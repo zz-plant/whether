@@ -8,15 +8,23 @@ const TEST_ROOT = path.resolve(TEST_ROOT_ARG);
 const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
 /*
  * The deploy gate runs inside the Cloudflare build container, which is smaller
- * than a dev machine. This repo already documents the consequence — vinext-run's
- * own comment notes "the flakiness in this repo is real: whetherCli tests fail
- * under CPU contention" — and the suite has grown past a thousand tests. Eight
- * workers and a 60s ceiling are tuned for a workstation, not for that box, where
- * they buy contention rather than speed.
+ * than a dev machine, and this repo documents the consequence — vinext-run's own
+ * comment notes "the flakiness in this repo is real: whetherCli tests fail under
+ * CPU contention". So the gate gets a longer per-test ceiling: slower to give up,
+ * which is the right trade for the only remote signal this repo has. Overridable,
+ * and it does not change a local run.
  *
- * So the gate gets conservative defaults: fewer workers, a longer ceiling. It is
- * slower and it is not flaky, which is the right trade for the only remote signal
- * this repo has. Both stay overridable, and neither changes a local run.
+ * It used to also drop `--max-concurrency` from 8 to 2, described here as "fewer
+ * workers". That was a misreading of the flag, and measuring it on 2026-09-03 said
+ * so: `--max-concurrency` bounds how many tests declared with `test.concurrent`
+ * run at once, and this suite declares none, so the value changed nothing. The
+ * same 20 files took 8.26s at 1 and 8.10s at 8. Bun runs every file in one
+ * process, sequentially, and exposes no worker count to lower — which is also why
+ * CLAUDE.md can say module state leaks between files. The knob is gone rather
+ * than re-tuned: a setting that reads as protection and provides none is worse
+ * than no setting, because it stops anyone looking for the real cause. The real
+ * contention here is `tests/whetherCli.test.ts` spawning 62 Node processes while
+ * lint and tsc share the same cores, and no test-runner flag reaches that.
  */
 const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1';
 const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? (inDeployGate ? "120000" : "60000");
@@ -194,7 +202,14 @@ if (excludeToolTests) {
 }
 
 const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, ...defaultTargets];
-const concurrency = process.env.BUN_TEST_CONCURRENCY ?? (inDeployGate ? '2' : '8');
+/*
+ * Passed only when someone asks for it. Bun's own default applies otherwise, and
+ * for a suite with no `test.concurrent` any value is inert either way — see the
+ * note at the top of this file. Kept readable so a future concurrent suite has
+ * the knob available.
+ */
+const concurrency = process.env.BUN_TEST_CONCURRENCY;
+const concurrencyArgs = concurrency ? [`--max-concurrency=${concurrency}`] : [];
 /*
  * `bun test` sets NODE_ENV=test only when nothing else has. A build container often
  * has — NODE_ENV=production is a common build variable — and then the suite runs in
@@ -227,7 +242,7 @@ const randomize = inDeployGate || process.env.BUN_TEST_RANDOMIZE === '1';
 const seed = process.env.BUN_TEST_SEED;
 const orderArgs = seed ? ['--randomize', `--seed=${seed}`] : randomize ? ['--randomize'] : [];
 
-const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, `--max-concurrency=${concurrency}`, ...orderArgs, ...targetArgs], {
+const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...targetArgs], {
   stdio: 'inherit',
   env: childEnv,
 });

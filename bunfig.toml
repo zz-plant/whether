@@ -1,0 +1,7 @@
+# Preloaded for every `bun test`, including a bare one that bypasses
+# scripts/run-tests.mjs. The guard blocks outbound network from the suite: see
+# scripts/test-network-guard.ts for what that bought (49.3s -> 13.7s) and, more
+# importantly, why a suite that inherits the network gives a different answer in
+# Cloudflare's container than in a sandbox.
+[test]
+preload = ["./scripts/test-network-guard.ts"]

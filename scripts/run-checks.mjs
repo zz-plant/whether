@@ -19,6 +19,8 @@
 import { spawn } from "node:child_process";
 import { availableParallelism } from "node:os";
 
+import { recordPassedChecks } from "./check-gate-marker.mjs";
+
 const TASKS = [
   { name: "lint", script: "lint" },
   { name: "typecheck", script: "typecheck" },
@@ -183,6 +185,19 @@ if (serial) {
 
 const failed = results.filter((result) => !result.ok);
 const notRun = selected.length - results.length;
+
+/*
+ * Inside the deploy gate, leave a note of what passed so `vinext-run build` does not
+ * repeat it. `check:vinext` is the outer gate and the build is reached afterwards;
+ * until 2026-09-03 both ran the same five checks against the same commit. See
+ * scripts/check-gate-marker.mjs for why the inner gate is skipped rather than deleted.
+ */
+if (process.env.WHETHER_DEPLOY_GATE === "1") {
+  const passed = results.filter((result) => result.ok).map((result) => result.task.name);
+  if (passed.length > 0 && recordPassedChecks(passed)) {
+    process.stdout.write(`[run-checks] recorded for this commit: ${passed.join(", ")}\n`);
+  }
+}
 
 process.stdout.write(
   `\n${failed.length === 0 ? "All checks passed" : `${failed.length} check(s) failed: ${failed.map((r) => r.task.name).join(", ")}`}` +
