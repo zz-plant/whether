@@ -37,7 +37,7 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 - Build: `bun run build`
 - Full checks: `bun run check`
 - Lint: `bun run lint`
-- Tests: `bun run test` (full suite, ~50s)
+- Tests: `bun run test` (full suite, ~14s — it runs offline; see CLAUDE.md)
 - CI: `.github/workflows/ci.yml` — runs lint, typecheck, test on push/PR to main
 
 Use targeted tests when possible before running full checks:
@@ -45,7 +45,7 @@ Use targeted tests when possible before running full checks:
 - `bun run test tests/homeBriefModel.test.ts` — one file (~0.2s)
 - `bun run test -t "reversal trigger"` — filter by test name across the suite
 
-Iterate with a targeted test plus `bun run typecheck` (~9s); save `bun run check` (~40s) for pre-merge.
+Iterate with a targeted test plus `bun run typecheck` (~6s); save `bun run check` (~50s) for pre-merge.
 
 ## Architectural invariants
 
@@ -55,7 +55,9 @@ Iterate with a targeted test plus `bun run typecheck` (~9s); save `bun run check
 - **Materialized model includes history**: `MaterializedSignalReadModel.recentHistory` stores the trailing 92-day window per signal key, built at write time. The read path (`loadCanonicalReportInputs`) avoids scanning raw snapshot keys when `recentHistory` is present.
 - **Monthly regime history reads stay synchronous**: `getMonthlyRegimeHistory()` is called from `buildHomeBriefModelInternal`, which is sync and runs under the report read path's deadline. The cron writes the month in progress to KV (`summary:monthly-regime-history`); `loadReportData` primes that copy before assembly, bounded by a 1s deadline, and the snapshot bundled from `data/` is the floor whenever KV is empty, stale, or unreachable. Do not convert the reader to async to pick KV up — priming exists so that chain stays sync.
 - **`getDefaultIngestionStore` re-checks binding**: No longer permanently memoizes — if a binding becomes available after an earlier fallback, the store reinitializes. Selection order: the `IngestCoordinator` Durable Object when `WHETHER_INGEST_COORDINATOR=1` and its binding exist (a preview-lane trial; see `lib/ingestion/coordinatorStore.ts`), then KV, then the local file store. The KV store reads only KV; it no longer falls back to `.cache/ingestion`.
-- **Local gate enforced, remote gate on every push**: `.husky/pre-push` runs lint (oxlint), typecheck (TypeScript 7), test, assets, and the review hotspot preflight on every push; the deploy gate additionally runs the suite in randomized order. `.github/workflows/ci.yml` is `workflow_dispatch` only — the account stopped paying for Actions minutes — so nothing on GitHub blocks a merge. Cloudflare's build is the remaining remote signal, and it gates production too: Workers Builds runs `bun run check:vinext` — the deploy gate (lint, typecheck, the suite under `WHETHER_DEPLOY_GATE=1`, assets, then the landmark audit on its own) — on every push, `main` included, before anything is built or deployed. `scripts/vinext-run.mjs` additionally runs the same gate before `vinext build` on preview branches and skips it on `main`, so a pull request carries a real red or green and production is gated once. A failing test does block a deploy; CLAUDE.md records the two-gate history and why the earlier "production skips it" reading cost two days.
+- **Local gate enforced, remote gate on every push**: `.husky/pre-push` runs lint (oxlint), typecheck (TypeScript 7), test, assets, and the review hotspot preflight on every push; the deploy gate additionally runs the suite in randomized order. `.github/workflows/ci.yml` is `workflow_dispatch` only — the account stopped paying for Actions minutes — so nothing on GitHub blocks a merge. Cloudflare's build is the remaining remote signal, and it gates production too: Workers Builds runs `bun run check:vinext` — the deploy gate (lint, typecheck, the suite under `WHETHER_DEPLOY_GATE=1`, assets, then the landmark audit on its own) — on every push, `main` included, before anything is built or deployed. `scripts/vinext-run.mjs` guards `vinext build` on preview branches with the same list, but since 2026-09-03 it runs only what the outer command has not already proved for this commit (`scripts/check-gate-marker.mjs`), which on a normal build is nothing — the two gates were running the same five checks twice per pull-request push. A failing test does block a deploy; CLAUDE.md records the two-gate history, why the earlier "production skips it" reading cost two days, and why the inner gate is skipped by evidence rather than deleted.
+
+- **The test suite owns its upstreams**: `bunfig.toml` preloads `scripts/test-network-guard.ts`, so an outbound fetch from a test throws rather than leaving the box (loopback stays open). A test that needs data serves it — a fixture fetcher, or an assigned `globalThis.fetch`. This is what stops a suite from meaning one thing in Cloudflare's container, which reaches FRED, and another in a sandbox, which reaches nothing; it is also what took the suite from 49.3s to 13.7s.
 
 ---
 

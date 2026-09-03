@@ -3,8 +3,32 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { passedChecks } from "./check-gate-marker.mjs";
+
 /** The branch whose builds ship to production. */
 const PRODUCTION_BRANCH = "main";
+
+/**
+ * What must have passed before this build proceeds. The same list `check:vinext`
+ * runs, because they are the same gate reached from two directions — the build
+ * command, and the deploy command that lands here afterwards. Exported so a test
+ * can compare it against the configured command without parsing this file.
+ */
+export const GATE_TASKS = ["lint", "typecheck", "test", "assets", "landmarks"];
+
+/**
+ * The gate tasks still owed for this commit.
+ *
+ * `check:vinext` records what it proved (scripts/check-gate-marker.mjs), so on a
+ * normal Workers build this is empty and the build starts immediately instead of
+ * repeating a minute of checks the outer command has already run against the same
+ * tree. Anything the marker does not cover is still run here, so a build reached
+ * some other way is gated exactly as it was before.
+ */
+export function outstandingChecks(alreadyPassed = passedChecks()) {
+  const proven = new Set(alreadyPassed);
+  return GATE_TASKS.filter((task) => !proven.has(task));
+}
 
 /**
  * Whether a build should run the check suite before building.
@@ -87,21 +111,31 @@ function main() {
     console.log(`[vinext-run] check gate: ${gate.run ? "running" : "skipped"} — ${gate.reason}`);
 
     if (gate.run) {
-      // WHETHER_DEPLOY_GATE tells the test runner it is inside the deploy path,
-      // so it leaves out tests/tools/ — suites that drive external interpreters
-      // the build image does not guarantee — and drops to conservative worker and
-      // timeout defaults, because this container is smaller than a dev machine
-      // (see scripts/run-tests.mjs). Those tests still run on every
-      // `bun run check` and on pre-push; what they must not do is block a deploy
-      // over a dependency that cannot affect the built artifact.
-      const checks = spawnSync("bun", ["scripts/run-checks.mjs", "lint", "typecheck", "test", "assets", "landmarks"], {
-        env: { ...process.env, WHETHER_DEPLOY_GATE: "1" },
-        stdio: "inherit",
-      });
+      const outstanding = outstandingChecks();
 
-      if (checks.status !== 0) {
-        console.error("[vinext-run] checks failed — not building.");
-        process.exit(checks.status ?? 1);
+      if (outstanding.length === 0) {
+        console.log(
+          `[vinext-run] check gate: already proved ${GATE_TASKS.join(", ")} for this commit — not repeating them.`,
+        );
+      } else {
+        console.log(`[vinext-run] check gate: running ${outstanding.join(", ")}.`);
+
+        // WHETHER_DEPLOY_GATE tells the test runner it is inside the deploy path,
+        // so it leaves out tests/tools/ — suites that drive external interpreters
+        // the build image does not guarantee — and gives each test a longer
+        // ceiling, because this container is smaller than a dev machine (see
+        // scripts/run-tests.mjs). Those tests still run on every `bun run check`
+        // and on pre-push; what they must not do is block a deploy over a
+        // dependency that cannot affect the built artifact.
+        const checks = spawnSync("bun", ["scripts/run-checks.mjs", ...outstanding], {
+          env: { ...process.env, WHETHER_DEPLOY_GATE: "1" },
+          stdio: "inherit",
+        });
+
+        if (checks.status !== 0) {
+          console.error("[vinext-run] checks failed — not building.");
+          process.exit(checks.status ?? 1);
+        }
       }
     }
   }

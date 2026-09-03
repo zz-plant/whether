@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { GATE_TASKS, outstandingChecks } from "../scripts/vinext-run.mjs";
 
 /**
  * What the deploy gate is allowed to run.
@@ -41,9 +42,24 @@ describe("deploy gate test scope", () => {
   });
 
   it("still runs the tool suite outside the gate", async () => {
-    // The rule this protects: excluded from the deploy path, not from the repo.
+    /*
+     * The rule this protects: tests/tools/ is excluded from the deploy path, not from
+     * the repo. The exclusion keys off WHETHER_DEPLOY_GATE in the *spawned* runner, so
+     * what must never happen is `bun run check` putting that variable into a child's
+     * environment. This used to assert the file never mentions the name at all, which
+     * is a different and larger claim: run-checks.mjs now reads the variable to decide
+     * whether to record what passed, and reading it cannot rescope anything.
+     */
     const checks = await readFile("scripts/run-checks.mjs", "utf8");
-    assert.ok(!checks.includes("WHETHER_DEPLOY_GATE"), "bun run check must not inherit the exclusion");
+    assert.doesNotMatch(
+      checks,
+      /WHETHER_DEPLOY_GATE\s*[:=]\s*["'`]?1/,
+      "bun run check must not set the gate signal for the children it spawns",
+    );
+    assert.ok(
+      checks.includes('process.env.WHETHER_DEPLOY_GATE === "1"'),
+      "reading the signal is how the marker stays scoped to the deploy path",
+    );
   });
 
   /*
@@ -73,30 +89,61 @@ describe("deploy gate test scope", () => {
     assert.match(command, /assets && WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs landmarks$/);
   });
 
-  it("runs the same tasks as the inner build gate", async () => {
+  it("requires the same tasks as the configured build command", async () => {
     const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
-    const gate = await readFile("scripts/vinext-run.mjs", "utf8");
-    const innerTasks = gate.match(/run-checks\.mjs",\s*((?:"[a-z-]+",?\s*)+)\]/)?.[1] ?? "";
-    const inner = [...innerTasks.matchAll(/"([a-z-]+)"/g)].map((match) => match[1]).sort();
-    const outer = (packageJson.scripts?.["check:vinext"] ?? "").split(/\s+/).filter((word) => /^[a-z-]+$/.test(word) && word !== "bun").sort();
+    const outer = (packageJson.scripts?.["check:vinext"] ?? "")
+      .split(/\s+/)
+      .filter((word) => /^[a-z-]+$/.test(word) && word !== "bun")
+      .sort();
 
-    assert.deepEqual(outer, inner);
+    assert.deepEqual(outer, [...GATE_TASKS].sort());
+  });
+
+  /*
+   * The two gates are the same gate reached from two directions: Workers Builds runs
+   * `check:vinext`, then runs the deploy command, which reaches `vinext-run build`.
+   * Until 2026-09-03 that second arrival re-ran all five checks against the tree the
+   * first had just proved — about a minute of repeated work on every pull-request push,
+   * and no signal, because a check that just passed cannot fail. It is skipped by
+   * evidence rather than deleted: `check:vinext` records what it proved for the commit,
+   * and only what that record covers is skipped, so a build reached without the outer
+   * command is gated exactly as it was.
+   */
+  it("skips only the checks a record proves for this very commit", () => {
+    assert.deepEqual(outstandingChecks(GATE_TASKS), []);
+    assert.deepEqual(outstandingChecks([]), GATE_TASKS);
+    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "landmarks"]);
   });
 });
 
 describe("deploy gate resource defaults", () => {
-  it("runs fewer workers and allows longer tests inside the gate", async () => {
+  it("allows longer tests inside the gate", async () => {
     // The build container is smaller than a dev machine, and this repo already
-    // documents that its suite fails under CPU contention. Defaults tuned for a
-    // workstation buy contention there, not speed.
+    // documents that its suite fails under CPU contention. Slower to give up is the
+    // right trade for the only remote signal this repo has.
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
-    assert.match(runner, /inDeployGate \? '2' : '8'/);
     assert.match(runner, /inDeployGate \? "120000" : "60000"/);
   });
 
-  it("leaves both overridable, so a slow box can be tuned without a code change", async () => {
+  /*
+   * The gate used to also drop `--max-concurrency` from 8 to 2 and call it "fewer
+   * workers". Measured on 2026-09-03, the same 20 files took 8.26s at 1 and 8.10s at
+   * 8: the flag bounds `test.concurrent` tests, this suite declares none, and bun runs
+   * every file in one process either way. A setting that reads as protection and
+   * provides none is worse than no setting, because it stops anyone looking for the
+   * real cause — here, whetherCli spawning 62 Node processes beside lint and tsc.
+   */
+  it("does not pretend to bound workers bun does not have", async () => {
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
-    assert.ok(runner.includes("process.env.BUN_TEST_CONCURRENCY ??"));
+    // No hard-coded default either way: the flag reaches bun only when someone asks
+    // for it by name, so nothing in this repo claims a protection it does not provide.
+    assert.doesNotMatch(runner, /inDeployGate \? '2' : '8'/);
+    assert.match(runner, /const concurrency = process\.env\.BUN_TEST_CONCURRENCY;/);
+    assert.match(runner, /concurrency \? \[`--max-concurrency=\$\{concurrency\}`\] : \[\]/);
+  });
+
+  it("leaves the ceiling overridable, so a slow box can be tuned without a code change", async () => {
+    const runner = await readFile("scripts/run-tests.mjs", "utf8");
     assert.ok(runner.includes("process.env.BUN_TEST_TIMEOUT_MS ??"));
   });
 

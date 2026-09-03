@@ -19,6 +19,7 @@
  *   node scripts/check-main-content-landmarks.mjs --no-dev    # require a running server
  */
 import process from "node:process";
+import { availableParallelism } from "node:os";
 
 import {
   auditMainContentRoutes,
@@ -48,7 +49,20 @@ const baseUrl = readArgValue("--base-url", DEFAULT_BASE_URL);
  */
 const inDeployGate = process.env.WHETHER_DEPLOY_GATE === "1";
 const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", inDeployGate ? "180000" : "90000"), 10);
-const concurrency = Number.parseInt(readArgValue("--concurrency", "4"), 10);
+/*
+ * Route fetches are mostly waiting: the dev server compiles each route on demand and
+ * this process does nothing while it does. A flat 4 left most of a bigger box idle —
+ * measured on 2026-09-03, the 40-route audit took 51.8s at 4 and 33.0s at 8 on four
+ * cores, and 12 bought nothing more (32.7s), because what is left is the server's
+ * cold start and Vite's own compile rather than anything more requests can overlap.
+ *
+ * So: twice the cores, capped at 8, floored at the old 4. A two-core build container
+ * lands on 4 and behaves exactly as it did — which matters, because this check runs
+ * where a route that compiles slowly must not read as a route that never answered.
+ * Only a box with cores to spare goes faster. Still overridable by flag.
+ */
+const defaultConcurrency = Math.min(8, Math.max(4, availableParallelism() * 2));
+const concurrency = Number.parseInt(readArgValue("--concurrency", String(defaultConcurrency)), 10);
 // Separate from --timeout-ms, which bounds dev-server readiness rather than a
 // single route. Tunable so a slow container can be given room without editing code.
 const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", inDeployGate ? "60000" : "30000"), 10);

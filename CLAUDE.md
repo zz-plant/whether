@@ -10,11 +10,11 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~40s | 1,100+ tests / 205 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run test` | ~14s | 1,180+ tests / 211 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
-| `bun run check` | ~40s | lint + typecheck + test + assets + audit + preflight, concurrently. Pre-merge only. |
+| `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
@@ -67,6 +67,23 @@ deploys every push, which is the only remote gate left.
   `BUN_TEST_SEED=<n> bun run test` replays the container's order locally. The runner also strips
   `FRED_API_KEY` and `ALPHA_VANTAGE_API_KEY` from the suite's environment, so a key in a shell
   cannot route a fixture-driven test to a real upstream.
+- **The suite runs offline.** `bunfig.toml` preloads `scripts/test-network-guard.ts` for every
+  `bun test`, and an outbound fetch throws instead of leaving the box; loopback stays open, because
+  `tests/whetherCli.test.ts` starts its own server. This is the same argument as the stripped API
+  keys one line up, taken to its end: a result that depends on what the environment happens to
+  allow is not a result about the code. Measured 2026-09-03, it took the suite from **49.3s to
+  13.7s** with all 1169 tests still passing — not one needed the network. Three files held ~18s
+  between them (`/api/health` 8.5s → 0.4s, `whetherClientSdk` 5.3s → 0.4s, `mcpCommitmentLinter`
+  4.8s → 0.4s), every second of it spent on FRED reads nothing asserted against. Serve an upstream
+  with a fixture fetcher (`fixtureFetch` in `tests/architectureInvariants.test.ts`) or by assigning
+  `globalThis.fetch`; to exercise a real one on purpose, `WHETHER_TEST_ALLOW_NETWORK=1`.
+- **`--max-concurrency` was never a worker count.** The runner used to pass 8 locally and 2 in the
+  gate and call it "fewer workers". It bounds `test.concurrent` tests, this suite declares none,
+  and bun runs every file in one process regardless: the same 20 files took 8.26s at 1 and 8.10s
+  at 8. The knob is gone rather than re-tuned — a setting that reads as protection and provides
+  none stops anyone looking for the real cause. The real contention is `tests/whetherCli.test.ts`
+  spawning 62 Node processes, which no runner flag reaches. `BUN_TEST_CONCURRENCY` is still
+  honoured when set explicitly; nothing sets it.
 - **Zod is pinned to 4.4.3.** 4.5.x changes schema types in a way `@modelcontextprotocol/sdk`
   1.30's tool registration does not accept (`ZodString` is not assignable to its `AnySchema`);
   `scripts/mcp/whether-mcp-server.ts` stops typechecking. Revisit with the MCP SDK v2 migration.
@@ -159,9 +176,10 @@ container in three ways, and the deploy-gate rules this repo already had never r
 suite ran with workstation defaults (8 workers, 60s ceiling) on a box where this repo documents
 those defaults as flaky; `tests/tools/` ran, which shells out to `python3` the build image does not
 guarantee; and `audit` (network) and `hotspot-preflight` (git history) ran where neither has what it
-needs. `WHETHER_DEPLOY_GATE=1` is what switches `scripts/run-tests.mjs` to 2 workers, a 120s
-ceiling, and no `tests/tools/`, and what gives the landmark audit's readiness and per-route bounds
-room for a cold start (180s / 60s instead of 90s / 30s). The runner also pins `NODE_ENV=test` for the
+needs. `WHETHER_DEPLOY_GATE=1` is what switches `scripts/run-tests.mjs` to a 120s
+ceiling and no `tests/tools/`, and what gives the landmark audit's readiness and per-route bounds
+room for a cold start (180s / 60s instead of 90s / 30s). (It also used to drop to "2 workers";
+see the toolchain note above for why that never did anything.) The runner also pins `NODE_ENV=test` for the
 suite it spawns: `bun test` only defaults it when unset, and a build container that sets
 `NODE_ENV=production` runs the suite in production mode, where `programmaticPayloadBuilder` stops
 relaxing its freshness contract and fails on fallback data. Those rules had only ever applied inside
@@ -177,6 +195,21 @@ there are *two* gates. `scripts/vinext-run.mjs` does skip lint/typecheck/test/as
 production branch, and still logs which way it went (`[vinext-run] check gate: …`) — but that gate
 guards `vinext-run build`, which CI only reaches *after* `bun run check` has already passed. The
 inner gate never decides whether a deploy happens.
+
+**The inner gate no longer repeats the outer one (2026-09-03).** Both were deliberate and each was
+documented on its own; nothing recorded that on a preview build the second could never fail, because
+the first had just passed on the same tree. It was the most expensive thing in the build — roughly a
+minute of lint, typecheck, suite, assets and landmarks re-run on every pull-request push, for no
+signal. Deleting the inner gate would have fixed the waste and given up the guarantee: the build
+command lives in the Cloudflare dashboard, so no test here can prove it still names `check:vinext`,
+and "a gate that quietly stops running is worse than no gate at all" is a rule this repo has already
+paid to learn. So the inner gate is skipped **by evidence**: `run-checks.mjs` under
+`WHETHER_DEPLOY_GATE=1` records which checks passed for the current commit
+(`scripts/check-gate-marker.mjs`, into gitignored `.cache/check-gate/`), and `vinext-run build` runs
+whichever of `GATE_TASKS` that record does not cover — all five, if the dashboard command ever stops
+writing one. The record is refused for a dirty tree, for another commit, and after six hours, so
+every way it can go wrong costs a repeated run rather than a skipped gate. The build log says which
+way it went.
 
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
@@ -199,7 +232,9 @@ cold store against the real network, so it passed here and failed every containe
 2026-08-30 to 2026-09-02 — the earlier tests had ingested a rates-only model into `.cache/ingestion`,
 the KV store read it through a file fallback it no longer has, and the read took the refresh lock.
 A test about writes has to serve its own upstreams (see `readWithStore` in
-`tests/architectureInvariants.test.ts`).
+`tests/architectureInvariants.test.ts`). Since 2026-09-03 that is the default rather than something
+each test must remember: the suite runs offline (see "The suite runs offline" above), so the
+container and a sandboxed session now see the same upstreams — none — unless a test serves its own.
 
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.

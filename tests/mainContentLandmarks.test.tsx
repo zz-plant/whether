@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
+import { GATE_TASKS } from "../scripts/vinext-run.mjs";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { ContentPageShell } from "../app/components/ui/contentPageShell";
@@ -119,14 +120,37 @@ describe("fetch-based main-content guard", () => {
     const runChecks = readFileSync(new URL("../scripts/run-checks.mjs", import.meta.url), "utf8");
     const prePush = readFileSync(new URL("../.husky/pre-push", import.meta.url), "utf8");
     const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
-    const previewBuild = readFileSync(new URL("../scripts/vinext-run.mjs", import.meta.url), "utf8");
 
     assert.match(packageJson, /"check:landmarks":\s*"node scripts\/check-main-content-landmarks\.mjs"/);
     assert.match(runChecks, /name: "landmarks", script: "check:landmarks"/);
     assert.match(prePush, /run-checks\.mjs[^\n]*\blandmarks\b/);
     assert.match(workflow, /run-checks\.mjs[^\n]*\blandmarks\b/);
-    assert.match(previewBuild, /run-checks\.mjs[^\n]*\blandmarks\b/);
+    // The preview build names its checks in GATE_TASKS rather than in the spawn call:
+    // it runs whichever of them `check:vinext` has not already proved for this commit.
+    assert.ok(GATE_TASKS.includes("landmarks"), "the preview build gate no longer requires landmarks");
     // The command Workers Builds is configured to run, on every push including main.
     assert.match(packageJson, /"check:vinext":\s*"[^"]*run-checks\.mjs[^"]*\blandmarks\b[^"]*"/);
+  });
+
+  /*
+   * The audit is mostly waiting: the dev server compiles each route on demand and this
+   * process does nothing meanwhile. A flat concurrency of 4 left most of a bigger box
+   * idle — measured on 2026-09-03, 40 routes took 51.8s at 4 and 33.0s at 8 on four
+   * cores, with 12 buying nothing further. What must not change is the small container:
+   * this check runs where a route that compiles slowly must not read as one that never
+   * answered, so two cores still land on the 4 that was always there.
+   */
+  it("scales its route concurrency with the box, never below the old default", () => {
+    const audit = readFileSync(new URL("../scripts/check-main-content-landmarks.mjs", import.meta.url), "utf8");
+    assert.match(audit, /Math\.min\(8, Math\.max\(4, availableParallelism\(\) \* 2\)\)/);
+
+    const defaultFor = (cores: number) => Math.min(8, Math.max(4, cores * 2));
+    assert.equal(defaultFor(1), 4);
+    assert.equal(defaultFor(2), 4);
+    assert.equal(defaultFor(4), 8);
+    assert.equal(defaultFor(16), 8);
+
+    // Still overridable, so a box that disagrees needs no code change.
+    assert.match(audit, /readArgValue\("--concurrency", String\(defaultConcurrency\)\)/);
   });
 });
