@@ -145,11 +145,16 @@ export const getRegimeDisplayLabel = ({
   confidence?: RegimeConfidenceLabel | "MEDIUM";
   transitionWatch?: boolean;
 }) => {
+  // The label is the weather name, full stop. This used to return "Contraction",
+  // "Transitional Mixed" and "Guarded Expansion" — a third vocabulary for a state
+  // the hero already called Cloudy, Stormy or Sunny. The modifier survives as data
+  // for callers that want to qualify the name; the regime's stage (Early/Mid/Late,
+  // Fragile) already carries what "guarded" used to say on screen.
   if (regime === "VOLATILE") {
     return {
       canonicalRegime: regime,
       modifier: "Transitional" as const,
-      label: "Transitional Mixed",
+      label: REGIME_WEATHER_LABELS[regime],
     };
   }
 
@@ -157,7 +162,7 @@ export const getRegimeDisplayLabel = ({
     return {
       canonicalRegime: regime,
       modifier: null,
-      label: "Contraction",
+      label: REGIME_WEATHER_LABELS[regime],
     };
   }
 
@@ -170,7 +175,7 @@ export const getRegimeDisplayLabel = ({
   return {
     canonicalRegime: regime,
     modifier: guardedExpansion ? ("Guarded" as const) : null,
-    label: guardedExpansion ? "Guarded Expansion" : "Expansion",
+    label: REGIME_WEATHER_LABELS[regime],
   };
 };
 

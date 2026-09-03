@@ -252,7 +252,6 @@ app/
     ├── DecisionHero.tsx              # Primary weekly decision card + shortcuts
     ├── CadenceCallCard.tsx           # Monthly/quarterly lead for the cadence selector
     ├── ThresholdProximityBar.tsx     # Visual tightening buffer indicator
-    ├── DeveloperQuickAccess.tsx      # Inline MCP/API popover
     ├── commandPalette.tsx            # Cmd+K palette
     └── KeyboardShortcuts.tsx         # Global keyboard handlers
 ```

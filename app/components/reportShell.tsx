@@ -169,7 +169,11 @@ export const ReportShell = (props: ReportShellProps) => {
   const resolvedPrimaryCta =
     inputPrimaryCta ?? (resolvedCurrentPath === "/" ? undefined : { href: "#weekly-action-summary", label: "This week" });
   const resolvedExportCta = inputExportCta ?? null;
-  const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
+  // Only a historical selection has a refresh state worth a label. The live
+  // masthead used to add "15m cadence" beside the decision date and the refresh
+  // timestamp — a third time marker, advertising a poll interval on a product
+  // whose whole premise is a Monday call.
+  const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : undefined);
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
   /*
@@ -206,7 +210,7 @@ export const ReportShell = (props: ReportShellProps) => {
   const trustReadiness = resolveTrustReadinessCopy({
     trustStatusTone: resolvedTrustStatusTone,
     degradedSourceRows: resolvedDegradedSourceRows,
-    trustStatusDetail: resolvedTrustStatusDetail,
+    isFallbackSnapshot: resolvedShowOfflineBadge,
   });
   const controlHeadline = trustReadiness.headline;
   const trustStatusDetailForDisplay = resolvedTrustStatusDetail;

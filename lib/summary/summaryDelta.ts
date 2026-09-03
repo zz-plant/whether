@@ -51,7 +51,9 @@ const buildConstraintSummary = (added: string[], removed: string[]) => {
   return `${formatCountLabel(removed.length, "constraint")} removed`;
 };
 
-const buildProvenanceBullet = (delta: SummaryDelta["provenance"], ageLabel: string) => {
+const buildProvenanceBullet = (delta: SummaryDelta["provenance"], rawAgeLabel: string) => {
+  // The age label arrives sentence-terminated ("14h."); this bullet supplies its own period.
+  const ageLabel = rawAgeLabel.replace(/\.$/, "");
   if (delta.ageDeltaHours === null) {
     const statusSuffix = delta.statusChanged
       ? `; confidence now ${delta.monthlyStatusLabel}`

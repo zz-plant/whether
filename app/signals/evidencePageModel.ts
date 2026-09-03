@@ -168,10 +168,10 @@ export const buildSignalsPageModel = async (
       "Hold major decisions until live signals return or you validate the cache.",
     stableAction: "Evidence is live with current thresholds and timestamps.",
   });
-  const nextRefreshLabel = historicalSelection ? "Fixed historical snapshot" : "15m cadence";
+  const nextRefreshLabel = historicalSelection ? "Fixed historical snapshot" : undefined;
   const freshnessSummaryLabel = historicalSelection
     ? `Historical snapshot fixed at ${recordDateLabel}.`
-    : `Decision as-of ${recordDateLabel}; live data refreshed ${fetchedAtLabel}. Next refresh ${nextRefreshLabel}.`;
+    : `Decision as-of ${recordDateLabel}; live data refreshed ${fetchedAtLabel}.`;
   const decisionDeltaLabel = historicalSelection
     ? "Historical snapshot for review only — switch to live data before approving new bets."
     : isFallback

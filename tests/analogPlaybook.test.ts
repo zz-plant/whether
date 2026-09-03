@@ -45,8 +45,14 @@ describe("analogPlaybook", () => {
 
     assert.equal(playbook.analogPeriod, "Q3 2007");
     assert.ok(playbook.correlationScore >= 80);
-    assert.ok(playbook.consensusTrap.includes("What peer startups got wrong"));
-    assert.ok(playbook.winningMove.includes("What top performers executed"));
+    assert.equal(playbook.referenceCycleCount, 4);
+    assert.deepEqual(
+      playbook.matchBasis.map((item) => item.key),
+      ["baseRate", "curveSlope", "tightness", "riskAppetite"],
+    );
+    assert.equal(playbook.matchBasis[0]?.now, 5.25);
+    assert.doesNotMatch(playbook.consensusTrap, /^What peer startups got wrong/);
+    assert.match(playbook.consensusTrap, /Expanded enterprise direct sales headcount/);
     assert.ok(playbook.reversalMarker.includes("Yield curve"));
   });
 });

@@ -70,8 +70,8 @@ describe("reportFormatting regime signal helpers", () => {
 
     assert.deepEqual(formatted, {
       action: "Prioritize revenue-linked hiring lanes",
-      threshold: "net-new hiring if tightness > 76 or risk appetite < 44",
-      reversal: "staged approvals when tightness < 66 and risk appetite > 54",
+      threshold: "Tightness > 76 or risk appetite < 44",
+      reversal: "Tightness < 66 and risk appetite > 54",
     });
   });
 

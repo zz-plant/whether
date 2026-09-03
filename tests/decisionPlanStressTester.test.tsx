@@ -81,8 +81,8 @@ describe("DecisionPlanStressTester & StagePersonaSelector", () => {
 
     assert.ok(html.includes("Plan stress test"));
     assert.ok(html.includes("Stress-Test Plan"));
-    assert.ok(html.includes("Seed / Discovery"));
-    assert.ok(html.includes("Series A / Growth"));
+    assert.ok(html.includes(">Seed<"));
+    assert.ok(html.includes(">Series A<"));
     assert.ok(html.includes("72/100"));
   });
 

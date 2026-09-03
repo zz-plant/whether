@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { Menu as MenuIcon } from "lucide-react";
 import { Drawer } from "@base-ui/react/drawer";
 import {
+  resolveGlobalHeaderLoopLinks,
   resolveGlobalHeaderRouteLabel,
   resolveGlobalHeaderNavigationLinks,
   type GlobalHeaderNavigationLink,
@@ -153,8 +154,11 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
     () => resolveGlobalHeaderNavigationLinks(resolvedPathname),
     [resolvedPathname],
   );
+  const loopLinks = useMemo(
+    () => resolveGlobalHeaderLoopLinks(resolvedPathname),
+    [resolvedPathname],
+  );
   const activeRouteLabel = resolveGlobalHeaderRouteLabel(resolvedPathname);
-  const isApiActive = pathMatchesLink("/api-docs", resolvedPathname);
 
   return (
     <>
@@ -171,33 +175,28 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         <span className="hidden min-[400px]:inline">{activeRouteLabel}</span>
       </button>
 
+      {/* The operator loop, in IA order. Supporting layers hide below lg so the
+          header keeps its width at md; the brief stays at every size. The API
+          link that used to sit here is a developer destination on a founder
+          product — it lives under More as "API & MCP". */}
       <nav aria-label="Primary" className="hidden md:flex items-center gap-1.5">
-        {navigationLinks.map((link) => (
+        {loopLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             aria-current={link.isActive ? "page" : undefined}
-            className={`rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center focus-visible:outline-2 focus-visible:outline-sky-400 ${
+            className={`rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 items-center focus-visible:outline-2 focus-visible:outline-sky-400 ${
+              link.tier === "primary" ? "flex" : "hidden lg:flex"
+            } ${
               link.isActive
                 ? "bg-sky-500/20 text-sky-100 font-bold border border-sky-400/50"
                 : "text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
             }`}
           >
-            <span>{link.label}</span>
+            <span>{link.tier === "primary" ? link.label : (link.navLabel ?? link.label)}</span>
           </Link>
         ))}
         <span className="mx-1 h-4 w-px bg-slate-800" aria-hidden="true" />
-        <Link
-          href="/api-docs"
-          aria-current={isApiActive ? "page" : undefined}
-          className={`rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center focus-visible:outline-2 focus-visible:outline-sky-400 ${
-            isApiActive
-              ? "bg-sky-500/20 text-sky-100 font-bold border border-sky-400/50"
-              : "text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
-          }`}
-        >
-          <span>API</span>
-        </Link>
         {/* Utility links surfaced one level up instead of buried in the mobile
             drawer or footer: SaaS multiples, macro analogs, framework, template,
             pricing. Kept native (details) so it works without JS and costs nothing

@@ -10,18 +10,49 @@ import type {
   ReportDynamics,
   ReportEvidenceItem,
 } from "./reportDataTypes";
+import type { RegimeKey } from "../regimeEngine";
+
+type WeeklyTone = "tightening" | "easing" | "holding";
+
+// The headline is the week's direction applied to the regime's posture. It used
+// to ignore the regime, so a Sunny week that softened a little read "freeze new
+// commitments" above a card that said scale proven bets — the two surfaces
+// disagreed about the same call. Direction picks the row; regime picks the verb.
+const ACTION_NOW_BY_REGIME: Record<RegimeKey, Record<WeeklyTone, string>> = {
+  EXPANSION: {
+    tightening: "Conditions tightening — keep proven bets moving, but stage anything new.",
+    easing: "Conditions easing — scale proven bets with milestone gates.",
+    holding: "Conditions holding — keep scaling proven bets at the current pace.",
+  },
+  VOLATILE: {
+    tightening: "Conditions tightening — keep only reversible bets and cap concurrent experiments.",
+    easing: "Conditions easing — reopen staged bets one tranche at a time.",
+    holding: "Conditions holding — run reversible bets with named rollback owners.",
+  },
+  DEFENSIVE: {
+    tightening: "Conditions tightening — freeze new commitments and keep spend flexible.",
+    easing: "Conditions easing — resume paused work with clear milestones.",
+    holding: "Conditions holding — continue at current pace with measurable outcomes.",
+  },
+  SCARCITY: {
+    tightening: "Conditions tightening — freeze new commitments and protect runway.",
+    easing: "Conditions easing — resume paused work with clear milestones.",
+    holding: "Conditions holding — hold spend flat and require short paybacks.",
+  },
+};
 
 export const buildActionNowShort = ({
   directionLabel,
   regimeChanged,
-}: Pick<ReportDynamics, "directionLabel" | "regimeChanged">): string => {
-  if (regimeChanged || directionLabel === "deteriorating") {
-    return "Conditions tightening — freeze new commitments and keep spend flexible.";
-  }
-  if (directionLabel === "improving") {
-    return "Conditions easing — resume paused work with clear milestones.";
-  }
-  return "Conditions holding — continue at current pace with measurable outcomes.";
+  regime = "DEFENSIVE",
+}: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & { regime?: RegimeKey }): string => {
+  const tone: WeeklyTone =
+    directionLabel === "improving"
+      ? "easing"
+      : regimeChanged || directionLabel === "deteriorating"
+        ? "tightening"
+        : "holding";
+  return ACTION_NOW_BY_REGIME[regime][tone];
 };
 
 export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {

@@ -5,10 +5,29 @@
  */
 import type { RegimeAssessment } from "./regimeEngine";
 
+export type AnalogCoordinate = {
+  key: "baseRate" | "curveSlope" | "tightness" | "riskAppetite";
+  label: string;
+  /** The reference cycle's value. */
+  then: number;
+  /** The live value it was compared against. */
+  now: number;
+  unit: "%" | "pts";
+};
+
 export interface AnalogPlaybookResult {
   analogPeriod: string;
+  /**
+   * Nearness of the closest reference cycle on a 65–96 scale derived from the
+   * coordinate distance. Kept for API compatibility; it is not a measured
+   * correlation, and the site no longer renders it. Read `matchBasis`.
+   */
   correlationScore: number;
   regimeType: string;
+  /** How many reference cycles were compared. Four, hand-picked — say so. */
+  referenceCycleCount: number;
+  /** The four coordinates the match was made on, then vs now. */
+  matchBasis: AnalogCoordinate[];
   consensusTrap: string;
   winningMove: string;
   reversalMarker: string;
@@ -37,9 +56,9 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     tightness: 70,
     riskAppetite: 40,
     consensusTrap:
-      "What peer startups got wrong: Expanded enterprise direct sales headcount expecting a Q4 demand rebound; burned 35% of cash buffer with zero closed-won conversions as enterprise procurement timelines doubled.",
+      "Expanded enterprise direct sales headcount expecting a Q4 demand rebound; burned 35% of cash buffer with zero closed-won conversions as enterprise procurement timelines doubled.",
     winningMove:
-      "What top performers executed: Restructured pricing to 100% annual upfront cash collection with a 15% incentive; converted open engineering reqs to 6-month contract-to-hire.",
+      "Restructured pricing to 100% annual upfront cash collection with a 15% incentive; converted open engineering reqs to 6-month contract-to-hire.",
     reversalMarker:
       "Yield curve un-inversion past +0.25% combined with 2 consecutive months of tightening contraction signaled the safe expansion window.",
   },
@@ -52,9 +71,9 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     tightness: 62,
     riskAppetite: 35,
     consensusTrap:
-      "What peer startups got wrong: Froze all product releases and panicked on marketing spend right before the Fed pivoted to an easing pause.",
+      "Froze all product releases and panicked on marketing spend right before the Fed pivoted to an easing pause.",
     winningMove:
-      "What top performers executed: Accelerated core product velocity while competitors stalled; renegotiated annual cloud commits to monthly rolling tiers.",
+      "Accelerated core product velocity while competitors stalled; renegotiated annual cloud commits to monthly rolling tiers.",
     reversalMarker:
       "Fed pause announcement and Risk Appetite rising past 55 signaled the green light for aggressive GTM resumption.",
   },
@@ -67,9 +86,9 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     tightness: 78,
     riskAppetite: 28,
     consensusTrap:
-      "What peer startups got wrong: Maintained high gross burn assuming secondary venture funding rounds would remain available at 2021 valuation multiples.",
+      "Maintained high gross burn assuming secondary venture funding rounds would remain available at 2021 valuation multiples.",
     winningMove:
-      "What top performers executed: Cut non-essential vendor SaaS bloat immediately; extended runway beyond 24 months to bypass dilutive down-rounds entirely.",
+      "Cut non-essential vendor SaaS bloat immediately; extended runway beyond 24 months to bypass dilutive down-rounds entirely.",
     reversalMarker:
       "Stabilization of base rate hikes and tightness leveling off below 65.",
   },
@@ -82,9 +101,9 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     tightness: 25,
     riskAppetite: 85,
     consensusTrap:
-      "What peer startups got wrong: Hired indiscriminately without onboarding infrastructure, driving down per-employee productivity and ballooning fixed overhead.",
+      "Hired indiscriminately without onboarding infrastructure, driving down per-employee productivity and ballooning fixed overhead.",
     winningMove:
-      "What top performers executed: Raised multi-year capital reserves while cost of capital was near zero; locked in long-term enterprise anchor customers.",
+      "Raised multi-year capital reserves while cost of capital was near zero; locked in long-term enterprise anchor customers.",
     reversalMarker:
       "Initial inflation surge above 3.5% and yield curve flattening signaled the impending end of frictionless capital.",
   },
@@ -116,10 +135,19 @@ export function getHistoricalAnalogPlaybook(assessment: RegimeAssessment): Analo
 
   const correlation = Math.max(65, Math.min(96, Math.round(100 - lowestDistance * 0.4)));
 
+  const matchBasis: AnalogCoordinate[] = [
+    { key: "baseRate", label: "Base rate", then: bestMatch.baseRate, now: baseRate, unit: "%" },
+    { key: "curveSlope", label: "10Y−2Y slope", then: bestMatch.curveSlope, now: currentSlope, unit: "%" },
+    { key: "tightness", label: "Funding pressure", then: bestMatch.tightness, now: tightness, unit: "pts" },
+    { key: "riskAppetite", label: "Risk appetite", then: bestMatch.riskAppetite, now: riskAppetite, unit: "pts" },
+  ];
+
   return {
     analogPeriod: bestMatch.period,
     correlationScore: correlation,
     regimeType: bestMatch.regimeType,
+    referenceCycleCount: HISTORICAL_CYCLES.length,
+    matchBasis,
     consensusTrap: bestMatch.consensusTrap,
     winningMove: bestMatch.winningMove,
     reversalMarker: bestMatch.reversalMarker,

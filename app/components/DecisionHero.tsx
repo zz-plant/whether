@@ -21,12 +21,11 @@ import {
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
-import { CopySlackBriefButton } from "./CopySlackBriefButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { PresentModeButton } from "./PresentModeButton";
+import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 import type { MeetingSlidePayload } from "../../lib/export/meetingSlideExport";
 import { ThresholdProximityBar } from "./ThresholdProximityBar";
-import { DeveloperQuickAccess } from "./DeveloperQuickAccess";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
@@ -173,7 +172,7 @@ export function DecisionHero({
   const trendTone = boldnessDelta > 0 ? "easing" : boldnessDelta < 0 ? "tightening" : "unchanged";
 
   const isDegradedData = isFallback || (degradedCount && degradedCount > 0);
-  const dataStatus = isFallback ? "Snapshot" : degradedCount && degradedCount > 0 ? `${degradedCount} cached` : "Live";
+  const dataStatus = resolveDataStatusLabel({ isFallbackSnapshot: isFallback, degradedSourceCount: degradedCount ?? 0 });
 
   const isTreasuryUrl = treasurySource?.startsWith("http");
   const sourceNode = isTreasuryUrl ? (
@@ -338,7 +337,6 @@ export function DecisionHero({
                 ? DIRECTION_LABEL[signalDirection]
                 : `${DIRECTION_LABEL[signalDirection]} · ${boldnessDeltaLabel}`}
             </p>
-            <StagePersonaSelector activeStage={activeStage} className="pt-1.5" />
           </div>
 
         <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-span-2 sm:col-start-1 sm:row-start-2">
@@ -386,6 +384,12 @@ export function DecisionHero({
               </p>
             ) : null}
           </section>
+
+          {/* After the call and the reconsideration list, before the rules the
+              stage actually changes. It sat directly under the headline, which
+              put a four-way control between the sentence and the list that
+              explains it. */}
+          <StagePersonaSelector activeStage={activeStage} />
 
           {/* The chevron comes from the shared contract rather than a hand-rolled
               `after:content` pair, and the open state rides in `?why=1` so the
@@ -454,16 +458,11 @@ export function DecisionHero({
             </div>
           ) : null}
 
+          {/* One copy control per artifact. "Copy Brief" already produces the
+              Slack-formatted block (and hands off to the native share sheet where
+              there is one), so the separate Slack button duplicated it. */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <CopySlackBriefButton
-              weeklyCall={weeklyCall ?? postureLabel}
-              regime={regimeDisplay}
-              boldnessScore={boldnessScore}
-              recordDate={recordDate}
-              guardrail={guardrail}
-              reversalTrigger={reversalTrigger}
-              lines={shareLines}
-            />
+            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
             <CopyMeetingSlideButton
               payload={{
                 recordDate,
@@ -478,7 +477,6 @@ export function DecisionHero({
                 provenance: treasurySource ?? "U.S. Treasury",
               }}
             />
-            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
             <DecisionMemoryButton
               regime={regime}
               recordDate={recordDate}
@@ -514,11 +512,6 @@ export function DecisionHero({
               <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}</span>
               {trustStatusLabel ? <span className="hidden sm:inline">· {trustStatusLabel}</span> : null}
             </p>
-            <DeveloperQuickAccess
-              regime={regimeDisplay}
-              boldnessScore={boldnessScore}
-              weeklyCall={weeklyCall ?? postureLabel}
-            />
           </div>
         </div>
 

@@ -69,7 +69,7 @@ export type HeroTrustProvenanceBlockProps = {
   degradedSourceRows?: DegradedSourceRow[];
   statusLabel: string;
   fetchedAtLabel: string;
-  resolvedNextRefreshLabel: string;
+  resolvedNextRefreshLabel?: string;
   sourceLabel: string;
   sourceHref?: string;
   provenance?: DataProvenance;
@@ -153,7 +153,7 @@ export function HeroTrustProvenanceBlock({
         </div>
         <div className="text-right text-fluid-xs leading-5 text-slate-400">
           <p>Refreshed {fetchedAtLabel}</p>
-          <p>Next {resolvedNextRefreshLabel}</p>
+          {resolvedNextRefreshLabel ? <p>Next {resolvedNextRefreshLabel}</p> : null}
         </div>
       </div>
 
@@ -231,10 +231,12 @@ export function HeroTrustProvenanceBlock({
                   <dt className="text-slate-400">Data refreshed</dt>
                   <dd className="text-slate-200">{fetchedAtLabel}</dd>
                 </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Next refresh</dt>
-                  <dd className="text-slate-200">{resolvedNextRefreshLabel}</dd>
-                </div>
+                {resolvedNextRefreshLabel ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-slate-400">Next refresh</dt>
+                    <dd className="text-slate-200">{resolvedNextRefreshLabel}</dd>
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-slate-400">Source</dt>
                   <dd className="text-right text-slate-200">

@@ -196,14 +196,51 @@ const compactDecisionPhrase = ({
   return extractCompactClause(normalized, fallback);
 };
 
+const capitalizeFirst = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
+/**
+ * Rule sentences are written verb + object + condition ("Pause net-new hiring
+ * if funding pressure rises above 76"). Under a slot label that already carries
+ * the verb ("Pause if:", "Guardrail:") the object has to go too, or the row
+ * reads "Pause if: net-new hiring if funding pressure…". The object is named by
+ * the area heading the rule sits under, so only the condition survives here.
+ */
+const compactDecisionCondition = ({
+  value,
+  fallback,
+  verbPrefix,
+  conditionPrefix,
+}: {
+  value: string;
+  fallback: string;
+  verbPrefix: RegExp;
+  conditionPrefix: RegExp;
+}): string => {
+  const stripped = conditionPrefix.test(value)
+    ? value.replace(conditionPrefix, "")
+    : value.replace(verbPrefix, "");
+  const clause = extractCompactClause(stripped, fallback);
+  return clause === fallback ? clause : capitalizeFirst(clause);
+};
+
 export const formatDecisionAction = (value: string, fallback = boundedDecisionPhraseFallbacks.action): string =>
   compactDecisionPhrase({ value, fallback });
 
 export const formatDecisionThreshold = (value: string, fallback = boundedDecisionPhraseFallbacks.threshold): string =>
-  compactDecisionPhrase({ value, fallback, stripPrefix: /^Pause\s+/i });
+  compactDecisionCondition({
+    value,
+    fallback,
+    verbPrefix: /^Pause\s+/i,
+    conditionPrefix: /^Pause\s+(?:[^.;]*?\s+)?(?:if|when)\s+/i,
+  });
 
 export const formatDecisionReversal = (value: string, fallback = boundedDecisionPhraseFallbacks.reversal): string =>
-  compactDecisionPhrase({ value, fallback, stripPrefix: /^Resume\s+/i });
+  compactDecisionCondition({
+    value,
+    fallback,
+    verbPrefix: /^Resume\s+/i,
+    conditionPrefix: /^Resume\s+(?:[^.;]*?\s+)?(?:when|once|after|if)\s+/i,
+  });
 
 export const formatDecisionTriplet = ({
   action,

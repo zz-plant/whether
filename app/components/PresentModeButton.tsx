@@ -22,9 +22,6 @@ export function PresentModeButton({ className = "" }: Props) {
     >
       <Maximize2 size={13} className="text-slate-400" />
       <span className="hidden sm:inline">Present</span>
-      <kbd className="hidden lg:inline-block rounded border border-slate-700 px-1 py-0.2 text-[10px] font-mono text-slate-400">
-        F
-      </kbd>
     </button>
   );
 }

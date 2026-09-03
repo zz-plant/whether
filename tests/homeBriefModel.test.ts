@@ -100,7 +100,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.stageLabel, /Early|Mid|Late/);
     assert.equal(typeof model.stageFragile, "boolean");
     assert.match(model.postureWithStageLabel, /—/);
-    assert.equal(model.postureLabel, "Contraction");
+    assert.equal(model.postureLabel, "Cloudy");
     assert.equal(typeof model.confidencePercent, "number");
     assert.equal(typeof model.regimeHeader.regime, "string");
     assert.equal(typeof model.regimeHeader.confidence, "string");
@@ -315,7 +315,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.reversalTrigger, /(R|r)isk appetite falls to or below 50\.0 \(56\.0 today\)/i);
+    assert.match(model.reversalTrigger, /(R|r)isk appetite falls to or below 50 \(56 today\)/i);
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
@@ -422,7 +422,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
     assert.equal(mixedStabilization.stageLabel, "Mid");
-    assert.equal(mixedStabilization.postureLabel, "Transitional Mixed");
+    assert.equal(mixedStabilization.postureLabel, "Stormy");
 
     const scarcityRecovery = buildHomeBriefModel({
       assessment: {
@@ -480,7 +480,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.postureLabel, /Contraction|Transition|Expansion/i);
+    assert.match(model.postureLabel, /Freezing|Cloudy|Stormy|Sunny/);
     assert.match(model.operatingStanceLine, /posture|operate|approval/i);
     assert.doesNotMatch(model.netConstraintSummary, /climate stance/i);
   });

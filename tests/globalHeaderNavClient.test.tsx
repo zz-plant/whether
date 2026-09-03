@@ -5,26 +5,33 @@ import { GlobalHeaderNavClient, MobileNavContent } from "../app/components/globa
 import { resolveGlobalHeaderNavigationLinks } from "../lib/navigation/globalHeader";
 
 describe("GlobalHeaderNavClient", () => {
-  it("renders the one-screen brief and API link in desktop nav", () => {
+  it("renders the operator loop in IA order in desktop nav, without a top-level API link", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavClient pathname="/" />,
     );
-    assert.ok(html.includes("Brief"), "renders Brief link");
-    assert.ok(html.includes("API"), "renders API link");
+    const primaryNav = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf("<details"));
+    assert.ok(primaryNav.includes("Weekly Brief"), "renders Brief link");
 
-    // The four hubs are no longer primary peers; they stay reachable through the
-    // mobile drawer as supporting layers under the brief.
-    for (const hub of ["Evidence", "Plan", "Resolve", "Trust"]) {
-      assert.ok(!html.includes(hub), `desktop nav does not render ${hub} as a primary peer`);
-    }
+    const positions = ["Plan", "Evidence", "Resolve", "Trust", "History"].map((label) => {
+      const index = primaryNav.indexOf(`>${label}<`);
+      assert.ok(index > -1, `desktop nav renders ${label}`);
+      return index;
+    });
+    assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "loop links keep IA order");
+    assert.ok(!primaryNav.includes('href="/api-docs"'), "API is not a top-level nav item");
   });
 
-  it("marks API link active when on /api-docs", () => {
+  it("marks the matching loop link active on a nested report route", () => {
     const html = renderToStaticMarkup(
-      <GlobalHeaderNavClient pathname="/api-docs" />,
+      <GlobalHeaderNavClient pathname="/signals/thresholds" />,
     );
-    assert.ok(html.includes('href="/api-docs"'), "renders API link href");
-    assert.ok(html.includes('aria-current="page"'), "API link has aria-current page attribute");
+    const primaryNav = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf("<details"));
+    assert.match(
+      primaryNav,
+      /<a[^>]*href="\/signals"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*href="\/signals"/,
+      "Evidence link is current",
+    );
+    assert.equal(primaryNav.split('aria-current="page"').length - 1, 1, "exactly one loop link is active");
   });
 
   it("renders resource and framework section in mobile navigation content", () => {

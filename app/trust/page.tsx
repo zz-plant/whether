@@ -34,6 +34,7 @@ export default async function MethodPage({
   const {
     reportData,
     isFallback,
+    degradedSourceRows,
     confidenceLabel,
     trustSummary,
     citationLine,
@@ -184,9 +185,16 @@ export default async function MethodPage({
       <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and the trust to act.">
         <div className={`weather-hub-card px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
           <div className="flex items-center gap-3">
-            <span className={`flex h-3 w-3 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
+            {/* Same word as the masthead above and the pill on the brief. This
+                said "All systems operational" while the homepage said DEGRADED
+                about the same read, because it looked only at the fallback flag. */}
+            <span className={`flex h-3 w-3 rounded-full ${isFallback || degradedSourceRows.length > 0 ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
             <p className="text-sm font-semibold text-slate-100">
-              {isFallback ? "Degraded — cached data in use" : "All systems operational"}
+              {isFallback
+                ? "Cached snapshot in use"
+                : degradedSourceRows.length > 0
+                  ? `Partly cached — ${degradedSourceRows.length} ${degradedSourceRows.length === 1 ? "source" : "sources"} delayed`
+                  : "All sources live"}
             </p>
           </div>
           {/* "Data refreshed {fetchedAtLabel}" was here, and the Freshness card

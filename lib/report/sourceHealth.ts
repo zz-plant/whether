@@ -239,6 +239,16 @@ const buildGroupedRow = ({
   };
 };
 
+/** Non-live sources in the shape the report shell and trust surfaces render. One builder, so every page counts the same rows. */
+export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
+  rows
+    .filter((row) => row.mode !== "live")
+    .map((row) => ({
+      sourceName: row.sourceName,
+      modeLabel: formatSourceModeLabel(row.mode),
+      freshnessStatus: formatSourceFreshnessLabel(row),
+    }));
+
 export const formatSourceModeLabel = (mode: SourceModeStatus) => {
   if (mode === "live") return "Live";
   if (mode === "snapshot") return "Snapshot-backed";

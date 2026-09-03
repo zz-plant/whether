@@ -74,11 +74,13 @@ export function FirstVisitExplainer() {
         How hard it is to raise money right now, and how much risk investors will fund, scored into
         one operating call each Monday.
       </p>
+      {/* Two links, not five. A cold visitor has two questions — how the number
+          is made, and whether the call has ever meant anything — and this strip
+          answers exactly those. The glossary is one click away inside the brief,
+          the source and the API live in the footer and under More; putting them
+          here made the product explain itself before showing itself. */}
       <Link href="/trust#formula-reference" className={orientationLinkClass}>
         How the score works
-      </Link>
-      <Link href="/trust#beginner-glossary" className={orientationLinkClass}>
-        Glossary
       </Link>
       {/* "How is this not a horoscope" is the first objection a cold visitor
           forms, and the method page answers a different one — that the number is
@@ -86,17 +88,6 @@ export function FirstVisitExplainer() {
           which /history owns. */}
       <Link href="/history#track-record-heading" className={orientationLinkClass}>
         Track record
-      </Link>
-      <a
-        href="https://github.com/zz-plant/whether"
-        target="_blank"
-        rel="noreferrer"
-        className={orientationLinkClass}
-      >
-        Source
-      </a>
-      <Link href="/api-docs" className={orientationLinkClass}>
-        API
       </Link>
       <button
         type="button"

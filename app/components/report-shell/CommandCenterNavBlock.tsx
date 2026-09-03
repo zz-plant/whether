@@ -48,7 +48,7 @@ export function CommandCenterNavBlock({
   statusLabel: string;
   trustStatusLabel: string;
   fetchedAtLabel: string;
-  resolvedNextRefreshLabel: string;
+  resolvedNextRefreshLabel?: string;
   trustStatusAction: string;
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
@@ -131,7 +131,7 @@ export function CommandCenterNavBlock({
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400">
             <span>Updated {fetchedAtLabel}</span>
-            <span>{resolvedNextRefreshLabel}</span>
+            {resolvedNextRefreshLabel ? <span>{resolvedNextRefreshLabel}</span> : null}
             {nextStep ? <span>Next: {nextStep.description}</span> : null}
           </div>
 

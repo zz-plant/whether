@@ -119,7 +119,7 @@ type ReportDataLoaderDependencies = {
     currentTrendDirection: ReportDynamics["directionLabel"];
     limit?: number;
   }) => HistoricalAnalog[];
-  buildActionNowShort: (args: Pick<ReportDynamics, "directionLabel" | "regimeChanged">) => string;
+  buildActionNowShort: (args: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & { regime?: RegimeAssessment["regime"] }) => string;
   buildFlipThreshold: (assessment: RegimeAssessment) => string;
   buildReportEvidenceItems: (args: {
     reportDynamics: ReportDynamics;
@@ -478,8 +478,11 @@ export const loadReportDataUncachedInternal = async ({
     thresholds,
     currentTrendDirection: reportDynamics.directionLabel,
   });
-  const actionNowShort = deps.buildActionNowShort(reportDynamics);
-  const guardrailThreshold = stopItems[0];
+  const actionNowShort = deps.buildActionNowShort({ ...reportDynamics, regime: assessment.regime });
+  // A threshold, not a playbook "stop" item. This read stopItems[0], so the
+  // guardrail slot on the trust and evidence pages carried lines like
+  // "Over-engineering before demand proves out" under "Pause if:".
+  const guardrailThreshold = actionStripItems[0]?.triggerThreshold ?? stopItems[0];
   const flipThreshold = deps.buildFlipThreshold(assessment);
   const reportEvidenceItems = deps.buildReportEvidenceItems({
     reportDynamics,
@@ -592,8 +595,11 @@ export const buildFallbackReportDataInternal = ({
     regimeChanged: false,
     directionLabel: "stable",
   };
-  const actionNowShort = deps.buildActionNowShort(fallbackReportDynamics);
-  const guardrailThreshold = stopItems[0];
+  const actionNowShort = deps.buildActionNowShort({ ...fallbackReportDynamics, regime: assessment.regime });
+  // A threshold, not a playbook "stop" item. This read stopItems[0], so the
+  // guardrail slot on the trust and evidence pages carried lines like
+  // "Over-engineering before demand proves out" under "Pause if:".
+  const guardrailThreshold = actionStripItems[0]?.triggerThreshold ?? stopItems[0];
   const flipThreshold = deps.buildFlipThreshold(assessment);
   const reportEvidenceItems = deps.buildReportEvidenceItems({
     reportDynamics: fallbackReportDynamics,

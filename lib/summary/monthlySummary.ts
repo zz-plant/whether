@@ -3,6 +3,7 @@
  * Powers copy-ready cards and API responses with traceable provenance metadata.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { formatThresholdNumber } from "../formatters";
 import { getRegimeOperatorLabel } from "../regimeLabels";
 import { buildHorizonOperatingRule, buildHorizonThresholdBands } from "./horizonOperatingRules";
 import { joinSentences } from "../report/reportFormatting";
@@ -54,13 +55,13 @@ export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyS
     return [
       {
         action: "Run no more than three concurrent experiments, each with a named rollback owner.",
-        threshold: `Pause new experiments if risk appetite falls below ${riskPause.toFixed(1)}.`,
-        reversal: `Reopen slots when risk appetite is above ${riskResume.toFixed(1)} and weekly direction stabilizes or improves.`,
+        threshold: `Pause new experiments if risk appetite falls below ${formatThresholdNumber(riskPause)}.`,
+        reversal: `Reopen slots when risk appetite is above ${formatThresholdNumber(riskResume)} and weekly direction stabilizes or improves.`,
       },
       {
         action: "Stage net-new headcount and multi-quarter vendor approvals.",
-        threshold: `Pause fixed-cost approvals if funding pressure rises above ${tightnessPause.toFixed(1)}.`,
-        reversal: `Resume staged approvals when funding pressure falls below ${tightnessResume.toFixed(1)}.`,
+        threshold: `Pause fixed-cost approvals if funding pressure rises above ${formatThresholdNumber(tightnessPause)}.`,
+        reversal: `Resume staged approvals when funding pressure falls below ${formatThresholdNumber(tightnessResume)}.`,
       },
       {
         action: "Assign one checkpoint owner to every cross-team commitment before work starts.",
@@ -98,15 +99,18 @@ export const buildMonthlyStructured = ({
   provenance: MonthlySummaryProvenance;
   operatingRules?: MonthlyStructured["operatingRules"];
 }): MonthlyStructured => {
+  // The guidance sentence is stated once, in the planning language, which is the
+  // line meant to be pasted. It used to be repeated verbatim in the posture
+  // summary, the next actions, and the operating rule as well — five copies of
+  // one sentence on a single card, which reads as generated because it was.
   const postureSummary = [
-    `The priority this month is to ${guidance}.`,
     formatConfidenceSentence(confidence, intensity),
     transitionWatch
       ? "The call is close to a boundary, so keep reversals cheap."
       : "The call is clear of its boundaries.",
   ];
   const boundedNextActions = [
-    `Hold the month to one job: ${guidance}.`,
+    "Approve only work that serves the month's priority; hold the rest for the next read.",
     transitionWatch
       ? "Keep new commitments reversible until the next read confirms stability."
       : "Keep new commitments inside the current constraints.",

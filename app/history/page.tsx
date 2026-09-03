@@ -10,6 +10,8 @@ import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { formatDateUTC } from "../../lib/formatters";
+import { toWeatherLabel } from "../../lib/regimeLabels";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
@@ -24,10 +26,14 @@ export default async function HistoryPage({
   const resolvedSearchParams = await searchParams;
   const regimeSeries = getTimeMachineRegimeSeries();
   const statsSeries = getTimeMachineRegimeSeries(60);
+  // The whole record, not a trailing window. "Months on record: 60" next to
+  // "Record starts Aug 2021" beside a year strip that reached 2010 was three
+  // answers to one question. The stats disclosure below still reads 60 months.
+  const fullSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   const tightnessTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.tightness }));
   const riskAppetiteTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
-  const trackRecord = buildTrackRecord(statsSeries);
+  const trackRecord = buildTrackRecord(fullSeries);
 
   return (
     <ReportShell
@@ -35,12 +41,12 @@ export default async function HistoryPage({
         // The newest month the record actually covers. This was an empty string,
         // which rendered a dangling "As of" on the one page whose subject is dates.
         status: {
-          statusLabel: "Historical",
+          statusLabel: trackRecord?.currentRegimeLabel ?? "Historical",
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
           treasurySource: "https://fred.stlouisfed.org",
         },
-        page: { pageTitle: "History", pageSummary: "The permanent record of past weekly calls.", sectionLinks: [], currentPath: "/history" },
+        page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: [], currentPath: "/history" },
         trust: { trustStatusLabel: "Stable", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "stable" },
         chrome: { sidebarVariant: "full" },
       }}
@@ -57,8 +63,14 @@ export default async function HistoryPage({
         <section className="weather-panel space-y-4 px-5 py-5">
           <div>
             <h2 className="type-eyebrow">Published weekly briefs</h2>
+            {/* Say what the archive holds, not what it aspires to. With one entry,
+                "permanent, immutable calls cited in board documents" promised a
+                record the page could not show. The count is the honest claim; the
+                append-only rule is the guarantee worth stating. */}
             <p className="text-sm text-slate-300">
-              Permanent, immutable weekly operating calls cited in executive and board documents.
+              {publishedBriefs.length === 1
+                ? "One week published so far. Entries are never edited after publication, so the archive fills forward from here."
+                : `${publishedBriefs.length} weeks published. Entries are never edited after publication, so a past call reads the way it did when it was made.`}
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -72,7 +84,7 @@ export default async function HistoryPage({
                   <div className="flex w-full items-center justify-between gap-2">
                     <span className="text-fluid-micro font-mono text-slate-400">{brief.recordDateLabel}</span>
                     <span className="type-badge text-fluid-micro rounded-sm px-1.5 py-0.5 bg-slate-800 text-slate-200">
-                      {brief.postureLabel}
+                      {getRegimePublicLabel(brief.regime)}
                     </span>
                   </div>
                   <span className="text-sm font-semibold text-slate-100 line-clamp-1">{brief.headline}</span>
@@ -96,7 +108,7 @@ export default async function HistoryPage({
             <li key={year.slug}>
               <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
                 {year.title}
-                <span className="ml-2 text-slate-400">{year.operatorLabel}</span>
+                <span className="ml-2 text-slate-400">{toWeatherLabel(year.operatorLabel)}</span>
               </ActionLink>
             </li>
           ))}

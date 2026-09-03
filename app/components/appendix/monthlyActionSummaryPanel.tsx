@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import {
   buildMonthlySummary,
-  getMonthlyActionGuidance,
   getMonthlyOperatingRules,
 } from "../../../lib/summary/monthlySummary";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
@@ -81,7 +80,6 @@ export const MonthlyActionSummaryPanel = ({
   weeklyRecordDateLabel: string;
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
-  const actionGuidance = getMonthlyActionGuidance(assessment.regime);
   const operatingRules = getMonthlyOperatingRules(assessment);
   const weeklySummary = buildWeeklySummary({
     assessment,
@@ -142,8 +140,9 @@ export const MonthlyActionSummaryPanel = ({
       title="Monthly action summary"
       description={
         <>
-          This month, operate in {regimeLabel} mode: {actionGuidance}. Use these constraints to
-          align staffing, sequencing, and approval cadence before you lock the next sprint slate.
+          This month, operate in {regimeLabel} mode. The card below carries the one priority for
+          the month; use the constraints to align staffing, sequencing, and approval cadence before
+          you lock the next sprint slate.
         </>
       }
       summaryCard={

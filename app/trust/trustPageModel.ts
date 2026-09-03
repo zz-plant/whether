@@ -10,6 +10,7 @@ import {
   buildWeeklyCitationMetaLine,
 } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
+import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 type ReportShellProps = Omit<ComponentProps<typeof ReportShell>, "children">;
@@ -27,6 +28,7 @@ export async function buildTrustPageModel() {
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/trust" });
   const homeBriefModel = snapshot.homeBriefModel;
   const isFallback = snapshot.isFallback;
+  const degradedSourceRows = buildDegradedSourceRows(reportData.sourceHealth);
   const trustSummary = buildCompactTrustSummary({
     confidenceLabel: homeBriefModel.confidenceLabel,
     freshnessLabel: reportData.fetchedAtLabel,
@@ -126,6 +128,8 @@ export async function buildTrustPageModel() {
     trustStatusDetail: `Coverage: ${sourceCoverage}`,
     trustStatusAction,
     trustStatusTone,
+    degradedSourceRows,
+    showOfflineBadge: isFallback,
     pageTitle: "How much to trust this week's call",
 
     currentPath: "/trust",
@@ -174,6 +178,7 @@ export async function buildTrustPageModel() {
   return {
     reportData,
     isFallback,
+    degradedSourceRows,
     confidenceLabel,
     trustSummary,
     sourceCoverage,

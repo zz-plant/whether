@@ -1,3 +1,4 @@
+import { formatThresholdNumber } from "../lib/formatters";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
@@ -94,10 +95,10 @@ describe("buildCadenceCallModel", () => {
     assert.equal(funding.key, "tightness");
     assert.equal(risk.key, "riskAppetite");
     // Whatever the numbers are, the drawing and the paragraph have to agree on them.
-    assert.ok(boundedRule.threshold.includes(funding.pause.toFixed(1)));
-    assert.ok(boundedRule.threshold.includes(risk.pause.toFixed(1)));
-    assert.ok(boundedRule.reversal.includes(funding.resume.toFixed(1)));
-    assert.ok(boundedRule.reversal.includes(risk.resume.toFixed(1)));
+    assert.ok(boundedRule.threshold.includes(formatThresholdNumber(funding.pause)));
+    assert.ok(boundedRule.threshold.includes(formatThresholdNumber(risk.pause)));
+    assert.ok(boundedRule.reversal.includes(formatThresholdNumber(funding.resume)));
+    assert.ok(boundedRule.reversal.includes(formatThresholdNumber(risk.resume)));
   });
 
   it("points each band at the edge its own signal trips", () => {
@@ -203,7 +204,7 @@ describe("buildCadenceCallModel", () => {
   it("reports what the run of periods changed from", () => {
     assert.equal(
       build("monthly").historyDelta,
-      "Moved to Guarded Expand from Conserve in May 2026.",
+      "Moved to Stormy from Cloudy in May 2026.",
     );
   });
 
@@ -216,7 +217,7 @@ describe("buildCadenceCallModel", () => {
 
     assert.equal(
       build("monthly", flat).historyDelta,
-      "Expand for every month shown — 3 months.",
+      "Sunny for every month shown — 3 months.",
     );
   });
 

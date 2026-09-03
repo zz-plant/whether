@@ -28,7 +28,7 @@ export const MCP_PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26"] as const;
 
 const SERVER_INFO = {
   name: "whether",
-  title: "Whether — Weekly Macro Operating Brief",
+  title: "Whether — Weekly Operating Brief",
   version: "1.0.0",
 } as const;
 

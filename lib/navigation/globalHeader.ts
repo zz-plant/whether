@@ -69,3 +69,20 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
     isActive: pathMatchesLink(link.href, normalizedPathname),
   }));
 };
+
+// The operator loop as the desktop header shows it: brief → plan → evidence →
+// resolve → trust → history, in IA order, with only the deepest nested layer
+// (compare, under history) left to its parent page. The header used to render
+// the brief, an API link, and a More menu — the loop the IA file defines was
+// reachable only from the mobile drawer and in-page cues. Exactly one link is
+// active: the most specific layer matching the path.
+export const resolveGlobalHeaderLoopLinks = (pathname: string): GlobalHeaderNavigationLink[] => {
+  const activeLayer = findActiveLayer(pathname);
+
+  return navigationLayers
+    .filter((layer) => layer.key !== "compare")
+    .map((link) => ({
+      ...link,
+      isActive: activeLayer?.key === link.key,
+    }));
+};

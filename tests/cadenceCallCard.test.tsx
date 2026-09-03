@@ -95,7 +95,7 @@ describe("CadenceCallCard", () => {
 
     // The chip's fill is the only visual carrier of the regime; the name has to
     // reach a screen reader some other way.
-    assert.match(html, /Aug 2026<\/span><span class="sr-only">: Expand/);
+    assert.match(html, /Aug 2026<\/span><span class="sr-only">: Sunny/);
   });
 
   it("names the artifact its copy button copies, not the hero's", () => {

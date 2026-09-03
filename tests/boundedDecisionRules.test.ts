@@ -40,7 +40,7 @@ describe("bounded decision rule formatting", () => {
 
     assert.equal(
       formatBoundedDecisionReverse(rules[0]!),
-      "staged approvals when funding pressure falls below 0.0 and risk appetite is above 54",
+      "Funding pressure falls below 0 and risk appetite is above 54",
     );
   });
 });

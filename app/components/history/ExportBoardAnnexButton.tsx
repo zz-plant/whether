@@ -25,7 +25,7 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
       "---",
       "",
       "## 1. Operating Climate Summary",
-      `- **Current Posture:** Guarded Expansion (Sunny)`,
+      `- **Current Posture:** ${record ? record.currentRegimeLabel : "Unavailable"}`,
       `- **Stance Stability:** ${holdMonths} consecutive months with consistent posture guidance`,
       `- **Audited History:** ${monthsOnRecord} months of continuous public market data`,
       "",

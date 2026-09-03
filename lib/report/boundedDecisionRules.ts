@@ -1,4 +1,5 @@
 import type { RegimeKey } from "../regimeEngine";
+import { formatThresholdNumber } from "../formatters";
 import {
   extractCompactClause as extractCompactClauseFromFormatting,
   formatDecisionAction,
@@ -112,13 +113,7 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
   };
 };
 
-const fmt = (value: number) => {
-  if (Math.abs(value) < 10 || !Number.isInteger(value)) {
-    return value.toFixed(1);
-  }
-
-  return value.toFixed(0);
-};
+const fmt = formatThresholdNumber;
 
 export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores }: RuleContext): BoundedDecisionRule[] => {
   const isExpansion = regime === "EXPANSION";

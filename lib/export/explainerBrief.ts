@@ -74,7 +74,7 @@ export const buildExplainerBriefContent = ({
   sections.push("• Risk appetite: a score from 0-100. Lower = investors are more cautious → de-risk.");
   sections.push("• Recession warning gauge: measures the yield curve. Inverted = favor short-payback bets.");
   sections.push("• Fed interest rate: the cost of borrowing. Higher = debt is more expensive.");
-  sections.push("• Operating environment (regime) → Defend / Conserve / Guarded Expand / Expand");
+  sections.push("• Operating environment (regime) → Freezing / Cloudy / Stormy / Sunny");
   sections.push("• Clears-when condition: the threshold that, once crossed, would change the recommendation.");
   sections.push("• Watch-for condition: the boundary that pauses or slows current plans.");
 

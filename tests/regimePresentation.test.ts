@@ -26,14 +26,15 @@ const collectText = (node: ReactNode): string => {
 };
 
 describe("regime presentation labels", () => {
-  it("keeps contraction mapping for defensive/scarcity regimes", () => {
-    assert.equal(getRegimeDisplayLabel({ regime: "DEFENSIVE" }).label, "Contraction");
-    assert.equal(getRegimeDisplayLabel({ regime: "SCARCITY" }).label, "Contraction");
+  it("names defensive/scarcity regimes by their weather label", () => {
+    assert.equal(getRegimeDisplayLabel({ regime: "DEFENSIVE" }).label, "Cloudy");
+    assert.equal(getRegimeDisplayLabel({ regime: "SCARCITY" }).label, "Freezing");
   });
 
-  it("maps volatile to transitional mixed", () => {
+  it("names volatile Stormy and keeps the transitional modifier as data", () => {
     const presentation = getRegimeDisplayLabel({ regime: "VOLATILE" });
-    assert.equal(presentation.label, "Transitional Mixed");
+    assert.equal(presentation.label, "Stormy");
+    assert.equal(presentation.modifier, "Transitional");
     assert.equal(presentation.canonicalRegime, "VOLATILE");
   });
 
@@ -41,7 +42,7 @@ describe("regime presentation labels", () => {
     const image = renderBriefImage({
       decision: "Hold reversible bets",
       regime: "VOLATILE",
-      postureLabel: "Transitional Mixed",
+      postureLabel: "Stormy — Mid",
       tightness: 64,
       tightnessDelta: 0,
       confidenceLabel: "MED",
@@ -50,8 +51,8 @@ describe("regime presentation labels", () => {
 
     assert.equal(getRegimePublicLabel("VOLATILE"), "Stormy");
     assert.equal(REGIME_DISPLAY.VOLATILE, getRegimePublicLabel("VOLATILE"));
-    assert.match(collectText(image), /Stormy · Transitional Mixed/);
-    assert.doesNotMatch(collectText(image), /Uncertain · Transitional Mixed/);
+    assert.match(collectText(image), /Stormy · Stormy — Mid/);
+    assert.doesNotMatch(collectText(image), /Uncertain · Stormy/);
   });
 
 
@@ -77,7 +78,7 @@ describe("regime presentation labels", () => {
     assert.match(getRegimeWeatherRationale("EXPANSION"), /move faster/i);
   });
 
-  it("adds guarded modifier to expansion when diagnostics are fragile", () => {
+  it("keeps the guarded modifier as data without renaming the regime", () => {
     const guarded = getRegimeDisplayLabel({
       regime: "EXPANSION",
       momentum: "deteriorating",
@@ -85,7 +86,8 @@ describe("regime presentation labels", () => {
       transitionWatch: true,
     });
 
-    assert.equal(guarded.label, "Guarded Expansion");
+    assert.equal(guarded.label, "Sunny");
+    assert.equal(guarded.modifier, "Guarded");
     assert.equal(guarded.canonicalRegime, "EXPANSION");
   });
 });

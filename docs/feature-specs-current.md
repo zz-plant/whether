@@ -128,20 +128,16 @@ Cold opens into `/` now use a share-card-aligned loading state before the full r
 social clicks land on the same action-first artifact structure rather than a generic skeleton.
 
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
-The Decision Hero header now embeds four progressive-disclosure operator shortcuts:
+The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
+Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces
+the Slack block, and developer access lives under the header's More menu):
 
-- **CopySlackBriefButton** (`app/components/CopySlackBriefButton.tsx`): 1-click clipboard copy of the
-  Slack-formatted weekly brief. Also wired to the `C` keyboard shortcut and command palette
-  (`Cmd+K → Copy Slack brief`). Visual confirmation on success.
 - **PresentModeButton** (`app/components/PresentModeButton.tsx`): fullscreen focus mode for
   leadership syncs and Zoom meetings. Triggered by the `F` keyboard shortcut or command palette.
   Strips navigation and secondary chrome so the Decision Hero fills the viewport.
 - **ThresholdProximityBar** (`app/components/ThresholdProximityBar.tsx`): visual tightening buffer
   indicator (`[████████░░] 14 pts buffer remaining`) replacing buried microtext. Color-coded with
   emerald (safe) / amber (watch) / rose (near threshold) semantic zones.
-- **DeveloperQuickAccess** (`app/components/DeveloperQuickAccess.tsx`): inline `</> MCP / API`
-  popover chip in the provenance line with 1-click copy for MCP config URL
-  (`https://whether.work/api/mcp`), curl command, and LLM prompt context snippet.
 
 These sit inside the hero's action bar and secondary provenance row, following a routine-first
 hierarchy: the Slack copy button is the primary visible action, while Present, developer access,
@@ -636,3 +632,34 @@ bun run dev                                    # Start dev server
 **Print layout GIF**: Open `/`, Cmd+P, show print preview with clean white layout. ~5 seconds.
 
 For screen recording, use macOS QuickTime (File → New Screen Recording) or Kap (https://getkap.co). Convert to GIF with `ffmpeg` or gifski.
+
+## 9) Vocabulary and trust-state consolidation (2026-09-02)
+
+Ten product-sense fixes landed together; the semantic ones are recorded here so downstream
+surfaces do not reintroduce the old words.
+
+- **One regime vocabulary.** `getRegimeOperatorLabel` and `getRegimeDisplayLabel` both return the
+  weather name (Freezing / Cloudy / Stormy / Sunny). "Expand", "Guarded Expand", "Conserve",
+  "Defend", "Contraction", "Transitional Mixed", and "Guarded Expansion" are no longer rendered.
+  Archived labels in `data/*.json` are translated at render time with `toWeatherLabel`
+  (`lib/regimeLabels.ts`). The `modifier` field (Guarded / Transitional) survives as data.
+- **One data-status vocabulary.** `DATA_STATUS_LABELS` in `lib/report/trustStatus.ts` — Live,
+  Partly cached, Cached snapshot, Historical snapshot — is what the freshness pill, the hero
+  provenance line, the report-shell masthead, and the Trust page status card all render. The
+  masthead headline is derived from state via `resolveTrustReadinessCopy`; it no longer sniffs
+  the detail string for words like "low".
+- **Regime-aware weekly headline.** `buildActionNowShort` takes the regime, so a softening Sunny
+  week reads "keep proven bets moving, but stage anything new" rather than "freeze new
+  commitments", which contradicted every downstream page.
+- **Guardrail slot is a threshold.** `reportDataLoader` fills `guardrailThreshold` from the first
+  action-strip trigger instead of the playbook's first "stop" item.
+- **Condition phrasing.** `formatDecisionThreshold` / `formatDecisionReversal` strip the verb and
+  its object ("Pause net-new hiring if …" → "Funding pressure rises above 76 …") so slot labels
+  that already carry the verb read as sentences. `formatThresholdNumber` drops the `.0` on integer
+  thresholds everywhere a threshold is printed.
+- **Historical analog.** The Evidence page shows the four match coordinates (then vs now) and
+  names the block "Nearest reference cycle"; the clamped `correlationScore` stays in the API
+  payload for compatibility but is not rendered as a match percentage.
+- **Header.** The desktop nav renders the operator loop from `resolveGlobalHeaderLoopLinks`
+  (supporting layers hidden below `lg`); the top-level API link moved under More. The live
+  masthead no longer prints a "15m cadence" refresh label.

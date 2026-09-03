@@ -166,10 +166,13 @@ export function DecisionPlanStressTester({
                 }}
                 className="weather-control w-auto px-2 py-1"
               >
-                <option value="DISCOVERY">Seed / Discovery</option>
-                <option value="GROWTH">Series A / Growth</option>
-                <option value="SCALE">Series B+ / Scale</option>
-                <option value="MATURE">Bootstrapped / Mature</option>
+                {/* Same four names as the stage selector in the hero. This list
+                    used to call them Discovery / Growth / Scale / Mature, a second
+                    taxonomy for the same question on the same screen. */}
+                <option value="DISCOVERY">Seed</option>
+                <option value="GROWTH">Series A</option>
+                <option value="SCALE">Series B+</option>
+                <option value="MATURE">Bootstrapped</option>
               </select>
             </label>
 

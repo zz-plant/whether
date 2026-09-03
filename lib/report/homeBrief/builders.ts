@@ -13,6 +13,7 @@ import {
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD, REGIME_CONFIDENCE_MEDIUM_THRESHOLD } from "../../regimeEngineCore";
 import { type ReportDynamics } from "../reportData";
+import { formatThresholdNumber } from "../../formatters";
 import {
   REGIME_SEVERITY_RANK,
   deriveRegimeStage,
@@ -110,7 +111,7 @@ const buildBoundaryTriggerText = ({
   // "Re-open when:" / "The call flips when:" as well as showing it standalone.
   const dimensionLabel = dimension === "tightness" ? "Funding pressure" : "Risk appetite";
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
-  return `${dimensionLabel} ${condition} ${threshold.toFixed(1)} (${current.toFixed(1)} today), which flips the call to ${targetRegimeLabel}.`;
+  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today), which flips the call to ${targetRegimeLabel}.`;
 };
 
 type RevisitDriverSignal = {

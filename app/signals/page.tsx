@@ -143,46 +143,67 @@ export default async function SignalsPage({
         </div>
       </div>
 
-      {/* Historical Analog Pattern Matching */}
-      <div id="analog-pattern" className="weather-panel scroll-mt-28 p-5 border border-sky-500/30 bg-slate-900/60 shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <div>
-            <p className="type-label text-sky-400 font-semibold">Historical analog</p>
-            <h3 className="text-base font-bold text-slate-100">
-              Closest past cycle: {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} ({getHistoricalAnalogPlaybook(model.assessment).correlationScore}% match)
-            </h3>
-            <p className="text-fluid-xs text-slate-400 mt-0.5">
-              Live macro coordinates match conditions during {getHistoricalAnalogPlaybook(model.assessment).analogPeriod}.
-            </p>
-          </div>
-          <span className="self-start sm:self-auto px-3 py-1 text-xs font-bold rounded-sm bg-sky-500/20 text-sky-300 border border-sky-500/40">
-            {getHistoricalAnalogPlaybook(model.assessment).analogPeriod} analog
-          </span>
-        </div>
+      {/* The nearest of four hand-picked reference cycles, by four coordinates.
+          This used to headline a "90% Match" — a number clamped into 65–96 from
+          a distance, on the page whose job is to be the proof behind the call.
+          The coordinates are the evidence, so they are what gets shown. */}
+      {(() => {
+        const analog = getHistoricalAnalogPlaybook(model.assessment);
+        const formatCoordinate = (value: number, unit: "%" | "pts") =>
+          unit === "%" ? `${value.toFixed(2)}%` : value.toFixed(0);
+        return (
+          <section id="analog-pattern" aria-labelledby="analog-pattern-title" className="weather-panel scroll-mt-28 space-y-4 p-5">
+            <div>
+              <p className="type-eyebrow">Nearest reference cycle</p>
+              <h3 id="analog-pattern-title" className="text-base font-semibold text-slate-100">
+                {analog.analogPeriod} · {analog.regimeType}
+              </h3>
+              <p className="mt-1 text-fluid-xs text-slate-400">
+                Closest of {analog.referenceCycleCount} reference cycles on the four coordinates below.
+                A resemblance in the inputs, not a forecast of the outcome.
+              </p>
+            </div>
 
-        <div className="grid sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
-          <div className="rounded-lg bg-rose-950/20 border border-rose-500/30 p-3.5">
-            <p className="text-fluid-nano uppercase font-bold text-rose-300 tracking-wider">What consensus got wrong</p>
-            <p className="text-fluid-xs text-rose-100/90 mt-1 leading-relaxed">
-              {getHistoricalAnalogPlaybook(model.assessment).consensusTrap}
-            </p>
-          </div>
+            <table className="w-full border-collapse text-left text-fluid-xs">
+              <caption className="sr-only">Match coordinates, reference cycle against this week</caption>
+              <thead>
+                <tr className="border-b border-slate-800/80 text-slate-400">
+                  <th scope="col" className="py-1.5 pr-3 font-medium">Coordinate</th>
+                  <th scope="col" className="py-1.5 pr-3 text-right font-medium">{analog.analogPeriod}</th>
+                  <th scope="col" className="py-1.5 text-right font-medium">This week</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analog.matchBasis.map((item) => (
+                  <tr key={item.key} className="border-b border-slate-800/40 last:border-0">
+                    <td className="py-1.5 pr-3 text-slate-300">{item.label}</td>
+                    <td className="py-1.5 pr-3 text-right font-mono text-slate-400">{formatCoordinate(item.then, item.unit)}</td>
+                    <td className="py-1.5 text-right font-mono text-slate-100">{formatCoordinate(item.now, item.unit)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <div className="rounded-lg bg-emerald-950/20 border border-emerald-500/30 p-3.5">
-            <p className="text-fluid-nano uppercase font-bold text-emerald-300 tracking-wider">What worked</p>
-            <p className="text-fluid-xs text-emerald-100/90 mt-1 leading-relaxed">
-              {getHistoricalAnalogPlaybook(model.assessment).winningMove}
+            <div className="grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-3">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3.5">
+                <p className="text-fluid-nano font-semibold uppercase tracking-wider text-slate-400">Common mistake then</p>
+                <p className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{analog.consensusTrap}</p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3.5">
+                <p className="text-fluid-nano font-semibold uppercase tracking-wider text-slate-400">What held up then</p>
+                <p className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{analog.winningMove}</p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3.5">
+                <p className="text-fluid-nano font-semibold uppercase tracking-wider text-slate-400">What marked the turn</p>
+                <p className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{analog.reversalMarker}</p>
+              </div>
+            </div>
+            <p className="text-fluid-nano text-slate-500">
+              Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.
             </p>
-          </div>
-
-          <div className="rounded-lg bg-slate-950/60 border border-slate-800 p-3.5">
-            <p className="text-fluid-nano uppercase font-bold text-slate-300 tracking-wider">What marked the turn</p>
-            <p className="text-fluid-xs text-slate-300 mt-1 leading-relaxed">
-              {getHistoricalAnalogPlaybook(model.assessment).reversalMarker}
-            </p>
-          </div>
-        </div>
-      </div>
+          </section>
+        );
+      })()}
 
       {/* The model builds `scoreCardsByType` on every request and both view modes
           list "Current scores" in their section nav, but nothing rendered it —

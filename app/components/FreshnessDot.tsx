@@ -2,6 +2,7 @@
 
 import { useId, useState, useEffect, useRef } from "react";
 import { CheckIcon, StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
+import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 
 export type FreshnessDotProps = {
   label: string;
@@ -77,7 +78,7 @@ export function FreshnessDot({
           ) : (
             <StatusLiveIcon className="size-1.5 motion-safe:animate-pulse" />
           )}
-          {showOfflineBadge ? "Snapshot" : hasDegraded ? "Degraded" : "Live"}
+          {resolveDataStatusLabel({ isFallbackSnapshot: showOfflineBadge, degradedSourceCount: degradedSourceRows.length })}
         </span>
         <span>Data as of {label}</span>
       </button>
@@ -124,7 +125,7 @@ export function FreshnessDot({
           {degradedSourceRows.length ? (
             <div className="border-t border-white/[0.06] pt-2">
               <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase mb-1.5">
-                Degraded feeds
+                Cached or delayed feeds
               </p>
               <div className="space-y-1">
                 {degradedSourceRows.map((row, index) => (

@@ -8,6 +8,7 @@
  * surfaces end up quoting different numbers for the same call.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { formatThresholdNumber } from "../formatters";
 import { deltaLabelBySignal } from "../report/briefFormatting";
 import { compositeSignalScales } from "../report/signalTranslations";
 
@@ -156,7 +157,7 @@ export const buildHorizonOperatingRule = ({
 
   return {
     action: `Apply this ${horizon}'s priority: ${guidance}.`,
-    threshold: `Pause broader commitments if funding pressure rises above ${tightnessPause.toFixed(1)} or risk appetite falls below ${riskPause.toFixed(1)}.`,
-    reversal: `Reopen broader scope when funding pressure is below ${tightnessResume.toFixed(1)} and risk appetite is above ${riskResume.toFixed(1)}.`,
+    threshold: `Pause broader commitments if funding pressure rises above ${formatThresholdNumber(tightnessPause)} or risk appetite falls below ${formatThresholdNumber(riskPause)}.`,
+    reversal: `Reopen broader scope when funding pressure is below ${formatThresholdNumber(tightnessResume)} and risk appetite is above ${formatThresholdNumber(riskResume)}.`,
   };
 };

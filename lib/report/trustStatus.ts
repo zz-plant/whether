@@ -327,33 +327,71 @@ export const buildCompactTrustSummary = ({
   return `Confidence ${confidenceLabel} (${normalizedFreshness}) — safe for near-term operating decisions.`;
 };
 
+/**
+ * The one vocabulary for "how live is the data behind this". Every badge that
+ * states it — the freshness pill above the brief, the hero's provenance line,
+ * the shell masthead on each report page, the Trust page's status card — reads
+ * from here. They used to say DEGRADED, Trust clear, Trust constrained and All
+ * systems operational about the same read at the same moment.
+ */
+export const DATA_STATUS_LABELS = {
+  live: "Live",
+  partlyCached: "Partly cached",
+  cachedSnapshot: "Cached snapshot",
+  historical: "Historical snapshot",
+} as const;
+
+export type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
+
+export const resolveDataStatus = ({
+  isHistoricalSelection = false,
+  isFallbackSnapshot = false,
+  degradedSourceCount = 0,
+}: {
+  isHistoricalSelection?: boolean;
+  isFallbackSnapshot?: boolean;
+  degradedSourceCount?: number;
+}): DataStatusKey =>
+  isHistoricalSelection
+    ? "historical"
+    : isFallbackSnapshot
+      ? "cachedSnapshot"
+      : degradedSourceCount > 0
+        ? "partlyCached"
+        : "live";
+
+export const resolveDataStatusLabel = (input: Parameters<typeof resolveDataStatus>[0]) =>
+  DATA_STATUS_LABELS[resolveDataStatus(input)];
+
 export const resolveTrustReadinessCopy = ({
   trustStatusTone,
   degradedSourceRows,
-  trustStatusDetail,
+  isFallbackSnapshot = false,
 }: {
   trustStatusTone: TrustStatusTone;
   degradedSourceRows?: Array<unknown>;
+  isFallbackSnapshot?: boolean;
+  /** @deprecated No longer read. The headline is derived from state, not sniffed from prose. */
   trustStatusDetail?: string;
 }): { tone: TrustStatusTone; headline: string } => {
-  const hasDegradedSources = (degradedSourceRows?.length ?? 0) > 0;
-  const hasConstrainedDetail = (trustStatusDetail ?? "").toLowerCase().includes("too weak")
-    || (trustStatusDetail ?? "").toLowerCase().includes("low")
-    || (trustStatusDetail ?? "").toLowerCase().includes("staged");
-  const tone = trustStatusTone === "historical"
+  const status = resolveDataStatus({
+    isHistoricalSelection: trustStatusTone === "historical",
+    isFallbackSnapshot,
+    degradedSourceCount: degradedSourceRows?.length ?? 0,
+  });
+  const tone: TrustStatusTone = status === "historical"
     ? "historical"
-    : hasDegradedSources || trustStatusTone === "warning" || hasConstrainedDetail
+    : status !== "live" || trustStatusTone === "warning"
       ? "warning"
       : "stable";
 
-  return {
-    tone,
-    headline: tone === "historical"
-      ? "Historical snapshot"
-      : tone === "warning"
-        ? "Trust constrained"
-        : "Trust clear",
-  };
+  // A live feed under reduced confidence is still live; the qualifier says why the
+  // tone is amber without inventing a second data state.
+  const headline = status === "live" && tone === "warning"
+    ? `${DATA_STATUS_LABELS.live} · reduced confidence`
+    : DATA_STATUS_LABELS[status];
+
+  return { tone, headline };
 };
 
 export const buildDecisionReadinessState = ({

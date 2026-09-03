@@ -1,3 +1,4 @@
+import { toWeatherLabel } from "../../../lib/regimeLabels";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -51,7 +52,7 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
 };
 
 const describePeriod = (period: PostureArchivePeriod) =>
-  `Whether's operating posture for ${period.title}: ${period.operatorLabel}. ${period.headline}`;
+  `Whether's operating posture for ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
 
 const cadenceNoun = (period: PostureArchivePeriod) =>
   period.sampleCadence === "weekly" ? "weekly readings" : "monthly readings";
@@ -63,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!period) return {};
 
   return buildPageMetadata({
-    title: `${period.title} operating posture — ${period.operatorLabel}`,
+    title: `${period.title} operating posture — ${toWeatherLabel(period.operatorLabel)}`,
     description: describePeriod(period),
     path: buildPostureArchivePath(period.slug),
     imageAlt: `Whether operating posture for ${period.title}`,
@@ -96,7 +97,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const articleStructuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: `${period.title} operating posture — ${period.operatorLabel}`,
+    headline: `${period.title} operating posture — ${toWeatherLabel(period.operatorLabel)}`,
     description: describePeriod(period),
     datePublished: period.asOf,
     dateModified: period.asOf,
@@ -129,7 +130,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
       <section className="weather-panel space-y-4 px-6 py-6">
         <div className="flex flex-wrap items-center gap-2">
-          <Tag tone={regimeTone[period.regime]}>{period.operatorLabel}</Tag>
+          <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
           <Tag tone="slate">{period.statusLabel}</Tag>
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
@@ -198,7 +199,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
               <li key={transition.asOf} className="flex flex-wrap items-baseline gap-2">
                 <span className="font-semibold text-slate-100">{transition.dateLabel}</span>
                 <span>
-                  {transition.fromLabel} → {transition.toLabel}
+                  {toWeatherLabel(transition.fromLabel)} → {toWeatherLabel(transition.toLabel)}
                 </span>
               </li>
             ))}
@@ -208,7 +209,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         <section className="weather-panel space-y-2 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Posture changes inside {period.title}</h2>
           <p className="text-sm text-slate-300">
-            The posture held at {period.operatorLabel} for the whole period. No mid-period reversal was recorded.
+            The posture held at {toWeatherLabel(period.operatorLabel)} for the whole period. No mid-period reversal was recorded.
           </p>
         </section>
       )}
@@ -256,7 +257,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
                   className="flex min-h-[44px] flex-col gap-1 rounded-lg px-2 py-2 transition-colors hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
                   <span className="text-sm font-semibold text-slate-100">
-                    {child.title} — {child.operatorLabel}
+                    {child.title} — {toWeatherLabel(child.operatorLabel)}
                   </span>
                   <span className="text-sm text-slate-300">{child.guidance}</span>
                 </Link>

@@ -154,6 +154,13 @@ export const formatSignedDeltaValue = (value: number | null) => {
 
 export const formatScoreValue = (value: number) => value.toFixed(0);
 
+/**
+ * Threshold and score points read in whole points. A decimal appears only when
+ * the value carries one — "50.0 (56.0 today)" was precision the engine never had.
+ */
+export const formatThresholdNumber = (value: number) =>
+  Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
+
 export const formatMonthYearShortUtc = (date: Date) => monthYearShortUtcFormatter.format(date);
 
 export const formatMonthYearShortFromValue = (value: string) =>

@@ -4,7 +4,7 @@ import {
 } from "../timeMachine/timeMachineSelection";
 import { type ReportData, type ReportDataFallback } from "./reportData";
 import { buildTrustMarker, buildTrustStatus } from "./trustStatus";
-import { formatSourceFreshnessLabel, formatSourceModeLabel } from "./sourceHealth";
+import { buildDegradedSourceRows } from "./sourceHealth";
 import {
   buildInterpretationLayer,
   isInterpretationView,
@@ -410,13 +410,7 @@ export const assembleHomePage = async ({
       approvalBuckets,
       recoveryPlan,
       outageExitGate,
-      degradedSourceRows: reportData.sourceHealth
-        .filter((row) => row.mode !== "live")
-        .map((row) => ({
-          sourceName: row.sourceName,
-          modeLabel: formatSourceModeLabel(row.mode),
-          freshnessStatus: formatSourceFreshnessLabel(row),
-        })),
+      degradedSourceRows: buildDegradedSourceRows(reportData.sourceHealth),
       provenance: treasuryProvenance,
       showOfflineBadge: isFallback && !historicalSelection,
       sectionLinks,
