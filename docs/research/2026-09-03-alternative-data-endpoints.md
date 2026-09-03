@@ -43,16 +43,25 @@ Three findings, in descending value-per-unit-of-work:
 3. **The market-data leg has no free official replacement.** Alpha Vantage's free tier is 25
    requests/day and the basket already uses 15. This one needs a budget decision, not a code change.
 
-A fourth, negative, finding worth recording so nobody spends a day on it: **the Fiscal Data API is
-not a yield-curve source.**
+Two further findings, both negative and both worth recording so nobody spends a day on them:
+
+- **The Fiscal Data API is not a yield-curve source.** Its interest-rate dataset is the average
+  rate on the debt.
+- **DFF is not part of the pipeline, but the product says it is.** The constant exists, nothing
+  fetches it, no snapshot carries it — so the base rate is always the 1-month bill — while
+  `TREASURY_SOURCE_LABEL` and the trust page's formula reference both name DFF as a source. That
+  is a provenance defect rather than a sourcing one, and it is cheap to fix in either direction:
+  fetch DFF, or stop claiming it.
 
 ## Evidence table
 
 | # | Claim | Source | Type | Confidence |
 | --- | --- | --- | --- | --- |
 | 1 | Pipeline reaches 5 hosts: `fred.stlouisfed.org`, `api.stlouisfed.org`, `home.treasury.gov`, `query1.finance.yahoo.com`, `www.alphavantage.co` | repo grep; `CLAUDE.md` egress list | primary | high |
-| 2 | 11 series pulled: DGS1MO, DGS3MO, DGS2, DGS10, DFF, BAMLH0A0HYM2, BAA10Y, CPIAUCSL, UNRATE, NFCI, VIXCLS | repo grep | primary | high |
-| 3 | The "Treasury" client reads 5 rate series from **FRED's chart export**, not Treasury | `lib/treasury/treasuryClient.ts:31-37` | primary | high |
+| 2 | **10** series pulled: DGS1MO, DGS3MO, DGS2, DGS10, BAA10Y, BAMLH0A0HYM2, CPIAUCSL, UNRATE, NFCI, VIXCLS | `lib/ingestion/families.ts` | primary | high |
+| 2b | **DFF is never fetched.** `TREASURY_ENDPOINTS.fedFunds` is declared but absent from the endpoints object the client actually builds, and no bundled snapshot carries a `fedFunds` value — so `getBaseRate`'s `"FED"` branch is unreachable and the base rate is always the 1-month bill | `lib/treasury/treasuryClient.ts:32,395-400`; `lib/regimeEngineCore.ts:238-248`; `grep fedFunds data/*.json` → no match | primary | high |
+| 2c | Two user-facing strings nonetheless name DFF as a source: `TREASURY_SOURCE_LABEL` and the trust page's formula reference | `lib/regimeEngineCore.ts:160`; `app/trust/formulaReference.tsx:97-101` | primary | high |
+| 3 | The "Treasury" client reads **4** rate series (DGS1MO, DGS3MO, DGS2, DGS10) from **FRED's chart export**, not Treasury | `lib/treasury/treasuryClient.ts:31-37,395-400` | primary | high |
 | 4 | `/current/all` returned 200 + zero-byte body; fallback chain ended in a June snapshot served into late August | `lib/treasury/treasuryClient.ts:22-27` | primary | high |
 | 5 | Treasury publishes a **documented** XML feed: base `home.treasury.gov`, path `/resource-center/data-chart-center/interest-rates/pages/xml`, params `?data=daily_treasury_yield_curve&field_tdr_date_value=YYYY`; values include `daily_treasury_yield_curve`, `daily_treasury_bill_rates`, `daily_treasury_long_term_rate`, `daily_treasury_real_yield_curve` | [Treasury Daily Interest Rate XML Feed](https://home.treasury.gov/treasury-daily-interest-rate-xml-feed) | primary (via search) | medium-high — see fallback note |
 | 6 | Fiscal Data API's interest-rate dataset is `avg_interest_rates` (average rate on the debt), a different series from the par yield curve | [Fiscal Data API docs](https://fiscaldata.treasury.gov/api-documentation/) | primary (via search) | medium — absence of the curve is inferred, not stated |
@@ -77,10 +86,16 @@ reporting FAILED on `connect_rejected`. Every host is a permission that has to e
 environment. Dropping `fred.stlouisfed.org` is worth more than the code change suggests: it is one
 fewer thing to get wrong per environment, and it retires an interface with no stability contract.
 
-**Alpha Vantage is not headroom, it's a ceiling.** 15 of 25 daily requests, at 5/min, means the
-basket takes ~3 minutes to refresh and cannot grow past 25 tickers without paying. Treating it as
-"the documented path" overstates it — it is the documented path *within a free tier that the
-current basket has nearly exhausted*.
+**Alpha Vantage is not headroom, it's a ceiling — and the basket does not pace itself against it.**
+15 of 25 daily requests, and the basket cannot grow past 25 tickers without paying. But
+`fetchSaaSValuations` issues all fifteen through one `Promise.all` with no throttling
+(`lib/saasMultiples.ts:253-255`), deliberately, to bound edge request budget. Against a documented
+5-requests/minute limit that is a burst three times the ceiling, and the failure is quiet: the
+function throws only when *every* symbol is unavailable, so a run where most calls are declined
+still computes a median — from whichever subset answered, with no record in the snapshot of how
+many that was. For a product that publishes its sourcing, a median over an unknown subset is the
+worse half of this finding; the daily cap is only the budget half. Any move here should add
+throttling or record the responding-symbol count, not just buy more requests.
 
 **Yahoo can't be fixed by finding a better free endpoint,** because there isn't one. SEC EDGAR is
 official, free and keyless, but CompanyFacts carries revenue and shares outstanding and **not
@@ -93,10 +108,17 @@ revenue-growth half and a strong provenance anchor; it is not a Yahoo replacemen
    new dependency. Verify the feed's shape against a live response first (blocked here — see
    fallback note), keep the year-scoping that the `/current/all` incident forced, and keep the CSV
    as fallback for one release. *Small, testable, highest value per unit of work.*
-2. **Make `api.stlouisfed.org` primary for all 11 series and retire the chart export.** The code
-   already has `fetchFredApiRows` and key handling; this is mostly deleting a path. Confirm first
-   whether the repo's "FRED refuses Worker-originated requests" note applies to the API host or
-   only to the chart export — that determines whether this is a cleanup or a fix.
+2. **Make `api.stlouisfed.org` primary for all ten series and retire the chart export.** The code
+   already has `fetchFredApiRows` and key handling — but this is **not** mostly deleting a path.
+   `fetchFredRows` catches an API failure and retries through the CSV export by design, so a
+   revoked key degrades to the path the site ran on for years, and **without a key the CSV export
+   is the only path** (`lib/fred.ts:389-419`). Retiring the chart host therefore costs a live
+   fallback for all ten series and breaks keyless environments outright. So this action is
+   conditional: it needs a key provisioned everywhere the pipeline runs *and* a replacement
+   degradation path (the Treasury XML feed covers the four rate series; the other six would have
+   none), or an explicit decision to accept the resilience loss. Confirm too whether the repo's
+   "FRED refuses Worker-originated requests" note applies to the API host or only to the chart
+   export.
 3. **Put the market-data decision to the owner with numbers**, rather than changing code: pay Alpha
    Vantage $49.99/mo to remove the daily cap, or migrate the basket to Twelve Data / Finnhub / FMP.
    Either beats depending on an endpoint whose failure mode is a multi-day IP block.
@@ -115,6 +137,10 @@ revenue-growth half and a strong provenance anchor; it is not a Yahoo replacemen
   same-day publication time (~3:30 PM ET)?
 - Is a third-party mirror (DBnomics) acceptable under the editorial guardrails, given `/history`
   shows sourcing to visitors?
+- Was DFF meant to be fetched and lost along the way, or was the label written ahead of the
+  implementation? The fix differs: restore the fetch, or correct two strings.
+- How often does the Alpha Vantage path actually compute a median over a partial basket? Nothing
+  in the snapshot records it today, so the honest answer is that nobody can tell from the data.
 
 ## Fallback note
 
