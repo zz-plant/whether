@@ -10,6 +10,7 @@ import {
   DECISION_CONTRACT_LABELS,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
+import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
 import { buildTrustPageModel } from "./trustPageModel";
@@ -36,6 +37,7 @@ export default async function MethodPage({
     isFallback,
     degradedSourceRows,
     confidenceLabel,
+    confidenceCode,
     trustSummary,
     citationLine,
     warnings,
@@ -44,6 +46,12 @@ export default async function MethodPage({
     trustVerdict,
     reportShellProps,
   } = await buildTrustPageModel();
+
+  const confidenceDotClass = {
+    positive: "bg-emerald-400",
+    caution: "bg-amber-400",
+    alert: "bg-rose-400",
+  }[resolveConfidenceTone(confidenceCode)];
 
   const secondaryContent = (
     <>
@@ -233,9 +241,7 @@ export default async function MethodPage({
           <div className="weather-hub-card px-4 py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className={`flex h-2.5 w-2.5 rounded-full ${
-                  confidenceLabel === "HIGH" ? "bg-emerald-400" : confidenceLabel === "MED" ? "bg-amber-400" : "bg-rose-400"
-                }`} aria-hidden="true" />
+                <span className={`flex h-2.5 w-2.5 rounded-full ${confidenceDotClass}`} aria-hidden="true" />
                 <p className="text-sm font-semibold text-slate-100">Confidence</p>
               </div>
               <span className="text-fluid-xs text-slate-400">{confidenceLabel}</span>

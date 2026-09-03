@@ -180,6 +180,10 @@ export async function buildTrustPageModel() {
     isFallback,
     degradedSourceRows,
     confidenceLabel,
+    // The plain label ("Medium (mixed signal reliability)") is prose. The status
+    // dot needs the code, and comparing the prose against "MED" never matched —
+    // so every confidence level, HIGH included, painted the dot rose.
+    confidenceCode: homeBriefModel.confidenceLabel,
     trustSummary,
     sourceCoverage,
     citationLine,

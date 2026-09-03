@@ -90,7 +90,12 @@ export function FormulaReference() {
         </p>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      {/* Wider gutters than a framed grid needs. The depth ladder in
+          surfaces.css drops the enclosure on these cards — they sit third
+          level and deeper — so spacing and type are what separate them, and
+          a 12px gap sized for bordered cards left four unframed blocks
+          reading as one run of text. */}
+      <div className="grid gap-x-10 gap-y-8 lg:grid-cols-2">
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>

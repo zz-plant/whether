@@ -387,7 +387,11 @@ export function TimelineBar({
                 style={{
                   width: `${100 / visibleSeries.length}%`,
                   backgroundColor: hexColor,
-                  opacity: isEntryActive ? 1 : isEntryHovered ? 0.9 : 0.65,
+                  // History recedes so the present asserts. At 0.65 idle against
+                  // 1.0 active the selected month was indistinguishable from the
+                  // other 40-odd, and a full-chroma band of rose/amber/emerald/sky
+                  // out-weighed the headline it sits directly above.
+                  opacity: isEntryActive ? 1 : isEntryHovered ? 0.85 : 0.45,
                 }}
                 className="h-full transition-opacity duration-150 relative border-r border-slate-950/20 last:border-r-0"
               />

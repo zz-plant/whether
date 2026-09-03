@@ -230,7 +230,10 @@ export default function RootLayout({
               {/* A file, not a page — stays an <a> and outside the link set. */}
               <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">RSS</a>
             </nav>
-            <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
+            {/* A rule above the legal tier. Tiers 2 and 3 carry the same size and
+                colour, so without it the tools row and the credits row read as one
+                twenty-link wall — the largest block of uniform text on the site. */}
+            <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 border-t border-slate-800/40 pt-4 text-fluid-micro text-[var(--footer-legal)]">
               <Link href="/acceptable-use-policy" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Acceptable Use</Link>
               <Link href="/terms-of-service" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Terms</Link>
               <span aria-hidden="true">·</span>

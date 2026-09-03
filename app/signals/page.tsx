@@ -164,8 +164,18 @@ export default async function SignalsPage({
               </p>
             </div>
 
-            <table className="w-full border-collapse text-left text-fluid-xs">
+            {/* Without explicit column widths the label column absorbs every
+                pixel of slack, so on a wide panel the two numeric columns end
+                up jammed against the right edge with ~400px of nothing between
+                a coordinate and its value. 50/25/25 keeps the pairs readable
+                across the row. */}
+            <table className="w-full max-w-2xl table-fixed border-collapse text-left text-fluid-xs">
               <caption className="sr-only">Match coordinates, reference cycle against this week</caption>
+              <colgroup>
+                <col className="w-1/2" />
+                <col className="w-1/4" />
+                <col className="w-1/4" />
+              </colgroup>
               <thead>
                 <tr className="border-b border-slate-800/80 text-slate-400">
                   <th scope="col" className="py-1.5 pr-3 font-medium">Coordinate</th>

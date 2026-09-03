@@ -138,14 +138,20 @@ export default async function DecidePage({
         title="Which decision is still open?"
         description="Start with the recommended next step."
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <article className="weather-surface space-y-4 px-4 py-4">
-            <p className="type-eyebrow text-sky-200">{recommendedPath.kicker}</p>
-            <div className="space-y-2">
+        {/* Stacked, not side by side. The recommended path is three lines and a
+            button; the starting-points list is six links in two groups. Racing
+            them as columns gave the least content the widest track and stretched
+            the short card to the tall one's height. The recommendation now runs
+            full width as a banner — copy left, action right — and the
+            alternatives sit below it as a pair. */}
+        <div className="space-y-4">
+          <article className="weather-surface flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0 space-y-2">
+              <p className="type-eyebrow text-sky-200">{recommendedPath.kicker}</p>
               <h3 className="text-lg font-semibold text-slate-100">{recommendedPath.title}</h3>
               <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
             </div>
-            <ButtonLink href={recommendedPath.href} variant="primary">
+            <ButtonLink href={recommendedPath.href} variant="primary" className="lg:shrink-0">
               {recommendedPath.cta}
             </ButtonLink>
           </article>
@@ -155,7 +161,7 @@ export default async function DecidePage({
               <p className="type-eyebrow">Other starting points</p>
               <p className="text-sm text-slate-300">If the recommended step isn&apos;t the decision you need.</p>
             </div>
-            <div className="space-y-4">
+            <div className="grid gap-4 lg:grid-cols-2">
               <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
                 <p className="type-eyebrow text-amber-200">Direct answers</p>
                 <p className="mt-1 text-fluid-xs text-slate-300">A direct yes-or-no decision.</p>

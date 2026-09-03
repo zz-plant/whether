@@ -9,6 +9,27 @@ import { pathMatchesLink } from "./pathMatching";
 
 const fallbackLabel = "Page";
 
+/**
+ * Labels for routes that no navigation layer or utility link claims.
+ *
+ * These all resolved to the bare fallback, so the header on the most linkable
+ * URL on the site — a frozen, citable weekly record — read "Whether · Page"
+ * while every other route named itself. Prefix-matched, longest first, so a
+ * future exact entry can still win.
+ */
+const sectionRouteLabels: ReadonlyArray<readonly [prefix: string, label: string]> = [
+  ["/answers", "Answer"],
+  ["/brief", "Published brief"],
+  ["/resources", "Resource"],
+  ["/toolkits", "Toolkit"],
+  ["/contact", "Contact"],
+];
+
+const resolveSectionRouteLabel = (pathname: string) =>
+  [...sectionRouteLabels]
+    .sort((a, b) => b[0].length - a[0].length)
+    .find(([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`))?.[1] ?? null;
+
 export const normalizePathname = (pathname: string) =>
   pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
 
@@ -39,7 +60,13 @@ export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
     return activeLayer.navLabel ?? activeLayer.label;
   }
 
-  return resolveUtilityRouteLabel(normalizePathname(pathname)) ?? fallbackLabel;
+  const normalizedPathname = normalizePathname(pathname);
+
+  return (
+    resolveUtilityRouteLabel(normalizedPathname)
+    ?? resolveSectionRouteLabel(normalizedPathname)
+    ?? fallbackLabel
+  );
 };
 
 // Next step in the operator loop. The weekly brief is the only primary layer,
