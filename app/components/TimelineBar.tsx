@@ -8,6 +8,7 @@ import {
 } from "../../lib/timeMachine/timeMachineCache";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { REGIME_COLORS } from "../viewModel";
+import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 
 export type ZoomPreset = "1Y" | "3Y" | "5Y" | "MAX";
 
@@ -19,13 +20,6 @@ const ZOOM_MONTH_COUNTS: Record<ZoomPreset, number> = {
 };
 
 const ZOOM_ORDER: ZoomPreset[] = ["1Y", "3Y", "5Y", "MAX"];
-
-const REGIME_HEX_COLORS: Record<string, string> = {
-  EXPANSION: "#10b981", // emerald-500
-  SCARCITY: "#f43f5e",  // rose-500
-  DEFENSIVE: "#f59e0b", // amber-500
-  VOLATILE: "#0ea5e9",  // sky-500
-};
 
 export interface TimelineBarProps {
   currentMonth?: number;

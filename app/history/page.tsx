@@ -2,6 +2,7 @@ import { ActionLink } from "../components/ui/actionLink";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
+import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { TrackRecord } from "../components/history/TrackRecord";
 import { ReportShell } from "../components/reportShell";
@@ -9,6 +10,7 @@ import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../li
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
+import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
 import { formatDateUTC } from "../../lib/formatters";
 import { toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
@@ -16,7 +18,19 @@ import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexBu
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
-type HistorySearchParams = { month?: string; year?: string; months?: string };
+type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string };
+
+/** The phase map's window rides in the URL, so its links have to preserve the
+ *  other params on the page — a reader who has the raw-conditions disclosure open
+ *  and the year picker set should not lose either by changing the window. */
+const buildSpanHref = (params: HistorySearchParams | undefined, span: string) => {
+  const query = new URLSearchParams();
+  if (params?.month) query.set("month", params.month);
+  if (params?.year) query.set("year", params.year);
+  if (params?.explore) query.set("explore", params.explore);
+  query.set("span", span);
+  return `/history?${query.toString()}#phase-map-heading`;
+};
 
 export default async function HistoryPage({
   searchParams,
@@ -34,6 +48,8 @@ export default async function HistoryPage({
   const riskAppetiteTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
   const trackRecord = buildTrackRecord(fullSeries);
+  const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
+  const phaseSeries = fullSeries.slice(-phaseSpan.months);
 
   return (
     <ReportShell
@@ -60,6 +76,16 @@ export default async function HistoryPage({
       <TrackRecord
         record={trackRecord}
         allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
+      />
+
+      {/* Between the record's summary numbers and its archive: the numbers say how
+          often the call changed, this says where it changed and how near the next
+          one is, and the archive below says what each call was. */}
+      <RegimePhaseMap
+        series={phaseSeries}
+        activeSpan={phaseSpan.key}
+        spanHref={(span) => buildSpanHref(resolvedSearchParams, span)}
+        totalMonths={fullSeries.length}
       />
 
       {publishedBriefs.length > 0 ? (

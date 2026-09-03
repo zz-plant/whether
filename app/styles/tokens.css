@@ -209,6 +209,21 @@
   --atmosphere-scarcity: rgba(76, 5, 25, 0.40);
   --atmosphere-volatile: rgba(8, 47, 73, 0.30);
 
+  /* Regime phase map (app/components/history/RegimePhaseMap.tsx) ---------
+     Quadrant washes for the plane the classifier actually cuts. Held far below
+     the --atmosphere-* tints above: those are full-page backdrops with nothing
+     over them, while these carry axis ticks, a trace, and markers, and have to
+     read as ground rather than as fill. The marker hues come from
+     REGIME_HEX_COLORS in lib/regimePhaseSpace.ts — 500-level, legible on both
+     ground colours — so only the washes and the chart furniture live here. */
+  --phase-scarcity: rgba(244, 63, 94, 0.11);
+  --phase-defensive: rgba(245, 158, 11, 0.10);
+  --phase-volatile: rgba(14, 165, 233, 0.10);
+  --phase-expansion: rgba(16, 185, 129, 0.08);
+  --phase-grid: rgba(148, 163, 184, 0.14);
+  --phase-boundary: rgba(226, 232, 240, 0.45);
+  --phase-trace: rgba(148, 163, 184, 0.85);
+
   /* Elevation ------------------------------------------------------------
      Two token families, deliberately not interchangeable:
 
@@ -553,6 +568,18 @@ html[data-theme="light"] {
   --atmosphere-defensive: rgba(217, 119, 6, 0.10);
   --atmosphere-scarcity: rgba(225, 29, 72, 0.09);
   --atmosphere-volatile: rgba(2, 132, 199, 0.09);
+
+  /* Phase-map quadrants and furniture. Same hues, re-mixed for a white plot
+     ground: the dark washes rely on a light tint lifting off a dark ground and
+     invert to nearly nothing on #ffffff, and the grid and trace have to darken
+     rather than lighten to stay visible at all. */
+  --phase-scarcity: rgba(225, 29, 72, 0.10);
+  --phase-defensive: rgba(217, 119, 6, 0.11);
+  --phase-volatile: rgba(2, 132, 199, 0.09);
+  --phase-expansion: rgba(5, 150, 105, 0.08);
+  --phase-grid: rgba(15, 23, 42, 0.10);
+  --phase-boundary: rgba(15, 23, 42, 0.34);
+  --phase-trace: rgba(51, 65, 85, 0.70);
 
   /* 700-level so accent-tinted labels and badges clear 4.5:1 on --bg-body. */
   --accent-action: #0369a1;
