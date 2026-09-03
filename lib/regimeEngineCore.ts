@@ -157,7 +157,14 @@ export const RISK_APPETITE_REGIME_THRESHOLD = 50;
 /** How long conditions must hold before a reversal is described as durable.
  *  Product choice: one month is the shortest window a team can plan against. */
 export const REGIME_REVERSAL_DAYS = 30;
-export const TREASURY_SOURCE_LABEL = "FRED CSV (DFF, DGS1MO, DGS3MO, DGS2, DGS10)";
+/*
+ * DFF is deliberately absent: nothing fetches it. `TREASURY_ENDPOINTS` once declared a fed-funds
+ * URL that was never wired into the request the client builds, and no bundled snapshot carries a
+ * `fedFunds` value, so `getBaseRate`'s FED rung has never fired and the base rate is always the
+ * one-month bill. This label is what the site cites as its source, so it names the four series
+ * actually read. tests/treasurySourceLabel.test.ts holds the two in step.
+ */
+export const TREASURY_SOURCE_LABEL = "FRED CSV (DGS1MO, DGS3MO, DGS2, DGS10)";
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;

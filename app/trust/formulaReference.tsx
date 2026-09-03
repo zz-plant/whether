@@ -94,12 +94,12 @@ export function FormulaReference() {
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Rates:</span> FRED daily series — DFF (fed funds; falls
-              back to DGS1MO, then DGS3MO), DGS2, DGS10.
+              <span className="text-slate-400">Rates:</span> FRED daily series — DGS1MO (the base
+              rate; falls back to DGS3MO), DGS2, DGS10.
               <span className="mt-1 block text-xs text-slate-400">
                 FRED is the Federal Reserve&rsquo;s free public data service; each code names one
-                published series. DFF is the Fed&rsquo;s policy rate, DGS2 the two-year Treasury
-                rate, DGS10 the ten-year.
+                published series. DGS1MO is the one-month Treasury bill rate, DGS2 the two-year,
+                DGS10 the ten-year.
               </span>
             </li>
             <li>
