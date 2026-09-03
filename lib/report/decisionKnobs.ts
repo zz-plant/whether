@@ -2,8 +2,6 @@ import type { RegimeKey } from "../regimeEngine";
 import { REGIME_LABELS } from "../regimePresentation";
 import type { RegimeStateTransition } from "./regimeStateMachine";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
-import {
-  } from "./operatorContext";
 
 /**
  * Loop stage owner: posture → decision.

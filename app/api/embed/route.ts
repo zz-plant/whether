@@ -8,8 +8,6 @@
 
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../../lib/report/homePageAssembler";
-import {
-} from "../../../lib/report/home/artifactPayload";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 export const runtime = "edge";
