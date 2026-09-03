@@ -172,6 +172,24 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     setSelectedIndex(0);
   }, [query]);
 
+  /*
+   * Capture phase, not bubble.
+   *
+   * Base UI's `Dialog.Popup` installs its own `onKeyDown` that calls
+   * `stopPropagation()` for every key in its COMPOSITE_KEYS set — ArrowUp,
+   * ArrowDown, ArrowLeft, ArrowRight, Home, End. The palette renders inside
+   * that popup, so an arrow keydown died at the popup element and never
+   * reached a bubble-phase listener on `window`: ↑/↓ did nothing at all.
+   *
+   * Enter is not in COMPOSITE_KEYS, which is what made this hard to see —
+   * Enter bubbled through and ran the selected command, so the palette looked
+   * wired up while the arrows were silently inert.
+   *
+   * Capturing runs this before the popup's handler, so navigation works
+   * without the dialog having to stop swallowing arrows for everyone else.
+   * The `true` here and on `removeEventListener` must stay in sync, or the
+   * listener is never removed.
+   */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown") {
@@ -185,8 +203,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         filteredRef.current[selectedIndexRef.current]?.action();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, []);
 
   // The palette opens in response to an explicit command, so moving focus to
