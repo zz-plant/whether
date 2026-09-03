@@ -10,6 +10,12 @@ import {
   DECISION_GUARDRAILS,
   DECISION_VERDICT_MATRIX,
 } from "./decisionShieldConfig";
+import {
+  computeRunwayShare,
+  formatCommitmentUsd,
+  parsePlanCommitment,
+  type ParsedCommitment,
+} from "./planCommitment";
 
 export type LifecycleStage = "DISCOVERY" | "GROWTH" | "SCALE" | "MATURE";
 export type DecisionCategory =
@@ -168,9 +174,43 @@ export const evaluateDecision = (
 export interface CompanyFinancialProfile {
   runwayMonths?: number;
   cashBalanceUsd?: number;
+  /** Net monthly cash burn. With `runwayMonths` this stands in for a cash
+   *  balance, which is the figure a founder is likelier to know from memory. */
+  monthlyBurnUsd?: number;
   businessModel?: "VC_BACKED" | "BOOTSTRAPPED";
   grossMarginPct?: number;
 }
+
+/**
+ * Runway below which a new commitment is treated as critical rather than merely
+ * expensive, in months.
+ *
+ * Named because the prose used to quote a different number than the rule: the
+ * check was `< 12` and the sentence beside it read "below the 15-month safe
+ * threshold". An operator reading that could not reproduce the verdict from the
+ * stated rule, which is the one thing every bounded rule here has to allow.
+ */
+export const RUNWAY_CRITICAL_MONTHS = 12;
+
+/**
+ * Share of available cash a single first-year commitment can consume before the
+ * verdict moves.
+ *
+ * Sizing only ever makes a call worse, never better. A small commitment in the
+ * wrong regime is still a bet in the wrong direction, so there is no de-escalation
+ * rung here — the regime matrix owns direction and this owns magnitude.
+ */
+export const COMMITMENT_SHARE_ELEVATED = 0.25;
+export const COMMITMENT_SHARE_SEVERE = 0.5;
+
+/**
+ * The last rule to move the verdict, so the headline can name the real cause.
+ *
+ * Without this the headline read "considered DANGEROUS in Sunny conditions" for a
+ * plan graded dangerous purely on size — crediting the week for a call the week
+ * did not make, directly above a sizing line that said otherwise.
+ */
+export type VerdictDriver = "REGIME" | "RUNWAY" | "REVERSIBILITY" | "SIZE";
 
 export const isBusinessModel = (
   value: string,
@@ -189,6 +229,23 @@ export interface PlanStressTestResult {
   headline: string;
   detectedCategory: DecisionCategory;
   detectedAction: DecisionAction;
+  /**
+   * Whether the category came from something in the sentence or from the
+   * fallback. Unmatched text still classifies as HIRE so every lookup keyed by
+   * `DecisionAction` keeps working, and callers used to have no way to tell that
+   * apart from a real match — "asdf qwerty" produced "Hire is considered SAFE"
+   * with the same confidence as a described hiring plan. Surfaces must show this
+   * and offer a correction.
+   */
+  detectionConfidence: "MATCHED" | "ASSUMED";
+  /** What the sentence said about size. `annualUsd` is null when it said nothing. */
+  commitment: ParsedCommitment;
+  /** The commitment against available cash, when the caller supplied enough to divide by. */
+  runwayShare: { share: number; cashUsd: number; cashBasis: string } | null;
+  /** One line naming what sizing did to the verdict, or why it could not size the plan. */
+  sizingNote: string;
+  /** Which rule produced the verdict above. */
+  verdictDriver: VerdictDriver;
   fragileAssumptions: string[];
   boundedGuardrail: string;
   reversalTrigger: string;
@@ -203,41 +260,76 @@ export interface PlanComparisonResult {
   comparativeRecommendation: string;
 }
 
-const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCategory): { category: DecisionCategory; action: DecisionAction } => {
+type Detection = { category: DecisionCategory; action: DecisionAction; confidence: "MATCHED" | "ASSUMED" };
+
+const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCategory): Detection => {
   if (categoryOverride) {
-    if (categoryOverride === "HIRING") return { category: "HIRING", action: "HIRE" };
-    if (categoryOverride === "INFRASTRUCTURE") return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
-    if (categoryOverride === "PRICING") return { category: "PRICING", action: "DISCOUNT" };
-    if (categoryOverride === "ROADMAP") return { category: "ROADMAP", action: "REWRITE" };
-    if (categoryOverride === "M_AND_A") return { category: "M_AND_A", action: "ACQUIRE" };
-    if (categoryOverride === "GEOGRAPHIC_EXPANSION") return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION" };
-    return { category: "RESTRUCTURING", action: "RESTRUCTURE" };
+    /* The caller said which kind of decision this is, so there is nothing to
+       infer and nothing to be unsure about. */
+    const matched = "MATCHED" as const;
+    if (categoryOverride === "HIRING") return { category: "HIRING", action: "HIRE", confidence: matched };
+    if (categoryOverride === "INFRASTRUCTURE") return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: matched };
+    if (categoryOverride === "PRICING") return { category: "PRICING", action: "DISCOUNT", confidence: matched };
+    if (categoryOverride === "ROADMAP") return { category: "ROADMAP", action: "REWRITE", confidence: matched };
+    if (categoryOverride === "M_AND_A") return { category: "M_AND_A", action: "ACQUIRE", confidence: matched };
+    if (categoryOverride === "GEOGRAPHIC_EXPANSION") return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION", confidence: matched };
+    return { category: "RESTRUCTURING", action: "RESTRUCTURE", confidence: matched };
   }
 
   const lower = text.toLowerCase();
   if (/\b(hire|hiring|headcount|recruiting|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
-    return { category: "HIRING", action: "HIRE" };
+    return { category: "HIRING", action: "HIRE", confidence: "MATCHED" };
   }
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
-    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
+    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: "MATCHED" };
   }
   if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
-    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
+    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: "MATCHED" };
   }
   if (/\b(discount|pricing|price|deal|contract discount|payment term)\b/.test(lower)) {
-    return { category: "PRICING", action: "DISCOUNT" };
+    return { category: "PRICING", action: "DISCOUNT", confidence: "MATCHED" };
   }
   if (/\b(acquire|acquisition|merger|m&a|buy company)\b/.test(lower)) {
-    return { category: "M_AND_A", action: "ACQUIRE" };
+    return { category: "M_AND_A", action: "ACQUIRE", confidence: "MATCHED" };
   }
   if (/\b(rewrite|refactor|architecture|rebuild|v2 migration)\b/.test(lower)) {
-    return { category: "ROADMAP", action: "REWRITE" };
+    return { category: "ROADMAP", action: "REWRITE", confidence: "MATCHED" };
   }
   if (/\b(expand|international|europe|asia|new market|geo)\b/.test(lower)) {
-    return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION" };
+    return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION", confidence: "MATCHED" };
   }
 
-  return { category: "HIRING", action: "HIRE" };
+  /* Nothing in the sentence named a decision type. Still HIRING, because every
+     downstream table is keyed by `DecisionAction` and there is no "unknown"
+     column — but flagged, so the surface can show what it assumed and let the
+     reader correct it rather than quietly grading the wrong kind of decision. */
+  return { category: "HIRING", action: "HIRE", confidence: "ASSUMED" };
+};
+
+/** Names the rule that decided, not the week, unless the week is what decided. */
+const buildStressHeadline = ({
+  actionLabel,
+  verdict,
+  verdictDriver,
+  regimeLabel,
+  runwayMonths,
+}: {
+  actionLabel: string;
+  verdict: DecisionVerdict;
+  verdictDriver: VerdictDriver;
+  regimeLabel: string;
+  runwayMonths?: number;
+}): string => {
+  if (verdictDriver === "SIZE") {
+    return `${actionLabel} is ${verdict} at this size, not on ${regimeLabel} conditions alone.`;
+  }
+  if (verdictDriver === "RUNWAY") {
+    return `${actionLabel} is ${verdict} on ${runwayMonths} months of runway in ${regimeLabel} conditions.`;
+  }
+  if (verdictDriver === "REVERSIBILITY") {
+    return `${actionLabel} is ${verdict} because the plan is structured to be reversible.`;
+  }
+  return `${actionLabel} is considered ${verdict} in ${regimeLabel} conditions.`;
 };
 
 export const stressTestDecisionPlan = (
@@ -245,7 +337,7 @@ export const stressTestDecisionPlan = (
   request: PlanStressTestRequest
 ): PlanStressTestResult => {
   const lifecycle = request.lifecycle ?? "GROWTH";
-  const { category, action } = detectCategoryAndAction(request.planText, request.category);
+  const { category, action, confidence: detectionConfidence } = detectCategoryAndAction(request.planText, request.category);
   const profile = request.companyProfile;
 
   const baseEvaluation = evaluateDecision(assessment, {
@@ -259,16 +351,22 @@ export const stressTestDecisionPlan = (
   const regimeLabel = REGIME_LABELS[assessment.regime];
 
   let verdict = baseEvaluation.verdict;
+  let verdictDriver: VerdictDriver = "REGIME";
   const fragileAssumptions: string[] = [];
   let financialImpactSummary: string | undefined = undefined;
 
   if (profile) {
-    if (profile.runwayMonths !== undefined && profile.runwayMonths < 12 && (assessment.regime === "DEFENSIVE" || assessment.regime === "SCARCITY")) {
+    if (
+      profile.runwayMonths !== undefined &&
+      profile.runwayMonths < RUNWAY_CRITICAL_MONTHS &&
+      (assessment.regime === "DEFENSIVE" || assessment.regime === "SCARCITY")
+    ) {
       verdict = "DANGEROUS";
+      verdictDriver = "RUNWAY";
       fragileAssumptions.push(
         `Critical runway constraint: With only ${profile.runwayMonths} months cash buffer, capital markets in ${regimeLabel} severely penalize refinancing.`
       );
-      financialImpactSummary = `Current runway (${profile.runwayMonths}m) is below the 15-month safe threshold for ${regimeLabel} conditions.`;
+      financialImpactSummary = `Runway of ${profile.runwayMonths} months is under the ${RUNWAY_CRITICAL_MONTHS}-month line this rule uses for ${regimeLabel} conditions.`;
     } else if (profile.businessModel === "BOOTSTRAPPED" && profile.grossMarginPct && profile.grossMarginPct >= 70) {
       if (verdict === "RISKY") {
         verdict = "SAFE";
@@ -282,6 +380,47 @@ export const stressTestDecisionPlan = (
   const isExplicitlyReversible = /\b(contract-to-hire|contract to hire|milestone|monthly rolling|on-demand|convertible|short-term|reversible)\b/i.test(request.planText);
   if (isExplicitlyReversible && verdict === "RISKY") {
     verdict = "SAFE";
+    verdictDriver = "REVERSIBILITY";
+  }
+
+  /*
+   * Size last, and deliberately after the reversibility upgrade above.
+   *
+   * That upgrade reads a keyword out of the operator's own sentence, so running
+   * it after this would let the word "reversible" talk a commitment worth half
+   * the company's cash back down to SAFE. Structure can soften a posture call;
+   * it cannot shrink a number. Ordering is the whole guarantee here, so leave it.
+   */
+  const commitment = parsePlanCommitment(request.planText);
+  const runwayShare = computeRunwayShare({
+    annualUsd: commitment.annualUsd,
+    cashBalanceUsd: profile?.cashBalanceUsd,
+    monthlyBurnUsd: profile?.monthlyBurnUsd,
+    runwayMonths: profile?.runwayMonths,
+  });
+
+  let sizingNote: string;
+  if (runwayShare) {
+    const pct = Math.round(runwayShare.share * 100);
+    const spend = formatCommitmentUsd(commitment.annualUsd!);
+    if (runwayShare.share >= COMMITMENT_SHARE_SEVERE) {
+      verdict = "DANGEROUS";
+      verdictDriver = "SIZE";
+      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — at or over the ${Math.round(COMMITMENT_SHARE_SEVERE * 100)}% line, so this is graded dangerous on size alone.`;
+      fragileAssumptions.push(
+        `Assumes the raise or revenue that refills ${pct}% of available cash arrives before this commitment ends.`
+      );
+    } else if (runwayShare.share >= COMMITMENT_SHARE_ELEVATED) {
+      verdict = adjustVerdict(verdict, "up");
+      verdictDriver = "SIZE";
+      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — over the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line, so the call is one step harsher than the regime alone would give.`;
+    } else {
+      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis}, under the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line that would move the call.`;
+    }
+  } else if (commitment.annualUsd !== null) {
+    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash or monthly burn — without one the verdict is the regime's alone.`;
+  } else {
+    sizingNote = "No amount in the plan, so this is graded on posture only. Add a figure to size it against your cash.";
   }
 
   if (tightness > 60 && profile?.businessModel !== "BOOTSTRAPPED") {
@@ -325,9 +464,20 @@ export const stressTestDecisionPlan = (
 
   return {
     verdict,
-    headline: `${formatDecisionAction(action)} is considered ${verdict} in ${regimeLabel} conditions.`,
+    headline: buildStressHeadline({
+      actionLabel: formatDecisionAction(action),
+      verdict,
+      verdictDriver,
+      regimeLabel,
+      runwayMonths: profile?.runwayMonths,
+    }),
     detectedCategory: category,
     detectedAction: action,
+    detectionConfidence,
+    commitment,
+    runwayShare,
+    sizingNote,
+    verdictDriver,
     fragileAssumptions,
     boundedGuardrail: baseEvaluation.guardrail,
     reversalTrigger: baseEvaluation.reversalTrigger,

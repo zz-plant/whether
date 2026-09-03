@@ -96,7 +96,10 @@ describe("decisionRedTeam", () => {
 
     assert.equal(result.verdict, "DANGEROUS");
     assert.ok(result.fragileAssumptions.some((a) => a.includes("Critical runway constraint")));
-    assert.ok(result.financialImpactSummary?.includes("below the 15-month safe threshold"));
+    // The summary now quotes the month count the check actually uses. This line
+    // asserted "15-month" while the rule was `< 12` and this test's own title
+    // said 12 — the prose was pinned to a threshold that never existed.
+    assert.ok(result.financialImpactSummary?.includes("under the 12-month line"));
   });
 
   it("compares Plan A vs Plan B side-by-side and recommends the safer option", () => {
