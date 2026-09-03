@@ -192,11 +192,32 @@ const buildLiveGroupFallbackReason = ({
     return null;
   }
 
+  /*
+   * Name the series that are not live, rather than only the group.
+   *
+   * A live group is all-or-nothing: `hasCompleteLiveCoverage` needs every id, so one cached
+   * series presents "Market stress" as a wholly failed source while three of its four reads
+   * are fine. The mode is right -- a composite of partly stale inputs is not a live reading --
+   * but "is mixing live and cached values" told an operator that something was wrong without
+   * telling them what, which is the whole question when a source degrades in production and
+   * the box serving it cannot be reached to look.
+   */
+  const staleLabels = relevantSeries.filter((series) => !series.isLive).map((series) => series.label);
+  const missingIds = group.ids.filter((id) => !relevantSeries.some((series) => series.id === id));
+  const detail = [
+    staleLabels.length > 0 ? `cached: ${staleLabels.join(", ")}` : null,
+    missingIds.length > 0 ? `not loaded: ${missingIds.join(", ")}` : null,
+  ]
+    .filter((part): part is string => part !== null)
+    .join("; ");
+
   if (liveSeriesCount > 0) {
-    return `${group.sourceName} is mixing live and cached values for this refresh.`;
+    return `${group.sourceName} is mixing live and cached values for this refresh (${detail}).`;
   }
 
-  return `${group.sourceName} is running on cached snapshot values.`;
+  return detail
+    ? `${group.sourceName} is running on cached snapshot values (${detail}).`
+    : `${group.sourceName} is running on cached snapshot values.`;
 };
 
 const buildGroupedRow = ({

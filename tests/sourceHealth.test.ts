@@ -85,6 +85,46 @@ describe("buildSourceHealthRows", () => {
     assert.match(marketStress?.activeFallbackReason ?? "", /mixing live and cached values/i);
   });
 
+  /*
+   * The mode alone cannot be acted on. One cached series turns the whole group to "fallback",
+   * so an operator reading the trust page sees a failed source without learning which of the
+   * four reads failed -- the one thing they need when the box serving production is not
+   * reachable to inspect.
+   */
+  it("names the series that are cached and the ones that never loaded", () => {
+    const rows = buildSourceHealthRows({
+      treasury: buildTreasury(),
+      macroSeries: [
+        buildMacroSeriesReading({ id: "BBB_CREDIT_SPREAD", label: "BBB spread", isLive: true }),
+        buildMacroSeriesReading({ id: "HY_CREDIT_SPREAD", label: "HY spread", isLive: false }),
+      ],
+      now: new Date("2026-03-11T00:00:00.000Z"),
+    });
+
+    const reason = rows.find((row) => row.sourceName === "Market stress")?.activeFallbackReason ?? "";
+
+    assert.match(reason, /cached: HY spread/, "the cached series is named");
+    assert.ok(!reason.includes("BBB spread"), "a live series is not blamed");
+    // CHICAGO_FCI and VIX_INDEX are in the group but absent from the reading set entirely,
+    // which is a different failure from a stale value and reads differently.
+    assert.match(reason, /not loaded: CHICAGO_FCI, VIX_INDEX/, "absent ids are named separately");
+  });
+
+  it("keeps the reason clean when a fully cached group has every series present", () => {
+    const rows = buildSourceHealthRows({
+      treasury: buildTreasury(),
+      macroSeries: [
+        buildMacroSeriesReading({ id: "CPI_YOY", label: "CPI YoY", isLive: false }),
+      ],
+      now: new Date("2026-03-11T00:00:00.000Z"),
+    });
+
+    const reason = rows.find((row) => row.sourceName === "Inflation")?.activeFallbackReason ?? "";
+
+    assert.match(reason, /running on cached snapshot values \(cached: CPI YoY\)/);
+    assert.ok(!reason.includes("not loaded"), "nothing is missing, so nothing claims to be");
+  });
+
   it("summarizes live, cached, and missing source coverage", () => {
     const summary = summarizeSourceHealthCoverage([
       {

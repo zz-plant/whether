@@ -28,8 +28,16 @@ const RETRY_BACKOFF_MS =
 const buildTreasuryRatesEndpoint = (year: number) =>
   `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/${year}/all` +
   `?type=daily_treasury_yield_curve&field_tdr_date_value=${year}&_format=csv`;
+/*
+ * A `fedFunds` entry (DFF) sat here from the commit that introduced this object until 2026-09-03
+ * and was never added to the `endpoints` the client builds below, so it never produced a request.
+ * Its presence was read as evidence that DFF was a live input -- it reached the source label and
+ * the trust page's formula reference, both of which told visitors the Fed's policy rate was in
+ * use while `getBaseRate` was falling through to the one-month bill on every render. Wiring it up
+ * is a live change to the base rate and belongs to whoever owns that call; naming it without
+ * reading it is not.
+ */
 export const TREASURY_ENDPOINTS = {
-  fedFunds: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFF",
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
   threeMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO",
   twoYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2",
