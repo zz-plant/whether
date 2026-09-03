@@ -117,7 +117,7 @@ export const DecisionShieldPanel = ({
   const presetInputRef = useRef<HTMLInputElement | null>(null);
   const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
   const lastClipboardStatusRef = useRef<ClipboardCopyState["status"]>("idle");
-  const lastAttemptedTargetRef = useRef<"verdict" | "link" | null>(null);
+  const [lastAttemptedTarget, setLastAttemptedTarget] = useState<"verdict" | "link" | null>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -248,7 +248,7 @@ export const DecisionShieldPanel = ({
     if (status === "copying") {
       return;
     }
-    lastAttemptedTargetRef.current = "verdict";
+    setLastAttemptedTarget("verdict");
     await copyToClipboard(shareText, "verdict");
   };
 
@@ -257,7 +257,7 @@ export const DecisionShieldPanel = ({
       return;
     }
     const link = `${window.location.origin}${pathname}?${searchParams.toString()}`;
-    lastAttemptedTargetRef.current = "link";
+    setLastAttemptedTarget("link");
     await copyToClipboard(link, "link");
   };
 
@@ -349,7 +349,7 @@ export const DecisionShieldPanel = ({
     }
     if (status === "error") {
       const isBlocked = errorReason === "unavailable";
-      const onLink = lastAttemptedTargetRef.current === "link";
+      const onLink = lastAttemptedTarget === "link";
       add({
         title: isBlocked ? "Clipboard blocked" : "Copy failed",
         description: onLink
@@ -363,7 +363,7 @@ export const DecisionShieldPanel = ({
       });
     }
     lastClipboardStatusRef.current = status;
-  }, [add, copiedTarget, errorReason, status]);
+  }, [add, copiedTarget, errorReason, lastAttemptedTarget, status]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setMemoryStatus(null), 2600);
@@ -430,13 +430,13 @@ export const DecisionShieldPanel = ({
                 : ""}
         </output>
         <output className="mt-2 block min-h-[20px] text-xs text-amber-200" aria-live="polite">
-          {error && lastAttemptedTargetRef.current === "link" ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
+          {error && lastAttemptedTarget === "link" ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
         </output>
         <output className="mt-1 block min-h-[20px] text-xs text-slate-300" aria-live="polite">
           {memoryStatus ?? ""}
         </output>
         <div className="mt-4 min-h-[260px]">
-          {error && lastAttemptedTargetRef.current === "verdict" ? (
+          {error && lastAttemptedTarget === "verdict" ? (
             <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
               <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
                 Clipboard blocked

@@ -50,7 +50,7 @@ describe("analogPlaybook", () => {
       playbook.matchBasis.map((item) => item.key),
       ["baseRate", "curveSlope", "tightness", "riskAppetite"],
     );
-    assert.equal(playbook.matchBasis[0]?.now, 5.25);
+    assert.equal(playbook.matchBasis[0]?.live, 5.25);
     assert.doesNotMatch(playbook.consensusTrap, /^What peer startups got wrong/);
     assert.match(playbook.consensusTrap, /Expanded enterprise direct sales headcount/);
     assert.ok(playbook.reversalMarker.includes("Yield curve"));

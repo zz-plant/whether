@@ -160,8 +160,13 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     return matches.length ? [...matches, searchCommand] : [searchCommand];
   }, [query, commands, navigateTo]);
 
-  filteredRef.current = filtered;
-  selectedIndexRef.current = selectedIndex;
+  // Mirrored for the keydown handler below, which is attached once and must not
+  // re-subscribe on every keystroke. Assigned on commit rather than during render:
+  // a render React throws away must not leave the ref mutated.
+  useEffect(() => {
+    filteredRef.current = filtered;
+    selectedIndexRef.current = selectedIndex;
+  }, [filtered, selectedIndex]);
 
   useEffect(() => {
     setSelectedIndex(0);

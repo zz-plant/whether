@@ -177,8 +177,8 @@ export default async function SignalsPage({
                 {analog.matchBasis.map((item) => (
                   <tr key={item.key} className="border-b border-slate-800/40 last:border-0">
                     <td className="py-1.5 pr-3 text-slate-300">{item.label}</td>
-                    <td className="py-1.5 pr-3 text-right font-mono text-slate-400">{formatCoordinate(item.then, item.unit)}</td>
-                    <td className="py-1.5 text-right font-mono text-slate-100">{formatCoordinate(item.now, item.unit)}</td>
+                    <td className="py-1.5 pr-3 text-right font-mono text-slate-400">{formatCoordinate(item.historical, item.unit)}</td>
+                    <td className="py-1.5 text-right font-mono text-slate-100">{formatCoordinate(item.live, item.unit)}</td>
                   </tr>
                 ))}
               </tbody>
