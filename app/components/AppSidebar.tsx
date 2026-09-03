@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReportSectionLink } from "./reportShellNavigation";
 import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
+import {
+  resolveActiveSectionId,
+  sectionIdsFromHrefs,
+} from "../../lib/navigation/sectionOutline";
 
 function OutlineItem({
   href,
@@ -24,7 +28,10 @@ function OutlineItem({
 
   if (isHash) {
     return (
-      <a href={href} className={linkClass}>
+      // aria-current="location" is the ARIA value for "the current place within
+      // a page", which is exactly what an outline entry marks. Without it the
+      // active state was colour only.
+      <a href={href} className={linkClass} aria-current={isActive ? "location" : undefined}>
         {label}
       </a>
     );
@@ -37,9 +44,64 @@ function OutlineItem({
   );
 }
 
+/**
+ * Which section the reader is actually in.
+ *
+ * The outline used to mark a section active with `pathname.includes(section.href)`,
+ * where the href is a fragment like "#current-scores" and the pathname never
+ * carries a fragment — so the branch was unreachable and the table of contents
+ * on a 4,000px page never said where you were.
+ *
+ * The band is the top slice of the viewport: a section counts as current once its
+ * heading reaches the header and until the next one does. When nothing is in the
+ * band — mid-scroll between two sections, or at the very bottom — the last answer
+ * stands rather than blanking.
+ */
+const useActiveSectionId = (sectionLinks: ReportSectionLink[]) => {
+  const sectionIds = useMemo(
+    () => sectionIdsFromHrefs(sectionLinks.map((section) => section.href)),
+    [sectionLinks],
+  );
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!sectionIds.length || typeof IntersectionObserver === "undefined") {
+      return;
+    }
+
+    const nodes = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((node): node is HTMLElement => Boolean(node));
+    if (!nodes.length) {
+      return;
+    }
+
+    const onScreen = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            onScreen.add(entry.target.id);
+          } else {
+            onScreen.delete(entry.target.id);
+          }
+        }
+        setActiveId((previous) => resolveActiveSectionId(sectionIds, onScreen, previous));
+      },
+      { rootMargin: "-96px 0px -72% 0px", threshold: 0 },
+    );
+
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [sectionIds]);
+
+  return activeId;
+};
+
 function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] }) {
   const currentPathname = usePathname() ?? "/";
   const [pathname, setPathname] = useState("/");
+  const activeSectionId = useActiveSectionId(sectionLinks);
 
   useEffect(() => {
     setPathname(currentPathname);
@@ -63,7 +125,7 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
           </p>
           <nav aria-label="Page sections" className="space-y-0.5">
             {sectionLinks.map((section) => {
-              const isActive = pathname.includes(section.href);
+              const isActive = section.href === `#${activeSectionId}`;
               return (
                 <OutlineItem
                   key={section.href}

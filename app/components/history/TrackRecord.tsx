@@ -1,5 +1,9 @@
-import type { TrackRecord as TrackRecordModel } from "../../../lib/report/trackRecord";
+import type {
+  TrackRecord as TrackRecordModel,
+  TrackRecordRow,
+} from "../../../lib/report/trackRecord";
 import { formatDateUTC } from "../../../lib/formatters";
+import { UrlDetails } from "../ui/urlDetails";
 
 /**
  * The record of what this product has called, framed as evidence rather than as
@@ -26,11 +30,77 @@ const renderDelta = (delta: number | null) => {
   );
 };
 
-export function TrackRecord({ record }: { record: TrackRecordModel | null }) {
+/**
+ * One table, rendered twice: the recent window the panel leads with, and the
+ * remainder behind a disclosure. Extracted rather than duplicated so the two can
+ * never drift into two different tables of the same thing.
+ */
+const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: string }) => (
+  <table className="w-full max-w-3xl table-fixed border-collapse text-left text-fluid-xs">
+    <colgroup>
+      <col className="w-[26%]" />
+      <col className="w-[32%]" />
+      <col className="w-[21%]" />
+      <col className="w-[21%]" />
+    </colgroup>
+    <caption className="sr-only">{caption}</caption>
+    <thead>
+      <tr className="border-b border-slate-800/80 text-slate-400">
+        <th scope="col" className="py-2 pr-3 font-medium">Month</th>
+        <th scope="col" className="py-2 pr-3 font-medium">Call</th>
+        <th scope="col" className="py-2 pr-3 text-right font-medium">Boldness</th>
+        <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      {/* A changed row is the only event in a run of held ones, so it is
+          marked as one. Twelve rows reading "Sunny" with a grey badge on
+          the seventh made the transition the least visible thing in a
+          table whose subject is transitions. */}
+      {rows.map((row) => (
+        <tr
+          key={row.recordDate}
+          className={`border-b border-slate-800/40 last:border-0${
+            row.changed ? " bg-slate-900/40" : ""
+          }`}
+        >
+          <td className="py-2 pr-3 font-mono text-slate-400">{formatDateUTC(row.recordDate)}</td>
+          <td className="py-2 pr-3 text-slate-200">
+            <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
+              {row.regimeLabel}
+            </span>
+            {row.changed ? (
+              <span className="ml-2 type-badge text-fluid-micro rounded-sm bg-sky-500/15 px-1.5 py-0.5 text-sky-200">
+                changed
+              </span>
+            ) : null}
+          </td>
+          <td className="py-2 pr-3 text-right font-mono text-slate-200">
+            {row.boldness.toLocaleString("en-US")}
+            <span className="ml-2 sm:hidden">{renderDelta(row.boldnessDelta)}</span>
+          </td>
+          <td className="hidden py-2 text-right font-mono sm:table-cell">
+            {renderDelta(row.boldnessDelta)}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
+
+export function TrackRecord({
+  record,
+  allMonthsOpen = false,
+}: {
+  record: TrackRecordModel | null;
+  allMonthsOpen?: boolean;
+}) {
   if (!record) {
     return null;
   }
 
+  const earlierRows = record.allRows.slice(record.rows.length);
+  const oldestShownDate = record.rows[record.rows.length - 1]?.recordDate ?? record.firstRecordDate;
   const yearsCovered = record.monthsCovered / 12;
   const changeRate = yearsCovered >= 1
     ? `${(Math.round((record.regimeChanges / yearsCovered) * 10) / 10).toLocaleString("en-US")} per year`
@@ -86,53 +156,37 @@ export function TrackRecord({ record }: { record: TrackRecordModel | null }) {
           off-screen behind a scroll nobody discovers — and the delta is the most
           scannable thing here. It now folds into the Boldness cell below sm. */}
       <div>
-        <table className="w-full border-collapse text-left text-fluid-xs">
-          <caption className="sr-only">
-            Monthly operating call history, newest first, with the boldness score behind each call.
-          </caption>
-          <thead>
-            <tr className="border-b border-slate-800/80 text-slate-400">
-              <th scope="col" className="py-2 pr-3 font-medium">Month</th>
-              <th scope="col" className="py-2 pr-3 font-medium">Call</th>
-              <th scope="col" className="py-2 pr-3 text-right font-medium">Boldness</th>
-              <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* A changed row is the only event in a run of held ones, so it is
-                marked as one. Twelve rows reading "Sunny" with a grey badge on
-                the seventh made the transition the least visible thing in a
-                table whose subject is transitions. */}
-            {record.rows.map((row) => (
-              <tr
-                key={row.recordDate}
-                className={`border-b border-slate-800/40 last:border-0${
-                  row.changed ? " bg-slate-900/40" : ""
-                }`}
-              >
-                <td className="py-2 pr-3 font-mono text-slate-400">{formatDateUTC(row.recordDate)}</td>
-                <td className="py-2 pr-3 text-slate-200">
-                  <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
-                    {row.regimeLabel}
-                  </span>
-                  {row.changed ? (
-                    <span className="ml-2 type-badge text-fluid-micro rounded-sm bg-sky-500/15 px-1.5 py-0.5 text-sky-200">
-                      changed
-                    </span>
-                  ) : null}
-                </td>
-                <td className="py-2 pr-3 text-right font-mono text-slate-200">
-                  {row.boldness.toLocaleString("en-US")}
-                  <span className="ml-2 sm:hidden">{renderDelta(row.boldnessDelta)}</span>
-                </td>
-                <td className="hidden py-2 text-right font-mono sm:table-cell">
-                  {renderDelta(row.boldnessDelta)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <RecordTable
+          rows={record.rows}
+          caption={`The ${record.rows.length} most recent monthly operating calls, newest first, with the boldness score behind each call.`}
+        />
       </div>
+
+      {/* The rest of the record. URL-carried per §XII: a reader who opens the
+          full history and shares the link is sharing the full history, which is
+          the whole point of a record you can audit. */}
+      {earlierRows.length > 0 ? (
+        <UrlDetails
+          queryKey="months"
+          initialOpen={allMonthsOpen}
+          className="weather-auto-chevron"
+          summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
+          summary={
+            <span>
+              Earlier months ({earlierRows.length.toLocaleString("en-US")}) ·{" "}
+              {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(oldestShownDate)}
+            </span>
+          }
+        >
+          <div className="mt-3">
+            <RecordTable
+              rows={earlierRows}
+              caption="The remainder of the monthly operating call history, newest first."
+            />
+          </div>
+        </UrlDetails>
+      ) : null}
+
     </section>
   );
 }

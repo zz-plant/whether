@@ -46,7 +46,12 @@ export const PlaybookPanel = ({
             {playbook?.title ?? "Rules for new commitments"}
           </h3>
         </div>
-        <div className="mt-4 weather-surface p-4">
+        {/* A labelled group, not another box — the same argument the "Rules by
+            area" group below already records. Framing this one put its text on
+            a fourth left edge: the panel heading, this box's inset, the group
+            label, and the rule cards each started at a different x inside one
+            block. */}
+        <div className="mt-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Summary</p>
           <p className="mt-2 text-sm text-slate-200">
             {playbook

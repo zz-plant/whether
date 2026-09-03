@@ -22,6 +22,31 @@ type ReportSectionProps = {
   action?: ReactNode;
 };
 
+/**
+ * A link to this section.
+ *
+ * Every section on these pages already carries an `id` — the outline sidebar
+ * links to them and J/K jumps between them — but nothing exposed one, so a
+ * reader who wanted to send a colleague to "What would flip the call" had to
+ * hand-edit the URL bar. Section XII makes the case directly: this product's job
+ * includes handing someone an artifact.
+ *
+ * Always visible rather than hover-revealed. Hover-reveal is the docs-site
+ * convention, but it hides the affordance entirely on touch, where sharing a
+ * link is more likely, not less.
+ */
+const SectionAnchor = ({ id, title }: { id: string; title: string }) => (
+  <a
+    href={`#${id}`}
+    aria-label={`Link to this section: ${title}`}
+    // -my-2 so the 44px target required by section II does not set the height of
+    // the heading row it sits in.
+    className="weather-section-anchor -my-2 inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-md text-base font-normal text-slate-600 no-underline transition-colors hover:text-sky-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+  >
+    <span aria-hidden="true">#</span>
+  </a>
+);
+
 export function ReportSection({
   id,
   title,
@@ -59,9 +84,12 @@ export function ReportSection({
               {label}
             </span>
           ) : null}
-          <HeadingTag id={headingId} className="mt-1 max-w-2xl text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
-            {title}
-          </HeadingTag>
+          <div className="mt-1 flex items-center gap-1">
+            <HeadingTag id={headingId} className="max-w-2xl text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
+              {title}
+            </HeadingTag>
+            <SectionAnchor id={id} title={title} />
+          </div>
           {description ? (
             <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-300 sm:text-sm">
               {description}
@@ -95,9 +123,12 @@ export function ReportSection({
               using this component, which is a large part of why it only ever got
               adopted on /trust. */}
           {label ? <p className="type-eyebrow mb-1">{label}</p> : null}
-          <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
-            {title}
-          </HeadingTag>
+          <div className="flex items-center gap-1">
+            <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
+              {title}
+            </HeadingTag>
+            <SectionAnchor id={id} title={title} />
+          </div>
           {description ? (
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
               {description}

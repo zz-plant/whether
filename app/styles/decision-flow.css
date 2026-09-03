@@ -73,6 +73,14 @@ summary:focus-visible {
   text-decoration-color: rgba(56, 189, 248, 0.46);
 }
 
+/* The section permalink is a mark, not a phrase, and a lone underlined "#"
+   reads as a typo rather than a link. It cannot be switched off at the call
+   site: the anchor rules above are unlayered, so they beat Tailwind's
+   `no-underline`, which lives in the utilities layer. */
+:where(.weather-panel, .weather-surface) a.weather-section-anchor {
+  text-decoration: none;
+}
+
 .weather-meta-list__item {
   display: inline-flex;
   align-items: baseline;

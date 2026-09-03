@@ -337,7 +337,13 @@ export async function buildPlanningPageModel(
               id: "ops-monthly-action-summary-panel",
               title: "Weekly plan",
               children: h(Fragment, null,
-              h("section", { className: "weather-surface space-y-4 px-4 py-4" },
+              // A labelled group, not another box. `weather-surface` is the Surface tier —
+              // the outermost radius, with its own elevation — and this sat two
+              // containers deep inside the step card, wrapping three cells that are
+              // bordered themselves. Three frames for one group, and the middle one
+              // put the block on its own left edge. Same call the playbook panel
+              // already records for its "Rules by area" group.
+              h("section", { className: "space-y-4" },
                 h("div", { className: "space-y-2" },
                   h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "Weekly approval boundary"),
                   h("p", { className: "text-sm text-slate-300" }, "Confirm this week's move first. Open the monthly roll-up for broader context."),
@@ -458,7 +464,7 @@ export async function buildPlanningPageModel(
               id: "ops-playbook-panel",
               title: "Rules before you commit",
               children: h(Fragment, null,
-              h("div", { className: "flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3" },
+              h("div", { className: "flex flex-wrap items-center justify-between gap-3" },
                 h("p", { className: "text-xs text-slate-300" }, showAllActionLanes ? "Full rule list." : "Top 3 rules per area."),
                 h("a", {
                   href: buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes),

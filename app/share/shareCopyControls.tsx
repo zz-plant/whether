@@ -74,7 +74,12 @@ export function ShareCopyControls({
           under each button. */}
       <div className="grid gap-4 sm:grid-cols-2 content-start">
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-200">Slack</h2>
+          {/* One colour for four peer formats. These were sky / emerald / amber /
+              violet, which reads as a status legend on a site where emerald and
+              amber mean easing and tightening everywhere else — decoration
+              spending the semantic palette on four things that differ only by
+              destination. */}
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Slack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the current weekly operator brief for channel handoff.</p>
           <button
             type="button"
@@ -86,7 +91,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-emerald-200">Email</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Email</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the same call with citation context for leadership notes.</p>
           <button
             type="button"
@@ -98,7 +103,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-amber-200">Meeting pack</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Meeting pack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the board note, call snapshot, weekly brief, board summary, and citation.</p>
           <button
             type="button"
@@ -110,7 +115,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-violet-200">Calendar</h2>
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Calendar</h2>
           <p className="text-xs leading-relaxed text-slate-300">Open a Monday review invite with the current call in the agenda.</p>
           <a
             href={calendarHref}

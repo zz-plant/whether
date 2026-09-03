@@ -16,7 +16,7 @@ import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexBu
 import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
-type HistorySearchParams = { month?: string; year?: string };
+type HistorySearchParams = { month?: string; year?: string; months?: string };
 
 export default async function HistoryPage({
   searchParams,
@@ -57,7 +57,10 @@ export default async function HistoryPage({
         <ExportBoardAnnexButton record={trackRecord} />
       </div>
 
-      <TrackRecord record={trackRecord} />
+      <TrackRecord
+        record={trackRecord}
+        allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
+      />
 
       {publishedBriefs.length > 0 ? (
         <section className="weather-panel space-y-4 px-5 py-5">

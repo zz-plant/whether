@@ -21,7 +21,11 @@ export function PresentModeButton({ className = "" }: Props) {
       aria-label="Toggle presentation focus mode"
     >
       <Maximize2 size={13} className="text-slate-400" />
-      <span className="hidden sm:inline">Present</span>
+      {/* Labelled at every width. Hiding it below sm left one bare ⤢ box at the
+          end of a wrapping row of three labelled buttons — it saved no row,
+          since the row had already wrapped, and "presentation focus mode" is
+          not a glyph anyone reads cold. */}
+      <span>Present</span>
     </button>
   );
 }

@@ -112,6 +112,20 @@ export const formatCrossingRiskLabel = (risk: CrossingRiskLabel): string => cros
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
   confidencePlainLabels[confidence];
 
+/** Status tone for a confidence reading.
+ *
+ *  Takes the code, never the plain label. `app/trust/page.tsx` used to compare
+ *  the prose from `formatConfidencePlainLabel` ("Medium (mixed signal
+ *  reliability)") against "MED" and "HIGH": neither branch could ever match, so
+ *  every confidence level — HIGH included — painted the alert tone on the page
+ *  whose entire subject is how much to trust the call. Comparing a `string`
+ *  against a literal type-checks, which is why the mistake was invisible; a
+ *  parameter typed to the union rejects the plain label at the call site. */
+export const resolveConfidenceTone = (
+  confidence: "LOW" | "MED" | "HIGH",
+): "positive" | "caution" | "alert" =>
+  confidence === "HIGH" ? "positive" : confidence === "MED" ? "caution" : "alert";
+
 export const formatRegimeSignalValue = (value: number | null, key: RegimeSignalKey): string => {
   if (value === null || Number.isNaN(value)) {
     return "—";

@@ -102,15 +102,18 @@ export default function PricingPage() {
             would otherwise have to guess at. A pricing page that implies you can
             buy today, when you cannot, spends credibility this product does not
             have to spare. */}
+        {/* Prose needs a measure. The promise line above is capped at max-w-2xl;
+            this block ran the full 64rem panel, so the page set its intro at ~90
+            characters a line and its explanation at ~140. */}
         <section className="weather-panel space-y-3 px-5 py-5">
           <h2 className="type-eyebrow">Pro and Team are not on sale yet</h2>
-          <p className="text-fluid-xs text-slate-300">
+          <p className="max-w-2xl text-fluid-xs text-slate-300">
             These prices are real and the plans are not buyable today. We are working out whether
             enough people want them at this price before building the billing around them, so the
             buttons above register interest rather than take your money. The free tier is not a trial
             and does not expire.
           </p>
-          <p className="text-fluid-xs text-slate-400">
+          <p className="max-w-2xl text-fluid-xs text-slate-400">
             Questions about a plan, or want something that is not listed?{" "}
             <Link href="/contact" className="underline decoration-slate-600 underline-offset-4 hover:text-white">
               Tell us

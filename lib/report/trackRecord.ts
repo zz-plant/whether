@@ -42,6 +42,13 @@ export type TrackRecord = {
   currentRegimeLabel: string;
   /** Newest first, capped by `rowLimit`. */
   rows: TrackRecordRow[];
+  /**
+   * Every month, newest first, uncapped. `rows` is what the surface leads with;
+   * this is what lets it offer the rest. Without it the page advertised
+   * "175 months on record" directly above a table of twelve, with no way to ask
+   * for the other 163 — the audit claim stopped at the fold.
+   */
+  allRows: TrackRecordRow[];
 };
 
 /**
@@ -107,5 +114,6 @@ export const buildTrackRecord = (
     currentRegime: latest.regime,
     currentRegimeLabel: getRegimePublicLabel(latest.regime),
     rows: rows.slice(-rowLimit).reverse(),
+    allRows: [...rows].reverse(),
   };
 };

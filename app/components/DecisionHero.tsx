@@ -381,7 +381,7 @@ export function DecisionHero({
           <section
             data-testid="weekly-top-fold"
             aria-label="What needs reconsideration this week"
-            className={`rounded-xl border p-3.5 backdrop-blur-sm transition-all ${
+            className={`rounded-lg border p-3.5 backdrop-blur-sm transition-all ${
               revisitDecisions
                 ? "border-amber-500/40 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.08)]"
                 : "border-emerald-500/30 bg-emerald-500/[0.07] shadow-[0_0_20px_rgba(16,185,129,0.06)]"

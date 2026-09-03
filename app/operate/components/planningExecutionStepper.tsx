@@ -18,11 +18,11 @@ type OperationsExecutionStep = {
   children: ReactNode;
 };
 
-export const buildOperationsExecutionStepHref = (stepId: string) => `#${stepId}`;
+export const buildOperationsExecutionStepHref = (stepId: string) =>
+  `#${stepId}`;
 
 export const resolveOperationsExecutionStepActionLabel = (isActive: boolean) =>
   isActive ? "Current step" : "Open step";
-
 
 export const resolveOperationsExecutionStepId = ({
   hashId,
@@ -33,7 +33,9 @@ export const resolveOperationsExecutionStepId = ({
   firstStepId: string;
   steps: OperationsExecutionStep[];
 }) => {
-  const matchingStep = steps.find((step) => step.id === hashId || step.hashAliases?.includes(hashId));
+  const matchingStep = steps.find(
+    (step) => step.id === hashId || step.hashAliases?.includes(hashId),
+  );
   return matchingStep?.id ?? firstStepId;
 };
 
@@ -62,7 +64,9 @@ export const resolveInitialOpenStepIds = ({
   }
   const hashId = hash.replace(/^#/, "");
   if (hashId) {
-    const target = steps.find((step) => step.id === hashId || step.hashAliases?.includes(hashId));
+    const target = steps.find(
+      (step) => step.id === hashId || step.hashAliases?.includes(hashId),
+    );
     if (target) open.add(target.id);
   }
   return [...open];
@@ -78,7 +82,9 @@ export const resolveOperationsExecutionStepIdFromLocation = ({
   steps: OperationsExecutionStep[];
 }) => {
   const hashId = hash.replace(/^#/, "");
-  return hashId ? resolveOperationsExecutionStepId({ hashId, firstStepId, steps }) : firstStepId;
+  return hashId
+    ? resolveOperationsExecutionStepId({ hashId, firstStepId, steps })
+    : firstStepId;
 };
 
 export function OperationsExecutionStepper({
@@ -107,7 +113,9 @@ export function OperationsExecutionStepper({
       });
       setCurrentStepId(targeted);
       // Additive: following a link to one step no longer collapses the others.
-      setOpenStepIds((prev) => (prev.has(targeted) ? prev : new Set(prev).add(targeted)));
+      setOpenStepIds((prev) =>
+        prev.has(targeted) ? prev : new Set(prev).add(targeted),
+      );
     };
 
     syncFromLocation();
@@ -140,16 +148,27 @@ export function OperationsExecutionStepper({
     });
   };
 
-  const completedCount = steps.filter((step) => completedSteps.has(step.id)).length;
+  const completedCount = steps.filter((step) =>
+    completedSteps.has(step.id),
+  ).length;
 
   return (
-    <section id="planning-stepper" className="space-y-4" aria-label="Planning checklist">
+    <section
+      id="planning-stepper"
+      className="space-y-4"
+      aria-label="Planning checklist"
+    >
       <div className="weather-panel relative overflow-hidden space-y-3 px-4 py-4">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
+          aria-hidden="true"
+        />
         <div className="max-w-3xl">
           <div className="flex items-baseline justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">This week&apos;s checklist</h2>
+              <h2 className="text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">
+                This week&apos;s checklist
+              </h2>
             </div>
             <span className="text-fluid-xs font-medium text-slate-400 tabular-nums">
               {completedCount}/{steps.length}
@@ -167,11 +186,18 @@ export function OperationsExecutionStepper({
             const stepHref = buildOperationsExecutionStepHref(step.id);
 
             return (
-              <li key={step.id} className="flex items-start gap-3 rounded-lg px-3 py-2.5 hover:bg-slate-900/40 transition-colors">
+              <li
+                key={step.id}
+                className="flex items-start gap-3 rounded-lg px-3 py-2.5 hover:bg-slate-900/40 transition-colors"
+              >
                 <button
                   type="button"
                   onClick={() => toggleCompleted(step.id)}
-                  aria-label={isCompleted ? `Mark "${step.title}" as incomplete` : `Mark "${step.title}" as complete`}
+                  aria-label={
+                    isCompleted
+                      ? `Mark "${step.title}" as incomplete`
+                      : `Mark "${step.title}" as complete`
+                  }
                   className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors ${
                     isCompleted
                       ? "border-emerald-400 bg-emerald-500/20 text-emerald-100"
@@ -179,8 +205,19 @@ export function OperationsExecutionStepper({
                   }`}
                 >
                   {isCompleted ? (
-                    <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true">
-                      <path d="M2.5 6l2.5 2.5 4.5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      viewBox="0 0 12 12"
+                      className="h-3 w-3"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2.5 6l2.5 2.5 4.5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   ) : null}
                 </button>
@@ -190,14 +227,16 @@ export function OperationsExecutionStepper({
                   aria-labelledby={`${step.id}-nav-title`}
                   className={`flex-1 min-w-0 no-underline ${isCompleted ? "opacity-60" : ""}`}
                 >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span id={`${step.id}-nav-title`} className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}>
-                      {step.title}
-                    </span>
-                    <span className="type-eyebrow flex-shrink-0">
-                      {step.label}
-                    </span>
-                  </div>
+                  {/* The step label sat right-aligned against the far edge of a
+                      full-width row — "Weekly plan ......... PLAN" with ~500px
+                      of nothing between them. It named the same thing as the
+                      title beside it, so the gap bought no information. */}
+                  <span
+                    id={`${step.id}-nav-title`}
+                    className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}
+                  >
+                    {step.title}
+                  </span>
                 </a>
               </li>
             );
@@ -226,9 +265,15 @@ export function OperationsExecutionStepper({
                   isOpen ? "pb-4 border-b border-white/[0.04]" : ""
                 }`}
               >
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent" aria-hidden="true" />
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
+                  aria-hidden="true"
+                />
                 <div className="space-y-1">
-                  <p className="type-eyebrow">{step.label}</p>
+                  {/* No `step.label` eyebrow here. All six read as a word already
+                      in the title underneath — PLAN over "Weekly plan", RULES
+                      over "Rules before you commit" — so the page opened six
+                      sections with a near-duplicate stacked above each heading. */}
                   {/* A toggle, not a link: with steps opening independently the
                       title's job is expand/collapse, which §IV says is a button.
                       Deep links still arrive through the checklist above and
@@ -251,7 +296,9 @@ export function OperationsExecutionStepper({
                       {step.title}
                     </button>
                   </h3>
-                  <p className="max-w-2xl text-sm leading-6 text-slate-300">{step.description}</p>
+                  <p className="max-w-2xl text-sm leading-6 text-slate-300">
+                    {step.description}
+                  </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {step.owner ? (
                       <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">

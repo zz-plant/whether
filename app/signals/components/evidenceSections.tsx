@@ -31,7 +31,10 @@ const SIGNAL_LABEL_COPY: Record<string, string> = {
 const displaySignalLabel = (label: string) => SIGNAL_LABEL_COPY[label] ?? label;
 const clampPercent = (value: number) => Math.min(96, Math.max(4, value));
 
-const normalizeBulletPosition = (value: number, domain: { min: number; max: number }) =>
+const normalizeBulletPosition = (
+  value: number,
+  domain: { min: number; max: number },
+) =>
   clampPercent(((value - domain.min) / (domain.max - domain.min || 1)) * 100);
 
 const buildThresholdMeterState = ({
@@ -51,7 +54,11 @@ const buildThresholdMeterState = ({
   leftLabel: string;
   rightLabel: string;
 }) => {
-  if (currentValue === null || thresholdValue === null || chartDomain === null) {
+  if (
+    currentValue === null ||
+    thresholdValue === null ||
+    chartDomain === null
+  ) {
     return null;
   }
 
@@ -70,7 +77,10 @@ const buildThresholdMeterState = ({
       thresholdPercent: normalizeBulletPosition(thresholdValue, chartDomain),
       leftLabel,
       rightLabel,
-      safe: buildSegment(chartDomain.min, Math.min(thresholdValue - watchBuffer, chartDomain.max)),
+      safe: buildSegment(
+        chartDomain.min,
+        Math.min(thresholdValue - watchBuffer, chartDomain.max),
+      ),
       caution: buildSegment(
         Math.max(chartDomain.min, thresholdValue - watchBuffer),
         Math.min(thresholdValue, chartDomain.max),
@@ -89,7 +99,10 @@ const buildThresholdMeterState = ({
       Math.max(chartDomain.min, thresholdValue),
       Math.min(thresholdValue + watchBuffer, chartDomain.max),
     ),
-    safe: buildSegment(Math.min(thresholdValue + watchBuffer, chartDomain.max), chartDomain.max),
+    safe: buildSegment(
+      Math.min(thresholdValue + watchBuffer, chartDomain.max),
+      chartDomain.max,
+    ),
   };
 };
 
@@ -103,11 +116,12 @@ export const SignalsModeSwitcherSection = ({
   const router = useRouter();
 
   return (
-    <section className="weather-panel space-y-3 px-5 py-4" aria-label="Evidence view">
+    <section
+      className="weather-panel space-y-3 px-5 py-4"
+      aria-label="Evidence view"
+    >
       <div className="space-y-1">
-        <p className="type-eyebrow text-sky-200">
-          Reading depth
-        </p>
+        <p className="type-eyebrow text-sky-200">Reading depth</p>
         {/* The paragraph that sat here restated both radio options, which carry
             their own descriptions a few lines below. */}
         <h2 className="text-base font-semibold text-slate-100">
@@ -119,29 +133,29 @@ export const SignalsModeSwitcherSection = ({
         aria-label="Evidence view mode"
         className="grid gap-2 sm:grid-cols-2"
       >
-        {([
-          {
-            id: "implication",
-            label: "Short read",
-            detail:
-              "What changed, what it means this week, and the main lines to watch.",
-          },
-          {
-            id: "detail",
-            label: "Deeper evidence",
-            detail:
-              "Diagnostics, replay, and the checks that would overturn the assessment.",
-          },
-        ] as const).map((item) => (
+        {(
+          [
+            {
+              id: "implication",
+              label: "Short read",
+              detail:
+                "What changed, what it means this week, and the main lines to watch.",
+            },
+            {
+              id: "detail",
+              label: "Deeper evidence",
+              detail:
+                "Diagnostics, replay, and the checks that would overturn the assessment.",
+            },
+          ] as const
+        ).map((item) => (
           <label
             key={item.id}
-            className={
-              `flex min-h-[44px] cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-left outline-none transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sky-300 ${
-                activeSignalsView === item.id
-                  ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
-                  : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-              }`
-            }
+            className={`flex min-h-[44px] cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-left outline-none transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sky-300 ${
+              activeSignalsView === item.id
+                ? "border-sky-300/80 bg-sky-500/12 text-slate-100"
+                : "border-slate-700/80 bg-slate-950/55 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+            }`}
           >
             {/* A real radio, so one tab stop and arrow-key movement between the
                 two depths come from the platform. It is visually hidden because
@@ -160,14 +174,22 @@ export const SignalsModeSwitcherSection = ({
               aria-label={item.label}
               className="sr-only"
             />
-            <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-500/80" aria-hidden="true">
+            <span
+              className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-500/80"
+              aria-hidden="true"
+            >
               {activeSignalsView === item.id ? (
-                <span className="h-2 w-2 rounded-full bg-sky-200" aria-hidden="true" />
+                <span
+                  className="h-2 w-2 rounded-full bg-sky-200"
+                  aria-hidden="true"
+                />
               ) : null}
             </span>
             <span className="min-w-0">
               <span className="type-eyebrow">{item.label}</span>
-              <span className="mt-2 block text-xs leading-5 text-slate-300">{item.detail}</span>
+              <span className="mt-2 block text-xs leading-5 text-slate-300">
+                {item.detail}
+              </span>
             </span>
           </label>
         ))}
@@ -202,93 +224,103 @@ export const SignalsDecisionSummarySection = ({
   // both read "Over-engineering before demand proves out", printed twice within
   // one screen. Drop the repeat from the list, which is the secondary of the
   // two, unless that would empty it.
-  const normalize = (value: string) => value.trim().toLowerCase().replace(/\.$/, "");
+  const normalize = (value: string) =>
+    value.trim().toLowerCase().replace(/\.$/, "");
   const stopItemsWithoutTrigger = stopItems.filter(
     (item) => normalize(item) !== normalize(triggerCondition),
   );
-  const displayStopItems = stopItemsWithoutTrigger.length > 0 ? stopItemsWithoutTrigger : stopItems;
+  const displayStopItems =
+    stopItemsWithoutTrigger.length > 0 ? stopItemsWithoutTrigger : stopItems;
 
   return (
-  <section
-    id="decision-summary"
-    className="weather-panel scroll-mt-28 space-y-6 px-6 py-5"
-    aria-label="Decision summary"
-  >
-    <p className="weather-surface flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-      {decisionDeltaLabel}
-    </p>
-    <article className="weather-surface space-y-3 p-4">
-      <p className="type-eyebrow text-sky-200">
-        What this means now
+    <section
+      id="decision-summary"
+      className="weather-panel scroll-mt-28 space-y-6 px-6 py-5"
+      aria-label="Decision summary"
+    >
+      <p className="weather-surface flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+        {decisionDeltaLabel}
       </p>
-      <div className="grid gap-3 lg:grid-cols-3">
-        <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-xs font-semibold text-slate-400">
-            Current outlook
-          </p>
-          <p className="mt-2 text-sm font-semibold text-slate-100">
-            {actionNowShort ?? "Hold the current operating posture while thresholds hold."}
-          </p>
-        </div>
-        <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-xs font-semibold text-slate-400">
-            Main pressure
-          </p>
-          {topDiagnosticCallouts[0] ? (
-            <>
-              {/* Names the driver as well as describing it — this cell is now the
-                  only place the top mover appears. */}
-              <p className="mt-2 text-sm font-semibold text-slate-100">
-                {displaySignalLabel(topDiagnosticCallouts[0].label)}
-              </p>
-              <p className="mt-1 text-sm text-slate-200">{topDiagnosticCallouts[0].why}</p>
-            </>
-          ) : (
-            <p className="mt-2 text-sm text-slate-200">
-              Review the scorecard below to confirm the main driver before you change posture.
+      <article className="weather-surface space-y-3 p-4">
+        <p className="type-eyebrow text-sky-200">What this means now</p>
+        <div className="grid gap-3 lg:grid-cols-3">
+          <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+            <p className="text-xs font-semibold text-slate-400">
+              Current outlook
             </p>
-          )}
-        </div>
-        <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-xs font-semibold text-slate-400">
-            What would change this
-          </p>
-          {showMicroDecisionRows ? (
-            /* Was two tinted cards nested inside this card, inside the section
+            <p className="mt-2 text-sm font-semibold text-slate-100">
+              {actionNowShort ??
+                "Hold the current operating posture while thresholds hold."}
+            </p>
+          </div>
+          <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+            <p className="text-xs font-semibold text-slate-400">
+              Main pressure
+            </p>
+            {topDiagnosticCallouts[0] ? (
+              <>
+                {/* Names the driver as well as describing it — this cell is now the
+                  only place the top mover appears. */}
+                <p className="mt-2 text-sm font-semibold text-slate-100">
+                  {displaySignalLabel(topDiagnosticCallouts[0].label)}
+                </p>
+                <p className="mt-1 text-sm text-slate-200">
+                  {topDiagnosticCallouts[0].why}
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-slate-200">
+                Review the scorecard below to confirm the main driver before you
+                change posture.
+              </p>
+            )}
+          </div>
+          <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
+            <p className="text-xs font-semibold text-slate-400">
+              What would change this
+            </p>
+            {showMicroDecisionRows ? (
+              /* Was two tinted cards nested inside this card, inside the section
                card — three containment levels for two sentences. Labelled rows
                carry the same distinction with one level, and the hue now sits on
                the label rather than on a box around it. */
-            <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
-              <div className="flex flex-wrap gap-x-2">
-                <dt className="shrink-0 font-semibold text-semantic-caution-fg">Wrong if:</dt>
-                <dd className="min-w-0"><BoundedValue>{triggerCondition}</BoundedValue></dd>
-              </div>
-              <div className="flex flex-wrap gap-x-2">
-                <dt className="shrink-0 font-semibold text-semantic-easing-fg">Safe again when:</dt>
-                <dd className="min-w-0"><BoundedValue>{reversalCondition}</BoundedValue></dd>
-              </div>
-            </dl>
-          ) : (
-            <p className="mt-2 text-sm text-slate-200">
-              <span className="mr-1 type-eyebrow text-amber-200">
-                Wrong if:
-              </span>
-              {" "}
-              <span>{triggerCondition}</span>
-              {" "}
-              <span aria-hidden="true" className="text-slate-400">·</span>
-              {" "}
-              <span className="mr-1 type-eyebrow text-amber-200">
-                Safe again when:
-              </span>
-              {" "}
-              <span>{reversalCondition}</span>
-            </p>
-          )}
+              <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-semantic-caution-fg">
+                    Wrong if:
+                  </dt>
+                  <dd className="min-w-0">
+                    <BoundedValue>{triggerCondition}</BoundedValue>
+                  </dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-semantic-easing-fg">
+                    Safe again when:
+                  </dt>
+                  <dd className="min-w-0">
+                    <BoundedValue>{reversalCondition}</BoundedValue>
+                  </dd>
+                </div>
+              </dl>
+            ) : (
+              <p className="mt-2 text-sm text-slate-200">
+                <span className="mr-1 type-eyebrow text-amber-200">
+                  Wrong if:
+                </span>{" "}
+                <span>{triggerCondition}</span>{" "}
+                <span aria-hidden="true" className="text-slate-400">
+                  ·
+                </span>{" "}
+                <span className="mr-1 type-eyebrow text-amber-200">
+                  Safe again when:
+                </span>{" "}
+                <span>{reversalCondition}</span>
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-    </article>
-    {/* The four-cell state grid that stood here — Current environment,
+      </article>
+      {/* The four-cell state grid that stood here — Current environment,
         Confidence, Decision as-of, Freshness — restated, word for word, what the
         report shell's own intro block already says one screen above ("Sunny ·
         Trust constrained · As of Jun 17, 2026 · Cached snapshot", then "Updated
@@ -297,7 +329,7 @@ export const SignalsDecisionSummarySection = ({
         stated its posture and freshness four times before any evidence
         appeared. State belongs on the earliest layer that carries it, so the
         shell keeps it and this section starts with the evidence. */}
-    {/* The "Big picture" card that stood here held one data-driven line (the
+      {/* The "Big picture" card that stood here held one data-driven line (the
         regime headline, now promoted to this section heading) wrapped in four
         blocks of copy that never changed with the data: a "the sections below
         show..." preamble, a hardcoded What to do / If this is wrong / Check
@@ -305,50 +337,56 @@ export const SignalsDecisionSummarySection = ({
         restated the playbook card beside it and the Freshness cell above it,
         and it printed identical text every week on a page whose entire job is
         reporting what changed this week. */}
-    <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-      {regimeLabel} is the current funding environment.
-    </h2>
-    <div className="grid gap-4 lg:grid-cols-2">
-      <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
-        <p className="type-eyebrow text-sky-200">
-          This week
-        </p>
-        <h3 className="text-lg font-semibold text-slate-100">
-          What founders should do this week
-        </h3>
-        {/* Two tinted boxes stood here, inside this card, inside the section —
+      <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+        {regimeLabel} is the current funding environment.
+      </h2>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <article
+          className="weather-surface space-y-3 p-5"
+          aria-label="Founder decision playbook"
+        >
+          <p className="type-eyebrow text-sky-200">This week</p>
+          <h3 className="text-lg font-semibold text-slate-100">
+            What founders should do this week
+          </h3>
+          {/* Two tinted boxes stood here, inside this card, inside the section —
             the same three-level nesting that was flattened out of the decision
             summary one screen above, left behind on the first pass. A ruled
             group carries the same distinction with one level, and the direction
             now sits on the label rather than on a box around it. Both labels
             also shared the same sky eyebrow, which told the reader nothing about
             which list was which. */}
-        <div className="border-l-2 border-semantic-easing-border pl-3">
-          <p className="type-eyebrow text-semantic-easing-fg">
-            Lean in here
+          <div className="border-l-2 border-semantic-easing-border pl-3">
+            <p className="type-eyebrow text-semantic-easing-fg">Lean in here</p>
+            <ul
+              className="mt-2 space-y-1 text-sm text-slate-100"
+              aria-label="Start rules"
+            >
+              {startItems.slice(0, 3).map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="border-l-2 border-semantic-tightening-border pl-3">
+            <p className="type-eyebrow text-semantic-tightening-fg">
+              Hold or gate
+            </p>
+            <ul
+              className="mt-2 space-y-1 text-sm text-slate-100"
+              aria-label="Stop rules"
+            >
+              {displayStopItems.slice(0, 3).map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
+            </ul>
+          </div>
+          <p className="text-xs text-slate-300">
+            This outlook comes down to three things: how hard it is to fund new
+            bets, how open markets are to risk, and whether interest rates are
+            rising or falling.
           </p>
-          <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
-            {startItems.slice(0, 3).map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="border-l-2 border-semantic-tightening-border pl-3">
-          <p className="type-eyebrow text-semantic-tightening-fg">
-            Hold or gate
-          </p>
-          <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
-            {displayStopItems.slice(0, 3).map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </div>
-        <p className="text-xs text-slate-300">
-          This outlook comes down to three things: how hard it is to fund new bets, how open
-          markets are to risk, and whether interest rates are rising or falling.
-        </p>
-      </article>
-      {/* Starts at the second callout. The first one's `why` is already the
+        </article>
+        {/* Starts at the second callout. The first one's `why` is already the
           Main pressure cell in the summary above, word for word, so listing it
           again here was the same sentence twice on one screen.
 
@@ -357,26 +395,26 @@ export const SignalsDecisionSummarySection = ({
           opening at 2 reads to the reader as one with an item missing. The card
           is titled "Also moved" and its items are in rank order, which carries
           the same information without implying an absent row. */}
-      {topDiagnosticCallouts.length > 1 ? (
-        <article className="weather-surface space-y-3 p-5">
-          <p className="type-eyebrow text-sky-200">
-            Also moved
-          </p>
-          <ul className="space-y-3" aria-label="Top mover callouts">
-            {topDiagnosticCallouts.slice(1).map((item) => (
-              <li
-                key={item.label}
-                className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
-              >
-                <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
-                <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-              </li>
-            ))}
-          </ul>
-        </article>
-      ) : null}
-    </div>
-  </section>
+        {topDiagnosticCallouts.length > 1 ? (
+          <article className="weather-surface space-y-3 p-5">
+            <p className="type-eyebrow text-sky-200">Also moved</p>
+            <ul className="space-y-3" aria-label="Top mover callouts">
+              {topDiagnosticCallouts.slice(1).map((item) => (
+                <li
+                  key={item.label}
+                  className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
+                >
+                  <p className="text-sm font-semibold text-slate-100">
+                    {displaySignalLabel(item.label)}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ) : null}
+      </div>
+    </section>
   );
 };
 
@@ -406,87 +444,110 @@ export const SignalsCurrentScoresSection = ({
     label="Key numbers"
     title="The three numbers most responsible for this week's outlook."
   >
-    <div className="space-y-4">
-      {(["leading", "lagging"] as const).map((type) => (
-        <section key={type} className="space-y-2">
-          <h3 className="text-sm font-semibold tracking-[0.14em] text-slate-300">
-            {indicatorTypeLabel[type]}
-          </h3>
-          <div className="grid gap-3 lg:grid-cols-3">
-            {scoreCardsByType[type].map((card) => {
-              const meterState = buildThresholdMeterState({
-                currentValue: card.currentValue,
-                thresholdValue: card.thresholdValue,
-                chartDomain: card.chartDomain,
-                watchBuffer: card.watchBuffer,
-                pressureDirection: card.pressureDirection,
-                leftLabel: card.leftLabel,
-                rightLabel: card.rightLabel,
-              });
+    {/* One row, not two groups. The three cards are small multiples — same
+        encoding, same scale, same orientation — and splitting them into a
+        2-card row and a 1-card row put them at the same width but never side
+        by side, while leaving two thirds of the second row empty. The
+        leading/lagging distinction is a property of each signal, so it rides
+        on the card's own label row instead of a section heading. */}
+    <div className="grid gap-3 lg:grid-cols-3">
+      {(["leading", "lagging"] as const).flatMap((type) =>
+        scoreCardsByType[type].map((card) => {
+          const meterState = buildThresholdMeterState({
+            currentValue: card.currentValue,
+            thresholdValue: card.thresholdValue,
+            chartDomain: card.chartDomain,
+            watchBuffer: card.watchBuffer,
+            pressureDirection: card.pressureDirection,
+            leftLabel: card.leftLabel,
+            rightLabel: card.rightLabel,
+          });
 
-              return (
-                <article key={card.label} className="weather-surface space-y-3 p-4">
-                  <dl>
-                    <dt className="type-eyebrow text-slate-300">
-                      {displaySignalLabel(card.label)}
-                    </dt>
-                    <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.valueLabel}</dd>
-                  </dl>
-                  <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
-                    <div className="flex items-center justify-between gap-3 type-eyebrow">
-                      <span>Current vs watch line</span>
-                      <span>{card.watchDistanceLabel}</span>
+          return (
+            <article key={card.label} className="weather-surface space-y-3 p-4">
+              <dl>
+                <dt className="flex min-h-[2.9em] items-baseline justify-between gap-3 type-eyebrow text-slate-300">
+                  <span>{displaySignalLabel(card.label)}</span>
+                  <span className="shrink-0 text-fluid-nano font-normal text-slate-500">
+                    {indicatorTypeLabel[type]}
+                  </span>
+                </dt>
+                <dd className="mono mt-2 text-3xl leading-none text-slate-100">
+                  {card.valueLabel}
+                </dd>
+              </dl>
+              <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
+                <div className="flex items-center justify-between gap-3 type-eyebrow">
+                  <span>Current vs watch line</span>
+                  <span>{card.watchDistanceLabel}</span>
+                </div>
+                {meterState ? (
+                  <>
+                    <div
+                      className="relative mt-3 h-7 overflow-hidden rounded-sm border border-slate-800/70 bg-slate-950/75"
+                      aria-hidden="true"
+                    >
+                      <span
+                        className="absolute inset-y-0 bg-emerald-400/12"
+                        style={{
+                          left: meterState.safe.left,
+                          width: meterState.safe.width,
+                        }}
+                      />
+                      <span
+                        className="absolute inset-y-0 bg-amber-400/14"
+                        style={{
+                          left: meterState.caution.left,
+                          width: meterState.caution.width,
+                        }}
+                      />
+                      <span
+                        className="absolute inset-y-0 bg-rose-400/12"
+                        style={{
+                          left: meterState.risk.left,
+                          width: meterState.risk.width,
+                        }}
+                      />
+                      <span
+                        className="absolute inset-y-1 w-px bg-slate-200/90"
+                        style={{ left: `${meterState.thresholdPercent}%` }}
+                      />
+                      <span
+                        className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 bg-sky-300 shadow-[0_0_0_2px_rgba(15,23,42,0.7)]"
+                        style={{ left: `${meterState.currentPercent}%` }}
+                      />
                     </div>
-                    {meterState ? (
-                      <>
-                        <div className="relative mt-3 h-7 overflow-hidden rounded-sm border border-slate-800/70 bg-slate-950/75" aria-hidden="true">
-                          <span
-                            className="absolute inset-y-0 bg-emerald-400/12"
-                            style={{ left: meterState.safe.left, width: meterState.safe.width }}
-                          />
-                          <span
-                            className="absolute inset-y-0 bg-amber-400/14"
-                            style={{ left: meterState.caution.left, width: meterState.caution.width }}
-                          />
-                          <span
-                            className="absolute inset-y-0 bg-rose-400/12"
-                            style={{ left: meterState.risk.left, width: meterState.risk.width }}
-                          />
-                          <span
-                            className="absolute inset-y-1 w-px bg-slate-200/90"
-                            style={{ left: `${meterState.thresholdPercent}%` }}
-                          />
-                          <span
-                            className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 bg-sky-300 shadow-[0_0_0_2px_rgba(15,23,42,0.7)]"
-                            style={{ left: `${meterState.currentPercent}%` }}
-                          />
-                        </div>
-                        {/* Endpoint labels only. A centred "Watch line" sat between
+                    {/* Endpoint labels only. A centred "Watch line" sat between
                             these two, which put three uppercase letterspaced phrases
                             in one narrow row with no separators — they read as a
                             single sentence that does not parse ("MORE PRESSURE WATCH
                             LINE MORE ROOM"). It also did not mark the threshold's
                             position, and the line below already names the watch line
                             with its actual value. */}
-                        <div className="mt-1 flex items-start justify-between gap-4 type-eyebrow">
-                          <span className="text-left">{meterState.leftLabel}</span>
-                          <span className="text-right">{meterState.rightLabel}</span>
-                        </div>
-                        <p className="mt-2 text-fluid-xs text-slate-400">
-                          Watch line: <span className="text-slate-200">{card.thresholdLabel}</span>
-                        </p>
-                      </>
-                    ) : (
-                      <p className="mt-2 text-xs text-slate-400">Watch line: {card.thresholdLabel}</p>
-                    )}
-                  </div>
-                  <p className="text-sm text-slate-300">{card.description}</p>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      ))}
+                    <div className="mt-1 flex items-start justify-between gap-4 type-eyebrow">
+                      <span className="text-left">{meterState.leftLabel}</span>
+                      <span className="text-right">
+                        {meterState.rightLabel}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-fluid-xs text-slate-400">
+                      Watch line:{" "}
+                      <span className="text-slate-200">
+                        {card.thresholdLabel}
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-xs text-slate-400">
+                    Watch line: {card.thresholdLabel}
+                  </p>
+                )}
+              </div>
+              <p className="text-sm text-slate-300">{card.description}</p>
+            </article>
+          );
+        }),
+      )}
     </div>
   </ReportSection>
 );
@@ -501,7 +562,9 @@ export const SignalsNeedMoreProofSection = ({
         the same switch repeated at the end of the page, so it carries the action only. */}
     <h2 className="text-lg font-semibold text-slate-100">Need more detail?</h2>
     <a
-      href={buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"}
+      href={
+        buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"
+      }
       className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
     >
       Open deeper evidence
@@ -554,13 +617,18 @@ export const SignalsEvidencePrioritiesSection = ({
         );
       })}
     </div>
-    <ol className="grid gap-3 md:grid-cols-2" aria-label="Prioritized signal queue">
+    <ol
+      className="grid gap-3 md:grid-cols-2"
+      aria-label="Prioritized signal queue"
+    >
       {essentialPriorityQueue.map((item, index) => (
         <li key={item.label} className="weather-surface space-y-2 p-4">
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
             First check {index + 1}
           </p>
-          <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
+          <p className="text-sm font-semibold text-slate-100">
+            {displaySignalLabel(item.label)}
+          </p>
           <p className="text-sm text-slate-200">{item.why}</p>
           <p className="text-xs text-slate-300">
             Use the sections below to check this next.
@@ -577,20 +645,28 @@ export const SignalsEvidencePrioritiesSection = ({
           </span>
         </Collapsible.Trigger>
         <Collapsible.Panel>
-        <ol className="mt-3 grid gap-3" aria-label="Additional prioritized signal queue">
-          {additionalPriorityQueue.map((item, index) => (
-            <li key={item.label} className="rounded-md border border-slate-800/80 bg-slate-950/50 p-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                Next check {index + essentialPriorityQueue.length + 1}
-              </p>
-              <p className="mt-2 text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
-              <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-              <p className="mt-2 text-xs text-slate-300">
-                Check this in the matching section below.
-              </p>
-            </li>
-          ))}
-        </ol>
+          <ol
+            className="mt-3 grid gap-3"
+            aria-label="Additional prioritized signal queue"
+          >
+            {additionalPriorityQueue.map((item, index) => (
+              <li
+                key={item.label}
+                className="rounded-md border border-slate-800/80 bg-slate-950/50 p-4"
+              >
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
+                  Next check {index + essentialPriorityQueue.length + 1}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-slate-100">
+                  {displaySignalLabel(item.label)}
+                </p>
+                <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                <p className="mt-2 text-xs text-slate-300">
+                  Check this in the matching section below.
+                </p>
+              </li>
+            ))}
+          </ol>
         </Collapsible.Panel>
       </Collapsible.Root>
     ) : null}
@@ -621,7 +697,10 @@ export const SignalsDiagnosticsSection = ({
   showFullDiagnostics: boolean;
   searchParams?: Record<string, string | undefined>;
   topDiagnosticCallouts: Array<{ label: string; why: string }>;
-  SignalVisualizationSuite: ComponentType<{ treasury: TreasuryData; yieldCurveSeries: YieldCurvePoint[] }> | null;
+  SignalVisualizationSuite: ComponentType<{
+    treasury: TreasuryData;
+    yieldCurveSeries: YieldCurvePoint[];
+  }> | null;
   treasury: TreasuryData;
   yieldCurveSeries: YieldCurvePoint[];
 }) => (
@@ -644,22 +723,28 @@ export const SignalsDiagnosticsSection = ({
     }
   >
     {!showFullDiagnostics ? (
-      <ol className="grid gap-3 md:grid-cols-3" aria-label="Top 3 signal drivers">
+      <ol
+        className="grid gap-3 md:grid-cols-3"
+        aria-label="Top 3 signal drivers"
+      >
         {topDiagnosticCallouts.map((item, index) => (
           <li key={item.label} className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
               Top driver {index + 1}
             </p>
-            <p className="text-sm font-semibold text-slate-100">{displaySignalLabel(item.label)}</p>
-            <p className="text-sm text-slate-200">{item.why}</p>
-            <p className="text-xs text-slate-300">
-              More detail is below.
+            <p className="text-sm font-semibold text-slate-100">
+              {displaySignalLabel(item.label)}
             </p>
+            <p className="text-sm text-slate-200">{item.why}</p>
+            <p className="text-xs text-slate-300">More detail is below.</p>
           </li>
         ))}
       </ol>
     ) : SignalVisualizationSuite ? (
-      <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
+      <SignalVisualizationSuite
+        treasury={treasury}
+        yieldCurveSeries={yieldCurveSeries}
+      />
     ) : null}
   </ReportSection>
 );
@@ -685,7 +770,9 @@ export const SignalsAdvancedControlsSection = ({
         </span>
         {!showAdvanced ? (
           <a
-            href={buildSignalsAdvancedHref(searchParams, true) + "#time-machine"}
+            href={
+              buildSignalsAdvancedHref(searchParams, true) + "#time-machine"
+            }
             className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
           >
             Open Time Machine

@@ -58,6 +58,26 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveReportHeaderNextStep("/nonexistent"), null);
   });
 
+  it("names every public route rather than falling back to \"Page\"", () => {
+    // These five families matched no navigation layer and no utility link, so
+    // the header read "Whether · Page" on them — including /brief/<week>, the
+    // frozen, citable record this product asks people to link to.
+    assert.equal(resolveGlobalHeaderRouteLabel("/brief/2026-w31"), "Published brief");
+    assert.equal(resolveGlobalHeaderRouteLabel("/answers/should-startups-hire-now"), "Answer");
+    assert.equal(resolveGlobalHeaderRouteLabel("/resources/anything"), "Resource");
+    assert.equal(resolveGlobalHeaderRouteLabel("/toolkits/anything/cluster"), "Toolkit");
+    assert.equal(resolveGlobalHeaderRouteLabel("/contact"), "Contact");
+  });
+
+  it("does not let a section label shadow a real navigation layer", () => {
+    // /answer is the Resolve layer; /answers is the direct-answer pages. A
+    // prefix match must not confuse the two in either direction.
+    assert.equal(resolveGlobalHeaderRouteLabel("/answer"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/answer/use-cases"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Evidence");
+    assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
+  });
+
   it("marks the brief active only on the home route", () => {
     const homeLinks = resolveGlobalHeaderNavigationLinks("/").filter((link) => link.isActive);
     assert.equal(homeLinks.length, 1);

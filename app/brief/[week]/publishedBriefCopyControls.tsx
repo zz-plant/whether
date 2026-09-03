@@ -113,9 +113,19 @@ export function PublishedBriefCopyControls({
           </span>
           <span className="font-mono text-fluid-nano text-slate-500">Date-pinned record</span>
         </div>
-        <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200 font-mono">
-          {activeText}
-        </pre>
+        {/* The clip needs to read as "there is more", not as a rendering fault.
+            max-h-64 cuts horizontally through a line of glyphs, and macOS
+            overlay scrollbars stay hidden until you scroll, so the block just
+            appeared sliced in half on the most linkable page on the site. */}
+        <div className="relative">
+          <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200 font-mono">
+            {activeText}
+          </pre>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-px bottom-px h-10 rounded-b-md bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent"
+          />
+        </div>
       </div>
     </section>
   );
