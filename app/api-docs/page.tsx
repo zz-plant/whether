@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { PageShell } from "../components/pageShell";
 import { siteUrl } from "../../lib/siteUrl";
@@ -230,14 +231,14 @@ export default function ApiDocsPage() {
             <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
               {embedSnippet}
             </pre>
-            <a
+            <Link
               href="/embed"
               data-premium-intent="api_access"
               data-premium-cta="open_embed_builder"
               className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600"
             >
               Configure it with a live preview →
-            </a>
+            </Link>
           </div>
         </section>
 

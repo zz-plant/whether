@@ -16,4 +16,11 @@
 # than to what you are pushing. Check `git status` before assuming it is yours.
 [ "$SKIP_PREPUSH" = "1" ] && exit 0
 
-bun scripts/run-checks.mjs lint typecheck test assets hotspot-preflight landmarks
+# Git exports these to every hook, and they are inherited by every `git` this gate
+# shells out to. That silently redirects those calls at the pushing repository:
+# `tests/checkGateMarker.test.ts` builds a throwaway repo with `git init` and gets
+# this one instead, and `review:hotspot-preflight` resolves `HEAD~1` against the
+# wrong index. Both pass standalone and failed only here, which is the tell.
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX GIT_QUARANTINE_PATH GIT_REFLOG_ACTION
+
+bun scripts/run-checks.mjs lint typecheck test assets suppressions hotspot-preflight landmarks

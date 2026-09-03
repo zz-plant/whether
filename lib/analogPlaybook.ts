@@ -9,9 +9,9 @@ export type AnalogCoordinate = {
   key: "baseRate" | "curveSlope" | "tightness" | "riskAppetite";
   label: string;
   /** The reference cycle's value. */
-  then: number;
+  historical: number;
   /** The live value it was compared against. */
-  now: number;
+  live: number;
   unit: "%" | "pts";
 };
 
@@ -136,10 +136,10 @@ export function getHistoricalAnalogPlaybook(assessment: RegimeAssessment): Analo
   const correlation = Math.max(65, Math.min(96, Math.round(100 - lowestDistance * 0.4)));
 
   const matchBasis: AnalogCoordinate[] = [
-    { key: "baseRate", label: "Base rate", then: bestMatch.baseRate, now: baseRate, unit: "%" },
-    { key: "curveSlope", label: "10Y−2Y slope", then: bestMatch.curveSlope, now: currentSlope, unit: "%" },
-    { key: "tightness", label: "Funding pressure", then: bestMatch.tightness, now: tightness, unit: "pts" },
-    { key: "riskAppetite", label: "Risk appetite", then: bestMatch.riskAppetite, now: riskAppetite, unit: "pts" },
+    { key: "baseRate", label: "Base rate", historical: bestMatch.baseRate, live: baseRate, unit: "%" },
+    { key: "curveSlope", label: "10Y−2Y slope", historical: bestMatch.curveSlope, live: currentSlope, unit: "%" },
+    { key: "tightness", label: "Funding pressure", historical: bestMatch.tightness, live: tightness, unit: "pts" },
+    { key: "riskAppetite", label: "Risk appetite", historical: bestMatch.riskAppetite, live: riskAppetite, unit: "pts" },
   ];
 
   return {

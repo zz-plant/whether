@@ -282,7 +282,7 @@ export const auditMainContentRoutes = async ({
   concurrency = 4,
   timeoutMs = ROUTE_FETCH_TIMEOUT_MS,
 }) => {
-  const results = new Array(routes.length);
+  const results = Array.from({ length: routes.length });
   let nextIndex = 0;
   const workerCount = Math.max(1, Math.min(concurrency, routes.length));
 

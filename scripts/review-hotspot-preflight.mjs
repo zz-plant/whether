@@ -65,9 +65,9 @@ function changedFiles(diffRange) {
 
 /**
  * Line numbers (1-based) that sit inside a comment. Exported because the scanner reads
- * comment state from the file rather than from the diff: tracking `/* *​/` across added
- * lines alone only works when the opening `/**` is itself added, so editing the middle of
- * an existing doc comment used to hand the matcher bare prose.
+ * comment state from the file rather than from the diff: tracking the block-comment open and
+ * close markers across added lines alone only works when the opening `/**` is itself added,
+ * so editing the middle of an existing doc comment used to hand the matcher bare prose.
  */
 export function blockCommentLines(source) {
   const inside = new Set();

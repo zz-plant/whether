@@ -24,7 +24,15 @@ reports every failure in one pass; add `--serial` for fail-fast sequencing when 
 `check` also runs automatically on `git push` via `.husky/pre-push`, and since 2026-08-22 that hook
 is the check gate rather than a mirror of one: the GitHub workflows are manual-only, because this
 private repo's Actions minutes are billed and the account stopped paying for them. Skipping the hook
-means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`. Note that
+means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --no-verify`.
+
+**The hook clears git's exported environment before running the gate, and must keep doing so.**
+Git hands every hook `GIT_DIR`, `GIT_INDEX_FILE`, and friends, and every `git` the gate shells out
+to inherits them — which silently redirects those calls at the pushing repository.
+`tests/checkGateMarker.test.ts` builds a throwaway repo with `git init` and gets this one instead;
+`review:hotspot-preflight` resolves `HEAD~1` against the wrong index. Both pass standalone and fail
+only under the hook, so the symptom reads as flakiness. Reproduce it with
+`GIT_DIR=$PWD/.git bun run test tests/checkGateMarker.test.ts`. Note that
 this worktree is often shared with other sessions, so a pre-push failure may be someone else's
 in-flight edit rather than yours — check `git status` first. The hook covers lint, typecheck, test,
 assets, and `hotspot-preflight`, and deliberately omits `audit`, which needs the network — run
@@ -39,17 +47,26 @@ deploys every push, which is the only remote gate left.
   was switched off at the swap has been worked down: as of 2026-09-02 `no-unused-vars` (84),
   every `jsx-a11y` rule (50), `no-useless-escape` (12), `no-extra-boolean-cast`,
   and `no-useless-rename` are all **enforced at zero**.
-  Two files keep a scoped `jsx-a11y/prefer-tag-over-role` exemption because their ARIA pattern is
-  the correct one and the suggested native tag cannot carry it: `TimelineBar.tsx` renders a
-  segmented colour track as `role="slider"`, and `evidenceSections.tsx` renders a rich-content
-  `role="radiogroup"` whose custom radios are themselves guarded by `tests/evidenceSections.test.tsx`.
-  Still off, with counts: `react/set-state-in-effect` (26), `react/no-danger` (12 — all JSON-LD
-  injection, which is the intended use), `unicorn/no-thenable` (5), `react/refs` (4),
+  Seven more were enforced on 2026-09-03: `unicorn/no-thenable` (5), `react/refs` (4),
   `nextjs/no-html-link-for-pages` (3), `react/purity` (2), `unicorn/no-new-array` (1),
-  `no-irregular-whitespace` (1), and `unicorn/no-useless-fallback-in-spread` (1 — its only
-  finding sits on a line carrying a pre-existing `as` cast, and touching that line makes
-  `review:hotspot-preflight` count it as a newly added type assertion). Tighten one per PR,
-  largest first.
+  `no-irregular-whitespace` (1), and `unicorn/no-useless-fallback-in-spread` (1). That last one
+  was recorded here as blocked, because its only finding sat on a line carrying an `as` cast that
+  `review:hotspot-preflight` would then count as newly added. It is not blocked: Next augments the
+  global `RequestInit` with `next`, so the whole expression collapses to `...init?.next` and the
+  cast goes with the fallback.
+
+  **Only `react/set-state-in-effect` (26) and `react/no-danger` (12) are still off**, and both
+  want judgement per site rather than a codemod.
+
+  Two rules are enforced everywhere except a named set of files, which the suppression census
+  counts rather than treating as configuration:
+  `nextjs/no-html-link-for-pages` is off for `app/layout.tsx`, where `/feed.xml` is a route handler
+  serving a file that `<Link>` would client-navigate to; and `jsx-a11y/prefer-tag-over-role` is off
+  for `TimelineBar.tsx` and `scrollProgressBar.tsx`, whose `role="region"` and `role="progressbar"`
+  wrappers would cost a named landmark or a UA-styled `<progress>` to satisfy. (This paragraph used
+  to name `evidenceSections.tsx`, which the config never listed; the third entry was
+  `AppSidebar.tsx`, and it stopped being needed when that file's dead `role="dialog"` drawer was
+  deleted.)
 - **Product code carries a file-size budget.** `max-lines` is enforced at 800 effective lines
   (blank lines and comments skipped) across `app/**` and `lib/**`. It is deliberately not applied
   to `scripts/**` or `tests/**`, where a budget only invites fake overrides. The pre-existing
@@ -57,6 +74,20 @@ deploys every push, which is the only remote gate left.
   the budget so they still win. Nine files sit between 500 and 800; 500 is the ratchet target.
   ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
+- **Suppressions are themselves a gated metric.** `bun run check:suppressions`
+  (`scripts/check-suppression-census.ts`) counts inline lint disables, `@ts-*` comments, skipped
+  tests, lint rules disabled globally, and lint rules an `overrides` block turns off, against an
+  inline baseline — and fails when any of them rises. It exists because every other ratchet here —
+  the rule burn-down, `lint:types`, the suite — can be turned green by suppressing the finding
+  rather than fixing it, and nothing else in the gate notices. A change that trades a lint finding
+  for a disable comment now moves one number down and this one up, and is rejected.
+
+  The override category matters as much as the inline one: a rule set to `error` and scoped `off`
+  for a handful of files is a suppression with a wider blast radius than a disable comment, and
+  before this it moved no number at all. Baseline as of 2026-09-03: 7 lint suppressions, 3 type
+  suppressions, 0 skipped tests, 2 disabled rules, 2 override-disabled rules, and a floor of 212
+  test files. Lower it in the script when work earns it; raising one is a policy change and belongs
+  in its own PR with the reason.
 - **`lint:types` is advisory, not a gate — yet.** Type-aware oxlint (`oxlint-tsgolint` 7.0.2001)
   adds `no-floating-promises`, `no-base-to-string`, and the type-constituent rules, and reports 28
   pre-existing findings; a PR must not raise that number. Three consecutive runs in each mode

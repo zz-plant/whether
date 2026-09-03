@@ -257,7 +257,7 @@ export const loadReportDataUncachedInternal = async ({
     fetch(input, {
       ...init,
       next: {
-        ...((init as RequestInit & { next?: { revalidate?: number } })?.next ?? {}),
+        ...init?.next,
         revalidate: deps.REPORT_DATA_REVALIDATE_SECONDS,
       },
     });
@@ -416,7 +416,7 @@ export const loadReportDataUncachedInternal = async ({
   const historicalComparison =
     shouldLoadHistoricalLiveComparison && liveAssessment
       ? {
-          then: {
+          historical: {
             regime: assessment.regime,
             recordDate: treasury.record_date,
             baseRate: assessment.scores.baseRate,
@@ -424,7 +424,7 @@ export const loadReportDataUncachedInternal = async ({
             tightness: assessment.scores.tightness,
             riskAppetite: assessment.scores.riskAppetite,
           },
-          now: {
+          live: {
             regime: liveAssessment.regime,
             recordDate: liveTreasury.record_date,
             baseRate: liveAssessment.scores.baseRate,

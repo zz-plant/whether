@@ -16,18 +16,18 @@
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "error",
     "react/set-state-in-effect": "off",
-    "react/purity": "off",
-    "react/refs": "off",
+    "react/purity": "error",
+    "react/refs": "error",
     "react/no-danger": "off",
-    "nextjs/no-html-link-for-pages": "off",
+    "nextjs/no-html-link-for-pages": "error",
     "no-unused-vars": "error",
     "no-useless-escape": "error",
     "no-extra-boolean-cast": "error",
     "no-useless-rename": "error",
-    "no-irregular-whitespace": "off",
-    "unicorn/no-useless-fallback-in-spread": "off",
-    "unicorn/no-thenable": "off",
-    "unicorn/no-new-array": "off",
+    "no-irregular-whitespace": "error",
+    "unicorn/no-useless-fallback-in-spread": "error",
+    "unicorn/no-thenable": "error",
+    "unicorn/no-new-array": "error",
     "jsx-a11y/prefer-tag-over-role": "error",
     "jsx-a11y/label-has-associated-control": "error",
     "jsx-a11y/control-has-associated-label": "error",
@@ -79,8 +79,7 @@
     {
       "files": [
         "app/components/TimelineBar.tsx",
-        "app/components/scrollProgressBar.tsx",
-        "app/components/AppSidebar.tsx"
+        "app/components/scrollProgressBar.tsx"
       ],
       "rules": {
         "jsx-a11y/prefer-tag-over-role": "off"
@@ -100,6 +99,14 @@
             "skipComments": true
           }
         ]
+      }
+    },
+    {
+      "files": [
+        "app/layout.tsx"
+      ],
+      "rules": {
+        "nextjs/no-html-link-for-pages": "off"
       }
     }
   ],
