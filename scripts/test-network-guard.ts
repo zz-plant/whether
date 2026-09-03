@@ -82,6 +82,30 @@ export const targetUrl = (input: Parameters<typeof fetch>[0]): string => {
 };
 
 /**
+ * What a blocked request may safely be called in an error: its origin, and nothing after.
+ *
+ * The message goes to test output and, in the deploy gate, to a build log — so it must not
+ * carry a credential. Plenty of URLs here are credentials in their entirety:
+ * `SLACK_WEBHOOK_URL` and `PREMIUM_FUNNEL_WEBHOOK_URL` hold their secret in the *path*
+ * (`hooks.slack.com/services/T…/B…/…`), and `lib/premiumFunnel.ts` hands that value
+ * straight to the global `fetch` this guard wraps. Query strings are no safer — the repo
+ * already carries `redactFredApiKey` and `redactAlphaVantageKey` for exactly that.
+ *
+ * The origin is kept and everything else dropped, rather than the path being scrubbed by
+ * pattern. A heuristic has to be right about every shape of secret anyone adds later; the
+ * origin is right by construction, and it is the whole of what the message needs to be
+ * useful — it names the upstream to serve, which is the decision the reader has to make.
+ * `URL.origin` also drops any `user:pass@` userinfo.
+ */
+export const redactTarget = (url: string): string => {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return "an unparseable URL";
+  }
+};
+
+/**
  * Wraps `passThrough` so anything but a local target throws instead of leaving the box.
  *
  * The thrown message is one line on purpose. Code under test catches these and logs
@@ -109,7 +133,7 @@ export function createGuardedFetch(passThrough: typeof fetch, explain: (text: st
       );
     }
 
-    throw new Error(`[test-network-guard] blocked outbound fetch to ${url}`);
+    throw new Error(`[test-network-guard] blocked outbound fetch to ${redactTarget(url)}`);
   };
 
   return guardedFetch;
