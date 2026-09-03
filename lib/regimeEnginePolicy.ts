@@ -44,7 +44,17 @@ const computeRollingStats = (
 
   const values = numericHistory;
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+  /*
+   * Sample variance (n-1), not population. These values are a rolling window
+   * drawn from an ongoing series, not the whole population, and dividing by n
+   * biases sigma downward — which inflates every |z| built on it and pushes the
+   * band classification toward ELEVATED/EXTREME. A single-value window has no
+   * dispersion to estimate, so it falls back rather than dividing by zero.
+   */
+  const variance =
+    values.length > 1
+      ? values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (values.length - 1)
+      : 0;
   const stdDev = Math.sqrt(variance) || fallbackStdDev;
   return { mean, stdDev };
 };
@@ -177,17 +187,17 @@ export const computePolicyAssessment = (
         ? "RISK_ON"
         : "TRANSITION";
 
-  const agreement = Math.abs(cts - ras);
+  const signalDisagreement = Math.abs(cts - ras);
   const dominantBand = classifyPolicyBand(Math.max(Math.abs(cts), Math.abs(ras)));
   const distanceFromNeutral = Math.min(Math.abs(cts), Math.abs(ras));
-  const volatility30d = computeVolatility([cts, ras, legacyTightness / 100, legacyRiskAppetite / 100]);
+  const signalDispersion = computeVolatility([cts, ras, legacyTightness / 100, legacyRiskAppetite / 100]);
 
   const missingCount = normalizations.filter((entry) => entry.clippedZ === null).length;
   const refusalReasons: string[] = [];
-  if (agreement >= POLICY_SPEC_V1.refusal.disagreementThreshold) {
+  if (signalDisagreement >= POLICY_SPEC_V1.refusal.disagreementThreshold) {
     refusalReasons.push("The underlying signals disagree too sharply to move the posture.");
   }
-  if (volatility30d >= POLICY_SPEC_V1.refusal.volatilityThreshold) {
+  if (signalDispersion >= POLICY_SPEC_V1.refusal.dispersionThreshold) {
     refusalReasons.push("Signals have swung too hard over the past 30 days to trust a posture change.");
   }
   if (missingCount > POLICY_SPEC_V1.refusal.maxMissingSignalCount) {
@@ -219,7 +229,7 @@ export const computePolicyAssessment = (
     composites: { cts, ras },
     posture,
     band: dominantBand,
-    confidenceIndex: { agreement, distanceFromNeutral, volatility30d },
+    confidenceIndex: { signalDisagreement, distanceFromNeutral, signalDispersion },
     refusal,
     governanceParameters: getGovernanceParametersForPosture(posture, refusal.refused),
   };

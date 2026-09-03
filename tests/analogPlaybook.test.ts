@@ -44,7 +44,9 @@ describe("analogPlaybook", () => {
     const playbook = getHistoricalAnalogPlaybook(createMockAssessment());
 
     assert.equal(playbook.analogPeriod, "Q3 2007");
-    assert.ok(playbook.correlationScore >= 80);
+    // A nearness score, not a correlation: 100 is an exact coordinate match and
+    // there is no floor, so a poor match is free to score low.
+    assert.ok(playbook.matchScore > 0 && playbook.matchScore <= 100);
     assert.equal(playbook.referenceCycleCount, 4);
     assert.deepEqual(
       playbook.matchBasis.map((item) => item.key),

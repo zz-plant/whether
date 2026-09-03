@@ -6,6 +6,23 @@ export type { RegimeKey };
 
 export interface RegimeScores {
   tightness: number;
+  /**
+   * The tightness components before the 0-100 clip: rate points plus inversion
+   * points, uncapped.
+   *
+   * `tightness` deliberately saturates, and the components over-subscribe the cap
+   * (90 + 25 + macro add-ons), so above roughly a 4% base rate the published score
+   * is a constant and its week-over-week delta is zero. Classification wants that
+   * bounded scale; "how much pressure, and did it move" does not. Read this for
+   * magnitude, `tightness` for the regime.
+   *
+   * Optional because it is derived, not an input: `evaluateRegime` always sets it,
+   * while hand-built fixtures that only pin the classification inputs need not.
+   */
+  tightnessPressure?: number;
+  /** Whether `tightness` is pinned at its ceiling, so a flat score is the clip
+   *  rather than a flat reading. */
+  tightnessSaturated?: boolean;
   riskAppetite: number;
   baseRateUsed: "FED" | "1M" | "3M" | "MISSING";
   baseRate: number;
@@ -71,9 +88,24 @@ export interface PolicyCompositeScores {
 export type PolicyBand = "NEUTRAL" | "ELEVATED" | "EXTREME";
 
 export interface PolicyConfidenceIndex {
-  agreement: number;
+  /**
+   * How far apart the two composites sit, as |cts - ras|. Larger means they
+   * disagree more, which is why it gates a refusal. It was named `agreement`,
+   * which reads as the opposite of what it measures.
+   */
+  signalDisagreement: number;
   distanceFromNeutral: number;
-  volatility30d: number;
+  /**
+   * Spread across the current composite and legacy scores — a cross-sectional
+   * dispersion of four simultaneous readings, not a time series.
+   *
+   * It was named `volatility30d`, which promises a 30-day window this never had:
+   * `computeVolatility` is a plain standard deviation of whatever array it is
+   * given, and it is given four values from the same instant. Renamed rather than
+   * given a window, because the refusal gate it drives wants "do these signals
+   * cohere right now", which is what it actually answers.
+   */
+  signalDispersion: number;
 }
 
 export interface PolicyRefusalState {
@@ -135,8 +167,11 @@ export interface RegimeAssessment {
  *  post-2000 U.S. average policy rate — a rate near here reads as "normal", not
  *  as pressure. */
 export const BASE_RATE_TIGHTNESS_THRESHOLD = 3.5;
-/** Ceiling on the rate component, leaving the remaining 10 points of headroom to
- *  the inversion component and the macro stress add-ons. */
+/** Ceiling on the rate component. Note the components are allowed to over-subscribe
+ *  the cap: 90 here plus 25 of inversion plus the macro add-ons can reach past 100,
+ *  and the sum is clipped. That is why inversion and macro stress stop moving the
+ *  score once rates alone are at the ceiling. (This comment previously claimed
+ *  "10 points of headroom", which the 25-point inversion ceiling below contradicts.) */
 export const TIGHTNESS_BASE_RATE_POINTS = 90;
 /** Ceiling on the inversion component. Deliberately a minority of the score:
  *  inversion is a slow warning, not a funding cost. */
@@ -148,6 +183,15 @@ export const TIGHTNESS_CAP = 100;
  *  normal expansion runs. */
 export const RISK_APPETITE_MIN_SLOPE = -1.0;
 export const RISK_APPETITE_MAX_SLOPE = 1.5;
+/** Slope used when the curve cannot be read. Deliberately the most inverted value
+ *  in the range, so an outage biases the call toward caution rather than toward
+ *  calm — it maxes the inversion term and zeroes risk appetite at once. That is a
+ *  loud default, so it is paired with a hard cap on reported confidence
+ *  (`CONFIDENCE_PERCENT_IMPUTED_CEILING`); without that cap the stand-in scored
+ *  the confidence ceiling precisely because it sits far from both boundaries.
+ *  It borrows the bound rather than sharing meaning with it: this is an
+ *  imputation policy, not a display range. */
+export const MISSING_SLOPE_FALLBACK = RISK_APPETITE_MIN_SLOPE;
 /** Regime quadrant boundaries: tightness above 70 counts as tight, risk appetite
  *  above 50 as willing. Not the same as the 30/70 display bands in
  *  `report/signalTranslations.ts`, which answer "is this reading unusual" rather
@@ -178,12 +222,54 @@ export const BASE_RATE_TIGHTNESS_MULTIPLIER = 180;
  *  25-point cap, saturates at a 0.5% inversion. */
 export const CURVE_INVERSION_TIGHTNESS_MULTIPLIER = 50;
 
+/**
+ * Score points each axis moves per percentage point of the variable that drives
+ * it. Tightness moves 180 points per point of base rate; risk appetite spans 100
+ * points across a 2.5-point slope range, so 40 per point.
+ *
+ * They differ by 4.5x, which is why a raw `min()` of the two gaps is not a
+ * comparison: the same number of points is a far larger move in the underlying
+ * slope than in the underlying rate, so the risk axis looked closer to its
+ * boundary almost always, purely because its scale is compressed.
+ */
+export const TIGHTNESS_POINTS_PER_RATE_POINT = BASE_RATE_TIGHTNESS_MULTIPLIER;
+export const RISK_POINTS_PER_SLOPE_POINT =
+  SCORE_MAX / (RISK_APPETITE_MAX_SLOPE - RISK_APPETITE_MIN_SLOPE);
+/** Multiplier that puts a risk-appetite gap on the tightness points scale, so the
+ *  existing percent calibration keeps its meaning. */
+export const RISK_GAP_TO_TIGHTNESS_EQUIVALENT =
+  TIGHTNESS_POINTS_PER_RATE_POINT / RISK_POINTS_PER_SLOPE_POINT;
+
 export const REGIME_CONFIDENCE_NEAR_THRESHOLD = 5;
 export const REGIME_CONFIDENCE_MEDIUM_THRESHOLD = 12;
 export const CONFIDENCE_PERCENT_BASELINE = 55;
-export const CONFIDENCE_PERCENT_PER_POINT = 3;
+/**
+ * Percent per point of distance from the nearest regime boundary.
+ *
+ * Was 3, calibrated when `resolveDistanceToFlip` measured the risk-appetite gap in
+ * its own compressed units. Putting both axes on one scale roughly doubled the
+ * mean distance (25.5 -> 47.5 across the 175 months in
+ * `summary_monthly_regime_history.json`), so keeping 3 would have lifted mean
+ * reported confidence from 85.7% to 90.2% purely as an artefact of the unit fix.
+ * At 1 the mean is unchanged, which is the point: the axis normalisation changes
+ * *which* distance is measured, not how confident the product claims to be.
+ *
+ * It also makes the formula legible — the percent is the baseline plus the points
+ * of distance.
+ *
+ * Known limitation: even at this setting the scale still tops out for most
+ * months, so the number discriminates poorly at the confident end. Fixing that
+ * needs calibration against outcomes — how often a call at distance d was later
+ * revised — not another constant. `data/summary_archive.json` is the input for
+ * that work.
+ */
+export const CONFIDENCE_PERCENT_PER_POINT = 1;
 export const CONFIDENCE_PERCENT_FLOOR = 35;
 export const CONFIDENCE_PERCENT_CEILING = 92;
+/** Ceiling when either score came from a stand-in rather than a reading. Below
+ *  the floor the scale otherwise reports, because a call built on imputed inputs
+ *  should read as weaker than the weakest call built on real ones. */
+export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
 
 export const FORECAST_CONE_HIGH = 3.5;
 export const FORECAST_CONE_MEDIUM = 5;
@@ -334,6 +420,34 @@ export const resolveThresholds = (
   tightnessRegime: overrides?.tightnessRegime ?? DEFAULT_THRESHOLDS.tightnessRegime,
   riskAppetiteRegime: overrides?.riskAppetiteRegime ?? DEFAULT_THRESHOLDS.riskAppetiteRegime,
 });
+
+/**
+ * Tightness in the same points as the published score, with no ceiling anywhere.
+ *
+ * Every ceiling is removed, not just the final clip — clamping the components and
+ * summing them only moves the saturation point from 100 to 115, which is still
+ * flat. Floored at zero per component so a rate below the threshold or an upward
+ * curve contributes nothing rather than subtracting.
+ *
+ * Comparable to `tightness` below the ceiling and unbounded above it, so a
+ * week-over-week difference stays meaningful in a regime where the published
+ * score cannot move.
+ */
+export const computeTightnessPressure = (
+  baseRate: number,
+  curveSlope: number,
+  baseRateThreshold: number,
+) => {
+  const baseRatePoints = Math.max(
+    SCORE_MIN,
+    Math.round((baseRate - baseRateThreshold) * BASE_RATE_TIGHTNESS_MULTIPLIER),
+  );
+  const inversionPoints =
+    curveSlope < SCORE_MIN
+      ? Math.round(Math.abs(curveSlope) * CURVE_INVERSION_TIGHTNESS_MULTIPLIER)
+      : SCORE_MIN;
+  return baseRatePoints + inversionPoints;
+};
 
 export const computeTightnessScore = (
   baseRate: number,

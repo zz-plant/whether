@@ -81,12 +81,16 @@ export function getRegimeProjection(
   currentRegime: string,
   tightness: number,
   riskAppetite: number,
-  tightnessDelta: number,
-  riskAppetiteDelta: number,
+  /* Week-over-week change in the score, i.e. points per week. NOT
+   * `RegimeDiagnostics.tightnessDelta`, which carries the same name but is a
+   * distance from the threshold; passing that compiles and yields a
+   * dimensionless ratio rendered as weeks. */
+  tightnessVelocity: number,
+  riskAppetiteVelocity: number,
   tightnessThreshold = 70,
   riskAppetiteThreshold = 50,
 ): RegimeProjection {
-  if (tightnessDelta === 0 && riskAppetiteDelta === 0) {
+  if (tightnessVelocity === 0 && riskAppetiteVelocity === 0) {
     return { weeksToFlip: null, projectedRegime: null, velocityLabel: "Stable — no significant movement." };
   }
 
@@ -98,8 +102,8 @@ export function getRegimeProjection(
     ? riskAppetiteThreshold - riskAppetite
     : riskAppetite - riskAppetiteThreshold;
 
-  const tightVelocity = Math.abs(tightnessDelta);
-  const riskVelocity = Math.abs(riskAppetiteDelta);
+  const tightVelocity = Math.abs(tightnessVelocity);
+  const riskVelocity = Math.abs(riskAppetiteVelocity);
   const maxVelocity = Math.max(tightVelocity, riskVelocity);
   const minDist = Math.min(Math.abs(tightDist), Math.abs(riskDist));
 
@@ -113,7 +117,7 @@ export function getRegimeProjection(
     : `Slow trend — no near-term flip expected.`;
 
   /* Project which regime would follow */
-  const tightDir = tightnessDelta > 0 ? "tightening" : "easing";
+  const tightDir = tightnessVelocity > 0 ? "tightening" : "easing";
 
   const projectedRegime = weeksEstimate <= 4
     ? (tightDir === "tightening" ? "SCARCITY" : "EXPANSION")
