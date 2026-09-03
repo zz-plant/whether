@@ -135,13 +135,18 @@ the Slack block, and developer access lives under the header's More menu):
 - **PresentModeButton** (`app/components/PresentModeButton.tsx`): fullscreen focus mode for
   leadership syncs and Zoom meetings. Triggered by the `F` keyboard shortcut or command palette.
   Strips navigation and secondary chrome so the Decision Hero fills the viewport.
-- **ThresholdProximityBar** (`app/components/ThresholdProximityBar.tsx`): visual tightening buffer
-  indicator (`[████████░░] 14 pts buffer remaining`) replacing buried microtext. Color-coded with
-  emerald (safe) / amber (watch) / rose (near threshold) semantic zones.
+- **Bounded-condition rails** (`ThresholdLadder`, fed by `buildBoundedConditionRails` in
+  `lib/report/operatingCalls.ts`): one rail per composite signal in the Watch-this-week block,
+  showing the current reading, the guardrail, the line that clears it, and the span where neither
+  fires. Replaced `ThresholdProximityBar` on 2026-09-03, which encoded the same distance as a fill
+  against an arbitrary, unstated 30-point reference and restated the counter beside it. Both lines
+  are parsed back out of the guardrail and clears-when copy the block prints, so a rail cannot
+  state a threshold the sentence under it does not; copy that will not parse renders no rail.
 
 These sit inside the hero's action bar and secondary provenance row, following a routine-first
-hierarchy: the Slack copy button is the primary visible action, while Present, developer access,
-and threshold detail are progressive disclosures.
+hierarchy: the Slack copy button is the primary visible action, while Present and developer access
+are progressive disclosures. The bounded-condition rails are not — threshold distance is what the
+week's call turns on, so it stays on the default screen.
 
 ### 1.1.2 Bounded decisions moved to Plan (2026-09-01)
 The per-lever bounded-decision ledger no longer renders on `/`. §VIII assigns operating

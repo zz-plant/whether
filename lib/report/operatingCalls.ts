@@ -191,7 +191,7 @@ type CurrentScores = {
   riskAppetite: number;
 };
 
-type RuleThresholdCondition = {
+export type RuleThresholdCondition = {
   metric: keyof CurrentScores;
   operator: ">" | ">=" | "<" | "<=";
   value: number;
@@ -220,7 +220,7 @@ const progressByStep = [12, 38, 70, 92] as const;
 
 const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Funding pressure");
 
-const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
+export const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
   const matches = text.matchAll(
     /(funding pressure|risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
   );
@@ -265,6 +265,94 @@ const toThresholdDistance = (condition: RuleThresholdCondition, scores: CurrentS
     pointsToLine: satisfied ? 0 : Math.max(0, rawGap),
     satisfied,
   };
+};
+
+/**
+ * One composite signal, ready to draw as a threshold rail.
+ *
+ * A bounded rule is three numbers on one scale — where the signal is, where it
+ * trips, and where the trip clears — and prose can only state them and leave the
+ * reader to subtract. `ThresholdLadder` draws that directly, so this turns the
+ * rule into rail coordinates.
+ */
+export type BoundedConditionRail = {
+  metric: keyof CurrentScores;
+  /** What the surface calls the signal, e.g. "Funding pressure". */
+  label: string;
+  current: number;
+  /** Crossing this trips the rule; parsed from the guardrail sentence. */
+  guardrail: number;
+  /** Where the trip clears. Absent when the rule states no resume line. */
+  clearsAt?: number;
+  /**
+   * Run the rail from `max` to `min`. Funding pressure trips high and risk
+   * appetite trips low, so drawn honestly the two rails put trouble on opposite
+   * ends and a reader has to re-orient between them. Inverting the falling one
+   * puts trouble on the right for both, which is what makes the pair readable as
+   * small multiples rather than as a pair of unrelated charts.
+   */
+  invert: boolean;
+};
+
+/**
+ * Rail coordinates for the bounded conditions a surface is *already printing*.
+ *
+ * Both lines are parsed out of the same sentences the surface renders rather
+ * than re-derived from the thresholds behind them, because the guardrail copy
+ * reaching the homepage is assembled from several sources and a second
+ * derivation would eventually disagree with the sentence beside it. A condition
+ * that will not parse contributes no rail: a missing graphic costs a reader
+ * nothing, and a graphic that contradicts the sentence under it costs the trust
+ * the whole surface runs on.
+ */
+export const buildBoundedConditionRails = ({
+  guardrail,
+  clearsWhen = [],
+  scores,
+}: {
+  guardrail?: string;
+  clearsWhen?: readonly string[];
+  scores?: CurrentScores;
+}): BoundedConditionRail[] => {
+  if (!guardrail || !scores) {
+    return [];
+  }
+
+  const clearLines = new Map<keyof CurrentScores, number>();
+  for (const condition of parseRuleThresholdConditions(clearsWhen.join(" · "))) {
+    if (!clearLines.has(condition.metric)) {
+      clearLines.set(condition.metric, condition.value);
+    }
+  }
+
+  const seen = new Set<keyof CurrentScores>();
+  const rails: BoundedConditionRail[] = [];
+
+  for (const condition of parseRuleThresholdConditions(guardrail)) {
+    // One rail per signal. A rule naming the same metric twice states the
+    // binding line first, and a second rail for it would double-count the signal
+    // in a row read as one-per-signal.
+    if (seen.has(condition.metric)) continue;
+    seen.add(condition.metric);
+
+    const current = scores[condition.metric];
+    if (!Number.isFinite(current) || !Number.isFinite(condition.value)) continue;
+
+    // Which way the rule trips is what the operator encodes: ">" trips high, so
+    // trouble already sits on the right and the rail runs as drawn.
+    const tripsHigh = condition.operator === ">" || condition.operator === ">=";
+
+    rails.push({
+      metric: condition.metric,
+      label: metricLabel(condition.metric),
+      current,
+      guardrail: condition.value,
+      clearsAt: clearLines.get(condition.metric),
+      invert: !tripsHigh,
+    });
+  }
+
+  return rails;
 };
 
 const formatDistanceLabel = (distance: RuleThresholdDistance | undefined, kind: "caution" | "reopen") => {

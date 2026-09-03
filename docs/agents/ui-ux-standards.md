@@ -212,3 +212,44 @@ take the other's job.
   eyebrow was considered for this register and rejected — it stacks near-duplicates (`Plan` over
   `Weekly plan`) across the report shells. Rationing eyebrows is per-surface content work
   (`docs/ui-facelift-plan.md`, Phase 2), not a register change.
+
+## XV. Encoding a number (figure register, and when to draw the line)
+
+Scope: any surface that states a reading, a threshold, or the distance between them.
+
+### Figure register
+
+- MUST: set a figure in mono (`--font-mono`, `.mono`, `font-mono`) only when it has to align
+  **with other figures** — a table column, the two sides of a before/after comparison, a rail's
+  own labels. Monospaced digits share an advance width, which is what makes a column diffable.
+- MUST: set every other figure in the sans with `tabular-nums` — a number in a sentence, a score
+  beside its label, a delta beside its arrow. That fixes the digit width, so a value updating in
+  place does not shift its neighbours, without changing the face.
+- NEVER: render the same figure in two faces. The boldness score was mono in `StickyCallStrip`
+  and sans in `DecisionHero`, which read as two quantities on one screen. One number, one face,
+  across every surface it appears on.
+
+### Encode the claim, don't only state it
+
+- MUST: encode a threshold claim on the surface that makes it. A bounded rule is three numbers on
+  one scale — the reading, the line that trips it, the line that clears it — and prose can only
+  state them and leave the reader to subtract. `ThresholdLadder` draws exactly that; reach for it
+  before writing another sentence with numbers in it. The prose stays: it is what gets copied
+  into Slack and cited. It just stops being the only thing carrying the distance.
+- MUST: use one encoding per concept per screen. Until 2026-09-03 the weekly brief showed
+  distance-to-threshold three ways at once — a fill bar on an arbitrary 30-point reference, a
+  rail on the real 0–100 scale, and three rows of prose — so a reader had to learn three
+  vocabularies for one idea. The rail won because it is the only one that is decodable without
+  being told its domain.
+- MUST: state the domain of any autoscaled or arbitrary-reference graphic next to it. This is the
+  rule `app/components/ui/sparkline.tsx` documents and the deleted `ThresholdProximityBar`
+  violated: a bar whose full width silently meant "30 points" cannot be read, only glanced at.
+- MUST: draw panels meant to be compared with one encoding, one scale, and one orientation —
+  small multiples. A pair where one signal got a rail and the other got a sentence is not a pair.
+  Where two signals trip in opposite directions, `invert` the falling one so trouble sits on the
+  same side of both rails; the rail ends label themselves, so the flip stays visible.
+- NEVER: draw a graphic whose numbers are derived separately from the copy beside it. Parse the
+  displayed sentence (`buildBoundedConditionRails` in `lib/report/operatingCalls.ts`) or pass one
+  source to both. A second derivation eventually disagrees with the sentence under it, and a
+  graphic that contradicts its own caption costs more trust than no graphic at all — so copy that
+  will not parse renders nothing.

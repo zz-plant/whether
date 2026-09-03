@@ -21,6 +21,14 @@ export type ThresholdLadderProps = {
   triggerLabel?: string;
   /** Crossing this reverses the rule. Omit if the rule has no reversal condition. */
   reversal?: number;
+  /**
+   * What the surface calls the reversal line. Defaults to "Reversal", but a card
+   * that already spends the word "Reversal" on a different rule has to name this
+   * line something else — two lines under one word is the same defect
+   * `triggerLabel` exists to prevent, seen from the other end. Like `triggerLabel`
+   * it renames the visible caption only; the description keeps the generic noun.
+   */
+  reversalLabel?: string;
   /** Unit suffix for the readout, e.g. "%" or "bps". */
   unit?: string;
   /** Name of the measured signal, for the accessible title. */
@@ -68,6 +76,7 @@ export function ThresholdLadder({
   trigger,
   triggerLabel = "Trigger",
   reversal,
+  reversalLabel = "Reversal",
   unit = "",
   signalLabel,
   scaleDirection,
@@ -172,9 +181,48 @@ export function ThresholdLadder({
   // Keep end-of-rail captions from spilling out of the viewBox.
   const clampLabelX = (x: number) => Math.min(Math.max(x, RAIL_START + 14), RAIL_END - 14);
 
+  /* A tight hysteresis gap is the normal case, not the edge one — a rule that
+     trips at 76 and clears at 66 puts its two captions 10 units apart on a
+     100-unit rail — so the captions collide exactly when the rule is worth
+     reading. Approximating the glyph width from the character count is enough to
+     tell whether they do; when they would, the reversal caption goes on a second
+     line and the rail drops to make room for it. */
+  const captionWidth = (text: string, fontSize = 9) => text.length * fontSize * 0.52;
+  const captionsCollide =
+    reversalValue !== undefined
+    && Math.abs(xTrigger - xFor(reversalValue))
+      < (captionWidth(triggerLabel) + captionWidth(reversalLabel)) / 2;
+  const stackedCaptionRise = captionsCollide ? 10 : 0;
+
+  /* A scale direction names both ends of the rail ("0 = easier funding · 100 =
+     harder funding"), so a single left-anchored run both overflows a narrow rail
+     — SVG text does not wrap, it clips — and puts the caption for the right end
+     nowhere near it. Split on the separator the copy already uses and anchor each
+     half to the end it describes. `invert` swaps which end that is, so the halves
+     follow the flip rather than contradicting it. Anything that will not split
+     into two halves that fit stays one run, shrunk to the rail width. */
+  const directionHalves = (() => {
+    if (!scaleDirection) return undefined;
+    const parts = scaleDirection.split(" · ");
+    if (parts.length !== 2) return undefined;
+    // Each half names the value it belongs to ("0 = easier funding"), which the
+    // rail end directly beneath it already prints. Anchored to that end the
+    // number is redundant, and dropping it is most of what makes the halves fit.
+    const stripValue = (part: string) => part.replace(/^-?\d+(?:\.\d+)?\s*=\s*/, "");
+    const [low, high] = [stripValue(parts[0]), stripValue(parts[1])];
+    const fits = captionWidth(low, 8) + captionWidth(high, 8) + 8 <= RAIL_END - RAIL_START;
+    if (!fits) return undefined;
+    return invert ? ([high, low] as const) : ([low, high] as const);
+  })();
+
+  const directionFontSize =
+    scaleDirection && !directionHalves
+      ? Math.min(8, ((RAIL_END - RAIL_START) / (scaleDirection.length * 0.52)))
+      : 8;
+
   return (
     <svg
-      viewBox={`0 0 ${viewBoxWidth} ${scaleDirection ? 68 : 56}`}
+      viewBox={`0 0 ${viewBoxWidth} ${(scaleDirection ? 68 : 56) + stackedCaptionRise}`}
       width="100%"
       style={{ height: "auto" }}
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
@@ -183,17 +231,27 @@ export function ThresholdLadder({
       <title id={`${idPrefix}-title`}>{`${signalLabel}: ${readout}`}</title>
       <desc id={`${idPrefix}-desc`}>{desc}</desc>
 
-      {scaleDirection ? (
+      {directionHalves ? (
+        <>
+          <text x={RAIL_START} y={9} textAnchor="start" fill="var(--app-text-muted)" fontSize={8}>
+            {directionHalves[0]}
+          </text>
+          <text x={RAIL_END} y={9} textAnchor="end" fill="var(--app-text-muted)" fontSize={8}>
+            {directionHalves[1]}
+          </text>
+        </>
+      ) : scaleDirection ? (
         <text
           x={RAIL_START}
           y={9}
           fill="var(--app-text-muted)"
-          fontSize={8}
+          fontSize={directionFontSize}
         >
           {scaleDirection}
         </text>
       ) : null}
 
+      <g transform={stackedCaptionRise ? `translate(0, ${stackedCaptionRise})` : undefined}>
       <line
         x1={RAIL_START}
         y1={RAIL_Y}
@@ -286,12 +344,12 @@ export function ThresholdLadder({
           />
           <text
             x={clampLabelX(xFor(reversalValue))}
-            y={RAIL_Y - 14}
+            y={RAIL_Y - 14 - (stackedCaptionRise ? 10 : 0)}
             textAnchor="middle"
             fill="var(--app-text-muted)"
             fontSize={9}
           >
-            Reversal
+            {reversalLabel}
           </text>
         </>
       ) : null}
@@ -358,6 +416,7 @@ export function ThresholdLadder({
       <text x={RAIL_END} y={RAIL_Y + 20} textAnchor="end" fill="var(--app-text-muted)" fontSize={8}>
         {formatNumber(invert ? min : max)}
       </text>
+      </g>
     </svg>
   );
 }

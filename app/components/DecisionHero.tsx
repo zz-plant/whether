@@ -8,9 +8,10 @@ import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
+import { buildBoundedConditionRails } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
-import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "./ui/plainLanguage";
+import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
 import { BoundedValue } from "./ui/boundedValue";
 import {
@@ -24,7 +25,6 @@ import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { PresentModeButton } from "./PresentModeButton";
 import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
-import { ThresholdProximityBar } from "./ThresholdProximityBar";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
@@ -153,6 +153,18 @@ export function DecisionHero({
   const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
   const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
 
+  // The bounded rule, as rail coordinates. Both lines are parsed back out of the
+  // guardrail and clears-when copy this box renders, so the rails cannot state a
+  // threshold the sentences under them do not.
+  const boundedRails = buildBoundedConditionRails({
+    guardrail,
+    clearsWhen: flipConditions,
+    scores:
+      typeof riskAppetite === "number"
+        ? { tightness, riskAppetite }
+        : undefined,
+  });
+
   const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
   const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10
     ? "text-rose-300"
@@ -245,6 +257,8 @@ export function DecisionHero({
             current={tightness}
             previous={tightness - tightnessDelta}
             trigger={tightnessThreshold}
+            triggerLabel="Watch line"
+            viewBoxWidth={220}
             signalLabel="Funding pressure"
             scaleDirection={compositeSignalScales.tightness.directionLabel}
           />
@@ -283,7 +297,28 @@ export function DecisionHero({
               </span>
             </p>
           ) : null}
-          <SignalScaleNote signalKey="riskAppetite" className="mt-1.5" />
+          {/* The pair is meant to be read together, so it gets a single
+              encoding. Funding pressure had a rail and risk appetite had a
+              sentence, which left two panels claiming to be a pair while showing
+              the reader nothing he could compare. Risk appetite trips low, so the
+              rail is inverted and both put trouble on the right. */}
+          <div className="mt-1.5 w-full">
+            <ThresholdLadder
+              idPrefix={`hero-risk-appetite-${idSuffix}`}
+              min={0}
+              max={100}
+              current={riskAppetite}
+              previous={
+                typeof riskAppetiteDelta === "number" ? riskAppetite - riskAppetiteDelta : undefined
+              }
+              trigger={riskAppetiteThreshold}
+              triggerLabel="Watch line"
+              viewBoxWidth={220}
+              invert
+              signalLabel="Risk appetite"
+              scaleDirection={compositeSignalScales.riskAppetite.directionLabel}
+            />
+          </div>
           <PlainEnglishScoreNote
             signalKey="riskAppetite"
             score={riskAppetite}
@@ -423,8 +458,39 @@ export function DecisionHero({
                 ) : null}
               </div>
 
-              {thresholdBusinessConsequence ? (
-                <ThresholdProximityBar consequence={thresholdBusinessConsequence} className="my-1" />
+              {/* The rule, drawn. Three prose rows state six numbers across two
+                  scales and leave the reader to subtract; a rail per signal puts
+                  the reading, the guardrail and the line that clears it on one
+                  axis, with the span where neither fires shaded. The rows below
+                  stay — they are what gets copied into Slack and cited — but they
+                  no longer have to carry the distance on their own. Both rails
+                  run trouble-to-the-right (`invert` flips the falling one), which
+                  is what lets the pair read as a small-multiple set. */}
+              {boundedRails.length > 0 ? (
+                <div
+                  className="grid gap-x-4 gap-y-1 sm:grid-cols-2"
+                  aria-label="Distance to this week's bounded conditions"
+                >
+                  {boundedRails.map((rail) => (
+                    <div key={rail.metric} className="min-w-0">
+                      <p className="text-fluid-nano text-white/45">{rail.label}</p>
+                      <ThresholdLadder
+                        idPrefix={`hero-bounded-${rail.metric}`}
+                        min={0}
+                        max={100}
+                        current={rail.current}
+                        trigger={rail.guardrail}
+                        triggerLabel={DECISION_CONTRACT_LABELS.threshold.guardrail}
+                        reversal={rail.clearsAt}
+                        reversalLabel={DECISION_CONTRACT_LABELS.reversal.clearsWhen}
+                        hysteresisBand
+                        invert={rail.invert}
+                        signalLabel={rail.label}
+                        viewBoxWidth={300}
+                      />
+                    </div>
+                  ))}
+                </div>
               ) : null}
 
               <dl className="space-y-1.5 text-fluid-xs">
@@ -534,25 +600,35 @@ export function DecisionHero({
             <TrendGlyph direction={trendDirectionFromDelta(boldnessDelta)} className="h-4 w-4" />
             <span>{boldnessDeltaLabel}</span>
           </div>
+          <p className="mt-1 text-fluid-xs font-medium text-white/50">
+            Boldness budget
+          </p>
           {trendPoints && trendDomain ? (
-            <p className="mt-1.5 flex items-center justify-center gap-1.5 text-fluid-nano tabular-nums text-white/45">
+            /* Still a sparkline — no axes, no gridlines, no legend — but sized to
+               the column instead of to a line of type. At six em on nano text it
+               drew 72x14px, which is under the width the series has points and
+               too short for the shaded quartile band to separate from the stroke:
+               the one graphic that answers "is 57 a normal reading?" was the one
+               nobody could decode. The domain stays in text beside it because the
+               scale is still fitted to the window. */
+            <figure className="mt-1.5 flex flex-col items-center text-fluid-nano">
               <Sparkline
                 points={trendPoints}
                 label="Boldness budget"
                 domain={trendDomain}
                 band={trendBand}
                 tone={trendTone}
-                widthEm={6}
+                widthEm={14}
                 className="text-white/60"
               />
-              {/* The graphic is autoscaled, so the span has to be readable or the
-                  shape can't be decoded. */}
-              <span>{trendPoints.length} mo · {rangeLabel(trendDomain)}</span>
-            </p>
+              <figcaption className="mt-1 w-full max-w-[14em] tabular-nums text-white/45">
+                <span className="flex items-baseline justify-between gap-2">
+                  <span>{trendPoints.length} mo</span>
+                  <span>{rangeLabel(trendDomain)}</span>
+                </span>
+              </figcaption>
+            </figure>
           ) : null}
-          <p className="text-fluid-xs font-medium text-white/50 mt-1">
-            Boldness budget
-          </p>
           <p className="text-fluid-nano leading-snug text-white/40">
             How much room you have to hire, spend, and commit.
           </p>

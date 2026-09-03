@@ -96,6 +96,23 @@
      non-heading needs the serif, set font-family in CSS rather than minting the
      utility. See the --text-display note above for why serif is rationed. */
   --font-display: var(--font-display-google, "Fraunces", Georgia, serif);
+  /* Figure register — which face a number is set in, assigned by role rather
+     than by taste, the same way the radius scale below is.
+
+     Mono is for figures that have to line up *with each other*: a column in a
+     table, the two sides of a before/after comparison, a rail's own labels.
+     Monospaced digits share an advance width, so the column reads as a column
+     and the eye can diff down it.
+
+     Everything else — a figure in a sentence, a score beside its label, a
+     delta beside its arrow — stays in the sans with `tabular-nums`, which
+     fixes the digit width without changing the face. That is what keeps a
+     number from jittering as it updates while still reading as prose.
+
+     The rule that matters most: one number, one face. The boldness score
+     rendered mono in the sticky strip and sans in the hero, which read as two
+     different quantities on one screen. If a figure appears on more than one
+     surface, it is the same figure everywhere. */
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --text-primary: var(--app-text);
   --footer-link: #cbd5e1;

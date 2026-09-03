@@ -73,7 +73,12 @@ describe("ThresholdLadder", () => {
 
     assert.match(html, /Funding pressure: 64/);
     assert.match(html, /Trigger at 68\./);
-    assert.equal(html.match(/0 = easier funding · 100 = harder funding/g)?.length, 2);
+    // The visible caption is split across the rail ends it names; the
+    // description carries the same direction as one sentence.
+    assert.match(html, />easier funding</);
+    assert.match(html, />harder funding</);
+    assert.equal(html.match(new RegExp(direction, "g"))?.length, 1);
+    assert.match(html, /Scale direction: 0 = easier funding · 100 = harder funding/);
   });
 
   it("runs an inverted rail backwards, ends included", () => {
@@ -141,6 +146,124 @@ describe("ThresholdLadder", () => {
     assert.match(html, />Guardrail</);
     // The accessible description keeps the generic noun, which other copy quotes.
     assert.match(html, /Trigger at 80\./);
+  });
+
+  it("names the reversal line what the surface calls it, visibly only", () => {
+    const html = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7b"
+        min={0}
+        max={100}
+        current={32}
+        trigger={76}
+        triggerLabel="Guardrail"
+        reversal={66}
+        reversalLabel="Clears when"
+        hysteresisBand
+        signalLabel="Funding pressure"
+      />,
+    );
+
+    assert.match(html, />Clears when</);
+    // Same split as `triggerLabel`: the description keeps the generic noun.
+    assert.match(html, /Reversal at 66\./);
+  });
+
+  it("lifts the reversal caption clear of the trigger caption when they would collide", () => {
+    const tight = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7c"
+        min={0}
+        max={100}
+        current={32}
+        trigger={76}
+        triggerLabel="Guardrail"
+        reversal={66}
+        reversalLabel="Clears when"
+        hysteresisBand
+        signalLabel="Funding pressure"
+        viewBoxWidth={300}
+      />,
+    );
+    const roomy = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7d"
+        min={0}
+        max={100}
+        current={32}
+        trigger={90}
+        triggerLabel="Guardrail"
+        reversal={10}
+        reversalLabel="Clears when"
+        hysteresisBand
+        signalLabel="Funding pressure"
+        viewBoxWidth={300}
+      />,
+    );
+
+    // A hysteresis gap is small by design, so the two captions overlap exactly
+    // when the rule is tight. The stacked one buys its room from the box height.
+    assert.match(tight, /viewBox="0 0 300 66"/);
+    assert.match(tight, /transform="translate\(0, 10\)"/);
+    assert.match(roomy, /viewBox="0 0 300 56"/);
+    assert.doesNotMatch(roomy, /translate\(0, 10\)/);
+  });
+
+  it("splits a two-ended scale direction across the ends it names, and follows invert", () => {
+    const upright = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7e"
+        min={0}
+        max={100}
+        current={32}
+        trigger={70}
+        signalLabel="Funding pressure"
+        scaleDirection="0 = easier funding · 100 = harder funding"
+        viewBoxWidth={220}
+      />,
+    );
+    const inverted = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7f"
+        min={0}
+        max={100}
+        current={52}
+        trigger={50}
+        invert
+        signalLabel="Risk appetite"
+        scaleDirection="0 = easier funding · 100 = harder funding"
+        viewBoxWidth={220}
+      />,
+    );
+
+    // The rail end beneath each half already prints the number, so the halves drop it.
+    assert.match(upright, /text-anchor="start"[^>]*>easier funding</);
+    assert.match(upright, /text-anchor="end"[^>]*>harder funding</);
+    // Inverting the rail puts 100 on the left, so its caption goes with it.
+    assert.match(inverted, /text-anchor="start"[^>]*>harder funding</);
+    assert.match(inverted, /text-anchor="end"[^>]*>easier funding</);
+    // The description keeps the unsplit sentence either way.
+    assert.match(upright, /Scale direction: 0 = easier funding · 100 = harder funding/);
+  });
+
+  it("shrinks rather than clips a scale direction that will not split", () => {
+    const html = renderToStaticMarkup(
+      <ThresholdLadder
+        idPrefix="l7g"
+        min={0}
+        max={100}
+        current={32}
+        trigger={70}
+        signalLabel="Curve"
+        scaleDirection="a single unsplittable run of scale direction copy that overflows"
+        viewBoxWidth={200}
+      />,
+    );
+
+    // SVG text does not wrap; left at font-size 8 this run would be cut off
+    // mid-word with no indication anything was lost.
+    const fontSize = Number(html.match(/font-size="([\d.]+)"[^>]*>a single unsplittable/)?.[1]);
+    assert.ok(fontSize > 0 && fontSize < 8, `expected a shrunk caption, got ${fontSize}`);
   });
 
   it("does not read a signal that blew through the trigger as improving", () => {
