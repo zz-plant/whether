@@ -155,7 +155,9 @@ export function AppSidebar({ mobileOpen, onMobileClose, sectionLinks = [] }: App
           aria-modal="true"
           aria-label="Sidebar navigation"
         >
-          <div
+          <button
+            type="button"
+            aria-label="Close navigation"
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onMobileClose}
           />

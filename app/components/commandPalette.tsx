@@ -32,6 +32,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
 
   const filteredRef = useRef<CommandItem[]>([]);
   const selectedIndexRef = useRef(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const toggleFocusMode = useCallback(() => {
     document.dispatchEvent(new CustomEvent("whether:toggle-focus-mode"));
@@ -159,12 +160,18 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     return matches.length ? [...matches, searchCommand] : [searchCommand];
   }, [query, commands, navigateTo]);
 
-  filteredRef.current = filtered;
-  selectedIndexRef.current = selectedIndex;
+  // Mirrored for the keydown handler below, which is attached once and must not
+  // re-subscribe on every keystroke. Assigned on commit rather than during render:
+  // a render React throws away must not leave the ref mutated.
+  useEffect(() => {
+    filteredRef.current = filtered;
+    selectedIndexRef.current = selectedIndex;
+  }, [filtered, selectedIndex]);
 
   useEffect(() => {
     setSelectedIndex(0);
   }, [query]);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -187,7 +194,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Popup className="fixed z-50 top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-2xl border border-slate-800/80 bg-slate-950/95 shadow-2xl shadow-black/80 backdrop-blur-2xl overflow-hidden" aria-label="Command palette">
+        <Dialog.Popup initialFocus={inputRef} className="fixed z-50 top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-2xl border border-slate-800/80 bg-slate-950/95 shadow-2xl shadow-black/80 backdrop-blur-2xl overflow-hidden" aria-label="Command palette">
           <div className="flex items-center gap-3 border-b border-slate-800/80 px-4 py-3.5 bg-slate-900/40">
             <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
             <input
@@ -196,7 +203,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search pages, actions, tools..."
               className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none font-medium"
-              autoFocus
+              ref={inputRef}
               aria-label="Search commands"
             />
             <kbd className="text-[10px] text-slate-400 font-mono border border-slate-800 bg-slate-900 rounded-md px-2 py-0.5 shadow-inner">ESC</kbd>

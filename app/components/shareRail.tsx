@@ -97,7 +97,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             </div>
           </fieldset>
 
-          <label className="flex items-center gap-2 text-sm text-slate-300">
+          <div className="flex items-center gap-2 text-sm text-slate-300">
             <Switch.Root
               checked={includeContext}
               onCheckedChange={setIncludeContext}
@@ -107,9 +107,9 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
             </Switch.Root>
             <span id={includeContextLabelId}>Include context for non-users</span>
-          </label>
+          </div>
 
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+          <div className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
             <Switch.Root
               checked={slackOverlayActive}
               onCheckedChange={handleToggleSlackOverlay}
@@ -119,7 +119,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
             </Switch.Root>
             <span id={slackOverlayLabelId}>Slack preview overlay (1.91:1)</span>
-          </label>
+          </div>
 
           <div className="border-t border-slate-800/60 pt-3">
             <div className="mb-3">

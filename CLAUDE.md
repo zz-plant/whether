@@ -40,10 +40,26 @@ deploys every push, which is the only remote gate left.
   tool, not the policy. Tighten one rule per PR, largest first. `no-unused-vars` (83: 49 unused
   imports, 34 declarations, 46 files) was burned down and enforced on 2026-09-03, along with
   `no-useless-escape` (12), `no-extra-boolean-cast` (3), `no-useless-rename` (2), and
-  `no-irregular-whitespace` (1) — all four auto-fixable and semantics-preserving. 100 findings
-  remain across 16 rules: `jsx-a11y/prefer-tag-over-role` (32), `react/set-state-in-effect` (26),
-  `react/no-danger` (12), `jsx-a11y/label-has-associated-control` (11), `react/refs` (4),
-  then the tail.
+  `no-irregular-whitespace` (1) — all four auto-fixable and semantics-preserving. Eleven more
+  closed the same week: the three `unicorn/*` rules, `react/purity`, `react/refs`,
+  `nextjs/no-html-link-for-pages`, `jsx-a11y/label-has-associated-control` (11), and the four
+  single-finding a11y rules. **71 findings remain across 5 rules**:
+  `jsx-a11y/prefer-tag-over-role` (31), `react/set-state-in-effect` (26), `react/no-danger` (12),
+  and one finding each in `jsx-a11y/control-has-associated-label` and
+  `jsx-a11y/no-noninteractive-element-interactions`.
+
+  The last two are single false positives, which is why they stay off. The
+  `control-has-associated-label` finding is a link in `planningExecutionStepper.tsx` whose name
+  comes from its dynamic children — adding an `aria-label` would override the visible text and
+  make it worse. The `no-noninteractive-element-interactions` one is `TimelineBar`'s
+  `role="region"` wrapper handling arrow keys; `role="toolbar"` satisfies the rule but costs a
+  named landmark a screen-reader user can jump to, which is a bad trade for one finding.
+
+  Enabling a rule with a scoped exception is fine and is now visible: `nextjs/no-html-link-for-pages`
+  is enforced repo-wide and `off` for `app/layout.tsx` alone, because `/feed.xml` is a route handler
+  serving a file and `<Link>` would client-navigate to a feed. The census counts that override as a
+  suppression rather than treating it as configuration — otherwise silencing a rule per-file would
+  be the cheapest way past the gate.
 
   **`jsx-a11y/prefer-tag-over-role` is not a mechanical burn-down — do not batch it.** Ten of
   its 32 findings are inline `<svg role="img" aria-labelledby=…>`, which is the recommended
@@ -73,8 +89,9 @@ deploys every push, which is the only remote gate left.
   be turned green by suppressing the finding rather than fixing it, and nothing else in the gate
   notices. A burn-down that trades a lint finding for a disable comment now moves one number down
   and this one up, and is rejected. Baseline as of 2026-09-03: 7 lint suppressions, 3 type
-  suppressions, 0 skipped tests, 20 disabled rules, and a floor of 206 test files. Lower it in the
-  script when work earns it; raising one is a policy change and belongs in its own PR.
+  suppressions, 0 skipped tests, 5 disabled rules, 1 override-disabled rule, and a floor of 206
+  test files. Lower it in the script when work earns it; raising one is a policy change and belongs
+  in its own PR.
 - **`lint:types` is advisory, not a gate — yet.** Type-aware oxlint (`oxlint-tsgolint` 7.0.2001)
   adds `no-floating-promises`, `no-base-to-string`, and the type-constituent rules, and reports 28
   pre-existing findings; a PR must not raise that number. Three consecutive runs in each mode

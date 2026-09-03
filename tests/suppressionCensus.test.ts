@@ -59,6 +59,17 @@ describe("suppression census", () => {
       "no-extra-boolean-cast",
       "no-useless-rename",
       "no-irregular-whitespace",
+      "unicorn/no-useless-fallback-in-spread",
+      "unicorn/no-thenable",
+      "unicorn/no-new-array",
+      "react/purity",
+      "react/refs",
+      "nextjs/no-html-link-for-pages",
+      "jsx-a11y/label-has-associated-control",
+      "jsx-a11y/no-noninteractive-tabindex",
+      "jsx-a11y/no-autofocus",
+      "jsx-a11y/click-events-have-key-events",
+      "jsx-a11y/no-static-element-interactions",
     ]) {
       assert.ok(!disabled.includes(rule), `${rule} was re-disabled`);
     }
@@ -66,5 +77,16 @@ describe("suppression census", () => {
 
   it("counts no skipped tests, which is the state the baseline pins", () => {
     assert.equal(takeCensus().counts.skippedTests, 0);
+  });
+
+  it("counts a rule an override turns off, not just one that is off everywhere", () => {
+    const { overrideDisabled, disabled } = auditLintRules();
+
+    // nextjs/no-html-link-for-pages is enforced repo-wide and off for app/layout.tsx
+    // alone, because /feed.xml is a route handler serving a file. That is a
+    // suppression with a wider reach than a disable comment, so it has to be counted
+    // — otherwise silencing a rule per-file is the cheapest way past this census.
+    assert.ok(overrideDisabled.includes("nextjs/no-html-link-for-pages"));
+    assert.ok(!disabled.includes("nextjs/no-html-link-for-pages"));
   });
 });

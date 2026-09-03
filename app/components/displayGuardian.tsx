@@ -21,8 +21,8 @@ export const DisplayGuardian = ({
   driftIntervalSeconds = 45,
 }: DisplayGuardianProps) => {
   const router = useRouter();
-  const lastInteractionAt = useRef(Date.now());
-  const lastRefreshAt = useRef(Date.now());
+  const lastInteractionAt = useRef(0);
+  const lastRefreshAt = useRef(0);
 
   useEffect(() => {
     const max = clamp(Math.round(driftPixels), 1, 6);
@@ -34,6 +34,15 @@ export const DisplayGuardian = ({
   useEffect(() => {
     const refreshMs = clamp(refreshMinutes, 2, 60) * 60 * 1000;
     let heartbeatTimer: number | null = null;
+
+    // Seeded here rather than in useRef so the clock is not read during render.
+    // Guarded because this effect re-runs on refreshMinutes/router, and an
+    // unguarded assignment would restart the idle window on every re-run.
+    if (lastInteractionAt.current === 0) {
+      const startedAt = Date.now();
+      lastInteractionAt.current = startedAt;
+      lastRefreshAt.current = startedAt;
+    }
 
     const refreshIfStale = () => {
       const now = Date.now();

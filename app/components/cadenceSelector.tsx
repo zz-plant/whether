@@ -76,7 +76,8 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
 
   return (
     <div
-      role="group"
+      role="toolbar"
+      tabIndex={-1}
       aria-label={ariaLabel}
       onKeyDown={handleKeyDown}
       className="flex items-center gap-0.5 rounded-sm border border-white/[0.10] bg-[var(--bg-nested)] p-0.5"

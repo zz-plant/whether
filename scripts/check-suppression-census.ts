@@ -97,7 +97,7 @@ const CATEGORIES: Category[] = [
  * `no-restricted-imports` for the `lib/report/home` fence — is configuration,
  * not debt, and is reported separately rather than counted.
  */
-type RuleAudit = { disabled: string[]; scoped: string[] };
+type RuleAudit = { disabled: string[]; scoped: string[]; overrideDisabled: string[] };
 
 const isOff = (value: unknown): boolean =>
   value === 'off' || value === 0 || (Array.isArray(value) && (value[0] === 'off' || value[0] === 0));
@@ -131,20 +131,36 @@ export function auditLintRules(): RuleAudit {
   const overrides = Array.isArray(config.overrides) ? config.overrides : [];
 
   const overridden = new Set<string>();
+  const silenced = new Set<string>();
   for (const override of overrides) {
     for (const [rule, value] of Object.entries(toRecord(toRecord(override).rules))) {
       if (isEnabled(value)) overridden.add(rule);
+      if (isOff(value)) silenced.add(rule);
     }
   }
 
+  const topLevel = toRecord(config.rules);
+
   const disabled: string[] = [];
   const scoped: string[] = [];
-  for (const [rule, value] of Object.entries(toRecord(config.rules))) {
+  for (const [rule, value] of Object.entries(topLevel)) {
     if (!isOff(value)) continue;
     (overridden.has(rule) ? scoped : disabled).push(rule);
   }
 
-  return { disabled: disabled.sort(), scoped: scoped.sort() };
+  /*
+   * A rule enforced everywhere except one `overrides` block is not configuration —
+   * it is a suppression with a wider blast radius than a disable comment, and until
+   * this counted it was the cheapest way to silence a finding without moving any
+   * number in this census.
+   */
+  const overrideDisabled = [...silenced].filter((rule) => !isOff(topLevel[rule]));
+
+  return {
+    disabled: disabled.sort(),
+    scoped: scoped.sort(),
+    overrideDisabled: overrideDisabled.sort(),
+  };
 }
 
 function collectFiles(): string[] {
@@ -210,6 +226,7 @@ export function takeCensus(files: string[] = collectFiles()): Census {
     counts: {
       ...Object.fromEntries(CATEGORIES.map((category) => [category.key, hits[category.key].length])),
       disabledLintRules: lintRules.disabled.length,
+      overrideDisabledRules: lintRules.overrideDisabled.length,
     },
     hits,
     lintRules,
@@ -226,7 +243,11 @@ const BASELINE: Record<string, number> = {
   lintSuppressions: 7,
   typeSuppressions: 3,
   skippedTests: 0,
-  disabledLintRules: 16,
+  disabledLintRules: 5,
+  // `next/no-html-link-for-pages` is off for app/layout.tsx alone: /feed.xml is a
+  // route handler serving a file, so the rule reads it as a page, and <Link> would
+  // client-navigate to a feed. Enforced across every other file.
+  overrideDisabledRules: 1,
 };
 
 /**
@@ -243,7 +264,9 @@ function main() {
   for (const key of Object.keys(BASELINE)) {
     const actual = census.counts[key] ?? 0;
     const allowed = BASELINE[key];
-    const label = CATEGORIES.find((category) => category.key === key)?.label ?? 'disabled lint rules';
+    const label =
+      CATEGORIES.find((category) => category.key === key)?.label ??
+      (key === 'overrideDisabledRules' ? 'lint rules disabled by an override' : 'disabled lint rules');
 
     if (actual > allowed) {
       errors.push(
@@ -257,6 +280,11 @@ function main() {
       }
       if (key === 'disabledLintRules') {
         for (const rule of census.lintRules.disabled) errors.push(`    off: ${rule}`);
+      }
+      if (key === 'overrideDisabledRules') {
+        for (const rule of census.lintRules.overrideDisabled) {
+          errors.push(`    off in an override: ${rule}`);
+        }
       }
     } else if (actual < allowed) {
       improvements.push(`${label}: ${actual} (baseline ${allowed}) — lower it to ${actual}`);

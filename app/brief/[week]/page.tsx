@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
@@ -123,13 +124,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           <p className="text-sm text-slate-300">{brief.summary}</p>
           <p className="text-xs text-slate-400">
             By{" "}
-            <a
+            <Link
               href="/about"
               className="text-sky-300 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               rel="author"
             >
               {publisherAuthor.name}
-            </a>{" "}
+            </Link>{" "}
             ·{" "}
             <time dateTime={brief.publishedAt}>Published {brief.recordDateLabel}</time>
           </p>

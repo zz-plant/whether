@@ -262,10 +262,11 @@ export default function IdenticonsMockupPage() {
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="identicon-seed">
                 Input Report / Signal Seed String
               </label>
               <input
+                id="identicon-seed"
                 type="text"
                 value={sandboxSeed}
                 onChange={(e) => setSandboxSeed(e.target.value)}
@@ -276,10 +277,11 @@ export default function IdenticonsMockupPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="identicon-mode">
                   Shader Mode
                 </label>
                 <select
+                  id="identicon-mode"
                   value={sandboxUseCase}
                   onChange={(e) => setSandboxUseCase(e.target.value as ShaderMode)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none"

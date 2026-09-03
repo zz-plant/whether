@@ -121,10 +121,11 @@ export default function VisualSystemMockupPage() {
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="visual-system-seed">
                 Input Seed String
               </label>
               <input
+                id="visual-system-seed"
                 type="text"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
@@ -134,10 +135,11 @@ export default function VisualSystemMockupPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="visual-system-mode">
                   Shader Mode
                 </label>
                 <select
+                  id="visual-system-mode"
                   value={mode}
                   onChange={(e) => setMode(e.target.value as ShaderMode)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none"
@@ -149,10 +151,11 @@ export default function VisualSystemMockupPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="visual-system-tier">
                   Rendering Tier
                 </label>
                 <select
+                  id="visual-system-tier"
                   value={tier}
                   onChange={(e) => setTier(e.target.value as any)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white focus:border-cyan-500 focus:outline-none"
