@@ -25,7 +25,7 @@ describe("FossilRecordSection", () => {
     const html = renderToStaticMarkup(<FossilRecordSection regime="SCARCITY" />);
 
     assert.match(html, /The Fossil Record/);
-    assert.match(html, /Architecture &amp; UX as economic indicators/);
+    assert.match(html, /Architecture &amp; UX a[s] economic indicators/);
     assert.match(html, /Infrastructure/);
     assert.match(html, /Microservices sprawl/);
     assert.match(html, /Consolidated monoliths/);
