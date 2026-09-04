@@ -1,3 +1,7 @@
+import type { DecisionDepartment } from "../decisionMemory";
+
+export type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
+
 export type AlertConditions = {
   regime: string;
   tightness: number;
@@ -24,6 +28,9 @@ export type AlertDecision = {
   headline: string;
   /** Set on threshold alerts; absent on regime changes. */
   metric?: AlertMetric;
+  /** Department and executive role preset most impacted by this alert. */
+  department?: DecisionDepartment;
+  rolePreset?: RolePreset;
 };
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -54,6 +61,8 @@ const buildRegimeDecision = (regime: string): AlertDecision => ({
   type: "regime_change",
   severity: "critical",
   headline: `Regime changed to ${regime}`,
+  department: "Executive",
+  rolePreset: "CFO",
 });
 
 const buildThresholdDecision = (
@@ -66,6 +75,8 @@ const buildThresholdDecision = (
   severity: threshold === 75 ? "warning" : "info",
   headline: `${label} crossed ${threshold} boundary (${score.toFixed(1)})`,
   metric,
+  department: metric === "credit" ? "Finance" : "Operations",
+  rolePreset: metric === "credit" ? "CFO" : "COO",
 });
 
 const isWithinCooldown = (lastSentAt: string): boolean => {

@@ -23,6 +23,11 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     label: "Decision memory",
     description: "Immutable timeline registry of committed posture overrides and audit checks.",
   },
+  {
+    href: "/operate/scenarios",
+    label: "Scenario studio",
+    description: "Interactive counterfactual simulation: test rate cuts, inversions, and stress scenarios.",
+  },
 ];
 
 export const operationsSectionLinks: { plan: ReportSectionLink[] } = {

@@ -507,6 +507,8 @@ export const buildHomeBriefModelInternal = (
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
   const currentScores = {
     tightness: assessment.scores.tightness,
+    tightnessPressure: assessment.scores.tightnessPressure,
+    tightnessSaturated: assessment.scores.tightnessSaturated,
     riskAppetite: assessment.scores.riskAppetite,
   };
   const actionStripItems = buildActionStripItems(decisionRules, currentScores);

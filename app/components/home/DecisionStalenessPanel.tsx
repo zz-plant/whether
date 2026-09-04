@@ -84,9 +84,26 @@ export function DecisionStalenessPanel({
     });
   }, [entries, conditions]);
 
-  const attentionCount = staleness.length;
+  if (entries.length === 0) {
+    return (
+      <section
+        aria-labelledby="decision-staleness-heading"
+        className="weather-section rounded-xl border border-slate-800/50 bg-slate-900/30 px-4 py-3"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="decision-staleness-heading" className="type-section font-semibold tracking-tight text-white/90">
+            Decisions to reconsider
+          </h2>
+          <span className="text-fluid-nano text-slate-400">0 tracked</span>
+        </div>
+        <p className="mt-1.5 text-fluid-xs text-slate-400">
+          No decisions tracked yet. Save this week’s call using the bookmark in the header to monitor assumption drift as macro conditions move.
+        </p>
+      </section>
+    );
+  }
 
-  if (entries.length === 0) return null;
+  const attentionCount = staleness.length;
 
   return (
     <section

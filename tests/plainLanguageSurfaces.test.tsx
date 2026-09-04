@@ -111,6 +111,28 @@ describe("DecisionHero plain-English layer", () => {
       "the ladder states the same direction in its visible label and its accessible description",
     );
   });
+
+  it("renders a ceiling pressure badge when tightness is saturated", () => {
+    const html = renderToStaticMarkup(
+      <DecisionHero
+        tightness={100}
+        tightnessDelta={0}
+        tightnessPressure={114}
+        tightnessSaturated={true}
+        riskAppetite={38}
+        riskAppetiteDelta={-2}
+        boldnessScore={58}
+        boldnessDelta={-2}
+        regime="DEFENSIVE"
+        postureLabel="Contraction"
+        signalDirection="tighten"
+        recordDate="2026-08-14"
+        fetchedAt="2026-08-15"
+        signalData={{ tightnessThreshold: 68 }}
+      />,
+    );
+    assert.match(html, /ceiling \(114\)/);
+  });
 });
 
 describe("curve chart shorthand", () => {

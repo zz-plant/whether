@@ -56,7 +56,7 @@ export default async function DecisionMemoryPage({
         },
         page: {
           pageTitle: "Decision memory",
-          currentPath: "/planning/memory",
+          currentPath: "/operate/memory",
           pageSummary: "Review saved weekly posture decisions, override notes, and print board-ready exports.",
           sectionLinks: operationsSectionLinks.plan,
         },
@@ -101,7 +101,7 @@ export default async function DecisionMemoryPage({
           />
         </div>
         <Suspense fallback={<WorkstreamNavFallback />}>
-          <OperationsWorkstreamNav currentPath="/planning/memory" />
+          <OperationsWorkstreamNav currentPath="/operate/memory" />
         </Suspense>
       </div>
     </ReportShell>

@@ -62,7 +62,14 @@ export type HomeReportData = {
   assessment: {
     regime: Regime;
     thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
-    scores: { tightness: number; riskAppetite: number; baseRate?: number; curveSlope?: number | null };
+    scores: {
+      tightness: number;
+      tightnessPressure?: number;
+      tightnessSaturated?: boolean;
+      riskAppetite: number;
+      baseRate?: number;
+      curveSlope?: number | null;
+    };
     policyAssessment?: {
       refusal?: {
         refused?: boolean;
@@ -370,6 +377,8 @@ export type WeeklyDecisionCardViewModel = {
     postureTrajectory?: PostureTrajectoryState;
     currentScores: {
       tightness: number;
+      tightnessPressure?: number;
+      tightnessSaturated?: boolean;
       riskAppetite: number;
     };
     startupClimateIndex: StartupClimateIndex;
