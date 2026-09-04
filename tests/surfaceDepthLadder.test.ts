@@ -57,12 +57,38 @@ const collectContainerClasses = () => {
   return found;
 };
 
+/**
+ * The ladder, located by shape rather than by a comment.
+ *
+ * This used to slice between two comment markers. A dead-CSS cleanup (e8a281fd)
+ * deleted the closing one, `indexOf` returned -1, and `slice(start, -1)` runs to
+ * the end of the file — so every `weather-*` class declared anywhere below the
+ * de-escalation block counted as registered, and the check below silently
+ * stopped checking. It kept reporting two passing tests. A gate that quietly
+ * stops running is worse than no gate at all, so this finder asserts it found
+ * something rather than trusting a string that another file is free to delete.
+ *
+ * A de-escalation rule is a container inside a container: a selector nesting two
+ * or more `:is(...)` groups. Nothing else in this stylesheet is shaped that way.
+ */
 const ladderClasses = () => {
   const source = readFileSync(`${STYLES_DIR}surfaces.css`, "utf8");
-  const start = source.indexOf("Depth de-escalation");
-  assert.ok(start > -1, "the depth de-escalation block is gone from surfaces.css");
-  const block = source.slice(start, source.indexOf("Nav scroll fade", start));
-  return new Set([...block.matchAll(/\.(weather-[a-z0-9-]+)/g)].map((m) => m[1]));
+  const found = new Set<string>();
+  let ruleCount = 0;
+
+  for (const [, selector] of source.matchAll(/([^{}]*)\{[^{}]*\}/g)) {
+    if ((selector.match(/:is\(/g) ?? []).length < 2) continue;
+    ruleCount += 1;
+    for (const [, className] of selector.matchAll(/\.(weather-[a-z0-9-]+)/g)) {
+      found.add(className);
+    }
+  }
+
+  assert.ok(
+    ruleCount >= 2,
+    `expected the nested :is(...) de-escalation rules in app/styles/surfaces.css and found ${ruleCount}. If the ladder was restructured, teach this finder the new shape — do not leave it matching nothing.`,
+  );
+  return found;
 };
 
 describe("surface depth ladder", () => {
