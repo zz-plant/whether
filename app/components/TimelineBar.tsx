@@ -1,25 +1,50 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import {
   getTimeMachineRegimeSeries,
   type TimeMachineRegimeEntry,
 } from "../../lib/timeMachine/timeMachineCache";
+import {
+  findSeriesIndex,
+  FINE_SCRUB_SCALE,
+  indexFromRatio,
+  nextZoom,
+  ratioForIndex,
+  resolveTimelineWindow,
+  stepIndex,
+  windowContainsIndex,
+  windowFromStart,
+  TIMELINE_PAGE_MONTHS,
+  ZOOM_ORDER,
+  type ZoomPreset,
+} from "../../lib/timeMachine/timelineWindow";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { formatMonthShortUtc } from "../../lib/formatters";
 import { REGIME_COLORS } from "../viewModel";
 import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 
-export type ZoomPreset = "1Y" | "3Y" | "5Y" | "MAX";
+export type { ZoomPreset };
 
-const ZOOM_MONTH_COUNTS: Record<ZoomPreset, number> = {
-  "1Y": 12,
-  "3Y": 36,
-  "5Y": 60,
-  MAX: 180,
-};
+/** History recedes so the present asserts. At 0.65 idle against 1.0 active the
+ *  selected month was indistinguishable from the other 40-odd, and a full-chroma
+ *  band of rose/amber/emerald/sky out-weighed the headline it sits above. The
+ *  legend swatches below use the same value, so they match the thing they name. */
+const IDLE_SEGMENT_OPACITY = 0.45;
+const PREVIEW_SEGMENT_OPACITY = 0.85;
 
-const ZOOM_ORDER: ZoomPreset[] = ["1Y", "3Y", "5Y", "MAX"];
+/** Arrow keys held down fire faster than a route can render. Echo every press
+ *  on the handle immediately, but let the presses settle before spending a
+ *  round-trip, so hold-to-repeat costs one navigation rather than twenty. */
+const KEY_COMMIT_COALESCE_MS = 140;
 
 export interface TimelineBarProps {
   currentMonth?: number;
@@ -31,6 +56,22 @@ export interface TimelineBarProps {
   variant?: "compact" | "detailed";
 }
 
+const loadRegimeSeries = (): TimeMachineRegimeEntry[] => {
+  try {
+    return getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
+  } catch {
+    // time machine cache empty or unreadable
+    return [];
+  }
+};
+
+const tickHaptic = (pointerType: string) => {
+  if (pointerType !== "touch") return;
+  if (typeof navigator === "undefined") return;
+  if (typeof navigator.vibrate !== "function") return;
+  navigator.vibrate(1);
+};
+
 export function TimelineBar({
   currentMonth,
   currentYear,
@@ -41,125 +82,187 @@ export function TimelineBar({
   variant = "compact",
 }: TimelineBarProps) {
   const [zoom, setZoom] = useState<ZoomPreset>(defaultZoom);
-  const [allSeries, setAllSeries] = useState<TimeMachineRegimeEntry[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
+  // null means "centre on the selection". A number holds the window where the
+  // reader put it, so a commit or a pan does not slide the band sideways.
+  const [windowStart, setWindowStart] = useState<number | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const trackRef = useRef<HTMLDivElement>(null);
+  const commitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fineAnchorRef = useRef<{ clientX: number; index: number } | null>(null);
+  const lastTickRef = useRef<number | null>(null);
 
-  // Load maximum available regime series once on client
+  // The record is bundled JSON, so it is available during the first render on
+  // both sides. Loading it in an effect instead made the bar pop in after
+  // hydration, above the fold, on the page it sits at the top of.
+  const series = useMemo(() => loadRegimeSeries(), []);
+  const seriesLength = series.length;
+  const liveIndex = seriesLength - 1;
+
+  // "Live" is the newest month on record, not the wall clock. Reading it from
+  // `new Date()` resolved to no index at all for every month between the last
+  // snapshot and today, and could differ between the server and client renders.
+  const selectedIndex = useMemo(() => {
+    const requested = findSeriesIndex(series, currentMonth, currentYear);
+    return requested >= 0 ? requested : Math.max(liveIndex, 0);
+  }, [series, currentMonth, currentYear, liveIndex]);
+
+  // The URL is the source of truth; this local echo only keeps the handle under
+  // the pointer while the server renders the month. Clearing it when the new
+  // selection arrives is what stops the handle snapping back on release.
   useEffect(() => {
-    try {
-      const fullSeries = getTimeMachineRegimeSeries(180);
-      setAllSeries(fullSeries);
-    } catch {
-      // time machine cache empty or server fallback
-    }
-  }, []);
+    setPendingIndex(null);
+  }, [currentMonth, currentYear]);
 
-  const now = new Date();
-  const activeMonth = currentMonth ?? now.getMonth() + 1;
-  const activeYear = currentYear ?? now.getFullYear();
+  useEffect(
+    () => () => {
+      if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
+    },
+    []
+  );
 
-  // Slice series according to selected zoom window
-  const visibleSeries = useMemo(() => {
-    if (allSeries.length === 0) return [];
-    const count = ZOOM_MONTH_COUNTS[zoom];
-    if (zoom === "MAX" || count >= allSeries.length) {
-      return allSeries;
-    }
-    return allSeries.slice(-count);
-  }, [allSeries, zoom]);
+  const handleIndex = dragIndex ?? pendingIndex ?? selectedIndex;
+  // The window is anchored on what is committed or in flight, never on the live
+  // drag, so content does not slide out from under the pointer mid-gesture.
+  const anchorIndex = pendingIndex ?? selectedIndex;
+  const previewIndex = dragIndex ?? hoverIndex;
 
-  // Find index of current selection in visible series
-  const activeIndex = useMemo(() => {
-    if (visibleSeries.length === 0) return -1;
-    const idx = visibleSeries.findIndex(
-      (entry) => entry.month === activeMonth && entry.year === activeYear
-    );
-    // If not in current visible window, find in full series
-    return idx;
-  }, [visibleSeries, activeMonth, activeYear]);
+  // Derived, not stored: a held window that no longer contains the selection
+  // silently gives way to the centred one, so an external selection change (a
+  // month button, a link, the back button) can never strand the handle at an
+  // edge showing a position it does not hold.
+  const viewWindow = useMemo(() => {
+    const centred = resolveTimelineWindow(seriesLength, anchorIndex, zoom);
+    if (windowStart === null) return centred;
+    const held = windowFromStart(seriesLength, windowStart, zoom);
+    return windowContainsIndex(held, anchorIndex) ? held : centred;
+  }, [seriesLength, anchorIndex, zoom, windowStart]);
 
-  // Fallback index if active is out of visible bounds or latest is active
-  const effectiveIndex =
-    activeIndex >= 0 ? activeIndex : Math.max(visibleSeries.length - 1, 0);
+  const visibleSeries = useMemo(
+    () => series.slice(viewWindow.start, viewWindow.end),
+    [series, viewWindow.start, viewWindow.end]
+  );
 
-  const isLive =
-    allSeries.length > 0 &&
-    effectiveIndex === visibleSeries.length - 1 &&
-    (!currentMonth ||
-      (currentMonth === allSeries[allSeries.length - 1]?.month &&
-        currentYear === allSeries[allSeries.length - 1]?.year));
-
-  const displayedIndex =
-    dragIndex !== null
-      ? dragIndex
-      : hoverIndex !== null
-        ? hoverIndex
-        : effectiveIndex;
-
-  const currentEntry = visibleSeries[displayedIndex] ?? visibleSeries[effectiveIndex];
-
-  const handleSelectIndex = useCallback(
-    (idx: number) => {
-      const target = visibleSeries[idx];
+  const commit = useCallback(
+    (index: number, mode: "immediate" | "coalesced" = "immediate") => {
+      const target = series[index];
       if (!target) return;
-      onSelect?.({ month: target.month, year: target.year });
+
+      setPendingIndex(index);
+      // Hold the strip still when the new selection is already in view; recentre
+      // only when it lands on an edge and there is nothing to see beyond it.
+      setWindowStart(
+        index > viewWindow.start && index < viewWindow.end - 1
+          ? viewWindow.start
+          : null
+      );
+      if (commitTimerRef.current) {
+        clearTimeout(commitTimerRef.current);
+        commitTimerRef.current = null;
+      }
+
+      const send = () => {
+        startTransition(() => {
+          onSelect?.({ month: target.month, year: target.year });
+        });
+      };
+
+      if (mode === "immediate") {
+        send();
+        return;
+      }
+
+      commitTimerRef.current = setTimeout(() => {
+        commitTimerRef.current = null;
+        send();
+      }, KEY_COMMIT_COALESCE_MS);
     },
-    [visibleSeries, onSelect]
+    [series, onSelect, viewWindow]
   );
 
-  const getIndexFromClientX = useCallback(
-    (clientX: number): number => {
-      if (!trackRef.current || visibleSeries.length === 0) return 0;
-      const rect = trackRef.current.getBoundingClientRect();
-      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      const idx = Math.round(ratio * (visibleSeries.length - 1));
-      return Math.max(0, Math.min(visibleSeries.length - 1, idx));
+  const indexFromPointer = useCallback(
+    (clientX: number, shiftKey: boolean, base: number): number => {
+      const node = trackRef.current;
+      if (!node || viewWindow.length === 0) return base;
+      const rect = node.getBoundingClientRect();
+
+      if (shiftKey) {
+        const anchor = fineAnchorRef.current ?? { clientX, index: base };
+        fineAnchorRef.current = anchor;
+        const pxPerMonth = rect.width / Math.max(1, viewWindow.length - 1);
+        const delta = Math.round(
+          ((clientX - anchor.clientX) * FINE_SCRUB_SCALE) / pxPerMonth
+        );
+        return Math.max(
+          viewWindow.start,
+          Math.min(viewWindow.end - 1, anchor.index + delta)
+        );
+      }
+
+      fineAnchorRef.current = null;
+      return indexFromRatio(viewWindow, (clientX - rect.left) / rect.width);
     },
-    [visibleSeries]
+    [viewWindow]
   );
 
-  // Pointer drag/scrub event handlers
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      e.currentTarget.setPointerCapture(e.pointerId);
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      event.currentTarget.setPointerCapture(event.pointerId);
       setIsDragging(true);
-      const idx = getIndexFromClientX(e.clientX);
-      setDragIndex(idx);
+      fineAnchorRef.current = null;
+      const index = indexFromPointer(event.clientX, event.shiftKey, handleIndex);
+      setDragIndex(index);
+      lastTickRef.current = index;
     },
-    [getIndexFromClientX]
+    [indexFromPointer, handleIndex]
   );
 
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      const idx = getIndexFromClientX(e.clientX);
-      if (isDragging) {
-        setDragIndex(idx);
-      } else {
-        setHoverIndex(idx);
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const index = indexFromPointer(
+        event.clientX,
+        event.shiftKey,
+        dragIndex ?? handleIndex
+      );
+      if (!isDragging) {
+        setHoverIndex(index);
+        return;
+      }
+      setDragIndex(index);
+      if (lastTickRef.current !== index) {
+        lastTickRef.current = index;
+        tickHaptic(event.pointerType);
       }
     },
-    [isDragging, getIndexFromClientX]
+    [indexFromPointer, isDragging, dragIndex, handleIndex]
   );
 
   const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (event: React.PointerEvent<HTMLDivElement>) => {
       if (isDragging) {
+        const index = indexFromPointer(
+          event.clientX,
+          event.shiftKey,
+          dragIndex ?? handleIndex
+        );
         setIsDragging(false);
-        const idx = getIndexFromClientX(e.clientX);
+        // `commit` sets the pending echo before the drag index clears, so the
+        // handle stays exactly where it was released.
+        commit(index);
         setDragIndex(null);
-        handleSelectIndex(idx);
+        fineAnchorRef.current = null;
       }
       try {
-        e.currentTarget.releasePointerCapture(e.pointerId);
+        event.currentTarget.releasePointerCapture(event.pointerId);
       } catch {
         // pointer capture release fallback
       }
     },
-    [isDragging, getIndexFromClientX, handleSelectIndex]
+    [isDragging, indexFromPointer, dragIndex, handleIndex, commit]
   );
 
   const handlePointerLeave = useCallback(() => {
@@ -168,76 +271,92 @@ export function TimelineBar({
     }
   }, [isDragging]);
 
-  // Step backward / forward
-  const canGoPrevious = effectiveIndex > 0;
-  const canGoNext = effectiveIndex < visibleSeries.length - 1;
+  const canGoPrevious = handleIndex > 0;
+  const canGoNext = handleIndex < liveIndex;
 
   const goToPrevious = useCallback(() => {
-    if (canGoPrevious) {
-      handleSelectIndex(effectiveIndex - 1);
-    }
-  }, [canGoPrevious, effectiveIndex, handleSelectIndex]);
+    if (canGoPrevious) commit(stepIndex(seriesLength, handleIndex, -1));
+  }, [canGoPrevious, commit, seriesLength, handleIndex]);
 
   const goToNext = useCallback(() => {
-    if (canGoNext) {
-      handleSelectIndex(effectiveIndex + 1);
-    }
-  }, [canGoNext, effectiveIndex, handleSelectIndex]);
+    if (canGoNext) commit(stepIndex(seriesLength, handleIndex, 1));
+  }, [canGoNext, commit, seriesLength, handleIndex]);
 
   const goToLatest = useCallback(() => {
-    if (allSeries.length > 0) {
-      const latest = allSeries[allSeries.length - 1];
-      onSelect?.({ month: latest.month, year: latest.year });
-    }
-  }, [allSeries, onSelect]);
+    if (liveIndex >= 0) commit(liveIndex);
+  }, [commit, liveIndex]);
 
-  // Keyboard navigation
+  // Steps are over the record, not the visible window: before this, one arrow
+  // press from a zoomed-out 2015 stepped back from the *last visible* month and
+  // landed in 2026.
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        goToPrevious();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        goToNext();
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        handleSelectIndex(0);
-      } else if (e.key === "End") {
-        e.preventDefault();
-        handleSelectIndex(visibleSeries.length - 1);
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const step = (delta: number) => {
+        event.preventDefault();
+        commit(stepIndex(seriesLength, handleIndex, delta), "coalesced");
+      };
+
+      if (event.key === "ArrowLeft") step(-1);
+      else if (event.key === "ArrowRight") step(1);
+      else if (event.key === "PageDown") step(-TIMELINE_PAGE_MONTHS);
+      else if (event.key === "PageUp") step(TIMELINE_PAGE_MONTHS);
+      else if (event.key === "Home") {
+        event.preventDefault();
+        commit(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        commit(liveIndex);
       }
     },
-    [goToPrevious, goToNext, handleSelectIndex, visibleSeries.length]
+    [commit, seriesLength, handleIndex, liveIndex]
   );
 
-  // Wheel zoom over track
-  const handleWheel = useCallback(
-    (e: React.WheelEvent<HTMLDivElement>) => {
-      if (Math.abs(e.deltaY) < 15) return;
-      const currentIdx = ZOOM_ORDER.indexOf(zoom);
-      if (e.deltaY < 0 && currentIdx > 0) {
-        // Zoom in (fewer months)
-        setZoom(ZOOM_ORDER[currentIdx - 1]);
-      } else if (e.deltaY > 0 && currentIdx < ZOOM_ORDER.length - 1) {
-        // Zoom out (more months)
-        setZoom(ZOOM_ORDER[currentIdx + 1]);
+  // Wheel is a native non-passive listener because React attaches its own at the
+  // root as passive, where preventDefault does nothing. Zoom now needs an
+  // explicit modifier — a trackpad pinch arrives as ctrl+wheel, so pinch-to-zoom
+  // works, while an ordinary scroll past the bar no longer rewrites the window
+  // under a reader who was only trying to reach the brief below it.
+  useEffect(() => {
+    const node = trackRef.current;
+    if (!node) return;
+
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+        setZoom((current) => nextZoom(current, event.deltaY < 0 ? "in" : "out"));
+        setWindowStart(null);
+        return;
       }
-    },
-    [zoom]
-  );
+      if (
+        Math.abs(event.deltaX) > Math.abs(event.deltaY) &&
+        Math.abs(event.deltaX) > 2
+      ) {
+        event.preventDefault();
+        setWindowStart(
+          windowFromStart(
+            seriesLength,
+            viewWindow.start + (event.deltaX > 0 ? 1 : -1),
+            zoom
+          ).start
+        );
+      }
+    };
 
-  // Derive unique year labels and positions for timeline axis
+    node.addEventListener("wheel", onWheel, { passive: false });
+    return () => node.removeEventListener("wheel", onWheel);
+  }, [seriesLength, zoom, viewWindow]);
+
   const yearTicks = useMemo(() => {
     if (visibleSeries.length === 0) return [];
     const ticks: { year: number; positionPercent: number }[] = [];
     let lastYear = -1;
 
-    visibleSeries.forEach((entry, i) => {
+    visibleSeries.forEach((entry, index) => {
       if (entry.year !== lastYear) {
         ticks.push({
           year: entry.year,
-          positionPercent: (i / (visibleSeries.length - 1 || 1)) * 100,
+          positionPercent:
+            (index / (visibleSeries.length - 1 || 1)) * 100,
         });
         lastYear = entry.year;
       }
@@ -246,24 +365,27 @@ export function TimelineBar({
     return ticks;
   }, [visibleSeries]);
 
-  if (visibleSeries.length === 0) {
+  if (seriesLength === 0 || visibleSeries.length === 0) {
     return null;
   }
 
-  const handlePercent = (effectiveIndex / (visibleSeries.length - 1 || 1)) * 100;
-  const previewPercent = (displayedIndex / (visibleSeries.length - 1 || 1)) * 100;
+  const describe = (index: number) => {
+    const entry = series[index];
+    if (!entry) return { entry: null, period: "Timeline", regime: "" };
+    return {
+      entry,
+      period: `${formatMonthShortUtc(entry.month)} ${entry.year}`,
+      regime: getRegimePublicLabel(entry.regime),
+    };
+  };
 
-  const monthLabel = currentEntry
-    ? new Date(currentEntry.year, currentEntry.month - 1).toLocaleString("en", {
-        month: "short",
-      })
-    : "";
-  const periodLabel = currentEntry
-    ? `${monthLabel} ${currentEntry.year}`
-    : "Timeline";
-  const regimePublicLabel = currentEntry
-    ? getRegimePublicLabel(currentEntry.regime)
-    : "";
+  const selected = describe(handleIndex);
+  const preview = previewIndex === null ? null : describe(previewIndex);
+  const isLive = handleIndex === liveIndex;
+
+  const handlePercent = ratioForIndex(viewWindow, handleIndex) * 100;
+  const previewPercent =
+    previewIndex === null ? 0 : ratioForIndex(viewWindow, previewIndex) * 100;
 
   return (
     <section
@@ -293,19 +415,32 @@ export function TimelineBar({
             <ChevronRight className="size-3.5" aria-hidden="true" />
           </button>
 
-          {/* Current Period Badge */}
+          {/* Current Period Badge. This answers "where am I", so it tracks the
+              selection and any commit in flight — never the hover, which is a
+              question about where you *would* land and belongs in the tooltip. */}
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-fluid-micro">
             <span
-              className={`size-2 rounded-full ${REGIME_COLORS[currentEntry?.regime] ?? "bg-slate-400"}`}
-              style={{ backgroundColor: REGIME_HEX_COLORS[currentEntry?.regime] }}
+              className={`size-2 rounded-full ${
+                selected.entry ? REGIME_COLORS[selected.entry.regime] : "bg-slate-400"
+              }`}
+              style={{
+                backgroundColor: selected.entry
+                  ? REGIME_HEX_COLORS[selected.entry.regime]
+                  : undefined,
+              }}
             />
             <span className="font-semibold text-slate-100 tabular-nums">
-              {periodLabel}
+              {selected.period}
             </span>
-            <span className="text-slate-400 font-normal">· {regimePublicLabel}</span>
+            <span className="text-slate-400 font-normal">· {selected.regime}</span>
             {isLive ? (
               <span className="ml-1 rounded px-1 py-0.2 bg-emerald-500/20 text-emerald-300 font-mono text-[10px] uppercase tracking-wider">
                 Live
+              </span>
+            ) : null}
+            {isPending ? (
+              <span className="ml-1 text-slate-500 font-mono text-[10px] uppercase tracking-wider">
+                Loading
               </span>
             ) : null}
           </div>
@@ -334,7 +469,10 @@ export function TimelineBar({
                 <button
                   key={preset}
                   type="button"
-                  onClick={() => setZoom(preset)}
+                  onClick={() => {
+                    setZoom(preset);
+                    setWindowStart(null);
+                  }}
                   className={`px-2 py-0.5 rounded-md font-mono transition-all ${
                     isActive
                       ? "bg-sky-500/25 text-sky-200 font-semibold border border-sky-400/40 shadow-sm"
@@ -357,22 +495,23 @@ export function TimelineBar({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerLeave}
-        onWheel={handleWheel}
         onKeyDown={handleKeyDown}
         tabIndex={0}
         role="slider"
         aria-label="Select month"
         aria-valuemin={0}
-        aria-valuemax={visibleSeries.length - 1}
-        aria-valuenow={effectiveIndex}
-        aria-valuetext={`${periodLabel}, ${regimePublicLabel}`}
-        className="relative group cursor-pointer h-7 w-full rounded-md border border-slate-700/60 bg-slate-950/80 p-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 touch-none"
+        aria-valuemax={liveIndex}
+        aria-valuenow={handleIndex}
+        aria-valuetext={`${selected.period}, ${selected.regime}`}
+        aria-busy={isPending}
+        className="relative group cursor-pointer h-9 w-full rounded-md border border-slate-700/60 bg-slate-950/80 p-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 touch-none"
       >
         {/* Continuous Regime Color Strip Segments */}
         <div className="relative flex h-full w-full overflow-hidden rounded-[4px]">
-          {visibleSeries.map((entry, idx) => {
-            const isEntryHovered = displayedIndex === idx;
-            const isEntryActive = effectiveIndex === idx;
+          {visibleSeries.map((entry, offset) => {
+            const absoluteIndex = viewWindow.start + offset;
+            const isEntryPreviewed = previewIndex === absoluteIndex;
+            const isEntryActive = handleIndex === absoluteIndex;
             const hexColor = REGIME_HEX_COLORS[entry.regime] ?? "#64748b";
 
             return (
@@ -381,11 +520,11 @@ export function TimelineBar({
                 style={{
                   width: `${100 / visibleSeries.length}%`,
                   backgroundColor: hexColor,
-                  // History recedes so the present asserts. At 0.65 idle against
-                  // 1.0 active the selected month was indistinguishable from the
-                  // other 40-odd, and a full-chroma band of rose/amber/emerald/sky
-                  // out-weighed the headline it sits directly above.
-                  opacity: isEntryActive ? 1 : isEntryHovered ? 0.85 : 0.45,
+                  opacity: isEntryActive
+                    ? 1
+                    : isEntryPreviewed
+                      ? PREVIEW_SEGMENT_OPACITY
+                      : IDLE_SEGMENT_OPACITY,
                 }}
                 className="h-full transition-opacity duration-150 relative border-r border-slate-950/20 last:border-r-0"
               />
@@ -394,7 +533,7 @@ export function TimelineBar({
         </div>
 
         {/* Hover / Preview Indicator Ghost */}
-        {(isDragging || hoverIndex !== null) && (
+        {previewIndex !== null ? (
           <div
             className="absolute top-0 bottom-0 pointer-events-none w-0.5 bg-white/70 shadow-[0_0_8px_rgba(255,255,255,0.8)] z-10 transition-transform duration-75"
             style={{
@@ -402,25 +541,31 @@ export function TimelineBar({
               transform: "translateX(-50%)",
             }}
           />
-        )}
+        ) : null}
 
-        {/* Active Selection Handle */}
+        {/* Active Selection Handle. Driven by the drag and by any commit still in
+            flight, so the one element that looks grabbable is the one that
+            actually follows the pointer. */}
         <div
-          className="absolute top-1/2 pointer-events-none z-20 transition-transform duration-100"
+          className={`absolute top-1/2 pointer-events-none z-20 ${isDragging ? "" : "transition-[left] duration-100"}`}
           style={{
             left: `${handlePercent}%`,
             transform: "translate(-50%, -50%)",
           }}
         >
-          <div className="h-6 w-3 rounded-[3px] border-2 border-white bg-slate-950 shadow-[0_0_10px_rgba(0,0,0,0.8)] flex items-center justify-center">
+          <div
+            className={`h-8 w-3 rounded-[3px] border-2 bg-slate-950 shadow-[0_0_10px_rgba(0,0,0,0.8)] flex items-center justify-center ${
+              isPending ? "border-sky-300 animate-pulse" : "border-white"
+            }`}
+          >
             <div className="h-3 w-0.5 bg-white/80 rounded-full" />
           </div>
         </div>
 
-        {/* Tooltip on Drag / Hover */}
-        {(isDragging || hoverIndex !== null) && currentEntry ? (
+        {/* Tooltip on Drag / Hover — the "where would I land" readout. */}
+        {preview?.entry ? (
           <div
-            className="absolute -top-11 pointer-events-none z-30 transform -translate-x-1/2 whitespace-nowrap rounded-md border border-slate-700 bg-slate-900/95 px-2 py-1 shadow-xl text-fluid-micro backdrop-blur-sm"
+            className="absolute -top-14 pointer-events-none z-30 transform -translate-x-1/2 whitespace-nowrap rounded-md border border-slate-700 bg-slate-900/95 px-2 py-1 shadow-xl text-fluid-micro backdrop-blur-sm"
             style={{
               left: `${previewPercent}%`,
             }}
@@ -428,10 +573,18 @@ export function TimelineBar({
             <div className="flex items-center gap-1.5 font-medium text-slate-100">
               <span
                 className="size-2 rounded-full"
-                style={{ backgroundColor: REGIME_HEX_COLORS[currentEntry.regime] }}
+                style={{
+                  backgroundColor: REGIME_HEX_COLORS[preview.entry.regime],
+                }}
               />
-              <span>{periodLabel}</span>
-              <span className="text-slate-400">· {regimePublicLabel}</span>
+              <span>{preview.period}</span>
+              <span className="text-slate-400">· {preview.regime}</span>
+            </div>
+            {/* The record is already on the client, so the trajectory can be read
+                without spending a navigation on every month you are curious about. */}
+            <div className="flex items-center gap-2 pt-0.5 text-fluid-nano text-slate-400 tabular-nums">
+              <span>Tightness {preview.entry.tightness.toFixed(0)}</span>
+              <span>Risk {preview.entry.riskAppetite.toFixed(0)}</span>
             </div>
           </div>
         ) : null}
@@ -456,14 +609,15 @@ export function TimelineBar({
           currently selected one named, in the chip above. Without this a reader
           can see that something changed in 2024 without being able to say what
           it changed to. Public labels, so the legend matches the word the rest
-          of the page uses for the same state. */}
+          of the page uses for the same state; idle opacity, so the swatch
+          matches the colour it is naming rather than a brighter version of it. */}
       <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-fluid-nano text-slate-400">
         {Object.entries(REGIME_HEX_COLORS).map(([regime, hex]) => (
           <li key={regime} className="inline-flex items-center gap-1.5">
             <span
               aria-hidden="true"
               className="size-2 shrink-0 rounded-full"
-              style={{ backgroundColor: hex }}
+              style={{ backgroundColor: hex, opacity: IDLE_SEGMENT_OPACITY }}
             />
             {getRegimePublicLabel(regime)}
           </li>
@@ -471,16 +625,16 @@ export function TimelineBar({
       </ul>
 
       {/* Detailed Variant Info (Optional) */}
-      {variant === "detailed" && currentEntry ? (
+      {variant === "detailed" && selected.entry ? (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-fluid-micro text-slate-400">
           <span>
-            Tightness: <strong className="text-slate-200">{currentEntry.tightness.toFixed(0)} pts</strong>
+            Tightness: <strong className="text-slate-200">{selected.entry.tightness.toFixed(0)} pts</strong>
           </span>
           <span>
-            Risk Appetite: <strong className="text-slate-200">{currentEntry.riskAppetite.toFixed(0)}/100</strong>
+            Risk Appetite: <strong className="text-slate-200">{selected.entry.riskAppetite.toFixed(0)}/100</strong>
           </span>
           <span className="text-slate-500 font-mono">
-            {currentEntry.recordDate}
+            {selected.entry.recordDate}
           </span>
         </div>
       ) : null}
