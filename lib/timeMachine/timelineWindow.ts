@@ -151,6 +151,120 @@ export const nextZoom = (
   return ZOOM_ORDER[target] ?? zoom;
 };
 
+/** Room a four-digit year label needs before the next one, in px. "2021"
+ *  measures 38.4px in the axis font (11px monospace); this is that, rounded. */
+export const YEAR_LABEL_MIN_GAP_PX = 38;
+
+/** Below this much room per year, a positional axis stops being a control.
+ *  Fifteen years across a 343px phone track is 22.9px each — narrower than the
+ *  label itself, so no amount of thinning leaves every year reachable, and
+ *  abbreviating to "'21" only buys 23.1px. Under this pitch the years are
+ *  offered as a scrollable list with real targets instead. */
+export const YEAR_AXIS_MIN_PITCH_PX = 46;
+
+export const shouldUseYearRail = (
+  tickCount: number,
+  trackWidthPx: number
+): boolean => {
+  // Unmeasured (SSR, first client render) keeps the positional axis, so the
+  // markup being hydrated is the markup that was sent.
+  if (tickCount <= 1 || trackWidthPx <= 0) return false;
+  return trackWidthPx / tickCount < YEAR_AXIS_MIN_PITCH_PX;
+};
+
+export interface YearTick {
+  year: number;
+  /** Absolute index of the first month of that year inside the window. */
+  index: number;
+  positionPercent: number;
+  /** Unlabelled ticks are drawn but not clickable — an invisible target is
+   *  worse than no target. */
+  labelled: boolean;
+}
+
+/**
+ * The year axis, thinned to what actually fits.
+ *
+ * At MAX zoom the record spans fifteen years, which is 70px per label on a
+ * desktop track and 23px on a phone — where all fourteen adjacent pairs
+ * collided into an unreadable smear, on the one control a reader uses to find
+ * an old year. Labelling is walked outward from the selected year rather than
+ * greedily from the left, so the year you are on is always the one named.
+ */
+export const buildYearTicks = (
+  series: ReadonlyArray<{ year: number }>,
+  timelineWindow: TimelineWindow,
+  trackWidthPx: number,
+  anchorYear?: number
+): YearTick[] => {
+  if (timelineWindow.length <= 0) return [];
+
+  const ticks: YearTick[] = [];
+  let lastYear: number | null = null;
+
+  for (
+    let index = timelineWindow.start;
+    index < timelineWindow.end;
+    index += 1
+  ) {
+    const entry = series[index];
+    if (!entry || entry.year === lastYear) continue;
+    lastYear = entry.year;
+    ticks.push({
+      year: entry.year,
+      index,
+      positionPercent: ratioForIndex(timelineWindow, index) * 100,
+      labelled: true,
+    });
+  }
+
+  // Width is unknown during SSR and on the first client render, so everything
+  // is labelled — the same markup on both sides, thinned once measured.
+  if (ticks.length <= 1 || trackWidthPx <= 0) return ticks;
+
+  const pxFor = (tick: YearTick) => (tick.positionPercent / 100) * trackWidthPx;
+  const anchorAt = Math.max(
+    0,
+    ticks.findIndex((tick) => tick.year === anchorYear)
+  );
+  const labelled = new Set<number>([anchorAt]);
+
+  let lastRight = pxFor(ticks[anchorAt]);
+  for (let at = anchorAt + 1; at < ticks.length; at += 1) {
+    if (pxFor(ticks[at]) - lastRight < YEAR_LABEL_MIN_GAP_PX) continue;
+    labelled.add(at);
+    lastRight = pxFor(ticks[at]);
+  }
+
+  let lastLeft = pxFor(ticks[anchorAt]);
+  for (let at = anchorAt - 1; at >= 0; at -= 1) {
+    if (lastLeft - pxFor(ticks[at]) < YEAR_LABEL_MIN_GAP_PX) continue;
+    labelled.add(at);
+    lastLeft = pxFor(ticks[at]);
+  }
+
+  return ticks.map((tick, at) => ({ ...tick, labelled: labelled.has(at) }));
+};
+
+/**
+ * The month to land on when a reader picks a year. Holding the month-of-year
+ * means stepping across years keeps their place in the calendar; only a year
+ * that does not carry that month falls back to its first month on record.
+ */
+export const findYearEntryIndex = (
+  series: ReadonlyArray<{ month: number; year: number }>,
+  year: number,
+  preferredMonth?: number
+): number => {
+  if (preferredMonth) {
+    const exact = series.findIndex(
+      (entry) => entry.year === year && entry.month === preferredMonth
+    );
+    if (exact >= 0) return exact;
+  }
+  return series.findIndex((entry) => entry.year === year);
+};
+
 export const findSeriesIndex = (
   series: ReadonlyArray<{ month: number; year: number }>,
   month: number | undefined,

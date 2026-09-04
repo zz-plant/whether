@@ -1,14 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
+  buildYearTicks,
   findSeriesIndex,
+  findYearEntryIndex,
   indexFromRatio,
   nextZoom,
   ratioForIndex,
   resolveTimelineWindow,
+  shouldUseYearRail,
   stepIndex,
   TIMELINE_PAGE_MONTHS,
   windowContainsIndex,
+  YEAR_AXIS_MIN_PITCH_PX,
+  YEAR_LABEL_MIN_GAP_PX,
   windowFromStart,
   ZOOM_ORDER,
 } from "../lib/timeMachine/timelineWindow";
@@ -189,5 +194,144 @@ describe("findSeriesIndex", () => {
     assert.equal(findSeriesIndex(series, undefined, 2024), -1);
     assert.equal(findSeriesIndex(series, 12, undefined), -1);
     assert.equal(findSeriesIndex(series, 0, 0), -1);
+  });
+});
+
+/** Jan 2012 through Jul 2026, the shape of the real record. */
+const monthlySeries = (() => {
+  const months: { month: number; year: number }[] = [];
+  for (let year = 2012; year <= 2026; year += 1) {
+    for (let month = 1; month <= 12; month += 1) {
+      if (year === 2026 && month > 7) break;
+      months.push({ month, year });
+    }
+  }
+  return months;
+})();
+
+describe("buildYearTicks", () => {
+  const fullWindow = resolveTimelineWindow(monthlySeries.length, 0, "MAX");
+
+  it("puts one tick on the first month of each year in view", () => {
+    const ticks = buildYearTicks(monthlySeries, fullWindow, 1024);
+    assert.deepEqual(
+      ticks.map((tick) => tick.year),
+      [
+        2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+        2024, 2025, 2026,
+      ]
+    );
+    assert.equal(monthlySeries[ticks[9].index].year, 2021);
+    assert.equal(monthlySeries[ticks[9].index].month, 1);
+  });
+
+  it("labels every year when they fit", () => {
+    // 1024px over fifteen years is ~70px each, which is what a desktop track
+    // measures; nothing should be dropped there.
+    const ticks = buildYearTicks(monthlySeries, fullWindow, 1024);
+    assert.equal(ticks.every((tick) => tick.labelled), true);
+  });
+
+  it("thins labels that would collide on a narrow track", () => {
+    // 343px over fifteen years is ~23px each, where all fourteen adjacent pairs
+    // used to overlap into an unreadable smear.
+    const ticks = buildYearTicks(monthlySeries, fullWindow, 343);
+    const labelled = ticks.filter((tick) => tick.labelled);
+    assert.equal(labelled.length < ticks.length, true);
+
+    for (let at = 1; at < labelled.length; at += 1) {
+      const gap =
+        ((labelled[at].positionPercent - labelled[at - 1].positionPercent) /
+          100) *
+        343;
+      assert.equal(gap >= YEAR_LABEL_MIN_GAP_PX, true);
+    }
+  });
+
+  it("keeps every tick as a mark even when its label is dropped", () => {
+    const ticks = buildYearTicks(monthlySeries, fullWindow, 343);
+    assert.equal(ticks.length, 15);
+  });
+
+  it("always labels the year being viewed", () => {
+    // Walking outward from the selection, rather than greedily from the left,
+    // is what guarantees the year you are on is the one named.
+    for (const year of [2012, 2017, 2021, 2024, 2026]) {
+      const ticks = buildYearTicks(monthlySeries, fullWindow, 343, year);
+      const tick = ticks.find((candidate) => candidate.year === year);
+      assert.equal(tick?.labelled, true);
+    }
+  });
+
+  it("labels the single year of a one-year window", () => {
+    const window2021 = resolveTimelineWindow(monthlySeries.length, 108, "1Y");
+    const ticks = buildYearTicks(monthlySeries, window2021, 1024, 2021);
+    assert.equal(ticks.length >= 1, true);
+    assert.equal(ticks.every((tick) => tick.labelled), true);
+  });
+
+  it("labels everything before the track has been measured", () => {
+    // SSR and the first client render share this branch, so the markup matches.
+    const ticks = buildYearTicks(monthlySeries, fullWindow, 0);
+    assert.equal(ticks.every((tick) => tick.labelled), true);
+  });
+
+  it("returns nothing for an empty window", () => {
+    assert.deepEqual(buildYearTicks(monthlySeries, resolveTimelineWindow(0, 0, "MAX"), 1024), []);
+  });
+});
+
+describe("findYearEntryIndex", () => {
+  it("holds the month of year so stepping years keeps the reader's place", () => {
+    const index = findYearEntryIndex(monthlySeries, 2021, 2);
+    assert.equal(monthlySeries[index].year, 2021);
+    assert.equal(monthlySeries[index].month, 2);
+  });
+
+  it("falls back to the first month a partial year holds", () => {
+    // 2026 stops at July, so a December selection cannot carry across.
+    const index = findYearEntryIndex(monthlySeries, 2026, 12);
+    assert.equal(monthlySeries[index].year, 2026);
+    assert.equal(monthlySeries[index].month, 1);
+  });
+
+  it("reports a miss for a year off the record", () => {
+    assert.equal(findYearEntryIndex(monthlySeries, 1999, 1), -1);
+  });
+});
+
+describe("shouldUseYearRail", () => {
+  const fifteenYears = 15;
+
+  it("keeps the positional axis on a desktop track", () => {
+    // 1024px over fifteen years is ~68px each — room for a full label and the
+    // mapping to the band above it is worth keeping.
+    assert.equal(shouldUseYearRail(fifteenYears, 1024), false);
+  });
+
+  it("switches to the rail on a phone at full zoom", () => {
+    // 343px over fifteen years is 22.9px each, narrower than the 38.4px label.
+    assert.equal(shouldUseYearRail(fifteenYears, 343), true);
+  });
+
+  it("keeps the positional axis on a phone at a narrower zoom", () => {
+    // A 3Y window has four year ticks, ~86px each: no crowding, no rail.
+    assert.equal(shouldUseYearRail(4, 343), false);
+  });
+
+  it("keeps the positional axis before the track is measured", () => {
+    // Same branch on the server and the first client render, so hydration sees
+    // the markup it was sent.
+    assert.equal(shouldUseYearRail(fifteenYears, 0), false);
+  });
+
+  it("never rails a single year", () => {
+    assert.equal(shouldUseYearRail(1, 40), false);
+  });
+
+  it("switches exactly at the documented pitch", () => {
+    const pitch = YEAR_AXIS_MIN_PITCH_PX;
+    assert.equal(shouldUseYearRail(10, pitch * 10), false);
+    assert.equal(shouldUseYearRail(10, pitch * 10 - 1), true);
   });
 });
