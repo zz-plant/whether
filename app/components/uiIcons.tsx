@@ -18,6 +18,7 @@ import {
   Settings,
   Share2,
   Shield,
+  SlidersHorizontal,
   Sun,
   Target,
   TrendingUp,
@@ -105,6 +106,10 @@ export const ChevronRightIcon = ({ className = "h-4 w-4", title: _title, ...prop
 
 export const TrendUpIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <TrendingUp className={className} {...baseProps} {...props} />
+);
+
+export const SlidersIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <SlidersHorizontal className={className} {...baseProps} {...props} />
 );
 
 export const SunIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (

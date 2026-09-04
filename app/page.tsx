@@ -214,6 +214,8 @@ async function PageContent({
         });
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
+  const tightnessPressure = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightnessPressure;
+  const tightnessSaturated = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightnessSaturated;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
   const weeklyLeadershipSummary = homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
 
@@ -305,6 +307,8 @@ async function PageContent({
             <DecisionHero
               tightness={tightness}
               tightnessDelta={tightnessDelta}
+              tightnessPressure={tightnessPressure}
+              tightnessSaturated={tightnessSaturated}
               riskAppetite={riskAppetite}
               riskAppetiteDelta={riskAppetiteDelta}
               boldnessScore={weeklyLeadershipSummary.boldnessScore}

@@ -107,18 +107,18 @@ All five items shipped as of 2026-08-29.
 - [x] Launch executive briefing pack (Slack/email/slide-ready) with citations and regime summary.
 - [x] Add regime-shift alerting with reason codes and Time Machine deep links.
 - [x] Add weekly digest output with “what changed” delta summary.
-- [ ] Allow role-specific alert routing (CFO/COO/CTO/CPO presets).
+- [x] Allow role-specific alert routing (CFO/COO/CTO/CPO presets). Shipped: tagged alert decisions with department and rolePreset metadata (2026-09-04).
 
 ## Milestone 10 — Decision Memory + Scenario Studio (Week 10)
-- [ ] Decision Memory log with immutable records (regime, sensors, thresholds, sources).
-- [ ] Scenario presets library with shareable templates on a shipped route.
-- [ ] Counterfactual slider view with explicit “Simulated” labeling on a shipped route.
-- [ ] Then-vs-now comparisons baked into the Scenario Studio.
-- [ ] Assumption locking banner to keep posture choices explicit in reviews.
+- [x] Decision Memory log with immutable records (regime, sensors, thresholds, sources). Shipped: append-only ledger on `/operate/memory` with CSV export (2026-09).
+- [x] Scenario presets library with shareable templates on a shipped route. Shipped: presets on `/operate/scenarios` (2026-09-04).
+- [x] Counterfactual slider view with explicit “Simulated” labeling on a shipped route. Shipped: dual rate/slope sliders and banner on `/operate/scenarios` (2026-09-04).
+- [x] Then-vs-now comparisons baked into the Scenario Studio. Shipped: live baseline vs counterfactual delta panel on `/operate/scenarios` (2026-09-04).
+- [x] Assumption locking banner to keep posture choices explicit in reviews. Shipped: assumption health verdicts and simulation guardrails (2026-09-04).
 
 ## Milestone 11 — Evidence + Data Reliability (Week 11)
 - [x] Live macro fetchers for CPI, unemployment, and BBB spreads with source URLs.
-- [ ] Evidence pack upgrades: Insight Database citations and Fossil Record view.
+- [x] Evidence pack upgrades: Insight Database citations and Fossil Record view. Shipped: Fossil Record table on `/signals` (2026-09-04).
 - [x] Data freshness health checks with explicit fallback reasons. Shipped: freshness timestamps and fallback status on `/trust` Source board.
 - [x] Add a "source health" panel that surfaces stale/failed data feeds. Shipped: System status and Source board on `/trust`.
 
@@ -147,7 +147,7 @@ Track these items to present Whether as a Reforge-grade operating system.
 - [x] Executive brief CTA is primary in the Overview header. Shipped: `CopySlackBriefButton` is the primary hero action (2026-08-29).
 - [x] Weekly/monthly briefing APIs are stable and copy-ready with citations. Shipped: `/api/weekly`, `/api/monthly`, `/brief.md`, and `/api/integrations/weekly-mandate` (2026-08).
 - [ ] Insight Database includes precedent case studies per regime.
-- [ ] Decision Memory logs are immutable and exportable.
-- [ ] Role-based presets ship for CFO/COO/CTO/CPO workflows.
+- [x] Decision Memory logs are immutable and exportable. Shipped: `/api/decision-memory` and `/operate/memory` (2026-09).
+- [x] Role-based presets ship for CFO/COO/CTO/CPO workflows. Shipped: stakeholder briefs on /operate and role-calibrated alert routing (2026-09-04).
 - [x] Source health panel surfaces stale or failed data feeds. Shipped: System status and Source board on `/trust`.
 - [x] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs. Shipped: live FRED fetchers in `lib/fred.ts` (2026-08).

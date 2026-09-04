@@ -204,6 +204,7 @@ export const buildSignalsPageModel = async (
           { href: "#evidence-priorities", label: "Evidence priorities" },
           { href: "#current-scores", label: "Current scores" },
           { href: "#team-context", label: "What this means for your team" },
+          { href: "#fossil-record", label: "Fossil record" },
           { href: "#advanced-controls", label: "Advanced controls" },
         ]
       : // Short read listed two of the page's sections. The sidebar is a fixed
@@ -215,6 +216,7 @@ export const buildSignalsPageModel = async (
           { href: "#trends", label: "Trends" },
           { href: "#current-scores", label: "Current scores" },
           { href: "#team-context", label: "What this means for your team" },
+          { href: "#fossil-record", label: "Fossil record" },
           { href: "#curve-context", label: "Curve context" },
         ];
 

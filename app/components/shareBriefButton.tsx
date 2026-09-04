@@ -40,7 +40,7 @@ export function ShareBriefButton({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = useCallback(() => {
-    const bulletBlock = lines && lines.length > 0 ? `\n${lines.map((line) => `• ${line}`).join("\n")}` : "";
+    const bulletBlock = lines && lines.length > 0 ? `\n\n${lines.map((line) => `• ${line}`).join("\n")}` : "";
     const payload = { title, text: `${text}${bulletBlock}`, url };
     const canNativeShare = typeof navigator !== "undefined" && "canShare" in navigator && navigator.canShare(payload);
     if (canNativeShare) {

@@ -7,6 +7,7 @@ import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { DomainContextSection } from "./components/domainContextSection";
+import { FossilRecordSection } from "./components/fossilRecordSection";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import {
@@ -224,6 +225,8 @@ export default async function SignalsPage({
       <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
 
       <DomainContextSection regime={model.assessment.regime} />
+
+      <FossilRecordSection regime={model.assessment.regime} />
 
       <SignalsModeSwitcherSection
         activeSignalsView={model.activeSignalsView}

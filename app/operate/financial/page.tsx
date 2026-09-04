@@ -58,7 +58,7 @@ export default async function FinancialStrategyPage({
         },
         page: {
           pageTitle: "Financial strategy",
-          currentPath: "/planning/financial",
+          currentPath: "/operate/financial",
           pageSummary: "CFO runway planning and capital efficiency settings for the current macro regime.",
           sectionLinks: operationsSectionLinks.plan,
         },
@@ -105,7 +105,7 @@ export default async function FinancialStrategyPage({
           />
         </div>
         <Suspense fallback={<WorkstreamNavFallback />}>
-          <OperationsWorkstreamNav currentPath="/planning/financial" />
+          <OperationsWorkstreamNav currentPath="/operate/financial" />
         </Suspense>
       </div>
     </ReportShell>

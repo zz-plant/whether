@@ -40,7 +40,7 @@ describe("alert routing", () => {
     }
   });
 
-  it("routes a funding-pressure crossing to the credit metric", () => {
+  it("routes a funding-pressure crossing to the credit metric and Finance/CFO role", () => {
     const decisions = evaluateAlert(
       conditions({ riskAppetite: 60 }),
       lastKnown({ riskAppetite: 60 }),
@@ -48,10 +48,12 @@ describe("alert routing", () => {
     const thresholds = decisions.filter((d) => d.type === "threshold");
     assert.ok(thresholds.length > 0);
     assert.ok(thresholds.every((d) => d.metric === "credit"));
+    assert.ok(thresholds.every((d) => d.department === "Finance"));
+    assert.ok(thresholds.every((d) => d.rolePreset === "CFO"));
     assert.ok(thresholds.every((d) => d.headline.startsWith("Funding pressure")));
   });
 
-  it("routes a risk-appetite crossing to the sentiment metric", () => {
+  it("routes a risk-appetite crossing to the sentiment metric and Operations/COO role", () => {
     const decisions = evaluateAlert(
       conditions({ tightness: 60, riskAppetite: 42 }),
       lastKnown({ tightness: 60, riskAppetite: 60 }),
@@ -59,6 +61,8 @@ describe("alert routing", () => {
     const thresholds = decisions.filter((d) => d.type === "threshold");
     assert.ok(thresholds.length > 0);
     assert.ok(thresholds.every((d) => d.metric === "sentiment"));
+    assert.ok(thresholds.every((d) => d.department === "Operations"));
+    assert.ok(thresholds.every((d) => d.rolePreset === "COO"));
     assert.ok(thresholds.every((d) => d.headline.startsWith("Risk appetite")));
   });
 

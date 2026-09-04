@@ -14,12 +14,15 @@ import {
   type TimeMachineRegimeEntry,
 } from "../../lib/timeMachine/timeMachineCache";
 import {
+  buildYearTicks,
   findSeriesIndex,
+  findYearEntryIndex,
   FINE_SCRUB_SCALE,
   indexFromRatio,
   nextZoom,
   ratioForIndex,
   resolveTimelineWindow,
+  shouldUseYearRail,
   stepIndex,
   windowContainsIndex,
   windowFromStart,
@@ -89,12 +92,16 @@ export function TimelineBar({
   // null means "centre on the selection". A number holds the window where the
   // reader put it, so a commit or a pan does not slide the band sideways.
   const [windowStart, setWindowStart] = useState<number | null>(null);
+  // 0 until measured, which is also what the server renders with, so the first
+  // client render matches the markup it is hydrating.
+  const [trackWidth, setTrackWidth] = useState(0);
   const [isPending, startTransition] = useTransition();
 
   const trackRef = useRef<HTMLDivElement>(null);
   const commitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fineAnchorRef = useRef<{ clientX: number; index: number } | null>(null);
   const lastTickRef = useRef<number | null>(null);
+  const yearRailRef = useRef<HTMLDivElement>(null);
 
   // The record is bundled JSON, so it is available during the first render on
   // both sides. Loading it in an effect instead made the bar pop in after
@@ -148,15 +155,21 @@ export function TimelineBar({
   );
 
   const commit = useCallback(
-    (index: number, mode: "immediate" | "coalesced" = "immediate") => {
+    (
+      index: number,
+      options?: { coalesce?: boolean; recentre?: boolean }
+    ) => {
       const target = series[index];
       if (!target) return;
 
       setPendingIndex(index);
       // Hold the strip still when the new selection is already in view; recentre
-      // only when it lands on an edge and there is nothing to see beyond it.
+      // only when it lands on an edge and there is nothing to see beyond it, or
+      // when the caller is deliberately moving the view somewhere else.
       setWindowStart(
-        index > viewWindow.start && index < viewWindow.end - 1
+        !options?.recentre &&
+          index > viewWindow.start &&
+          index < viewWindow.end - 1
           ? viewWindow.start
           : null
       );
@@ -171,7 +184,7 @@ export function TimelineBar({
         });
       };
 
-      if (mode === "immediate") {
+      if (!options?.coalesce) {
         send();
         return;
       }
@@ -293,7 +306,7 @@ export function TimelineBar({
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       const step = (delta: number) => {
         event.preventDefault();
-        commit(stepIndex(seriesLength, handleIndex, delta), "coalesced");
+        commit(stepIndex(seriesLength, handleIndex, delta), { coalesce: true });
       };
 
       if (event.key === "ArrowLeft") step(-1);
@@ -310,6 +323,29 @@ export function TimelineBar({
     },
     [commit, seriesLength, handleIndex, liveIndex]
   );
+
+  useEffect(() => {
+    const node = trackRef.current;
+    if (!node) return;
+
+    const measure = () => setTrackWidth(node.getBoundingClientRect().width);
+    measure();
+
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const rail = yearRailRef.current;
+    const active = rail?.querySelector<HTMLElement>('[aria-current="true"]');
+    if (!rail || !active) return;
+    // scrollLeft directly rather than scrollIntoView, which also scrolls every
+    // ancestor — including the page the brief is on.
+    rail.scrollLeft =
+      active.offsetLeft - (rail.clientWidth - active.offsetWidth) / 2;
+  }, [handleIndex, trackWidth]);
 
   // Wheel is a native non-passive listener because React attaches its own at the
   // root as passive, where preventDefault does nothing. Zoom now needs an
@@ -346,24 +382,34 @@ export function TimelineBar({
     return () => node.removeEventListener("wheel", onWheel);
   }, [seriesLength, zoom, viewWindow]);
 
-  const yearTicks = useMemo(() => {
-    if (visibleSeries.length === 0) return [];
-    const ticks: { year: number; positionPercent: number }[] = [];
-    let lastYear = -1;
+  const yearTicks = useMemo(
+    () =>
+      buildYearTicks(
+        series,
+        viewWindow,
+        trackWidth,
+        series[handleIndex]?.year
+      ),
+    [series, viewWindow, trackWidth, handleIndex]
+  );
 
-    visibleSeries.forEach((entry, index) => {
-      if (entry.year !== lastYear) {
-        ticks.push({
-          year: entry.year,
-          positionPercent:
-            (index / (visibleSeries.length - 1 || 1)) * 100,
-        });
-        lastYear = entry.year;
-      }
-    });
-
-    return ticks;
-  }, [visibleSeries]);
+  /** Picking a year is the coarse move the track cannot be: at MAX zoom a month
+   *  is under 6px on a desktop and under 2px on a phone, so aiming at 2021 by
+   *  dragging was guesswork. Landing narrows to that year, which is the view
+   *  the reader asked for. */
+  const goToYear = useCallback(
+    (year: number) => {
+      const index = findYearEntryIndex(
+        series,
+        year,
+        series[handleIndex]?.month
+      );
+      if (index < 0) return;
+      setZoom("1Y");
+      commit(index, { recentre: true });
+    },
+    [series, handleIndex, commit]
+  );
 
   if (seriesLength === 0 || visibleSeries.length === 0) {
     return null;
@@ -379,6 +425,7 @@ export function TimelineBar({
     };
   };
 
+  const useYearRail = shouldUseYearRail(yearTicks.length, trackWidth);
   const selected = describe(handleIndex);
   const preview = previewIndex === null ? null : describe(previewIndex);
   const isLive = handleIndex === liveIndex;
@@ -590,19 +637,75 @@ export function TimelineBar({
         ) : null}
       </div>
 
-      {/* Axis Year Ticks */}
-      <div className="relative h-3.5 w-full text-fluid-nano font-mono text-slate-400" aria-hidden="true">
-        {yearTicks.map((tick) => (
-          <div
-            key={tick.year}
-            className="absolute transform -translate-x-1/2 flex flex-col items-center"
-            style={{ left: `${tick.positionPercent}%` }}
-          >
-            <div className="h-1 w-px bg-slate-700 mb-0.5" />
-            <span>{tick.year}</span>
-          </div>
-        ))}
-      </div>
+      {/* The year axis, which used to be aria-hidden decoration. It is the only
+          coarse control on this component: at MAX zoom the track is under 6px
+          per month on a desktop and under 2px on a phone, so "show me 2021" was
+          a drag nobody could aim. Where the years have room it stays positional,
+          so it still maps to the band above it; where they do not, a positional
+          axis cannot give every year a reachable target at any label length, so
+          the same years are offered as a scrollable list. */}
+      {useYearRail ? (
+        <div
+          ref={yearRailRef}
+          role="group"
+          aria-label="Jump to a year"
+          className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 text-fluid-nano font-mono text-slate-400 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {yearTicks.map((tick) => {
+            const isCurrentYear = tick.year === selected.entry?.year;
+            return (
+              <button
+                key={tick.year}
+                type="button"
+                onClick={() => goToYear(tick.year)}
+                aria-label={`Jump to ${tick.year}`}
+                aria-current={isCurrentYear ? "true" : undefined}
+                className={`min-h-[44px] min-w-[44px] shrink-0 rounded-md border px-2 tabular-nums transition-colors ${
+                  isCurrentYear
+                    ? "border-sky-400/50 bg-sky-500/20 text-sky-100"
+                    : "border-slate-800/60 hover:bg-slate-800/50 hover:text-slate-100"
+                } focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400`}
+              >
+                {tick.year}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div
+          className="relative h-6 w-full text-fluid-nano font-mono text-slate-400"
+          role="group"
+          aria-label="Jump to a year"
+        >
+          {yearTicks.map((tick) =>
+            tick.labelled ? (
+              <button
+                key={tick.year}
+                type="button"
+                onClick={() => goToYear(tick.year)}
+                aria-label={`Jump to ${tick.year}`}
+                aria-current={
+                  tick.year === selected.entry?.year ? "true" : undefined
+                }
+                className={`absolute top-0 flex -translate-x-1/2 flex-col items-center rounded px-1.5 py-0.5 transition-colors hover:bg-white/[0.08] hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 ${
+                  tick.year === selected.entry?.year ? "text-slate-100" : ""
+                }`}
+                style={{ left: `${tick.positionPercent}%` }}
+              >
+                <span className="mb-0.5 h-1 w-px bg-slate-600" aria-hidden="true" />
+                <span className="tabular-nums">{tick.year}</span>
+              </button>
+            ) : (
+              <span
+                key={tick.year}
+                aria-hidden="true"
+                className="absolute top-0 h-1 w-px -translate-x-1/2 bg-slate-700"
+                style={{ left: `${tick.positionPercent}%` }}
+              />
+            )
+          )}
+        </div>
+      )}
 
       {/* The band is the most visually dominant element above the brief and was
           the least explained: four colours encoding regime, with only the

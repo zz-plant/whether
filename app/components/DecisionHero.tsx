@@ -32,6 +32,8 @@ import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 type Props = {
   tightness: number;
   tightnessDelta: number;
+  tightnessPressure?: number;
+  tightnessSaturated?: boolean;
   riskAppetite?: number;
   riskAppetiteDelta?: number;
   boldnessScore: number;
@@ -88,6 +90,8 @@ const isRegimeKey = (value: string): value is RegimeKey =>
 export function DecisionHero({
   tightness,
   tightnessDelta,
+  tightnessPressure,
+  tightnessSaturated,
   riskAppetite,
   riskAppetiteDelta,
   boldnessScore,
@@ -225,6 +229,14 @@ export function DecisionHero({
           {tightness}
           <span className="font-normal text-white/35">/100</span>{" "}
           <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
+          {tightnessSaturated && typeof tightnessPressure === "number" ? (
+            <span
+              className="ml-1.5 text-fluid-nano font-normal text-amber-300/80"
+              title={`Raw pressure is ${tightnessPressure.toFixed(0)} before the 100-point clip`}
+            >
+              · ceiling ({tightnessPressure.toFixed(0)})
+            </span>
+          ) : null}
         </p>
         {tightnessDelta !== 0 ? (
           // The glyph carries its own title/desc ("Rose from 61 to 64"), so it
