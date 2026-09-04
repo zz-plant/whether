@@ -1,44 +1,73 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ActionLink } from "../components/ui/actionLink";
 import { ButtonLink } from "../components/ui/buttonLink";
 import { TimelineBar } from "../components/TimelineBar";
-import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import { REGIME_COLORS } from "../viewModel";
 import { formatMonthShortUtc, formatMonthLongYearUtc } from "../../lib/formatters";
 import type { TimeMachineRegimeEntry } from "../../lib/timeMachine/timeMachineCache";
 
-type Coverage = Record<number, number[]>;
-
 export function HistoryExplorer({
-  coverage,
   initialMonth,
   initialYear,
   regimeSeries,
 }: {
-  coverage: Coverage;
   initialMonth: number;
   initialYear: number;
   regimeSeries: TimeMachineRegimeEntry[];
 }) {
   const router = useRouter();
-  const years = useMemo(() => Object.keys(coverage).map(Number).sort((a, b) => b - a), [coverage]);
+  const [isPending, startTransition] = useTransition();
+
+  // Both pickers read one source. The month grid used to come from the full
+  // record while the regime lookup came from a trailing 24-month series, so the
+  // grid offered months the rest of the panel could not resolve — picking one
+  // older than two years produced a selection with nothing attached to it.
+  const coverage = useMemo(() => {
+    const byYear = new Map<number, number[]>();
+    for (const entry of regimeSeries) {
+      const months = byYear.get(entry.year);
+      if (months) months.push(entry.month);
+      else byYear.set(entry.year, [entry.month]);
+    }
+    return byYear;
+  }, [regimeSeries]);
+
+  const years = useMemo(
+    () => [...coverage.keys()].sort((a, b) => b - a),
+    [coverage]
+  );
+
   const [selectedYear, setSelectedYear] = useState(initialYear || years[0] || 0);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
-  const months = selectedYear ? (coverage[selectedYear] ?? []) : [];
-  const regimeForPeriod = regimeSeries.find((entry) => entry.year === selectedYear && entry.month === selectedMonth)?.regime ?? null;
+  const months = selectedYear ? (coverage.get(selectedYear) ?? []) : [];
+  const hasSelection =
+    selectedMonth > 0 &&
+    regimeSeries.some(
+      (entry) => entry.year === selectedYear && entry.month === selectedMonth
+    );
 
-  const navigateTo = useCallback((year: number, month: number) => {
-    setSelectedYear(year);
-    setSelectedMonth(month);
-    router.push(`/history?month=${month}&year=${year}`);
-  }, [router]);
+  const navigateTo = useCallback(
+    (year: number, month: number) => {
+      setSelectedYear(year);
+      setSelectedMonth(month);
+      // Replace while already exploring a month, so leaving the explorer costs
+      // one back-press rather than one per month visited.
+      const href = `/history?month=${month}&year=${year}`;
+      startTransition(() => {
+        if (selectedMonth > 0) router.replace(href);
+        else router.push(href);
+      });
+    },
+    [router, selectedMonth]
+  );
 
   const clearSelection = useCallback(() => {
     setSelectedMonth(0);
-    router.push("/history");
+    startTransition(() => {
+      router.replace("/history");
+    });
   }, [router]);
 
   const handleTimelineSelect = useCallback(
@@ -62,7 +91,9 @@ export function HistoryExplorer({
       <div className="space-y-2 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
         <div className="flex items-center justify-between pb-1">
           <p className="type-eyebrow">Interactive macro timeline</p>
-          <span className="text-fluid-micro text-slate-400">Pinch or scrub along track to explore</span>
+          <span className="text-fluid-micro text-slate-400">
+            Drag to scrub · shift-drag for single months · pinch or &#8984;-scroll to zoom
+          </span>
         </div>
         <TimelineBar
           currentMonth={selectedMonth || undefined}
@@ -74,8 +105,11 @@ export function HistoryExplorer({
         />
       </div>
 
-      {/* Quick Month / Year Selector */}
-      <div className="space-y-3 pt-2">
+      {/* The precise picker. The scrubber above already names the selected
+          period and its regime, so this no longer restates them in a third
+          place — it only offers the large targets the 6px-per-month track
+          cannot, and the link out to that month's brief. */}
+      <div className="space-y-3 pt-2" aria-busy={isPending}>
         <div className="flex items-center justify-between">
           <p className="type-eyebrow">Jump to specific month</p>
           {selectedMonth > 0 ? (
@@ -104,6 +138,7 @@ export function HistoryExplorer({
                 key={month}
                 type="button"
                 onClick={() => navigateTo(selectedYear, month)}
+                aria-pressed={month === selectedMonth}
                 className={`min-h-[44px] rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                   month === selectedMonth
                     ? "bg-sky-500/20 text-sky-100 border border-sky-400/50 shadow-sm"
@@ -117,23 +152,14 @@ export function HistoryExplorer({
         </div>
       </div>
 
-      {regimeForPeriod && selectedMonth > 0 ? (
-        <div className="rounded-lg border border-slate-700/60 bg-slate-900/80 px-4 py-3 space-y-3">
-          <div className="space-y-1">
-            <p className="type-eyebrow">Selected period</p>
-            <p className="text-sm font-semibold text-slate-100">
-              {formatMonthLongYearUtc(selectedYear, selectedMonth)}
-            </p>
-            <span className={`inline-block rounded-sm px-2 py-0.5 type-badge text-slate-950 font-bold ${REGIME_COLORS[regimeForPeriod] ?? "bg-slate-500"}`}>
-              {getRegimePublicLabel(regimeForPeriod)}
-            </span>
-          </div>
-          <div className="pt-2 border-t border-slate-800/60">
-            <ButtonLink href={`/?month=${selectedMonth}&year=${selectedYear}`} variant="primary" className="w-full sm:w-auto">
-              View Weekly Operating Brief for this period &rarr;
-            </ButtonLink>
-          </div>
-        </div>
+      {hasSelection ? (
+        <ButtonLink
+          href={`/?month=${selectedMonth}&year=${selectedYear}`}
+          variant="primary"
+          className="w-full sm:w-auto"
+        >
+          View the {formatMonthLongYearUtc(selectedYear, selectedMonth)} operating brief &rarr;
+        </ButtonLink>
       ) : null}
     </div>
   );

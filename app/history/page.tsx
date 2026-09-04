@@ -6,7 +6,7 @@ import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { TrackRecord } from "../components/history/TrackRecord";
 import { ReportShell } from "../components/reportShell";
-import { getTimeMachineMonthsByYear, getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
@@ -152,11 +152,14 @@ export default async function HistoryPage({
         summary={<span>Explore raw historical conditions</span>}
       >
         <div className="mt-4 space-y-5">
+          {/* The whole record, not the trailing 24 months `regimeSeries` holds
+              for the trend sparklines: the explorer offers every month back to
+              2012, and handing it a shorter series left most of them selectable
+              but unresolvable. */}
           <HistoryExplorer
-            coverage={getTimeMachineMonthsByYear()}
             initialMonth={Number(resolvedSearchParams?.month) || 0}
             initialYear={Number(resolvedSearchParams?.year) || 0}
-            regimeSeries={regimeSeries}
+            regimeSeries={fullSeries}
           />
           <RegimeStats series={statsSeries} />
           <div className="grid gap-6 sm:grid-cols-2">
