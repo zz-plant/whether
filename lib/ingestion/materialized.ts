@@ -433,7 +433,7 @@ export const loadCanonicalReportInputs = async (
        * nothing stale to serve. The lock bounds duplicate upstream fetches when
        * concurrent isolates hit the same due window. */
       const fetcher = options?.fetcher;
-      runInBackground("canonical-signal-refresh", async () => {
+      void runInBackground("canonical-signal-refresh", async () => {
         const acquired = (await store.acquireRefreshLock?.(BACKGROUND_REFRESH_LOCK_TTL_SECONDS)) ?? true;
         if (!acquired) {
           return;

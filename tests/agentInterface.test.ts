@@ -1,3 +1,4 @@
+import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { pullRecentSiteInfo } from "../lib/agentInterface";
@@ -6,7 +7,7 @@ describe("pullRecentSiteInfo", () => {
   it("fetches weekly cadence from the default site URL", async () => {
     let requestedUrl = "";
     const mockFetch: typeof fetch = (async (input) => {
-      requestedUrl = String(input);
+      requestedUrl = requestUrl(input);
       return {
         ok: true,
         status: 200,
@@ -25,7 +26,7 @@ describe("pullRecentSiteInfo", () => {
   it("uses provided site URL and cadence", async () => {
     let requestedUrl = "";
     const mockFetch: typeof fetch = (async (input) => {
-      requestedUrl = String(input);
+      requestedUrl = requestUrl(input);
       return {
         ok: true,
         status: 200,

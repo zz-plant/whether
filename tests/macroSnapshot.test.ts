@@ -1,3 +1,4 @@
+import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it, beforeEach } from "bun:test";
 import { loadMacroSeries } from "../lib/macroSnapshot";
@@ -12,7 +13,7 @@ describe("loadMacroSeries", () => {
 
   it("computes CPI as year-over-year percentage and loads Tier 1 live data", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = String(input);
+      const url = requestUrl(input);
 
       if (url.includes("CPIAUCSL")) {
         return new Response(buildFredCsv([
@@ -100,7 +101,7 @@ describe("loadMacroSeries", () => {
 
   it("keeps partial live coverage when one upstream series fails", async () => {
     const fetcher: typeof fetch = async (input) => {
-      const url = String(input);
+      const url = requestUrl(input);
 
       if (url.includes("CPIAUCSL")) {
         return new Response(buildFredCsv([

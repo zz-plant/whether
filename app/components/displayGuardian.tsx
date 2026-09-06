@@ -112,21 +112,25 @@ export const DisplayGuardian = ({
       }
     };
 
+    /* Every wake-lock call here is deliberately fire-and-forget: requestWakeLock
+       swallows its own failures, and a release we do not await cannot fail in a
+       way this component would act on. `void` says that, rather than leaving it
+       to be read as a forgotten await. */
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
-        requestWakeLock();
+        void requestWakeLock();
       } else {
-        wakeLock?.release();
+        void wakeLock?.release();
         wakeLock = null;
       }
     };
 
-    requestWakeLock();
+    void requestWakeLock();
     document.addEventListener("visibilitychange", handleVisibility);
 
     wakeTimer = window.setInterval(() => {
       if (!wakeLock) {
-        requestWakeLock();
+        void requestWakeLock();
       }
     }, 5 * 60 * 1000);
 
@@ -135,7 +139,7 @@ export const DisplayGuardian = ({
       if (wakeTimer) {
         window.clearInterval(wakeTimer);
       }
-      wakeLock?.release();
+      void wakeLock?.release();
       wakeLock = null;
     };
   }, []);

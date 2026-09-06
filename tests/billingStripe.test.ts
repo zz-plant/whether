@@ -1,3 +1,4 @@
+import { requestBodyText } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -57,7 +58,7 @@ describe("stripe billing helpers", () => {
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     assert.equal((init.headers as Record<string, string>)["Idempotency-Key"], "idem-456");
-    const params = new URLSearchParams(String(init.body));
+    const params = new URLSearchParams(requestBodyText(init.body));
     assert.equal(params.get("metadata[source]"), "export_brief");
     assert.equal(params.get("metadata[planCandidate]"), "team");
     assert.equal(params.get("metadata[seatBand]"), "6-20");

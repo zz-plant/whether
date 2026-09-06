@@ -1,3 +1,4 @@
+import { requestBodyText } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { afterEach, describe, it, mock, spyOn } from "bun:test";
@@ -119,7 +120,10 @@ describe("/api/billing/webhook", () => {
     assert.equal(response.status, 200);
     assert.equal(fetchMock.mock.calls.length, 1);
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    const body = JSON.parse(String(init.body)) as { type?: string; source?: string; planCandidate?: string };
+    // An annotation rather than a cast: JSON.parse returns `any`, so naming the
+    // shape here asserts nothing the assertions below do not already check.
+    const body: { type?: unknown; source?: unknown; planCandidate?: unknown } =
+      JSON.parse(requestBodyText(init.body));
     assert.equal(body.type, "premium_checkout_complete");
     assert.equal(body.source, "export_brief");
     assert.equal(body.planCandidate, "team");

@@ -68,13 +68,17 @@ export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunne
 
   const payload = input as Record<string, unknown>;
 
+  /* These were `String(value)`, so an object arrived at the enum check as
+     "[object Object]" and was rejected for the wrong reason. A non-string is
+     not a candidate, and saying so directly is the same answer with a readable
+     cause. */
   const planCandidate = payload.planCandidate;
-  if (planCandidate !== undefined && !isPremiumPlanCandidate(String(planCandidate))) {
+  if (planCandidate !== undefined && (typeof planCandidate !== "string" || !isPremiumPlanCandidate(planCandidate))) {
     return false;
   }
 
   const seatBand = payload.seatBand;
-  if (seatBand !== undefined && !isPremiumSeatBand(String(seatBand))) {
+  if (seatBand !== undefined && (typeof seatBand !== "string" || !isPremiumSeatBand(seatBand))) {
     return false;
   }
 

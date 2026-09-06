@@ -99,7 +99,9 @@ export function recordPassedChecks(tasks, commit = headCommit()) {
 
   try {
     mkdirSync(MARKER_DIRECTORY, { recursive: true });
-    const merged = [...new Set([...passedChecks(commit), ...tasks])].sort();
+    const merged = [...new Set([...passedChecks(commit), ...tasks])].sort((a, b) =>
+      a < b ? -1 : a > b ? 1 : 0,
+    );
     writeFileSync(
       markerPath(commit),
       `${JSON.stringify({ commit, tasks: merged, recordedAt: new Date().toISOString() }, null, 2)}\n`,

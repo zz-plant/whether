@@ -88,9 +88,14 @@ deploys every push, which is the only remote gate left.
   suppressions, 0 skipped tests, 2 disabled rules, 2 override-disabled rules, and a floor of 212
   test files. Lower it in the script when work earns it; raising one is a policy change and belongs
   in its own PR with the reason.
-- **`lint:types` is advisory, not a gate — yet.** Type-aware oxlint (`oxlint-tsgolint` 7.0.2001)
-  adds `no-floating-promises`, `no-base-to-string`, and the type-constituent rules, and reports 28
-  pre-existing findings; a PR must not raise that number. Three consecutive runs in each mode
+- **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
+  (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
+  type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared
+  `tests/fixtures/requestTarget.ts` replaced `String(input)` on a `RequestInfo | URL` in eight test
+  files (a `Request` there compares as "[object Object]"), deliberate fire-and-forget promises took
+  `void`, `RegimeKey | string` unions collapsed to `string`, `premiumFunnel` rejects a non-string
+  candidate instead of stringifying it, and `app/brief.md` no longer risks pasting "[object Object]"
+  into a published artifact. A PR must not raise the number above zero. Three consecutive runs in each mode
   gave identical results, but one earlier run in the same session reported findings later runs
   did not and could not be reproduced. Promote it into the gate after a week of identical runs.
 - **The gate shuffles test order.** `scripts/run-tests.mjs` passes `--randomize` under

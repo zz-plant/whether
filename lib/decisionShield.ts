@@ -4,6 +4,7 @@
  */
 import type { RegimeAssessment } from "./regimeEngine";
 import { REGIME_REVERSAL_DAYS } from "./regimeEngine";
+import { BASE_RATE_SOURCE_LABELS } from "./regimeEngineCore";
 import { REGIME_LABELS } from "./regimePresentation";
 import {
   DECISION_ACTION_LABELS,
@@ -108,13 +109,18 @@ const applyContextualVerdict = (baseVerdict: DecisionVerdict, input: DecisionInp
 
 const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
-  const { baseRate, curveSlope, tightness, riskAppetite } = assessment.scores;
+  const { baseRate, baseRateUsed, curveSlope, tightness, riskAppetite } = assessment.scores;
   const { baseRateTightness } = assessment.thresholds;
 
+  /* This line said "The Fed rate is X%" for a reading that is the one-month
+     bill, and `buildShareText` copies these bullets verbatim into the block
+     operators paste into a thread — so the misnaming travelled further than the
+     screen it was written on. */
+  const rateLabel = BASE_RATE_SOURCE_LABELS[baseRateUsed];
   bullets.push(
     baseRate > baseRateTightness
-      ? `The Fed rate is ${baseRate.toFixed(2)}%, above the ${baseRateTightness}% line where capital gets expensive.`
-      : `The Fed rate is ${baseRate.toFixed(2)}%, below the ${baseRateTightness}% line, so the cost of capital is manageable.`
+      ? `${rateLabel} is ${baseRate.toFixed(2)}%, above the ${baseRateTightness}% line where capital gets expensive.`
+      : `${rateLabel} is ${baseRate.toFixed(2)}%, below the ${baseRateTightness}% line, so the cost of capital is manageable.`
   );
 
   if (curveSlope === null) {

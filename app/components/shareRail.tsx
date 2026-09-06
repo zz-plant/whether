@@ -44,7 +44,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   }, [preset, includeContext]);
 
   const handleCopy = useCallback(() => {
-    copyToClipboard(buildShareText(), "plain");
+    void copyToClipboard(buildShareText(), "plain");
   }, [copyToClipboard, buildShareText]);
 
   const copySlackText = useCallback(() => {

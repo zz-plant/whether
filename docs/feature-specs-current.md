@@ -244,6 +244,27 @@ assumptions optimistic in three ways, and this pass fixed each:
   production a missing binding is now a failed send with a named reason
   (`tests/emailDeliveryStub.test.ts`).
 
+### 1.1.8 The base rate is named as the series that is read (2026-09-06)
+`getBaseRate` falls through to the one-month bill on every render — nothing populates
+`fedFunds` — and 2026-09-03 already fixed the provenance half of this (the phantom DFF endpoint
+went, and `TREASURY_SOURCE_LABEL` now names the four series actually fetched). Two surfaces still
+called the reading "the Fed rate":
+
+- `buildSensorBullets` in `lib/decisionShield.ts` produced "The Fed rate is 5.20%…", and
+  `buildShareText` copies those bullets verbatim into the block operators paste into a thread or a
+  board doc, so the misnaming travelled past the screen it was written on.
+- `buildRegimeInputs` labelled the input "Policy base rate (1M)" — a policy-rate claim that then
+  admitted in parentheses it had read a bill.
+
+`BASE_RATE_SOURCE_LABELS` (`lib/regimeEngineCore.ts`) is now the one place that names the reading,
+and both surfaces use it: "The 1-month Treasury bill is 5.20%…". The `FED` entry exists so that
+wiring DFF renames the surface rather than leaving it wrong in the other direction.
+**Wiring DFF is deliberately not done here** — `treasury/treasuryClient.ts` says that is a live
+change to the published call and belongs to whoever owns it; naming what is read is not.
+Covered by `tests/baseRateNaming.test.ts`. Entries already written into
+`data/posture_archive_index.json` keep the old label: the archive is never edited after
+publication, so a past call reads the way it did when it was made.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
