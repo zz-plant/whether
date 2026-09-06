@@ -1,3 +1,4 @@
+import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
@@ -93,7 +94,7 @@ describe("test network guard", () => {
   it("lets a test reach a server the suite itself started", async () => {
     const seen: string[] = [];
     const recordingFetch: typeof fetch = async (input) => {
-      seen.push(String(input));
+      seen.push(requestUrl(input));
       return new Response("local");
     };
     const { fetch: guardedFetch } = guarded(recordingFetch);

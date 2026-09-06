@@ -1,3 +1,4 @@
+import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
@@ -77,7 +78,7 @@ describe("trackContentCtaConversion", () => {
 
     globalThis.fetch = (async (input: RequestInfo | URL) => {
       fetchCalls += 1;
-      assert.equal(String(input), CONTENT_MEASUREMENT_ENDPOINT);
+      assert.equal(requestUrl(input), CONTENT_MEASUREMENT_ENDPOINT);
       return new Response(null, { status: 204 });
     }) as typeof fetch;
 

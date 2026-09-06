@@ -1,3 +1,4 @@
+import { requestBodyText, requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import { POST as postCheckoutRoute } from "../app/api/billing/checkout/route";
@@ -48,7 +49,7 @@ describe("/api/billing/checkout", () => {
     process.env.STRIPE_PRICE_TEAM_MONTHLY = "price_team";
 
     const fetchMock = spyOn(globalThis, "fetch").mockImplementation(async (input: string | URL | Request) => {
-      const url = String(input);
+      const url = requestUrl(input);
       if (url.includes("api.stripe.com")) {
         return new Response(
           JSON.stringify({ id: "cs_test_456", url: "https://checkout.stripe.com/c/pay/cs_test_456" }),
@@ -90,7 +91,7 @@ describe("/api/billing/checkout", () => {
     assert.equal(stripeCalls.length, 1);
     const [, stripeInit] = stripeCalls[0] as [string, RequestInit];
     assert.equal((stripeInit.headers as Record<string, string>)["Idempotency-Key"], "idem-123");
-    const stripeParams = new URLSearchParams(String(stripeInit.body));
+    const stripeParams = new URLSearchParams(requestBodyText(stripeInit.body));
     assert.equal(stripeParams.get("metadata[planCandidate]"), "team");
     assert.equal(stripeParams.get("metadata[seatBand]"), "6-20");
   });

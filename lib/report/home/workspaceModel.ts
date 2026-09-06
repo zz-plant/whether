@@ -97,7 +97,8 @@ const resolvePrimaryPathDetail = (slug: string) => {
   return "Use the most concrete operating path first before widening into broader browse.";
 };
 
-const buildSourceCoverageLine = (rows: ReportData["sourceHealth"] | ReportDataFallback["sourceHealth"]) => {
+// ReportDataFallback["sourceHealth"] is the same type; naming both said otherwise.
+const buildSourceCoverageLine = (rows: ReportData["sourceHealth"]) => {
   const liveRows = rows.filter((row) => row.mode === "live").map((row) => row.sourceName);
   const snapshotRows = rows.filter((row) => row.mode === "snapshot").map((row) => row.sourceName);
   const fallbackRows = rows.filter((row) => row.mode === "fallback").map((row) => row.sourceName);

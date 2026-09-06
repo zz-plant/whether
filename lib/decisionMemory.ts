@@ -53,7 +53,8 @@ export type DecisionMemoryEntry = {
     verdict?: DecisionOutput["verdict"];
   };
   regime: {
-    label: RegimeAssessment["regime"] | string;
+    /** A `RegimeKey` on entries this build wrote; any string on older ones. */
+    label: string;
     /** Snapshots carry only the scores the weekly brief actually holds. */
     scores: Partial<RegimeAssessment["scores"]> & { boldnessScore?: number };
     thresholds?: RegimeAssessment["thresholds"];

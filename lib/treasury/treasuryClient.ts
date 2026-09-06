@@ -275,6 +275,21 @@ const buildSeriesEndpoint = (baseEndpoint: string | undefined, seriesId: string,
   return url.toString();
 };
 
+/**
+ * Lowercased text of an unknown throw.
+ *
+ * Was `String(error).toLowerCase()` in two places, which turns a thrown object
+ * without a `message` into "[object Object]" and then matches that against
+ * "aborted" / "timeout" — a comparison that can only ever be false, dressed as
+ * a check. A throw with no readable message has no text, and says so.
+ */
+const errorMessageText = (error: unknown): string => {
+  if (typeof error === "object" && error !== null && "message" in error && typeof error.message === "string") {
+    return error.message.toLowerCase();
+  }
+  return typeof error === "string" ? error.toLowerCase() : "";
+};
+
 const isAbortLikeError = (error: unknown) => {
   if (!error) {
     return false;
@@ -284,10 +299,7 @@ const isAbortLikeError = (error: unknown) => {
     typeof error === "object" && "name" in error && typeof error.name === "string"
       ? error.name.toLowerCase()
       : "";
-  const message =
-    typeof error === "object" && "message" in error && typeof error.message === "string"
-      ? error.message.toLowerCase()
-      : String(error).toLowerCase();
+  const message = errorMessageText(error);
 
   return name.includes("abort") || message.includes("aborted") || message.includes("timeout");
 };
@@ -297,10 +309,7 @@ const isTransientFetchError = (error: unknown) => {
     return false;
   }
 
-  const message =
-    typeof error === "object" && "message" in error && typeof error.message === "string"
-      ? error.message.toLowerCase()
-      : String(error).toLowerCase();
+  const message = errorMessageText(error);
   const code =
     typeof error === "object" && "cause" in error && error.cause && typeof error.cause === "object" && "code" in error.cause
       ? String(error.cause.code).toLowerCase()

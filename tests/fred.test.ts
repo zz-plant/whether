@@ -1,3 +1,4 @@
+import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it, beforeEach } from "bun:test";
 import {
@@ -27,7 +28,7 @@ describe("fetchFredCsv", () => {
   it("succeeds on FRED", async () => {
     const calls: string[] = [];
     const fetcher: typeof fetch = (async (input: RequestInfo | URL) => {
-      const url = String(input);
+      const url = requestUrl(input);
       calls.push(url);
       return new Response(FRED_CSV, { status: 200 });
     }) as typeof fetch;

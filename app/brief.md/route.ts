@@ -6,8 +6,16 @@ import { buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 export const runtime = "edge";
 export const revalidate = 900;
 
+/** Interpolates primitives; anything else is JSON rather than "[object Object]" in a published artifact. */
+const mdValue = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint") return String(value);
+  return JSON.stringify(value) ?? "";
+};
+
 const md = (strings: TemplateStringsArray, ...values: unknown[]) =>
-  String.raw({ raw: strings }, ...values.map((v) => String(v ?? "")));
+  String.raw({ raw: strings }, ...values.map(mdValue));
 
 export async function GET() {
   const homepage = await assembleHomePage({ searchParams: undefined });

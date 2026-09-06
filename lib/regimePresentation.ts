@@ -66,7 +66,8 @@ export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
 export const isRegimeKey = (regime: string): regime is RegimeKey =>
   Object.prototype.hasOwnProperty.call(REGIME_PUBLIC_LABELS, regime);
 
-export const getRegimePublicLabel = (regime: RegimeKey | string) =>
+/** Takes any string: a known key maps to its label, anything else passes through. */
+export const getRegimePublicLabel = (regime: string) =>
   isRegimeKey(regime) ? REGIME_PUBLIC_LABELS[regime] : regime;
 
 export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABELS[regime];

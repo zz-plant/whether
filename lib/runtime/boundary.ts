@@ -19,7 +19,7 @@ class DefaultRuntimeBoundary implements RuntimeBoundary {
   }
 
   backgroundWork(taskName: string, work: () => Promise<void>): void {
-    runInBackground(taskName, work);
+    void runInBackground(taskName, work);
   }
 
   get clock(): { now(): Date } {
