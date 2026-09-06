@@ -337,6 +337,23 @@ export const RISK_APPETITE_EXPLANATION =
   `Risk appetite score maps the 10Y-2Y slope from ${RISK_APPETITE_MIN_SLOPE}% (very cautious) ` +
   `to ${RISK_APPETITE_MAX_SLOPE}% (confident), scaled to 0-100.`;
 
+/**
+ * What the base rate reading actually is, in the reader's words.
+ *
+ * `getBaseRate` falls through to the one-month bill on every render — nothing
+ * populates `fedFunds` (see `TREASURY_SOURCE_LABEL` above and the note in
+ * `treasury/treasuryClient.ts`). Surfaces used to call the result "the Fed
+ * rate" regardless, which put a claim about the policy rate into verdicts and
+ * into the text operators paste into threads. Name the series that was read;
+ * wiring DFF is a change to the published call and is not this label's job.
+ */
+export const BASE_RATE_SOURCE_LABELS: Record<RegimeScores["baseRateUsed"], string> = {
+  FED: "The federal funds rate",
+  "1M": "The 1-month Treasury bill",
+  "3M": "The 3-month Treasury bill",
+  MISSING: "The short-rate anchor",
+};
+
 export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export const getBaseRate = (yields: TreasuryYields) => {
@@ -368,8 +385,12 @@ export const buildRegimeInputs = (
   baseRate: ReturnType<typeof getBaseRate>,
   curveSlope: number | null,
 ): RegimeInput[] => {
+  // "Policy base rate (1M)" named a policy rate and then admitted in parentheses
+  // that it had read a bill. The label now says which series it is.
   const baseRateLabel =
-    baseRate.used === "MISSING" ? "Policy base rate (missing)" : `Policy base rate (${baseRate.used})`;
+    baseRate.used === "MISSING"
+      ? "Short-rate anchor (missing)"
+      : `${BASE_RATE_SOURCE_LABELS[baseRate.used]} (${baseRate.used})`;
   const baseRateNotes =
     baseRate.used === "MISSING"
       ? "No 1M or 3M Treasury rate available; defaulted to 0% for scoring."
