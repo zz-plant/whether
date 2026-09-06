@@ -223,6 +223,17 @@ whether/
 
 ---
 
+## Where Whether sits
+
+Whether is one of five systems that each hold a step of the loop an institution runs when it delegates consequential work to machines: believe, know what can be done, decide what authority is justified, act, detect mismatch, revise. Whether holds the **act** step. It turns changed conditions into a weekly operating call; the operator acts. It authorizes nothing and takes no action itself.
+
+- **Canonical export**: the decision memory ledger, in the [STD-07 Revisable Delegation Record](https://ethotechnics.org/standards/std-07-revisable-delegation-record) shape at `GET /api/decision-memory?format=records` (newline-delimited JSON, SHA-256 chained, oldest first). Every record is a `belief`: the regime read at the time, and the call that depended on it, with the assumption snapshot restated as the conditions that would invalidate it.
+- **Conformance**: Level 1 (append-only, hashed, chained). Declared in [`/.well-known/whether-agent.json`](https://whether.work/.well-known/whether-agent.json) under `revisableDelegation`.
+- **Wired to**: nothing yet. No sibling consumes these records and Whether consumes none. The manifest's `upstream` and `downstream` arrays are empty on purpose and fill in only when an edge exists in code.
+- **Siblings**: [Ambit](https://github.com/zz-plant/ambit) (capability and authorization), [Refract](https://github.com/refract-org/refract) (discrepancy), [NextConsensus](https://nextconsensus.com) (belief), [Ethotechnics](https://ethotechnics.org) (the record shape and the vocabulary).
+
+---
+
 ## Stance & Philosophy
 
 - **Operating guidance, not financial advice**: Whether is built to pace organizational hiring, burn, and expansion — not pick stocks.

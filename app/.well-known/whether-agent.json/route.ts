@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
 import { supportedAgentCadences } from "../../../lib/agentInterface";
+import {
+  REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION,
+  REVISABLE_DELEGATION_SCHEMA_URL,
+  REVISABLE_DELEGATION_STANDARD_URL,
+  WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL,
+} from "../../../lib/export/revisableDelegationRecord";
 
 export const runtime = "edge";
 export const revalidate = 3600;
@@ -31,6 +37,21 @@ export async function GET() {
     },
     agent: {
       invalidCadenceStatus: 400,
+    },
+    // Where Whether sits in the loop an institution runs when it delegates
+    // work to machines, and what it emits in the shared record shape. Whether
+    // authorizes nothing and acts on nothing, so it emits belief records only.
+    revisableDelegation: {
+      loopPosition: "act",
+      loopRole: "turns changed conditions into a weekly operating call; the operator acts",
+      standard: REVISABLE_DELEGATION_STANDARD_URL,
+      schema: REVISABLE_DELEGATION_SCHEMA_URL,
+      schemaVersion: REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION,
+      conformanceLevel: WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL,
+      kinds: ["belief"],
+      records: `${baseUrl}/api/decision-memory?format=records`,
+      upstream: [],
+      downstream: [],
     },
   });
 }

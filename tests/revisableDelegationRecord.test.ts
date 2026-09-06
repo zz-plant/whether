@@ -1,0 +1,97 @@
+import assert from "node:assert/strict";
+import { describe, it } from "bun:test";
+import type { DecisionMemoryEntry } from "../lib/decisionMemory";
+import {
+  canonicalizeRecord,
+  hashRecord,
+  toRevisableDelegationNdjson,
+  toRevisableDelegationRecords,
+} from "../lib/export/revisableDelegationRecord";
+
+const decisionEntry: DecisionMemoryEntry = {
+  id: "dm-2",
+  createdAt: "2026-02-16T12:00:00.000Z",
+  kind: "decision",
+  owner: "kj",
+  context: { clientId: "client-a", recordDate: "2026-02-16" },
+  decision: { lifecycle: "GROWTH", category: "HIRING", action: "HIRE" },
+  outcome: {
+    verdict: "RISKY",
+    summary: "Hiring remains constrained.",
+    guardrail: "Require revenue-backed roles first.",
+    reversalTrigger: "tightness drops below 70",
+  },
+  regime: { label: "DEFENSIVE", scores: { tightness: 72, riskAppetite: 52 } },
+  sources: ["https://fred.stlouisfed.org/series/DGS1MO"],
+  assumptions: { tightness: 72, riskAppetite: 52, tightnessThreshold: 70, riskAppetiteThreshold: 50 },
+};
+
+const snapshotEntry: DecisionMemoryEntry = {
+  id: "dm-1",
+  createdAt: "2026-02-09T12:00:00.000Z",
+  kind: "posture-snapshot",
+  context: { clientId: "client-a", recordDate: "2026-02-09" },
+  outcome: { summary: "Stage decisions; avoid fixed-cost commitments.", guardrail: "", reversalTrigger: "" },
+  regime: { label: "DEFENSIVE", scores: { tightness: 71 } },
+  sources: [],
+};
+
+describe("STD-07 export of decision memory", () => {
+  it("emits belief records only, with the decision depending on the regime belief", async () => {
+    const records = await toRevisableDelegationRecords([decisionEntry], { baseUrl: "https://whether.work" });
+    assert.equal(records.length, 2);
+    assert.ok(records.every((record) => record.kind === "belief"));
+    const [regime, decision] = records;
+    assert.equal(regime.record_id, "whether:belief:dm-2:regime");
+    assert.deepEqual(decision.depends_on, [regime.record_id]);
+    assert.equal(decision.subject, "HIRING / HIRE (GROWTH)");
+    assert.equal(decision.actor.id, "kj");
+    assert.equal(decision.actor.on_behalf_of, "client-a");
+    assert.equal(decision.time.as_of, "2026-02-16T00:00:00.000Z");
+    assert.equal(decision.time.recorded_at, "2026-02-16T12:00:00.000Z");
+    assert.equal(decision.visibility, "private");
+  });
+
+  it("restates the assumption snapshot and reversal trigger as invalidation conditions", async () => {
+    const [regime, decision] = await toRevisableDelegationRecords([decisionEntry], { baseUrl: "https://whether.work" });
+    const conditions = decision.invalidated_by.map((entry) => entry.condition);
+    assert.equal(conditions.length, 3);
+    assert.match(conditions[0], /tightness moves below the 70 regime boundary \(recorded 72\)/);
+    assert.match(conditions[1], /risk appetite moves below the 50 regime boundary \(recorded 52\)/);
+    assert.equal(conditions[2], "tightness drops below 70");
+    assert.ok(decision.invalidated_by.every((entry) => entry.check === "https://whether.work/api/weekly"));
+    assert.equal(regime.invalidated_by.length, 2);
+  });
+
+  it("chains records oldest first and hashes the canonical serialization", async () => {
+    const records = await toRevisableDelegationRecords([decisionEntry, snapshotEntry], { baseUrl: "https://whether.work" });
+    assert.equal(records.length, 3);
+    assert.equal(records[0].record_id, "whether:belief:dm-1:call");
+    assert.equal(records[0].integrity.prior_hash, undefined);
+    assert.equal(records[1].integrity.prior_hash, records[0].integrity.hash);
+    assert.equal(records[2].integrity.prior_hash, records[1].integrity.hash);
+    for (const record of records) {
+      assert.equal(record.integrity.hash, await hashRecord(record));
+      assert.match(record.integrity.hash, /^[0-9a-f]{64}$/);
+    }
+
+    const seeded = await toRevisableDelegationRecords([snapshotEntry], { baseUrl: "https://whether.work", priorHash: "ab".repeat(32) });
+    assert.equal(seeded[0].integrity.prior_hash, "ab".repeat(32));
+  });
+
+  it("canonicalizes independent of key order and excludes the integrity block", async () => {
+    const [record] = await toRevisableDelegationRecords([snapshotEntry], { baseUrl: "https://whether.work" });
+    const reordered = JSON.parse(JSON.stringify({ ...record, time: { recorded_at: record.time.recorded_at, as_of: record.time.as_of, valid_until: record.time.valid_until } }));
+    assert.equal(canonicalizeRecord(reordered), canonicalizeRecord(record));
+    assert.ok(!canonicalizeRecord(record).includes('"integrity"'));
+    assert.ok(canonicalizeRecord(record).includes('"proposition"'));
+  });
+
+  it("serializes to ndjson one record per line", async () => {
+    const records = await toRevisableDelegationRecords([snapshotEntry], { baseUrl: "https://whether.work" });
+    const ndjson = toRevisableDelegationNdjson(records);
+    assert.equal(ndjson.split("\n").filter(Boolean).length, 1);
+    assert.equal(JSON.parse(ndjson.trim()).schema_version, "0.1.0");
+    assert.equal(toRevisableDelegationNdjson([]), "");
+  });
+});

@@ -42,6 +42,10 @@ describe("agent-facing routes", () => {
     assert.deepEqual(body.supportedCadences, ["weekly", "monthly", "quarterly", "yearly"]);
     assert.equal(body.endpoints.llms, "https://whether.work/llms.txt");
     assert.equal(body.examples.weekly, "https://whether.work/api/agent?cadence=weekly");
+    assert.equal(body.revisableDelegation.loopPosition, "act");
+    assert.equal(body.revisableDelegation.conformanceLevel, 1);
+    assert.deepEqual(body.revisableDelegation.kinds, ["belief"]);
+    assert.equal(body.revisableDelegation.records, "https://whether.work/api/decision-memory?format=records");
   });
 });
 

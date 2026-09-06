@@ -72,6 +72,20 @@ describe("decision memory and alert routes", () => {
     assert.equal(csvResponse.headers.get("content-type"), "text/csv; charset=utf-8");
     const csvBody = await csvResponse.text();
     assert.match(csvBody, /"recordDate"/);
+
+    const recordsResponse = await getDecisionMemoryRoute(new Request("http://localhost/api/decision-memory?format=records", { headers: { "x-whether-client-id": "client-a" } }));
+    assert.equal(recordsResponse.status, 200);
+    assert.equal(recordsResponse.headers.get("content-type"), "application/x-ndjson; charset=utf-8");
+    assert.match(recordsResponse.headers.get("x-whether-record-schema") ?? "", /revisable-delegation-record\.schema\.json$/);
+    const recordLines = (await recordsResponse.text()).trim().split("\n");
+    assert.equal(recordLines.length, 2);
+    const decisionRecord: unknown = JSON.parse(recordLines[1]);
+    assert.ok(decisionRecord && typeof decisionRecord === "object");
+    assert.equal("kind" in decisionRecord ? decisionRecord.kind : null, "belief");
+    const dependsOn = "depends_on" in decisionRecord ? decisionRecord.depends_on : null;
+    assert.ok(Array.isArray(dependsOn) && dependsOn.length === 1);
+    const integrity = "integrity" in decisionRecord ? decisionRecord.integrity : null;
+    assert.ok(integrity && typeof integrity === "object" && "prior_hash" in integrity && integrity.prior_hash);
   });
 
   it("scopes POST response entries to the posting client", async () => {
