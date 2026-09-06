@@ -97,7 +97,7 @@ export function DecisionStalenessPanel({
           <span className="text-fluid-nano text-slate-400">0 tracked</span>
         </div>
         <p className="mt-1.5 text-fluid-xs text-slate-400">
-          No decisions tracked yet. Save this week’s call using the bookmark in the header to monitor assumption drift when macro conditions move.
+          No decisions tracked yet. Save this week’s call with <span className="font-medium text-slate-300">Log to Memory</span> above, or a plan verdict with <span className="font-medium text-slate-300">Track in Memory</span>, to watch its assumptions when conditions move. Tracked decisions stay in this browser.
         </p>
       </section>
     );

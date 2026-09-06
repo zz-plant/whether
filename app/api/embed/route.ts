@@ -2,14 +2,14 @@
  * Embed API — returns the weekly brief as an HTML snippet for newsletter writers.
  * Newsletter build steps call this endpoint at send time and insert the response.
  *
- * GET /api/embed?ticker=GOOGL&stage=growth&format=html
+ * GET /api/embed?ticker=GOOGL&stage=series-b&format=html
  * GET /api/embed?format=text
  */
 
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../../lib/report/homePageAssembler";
-import {
-} from "../../../lib/report/home/artifactPayload";
+import type { OperatorContext } from "../../../lib/report/operatorContext";
+import { isOperatorStage } from "../../../lib/report/operatorStage";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 export const runtime = "edge";
@@ -23,18 +23,15 @@ export async function GET(request: Request) {
   const ref = url.searchParams.get("ref") || "embed";
 
   // Build operator context from ticker/stage params
-  const operatorContext = {
-    companyStage: (["pre-seed", "seed", "series-a", "series-b-plus", "public"].includes(stageParam)
-      ? stageParam
-      : null) as "seed" | "series-a" | "public" | "growth" | null,
-    rateSensitivity: null as string | null,
+  const operatorContext: OperatorContext = {
+    companyStage: isOperatorStage(stageParam) ? stageParam : null,
     ticker: tickerParam || null,
   };
 
   try {
     const homepage = await assembleHomePage({
       searchParams: tickerParam ? { ticker: tickerParam } : undefined,
-      operatorContext: operatorContext as any,
+      operatorContext,
     });
 
     const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;

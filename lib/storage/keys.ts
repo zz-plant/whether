@@ -1,18 +1,20 @@
 /**
  * Centralized Client Storage Keys
  * Single source of truth for localStorage and sessionStorage keys.
+ *
+ * Every entry here has a reader and a writer. The registry used to list five
+ * keys nothing touched — including `whether_stage`, while the code that
+ * actually persisted stage wrote a cookie under a different name — which is
+ * how a "single source of truth" stops being one.
  */
+import { OPERATOR_PROFILE_STORAGE_KEY } from "../operatorProfile";
 
 export const STORAGE_KEYS = {
   theme: "whether-theme",
   displayMode: "whether-display-mode",
   homeOrientationDismissed: "whether.home.orientation.dismissed",
   reviewedRecordDates: "whether_reviewed",
-  decisionHistory: "whether_decision_history",
-  commandCenterVisited: "whether_command_center_visited",
-  companyStage: "whether_stage",
-  rateSensitivity: "whether_sensitivity",
-  displayPreference: "whether_display",
+  operatorProfile: OPERATOR_PROFILE_STORAGE_KEY,
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
   decisionMemory: (clientId: string) => `whether.decisionMemory:${clientId}`,
   decisionShieldPresets: (clientId?: string | null) =>

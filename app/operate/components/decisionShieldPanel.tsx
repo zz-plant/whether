@@ -24,10 +24,17 @@ import {
   type CompanyFinancialProfile,
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
+import {
+  lifecycleStageForOperatorStage,
+  operatorStageForLifecycleStage,
+} from "../../../lib/report/operatorStage";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { readDecisionMemorySaveResponse, rememberDecisionMemoryEntry } from "../../components/decisionMemoryLocalCache";
+import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
+import { useOperatorProfile } from "../../components/useOperatorProfile";
+import { useOperatorStage } from "../../components/useOperatorStage";
 import {
   getClipboardUiState,
   useClipboardCopy,
@@ -124,17 +131,37 @@ export const DecisionShieldPanel = ({
   const clientId = usePersistentClientId();
   const presetStorageKey = clientId ? `whether.decisionShieldPresets:${clientId}` : null;
 
+  // No sample plan and no sample company: the panel used to open on a
+  // fictional hiring plan with 14 months of runway and a 75% gross margin no
+  // control ever exposed, and the margin alone could turn RISKY into SAFE.
   const [planMode, setPlanMode] = useState<"dropdown" | "natural_language" | "compare">("natural_language");
-  const [planText, setPlanText] = useState("We want to hire 3 senior full-stack engineers ($540k annual burn) and sign a 2-year cloud reservation.");
-  const [planBText, setPlanBText] = useState("We want to hire 2 contractors for 6 months on milestone deliverables and use monthly rolling compute.");
-  const [runwayMonths, setRunwayMonths] = useState<number | undefined>(14);
+  const [planText, setPlanText] = useState("");
+  const [planBText, setPlanBText] = useState("");
   const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">("VC_BACKED");
+  const { profile, setProfileField } = useOperatorProfile();
+  const { stage, setStage } = useOperatorStage();
+  const initialUrlLifecycle = useRef(searchParams.get("lifecycle"));
+
+  // The stage cookie is the same answer this panel's lifecycle asks for. A link
+  // that names a lifecycle keeps it; otherwise the cookie sets it, and choosing
+  // one here writes the cookie back so the brief and the planner follow.
+  useEffect(() => {
+    if (!stage || initialUrlLifecycle.current !== null) return;
+    setField("lifecycle", lifecycleStageForOperatorStage[stage]);
+  }, [setField, stage]);
+
+  const selectLifecycle = (value: LifecycleStage) => {
+    setField("lifecycle", value);
+    setStage(operatorStageForLifecycleStage[value]);
+  };
 
   const companyProfile = useMemo<CompanyFinancialProfile>(() => ({
-    runwayMonths,
+    runwayMonths: profile.runwayMonths,
+    monthlyBurnUsd: profile.monthlyBurnUsd,
     businessModel,
-    grossMarginPct: 75,
-  }), [runwayMonths, businessModel]);
+  }), [profile.runwayMonths, profile.monthlyBurnUsd, businessModel]);
+  const planReady = planText.trim().length > 0;
+  const comparisonReady = planReady && planBText.trim().length > 0;
 
   const stressTestResult = useMemo(
     () => stressTestDecisionPlan(assessment, { planText, lifecycle, companyProfile }),
@@ -299,25 +326,9 @@ export const DecisionShieldPanel = ({
 
         // Mirror the entry the server actually created. Minting a second id here
         // would make the same save appear twice once the panel merges by id.
-        const { entry } = (await response.json()) as { entry?: DecisionMemoryEntry };
-        if (entry) {
-          try {
-            const entryKey = `whether.decisionMemory:${clientId}`;
-            const currentLocalRaw = window.localStorage.getItem(entryKey);
-            const currentLocal = currentLocalRaw
-              ? (JSON.parse(currentLocalRaw) as DecisionMemoryEntry[])
-              : [];
-            window.localStorage.setItem(
-              entryKey,
-              JSON.stringify([entry, ...currentLocal].slice(0, 64)),
-            );
-          } catch (e) {
-            console.error("Local storage memory save error:", e);
-          }
-        }
-
-        window.dispatchEvent(new CustomEvent("whether-decision-memory-updated"));
-        setMemoryStatus("Decision Memory entry saved.");
+        const { entry, degraded } = readDecisionMemorySaveResponse(await response.json());
+        if (entry) rememberDecisionMemoryEntry(clientId, entry);
+        setMemoryStatus(degraded ? "Saved in this browser; server memory is unavailable." : "Decision Memory entry saved.");
       })
       .catch(() => {
         setMemoryStatus("Failed to save Decision Memory entry.");
@@ -502,36 +513,40 @@ export const DecisionShieldPanel = ({
                     Paste any planned hiring, infra, or contract decision. Tested against live macro tightness &amp; curve slope.
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 text-fluid-xs text-slate-300">
-                    <span className="text-slate-400">Runway:</span>
-                    <select
-                      value={runwayMonths ?? 14}
-                      onChange={(e) => setRunwayMonths(Number(e.target.value))}
-                      className="bg-slate-800 text-slate-200 rounded px-2 py-1 text-xs border border-slate-700 font-mono"
-                    >
-                      <option value={6}>6 mos (&lt;12m warning)</option>
-                      <option value={10}>10 mos (tight)</option>
-                      <option value={14}>14 mos (standard)</option>
-                      <option value={18}>18 mos (safe)</option>
-                      <option value={24}>24+ mos (buffered)</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-fluid-xs text-slate-300">
-                    <span className="text-slate-400">Model:</span>
-                    <select
-                      value={businessModel}
-                      onChange={(event) => {
-                        if (isBusinessModel(event.target.value)) {
-                          setBusinessModel(event.target.value);
-                        }
-                      }}
-                      className="bg-slate-800 text-slate-200 rounded px-2 py-1 text-xs border border-slate-700"
-                    >
-                      <option value="VC_BACKED">VC-Backed</option>
-                      <option value="BOOTSTRAPPED">Bootstrapped</option>
-                    </select>
-                  </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <OperatorProfileNumberField
+                  field="runwayMonths"
+                  label="Runway (months)"
+                  placeholder="e.g. 14"
+                  value={profile.runwayMonths}
+                  onCommit={(value) => setProfileField("runwayMonths", value)}
+                  optional
+                />
+                <OperatorProfileNumberField
+                  field="monthlyBurnUsd"
+                  label="Monthly burn"
+                  placeholder="$150k"
+                  value={profile.monthlyBurnUsd}
+                  onCommit={(value) => setProfileField("monthlyBurnUsd", value)}
+                  optional
+                />
+                <div>
+                  <label htmlFor="decision-shield-model" className="block text-fluid-nano text-slate-400">Model</label>
+                  <select
+                    id="decision-shield-model"
+                    value={businessModel}
+                    onChange={(event) => {
+                      if (isBusinessModel(event.target.value)) {
+                        setBusinessModel(event.target.value);
+                      }
+                    }}
+                    className="weather-control mt-1"
+                  >
+                    <option value="VC_BACKED">VC-Backed</option>
+                    <option value="BOOTSTRAPPED">Bootstrapped</option>
+                  </select>
                 </div>
               </div>
 
@@ -543,7 +558,15 @@ export const DecisionShieldPanel = ({
                 placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
               />
 
-              {/* Stress Test Audit Output */}
+              {/* Stress Test Audit Output — only once there is a plan to grade. */}
+              {!planReady ? (
+                <div className="rounded-lg border border-dashed border-slate-800 bg-slate-950/60 p-4" aria-live="polite">
+                  <p className="text-sm text-slate-200">Describe the plan to grade it.</p>
+                  <p className="mt-1 text-fluid-xs text-slate-400">
+                    Name the commitment and its size. Runway and burn are optional; with both, the verdict is sized against your cash.
+                  </p>
+                </div>
+              ) : (
               <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -590,6 +613,7 @@ export const DecisionShieldPanel = ({
                   </div>
                 </div>
               </div>
+              )}
             </div>
           )}
 
@@ -610,8 +634,10 @@ export const DecisionShieldPanel = ({
                     value={planText}
                     onChange={(e) => setPlanText(e.target.value)}
                     rows={3}
+                    placeholder="e.g. Hire 3 senior engineers @ $180k and sign a 2-year cloud reservation"
                     className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
                   />
+                  {planReady ? (
                   <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
                     <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
                       comparisonResult.planA.verdict === "SAFE" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
@@ -620,6 +646,7 @@ export const DecisionShieldPanel = ({
                     </span>
                     <p className="text-fluid-xs text-slate-300 mt-1.5">{comparisonResult.planA.reversibleAlternative}</p>
                   </div>
+                  ) : null}
                 </div>
 
                 <div className="space-y-2">
@@ -629,8 +656,10 @@ export const DecisionShieldPanel = ({
                     value={planBText}
                     onChange={(e) => setPlanBText(e.target.value)}
                     rows={3}
+                    placeholder="e.g. Hire 2 contractors for 6 months on milestones and use monthly rolling compute"
                     className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
                   />
+                  {planBText.trim() ? (
                   <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
                     <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
                       comparisonResult.planB.verdict === "SAFE" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
@@ -639,12 +668,15 @@ export const DecisionShieldPanel = ({
                     </span>
                     <p className="text-fluid-xs text-slate-300 mt-1.5">{comparisonResult.planB.reversibleAlternative}</p>
                   </div>
+                  ) : null}
                 </div>
               </div>
 
-              <div className="p-3.5 bg-sky-950/30 border border-sky-500/30 rounded-lg flex items-center justify-between">
+              <div className="p-3.5 bg-sky-950/30 border border-sky-500/30 rounded-lg flex items-center justify-between" aria-live="polite">
                 <span className="text-fluid-xs text-sky-300 font-semibold">
-                  🏆 Recommendation: {comparisonResult.comparativeRecommendation}
+                  {comparisonReady
+                    ? `🏆 Recommendation: ${comparisonResult.comparativeRecommendation}`
+                    : "Describe both plans to compare them."}
                 </span>
               </div>
             </div>
@@ -662,7 +694,7 @@ export const DecisionShieldPanel = ({
                 <LabeledSelectField
                   label="Lifecycle"
                   value={lifecycle}
-                  onValueChange={(value) => setField("lifecycle", value)}
+                  onValueChange={selectLifecycle}
                   options={lifecycleSelectOptions}
                   placeholder="Select lifecycle"
                   triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"

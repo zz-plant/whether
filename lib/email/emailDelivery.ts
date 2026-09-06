@@ -15,7 +15,20 @@ export type EmailDeliveryAdapter = {
   send: (params: { to: EmailRecipient; subject: string; html: string; text: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
-export const createCloudflareEmailAdapter = (): EmailDeliveryAdapter => {
+export const EMAIL_NOT_CONFIGURED_ERROR = "Email delivery is not configured on this deployment.";
+
+/**
+ * Cloudflare's email binding, or — outside production only — a stub that logs
+ * instead of sending.
+ *
+ * The stub used to answer `ok: true` everywhere, so a production deploy without
+ * the binding told every subscriber "check your email" for mail that never
+ * left. A missing binding in production is now a failed send, which the
+ * subscribe surfaces already know how to show.
+ */
+export const createCloudflareEmailAdapter = (
+  options: { allowStub?: boolean } = {},
+): EmailDeliveryAdapter => {
   const emailBinding = (globalThis as { EMAIL?: { send: (msg: {
     to: string;
     from: { email: string; name: string };
@@ -25,6 +38,12 @@ export const createCloudflareEmailAdapter = (): EmailDeliveryAdapter => {
   }) => Promise<unknown> } }).EMAIL;
 
   if (!emailBinding) {
+    const allowStub = options.allowStub ?? process.env.NODE_ENV !== "production";
+    if (!allowStub) {
+      return {
+        send: async () => ({ ok: false, error: EMAIL_NOT_CONFIGURED_ERROR }),
+      };
+    }
     console.warn("[EMAIL] No EMAIL binding found — using stub. Add send_email binding to wrangler.toml.");
     return {
       send: async ({ to, subject }) => {

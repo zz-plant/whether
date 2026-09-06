@@ -9,7 +9,9 @@ import {
   evaluateDecisionAssumptionHealth,
 } from "../../../lib/decisionMemory";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
+import { DECISION_MEMORY_UPDATED_EVENT } from "../../components/decisionMemoryLocalCache";
 import { CopyIcon, DownloadIcon } from "../../components/uiIcons";
+import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 
 type DecisionMemoryResponse = {
@@ -63,7 +65,7 @@ export const DecisionMemoryPanel = ({
         const payload = (await response.json()) as DecisionMemoryResponse;
         
         // Load local storage entries and merge
-        const localKey = `whether.decisionMemory:${clientId}`;
+        const localKey = STORAGE_KEYS.decisionMemory(clientId);
         const localRaw = window.localStorage.getItem(localKey);
         const localEntries: DecisionMemoryEntry[] = localRaw ? JSON.parse(localRaw) : [];
 
@@ -83,7 +85,7 @@ export const DecisionMemoryPanel = ({
       })
       .catch(() => {
         // Fallback to local storage only
-        const localKey = `whether.decisionMemory:${clientId}`;
+        const localKey = STORAGE_KEYS.decisionMemory(clientId);
         const localRaw = window.localStorage.getItem(localKey);
         if (localRaw) {
           try {
@@ -94,7 +96,7 @@ export const DecisionMemoryPanel = ({
             setEntries([]);
           }
         } else {
-          setStatusMessage("No saved decisions yet. Start by saving a decision from the weekly brief.");
+          setStatusMessage("No saved decisions yet. Start with Log to Memory in the weekly brief.");
           setEntries([]);
         }
       });
@@ -106,9 +108,9 @@ export const DecisionMemoryPanel = ({
     const handleUpdate = () => {
       fetchEntries();
     };
-    window.addEventListener("whether-decision-memory-updated", handleUpdate);
+    window.addEventListener(DECISION_MEMORY_UPDATED_EVENT, handleUpdate);
     return () => {
-      window.removeEventListener("whether-decision-memory-updated", handleUpdate);
+      window.removeEventListener(DECISION_MEMORY_UPDATED_EVENT, handleUpdate);
     };
   }, [clientId, fetchEntries]);
 
@@ -173,6 +175,9 @@ export const DecisionMemoryPanel = ({
             <p className="mt-2 type-data text-slate-300">
               Each saved decision check stores the inputs, result, stop line, and source links.
             </p>
+            <p className="mt-1 text-fluid-xs text-slate-400">
+              Saved decisions are tied to this browser. Clearing site data or switching devices starts a new history; export CSV to keep a copy.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {entries.length > 0 ? (
@@ -213,7 +218,7 @@ export const DecisionMemoryPanel = ({
         ) : entries.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
-              No saved decisions yet. Go to the weekly brief and click &quot;Save decision to history&quot; (next to &quot;Log to Memory&quot;) to start tracking your operating postures.
+              No saved decisions yet. On the weekly brief, click <span className="font-semibold text-slate-100">Log to Memory</span> to save this week&apos;s call, or <span className="font-semibold text-slate-100">Track in Memory</span> under a plan stress test verdict.
             </p>
           </div>
         ) : (

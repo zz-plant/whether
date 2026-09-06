@@ -88,6 +88,10 @@ const postureForPolicyPosture = (
   return "SAFETY_MODE";
 };
 
+/** A profile with at least one field set is the reader's; an empty one means the illustrative default. */
+const hasCompanyProfile = (profile?: Partial<CompanyProfile>): boolean =>
+  Boolean(profile && Object.values(profile).some((value) => value !== undefined));
+
 const getDefaultFinancialInput = (
   assessment: RegimeAssessment,
 ): FinancialViewInput => ({
@@ -208,8 +212,9 @@ export const buildInterpretationLayer = ({
     return {
       view,
       label: "Company view",
-      summary:
-        "Translate the weekly call into company-specific bounded rules without changing the base posture.",
+      summary: hasCompanyProfile(companyProfile)
+        ? "Translate the weekly call into company-specific bounded rules without changing the base posture."
+        : "Illustrative: these rules assume a Series B company with $1–10M ARR and 12–18 months of runway. Whether does not take your company's figures here; use the runway planner on Planning for yours.",
       bullets: formatBullets(
         adjustedRules
           .slice(0, 3)
@@ -241,8 +246,9 @@ export const buildInterpretationLayer = ({
     return {
       view,
       label: "Financial view",
-      summary:
-        "This week's call, translated into runway: how fast to spend, when to raise, and how far burn can move.",
+      summary: financialInput
+        ? "This week's call, translated into runway: how fast to spend, when to raise, and how far burn can move."
+        : "Illustrative: this week's call translated into runway for a typical company in this regime, not your figures. The runway planner on Planning sizes it with yours.",
       bullets: formatBullets([
         boundedLine(DECISION_CONTRACT_LABELS.slot.action, actionPhrase),
         boundedLine(
