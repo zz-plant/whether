@@ -1,16 +1,9 @@
 import type { HomePageSearchParams } from "./homeMetadata";
-import type { CompanyStage, OperatorContext, RateSensitivity } from "./operatorContext";
+import type { CompanyStage, OperatorContext } from "./operatorContext";
+import { isOperatorStage } from "./operatorStage";
 import type { SectorKey } from "./sectorSensitivity";
 
 const VALID_CADENCES = new Set(["weekly", "monthly", "quarterly", "yearly"]);
-const VALID_COMPANY_STAGES = new Set<CompanyStage>([
-  "pre-seed",
-  "seed",
-  "series-a",
-  "series-b-plus",
-  "public",
-]);
-const VALID_RATE_SENSITIVITIES = new Set<RateSensitivity>(["high", "medium", "low"]);
 const VALID_SECTORS = new Set<SectorKey>([
   "b2b-saas",
   "consumer",
@@ -31,8 +24,6 @@ const SUPPORTED_IMAGE_BRIEF_PARAM_KEYS = [
   "cadence",
   "stage",
   "companyStage",
-  "rateSensitivity",
-  "sensitivity",
   "ticker",
   "company",
 ] as const;
@@ -99,16 +90,7 @@ const normalizeTicker = (value: string | undefined) => {
 
 const normalizeCompanyStage = (value: string | undefined): CompanyStage | undefined => {
   const normalized = normalizeBoundedText(value)?.toLowerCase();
-  return normalized && VALID_COMPANY_STAGES.has(normalized as CompanyStage)
-    ? (normalized as CompanyStage)
-    : undefined;
-};
-
-const normalizeRateSensitivity = (value: string | undefined): RateSensitivity | undefined => {
-  const normalized = normalizeBoundedText(value)?.toLowerCase();
-  return normalized && VALID_RATE_SENSITIVITIES.has(normalized as RateSensitivity)
-    ? (normalized as RateSensitivity)
-    : undefined;
+  return isOperatorStage(normalized) ? normalized : undefined;
 };
 
 const normalizeCadence = (value: string | undefined) => {
@@ -130,9 +112,6 @@ export const buildSupportedImageBriefSearchParams = (source: SearchParamReader) 
   const cadence = normalizeCadence(readTrimmed(source, "cadence"));
   const companyStage = normalizeCompanyStage(
     readTrimmed(source, "stage") ?? readTrimmed(source, "companyStage"),
-  );
-  const rateSensitivity = normalizeRateSensitivity(
-    readTrimmed(source, "rateSensitivity") ?? readTrimmed(source, "sensitivity"),
   );
   const ticker = normalizeTicker(readTrimmed(source, "ticker") ?? readTrimmed(source, "company"));
 
@@ -158,10 +137,6 @@ export const buildSupportedImageBriefSearchParams = (source: SearchParamReader) 
 
   if (companyStage) {
     params.set("stage", companyStage);
-  }
-
-  if (rateSensitivity) {
-    params.set("rateSensitivity", rateSensitivity);
   }
 
   if (ticker) {
@@ -207,15 +182,15 @@ export const parseImageBriefRequestContext = (source: SearchParamReader): ImageB
     searchParams.cadence = cadence;
   }
 
+  const stage = supportedParams.get("stage");
   const operatorContext: OperatorContext = {
-    companyStage: (supportedParams.get("stage") as CompanyStage | null) ?? null,
-    rateSensitivity: (supportedParams.get("rateSensitivity") as RateSensitivity | null) ?? null,
+    companyStage: isOperatorStage(stage) ? stage : null,
     ticker: supportedParams.get("ticker"),
   };
 
   return {
     searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
-    operatorContext: operatorContext.companyStage || operatorContext.rateSensitivity || operatorContext.ticker
+    operatorContext: operatorContext.companyStage || operatorContext.ticker
       ? operatorContext
       : undefined,
   };

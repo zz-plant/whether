@@ -162,13 +162,14 @@ export const assembleHomePage = async ({
     ...dependencies,
   } satisfies HomePageAssemblerDependencies;
   const homepageOverlaySector = resolveHomepageOverlaySector(searchParams?.sector);
-  // Only pass a stage when the operator explicitly selected one. The default
-  // "series-a" mode stays implicit so an untouched brief keeps its canonical
-  // (stage-agnostic) action copy rather than silently switching to Series A
-  // language the operator never asked for.
+  // Only pass a stage when the operator explicitly selected one — in the URL
+  // for this view, or in the stage cookie the hero selector and the settings
+  // panel both write. An untouched brief keeps its canonical (stage-agnostic)
+  // action copy rather than silently switching to Series A language the
+  // operator never asked for.
   const startupVariantMode = searchParams?.stage
     ? resolveStartupVariantMode(searchParams.stage)
-    : undefined;
+    : operatorContext?.companyStage ?? undefined;
   const interpretationView: InterpretationView = isInterpretationView(searchParams?.view)
     ? searchParams.view
     : "default";
@@ -202,7 +203,6 @@ export const assembleHomePage = async ({
     reportData,
     degraded: !reportResult.ok,
     overlaySector: homepageOverlaySector,
-    operatorContext,
     startupVariantMode,
   });
   const { isFallback, trustStatus, freshnessMeta, homeBriefModel, weeklyDecisionCardModel, weeklyCall } = baseSnapshot;
@@ -268,7 +268,6 @@ export const assembleHomePage = async ({
         degraded: !reportResult.ok,
         overlaySector: homepageOverlaySector,
         postureState,
-        operatorContext,
         startupVariantMode,
       });
 

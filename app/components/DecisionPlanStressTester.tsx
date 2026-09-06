@@ -1,22 +1,27 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { ShieldAlert, ShieldCheck, Zap, ArrowRight, Bookmark, CheckCircle2, Copy } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Zap, ArrowRight, Bookmark, CheckCircle2, Copy, AlertCircle } from "lucide-react";
 import {
   stressTestDecisionPlan,
   type PlanStressTestResult,
-  type LifecycleStage,
   type DecisionCategory,
   type DecisionVerdict,
 } from "../../lib/decisionShield";
-import { parseMoneyInput } from "../../lib/planCommitment";
+import { buildPlanStressTestMemoryPayload } from "../../lib/decisionMemory";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
+import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import {
+  lifecycleStageForOperatorStage,
+  operatorStageForVariantMode,
+  operatorStageLabel,
+} from "../../lib/report/operatorStage";
 import { usePersistentClientId } from "./clientIdentity";
+import { readDecisionMemorySaveResponse, rememberDecisionMemoryEntry } from "./decisionMemoryLocalCache";
+import { OperatorProfileNumberField } from "./operatorProfileFields";
 import { useClipboardCopy, getClipboardUiState } from "./useClipboardCopy";
+import { useOperatorProfile } from "./useOperatorProfile";
 import { ClipboardActionRow } from "./clipboardActionRow";
-
-const isLifecycleStage = (value: unknown): value is LifecycleStage =>
-  value === "DISCOVERY" || value === "GROWTH" || value === "SCALE" || value === "MATURE";
 
 /** "Detect" is the absence of an override, so it is not a `DecisionCategory`. */
 type CategoryChoice = DecisionCategory | "AUTO";
@@ -35,20 +40,11 @@ const CATEGORY_OPTIONS: { value: CategoryChoice; label: string }[] = [
 const isCategoryChoice = (value: string): value is CategoryChoice =>
   CATEGORY_OPTIONS.some((option) => option.value === value);
 
-/** Runway options carry the number they send. The old list labelled one option
- *  "< 9 months" while sending 6, and the engine then quoted "6 months" back at an
- *  operator who had never typed a 6. */
-const RUNWAY_OPTIONS: { value: string; label: string }[] = [
-  { value: "6", label: "6 months (critical)" },
-  { value: "9", label: "9 months (tight)" },
-  { value: "12", label: "12 months" },
-  { value: "18", label: "18 months (standard)" },
-  { value: "24", label: "24+ months (strong)" },
-];
-
 export interface DecisionPlanStressTesterProps {
   assessment: RegimeAssessment;
   recordDate: string;
+  /** The stage the hero's Calibrate stage control settled on; this panel grades for the same team. */
+  activeStage?: StartupVariantMode;
   className?: string;
 }
 
@@ -104,24 +100,43 @@ const buildShareText = (
     `Conditions as of ${recordDate}.`,
   ].join("\n");
 
+/**
+ * "saved" means the server holds the entry; "saved-local" means the server
+ * answered from its in-memory fallback, so the browser cache is the only copy
+ * that outlives the request. The button says which, because "Tracked in
+ * Memory" used to appear for a request the API had rejected outright.
+ */
+type SaveState = "idle" | "saving" | "saved" | "saved-local" | "failed";
+
+const SAVE_LABELS: Record<SaveState, string> = {
+  idle: "Track in Memory",
+  saving: "Saving...",
+  saved: "Tracked in Memory",
+  "saved-local": "Saved in this browser",
+  failed: "Save failed — retry",
+};
+
 export function DecisionPlanStressTester({
   assessment,
   recordDate,
+  activeStage,
   className = "",
 }: DecisionPlanStressTesterProps) {
   const [planText, setPlanText] = useState("");
-  const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
   const [category, setCategory] = useState<CategoryChoice>("AUTO");
-  const [runwayMonths, setRunwayMonths] = useState<string>("18");
-  const [burnInput, setBurnInput] = useState("");
   const [result, setResult] = useState<PlanStressTestResult | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState<string | null>(null);
   const planInputRef = useRef<HTMLInputElement>(null);
   const clientId = usePersistentClientId();
   const clipboard = useClipboardCopy();
   const fieldId = useId();
+  const { profile, setProfileField } = useOperatorProfile();
+
+  // One stage control on this page: the hero's. The select that used to sit
+  // here was a second copy of the same question, answered separately.
+  const stage = operatorStageForVariantMode(activeStage);
+  const lifecycle = lifecycleStageForOperatorStage[stage];
 
   const runTest = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -132,51 +147,51 @@ export function DecisionPlanStressTester({
     }
     setError(null);
 
-    const runway = Number.parseInt(runwayMonths, 10);
     setResult(
       stressTestDecisionPlan(assessment, {
         planText,
         lifecycle,
         category: category === "AUTO" ? undefined : category,
+        // Both left undefined when not given, which is what makes the engine say
+        // it cannot size the plan instead of guessing a runway or a burn rate.
         companyProfile: {
-          runwayMonths: Number.isFinite(runway) ? runway : 18,
-          // Left undefined when the box is empty or unreadable, which is what
-          // makes the engine say it cannot size the plan instead of guessing.
-          monthlyBurnUsd: parseMoneyInput(burnInput) ?? undefined,
+          runwayMonths: profile.runwayMonths,
+          monthlyBurnUsd: profile.monthlyBurnUsd,
         },
       }),
     );
-    setIsSaved(false);
+    setSaveState("idle");
   };
 
   const handleSaveToMemory = async () => {
-    if (!result || isSaving || isSaved || !clientId) return;
-    setIsSaving(true);
+    if (!result || saveState === "saving" || saveState === "saved" || saveState === "saved-local") return;
+    if (!clientId) {
+      setSaveState("failed");
+      return;
+    }
+    setSaveState("saving");
 
     try {
-      await fetch("/api/decision-memory", {
+      const response = await fetch("/api/decision-memory", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-whether-client-id": clientId },
-        body: JSON.stringify({
-          kind: "plan-evaluation",
-          clientId,
-          recordDate,
-          planText,
-          verdict: result.verdict,
-          primaryCall: result.headline,
-          guardrail: result.boundedGuardrail,
-          reversalTrigger: result.reversalTrigger,
-          tightness: assessment.scores.tightness,
-          riskAppetite: assessment.scores.riskAppetite,
-        }),
+        body: JSON.stringify(
+          buildPlanStressTestMemoryPayload({ clientId, recordDate, planText, lifecycle, result, assessment }),
+        ),
       });
-      setIsSaved(true);
+      if (!response.ok) {
+        setSaveState("failed");
+        return;
+      }
+      const { entry, degraded } = readDecisionMemorySaveResponse(await response.json());
+      if (entry) rememberDecisionMemoryEntry(clientId, entry);
+      setSaveState(degraded ? "saved-local" : "saved");
     } catch {
-      // ignore
-    } finally {
-      setIsSaving(false);
+      setSaveState("failed");
     }
   };
+
+  const saveSucceeded = saveState === "saved" || saveState === "saved-local";
 
   return (
     <section
@@ -194,9 +209,12 @@ export function DecisionPlanStressTester({
           </h3>
         </div>
         <p className="mt-1.5 text-fluid-sm text-slate-300">
-          Describe a hire, a commitment, or an expansion. It is graded against this week&rsquo;s
-          funding pressure ({assessment.scores.tightness.toFixed(0)}/100) and, if you give a burn
-          rate, against the cash you have to absorb it.
+          Describe a hire, a commitment, or an expansion. It is graded for a {operatorStageLabel(stage)} team
+          against this week&rsquo;s funding pressure ({assessment.scores.tightness.toFixed(0)}/100) and, if you
+          give runway and monthly burn, against the cash you have to absorb it.
+        </p>
+        <p className="mt-1 text-fluid-nano text-slate-500">
+          Stage follows Calibrate stage above. Runway and burn stay in this browser and are shared with the runway planner.
         </p>
       </div>
 
@@ -206,8 +224,7 @@ export function DecisionPlanStressTester({
             The plan to stress-test
           </label>
           {/* .weather-input carries the 44px target and the 16px font size that
-              stops mobile Safari zooming on focus. The hand-rolled chain that
-              used to be here was text-xs, so it did neither. */}
+              stops mobile Safari zooming on focus. */}
           <input
             id={`${fieldId}-plan`}
             ref={planInputRef}
@@ -229,68 +246,26 @@ export function DecisionPlanStressTester({
           ) : null}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label htmlFor={`${fieldId}-stage`} className="block text-fluid-nano text-slate-400">
-              Stage
-            </label>
-            <select
-              id={`${fieldId}-stage`}
-              value={lifecycle}
-              onChange={(e) => {
-                if (isLifecycleStage(e.target.value)) setLifecycle(e.target.value);
-              }}
-              className="weather-control mt-1"
-            >
-              {/* Same four names as the stage selector in the hero. This list
-                  used to call them Discovery / Growth / Scale / Mature, a second
-                  taxonomy for the same question on the same screen. */}
-              <option value="DISCOVERY">Seed</option>
-              <option value="GROWTH">Series A</option>
-              <option value="SCALE">Series B+</option>
-              <option value="MATURE">Bootstrapped</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor={`${fieldId}-runway`} className="block text-fluid-nano text-slate-400">
-              Runway
-            </label>
-            <select
-              id={`${fieldId}-runway`}
-              value={runwayMonths}
-              onChange={(e) => setRunwayMonths(e.target.value)}
-              className="weather-control mt-1"
-            >
-              {RUNWAY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor={`${fieldId}-burn`} className="block text-fluid-nano text-slate-400">
-              Monthly burn <span className="text-slate-500">(optional)</span>
-            </label>
-            {/* Optional on purpose, and the result says what its absence costs.
-                Without it there is no denominator, and a size verdict computed
-                from a burn rate nobody supplied would be invention. */}
-            <input
-              id={`${fieldId}-burn`}
-              type="text"
-              inputMode="decimal"
-              value={burnInput}
-              onChange={(e) => setBurnInput(e.target.value)}
-              placeholder="$150k"
-              aria-describedby={`${fieldId}-burn-hint`}
-              className="weather-input mt-1 w-full px-3.5 py-2.5"
-            />
-            <p id={`${fieldId}-burn-hint`} className="sr-only">
-              Net cash burn per month. Used with runway to size the plan against available cash.
-            </p>
-          </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <OperatorProfileNumberField
+            field="runwayMonths"
+            label="Runway (months)"
+            placeholder="e.g. 14"
+            value={profile.runwayMonths}
+            onCommit={(value) => setProfileField("runwayMonths", value)}
+            optional
+          />
+          {/* Optional on purpose, and the result says what its absence costs.
+              Without it there is no denominator, and a size verdict computed
+              from a burn rate nobody supplied would be invention. */}
+          <OperatorProfileNumberField
+            field="monthlyBurnUsd"
+            label="Monthly burn"
+            placeholder="$150k"
+            value={profile.monthlyBurnUsd}
+            onCommit={(value) => setProfileField("monthlyBurnUsd", value)}
+            optional
+          />
 
           <div>
             <label htmlFor={`${fieldId}-category`} className="block text-fluid-nano text-slate-400">
@@ -326,8 +301,7 @@ export function DecisionPlanStressTester({
 
       {/* Polite, not assertive: the verdict is the answer to something the reader
           just asked for, so it should follow their own action rather than cut
-          across whatever they are reading. Without this the form submitted and a
-          screen-reader user was told nothing at all. */}
+          across whatever they are reading. */}
       <div aria-live="polite">
         {result ? (
           <div
@@ -349,20 +323,20 @@ export function DecisionPlanStressTester({
               <button
                 type="button"
                 onClick={handleSaveToMemory}
-                disabled={isSaved || isSaving}
+                disabled={saveSucceeded || saveState === "saving"}
+                aria-busy={saveState === "saving"}
                 className="weather-button inline-flex min-h-[44px] shrink-0 items-center gap-1 text-fluid-xs font-medium"
               >
-                {isSaved ? (
-                  <>
-                    <CheckCircle2 className="size-3 text-emerald-400" />
-                    <span className="text-emerald-300">Tracked in Memory</span>
-                  </>
+                {saveSucceeded ? (
+                  <CheckCircle2 className="size-3 text-emerald-400" />
+                ) : saveState === "failed" ? (
+                  <AlertCircle className="size-3 text-amber-400" />
                 ) : (
-                  <>
-                    <Bookmark className="size-3 text-slate-400" />
-                    <span>{isSaving ? "Saving..." : "Track in Memory"}</span>
-                  </>
+                  <Bookmark className="size-3 text-slate-400" />
                 )}
+                <span className={saveSucceeded ? "text-emerald-300" : saveState === "failed" ? "text-amber-300" : undefined}>
+                  {SAVE_LABELS[saveState]}
+                </span>
               </button>
             </div>
 
@@ -389,9 +363,6 @@ export function DecisionPlanStressTester({
                 <dt className="shrink-0 font-medium text-slate-400">Sizing</dt>
                 <dd className="text-slate-200">{result.sizingNote}</dd>
               </div>
-              {/* Computed since this feature shipped and never rendered here, while
-                  /operate showed both. The bounded rule is the product; a verdict
-                  without it is an opinion. */}
               <div className="flex flex-wrap gap-x-2">
                 <dt className="shrink-0 font-medium text-semantic-caution-fg">Guardrail</dt>
                 <dd className="text-slate-200">{result.boundedGuardrail}</dd>

@@ -212,6 +212,38 @@ What changed for operators:
   weekly email, decision alert, and share-image labels onto the constant; Invariant 9 fails on
   any retired heading term returning to `app/` or `lib/`.
 
+### 1.1.7 One stage, one profile, honest empty states (2026-09-06)
+An audit of every place the product asks the operator to type or choose something found the
+assumptions optimistic in three ways, and this pass fixed each:
+
+- **Stage was five vocabularies that never read each other.** The settings cookie (pre-seed …
+  public), a `/api/config` route writing the same cookie from a different list, the hero's
+  `?stage=`, the runway planner's own select, and the stress test's lifecycle dropdown. Now
+  `lib/report/operatorStage.ts` is the one answer set (Seed / Series A / Series B+ /
+  Bootstrapped, the hero's four) and the one cookie. The settings panel, the hero selector, the
+  runway planner, and the Decision Shield on `/operate` all read and write it; the assembler
+  uses the cookie as the brief's stage when the URL names none (`tests/homePageAssembler.test.ts`);
+  the plan stress test on `/` takes the hero's stage as a prop and no longer has a select of its
+  own. Legacy cookie values read as unset rather than as a guess. `/api/config` is deleted.
+- **Rate sensitivity was stored and applied nowhere.** The settings panel promised it "adjusts
+  operating knobs"; the two functions that would have applied it had no callers. The setting,
+  the cookie field, and the functions are removed rather than given a consumer the product has
+  not asked for (see AGENTS.md on speculative personalization).
+- **Numbers were typed in for the reader.** The runway planner and the `/operate` stress test
+  opened on fictional companies (including a 75% gross margin no control exposed, which could
+  turn RISKY into SAFE). Both now start empty and say what to enter; runway, burn, revenue, and
+  growth live in one browser-held profile (`lib/operatorProfile.ts`, `whether.operatorProfile`)
+  that the planner and both stress tests share through `OperatorProfileNumberField`, which
+  validates on blur, commits on parse, and treats blank as "not given".
+- **Dead capture paths removed.** `useCrossDeviceSync` (no call sites; `/api/sync` stays,
+  tested, with no client), `useDecisionHistory` + the history page's "Decision archive" (nothing
+  ever wrote the key it read), `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts`
+  (no product callers), and the unused entries in `lib/storage/keys.ts`.
+- **Subscribe no longer succeeds without mail.** Without an EMAIL binding the adapter stubbed
+  `ok: true`, so production told subscribers to check their inbox for mail that never left. In
+  production a missing binding is now a failed send with a named reason
+  (`tests/emailDeliveryStub.test.ts`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -439,6 +471,19 @@ Slack, Notion, and Linear targets.
   - risk score is clamped to 0–100 with labels `low|moderate|high|critical`,
   - recommendations include explicit raise window, burn adjustment range, and reversal language,
   - posture/regime flips should change urgency and guardrail strictness, not just copy tone.
+- Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
+  pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
+  and offer to copy a board memo built from it; an emptied field became zero and read as
+  "critical". Now `lib/report/runwayPlannerInputs.ts` resolves the request from the shared
+  operator profile and reports which of runway, monthly burn, and monthly revenue is missing;
+  the panel shows that sentence instead of a verdict until all three are entered. Growth is
+  optional and blank reads as flat, which the output says. The memo lists its inputs and no
+  longer claims to be "safe for board presentation".
+- The `company` and `financial` interpretation views have never received a company profile
+  from any caller, so they always describe the built-in default (`lib/report/companyProfile.ts`:
+  Series B, $1–10M ARR, 12–18 months of runway). Their summaries now say so and point to the
+  runway planner; the copy is the fix, because the assembler runs server-side and cannot see
+  the browser-held profile.
 
 ## 5) Playbooks, summaries, and briefings
 
@@ -528,6 +573,20 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   decision memory from localStorage, runs the staleness engine against this week's conditions,
   and surfaces "N DECISIONS NEED ATTENTION" with per-decision verdicts and a "No change" lane.
   It renders only when the operator has saved decisions; empty state is silent.
+- Decision memory is scoped to one browser, and the surfaces say so (2026-09-06). Identity is a
+  random id in localStorage (`whether-client-id`); clearing site data or opening a second device
+  starts a new history with no recovery path, and the staleness panel reads localStorage only.
+  The memory panel, the staleness empty state, and the settings panel state this scope rather
+  than implying an account. Every save path — `DecisionMemoryButton`, the Decision Shield on
+  `/operate`, and the plan stress test on `/` — mirrors the server's entry through one helper
+  (`app/components/decisionMemoryLocalCache.ts`) and reports "Saved in this browser" when the
+  API answered from its in-memory fallback (`degraded: true`), instead of "Logged to Memory".
+- The plan stress test's "Track in Memory" now stores something. It used to post
+  `{ kind: "plan-evaluation", … }`, a shape `/api/decision-memory` has never accepted, and set
+  its own "Tracked in Memory" state without reading the 400. It posts a `decision` entry via
+  `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`) — the same shape the Decision
+  Shield writes, with the graded sentence as `decision.context` — checks `response.ok`, and
+  shows "Save failed — retry" otherwise (`tests/planStressTestMemoryPayload.test.ts`).
 - The hero's canonical revisit block now reads **What needs reconsideration this week?** with an
   explicit `No change` lane listing decision areas that are on track.
 

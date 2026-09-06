@@ -1,4 +1,4 @@
-import type { DecisionInput, DecisionOutput } from "./decisionShield";
+import type { DecisionInput, DecisionOutput, LifecycleStage, PlanStressTestResult } from "./decisionShield";
 import type { RegimeAssessment } from "./regimeEngine";
 
 /**
@@ -439,3 +439,53 @@ export const auditCohortDecisions = (
     totalAudited: entries.length,
   };
 };
+
+/**
+ * The payload the plan stress test on the brief sends when the reader clicks
+ * "Track in Memory".
+ *
+ * It used to post `{ kind: "plan-evaluation", planText, verdict, … }`, a shape
+ * this API has never accepted, and then reported "Tracked in Memory" without
+ * reading the 400. This builds the same `decision` entry the Decision Shield
+ * on Planning writes, so the entry lands in the same list with the same
+ * assumption snapshot, and the sentence that was tested travels as `context`.
+ */
+export const buildPlanStressTestMemoryPayload = ({
+  clientId,
+  recordDate,
+  planText,
+  lifecycle,
+  result,
+  assessment,
+}: {
+  clientId: string;
+  recordDate: string;
+  planText: string;
+  lifecycle: LifecycleStage;
+  result: Pick<
+    PlanStressTestResult,
+    "detectedCategory" | "detectedAction" | "verdict" | "headline" | "boundedGuardrail" | "reversalTrigger"
+  >;
+  assessment: Pick<RegimeAssessment, "regime" | "scores" | "thresholds" | "inputs">;
+}): DecisionMemoryPayload => ({
+  clientId,
+  recordDate,
+  decision: {
+    lifecycle,
+    category: result.detectedCategory,
+    action: result.detectedAction,
+    context: planText.trim(),
+  },
+  outcome: {
+    verdict: result.verdict,
+    summary: result.headline,
+    guardrail: result.boundedGuardrail,
+    reversalTrigger: result.reversalTrigger,
+  },
+  assessment: {
+    regime: assessment.regime,
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+    inputs: assessment.inputs,
+  },
+});

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Bookmark, CheckCircle, AlertCircle } from "lucide-react";
 import { usePersistentClientId } from "./clientIdentity";
-import type { DecisionMemoryEntry } from "../../lib/decisionMemory";
+import { readDecisionMemorySaveResponse, rememberDecisionMemoryEntry } from "./decisionMemoryLocalCache";
 
 export type DecisionMemoryButtonProps = {
   regime: string;
@@ -23,7 +23,8 @@ export type DecisionMemoryButtonProps = {
   className?: string;
 };
 
-type SaveState = "idle" | "saving" | "saved" | "failed";
+/** "saved-local": the server answered from its in-memory fallback, so this browser's copy is the durable one. */
+type SaveState = "idle" | "saving" | "saved" | "saved-local" | "failed";
 
 export function DecisionMemoryButton({
   regime,
@@ -42,7 +43,7 @@ export function DecisionMemoryButton({
   const clientId = usePersistentClientId();
 
   const handleSave = async () => {
-    if (saveState === "saving" || saveState === "saved") return;
+    if (saveState === "saving" || saveState === "saved" || saveState === "saved-local") return;
     if (!clientId || !primaryCall) {
       setSaveState("failed");
       setTimeout(() => setSaveState("idle"), 3000);
@@ -78,21 +79,10 @@ export function DecisionMemoryButton({
 
       // Mirror the server's entry into the same local cache the planning memory
       // panel reads, so a saved posture shows up there without a round trip.
-      const { entry } = (await response.json()) as { entry?: DecisionMemoryEntry };
-      if (entry) {
-        try {
-          const entryKey = `whether.decisionMemory:${clientId}`;
-          const existingRaw = window.localStorage.getItem(entryKey);
-          const existing = existingRaw ? (JSON.parse(existingRaw) as DecisionMemoryEntry[]) : [];
-          window.localStorage.setItem(entryKey, JSON.stringify([entry, ...existing].slice(0, 64)));
-        } catch {
-          // A full or unavailable localStorage must not fail the save — the
-          // server already has the entry.
-        }
-      }
+      const { entry, degraded } = readDecisionMemorySaveResponse(await response.json());
+      if (entry) rememberDecisionMemoryEntry(clientId, entry);
 
-      window.dispatchEvent(new CustomEvent("whether-decision-memory-updated"));
-      setSaveState("saved");
+      setSaveState(degraded ? "saved-local" : "saved");
       setTimeout(() => setSaveState("idle"), 3000);
     } catch {
       setSaveState("failed");
@@ -109,10 +99,12 @@ export function DecisionMemoryButton({
         className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-fluid-xs font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-[background-color,color,transform] duration-200 weather-press-scale weather-focus-ring disabled:opacity-50 ${className}`}
         aria-label="Save decision to history"
       >
-      {saveState === "saved" ? (
+      {saveState === "saved" || saveState === "saved-local" ? (
         <>
           <CheckCircle size={13} className="text-emerald-400" />
-          <span className="text-emerald-300 font-semibold">Logged to Memory</span>
+          <span className="text-emerald-300 font-semibold">
+            {saveState === "saved" ? "Logged to Memory" : "Saved in this browser"}
+          </span>
         </>
       ) : saveState === "failed" ? (
         <>

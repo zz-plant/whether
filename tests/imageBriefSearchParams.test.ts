@@ -22,7 +22,7 @@ describe("image brief search params", () => {
 
     assert.equal(
       buildImageBriefApiPath(source),
-      "/api/image/brief?month=3&year=2026&sector=consumer&view=sector&cadence=monthly&stage=series-a&rateSensitivity=high&ticker=MSFT",
+      "/api/image/brief?month=3&year=2026&sector=consumer&view=sector&cadence=monthly&stage=series-a&ticker=MSFT",
     );
   });
 
@@ -39,9 +39,11 @@ describe("image brief search params", () => {
       preview: "true",
     }));
 
+    // Rate sensitivity is no longer a context the product reads, so it no
+    // longer makes an otherwise-empty context non-empty.
     assert.deepEqual(context, {
       searchParams: undefined,
-      operatorContext: { companyStage: null, rateSensitivity: "medium", ticker: null },
+      operatorContext: undefined,
     });
   });
 
@@ -55,7 +57,7 @@ describe("image brief search params", () => {
 
     assert.deepEqual(context, {
       searchParams: { month: "2", year: "2026" },
-      operatorContext: { companyStage: "seed", rateSensitivity: null, ticker: "GOOGL" },
+      operatorContext: { companyStage: "seed", ticker: "GOOGL" },
     });
   });
 });

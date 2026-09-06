@@ -159,4 +159,28 @@ describe("assembleHomePage streaming contract", () => {
     assert.match(homepage.interpretationLayer.summary, /boundary|flip|momentum/i);
     assert.match(homepage.weeklyDecisionCardModel.decision.immediateDecision, /stage|revise|hold/i);
   });
+
+  it("calibrates the brief to the stage cookie when the URL names none, and lets the URL win", async () => {
+    const dependencies = {
+      loadHomePageReportData: async () => buildReportResult(),
+      buildPostureState: async () => postureState,
+    };
+
+    const untouched = await assembleHomePage({ searchParams: undefined }, dependencies);
+    assert.equal(untouched.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode, "series-a");
+
+    // The settings panel and the hero selector both write this cookie; before
+    // this it was parsed on every request and read by nothing.
+    const fromCookie = await assembleHomePage(
+      { searchParams: undefined, operatorContext: { companyStage: "bootstrapped", ticker: null } },
+      dependencies,
+    );
+    assert.equal(fromCookie.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode, "bootstrapped");
+
+    const fromUrl = await assembleHomePage(
+      { searchParams: { stage: "seed" }, operatorContext: { companyStage: "bootstrapped", ticker: null } },
+      dependencies,
+    );
+    assert.equal(fromUrl.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode, "seed");
+  });
 });
