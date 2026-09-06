@@ -265,6 +265,34 @@ Covered by `tests/baseRateNaming.test.ts`. Entries already written into
 `data/posture_archive_index.json` keep the old label: the archive is never edited after
 publication, so a past call reads the way it did when it was made.
 
+### 1.1.9 Pages that were halves of one page (2026-09-06)
+A route-set pass against the IA boundary rules found three consolidations worth making, and one
+that looked worth making and was not.
+
+- **`/template` folded into `/threshold`.** `/threshold` explained the bounded-decision framework —
+  action, threshold, reversal — and `/template` was a printable blank form asking for exactly those
+  three parts. Each ended with a "next steps" row whose first suggestion was the other one. The form
+  is now the `#template` section of the framework page, `/template` is a permanent redirect to that
+  anchor (`iaConsolidationRedirectPairs`), and the two utility-nav rows became one. Nobody wants the
+  form without the explanation, and the explanation's payoff is filling one in.
+- **`/mockups/identicons` and `/mockups/visual-system` deleted.** 537 effective lines of WebGL and
+  design experiments, noindex but publicly reachable and rebuilt on every deploy, referenced by no
+  spec. `/mockups/operator-brief` stays: `docs/one-screen-weekly-brief-spec.md` cites it as a design
+  reference.
+- **`/state` now says it is a view of the brief.** It calls `assembleHomePage` — the weekly brief's
+  own pipeline — and renders a subset of the hero, so presenting the call under its own H1 read as a
+  second, independently-derived answer. It also credited "Yahoo Finance" as a data source; Yahoo is
+  read only by `lib/saasMultiples.ts` for the SaaS comps on `/comps` and contributes nothing to the
+  two scores on that page. The line now reads "U.S. Treasury · FRED".
+- **`/share` was left alone**, against the first read. `ShareRail` is reachable from a visible
+  control (the profile sheet's "Share brief"), so the page is not the only discoverable path — but
+  `/share` is server-rendered, indexed, and already the redirect target for `/export` and
+  `/export/board-packet`. Deleting it drops an indexed page and orphans two redirects for no reader
+  gain. The duplication that remains is component-level: `ShareCopyControls` and `ShareRail` build
+  the same artifacts from the same `lib/export/briefBuilders`. That is the smaller follow-up.
+
+Covered by `tests/pageConsolidation.test.tsx`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

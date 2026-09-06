@@ -41,7 +41,9 @@ describe("GlobalHeaderNavClient", () => {
     );
     assert.ok(html.includes("Resources &amp; Framework") || html.includes("Resources & Framework"), "includes mobile resource section title");
     assert.ok(html.includes("Framework"), "includes Framework link");
-    assert.ok(html.includes("Template"), "includes Template link");
+    // The Template row is gone: the blank form is a section of the Framework
+    // page now, so two rows pointing at halves of one page became one.
+    assert.ok(!html.includes(">Template<"), "no separate Template row");
     assert.ok(html.includes("About"), "includes About link");
   });
 
