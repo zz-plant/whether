@@ -81,9 +81,24 @@ describe("DecisionPlanStressTester & StagePersonaSelector", () => {
 
     assert.ok(html.includes("Plan stress test"));
     assert.ok(html.includes("Stress-Test Plan"));
-    assert.ok(html.includes(">Seed<"));
-    assert.ok(html.includes(">Series A<"));
     assert.ok(html.includes("72/100"));
+    // Stage is the hero's control, not a second select here; without one the
+    // panel grades for the brief's default stage and says so.
+    assert.ok(html.includes("graded for a Series A team"));
+    assert.ok(!html.includes('name="stage"'));
+    assert.ok(html.includes("Runway (months)"));
+    assert.ok(html.includes("Monthly burn"));
+  });
+
+  it("grades for the stage the hero settled on", () => {
+    const html = renderToStaticMarkup(
+      <DecisionPlanStressTester
+        assessment={mockAssessment}
+        recordDate="2026-08-31"
+        activeStage="bootstrapped"
+      />
+    );
+    assert.ok(html.includes("graded for a Bootstrapped team"));
   });
 
   it("renders the stage persona selector with all 4 primary options", () => {

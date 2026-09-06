@@ -15,7 +15,6 @@ import { formatDateUTC } from "../../lib/formatters";
 import { toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
-import { DecisionArchive } from "./decisionArchive";
 import { HistoryExplorer } from "./historyExplorer";
 
 type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string };
@@ -124,8 +123,6 @@ export default async function HistoryPage({
           </ul>
         </section>
       ) : null}
-
-      <DecisionArchive />
 
       <section className="weather-panel space-y-4 px-5 py-5">
         <h2 className="type-eyebrow">Posture by year</h2>

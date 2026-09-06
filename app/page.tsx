@@ -344,6 +344,7 @@ async function PageContent({
             <DecisionPlanStressTester
               assessment={reportData.assessment}
               recordDate={homepage.reportShell.recordDateLabel}
+              activeStage={activeStage}
             />
 
             <CompareStrip

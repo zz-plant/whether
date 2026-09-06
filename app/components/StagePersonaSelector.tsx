@@ -2,19 +2,19 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import {
+  DEFAULT_OPERATOR_STAGE,
+  OPERATOR_STAGE_OPTIONS,
+  operatorStageForVariantMode,
+  type OperatorStage,
+  type OperatorStageOption,
+} from "../../lib/report/operatorStage";
+import { persistOperatorStage } from "./useOperatorStage";
 
-export interface StagePersonaOption {
-  key: StartupVariantMode;
-  label: string;
-  sublabel: string;
-}
+export type StagePersonaOption = OperatorStageOption;
 
-export const STAGE_PERSONA_OPTIONS: StagePersonaOption[] = [
-  { key: "seed", label: "Seed", sublabel: "Runway & Proof" },
-  { key: "series-a", label: "Series A", sublabel: "Payback & GTM" },
-  { key: "series-b", label: "Series B+", sublabel: "Operating Leverage" },
-  { key: "bootstrapped", label: "Bootstrapped", sublabel: "Cash Flow Defense" },
-];
+/** The four stages, from the one module every stage control reads. */
+export const STAGE_PERSONA_OPTIONS = OPERATOR_STAGE_OPTIONS;
 
 export interface StagePersonaSelectorProps {
   activeStage: StartupVariantMode;
@@ -28,10 +28,15 @@ export function StagePersonaSelector({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const selected = operatorStageForVariantMode(activeStage);
 
-  const handleSelectStage = (stage: StartupVariantMode) => {
+  const handleSelectStage = (stage: OperatorStage) => {
+    // The cookie is what makes the choice survive this page: the settings panel,
+    // the runway planner, and the stress tests all read it, and the server
+    // renders the next visit from it. The URL still carries it for shared links.
+    persistOperatorStage(stage);
     const params = new URLSearchParams(searchParams.toString());
-    if (stage === "series-a") {
+    if (stage === DEFAULT_OPERATOR_STAGE) {
       params.delete("stage");
     } else {
       params.set("stage", stage);
@@ -50,8 +55,8 @@ export function StagePersonaSelector({
         aria-label="Startup lifecycle stage selector"
         className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 p-1 backdrop-blur-sm"
       >
-        {STAGE_PERSONA_OPTIONS.map((option) => {
-          const isSelected = activeStage === option.key;
+        {OPERATOR_STAGE_OPTIONS.map((option) => {
+          const isSelected = selected === option.key;
           return (
             <button
               key={option.key}

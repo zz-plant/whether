@@ -1,28 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { CompanyStage, RateSensitivity } from "../../lib/report/operatorContext";
+import { useRouter } from "next/navigation";
+import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
 import { requestSubscription } from "./subscribeRequest";
+import { useOperatorStage } from "./useOperatorStage";
 
 import { Dialog } from "@base-ui/react/dialog";
 import { CloseIcon } from "./uiIcons";
-
-const STAGE_KEY = "whether-company-stage";
-const SENSITIVITY_KEY = "whether-rate-sensitivity";
-
-const stages: { value: CompanyStage; label: string }[] = [
-  { value: "pre-seed", label: "Pre-seed" },
-  { value: "seed", label: "Seed" },
-  { value: "series-a", label: "Series A" },
-  { value: "series-b-plus", label: "Series B+" },
-  { value: "public", label: "Public company" },
-];
-
-const sensitivities: { value: RateSensitivity; label: string }[] = [
-  { value: "high", label: "High (capital-intensive)" },
-  { value: "medium", label: "Medium" },
-  { value: "low", label: "Low (capital-light)" },
-];
 
 const DISPLAY_KEY = "whether-display-mode";
 
@@ -32,8 +17,8 @@ const displayModes = [
 ] as const;
 
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
-  const [stage, setStage] = useState<CompanyStage | null>(null);
-  const [sensitivity, setSensitivity] = useState<RateSensitivity | null>(null);
+  const router = useRouter();
+  const { stage, setStage } = useOperatorStage();
   const [displayMode, setDisplayMode] = useState<string>("auto");
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
@@ -42,27 +27,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setStage((localStorage.getItem(STAGE_KEY) as CompanyStage | null));
-    setSensitivity((localStorage.getItem(SENSITIVITY_KEY) as RateSensitivity | null));
     setDisplayMode(localStorage.getItem(DISPLAY_KEY) ?? "auto");
-  }, []);
-
-  const saveStage = useCallback((value: CompanyStage) => {
-    setStage(value);
-    localStorage.setItem(STAGE_KEY, value);
-    document.cookie = `${STAGE_KEY}=${value};path=/;max-age=31536000`;
-  }, []);
-
-  const saveSensitivity = useCallback((value: RateSensitivity) => {
-    setSensitivity(value);
-    localStorage.setItem(SENSITIVITY_KEY, value);
-    document.cookie = `${SENSITIVITY_KEY}=${value};path=/;max-age=31536000`;
-  }, []);
-
-  const saveDisplayMode = useCallback((value: string) => {
-    setDisplayMode(value);
-    localStorage.setItem(DISPLAY_KEY, value);
-    document.documentElement.dataset.displayMode = value;
   }, []);
 
   const showSaved = useCallback(() => {
@@ -70,20 +35,20 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     setTimeout(() => setSaved(false), 2000);
   }, []);
 
-  const saveStageWithFeedback = useCallback((value: CompanyStage) => {
-    saveStage(value);
+  // The brief is server-rendered from the stage cookie, so the choice is
+  // applied by refreshing the route rather than promised for "next refresh".
+  const saveStage = useCallback((value: OperatorStage) => {
+    setStage(value);
+    router.refresh();
     showSaved();
-  }, [saveStage, showSaved]);
+  }, [router, setStage, showSaved]);
 
-  const saveSensitivityWithFeedback = useCallback((value: RateSensitivity) => {
-    saveSensitivity(value);
+  const saveDisplayMode = useCallback((value: string) => {
+    setDisplayMode(value);
+    localStorage.setItem(DISPLAY_KEY, value);
+    document.documentElement.dataset.displayMode = value;
     showSaved();
-  }, [saveSensitivity, showSaved]);
-
-  const saveDisplayModeWithFeedback = useCallback((value: string) => {
-    saveDisplayMode(value);
-    showSaved();
-  }, [saveDisplayMode, showSaved]);
+  }, [showSaved]);
 
   const handleSubscribe = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -113,14 +78,15 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             <fieldset>
               <legend className="type-eyebrow">Company stage</legend>
               <p className="mt-1 text-xs leading-relaxed text-slate-400">
-                Adjusts operating knobs to your company&apos;s maturity.
+                The stage the weekly call, the plan stress test, and the runway planner are calibrated for.
+                Same control the brief's Calibrate stage uses.
               </p>
               <div className="mt-2 space-y-1">
-                {stages.map((s) => (
+                {OPERATOR_STAGE_OPTIONS.map((option) => (
                   <label
-                    key={s.value}
+                    key={option.key}
                     className={`flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${
-                      stage === s.value
+                      stage === option.key
                         ? "bg-sky-500/12 text-sky-100"
                         : "text-slate-300 hover:bg-slate-800/50"
                     }`}
@@ -128,44 +94,21 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                     <input
                       type="radio"
                       name="company-stage"
-                      value={s.value}
-                      checked={stage === s.value}
-                      onChange={() => saveStageWithFeedback(s.value)}
+                      value={option.key}
+                      checked={stage === option.key}
+                      onChange={() => saveStage(option.key)}
                       className="accent-sky-400"
                     />
-                    {s.label}
+                    <span>{option.label}</span>
+                    <span className="text-fluid-micro text-slate-500">· {option.sublabel}</span>
                   </label>
                 ))}
               </div>
-            </fieldset>
-
-            <fieldset>
-              <legend className="type-eyebrow">Rate sensitivity</legend>
-              <p className="mt-1 text-xs leading-relaxed text-slate-400">
-                How much interest rates affect your business.
-              </p>
-              <div className="mt-2 space-y-1">
-                {sensitivities.map((s) => (
-                  <label
-                    key={s.value}
-                    className={`flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${
-                      sensitivity === s.value
-                        ? "bg-sky-500/12 text-sky-100"
-                        : "text-slate-300 hover:bg-slate-800/50"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="rate-sensitivity"
-                      value={s.value}
-                      checked={sensitivity === s.value}
-                      onChange={() => saveSensitivityWithFeedback(s.value)}
-                      className="accent-sky-400"
-                    />
-                    {s.label}
-                  </label>
-                ))}
-              </div>
+              {stage === null ? (
+                <p className="mt-2 text-fluid-micro text-slate-500">
+                  Not set. The brief keeps its stage-agnostic default until you choose one.
+                </p>
+              ) : null}
             </fieldset>
 
             <p className="type-eyebrow border-b border-slate-800/60 pb-2 mt-4">Display &amp; notifications</p>
@@ -179,7 +122,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   <button
                     key={mode.value}
                     type="button"
-                    onClick={() => saveDisplayModeWithFeedback(mode.value)}
+                    onClick={() => saveDisplayMode(mode.value)}
                     className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
                       displayMode === mode.value
                         ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
@@ -227,7 +170,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <p className="text-fluid-micro text-slate-400">Changes apply on next brief refresh.</p>
+            <p className="text-fluid-micro text-slate-400">Settings are stored in this browser.</p>
             {saved ? (
               <span className="rounded-sm bg-emerald-500/15 px-2.5 py-0.5 text-fluid-micro font-semibold text-emerald-200">Saved</span>
             ) : null}

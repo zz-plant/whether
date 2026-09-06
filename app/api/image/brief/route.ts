@@ -5,7 +5,7 @@ import { loadOgFonts } from "../../../../lib/image/ogFonts";
 import type { SignalChange } from "../../../../lib/report/homeBriefModel";
 import { parseImageBriefRequestContext } from "../../../../lib/report/imageBriefSearchParams";
 import { SECTOR_TAXONOMY, type SectorKey } from "../../../../lib/report/sectorSensitivity";
-import type { CompanyStage } from "../../../../lib/report/operatorContext";
+import { operatorStageLabel } from "../../../../lib/report/operatorStage";
 
 export const runtime = "edge";
 
@@ -16,14 +16,6 @@ const cadenceLabel: Record<string, string> = {
   yearly: "Yearly Brief",
 };
 
-const stageLabel: Record<CompanyStage, string> = {
-  "pre-seed": "Pre-seed",
-  seed: "Seed",
-  "series-a": "Series A",
-  "series-b-plus": "Series B+",
-  public: "Public",
-};
-
 const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBriefRequestContext>) => {
   const labels = [
     requestContext.searchParams?.sector
@@ -31,7 +23,7 @@ const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBrie
       : null,
     requestContext.operatorContext?.ticker,
     requestContext.operatorContext?.companyStage
-      ? stageLabel[requestContext.operatorContext.companyStage]
+      ? operatorStageLabel(requestContext.operatorContext.companyStage)
       : null,
   ].filter((label): label is string => Boolean(label));
 
