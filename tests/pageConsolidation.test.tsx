@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { describe, it } from "bun:test";
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import ThresholdPage from "../app/threshold/page";
-import { iaConsolidationRedirectPairs } from "../next.config.js";
 import { utilityLinks } from "../lib/navigation/informationArchitecture";
 
 const appPath = (route: string) => new URL(`../app${route}`, import.meta.url).pathname;
@@ -25,14 +25,21 @@ describe("bounded decisions: framework and form on one page", () => {
     const html = renderToStaticMarkup(<ThresholdPage />);
     assert.match(html, /id="template"/);
 
-    const redirect = iaConsolidationRedirectPairs.find(([from]: string[]) => from === "/template");
-    assert.ok(redirect, "/template must keep a permanent redirect for external links");
-    assert.equal(redirect[1], "/threshold#template");
+    // next.config.js ships no types, so this reads the pair as text rather than
+    // importing the module into a typechecked test.
+    const config = readFileSync(new URL("../next.config.js", import.meta.url).pathname, "utf8");
+    assert.match(
+      config,
+      /\["\/template", "\/threshold#template"\]/,
+      "/template must keep a permanent redirect for external links",
+    );
   });
 
   it("stops advertising the merged route as a separate destination", () => {
     assert.equal(existsSync(appPath("/template/page.tsx")), false);
-    const hrefs = utilityLinks.map((link) => link.href);
+    // `utilityLinks` is a const tuple, so TypeScript already refuses "/template"
+    // as a member — this keeps the guarantee readable at runtime too.
+    const hrefs: readonly string[] = utilityLinks.map((link) => link.href);
     assert.equal(hrefs.includes("/template"), false, "two rows must not point at halves of one page");
     assert.equal(hrefs.filter((href) => href === "/threshold").length, 1);
   });
