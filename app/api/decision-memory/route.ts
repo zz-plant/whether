@@ -8,6 +8,12 @@ import {
 } from "../../../lib/decisionMemory";
 import { getDecisionMemoryRepository } from "../../../lib/storage/decisionMemoryRepository";
 import { requireClientOwner } from "../../../lib/api/clientOwnership";
+import {
+  REVISABLE_DELEGATION_SCHEMA_URL,
+  toRevisableDelegationNdjson,
+  toRevisableDelegationRecords,
+} from "../../../lib/export/revisableDelegationRecord";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 export const runtime = "edge";
 
@@ -69,6 +75,19 @@ export async function GET(request: Request) {
       headers: {
         "content-type": "text/csv; charset=utf-8",
         "content-disposition": "attachment; filename=decision-memory.csv",
+        "x-whether-storage": repository.backendStatus(),
+      },
+    });
+  }
+
+  if (format === "records") {
+    const records = await toRevisableDelegationRecords(listed.entries, { baseUrl: resolveSiteUrl() });
+    return new NextResponse(toRevisableDelegationNdjson(records), {
+      status: 200,
+      headers: {
+        "content-type": "application/x-ndjson; charset=utf-8",
+        "content-disposition": "attachment; filename=decision-memory.records.ndjson",
+        "x-whether-record-schema": REVISABLE_DELEGATION_SCHEMA_URL,
         "x-whether-storage": repository.backendStatus(),
       },
     });
