@@ -368,7 +368,7 @@ async function PageContent({
           />
         </div>
 
-        <div className="space-y-4 border-t border-slate-800/70 pt-6">
+        <div id="subscribe" className="scroll-mt-28 space-y-4 border-t border-slate-800/70 pt-6">
           <SubscribeForm />
           <CanonicalWeekPermalink currentRecordDate={reportData.treasury.record_date} />
         </div>

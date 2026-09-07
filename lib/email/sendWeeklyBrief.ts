@@ -1,4 +1,5 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
+import { unsubscribeFooterHtml, unsubscribeFooterText } from "../alert/alertTemplates";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
@@ -65,6 +66,7 @@ export const sendWeeklyBrief = async (options?: {
         briefUrl,
         `---`,
         `Whether · weekly operating brief`,
+        ...unsubscribeFooterText(recipient.token),
       ].join("\n");
 
       /* Regime-adaptive email */
@@ -127,6 +129,7 @@ export const sendWeeklyBrief = async (options?: {
         `<a href="https://whether.work/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
         ` · `,
         `<a href="https://whether.work" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
+        unsubscribeFooterHtml(recipient.token),
         `</td></tr></table>`,
         `</body></html>`,
       ].join("\n");

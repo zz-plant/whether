@@ -7,11 +7,7 @@ import {
   createCloudflareEmailAdapter,
   type EmailDeliveryAdapter,
 } from "../email/emailDelivery";
-import {
-  getAlertPreferenceRepository,
-  type AlertPreferences,
-} from "../storage/alertPreferenceRepository";
-import { getSubscriberStore } from "../email/subscriberStore";
+import { getSubscriberStore, type Subscriber } from "../email/subscriberStore";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
@@ -55,46 +51,22 @@ const writeAlertState = async (state: LastAlertState): Promise<void> => {
   }
 };
 
-const listAlertSubscribers = async (): Promise<
-  Array<{ clientId: string; preferences: AlertPreferences }>
-> => {
-  const kv = getKv();
-  if (!kv) return [];
-  const repository = getAlertPreferenceRepository();
-  const subscribers: Array<{
-    clientId: string;
-    preferences: AlertPreferences;
-  }> = [];
-  let cursor: string | undefined;
-  const PREF_PREFIX = "alert-pref:";
-  const PREFERENCE_READ_CONCURRENCY = 32;
-  do {
-    try {
-      const page = await kv.list({ prefix: PREF_PREFIX, cursor, limit: 500 });
-      const clientIds = page.keys
-        .map((key) => key.name.slice(PREF_PREFIX.length))
-        .filter(Boolean);
-
-      // Previously one serial KV read per key, so this scaled linearly in wall-clock with
-      // the subscriber count. Batched with a bound on simultaneous subrequests.
-      for (let offset = 0; offset < clientIds.length; offset += PREFERENCE_READ_CONCURRENCY) {
-        const batch = clientIds.slice(offset, offset + PREFERENCE_READ_CONCURRENCY);
-        const resolved = await Promise.all(batch.map((clientId) => repository.get(clientId)));
-
-        for (let i = 0; i < batch.length; i++) {
-          const prefs = resolved[i];
-          if (prefs?.email) {
-            subscribers.push({ clientId: batch[i], preferences: prefs });
-          }
-        }
-      }
-      cursor = page.cursor;
-      if (page.list_complete) break;
-    } catch {
-      break;
-    }
-  } while (cursor);
-  return subscribers;
+/**
+ * The people who opted into alert mail: active, verified, `alerts: true`.
+ *
+ * This used to scan an `alert-pref:` keyspace instead. The browser wrote those records
+ * keyed on a random client UUID, and the recipient lookup below only ever accepted a
+ * subscriber token — so every record the alerts panel wrote was counted and then
+ * skipped, and the enrollment path the tests described ("enrolled by token") had no
+ * surface that could take it. The opt-in now rides the subscription, where the verified
+ * address and the consent already live.
+ */
+const listAlertSubscribers = async (): Promise<Subscriber[]> => {
+  try {
+    return await getSubscriberStore().listAlertSubscribers();
+  } catch {
+    return [];
+  }
 };
 
 const wasAlreadyDelivered = async (
@@ -111,37 +83,6 @@ const wasAlreadyDelivered = async (
     return Date.now() - deliveredMs < 7 * 24 * 60 * 60 * 1000;
   } catch {
     return false;
-  }
-};
-
-const isValidEmail = (raw: string): boolean =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(raw.trim());
-
-/**
- * Only a subscriber token can name a recipient.
- *
- * The clientId on an alert-pref record is self-asserted: POST /api/alert-preferences
- * authorizes it by comparing the body's clientId to a header the same caller sets. Two
- * rounds of narrowing got here. First this returned any email-shaped clientId as its own
- * recipient, so one unauthenticated write enrolled any address at all. Then it required
- * that address to belong to a verified, active subscriber — which still left knowing
- * somebody's address as enough to sign them up for mail they never asked for, and the
- * alert templates carry no unsubscribe link, so they could not easily stop it.
- *
- * A token closes that: it is generated at subscribe time and only ever reaches the
- * subscriber's own inbox, so holding one is evidence of consent in a way that knowing an
- * address is not. There is no self-serve alert enrollment either way — no surface writes
- * these records — so this removes a hole rather than a capability.
- */
-export const resolveRecipientEmail = async (clientId: string): Promise<string | null> => {
-  try {
-    const store = getSubscriberStore();
-    const subscriber = await store.getSubscriberByToken(clientId);
-
-    if (!subscriber?.verified || !subscriber.active) return null;
-    return isValidEmail(subscriber.email) ? subscriber.email : null;
-  } catch {
-    return null;
   }
 };
 
@@ -173,6 +114,7 @@ export const deliverAlertToSubscriber = async (
   alert: AlertDecision,
   conditions: AlertConditions,
   adapter: EmailDeliveryAdapter,
+  unsubscribeToken?: string | null,
 ): Promise<boolean> => {
   try {
     let template: ReturnType<typeof decisionVerdictEmail>;
@@ -182,6 +124,7 @@ export const deliverAlertToSubscriber = async (
         why: `The operating regime shifted to ${conditions.regime}. The assumptions behind the current posture have moved.`,
         actionNow: conditions.posture,
         reversal: "Revert only if the prior regime state holds across two consecutive updates.",
+        unsubscribeToken,
       });
     } else if (alert.metric === "credit") {
       const threshold = alert.severity === "warning" ? 75 : 50;
@@ -189,6 +132,7 @@ export const deliverAlertToSubscriber = async (
         "credit",
         conditions.tightness,
         threshold,
+        unsubscribeToken,
       );
     } else {
       const threshold = alert.severity === "warning" ? 75 : 50;
@@ -196,6 +140,7 @@ export const deliverAlertToSubscriber = async (
         "sentiment",
         conditions.riskAppetite,
         threshold,
+        unsubscribeToken,
       );
     }
     const result = await adapter.send({
@@ -283,31 +228,25 @@ export const deliverAlerts = async (
   let errors = 0;
 
   for (const sub of subscribers) {
-    const targetEmail = await resolveRecipientEmail(sub.clientId);
-    if (!targetEmail) {
-      // Not a failure: a preference record whose clientId names no verified subscriber is
-      // simply not owed mail. Counting it as an error would bury real send failures.
-      skipped++;
-      continue;
-    }
     for (const alert of alerts) {
-      // Keyed on the address, not on the preference record. Two records can resolve to one
-      // inbox — the address itself and that subscriber's token — and a clientId key gave
-      // each of them its own "already delivered" marker, so the reader got two copies.
-      const already = await wasAlreadyDelivered(targetEmail, alert.type);
+      // Keyed on the address rather than on the record, because two records could once
+      // resolve to one inbox and each got its own "already delivered" marker — the
+      // reader received two copies of the same alert.
+      const already = await wasAlreadyDelivered(sub.email, alert.type);
       if (already) {
         skipped++;
         continue;
       }
       const ok = await deliverAlertToSubscriber(
-        targetEmail,
+        sub.email,
         alert,
         conditions,
         adapter,
+        sub.token,
       );
       if (ok) {
         sent++;
-        await trackAlertDelivery(targetEmail, alert.type);
+        await trackAlertDelivery(sub.email, alert.type);
       } else {
         errors++;
       }

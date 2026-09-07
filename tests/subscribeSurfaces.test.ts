@@ -111,7 +111,6 @@ describe("subscribe surfaces", () => {
   it("keeps binding-backed modules out of client components", () => {
     const bindingBacked = [
       "lib/email/subscriberStore",
-      "lib/storage/alertPreferenceRepository",
       "lib/alert/alertDelivery",
       "lib/runtime/kv",
     ];

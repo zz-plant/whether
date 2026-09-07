@@ -12,7 +12,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Valid email required." }, { status: 400 });
     }
 
-    await subscribeAndSendVerification({ email, request });
+    // Only an explicit boolean counts. Anything else — absent, "true", 1 — leaves an
+    // existing subscriber's choice alone rather than enrolling them in a second mail
+    // stream on a value the caller did not mean as consent.
+    const alerts = typeof body.alerts === "boolean" ? body.alerts : undefined;
+
+    await subscribeAndSendVerification({ email, alerts, request });
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {

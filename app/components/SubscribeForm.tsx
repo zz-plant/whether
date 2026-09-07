@@ -8,6 +8,10 @@ import { buildMondayCalendarUrl } from "./calendarButton";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
+  // Default off. Alert mail is a second stream, and the person opting in is the only
+  // one who can consent to it — the alerts panel used to "record" a channel against a
+  // random device id that the delivery path could never resolve to an inbox.
+  const [alerts, setAlerts] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -15,7 +19,7 @@ export function SubscribeForm() {
     e.preventDefault();
     setStatus("loading");
 
-    const result = await requestSubscription(email);
+    const result = await requestSubscription(email, { alerts });
     setStatus(result.ok ? "success" : "error");
     setMessage(result.message);
     if (result.ok) {
@@ -73,6 +77,20 @@ export function SubscribeForm() {
           {status === "loading" ? "Subscribing…" : "Subscribe"}
         </button>
       </form>
+
+      <label className="flex cursor-pointer items-start gap-2 text-fluid-xs text-white/60">
+        <input
+          type="checkbox"
+          checked={alerts}
+          onChange={(e) => setAlerts(e.target.checked)}
+          disabled={status === "loading"}
+          className="mt-0.5 size-4 shrink-0 accent-sky-400"
+        />
+        <span>
+          Also email me when the regime changes between Mondays. Off by default; every
+          email carries an unsubscribe link.
+        </span>
+      </label>
 
       {message && (
         <p id="subscribe-message" aria-live="polite" className="text-fluid-micro text-rose-400">

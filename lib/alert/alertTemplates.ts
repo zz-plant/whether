@@ -11,7 +11,32 @@ export type EmailContent = {
   text: string;
 };
 
-const baseHtml = (title: string, body: string): string =>
+export const UNSUBSCRIBE_BASE_URL = "https://whether.work/api/email/unsubscribe";
+
+/**
+ * The one-click unsubscribe URL for a subscriber token, or null without one.
+ *
+ * `/api/email/unsubscribe` has always worked and nothing has ever linked to it: no
+ * template in this repo carried the link, on either mail stream. That was tolerable
+ * while alert mail reached nobody; it is not, now that an opt-in actually enrolls
+ * someone. A missing token yields no link rather than a broken one.
+ */
+export const buildUnsubscribeUrl = (token: string | null | undefined): string | null =>
+  token ? `${UNSUBSCRIBE_BASE_URL}?token=${encodeURIComponent(token)}` : null;
+
+export const unsubscribeFooterHtml = (token: string | null | undefined): string => {
+  const url = buildUnsubscribeUrl(token);
+  return url
+    ? ` · <a href="${url}" style="color:#64748b;text-decoration:underline;">Unsubscribe</a>`
+    : "";
+};
+
+export const unsubscribeFooterText = (token: string | null | undefined): string[] => {
+  const url = buildUnsubscribeUrl(token);
+  return url ? [`Unsubscribe: ${url}`] : [];
+};
+
+const baseHtml = (title: string, body: string, unsubscribeToken?: string | null): string =>
   [
     `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#e2e8f0;">`,
     `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#f1f5f9;">${title}</h1>`,
@@ -28,6 +53,7 @@ const baseHtml = (title: string, body: string): string =>
     `<a href="https://whether.work/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
     ` · `,
     `<a href="https://whether.work" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
+    unsubscribeFooterHtml(unsubscribeToken),
     `</td></tr></table>`,
     `</body></html>`,
   ].join("\n");
@@ -67,11 +93,13 @@ export const decisionVerdictEmail = ({
   why,
   actionNow,
   reversal,
+  unsubscribeToken,
 }: {
   headline: string;
   why: string;
   actionNow: string;
   reversal: string;
+  unsubscribeToken?: string | null;
 }): EmailContent => {
   const subject = `Whether Alert — ${headline}`;
   const text = [
@@ -84,6 +112,7 @@ export const decisionVerdictEmail = ({
     `View full brief: https://whether.work`,
     `---`,
     `Whether · weekly operating brief`,
+    ...unsubscribeFooterText(unsubscribeToken),
   ].join("\n");
   const html = baseHtml(
     "Whether Decision Alert",
@@ -99,6 +128,7 @@ export const decisionVerdictEmail = ({
       sectionBlock(DECISION_CONTRACT_LABELS.reversal.reversal, reversal, "#94a3b8", "#f1f5f9"),
       `</div>`,
     ].join("\n"),
+    unsubscribeToken,
   );
   return { subject, html, text };
 };
@@ -110,6 +140,7 @@ export const thresholdCrossingEmail = (
   metric: "credit" | "sentiment",
   value: number,
   threshold: number,
+  unsubscribeToken?: string | null,
 ): EmailContent => {
   const metricLabel = metric === "credit" ? "Funding pressure" : "Risk appetite";
   const direction = value > threshold ? "above" : "below";
@@ -122,6 +153,7 @@ export const thresholdCrossingEmail = (
     `View full brief: https://whether.work`,
     `---`,
     `Whether · weekly operating brief`,
+    ...unsubscribeFooterText(unsubscribeToken),
   ].join("\n");
   const severity = threshold === 75 ? "warning" : "info";
   const html = baseHtml(
@@ -135,6 +167,7 @@ export const thresholdCrossingEmail = (
       sectionBlock(metricLabel, `${value.toFixed(1)} / ${threshold}`, "#fbbf24", "#fde68a"),
       `</div>`,
     ].join("\n"),
+    unsubscribeToken,
   );
   return { subject, html, text };
 };

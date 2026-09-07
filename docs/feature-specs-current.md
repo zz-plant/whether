@@ -392,6 +392,52 @@ consume it. Four did not reach one.
 Covered by `tests/persistedUiBootstrap.test.ts`, `tests/embedRoute.test.ts`,
 `tests/telemetryDynamicRoute.test.ts`, and `tests/alertPreferenceRequest.test.ts`.
 
+### 1.1.12 Alert mail that could not reach anyone (2026-09-07)
+Follow-up to §1.1.11, after tracing the alert channel toggles past the UI into the delivery
+path. The toggles were not merely awaiting a delivery path — they wrote to a keyspace the
+existing, working one could not route.
+
+- **The record could never resolve.** The panel keyed preferences on
+  `usePersistentClientId()`, a `crypto.randomUUID()` in `localStorage`. The cron path did
+  read them: `listAlertSubscribers` collected every `alert-pref:*` record with
+  `email: true`. It then called `resolveRecipientEmail(clientId)`, which accepts only a
+  **subscriber token** — issued at subscribe time and reaching nobody but that
+  subscriber's own inbox, as the `?token=` on the verify and unsubscribe links. A device
+  UUID is never a token, so every record the panel wrote was counted and then skipped.
+  `alertDelivery.ts` said as much in a comment — "no surface writes these records" — which
+  had stopped being true when the panel started writing them. The one test that showed
+  delivery working enrolled *by token*, which no product surface could do.
+- **The opt-in moved onto the subscription.** `Subscriber` gains `alerts: boolean`;
+  `subscribe(email, { alerts })` records it; `listAlertSubscribers()` returns active,
+  verified subscribers who opted in. Consent now lives beside the verified address, which
+  is the only place the delivery path was ever willing to accept it. Records written
+  before the field existed read as `false` (`hydrateSubscriber` tests `=== true`, not a
+  truthy check), so the migration enrolls nobody.
+- **Both subscribe surfaces ask.** `SubscribeForm` and the settings panel offer "Also
+  email me when the regime changes between Mondays", default off, and
+  `requestSubscription` sends `alerts` only when it is an explicit boolean — an omitted
+  value leaves a standing choice alone rather than switching it off. `/api/email/subscribe`
+  applies the same rule, so no non-boolean truthy value can be read as consent.
+- **Every outgoing email now carries an unsubscribe link.** `/api/email/unsubscribe` has
+  always worked and nothing linked to it — not the alert templates, and not the weekly
+  brief, which has been sending without one. Enabling a second stream without that link is
+  exactly the harm `resolveRecipientEmail`'s own doc comment warned about, so
+  `buildUnsubscribeUrl` threads the token into both footers. `EmailRecipient` carries the
+  token for the weekly brief; a missing token yields no link rather than a broken one.
+- **Deleted:** `lib/storage/alertPreferenceRepository.ts`, `app/api/alert-preferences/route.ts`,
+  `app/components/alertPreferenceRequest.ts`, and the panel's three toggles. Slack and
+  webhook are not deferred — there is no adapter for either, and the panel now says so
+  instead of offering them. It points at `/#subscribe`, which is a real anchor as of this
+  change; it was not one when the link was first written.
+
+Also in this pass: `lib/report/imageBriefSearchParams.ts` gated stage on `isOperatorStage`
+in two places, so `?stage=growth` on `/api/image/brief` or a shared brief link serialized
+through and was then dropped — the same defect §1.1.11 fixed in `/api/embed`, still live
+one route over. Both now use `parseOperatorStageParam`.
+
+Covered by `tests/alertDelivery.test.ts`, `tests/alertsPanelClaims.test.tsx`, and
+`tests/imageBriefSearchParams.test.ts`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

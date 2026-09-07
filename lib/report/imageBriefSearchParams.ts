@@ -1,6 +1,6 @@
 import type { HomePageSearchParams } from "./homeMetadata";
 import type { CompanyStage, OperatorContext } from "./operatorContext";
-import { isOperatorStage } from "./operatorStage";
+import { parseOperatorStageParam } from "./operatorStage";
 import type { SectorKey } from "./sectorSensitivity";
 
 const VALID_CADENCES = new Set(["weekly", "monthly", "quarterly", "yearly"]);
@@ -88,10 +88,14 @@ const normalizeTicker = (value: string | undefined) => {
   return normalized;
 };
 
-const normalizeCompanyStage = (value: string | undefined): CompanyStage | undefined => {
-  const normalized = normalizeBoundedText(value)?.toLowerCase();
-  return isOperatorStage(normalized) ? normalized : undefined;
-};
+/**
+ * `parseOperatorStageParam`, not `isOperatorStage`, for the same reason `/api/embed`
+ * changed on 2026-09-07: `growth` and `public` were published in older `?stage=` links
+ * and embed snippets, and rejecting them drops the calibration silently rather than
+ * folding them into Series B+ where they belong.
+ */
+const normalizeCompanyStage = (value: string | undefined): CompanyStage | undefined =>
+  parseOperatorStageParam(normalizeBoundedText(value)?.toLowerCase()) ?? undefined;
 
 const normalizeCadence = (value: string | undefined) => {
   const normalized = normalizeBoundedText(value)?.toLowerCase();
@@ -182,9 +186,11 @@ export const parseImageBriefRequestContext = (source: SearchParamReader): ImageB
     searchParams.cadence = cadence;
   }
 
-  const stage = supportedParams.get("stage");
+  // Same parse as the writer above. These two disagreed until 2026-09-07: the writer
+  // normalized a stage into the params and this reader gated the result again on a
+  // narrower predicate, so a legacy value survived serialization and was then dropped.
   const operatorContext: OperatorContext = {
-    companyStage: isOperatorStage(stage) ? stage : null,
+    companyStage: parseOperatorStageParam(supportedParams.get("stage")),
     ticker: supportedParams.get("ticker"),
   };
 

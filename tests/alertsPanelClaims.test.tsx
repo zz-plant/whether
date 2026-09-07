@@ -28,12 +28,23 @@ const callsAlertDeliveries = (source: string) =>
   /fetch\(\s*[`"'][^`"']*\/api\/alert-deliveries/.test(stripComments(source));
 
 describe("regime alerts panel", () => {
-  it("says the channel choices are a preference, not a delivery", () => {
+  // The three channel toggles this replaced wrote a preference keyed on a random device
+  // UUID. Delivery resolved each record through `getSubscriberByToken`, so no record the
+  // panel could write ever reached an inbox; slack and webhook had no adapter at all.
+  it("names where alert mail comes from instead of offering channels", () => {
     const html = renderToStaticMarkup(<RegimeAlertsPanel />);
 
     assert.ok(html.includes("Alert history"), "renders the alert history panel");
-    assert.match(html, /not live yet/, "discloses that push delivery is not running");
-    assert.match(html, /nothing is sent from here/, "says plainly that the toggles send nothing");
+    assert.match(html, /weekly brief subscription/, "says the opt-in rides the subscription");
+    assert.match(html, /unsubscribe link/, "says the mail can be stopped");
+    assert.match(html, /do not exist/, "does not offer slack or webhook as choices");
+  });
+
+  it("offers no per-device channel toggle", () => {
+    const html = renderToStaticMarkup(<RegimeAlertsPanel />);
+
+    assert.doesNotMatch(html, /aria-pressed/, "no toggle state to report");
+    assert.doesNotMatch(html, /alert-preferences/, "no call to the removed endpoint");
   });
 
   // The control this replaced said "Deliver latest alert" and then reported "Delivered to N

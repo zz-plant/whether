@@ -1,20 +1,17 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "bun:test";
 import { GET as getDecisionMemoryRoute, POST as postDecisionMemoryRoute } from "../app/api/decision-memory/route";
-import { GET as getAlertPreferencesRoute, POST as postAlertPreferencesRoute } from "../app/api/alert-preferences/route";
 import { GET as getAlertDeliveriesRoute, POST as postAlertDeliveriesRoute } from "../app/api/alert-deliveries/route";
 import { GET as getWeeklyDigestRoute } from "../app/api/weekly-digest/route";
 import { GET as getRegimeAlertsRoute, POST as postRegimeAlertsRoute } from "../app/api/regime-alerts/route";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 import { resetDecisionMemoryRepository } from "../lib/storage/decisionMemoryRepository";
-import { resetAlertPreferenceRepository } from "../lib/storage/alertPreferenceRepository";
 import { getRegimeAlertRepository, resetRegimeAlertRepository } from "../lib/storage/regimeAlertRepository";
 import type { AlertDeliveryEvent, RegimeAlertEvent } from "../lib/signalOps";
 
 describe("decision memory and alert routes", () => {
   beforeEach(() => {
     resetDecisionMemoryRepository();
-    resetAlertPreferenceRepository();
     resetRegimeAlertRepository();
   });
 
@@ -262,43 +259,6 @@ describe("decision memory and alert routes", () => {
       headers: { "x-whether-client-id": "client-b" },
     }));
     assert.equal(mismatch.status, 403);
-  });
-
-  it("gets and upserts alert preferences", async () => {
-    const initial = await getAlertPreferencesRoute(new Request("http://localhost/api/alert-preferences?clientId=abc", { headers: { "x-whether-client-id": "abc" } }));
-    assert.equal(initial.status, 200);
-    const initialBody = (await initial.json()) as { preferences: { slack: boolean } };
-    assert.equal(initialBody.preferences.slack, true);
-
-    const post = await postAlertPreferencesRoute(
-      new Request("http://localhost/api/alert-preferences", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-whether-client-id": "abc" },
-        body: JSON.stringify({
-          clientId: "abc",
-          preferences: { slack: false, email: true, webhook: true },
-        }),
-      }),
-    );
-
-    assert.equal(post.status, 200);
-    const postBody = (await post.json()) as { preferences: { slack: boolean; webhook: boolean } };
-    assert.equal(postBody.preferences.slack, false);
-    assert.equal(postBody.preferences.webhook, true);
-  });
-
-  it("rejects invalid alert preferences payload", async () => {
-    const response = await postAlertPreferencesRoute(
-      new Request("http://localhost/api/alert-preferences", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ clientId: "abc", preferences: { slack: true } }),
-      }),
-    );
-
-    assert.equal(response.status, 400);
-    const body = (await response.json()) as { error?: string };
-    assert.equal(body.error, "invalid-payload");
   });
 
   /** Narrow the response instead of asserting a shape onto it. */
