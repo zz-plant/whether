@@ -328,11 +328,16 @@ Also collapsed, same pass:
 through `next/dynamic`, which a filename-based import search does not see. Check by exported symbol
 before deleting a component.
 
-**Open, not done:** only `monthly` ever reaches `CadenceSummaryCardAdapter` in the product —
-`monthlyActionSummaryPanel` is its one caller. The `weekly`, `quarterly`, and `yearly` entries in
-`summaryCardCadences.ts` are exercised only by `tests/cadenceSummaryCardAdapter.test.tsx`; the API
-routes for those cadences serve data without rendering this card. Whether that scaffolding earns
-its place is a product call, so it stays.
+**Resolved 2026-09-07:** the generic cadence layer is gone. Only `monthly` ever reached
+`CadenceSummaryCardAdapter` — `monthlyActionSummaryPanel` was its one caller — and the `weekly`,
+`quarterly` and `yearly` entries in `summaryCardCadences.ts` were exercised only by that adapter's
+own test, which made the test the sole thing keeping three unrendered cadences alive. The API routes
+for those cadences serve their data without rendering this card, so the layer was scaffolding for
+surfaces that do not exist. `MonthlySummaryCard` now renders `SummaryCard` directly with its
+sections inline; `cadenceSummaryCardAdapter.tsx` and `summaryCardCadences.ts` are deleted, and
+`tests/monthlySummaryCard.test.tsx` keeps the monthly assertions that had a surface behind them
+(section order, the `/api/monthly` link, the raw copy block, provenance). The chain that began this
+pass at four links is one component and one card.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
