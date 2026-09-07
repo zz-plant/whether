@@ -293,6 +293,47 @@ that looked worth making and was not.
 
 Covered by `tests/pageConsolidation.test.tsx`.
 
+### 1.1.10 Copy controls that reported a copy that did not happen (2026-09-06)
+A component-layer pass after the route consolidation. Eighteen surfaces route clipboard writes
+through `useClipboardCopy`, which separates "clipboard unavailable" from "write failed" and drives
+the "Clipboard blocked — select the text" fallback. Five hand-rolled `navigator.clipboard` instead,
+and two of those five asserted success they had not checked:
+
+- `shareBriefButton` — the `Copy Brief` control in `DecisionHero` and `CadenceCallCard`, i.e. the
+  homepage hero — ran `void navigator.clipboard.writeText(text)` inside a try/catch and then set
+  `didCopy` unconditionally. `void` discards the promise, so a rejected write is an unhandled
+  rejection rather than a synchronous throw: the catch could never fire. The brief people paste into
+  Slack reported "Brief Copied" whether or not anything reached the clipboard.
+- `ExportBoardAnnexButton` on `/history` had the identical shape and the same unconditional
+  `setCopied(true)`.
+
+Both now go through the hook and show a failure state; `tests/clipboardFailureReporting.test.tsx`
+pins the call shape, because the defect is the shape rather than the rendered output. The remaining
+three hand-rollers are deliberate and listed in that test: `CopyMeetingSlideButton` writes rich HTML
+via `ClipboardItem`, which the hook does not cover, and `/share` and `/embed` predate the hook and
+handle their own failure paths.
+
+Also collapsed, same pass:
+- The summary-card chain was four links — `MonthlySummaryCard` → `CadenceSummaryCardAdapter` →
+  `CadenceSummaryCard` → `SummaryCard`. `CadenceSummaryCard` forwarded three props and added
+  nothing, and the adapter's two arms rendered the same card: the props the second arm passed extra
+  (`companionHref`, `sectionBuilder?.(summary)`) are already `undefined` in exactly the case the
+  first arm handled. The wrapper is deleted and the branch is one call.
+- `app/components/ParametricGraphic.tsx` deleted — 60 lines, no reference in app, lib, tests,
+  scripts, or docs.
+
+**Method note.** A first scan for unimported components flagged four `/signals` panels
+(`timeMachinePanel`, `signalVisualizationSuite`, `regimeTimelinePanel`,
+`advancedThresholdsSection`, ~1,050 lines). All four are live: `evidencePagePanels.ts` loads them
+through `next/dynamic`, which a filename-based import search does not see. Check by exported symbol
+before deleting a component.
+
+**Open, not done:** only `monthly` ever reaches `CadenceSummaryCardAdapter` in the product —
+`monthlyActionSummaryPanel` is its one caller. The `weekly`, `quarterly`, and `yearly` entries in
+`summaryCardCadences.ts` are exercised only by `tests/cadenceSummaryCardAdapter.test.tsx`; the API
+routes for those cadences serve data without rendering this card. Whether that scaffolding earns
+its place is a product call, so it stays.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
