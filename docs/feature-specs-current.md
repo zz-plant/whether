@@ -438,6 +438,54 @@ one route over. Both now use `parseOperatorStageParam`.
 Covered by `tests/alertDelivery.test.ts`, `tests/alertsPanelClaims.test.tsx`, and
 `tests/imageBriefSearchParams.test.ts`.
 
+### 1.1.13 Controls at the wrong layer of parentage (2026-09-07)
+A pass over every control whose effect leaves the container it sits in. Three did.
+
+- **A page reload was rendered eleven times, each looking panel-scoped.**
+  `DataProvenanceStrip` carried a "Refresh" pill titled *"Request a fresh snapshot
+  for this provenance context"*, whose implementation is `window.location.reload()`.
+  The strip mounts at eleven call sites — `decisionShieldPanel`, `exportBriefPanel`,
+  `executiveBriefingPanel`, `playbookPanel`, `financeStrategyPanel`, both
+  `ReferencePanels`, `timeMachinePanel`, `thresholdsPanel`,
+  `advancedThresholdsSection` and `TrustBlocks`, with `showProvenance = true` the
+  default on six — so a single `/operate` or `/signals` view showed several of them,
+  each reading as scoped to the panel around it, all reloading the document and
+  discarding unsaved plan text and planner inputs elsewhere on the page. The title
+  was wrong twice over: a reload re-renders the same materialized model and requests
+  nothing. The strip is now what its name says, and the control lives only on
+  `LiveDataFallbackAlert`, where the page is genuinely the unit being retried.
+  `ManualRefreshButton` also lost a `successLabel` ("Updated just now") and its 8s
+  clearing timer, neither of which could ever render: `isRefreshing` is set true in
+  the handler and never cleared, so the ternary could not reach the success arm.
+- **Present mode sat in the hero's artifact row.** `DecisionHero` ran
+  Copy Brief · Copy Meeting Slide · Track in Memory · Present under a comment reading
+  "One copy control per artifact". The first three act on the brief; the fourth
+  changes the page's display mode by rewriting `[data-home-shell-main]`. Display
+  modes belong beside theme and settings in the global header, which is where this
+  app already puts them, so that is where it went — icon-only to match its new
+  siblings, and rendered only on the home brief, because focus mode targets a
+  landmark that only `Shell` renders. It stays reachable from `F` and the command
+  palette, which were always the right layers.
+- **The share rail had two mount points at different depths.** `GlobalShareRail` is
+  mounted once from `app/layout.tsx`; `profileSheet` rendered a second `ShareRail`
+  inside its own dialog — an overlay within an overlay, leaving the sheet mounted
+  behind it and returning the reader to the sheet rather than the page on close. The
+  sheet now closes itself and dispatches, as the command palette already did. The
+  event name moved out of two string literals into `openShareRail`.
+
+**Checked and clean**, so the list above is a result rather than a filename scan: no
+nested interactive elements anywhere; no invalid block-in-`<p>` nesting (the one
+`<button>` inside a `<p>` is valid — `button` is phrasing content); `FreshnessDot`'s
+absolute dropdown sets `relative` on its own wrapper and mounts at page top level.
+`exportBriefPanel` puts a Tailwind `shadow-lg` on a nested `weather-surface`, which
+looked like a §XIII elevation violation and is not one — neither `surfaces.css` nor
+`globals.css` uses `@layer`, so the depth ladder's `:is(…) :is(…)` selector (0,2,0)
+outranks `.shadow-lg` (0,1,0) and zeroes it. The class is dead weight, not a floating
+box. The remaining offset shadows sit on portaled popups and dialogs, or are
+zero-offset halos, which §XIII allows as emphasis.
+
+Covered by `tests/pageScopedControls.test.ts`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

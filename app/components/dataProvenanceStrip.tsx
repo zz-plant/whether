@@ -1,12 +1,19 @@
 /**
  * Data provenance strip for surfacing source, freshness, and live status inline.
  * Keeps each Capital Posture Governance section traceable at the point of interpretation.
+ *
+ * Informational only, as the name says. It used to carry a "Refresh" pill titled
+ * "Request a fresh snapshot for this provenance context", which called
+ * `window.location.reload()`. This component mounts at eleven call sites, so a
+ * single `/operate` or `/signals` view showed several of them — each reading as
+ * scoped to its own panel, each reloading the document and discarding unsaved
+ * plan text and planner inputs elsewhere on the page. The page-level retry lives
+ * on `LiveDataFallbackAlert`, where the whole brief is the unit being retried.
  */
 "use client";
 
 import { Popover } from "@base-ui/react/popover";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
-import { ManualRefreshButton } from "./manualRefreshButton";
 
 export type DataProvenance = {
   sourceLabel: string;
@@ -166,11 +173,6 @@ export const DataProvenanceStrip = ({
             </Popover.Positioner>
             </Popover.Portal>
           </Popover.Root>
-          <ManualRefreshButton
-            label="Refresh"
-            title="Request a fresh snapshot for this provenance context."
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 type-eyebrow text-slate-200 hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
-          />
         </div>
         <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
           {provenanceRows.map((row) => (
@@ -217,11 +219,6 @@ export const DataProvenanceStrip = ({
             </Popover.Positioner>
           </Popover.Portal>
         </Popover.Root>
-        <ManualRefreshButton
-          label="Refresh"
-          title="Request a fresh snapshot for this provenance context."
-          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 type-eyebrow hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
-        />
       </div>
       <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
         {provenanceRows.map((row) => (

@@ -6,11 +6,10 @@ import { ActionLink } from "./ui/actionLink";
 import { TimeMachineDatePicker } from "./timeMachineDatePicker";
 import { useState } from "react";
 import { CalendarButton } from "./calendarButton";
-import { ShareRail } from "./shareRail";
+import { openShareRail } from "./globalShareRail";
 
 export function ProfileSheet({ onClose }: { onClose: () => void }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showShare, setShowShare] = useState(false);
 
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
@@ -40,9 +39,15 @@ export function ProfileSheet({ onClose }: { onClose: () => void }) {
             <div className="border-t border-slate-800/60 pt-4">
               <p className="type-eyebrow mb-2">Export & Share</p>
               <div className="space-y-2">
+                {/* Closes this sheet and hands off to the single rail mounted in
+                    the layout, rather than opening a second one inside this
+                    dialog. */}
                 <button
                   type="button"
-                  onClick={() => setShowShare(true)}
+                  onClick={() => {
+                    onClose();
+                    openShareRail();
+                  }}
                   className="w-full text-left flex items-center justify-between px-3 py-2 rounded-md text-sm text-slate-300 hover:bg-slate-800/50 transition-colors"
                 >
                   Share brief
@@ -69,7 +74,6 @@ export function ProfileSheet({ onClose }: { onClose: () => void }) {
         </Dialog.Popup>
       </Dialog.Portal>
       {showDatePicker ? <TimeMachineDatePicker onClose={() => setShowDatePicker(false)} /> : null}
-      {showShare ? <ShareRail onClose={() => setShowShare(false)} /> : null}
     </Dialog.Root>
   );
 }

@@ -31,11 +31,12 @@ export function LiveDataFallbackAlert({
         {fallbackReason ? ` Reason: ${fallbackReason}` : null}
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
+        {/* The one place this control's scope matches its effect: the whole brief
+            is on cached data, so reloading the whole page is the retry. */}
         <ManualRefreshButton
           label="Retry live data"
           refreshingLabel="Retrying…"
-          successLabel="Retry sent"
-          title="Retry a live data check for this weekly brief."
+          title="Reload the page to retry a live data check for this brief."
           className="weather-pill inline-flex min-h-[44px] items-center justify-center border-amber-300/50 bg-amber-500/15 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-amber-50 hover:border-amber-200/80 hover:text-white disabled:cursor-not-allowed disabled:border-amber-700/40 disabled:text-amber-200/70"
         />
       </div>

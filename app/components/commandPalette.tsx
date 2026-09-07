@@ -6,6 +6,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal } from "lucide-react";
 import { navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { buildMondayCalendarUrl } from "./calendarButton";
+import { openShareRail } from "./globalShareRail";
 
 type CommandItem = {
   id: string;
@@ -99,7 +100,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         icon: Download,
         action: () => {
           onClose();
-          document.dispatchEvent(new CustomEvent("whether-open-share-rail"));
+          openShareRail();
         },
         shortcut: "⇧S",
       },

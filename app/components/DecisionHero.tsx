@@ -23,7 +23,6 @@ import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
-import { PresentModeButton } from "./PresentModeButton";
 import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
@@ -542,7 +541,11 @@ export function DecisionHero({
 
           {/* One copy control per artifact. "Copy Brief" already produces the
               Slack-formatted block (and hands off to the native share sheet where
-              there is one), so the separate Slack button duplicated it. */}
+              there is one), so the separate Slack button duplicated it.
+
+              Everything in this row acts on the brief. "Present" used to sit at
+              the end of it and changes the page's display mode instead, so it
+              moved to the header beside theme and settings. */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
             <CopyMeetingSlideButton
@@ -571,7 +574,6 @@ export function DecisionHero({
               tightnessThreshold={tightnessThreshold}
               riskAppetiteThreshold={riskAppetiteThreshold}
             />
-            <PresentModeButton />
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
