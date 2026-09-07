@@ -113,3 +113,19 @@ export const resolveGlobalHeaderLoopLinks = (pathname: string): GlobalHeaderNavi
       isActive: activeLayer?.key === link.key,
     }));
 };
+
+/**
+ * Whether the desktop nav row will visibly mark the current route.
+ *
+ * The header stopped printing the route beside the wordmark on the grounds that
+ * the navigation names it — true for the six loop routes, and false everywhere
+ * else. On `/pricing`, `/about`, `/brief/<week>` and `/resources/...` no loop
+ * link is active, the mobile trigger is hidden from `md`, and a matching utility
+ * link sits inside the closed More menu, so the desktop header was left with the
+ * wordmark alone. Callers render the label when this returns false.
+ *
+ * `compare` is excluded from the loop links, so `/history/compare` reports false
+ * and keeps its label — which is right: the nav row does not mark it either.
+ */
+export const hasVisibleActiveNavLink = (pathname: string) =>
+  resolveGlobalHeaderLoopLinks(pathname).some((link) => link.isActive);

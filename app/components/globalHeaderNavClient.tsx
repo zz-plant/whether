@@ -169,10 +169,11 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         aria-label="Open navigation"
       >
         <MenuIcon className="size-4 text-slate-400" aria-hidden="true" />
-        {/* The label is redundant below 400px, where the four 44px header
-            controls plus the wordmark already exceed the viewport. aria-label
-            carries the name either way, so this costs nothing but width. */}
-        <span className="hidden min-[400px]:inline">{activeRouteLabel}</span>
+        {/* Shown at every width now. The header used to print the route beside
+            the wordmark as well, so hiding this below 400px cost nothing; with
+            that span gone this is the only place the route names itself, and the
+            width it freed pays for it. */}
+        <span>{activeRouteLabel}</span>
       </button>
 
       {/* The operator loop, in IA order. Supporting layers hide below lg so the

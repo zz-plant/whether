@@ -12,7 +12,7 @@ import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
-import { buildSocialImageUrl, defaultSiteDescription, websiteName } from "../lib/seo";
+import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
@@ -202,49 +202,108 @@ export default function RootLayout({
           <PremiumFunnelTracker />
           {children}
         </ToastProviderRoot>
-        <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8">
-          <div className="mx-auto max-w-4xl space-y-4">
-            {/* Two tiers, because thirteen links in one flat row ranked nothing:
-                the five surfaces the product is actually about sat level with
-                Embed and RSS. The primary row derives from
-                lib/navigation/informationArchitecture — that module asks callers
-                not to maintain a parallel ordering elsewhere, and this footer was
-                doing exactly that. Note navigationLayers, not
-                primaryNavigationLayers: only the weekly brief carries the
-                "primary" tier, so that filter renders a one-link footer. */}
-            <nav aria-label="Product" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-fluid-sm text-[var(--footer-link)]">
-              {navigationLayers.map((layer) => (
-                <Link key={layer.href} href={layer.href} className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline">{layer.navLabel ?? layer.label}</Link>
-              ))}
-            </nav>
-            {/* Derived from utilityLinks for the same reason the row above is
-                derived from navigationLayers: the hand-written copy that used to
-                live here drifted, and /pricing fell out of the footer entirely. */}
-            <nav aria-label="Tools and reference" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-fluid-micro text-[var(--footer-legal)]">
-              {utilityLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">{link.label}</Link>
-              ))}
-              {/* A file, not a page — stays an <a> and outside the link set. */}
-              <a href="/feed.xml" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">RSS</a>
-            </nav>
-            {/* A rule above the legal tier. Tiers 2 and 3 carry the same size and
-                colour, so without it the tools row and the credits row read as one
-                twenty-link wall — the largest block of uniform text on the site. */}
-            <nav aria-label="Legal and credits" className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 border-t border-slate-800/40 pt-4 text-fluid-micro text-[var(--footer-legal)]">
-              <Link href="/acceptable-use-policy" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Acceptable Use</Link>
-              <Link href="/terms-of-service" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline">Terms</Link>
-              <span aria-hidden="true">·</span>
-              <a href="https://github.com/zz-plant/whether" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-legal-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">GitHub</a>
-              <span aria-hidden="true">·</span>
-              <span className="min-h-[44px] inline-flex items-center">Built by <a href="https://kanav.net" className="hover:text-[var(--footer-link-hover)] transition-colors no-underline ml-1" target="_blank" rel="noreferrer">Kanav Jain</a></span>
-              <span aria-hidden="true">·</span>
-              <a href="https://nextconsensus.com" className="min-h-[44px] inline-flex items-center hover:text-[var(--footer-link-hover)] transition-colors no-underline" target="_blank" rel="noreferrer">Next Consensus</a>
-              <span aria-hidden="true">·</span>
-              <span className="min-h-[44px] inline-flex items-center">© 2026 Whether</span>
-            </nav>
+        <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-10">
+          <div className="mx-auto max-w-5xl">
+            {/* Brand first. The footer opened straight into three centred rows of
+                anonymous links: no wordmark, no statement of what the product is,
+                on the second-most-common surface a reader checks for exactly
+                that. The line is `canonicalPositioningLine`, so it cannot drift
+                from the one the metadata already ships. */}
+            <div className="grid gap-8 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] sm:gap-12">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold tracking-[0.08em] text-white">Whether</p>
+                <p className="max-w-[32ch] text-fluid-micro leading-relaxed text-[var(--footer-legal)]">
+                  {canonicalPositioningLine}
+                </p>
+              </div>
+
+              {/* Two labelled columns rather than two centred rows. Centring gave
+                  the five surfaces the product is about the same rank and the same
+                  scan path as Embed and RSS; a heading per group says which is
+                  which before the reader has read a single link. */}
+              <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+                <nav aria-labelledby="footer-product-heading" className="space-y-1">
+                  <p id="footer-product-heading" className="type-eyebrow text-slate-400">The weekly loop</p>
+                  {/* Wraps horizontally on mobile, stacks on `sm`. A vertical list
+                      gives every link its own 44px row, which on a phone turned a
+                      ~400px footer into a ~1000px one; the labelled groups are the
+                      part worth keeping, not the column shape at every width. */}
+                  <ul className="flex flex-wrap gap-x-5 sm:block">
+                    {navigationLayers.map((layer) => (
+                      <li key={layer.href} className="break-inside-avoid">
+                        <Link
+                          href={layer.href}
+                          className="inline-flex min-h-[44px] items-center text-fluid-sm text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
+                        >
+                          {layer.navLabel ?? layer.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+
+                {/* Derived from utilityLinks for the same reason the column beside
+                    it is derived from navigationLayers: the hand-written copy that
+                    used to live here drifted, and /pricing fell out of the footer
+                    entirely. */}
+                <nav aria-labelledby="footer-tools-heading" className="space-y-1">
+                  <p id="footer-tools-heading" className="type-eyebrow text-slate-400">Tools &amp; reference</p>
+                  {/* Same shape as the column beside it: wrapping row on mobile,
+                      stacked list on `sm`, where twelve entries at the 44px touch
+                      target still read as a scannable column rather than a tower. */}
+                  <ul className="flex flex-wrap gap-x-4 sm:block sm:columns-2 sm:gap-x-5">
+                    {utilityLinks.map((link) => (
+                      <li key={link.href} className="break-inside-avoid">
+                        <Link
+                          href={link.href}
+                          className="inline-flex min-h-[44px] items-center text-fluid-sm text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                    <li className="break-inside-avoid">
+                      {/* A file, not a page — stays an <a> and outside the link set. */}
+                      <a
+                        href="/feed.xml"
+                        className="inline-flex min-h-[44px] items-center text-fluid-sm text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                      >
+                        RSS
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+
+            {/* No separators. They were `<span>·</span>` siblings — text nodes,
+                and so wrap candidates like any other, which regularly stranded a
+                dot at the end of a line; moving them to a CSS `::before` only
+                moved the defect, since the item that lands first on a wrapped
+                line still carries one. Spacing separates these six well enough,
+                and spacing cannot wrap badly. */}
+            <div className="mt-8 flex flex-col gap-3 border-t border-slate-800/40 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <nav
+                aria-label="Legal and credits"
+                className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
+              >
+                <Link href="/acceptable-use-policy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
+                <Link href="/terms-of-service" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>
+                <a href="https://github.com/zz-plant/whether" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]" target="_blank" rel="noreferrer">GitHub</a>
+                <span className="inline-flex min-h-[44px] items-center">
+                  Built by
+                  <a href="https://kanav.net" className="ml-1 no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Kanav Jain</a>
+                </span>
+                <a href="https://nextconsensus.com" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Next Consensus</a>
+                <span className="inline-flex min-h-[44px] items-center">© 2026 Whether</span>
+              </nav>
+              {/* Inside the footer now. It used to render after `</footer>`, so a
+                  keyboard hint floated alone under the copyright, attached to
+                  nothing. */}
+              <KeyboardShortcuts />
+            </div>
           </div>
         </footer>
-        <KeyboardShortcuts />
         </TooltipProvider>
       </body>
     </html>
