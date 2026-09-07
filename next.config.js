@@ -86,6 +86,9 @@ export const iaConsolidationRedirectPairs = [
   // Redirect stubs — kept as permanent redirects for external links
   ["/current-regime", "/"],
   ["/this-week", "/"],
+  // The blank bounded-decision form is a section of the framework page it used
+  // to link out to, so the form keeps its own entry point via the anchor.
+  ["/template", "/threshold#template"],
   // Orphaned export page — functionality lives in /share
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists

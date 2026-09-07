@@ -74,6 +74,13 @@ function MarketStateView({ state }: { state: MarketState }) {
           {state.posture}
         </p>
 
+        {/* This page runs assembleHomePage — the weekly brief's own pipeline — and
+            shows a subset of its hero. Saying so stops it reading as a second,
+            independently-derived call that might disagree with the brief. */}
+        <p className="text-fluid-micro text-slate-400">
+          This week&apos;s call from the weekly brief, refreshed on the same cadence.
+        </p>
+
         <div className="flex flex-wrap justify-center gap-4 pt-2">
           <ScoreCard
             label="Funding pressure"
@@ -111,8 +118,12 @@ function MarketStateView({ state }: { state: MarketState }) {
           <span>Refreshed {state.fetchedAt}</span>
         </div>
 
+        {/* Yahoo Finance was named here and feeds nothing on this page: it is
+            read only by lib/saasMultiples.ts for the SaaS comps on /comps. The
+            two scores above come from the Treasury series and the FRED macro
+            series the regime engine reads. */}
         <p className="text-fluid-micro text-slate-400">
-          Data: FRED · Treasury · Yahoo Finance
+          Data: U.S. Treasury · FRED
         </p>
 
         <div className="pt-4">
