@@ -68,7 +68,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 <CadenceSelector />
               </div>
               <div className="flex items-center gap-1.5 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-sky-400">
-                <GlobalHeaderActionsClient />
+                <GlobalHeaderActionsClient showPresentMode />
               </div>
             </div>
           </div>
