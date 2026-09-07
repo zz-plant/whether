@@ -4,6 +4,7 @@ import { supportedAgentCadences } from "../../../lib/agentInterface";
 import {
   REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION,
   REVISABLE_DELEGATION_SCHEMA_URL,
+  REVISABLE_DELEGATION_VERIFIER_URL,
   REVISABLE_DELEGATION_STANDARD_URL,
   WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL,
 } from "../../../lib/export/revisableDelegationRecord";
@@ -48,6 +49,9 @@ export async function GET() {
       schema: REVISABLE_DELEGATION_SCHEMA_URL,
       schemaVersion: REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION,
       conformanceLevel: WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL,
+      // A declared level is worth what a reader can check. This names the one
+      // that can contradict it, against the stream at `records` below.
+      verifier: REVISABLE_DELEGATION_VERIFIER_URL,
       kinds: ["belief"],
       records: `${baseUrl}/api/decision-memory?format=records`,
       upstream: [],
