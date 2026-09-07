@@ -18,6 +18,12 @@ import { useEffect, useState } from "react";
 import { usePersistentClientId } from "./clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
+import {
+  CHANNELS,
+  saveAlertPreferences,
+  type ChannelPreferences,
+  type DeliveryChannel,
+} from "./alertPreferenceRequest";
 import type { RegimeChangeReason } from "../../lib/regimeEngine";
 
 /** Only the fields /api/regime-alerts actually carries. The previous shape claimed a whole
@@ -30,11 +36,6 @@ type AlertRecord = {
   reasons: RegimeChangeReason[];
   timeMachineHref?: string;
 };
-
-type DeliveryChannel = "slack" | "email" | "webhook";
-type ChannelPreferences = Record<DeliveryChannel, boolean>;
-
-const CHANNELS: DeliveryChannel[] = ["slack", "email", "webhook"];
 
 const formatTimestamp = (value: string) => formatTimestampUTC(value);
 const formatRecordDate = (value: string) => formatDateUTC(value);
@@ -112,6 +113,7 @@ export const RegimeAlertsPanel = () => {
     email: false,
     webhook: false,
   });
+  const [preferenceError, setPreferenceError] = useState<string | null>(null);
   const { activeTarget, copiedTarget, status, error, copyToClipboard } = useClipboardCopy();
   const clientId = usePersistentClientId();
 
@@ -149,18 +151,29 @@ export const RegimeAlertsPanel = () => {
     };
   }, []);
 
-  const togglePreference = (channel: DeliveryChannel) => {
+  /*
+   * The POST was fire-and-forget behind a `.catch()` that kept the optimistic
+   * checkmark, so a channel read as recorded when the write had failed — the
+   * same shape as a copy button reporting success on a rejected clipboard
+   * write. The optimistic flip stays, because the round trip is slow enough to
+   * feel; what changed is that a failure takes it back and says so.
+   */
+  const togglePreference = async (channel: DeliveryChannel) => {
     if (!clientId) return;
 
-    const next = { ...preferences, [channel]: !preferences[channel] };
+    const previousValue = preferences[channel];
+    const next = { ...preferences, [channel]: !previousValue };
     setPreferences(next);
-    void fetch("/api/alert-preferences", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-whether-client-id": clientId },
-      body: JSON.stringify({ clientId, preferences: next }),
-    }).catch(() => {
-      // Keep the optimistic toggle and avoid noisy fetch errors in the console.
-    });
+    setPreferenceError(null);
+
+    if (await saveAlertPreferences(clientId, next)) {
+      return;
+    }
+
+    // Revert this channel alone: another toggle may be in flight, and
+    // restoring the whole snapshot would silently undo that one too.
+    setPreferences((current) => ({ ...current, [channel]: previousValue }));
+    setPreferenceError("Could not save that channel — it is unchanged. Try again.");
   };
 
   return (
@@ -190,7 +203,7 @@ export const RegimeAlertsPanel = () => {
                 <button
                   key={channel}
                   type="button"
-                  onClick={() => togglePreference(channel)}
+                  onClick={() => void togglePreference(channel)}
                   disabled={!clientId}
                   className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
                     preferences[channel] ? "text-emerald-200" : "text-slate-400"
@@ -208,6 +221,11 @@ export const RegimeAlertsPanel = () => {
               Push delivery is not live yet. This records the channel against this device&apos;s
               operator profile; nothing is sent from here.
             </p>
+            {preferenceError ? (
+              <p aria-live="polite" className="text-xs text-amber-300">
+                {preferenceError}
+              </p>
+            ) : null}
           </div>
         </div>
         {alerts.length === 0 ? (

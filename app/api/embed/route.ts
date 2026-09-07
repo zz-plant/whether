@@ -9,7 +9,7 @@
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../../lib/report/homePageAssembler";
 import type { OperatorContext } from "../../../lib/report/operatorContext";
-import { isOperatorStage } from "../../../lib/report/operatorStage";
+import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 export const runtime = "edge";
@@ -18,13 +18,16 @@ export const revalidate = 900;
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const tickerParam = url.searchParams.get("ticker")?.trim().toUpperCase() || "";
-  const stageParam = url.searchParams.get("stage")?.trim() || "";
   const format = url.searchParams.get("format") || "html";
   const ref = url.searchParams.get("ref") || "embed";
 
-  // Build operator context from ticker/stage params
+  // One parse, used for both the calibration and the label. Splitting them is
+  // what let `stage=growth` — a value the picker offered and `isOperatorStage`
+  // rejects — produce a stage-agnostic brief wearing a "growth" badge.
+  const companyStage = parseOperatorStageParam(url.searchParams.get("stage"));
+
   const operatorContext: OperatorContext = {
-    companyStage: isOperatorStage(stageParam) ? stageParam : null,
+    companyStage,
     ticker: tickerParam || null,
   };
 
@@ -66,7 +69,7 @@ export async function GET(request: Request) {
       regimeLabel: homepage.reportShell.statusLabel,
       recordDate: reportData.weeklyRecordDate,
       tickerLabel: tickerParam || null,
-      stageLabel: stageParam || null,
+      stageLabel: companyStage ? operatorStageLabel(companyStage) : null,
       sourceLabel: homepage.reportShell.treasurySource,
       briefUrl,
       attributionUrl,
@@ -173,8 +176,11 @@ const escapeHtml = (value: string): string =>
 const escapeAttribute = escapeHtml;
 
 export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
-  const { operatingCall, actionNow, doNowItems, flipTrigger, postureLabel, confidenceLabel, recordDate, tickerLabel, attributionUrl } = data;
-  const metaParts = [postureLabel, confidenceLabel, `As of ${recordDate}`, tickerLabel].filter(Boolean);
+  const { operatingCall, actionNow, doNowItems, flipTrigger, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
+  // `stageLabel` is only ever a stage the brief was actually calibrated for —
+  // the route derives it from the parsed stage, not the raw parameter — so the
+  // meta line can carry it without claiming a calibration that did not happen.
+  const metaParts = [postureLabel, confidenceLabel, `As of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
   const doNowHtml = doNowItems
     .map((item) => `<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:2px 0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">${escapeHtml(item)}</p>`)
     .join("");

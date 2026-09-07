@@ -24,7 +24,6 @@ const siteName = websiteName;
 const siteDescription = defaultSiteDescription;
 const socialImageUrl = buildSocialImageUrl();
 const themeStorageKey = "whether-theme";
-const displayModeStorageKey = "whether-display-mode";
 const orientationDismissKey = "whether.home.orientation.dismissed";
 
 export const buildThemeBootstrapScript = () => `
@@ -41,24 +40,23 @@ export const buildThemeBootstrapScript = () => `
 })();
 `;
 
-export const buildDisplayBootstrapScript = () => `
+/**
+ * Hides the first-run orientation card before hydration when the visitor has
+ * already dismissed it, so it does not flash back in on every navigation.
+ *
+ * This script used to bootstrap a display mode too, writing `data-display-mode`
+ * and `data-display-preference` onto the root element. No stylesheet ever read
+ * either attribute, so the TV/kiosk mode that four other modules existed to
+ * serve never changed a pixel; the whole subsystem was deleted on 2026-09-07.
+ * The orientation half is the part that always worked — it injects the rule
+ * that consumes its own attribute, three lines below where it sets it.
+ */
+export const buildOrientationBootstrapScript = () => `
 (() => {
   try {
     const root = document.documentElement;
-    const storage = window.localStorage;
-    const displayModeParam = new URL(window.location.href).searchParams.get("display");
-    const persistedDisplayMode = storage.getItem(${JSON.stringify(displayModeStorageKey)});
-    const requestedDisplayMode = displayModeParam === "tv" || displayModeParam === "auto"
-      ? displayModeParam
-      : persistedDisplayMode === "tv" || persistedDisplayMode === "auto"
-        ? persistedDisplayMode
-        : "auto";
-    const coarsePointer = window.matchMedia("(min-width: 1280px) and (pointer: coarse)").matches || window.matchMedia("(min-width: 1920px)").matches;
-    const nextDisplayMode = requestedDisplayMode === "auto" && coarsePointer ? "tv" : requestedDisplayMode;
-    const dismissed = storage.getItem(${JSON.stringify(orientationDismissKey)}) === "1";
+    const dismissed = window.localStorage.getItem(${JSON.stringify(orientationDismissKey)}) === "1";
 
-    root.dataset.displayMode = nextDisplayMode;
-    root.dataset.displayPreference = requestedDisplayMode;
     root.dataset.homeOrientationDismissed = dismissed ? "true" : "false";
 
     if (!document.head.querySelector('style[data-weather-ui-bootstrap="orientation"]')) {
@@ -68,7 +66,7 @@ export const buildDisplayBootstrapScript = () => `
       document.head.appendChild(style);
     }
   } catch {
-    // Ignore display bootstrap errors; orientation styling can fallback.
+    // Ignore bootstrap errors; the orientation card falls back to rendering.
   }
 })();
 `;
@@ -185,10 +183,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: buildThemeBootstrapScript() }}
         />
         <script
-          id="whether-display-bootstrap"
+          id="whether-orientation-bootstrap"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: buildDisplayBootstrapScript() }}
-          async
+          dangerouslySetInnerHTML={{ __html: buildOrientationBootstrapScript() }}
         />
       </head>
       <body className="flex min-h-screen flex-col">

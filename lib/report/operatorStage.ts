@@ -98,6 +98,25 @@ export const readOperatorStageCookie = (cookieHeader: string | null | undefined)
   return isOperatorStage(value) ? value : null;
 };
 
+/**
+ * Reads a stage out of a query parameter or an embed attribute.
+ *
+ * Unlike the cookie reader this folds the legacy `growth` and `public` values
+ * into Series B+, because those two were published in `/embed` snippets and in
+ * `?stage=` links that are still in the wild. Anything else — an absent value
+ * included — reads as unset, so a stage-agnostic brief is served rather than a
+ * guess. Callers must not label the output from the raw parameter: `/embed`
+ * did, and a widget requested with `stage=growth` carried a "growth" badge on a
+ * brief that had been calibrated for nobody.
+ */
+export const parseOperatorStageParam = (value: string | null | undefined): OperatorStage | null => {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  if (isOperatorStage(trimmed)) return trimmed;
+  if (trimmed === "growth" || trimmed === "public") return "series-b";
+  return null;
+};
+
 /** The `document.cookie` assignment that stores (or, with `null`, clears) the stage. */
 export const buildOperatorStageCookie = (stage: OperatorStage | null): string => {
   const maxAge = stage ? OPERATOR_STAGE_COOKIE_MAX_AGE_SECONDS : 0;

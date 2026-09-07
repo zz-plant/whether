@@ -339,6 +339,59 @@ sections inline; `cadenceSummaryCardAdapter.tsx` and `summaryCardCadences.ts` ar
 (section order, the `/api/monthly` link, the raw copy block, provenance). The chain that began this
 pass at four links is one component and one card.
 
+### 1.1.11 Modes and settings that changed nothing (2026-09-07)
+A settings-layer pass, tracing every mode and toggle in the product to whatever was supposed to
+consume it. Four did not reach one.
+
+- **TV / kiosk display mode is deleted, subsystem and all.** Settings offered "Auto" and
+  "TV / Kiosk" under the promise *"Larger text and buttons for screens across the room."* It wrote
+  `whether-display-mode` to `localStorage` and set `data-display-mode` on the root element, and no
+  stylesheet in the repo has ever selected on that attribute or on `data-display-preference`. The
+  choice persisted, the pill highlighted, "Saved" appeared, and nothing resized. The tell sits in
+  the same bootstrap script: three lines after writing `data-display-mode` it injects a `<style>`
+  element so `data-home-orientation-dismissed` has a reader. One attribute got its consumer; the
+  other never did. Four further modules existed to serve the mode and three of them never
+  executed — `displayModeManager` (~180 lines) and `displayGuardian` (~145: burn-in pixel drift,
+  screen wake lock, idle auto-refresh) mount only under `ambientMode="tv"`, which no caller ever
+  passed, and `displayModeToggle` renders only inside a `tv-action-rail` gated the same way. The
+  `.tv-action-rail` and `.tv-rail-safe` classes had no CSS rule either. Deleted: those three
+  modules, `tests/displayModeManager.test.ts` (172 lines testing a module that never mounted), the
+  `ambientMode` prop chain through `pageShell` and `reportShell`, the Settings fieldset, and the
+  `displayMode` entry in `lib/storage/keys.ts`, whose own doc comment promises every key has a
+  reader and a writer. The layout bootstrap keeps the orientation half that always worked, and
+  `tests/persistedUiBootstrap.test.ts` now pins the absence of the display half.
+- **`/embed`'s company stage offered two options the API rejects.** The picker listed `seed`,
+  `series-a`, `growth` and `public`; `isOperatorStage` accepts `seed`, `series-a`, `series-b` and
+  `bootstrapped`. So `growth` and `public` resolved to `companyStage: null` — a stage-agnostic
+  brief — while `stageLabel` carried the raw parameter through, so the widget could name a stage the
+  brief had not been calibrated for. The two stages that do work were not offered at all. The picker
+  now derives from `OPERATOR_STAGE_OPTIONS`, and a shared `parseOperatorStageParam` folds the legacy
+  `growth`/`public` values into Series B+ so snippets already embedded in newsletters keep working.
+  Label and calibration now come from one parse, and the HTML embed shows the stage in its meta line
+  because it can only show one that was applied.
+- **The literacy-assist key table is deleted.** `visitorStrip` read `whether.literacy.focus` to pick
+  one of four heading/subtitle pairs and a set of impact links. Nothing wrote that key, and the
+  `focusImpactLinks` prop the focus also selected was passed by no caller — so every visitor has
+  always seen the `decision` pair and the default links. The other five keys
+  (`decisionHelp`, `evidenceHelp`, `trustHelp`, `shareHelp`, `whether.artifact.mode`) were neither
+  read nor written anywhere, and `artifactModeLabels` was exported and unused. `lib/literacyAssist.ts`
+  is gone; the strip renders the copy it always rendered. The telemetry union went with it:
+  `OperatorWorkflowEvent` carried `assist_panel_opened` and `artifact_mode_selected` variants typed
+  against those modes, validated by `/api/telemetry/[stream]`, with no emitter — the one caller of
+  `trackOperatorWorkflowEvent` sends `route_transition`. A validator that accepts events nothing
+  produces reads as coverage of a feature that was never built.
+- **Alert channel toggles kept the checkmark on a failed write.** The POST to
+  `/api/alert-preferences` was fire-and-forget behind a `.catch()` that preserved the optimistic
+  flip, and a 4xx or 5xx resolves rather than throwing, so it never reached that catch either. The
+  panel's copy is honest about delivery ("Push delivery is not live yet… nothing is sent from here"),
+  so what was at stake was only whether the channel was recorded — but it is the same shape as the
+  copy buttons in §1.1.10. The request moved to `app/components/alertPreferenceRequest.ts`, which
+  returns a boolean the caller must act on; a failure reverts that one channel (not the whole
+  snapshot, which would undo a concurrent toggle) and says the save did not land.
+
+Covered by `tests/persistedUiBootstrap.test.ts`, `tests/embedRoute.test.ts`,
+`tests/telemetryDynamicRoute.test.ts`, and `tests/alertPreferenceRequest.test.ts`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -382,10 +435,11 @@ The share step now also houses the operator follow-through surfaces that were pr
 - per-profile alert delivery controls and recent send history,
 - Decision Memory export and latest-entry recall,
 - share artifacts, explainer mode, board/governance repackaging, company-specific exceptions, delivery controls, and audit history in one checkpoint before the brief leaves the room.
-`/operate` now exposes the same mixed-literacy translation model as the Weekly Brief: a
-top-of-page router sends users to decision, evidence, trust, or share help, and persisted planning
-assist panels explain only the planning layer the user needs. The execution stepper itself now shows
-owner, approval state, and `reopen when` metadata on both the active step and collapsed summaries.
+The execution stepper shows owner, approval state, and `reopen when` metadata on both the active
+step and collapsed summaries. (This paragraph used to describe a mixed-literacy translation model on
+`/operate` — a top-of-page router to decision, evidence, trust or share help, plus persisted assist
+panels. No such router or panel existed; the only trace in the code was a table of storage keys
+nothing wrote, deleted in §1.1.11.)
 Shared report-shell routes now avoid stacking a separate trust summary panel ahead of the first task block; trust status stays compressed inside the intro layer unless a route explicitly promotes a deeper trust section.
 
 ### 1.4 Planning workstreams

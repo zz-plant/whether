@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
 import { requestSubscription } from "./subscribeRequest";
@@ -9,26 +9,14 @@ import { useOperatorStage } from "./useOperatorStage";
 import { Dialog } from "@base-ui/react/dialog";
 import { CloseIcon } from "./uiIcons";
 
-const DISPLAY_KEY = "whether-display-mode";
-
-const displayModes = [
-  { value: "auto", label: "Auto" },
-  { value: "tv", label: "TV / Kiosk" },
-] as const;
-
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const { stage, setStage } = useOperatorStage();
-  const [displayMode, setDisplayMode] = useState<string>("auto");
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeMsg, setSubscribeMsg] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    setDisplayMode(localStorage.getItem(DISPLAY_KEY) ?? "auto");
-  }, []);
 
   const showSaved = useCallback(() => {
     setSaved(true);
@@ -42,13 +30,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     router.refresh();
     showSaved();
   }, [router, setStage, showSaved]);
-
-  const saveDisplayMode = useCallback((value: string) => {
-    setDisplayMode(value);
-    localStorage.setItem(DISPLAY_KEY, value);
-    document.documentElement.dataset.displayMode = value;
-    showSaved();
-  }, [showSaved]);
 
   const handleSubscribe = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -111,29 +92,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               ) : null}
             </fieldset>
 
-            <p className="type-eyebrow border-b border-slate-800/60 pb-2 mt-4">Display &amp; notifications</p>
-            <fieldset>
-              <legend className="type-eyebrow">Display mode</legend>
-              <p className="mt-1 text-xs leading-relaxed text-slate-400">
-                Larger text and buttons for screens across the room.
-              </p>
-              <div className="mt-2 flex gap-2">
-                {displayModes.map((mode) => (
-                  <button
-                    key={mode.value}
-                    type="button"
-                    onClick={() => saveDisplayMode(mode.value)}
-                    className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
-                      displayMode === mode.value
-                        ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
-                        : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"
-                    }`}
-                  >
-                    {mode.label}
-                  </button>
-                ))}
-              </div>
-          </fieldset>
+            <p className="type-eyebrow border-b border-slate-800/60 pb-2 mt-4">Notifications</p>
 
           <fieldset>
             <legend className="type-eyebrow">Weekly delivery</legend>

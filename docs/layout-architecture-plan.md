@@ -75,7 +75,7 @@ this plan. A tenth shell is only an improvement if the set has a stated shape.
    rendering their own — three independent owners, which is the condition this document blames for
    the defect. That inconsistency was real, and the fix is to weaken the invariant rather than the
    phase: routing every page through `PageShell` would force its chrome (climate backdrop, web
-   vitals, display mode, footer) onto pages that deliberately opt out, which is a larger and less
+   vitals, anchor feedback, footer) onto pages that deliberately opt out, which is a larger and less
    defensible change than the defect warrants.
 
    Per-route uniqueness is what the skip link actually depends on, it is what Phase 3 can check, and
