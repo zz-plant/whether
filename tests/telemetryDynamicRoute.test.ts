@@ -50,14 +50,15 @@ describe("Unified Dynamic Telemetry Handler (/api/telemetry/[stream])", () => {
     assert.equal(body.ok, true);
   });
 
-  it("accepts valid operator-workflow payloads", async () => {
+  it("accepts the route transition the client actually sends", async () => {
     const request = new Request("http://localhost/api/telemetry/operator-workflow", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        type: "artifact_mode_selected",
-        path: "/",
-        artifactMode: "operator",
+        type: "route_transition",
+        path: "/signals",
+        fromPath: "/",
+        toPath: "/signals",
       }),
     });
 
@@ -65,5 +66,24 @@ describe("Unified Dynamic Telemetry Handler (/api/telemetry/[stream])", () => {
     assert.equal(response.status, 202);
     const body: { ok: boolean } = await response.json();
     assert.equal(body.ok, true);
+  });
+
+  it("rejects the assist and artifact events no emitter produces", async () => {
+    // These two were valid until 2026-09-07, typed against a literacy-assist
+    // module whose storage keys nothing wrote. Accepting them made the endpoint
+    // look like it served UI that was never built.
+    for (const payload of [
+      { type: "assist_panel_opened", path: "/", assistMode: "decision", source: "click" },
+      { type: "artifact_mode_selected", path: "/", artifactMode: "operator" },
+    ]) {
+      const request = new Request("http://localhost/api/telemetry/operator-workflow", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const response = await POST(request, { params: { stream: "operator-workflow" } });
+      assert.equal(response.status, 400);
+    }
   });
 });

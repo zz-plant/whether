@@ -5,13 +5,13 @@
  * Every entry here has a reader and a writer. The registry used to list five
  * keys nothing touched — including `whether_stage`, while the code that
  * actually persisted stage wrote a cookie under a different name — which is
- * how a "single source of truth" stops being one.
+ * how a "single source of truth" stops being one. `displayMode` went the same
+ * way on 2026-09-07: it had both, and no stylesheet that read what they wrote.
  */
 import { OPERATOR_PROFILE_STORAGE_KEY } from "../operatorProfile";
 
 export const STORAGE_KEYS = {
   theme: "whether-theme",
-  displayMode: "whether-display-mode",
   homeOrientationDismissed: "whether.home.orientation.dismissed",
   reviewedRecordDates: "whether_reviewed",
   operatorProfile: OPERATOR_PROFILE_STORAGE_KEY,

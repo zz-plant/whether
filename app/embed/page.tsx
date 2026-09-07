@@ -1,13 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { OPERATOR_STAGE_OPTIONS } from "../../lib/report/operatorStage";
 
+/**
+ * The canonical four, derived rather than retyped. This list used to offer
+ * `growth` and `public`, which `/api/embed` rejects — both selections produced
+ * a stage-agnostic brief — while omitting `series-b` and `bootstrapped`, the
+ * two it accepts. Legacy snippets carrying the old values still work: the route
+ * folds them into Series B+.
+ */
 const STAGE_OPTIONS = [
-  { value: "", label: "Generic (no ticker)" },
-  { value: "seed", label: "Seed" },
-  { value: "series-a", label: "Series A" },
-  { value: "growth", label: "Growth stage" },
-  { value: "public", label: "Public company" },
+  { value: "", label: "Any stage" },
+  ...OPERATOR_STAGE_OPTIONS.map((option) => ({ value: option.key, label: option.label })),
 ] as const;
 
 const DEFAULT_TICKERS = ["", "GOOGL", "MSFT", "DOCU", "COIN", "UBER", "AAPL"];

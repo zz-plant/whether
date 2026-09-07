@@ -1,26 +1,22 @@
-import type { ArtifactMode, LiteracyAssistMode } from "./literacyAssist";
-
 export type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/answer";
-export type AssistPanelOpenSource = "click" | "query" | "stored_preference";
 
-export type OperatorWorkflowEvent =
-  | {
-      type: "assist_panel_opened";
-      path: string;
-      assistMode: LiteracyAssistMode;
-      source: AssistPanelOpenSource;
-    }
-  | {
-      type: "artifact_mode_selected";
-      path: string;
-      artifactMode: ArtifactMode;
-    }
-  | {
-      type: "route_transition";
-      path: string;
-      fromPath: OperatorWorkflowRoute;
-      toPath: OperatorWorkflowRoute;
-    };
+/**
+ * One event, because one is what the client sends.
+ *
+ * This union also carried `assist_panel_opened` and `artifact_mode_selected`,
+ * typed against a `literacyAssist` module that was nothing but a table of
+ * storage keys: no control set an assist focus or an artifact mode, nothing
+ * read five of the six keys, and `trackOperatorWorkflowEvent` has exactly one
+ * caller — the route tracker below-left, which emits `route_transition`. A
+ * validator that accepts events no emitter produces reads as coverage of a
+ * feature that does not exist.
+ */
+export type OperatorWorkflowEvent = {
+  type: "route_transition";
+  path: string;
+  fromPath: OperatorWorkflowRoute;
+  toPath: OperatorWorkflowRoute;
+};
 
 export const OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT = "/api/telemetry/operator-workflow";
 export const operatorWorkflowRouteStorageKey = "whether.operatorWorkflow.lastPath";
@@ -37,22 +33,6 @@ export const isOperatorWorkflowEvent = (input: unknown): input is OperatorWorkfl
 
   if (typeof payload.path !== "string" || payload.path.length === 0) {
     return false;
-  }
-
-  if (payload.type === "assist_panel_opened") {
-    return (
-      (payload.assistMode === "decision" ||
-        payload.assistMode === "evidence" ||
-        payload.assistMode === "trust" ||
-        payload.assistMode === "share") &&
-      (payload.source === "click" ||
-        payload.source === "query" ||
-        payload.source === "stored_preference")
-    );
-  }
-
-  if (payload.type === "artifact_mode_selected") {
-    return payload.artifactMode === "operator" || payload.artifactMode === "explainer";
   }
 
   if (payload.type === "route_transition") {

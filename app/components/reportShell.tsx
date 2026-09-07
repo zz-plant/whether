@@ -7,7 +7,6 @@
  */
 import { Children, type ReactNode, isValidElement } from "react";
 import { PageShell } from "./pageShell";
-import { DisplayModeToggle } from "./displayModeToggle";
 import type { DataProvenance } from "./dataProvenanceStrip";
 import { type ReportSectionLink } from "./reportShellNavigation";
 import { AppSidebar } from "./AppSidebar";
@@ -75,14 +74,13 @@ type ReportShellInput = {
   inlineTrustPlacement?: "before-content" | "after-first-section" | "hidden";
   provenance?: DataProvenance;
   commandBar?: RegimeCommandBarProps;
-  ambientMode?: "standard" | "tv";
 };
 
 type ReportShellModel = {
   status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
   page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "sectionLinks" | "currentPath">;
   trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
-  chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
+  chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome">;
   actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "sharePayload" | "nextStep" | "nextRefreshLabel">;
   payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
@@ -161,7 +159,6 @@ export const ReportShell = (props: ReportShellProps) => {
     inlineTrustPlacement: resolvedInlineTrustPlacement = "before-content",
     provenance: resolvedProvenance,
     commandBar: resolvedCommandBar,
-    ambientMode: resolvedAmbientMode = "standard",
   } = input;
   const resolvedPrimaryCta =
     inputPrimaryCta ?? (resolvedCurrentPath === "/" ? undefined : { href: "#weekly-action-summary", label: "This week" });
@@ -203,7 +200,6 @@ export const ReportShell = (props: ReportShellProps) => {
     !showIntroBlock
     && resolvedInlineTrustPlacement !== "hidden"
     && (hasSidebar || resolvedInlineTrustPlacement === "after-first-section");
-  const enableTvAmbientMode = resolvedAmbientMode === "tv";
   const trustReadiness = resolveTrustReadinessCopy({
     trustStatusTone: resolvedTrustStatusTone,
     degradedSourceRows: resolvedDegradedSourceRows,
@@ -238,7 +234,6 @@ export const ReportShell = (props: ReportShellProps) => {
     <PageShell
       regime={resolvedRegime}
       structuredData={resolvedStructuredData}
-      ambientMode={resolvedAmbientMode}
     >
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
@@ -316,7 +311,6 @@ export const ReportShell = (props: ReportShellProps) => {
 
         {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-fluid-xs font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{resolvedDecisionBanner?.decision}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
 
-        {enableTvAmbientMode && resolvedPrimaryCta ? <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{resolvedPrimaryCta.label}</ReportCta>{resolvedSecondaryCta ? <InternalAwareLink href={resolvedSecondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{resolvedSecondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside> : null}
     </PageShell>
   );
 };
