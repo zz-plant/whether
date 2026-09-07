@@ -521,6 +521,21 @@ A screenshot pass over the global chrome — `bun run ui:iterate` plus header/fo
 - **The keyboard hint strip rendered after `</footer>`**, so it floated under the copyright
   attached to nothing. It sits inside the footer's bottom row now.
 
+Two review-bot findings on the first pass, both real and both fixed in the same PR:
+
+- **"The nav names the route" holds for six routes and no others.** Dropping the label beside
+  the wordmark left `/pricing`, `/about`, `/brief/<week>` and `/resources/...` showing the
+  wordmark alone on desktop: no loop link is active there, the mobile trigger is hidden from
+  `md`, and a matching utility link sits inside the closed More menu. `hasVisibleActiveNavLink`
+  now gates the label, so it returns for exactly the routes the navigation does not mark —
+  `/history/compare` included, since `compare` is filtered out of the loop links.
+- **The grouped icon cluster clipped its own focus rings.** `overflow-hidden` cut the top and
+  bottom off the theme toggle's ring: `.weather-pill:focus-visible` draws an outward 2px
+  outline plus a halo from unlayered CSS, which outranks any Tailwind offset utility, and
+  `PresentModeButton` had no offset at all. The group rounds through its end cells instead, so
+  nothing clips and a child added later cannot silently lose its ring. Verified in the browser:
+  computed `outline-offset: -2px`, group `overflow: visible`.
+
 Not changed, and worth naming: the home brief still spends a second full band on the cadence
 chips, ~240px of chrome on a 430px viewport before any content. Narrowing that is an IA
 question about whether monthly and quarterly deserve top-level persistence, not a styling one.

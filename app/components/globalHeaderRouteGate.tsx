@@ -4,8 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  hasVisibleActiveNavLink,
   isReportShellRoute,
   normalizePathname,
+  resolveGlobalHeaderRouteLabel,
   resolveReportHeaderNextStep,
 } from "../../lib/navigation/globalHeader";
 import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
@@ -55,6 +57,11 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   }, [currentPathname]);
 
   const isReportRoute = isReportShellRoute(pathname);
+  // Only where the nav row will not mark the route itself. Below `md` the nav
+  // trigger always carries it, so this stays a desktop-only fallback.
+  const fallbackRouteLabel = hasVisibleActiveNavLink(pathname)
+    ? null
+    : resolveGlobalHeaderRouteLabel(pathname);
   const isHomeBrief = pathname === "/";
   const reportHeaderAction = resolveReportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
@@ -97,11 +104,20 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
         <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
           {/* The route named itself three times here: this span, the nav
               trigger's label below `md`, and the active item in the nav row
-              above it. One is enough, and it belongs next to the navigation
-              that sets it rather than beside the brand. */}
-          <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white no-underline">
-            Whether
-          </Link>
+              above it. One is enough — but "the nav names it" only holds for the
+              six loop routes. On `/pricing`, `/about`, `/brief/<week>` and
+              `/resources/...` nothing in the desktop nav is active, so the label
+              comes back for exactly those. */}
+          <div className="flex min-w-0 items-center gap-2">
+            <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white no-underline">
+              Whether
+            </Link>
+            {fallbackRouteLabel ? (
+              <span className="hidden truncate text-fluid-xs font-medium tracking-[0.04em] text-[var(--app-text-muted)] md:inline">
+                {fallbackRouteLabel}
+              </span>
+            ) : null}
+          </div>
 
           <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
             {isReportRoute ? (
