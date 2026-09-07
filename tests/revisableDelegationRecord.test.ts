@@ -52,6 +52,35 @@ describe("STD-07 export of decision memory", () => {
     assert.equal(decision.visibility, "private");
   });
 
+  it("never emits a belief that says nothing would end it", async () => {
+    // The published conformance checker holds a stream at Level 1 for exactly
+    // one empty invalidated_by, and a posture snapshot carrying no assumptions
+    // used to produce one. A weekly call that cannot be invalidated is the
+    // failure STD-07 exists to make visible, so the floor is asserted over
+    // every record rather than over the entry shapes known today.
+    const records = await toRevisableDelegationRecords([snapshotEntry, decisionEntry], {
+      baseUrl: "https://whether.work",
+    });
+    for (const record of records) {
+      assert.ok(
+        record.invalidated_by.length > 0,
+        `${record.record_id} states nothing that would end it`,
+      );
+    }
+  });
+
+  it("falls back to the regime label and the week when an entry carries no assumptions", async () => {
+    const [snapshot] = await toRevisableDelegationRecords([snapshotEntry], {
+      baseUrl: "https://whether.work",
+    });
+    assert.equal(snapshot.invalidated_by.length, 1);
+    assert.equal(
+      snapshot.invalidated_by[0].condition,
+      "the operating regime moves off DEFENSIVE, or the week this call covers ends",
+    );
+    assert.equal(snapshot.invalidated_by[0].clock, "P7D");
+  });
+
   it("restates the assumption snapshot and reversal trigger as invalidation conditions", async () => {
     const [regime, decision] = await toRevisableDelegationRecords([decisionEntry], { baseUrl: "https://whether.work" });
     const conditions = decision.invalidated_by.map((entry) => entry.condition);

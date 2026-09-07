@@ -12,9 +12,16 @@ import type { DecisionMemoryEntry } from "../decisionMemory";
  * already carries, restated as checkable conditions, which is what lets a
  * later week see that a recorded call no longer rests on its own assumptions.
  *
- * Conformance: Level 1. Records are append-only, hashed over the canonical
- * serialization in STD-07 §5.1, and chained by prior_hash in createdAt order.
- * Not Level 2, because the regime belief has no `depends_on` of its own.
+ * Conformance: Level 2, as measured rather than asserted. Records are
+ * append-only, hashed over the canonical serialization in STD-07 §5.1, chained
+ * by prior_hash in createdAt order, and every one states what would end it.
+ * Whether emits no discrepancies, so the Level 2 requirement that each one be
+ * answered inside its clock is met vacuously.
+ *
+ * Not Level 3. Every record carries `contest`, but Level 3 asks for an objection
+ * that was actually accepted and answered, and Whether has no channel that
+ * writes one into the stream. A level is what a reader can see, not what the
+ * emitter intends.
  */
 
 export const REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION = "0.1.0";
@@ -22,7 +29,10 @@ export const REVISABLE_DELEGATION_STANDARD_URL =
   "https://ethotechnics.org/standards/std-07-revisable-delegation-record";
 export const REVISABLE_DELEGATION_SCHEMA_URL =
   "https://ethotechnics.org/api/schema/revisable-delegation-record.schema.json";
-export const WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL = 1;
+/** The reader that can contradict the level declared below. */
+export const REVISABLE_DELEGATION_VERIFIER_URL =
+  "https://ethotechnics.org/diagnostics/record-conformance";
+export const WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL = 2;
 const WHETHER_VERSION = "0.1.0";
 
 type InvalidationCondition = { condition: string; check?: string; clock?: string };
@@ -87,6 +97,19 @@ const addDays = (isoDate: string, days: number): string => {
 const asOfFromRecordDate = (recordDate: string): string =>
   recordDate.includes("T") ? new Date(recordDate).toISOString() : `${recordDate}T00:00:00.000Z`;
 
+/**
+ * Every belief has to say what would end it. An entry that carries an assumption
+ * snapshot says so precisely, in the regime boundaries it was decided against.
+ * An entry that carries none — an early posture snapshot, mostly — still has a
+ * regime label and a one-week horizon, and those are checkable: the call stops
+ * holding when the regime moves off the label it was made under, or when the
+ * week it covers runs out.
+ *
+ * Without that floor, such an entry emitted an empty `invalidated_by`, which
+ * STD-07 reads as a belief that cannot be revised, only replaced. It is also
+ * what the published conformance checker at ethotechnics.org actually held this
+ * stream at Level 1 for — not the missing `depends_on` this file used to blame.
+ */
 const conditionsFromAssumptions = (
   entry: DecisionMemoryEntry,
   checkUrl: string,
@@ -110,6 +133,13 @@ const conditionsFromAssumptions = (
   const reversalTrigger = entry.outcome.reversalTrigger?.trim();
   if (reversalTrigger) {
     conditions.push({ condition: reversalTrigger, check: checkUrl, clock: "P7D" });
+  }
+  if (conditions.length === 0) {
+    conditions.push({
+      condition: `the operating regime moves off ${entry.regime.label}, or the week this call covers ends`,
+      check: checkUrl,
+      clock: "P7D",
+    });
   }
   return conditions;
 };
