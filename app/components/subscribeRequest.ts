@@ -10,6 +10,11 @@
 
 export type SubscribeResult = { ok: boolean; message: string };
 
+export type SubscribeOptions = {
+  /** Also send regime-change alerts between Mondays. Omitted leaves a standing choice alone. */
+  alerts?: boolean;
+};
+
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
 
 const INVALID_EMAIL_MESSAGE = "Please enter a valid email address.";
@@ -17,7 +22,10 @@ const VERIFY_MESSAGE = "Check your email to verify your subscription.";
 const FAILURE_MESSAGE = "Failed to subscribe. Please try again.";
 const NETWORK_MESSAGE = "A network error occurred. Please try again.";
 
-export async function requestSubscription(email: string): Promise<SubscribeResult> {
+export async function requestSubscription(
+  email: string,
+  options?: SubscribeOptions,
+): Promise<SubscribeResult> {
   const trimmed = email.trim();
   if (!trimmed || !trimmed.includes("@")) {
     return { ok: false, message: INVALID_EMAIL_MESSAGE };
@@ -27,7 +35,11 @@ export async function requestSubscription(email: string): Promise<SubscribeResul
     const res = await fetch(SUBSCRIBE_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: trimmed }),
+      body: JSON.stringify(
+        typeof options?.alerts === "boolean"
+          ? { email: trimmed, alerts: options.alerts }
+          : { email: trimmed },
+      ),
     });
     const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
 

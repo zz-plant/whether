@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
-import { deliverAlerts, resolveRecipientEmail } from "../lib/alert/alertDelivery";
+import { deliverAlerts, deliverAlertToSubscriber } from "../lib/alert/alertDelivery";
 import { resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
-import {
-  getAlertPreferenceRepository,
-  resetAlertPreferenceRepository,
-} from "../lib/storage/alertPreferenceRepository";
+import type { EmailDeliveryAdapter } from "../lib/email/emailDelivery";
+import type { AlertDecision } from "../lib/alert/alertEvaluator";
 import type { KvNamespace } from "../lib/runtime/kv";
+
+/**
+ * Alert mail is enrolled through the email subscription, not through a per-device record.
+ *
+ * It used to be the other way round: the alerts panel POSTed a preference keyed on a
+ * random client UUID from localStorage, and delivery resolved each record through
+ * `getSubscriberByToken` — which only ever accepts a token that reached the subscriber's
+ * own inbox. No surface could write a record under a token, so the enrollment path these
+ * tests described was unreachable from the product and every real record was skipped.
+ */
 
 class FakeKv implements KvNamespace {
   private readonly entries = new Map<string, string>();
@@ -43,16 +51,9 @@ const CONDITIONS = {
 let store: SubscriberStore;
 let kv: FakeKv;
 
-/** Enroll an address in email alerts the way the API allows: a self-asserted clientId. */
-const enrollForAlerts = async (clientId: string) => {
-  await getAlertPreferenceRepository().upsert(clientId, { slack: false, email: true, webhook: false });
-  // listAlertSubscribers finds candidates by scanning KV keys, so the record has to exist
-  // there too — the repository lookup alone would never be reached.
-  await kv.put(`alert-pref:${clientId}`, JSON.stringify({ slack: false, email: true, webhook: false }));
-};
-
-const subscribeVerified = async (email: string) => {
-  const subscriber = await store.subscribe(email);
+/** The product path: subscribe with the alerts box ticked, then confirm the address. */
+const subscribeVerified = async (email: string, options?: { alerts?: boolean }) => {
+  const subscriber = await store.subscribe(email, options);
   await store.verifyEmail(subscriber.token);
   return subscriber;
 };
@@ -61,56 +62,16 @@ beforeEach(() => {
   kv = new FakeKv();
   Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });
   store = resetSubscriberStore();
-  resetAlertPreferenceRepository();
 });
 
 afterEach(() => {
   Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
   resetSubscriberStore();
-  resetAlertPreferenceRepository();
-});
-
-describe("resolveRecipientEmail", () => {
-  // Knowing an address is not consent. Anyone can write a preference record naming any
-  // clientId, so accepting an address let a stranger sign a real subscriber up for alert
-  // mail that carries no unsubscribe link.
-  it("refuses a bare address, even a verified subscriber's", async () => {
-    await subscribeVerified("operator@example.com");
-
-    assert.equal(await resolveRecipientEmail("operator@example.com"), null);
-    assert.equal(await resolveRecipientEmail("Operator@Example.COM"), null);
-  });
-
-  it("resolves a verified subscriber by token", async () => {
-    const subscriber = await subscribeVerified("operator@example.com");
-
-    assert.equal(await resolveRecipientEmail(subscriber.token), "operator@example.com");
-  });
-
-  // The clientId on an alert-pref record is self-asserted, so an address that merely looks
-  // like an address is not evidence that its owner asked for mail.
-  it("refuses an address with no subscriber record", async () => {
-    assert.equal(await resolveRecipientEmail("stranger@example.com"), null);
-  });
-
-  it("refuses an address that has not completed verification", async () => {
-    await store.subscribe("pending@example.com");
-
-    assert.equal(await resolveRecipientEmail("pending@example.com"), null);
-  });
-
-  it("refuses an address that unsubscribed", async () => {
-    const subscriber = await subscribeVerified("former@example.com");
-    await store.unsubscribe(subscriber.token);
-
-    assert.equal(await resolveRecipientEmail("former@example.com"), null);
-  });
 });
 
 describe("deliverAlerts", () => {
-  it("delivers to a verified subscriber enrolled by token", async () => {
-    const subscriber = await subscribeVerified("operator@example.com");
-    await enrollForAlerts(subscriber.token);
+  it("delivers to a verified subscriber who opted in", async () => {
+    await subscribeVerified("operator@example.com", { alerts: true });
 
     const result = await deliverAlerts(CONDITIONS);
 
@@ -119,38 +80,114 @@ describe("deliverAlerts", () => {
     assert.equal(result.errors, 0);
   });
 
-  // Belt and braces now. The delivered-marker is keyed on the resolved address rather than
-  // on the preference record, so two records naming one inbox still produce one copy. Since
-  // only the token record resolves, the address-keyed one lands as a skip.
-  it("sends one copy when an address record sits beside the subscriber's token record", async () => {
-    const subscriber = await subscribeVerified("reader@example.com");
-    await enrollForAlerts("reader@example.com");
-    await enrollForAlerts(subscriber.token);
-
-    const result = await deliverAlerts(CONDITIONS);
-
-    assert.equal(result.sent, 1, "one inbox, one copy");
-    assert.equal(result.skipped, 1, "the address-keyed record names nobody");
-  });
-
-  it("sends nothing when a preference record names an address that never consented", async () => {
-    await enrollForAlerts("stranger@example.com");
+  // The weekly brief and the alert stream are separate consents. Someone who asked for
+  // Monday mail has not asked to be interrupted when the regime moves.
+  it("sends nothing to a verified subscriber who did not opt in", async () => {
+    await subscribeVerified("weekly-only@example.com");
 
     const result = await deliverAlerts(CONDITIONS);
 
     assert.equal(result.alerts.length, 1, "the alert still fires; only the delivery is withheld");
-    assert.equal(result.sent, 0, "no mail to an address with no verified subscription");
-    assert.equal(result.skipped, 1, "withheld, not counted as a send failure");
+    assert.equal(result.sent, 0);
     assert.equal(result.errors, 0);
   });
 
-  it("sends nothing to a subscriber who has not verified yet", async () => {
-    const pending = await store.subscribe("pending@example.com");
-    await enrollForAlerts(pending.token);
+  it("sends nothing to a subscriber who has not confirmed the address", async () => {
+    await store.subscribe("pending@example.com", { alerts: true });
 
     const result = await deliverAlerts(CONDITIONS);
 
     assert.equal(result.sent, 0);
-    assert.equal(result.skipped, 1);
+  });
+
+  it("sends nothing to a subscriber who unsubscribed", async () => {
+    const subscriber = await subscribeVerified("former@example.com", { alerts: true });
+    await store.unsubscribe(subscriber.token);
+
+    const result = await deliverAlerts(CONDITIONS);
+
+    assert.equal(result.sent, 0);
+  });
+
+  it("sends one copy per inbox per alert type", async () => {
+    await subscribeVerified("reader@example.com", { alerts: true });
+
+    const first = await deliverAlerts(CONDITIONS);
+    const second = await deliverAlerts({ ...CONDITIONS, regime: "SCARCITY" });
+
+    assert.equal(first.sent, 1);
+    assert.equal(second.sent, 0, "the delivered marker is keyed on the address");
+    assert.equal(second.skipped, 1, "withheld, not counted as a send failure");
+  });
+
+  // A subscriber record written before the field existed reads as opted out, so the
+  // migration enrolls nobody who did not ask.
+  it("treats a record with no alerts field as opted out", async () => {
+    const subscriber = await subscribeVerified("legacy@example.com");
+    const stored = JSON.parse((await kv.get(`email:sub:${subscriber.email}`)) ?? "{}");
+    delete stored.alerts;
+    await kv.put(`email:sub:${subscriber.email}`, JSON.stringify(stored));
+
+    const result = await deliverAlerts(CONDITIONS);
+
+    assert.equal(result.sent, 0);
+  });
+});
+
+/** Annotated, not asserted, so the fixture is checked against the real decision shape. */
+const REGIME_CHANGE: AlertDecision = {
+  type: "regime_change",
+  severity: "critical",
+  headline: "RECONSIDER OPERATING POSTURE",
+};
+
+/**
+ * Collects what was sent. An array rather than a nullable capture variable so the
+ * assertions need no cast to read it back: TypeScript narrows a `let x = null` assigned
+ * only inside a closure to `null`, and the usual escape is an assertion this repo counts.
+ */
+const recordingAdapter = () => {
+  const sends: Array<{ html: string; text: string }> = [];
+  const adapter: EmailDeliveryAdapter = {
+    send: async ({ html, text }) => {
+      sends.push({ html, text });
+      return { ok: true };
+    },
+  };
+  return { adapter, sends };
+};
+
+describe("alert mail", () => {
+  it("carries a one-click unsubscribe link", async () => {
+    const { adapter, sends } = recordingAdapter();
+
+    const ok = await deliverAlertToSubscriber(
+      "operator@example.com",
+      REGIME_CHANGE,
+      CONDITIONS,
+      adapter,
+      "token-123",
+    );
+
+    assert.equal(ok, true);
+    assert.equal(sends.length, 1, "the adapter was called");
+    assert.match(sends[0].html, /\/api\/email\/unsubscribe\?token=token-123/);
+    assert.match(sends[0].text, /\/api\/email\/unsubscribe\?token=token-123/);
+  });
+
+  it("omits the link rather than sending a broken one when there is no token", async () => {
+    const { adapter, sends } = recordingAdapter();
+
+    await deliverAlertToSubscriber(
+      "operator@example.com",
+      REGIME_CHANGE,
+      CONDITIONS,
+      adapter,
+      null,
+    );
+
+    assert.equal(sends.length, 1);
+    assert.doesNotMatch(sends[0].html, /unsubscribe/i);
+    assert.doesNotMatch(sends[0].text, /unsubscribe/i);
   });
 });

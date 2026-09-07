@@ -1,29 +1,29 @@
 /**
  * Alert history for logged regime changes, with a copyable summary per alert.
  *
- * This panel used to carry a "Deliver latest alert" control. It POSTed
- * /api/alert-deliveries, whose unauthenticated branch appends a log row marked "sent" for
- * every enabled channel without contacting a single channel, and the panel then reported
- * "Delivered to N channels" and listed those rows back. Nothing was ever sent. Alert mail
- * goes out from the cron path in lib/alert/alertDelivery.ts, to verified subscribers only,
- * and there is no Slack or webhook destination stored per operator profile at all.
+ * Two controls have been removed from this panel, for the same underlying reason.
  *
- * What is left is what the panel can actually do: show the history that
- * /api/regime-alerts serves, let a reader copy one, and record which channels they would
- * want it on — labelled as the preference it is rather than as delivery.
+ * A "Deliver latest alert" button POSTed /api/alert-deliveries, whose unauthenticated
+ * branch appends a log row marked "sent" for every enabled channel without contacting a
+ * channel, and the panel reported "Delivered to N channels" off those rows.
+ *
+ * Then three channel toggles (slack / email / webhook) POSTed /api/alert-preferences,
+ * keyed on `usePersistentClientId` — a random UUID in this browser's localStorage. The
+ * cron delivery path did read those records, but resolved each one through
+ * `getSubscriberByToken`, and a device UUID is never a subscriber token, so every record
+ * the panel wrote was counted and then skipped. Slack and webhook had no adapter at all.
+ *
+ * Alert mail now rides the email subscription: opt in beside the address, verify it, and
+ * `listAlertSubscribers` sends to that verified inbox. What is left here is what the
+ * panel can actually do — show the history /api/regime-alerts serves, let a reader copy
+ * one, and say where the mail comes from.
  */
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePersistentClientId } from "./clientIdentity";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
-import {
-  CHANNELS,
-  saveAlertPreferences,
-  type ChannelPreferences,
-  type DeliveryChannel,
-} from "./alertPreferenceRequest";
 import type { RegimeChangeReason } from "../../lib/regimeEngine";
 
 /** Only the fields /api/regime-alerts actually carries. The previous shape claimed a whole
@@ -93,45 +93,9 @@ const parseAlertRecords = (payload: unknown): AlertRecord[] => {
   return payload.alerts.map(toAlertRecord).filter((entry): entry is AlertRecord => entry !== null);
 };
 
-const parseChannelPreferences = (payload: unknown): ChannelPreferences | null => {
-  if (!isRecord(payload) || !isRecord(payload.preferences)) return null;
-
-  const source = payload.preferences;
-  const parsed: ChannelPreferences = { slack: false, email: false, webhook: false };
-  for (const channel of CHANNELS) {
-    const value = source[channel];
-    if (typeof value !== "boolean") return null;
-    parsed[channel] = value;
-  }
-  return parsed;
-};
-
 export const RegimeAlertsPanel = () => {
   const [alerts, setAlerts] = useState<AlertRecord[]>([]);
-  const [preferences, setPreferences] = useState<ChannelPreferences>({
-    slack: false,
-    email: false,
-    webhook: false,
-  });
-  const [preferenceError, setPreferenceError] = useState<string | null>(null);
   const { activeTarget, copiedTarget, status, error, copyToClipboard } = useClipboardCopy();
-  const clientId = usePersistentClientId();
-
-  useEffect(() => {
-    if (!clientId) return;
-
-    void fetch(`/api/alert-preferences?clientId=${encodeURIComponent(clientId)}`, {
-      headers: { "x-whether-client-id": clientId },
-    })
-      .then(async (response) => {
-        if (!response.ok) return;
-        const parsed = parseChannelPreferences(await response.json());
-        if (parsed) setPreferences(parsed);
-      })
-      .catch(() => {
-        // Keep the defaults; an unreachable preference read is not worth a visible error.
-      });
-  }, [clientId]);
 
   useEffect(() => {
     let active = true;
@@ -150,31 +114,6 @@ export const RegimeAlertsPanel = () => {
       active = false;
     };
   }, []);
-
-  /*
-   * The POST was fire-and-forget behind a `.catch()` that kept the optimistic
-   * checkmark, so a channel read as recorded when the write had failed — the
-   * same shape as a copy button reporting success on a rejected clipboard
-   * write. The optimistic flip stays, because the round trip is slow enough to
-   * feel; what changed is that a failure takes it back and says so.
-   */
-  const togglePreference = async (channel: DeliveryChannel) => {
-    if (!clientId) return;
-
-    const previousValue = preferences[channel];
-    const next = { ...preferences, [channel]: !previousValue };
-    setPreferences(next);
-    setPreferenceError(null);
-
-    if (await saveAlertPreferences(clientId, next)) {
-      return;
-    }
-
-    // Revert this channel alone: another toggle may be in flight, and
-    // restoring the whole snapshot would silently undo that one too.
-    setPreferences((current) => ({ ...current, [channel]: previousValue }));
-    setPreferenceError("Could not save that channel — it is unchanged. Try again.");
-  };
 
   return (
     <section
@@ -196,36 +135,25 @@ export const RegimeAlertsPanel = () => {
           </div>
           <div className="weather-surface space-y-2 p-3">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Where you would want these
+              Getting these by email
             </p>
-            <div className="flex flex-wrap gap-2">
-              {CHANNELS.map((channel) => (
-                <button
-                  key={channel}
-                  type="button"
-                  onClick={() => void togglePreference(channel)}
-                  disabled={!clientId}
-                  className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
-                    preferences[channel] ? "text-emerald-200" : "text-slate-400"
-                  }`}
-                  aria-pressed={preferences[channel]}
-                  data-premium-intent="integrations"
-                  data-premium-cta={`toggle_alert_channel_${channel}`}
-                  data-premium-detail={channel}
-                >
-                  {preferences[channel] ? "✓" : "○"} {channel}
-                </button>
-              ))}
-            </div>
+            <p className="text-xs leading-relaxed text-slate-400">
+              Alert mail rides the weekly brief subscription: tick &quot;email me when the
+              regime changes&quot; beside your address, confirm the address, and a change
+              logged here lands in that inbox. Every alert carries an unsubscribe link.
+            </p>
+            <Link
+              href="/#subscribe"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-sky-200"
+              data-premium-intent="integrations"
+              data-premium-cta="alert_email_subscribe"
+            >
+              Subscribe or update your address
+            </Link>
             <p className="text-xs text-slate-400">
-              Push delivery is not live yet. This records the channel against this device&apos;s
-              operator profile; nothing is sent from here.
+              Slack and webhook delivery do not exist — there is no adapter for either, so
+              this panel no longer lists them.
             </p>
-            {preferenceError ? (
-              <p aria-live="polite" className="text-xs text-amber-300">
-                {preferenceError}
-              </p>
-            ) : null}
           </div>
         </div>
         {alerts.length === 0 ? (

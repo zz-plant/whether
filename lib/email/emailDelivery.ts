@@ -9,6 +9,8 @@ export type EmailRecipient = {
   name?: string;
   tickerConfig?: string;
   stageConfig?: string;
+  /** The subscriber's unsubscribe token, so outgoing mail can carry a one-click link. */
+  token?: string;
 };
 
 export type EmailDeliveryAdapter = {
@@ -75,8 +77,10 @@ import { getSubscriberStore, resetSubscriberStore } from "./subscriberStore";
 
 export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
   const store = getSubscriberStore();
-  const emails = await store.getActiveSubscriptions();
-  return emails.map((email) => ({ email }));
+  const subscribers = await store.listActiveSubscribers();
+  // Carries the token, which the weekly brief's unsubscribe link needs. This returned
+  // bare addresses until 2026-09-07, which is why that mail went out without one.
+  return subscribers.map((sub) => ({ email: sub.email, token: sub.token }));
 };
 
 export const clearSubscriptions = async (): Promise<void> => {

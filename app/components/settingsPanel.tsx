@@ -13,6 +13,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const { stage, setStage } = useOperatorStage();
   const [email, setEmail] = useState("");
+  const [alerts, setAlerts] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeMsg, setSubscribeMsg] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -34,13 +35,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const handleSubscribe = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubscribing(true);
-    const result = await requestSubscription(email);
+    const result = await requestSubscription(email, { alerts });
     setSubscribed(result.ok);
     setSubscribeMsg(result.message);
     setIsSubscribing(false);
     setSaved(false);
     setTimeout(() => setSubscribeMsg(""), 6000);
-  }, [email]);
+  }, [email, alerts]);
 
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
@@ -117,6 +118,15 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 {isSubscribing ? "…" : subscribed ? "Check inbox" : "Subscribe"}
               </button>
             </form>
+            <label className="mt-2 flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-slate-400">
+              <input
+                type="checkbox"
+                checked={alerts}
+                onChange={(e) => setAlerts(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-sky-400"
+              />
+              <span>Also email me when the regime changes between Mondays.</span>
+            </label>
             {subscribeMsg ? (
               <p
                 aria-live="polite"

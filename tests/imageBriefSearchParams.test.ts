@@ -60,4 +60,26 @@ describe("image brief search params", () => {
       operatorContext: { companyStage: "seed", ticker: "GOOGL" },
     });
   });
+
+  it("folds the legacy stage values instead of dropping the calibration", () => {
+    // A shared brief link or OG image URL carrying ?stage=growth used to serialize the
+    // stage through and then reject it at the context boundary, so the rendered brief
+    // was stage-agnostic while the URL still named a stage.
+    for (const legacy of ["growth", "public"]) {
+      const source = new URLSearchParams({ stage: legacy });
+
+      assert.equal(buildImageBriefApiPath(source), "/api/image/brief?stage=series-b");
+      assert.equal(
+        parseImageBriefRequestContext(source).operatorContext?.companyStage,
+        "series-b",
+      );
+    }
+  });
+
+  it("still reads an unknown stage as no stage at all", () => {
+    const source = new URLSearchParams({ stage: "pre-seed" });
+
+    assert.equal(buildImageBriefApiPath(source), "/api/image/brief");
+    assert.equal(parseImageBriefRequestContext(source).operatorContext, undefined);
+  });
 });
