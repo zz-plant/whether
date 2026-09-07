@@ -1,4 +1,3 @@
-import { CadenceSummaryCard } from "./cadenceSummaryCard";
 import { SummaryCard } from "./summaryCard";
 import { summaryCardCadences, type SummaryCadence, type SummaryPayloadByCadence } from "./summaryCardCadences";
 
@@ -8,24 +7,20 @@ type CadenceSummaryCardAdapterProps<TCadence extends SummaryCadence> = {
 };
 
 /**
- * Generic summary-card adapter that routes cadence payloads through
- * either the compact cadence wrapper or full structured summary card.
+ * Renders a cadence's summary payload through the one summary card.
+ *
+ * This used to branch: a cadence with no `sectionBuilder` and no
+ * `companionHref` went to a `CadenceSummaryCard` wrapper, everything else went
+ * to `SummaryCard`. The two arms were the same render — the wrapper forwarded
+ * three props to `SummaryCard` and added nothing, and the props the other arm
+ * passed extra (`companionHref`, `sectionBuilder?.(summary)`) are already
+ * `undefined` in exactly the case the first arm handled. One call, one card.
  */
 export const CadenceSummaryCardAdapter = <TCadence extends SummaryCadence>({
   cadence,
   summary,
 }: CadenceSummaryCardAdapterProps<TCadence>) => {
   const cadenceConfig = summaryCardCadences[cadence];
-
-  if (!cadenceConfig.sectionBuilder && !cadenceConfig.companionHref) {
-    return (
-      <CadenceSummaryCard
-        summaryCopy={summary.copy}
-        cadenceLabel={cadenceConfig.cadenceLabel}
-        apiHref={cadenceConfig.apiHref}
-      />
-    );
-  }
 
   return (
     <SummaryCard
@@ -37,4 +32,3 @@ export const CadenceSummaryCardAdapter = <TCadence extends SummaryCadence>({
     />
   );
 };
-

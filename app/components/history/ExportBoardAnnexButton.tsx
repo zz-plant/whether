@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Check, FileText } from "lucide-react";
+import { Check, FileText, AlertCircle } from "lucide-react";
 import type { TrackRecord } from "../../../lib/report/trackRecord";
+import { useClipboardCopy } from "../useClipboardCopy";
 
 type Props = {
   record: TrackRecord | null;
@@ -10,7 +10,17 @@ type Props = {
 };
 
 export function ExportBoardAnnexButton({ record, className = "" }: Props) {
-  const [copied, setCopied] = useState(false);
+  /*
+   * This used to be `void navigator.clipboard.writeText(...)` inside a
+   * try/catch, then `setCopied(true)` on the next line. `void` discards the
+   * promise, so a rejected write is an unhandled rejection rather than a
+   * synchronous throw and the catch could never fire — the button said "Board
+   * Annex Copied!" for a memo that never reached the clipboard. The shared hook
+   * awaits the write and separates "clipboard unavailable" from "write failed".
+   */
+  const { status, copyToClipboard } = useClipboardCopy({ resetDelay: 2500 });
+  const copied = status === "copied";
+  const failed = status === "error";
 
   const handleExport = () => {
     const latestDate = record ? record.latestRecordDate : new Date().toISOString().slice(0, 10);
@@ -41,13 +51,7 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
       `- Citable Record Archive: https://whether.work/history`,
     ].join("\n");
 
-    try {
-      void navigator.clipboard.writeText(boardAnnex);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // ignore
-    }
+    void copyToClipboard(boardAnnex, "board-annex");
   };
 
   return (
@@ -62,6 +66,11 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
         <>
           <Check className="size-3.5 text-emerald-300" />
           <span className="text-emerald-300">Board Annex Copied!</span>
+        </>
+      ) : failed ? (
+        <>
+          <AlertCircle className="size-3.5 text-amber-300" />
+          <span className="text-amber-300">Copy failed — select the page text</span>
         </>
       ) : (
         <>

@@ -1,15 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback } from "react";
 import { CheckIcon, ShareIcon } from "./uiIcons";
-
-function fallbackCopy(text: string): void {
-  try {
-    void navigator.clipboard.writeText(text);
-  } catch {
-    // ignore
-  }
-}
+import { useClipboardCopy } from "./useClipboardCopy";
 
 type Props = {
   title?: string;
@@ -36,8 +29,16 @@ export function ShareBriefButton({
   label = "Copy Brief",
   copiedLabel = "Brief Copied",
 }: Props) {
-  const [didCopy, setDidCopy] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /*
+   * The copy path was `void navigator.clipboard.writeText(text)` in a try/catch
+   * whose catch could never fire — `void` makes a rejected write an unhandled
+   * rejection, not a synchronous throw — followed by an unconditional
+   * `setDidCopy(true)`. On the homepage hero, that meant the brief people paste
+   * into Slack reported "Brief Copied" whether or not anything was copied.
+   */
+  const { status, copyToClipboard } = useClipboardCopy();
+  const didCopy = status === "copied";
+  const didFail = status === "error";
 
   const handleClick = useCallback(() => {
     const bulletBlock = lines && lines.length > 0 ? `\n\n${lines.map((line) => `• ${line}`).join("\n")}` : "";
@@ -51,11 +52,8 @@ export function ShareBriefButton({
     // weekly heading here meant a monthly or quarterly call arrived in Slack labelled
     // "Whether Weekly Brief" — the wrong horizon on a message people act on.
     const formattedSlackBrief = `*${title}*\n> *Operating Call:* ${text}${bulletBlock}\n\n*Full brief:* ${url || "https://whether.work"}`;
-    fallbackCopy(formattedSlackBrief);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setDidCopy(true);
-    timeoutRef.current = setTimeout(() => setDidCopy(false), 2000);
-  }, [title, text, lines, url]);
+    void copyToClipboard(formattedSlackBrief, "share-brief");
+  }, [title, text, lines, url, copyToClipboard]);
 
   return (
     <button
@@ -74,9 +72,18 @@ export function ShareBriefButton({
       {didCopy ? (
         <CheckIcon className="size-4 text-emerald-300" />
       ) : (
-        <ShareIcon className="size-4" />
+        <ShareIcon className={didFail ? "size-4 text-amber-300" : "size-4"} />
       )}
-      {showLabel ? <span>{didCopy ? copiedLabel : label}</span> : null}
+      {showLabel ? (
+        <span className={didFail ? "text-amber-300" : undefined}>
+          {didCopy ? copiedLabel : didFail ? "Copy failed" : label}
+        </span>
+      ) : null}
+      {/* The label is optional on this button, so the failure has to reach a
+          screen reader either way. */}
+      <output className="sr-only" aria-live="polite">
+        {didCopy ? `${copiedLabel}.` : didFail ? "Copy failed. Select the brief text to copy it manually." : ""}
+      </output>
     </button>
   );
 }
