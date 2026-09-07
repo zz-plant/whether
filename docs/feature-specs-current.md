@@ -486,6 +486,45 @@ zero-offset halos, which §XIII allows as emphasis.
 
 Covered by `tests/pageScopedControls.test.ts`.
 
+### 1.1.14 Header, nav and footer, looked at rather than reasoned about (2026-09-07)
+A screenshot pass over the global chrome — `bun run ui:iterate` plus header/footer crops at
+430px and 1600px, before and after. Four of the five findings were only visible in a picture.
+
+- **The route named itself twice or three times.** On a report route the header printed the
+  route beside the wordmark, again on the nav trigger below `md`, and again as the active
+  item in the nav row above it — "Evidence" three times inside 130px. §XI's rule against
+  restating route state before the first task block. The span beside the brand is gone; the
+  route is named where the navigation that sets it lives. The trigger's label, previously
+  hidden below 400px because the span already carried it, now shows at every width.
+- **Two adjacent buttons, one destination.** `primaryNavigationLayers` holds exactly one
+  layer — the weekly brief at `/` — so `resolveReportHeaderUtilityAction` fell through on
+  every report route to `{ href: "/", label: "Home" }`, rendered as a pill beside the
+  `Weekly Brief` CTA that `resolveReportHeaderNextStep` also points at `/`. A matching layer
+  would have been no better: it would link to the page the reader is on. The slot now returns
+  null unless it names somewhere the primary action does not, and the caller renders nothing.
+- **The right edge was a strip of identical squares.** Each header control carried its own
+  border and fill — five of them on the home brief once Present moved up in §1.1.13 —
+  competing with the cadence segmented control beside them for the same "bordered group"
+  reading. One container now owns the border; the buttons are hairline-divided cells.
+- **The footer had no brand and three anonymous centred rows.** Twenty-four links, ranked by
+  nothing, on the second-most-common surface a reader checks to find out what a product is.
+  It now opens with the wordmark and `canonicalPositioningLine` — the same sentence the
+  metadata ships, so it cannot drift — beside two labelled groups derived, as before, from
+  `navigationLayers` and `utilityLinks`. The lists wrap horizontally on mobile and stack on
+  `sm`, which was worth measuring: a plain vertical list gives every link its own 44px row and
+  took the mobile footer from ~400px to 1028px before the reflow brought it back to 664px.
+- **The legal row stranded its separators.** `<span>·</span>` siblings are text nodes, so they
+  wrap like any other, regularly leaving a dot at the end of a line. Moving them to a CSS
+  `::before` only moved the defect — the item that lands first on a wrapped line still carries
+  one, which the after-shot showed. They are gone; spacing separates six items well enough and
+  cannot wrap badly.
+- **The keyboard hint strip rendered after `</footer>`**, so it floated under the copyright
+  attached to nothing. It sits inside the footer's bottom row now.
+
+Not changed, and worth naming: the home brief still spends a second full band on the cadence
+chips, ~240px of chrome on a 430px viewport before any content. Narrowing that is an IA
+question about whether monthly and quarterly deserve top-level persistence, not a styling one.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

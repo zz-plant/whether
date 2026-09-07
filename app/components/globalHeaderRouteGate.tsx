@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import {
   isReportShellRoute,
   normalizePathname,
-  resolveGlobalHeaderRouteLabel,
   resolveReportHeaderNextStep,
 } from "../../lib/navigation/globalHeader";
 import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
@@ -17,17 +16,30 @@ import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 
-// On the brief, the utility slot points at the toolkit library; on any other
-// hub it links back to that hub's root using its canonical IA label.
+/**
+ * The header's secondary destination, or null when there isn't a distinct one.
+ *
+ * `primaryNavigationLayers` holds exactly one layer — the weekly brief at `/` —
+ * so on every report route this used to fall through to `{ href: "/", label:
+ * "Home" }` and render a pill next to the `Weekly Brief` CTA, which
+ * `resolveReportHeaderNextStep` also points at `/`. Two adjacent buttons, two
+ * labels, one destination. A matching layer was no better: it would have linked
+ * to the page the reader is already on.
+ *
+ * So the slot is now filled only when it names somewhere the primary action
+ * does not, and the caller renders nothing otherwise.
+ */
 export const resolveReportHeaderUtilityAction = (pathname: string) => {
   if (pathname === "/") {
     return { href: "/answer#toolkit-library", label: "Toolkits" };
   }
 
   const activeLayer = primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, pathname));
-  return activeLayer
-    ? { href: activeLayer.href, label: activeLayer.navLabel ?? activeLayer.label }
-    : { href: "/", label: "Home" };
+  if (!activeLayer || pathMatchesLink(activeLayer.href, pathname)) {
+    return null;
+  }
+
+  return { href: activeLayer.href, label: activeLayer.navLabel ?? activeLayer.label };
 };
 
 type GlobalHeaderRouteGateProps = {
@@ -44,7 +56,6 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
   const isReportRoute = isReportShellRoute(pathname);
   const isHomeBrief = pathname === "/";
-  const routeLabel = isHomeBrief ? "Weekly brief" : resolveGlobalHeaderRouteLabel(pathname);
   const reportHeaderAction = resolveReportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
 
@@ -84,14 +95,13 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
     <GlobalHeaderScrollWrapper>
       <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
         <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
-              Whether
-            </Link>
-            <span className="hidden text-fluid-micro font-medium tracking-[0.04em] text-[var(--app-text-muted)] min-[360px]:inline sm:text-fluid-xs">
-              {routeLabel}
-            </span>
-          </div>
+          {/* The route named itself three times here: this span, the nav
+              trigger's label below `md`, and the active item in the nav row
+              above it. One is enough, and it belongs next to the navigation
+              that sets it rather than beside the brand. */}
+          <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white no-underline">
+            Whether
+          </Link>
 
           <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
             {isReportRoute ? (
@@ -109,12 +119,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                     {reportHeaderAction.label}
                   </Link>
                 ) : null}
-                <Link
-                  href={reportHeaderUtilityAction.href}
-                  className="weather-pill hidden min-h-[34px] items-center justify-center px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
-                >
-                  {reportHeaderUtilityAction.label}
-                </Link>
+                {reportHeaderUtilityAction ? (
+                  <Link
+                    href={reportHeaderUtilityAction.href}
+                    className="weather-pill hidden min-h-[34px] items-center justify-center px-2.5 py-1.5 text-fluid-xs font-semibold tracking-[0.04em] text-slate-100 sm:inline-flex"
+                  >
+                    {reportHeaderUtilityAction.label}
+                  </Link>
+                ) : null}
                 <div className="flex items-center gap-1.5 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-sky-400">
                   <GlobalHeaderActionsClient />
                 </div>

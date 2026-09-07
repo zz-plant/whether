@@ -17,6 +17,18 @@ type GlobalHeaderActionsClientProps = {
   showPresentMode?: boolean;
 };
 
+/**
+ * One bordered group, not four or five boxes.
+ *
+ * Each control used to carry its own border and fill, so the right edge of the
+ * header read as a strip of identical squares — five of them on the home brief
+ * once Present moved up here — competing with the cadence control beside it for
+ * the same "this is a bordered group" reading. The border is now on the
+ * container; the buttons are hairline-divided cells inside it.
+ */
+const CELL =
+  "inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center text-slate-400 transition-colors duration-150 hover:bg-slate-800/70 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sky-400";
+
 export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHeaderActionsClientProps = {}) {
   const [showSettings, setShowSettings] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -24,39 +36,23 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setShowPalette(true)}
-        className="inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/80 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400"
-        aria-label="Search"
-        title="Search ⌘K"
-      >
-        <Search aria-hidden="true" size={16} strokeWidth={1.8} />
-      </button>
-      <button
-        type="button"
-        onClick={() => setShowProfile(true)}
-        className="inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/80 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400"
-        aria-label="History & export"
-        title="History & export"
-      >
-        <History aria-hidden="true" size={16} strokeWidth={1.8} />
-      </button>
-      {/* The light theme has a full token set in tokens.css and layout.tsx
-          restores the saved choice pre-paint, but nothing rendered the control,
-          so the theme was unreachable from the UI. Matches the sizing of the
-          buttons either side rather than using the component's pill default. */}
-      <ThemeToggleButton className="!rounded-lg min-h-11 sm:min-h-9 min-w-11 border border-slate-800/80 bg-slate-900/60 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/80" />
-      {showPresentMode ? <PresentModeButton /> : null}
-      <button
-        type="button"
-        onClick={() => setShowSettings(true)}
-        className="inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/80 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sky-400"
-        aria-label="Settings"
-        title="Settings"
-      >
-        <Settings aria-hidden="true" size={16} strokeWidth={1.8} />
-      </button>
+      <div className="inline-flex items-stretch overflow-hidden rounded-lg border border-slate-800/80 bg-slate-900/60 divide-x divide-slate-800/80">
+        <button type="button" onClick={() => setShowPalette(true)} className={CELL} aria-label="Search" title="Search ⌘K">
+          <Search aria-hidden="true" size={16} strokeWidth={1.8} />
+        </button>
+        <button type="button" onClick={() => setShowProfile(true)} className={CELL} aria-label="History & export" title="History & export">
+          <History aria-hidden="true" size={16} strokeWidth={1.8} />
+        </button>
+        {/* The light theme has a full token set in tokens.css and layout.tsx
+            restores the saved choice pre-paint, but nothing rendered the control,
+            so the theme was unreachable from the UI. Takes the cell class rather
+            than its own pill default, like the buttons either side. */}
+        <ThemeToggleButton className={`!rounded-none ${CELL}`} />
+        {showPresentMode ? <PresentModeButton className="!rounded-none !border-0 !bg-transparent" /> : null}
+        <button type="button" onClick={() => setShowSettings(true)} className={CELL} aria-label="Settings" title="Settings">
+          <Settings aria-hidden="true" size={16} strokeWidth={1.8} />
+        </button>
+      </div>
       {showSettings ? <SettingsPanel onClose={() => setShowSettings(false)} /> : null}
       {showProfile ? <ProfileSheet onClose={() => setShowProfile(false)} /> : null}
       {showPalette ? <CommandPalette onClose={() => setShowPalette(false)} /> : null}
