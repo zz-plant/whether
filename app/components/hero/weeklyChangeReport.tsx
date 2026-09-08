@@ -23,7 +23,7 @@ import type { RevisitQueueItem } from "../../../lib/report/homeBriefModel";
  * still has to say what moved, and say that nothing followed from it.
  */
 
-type ChangeRow = {
+type WeeklyChange = {
   key: string;
   /** Plain-English sentence for the move, from the model where one exists. */
   headline: string;
@@ -71,10 +71,10 @@ const groupByDriver = (revisitQueue: readonly RevisitQueueItem[]) => {
 const buildChangeRows = (
   revisitQueue: readonly RevisitQueueItem[],
   signalIndicators: readonly RegimeSignalIndicator[],
-): ChangeRow[] => {
+): WeeklyChange[] => {
   const movedSignals = signalIndicators.filter(hasMoved);
   const groups = groupByDriver(revisitQueue);
-  const rows: ChangeRow[] = [];
+  const rows: WeeklyChange[] = [];
   const claimedSignals = new Set<string>();
 
   for (const [driver, items] of groups) {
@@ -114,6 +114,58 @@ const buildChangeRows = (
 
   return rows;
 };
+
+/**
+ * One change, with its evidence a disclosure away.
+ *
+ * Its own component because the list item was the deepest thing on the page:
+ * `section > div > div > ul > li > details > dl > dd`, and reading the map body
+ * meant holding eight open tags in your head to find the one conditional that
+ * mattered.
+ */
+const ChangeRow = ({
+  row,
+  recordDate,
+  sourceLabel,
+}: {
+  row: WeeklyChange;
+  recordDate: string;
+  sourceLabel: string;
+}) => (
+  <li>
+    {row.signal ? (
+      /* Plain `details`, not the shared `Details` surface: these
+         are compact rows inside a card, and the surface variant
+         brings its own panel padding and border. No client state
+         either — evidence opens with JS off. */
+      <details className="weather-auto-chevron group">
+        <summary className="cursor-pointer select-none rounded-sm py-0.5 text-fluid-xs leading-5 text-slate-200 weather-focus-ring">
+          {row.headline}
+        </summary>
+        <dl className="mt-1 ml-1 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-l border-white/[0.08] py-1 pl-3 text-fluid-nano">
+          <dt className="text-white/45">Reading</dt>
+          <dd className="tabular-nums text-slate-300">{row.signal.valueLabel}</dd>
+          <dt className="text-white/45">Movement</dt>
+          <dd className="tabular-nums text-slate-300">
+            {row.signal.trendArrow} {row.signal.trendDeltaLabel}
+          </dd>
+          <dt className="text-white/45">As of</dt>
+          <dd className="text-slate-300">{recordDate}</dd>
+          <dt className="text-white/45">Source</dt>
+          <dd className="text-slate-300">{sourceLabel}</dd>
+          <dt className="text-white/45">Changes</dt>
+          <dd className="text-slate-300">
+            {row.consequences.length > 0
+              ? row.consequences.map((item) => item.label).join(" · ")
+              : "No rule this week — the move stayed inside every threshold."}
+          </dd>
+        </dl>
+      </details>
+    ) : (
+      <p className="py-0.5 text-fluid-xs leading-5 text-slate-200">{row.headline}</p>
+    )}
+  </li>
+);
 
 const BandHeading = ({ children }: { children: React.ReactNode }) => (
   <p className="text-fluid-nano type-eyebrow text-white/50">{children}</p>
@@ -187,39 +239,12 @@ export function WeeklyChangeReport({
             ) : (
               <ul className="space-y-1">
                 {rows.map((row) => (
-                  <li key={row.key}>
-                    {row.signal ? (
-                      /* Plain `details`, not the shared `Details` surface: these
-                         are compact rows inside a card, and the surface variant
-                         brings its own panel padding and border. No client state
-                         either — evidence opens with JS off. */
-                      <details className="weather-auto-chevron group">
-                        <summary className="cursor-pointer select-none rounded-sm py-0.5 text-fluid-xs leading-5 text-slate-200 weather-focus-ring">
-                          {row.headline}
-                        </summary>
-                        <dl className="mt-1 ml-1 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-l border-white/[0.08] py-1 pl-3 text-fluid-nano">
-                          <dt className="text-white/45">Reading</dt>
-                          <dd className="tabular-nums text-slate-300">{row.signal.valueLabel}</dd>
-                          <dt className="text-white/45">Movement</dt>
-                          <dd className="tabular-nums text-slate-300">
-                            {row.signal.trendArrow} {row.signal.trendDeltaLabel}
-                          </dd>
-                          <dt className="text-white/45">As of</dt>
-                          <dd className="text-slate-300">{recordDate}</dd>
-                          <dt className="text-white/45">Source</dt>
-                          <dd className="text-slate-300">{sourceLabel}</dd>
-                          <dt className="text-white/45">Changes</dt>
-                          <dd className="text-slate-300">
-                            {row.consequences.length > 0
-                              ? row.consequences.map((item) => item.label).join(" · ")
-                              : "No rule this week — the move stayed inside every threshold."}
-                          </dd>
-                        </dl>
-                      </details>
-                    ) : (
-                      <p className="py-0.5 text-fluid-xs leading-5 text-slate-200">{row.headline}</p>
-                    )}
-                  </li>
+                  <ChangeRow
+                    key={row.key}
+                    row={row}
+                    recordDate={recordDate}
+                    sourceLabel={sourceLabel}
+                  />
                 ))}
               </ul>
             )}

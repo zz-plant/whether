@@ -1,5 +1,17 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { RegimeAssessment, RegimeThresholds, RegimeTrend } from "../regimeEngine";
+import {
+  PROVENANCE_STATUS,
+  historicalMacroStatus,
+  resolveProvenanceStatus,
+} from "./provenanceStatus";
+
+/**
+ * `isLive` is not on the declared macro-series element type, so this used to be
+ * read through a cast. `in` narrows instead, which also makes a series that
+ * simply lacks the flag read as not-live rather than as `undefined` coerced.
+ */
+const hasLiveFlag = (signal: object): boolean => "isLive" in signal && signal.isLive === true;
 import type { ForecastModel } from "./forecastModel";
 import { loadRegimeMachineSnapshot } from "../storage/regimeMachineSnapshotStore";
 import type { PlaybookEntry } from "../playbook";
@@ -365,13 +377,15 @@ export const loadReportDataUncachedInternal = async ({
     ? deps.evaluateRegime(previousSnapshot, thresholds)
     : null;
   const lastYearAssessment = lastYearSnapshot ? deps.evaluateRegime(lastYearSnapshot, thresholds) : null;
-  const confidenceLabel = historicalSelection
-    ? "Simulated (low)"
-    : operatingSnapshot || canonicalInputs
-      ? "Canonical snapshot (high confidence)"
-      : treasury.isLive
-        ? "Live (high confidence)"
-        : "Cached (medium)";
+  // One policy, two readings of it: the treasury strip judges the treasury feed,
+  // the macro strip judges the macro series. They differ only in what a replay
+  // is called and which feed counts as live.
+  const isCanonicalRead = Boolean(operatingSnapshot || canonicalInputs);
+  const confidenceLabel = resolveProvenanceStatus({
+    historicalLabel: historicalSelection ? PROVENANCE_STATUS.simulated : undefined,
+    isCanonical: isCanonicalRead,
+    isLive: Boolean(treasury.isLive),
+  });
   const treasuryProvenance = {
     sourceLabel: operatingSnapshot?.provenance.sourceLabel
       ?? (canonicalInputs ? "Canonical ingestion (FRED)" : "Federal Reserve Economic Data (FRED)"),
@@ -393,17 +407,13 @@ export const loadReportDataUncachedInternal = async ({
     recordDateLabel: deps.formatDateUTC(macroRecordDate),
     timestampLabel: deps.formatTimestampUTC(macroTimestamp),
     ageLabel: macroAgeLabel,
-    statusLabel: historicalSelection
-      ? alignedHistoricalMacro?.coverage.mode === "historical-aligned"
-        ? "Historical aligned (medium)"
-        : alignedHistoricalMacro?.coverage.mode === "historical-partial"
-          ? "Historical aligned (partial)"
-          : "Treasury-only (low)"
-      : operatingSnapshot || canonicalInputs
-        ? "Canonical snapshot (high confidence)"
-        : macroSeries.some((signal) => Boolean((signal as { isLive?: boolean }).isLive))
-          ? "Live (high confidence)"
-          : "Cached (medium)",
+    statusLabel: resolveProvenanceStatus({
+      historicalLabel: historicalSelection
+        ? historicalMacroStatus(alignedHistoricalMacro?.coverage.mode)
+        : undefined,
+      isCanonical: isCanonicalRead,
+      isLive: macroSeries.some(hasLiveFlag),
+    }),
   };
   const internalProvenance = {
     sourceLabel: "Whether curated playbook catalog",
