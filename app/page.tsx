@@ -7,7 +7,7 @@ import type { BriefArtifact } from "../lib/report/briefArtifact";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { RitualCheck } from "./components/RitualCheck";
+import { WeeklyCloseout } from "./components/weeklyCloseout";
 import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
@@ -111,15 +111,18 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
           further down competed with it and gave the reader no way to rank them.
           §X reserves `pill` for exactly this — a secondary navigation CTA. */}
       <div className="mt-4 border-t border-white/[0.06] pt-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
-            {props.planLabel ?? "Build this week’s plan →"}
-          </ActionLink>
-          <RitualCheck
-            recordDate={props.recordDate}
-            recentRecordDates={props.recentRecordDates}
-          />
-        </div>
+        <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
+          {props.planLabel ?? "Build this week’s plan →"}
+        </ActionLink>
+      </div>
+
+      {/* Its own block, not the right-hand end of the CTA row. That row was
+          sized for a checkbox; the closeout is a form with a record above it. */}
+      <div className="mt-4">
+        <WeeklyCloseout
+          recordDate={props.recordDate}
+          recentRecordDates={props.recentRecordDates}
+        />
       </div>
     </>
   );

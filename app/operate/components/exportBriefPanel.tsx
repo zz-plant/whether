@@ -23,9 +23,19 @@ import {
   type ClipboardCopyState,
 } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import {
+  EMPTY_OVERRIDE,
+  ExportDownloadButton,
+  ExportOverrideFields,
+  ExportPreviewPane,
+  ExportTargetGrid,
+  formatOverrideLine,
+  isOverrideComplete,
+  type OverrideDraft,
+} from "./exportBriefFields";
 import { WorkAppLabel } from "../../components/workAppIcon";
 import { CopyIcon, DocumentIcon, DownloadIcon } from "../../components/uiIcons";
-import { DECISION_CONTRACT_LABELS, PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
+import { PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
 
 export const ExportBriefPanel = ({
   assessment,
@@ -49,18 +59,11 @@ export const ExportBriefPanel = ({
   const lastLabelRef = useRef<string | null>(null);
   const { add } = Toast.useToastManager();
   const copyError = error;
-  const [overrideReason, setOverrideReason] = useState("");
-  const [overrideIndicator, setOverrideIndicator] = useState("");
-  const [overrideOwner, setOverrideOwner] = useState("");
-  const [overrideReversal, setOverrideReversal] = useState("");
+  const [override, setOverride] = useState<OverrideDraft>(EMPTY_OVERRIDE);
   const [customTeamNote, setCustomTeamNote] = useState("");
   const fallbackActive = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const hasOverride = [overrideReason, overrideIndicator, overrideOwner, overrideReversal].every(
-    (value) => value.trim().length > 0,
-  );
-  const overrideLine = hasOverride
-    ? `OVERRIDE ACTIVE: ${overrideReason.trim()} · Indicator: ${overrideIndicator.trim()} · Owner: ${overrideOwner.trim()} · Reverse when: ${overrideReversal.trim()}`
-    : "";
+  const hasOverride = isOverrideComplete(override);
+  const overrideLine = formatOverrideLine(override);
   const applyOverride = (content: string) => (hasOverride ? `${content}\n${overrideLine}` : content);
 
   useEffect(() => {
@@ -355,48 +358,7 @@ export const ExportBriefPanel = ({
           <summary data-chevron className="cursor-pointer list-none type-eyebrow text-slate-200">
             Company-specific exception
           </summary>
-          <div className="mt-4 space-y-3 border-t border-amber-300/20 pt-4">
-            <p className="text-sm text-amber-50">
-              Add a company-specific exception to all exports.
-            </p>
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="space-y-1">
-                <span className="type-eyebrow text-amber-100/80">Reason</span>
-                <input
-                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                  value={overrideReason}
-                  onChange={(event) => setOverrideReason(event.target.value)}
-                />
-              </label>
-              <label className="space-y-1">
-                <span className="type-eyebrow text-amber-100/80">Local indicator</span>
-                <input
-                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                  value={overrideIndicator}
-                  onChange={(event) => setOverrideIndicator(event.target.value)}
-                />
-              </label>
-              <label className="space-y-1">
-                <span className="type-eyebrow text-amber-100/80">Owner</span>
-                <input
-                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                  value={overrideOwner}
-                  onChange={(event) => setOverrideOwner(event.target.value)}
-                />
-              </label>
-              <label className="space-y-1">
-                <span className="type-eyebrow text-amber-100/80">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</span>
-                <input
-                  className="w-full rounded-lg border border-amber-300/20 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                  value={overrideReversal}
-                  onChange={(event) => setOverrideReversal(event.target.value)}
-                />
-              </label>
-            </div>
-            <p className="text-fluid-xs leading-5 text-amber-100/80">
-              When active, the exception is appended to the leadership team brief, plain-English brief, board note, meeting pack, one-screen summary, and board summary exports.
-            </p>
-          </div>
+          <ExportOverrideFields draft={override} onChange={setOverride} />
         </details>
 
         {/* Briefs for each audience */}
@@ -456,7 +418,7 @@ export const ExportBriefPanel = ({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+        <ExportTargetGrid className="mt-6">
           <div className="weather-surface p-4">
             <p className="type-kicker"><WorkAppLabel app="slack" label="Slack brief" /></p>
             <p className="mt-3 text-sm text-slate-300">
@@ -493,30 +455,20 @@ export const ExportBriefPanel = ({
                 disabled={isCopyDisabled("Board summary")}
                 onClick={() => void handleCopy(applyOverride(boardBrief), "Board summary")}
               />
-              <Button
-                type="button"
-                onClick={() =>
-                  handleDownload(
-                    applyOverride(weeklyOperatorPlainText),
-                    `whether-weekly-operator-brief-${weekEndingDate}.txt`
-                  )
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                Download leadership team brief
-              </Button>
-              <Button
-                type="button"
-                onClick={() =>
-                  handleDownload(
-                    weeklyOperatorSlackBlocks,
-                    `whether-weekly-operator-slack-blocks-${weekEndingDate}.json`
-                  )
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                Download Slack format
-              </Button>
+              <ExportDownloadButton
+                label="Download leadership team brief"
+                content={applyOverride(weeklyOperatorPlainText)}
+                fileName={`whether-weekly-operator-brief-${weekEndingDate}.txt`}
+                onDownload={handleDownload}
+                className="mt-0"
+              />
+              <ExportDownloadButton
+                label="Download Slack format"
+                content={weeklyOperatorSlackBlocks}
+                fileName={`whether-weekly-operator-slack-blocks-${weekEndingDate}.json`}
+                onDownload={handleDownload}
+                className="mt-0"
+              />
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
@@ -537,21 +489,15 @@ export const ExportBriefPanel = ({
               onClick={() => void handleCopy(slideBullets, "Slides")}
               className="mt-4"
             />
-            <Button
-              type="button"
-              onClick={() =>
-                handleDownload(
-                  slideBullets,
-                  `whether-slide-bullets-${treasury.record_date}.txt`
-                )
-              }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-            >
-              Download bullets
-            </Button>
+            <ExportDownloadButton
+              label="Download bullets"
+              content={slideBullets}
+              fileName={`whether-slide-bullets-${treasury.record_date}.txt`}
+              onDownload={handleDownload}
+            />
           </div>
-        </div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+        </ExportTargetGrid>
+        <ExportTargetGrid>
           <div className="weather-surface p-4">
             <p className="type-kicker">
               Key recommendations
@@ -566,35 +512,20 @@ export const ExportBriefPanel = ({
               onClick={() => void handleCopy(constraintHeadlines, "Key lines")}
               className="mt-4"
             />
-            <Button
-              type="button"
-              onClick={() =>
-                handleDownload(
-                  constraintHeadlines,
-                  `whether-headlines-${treasury.record_date}.txt`
-                )
-              }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-            >
-              Download key lines
-            </Button>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="type-kicker">
-              Key lines preview
-            </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Keep the text intact when sharing to preserve sourcing.
-            </p>
-            <textarea
-              readOnly
-              value={constraintHeadlines}
-              rows={6}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200"
+            <ExportDownloadButton
+              label="Download key lines"
+              content={constraintHeadlines}
+              fileName={`whether-headlines-${treasury.record_date}.txt`}
+              onDownload={handleDownload}
             />
           </div>
-        </div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+          <ExportPreviewPane
+            title="Key lines preview"
+            description="Keep the text intact when sharing to preserve sourcing."
+            value={constraintHeadlines}
+          />
+        </ExportTargetGrid>
+        <ExportTargetGrid>
           <div className="weather-surface p-4">
             <p className="type-kicker">
               Agent handoff
@@ -609,53 +540,35 @@ export const ExportBriefPanel = ({
                 disabled={isCopyDisabled("Agent JSON payload")}
                 onClick={() => void handleCopy(agentPayload, "Agent JSON payload")}
               />
-              <Button
-                type="button"
-                onClick={() =>
-                  handleDownload(
-                    agentPayload,
-                    `whether-agent-payload-${treasury.record_date}.json`
-                  )
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-              >
-                Download JSON
-              </Button>
+              <ExportDownloadButton
+                label="Download JSON"
+                content={agentPayload}
+                fileName={`whether-agent-payload-${treasury.record_date}.json`}
+                onDownload={handleDownload}
+                className="mt-0"
+              />
               <ClipboardActionRow
                 label="Copy prompt"
                 state={clipboardState("Agent prompt")}
                 disabled={isCopyDisabled("Agent prompt")}
                 onClick={() => void handleCopy(agentPrompt, "Agent prompt")}
               />
-              <Button
-                type="button"
-                onClick={() =>
-                  handleDownload(
-                    agentPrompt,
-                    `whether-agent-prompt-${treasury.record_date}.txt`
-                  )
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-              >
-                Download prompt
-              </Button>
+              <ExportDownloadButton
+                label="Download prompt"
+                content={agentPrompt}
+                fileName={`whether-agent-prompt-${treasury.record_date}.txt`}
+                onDownload={handleDownload}
+                className="mt-0"
+              />
             </div>
           </div>
-          <div className="weather-surface p-4">
-            <p className="type-kicker">
-              Agent payload preview
-            </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Keep the JSON intact to preserve provenance and timestamps.
-            </p>
-            <textarea
-              readOnly
-              value={agentPayload}
-              rows={10}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200"
-            />
-          </div>
-        </div>
+          <ExportPreviewPane
+            title="Agent payload preview"
+            description="Keep the JSON intact to preserve provenance and timestamps."
+            value={agentPayload}
+            rows={10}
+          />
+        </ExportTargetGrid>
         <details className="weather-auto-chevron mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
           <summary data-chevron className="cursor-pointer list-none type-eyebrow text-slate-200">
             Issue tracker formats
@@ -679,18 +592,13 @@ export const ExportBriefPanel = ({
                     disabled={isCopyDisabled("Jira note")}
                     onClick={() => void handleCopy(markdownBrief, "Jira note")}
                   />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      handleDownload(
-                        markdownBrief,
-                        `whether-jira-note-${treasury.record_date}.md`
-                      )
-                    }
-                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                  >
-                    Download <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" />
-                  </Button>
+                  <ExportDownloadButton
+                    label={<><span>Download</span> <WorkAppLabel app="jira" label="note" className="inline-flex items-center gap-2" /></>}
+                    content={markdownBrief}
+                    fileName={`whether-jira-note-${treasury.record_date}.md`}
+                    onDownload={handleDownload}
+                    className="mt-0"
+                  />
                 </div>
               </div>
               <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
@@ -707,18 +615,13 @@ export const ExportBriefPanel = ({
                     disabled={isCopyDisabled("Confluence note")}
                     onClick={() => void handleCopy(wikiBrief, "Confluence note")}
                   />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      handleDownload(
-                        wikiBrief,
-                        `whether-confluence-note-${treasury.record_date}.txt`
-                      )
-                    }
-                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                  >
-                    Download <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" />
-                  </Button>
+                  <ExportDownloadButton
+                    label={<><span>Download</span> <WorkAppLabel app="confluence" label="note" className="inline-flex items-center gap-2" /></>}
+                    content={wikiBrief}
+                    fileName={`whether-confluence-note-${treasury.record_date}.txt`}
+                    onDownload={handleDownload}
+                    className="mt-0"
+                  />
                 </div>
               </div>
               <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
@@ -735,18 +638,13 @@ export const ExportBriefPanel = ({
                     disabled={isCopyDisabled("Linear note")}
                     onClick={() => void handleCopy(markdownBrief, "Linear note")}
                   />
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      handleDownload(
-                        markdownBrief,
-                        `whether-linear-note-${treasury.record_date}.md`
-                      )
-                    }
-                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                  >
-                    Download <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" />
-                  </Button>
+                  <ExportDownloadButton
+                    label={<><span>Download</span> <WorkAppLabel app="linear" label="note" className="inline-flex items-center gap-2" /></>}
+                    content={markdownBrief}
+                    fileName={`whether-linear-note-${treasury.record_date}.md`}
+                    onDownload={handleDownload}
+                    className="mt-0"
+                  />
                 </div>
               </div>
             </div>

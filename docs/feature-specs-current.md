@@ -369,6 +369,69 @@ Two things the live data surfaced:
   backfilled, so the no-permalink branch is the common case: it cites the live page and says the
   address re-renders, rather than minting a stable-looking reference.
 
+### 1.1.12 One weekly call, four models of it (2026-09-08)
+A follow-up to 1.1.11, which fixed the share panel and in doing so added a fifth family of
+formatters. The export layer holds nine modules and ~1,370 effective lines, and the weekly call
+had four independent input models: `briefBuilders` takes `(assessment, treasury, sensors,
+macros)`, `weeklyOperatorBrief` takes an operating-snapshot payload, `meetingSlideExport` takes a
+`MeetingSlidePayload`, and `briefArtifact` takes the presentation model. Four Slack builders, two
+citation builders, three board/slide builders.
+
+**Only the presentation half was unified, deliberately.** `buildSlackBrief` feeds
+`scripts/generateWeeklySlackBrief.ts`, and `buildCallCitation` feeds `weeklyBriefSnapshot` — both
+write into the published, citable archive, which is append-only. Changing their output is a
+product decision about published records, not a refactor, so they are pinned where they are. What
+merged is the part with no such constraint:
+
+- The share panel's "Slide" format and `CopyMeetingSlideButton` were emitting two different
+  markdown blocks for the same week. The panel's carried the resume thresholds and a link; the
+  button's carried neither. Both now compose `formatMeetingSlideMarkdown` through
+  `briefArtifactToSlidePayload`, so the meeting slide gained the clears-when line it was missing
+  and the snapshot marker. `tests/briefArtifactFormats.test.ts` asserts the two are byte-identical.
+- The slide model had no field for the call, only `actionNow`. Mapping one onto the other dropped
+  the headline whenever they differed, so the payload gained a `call` that renders as a stance line
+  above the action — and is omitted when the two hold the same sentence.
+- `DecisionHero` assembled a twelve-line `MeetingSlidePayload` literal at the call site, with its
+  own fallback copy for the pause and reversal lines: a second definition of the week beside the
+  route that publishes it. `CopyMeetingSlideButton` reads the island instead, and a test pins that
+  the hero assembles no export payload of its own.
+
+### 1.1.13 The week closes with a record, not a checkmark (2026-09-08)
+`RitualCheck` ended the weekly review with "Mark reviewed", four dots and a flame streak.
+`docs/adoption-driven-change-plan.md` had already called that weak gamification. It is replaced by
+`app/components/weeklyCloseout.tsx`, which asks what the meeting answers — what did you change,
+what are you watching — and stores it with the readings at the moment of closing.
+
+The following week it reopens that record and sorts it against the queue: `flaggedAgain` is an area
+the operator changed last week that the model has queued again, which is the one thing a weekly
+ritual can catch that nothing else does; `settled` is one that held; `drift` says how far the
+conditions have moved since. The streak became a coverage line, which still means something after a
+missed week. `lib/report/weeklyCloseout.ts` owns the comparison so it is testable without a DOM.
+
+The device-scope line is the other half. Of eleven localStorage-backed surfaces, five said where
+the data lived and six did not — including this one, directly below `DecisionStalenessPanel`, which
+does. Two adjacent panels, same storage, one disclosure.
+
+### 1.1.14 Two panels that were one change from failing the budget (2026-09-08)
+`exportBriefPanel.tsx` (752 effective lines) and `evidenceSections.tsx` (747) both sat within fifty
+lines of the 800-line `max-lines` budget on `app/**`. A file that close to a ceiling gets its next
+change made under pressure to shrink rather than to improve.
+
+`exportBriefPanel` was one component function with no internal seams. DD-015 proposed splitting it
+at "six sibling blocks"; the sibling blocks were not the repetition. The repeated pieces were, and
+they are now `exportBriefFields.tsx`: the two-column `ExportTargetGrid`, the read-only
+`ExportPreviewPane` (twice), the `ExportDownloadButton` (nine times, each repeating the same
+forty-character class string and the same arrow wrapper), and the override form — whose four
+`useState` hooks became one `OverrideDraft`, with `isOverrideComplete` naming the rule that a
+partial override states a deviation without saying who owns it or what would reverse it. 752 → 650.
+
+`evidenceSections` was seven independent exported sections sharing two helpers. Split into
+`evidenceSectionShared.ts` (the label map and the bullet-chart geometry),
+`evidenceDecisionSummary.tsx` (the largest section), and the remaining five. 747 → 463.
+
+Neither is a redesign: labels, classes and copy are unchanged, which is what makes the split
+reviewable.
+
 Also collapsed, same pass:
 - The summary-card chain was four links — `MonthlySummaryCard` → `CadenceSummaryCardAdapter` →
   `CadenceSummaryCard` → `SummaryCard`. `CadenceSummaryCard` forwarded three props and added

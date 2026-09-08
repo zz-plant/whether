@@ -1,4 +1,8 @@
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import {
+  formatMeetingSlideMarkdown,
+  type MeetingSlidePayload,
+} from "../export/meetingSlideExport";
 
 /**
  * The week's call as one structured object, so every format the reader can copy
@@ -223,20 +227,36 @@ const formatSlack = (artifact: BriefArtifact, origin: string) =>
     `Full brief: ${resolveBriefUrl(artifact, origin)}`,
   ].join("\n");
 
+/**
+ * The one adapter from the presentation model to the slide model.
+ *
+ * This format used to build its own markdown block, which meant the share
+ * panel's "Slide" and `CopyMeetingSlideButton` produced two different slides
+ * from the same week — the panel's carried the resume thresholds and a link,
+ * the button's carried neither. One builder now serves both.
+ */
+export const briefArtifactToSlidePayload = (
+  artifact: BriefArtifact,
+  origin: string,
+): MeetingSlidePayload => ({
+  recordDate: artifact.recordDateLabel,
+  regime: artifact.regimeLabel,
+  stageLabel: artifact.postureLabel ?? "Startup",
+  actionNow: artifact.actionNow ?? artifact.call,
+  pauseIf: artifact.guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
+  changeCourseIf: artifact.reversal ?? "Resume staged approvals when conditions ease.",
+  tightness: artifact.tightness,
+  riskAppetite: artifact.riskAppetite ?? 50,
+  confidence: artifact.confidenceLabel ?? "MED",
+  provenance: artifact.source,
+  call: artifact.call,
+  clearsWhen: artifact.clearsWhen,
+  url: resolveBriefUrl(artifact, origin),
+  isFallback: artifact.isFallback,
+});
+
 const formatSlide = (artifact: BriefArtifact, origin: string) =>
-  [
-    `> **${artifact.title}** — *${artifact.recordDateLabel}*`,
-    `> **Conditions**: \`${artifact.regimeLabel}\`${artifact.postureLabel ? ` · **Posture**: \`${artifact.postureLabel}\`` : ""}`,
-    ">",
-    `> **${DECISION_CONTRACT_LABELS.slot.action.toUpperCase()}**: ${artifact.call}`,
-    ...conditionLines(artifact)
-      .filter((line) => !line.startsWith(`${DECISION_CONTRACT_LABELS.action.doNow}:`))
-      .map((line) => `> **${line.replace(/^([^:]+):/, "$1**:")}`),
-    ">",
-    `> *${signalLine(artifact)}*`,
-    `> *${provenanceLine(artifact)}*`,
-    `> ${resolveBriefUrl(artifact, origin)}`,
-  ].join("\n");
+  formatMeetingSlideMarkdown(briefArtifactToSlidePayload(artifact, origin));
 
 /**
  * Deliberately does not invent a stable identifier when the archive has none.
