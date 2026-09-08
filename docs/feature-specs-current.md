@@ -160,9 +160,57 @@ the Slack block, and developer access lives under the header's More menu):
   `lib/report/operatingCalls.ts`): one rail per composite signal in the Watch-this-week block,
   showing the current reading, the guardrail, the line that clears it, and the span where neither
   fires. Replaced `ThresholdProximityBar` on 2026-09-03, which encoded the same distance as a fill
-  against an arbitrary, unstated 30-point reference and restated the counter beside it. Both lines
-  are parsed back out of the guardrail and clears-when copy the block prints, so a rail cannot
-  state a threshold the sentence under it does not; copy that will not parse renders no rail.
+  against an arbitrary, unstated 30-point reference and restated the counter beside it. Since
+  2026-09-08 both lines come from the rule's own clause data (below) rather than being parsed back
+  out of the sentences, and a numeric readout under each rail states the guardrail, the clearing
+  line and the points to each; the guardrail and clears-when sentences print only when no rail
+  could be drawn. The regime-flip line keeps its own row, labelled "Posture flips", because it sits
+  at a different number from the rule's guardrail and used to read as a third unexplained pair.
+
+### 1.1.1a Bounded rules are data; the sentences are derived (2026-09-08)
+`BoundedDecisionRule` carries `pause` and `resume` clauses — a verb, a list of numeric
+`RuleCondition`s (metric, operator, value), a join word and an optional qualifier — and
+`pauseTrigger`, `resumeTrigger` and `flipConditions` are derived from them by `formatRuleClause`
+(`lib/report/boundedDecisionRules.ts`). Before this the rule stored only the sentences, and three
+separate regex parsers read the numbers back out of them: `parseRuleThresholdConditions` for the
+rails and lane states, `parseDistance` in the CLI contracts, and the hero's rail builder. All three
+are gone; `resolveDecisionLaneState`, `buildBoundedConditionRails` and the CLI's flip distances
+read the conditions directly, and `WeeklyLockCommitment.flipLines` / `whatFlipsNext.thresholdLines`
+carry the regime-flip lines the same way.
+
+Every surface that printed the corridor per area now draws it once and tabulates the areas:
+
+- **Plan, "Rules by area"** (`playbookPanel.tsx`): one rail per signal for the shared corridor
+  (`buildSharedCorridorRails`), then a table of Area · Action now · Pause if · Change course if,
+  where the pause and re-open cells are the lines with the distance to the nearest one
+  (`formatPointsToLine`: "44 pts away", "tripped", "holds"). Five cards of three sentences each
+  stated the same four numbers fifteen times.
+- **Published brief** (`/brief/[week]`): records frozen from 2026-09-08 carry `scores` (both
+  readings and their weekly deltas) and per-decision `pause` / `resume` lines. The page renders a
+  readings row with rails and the decisions as the same table; older records fall back to the
+  sentence layout. `buildPublishedBriefReadingLines` adds a `Readings:` key/value block to the
+  Slack and email updates. The archive is append-only, so the 2026-w31 record keeps its prose.
+- **Slack brief** (`lib/export/briefBuilders.ts`): `buildReadingLines` prints
+  `Funding pressure: 32/100 · -8.0 vs last week · pause > 76 (44 pts away) · re-open < 66 (holds)`
+  under the posture line, and per-area rows print lines with a distance instead of the sentence.
+  `Do now` no longer falls through to `assessment.constraints[0]`, which is the operating-limits
+  list printed in full further down and made the slot a verbatim copy of operating limit 1.
+- **Weekly email** (`lib/email/sendWeeklyBrief.ts`): a readings row (both scores, deltas,
+  confidence) in text, HTML and the Slack mirror; the regime prints as its public label, not the
+  engine enum; the two static regime paragraphs are gone.
+- **What-changed rows** (`weeklyChangeReport.tsx`): each moved signal is label, reading, signed
+  delta with a direction glyph and a sparkline; the model's sentence survives as `sr-only` text.
+- **Runway planner** (`runwayPlannerPanel.tsx`): risk, safe band, raise window and burn range are
+  drawn as `RangeBar`s with the operator's own runway marked; the sentence is the caption.
+- **Trust formula reference**: the regime rule is a 2x2 quadrant SVG, confidence a three-band
+  ladder, and the two saturating score components small ramp plots, all from engine constants.
+
+Three families of duplicated prose collapsed to one source each: data-state guidance
+(`DATA_STATUS_GUIDANCE` in `trustStatus.ts`, read by the homepage banner, the freshness popover and
+the export panel), distance-to-line (`formatBoundaryDistance` in `reportFormatting.ts`, read by the
+homepage evidence list, both interpretation views and the evidence rows), and the meeting packs on
+`/share`, `/operate` and the export panel, which pasted the board brief — the whole Slack brief with
+the slide bullets appended — beside the Slack brief and now carry the slide bullets alone.
 
 These sit inside the hero's action bar and secondary provenance row, following a routine-first
 hierarchy: the Slack copy button is the primary visible action, while Present and developer access

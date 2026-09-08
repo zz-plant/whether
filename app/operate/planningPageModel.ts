@@ -19,7 +19,7 @@ import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
 } from "../../lib/export/weeklyOperatorBrief";
-import { buildBoardBrief } from "../../lib/export/briefBuilders";
+import { buildBoardBrief, buildBoardSlideBullets } from "../../lib/export/briefBuilders";
 import { formatRegimeLabel } from "../../lib/regimeFormat";
 import { resolveWeekEndingIsoDateUTC } from "../../lib/formatters";
 import {
@@ -180,6 +180,7 @@ export async function buildPlanningPageModel(
 
   const citation = snapshot.callCitation;
   const boardBrief = buildBoardBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel });
+  const boardSlideBullets = buildBoardSlideBullets(assessment, treasury, macroSeries, { modeledDecision: decisionModel });
   const weeklyOperatorDate = resolveWeekEndingIsoDateUTC(treasury.record_date);
   const weeklyOperatorPayload = buildWeeklyOperatorBriefPayload({
     assessment,
@@ -227,8 +228,8 @@ export async function buildPlanningPageModel(
     "WEEKLY BRIEF",
     weeklyOperatorPlainText,
     "",
-    "BOARD SUMMARY",
-    boardBrief,
+    "BOARD SLIDE",
+    boardSlideBullets,
     "",
     "CITATION",
     citation,
@@ -480,6 +481,7 @@ export async function buildPlanningPageModel(
                 showProvenance: false,
                 actionStripItems,
                 showAllActionLanes,
+                scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
               }),
               ),
             }),

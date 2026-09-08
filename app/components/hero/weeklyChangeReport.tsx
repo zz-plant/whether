@@ -1,5 +1,46 @@
 import type { RegimeSignalIndicator } from "../../../lib/report/homeBriefModel";
 import type { RevisitQueueItem } from "../../../lib/report/homeBriefModel";
+import { Sparkline } from "../ui/sparkline";
+import { TrendGlyph, trendDirectionFromArrow, trendToneClass } from "../illustrations/TrendGlyph";
+
+/**
+ * Which way "up" counts for each signal. Funding pressure and the base rate
+ * worsen as they rise; risk appetite and the curve slope improve.
+ */
+const INCREASE_IS_POSITIVE: Record<string, boolean> = {
+  tightness: false,
+  baseRate: false,
+  riskAppetite: true,
+  curveSlope: true,
+};
+
+/**
+ * The move as a record, not a sentence: name, reading, signed delta with a
+ * direction glyph, and the trailing window as a sparkline. The sentence the
+ * model wrote survives for assistive tech and copy, where a row of chips
+ * does not read aloud.
+ */
+const SignalMoveRow = ({ signal, headline }: { signal: RegimeSignalIndicator; headline: string }) => {
+  const direction = trendDirectionFromArrow(signal.trendArrow);
+  const tone = trendToneClass(direction, INCREASE_IS_POSITIVE[signal.key] ?? false);
+  const points = signal.sparkline.map((value, index) => ({ label: String(index), value }));
+  return (
+    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span className="sr-only">{headline}</span>
+      <span aria-hidden="true" className="min-w-[9rem] font-medium text-slate-200">{signal.label}</span>
+      <span aria-hidden="true" className="tabular-nums font-semibold text-slate-100">{signal.valueLabel}</span>
+      <span aria-hidden="true" className={`inline-flex items-center gap-1 tabular-nums ${tone}`}>
+        <TrendGlyph direction={direction} className="h-3 w-3" />
+        {signal.trendDeltaLabel}
+      </span>
+      {points.length >= 2 ? (
+        <span aria-hidden="true" className="ml-auto text-white/50">
+          <Sparkline points={points} label={signal.label} widthEm={5} tone={direction === "up" ? (INCREASE_IS_POSITIVE[signal.key] ? "easing" : "tightening") : direction === "down" ? (INCREASE_IS_POSITIVE[signal.key] ? "tightening" : "easing") : "unchanged"} />
+        </span>
+      ) : null}
+    </span>
+  );
+};
 
 /**
  * The week as a change report: what moved, what that changes for the reader, and
@@ -140,7 +181,7 @@ const ChangeRow = ({
          either — evidence opens with JS off. */
       <details className="weather-auto-chevron group">
         <summary className="cursor-pointer select-none rounded-sm py-0.5 text-fluid-xs leading-5 text-slate-200 weather-focus-ring">
-          {row.headline}
+          <SignalMoveRow signal={row.signal} headline={row.headline} />
         </summary>
         <dl className="mt-1 ml-1 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-l border-white/[0.08] py-1 pl-3 text-fluid-nano">
           <dt className="text-white/45">Reading</dt>

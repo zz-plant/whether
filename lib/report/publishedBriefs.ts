@@ -15,6 +15,14 @@ import { formatIsoWeekSlug } from "../isoWeek";
 import { buildCanonicalUrl } from "../seo";
 import { publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { buildBoundedConditionRails, formatPointsToLine } from "./operatingCalls";
+
+const PublishedRuleLineSchema = z.object({
+  metric: z.enum(["tightness", "riskAppetite"]),
+  operator: z.enum([">", ">=", "<", "<="]),
+  value: z.number(),
+  label: z.string(),
+});
 
 const PublishedBriefDecisionSchema = z.object({
   area: z.string(),
@@ -22,6 +30,17 @@ const PublishedBriefDecisionSchema = z.object({
   doNow: z.string(),
   pauseTrigger: z.string(),
   resumeTrigger: z.string(),
+  /** The numeric lines behind `pauseTrigger`. Absent on records frozen before the lines were data. */
+  pause: z.array(PublishedRuleLineSchema).optional(),
+  /** The numeric lines behind `resumeTrigger`. */
+  resume: z.array(PublishedRuleLineSchema).optional(),
+});
+
+const PublishedBriefScoresSchema = z.object({
+  tightness: z.number(),
+  riskAppetite: z.number(),
+  tightnessDelta: z.number().nullable().optional(),
+  riskAppetiteDelta: z.number().nullable().optional(),
 });
 
 const PublishedBriefEvidenceSchema = z.object({
@@ -48,6 +67,8 @@ export const PublishedBriefSchema = z.object({
   guardrailThreshold: z.string(),
   flipThreshold: z.string(),
   decisions: z.array(PublishedBriefDecisionSchema),
+  /** The two composite readings the call was scored on. Absent on records frozen before they were recorded. */
+  scores: PublishedBriefScoresSchema.optional(),
   evidence: z.array(PublishedBriefEvidenceSchema),
   sourceLabel: z.string(),
   sourceUrl: z.string().optional(),
@@ -59,6 +80,45 @@ export const PublishedBriefSchema = z.object({
 export const PublishedBriefIndexSchema = z.array(PublishedBriefSchema);
 
 export type PublishedBrief = z.infer<typeof PublishedBriefSchema>;
+export type PublishedRuleLine = z.infer<typeof PublishedRuleLineSchema>;
+
+const formatDelta = (delta: number | null | undefined) =>
+  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
+    ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`
+    : null;
+
+/**
+ * The readings and the corridor as one fixed-width key/value block.
+ *
+ * The frozen record's prose already says the rule; this says the numbers, so a
+ * reader of the pasted block sees where each reading sits against its lines
+ * without parsing a sentence. Empty for records that carry no scores.
+ */
+export const buildPublishedBriefReadingLines = (brief: PublishedBrief): string[] => {
+  if (!brief.scores) return [];
+  const corridor = brief.decisions.find((decision) => (decision.pause?.length ?? 0) > 0);
+  const rails = buildBoundedConditionRails({
+    pause: corridor?.pause,
+    resume: corridor?.resume,
+    scores: brief.scores,
+  });
+  const readings: Array<{ label: string; metric: "tightness" | "riskAppetite"; value: number; delta: string | null }> = [
+    { label: "Funding pressure", metric: "tightness", value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta) },
+    { label: "Risk appetite", metric: "riskAppetite", value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta) },
+  ];
+  return readings.map((reading) => {
+    const rail = rails.find((candidate) => candidate.metric === reading.metric);
+    const parts = [
+      `${reading.label}: ${reading.value}/100`,
+      reading.delta,
+      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause")})` : null,
+      rail && rail.clearsAt !== undefined
+        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume")})`
+        : null,
+    ].filter((part): part is string => Boolean(part));
+    return parts.join(" · ");
+  });
+};
 
 export const parsePublishedBriefs = (input: unknown): PublishedBrief[] => {
   const parsed = PublishedBriefIndexSchema.safeParse(input);
@@ -169,6 +229,7 @@ export const labelForArea = (area: string) => decisionAreaLabels[area] ?? area;
  */
 export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string => {
   const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const readingLines = buildPublishedBriefReadingLines(brief);
   const decisions = brief.decisions.map((decision) =>
     [
       `• ${labelForArea(decision.area)}: ${decision.call}`,
@@ -183,6 +244,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
     `Posture: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
+    ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
     "Summary:",
     `• ${brief.summary}`,
@@ -211,6 +273,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
  */
 export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string => {
   const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const readingLines = buildPublishedBriefReadingLines(brief);
   const decisions = brief.decisions.map((decision) =>
     [
       `• ${labelForArea(decision.area)}: ${decision.call}`,
@@ -227,6 +290,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     "",
     `Posture: ${brief.postureLabel}`,
     `Confidence: ${brief.confidenceLabel} confidence`,
+    ...readingLines,
     `Executive summary: ${brief.summary}`,
     "",
     "What changed this week:",

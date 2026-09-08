@@ -1,6 +1,8 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import type { PlaybookEntry } from "../../../lib/playbook";
-import type { ActionStripItem } from "../../../lib/report/operatingCalls";
+import { buildSharedCorridorRails, type ActionStripItem } from "../../../lib/report/operatingCalls";
+import { RuleLines } from "../boundedRuleLines";
+import { ThresholdLadder } from "../illustrations/ThresholdLadder";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { CollapsibleDeepDive } from "../collapsibleDeepDive";
 import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
@@ -17,6 +19,7 @@ export const PlaybookPanel = ({
   showProvenance = true,
   actionStripItems = [],
   showAllActionLanes = false,
+  scores,
 }: {
   playbook: PlaybookEntry | null;
   stopItems: string[];
@@ -26,7 +29,10 @@ export const PlaybookPanel = ({
   showProvenance?: boolean;
   actionStripItems?: ActionStripItem[];
   showAllActionLanes?: boolean;
+  /** Current readings, so the corridor can be drawn with the reading on it. */
+  scores?: { tightness: number; riskAppetite: number };
 }) => {
+  const corridorRails = buildSharedCorridorRails(actionStripItems, scores);
   const visibleStopItems = getVisibleActionLaneItems(stopItems, showAllActionLanes);
   const visibleStartItems = getVisibleActionLaneItems(startItems, showAllActionLanes);
   const visibleFenceItems = getVisibleActionLaneItems(fenceItems, showAllActionLanes);
@@ -73,21 +79,73 @@ export const PlaybookPanel = ({
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Rules by area
           </p>
-          <ul className="mt-3 space-y-2 text-xs text-slate-300">
-            {visibleActionStripItems.map((item) => (
-              <li
-                key={item.lever}
-                className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2"
-              >
-                <p className="font-semibold text-slate-100">{item.label}</p>
-                <p className="mt-1 text-emerald-100">{DECISION_CONTRACT_LABELS.action.actionNow}: {item.areaActionNow}</p>
-                <p className="mt-1 text-amber-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}: {item.triggerThreshold}</p>
-                <p className="mt-1 text-sky-100">
-                  {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: {item.reversalCondition}
-                </p>
-              </li>
-            ))}
-          </ul>
+          {/* Every lever's rule is built from the same four lines in different
+              pairs, so five cards of three sentences each stated the corridor
+              fifteen times. The corridor is drawn once, and each area is a row
+              that says which lines apply and how far off they sit. */}
+          {corridorRails.length > 0 ? (
+            <ul className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2" aria-label="Shared corridor for this week's rules">
+              {corridorRails.map((rail) => (
+                <li key={rail.metric} className="min-w-0">
+                  <p className="flex items-baseline justify-between gap-2 text-fluid-nano text-slate-400">
+                    <span>{rail.label}</span>
+                    <span className="tabular-nums text-slate-200">{rail.current}<span className="text-slate-500">/100</span></span>
+                  </p>
+                  <ThresholdLadder
+                    idPrefix={`playbook-corridor-${rail.metric}`}
+                    min={0}
+                    max={100}
+                    current={rail.current}
+                    trigger={rail.guardrail}
+                    triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
+                    reversal={rail.clearsAt}
+                    reversalLabel={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
+                    hysteresisBand
+                    invert={rail.invert}
+                    signalLabel={rail.label}
+                    viewBoxWidth={420}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs text-slate-300">
+              <caption className="sr-only">Action, pause line and re-open line for each area</caption>
+              <thead>
+                <tr className="border-b border-slate-800/80 text-fluid-nano text-slate-400">
+                  <th scope="col" className="py-1.5 pr-3 font-medium">Area</th>
+                  <th scope="col" className="py-1.5 pr-3 font-medium">{DECISION_CONTRACT_LABELS.action.actionNow}</th>
+                  <th scope="col" className="py-1.5 pr-3 font-medium">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
+                  <th scope="col" className="py-1.5 font-medium">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleActionStripItems.map((item) => (
+                  <tr key={item.lever} className="border-b border-slate-800/50 align-top">
+                    <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{item.label}</th>
+                    <td className="py-2 pr-3 text-emerald-100">{item.areaActionNow}</td>
+                    <td className="py-2 pr-3">
+                      <RuleLines
+                        conditions={item.pauseConditions ?? []}
+                        fallback={item.triggerThreshold}
+                        nearest={item.nearestPause}
+                        kind="pause"
+                      />
+                    </td>
+                    <td className="py-2">
+                      <RuleLines
+                        conditions={item.resumeConditions ?? []}
+                        fallback={item.reversalCondition}
+                        nearest={item.nearestResume}
+                        kind="resume"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <CollapsibleDeepDive
           label="Deep dive: rule summary and detailed lists"

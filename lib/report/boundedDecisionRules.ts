@@ -10,25 +10,134 @@ import {
 
 export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "burn-discipline" | "expansion-bets";
 
+export type RuleConditionMetric = "tightness" | "riskAppetite";
+export type RuleConditionOperator = ">" | ">=" | "<" | "<=";
+
+/** One numeric line on one composite signal. */
+export type RuleCondition = {
+  metric: RuleConditionMetric;
+  operator: RuleConditionOperator;
+  value: number;
+  /** Compact form for chips and exports, e.g. "Funding pressure < 66". */
+  label: string;
+};
+
+/**
+ * A bounded rule's pause or resume side, as data.
+ *
+ * The rule used to store these only as sentences, and three separate regex
+ * parsers read the numbers back out of them to draw rails, grade lanes and
+ * compute distances. The numbers now live here and the sentence is derived —
+ * see `formatRuleClause` — so a rail can never state a line the sentence under
+ * it does not, and no consumer has to parse prose.
+ */
+export type BoundedRuleClause = {
+  /** The imperative the conditions attach to, e.g. "Pause net-new hiring". */
+  verb: string;
+  /** Numeric lines. Empty when the clause is purely qualitative. */
+  conditions: RuleCondition[];
+  /** How the lines combine: a pause fires on any, a resume needs all. */
+  join: "or" | "and";
+  /** A non-numeric condition stated after the lines, e.g. "budget payback proof is intact". */
+  qualifier?: string;
+};
+
 export type BoundedDecisionRule = {
   area: DecisionArea;
   recommendation: string;
   doNow: string[];
   avoidNow: string[];
   scope: string;
+  /** The pause side of the rule, as data. `pauseTrigger` is derived from it. */
+  pause: BoundedRuleClause;
+  /** The resume side of the rule, as data. `resumeTrigger` and `flipConditions` are derived from it. */
+  resume: BoundedRuleClause;
   /** Maps to UI label "Threshold" — the condition that triggers a pause */
   pauseTrigger: string;
   /** Maps to UI label "Reversal" — the condition that clears the pause */
   resumeTrigger: string;
   /** Additional conditions that would flip the regime/decision */
-  flipConditions: Array<{
-    metric: "tightness" | "riskAppetite";
-    operator: ">" | ">=" | "<" | "<=";
-    value: number;
-    label: string;
-  }>;
+  flipConditions: RuleCondition[];
   rationale: string;
 };
+
+export const ruleMetricLabel: Record<RuleConditionMetric, string> = {
+  tightness: "Funding pressure",
+  riskAppetite: "Risk appetite",
+};
+
+export const buildRuleCondition = (
+  metric: RuleConditionMetric,
+  operator: RuleConditionOperator,
+  value: number,
+): RuleCondition => ({
+  metric,
+  operator,
+  value,
+  label: `${ruleMetricLabel[metric]} ${operator} ${formatThresholdNumber(value)}`,
+});
+
+/**
+ * Points between the reading and the line, in the direction the line trips.
+ * Zero once the condition holds.
+ */
+export const distanceToRuleCondition = (condition: RuleCondition, current: number): number => {
+  switch (condition.operator) {
+    case ">":
+      return current > condition.value ? 0 : condition.value - current;
+    case ">=":
+      return current >= condition.value ? 0 : condition.value - current;
+    case "<":
+      return current < condition.value ? 0 : current - condition.value;
+    case "<=":
+      return current <= condition.value ? 0 : current - condition.value;
+  }
+};
+
+export const isRuleConditionMet = (condition: RuleCondition, current: number): boolean =>
+  distanceToRuleCondition(condition, current) === 0 && Number.isFinite(current);
+
+/**
+ * The one sentence form of a condition. A rising line reads "rises above", a
+ * falling one "falls below"; a resume line on risk appetite reads "is above"
+ * because that side of the rule is a state to hold, not a move to watch.
+ */
+const describeRuleCondition = (condition: RuleCondition, side: "pause" | "resume"): string => {
+  const metric = ruleMetricLabel[condition.metric].toLowerCase();
+  const value = formatThresholdNumber(condition.value);
+  switch (condition.operator) {
+    case ">":
+      return side === "resume" && condition.metric === "riskAppetite"
+        ? `${metric} is above ${value}`
+        : `${metric} rises above ${value}`;
+    case ">=":
+      return `${metric} is at or above ${value}`;
+    case "<":
+      return `${metric} falls below ${value}`;
+    case "<=":
+      return `${metric} is at or below ${value}`;
+  }
+};
+
+/** The sentence every surface prints for a clause, derived from its data. */
+export const formatRuleClause = (clause: BoundedRuleClause, side: "pause" | "resume"): string => {
+  const parts = [
+    ...clause.conditions.map((condition) => describeRuleCondition(condition, side)),
+    ...(clause.qualifier ? [clause.qualifier] : []),
+  ];
+  if (parts.length === 0) return `${clause.verb}.`;
+  const connective = side === "pause" ? "if" : "when";
+  return `${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`;
+};
+
+const withDerivedTriggers = (
+  rule: Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions">,
+): BoundedDecisionRule => ({
+  ...rule,
+  pauseTrigger: formatRuleClause(rule.pause, "pause"),
+  resumeTrigger: formatRuleClause(rule.resume, "resume"),
+  flipConditions: rule.resume.conditions,
+});
 
 export type StartupVariantMode = "seed" | "series-a" | "series-b" | "growth" | "public" | "bootstrapped";
 
@@ -122,7 +231,13 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
   const riskPause = Math.max(thresholds.riskAppetiteRegime - 6, 0);
   const riskResume = Math.min(thresholds.riskAppetiteRegime + 4, 100);
 
-  const rulesByArea: Record<DecisionArea, BoundedDecisionRule> = {
+  // Every lever shares one corridor: these four lines, in different pairs.
+  const tightnessPauseLine = buildRuleCondition("tightness", ">", tightnessPause);
+  const riskPauseLine = buildRuleCondition("riskAppetite", "<", riskPause);
+  const tightnessResumeLine = buildRuleCondition("tightness", "<", tightnessResume);
+  const riskResumeLine = buildRuleCondition("riskAppetite", ">", riskResume);
+
+  const rulesByArea: Record<DecisionArea, Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions">> = {
     hiring: {
       area: "hiring",
       recommendation: isExpansion
@@ -135,12 +250,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid broad hiring classes without clear revenue or reliability linkage."]
         : ["Avoid net-new hiring for speculative capacity or long-payback initiatives."],
       scope: `Applies to all net-new headcount; current funding pressure ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
-      pauseTrigger: `Pause net-new hiring if funding pressure rises above ${fmt(tightnessPause)} or risk appetite falls below ${fmt(riskPause)}.`,
-      resumeTrigger: `Resume staged approvals when funding pressure falls below ${fmt(tightnessResume)} and risk appetite is above ${fmt(riskResume)}.`,
-      flipConditions: [
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
-      ],
+      pause: { verb: "Pause net-new hiring", join: "or", conditions: [tightnessPauseLine, riskPauseLine] },
+      resume: { verb: "Resume staged approvals", join: "and", conditions: [tightnessResumeLine, riskResumeLine] },
       rationale: "Protect delivery capacity without locking in irreversible fixed-cost growth.",
     },
     "product-tempo": {
@@ -155,11 +266,18 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid irreversible scope expansion before milestone evidence confirms traction."]
         : ["Avoid long-payback roadmap expansions with weak near-term proof."],
       scope: "Roadmap sequencing, release scope, and experimentation cadence.",
-      pauseTrigger: `Pause long-payback bets if risk appetite falls below ${fmt(riskPause)} or two consecutive weaker weekly reads print.`,
-      resumeTrigger: `Resume tempo on deferred bets when risk appetite is above ${fmt(riskResume)} and weekly direction stabilizes or improves.`,
-      flipConditions: [
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
-      ],
+      pause: {
+        verb: "Pause long-payback bets",
+        join: "or",
+        conditions: [riskPauseLine],
+        qualifier: "two consecutive weaker weekly reads print",
+      },
+      resume: {
+        verb: "Resume tempo on deferred bets",
+        join: "and",
+        conditions: [riskResumeLine],
+        qualifier: "weekly direction stabilizes or improves",
+      },
       rationale: "Keep cycle-time high where evidence is strong; cap downside from speculative scope.",
     },
     "capital-raising": {
@@ -174,12 +292,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid waiting for urgency before engaging investors while leverage is strong."]
         : ["Avoid speed-first terms that reduce durability under tighter conditions."],
       scope: "Fundraising launch timing, process pacing, and minimum term quality.",
-      pauseTrigger: `Pause acceleration if risk appetite falls below ${fmt(riskPause)} or funding pressure rises above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume full process when risk appetite is above ${fmt(riskResume)} and funding pressure falls below ${fmt(tightnessResume)}.`,
-      flipConditions: [
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
-      ],
+      pause: { verb: "Pause acceleration", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
+      resume: { verb: "Resume full process", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
       rationale: "Timing the process around signal windows improves optionality and reduces forced terms.",
     },
     "burn-discipline": {
@@ -188,11 +302,13 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       doNow: ["Gate discretionary spend by measurable short-cycle payback proof."],
       avoidNow: ["Avoid multi-quarter spend commitments without clear payback evidence."],
       scope: "Hiring, vendor, and GTM program spend with multi-quarter commitments.",
-      pauseTrigger: `Pause discretionary burn expansion if funding pressure rises above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume controlled burn expansion when funding pressure falls below ${fmt(tightnessResume)} and budget payback proof is intact.`,
-      flipConditions: [
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
-      ],
+      pause: { verb: "Pause discretionary burn expansion", join: "or", conditions: [tightnessPauseLine] },
+      resume: {
+        verb: "Resume controlled burn expansion",
+        join: "and",
+        conditions: [tightnessResumeLine],
+        qualifier: "budget payback proof is intact",
+      },
       rationale: "Cash durability preserves strategic options when macro direction changes quickly.",
     },
     "expansion-bets": {
@@ -207,17 +323,13 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         ? ["Avoid one-way expansion commitments without stage-gate evidence."]
         : ["Avoid irreversible expansion bets until window strength improves."],
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
-      pauseTrigger: `Pause expansion bets if risk appetite falls below ${fmt(riskPause)} or funding pressure rises above ${fmt(tightnessPause)}.`,
-      resumeTrigger: `Resume in tranches when risk appetite is above ${fmt(riskResume)} and funding pressure falls below ${fmt(tightnessResume)}.`,
-      flipConditions: [
-        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
-        { metric: "tightness", operator: "<", value: tightnessResume, label: `Funding pressure < ${fmt(tightnessResume)}` },
-      ],
+      pause: { verb: "Pause expansion bets", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
+      resume: { verb: "Resume in tranches", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
       rationale: "Expansion should scale with validated window strength, not optimism.",
     },
   };
 
-  return areaOrder.map((area) => rulesByArea[area]);
+  return areaOrder.map((area) => withDerivedTriggers(rulesByArea[area]));
 };
 
 /**

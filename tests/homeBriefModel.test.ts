@@ -593,6 +593,8 @@ describe("buildHomeBriefModel", () => {
         scope: "Fundraising launch timing, process pacing, and minimum term quality.",
         pauseTrigger: "Pause acceleration if risk appetite falls below 44 or tightness rises above 6.0.",
         resumeTrigger: "Resume full process when risk appetite > 54 and tightness < 0.0.",
+        pause: { verb: "Pause", join: "or", conditions: [] },
+        resume: { verb: "Resume", join: "and", conditions: [] },
         flipConditions: [
           { metric: "tightness", operator: "<", value: 0, label: "Tightness < 0.0" },
           { metric: "riskAppetite", operator: ">", value: 54, label: "Risk appetite > 54" },

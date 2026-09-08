@@ -1,4 +1,5 @@
 import type { RegimeKey } from "../regimeEngine";
+import { buildRuleCondition, type RuleCondition } from "./boundedDecisionRules";
 import { REGIME_LABELS } from "../regimePresentation";
 import type { RegimeStateTransition } from "./regimeStateMachine";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
@@ -109,6 +110,11 @@ export type DecisionKnobContext = {
 export type WeeklyLockCommitment = {
   currentCall: string;
   flipConditions: string[];
+  /**
+   * The numeric lines behind each `flipConditions` entry, index-aligned. A
+   * consumer that needs a distance reads these rather than the sentence.
+   */
+  flipLines: RuleCondition[][];
   ownerCadence: string;
   trustMarkers: string[];
 };
@@ -259,14 +265,24 @@ export const buildWeeklyLockCommitment = ({
     freshnessDegraded ? "Freshness: Stale" : "",
   ].filter((marker) => marker.length > 0);
 
+  const tightnessLoosen = Math.max(tightnessRegime - loosenBy, 0);
+  const riskLoosen = Math.min(riskAppetiteRegime + loosenBy, 100);
+  const tightnessTighten = Math.min(tightnessRegime + tightenBy, 100);
+  const riskTighten = Math.max(riskAppetiteRegime - tightenBy, 0);
+
   return {
     currentCall: weeklyCallByRegime[regime],
     flipConditions: [
-      formatDecisionThreshold(`Tightness ≤ ${Math.max(tightnessRegime - loosenBy, 0)} for 2 consecutive refreshes.`),
-      formatDecisionThreshold(`Risk appetite ≥ ${Math.min(riskAppetiteRegime + loosenBy, 100)} for 2 consecutive refreshes.`),
+      formatDecisionThreshold(`Tightness ≤ ${tightnessLoosen} for 2 consecutive refreshes.`),
+      formatDecisionThreshold(`Risk appetite ≥ ${riskLoosen} for 2 consecutive refreshes.`),
       formatDecisionReversal(
-        `Tightness > ${Math.min(tightnessRegime + tightenBy, 100)} or risk appetite < ${Math.max(riskAppetiteRegime - tightenBy, 0)} resumes tighten stance.`
+        `Tightness > ${tightnessTighten} or risk appetite < ${riskTighten} resumes tighten stance.`
       ),
+    ],
+    flipLines: [
+      [buildRuleCondition("tightness", "<=", tightnessLoosen)],
+      [buildRuleCondition("riskAppetite", ">=", riskLoosen)],
+      [buildRuleCondition("tightness", ">", tightnessTighten), buildRuleCondition("riskAppetite", "<", riskTighten)],
     ],
     ownerCadence: confidenceDegraded || freshnessDegraded
       ? "Owner: CEO + Finance lead · Checkpoint: daily 10:00 review until trust markers clear."

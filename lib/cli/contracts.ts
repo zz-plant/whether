@@ -1,4 +1,5 @@
 import { deriveRegimeStage } from "../regimePresentation";
+import type { RuleCondition } from "../report/boundedDecisionRules";
 import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData } from "../report/reportData";
 import { buildCompactFreshnessMeta } from "../report/reportFormatting";
@@ -118,22 +119,21 @@ const impactFromSignal = (key: "tightness" | "riskAppetite" | "baseRate" | "curv
 const buildDecisionStability = (postureState: PostureStateContract): "stable" | "unstable" =>
   postureState.currentState.transitionWatch === "ON" ? "unstable" : "stable";
 
-const parseDistance = (condition: string, reportData: ReportData): number | null => {
-  const match = condition.match(/(tightness|risk appetite)\s*([<>]=?)\s*(\d+(?:\.\d+)?)/i);
-  if (!match) {
-    return null;
-  }
-  const metric = match[1].toLowerCase();
-  const operator = match[2];
-  const target = Number(match[3]);
-  const current = metric.includes("tightness")
-    ? reportData.assessment.scores.tightness
-    : reportData.assessment.scores.riskAppetite;
-
-  if (operator.includes("<")) {
-    return Number((current - target).toFixed(2));
-  }
-  return Number((target - current).toFixed(2));
+/**
+ * Points from the current reading to the nearest of a condition's lines, signed
+ * the way the old sentence parser reported it: positive while the line is
+ * ahead, negative once crossed. Null when the condition carries no numeric line.
+ */
+const distanceToLines = (lines: readonly RuleCondition[], reportData: ReportData): number | null => {
+  const distances = lines.map((line) => {
+    const current = line.metric === "tightness"
+      ? reportData.assessment.scores.tightness
+      : reportData.assessment.scores.riskAppetite;
+    const signed = line.operator.includes("<") ? current - line.value : line.value - current;
+    return Number(signed.toFixed(2));
+  });
+  if (distances.length === 0) return null;
+  return distances.reduce((nearest, value) => (Math.abs(value) < Math.abs(nearest) ? value : nearest));
 };
 
 const buildFreshness = ({ reportData, confidenceLabel, degraded }: { reportData: ReportData; confidenceLabel: "HIGH" | "MED" | "LOW"; degraded: boolean }): CliFreshnessContract => {
@@ -216,9 +216,9 @@ export const buildCliChangesContract = ({ reportData, postureState, degraded }: 
     };
   }),
   revisit: reportData.stopItems,
-  flip: postureState.whatFlipsNext.thresholds.map((condition) => ({
+  flip: postureState.whatFlipsNext.thresholds.map((condition, index) => ({
     condition,
-    distance: parseDistance(condition, reportData),
+    distance: distanceToLines(postureState.whatFlipsNext.thresholdLines?.[index] ?? [], reportData),
   })),
   degraded,
 });

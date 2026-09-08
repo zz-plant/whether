@@ -85,7 +85,15 @@ const record: PublishedBrief = {
     doNow: rule.doNow[0] ?? "",
     pauseTrigger: rule.pauseTrigger,
     resumeTrigger: rule.resumeTrigger,
+    pause: rule.pause.conditions,
+    resume: rule.resume.conditions,
   })),
+  scores: {
+    tightness: reportData.assessment.scores.tightness,
+    riskAppetite: reportData.assessment.scores.riskAppetite,
+    tightnessDelta: reportData.assessment.diagnostics.tightnessDelta ?? null,
+    riskAppetiteDelta: reportData.assessment.diagnostics.riskAppetiteDelta ?? null,
+  },
   evidence: reportData.reportEvidenceItems.map((item) => ({
     title: item.title,
     detail: item.immediateImplication,

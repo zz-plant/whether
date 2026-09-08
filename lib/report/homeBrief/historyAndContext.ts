@@ -1,7 +1,7 @@
 import { getWeeklyPostureHistory } from "../../summary/weeklyPostureHistory";
 import { REGIME_SHORT_LABELS } from "../../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY } from "../sectorSensitivity";
-import { joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
+import { formatBoundaryDistance, joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
 import { isImprovingSignalDelta } from "../reportData";
 import type {
   FlipRiskMeterState,
@@ -243,7 +243,7 @@ export const buildWhyThisCall = ({
     {
       key: "distance-to-regime-change",
       label: "Distance to regime change",
-      detail: `${boundaryLabel} is ${nearestGap.toFixed(1)} points from its ${boundaryThreshold.toFixed(1)} line. If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
+      detail: `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
     },
     {
       key: "momentum",

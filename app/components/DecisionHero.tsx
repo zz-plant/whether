@@ -9,8 +9,9 @@ import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrat
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../../lib/report/homeBriefModel";
 import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
-import { buildBoundedConditionRails } from "../../lib/report/operatingCalls";
+import { buildBoundedConditionRails, formatPointsToLine } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
+import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
@@ -57,6 +58,12 @@ type Props = {
   flipConditions?: string[];
   guardrail?: string;
   reversalTrigger?: string;
+  /**
+   * The bounded rule's lines as data — the same clause the `guardrail` and
+   * `flipConditions` sentences are derived from — so the rails draw what the
+   * rows say without parsing them.
+   */
+  boundedConditions?: { pause: readonly RuleCondition[]; resume: readonly RuleCondition[] };
   shareLines?: string[];
   /** Per-signal weekly movement, rendered in the signal-breakdown popover. */
   signalIndicators?: readonly RegimeSignalIndicator[];
@@ -107,6 +114,7 @@ export function DecisionHero({
   flipConditions,
   guardrail,
   reversalTrigger,
+  boundedConditions,
   shareLines,
   signalIndicators,
   revisitDecisions = false,
@@ -152,12 +160,11 @@ export function DecisionHero({
   const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
   const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
 
-  // The bounded rule, as rail coordinates. Both lines are parsed back out of the
-  // guardrail and clears-when copy this box renders, so the rails cannot state a
-  // threshold the sentences under them do not.
+  // The bounded rule, as rail coordinates. Rails and rows come off the same
+  // clause data, so the rails cannot state a threshold the rows do not.
   const boundedRails = buildBoundedConditionRails({
-    guardrail,
-    clearsWhen: flipConditions,
+    pause: boundedConditions?.pause,
+    resume: boundedConditions?.resume,
     scores:
       typeof riskAppetite === "number"
         ? { tightness, riskAppetite }
@@ -438,22 +445,26 @@ export function DecisionHero({
                 ) : null}
               </div>
 
-              {/* The rule, drawn. Three prose rows state six numbers across two
-                  scales and leave the reader to subtract; a rail per signal puts
-                  the reading, the guardrail and the line that clears it on one
-                  axis, with the span where neither fires shaded. The rows below
-                  stay — they are what gets copied into Slack and cited — but they
-                  no longer have to carry the distance on their own. Both rails
-                  run trouble-to-the-right (`invert` flips the falling one), which
-                  is what lets the pair read as a small-multiple set. */}
+              {/* The rule, drawn. Three prose rows used to state six numbers
+                  across two scales and leave the reader to subtract; a rail per
+                  signal puts the reading, the guardrail and the line that clears
+                  it on one axis, with the span where neither fires shaded, and
+                  the readout under each rail states the distance as a number.
+                  The sentences survive only as the copied share lines and as
+                  the fallback when a rule carries no numeric line. Both rails
+                  run trouble-to-the-right (`invert` flips the falling one),
+                  which is what lets the pair read as a small-multiple set. */}
               {boundedRails.length > 0 ? (
                 <div
-                  className="grid gap-x-4 gap-y-1 sm:grid-cols-2"
+                  className="grid gap-x-4 gap-y-2 sm:grid-cols-2"
                   aria-label="Distance to this week's bounded conditions"
                 >
                   {boundedRails.map((rail) => (
                     <div key={rail.metric} className="min-w-0">
-                      <p className="text-fluid-nano text-white/45">{rail.label}</p>
+                      <p className="flex items-baseline justify-between gap-2 text-fluid-nano text-white/45">
+                        <span>{rail.label}</span>
+                        <span className="tabular-nums text-white/70">{rail.current}<span className="text-white/35">/100</span></span>
+                      </p>
                       <ThresholdLadder
                         idPrefix={`hero-bounded-${rail.metric}`}
                         min={0}
@@ -468,19 +479,39 @@ export function DecisionHero({
                         signalLabel={rail.label}
                         viewBoxWidth={300}
                       />
+                      <dl className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums">
+                        <div className="flex items-baseline gap-1.5">
+                          <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}</dt>
+                          <dd className="text-slate-300">
+                            {rail.guardrail}
+                            <span className={`ml-1 ${rail.pointsToGuardrail === 0 ? "text-semantic-caution-fg" : "text-white/45"}`}>
+                              {formatPointsToLine(rail.pointsToGuardrail, "pause")}
+                            </span>
+                          </dd>
+                        </div>
+                        {rail.clearsAt !== undefined ? (
+                          <div className="flex items-baseline gap-1.5">
+                            <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}</dt>
+                            <dd className="text-slate-300">
+                              {rail.clearsAt}
+                              <span className={`ml-1 ${rail.pointsToClear === 0 ? "text-semantic-easing-fg" : "text-white/45"}`}>
+                                {formatPointsToLine(rail.pointsToClear, "resume")}
+                              </span>
+                            </dd>
+                          </div>
+                        ) : null}
+                      </dl>
                     </div>
                   ))}
                 </div>
               ) : null}
 
               <dl className="space-y-1.5 text-fluid-xs">
-                {/* Three rows previously carried three unrelated hues (amber,
-                    rose, sky), which ranked nothing — they were labels, not
-                    directions. Hue now tracks posture: guardrail and reversal
-                    are the tighten side, flip watch is neutral. The semantic
-                    tokens also invert correctly in light mode on their own,
-                    unlike the raw text-<hue>-300 classes these replace. */}
-                {guardrail ? (
+                {/* Hue tracks posture: guardrail and reversal are the tighten
+                    side. The guardrail and clears-when sentences print only when
+                    no rail could be drawn for them; otherwise the readouts above
+                    carry the numbers and the sentences would restate them. */}
+                {guardrail && boundedRails.length === 0 ? (
                   <div className="flex gap-2">
                     <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
@@ -488,18 +519,16 @@ export function DecisionHero({
                 ) : null}
                 {reversalTrigger ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.reversal.reversal}:</dt>
+                    {/* The regime line, not the rule line: this is where the
+                        posture itself flips, and it sits at a different number
+                        from the rule's guardrail. Named so the reader is not
+                        left with two unexplained pairs of thresholds. */}
+                    <dt className="shrink-0 font-medium text-semantic-reversal-fg">Posture flips:</dt>
                     <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
                   </div>
                 ) : null}
-                {flipConditions && flipConditions.length > 0 ? (
+                {flipConditions && flipConditions.length > 0 && boundedRails.length === 0 ? (
                   <div className="flex gap-2">
-                    {/* These are the resume thresholds — the levels at which the
-                        guardrail's pause lifts — so they take the contract's
-                        clears-when slot. Under the flip-watch slot they sat
-                        directly beneath the reversal row as a near-synonym
-                        carrying different numbers, which left three unexplained
-                        pairs of thresholds stacked in one box. */}
                     <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
                   </div>

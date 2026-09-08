@@ -21,6 +21,7 @@ import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
+import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
   buildV2HeroSignalData,
@@ -253,6 +254,13 @@ async function PageContent({
     ?? homepage.weeklyDecisionCardModel.decision.guardrail
     ?? (typeof guardrailThresholdRaw === "string" ? guardrailThresholdRaw : undefined);
   const reversalTriggerLabel = homepage.weeklyDecisionCardModel.decision.reversalTrigger;
+  // The first rule is the one whose pause sentence the guardrail slot prints
+  // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
+  // the rails may draw.
+  const corridorRule = homepage.weeklyDecisionCardModel.decision.decisionRules[0];
+  const boundedConditions = corridorRule
+    ? { pause: corridorRule.pause.conditions, resume: corridorRule.resume.conditions }
+    : undefined;
   const briefShareLines = [
     homepage.weeklyDecisionCardModel.decision.actionNowShort
       ? `${DECISION_CONTRACT_LABELS.action.doNow}: ${homepage.weeklyDecisionCardModel.decision.actionNowShort}`
@@ -317,9 +325,11 @@ async function PageContent({
         showOfflineBadge={homepage.reportShell.showOfflineBadge}
       />
       {isDegraded ? (
-        <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro">
-          <span className="font-semibold text-amber-300/80">Some data is cached.</span>{" "}
-          <span className="text-amber-300/50">Stage decisions but don&apos;t commit until live data returns.</span>
+        <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
+          {resolveDataStatusGuidance({
+            isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
+            degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
+          })}
         </div>
       ) : null}
       <div className="mx-auto max-w-[64rem] space-y-8">
@@ -373,6 +383,7 @@ async function PageContent({
               flipConditions={flipConditionLabels}
               guardrail={guardrailLabel}
               reversalTrigger={reversalTriggerLabel}
+              boundedConditions={boundedConditions}
               shareLines={briefShareLines}
               revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
               revisitQueue={revisitQueue}

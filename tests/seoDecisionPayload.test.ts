@@ -27,6 +27,8 @@ const baseInput = {
       scope: "Fundraising",
       pauseTrigger: "Pause acceleration if risk appetite falls below 44 or funding pressure tightens above 76.",
       resumeTrigger: "Resume full process when risk appetite > 54 and funding pressure < 66.",
+      pause: { verb: "Pause", join: "or" as const, conditions: [] },
+      resume: { verb: "Resume", join: "and" as const, conditions: [] },
       flipConditions: [{ metric: "riskAppetite" as const, operator: ">" as const, value: 54, label: "Risk appetite > 54" }],
       rationale: "Preserve optionality",
     },
