@@ -1,9 +1,14 @@
 import {
+  distanceToRuleCondition,
+  isRuleConditionMet,
   formatActionStripReversalText,
   formatActionStripThresholdText,
   formatBoundedDecisionAction,
+  ruleMetricLabel,
   type BoundedDecisionRule,
   type DecisionArea,
+  type RuleCondition,
+  type RuleConditionMetric,
 } from "./boundedDecisionRules";
 import { businessAreaLabel, businessAreaOrder, type BusinessAreaKey } from "./decisionKnobs";
 import { joinSentences } from "./reportFormatting";
@@ -38,11 +43,23 @@ export type ActionStripItem = {
   areaActionNow: string;
   triggerThreshold: string;
   reversalCondition: string;
+  /** The pause lines as data, so a surface can draw or tabulate them instead of reprinting the sentence. */
+  pauseConditions?: RuleCondition[];
+  /** The resume lines as data. */
+  resumeConditions?: RuleCondition[];
+  /** A non-numeric pause condition stated alongside the lines, e.g. "two consecutive weaker weekly reads print". */
+  pauseQualifier?: string;
+  /** A non-numeric resume condition stated alongside the lines. */
+  resumeQualifier?: string;
   currentStateLabel?: "Closed" | "Guarded" | "Staged" | "Open";
   currentStateStep?: 0 | 1 | 2 | 3;
   corridorProgressPercent?: number;
   tightenDistanceLabel?: string;
   reopenDistanceLabel?: string;
+  /** Nearest pause line and the points to it; zero once tripped. */
+  nearestPause?: RuleThresholdDistance;
+  /** Nearest resume line and the points to it; zero once it holds. */
+  nearestResume?: RuleThresholdDistance;
   priorityDistancePoints?: number;
   priorityOrderIndex?: number;
 };
@@ -191,14 +208,7 @@ type CurrentScores = {
   riskAppetite: number;
 };
 
-export type RuleThresholdCondition = {
-  metric: keyof CurrentScores;
-  operator: ">" | ">=" | "<" | "<=";
-  value: number;
-  label: string;
-};
-
-export type RuleThresholdDistance = RuleThresholdCondition & {
+export type RuleThresholdDistance = RuleCondition & {
   currentValue: number;
   pointsToLine: number;
   satisfied: boolean;
@@ -218,52 +228,20 @@ export type DecisionLaneState = {
 const stateLabelByStep = ["Closed", "Guarded", "Staged", "Open"] as const;
 const progressByStep = [12, 38, 70, 92] as const;
 
-const metricLabel = (metric: keyof CurrentScores) => (metric === "riskAppetite" ? "Risk appetite" : "Funding pressure");
+const metricLabel = (metric: RuleConditionMetric) => ruleMetricLabel[metric];
 
-export const parseRuleThresholdConditions = (text: string): RuleThresholdCondition[] => {
-  const matches = text.matchAll(
-    /(funding pressure|risk appetite|tightness|risk appetite)\s*(is\s+)?(>=|<=|>|<|eases\s+below|tightens\s+above|falls\s+below|rises\s+above|crosses\s+below|crosses\s+above|below|above)\s*(-?\d+(?:\.\d+)?)/gi,
-  );
-
-  return Array.from(matches, (match) => ({
-    metric: match[1].toLowerCase().includes("risk appetite") || match[1].toLowerCase().includes("risk") ? "riskAppetite" : "tightness",
-    operator: (["falls below", "crosses below", "below"].includes(match[3].toLowerCase())
-      ? "<"
-      : ["rises above", "crosses above", "above"].includes(match[3].toLowerCase())
-        ? ">"
-        : match[3]) as RuleThresholdCondition["operator"],
-    value: Number(match[4]),
-    label: `${match[1]} ${match[3]} ${match[4]}`,
-  }));
-};
-
-const isConditionSatisfied = (currentValue: number, operator: RuleThresholdCondition["operator"], targetValue: number) => {
-  switch (operator) {
-    case ">":
-      return currentValue > targetValue;
-    case ">=":
-      return currentValue >= targetValue;
-    case "<":
-      return currentValue < targetValue;
-    case "<=":
-      return currentValue <= targetValue;
-    default:
-      return false;
-  }
-};
-
-const toThresholdDistance = (condition: RuleThresholdCondition, scores: CurrentScores): RuleThresholdDistance => {
+/**
+ * Satisfaction comes from the operator, not from the distance: a strict ">"
+ * line sits zero points from a reading that equals it and has still not been
+ * crossed, and scores and lines are both integers, so equality is a real case.
+ */
+export const toThresholdDistance = (condition: RuleCondition, scores: CurrentScores): RuleThresholdDistance => {
   const currentValue = scores[condition.metric];
-  const satisfied = isConditionSatisfied(currentValue, condition.operator, condition.value);
-  const rawGap = condition.operator === ">" || condition.operator === ">="
-    ? condition.value - currentValue
-    : currentValue - condition.value;
-
   return {
     ...condition,
     currentValue,
-    pointsToLine: satisfied ? 0 : Math.max(0, rawGap),
-    satisfied,
+    pointsToLine: distanceToRuleCondition(condition, currentValue),
+    satisfied: isRuleConditionMet(condition, currentValue),
   };
 };
 
@@ -276,11 +254,11 @@ const toThresholdDistance = (condition: RuleThresholdCondition, scores: CurrentS
  * rule into rail coordinates.
  */
 export type BoundedConditionRail = {
-  metric: keyof CurrentScores;
+  metric: RuleConditionMetric;
   /** What the surface calls the signal, e.g. "Funding pressure". */
   label: string;
   current: number;
-  /** Crossing this trips the rule; parsed from the guardrail sentence. */
+  /** Crossing this trips the rule. */
   guardrail: number;
   /** Where the trip clears. Absent when the rule states no resume line. */
   clearsAt?: number;
@@ -292,43 +270,48 @@ export type BoundedConditionRail = {
    * small multiples rather than as a pair of unrelated charts.
    */
   invert: boolean;
+  /** Points from the reading to the guardrail; zero at the line or past it. */
+  pointsToGuardrail: number;
+  /** Whether the guardrail condition holds. Distinct from a zero distance on a strict line. */
+  guardrailTripped: boolean;
+  /** Points from the reading to the clearing line; zero at the line or past it. */
+  pointsToClear?: number;
+  /** Whether the clearing condition holds. */
+  clearHolds?: boolean;
 };
 
 /**
- * Rail coordinates for the bounded conditions a surface is *already printing*.
+ * Rail coordinates for a rule's pause and resume lines.
  *
- * Both lines are parsed out of the same sentences the surface renders rather
- * than re-derived from the thresholds behind them, because the guardrail copy
- * reaching the homepage is assembled from several sources and a second
- * derivation would eventually disagree with the sentence beside it. A condition
- * that will not parse contributes no rail: a missing graphic costs a reader
- * nothing, and a graphic that contradicts the sentence under it costs the trust
- * the whole surface runs on.
+ * Both sides come from the same clause data the sentences are derived from, so
+ * a rail cannot state a threshold the sentence beside it does not. A clause
+ * with no numeric line contributes no rail: a missing graphic costs a reader
+ * nothing.
  */
 export const buildBoundedConditionRails = ({
-  guardrail,
-  clearsWhen = [],
+  pause,
+  resume = [],
   scores,
 }: {
-  guardrail?: string;
-  clearsWhen?: readonly string[];
+  pause?: readonly RuleCondition[];
+  resume?: readonly RuleCondition[];
   scores?: CurrentScores;
 }): BoundedConditionRail[] => {
-  if (!guardrail || !scores) {
+  if (!pause || !scores) {
     return [];
   }
 
-  const clearLines = new Map<keyof CurrentScores, number>();
-  for (const condition of parseRuleThresholdConditions(clearsWhen.join(" · "))) {
+  const clearLines = new Map<RuleConditionMetric, RuleCondition>();
+  for (const condition of resume) {
     if (!clearLines.has(condition.metric)) {
-      clearLines.set(condition.metric, condition.value);
+      clearLines.set(condition.metric, condition);
     }
   }
 
-  const seen = new Set<keyof CurrentScores>();
+  const seen = new Set<RuleConditionMetric>();
   const rails: BoundedConditionRail[] = [];
 
-  for (const condition of parseRuleThresholdConditions(guardrail)) {
+  for (const condition of pause) {
     // One rail per signal. A rule naming the same metric twice states the
     // binding line first, and a second rail for it would double-count the signal
     // in a row read as one-per-signal.
@@ -341,18 +324,75 @@ export const buildBoundedConditionRails = ({
     // Which way the rule trips is what the operator encodes: ">" trips high, so
     // trouble already sits on the right and the rail runs as drawn.
     const tripsHigh = condition.operator === ">" || condition.operator === ">=";
+    const clear = clearLines.get(condition.metric);
 
     rails.push({
       metric: condition.metric,
       label: metricLabel(condition.metric),
       current,
       guardrail: condition.value,
-      clearsAt: clearLines.get(condition.metric),
+      clearsAt: clear?.value,
       invert: !tripsHigh,
+      pointsToGuardrail: distanceToRuleCondition(condition, current),
+      guardrailTripped: isRuleConditionMet(condition, current),
+      pointsToClear: clear ? distanceToRuleCondition(clear, current) : undefined,
+      clearHolds: clear ? isRuleConditionMet(clear, current) : undefined,
     });
   }
 
   return rails;
+};
+
+/**
+ * The one corridor every lever shares, drawn once.
+ *
+ * All five rules are built from the same four lines in different pairs, so a
+ * per-area rail set repeats the same two rails five times. This collects the
+ * first pause and resume line stated per signal across the items and draws
+ * that pair; per-area rows then only need to say which lines apply and how far
+ * off they are.
+ */
+export const buildSharedCorridorRails = (
+  items: readonly Pick<ActionStripItem, "pauseConditions" | "resumeConditions">[],
+  scores?: CurrentScores,
+): BoundedConditionRail[] => {
+  const pause: RuleCondition[] = [];
+  const resume: RuleCondition[] = [];
+  const seenPause = new Set<RuleConditionMetric>();
+  const seenResume = new Set<RuleConditionMetric>();
+  for (const item of items) {
+    for (const condition of item.pauseConditions ?? []) {
+      if (seenPause.has(condition.metric)) continue;
+      seenPause.add(condition.metric);
+      pause.push(condition);
+    }
+    for (const condition of item.resumeConditions ?? []) {
+      if (seenResume.has(condition.metric)) continue;
+      seenResume.add(condition.metric);
+      resume.push(condition);
+    }
+  }
+  // Rails read in signal order, whichever lever happened to state a line first.
+  const order: RuleConditionMetric[] = ["tightness", "riskAppetite"];
+  const byMetric = (left: RuleCondition, right: RuleCondition) =>
+    order.indexOf(left.metric) - order.indexOf(right.metric);
+  return buildBoundedConditionRails({ pause: pause.sort(byMetric), resume: resume.sort(byMetric), scores });
+};
+
+/**
+ * "44 pts away", "at the line", "tripped" or "holds" — a distance, not a
+ * sentence. `met` is the operator's verdict; a strict line at zero distance is
+ * "at the line", which is not the same claim as tripped.
+ */
+export const formatPointsToLine = (
+  points: number | undefined,
+  kind: "pause" | "resume",
+  met: boolean | undefined,
+): string => {
+  if (points === undefined || !Number.isFinite(points)) return "—";
+  if (met) return kind === "pause" ? "tripped" : "holds";
+  if (points === 0) return "at the line";
+  return `${points.toFixed(points % 1 === 0 ? 0 : 1)} pts away`;
 };
 
 const formatDistanceLabel = (distance: RuleThresholdDistance | undefined, kind: "caution" | "reopen") => {
@@ -376,15 +416,15 @@ export const resolveDecisionLaneState = ({
   rule,
   scores,
 }: {
-  rule?: Pick<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger">;
+  rule?: Pick<BoundedDecisionRule, "pause" | "resume">;
   scores?: CurrentScores;
 }): DecisionLaneState | null => {
   if (!rule || !scores) {
     return null;
   }
 
-  const pauseConditions = parseRuleThresholdConditions(rule.pauseTrigger).map((condition) => toThresholdDistance(condition, scores));
-  const resumeConditions = parseRuleThresholdConditions(rule.resumeTrigger).map((condition) => toThresholdDistance(condition, scores));
+  const pauseConditions = rule.pause.conditions.map((condition) => toThresholdDistance(condition, scores));
+  const resumeConditions = rule.resume.conditions.map((condition) => toThresholdDistance(condition, scores));
   const nearestPause = [...pauseConditions].sort(sortThresholdDistance)[0];
   const nearestResume = [...resumeConditions].sort(sortThresholdDistance)[0];
   const pauseSatisfied = pauseConditions.some((condition) => condition.satisfied);
@@ -426,6 +466,12 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
       areaActionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.areaActionNow,
       triggerThreshold: rule ? formatActionStripThresholdText(rule) : OPERATING_LEVER_FALLBACK.triggerThreshold,
       reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,
+      pauseConditions: rule?.pause.conditions ?? [],
+      resumeConditions: rule?.resume.conditions ?? [],
+      pauseQualifier: rule?.pause.qualifier,
+      resumeQualifier: rule?.resume.qualifier,
+      nearestPause: laneState?.nearestPause,
+      nearestResume: laneState?.nearestResume,
       currentStateLabel: laneState?.currentStateLabel,
       currentStateStep: laneState?.currentStateStep,
       corridorProgressPercent: laneState?.corridorProgressPercent,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
 import { ShareCopyControls } from "./shareCopyControls";
-import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
+import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
 import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
@@ -40,10 +40,12 @@ const buildCurrentShareArtifact = async () => {
     }),
   );
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportOptions);
-  const boardBrief = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportOptions);
   const citation = buildCallCitation(assessment, treasury, {
     postureWithStageLabel: snapshot.weeklyCall.regimeStage,
   });
+  // The slide bullets rather than the board brief, which is the Slack brief
+  // with the bullets appended: this pack used to paste the same block twice.
+  const boardSlideBullets = buildBoardSlideBullets(assessment, treasury, macroSeries, exportOptions);
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
@@ -51,8 +53,8 @@ const buildCurrentShareArtifact = async () => {
     "SLACK BRIEF",
     slackBrief,
     "",
-    "BOARD SUMMARY",
-    boardBrief,
+    "BOARD SLIDE",
+    boardSlideBullets,
     "",
     "CITATION",
     citation,

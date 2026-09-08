@@ -35,6 +35,73 @@ const strictnessLabel = (value: number) => {
   return { label: "Maximum strictness", tone: "border-rose-400/40 bg-rose-500/10 text-rose-100" };
 };
 
+/**
+ * A number against its scale, drawn.
+ *
+ * Every card in the planner is one of three shapes — a point on a 0–100 gauge,
+ * a min–max band with the operator's own figure marked, or a point inside a
+ * floor–ceiling range — and each used to be a sentence carrying three to five
+ * numbers. The sentence stays under the bar as its caption.
+ */
+const RangeBar = ({
+  min,
+  max,
+  band,
+  point,
+  marker,
+  unit = "",
+  tone = "sky",
+  label,
+}: {
+  min: number;
+  max: number;
+  /** A shaded span, e.g. the safe runway band or the raise window. */
+  band?: { from: number; to: number };
+  /** The recommended or current value. */
+  point?: number;
+  /** A second value to compare against, e.g. the operator's own runway. */
+  marker?: { value: number; label: string };
+  unit?: string;
+  tone?: "sky" | "emerald" | "amber" | "rose";
+  label: string;
+}) => {
+  const span = max - min || 1;
+  const pct = (value: number) => `${Math.min(100, Math.max(0, ((value - min) / span) * 100))}%`;
+  const bandColor = { sky: "bg-sky-400/25", emerald: "bg-emerald-400/25", amber: "bg-amber-400/25", rose: "bg-rose-400/25" }[tone];
+  const pointColor = { sky: "bg-sky-300", emerald: "bg-emerald-300", amber: "bg-amber-300", rose: "bg-rose-300" }[tone];
+  const fmt = (value: number) => `${Number.isInteger(value) ? value : value.toFixed(1)}${unit}`;
+  return (
+    <div className="mt-3" aria-label={label}>
+      <div className="relative h-2 w-full rounded-full bg-slate-800/80">
+        {band ? (
+          <span
+            className={`absolute inset-y-0 rounded-full ${bandColor}`}
+            style={{ left: pct(band.from), width: `calc(${pct(band.to)} - ${pct(band.from)})` }}
+          />
+        ) : null}
+        {typeof point === "number" ? (
+          <span
+            className={`absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ${pointColor} ring-2 ring-slate-950`}
+            style={{ left: pct(point) }}
+          />
+        ) : null}
+        {marker ? (
+          <span
+            className="absolute -top-1 h-4 w-0.5 -translate-x-1/2 bg-slate-100"
+            style={{ left: pct(marker.value) }}
+          />
+        ) : null}
+      </div>
+      <div className="mt-1 flex justify-between text-fluid-nano tabular-nums text-slate-500">
+        <span>{fmt(min)}</span>
+        {band ? <span className="text-slate-300">{fmt(band.from)}–{fmt(band.to)}</span> : null}
+        {marker ? <span className="text-slate-100">{marker.label} {fmt(marker.value)}</span> : null}
+        <span>{fmt(max)}</span>
+      </div>
+    </div>
+  );
+};
+
 const postureForPolicyPosture = (posture: RegimeAssessment["policyAssessment"]["posture"]): PlannerPosture => {
   if (posture === "RISK_ON") return "RISK_ON";
   if (posture === "TRANSITION") return "TRANSITION";
@@ -264,19 +331,88 @@ This memo aligns our company budget and operating guardrails with the current cl
           <div className="grid gap-3 md:grid-cols-2">
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway risk</p>
-              <p className="mt-2 text-sm text-slate-100">{output.runwayRisk.summary}</p>
+              <p className="mt-2 flex items-baseline gap-2 tabular-nums">
+                <span className="text-2xl font-semibold text-slate-100">{output.runwayRisk.score}</span>
+                <span className="text-sm text-slate-500">/100</span>
+                <span className="text-sm text-slate-300">{output.runwayRisk.level}</span>
+                <span className="ml-auto text-fluid-nano text-slate-400">
+                  downside flip <span className="text-slate-200">{output.runwayRisk.macroRiskDownsideFlip}</span>
+                </span>
+              </p>
+              <RangeBar
+                min={0}
+                max={100}
+                band={{ from: output.runwayRisk.macroRiskBase, to: output.runwayRisk.macroRiskDownsideFlip }}
+                point={output.runwayRisk.score}
+                tone={output.runwayRisk.score >= 60 ? "rose" : output.runwayRisk.score >= 35 ? "amber" : "emerald"}
+                label="Runway risk now and on a downside flip"
+              />
+              <p className="mt-2 text-fluid-xs text-slate-400">{output.runwayRisk.summary}</p>
             </article>
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Safe runway band</p>
-              <p className="mt-2 text-sm text-slate-100">{output.safeRunwayBand.summary}</p>
+              <p className="mt-2 flex items-baseline gap-2 tabular-nums">
+                <span className="text-2xl font-semibold text-slate-100">{output.safeRunwayBand.minMonths}–{output.safeRunwayBand.maxMonths}</span>
+                <span className="text-sm text-slate-500">months</span>
+                <span className={`ml-auto text-fluid-nano ${resolution.request.runway < output.safeRunwayBand.minMonths ? "text-semantic-caution-fg" : "text-slate-400"}`}>
+                  yours <span className="text-slate-100">{resolution.request.runway}</span>
+                </span>
+              </p>
+              <RangeBar
+                min={0}
+                max={Math.max(output.safeRunwayBand.maxMonths, resolution.request.runway) + 6}
+                band={{ from: output.safeRunwayBand.minMonths, to: output.safeRunwayBand.maxMonths }}
+                marker={{ value: resolution.request.runway, label: "yours" }}
+                unit="mo"
+                tone="emerald"
+                label="Safe runway band against your runway"
+              />
+              <p className="mt-2 text-fluid-xs text-slate-400">{output.safeRunwayBand.summary}</p>
             </article>
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Raise timing window</p>
-              <p className="mt-2 text-sm text-slate-100">{output.raiseTimingWindow.summary}</p>
+              <p className="mt-2 flex items-baseline gap-2 tabular-nums">
+                <span className="text-2xl font-semibold text-slate-100">
+                  month {output.raiseTimingWindow.startMonth}–{output.raiseTimingWindow.endMonth}
+                </span>
+                <span className="ml-auto text-fluid-nano text-slate-400">
+                  safe runway in <span className="text-slate-100">{output.raiseTimingWindow.timeToSafeRunwayTargetMonths} mo</span>
+                </span>
+              </p>
+              <RangeBar
+                min={0}
+                max={Math.max(output.raiseTimingWindow.endMonth, output.raiseTimingWindow.timeToSafeRunwayTargetMonths, resolution.request.runway) + 3}
+                band={{ from: output.raiseTimingWindow.startMonth, to: output.raiseTimingWindow.endMonth }}
+                marker={{ value: resolution.request.runway, label: "runway ends" }}
+                point={output.raiseTimingWindow.timeToSafeRunwayTargetMonths}
+                unit="mo"
+                tone="sky"
+                label="Raise window against runway"
+              />
+              <p className="mt-2 text-fluid-xs text-slate-400">{output.raiseTimingWindow.summary}</p>
             </article>
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Burn adjustment range</p>
-              <p className="mt-2 text-sm text-slate-100">{output.burnAdjustmentRange.summary}</p>
+              <p className="mt-2 flex items-baseline gap-2 tabular-nums">
+                <span className="text-2xl font-semibold text-slate-100">
+                  {output.burnAdjustmentRange.recommendedDeltaPercent > 0 ? "+" : ""}
+                  {output.burnAdjustmentRange.recommendedDeltaPercent}%
+                </span>
+                <span className="text-sm text-slate-500">
+                  within {output.burnAdjustmentRange.floorPercent}% to {output.burnAdjustmentRange.ceilingPercent > 0 ? "+" : ""}{output.burnAdjustmentRange.ceilingPercent}%
+                </span>
+              </p>
+              <RangeBar
+                min={-Math.max(Math.abs(output.burnAdjustmentRange.floorPercent), Math.abs(output.burnAdjustmentRange.ceilingPercent), 10) - 5}
+                max={Math.max(Math.abs(output.burnAdjustmentRange.floorPercent), Math.abs(output.burnAdjustmentRange.ceilingPercent), 10) + 5}
+                band={{ from: output.burnAdjustmentRange.floorPercent, to: output.burnAdjustmentRange.ceilingPercent }}
+                point={output.burnAdjustmentRange.recommendedDeltaPercent}
+                marker={{ value: 0, label: "hold" }}
+                unit="%"
+                tone={output.burnAdjustmentRange.recommendedDeltaPercent < 0 ? "amber" : "sky"}
+                label="Recommended burn change inside its range"
+              />
+              <p className="mt-2 text-fluid-xs text-slate-400">{output.burnAdjustmentRange.summary}</p>
               <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.08em] ${paybackStrictnessState.tone}`}>
                 Payback strictness: {paybackStrictnessState.label} ({paybackStrictnessLevel}/3)
               </p>

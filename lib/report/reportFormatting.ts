@@ -99,6 +99,24 @@ const confidencePlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
   HIGH: "High (safe for near-term operating cadence)",
 };
 
+/**
+ * The one sentence for "how far is this signal from its line".
+ *
+ * Five builders used to write this independently — the homepage evidence list,
+ * two interpretation views, the evidence rows and the Slack brief — each with
+ * its own wording and precision. The command bar already shows the number
+ * beside the posture map; every prose surface now states it the same way.
+ */
+export const formatBoundaryDistance = ({
+  label,
+  points,
+  threshold,
+}: {
+  label: string;
+  points: number;
+  threshold: number;
+}): string => `${label} is ${points.toFixed(1)} points from its ${threshold.toFixed(1)} line.`;
+
 export const formatProbabilityPercent = (probability: number, fractionDigits = 0): string => {
   const bounded = Math.min(100, Math.max(0, probability));
   return `${bounded.toFixed(fractionDigits)}%`;

@@ -1,6 +1,7 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
 import type { PostureDecisionEvent } from "../storage/postureDecisionEventRepository";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
+import { type RuleCondition } from "./boundedDecisionRules";
 
 export type PostureStateContract = {
   currentState: {
@@ -21,6 +22,8 @@ export type PostureStateContract = {
   whatFlipsNext: {
     flipTrigger: string;
     thresholds: readonly string[];
+    /** Numeric lines behind each `thresholds` entry, index-aligned. Absent on older fixtures. */
+    thresholdLines?: readonly (readonly RuleCondition[])[];
     reversalConditions: readonly string[];
   };
 };
@@ -86,6 +89,7 @@ export const buildPostureStateContract = ({
     whatFlipsNext: {
       flipTrigger: lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.",
       thresholds: lockCommitment.flipConditions,
+      thresholdLines: lockCommitment.flipLines,
       reversalConditions: lockCommitment.flipConditions.slice(1),
     },
   };

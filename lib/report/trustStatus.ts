@@ -343,6 +343,22 @@ export const DATA_STATUS_LABELS = {
 
 export type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
 
+/**
+ * What each data state means for approvals, in one sentence each. The homepage
+ * banner, the freshness popover and the export panel used to word this four
+ * different ways for the same boolean; a reader comparing them could not tell
+ * whether they described one state or three.
+ */
+export const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
+  live: "All sources live and current.",
+  partlyCached: "Some sources are cached. Stage decisions; do not commit until every source is current.",
+  cachedSnapshot: "Cached snapshot. Stage decisions; do not lock hiring, spend or vendor commitments until live data returns.",
+  historical: "Historical snapshot. Compare against the live read before changing current plans.",
+};
+
+export const resolveDataStatusGuidance = (input: Parameters<typeof resolveDataStatus>[0]) =>
+  DATA_STATUS_GUIDANCE[resolveDataStatus(input)];
+
 export const resolveDataStatus = ({
   isHistoricalSelection = false,
   isFallbackSnapshot = false,

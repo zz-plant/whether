@@ -5,7 +5,7 @@ import { buildBriefPermalinkLine } from "./briefPermalink";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
-import type { ActionStripItem } from "../report/operatingCalls";
+import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import {
@@ -81,12 +81,14 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
   const currentCall =
     firstMeaningful(modeled.currentCall, assessment.description)
     ?? "Hold bounded operating discipline.";
+  // Never `assessment.constraints`: that is the operating-limits list printed
+  // in full further down, and a constraint in this slot printed "Do now" as a
+  // verbatim copy of operating limit 1.
   const actionNow =
     firstMeaningful(
       modeled.actionNow,
       topActionStripItems[0]?.areaActionNow,
-      assessment.constraints[0],
-    ) ?? currentCall;
+    ) ?? "Keep current approvals staged.";
   const pauseIf =
     firstMeaningful(topActionStripItems[0]?.triggerThreshold, modeled.guardrailThreshold)
     ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
@@ -101,10 +103,70 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
     `• ${publicDecisionLabels.reversal}: ${changeCourseIf}`,
     ...topActionStripItems.slice(1).flatMap((item) => [
       `• ${item.label}: ${item.areaActionNow}`,
-      `  ${publicDecisionLabels.threshold}: ${item.triggerThreshold}`,
-      `  ${publicDecisionLabels.reversal}: ${item.reversalCondition}`,
+      `  ${publicDecisionLabels.threshold}: ${formatItemLines(item, "pause")}`,
+      `  ${publicDecisionLabels.reversal}: ${formatItemLines(item, "resume")}`,
     ]),
   ];
+};
+
+/**
+ * A lever's lines as `Funding pressure > 76 (44 pts away)`, or its sentence
+ * when it carries no numeric line.
+ */
+const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
+  const lines = kind === "pause" ? item.pauseConditions : item.resumeConditions;
+  const nearest = kind === "pause" ? item.nearestPause : item.nearestResume;
+  const qualifier = kind === "pause" ? item.pauseQualifier : item.resumeQualifier;
+  if (!lines || lines.length === 0) {
+    return kind === "pause" ? item.triggerThreshold : item.reversalCondition;
+  }
+  return [
+    ...lines.map((line) =>
+      nearest && nearest.metric === line.metric && nearest.value === line.value
+        ? `${line.label} (${formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied)})`
+        : line.label,
+    ),
+    // The qualifier is part of the rule, not decoration: "or two consecutive
+    // weaker weekly reads print" is a second way the pause fires.
+    ...(qualifier ? [qualifier] : []),
+  ].join(` ${kind === "pause" ? "or" : "and"} `);
+};
+
+/**
+ * The readings against the corridor, one line per signal.
+ *
+ * `Funding pressure: 32/100 · pause > 76 (44 pts away) · re-open < 66 (holds)`.
+ * The sentences elsewhere in the brief say the rule; this says where the
+ * reading sits against it, so nobody pastes a paragraph to answer "how close".
+ */
+export const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
+  const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
+  const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+  const rails = buildSharedCorridorRails(items, scores);
+  const deltas: Record<"tightness" | "riskAppetite", number | undefined> = {
+    tightness: assessment.diagnostics?.tightnessDelta,
+    riskAppetite: assessment.diagnostics?.riskAppetiteDelta,
+  };
+  const readings: Array<{ metric: "tightness" | "riskAppetite"; label: string; value: number }> = [
+    { metric: "tightness", label: "Funding pressure", value: scores.tightness },
+    { metric: "riskAppetite", label: "Risk appetite", value: scores.riskAppetite },
+  ];
+  return readings.map((reading) => {
+    const rail = rails.find((candidate) => candidate.metric === reading.metric);
+    const delta = deltas[reading.metric];
+    return [
+      `${reading.label}: ${reading.value}/100`,
+      typeof delta === "number" && Number.isFinite(delta) && delta !== 0
+        ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`
+        : null,
+      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})` : null,
+      rail && rail.clearsAt !== undefined
+        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
+        : null,
+    ]
+      .filter((part): part is string => Boolean(part))
+      .join(" · ");
+  });
 };
 
 const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
@@ -276,7 +338,7 @@ export const buildSlackBrief = (
   return [
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Posture: ${postureLabel}`,
-    `Funding pressure: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
+    ...buildReadingLines(assessment, options),
     `Fed interest rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Recession warning gauge (10Y−2Y): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",

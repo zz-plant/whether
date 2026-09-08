@@ -4,6 +4,52 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { getRegimePublicLabel } from "../regimePresentation";
+
+const formatDelta = (delta: number | undefined) =>
+  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
+    ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)}`
+    : null;
+
+/**
+ * The numbers the call was scored on, as one row.
+ *
+ * This is the highest-fanout artifact the product sends and it used to carry
+ * no number at all — four sentences and a link. The scores, their weekly
+ * deltas and the confidence label are what a reader forwards.
+ */
+export const buildWeeklyEmailReadings = (snapshot: OperatingSnapshot | undefined) => {
+  if (!snapshot) return [];
+  const { scores, diagnostics } = snapshot.assessment;
+  const confidence = diagnostics.confidence === "MEDIUM" ? "MED" : diagnostics.confidence;
+  return [
+    { label: "Funding pressure", value: `${scores.tightness}/100`, delta: formatDelta(diagnostics.tightnessDelta), worseWhenUp: true },
+    { label: "Risk appetite", value: `${scores.riskAppetite}/100`, delta: formatDelta(diagnostics.riskAppetiteDelta), worseWhenUp: false },
+    { label: "Confidence", value: confidence, delta: null, worseWhenUp: false },
+  ];
+};
+
+const readingsText = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
+  readings.map((reading) => `${reading.label}: ${reading.value}${reading.delta ? ` (${reading.delta} vs last week)` : ""}`);
+
+const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
+  readings.length === 0
+    ? ""
+    : [
+        `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
+        ...readings.map((reading) => {
+          const up = reading.delta?.startsWith("+");
+          const deltaColor = reading.delta ? (up === reading.worseWhenUp ? "#f59e0b" : "#10b981") : "#64748b";
+          return [
+            `<td style="padding:12px 16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;vertical-align:top;">`,
+            `<p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 4px;">${reading.label}</p>`,
+            `<p style="font-size:1.25rem;font-weight:600;margin:0;color:#f1f5f9;font-variant-numeric:tabular-nums;">${reading.value}</p>`,
+            reading.delta ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.delta} vs last week</p>` : "",
+            `</td>`,
+          ].join("");
+        }),
+        `</tr></table>`,
+      ].join("");
 
 export type SendWeeklyBriefResult = {
   ok: boolean;
@@ -41,6 +87,8 @@ export const sendWeeklyBrief = async (options?: {
   }
 
   const regime = snapshot?.assessment.regime ?? "DEFENSIVE";
+  const regimeLabel = getRegimePublicLabel(regime);
+  const readings = buildWeeklyEmailReadings(snapshot);
   const actionNow = weeklyCall?.actionNow ?? weeklyCall?.currentCall ?? "Hold bounded operating discipline.";
   const pauseIf = weeklyCall?.pauseIf ?? "Pause irreversible commitments if funding tightness rises.";
   const changeCourseIf = weeklyCall?.changeCourseIf ?? "Resume staged approvals when conditions stabilize.";
@@ -50,15 +98,15 @@ export const sendWeeklyBrief = async (options?: {
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
-        ? `Whether — ${regime}: ${actionNow}`
-        : `Whether Brief — ${regime}`;
+        ? `Whether — ${regimeLabel}: ${actionNow}`
+        : `Whether Brief — ${regimeLabel}`;
       const briefUrl = "https://whether.work";
       const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
-      const isExpansion = regime === "EXPANSION";
 
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
-        `Regime: ${regime}`,
+        `Conditions: ${regimeLabel}`,
+        ...readingsText(readings),
         `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${changeCourseIf}`,
@@ -74,9 +122,10 @@ export const sendWeeklyBrief = async (options?: {
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
         `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">Regime</p>`,
-        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#f1f5f9;">${regime}</p>`,
-        `</td></tr></table>`
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">Conditions</p>`,
+        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#f1f5f9;">${regimeLabel}</p>`,
+        `</td></tr></table>`,
+        readingsHtml(readings),
       );
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
@@ -89,28 +138,6 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${changeCourseIf}</p>`,
         `</td></tr></table>`
       );
-
-      /* Expansion emails include additional toolkits and trend context */
-      if (isExpansion) {
-        sections.push(
-          `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:16px;"><tr>`,
-          `<td style="padding:12px 16px;border:1px solid rgba(52,211,153,0.2);border-radius:8px;background:rgba(16,185,129,0.06);">`,
-          `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#34d399;margin:0 0 6px;">Expansion conditions</p>`,
-          `<p style="font-size:0.85rem;color:#e2e8f0;margin:0;">Risk appetite is strong. Consider updating your fundraising materials and exploring growth-stage toolkits on the site.</p>`,
-          `</td></tr></table>`
-        );
-      }
-
-      /* Volatile gets a caution note */
-      if (regime === "VOLATILE") {
-        sections.push(
-          `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
-          `<td style="padding:12px 16px;border:1px solid rgba(251,191,36,0.2);border-radius:8px;background:rgba(245,158,11,0.06);">`,
-          `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#fbbf24;margin:0 0 6px;">Uncertain conditions</p>`,
-          `<p style="font-size:0.85rem;color:#e2e8f0;margin:0;">Conditions can shift quickly. Favor reversible decisions and keep checkpoints active.</p>`,
-          `</td></tr></table>`
-        );
-      }
 
       const html = [
         `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#e2e8f0;">`,
@@ -152,7 +179,13 @@ export const sendWeeklyBrief = async (options?: {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Regime:* ${regime}\n*Action Now:* ${actionNow}\n*Pause If:* ${pauseIf}\n*Change Course If:* ${changeCourseIf}`,
+            text: [
+              `*Conditions:* ${regimeLabel}`,
+              ...readingsText(readings).map((line) => `*${line.replace(": ", ":* ")}`),
+              `*Action Now:* ${actionNow}`,
+              `*Pause If:* ${pauseIf}`,
+              `*Change Course If:* ${changeCourseIf}`,
+            ].join("\n"),
           },
         },
         {

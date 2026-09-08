@@ -2,7 +2,7 @@
 
 import { useId, useState, useEffect, useRef } from "react";
 import { CheckIcon, StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
-import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
+import { resolveDataStatusGuidance, resolveDataStatusLabel } from "../../lib/report/trustStatus";
 
 export type FreshnessDotProps = {
   label: string;
@@ -92,11 +92,7 @@ export function FreshnessDot({
           <div>
             <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase">Data status</p>
             <p className="text-fluid-xs text-white/65 mt-1">
-              {showOfflineBadge
-                ? "Using saved snapshot — not for live approvals."
-                : hasDegraded
-                ? "Some sources are delayed or cached — stage decisions until all sources are current."
-                : "All sources live and current."}
+              {resolveDataStatusGuidance({ isFallbackSnapshot: showOfflineBadge, degradedSourceCount: degradedSourceRows.length })}
             </p>
           </div>
 

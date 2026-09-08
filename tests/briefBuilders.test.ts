@@ -35,6 +35,24 @@ describe("buildSlackBrief", () => {
     );
   });
 
+  it("states each reading against the corridor as numbers, not a paragraph", async () => {
+    const { buildCanonicalBoundedDecisionRules } = await import("../lib/report/boundedDecisionRules");
+    const { buildActionStripItems } = await import("../lib/report/operatingCalls");
+    const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+    const rules = buildCanonicalBoundedDecisionRules({ regime: "EXPANSION", thresholds: assessment.thresholds, scores });
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      modeledDecision: { actionStripItems: buildActionStripItems(rules, scores) },
+    });
+
+    assert.match(brief, /^Funding pressure: 12\/100 · pause > 76 \(64 pts away\) · re-open < 66 \(holds\)$/m);
+    assert.match(brief, /^Risk appetite: 68\/100 · pause < 44 \(24 pts away\) · re-open > 54 \(holds\)$/m);
+    // Per-area rows print lines with a distance, not the rule's sentence.
+    assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
+    // The qualifier is part of the rule and prints with the lines.
+    assert.match(brief, /Re-open when: Funding pressure < 66 \(holds\) and budget payback proof is intact/);
+    assert.doesNotMatch(brief, /Do now: Constraint one/, "Do now must not fall through to the operating-limits list");
+  });
+
   it("resolves its change-course cross-reference to a label it actually prints", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
     const referenced = brief.match(/Change-course trigger: see "([^"]+)"/)?.[1];

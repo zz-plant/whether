@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { Tag } from "../../components/ui/tag";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
@@ -24,8 +25,35 @@ import {
   labelForArea,
   publishedBriefStaticParams,
   type PublishedBrief,
+  type PublishedRuleLine,
 } from "../../../lib/report/publishedBriefs";
 import { PublishedBriefCopyControls } from "./publishedBriefCopyControls";
+import { ThresholdLadder } from "../../components/illustrations/ThresholdLadder";
+import { RuleLines } from "../../components/boundedRuleLines";
+import {
+  buildBoundedConditionRails,
+  formatPointsToLine,
+  toThresholdDistance,
+  type RuleThresholdDistance,
+} from "../../../lib/report/operatingCalls";
+
+/**
+ * The nearest of a decision's lines to the frozen reading, for the distance
+ * column. Mirrors what `resolveDecisionLaneState` computes for the live page,
+ * on the record's own numbers rather than today's.
+ */
+const nearestLine = (
+  lines: readonly PublishedRuleLine[] | undefined,
+  scores: NonNullable<PublishedBrief["scores"]>,
+): RuleThresholdDistance | undefined =>
+  (lines ?? [])
+    .map((line) => toThresholdDistance(line, scores))
+    .sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
+
+const formatDelta = (delta: number | null | undefined) =>
+  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
+    ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)}`
+    : null;
 
 type Params = { week: string };
 
@@ -84,6 +112,25 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
   const emailUpdate = buildPublishedBriefEmailUpdate(brief);
+
+  // The record's readings and corridor, drawn. Records frozen before the lines
+  // were data carry neither and fall back to the sentences below.
+  const corridorDecision = brief.decisions.find((decision) => (decision.pause?.length ?? 0) > 0);
+  const rails = brief.scores
+    ? buildBoundedConditionRails({
+        pause: corridorDecision?.pause,
+        resume: corridorDecision?.resume,
+        scores: brief.scores,
+      })
+    : [];
+  const readings = brief.scores
+    ? [
+        { key: "tightness", label: "Funding pressure", value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta), worseWhenUp: true },
+        { key: "riskAppetite", label: "Risk appetite", value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta), worseWhenUp: false },
+      ]
+    : [];
+  const frozenScores = brief.scores;
+  const tabulateDecisions = frozenScores !== undefined && brief.decisions.some((decision) => (decision.pause?.length ?? 0) > 0);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -158,6 +205,67 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           permanentUrl={canonicalUrl}
         />
 
+        {readings.length > 0 ? (
+          <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="published-readings">
+            <h2 id="published-readings" className="text-lg font-semibold text-slate-100">The numbers the call was scored on</h2>
+            <dl className="grid gap-4 sm:grid-cols-2">
+              {readings.map((reading) => {
+                const rail = rails.find((candidate) => candidate.metric === reading.key);
+                const deltaUp = reading.delta?.startsWith("+");
+                const deltaTone = reading.delta
+                  ? deltaUp === reading.worseWhenUp
+                    ? "text-semantic-caution-fg"
+                    : "text-semantic-easing-fg"
+                  : "text-slate-500";
+                return (
+                  <div key={reading.key} className="min-w-0">
+                    <dt className="text-fluid-nano text-slate-400">{reading.label}</dt>
+                    <dd className="mt-0.5 flex items-baseline gap-2 tabular-nums">
+                      <span className="text-2xl font-semibold text-slate-100">{reading.value}</span>
+                      <span className="text-sm text-slate-500">/100</span>
+                      {reading.delta ? <span className={`text-sm ${deltaTone}`}>{reading.delta} vs prior week</span> : null}
+                    </dd>
+                    {rail ? (
+                      <dd className="mt-2">
+                        <ThresholdLadder
+                          idPrefix={`published-${brief.slug}-${rail.metric}`}
+                          min={0}
+                          max={100}
+                          current={rail.current}
+                          trigger={rail.guardrail}
+                          triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
+                          reversal={rail.clearsAt}
+                          reversalLabel={publicDecisionLabels.reversal}
+                          hysteresisBand
+                          invert={rail.invert}
+                          signalLabel={rail.label}
+                          viewBoxWidth={320}
+                        />
+                        <p className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums text-slate-400">
+                          <span>
+                            {DECISION_CONTRACT_LABELS.threshold.pauseIf} {rail.invert ? "<" : ">"} {rail.guardrail}
+                            <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-slate-500"}`}>
+                              {formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
+                            </span>
+                          </span>
+                          {rail.clearsAt !== undefined ? (
+                            <span>
+                              {publicDecisionLabels.reversal} {rail.invert ? ">" : "<"} {rail.clearsAt}
+                              <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-slate-500"}`}>
+                                {formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
+                              </span>
+                            </span>
+                          ) : null}
+                        </p>
+                      </dd>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </dl>
+          </section>
+        ) : null}
+
         <section className="weather-panel space-y-3 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
           <p className="text-sm text-slate-300">{brief.whatChanged}</p>
@@ -181,29 +289,69 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         {brief.decisions.length ? (
           <section className="weather-panel space-y-4 px-6 py-6">
             <h2 className="text-lg font-semibold text-slate-100">Bounded calls</h2>
-            <ul className="space-y-4">
-              {brief.decisions.map((decision) => (
-                <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">
-                  <p className="text-sm font-semibold text-slate-100">{labelForArea(decision.area)}</p>
-                  <p className="text-sm text-slate-300">{decision.call}</p>
-                  {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {decision.doNow}</p> : null}
-                  {/* Same size and weight as the rule above, not a tier below it.
-                      Phase 1 of the facelift moved bounded rules out of small grey
-                      prose on `/` and emphasized the numerals, because the number
-                      is what a reader scans for. That never reached this page —
-                      which is the one every shared link lands on, and the one
-                      quoted in board decks. */}
-                  <p className="text-sm text-slate-300">
-                    <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.slot.threshold}:</span>{" "}
-                    <BoundedValue>{decision.pauseTrigger}</BoundedValue>
-                  </p>
-                  <p className="text-sm text-slate-300">
-                    <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
-                    <BoundedValue>{decision.resumeTrigger}</BoundedValue>
-                  </p>
-                </li>
-              ))}
-            </ul>
+            {tabulateDecisions && frozenScores ? (
+              /* Every area's rule is a pair of the same four lines, drawn once
+                 above. A row per area says which lines apply and how far off
+                 the frozen reading sat, instead of five paraphrases of one
+                 corridor. */
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left text-sm text-slate-300">
+                  <caption className="sr-only">Action, pause line and re-open line for each area</caption>
+                  <thead>
+                    <tr className="border-b border-slate-800/80 text-fluid-nano text-slate-400">
+                      <th scope="col" className="py-1.5 pr-3 font-medium">Area</th>
+                      <th scope="col" className="py-1.5 pr-3 font-medium">{DECISION_CONTRACT_LABELS.action.doNow}</th>
+                      <th scope="col" className="py-1.5 pr-3 font-medium">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
+                      <th scope="col" className="py-1.5 font-medium">{publicDecisionLabels.reversal}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {brief.decisions.map((decision) => (
+                      <tr key={decision.area} className="border-b border-slate-800/50 align-top">
+                        <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{labelForArea(decision.area)}</th>
+                        <td className="py-2 pr-3">{decision.doNow || decision.call}</td>
+                        <td className="py-2 pr-3 text-xs">
+                          <RuleLines
+                            conditions={decision.pause ?? []}
+                            fallback={decision.pauseTrigger}
+                            nearest={nearestLine(decision.pause, frozenScores)}
+                            kind="pause"
+                            qualifier={decision.pauseQualifier}
+                          />
+                        </td>
+                        <td className="py-2 text-xs">
+                          <RuleLines
+                            conditions={decision.resume ?? []}
+                            fallback={decision.resumeTrigger}
+                            nearest={nearestLine(decision.resume, frozenScores)}
+                            kind="resume"
+                            qualifier={decision.resumeQualifier}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <ul className="space-y-4">
+                {brief.decisions.map((decision) => (
+                  <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">
+                    <p className="text-sm font-semibold text-slate-100">{labelForArea(decision.area)}</p>
+                    <p className="text-sm text-slate-300">{decision.call}</p>
+                    {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {decision.doNow}</p> : null}
+                    <p className="text-sm text-slate-300">
+                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.slot.threshold}:</span>{" "}
+                      <BoundedValue>{decision.pauseTrigger}</BoundedValue>
+                    </p>
+                    <p className="text-sm text-slate-300">
+                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
+                      <BoundedValue>{decision.resumeTrigger}</BoundedValue>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         ) : null}
 

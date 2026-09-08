@@ -2,7 +2,7 @@ import { DEFAULT_THRESHOLDS, buildSignalInfluence, evaluateRegime } from "../reg
 import { getPlaybookGuidance } from "../playbook";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { resolveSignalDirection, signalOrder } from "./briefFormatting";
-import { formatConfidencePlainLabel } from "./reportFormatting";
+import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
 import { formatScoreValue } from "../formatters";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildActionStripItems } from "./operatingCalls";
@@ -267,7 +267,11 @@ export const buildReportEvidenceItems = ({
         : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${direction === "tightening" ? "tightening" : "easing"} the read.`,
       thresholdDistance === null
         ? `${signalLabels[key]} feeds this week's call but carries no regime threshold of its own.`
-        : `Sits ${thresholdDistance.toFixed(1)} points from the regime threshold.`,
+        : formatBoundaryDistance({
+            label: signalLabels[key],
+            points: thresholdDistance,
+            threshold: key === "tightness" ? assessment.thresholds.tightnessRegime : assessment.thresholds.riskAppetiteRegime,
+          }),
     ];
 
     return {

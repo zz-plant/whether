@@ -2,6 +2,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { formatBoundaryDistance } from "./reportFormatting";
 import {
   buildCompanyAdjustedRules,
   type CompanyProfile,
@@ -290,11 +291,16 @@ export const buildInterpretationLayer = ({
     const closestScore = tightnessGap <= riskGap ? assessment.scores.tightness : assessment.scores.riskAppetite;
     const closestThreshold = tightnessGap <= riskGap ? thresholds.tightnessRegime : thresholds.riskAppetiteRegime;
 
+    const closestDistance = formatBoundaryDistance({
+      label: closestDimension,
+      points: Math.abs(closestScore - closestThreshold),
+      threshold: closestThreshold,
+    });
     let dynamicMomentum = momentumCopy[forecast.boundaryPressure.momentum];
     if (forecast.boundaryPressure.momentum === "toward-threshold") {
-      dynamicMomentum = `${closestDimension} is closing on its boundary — ${closestScore.toFixed(1)} today against a gate of ${closestThreshold.toFixed(1)}.`;
+      dynamicMomentum = `${closestDistance} Momentum is toward it.`;
     } else if (forecast.boundaryPressure.momentum === "away-from-threshold") {
-      dynamicMomentum = `${closestDimension} is pulling away from its boundary — ${closestScore.toFixed(1)} today against a gate of ${closestThreshold.toFixed(1)}.`;
+      dynamicMomentum = `${closestDistance} Momentum is away from it.`;
     }
 
     return {
@@ -306,7 +312,7 @@ export const buildInterpretationLayer = ({
         boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} while the current posture holds — it carries ${topRegime[1]}% of the next-90-day weight.`),
         boundedLine(
           DECISION_CONTRACT_LABELS.threshold.trigger,
-          `${forecast.boundaryPressure.distance} points separate this call from its ${closestDimension.toLowerCase()} boundary, at ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()} crossing risk.`,
+          `${formatBoundaryDistance({ label: closestDimension, points: forecast.boundaryPressure.distance, threshold: closestThreshold })} Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()}.`,
         ),
         boundedLine("Reverse", dynamicMomentum),
       ]),

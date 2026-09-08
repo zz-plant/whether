@@ -36,6 +36,7 @@ import {
 import { WorkAppLabel } from "../../components/workAppIcon";
 import { CopyIcon, DocumentIcon, DownloadIcon } from "../../components/uiIcons";
 import { PRIMARY_AUDIENCE_SHARE_GUIDANCE } from "../../../lib/report/reportCopy";
+import { DATA_STATUS_GUIDANCE } from "../../../lib/report/trustStatus";
 
 export const ExportBriefPanel = ({
   assessment,
@@ -129,8 +130,11 @@ export const ExportBriefPanel = ({
     "WEEKLY BRIEF",
     applyOverride(weeklyOperatorPlainText),
     "",
-    "BOARD SUMMARY",
-    applyOverride(boardBrief),
+    // The slide bullets, not the board brief: the board brief is the whole
+    // Slack brief with the bullets appended, so the pack carried the same
+    // sixty lines twice.
+    "BOARD SLIDE",
+    applyOverride(slideBullets),
     "",
     "CITATION",
     citation,
@@ -154,7 +158,7 @@ export const ExportBriefPanel = ({
     isClipboardTargetDisabled(target, { status, activeTarget });
 
   const handlePrint = () => {
-    if (fallbackActive && !window.confirm("Cached snapshot active: U.S. market data is stale. Are you sure? Stale data can mislead decisions about hiring or spending.")) {
+    if (fallbackActive && !window.confirm(`${DATA_STATUS_GUIDANCE.cachedSnapshot} Print anyway?`)) {
       return;
     }
     window.print();
@@ -317,9 +321,7 @@ export const ExportBriefPanel = ({
               <WeeklyDigestDownload />
             </div>
             {fallbackActive ? (
-              <p className="text-fluid-micro leading-5 text-amber-200">
-                Cached snapshot active: U.S. market data is stale. Stage decisions only. Do not lock hiring, spending, or vendor commitments until live data returns.
-              </p>
+              <p className="text-fluid-micro leading-5 text-amber-200">{DATA_STATUS_GUIDANCE.cachedSnapshot}</p>
             ) : null}
           </div>
         </details>
@@ -347,9 +349,7 @@ export const ExportBriefPanel = ({
               />
             </div>
             {fallbackActive ? (
-              <p className="text-fluid-micro leading-5 text-amber-200">
-                Cached snapshot active: U.S. market data is stale. Stage decisions only. Do not lock hiring, spending, or vendor commitments until live data returns.
-              </p>
+              <p className="text-fluid-micro leading-5 text-amber-200">{DATA_STATUS_GUIDANCE.cachedSnapshot}</p>
             ) : null}
           </div>
         </details>

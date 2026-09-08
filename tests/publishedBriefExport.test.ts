@@ -8,6 +8,33 @@ import {
 } from "../lib/report/publishedBriefs";
 import { buildCanonicalUrl } from "../lib/seo";
 
+describe("published brief readings block", () => {
+  it("prints a reading line per signal when the record carries scores and lines", async () => {
+    const { buildPublishedBriefReadingLines } = await import("../lib/report/publishedBriefs");
+    const { buildRuleCondition } = await import("../lib/report/boundedDecisionRules");
+    const base = findPublishedBrief("2026-w31");
+    assert.ok(base);
+    const brief: PublishedBrief = {
+      ...base,
+      scores: { tightness: 32, riskAppetite: 52, tightnessDelta: -8, riskAppetiteDelta: -7 },
+      decisions: [
+        {
+          ...base.decisions[0],
+          pause: [buildRuleCondition("tightness", ">", 76), buildRuleCondition("riskAppetite", "<", 44)],
+          resume: [buildRuleCondition("tightness", "<", 66), buildRuleCondition("riskAppetite", ">", 54)],
+        },
+      ],
+    };
+
+    assert.deepEqual(buildPublishedBriefReadingLines(brief), [
+      "Funding pressure: 32/100 · -8.0 vs last week · pause > 76 (44 pts away) · re-open < 66 (holds)",
+      "Risk appetite: 52/100 · -7.0 vs last week · pause < 44 (8 pts away) · re-open > 54 (2 pts away)",
+    ]);
+    assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure: 32\/100/);
+    assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
+  });
+});
+
 describe("published brief date-pinned exports", () => {
   const july30Brief = findPublishedBrief("2026-w31");
 
