@@ -94,10 +94,23 @@ The homepage global header now keeps the weekly brief calmer: it shows the direc
 The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure with smaller follow-on links rather than a second open card grid.
 The collapsed `Route this week's call` disclosure groups the downstream paths into Plan (capital posture, ship call), Resolve (by role, toolkits), Rule (blank decision form, reversal checklist), and Compare (past epochs, full archive), keeping them one expand away from the leading plan card.
 
-The home page now leads with a canonical **What needs reconsideration this week?** block inside
-the hero: when signals moved, it lists the bounded decision areas queued for revisit with why each
-is queued; it always shows an explicit `No change` lane for the decision areas that are on track,
-so the steady state is stated rather than implied. Below-the-fold tool racks (transition
+The home page now leads with a canonical **What changed this week?** block inside the hero,
+rendered by `WeeklyChangeReport` (`app/components/hero/weeklyChangeReport.tsx`). It reads as three
+bands — *What changed*, *What that changes for you*, *What stays the same* — so a movement always
+arrives with its consequence and a consequence always arrives with its cause. Each change opens to
+its evidence: the reading, the movement, the record date, the source, and the decision areas it
+drives. A week where nothing moved collapses to one sentence plus the unchanged list rather than
+three headings over two empty sections.
+
+It replaced a single revisit list that rendered `item.recheck || item.reason`, which dropped the
+signal move entirely on a multi-item week — `reason` is `driver + recheck`, and `recheck` won the
+`||`. `RevisitQueueItem.driver` already carried that sentence and its doc comment asks renderers
+listing several items to hoist the shared driver rather than repeat it; grouping by driver is that
+hoist. Movement is read from `signalIndicators`, not the queue, because `revisitDecisions` is false
+whenever the direction is "stable" — a week that moved without tripping a threshold has an empty
+queue and still has to say what moved. A signal whose published delta rounds to zero at the one
+decimal it reports is not a change: `formatTrendArrow` returns `→` only for an exact `0`, so a
+`-0.04` arrives as `↓` beside the label "-0.0 vs last week". Below-the-fold tool racks (transition
 probability, regime history chart, what-if simulators, ticker, source-disagreement, evidence
 drawer) were removed from `/` as surfaces that competed with the decision-attention block; their
 engines stay internal (see section 8). The only remaining below-fold company context is the
@@ -132,9 +145,17 @@ The Decision Hero header embeds two progressive-disclosure operator shortcuts (t
 Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces
 the Slack block, and developer access lives under the header's More menu):
 
-- **PresentModeButton** (`app/components/PresentModeButton.tsx`): fullscreen focus mode for
+- **PresentModeButton** (`app/components/PresentModeButton.tsx`): enters presentation mode for
   leadership syncs and Zoom meetings. Triggered by the `F` keyboard shortcut or command palette.
-  Strips navigation and secondary chrome so the Decision Hero fills the viewport.
+  `FocusModeController` restyles `[data-home-shell-main]` to a narrower column and renders
+  `PresentationFrames` (`app/components/presentationFrames.tsx`) over it: the call, then the
+  decisions to revisit, then what would change the call — one frame at a time, at projected type
+  size, with `←`/`→` to move, `Esc` to exit, and a copyable Slack summary on the last frame. The
+  frames read the published brief island rather than props, because the trigger lives in the global
+  header, outside the route holding the brief; the conditions they show come from
+  `briefConditionEntries`, the same list the copy formats print, so the slide and the paste cannot
+  disagree. Arrow handling is registered in the capture phase — the dialog settles key events on its
+  own container, so a bubble-phase listener never saw them.
 - **Bounded-condition rails** (`ThresholdLadder`, fed by `buildBoundedConditionRails` in
   `lib/report/operatingCalls.ts`): one rail per composite signal in the Watch-this-week block,
   showing the current reading, the guardrail, the line that clears it, and the span where neither
@@ -312,6 +333,41 @@ pins the call shape, because the defect is the shape rather than the rendered ou
 three hand-rollers are deliberate and listed in that test: `CopyMeetingSlideButton` writes rich HTML
 via `ClipboardItem`, which the hook does not cover, and `/share` and `/embed` predate the hook and
 handle their own failure paths.
+
+### 1.1.11 The share panel copied a blurb about the product, not the brief (2026-09-07)
+`ShareRail` is the format picker DD-005 names, mounted once from `app/layout.tsx` so a panel opened
+anywhere is the same instance. That global mount is also why it had no brief: it sits outside the
+route's props. What it copied instead:
+
+- **"Plain text" and "Slack format"** both emitted a fixed marketing sentence plus a URL
+  (`"This week's macro brief — posture, decisions, and evidence."`). No call, no record date, no
+  bounded conditions, no source. The one control named for transmitting the brief transmitted none
+  of it.
+- **"Decision card"** read `document.querySelector('[data-share-section="decision"]')`. No component
+  in this app sets that attribute, so the control only ever copied its own fallback string,
+  `"Decision card not found on this page."`
+- There was **no preview**: the reader chose a format blind.
+
+`lib/report/briefArtifact.ts` now holds the week as one `BriefArtifact` with three renderings —
+Slack, Slide, Citation. A format may reorder or re-mark fields but may not drop the record date, the
+bounded conditions, or the provenance line; `tests/briefArtifactFormats.test.ts` asserts that
+across every format rather than per format, so a fourth inherits the rule. The provenance line
+carries the snapshot state too: a brief pasted during an upstream outage says
+`cached snapshot, not a live read` in the channel it lands in, not only on the page it came from.
+
+The route publishes the object as a JSON island (`BriefArtifactScript`, read by `useBriefArtifact`),
+which keeps the single global mount and replaces the DOM scrape with structured fields. Routes with
+no weekly call render no island, and the panel falls back to the generic blurb — which is honest
+there, and is why the presets now render only in that case.
+
+Two things the live data surfaced:
+- `call` and `actionNow` hold the same sentence on a week with no stage-scoped action, so the block
+  printed it twice, once as `Operating call` and once as `Do now`. `DecisionHero` already suppressed
+  the second line on exactly this test; the formatters now apply it too.
+- The **citation** format refuses to imply a permanent record when none exists. `/` re-renders each
+  week under one URL, and `data/published_briefs.json` holds one record and is deliberately never
+  backfilled, so the no-permalink branch is the common case: it cites the live page and says the
+  address re-renders, rather than minting a stable-looking reference.
 
 Also collapsed, same pass:
 - The summary-card chain was four links — `MonthlySummaryCard` → `CadenceSummaryCardAdapter` →
@@ -884,8 +940,9 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`) — the same shape the Decision
   Shield writes, with the graded sentence as `decision.context` — checks `response.ok`, and
   shows "Save failed — retry" otherwise (`tests/planStressTestMemoryPayload.test.ts`).
-- The hero's canonical revisit block now reads **What needs reconsideration this week?** with an
-  explicit `No change` lane listing decision areas that are on track.
+- The hero's canonical revisit block now reads **What changed this week?** and renders three bands
+  (change, consequence, unchanged) via `WeeklyChangeReport`. See section 2 for why the previous
+  single-list form dropped the signal move on a multi-item week.
 
 ## 6) APIs (server routes)
 

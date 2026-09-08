@@ -86,4 +86,24 @@ describe("overlays open from the layer that owns them", () => {
     // Gated: focus mode targets [data-home-shell-main], which only Shell renders.
     assert.match(header, /showPresentMode/);
   });
+
+  it("makes presentation mode present the brief rather than only restyle it", () => {
+    const controller = stripComments(
+      readFileSync(`${APP_DIR}/components/focusModeController.tsx`, "utf8"),
+    );
+    const frames = stripComments(readFileSync(`${APP_DIR}/components/presentationFrames.tsx`, "utf8"));
+
+    // The mode was named "Presentation Focus Mode" while doing nothing but
+    // swapping the main container's classes — a reading mode under a
+    // presentation's name.
+    assert.match(controller, /<PresentationFrames/);
+    // Call, then what reopens, then what would flip it. The order is the point:
+    // a meeting that sees the thresholds before the decisions re-litigates the
+    // call instead of acting on it.
+    assert.match(frames, /"The call", "Decisions to revisit", "What would change the call"/);
+    // One artifact behind the frames and the copy formats, so the summary a
+    // presenter pastes is the brief the room just saw.
+    assert.match(frames, /useBriefArtifact/);
+    assert.match(frames, /formatBriefArtifact/);
+  });
 });

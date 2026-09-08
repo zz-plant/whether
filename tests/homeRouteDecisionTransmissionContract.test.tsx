@@ -7,11 +7,26 @@ describe("home route render contract", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
 
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
-    assert.match(heroSource, /data-testid="weekly-top-fold"/);
+    // The top fold is now `WeeklyChangeReport`, rendered by the hero. The rule it
+    // carries is unchanged — one revisit block, owned by the hero — so the
+    // assertions follow it to the file that holds it rather than relaxing.
+    const changeReportSource = readFileSync("app/components/hero/weeklyChangeReport.tsx", "utf8");
+    assert.match(changeReportSource, /data-testid="weekly-top-fold"/);
+    assert.ok(heroSource.includes("<WeeklyChangeReport"), "the hero still owns the top fold");
+    assert.ok(!routeSource.includes("<WeeklyChangeReport"), "the route does not mount a second change report");
     assert.ok(routeSource.includes("revisitDecisions="), "home route passes the canonical revisit state into the hero");
     assert.ok(!routeSource.includes("WeeklyTopFoldContract"), "home route does not repeat the current-conditions card");
     assert.ok(!routeSource.includes("lg:grid-cols-[1fr_18rem]"), "history does not occupy a competing sticky dashboard rail");
-    assert.ok(heroSource.includes("What needs reconsideration this week?"), "the hero owns the canonical revisit block");
+    assert.ok(
+      changeReportSource.includes("What changed this week?"),
+      "the hero's top fold leads with the weekly delta",
+    );
+    // The three bands are the contract, not decoration: a change with no stated
+    // consequence and a consequence with no stated cause are both what this
+    // block exists to prevent.
+    for (const band of ["What changed", "What that changes for you", "What stays the same"]) {
+      assert.ok(changeReportSource.includes(`>${band}<`), `change report keeps the "${band}" band`);
+    }
     assert.ok(heroSource.includes("Why this call"), "diagnostics are progressively disclosed");
     assert.ok(!routeSource.includes("DeltaTrustStrip"), "trust stays inline in the decision hero, not a duplicate summary card");
     assert.ok(!routeSource.includes("<FlipMeter"), "flip watch lives in the hero, not a separate barometer card");
@@ -37,6 +52,29 @@ describe("home route render contract", () => {
     assert.ok(
       cadenceSource.includes("label={model.shareLabel}"),
       "cadence lead must name the artifact it copies rather than reusing 'Copy Brief'",
+    );
+  });
+
+  it("copies the brief the reader is previewing, not a blurb about the product", () => {
+    const railSource = readFileSync("app/components/shareRail.tsx", "utf8");
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+
+    // The panel copied a fixed marketing sentence plus a URL under both format
+    // names, and its third control read the decision card out of
+    // `[data-share-section="decision"]` — an attribute nothing in this app sets,
+    // so it only ever copied its own not-found string.
+    assert.ok(
+      !railSource.includes("data-share-section"),
+      "no copy control may scrape a selector the app does not render",
+    );
+    assert.ok(railSource.includes("formatBriefArtifact"), "the panel formats the real brief");
+    assert.ok(
+      railSource.includes("{briefText}"),
+      "the preview renders the same string the copy button writes",
+    );
+    assert.ok(
+      routeSource.includes("<BriefArtifactScript"),
+      "the route publishes the brief the globally-mounted panel reads",
     );
   });
 

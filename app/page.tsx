@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
+import { BriefArtifactScript } from "./components/briefArtifactScript";
+import type { BriefArtifact } from "../lib/report/briefArtifact";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -259,12 +261,48 @@ async function PageContent({
       : null,
   ].filter((line): line is string => Boolean(line));
 
+  /* One join, two labels. The `h1` is this page's accessible name, where the
+   * product name would be noise; the artifact title is what lands in someone
+   * else's Slack channel, where it is the only thing identifying the source. A
+   * selected horizon names itself in both. */
+  const cadenceTitle = cadenceCall
+    ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
+    : null;
+
+  /* Published for the globally-mounted share panel, which sits outside this
+   * route's props. Only the frozen record is offered as a permalink: `/`
+   * re-renders every week under one URL, so a citation pointing at it has to say
+   * so rather than imply a fixed reference. `selectCitablePermalinkBrief`
+   * returns nothing once the archive falls behind, and the citation format
+   * degrades to the live page on its own. */
+  const citableBrief = selectCitablePermalinkBrief(reportData.treasury.record_date);
+  const briefArtifact: BriefArtifact = {
+    title: cadenceTitle ?? "Whether Weekly Brief",
+    recordDateLabel: homepage.reportShell.recordDateLabel,
+    call: primaryCall,
+    actionNow: homepage.weeklyDecisionCardModel.decision.actionNowShort,
+    guardrail: guardrailLabel,
+    reversal: reversalTriggerLabel,
+    clearsWhen: flipConditionLabels,
+    regimeLabel: publicRegimeLabel,
+    postureLabel,
+    tightness,
+    riskAppetite,
+    confidenceLabel,
+    source: homepage.reportShell.treasurySource?.startsWith("http")
+      ? "FRED"
+      : homepage.reportShell.treasurySource ?? "FRED",
+    revisit: revisitQueue.map((item) => ({ label: item.label, recheck: item.recheck })),
+    noChangeAreas,
+    permalinkPath: citableBrief ? buildPublishedBriefPath(citableBrief.slug) : undefined,
+    isFallback: homepage.reportShell.showOfflineBadge,
+  };
+
   return (
     <>
+      <BriefArtifactScript artifact={briefArtifact} />
       <h1 className="sr-only" id="share-ready-artifact">
-        {cadenceCall
-          ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
-          : "Weekly Brief"}
+        {cadenceTitle ?? "Weekly Brief"}
       </h1>
       <ActivationTracker path="/" />
       <FreshnessDot
