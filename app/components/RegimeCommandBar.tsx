@@ -199,7 +199,7 @@ const TrajectoryMap = ({
           {nearestBoundaryLabel}
         </span>
         <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
-          Tightness {postureTrajectory.current.tightness.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.tightness, 1)})
+          Funding pressure {postureTrajectory.current.tightness.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.tightness, 1)})
         </span>
         <span className="rounded-sm border border-slate-700/80 bg-slate-950/75 px-2.5 py-1">
           Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} ({formatSignedDelta(postureTrajectory.weeklyDelta.riskAppetite, 1)})

@@ -56,8 +56,8 @@ export const buildDecisionDeltaRules = (
       thresholdLabel: "Funding pressure regime threshold",
       thresholdValue: tightnessThreshold,
       reversal: tightnessUp
-        ? `Re-open spend only if tightness falls back to ${tightnessThreshold} or below for two updates.`
-        : `Re-tighten if tightness rises back above ${tightnessThreshold} for two updates.`,
+        ? `Re-open spend only if funding pressure falls back to ${tightnessThreshold} or below for two updates.`
+        : `Re-tighten if funding pressure rises back above ${tightnessThreshold} for two updates.`,
       metricValue: current.scores.tightness,
       crossed: true,
       direction: tightnessUp ? "up" : "down",
