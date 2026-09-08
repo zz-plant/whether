@@ -2,21 +2,33 @@
 
 import { useCallback, useRef, useState } from "react";
 import { CopyIcon, CheckIcon } from "./uiIcons";
-import { formatMeetingSlideHtml, formatMeetingSlideMarkdown, type MeetingSlidePayload } from "../../lib/export/meetingSlideExport";
+import { formatMeetingSlideHtml, formatMeetingSlideMarkdown } from "../../lib/export/meetingSlideExport";
+import { briefArtifactToSlidePayload } from "../../lib/report/briefArtifact";
+import { useBriefArtifact } from "./useBriefArtifact";
 
 export interface CopyMeetingSlideButtonProps {
-  payload: MeetingSlidePayload;
   className?: string;
 }
 
+/**
+ * Reads the published brief island rather than taking a payload prop.
+ *
+ * `DecisionHero` used to assemble a `MeetingSlidePayload` inline at the call
+ * site — twelve lines of literal, with its own fallback strings for the pause
+ * and reversal copy. That made the hero a second place where the artifact was
+ * defined, beside the route that publishes it, and the two could disagree
+ * without anything noticing. One artifact, one adapter.
+ */
 export function CopyMeetingSlideButton({
-  payload,
   className = "",
 }: CopyMeetingSlideButtonProps) {
+  const artifact = useBriefArtifact();
   const [didCopy, setDidCopy] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCopy = useCallback(async () => {
+    if (!artifact) return;
+    const payload = briefArtifactToSlidePayload(artifact, window.location.origin);
     const markdown = formatMeetingSlideMarkdown(payload);
     const html = formatMeetingSlideHtml(payload);
 
@@ -43,7 +55,7 @@ export function CopyMeetingSlideButton({
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => setDidCopy(false), 2500);
     }
-  }, [payload]);
+  }, [artifact]);
 
   return (
     <button

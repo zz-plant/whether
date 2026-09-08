@@ -164,6 +164,19 @@ The useful thing is "What needs reconsideration this week?" — which the revisi
 already answers. `RitualCheck.tsx` (mark reviewed + streak) is weak gamification; keep at
 most the reviewed marker, drop the streak if it adds no decision value.
 
+**Done 2026-09-08, further than "keep the marker".** `RitualCheck` is deleted and
+`app/components/weeklyCloseout.tsx` takes its place. A streak measures attendance; what a
+decision meeting produces is a decision, so the closeout asks the two questions the meeting
+answers — what did you change, what are you watching — and reopens that record the following
+week against the areas the model has queued again. `flaggedAgain` is the point: an area
+changed last week and queued again is a decision that is not holding, and the weekly ritual
+is the only place that shows up. The four dots became a plain coverage line ("3 of the last
+4 weeks closed"), which still means something after a missed week, unlike a streak.
+
+It also closed a disclosure gap. Of eleven localStorage-backed surfaces, five said where the
+data lived; `RitualCheck` was among the six that did not, sitting directly below
+`DecisionStalenessPanel`, which does say it. The closeout says it.
+
 ## One-screen redraft (2026-08)
 
 The adoption-driven phases above made `/` the decision-attention surface. This section goes

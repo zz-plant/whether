@@ -517,20 +517,10 @@ export function DecisionHero({
               moved to the header beside theme and settings. */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
-            <CopyMeetingSlideButton
-              payload={{
-                recordDate,
-                regime: regimeDisplay,
-                stageLabel: "Startup",
-                actionNow: actionNow ?? weeklyCall ?? postureLabel,
-                pauseIf: guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
-                changeCourseIf: reversalTrigger ?? "Resume staged approvals when conditions ease.",
-                tightness,
-                riskAppetite: riskAppetite ?? 50,
-                confidence: confidenceLabel ?? "MED",
-                provenance: treasurySource ?? "U.S. Treasury",
-              }}
-            />
+            {/* Takes no payload: it reads the same published artifact the share
+                panel and the presentation frames read. The literal that used to
+                sit here made the hero a second definition of the week's call. */}
+            <CopyMeetingSlideButton />
             <DecisionMemoryButton
               regime={regime}
               recordDate={recordDate}

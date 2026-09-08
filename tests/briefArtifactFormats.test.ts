@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { readFileSync } from "node:fs";
+import { formatMeetingSlideMarkdown } from "../lib/export/meetingSlideExport";
 import {
   BRIEF_FORMATS,
+  briefArtifactToSlidePayload,
   briefConditionEntries,
   formatBriefArtifact,
   parseBriefArtifact,
@@ -184,5 +187,37 @@ describe("brief artifact formats", () => {
     assert.deepEqual(parsed.clearsWhen, ["Funding pressure at or below 58"]);
     assert.deepEqual(parsed.revisit, [{ label: "Hiring", recheck: "Recheck approvals." }]);
     assert.equal(parsed.riskAppetite, undefined);
+  });
+
+  it("gives both slide controls the same markdown for the same week", () => {
+    // `CopyMeetingSlideButton` and the share panel's "Slide" format built their
+    // own blocks from the same call: the panel's carried the resume thresholds
+    // and a link, the button's carried neither. They compose through one builder
+    // now, and this is what stops a second one appearing.
+    const viaPanel = formatBriefArtifact(artifact, "slide", origin);
+    const viaButton = formatMeetingSlideMarkdown(briefArtifactToSlidePayload(artifact, origin));
+    assert.equal(viaPanel, viaButton);
+  });
+
+  it("keeps the slide's stance line distinct from its action", () => {
+    const slide = formatBriefArtifact(artifact, "slide", origin);
+    assert.match(slide, /\*\*CALL\*\*: Hold hiring at current headcount\./);
+    assert.match(slide, /\*\*ACTION NOW\*\*: Stage offers behind the September close\./);
+
+    // On a week where the model has no stage-scoped action the two hold the same
+    // sentence, and the slide states it once.
+    const restated = formatBriefArtifact({ ...artifact, actionNow: artifact.call }, "slide", origin);
+    assert.ok(!restated.includes("**CALL**:"));
+  });
+
+  it("keeps the weekly call defined in one place", () => {
+    // The hero assembled its own `MeetingSlidePayload` literal, with its own
+    // fallback copy for the pause and reversal lines — a second definition of
+    // the week sitting beside the route that publishes it.
+    const hero = readFileSync("app/components/DecisionHero.tsx", "utf8");
+    assert.ok(
+      !hero.includes("changeCourseIf:"),
+      "the hero must not assemble an export payload of its own",
+    );
   });
 });

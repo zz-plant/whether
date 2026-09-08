@@ -18,7 +18,28 @@ export interface MeetingSlidePayload {
   riskAppetite: number;
   confidence: string;
   provenance: string;
+  /** The operating call itself. The snapshot path has only `actionNow`, which
+   *  is why this is optional: it renders as the stance line when the two differ. */
+  call?: string;
+  /** The levels at which the pause lifts. Absent from a snapshot-derived slide. */
+  clearsWhen?: readonly string[];
+  /** Where to read the whole brief. Absent when the caller has no origin. */
+  url?: string;
+  /** True when the reading came off a snapshot rather than a live fetch. */
+  isFallback?: boolean;
 }
+
+/*
+ * The share panel's "Slide" format and `CopyMeetingSlideButton` used to emit two
+ * different markdown blocks for the same artifact — the panel's carried the
+ * clears-when line and a link, the button's carried neither, and each built its
+ * own string. Both now compose through `formatMeetingSlideMarkdown`, fed by
+ * `briefArtifactToSlidePayload` in `lib/report/briefArtifact.ts`, so the meeting
+ * slide gained the resume thresholds it was missing and the two controls cannot
+ * drift apart. The adapter lives there rather than here because this module is
+ * the lower layer: `extractMeetingSlidePayload` also feeds the OG image route
+ * straight from an `OperatingSnapshot`, with no presentation model involved.
+ */
 
 export function extractMeetingSlidePayload(
   snapshot: OperatingSnapshot,
@@ -54,11 +75,24 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     `> **Whether Weekly Operating Stance** — *${payload.recordDate}*`,
     `> **Regime**: \`${payload.regime}\` · **Stage**: \`${payload.stageLabel}\``,
     `>`,
+    // The stance the week is called at, above the action it implies. Omitted
+    // when the two are the same sentence, which is what the model returns on a
+    // week with no stage-scoped action.
+    ...(payload.call && payload.call.trim() !== payload.actionNow.trim()
+      ? [`> **CALL**: ${payload.call}`]
+      : []),
     `> 🎯 **ACTION NOW**: ${payload.actionNow}`,
     `> ⚠️ **PAUSE IF**: ${payload.pauseIf}`,
     `> 🔄 **CHANGE COURSE IF**: ${payload.changeCourseIf}`,
+    ...(payload.clearsWhen && payload.clearsWhen.length > 0
+      ? [`> ✅ **CLEARS WHEN**: ${payload.clearsWhen.join("; ")}`]
+      : []),
     `>`,
-    `> *Signals: Tightness ${payload.tightness.toFixed(0)} · Risk Appetite ${payload.riskAppetite.toFixed(0)} · Source: ${payload.provenance}*`,
+    // The snapshot marker travels with the numbers. A slide pasted into a deck
+    // during an upstream outage has to say so on the slide, not on the page it
+    // was copied from.
+    `> *Signals: Tightness ${payload.tightness.toFixed(0)} · Risk Appetite ${payload.riskAppetite.toFixed(0)} · Source: ${payload.provenance}${payload.isFallback ? " · cached snapshot, not a live read" : ""}*`,
+    ...(payload.url ? [`> ${payload.url}`] : []),
   ].join("\n");
 }
 

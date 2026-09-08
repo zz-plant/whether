@@ -14,6 +14,10 @@ export const STORAGE_KEYS = {
   theme: "whether-theme",
   homeOrientationDismissed: "whether.home.orientation.dismissed",
   reviewedRecordDates: "whether_reviewed",
+  /* Successor to `reviewedRecordDates`, which stored `{ reviewed: boolean }` per
+   * week. A separate key rather than a migration: the old value carries no part
+   * of the closeout record, so reading it would only invent one. */
+  weeklyCloseouts: "whether.weeklyCloseouts",
   operatorProfile: OPERATOR_PROFILE_STORAGE_KEY,
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
   decisionMemory: (clientId: string) => `whether.decisionMemory:${clientId}`,

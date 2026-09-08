@@ -13,12 +13,12 @@ import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory"
 import {
   SignalsAdvancedControlsSection,
   SignalsCurrentScoresSection,
-  SignalsDecisionSummarySection,
   SignalsDiagnosticsSection,
   SignalsEvidencePrioritiesSection,
   SignalsModeSwitcherSection,
   SignalsNeedMoreProofSection,
 } from "./components/evidenceSections";
+import { SignalsDecisionSummarySection } from "./components/evidenceDecisionSummary";
 import { getHistoricalAnalogPlaybook } from "../../lib/analogPlaybook";
 
 export { buildDiagnosticsExpansionHref } from "./evidenceQueryState";
