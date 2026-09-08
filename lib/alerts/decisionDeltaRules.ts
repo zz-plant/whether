@@ -53,7 +53,7 @@ export const buildDecisionDeltaRules = (
       action: tightnessUp
         ? "Tighten discretionary spend and hold non-critical hiring reqs."
         : "Loosen budget holds for pre-approved growth bets.",
-      thresholdLabel: "Tightness regime threshold",
+      thresholdLabel: "Funding pressure regime threshold",
       thresholdValue: tightnessThreshold,
       reversal: tightnessUp
         ? `Re-open spend only if tightness falls back to ${tightnessThreshold} or below for two updates.`

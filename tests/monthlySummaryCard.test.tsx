@@ -70,7 +70,7 @@ describe("MonthlySummaryCard", () => {
   it("links the monthly API and exposes the raw copy block", () => {
     const html = renderCard();
     assert.match(html, /href="\/api\/monthly"/);
-    assert.match(html, /Raw summary text/);
+    assert.match(html, /Details — structured data, provenance, raw text/);
   });
 
   it("carries the provenance the card claims", () => {

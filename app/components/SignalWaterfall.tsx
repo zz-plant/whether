@@ -144,7 +144,7 @@ export function SignalWaterfall({
 
             {data.tightnessThreshold != null ? (
               <div className="flex items-center justify-between text-fluid-nano">
-                <span className="text-white/60">Tightness threshold</span>
+                <span className="text-white/60">Funding pressure threshold</span>
                 <span className="tabular-nums text-white/60">{data.tightnessThreshold}</span>
               </div>
             ) : null}

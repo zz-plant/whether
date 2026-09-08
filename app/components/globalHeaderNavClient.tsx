@@ -208,7 +208,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
             tabIndex={0}
             className="list-none cursor-pointer rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center gap-1 text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 [&::-webkit-details-marker]:hidden"
           >
-            <span>More</span>
+            <span>Plan, Evidence &amp; more</span>
             <span aria-hidden="true" className="text-slate-500 transition-transform group-open:rotate-180">▾</span>
           </summary>
           <div className="absolute right-0 top-full z-50 mt-1 w-64 rounded-xl border border-slate-800/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-lg">

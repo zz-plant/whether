@@ -260,7 +260,7 @@ export function WeeklyChangeReport({
               : "border-emerald-500/40 bg-emerald-500/20 text-semantic-easing-fg"
           }`}
         >
-          {attention ? `${consequenceCount} need attention` : "No change"}
+          {attention ? `${consequenceCount} rules to recheck` : "No change"}
         </span>
       </div>
 

@@ -451,7 +451,7 @@ export const buildHomeBriefModelInternal = (
   const regimeDistance =
     reversalDimension === "tightness"
       ? {
-          dimensionLabel: "Tightness",
+          dimensionLabel: "Funding pressure",
           dimensionKey: "tightness" as const,
           currentValue: assessment.scores.tightness,
           thresholdValue: tightnessThreshold,

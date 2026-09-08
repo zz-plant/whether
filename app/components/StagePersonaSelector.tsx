@@ -52,6 +52,7 @@ export function StagePersonaSelector({
       </span>
       <div
         role="tablist"
+        id="calibrate-stage"
         aria-label="Startup lifecycle stage selector"
         className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 p-1 backdrop-blur-sm"
       >

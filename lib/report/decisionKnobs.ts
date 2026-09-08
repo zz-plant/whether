@@ -273,10 +273,10 @@ export const buildWeeklyLockCommitment = ({
   return {
     currentCall: weeklyCallByRegime[regime],
     flipConditions: [
-      formatDecisionThreshold(`Tightness ≤ ${tightnessLoosen} for 2 consecutive refreshes.`),
+      formatDecisionThreshold(`Funding pressure ≤ ${tightnessLoosen} for 2 consecutive refreshes.`),
       formatDecisionThreshold(`Risk appetite ≥ ${riskLoosen} for 2 consecutive refreshes.`),
       formatDecisionReversal(
-        `Tightness > ${tightnessTighten} or risk appetite < ${riskTighten} resumes tighten stance.`
+        `Funding pressure > ${tightnessTighten} or risk appetite < ${riskTighten} resumes tighten stance.`
       ),
     ],
     flipLines: [

@@ -71,11 +71,11 @@ export type ThresholdBusinessConsequence = {
 };
 
 const thresholdConsequenceByLever: Record<BusinessAreaKey, string> = {
-  "hiring-stance": "hiring review",
-  "investment-pace": "expansion pauses",
-  "sales-posture": "raise review",
-  "product-priorities": "roadmap review",
-  "risk-tolerance": "plan review",
+  "hiring-stance": "the hiring pause line",
+  "investment-pace": "the expansion pause line",
+  "sales-posture": "the raise-timing line",
+  "product-priorities": "the roadmap pause line",
+  "risk-tolerance": "the plan-review line",
 };
 
 const decisionAreaByLever: Record<BusinessAreaKey, DecisionArea> = {
@@ -380,7 +380,7 @@ export const buildSharedCorridorRails = (
 };
 
 /**
- * "44 pts away", "at the line", "tripped" or "holds" — a distance, not a
+ * "44 pts away", "at the line", "crossed" or "already met" — a distance, not a
  * sentence. `met` is the operator's verdict; a strict line at zero distance is
  * "at the line", which is not the same claim as tripped.
  */
@@ -390,7 +390,7 @@ export const formatPointsToLine = (
   met: boolean | undefined,
 ): string => {
   if (points === undefined || !Number.isFinite(points)) return "—";
-  if (met) return kind === "pause" ? "tripped" : "holds";
+  if (met) return kind === "pause" ? "crossed" : "already met";
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} pts away`;
 };

@@ -445,7 +445,7 @@ export function DecisionHero({
                 {thresholdBusinessConsequence ? (
                   <span className={`whitespace-nowrap text-fluid-nano font-medium tabular-nums ${counterColor}`}>
                     {thresholdBusinessConsequence.status === "crossed"
-                      ? `${pointsToPause} points — ${thresholdBusinessConsequence.consequenceLabel} threshold crossed`
+                      ? `${pointsToPause} points — ${thresholdBusinessConsequence.consequenceLabel} crossed`
                       : `${pointsToPause} points until ${thresholdBusinessConsequence.consequenceLabel}`}
                   </span>
                 ) : null}

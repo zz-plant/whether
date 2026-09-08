@@ -69,7 +69,7 @@ describe("buildWeeklyLockCommitment", () => {
 
     assert.equal(commitment.currentCall, "Focus on efficiency: Limit new commitments to 12-month payback. Pause if risk < 40; resume when > 50.");
     assert.equal(commitment.flipConditions.length, 3);
-    assert.match(commitment.flipConditions[0], /Tightness ≤ 66/);
+    assert.match(commitment.flipConditions[0], /Funding pressure ≤ 66/);
     assert.match(commitment.flipConditions[1], /Risk appetite ≥ 49/);
     assert.match(commitment.ownerCadence, /Mon\/Thu operating review/);
     assert.equal(commitment.trustMarkers.length, 0);

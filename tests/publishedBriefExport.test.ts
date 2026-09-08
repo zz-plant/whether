@@ -27,7 +27,7 @@ describe("published brief readings block", () => {
     };
 
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure: 32/100 · -8.0 vs last week · pause > 76 (44 pts away) · re-open < 66 (holds)",
+      "Funding pressure: 32/100 · -8.0 vs last week · pause > 76 (44 pts away) · re-open < 66 (already met)",
       "Risk appetite: 52/100 · -7.0 vs last week · pause < 44 (8 pts away) · re-open > 54 (2 pts away)",
     ]);
     assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure: 32\/100/);

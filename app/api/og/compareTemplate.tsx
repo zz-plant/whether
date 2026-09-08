@@ -162,7 +162,7 @@ const EpochBlock = ({ label, accent, epoch }: { label: string; accent: string; e
     </div>
     <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
       <div style={metricRowStyle}>
-        <span style={metricLabelStyle}>Tightness</span>
+        <span style={metricLabelStyle}>Funding pressure</span>
         <span style={metricValueStyle}>{formatScore(epoch.tightness)}</span>
       </div>
       <div style={metricRowStyle}>

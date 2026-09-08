@@ -481,8 +481,11 @@ export function TimelineBar({
             </span>
             <span className="text-slate-400 font-normal">· {selected.regime}</span>
             {isLive ? (
-              <span className="ml-1 rounded px-1 py-0.2 bg-emerald-500/20 text-emerald-300 font-mono text-[10px] uppercase tracking-wider">
-                Live
+              <span
+                className="ml-1 rounded px-1 py-0.2 bg-emerald-500/20 text-emerald-300 font-mono text-[10px] uppercase tracking-wider"
+                title="Newest month on record. The weekly call above is more recent."
+              >
+                Latest
               </span>
             ) : null}
             {isPending ? (
@@ -630,7 +633,7 @@ export function TimelineBar({
             {/* The record is already on the client, so the trajectory can be read
                 without spending a navigation on every month you are curious about. */}
             <div className="flex items-center gap-2 pt-0.5 text-fluid-nano text-slate-400 tabular-nums">
-              <span>Tightness {preview.entry.tightness.toFixed(0)}</span>
+              <span>Funding pressure {preview.entry.tightness.toFixed(0)}</span>
               <span>Risk {preview.entry.riskAppetite.toFixed(0)}</span>
             </div>
           </div>
@@ -731,7 +734,7 @@ export function TimelineBar({
       {variant === "detailed" && selected.entry ? (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-fluid-micro text-slate-400">
           <span>
-            Tightness: <strong className="text-slate-200">{selected.entry.tightness.toFixed(0)} pts</strong>
+            Funding pressure: <strong className="text-slate-200">{selected.entry.tightness.toFixed(0)} pts</strong>
           </span>
           <span>
             Risk Appetite: <strong className="text-slate-200">{selected.entry.riskAppetite.toFixed(0)}/100</strong>

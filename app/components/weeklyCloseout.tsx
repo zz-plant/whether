@@ -124,6 +124,9 @@ export function WeeklyCloseout({
           </span>
         ) : null}
       </div>
+      <p className="mt-1 text-fluid-nano leading-5 text-white/45">
+        A private note to your future self. It stays in this browser and is not sent anywhere.
+      </p>
 
       {reopened ? (
         <div className="mt-3 rounded-lg border border-slate-800/60 bg-slate-950/40 px-3 py-2.5">
@@ -226,10 +229,6 @@ export function WeeklyCloseout({
         </div>
       )}
 
-      <p className="mt-3 border-t border-white/[0.06] pt-2 text-fluid-nano leading-5 text-white/40">
-        Saved in this browser only — it is not sent anywhere and will not follow you to another
-        device.
-      </p>
     </section>
   );
 }

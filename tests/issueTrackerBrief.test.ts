@@ -40,7 +40,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
   it("carries both composite scores and the rate inputs behind them", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /Tightness:\*\* 12/);
+    assert.match(brief, /Funding pressure:\*\* 12/);
     assert.match(brief, /Risk appetite:\*\* 68/);
     assert.match(brief, /Base rate:\*\* 3\.75% \(1M\)/);
     assert.match(brief, /Curve slope:\*\* 0\.55%/);
