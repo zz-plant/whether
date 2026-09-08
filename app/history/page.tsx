@@ -124,6 +124,23 @@ export default async function HistoryPage({
         </section>
       ) : null}
 
+      {/* What was decided, beside what the regime did. The ledger used to sit
+          under /operate as one more planning tool; a record belongs with the
+          record. */}
+      <section className="weather-panel space-y-3 px-5 py-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="type-eyebrow">Decision ledger</h2>
+            <p className="text-sm text-slate-300">
+              Every posture decision saved from the weekly brief, stamped with the readings at the time.
+            </p>
+          </div>
+          <ActionLink href="/history/decisions" variant="pill">
+            Open the ledger
+          </ActionLink>
+        </div>
+      </section>
+
       <section className="weather-panel space-y-4 px-5 py-5">
         <h2 className="type-eyebrow">Posture by year</h2>
         <p className="text-sm text-slate-300">

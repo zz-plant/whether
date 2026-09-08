@@ -232,7 +232,7 @@ export default function ApiDocsPage() {
               {embedSnippet}
             </pre>
             <Link
-              href="/embed"
+              href="/share#embed"
               data-premium-intent="api_access"
               data-premium-cta="open_embed_builder"
               className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600"

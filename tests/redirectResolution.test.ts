@@ -74,7 +74,8 @@ describe("redirect resolution", () => {
       ["/resolve/ship-checklist", "/answer/ship-checklist"],
       ["/evidence/capital-tightness-watch", "/signals/capital-tightness-watch"],
       ["/evidence/capital-tightness-watch/hiring", "/signals/capital-tightness-watch/hiring"],
-      ["/planning/memory", "/operate/memory"],
+      ["/planning/memory", "/history/decisions"],
+      ["/operate/memory", "/history/decisions"],
       ["/planning/financial", "/operate/financial"],
     ] as const) {
       assert.equal(resolve(from).landing, to, `${from} should land on ${to}`);

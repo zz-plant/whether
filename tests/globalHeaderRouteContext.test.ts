@@ -7,21 +7,31 @@ import { hasVisibleActiveNavLink, resolveGlobalHeaderRouteLabel } from "../lib/n
  * The header may drop the route label beside the wordmark only where the
  * navigation shows the route itself.
  *
- * "The nav names it" holds for the six loop routes and nowhere else: on a
- * utility or unlisted route no loop link is active, the mobile trigger is hidden
- * from `md`, and a matching utility link sits inside the closed More menu — so
- * the desktop header was briefly left with the wordmark alone.
+ * "The nav names it" now holds for the brief alone. The supporting layers
+ * render inside the closed More menu — the IA marked them supporting, and the
+ * desktop bar used to show them anyway as `hidden lg:flex` — so on `/operate`
+ * or `/trust` no bar link is active and the label comes back, the way it
+ * always did for `/pricing`.
  */
 
 describe("route context in the global header", () => {
-  it("reports a visible active link for the routes the nav row marks", () => {
-    for (const pathname of ["/", "/signals", "/operate", "/answer", "/trust", "/history"]) {
-      assert.equal(hasVisibleActiveNavLink(pathname), true, pathname);
-    }
+  it("reports a visible active link only for the primary layer", () => {
+    assert.equal(hasVisibleActiveNavLink("/"), true);
   });
 
-  it("reports none for utility and unlisted routes, which then keep their label", () => {
-    for (const pathname of ["/pricing", "/about", "/brief/2026-w31", "/resources/some-article", "/history/compare"]) {
+  it("reports none for supporting, utility and unlisted routes, which then keep their label", () => {
+    for (const pathname of [
+      "/signals",
+      "/operate",
+      "/answer",
+      "/trust",
+      "/history",
+      "/pricing",
+      "/about",
+      "/brief/2026-w31",
+      "/resources/some-article",
+      "/history/compare",
+    ]) {
       assert.equal(hasVisibleActiveNavLink(pathname), false, pathname);
       // Whatever the header falls back to must actually name something.
       const label = resolveGlobalHeaderRouteLabel(pathname);

@@ -102,11 +102,10 @@ describe("fetch-based main-content guard", () => {
       "/about",
       "/answer/ship-checklist",
       "/brief/2026-w31",
-      "/embed",
       "/history/2025",
+      "/history/decisions",
       "/resources/decision-shield-overview",
       "/search",
-      "/state",
       "/threshold",
     ]) {
       assert.ok(routes.includes(expected), `${expected} is absent from the landmark audit`);

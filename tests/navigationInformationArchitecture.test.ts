@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import {
+  contentSections,
   navigationLayers,
   navigationLayerByKey,
   navigationLabelByPath,
@@ -121,3 +122,34 @@ describe("footer renders the whole utility set", () => {
     }
   });
 });
+
+/*
+ * The header used to keep a private list of route families that no layer or
+ * utility link claimed, which is how it came to read "Whether · Page" on the
+ * citable weekly record. The IA module owns that list now.
+ */
+describe("content sections", () => {
+  it("names every routed content family the layers and utilities do not", () => {
+    const named = new Set<string>(contentSections.map((section) => section.prefix));
+    for (const prefix of ["/answers", "/brief", "/resources", "/toolkits", "/contact"]) {
+      assert.ok(named.has(prefix), `${prefix} must be a named content section`);
+    }
+  });
+
+  it("does not overlap a navigation layer or a utility link", () => {
+    const claimed = new Set<string>([
+      ...navigationLayers.map((layer) => layer.href),
+      ...utilityLinks.map((link) => link.href),
+    ]);
+    for (const section of contentSections) {
+      assert.equal(claimed.has(section.prefix), false, `${section.prefix} is claimed twice`);
+    }
+  });
+
+  it("keeps the header out of the business of naming routes", () => {
+    const header = readFileSync(new URL("../lib/navigation/globalHeader.ts", import.meta.url), "utf8");
+    assert.doesNotMatch(header, /sectionRouteLabels/, "the private fallback list is gone");
+    assert.match(header, /contentSections/);
+  });
+});
+

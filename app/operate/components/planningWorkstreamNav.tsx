@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { Route } from "../../../lib/navigation/routeType";
-import { CircleTargetIcon, HistoryIcon, SlidersIcon, TrendUpIcon } from "../../components/uiIcons";
+import { CircleTargetIcon, SlidersIcon, TrendUpIcon } from "../../components/uiIcons";
 import {
   operationsWorkstreamLinks,
   type OperationsWorkstreamLink,
@@ -16,7 +16,6 @@ const navItemStyles =
 const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode> = {
   "Weekly plan": <CircleTargetIcon className="h-3.5 w-3.5" />,
   "Financial strategy": <TrendUpIcon className="h-3.5 w-3.5" />,
-  "Decision memory": <HistoryIcon className="h-3.5 w-3.5" />,
   "Scenario studio": <SlidersIcon className="h-3.5 w-3.5" />,
 };
 
@@ -34,7 +33,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
       <div className="flex flex-col gap-1">
         <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Other planning pages</p>
         <p className="text-sm text-slate-300">
-          Most teams start with Weekly plan. Open the others for finance direction or saved decisions.
+          Most teams start with Weekly plan. Open the others for finance direction or a scenario run.
         </p>
       </div>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

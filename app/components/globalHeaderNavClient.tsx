@@ -176,32 +176,33 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         <span>{activeRouteLabel}</span>
       </button>
 
-      {/* The operator loop, in IA order. Supporting layers hide below lg so the
-          header keeps its width at md; the brief stays at every size. The API
-          link that used to sit here is a developer destination on a founder
-          product — it lives under More as "API & MCP". */}
+      {/* One primary destination and one disclosure, at every width above md.
+          Supporting layers used to render here as `hidden lg:flex`, which made
+          the one-screen cut true below 1024px and false above it: the IA marked
+          six routes supporting, the desktop bar showed all six. They live in
+          More now, above the utility links, so the bar carries the brief and
+          nothing competes with it. */}
       <nav aria-label="Primary" className="hidden md:flex items-center gap-1.5">
-        {loopLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            aria-current={link.isActive ? "page" : undefined}
-            className={`rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 items-center focus-visible:outline-2 focus-visible:outline-sky-400 ${
-              link.tier === "primary" ? "flex" : "hidden lg:flex"
-            } ${
-              link.isActive
-                ? "bg-sky-500/20 text-sky-100 font-bold border border-sky-400/50"
-                : "text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
-            }`}
-          >
-            <span>{link.tier === "primary" ? link.label : (link.navLabel ?? link.label)}</span>
-          </Link>
-        ))}
+        {loopLinks
+          .filter((link) => link.tier === "primary")
+          .map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={link.isActive ? "page" : undefined}
+              className={`flex items-center rounded-lg px-3 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
+                link.isActive
+                  ? "bg-sky-500/20 text-sky-100 font-bold border border-sky-400/50"
+                  : "text-slate-300 font-medium border border-transparent hover:border-slate-800 hover:bg-slate-800/60 hover:text-slate-100"
+              }`}
+            >
+              <span>{link.label}</span>
+            </Link>
+          ))}
         <span className="mx-1 h-4 w-px bg-slate-800" aria-hidden="true" />
-        {/* Utility links surfaced one level up instead of buried in the mobile
-            drawer or footer: SaaS multiples, macro analogs, framework, template,
-            pricing. Kept native (details) so it works without JS and costs nothing
-            until opened. */}
+        {/* Native details so it works without JS and costs nothing until
+            opened. Two groups: the operator loop the IA demotes to supporting,
+            then the utility links that were always here. */}
         <details className="group relative">
           <summary
             tabIndex={0}
@@ -210,7 +211,29 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
             <span>More</span>
             <span aria-hidden="true" className="text-slate-500 transition-transform group-open:rotate-180">▾</span>
           </summary>
-          <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-slate-800/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-lg">
+          <div className="absolute right-0 top-full z-50 mt-1 w-64 rounded-xl border border-slate-800/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-lg">
+            <p className="px-3 pb-1 pt-1.5 type-eyebrow text-slate-500">The weekly loop</p>
+            {loopLinks
+              .filter((link) => link.tier === "supporting")
+              .map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={link.isActive ? "page" : undefined}
+                  onClick={(event) => {
+                    event.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className={`flex flex-col gap-0.5 rounded-md px-3 py-2 text-fluid-xs no-underline transition-colors ${
+                    link.isActive
+                      ? "bg-sky-500/14 text-sky-100 font-semibold"
+                      : "text-slate-300 hover:bg-slate-800/60 hover:text-slate-100"
+                  }`}
+                >
+                  <span className="font-medium">{link.navLabel ?? link.label}</span>
+                  <span className="text-fluid-micro text-slate-500">{link.description}</span>
+                </Link>
+              ))}
+            <p className="mt-1.5 border-t border-slate-800/60 px-3 pb-1 pt-2.5 type-eyebrow text-slate-500">Tools &amp; reference</p>
             {utilityLinks.map((link: UtilityLink) => {
               const isActive = pathMatchesLink(link.href, resolvedPathname);
               return (

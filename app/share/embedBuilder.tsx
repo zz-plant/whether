@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { OPERATOR_STAGE_OPTIONS } from "../../lib/report/operatorStage";
 
 /**
- * The canonical four, derived rather than retyped. This list used to offer
- * `growth` and `public`, which `/api/embed` rejects — both selections produced
- * a stage-agnostic brief — while omitting `series-b` and `bootstrapped`, the
- * two it accepts. Legacy snippets carrying the old values still work: the route
- * folds them into Series B+.
+ * The embed snippet builder, as a section of `/share`.
+ *
+ * It was its own route. An embed is the same artifact as everything else on
+ * this page in a different container, and a reader arriving to "get the brief
+ * out" was offered two doors — /share for text, /embed for a widget — with
+ * nothing on either saying the other existed. `/embed` redirects here.
  */
 const STAGE_OPTIONS = [
   { value: "", label: "Any stage" },
@@ -17,7 +18,7 @@ const STAGE_OPTIONS = [
 
 const DEFAULT_TICKERS = ["", "GOOGL", "MSFT", "DOCU", "COIN", "UBER", "AAPL"];
 
-export default function EmbedPage() {
+export function EmbedBuilder() {
   const [ticker, setTicker] = useState("");
   const [stage, setStage] = useState("");
   const [copied, setCopied] = useState(false);
@@ -51,15 +52,14 @@ export default function EmbedPage() {
   }, [ticker, stage]);
 
   return (
-    <main className="min-h-screen bg-[var(--bg-body)] text-white/90">
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-10">
+    <div className="space-y-8">
+        <div className="mb-8">
           <p className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-300">
-            Whether — Embed
+            Embed
           </p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-white/90 sm:text-3xl">
-            Add a weekly brief to your newsletter
-          </h1>
+          <h2 className="mt-2 text-xl font-bold tracking-tight text-white/90 sm:text-2xl">
+            Add a live brief to a newsletter, wiki or dashboard
+          </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
             Embed a live US macro brief in any newsletter or webpage. Readers get the current
             operating call, bounded decisions, and flip watch — updated automatically every week.
@@ -183,7 +183,7 @@ export default function EmbedPage() {
         </div>
 
         <div className="mt-14 border-t border-white/[0.04] pt-10">
-          <h2 className="mb-5 text-lg font-semibold text-white/70">How it works</h2>
+          <h3 className="mb-5 text-lg font-semibold text-white/70">How it works</h3>
           <div className="grid gap-5 sm:grid-cols-3">
             {[
               { step: "Configure", desc: "Pick a ticker and company stage that fits your audience." },
@@ -205,7 +205,6 @@ export default function EmbedPage() {
             This attribution is required for free embed usage.
           </p>
         </div>
-      </div>
-    </main>
+    </div>
   );
 }

@@ -59,6 +59,9 @@ export const canonicalSurfaceRedirectPairs = [
   ["/planning/data", "/operate"],
   ["/planning/cli", "/operate"],
   ["/planning/integrations", "/operate"],
+  // The ledger moved under history. Pointed straight there rather than at
+  // /operate/memory, which would chain through a second redirect.
+  ["/planning/memory", "/history/decisions"],
   // The same aliases one level down. Matching only the bare path left every
   // legacy sub-path a 404 — /resolve/ceo and /evidence/capital-tightness-watch
   // among them — so external links and anything still pointing at the old names
@@ -93,6 +96,16 @@ export const iaConsolidationRedirectPairs = [
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists
   ["/export", "/share"],
+  // Decision memory is a record of what was decided, which is history, not
+  // planning. /operate keeps the tools for deciding.
+  ["/operate/memory", "/history/decisions"],
+  // /state ran the brief's own pipeline and rendered a subset of the hero under
+  // its own H1 — a view of `/` that read as a second, independently derived
+  // answer, and competed with `/` and `/brief/[week]` for the same query.
+  ["/state", "/"],
+  // The embed builder is a section of the share page: same artifact, different
+  // container. Two doors to "get the brief out" said nothing about each other.
+  ["/embed", "/share#embed"],
 ];
 
 export const redirectEntries = [
@@ -136,13 +149,6 @@ const evidenceCacheHeaders = [
   },
 ];
 
-const stateCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, s-maxage=3600, stale-while-revalidate=3600",
-  },
-];
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -167,10 +173,6 @@ const nextConfig = {
       {
         source: "/signals",
         headers: evidenceCacheHeaders,
-      },
-      {
-        source: "/state",
-        headers: stateCacheHeaders,
       },
     ];
   },

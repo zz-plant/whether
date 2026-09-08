@@ -140,14 +140,11 @@ export const utilityLinks = [
     description: "Thresholds, vocabulary, reversal logic, and a blank form to fill in",
   },
   {
+    // Carries the embed builder too: same artifact in a different container,
+    // and it used to be a second door that said nothing about this one.
     href: "/share",
     label: "Share",
-    description: "Pasteable brief for Slack, email, and agendas",
-  },
-  {
-    href: "/embed",
-    label: "Embed",
-    description: "Live brief widget for a dashboard or wiki",
+    description: "Copy the brief for Slack, a slide or a citation, or embed it live",
   },
   {
     href: "/api-docs",
@@ -158,11 +155,6 @@ export const utilityLinks = [
     href: "/pricing",
     label: "Pricing",
     description: "What is free forever, and what Pro and Team add",
-  },
-  {
-    href: "/state",
-    label: "Current regime",
-    description: "The call, both scores, and confidence on one glanceable page",
   },
   {
     href: "/search",
@@ -177,3 +169,27 @@ export const utilityLinks = [
 ] as const;
 
 export type UtilityLink = typeof utilityLinks[number];
+
+/**
+ * Route families that are neither a navigation layer nor a utility link: the
+ * programmatic corpus, the citable archive, and contact.
+ *
+ * They were a private fallback list inside `globalHeader.ts`, which is how the
+ * header came to read "Whether · Page" on `/brief/<week>` — the most linkable
+ * URL on the site — until someone noticed. A third list living outside the IA
+ * module meant the IA module did not describe the site. Prefix-matched, longest
+ * first, so a future exact entry can still win.
+ *
+ * `/answers` is the direct-answer pages, a distinct set from the `/answer`
+ * Resolve hub one letter away. The two share nothing but a prefix, and this is
+ * the one place that says so in the IA rather than in a comment beside a regex.
+ */
+export const contentSections = [
+  { prefix: "/answers", label: "Answer" },
+  { prefix: "/brief", label: "Published brief" },
+  { prefix: "/resources", label: "Resource" },
+  { prefix: "/toolkits", label: "Toolkit" },
+  { prefix: "/contact", label: "Contact" },
+] as const;
+
+export type ContentSection = typeof contentSections[number];
