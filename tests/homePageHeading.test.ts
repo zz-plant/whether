@@ -10,7 +10,16 @@ describe("homepage heading contract", () => {
   });
 
   it("still names the weekly brief when no cadence is selected", () => {
-    assert.match(source, /: "Weekly Brief"/);
+    // Matches the fallback label, not the operator that selects it — this
+    // asserted `: "Weekly Brief"` and so failed when the ternary became a `??`
+    // against a shared cadence label, with the rendered heading unchanged.
+    assert.match(source, /(\?\?|:) "Weekly Brief"/);
+  });
+
+  it("gives the shareable artifact a product-qualified title", () => {
+    // The h1 names the page for someone already on it; the copied artifact lands
+    // in a channel where "Whether" is the only thing identifying the source.
+    assert.match(source, /title: cadenceTitle \?\? "Whether Weekly Brief"/);
   });
 
   it("names the selected horizon instead when one is", () => {

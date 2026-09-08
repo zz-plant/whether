@@ -1,8 +1,14 @@
 "use client";
 
-import { useCallback, useState, useId } from "react";
+import { useCallback, useMemo, useState, useId } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { useSlackPreviewOverlay } from "./useSlackPreviewOverlay";
+import { useBriefArtifact } from "./useBriefArtifact";
+import {
+  BRIEF_FORMATS,
+  formatBriefArtifact,
+  type BriefFormatId,
+} from "../../lib/report/briefArtifact";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
@@ -10,16 +16,20 @@ import { CalendarButton } from "./calendarButton";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
-const presetLabels: Record<SharePreset, string> = {
-  ceo: "Share with CEO",
-  finance: "Share with finance lead",
-  team: "Share with team",
-  custom: "Custom message",
-};
+/* A list, not a record keyed for its own `Object.keys` to be cast back. The
+ * order is the rendered order, and the union still checks every entry. */
+const SHARE_PRESETS: readonly { id: SharePreset; label: string }[] = [
+  { id: "ceo", label: "Share with CEO" },
+  { id: "finance", label: "Share with finance lead" },
+  { id: "team", label: "Share with team" },
+  { id: "custom", label: "Custom message" },
+];
 
 export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
+  const [format, setFormat] = useState<BriefFormatId>("slack");
+  const artifact = useBriefArtifact();
   const { active: slackOverlayActive, toggle: handleToggleSlackOverlay } = useSlackPreviewOverlay();
   const includeContextLabelId = useId();
   const slackOverlayLabelId = useId();
@@ -53,15 +63,30 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     void copyToClipboard(slackFormatted, "slack");
   }, [copyToClipboard, buildShareText]);
 
+  const activeFormat = BRIEF_FORMATS.find((option) => option.id === format) ?? BRIEF_FORMATS[0];
+
+  /* `window` is read here rather than in `formatBriefArtifact` so the formatters
+     stay pure and testable off a fixed origin. The panel only ever renders in a
+     browser, but the effect-loaded artifact means the first pass has none. */
+  const briefText = useMemo(
+    () => (artifact ? formatBriefArtifact(artifact, format, window.location.origin) : ""),
+    [artifact, format],
+  );
+
+  const copyBrief = useCallback(() => {
+    if (!briefText) return;
+    void copyToClipboard(briefText, "brief");
+  }, [briefText, copyToClipboard]);
+
   const copyStatusMessage =
-    copiedTarget === "plain"
+    copiedTarget === "brief"
+      ? `${activeFormat.label} format copied.`
+      : copiedTarget === "plain"
       ? "Plain text copied."
       : copiedTarget === "slack"
       ? "Slack format copied."
       : copiedTarget === "link"
       ? "Page link copied."
-      : copiedTarget === "section"
-      ? "Decision card copied."
       : "";
 
   return (
@@ -77,38 +102,46 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4 space-y-3">
-          <fieldset>
-            <legend className="type-eyebrow">Preset</legend>
-            <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-              {(Object.keys(presetLabels) as SharePreset[]).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setPreset(key)}
-                  className={`rounded-md px-3 py-2 text-left text-xs font-medium transition-colors ${
-                    preset === key
-                      ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
-                      : "text-slate-300 border border-transparent hover:bg-slate-800/50"
-                  }`}
-                >
-                  {presetLabels[key]}
-                </button>
-              ))}
-            </div>
-          </fieldset>
+          {/* A preset writes a sentence about the product and links to it. Beside
+              a picker that copies the actual call, it is a second, weaker copy
+              path for the same intent — DD-005 rules those out — so it renders
+              only where there is no call to copy. */}
+          {artifact ? null : (
+            <>
+              <fieldset>
+              <legend className="type-eyebrow">Preset</legend>
+              <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                {SHARE_PRESETS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setPreset(option.id)}
+                    className={`rounded-md px-3 py-2 text-left text-xs font-medium transition-colors ${
+                      preset === option.id
+                        ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
+                        : "text-slate-300 border border-transparent hover:bg-slate-800/50"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              </fieldset>
 
-          <label className="flex items-center gap-2 text-sm text-slate-300" htmlFor={`${includeContextLabelId}-control`}>
-            <Switch.Root
-              id={`${includeContextLabelId}-control`}
-              checked={includeContext}
-              onCheckedChange={setIncludeContext}
-              aria-labelledby={includeContextLabelId}
-              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
-            >
-              <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
-            </Switch.Root>
-            <span id={includeContextLabelId}>Include context for non-users</span>
-          </label>
+            <label className="flex items-center gap-2 text-sm text-slate-300" htmlFor={`${includeContextLabelId}-control`}>
+              <Switch.Root
+                id={`${includeContextLabelId}-control`}
+                checked={includeContext}
+                onCheckedChange={setIncludeContext}
+                aria-labelledby={includeContextLabelId}
+                className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
+              >
+                <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
+              </Switch.Root>
+              <span id={includeContextLabelId}>Include context for non-users</span>
+            </label>
+            </>
+          )}
 
           <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer" htmlFor={`${slackOverlayLabelId}-control`}>
             <Switch.Root
@@ -139,26 +172,77 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             <output aria-live="polite" className="sr-only">
               {copyStatusMessage}
             </output>
-            <div className="mt-2 flex gap-2">
-              <button
-                type="button"
-                onClick={handleCopy}
-                data-premium-intent="export_brief"
-                data-premium-cta="share_rail_copy_plain"
-                className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
-              >
-                {copiedTarget === "plain" ? "Copied!" : "Plain text"}
-              </button>
-              <button
-                type="button"
-                onClick={copySlackText}
-                data-premium-intent="export_brief"
-                data-premium-cta="share_rail_copy_slack"
-                className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
-              >
-                {copiedTarget === "slack" ? "Copied!" : "Slack format"}
-              </button>
-            </div>
+            {artifact ? (
+              <>
+                <fieldset className="mt-2">
+                  <legend className="sr-only">Format</legend>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {BRIEF_FORMATS.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setFormat(option.id)}
+                        aria-pressed={format === option.id}
+                        className={`min-h-[44px] rounded-md px-2 py-2 text-xs font-semibold transition-colors weather-focus-ring ${
+                          format === option.id
+                            ? "border border-sky-500/30 bg-sky-500/12 text-sky-100"
+                            : "border border-transparent text-slate-300 hover:bg-slate-800/50"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+                <p className="mt-1.5 text-xs text-slate-400">{activeFormat.hint}</p>
+                {/* The preview is the copy payload itself, not a rendering of
+                    it. A picker that describes three formats and copies a
+                    fourth thing is the failure this panel already had. */}
+                {/* No scroll container of its own. The panel already scrolls, and
+                    a nested scroller here would need its own tab stop to stay
+                    keyboard-reachable — a focusable, non-interactive region. The
+                    longest format runs a dozen short lines, so it wraps instead. */}
+                <pre
+                  aria-label={`Preview of the ${activeFormat.label} format`}
+                  className="mt-2 whitespace-pre-wrap break-words rounded-md border border-slate-800/70 bg-slate-950/60 p-2.5 text-[11px] leading-5 text-slate-300"
+                >
+                  {briefText}
+                </pre>
+                <button
+                  type="button"
+                  onClick={copyBrief}
+                  data-premium-intent="export_brief"
+                  data-premium-cta="share_rail_copy_brief"
+                  data-testid="share-rail-copy-brief"
+                  className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+                >
+                  {copiedTarget === "brief" ? "Copied!" : `Copy ${activeFormat.label} format`}
+                </button>
+              </>
+            ) : (
+              /* No weekly call on this route, so there is no brief to format.
+                 The generic blurb above is what this panel can honestly offer. */
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  data-premium-intent="export_brief"
+                  data-premium-cta="share_rail_copy_plain"
+                  className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+                >
+                  {copiedTarget === "plain" ? "Copied!" : "Plain text"}
+                </button>
+                <button
+                  type="button"
+                  onClick={copySlackText}
+                  data-premium-intent="export_brief"
+                  data-premium-cta="share_rail_copy_slack"
+                  className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+                >
+                  {copiedTarget === "slack" ? "Copied!" : "Slack format"}
+                </button>
+              </div>
+            )}
             <div className="mt-3">
               <button
                 type="button"
@@ -168,21 +252,6 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
                 {copiedTarget === "link" ? "Link copied!" : "Copy page link"}
-              </button>
-            </div>
-            <div className="mt-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const decisionSection = document.querySelector('[data-share-section="decision"]');
-                  const text = decisionSection?.textContent?.trim() ?? "Decision card not found on this page.";
-                  void copyToClipboard(text, "section");
-                }}
-                data-premium-intent="export_brief"
-                data-premium-cta="share_rail_copy_decision_card"
-                className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
-              >
-                {copiedTarget === "section" ? "Copied!" : "Decision card"}
               </button>
             </div>
           </div>

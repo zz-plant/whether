@@ -7,7 +7,8 @@ import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import type { RegimeKey } from "../../lib/types";
-import type { RegimeSignalIndicator } from "../../lib/report/homeBriefModel";
+import type { RegimeSignalIndicator, RevisitQueueItem } from "../../lib/report/homeBriefModel";
+import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
 import { buildBoundedConditionRails } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
@@ -60,12 +61,7 @@ type Props = {
   /** Per-signal weekly movement, rendered in the signal-breakdown popover. */
   signalIndicators?: readonly RegimeSignalIndicator[];
   revisitDecisions?: boolean;
-  revisitQueue?: ReadonlyArray<{
-    id: string;
-    label: string;
-    reason: string;
-    recheck: string;
-  }>;
+  revisitQueue?: readonly RevisitQueueItem[];
   /** Decision areas that are not flagged for revisit this week. */
   noChangeAreas?: readonly string[];
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
@@ -188,6 +184,10 @@ export function DecisionHero({
   const dataStatus = resolveDataStatusLabel({ isFallbackSnapshot: isFallback, degradedSourceCount: degradedCount ?? 0 });
 
   const isTreasuryUrl = treasurySource?.startsWith("http");
+  /* The same attribution as `sourceNode`, as plain text. The evidence rows in
+   * the change report are a definition list, not prose, so a URL would print
+   * there in full where the trust line renders it as the word "FRED". */
+  const sourceLabel = isTreasuryUrl ? "FRED" : treasurySource ?? "FRED";
   const sourceNode = isTreasuryUrl ? (
     <a
       href={treasurySource}
@@ -389,45 +389,14 @@ export function DecisionHero({
               <span className="text-emerald-300/80">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {actionNow}
             </p>
           ) : null}
-          <section
-            data-testid="weekly-top-fold"
-            aria-label="What needs reconsideration this week"
-            className={`rounded-lg border p-3.5 backdrop-blur-sm transition-all ${
-              revisitDecisions
-                ? "border-amber-500/40 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.08)]"
-                : "border-emerald-500/30 bg-emerald-500/[0.07] shadow-[0_0_20px_rgba(16,185,129,0.06)]"
-            }`}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-fluid-xs font-semibold text-slate-100 flex items-center gap-1.5">
-                <span className={`inline-block size-2 rounded-full ${revisitDecisions ? "bg-amber-400" : "bg-emerald-400"}`} />
-                What needs reconsideration this week?
-              </p>
-              <span className={`shrink-0 rounded-sm px-2.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.08em] border ${
-                revisitDecisions
-                  ? "border-amber-500/40 bg-amber-500/20 text-semantic-caution-fg"
-                  : "border-emerald-500/40 bg-emerald-500/20 text-semantic-easing-fg"
-              }`}>
-                {revisitDecisions ? `${revisitQueue.length} need attention` : "No change"}
-              </span>
-            </div>
-            {revisitQueue.length > 0 ? (
-              <ul className="mt-2 grid gap-1 text-fluid-xs text-slate-300 sm:grid-cols-2">
-                {revisitQueue.slice(0, 3).map((item) => (
-                  <li key={item.id}>
-                    <span className="font-semibold text-slate-100">{item.label}:</span>{" "}
-                    {item.recheck || item.reason}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            {noChangeAreas.length > 0 ? (
-              <p className="mt-2 border-t border-white/[0.06] pt-2 text-fluid-nano text-white/45">
-                <span className="font-semibold text-slate-400">No change:</span>{" "}
-                {noChangeAreas.join(" · ")}
-              </p>
-            ) : null}
-          </section>
+          <WeeklyChangeReport
+            revisitDecisions={revisitDecisions}
+            revisitQueue={revisitQueue}
+            noChangeAreas={noChangeAreas}
+            signalIndicators={signalIndicators}
+            recordDate={recordDate}
+            sourceLabel={sourceLabel}
+          />
 
           {/* After the call and the reconsideration list, before the rules the
               stage actually changes. It sat directly under the headline, which

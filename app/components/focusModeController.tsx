@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Minimize2 } from "lucide-react";
+import { PresentationFrames } from "./presentationFrames";
 
 const defaultMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 transition-all weather-page-enter";
 const focusedMainClassName = "mx-auto max-w-[64rem] px-6 py-12 transition-all weather-page-enter shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 rounded-2xl bg-slate-950/90 my-6";
 
 export function FocusModeController() {
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const exitFocusMode = useCallback(() => setIsFocusMode(false), []);
 
   useEffect(() => {
     const main = document.querySelector<HTMLElement>("[data-home-shell-main]");
@@ -40,19 +42,27 @@ export function FocusModeController() {
   if (!isFocusMode) return null;
 
   return (
-    <div className="fixed top-3 right-3 z-50 flex items-center gap-2 rounded-lg border border-sky-500/40 bg-slate-900/90 px-3 py-1.5 shadow-2xl backdrop-blur-md">
-      <span className="inline-block size-2 rounded-full bg-sky-400 animate-ping" />
-      <span className="text-fluid-nano font-mono font-semibold text-sky-200 uppercase tracking-wide">
-        Presentation Focus Mode
-      </span>
-      <button
-        type="button"
-        onClick={() => setIsFocusMode(false)}
-        className="ml-2 rounded-lg p-1 text-white/60 hover:bg-white/10 hover:text-white transition-colors"
-        aria-label="Exit focus mode"
-      >
-        <Minimize2 size={14} />
-      </button>
-    </div>
+    <>
+      {/* The mode has always been called presentation focus mode and has always
+          only restyled the page. `PresentationFrames` is the presentation: the
+          call, the decisions that reopen, and what would flip it, one frame at a
+          time. It renders nothing on a route that publishes no brief, which
+          leaves the container restyle below as the reading mode it was. */}
+      <PresentationFrames onExit={exitFocusMode} />
+      <div className="fixed top-3 right-3 z-50 flex items-center gap-2 rounded-lg border border-sky-500/40 bg-slate-900/90 px-3 py-1.5 shadow-2xl backdrop-blur-md">
+        <span className="inline-block size-2 rounded-full bg-sky-400 animate-ping" />
+        <span className="text-fluid-nano font-mono font-semibold text-sky-200 uppercase tracking-wide">
+          Presentation Focus Mode
+        </span>
+        <button
+          type="button"
+          onClick={exitFocusMode}
+          className="ml-2 rounded-lg p-1 text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+          aria-label="Exit focus mode"
+        >
+          <Minimize2 size={14} />
+        </button>
+      </div>
+    </>
   );
 }
