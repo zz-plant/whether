@@ -20,7 +20,7 @@ describe("navigation information architecture", () => {
   });
 
   it("keeps demoted hubs reachable as supporting layers", () => {
-    for (const href of ["/operate", "/signals", "/answer", "/trust", "/history", "/history/compare"]) {
+    for (const href of ["/operate", "/signals", "/resolve", "/trust", "/history", "/history/compare"]) {
       const layer = navigationLayers.find((candidate) => candidate.href === href);
       assert.ok(layer, `${href} stays in the IA layer set`);
       assert.equal(layer!.tier, "supporting", `${href} is reachable but not primary`);
@@ -37,7 +37,7 @@ describe("navigation information architecture", () => {
     assert.equal(navigationLabelByPath["/"], "Weekly Brief");
     assert.equal(navigationLabelByPath["/signals"], "Evidence");
     assert.equal(navigationLabelByPath["/operate"], "Plan");
-    assert.equal(navigationLabelByPath["/answer"], "Resolve");
+    assert.equal(navigationLabelByPath["/resolve"], "Resolve");
     assert.equal(navigationLabelByPath["/trust"], "Trust");
   });
 
@@ -62,7 +62,7 @@ describe("navigation information architecture", () => {
   it("keeps canonical route transitions for Decide and Method", () => {
     const resolveLayer = navigationLayers.find((layer) => layer.key === "resolve");
     const trustLayer = navigationLayers.find((layer) => layer.key === "trust");
-    assert.equal(resolveLayer?.href, "/answer");
+    assert.equal(resolveLayer?.href, "/resolve");
     assert.equal(trustLayer?.href, "/trust");
     assert.equal(resolveLayer?.href.startsWith("#"), false);
     assert.equal(trustLayer?.href.startsWith("#"), false);
@@ -79,9 +79,9 @@ describe("navigation information architecture", () => {
     assert.ok(pathMatchesLink("/operate", "/planning"));
     assert.ok(pathMatchesLink("/operate", "/planning/financial"));
 
-    assert.ok(pathMatchesLink("/answer", "/answer"));
-    assert.ok(pathMatchesLink("/answer", "/resolve"));
-    assert.ok(pathMatchesLink("/answer", "/answers"));
+    assert.ok(pathMatchesLink("/resolve", "/resolve"));
+    assert.ok(pathMatchesLink("/resolve", "/resolve"));
+    assert.ok(pathMatchesLink("/resolve", "/answers"));
   });
 });
 

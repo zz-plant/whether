@@ -93,8 +93,8 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(artifactPayload?.weeklyOperatorBriefText, headerOperatorBriefCopy);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operate#ops-monthly-action-summary");
-    assert.match(workspaceModel.translate.primaryPath.href, /^\/answer\//);
-    assert.match(workspaceModel.translate.fallbackUtility.href, /^\/answer\//);
+    assert.match(workspaceModel.translate.primaryPath.href, /^\/resolve\//);
+    assert.match(workspaceModel.translate.fallbackUtility.href, /^\/resolve\//);
     assert.ok(workspaceModel.translate.toolkitShortcuts.length > 0);
   });
 

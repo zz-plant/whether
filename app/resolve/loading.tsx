@@ -5,7 +5,7 @@ export default function Loading() {
     <RouteLoadingShell
       label="Loading answers"
       description="Resolving this week’s bounded calls for each decision area."
-      currentPath="/answer"
+      currentPath="/resolve"
       pageTitle="Resolve"
     />
   );

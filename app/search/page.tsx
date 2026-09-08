@@ -6,7 +6,7 @@ import {
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
-import { buildToolkitLibraryHref } from "../answer/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
 
 export const runtime = "edge";
 
@@ -42,7 +42,7 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
   if (commandJob === "resolve") {
     return results.some((entry) => entry.type === "toolkit")
       ? buildToolkitLibraryHref(query)
-      : "/answer#unresolved-question-router";
+      : "/resolve#unresolved-question-router";
   }
 
   if (commandJob === "risk") {
@@ -80,5 +80,5 @@ export default async function SearchPage({
     : matchingResults;
   const commandHref = resolveSearchCommandHref(query, results, activeJob);
 
-  permanentRedirect(commandHref ?? "/answer#unresolved-question-router");
+  permanentRedirect(commandHref ?? "/resolve#unresolved-question-router");
 }

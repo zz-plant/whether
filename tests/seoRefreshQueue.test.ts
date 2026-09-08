@@ -23,11 +23,11 @@ describe("seo refresh queue", () => {
       payloadRecords: [
         {
           ...basePage,
-          url: "/answer/ceo/capital-raising",
+          url: "/resolve/ceo/capital-raising",
         },
       ],
       metricsByUrl: {
-        "/answer/ceo/capital-raising": {
+        "/resolve/ceo/capital-raising": {
           trafficTier: "high",
           ctaConversionRate: 0.08,
         },
@@ -41,7 +41,7 @@ describe("seo refresh queue", () => {
     assert.equal(result.queue[0]?.noindexNow, true);
     assert.equal(result.queue[0]?.priority, "p0");
     assert.ok(result.queue[0]?.reasons.includes("freshness-stale"));
-    assert.equal(result.statusByUrl["/answer/ceo/capital-raising"]?.slaState, "due-soon");
+    assert.equal(result.statusByUrl["/resolve/ceo/capital-raising"]?.slaState, "due-soon");
   });
 
   it("queues high-tier low-conversion pages without forcing noindex", () => {
@@ -112,17 +112,17 @@ describe("seo refresh queue", () => {
       payloadRecords: [
         {
           ...basePage,
-          url: "/answer/ceo/runway-planning",
+          url: "/resolve/ceo/runway-planning",
         },
       ],
       metricsByUrl: {
-        "/answer/ceo/runway-planning": {
+        "/resolve/ceo/runway-planning": {
           trafficTier: "high",
           ctaConversionRate: 0.01,
         },
       },
       previousStatusByUrl: {
-        "/answer/ceo/runway-planning": {
+        "/resolve/ceo/runway-planning": {
           lastRefreshRequestedAtIso: "2026-03-01T00:00:00.000Z",
           lastRefreshedAtIso: null,
         },
@@ -131,8 +131,8 @@ describe("seo refresh queue", () => {
       staleAfterHours: 24 * 14,
     });
 
-    assert.equal(result.statusByUrl["/answer/ceo/runway-planning"]?.slaDueAtIso, "2026-03-04T00:00:00.000Z");
-    assert.equal(result.statusByUrl["/answer/ceo/runway-planning"]?.slaState, "overdue");
+    assert.equal(result.statusByUrl["/resolve/ceo/runway-planning"]?.slaDueAtIso, "2026-03-04T00:00:00.000Z");
+    assert.equal(result.statusByUrl["/resolve/ceo/runway-planning"]?.slaState, "overdue");
   });
 
   it("flags sustained high-intent underperformers as merge-or-prune candidates", () => {

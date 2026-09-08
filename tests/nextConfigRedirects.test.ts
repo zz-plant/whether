@@ -43,7 +43,7 @@ describe("next.config redirects", () => {
 });
 
 /*
- * A route rename (/resolve → /answer, /evidence → /signals, /planning →
+ * A route rename (/resolve → /resolve, /evidence → /signals, /planning →
  * /operate) left the aliases matching only the bare path, so every legacy
  * sub-path 404'd, and left redirects pointing at the dead names. Two of those
  * chains — /solutions/career-paths → /resolve/product — shipped a 308 into a

@@ -29,7 +29,7 @@ const featuredStakeholderSlugs = [
 export const metadata: Metadata = buildPageMetadata({
   title: "Resolve a Decision — By Role, Situation, or Toolkit",
   description: "One focused path per open decision: route by role, company stage, single answer, or a reusable toolkit.",
-  path: "/answer",
+  path: "/resolve",
   imageAlt: "Whether decision tools",
   imagePath: "/social/resolve.svg",
 });
@@ -44,12 +44,12 @@ export default async function DecidePage({
     ...buildBreadcrumbList(
       createBreadcrumbTrail([
         { path: "/" },
-        { path: "/answer" },
+        { path: "/resolve" },
       ]),
     ),
   };
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/answer" });
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
   const { homeBriefModel } = snapshot;
   const recommendedSituation = homeBriefModel.weeklyMovement.direction === "tightening"
     ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
@@ -63,14 +63,14 @@ export default async function DecidePage({
   };
   const recommendedPath = shouldStartWithChecker
     ? {
-        href: "/answer/ship-checklist",
+        href: "/resolve/ship-checklist",
         kicker: "Best next step",
         title: "Start with one decision check",
         detail: "This week moved enough to check one decision before opening broader guidance.",
         cta: "Open decision check",
       }
     : {
-        href: `/answer/${recommendedSituation.slug}`,
+        href: `/resolve/${recommendedSituation.slug}`,
         kicker: "Best next step",
         title: `Start with ${recommendedSituation.title}`,
         detail: "Go straight to the decision that fits.",
@@ -98,7 +98,7 @@ export default async function DecidePage({
       trustStatusAction="Return to Planning after the decision is closed."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve one open decision"
-      currentPath="/answer"
+      currentPath="/resolve"
       pageSummary="Answer one decision without re-reading the whole brief."
       pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}
       sectionLinks={sectionLinks.slice(0, 2)}
@@ -218,7 +218,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">Help by role</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
-                  <Link key={role.slug} href={`/answer/${role.slug}`} className="weather-chip">
+                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-chip">
                     {role.title}
                   </Link>
                 ))}
@@ -228,7 +228,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">Help by situation</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
-                  <Link key={situation.slug} href={`/answer/${situation.slug}`} className="weather-chip">
+                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-chip">
                     {situation.title}
                   </Link>
                 ))}

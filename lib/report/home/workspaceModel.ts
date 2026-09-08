@@ -265,13 +265,13 @@ export const buildHomeWorkspaceModel = ({
     },
     translate: {
       primaryPath: {
-        href: `/answer/${currentSituationPath.slug}`,
+        href: `/resolve/${currentSituationPath.slug}`,
         title: currentSituationPath.title,
         detail: resolvePrimaryPathDetail(currentSituationPath.slug),
         kicker: "Recommended unresolved path",
       },
       fallbackUtility: {
-        href: "/answer/ship-checklist",
+        href: "/resolve/ship-checklist",
         title: "Whether to ship checklist",
         detail: "Score one go / wait / kill launch decision against the current regime.",
       },

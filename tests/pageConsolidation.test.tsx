@@ -98,3 +98,26 @@ describe("routes folded into the surface that owned them", () => {
   });
 });
 
+describe("resources static params", () => {
+  it("emits no slug the dynamic route cannot render", () => {
+    /*
+     * `generateStaticParams` spread `resourceSupportingPages`, whose only
+     * contribution beyond the downloadables is decision-shield-overview — not a
+     * pillar, not a downloadable, not an article, so `[slug]` reaches
+     * `notFound()` for it. Its own static segment shadows the dynamic route, so
+     * the page worked and the phantom param never showed. It was a trap for
+     * whoever tried to delete that sibling believing `[slug]` covered it.
+     */
+    const route = readFileSync(appPath("/resources/[slug]/page.tsx"), "utf8");
+    const params = route.slice(
+      route.indexOf("export function generateStaticParams"),
+      route.indexOf("const buildSectionAnchor"),
+    );
+    assert.ok(!params.includes("resourceSupportingPages"), "supporting pages are not all renderable here");
+
+    // The sibling is what actually serves it, so it has to stay until the route
+    // grows a branch that can.
+    assert.ok(existsSync(appPath("/resources/decision-shield-overview/page.tsx")));
+  });
+});
+

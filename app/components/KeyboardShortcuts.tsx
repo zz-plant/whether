@@ -9,7 +9,7 @@ const SHORTCUTS: Record<string, string> = {
   "p": "/operate",
   "h": "/history",
   "t": "/trust",
-  "r": "/answer",
+  "r": "/resolve",
   "/": "/search",
 };
 

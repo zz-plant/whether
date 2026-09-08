@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildDecideClusterMetadata } from "../app/answer/[slug]/[cluster]/page";
+import { buildDecideClusterMetadata } from "../app/resolve/[slug]/[cluster]/page";
 import { buildSignalDecisionScenarioMetadata } from "../app/signals/[cluster]/[decision-scenario]/page";
 import { buildToolkitClusterMetadata } from "../app/toolkits/[slug]/[cluster]/page";
 

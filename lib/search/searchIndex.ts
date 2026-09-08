@@ -2,7 +2,7 @@ import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCat
 
 export type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
-export type SearchPrimaryHub = "/signals" | "/operate" | "/answer" | "/trust";
+export type SearchPrimaryHub = "/signals" | "/operate" | "/resolve" | "/trust";
 
 export type SearchEntity = {
   id: string;
@@ -71,10 +71,10 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/answer",
+    recommendedHubHref: "/resolve",
     recommendedHubLabel: "Decision Tools",
     title: "Translate the call inside Decision Tools",
-    href: "/answer#guided-translation",
+    href: "/resolve#guided-translation",
     summary: "Role and stage translation now lives inside the canonical Decision Tools workflow.",
     intentLabel: "Translate decision by role",
     keywords: ["guides", "stakeholder", "stage", "decision translation", "weekly brief"],
@@ -84,10 +84,10 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/answer",
+    recommendedHubHref: "/resolve",
     recommendedHubLabel: "Decision Tools",
     title: "Get a direct answer",
-    href: "/answer#direct-answers",
+    href: "/resolve#direct-answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
     intentLabel: "Get one-question answer",
     keywords: ["answers", "direct answer", "bounded decisions", "weekly posture", "shareable"],
@@ -110,10 +110,10 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "risk",
     routePriority: 1,
-    recommendedHubHref: "/answer",
+    recommendedHubHref: "/resolve",
     recommendedHubLabel: "Decision Tools",
     title: "Translate framework language into a decision",
-    href: "/answer#guided-translation",
+    href: "/resolve#guided-translation",
     summary: "Route product or operating framework language back into a live decision path instead of browsing concept libraries.",
     intentLabel: "Pressure-test framework language",
     keywords: ["concepts", "canon", "frameworks", "regime context", "decision translation"],
@@ -123,10 +123,10 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/answer",
+    recommendedHubHref: "/resolve",
     recommendedHubLabel: "Decision Tools",
     title: "Search the toolkit shortlist",
-    href: "/answer#toolkit-library",
+    href: "/resolve#toolkit-library",
     summary: "Toolkit search now lives under Decision Tools as a supporting shortlist rather than a standalone library.",
     intentLabel: "Find a runnable toolkit",
     keywords: ["toolkits", "rollback", "pmf", "roadmap", "pricing", "capacity"],
@@ -152,7 +152,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
     type: "toolkit",
     job: "resolve",
     routePriority: 2,
-    recommendedHubHref: "/answer",
+    recommendedHubHref: "/resolve",
     recommendedHubLabel: "Decision Tools",
     title: toolkit.title,
     href: `/toolkits/${toolkit.slug}`,

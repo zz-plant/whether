@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import { decideClusterStaticParams } from "../../app/answer/clusterRoutes";
+import { decideClusterStaticParams } from "../../app/resolve/clusterRoutes";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../app/seoRouteClusters";
 import { toolkitClusterStaticParams } from "../../app/toolkits/clusterRoutes";
 import { findUseCaseRole, findToolkitDefinition } from "../decisionDomainCatalog";
@@ -91,7 +91,7 @@ export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] => 
     kind: "decide" as const,
     slug: route.slug,
     cluster: route.cluster,
-    url: `/answer/${route.slug}/${route.cluster}`,
+    url: `/resolve/${route.slug}/${route.cluster}`,
   }));
 
   const toolkitRoutes = toolkitClusterStaticParams.map((route) => ({

@@ -55,7 +55,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "resolve",
-    href: "/answer",
+    href: "/resolve",
     label: "Resolve",
     navLabel: "Resolve",
     description: "Find the right answer or tool for one remaining question.",
@@ -180,7 +180,7 @@ export type UtilityLink = typeof utilityLinks[number];
  * module meant the IA module did not describe the site. Prefix-matched, longest
  * first, so a future exact entry can still win.
  *
- * `/answers` is the direct-answer pages, a distinct set from the `/answer`
+ * `/answers` is the direct-answer pages, a distinct set from the `/resolve`
  * Resolve hub one letter away. The two share nothing but a prefix, and this is
  * the one place that says so in the IA rather than in a comment beside a regex.
  */

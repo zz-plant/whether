@@ -127,10 +127,10 @@ export const decideHomeRecommendedToolkitSlugs: ToolkitSlug[] = Array.from(
 export const findDecisionPathsForToolkit = (toolkitSlug: ToolkitDefinition["slug"]) => ({
   roles: useCaseRoles
     .filter((role) => role.recommendedToolkitSlugs.includes(toolkitSlug))
-    .map((role) => ({ slug: role.slug, title: role.title, href: `/answer/${role.slug}` })),
+    .map((role) => ({ slug: role.slug, title: role.title, href: `/resolve/${role.slug}` })),
   situations: situationUseCaseDefinitions
     .filter((situation) =>
       situation.recommendedToolkitSlugs.some((recommendedSlug) => recommendedSlug === toolkitSlug),
     )
-    .map((situation) => ({ slug: situation.slug, title: situation.title, href: `/answer/${situation.slug}` })),
+    .map((situation) => ({ slug: situation.slug, title: situation.title, href: `/resolve/${situation.slug}` })),
 });

@@ -10,7 +10,7 @@ const liveRoutes = [
   { slug: "home", label: "Weekly brief (/)", path: "/" },
   { slug: "evidence", label: "Evidence", path: "/signals" },
   { slug: "planning", label: "Planning", path: "/operate" },
-  { slug: "resolve", label: "Resolve", path: "/answer" },
+  { slug: "resolve", label: "Resolve", path: "/resolve" },
   { slug: "trust", label: "Trust", path: "/trust" },
   // Added 2026-08-29. These four were never captured, so the UI facelift that
   // reviewed the five above could not have seen them — and three are now on the

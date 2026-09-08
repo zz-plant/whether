@@ -23,7 +23,7 @@ describe("route context in the global header", () => {
     for (const pathname of [
       "/signals",
       "/operate",
-      "/answer",
+      "/resolve",
       "/trust",
       "/history",
       "/pricing",

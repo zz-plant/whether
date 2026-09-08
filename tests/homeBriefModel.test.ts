@@ -663,7 +663,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.sinceLastReview.items.length, 3);
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/signals"));
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/operate"));
-    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/answer"));
+    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/resolve"));
   });
 
   it("returns compact fallback start-route copy when no meaningful delta exists", () => {

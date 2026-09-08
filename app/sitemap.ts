@@ -105,7 +105,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
-    { path: "/answer", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
+    { path: "/resolve", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     // Deep links, not destinations: the adoption plan's one-screen redraft ruled
     // that trust is an inline line on `/` with the formula reference kept as a
     // deep link, and compare is a disclosure under history. Both stay indexable;

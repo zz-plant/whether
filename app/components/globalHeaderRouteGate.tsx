@@ -33,7 +33,7 @@ import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
  */
 export const resolveReportHeaderUtilityAction = (pathname: string) => {
   if (pathname === "/") {
-    return { href: "/answer#toolkit-library", label: "Toolkits" };
+    return { href: "/resolve#toolkit-library", label: "Toolkits" };
   }
 
   const activeLayer = primaryNavigationLayers.find((layer) => pathMatchesLink(layer.href, pathname));

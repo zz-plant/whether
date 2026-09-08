@@ -100,7 +100,7 @@ describe("fetch-based main-content guard", () => {
     for (const expected of [
       "/",
       "/about",
-      "/answer/ship-checklist",
+      "/resolve/ship-checklist",
       "/brief/2026-w31",
       "/history/2025",
       "/history/decisions",
