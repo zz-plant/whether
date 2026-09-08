@@ -4,6 +4,7 @@ import { WebVitalsTracker } from "./webVitalsTracker";
 import { AnchorFeedback } from "./anchorFeedback";
 import { serializeJsonLd } from "../../lib/seo";
 import type { RegimeKey } from "../../lib/types";
+import { regimeAccentStyle } from "../../lib/regimeAccent";
 
 export type RegimeIconType = RegimeKey | "NEUTRAL";
 
@@ -30,6 +31,7 @@ export function PageShell({
       id="main-content"
       tabIndex={-1}
       className={`weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100${className ? ` ${className}` : ""}`}
+      style={regimeAccentStyle(regime)}
     >
       {backdropVariant === "hub" ? <div className="weather-hub-backdrop" aria-hidden="true" /> : null}
       {backdropVariant === "default" ? <ClimateBackdrop regime={regime || "NEUTRAL"} /> : null}

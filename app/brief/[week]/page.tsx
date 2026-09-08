@@ -295,7 +295,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                  the frozen reading sat, instead of five paraphrases of one
                  corridor. */
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left text-sm text-slate-300">
+                <table className="weather-stack-table w-full border-collapse text-left text-sm text-slate-300">
                   <caption className="sr-only">Action, pause line and re-open line for each area</caption>
                   <thead>
                     <tr className="border-b border-slate-800/80 text-fluid-nano text-slate-400">
@@ -309,8 +309,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     {brief.decisions.map((decision) => (
                       <tr key={decision.area} className="border-b border-slate-800/50 align-top">
                         <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{labelForArea(decision.area)}</th>
-                        <td className="py-2 pr-3">{decision.doNow || decision.call}</td>
-                        <td className="py-2 pr-3 text-xs">
+                        <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.action.doNow}>{decision.doNow || decision.call}</td>
+                        <td className="py-2 pr-3 text-xs" data-label={DECISION_CONTRACT_LABELS.threshold.pauseIf}>
                           <RuleLines
                             conditions={decision.pause ?? []}
                             fallback={decision.pauseTrigger}
@@ -319,7 +319,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                             qualifier={decision.pauseQualifier}
                           />
                         </td>
-                        <td className="py-2 text-xs">
+                        <td className="py-2 text-xs" data-label={publicDecisionLabels.reversal}>
                           <RuleLines
                             conditions={decision.resume ?? []}
                             fallback={decision.resumeTrigger}

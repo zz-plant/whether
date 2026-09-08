@@ -1,8 +1,7 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import type { PlaybookEntry } from "../../../lib/playbook";
-import { buildSharedCorridorRails, type ActionStripItem } from "../../../lib/report/operatingCalls";
+import type { ActionStripItem } from "../../../lib/report/operatingCalls";
 import { RuleLines } from "../boundedRuleLines";
-import { ThresholdLadder } from "../illustrations/ThresholdLadder";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { CollapsibleDeepDive } from "../collapsibleDeepDive";
 import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
@@ -19,7 +18,6 @@ export const PlaybookPanel = ({
   showProvenance = true,
   actionStripItems = [],
   showAllActionLanes = false,
-  scores,
 }: {
   playbook: PlaybookEntry | null;
   stopItems: string[];
@@ -29,10 +27,7 @@ export const PlaybookPanel = ({
   showProvenance?: boolean;
   actionStripItems?: ActionStripItem[];
   showAllActionLanes?: boolean;
-  /** Current readings, so the corridor can be drawn with the reading on it. */
-  scores?: { tightness: number; riskAppetite: number };
 }) => {
-  const corridorRails = buildSharedCorridorRails(actionStripItems, scores);
   const visibleStopItems = getVisibleActionLaneItems(stopItems, showAllActionLanes);
   const visibleStartItems = getVisibleActionLaneItems(startItems, showAllActionLanes);
   const visibleFenceItems = getVisibleActionLaneItems(fenceItems, showAllActionLanes);
@@ -83,34 +78,14 @@ export const PlaybookPanel = ({
               pairs, so five cards of three sentences each stated the corridor
               fifteen times. The corridor is drawn once, and each area is a row
               that says which lines apply and how far off they sit. */}
-          {corridorRails.length > 0 ? (
-            <ul className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2" aria-label="Shared corridor for this week's rules">
-              {corridorRails.map((rail) => (
-                <li key={rail.metric} className="min-w-0">
-                  <p className="flex items-baseline justify-between gap-2 text-fluid-nano text-slate-400">
-                    <span>{rail.label}</span>
-                    <span className="tabular-nums text-slate-200">{rail.current}<span className="text-slate-500">/100</span></span>
-                  </p>
-                  <ThresholdLadder
-                    idPrefix={`playbook-corridor-${rail.metric}`}
-                    min={0}
-                    max={100}
-                    current={rail.current}
-                    trigger={rail.guardrail}
-                    triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
-                    reversal={rail.clearsAt}
-                    reversalLabel={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
-                    hysteresisBand
-                    invert={rail.invert}
-                    signalLabel={rail.label}
-                    viewBoxWidth={420}
-                  />
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          {/* The corridor itself is drawn once at the top of the plan. The rows
+              here name which of its four lines each area pauses and re-opens on. */}
+          <p className="mt-1 text-fluid-xs text-slate-400">
+            Every area pauses and re-opens on the corridor drawn under the weekly plan above; the
+            rows say which lines apply and how far off they are.
+          </p>
           <div className="mt-3 overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs text-slate-300">
+            <table className="weather-stack-table w-full border-collapse text-left text-xs text-slate-300">
               <caption className="sr-only">Action, pause line and re-open line for each area</caption>
               <thead>
                 <tr className="border-b border-slate-800/80 text-fluid-nano text-slate-400">
@@ -124,8 +99,8 @@ export const PlaybookPanel = ({
                 {visibleActionStripItems.map((item) => (
                   <tr key={item.lever} className="border-b border-slate-800/50 align-top">
                     <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{item.label}</th>
-                    <td className="py-2 pr-3 text-emerald-100">{item.areaActionNow}</td>
-                    <td className="py-2 pr-3">
+                    <td className="py-2 pr-3 text-emerald-100" data-label={DECISION_CONTRACT_LABELS.action.actionNow}>{item.areaActionNow}</td>
+                    <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.threshold.pauseIf}>
                       <RuleLines
                         conditions={item.pauseConditions ?? []}
                         fallback={item.triggerThreshold}
@@ -134,7 +109,7 @@ export const PlaybookPanel = ({
                         qualifier={item.pauseQualifier}
                       />
                     </td>
-                    <td className="py-2">
+                    <td className="py-2" data-label={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}>
                       <RuleLines
                         conditions={item.resumeConditions ?? []}
                         fallback={item.reversalCondition}

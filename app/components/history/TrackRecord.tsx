@@ -2,7 +2,7 @@ import type {
   TrackRecord as TrackRecordModel,
   TrackRecordRow,
 } from "../../../lib/report/trackRecord";
-import { formatDateUTC } from "../../../lib/formatters";
+import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { UrlDetails } from "../ui/urlDetails";
 
 /**
@@ -64,7 +64,12 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
             row.changed ? " bg-slate-900/40" : ""
           }`}
         >
-          <td className="py-2 pr-3 font-mono text-slate-400">{formatDateUTC(row.recordDate)}</td>
+          {/* "Jul 31, 2026" wraps onto two lines in a 26% column at phone
+              width; the month alone is the fact the row is keyed on. */}
+          <td className="py-2 pr-3 font-mono text-slate-400">
+            <span className="sm:hidden">{formatMonthYearShortFromValue(row.recordDate)}</span>
+            <span className="hidden sm:inline">{formatDateUTC(row.recordDate)}</span>
+          </td>
           <td className="py-2 pr-3 text-slate-200">
             <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
               {row.regimeLabel}
@@ -151,41 +156,43 @@ export function TrackRecord({
         expected state and a change is the event worth reading.
       </p>
 
-      {/* No min-width and no horizontal scroll. The table was min-w-[26rem]
-          inside overflow-x-auto, so on a 430px viewport the Change column sat
-          off-screen behind a scroll nobody discovers — and the delta is the most
-          scannable thing here. It now folds into the Boldness cell below sm. */}
-      <div>
-        <RecordTable
-          rows={record.rows}
-          caption={`The ${record.rows.length} most recent monthly operating calls, newest first, with the boldness score behind each call.`}
-        />
-      </div>
-
-      {/* The rest of the record. URL-carried per §XII: a reader who opens the
-          full history and shares the link is sharing the full history, which is
-          the whole point of a record you can audit. */}
-      {earlierRows.length > 0 ? (
-        <UrlDetails
-          queryKey="months"
-          initialOpen={allMonthsOpen}
-          className="weather-auto-chevron"
-          summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
-          summary={
-            <span>
-              Earlier months ({earlierRows.length.toLocaleString("en-US")}) ·{" "}
-              {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(oldestShownDate)}
-            </span>
-          }
-        >
-          <div className="mt-3">
-            <RecordTable
-              rows={earlierRows}
-              caption="The remainder of the monthly operating call history, newest first."
-            />
-          </div>
-        </UrlDetails>
-      ) : null}
+      {/* The tiles and the held-since line are the record; the month-by-month
+          table is its evidence, one disclosure away. Leading with twelve rows
+          of the same word pushed the phase map — the graphic that shows where
+          the call sits — under a screen of table. URL-carried per §XII. */}
+      <UrlDetails
+        queryKey="months"
+        initialOpen={allMonthsOpen}
+        className="weather-auto-chevron"
+        summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
+        summary={
+          <span>
+            Monthly calls ({record.allRows.length.toLocaleString("en-US")}) ·{" "}
+            {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(record.latestRecordDate)}
+          </span>
+        }
+      >
+        {/* No min-width and no horizontal scroll: the delta folds into the
+            Boldness cell below sm rather than sitting off-screen. */}
+        <div className="mt-3 space-y-4">
+          <RecordTable
+            rows={record.rows}
+            caption={`The ${record.rows.length} most recent monthly operating calls, newest first, with the boldness score behind each call.`}
+          />
+          {earlierRows.length > 0 ? (
+            <div>
+              <p className="mb-2 text-fluid-nano type-eyebrow text-slate-500">
+                Earlier months ({earlierRows.length.toLocaleString("en-US")}) ·{" "}
+                {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(oldestShownDate)}
+              </p>
+              <RecordTable
+                rows={earlierRows}
+                caption="The remainder of the monthly operating call history, newest first."
+              />
+            </div>
+          ) : null}
+        </div>
+      </UrlDetails>
 
     </section>
   );
