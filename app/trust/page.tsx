@@ -191,91 +191,67 @@ export default async function MethodPage({
   return (
     <ReportShell {...reportShellProps}>
       <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and the trust to act.">
-        <div className={`weather-hub-card px-4 py-4 mb-4 border ${trustVerdict.toneClasses}`}>
-          <div className="flex items-center gap-3">
-            {/* Same word as the masthead above and the pill on the brief. This
-                said "All systems operational" while the homepage said DEGRADED
-                about the same read, because it looked only at the fallback flag. */}
-            <span className={`flex h-3 w-3 rounded-full ${isFallback || degradedSourceRows.length > 0 ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
-            <p className="text-sm font-semibold text-slate-100">
-              {isFallback
-                ? "Cached snapshot in use"
+        {/* One strip, five cells. This was five stacked cards each opening with
+            a coloured dot and a sentence that said "cached" a different way;
+            the state is five facts, and a row of five labelled values says them
+            in one line. The detail behind each sits in the sections below. */}
+        <dl className={`weather-hub-card grid grid-cols-2 gap-px overflow-hidden border sm:grid-cols-5 ${trustVerdict.toneClasses}`}>
+          {[
+            {
+              key: "data",
+              label: "Data",
+              value: isFallback
+                ? "Cached snapshot"
                 : degradedSourceRows.length > 0
-                  ? `Partly cached — ${degradedSourceRows.length} ${degradedSourceRows.length === 1 ? "source" : "sources"} delayed`
-                  : "All sources live"}
-            </p>
-          </div>
-          {/* "Data refreshed {fetchedAtLabel}" was here, and the Freshness card
-              directly below states the same timestamp, as does the shell
-              masthead above — three copies of one fact before the first scroll. */}
-          <p className="mt-2 text-xs text-slate-400">Decision date: {reportData.recordDateLabel}.</p>
-        </div>
-
-        <div className="space-y-3">
-          <div className="weather-hub-card px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
-                <p className="text-sm font-semibold text-slate-100">Freshness</p>
-              </div>
-              {/* No separate "Updated {fetchedAtLabel}" here: trustSummary below
-                  already carries the same timestamp in its parenthetical. */}
+                  ? `Partly cached · ${degradedSourceRows.length}`
+                  : "All sources live",
+              dot: isFallback || degradedSourceRows.length > 0 ? "bg-amber-400" : "bg-emerald-400",
+              detail: `Decision date ${reportData.recordDateLabel}`,
+            },
+            {
+              key: "freshness",
+              label: "Freshness",
+              value: reportData.fetchedAtLabel,
+              dot: isFallback ? "bg-amber-400" : "bg-emerald-400",
+              detail: trustSummary,
+            },
+            {
+              key: "sources",
+              label: "Sources",
+              value: `Treasury · ${reportData.treasuryProvenance.statusLabel}`,
+              dot: isFallback ? "bg-amber-400" : "bg-emerald-400",
+              detail: `Macro · ${reportData.macroProvenance.statusLabel}`,
+            },
+            {
+              key: "confidence",
+              label: "Confidence",
+              value: confidenceLabel,
+              dot: confidenceDotClass,
+              detail: reportData.flipThreshold,
+            },
+            {
+              key: "warnings",
+              label: "Warnings",
+              value: warnings.length === 0 ? "None" : `${warnings.length} active`,
+              dot: warnings.length === 0 ? "bg-emerald-400" : "bg-amber-400",
+              detail: warnings[0]?.warning ?? "Normal operating conditions.",
+            },
+          ].map((cell) => (
+            <div key={cell.key} className="min-w-0 bg-[var(--bg-surface)] px-3 py-3">
+              <dt className="flex items-center gap-1.5 text-fluid-nano type-eyebrow">
+                <span className={`flex h-2 w-2 shrink-0 rounded-full ${cell.dot}`} aria-hidden="true" />
+                {cell.label}
+              </dt>
+              <dd className="mt-1 truncate text-sm font-semibold text-slate-100" title={cell.value}>{cell.value}</dd>
+              <dd className="mt-0.5 line-clamp-2 text-fluid-nano text-slate-400">{cell.detail}</dd>
             </div>
-            <p className="mt-1 text-xs text-slate-400">{trustSummary}</p>
-          </div>
+          ))}
+        </dl>
 
-          <div className="weather-hub-card px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className={`flex h-2.5 w-2.5 rounded-full ${isFallback ? "bg-amber-400" : "bg-emerald-400"}`} aria-hidden="true" />
-                <p className="text-sm font-semibold text-slate-100">Sources</p>
-              </div>
-              {/* No coverage summary here: it concatenated the same two status labels the list itemizes. */}
-            </div>
-            <ul className="mt-1.5 space-y-0.5 text-xs text-slate-400">
-              <li>Treasury: {reportData.treasuryProvenance.statusLabel}</li>
-              <li>Macro: {reportData.macroProvenance.statusLabel}</li>
-            </ul>
-          </div>
-
-          <div className="weather-hub-card px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className={`flex h-2.5 w-2.5 rounded-full ${confidenceDotClass}`} aria-hidden="true" />
-                <p className="text-sm font-semibold text-slate-100">Confidence</p>
-              </div>
-              <span className="text-fluid-xs text-slate-400">{confidenceLabel}</span>
-            </div>
-            <p className="mt-1 text-xs text-slate-400">{reportData.flipThreshold}</p>
-          </div>
-
-          {warnings.length > 0 ? (
-            <div className="weather-hub-card px-4 py-4 border border-amber-500/30 bg-amber-500/5">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400" aria-hidden="true" />
-                <p className="text-sm font-semibold text-amber-100">Active warnings</p>
-              </div>
-              <ul className="mt-2 space-y-2">
-                {warnings.map((warning) => (
-                  <li key={warning.id} className="text-xs text-amber-200">{warning.warning}</li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <div className="weather-hub-card px-4 py-4">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400" aria-hidden="true" />
-                <p className="text-sm font-semibold text-slate-100">Warnings</p>
-              </div>
-              <p className="mt-1 text-xs text-slate-400">No active warnings. Normal operating conditions.</p>
-            </div>
-          )}
-
-          <p className="text-xs leading-5 text-slate-400 px-1">
-            {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
-            {PRIMARY_AUDIENCE_SUMMARY} Verify source data and combine it with company-specific metrics before acting on irreversible decisions.
-          </p>
-        </div>
+        <p className="mt-3 text-xs leading-5 text-slate-400 px-1">
+          {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
+          {PRIMARY_AUDIENCE_SUMMARY} Verify source data and combine it with company-specific metrics before acting on irreversible decisions.
+        </p>
       </ReportSection>
 
       <FormulaReference />

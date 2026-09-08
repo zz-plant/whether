@@ -43,7 +43,7 @@ describe("expansion controls rendering", () => {
     assert.doesNotMatch(html, /Stop 1/);
   });
 
-  it("tabulates each area's lines with a distance instead of reprinting the corridor per area", () => {
+  it("tabulates each area's lines with a distance instead of reprinting the corridor per area", async () => {
     const { buildCanonicalBoundedDecisionRules } = require("../lib/report/boundedDecisionRules");
     const { buildActionStripItems } = require("../lib/report/operatingCalls");
     const scores = { tightness: 32, riskAppetite: 52 };
@@ -81,9 +81,19 @@ describe("expansion controls rendering", () => {
     // The qualifier is part of the rule: product tempo also pauses on two weak reads.
     assert.match(html, /or two consecutive weaker weekly reads print/);
     assert.match(html, /and weekly direction stabilizes or improves/);
-    // One corridor drawing, not one per area.
-    assert.equal((html.match(/playbook-corridor-tightness/g) ?? []).length > 0, true);
-    assert.equal((html.match(/Shared corridor/g) ?? []).length, 1);
+    // The corridor is drawn once at the top of the plan, not inside this panel.
+    assert.doesNotMatch(html, /Shared corridor/);
+
+    const { BoundedCorridorRails } = await import("../app/components/boundedCorridorRails");
+    const railsHtml = renderToStaticMarkup(
+      require("react").createElement(BoundedCorridorRails, {
+        items: buildActionStripItems(rules, scores),
+        scores,
+        idPrefix: "plan-corridor",
+      }),
+    );
+    assert.equal((railsHtml.match(/plan-corridor-tightness/g) ?? []).length > 0, true);
+    assert.equal((railsHtml.match(/Shared corridor/g) ?? []).length, 1);
   });
 
   it("returns top-3 action lanes by default and full lists when expanded", () => {

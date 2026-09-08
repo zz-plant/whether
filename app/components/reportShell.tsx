@@ -10,6 +10,7 @@ import { PageShell } from "./pageShell";
 import type { DataProvenance } from "./dataProvenanceStrip";
 import { type ReportSectionLink } from "./reportShellNavigation";
 import { AppSidebar } from "./AppSidebar";
+import { MobileSectionChips } from "./mobileSectionChips";
 import { type ReportStageItem } from "./reportRevampElements";
 import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
 import { ReportCta } from "./reportCta";
@@ -252,6 +253,10 @@ export const ReportShell = (props: ReportShellProps) => {
                 used between items *inside* a section, so section boundaries
                 carried no more weight than item boundaries. */}
             <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+              {/* The outline, in chip form, where the rail is hidden. Renders
+                  nothing on a page with fewer than two sections. */}
+              <MobileSectionChips sectionLinks={resolvedSectionLinks} />
+
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />

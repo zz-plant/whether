@@ -19,6 +19,9 @@ import { ReportShell } from "../components/reportShell";
 import { buildGuidedTranslationHref, GuidedTranslationPanels, type GuidedTranslationSearchParams } from "./components/guidedTranslationPanels";
 import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 
+/** Typed route for a direct-answer page; the dynamic segment is `[slug]`. */
+const answerPageHref = (slug: string): Route => `/answers/${slug}`;
+
 const featuredStakeholderSlugs = [
   "founders-ceos",
   "heads-of-product",
@@ -156,53 +159,68 @@ export default async function DecidePage({
             </ButtonLink>
           </article>
 
-          <div className="weather-surface scroll-mt-28 px-4 py-4 space-y-4">
+          {/* Two menus, not two panels of cards. The alternatives are six links;
+              boxing each in a surface inside a surface inside the section made a
+              link list read as a dashboard with nothing on it. A divided list
+              with a chevron is what a menu looks like. */}
+          <div className="scroll-mt-28 space-y-3">
             <div className="space-y-1">
               <p className="type-eyebrow">Other starting points</p>
               <p className="text-sm text-slate-300">If the recommended step isn&apos;t the decision you need.</p>
             </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div id="direct-answers" className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4">
-                <p className="type-eyebrow text-amber-200">Direct answers</p>
-                <p className="mt-1 text-fluid-xs text-slate-300">A direct yes-or-no decision.</p>
-                <div className="mt-3 space-y-2">
+            <div className="grid gap-x-8 gap-y-4 lg:grid-cols-2">
+              <nav id="direct-answers" aria-labelledby="direct-answers-title">
+                <p id="direct-answers-title" className="type-eyebrow text-amber-200">Direct answers</p>
+                <ul className="mt-1 divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
                   {recommendedAnswerPages.map((page) => (
-                    <Link key={page.slug} href={`/answers/${page.slug}` as Route} className="weather-surface block space-y-1">
-                      <p className="text-sm font-semibold text-slate-100">{page.title}</p>
-                      <p className="text-xs text-slate-300">{page.shortAnswer}</p>
-                    </Link>
+                    <li key={page.slug}>
+                      <Link
+                        href={answerPageHref(page.slug)}
+                        className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                      >
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold text-slate-100">{page.title}</span>
+                          <span className="block text-xs text-slate-400">{page.shortAnswer}</span>
+                        </span>
+                        <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                      </Link>
+                    </li>
                   ))}
-                </div>
-              </div>
-              <div
-                id="guided-translation"
-                className="rounded-md border border-slate-700/70 bg-slate-950/50 px-4 py-4"
-              >
-                <p className="type-eyebrow text-violet-200">By role or stage</p>
-                <p className="mt-1 text-fluid-xs text-slate-300">For a role or company-stage lens.</p>
-                <div className="mt-3 grid gap-2">
+                </ul>
+              </nav>
+              <nav id="guided-translation" aria-labelledby="guided-translation-title">
+                <p id="guided-translation-title" className="type-eyebrow text-violet-200">By role or stage</p>
+                <ul className="mt-1 divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
                   {recommendedStakeholderGuides.map((guide) => (
-                    <Link
-                      key={guide.slug}
-                      href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
-                      className="weather-surface space-y-1"
-                    >
-                      <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
-                      <p className="text-xs text-slate-300">{guide.tagline}</p>
-                    </Link>
+                    <li key={guide.slug}>
+                      <Link
+                        href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
+                        className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                      >
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold text-slate-100">{guide.title}</span>
+                          <span className="block text-xs text-slate-400">{guide.tagline}</span>
+                        </span>
+                        <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                      </Link>
+                    </li>
                   ))}
                   {recommendedStageGuides.map((stage) => (
-                    <Link
-                      key={stage.slug}
-                      href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
-                      className="weather-surface space-y-1"
-                    >
-                      <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
-                      <p className="text-xs text-slate-300">{stage.primaryValue}</p>
-                    </Link>
+                    <li key={stage.slug}>
+                      <Link
+                        href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
+                        className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                      >
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold text-slate-100">{stage.title}</span>
+                          <span className="block text-xs text-slate-400">{stage.primaryValue}</span>
+                        </span>
+                        <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                      </Link>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>

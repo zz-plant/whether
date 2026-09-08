@@ -200,11 +200,11 @@ export const buildSignalsPageModel = async (
     activeSignalsView === "detail"
       ? [
           { href: "#decision-summary", label: "Decision summary" },
-          { href: "#trends", label: "Trends" },
-          { href: "#evidence-priorities", label: "Evidence priorities" },
           { href: "#current-scores", label: "Current scores" },
+          { href: "#trends", label: "Trends" },
           { href: "#team-context", label: "What this means for your team" },
           { href: "#fossil-record", label: "Fossil record" },
+          { href: "#evidence-priorities", label: "Evidence priorities" },
           { href: "#advanced-controls", label: "Advanced controls" },
         ]
       : // Short read listed two of the page's sections. The sidebar is a fixed
@@ -213,11 +213,11 @@ export const buildSignalsPageModel = async (
         // section a reader can actually land on is now listed.
         [
           { href: "#decision-summary", label: "What this means now" },
-          { href: "#trends", label: "Trends" },
           { href: "#current-scores", label: "Current scores" },
+          { href: "#curve-context", label: "Curve context" },
+          { href: "#trends", label: "Trends" },
           { href: "#team-context", label: "What this means for your team" },
           { href: "#fossil-record", label: "Fossil record" },
-          { href: "#curve-context", label: "Curve context" },
         ];
 
   const prioritizedSignalsByFocus: Record<

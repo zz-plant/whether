@@ -212,6 +212,33 @@ homepage evidence list, both interpretation views and the evidence rows), and th
 `/share`, `/operate` and the export panel, which pasted the board brief — the whole Slack brief with
 the slide bullets appended — beside the Slack brief and now carry the slide bullets alone.
 
+### 1.1.1b Wayfinding and visual weight (2026-09-08)
+Every page buried its one strong graphic under text, and phones had no in-page navigation on
+pages between 2,500 and 8,000px tall. The changes, per surface:
+
+- **Shell.** `MobileSectionChips` (`app/components/mobileSectionChips.tsx`) renders the outline
+  rail's anchors as a sticky, horizontally scrolling chip row below `md`, marking the section on
+  screen with the same `useActiveSectionId` hook the rail uses. `regimeAccentStyle`
+  (`lib/regimeAccent.ts`) sets `--regime-accent` on both shells from `REGIME_HEX_COLORS`, and
+  `ReportSection`'s top rule and eyebrow, and the active chip, draw in it, so a page reads as "this
+  week is Sunny" outside the hero.
+- **History** leads with the phase-space plane; the month-by-month table sits inside the
+  `?months=1` disclosure under the track-record tiles, and dates print as "Jul 2026" below `sm`.
+- **Evidence** puts the reading-depth toggle directly under the decision summary, then the
+  key-number gauges and the inversion timeline; the two twelve-month lines are a
+  `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
+  the fossil-record table is behind a `?fossil=1` disclosure.
+- **Plan** opens with the shared corridor rails (`BoundedCorridorRails`) inside the weekly plan
+  step, and the rules table refers back to them; the six-step checklist is a sticky one-row
+  progress strip with the check toggle on each chip.
+- **Weekly brief** merges "Decisions to reconsider" and "Close the week" into one `YourWeekCard`
+  with one heading and one privacy line; both children take `embedded` and stay a row when empty.
+- **Trust** states system status as one five-cell strip (data, freshness, sources, confidence,
+  warnings) instead of five stacked cards.
+- **Resolve** renders its two link groups as divided menus with a chevron, not panels in panels.
+- The Plan and published-brief rule tables carry `weather-stack-table`, which stacks rows and
+  prints each cell's column heading from `data-label` below `sm`.
+
 These sit inside the hero's action bar and secondary provenance row, following a routine-first
 hierarchy: the Slack copy button is the primary visible action, while Present and developer access
 are progressive disclosures. The bounded-condition rails are not — threshold distance is what the

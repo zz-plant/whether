@@ -9,6 +9,7 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { WeeklyCloseout } from "./components/weeklyCloseout";
 import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel";
+import { YourWeekCard } from "./components/home/YourWeekCard";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
@@ -103,8 +104,22 @@ type BelowTheFoldEvidenceProps = {
 function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
   return (
     <>
-      <DecisionStalenessPanel
-        conditions={{ tightness: props.tightness, riskAppetite: props.riskAppetite }}
+      {/* One card for the reader's own state. Two empty panels under the brief
+          was two screens of nothing for a first-time reader. */}
+      <YourWeekCard
+        decisions={
+          <DecisionStalenessPanel
+            conditions={{ tightness: props.tightness, riskAppetite: props.riskAppetite }}
+            embedded
+          />
+        }
+        closeout={
+          <WeeklyCloseout
+            recordDate={props.recordDate}
+            recentRecordDates={props.recentRecordDates}
+            embedded
+          />
+        }
       />
 
       {/* `pill`, not `primary`. DD-005 settled Copy Brief in the hero as the one
@@ -115,15 +130,6 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
           {props.planLabel ?? "Build this week’s plan →"}
         </ActionLink>
-      </div>
-
-      {/* Its own block, not the right-hand end of the CTA row. That row was
-          sized for a checkbox; the closeout is a form with a record above it. */}
-      <div className="mt-4">
-        <WeeklyCloseout
-          recordDate={props.recordDate}
-          recentRecordDates={props.recentRecordDates}
-        />
       </div>
     </>
   );

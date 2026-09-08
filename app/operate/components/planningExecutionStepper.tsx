@@ -158,28 +158,22 @@ export function OperationsExecutionStepper({
       className="space-y-4"
       aria-label="Planning checklist"
     >
-      <div className="weather-panel relative overflow-hidden space-y-3 px-4 py-4">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
-          aria-hidden="true"
-        />
-        <div className="max-w-3xl">
-          <div className="flex items-baseline justify-between gap-3">
-            <div>
-              <h2 className="text-sm font-semibold tracking-[-0.01em] text-slate-100 sm:text-base">
-                This week&apos;s checklist
-              </h2>
-            </div>
-            <span className="text-fluid-xs font-medium text-slate-400 tabular-nums">
-              {completedCount}/{steps.length}
+      {/* A strip, not a panel. Six rows of checkbox-plus-title was the first
+          screen of the page and said "0/6"; the same six steps, one chip each, in one
+          sticky row say it in 44px and stay in view while the reader works
+          down the page. The check toggle stays on each chip. */}
+      <div className="sticky top-2 z-20 -mx-1 overflow-x-auto rounded-xl border border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 py-1.5 backdrop-blur">
+        <ol className="flex min-w-max items-center gap-1.5" aria-label="This week's checklist">
+          <li className="flex items-center gap-2 pl-1 pr-2 text-fluid-nano font-semibold tabular-nums text-slate-400">
+            <span className="sr-only">Checklist progress</span>
+            <span aria-hidden="true">{completedCount}/{steps.length}</span>
+            <span className="flex h-1.5 w-12 overflow-hidden rounded-full bg-slate-800" aria-hidden="true">
+              <span
+                className="h-full bg-emerald-400 transition-[width]"
+                style={{ width: `${steps.length ? (completedCount / steps.length) * 100 : 0}%` }}
+              />
             </span>
-          </div>
-          <p className="mt-1 text-xs leading-5 text-slate-300">
-            Mark each step once it is complete.
-          </p>
-        </div>
-
-        <ol className="space-y-1">
+          </li>
           {steps.map((step) => {
             const isActive = step.id === currentStepId;
             const isCompleted = completedSteps.has(step.id);
@@ -188,7 +182,9 @@ export function OperationsExecutionStepper({
             return (
               <li
                 key={step.id}
-                className="flex items-start gap-3 rounded-lg px-3 py-2.5 hover:bg-slate-900/40 transition-colors"
+                className={`flex items-center rounded-lg border ${
+                  isActive ? "border-sky-500/50 bg-sky-500/10" : "border-transparent"
+                }`}
               >
                 <button
                   type="button"
@@ -198,45 +194,31 @@ export function OperationsExecutionStepper({
                       ? `Mark "${step.title}" as incomplete`
                       : `Mark "${step.title}" as complete`
                   }
-                  className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors ${
-                    isCompleted
-                      ? "border-emerald-400 bg-emerald-500/20 text-emerald-100"
-                      : "border-slate-600 hover:border-slate-400"
+                  className={`flex h-11 w-9 items-center justify-center rounded-l-lg transition-colors ${
+                    isCompleted ? "text-emerald-300" : "text-slate-500 hover:text-slate-300"
                   }`}
                 >
-                  {isCompleted ? (
-                    <svg
-                      viewBox="0 0 12 12"
-                      className="h-3 w-3"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M2.5 6l2.5 2.5 4.5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : null}
+                  <span
+                    className={`flex h-4 w-4 items-center justify-center rounded border-2 ${
+                      isCompleted ? "border-emerald-400 bg-emerald-500/20" : "border-current"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {isCompleted ? (
+                      <svg viewBox="0 0 12 12" className="h-2.5 w-2.5">
+                        <path d="M2.5 6l2.5 2.5 4.5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : null}
+                  </span>
                 </button>
                 <a
                   href={stepHref}
                   aria-current={isActive ? "step" : undefined}
-                  aria-labelledby={`${step.id}-nav-title`}
-                  className={`flex-1 min-w-0 no-underline ${isCompleted ? "opacity-60" : ""}`}
+                  className={`flex h-11 items-center pr-3 text-fluid-xs font-semibold no-underline ${
+                    isActive ? "text-sky-100" : "text-slate-300"
+                  } ${isCompleted ? "line-through decoration-slate-600 opacity-70" : ""}`}
                 >
-                  {/* The step label sat right-aligned against the far edge of a
-                      full-width row — "Weekly plan ......... PLAN" with ~500px
-                      of nothing between them. It named the same thing as the
-                      title beside it, so the gap bought no information. */}
-                  <span
-                    id={`${step.id}-nav-title`}
-                    className={`text-sm font-semibold ${isActive ? "text-sky-100" : "text-slate-200"} ${isCompleted ? "line-through decoration-slate-600" : ""}`}
-                  >
-                    {step.title}
-                  </span>
+                  {step.title}
                 </a>
               </li>
             );
