@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Check, Calendar } from "lucide-react";
 import { requestSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { buildMondayCalendarUrl } from "./calendarButton";
 
 export function SubscribeForm() {
+  // The form is mounted on /, /share and /brief/[week]; attribute the conversion
+  // to the route it happened on rather than crediting every one to the homepage.
+  const pathname = usePathname() ?? "/";
   const [email, setEmail] = useState("");
   // Default off. Alert mail is a second stream, and the person opting in is the only
   // one who can consent to it — the alerts panel used to "record" a channel against a
@@ -24,7 +28,7 @@ export function SubscribeForm() {
     setMessage(result.message);
     if (result.ok) {
       setEmail("");
-      trackActivationEvent({ step: "committed", path: "/", commitment: "subscribed" });
+      trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
     }
   };
 

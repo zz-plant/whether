@@ -501,7 +501,7 @@ export function TimelineBar({
               onClick={goToLatest}
               className="rounded-md border border-sky-500/30 bg-sky-500/10 px-2 py-1 text-fluid-micro font-medium text-sky-300 transition-colors hover:bg-sky-500/20"
             >
-              Jump to live
+              Jump to latest
             </button>
           ) : null}
         </div>
