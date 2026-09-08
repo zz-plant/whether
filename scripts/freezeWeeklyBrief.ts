@@ -87,6 +87,8 @@ const record: PublishedBrief = {
     resumeTrigger: rule.resumeTrigger,
     pause: rule.pause.conditions,
     resume: rule.resume.conditions,
+    pauseQualifier: rule.pause.qualifier,
+    resumeQualifier: rule.resume.qualifier,
   })),
   scores: {
     tightness: reportData.assessment.scores.tightness,

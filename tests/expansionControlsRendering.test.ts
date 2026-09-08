@@ -78,6 +78,9 @@ describe("expansion controls rendering", () => {
     assert.match(html, /pts away/);
     // The sentence form is not printed once the lines are tabulated.
     assert.doesNotMatch(html, /Pause net-new hiring if funding pressure rises above/);
+    // The qualifier is part of the rule: product tempo also pauses on two weak reads.
+    assert.match(html, /or two consecutive weaker weekly reads print/);
+    assert.match(html, /and weekly direction stabilizes or improves/);
     // One corridor drawing, not one per area.
     assert.equal((html.match(/playbook-corridor-tightness/g) ?? []).length > 0, true);
     assert.equal((html.match(/Shared corridor/g) ?? []).length, 1);

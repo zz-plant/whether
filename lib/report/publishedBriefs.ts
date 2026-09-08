@@ -34,6 +34,9 @@ const PublishedBriefDecisionSchema = z.object({
   pause: z.array(PublishedRuleLineSchema).optional(),
   /** The numeric lines behind `resumeTrigger`. */
   resume: z.array(PublishedRuleLineSchema).optional(),
+  /** Non-numeric conditions the rule states beside its lines. */
+  pauseQualifier: z.string().optional(),
+  resumeQualifier: z.string().optional(),
 });
 
 const PublishedBriefScoresSchema = z.object({
@@ -111,9 +114,9 @@ export const buildPublishedBriefReadingLines = (brief: PublishedBrief): string[]
     const parts = [
       `${reading.label}: ${reading.value}/100`,
       reading.delta,
-      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause")})` : null,
+      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})` : null,
       rail && rail.clearsAt !== undefined
-        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume")})`
+        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
         : null,
     ].filter((part): part is string => Boolean(part));
     return parts.join(" · ");

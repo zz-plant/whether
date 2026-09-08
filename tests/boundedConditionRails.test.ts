@@ -1,8 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import { buildBoundedConditionRails } from "../lib/report/operatingCalls";
-import { buildCanonicalBoundedDecisionRules, buildRuleCondition } from "../lib/report/boundedDecisionRules";
+import {
+  buildActionStripItems,
+  buildBoundedConditionRails,
+  formatPointsToLine,
+  toThresholdDistance,
+} from "../lib/report/operatingCalls";
+import {
+  buildCanonicalBoundedDecisionRules,
+  buildRuleCondition,
+  formatBoundedDecisionThreshold,
+  guardrailMatchesRule,
+} from "../lib/report/boundedDecisionRules";
 
 const scores = { tightness: 32, riskAppetite: 52 };
 
@@ -23,7 +33,9 @@ describe("buildBoundedConditionRails", () => {
         clearsAt: 66,
         invert: false,
         pointsToGuardrail: 44,
+        guardrailTripped: false,
         pointsToClear: 0,
+        clearHolds: true,
       },
       {
         metric: "riskAppetite",
@@ -33,7 +45,9 @@ describe("buildBoundedConditionRails", () => {
         clearsAt: 54,
         invert: true,
         pointsToGuardrail: 8,
+        guardrailTripped: false,
         pointsToClear: 2,
+        clearHolds: false,
       },
     ]);
   });
@@ -119,9 +133,66 @@ describe("buildSharedCorridorRails", () => {
       [["tightness", 76, 66], ["riskAppetite", 44, 54]],
       "five levers, one corridor",
     );
-    assert.equal(formatPointsToLine(rails[0].pointsToGuardrail, "pause"), "44 pts away");
-    assert.equal(formatPointsToLine(rails[0].pointsToClear, "resume"), "holds");
-    assert.equal(formatPointsToLine(0, "pause"), "tripped");
-    assert.equal(formatPointsToLine(2.5, "resume"), "2.5 pts away");
+    assert.equal(formatPointsToLine(rails[0].pointsToGuardrail, "pause", rails[0].guardrailTripped), "44 pts away");
+    assert.equal(formatPointsToLine(rails[0].pointsToClear, "resume", rails[0].clearHolds), "holds");
+    assert.equal(formatPointsToLine(0, "pause", true), "tripped");
+    assert.equal(formatPointsToLine(2.5, "resume", false), "2.5 pts away");
+  });
+
+  it("does not call a strict line crossed when the reading sits exactly on it", () => {
+    // Scores and lines are both integers, so equality is a real case: 76 is
+    // zero points from "> 76" and has not crossed it.
+    const onTheLine = { tightness: 76, riskAppetite: 44 };
+    const rails = buildBoundedConditionRails({
+      pause: [buildRuleCondition("tightness", ">", 76), buildRuleCondition("riskAppetite", "<", 44)],
+      resume: [buildRuleCondition("tightness", "<", 76)],
+      scores: onTheLine,
+    });
+    assert.equal(rails[0].pointsToGuardrail, 0);
+    assert.equal(rails[0].guardrailTripped, false);
+    assert.equal(rails[0].clearHolds, false);
+    assert.equal(formatPointsToLine(rails[0].pointsToGuardrail, "pause", rails[0].guardrailTripped), "at the line");
+
+    const distance = toThresholdDistance(buildRuleCondition("tightness", ">=", 76), onTheLine);
+    assert.equal(distance.satisfied, true, "an inclusive line is met at equality");
+
+    const rules = buildCanonicalBoundedDecisionRules({
+      regime: "EXPANSION",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: onTheLine,
+    });
+    const hiring = buildActionStripItems(rules, onTheLine).find((item) => item.lever === "hiring-stance");
+    assert.notEqual(hiring?.currentStateLabel, "Closed", "a reading on the line has not tripped the pause");
+  });
+
+  it("keeps a rule's qualifier on the action strip so a table can print the whole rule", () => {
+    const rules = buildCanonicalBoundedDecisionRules({
+      regime: "EXPANSION",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores,
+    });
+    const items = buildActionStripItems(rules, scores);
+    const product = items.find((item) => item.lever === "product-priorities");
+    assert.equal(product?.pauseQualifier, "two consecutive weaker weekly reads print");
+    assert.equal(product?.resumeQualifier, "weekly direction stabilizes or improves");
+    const hiring = items.find((item) => item.lever === "hiring-stance");
+    assert.equal(hiring?.pauseQualifier, undefined);
+  });
+
+  it("draws rails only for the guardrail sentence the surface actually prints", () => {
+    const rules = buildCanonicalBoundedDecisionRules({
+      regime: "EXPANSION",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores,
+    });
+    const hiring = rules[0];
+    assert.equal(guardrailMatchesRule(hiring.pauseTrigger, hiring), true);
+    assert.equal(guardrailMatchesRule(formatBoundedDecisionThreshold(hiring), hiring), true);
+    assert.equal(guardrailMatchesRule("Funding pressure crosses 76", hiring, 76), true);
+    // A stage-scoped or policy-override guardrail replaces the sentence with one
+    // these lines do not describe; rails drawn for it would show the wrong rule.
+    assert.equal(guardrailMatchesRule("Pause irreversible approvals while the policy override remains active.", hiring), false);
+    assert.equal(guardrailMatchesRule("Funding pressure crosses 60", hiring, 60), false);
+    assert.equal(guardrailMatchesRule(undefined, hiring), false);
   });
 });

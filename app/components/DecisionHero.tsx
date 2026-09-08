@@ -63,7 +63,13 @@ type Props = {
    * `flipConditions` sentences are derived from — so the rails draw what the
    * rows say without parsing them.
    */
-  boundedConditions?: { pause: readonly RuleCondition[]; resume: readonly RuleCondition[] };
+  boundedConditions?: {
+    pause: readonly RuleCondition[];
+    resume: readonly RuleCondition[];
+    /** Non-numeric conditions the rule states beside its lines; printed under the rails so the readout is the whole rule. */
+    pauseQualifier?: string;
+    resumeQualifier?: string;
+  };
   shareLines?: string[];
   /** Per-signal weekly movement, rendered in the signal-breakdown popover. */
   signalIndicators?: readonly RegimeSignalIndicator[];
@@ -484,8 +490,8 @@ export function DecisionHero({
                           <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}</dt>
                           <dd className="text-slate-300">
                             {rail.guardrail}
-                            <span className={`ml-1 ${rail.pointsToGuardrail === 0 ? "text-semantic-caution-fg" : "text-white/45"}`}>
-                              {formatPointsToLine(rail.pointsToGuardrail, "pause")}
+                            <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-white/45"}`}>
+                              {formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
                             </span>
                           </dd>
                         </div>
@@ -494,8 +500,8 @@ export function DecisionHero({
                             <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}</dt>
                             <dd className="text-slate-300">
                               {rail.clearsAt}
-                              <span className={`ml-1 ${rail.pointsToClear === 0 ? "text-semantic-easing-fg" : "text-white/45"}`}>
-                                {formatPointsToLine(rail.pointsToClear, "resume")}
+                              <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-white/45"}`}>
+                                {formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
                               </span>
                             </dd>
                           </div>
@@ -504,6 +510,14 @@ export function DecisionHero({
                     </div>
                   ))}
                 </div>
+              ) : null}
+
+              {boundedRails.length > 0 && (boundedConditions?.pauseQualifier || boundedConditions?.resumeQualifier) ? (
+                <p className="text-fluid-nano text-white/45">
+                  {boundedConditions?.pauseQualifier ? `${DECISION_CONTRACT_LABELS.threshold.guardrail} also trips if ${boundedConditions.pauseQualifier}.` : null}
+                  {boundedConditions?.pauseQualifier && boundedConditions?.resumeQualifier ? " " : null}
+                  {boundedConditions?.resumeQualifier ? `Clears only when ${boundedConditions.resumeQualifier}.` : null}
+                </p>
               ) : null}
 
               <dl className="space-y-1.5 text-fluid-xs">

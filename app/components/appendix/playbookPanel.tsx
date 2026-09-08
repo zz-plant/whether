@@ -131,6 +131,7 @@ export const PlaybookPanel = ({
                         fallback={item.triggerThreshold}
                         nearest={item.nearestPause}
                         kind="pause"
+                        qualifier={item.pauseQualifier}
                       />
                     </td>
                     <td className="py-2">
@@ -139,6 +140,7 @@ export const PlaybookPanel = ({
                         fallback={item.reversalCondition}
                         nearest={item.nearestResume}
                         kind="resume"
+                        qualifier={item.resumeQualifier}
                       />
                     </td>
                   </tr>

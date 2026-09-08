@@ -33,9 +33,9 @@ import { RuleLines } from "../../components/boundedRuleLines";
 import {
   buildBoundedConditionRails,
   formatPointsToLine,
+  toThresholdDistance,
   type RuleThresholdDistance,
 } from "../../../lib/report/operatingCalls";
-import { distanceToRuleCondition } from "../../../lib/report/boundedDecisionRules";
 
 /**
  * The nearest of a decision's lines to the frozen reading, for the distance
@@ -47,11 +47,7 @@ const nearestLine = (
   scores: NonNullable<PublishedBrief["scores"]>,
 ): RuleThresholdDistance | undefined =>
   (lines ?? [])
-    .map((line) => {
-      const currentValue = scores[line.metric];
-      const pointsToLine = distanceToRuleCondition(line, currentValue);
-      return { ...line, currentValue, pointsToLine, satisfied: pointsToLine === 0 };
-    })
+    .map((line) => toThresholdDistance(line, scores))
     .sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
 
 const formatDelta = (delta: number | null | undefined) =>
@@ -248,15 +244,15 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                         <p className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums text-slate-400">
                           <span>
                             {DECISION_CONTRACT_LABELS.threshold.pauseIf} {rail.invert ? "<" : ">"} {rail.guardrail}
-                            <span className={`ml-1 ${rail.pointsToGuardrail === 0 ? "text-semantic-caution-fg" : "text-slate-500"}`}>
-                              {formatPointsToLine(rail.pointsToGuardrail, "pause")}
+                            <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-slate-500"}`}>
+                              {formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
                             </span>
                           </span>
                           {rail.clearsAt !== undefined ? (
                             <span>
                               {publicDecisionLabels.reversal} {rail.invert ? ">" : "<"} {rail.clearsAt}
-                              <span className={`ml-1 ${rail.pointsToClear === 0 ? "text-semantic-easing-fg" : "text-slate-500"}`}>
-                                {formatPointsToLine(rail.pointsToClear, "resume")}
+                              <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-slate-500"}`}>
+                                {formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
                               </span>
                             </span>
                           ) : null}
@@ -320,6 +316,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                             fallback={decision.pauseTrigger}
                             nearest={nearestLine(decision.pause, frozenScores)}
                             kind="pause"
+                            qualifier={decision.pauseQualifier}
                           />
                         </td>
                         <td className="py-2 text-xs">
@@ -328,6 +325,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                             fallback={decision.resumeTrigger}
                             nearest={nearestLine(decision.resume, frozenScores)}
                             kind="resume"
+                            qualifier={decision.resumeQualifier}
                           />
                         </td>
                       </tr>

@@ -1,5 +1,6 @@
 import {
   distanceToRuleCondition,
+  isRuleConditionMet,
   formatActionStripReversalText,
   formatActionStripThresholdText,
   formatBoundedDecisionAction,
@@ -46,6 +47,10 @@ export type ActionStripItem = {
   pauseConditions?: RuleCondition[];
   /** The resume lines as data. */
   resumeConditions?: RuleCondition[];
+  /** A non-numeric pause condition stated alongside the lines, e.g. "two consecutive weaker weekly reads print". */
+  pauseQualifier?: string;
+  /** A non-numeric resume condition stated alongside the lines. */
+  resumeQualifier?: string;
   currentStateLabel?: "Closed" | "Guarded" | "Staged" | "Open";
   currentStateStep?: 0 | 1 | 2 | 3;
   corridorProgressPercent?: number;
@@ -225,14 +230,18 @@ const progressByStep = [12, 38, 70, 92] as const;
 
 const metricLabel = (metric: RuleConditionMetric) => ruleMetricLabel[metric];
 
-const toThresholdDistance = (condition: RuleCondition, scores: CurrentScores): RuleThresholdDistance => {
+/**
+ * Satisfaction comes from the operator, not from the distance: a strict ">"
+ * line sits zero points from a reading that equals it and has still not been
+ * crossed, and scores and lines are both integers, so equality is a real case.
+ */
+export const toThresholdDistance = (condition: RuleCondition, scores: CurrentScores): RuleThresholdDistance => {
   const currentValue = scores[condition.metric];
-  const pointsToLine = distanceToRuleCondition(condition, currentValue);
   return {
     ...condition,
     currentValue,
-    pointsToLine,
-    satisfied: pointsToLine === 0,
+    pointsToLine: distanceToRuleCondition(condition, currentValue),
+    satisfied: isRuleConditionMet(condition, currentValue),
   };
 };
 
@@ -261,10 +270,14 @@ export type BoundedConditionRail = {
    * small multiples rather than as a pair of unrelated charts.
    */
   invert: boolean;
-  /** Points from the reading to the guardrail; zero once it has tripped. */
+  /** Points from the reading to the guardrail; zero at the line or past it. */
   pointsToGuardrail: number;
-  /** Points from the reading to the clearing line; zero once it holds. */
+  /** Whether the guardrail condition holds. Distinct from a zero distance on a strict line. */
+  guardrailTripped: boolean;
+  /** Points from the reading to the clearing line; zero at the line or past it. */
   pointsToClear?: number;
+  /** Whether the clearing condition holds. */
+  clearHolds?: boolean;
 };
 
 /**
@@ -321,7 +334,9 @@ export const buildBoundedConditionRails = ({
       clearsAt: clear?.value,
       invert: !tripsHigh,
       pointsToGuardrail: distanceToRuleCondition(condition, current),
+      guardrailTripped: isRuleConditionMet(condition, current),
       pointsToClear: clear ? distanceToRuleCondition(clear, current) : undefined,
+      clearHolds: clear ? isRuleConditionMet(clear, current) : undefined,
     });
   }
 
@@ -364,10 +379,19 @@ export const buildSharedCorridorRails = (
   return buildBoundedConditionRails({ pause: pause.sort(byMetric), resume: resume.sort(byMetric), scores });
 };
 
-/** "44 pts away", "tripped", or "holds" — a distance, not a sentence. */
-export const formatPointsToLine = (points: number | undefined, kind: "pause" | "resume"): string => {
+/**
+ * "44 pts away", "at the line", "tripped" or "holds" — a distance, not a
+ * sentence. `met` is the operator's verdict; a strict line at zero distance is
+ * "at the line", which is not the same claim as tripped.
+ */
+export const formatPointsToLine = (
+  points: number | undefined,
+  kind: "pause" | "resume",
+  met: boolean | undefined,
+): string => {
   if (points === undefined || !Number.isFinite(points)) return "—";
-  if (points === 0) return kind === "pause" ? "tripped" : "holds";
+  if (met) return kind === "pause" ? "tripped" : "holds";
+  if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} pts away`;
 };
 
@@ -444,6 +468,8 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
       reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,
       pauseConditions: rule?.pause.conditions ?? [],
       resumeConditions: rule?.resume.conditions ?? [],
+      pauseQualifier: rule?.pause.qualifier,
+      resumeQualifier: rule?.resume.qualifier,
       nearestPause: laneState?.nearestPause,
       nearestResume: laneState?.nearestResume,
       currentStateLabel: laneState?.currentStateLabel,

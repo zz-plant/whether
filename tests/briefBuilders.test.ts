@@ -48,6 +48,8 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /^Risk appetite: 68\/100 · pause < 44 \(24 pts away\) · re-open > 54 \(holds\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
+    // The qualifier is part of the rule and prints with the lines.
+    assert.match(brief, /Re-open when: Funding pressure < 66 \(holds\) and budget payback proof is intact/);
     assert.doesNotMatch(brief, /Do now: Constraint one/, "Do now must not fall through to the operating-limits list");
   });
 

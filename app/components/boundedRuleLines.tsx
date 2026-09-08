@@ -11,17 +11,30 @@ export const RuleLines = ({
   fallback,
   nearest,
   kind,
+  qualifier,
 }: {
   conditions: readonly RuleCondition[];
   fallback: string;
   nearest?: RuleThresholdDistance;
   kind: "pause" | "resume";
+  /**
+   * The rule's non-numeric condition, if it has one. It is part of the rule —
+   * "or two consecutive weaker weekly reads print" is a second way the pause
+   * fires — so a table that drops it states a weaker rule than the sentence.
+   */
+  qualifier?: string;
 }) => {
   if (conditions.length === 0) {
     return <span className="text-slate-300">{fallback}</span>;
   }
   return (
     <span className="flex flex-col gap-0.5">
+      {qualifier ? (
+        <span className="order-last text-slate-400">
+          {kind === "pause" ? "or " : "and "}
+          {qualifier}
+        </span>
+      ) : null}
       {conditions.map((condition) => {
         const isNearest = nearest && nearest.metric === condition.metric && nearest.value === condition.value;
         return (
@@ -37,7 +50,7 @@ export const RuleLines = ({
                     : "text-slate-500"
                 }`}
               >
-                {formatPointsToLine(nearest.pointsToLine, kind)}
+                {formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied)}
               </span>
             ) : null}
           </span>

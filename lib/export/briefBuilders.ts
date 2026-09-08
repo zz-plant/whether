@@ -116,16 +116,20 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
 const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
   const lines = kind === "pause" ? item.pauseConditions : item.resumeConditions;
   const nearest = kind === "pause" ? item.nearestPause : item.nearestResume;
+  const qualifier = kind === "pause" ? item.pauseQualifier : item.resumeQualifier;
   if (!lines || lines.length === 0) {
     return kind === "pause" ? item.triggerThreshold : item.reversalCondition;
   }
-  return lines
-    .map((line) =>
+  return [
+    ...lines.map((line) =>
       nearest && nearest.metric === line.metric && nearest.value === line.value
-        ? `${line.label} (${formatPointsToLine(nearest.pointsToLine, kind)})`
+        ? `${line.label} (${formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied)})`
         : line.label,
-    )
-    .join(` ${kind === "pause" ? "or" : "and"} `);
+    ),
+    // The qualifier is part of the rule, not decoration: "or two consecutive
+    // weaker weekly reads print" is a second way the pause fires.
+    ...(qualifier ? [qualifier] : []),
+  ].join(` ${kind === "pause" ? "or" : "and"} `);
 };
 
 /**
@@ -155,9 +159,9 @@ export const buildReadingLines = (assessment: RegimeAssessment, options?: Export
       typeof delta === "number" && Number.isFinite(delta) && delta !== 0
         ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`
         : null,
-      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause")})` : null,
+      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})` : null,
       rail && rail.clearsAt !== undefined
-        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume")})`
+        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
         : null,
     ]
       .filter((part): part is string => Boolean(part))

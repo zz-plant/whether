@@ -29,7 +29,7 @@ import {
 } from "./viewModel";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
-import { decisionAreaLabel } from "../lib/report/boundedDecisionRules";
+import { decisionAreaLabel, guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 import { buildTimeMachineHref, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
@@ -256,10 +256,19 @@ async function PageContent({
   const reversalTriggerLabel = homepage.weeklyDecisionCardModel.decision.reversalTrigger;
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
-  // the rails may draw.
+  // the rails may draw — but only when that is in fact the sentence being
+  // printed. A stage-scoped or policy-override guardrail replaces the sentence
+  // with one these lines do not describe, and the hero hides the sentence
+  // whenever rails exist, so passing the canonical lines there would swap the
+  // active override for a generic corridor.
   const corridorRule = homepage.weeklyDecisionCardModel.decision.decisionRules[0];
-  const boundedConditions = corridorRule
-    ? { pause: corridorRule.pause.conditions, resume: corridorRule.resume.conditions }
+  const boundedConditions = corridorRule && guardrailMatchesRule(guardrailLabel, corridorRule, parsedGuardrailThreshold)
+    ? {
+        pause: corridorRule.pause.conditions,
+        resume: corridorRule.resume.conditions,
+        pauseQualifier: corridorRule.pause.qualifier,
+        resumeQualifier: corridorRule.resume.qualifier,
+      }
     : undefined;
   const briefShareLines = [
     homepage.weeklyDecisionCardModel.decision.actionNowShort

@@ -94,8 +94,23 @@ export const distanceToRuleCondition = (condition: RuleCondition, current: numbe
   }
 };
 
-export const isRuleConditionMet = (condition: RuleCondition, current: number): boolean =>
-  distanceToRuleCondition(condition, current) === 0 && Number.isFinite(current);
+/**
+ * Evaluated from the operator, not from the distance: a strict line sits zero
+ * points from a reading that equals it and is still not met.
+ */
+export const isRuleConditionMet = (condition: RuleCondition, current: number): boolean => {
+  if (!Number.isFinite(current)) return false;
+  switch (condition.operator) {
+    case ">":
+      return current > condition.value;
+    case ">=":
+      return current >= condition.value;
+    case "<":
+      return current < condition.value;
+    case "<=":
+      return current <= condition.value;
+  }
+};
 
 /**
  * The one sentence form of a condition. A rising line reads "rises above", a
@@ -220,6 +235,30 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
     threshold: triplet.threshold,
     reverse: triplet.reversal,
   };
+};
+
+/**
+ * Whether a printed guardrail sentence is this rule's pause clause.
+ *
+ * The homepage may print a stage-scoped or policy-override guardrail in the
+ * rule's slot. Rails drawn from the rule's lines would then describe a rule the
+ * reader is not being shown, so a surface asks this before drawing them.
+ * A bare numeric threshold matches when it is the rule's funding-pressure line.
+ */
+export const guardrailMatchesRule = (
+  guardrail: string | undefined,
+  rule: Pick<BoundedDecisionRule, "pause" | "pauseTrigger">,
+  numericThreshold?: number,
+): boolean => {
+  if (!guardrail) return false;
+  if (guardrail === rule.pauseTrigger || guardrail === formatDecisionThreshold(rule.pauseTrigger)) return true;
+  return (
+    typeof numericThreshold === "number"
+    && Number.isFinite(numericThreshold)
+    && rule.pause.conditions.some(
+      (condition) => condition.metric === "tightness" && condition.value === numericThreshold,
+    )
+  );
 };
 
 const fmt = formatThresholdNumber;
