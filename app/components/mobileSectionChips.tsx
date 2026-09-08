@@ -19,9 +19,14 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
   return (
     <nav
       aria-label="Page sections"
-      className="sticky top-0 z-20 -mx-4 border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-4 py-1.5 backdrop-blur md:hidden"
+      // The nav is the width-constrained scroll container and the list is the
+      // thing wider than it: overflow on the list itself, with min-w-max, gave
+      // the list nothing to scroll and let the page clip the trailing chips.
+      // Shown until the rail appears at lg, not md — between the two the shell
+      // used to reserve a rail column with nothing in it.
+      className="sticky top-0 z-20 -mx-4 overflow-x-auto border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-4 py-1.5 backdrop-blur [scrollbar-width:none] lg:hidden"
     >
-      <ul className="flex min-w-max gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none]">
+      <ul className="flex min-w-max gap-1.5 pb-0.5">
         {sectionLinks.map((section) => {
           const isActive = section.href === `#${activeSectionId}`;
           return (

@@ -239,12 +239,15 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
+          {/* The rail column exists only where the rail renders. `AppSidebar` is
+              hidden below lg, but the grid reserved its column from md, so a
+              tablet paid 12rem for an empty rail and got no outline at all. */}
+          <div className={`mt-2 ${sidebarEnabled ? "lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
             {/* max-h, not h: as a grid item a fixed height forces the whole row
                 to a viewport tall, so any page whose content was shorter than the
                 rail ended in a screenful of empty space. */}
             {sidebarEnabled ? (
-              <aside className="hidden md:block md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
+              <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
                 <AppSidebar sectionLinks={resolvedSectionLinks} />
               </aside>
             ) : null}

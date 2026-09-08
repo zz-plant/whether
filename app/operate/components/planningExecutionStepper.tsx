@@ -162,7 +162,10 @@ export function OperationsExecutionStepper({
           screen of the page and said "0/6"; the same six steps, one chip each, in one
           sticky row say it in 44px and stay in view while the reader works
           down the page. The check toggle stays on each chip. */}
-      <div className="sticky top-2 z-20 -mx-1 overflow-x-auto rounded-xl border border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 py-1.5 backdrop-blur">
+      {/* Below lg the shell's section-chip row is sticky at the top of the
+          viewport and 52px tall, so this strip sits under it rather than on
+          it; at lg the chips are gone and the strip can take the top edge. */}
+      <div className="sticky top-[3.5rem] z-10 -mx-1 overflow-x-auto rounded-xl border border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 py-1.5 backdrop-blur lg:top-2">
         <ol className="flex min-w-max items-center gap-1.5" aria-label="This week's checklist">
           <li className="flex items-center gap-2 pl-1 pr-2 text-fluid-nano font-semibold tabular-nums text-slate-400">
             <span className="sr-only">Checklist progress</span>
