@@ -4,10 +4,11 @@ import { answerPages } from "../app/answers/decisionPages";
 import { scoreAnswerLaunchReadiness, summarizeAnswerLaunchReadiness, type AnswerLaunchReadinessLiveInputs } from "../lib/seo/answerLaunchReadiness";
 import { buildWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { buildReportDataFixture } from "./fixtures/reportFixtures";
+import { PROVENANCE_STATUS, type ProvenanceStatusLabel } from "../lib/report/provenanceStatus";
 
 const buildLiveInputs = ({
   degraded = false,
-  provenanceStatusLabel = "Live (high confidence)",
+  provenanceStatusLabel = PROVENANCE_STATUS.live,
   reportEvidenceItems = [
     {
       key: "tightness" as const,
@@ -20,7 +21,7 @@ const buildLiveInputs = ({
   ],
 }: {
   degraded?: boolean;
-  provenanceStatusLabel?: string;
+  provenanceStatusLabel?: ProvenanceStatusLabel;
   reportEvidenceItems?: ReturnType<typeof buildReportDataFixture>["reportEvidenceItems"];
 } = {}): AnswerLaunchReadinessLiveInputs => {
   const fetchedAt = new Date().toISOString();
@@ -79,7 +80,7 @@ describe("answer launch readiness", () => {
     const [page] = answerPages;
     const records = await scoreAnswerLaunchReadiness(
       [page],
-      buildLiveInputs({ degraded: true, provenanceStatusLabel: "Cached (medium confidence)" }),
+      buildLiveInputs({ degraded: true, provenanceStatusLabel: PROVENANCE_STATUS.cached }),
     );
 
     assert.equal(records[0]?.eligible, false);

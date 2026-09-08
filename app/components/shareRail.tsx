@@ -25,6 +25,114 @@ const SHARE_PRESETS: readonly { id: SharePreset; label: string }[] = [
   { id: "custom", label: "Custom message" },
 ];
 
+const COPY_STATUS_MESSAGE: Record<string, string> = {
+  plain: "Plain text copied.",
+  slack: "Slack format copied.",
+  link: "Page link copied.",
+};
+
+/**
+ * The two halves of "Copy as", each a named thing.
+ *
+ * They were the branches of one inline `{artifact ? … : …}` inside the dialog,
+ * which put a fieldset, a preview and a copy button twelve levels deep. Three of
+ * those levels are base-ui's `Dialog.Root > Portal > Popup` chain and cannot go;
+ * the rest is what was worth naming.
+ */
+const BriefFormatPicker = ({
+  format,
+  activeFormat,
+  briefText,
+  copiedTarget,
+  onSelect,
+  onCopy,
+}: {
+  format: BriefFormatId;
+  activeFormat: (typeof BRIEF_FORMATS)[number];
+  briefText: string;
+  copiedTarget: string | null;
+  onSelect: (id: BriefFormatId) => void;
+  onCopy: () => void;
+}) => (
+  <>
+    <fieldset className="mt-2">
+      <legend className="sr-only">Format</legend>
+      <div className="grid grid-cols-3 gap-1.5">
+        {BRIEF_FORMATS.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onSelect(option.id)}
+            aria-pressed={format === option.id}
+            className={`min-h-[44px] rounded-md px-2 py-2 text-xs font-semibold transition-colors weather-focus-ring ${
+              format === option.id
+                ? "border border-sky-500/30 bg-sky-500/12 text-sky-100"
+                : "border border-transparent text-slate-300 hover:bg-slate-800/50"
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+    <p className="mt-1.5 text-xs text-slate-400">{activeFormat.hint}</p>
+    {/* The preview is the copy payload itself, not a rendering of
+        it. A picker that describes three formats and copies a
+        fourth thing is the failure this panel already had. */}
+    {/* No scroll container of its own. The panel already scrolls, and
+        a nested scroller here would need its own tab stop to stay
+        keyboard-reachable — a focusable, non-interactive region. The
+        longest format runs a dozen short lines, so it wraps instead. */}
+    <pre
+      aria-label={`Preview of the ${activeFormat.label} format`}
+      className="mt-2 whitespace-pre-wrap break-words rounded-md border border-slate-800/70 bg-slate-950/60 p-2.5 text-[11px] leading-5 text-slate-300"
+    >
+      {briefText}
+    </pre>
+    <button
+      type="button"
+      onClick={onCopy}
+      data-premium-intent="export_brief"
+      data-premium-cta="share_rail_copy_brief"
+      data-testid="share-rail-copy-brief"
+      className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+    >
+      {copiedTarget === "brief" ? "Copied!" : `Copy ${activeFormat.label} format`}
+    </button>
+  </>
+);
+
+const GenericSharePresets = ({
+  copiedTarget,
+  onCopyPlain,
+  onCopySlack,
+}: {
+  copiedTarget: string | null;
+  onCopyPlain: () => void;
+  onCopySlack: () => void;
+}) => (
+<div className="mt-2 flex gap-2">
+  <button
+    type="button"
+    onClick={onCopyPlain}
+    data-premium-intent="export_brief"
+    data-premium-cta="share_rail_copy_plain"
+    className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+  >
+    {copiedTarget === "plain" ? "Copied!" : "Plain text"}
+  </button>
+  <button
+    type="button"
+    onClick={onCopySlack}
+    data-premium-intent="export_brief"
+    data-premium-cta="share_rail_copy_slack"
+    className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+  >
+    {copiedTarget === "slack" ? "Copied!" : "Slack format"}
+  </button>
+</div>
+);
+
 export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
@@ -78,16 +186,13 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     void copyToClipboard(briefText, "brief");
   }, [briefText, copyToClipboard]);
 
+  /* A lookup, not a ternary chain. Only the brief's message varies, because it
+     names the format that was picked; the rest are fixed strings keyed by the
+     copy target, and a chain of them hid that. */
   const copyStatusMessage =
     copiedTarget === "brief"
       ? `${activeFormat.label} format copied.`
-      : copiedTarget === "plain"
-      ? "Plain text copied."
-      : copiedTarget === "slack"
-      ? "Slack format copied."
-      : copiedTarget === "link"
-      ? "Page link copied."
-      : "";
+      : COPY_STATUS_MESSAGE[copiedTarget ?? ""] ?? "";
 
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
@@ -173,75 +278,20 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               {copyStatusMessage}
             </output>
             {artifact ? (
-              <>
-                <fieldset className="mt-2">
-                  <legend className="sr-only">Format</legend>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {BRIEF_FORMATS.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => setFormat(option.id)}
-                        aria-pressed={format === option.id}
-                        className={`min-h-[44px] rounded-md px-2 py-2 text-xs font-semibold transition-colors weather-focus-ring ${
-                          format === option.id
-                            ? "border border-sky-500/30 bg-sky-500/12 text-sky-100"
-                            : "border border-transparent text-slate-300 hover:bg-slate-800/50"
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-                <p className="mt-1.5 text-xs text-slate-400">{activeFormat.hint}</p>
-                {/* The preview is the copy payload itself, not a rendering of
-                    it. A picker that describes three formats and copies a
-                    fourth thing is the failure this panel already had. */}
-                {/* No scroll container of its own. The panel already scrolls, and
-                    a nested scroller here would need its own tab stop to stay
-                    keyboard-reachable — a focusable, non-interactive region. The
-                    longest format runs a dozen short lines, so it wraps instead. */}
-                <pre
-                  aria-label={`Preview of the ${activeFormat.label} format`}
-                  className="mt-2 whitespace-pre-wrap break-words rounded-md border border-slate-800/70 bg-slate-950/60 p-2.5 text-[11px] leading-5 text-slate-300"
-                >
-                  {briefText}
-                </pre>
-                <button
-                  type="button"
-                  onClick={copyBrief}
-                  data-premium-intent="export_brief"
-                  data-premium-cta="share_rail_copy_brief"
-                  data-testid="share-rail-copy-brief"
-                  className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
-                >
-                  {copiedTarget === "brief" ? "Copied!" : `Copy ${activeFormat.label} format`}
-                </button>
-              </>
+              <BriefFormatPicker
+                format={format}
+                activeFormat={activeFormat}
+                briefText={briefText}
+                copiedTarget={copiedTarget}
+                onSelect={setFormat}
+                onCopy={copyBrief}
+              />
             ) : (
-              /* No weekly call on this route, so there is no brief to format.
-                 The generic blurb above is what this panel can honestly offer. */
-              <div className="mt-2 flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  data-premium-intent="export_brief"
-                  data-premium-cta="share_rail_copy_plain"
-                  className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
-                >
-                  {copiedTarget === "plain" ? "Copied!" : "Plain text"}
-                </button>
-                <button
-                  type="button"
-                  onClick={copySlackText}
-                  data-premium-intent="export_brief"
-                  data-premium-cta="share_rail_copy_slack"
-                  className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
-                >
-                  {copiedTarget === "slack" ? "Copied!" : "Slack format"}
-                </button>
-              </div>
+              <GenericSharePresets
+                copiedTarget={copiedTarget}
+                onCopyPlain={handleCopy}
+                onCopySlack={copySlackText}
+              />
             )}
             <div className="mt-3">
               <button
