@@ -64,23 +64,23 @@ export function ToolkitLibraryPanels({
         <p className="text-sm text-slate-300">
           {normalizedQuery
             ? "Use the filtered list below."
-            : "Default to this list. Search only when you know the tool you need."}
+            : "Default to this list, or filter it by the task in front of you. Site-wide search is under ⌘K."}
         </p>
       </div>
 
       <form action="/resolve" className="flex flex-col gap-3 sm:flex-row">
-        <label htmlFor="decide-toolkit-search-input" className="sr-only">Search tools by task</label>
+        <label htmlFor="decide-toolkit-search-input" className="sr-only">Filter tools by task</label>
         <input
           id="decide-toolkit-search-input"
           type="search"
           name="toolkitQuery"
           defaultValue={query ?? ""}
           className="weather-input w-full px-4 py-2"
-          placeholder="Search by task (e.g. rollback, roadmap, PMF)…"
+          placeholder="Filter by task (e.g. rollback, roadmap, PMF)…"
           autoComplete="off"
-          aria-label="Search tools"
+          aria-label="Filter tools"
         />
-        <button type="submit" className="weather-button">Search</button>
+        <button type="submit" className="weather-button">Filter</button>
         {normalizedQuery ? (
           <Link href="/resolve#toolkit-library" className="weather-button inline-flex items-center justify-center">
             Clear

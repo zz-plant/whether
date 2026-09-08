@@ -91,7 +91,7 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     // The snapshot marker travels with the numbers. A slide pasted into a deck
     // during an upstream outage has to say so on the slide, not on the page it
     // was copied from.
-    `> *Signals: Tightness ${payload.tightness.toFixed(0)} · Risk Appetite ${payload.riskAppetite.toFixed(0)} · Source: ${payload.provenance}${payload.isFallback ? " · cached snapshot, not a live read" : ""}*`,
+    `> *Signals: Funding pressure ${payload.tightness.toFixed(0)} · Risk Appetite ${payload.riskAppetite.toFixed(0)} · Source: ${payload.provenance}${payload.isFallback ? " · cached snapshot, not a live read" : ""}*`,
     ...(payload.url ? [`> ${payload.url}`] : []),
   ].join("\n");
 }
@@ -140,7 +140,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
   </table>
 
   <div style="display: flex; justify-content: space-between; font-size: 10px; color: #64748b; padding-top: 8px;">
-    <span>Macro: Tightness <b>${payload.tightness.toFixed(0)}</b> · Risk Appetite <b>${payload.riskAppetite.toFixed(0)}</b></span>
+    <span>Macro: Funding pressure <b>${payload.tightness.toFixed(0)}</b> · Risk Appetite <b>${payload.riskAppetite.toFixed(0)}</b></span>
     <span>Source: ${payload.provenance} · whether.work</span>
   </div>
 </div>
@@ -218,7 +218,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <!-- Footer Stats -->
   <g transform="translate(80, 600)">
     <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
-      Funding Tightness: <tspan fill="#f1f5f9">${payload.tightness.toFixed(0)}</tspan>  ·  Risk Appetite: <tspan fill="#f1f5f9">${payload.riskAppetite.toFixed(0)}</tspan>  ·  Confidence: <tspan fill="#f1f5f9">${esc(payload.confidence)}</tspan>
+      Funding pressure: <tspan fill="#f1f5f9">${payload.tightness.toFixed(0)}</tspan>  ·  Risk Appetite: <tspan fill="#f1f5f9">${payload.riskAppetite.toFixed(0)}</tspan>  ·  Confidence: <tspan fill="#f1f5f9">${esc(payload.confidence)}</tspan>
     </text>
     <text x="1040" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
       whether.work

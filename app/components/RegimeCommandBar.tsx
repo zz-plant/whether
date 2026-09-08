@@ -116,7 +116,7 @@ const TrajectoryMap = ({
   });
   const highlightNearestTightness = regimeDistance.dimensionKey === "tightness";
   const nearestBoundaryLabel = highlightNearestTightness
-    ? `Nearest flip: Tightness ${postureTrajectory.thresholds.tightness.toFixed(1)}`
+    ? `Nearest flip: Funding pressure ${postureTrajectory.thresholds.tightness.toFixed(1)}`
     : `Nearest flip: Risk appetite ${postureTrajectory.thresholds.riskAppetite.toFixed(1)}`;
 
   return (
@@ -134,7 +134,7 @@ const TrajectoryMap = ({
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
-          aria-label={`Posture map. Tightness ${postureTrajectory.current.tightness.toFixed(1)} and risk appetite ${postureTrajectory.current.riskAppetite.toFixed(1)}. ${regimeDistance.pointsToFlip.toFixed(1)} points from the nearest flip line.`}
+          aria-label={`Posture map. Funding pressure ${postureTrajectory.current.tightness.toFixed(1)} and risk appetite ${postureTrajectory.current.riskAppetite.toFixed(1)}. ${regimeDistance.pointsToFlip.toFixed(1)} points from the nearest flip line.`}
         >
           <rect x="0" y="0" width={riskThresholdX} height={tightnessThresholdY} fill="rgba(56,189,248,0.08)" />
           <rect x={riskThresholdX} y="0" width={100 - riskThresholdX} height={tightnessThresholdY} fill="rgba(16,185,129,0.08)" />
@@ -217,7 +217,7 @@ const PostureMapSummary = ({
   postureTrajectory: NonNullable<RegimeCommandBarProps["postureTrajectory"]>;
 }) => (
   <p className="text-xs leading-5 text-slate-200">
-    Trend {trendLabel} · Tightness {postureTrajectory.current.tightness.toFixed(1)} vs {postureTrajectory.thresholds.tightness.toFixed(1)} · Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} vs {postureTrajectory.thresholds.riskAppetite.toFixed(1)}
+    Trend {trendLabel} · Funding pressure {postureTrajectory.current.tightness.toFixed(1)} vs {postureTrajectory.thresholds.tightness.toFixed(1)} · Risk appetite {postureTrajectory.current.riskAppetite.toFixed(1)} vs {postureTrajectory.thresholds.riskAppetite.toFixed(1)}
   </p>
 );
 
@@ -365,7 +365,7 @@ export const RegimeCommandBar = ({
               <p className="type-eyebrow text-slate-300">Decision runways</p>
               <div className="mt-3 space-y-3">
                 <ThresholdRail
-                  label="Tightness"
+                  label="Funding pressure"
                   current={postureTrajectory.current.tightness}
                   threshold={postureTrajectory.thresholds.tightness}
                   currentColorClass={regimeStyle.markerClass}

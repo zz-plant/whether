@@ -102,6 +102,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return metadata;
 }
 
+import { SubscribeForm } from "../../components/SubscribeForm";
+
 export default async function PublishedBriefPage({ params }: { params: Promise<Params> }) {
   const { week } = await params;
   const brief = findPublishedBrief(week);
@@ -417,6 +419,10 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           About Whether
         </ActionLink>
       </nav>
+
+      {/* A shared brief used to be a dead end: the recipient got the citation
+          and nothing that brought next Monday's call to them. */}
+      <SubscribeForm />
     </main>
   );
 }

@@ -85,7 +85,7 @@ describe("WeeklyChangeReport", () => {
     for (const area of ["Hiring", "Burn discipline", "Capital raising"]) {
       assert.ok(html.includes(area), `consequence band lists ${area}`);
     }
-    assert.match(html, /3 need attention/);
+    assert.match(html, /3 rules to recheck/);
   });
 
   it("attaches reading, movement, date and source to the change it explains", () => {

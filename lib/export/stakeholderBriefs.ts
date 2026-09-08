@@ -100,7 +100,7 @@ export function buildStakeholderBriefs(payload: WeeklyOperatorBriefPayload): Mul
 
   // 5. CFO & Finance
   const cfoBullets = [
-    `Regime & Tightness: ${regime}. Baseline funding pressure requires proactive runway defense.`,
+    `Regime & funding pressure: ${regime}. Baseline funding pressure requires proactive runway defense.`,
     `Runway Buffer: Maintain minimum target cash runway buffer; gate unbudgeted OPEX.`,
     `Contract Approvals: Enforce break clauses on vendor contracts >$25k. ${guardrail}`,
     `Reversal Threshold: ${flip}`,

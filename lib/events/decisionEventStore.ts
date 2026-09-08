@@ -284,13 +284,13 @@ export const buildReversalConditions = (
   const tightening = isTightening(previousState, nextState);
   if (tightening) {
     return [
-      `Tightness <= ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
+      `Funding pressure <= ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
       `Risk appetite > ${thresholds.riskAppetiteRegime} for 2 consecutive refreshes.`,
     ];
   }
 
   return [
-    `Tightness > ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
+    `Funding pressure > ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
     `Risk appetite <= ${thresholds.riskAppetiteRegime} for 2 consecutive refreshes.`,
   ];
 };

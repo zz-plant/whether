@@ -80,7 +80,7 @@ export function FreshnessDot({
           )}
           {resolveDataStatusLabel({ isFallbackSnapshot: showOfflineBadge, degradedSourceCount: degradedSourceRows.length })}
         </span>
-        <span>Data as of {label}</span>
+        <span>{recordDate ? `Data through ${recordDate} · refreshed ${label}` : `Data as of ${label}`}</span>
       </button>
 
       {open ? (

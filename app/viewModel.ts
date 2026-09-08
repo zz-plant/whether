@@ -8,7 +8,7 @@ export const DIRECTION_ARROW: Record<SignalDirection, string> = {
 };
 
 export const DIRECTION_LABEL: Record<SignalDirection, string> = {
-  tighten: "Tightening", ease: "Easing", hold: "Holding",
+  tighten: "Tightening", ease: "Easing", hold: "Steady",
 };
 
 export const DIRECTION_COLOR: Record<SignalDirection, string> = {

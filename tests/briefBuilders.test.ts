@@ -44,12 +44,12 @@ describe("buildSlackBrief", () => {
       modeledDecision: { actionStripItems: buildActionStripItems(rules, scores) },
     });
 
-    assert.match(brief, /^Funding pressure: 12\/100 · pause > 76 \(64 pts away\) · re-open < 66 \(holds\)$/m);
-    assert.match(brief, /^Risk appetite: 68\/100 · pause < 44 \(24 pts away\) · re-open > 54 \(holds\)$/m);
+    assert.match(brief, /^Funding pressure: 12\/100 · pause > 76 \(64 pts away\) · re-open < 66 \(already met\)$/m);
+    assert.match(brief, /^Risk appetite: 68\/100 · pause < 44 \(24 pts away\) · re-open > 54 \(already met\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
-    assert.match(brief, /Re-open when: Funding pressure < 66 \(holds\) and budget payback proof is intact/);
+    assert.match(brief, /Re-open when: Funding pressure < 66 \(already met\) and budget payback proof is intact/);
     assert.doesNotMatch(brief, /Do now: Constraint one/, "Do now must not fall through to the operating-limits list");
   });
 
@@ -101,11 +101,11 @@ describe("buildSlackBrief", () => {
     });
 
     assert.match(brief, /Bounded decision \(Posture \/ Do now \/ Pause if \/ Re-open when\):/);
-    assert.match(brief, /• Posture: Capital is cheap and risk appetite is healthy\./);
+    assert.match(brief, /• Posture: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
     assert.match(brief, /• Re-open when: Resume when tightness < 64\./);
-    assert.ok(brief.indexOf("• Posture: Capital is cheap") < brief.indexOf("• Do now: Limit net new hiring."));
+    assert.ok(brief.indexOf("• Posture: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
     assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
     assert.match(brief, /Decision transmission check:/);

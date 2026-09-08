@@ -96,6 +96,8 @@ const buildCurrentShareArtifact = async () => {
   };
 };
 
+import { SubscribeForm } from "../components/SubscribeForm";
+
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
 
@@ -140,6 +142,8 @@ export default async function SharePage() {
       <section id="embed" className="weather-panel scroll-mt-28 px-5 py-5">
         <EmbedBuilder />
       </section>
+
+      <SubscribeForm />
     </PageShell>
   );
 }

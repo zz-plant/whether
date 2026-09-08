@@ -94,7 +94,7 @@ export const DecisionMemoryPanel = ({
             setEntries([]);
           }
         } else {
-          setStatusMessage("No saved decisions yet. Start with Log to Memory in the weekly brief.");
+          setStatusMessage("No saved decisions yet. Start with Save this call in the weekly brief.");
           setEntries([]);
         }
       });
@@ -216,7 +216,7 @@ export const DecisionMemoryPanel = ({
         ) : entries.length === 0 ? (
           <div className="mt-6 rounded-lg border border-dashed border-slate-800/80 bg-slate-950/50 p-4">
             <p className="text-sm text-slate-300">
-              No saved decisions yet. On the weekly brief, click <span className="font-semibold text-slate-100">Log to Memory</span> to save this week&apos;s call, or <span className="font-semibold text-slate-100">Track in Memory</span> under a plan stress test verdict.
+              No saved decisions yet. On the weekly brief, click <span className="font-semibold text-slate-100">Save this call</span> to save this week&apos;s call, or <span className="font-semibold text-slate-100">Track in Memory</span> under a plan stress test verdict.
             </p>
           </div>
         ) : (

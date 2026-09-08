@@ -94,7 +94,7 @@ const advanceRegimeStateBase = (
       previous: previousState?.lastSignals?.tightness,
       current: currentSignals.tightness,
       threshold: currentSignals.thresholds.tightnessRegime,
-      label: "Tightness",
+      label: "Funding pressure",
     }),
     crossed({
       previous: previousState?.lastSignals?.riskAppetite,

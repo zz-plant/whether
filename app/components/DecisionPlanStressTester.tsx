@@ -209,12 +209,15 @@ export function DecisionPlanStressTester({
           </h3>
         </div>
         <p className="mt-1.5 text-fluid-sm text-slate-300">
-          Describe a hire, a commitment, or an expansion. It is graded for a {operatorStageLabel(stage)} team
+          Describe a hire, a commitment, or an expansion. It is graded for a{" "}
+          <a href="#calibrate-stage" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+            {operatorStageLabel(stage)} team
+          </a>{" "}
           against this week&rsquo;s funding pressure ({assessment.scores.tightness.toFixed(0)}/100) and, if you
           give runway and monthly burn, against the cash you have to absorb it.
         </p>
         <p className="mt-1 text-fluid-nano text-slate-500">
-          Stage follows Calibrate stage above. Runway and burn stay in this browser and are shared with the runway planner.
+          Not your stage? Change it under Calibrate stage above; the default is Series A. Runway and burn stay in this browser and are shared with the runway planner.
         </p>
       </div>
 

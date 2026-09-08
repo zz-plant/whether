@@ -4,7 +4,6 @@
  */
 "use client";
 
-import { Accordion } from "@base-ui/react/accordion";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import { useEffect, useId, useRef } from "react";
@@ -110,7 +109,16 @@ export const SummaryCard = ({
         </div>
       </div>
       {hasStructuredSections ? (
-        <div className="mt-4 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
+        <details className="group mt-4 rounded-lg border border-slate-800/80 bg-slate-950/55 px-3 py-2">
+          <summary
+            id={rawSummaryTriggerId}
+            className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left text-fluid-xs font-semibold tracking-[0.12em] text-slate-200 [&::-webkit-details-marker]:hidden"
+          >
+            <span>Details — structured data, provenance, raw text</span>
+            <span aria-hidden="true" className="text-slate-400 transition-transform group-open:rotate-180"><ChevronDownIcon className="h-4 w-4" /></span>
+          </summary>
+          <div id={rawSummaryPanelId} aria-labelledby={rawSummaryTriggerId}>
+        <div className="mt-3 rounded-lg border border-slate-800/80 bg-slate-950/60 p-4">
           <p className="text-fluid-xs font-semibold tracking-[0.12em] text-slate-400">Structured data</p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {visibleStructuredSections.map((section) => (
@@ -128,30 +136,14 @@ export const SummaryCard = ({
             ))}
           </div>
         </div>
-      ) : null}
-      {hasStructuredSections ? (
-        <Accordion.Root defaultValue={[]} className="mt-4">
-          <Accordion.Item value="raw-summary" className="rounded-lg border border-slate-800/80 bg-slate-950/55 px-3 py-2">
-            <Accordion.Header>
-              <Accordion.Trigger
-                id={rawSummaryTriggerId}
-                aria-controls={rawSummaryPanelId}
-                className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-fluid-xs font-semibold tracking-[0.12em] text-slate-200"
-              >
-                <span>Raw summary text</span>
-                <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180"><ChevronDownIcon className="h-4 w-4" /></span>
-              </Accordion.Trigger>
-            </Accordion.Header>
-            <Accordion.Panel id={rawSummaryPanelId} aria-labelledby={rawSummaryTriggerId}>
               <pre
                 aria-label="Summary card text"
                 className="mt-2 whitespace-pre-wrap rounded-lg border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
               >
                 {summaryCopy}
               </pre>
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion.Root>
+          </div>
+        </details>
       ) : (
         <pre
           aria-label="Summary card text"
