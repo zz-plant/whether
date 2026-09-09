@@ -208,6 +208,10 @@ export async function buildPlanningPageModel(
     },
     children: h(Fragment, null,
       h(OperatorWorkflowRouteTracker),
+      // At the page root, not inside the Share step: that step is collapsed on
+      // arrival, and the island has to exist before the nav block's Share
+      // button or the picker can read it.
+      h(BriefArtifactScript, { artifact: buildBriefArtifactFromSnapshot({ reportData, weeklyCall, title: "Whether Weekly Brief" }) }),
       h("p", { className: "rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400" },
         "This page turns the weekly call from the ",
         h(Link, { href: "/", className: "font-semibold text-sky-200 hover:text-sky-100" }, "homepage brief"),
@@ -311,7 +315,6 @@ export async function buildPlanningPageModel(
                 // The same picker /share and the global rail use, reading the same
                 // island — one artifact pipeline. The eleven-button export panel
                 // that sat here built the brief a second way through its own lib.
-                h(BriefArtifactScript, { artifact: buildBriefArtifactFromSnapshot({ reportData, weeklyCall, title: "Whether Weekly Brief" }) }),
                 h(SharePageFormats),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   "Email, meeting pack, role memos, calendar hold and the embed live on ",

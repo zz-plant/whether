@@ -46,7 +46,7 @@ the landmark.
 | Measure | px | Where |
 | --- | --- | --- |
 | `max-w-2xl` | 672 | `/template` |
-| `max-w-3xl` | 768 | `/about`, `/contact`, `/api-docs`, `/share`, `/threshold`, `hubPageShell` |
+| `max-w-3xl` | 768 | `/about`, `/contact`, `/api-docs`, `/share`, `legalPageShell` |
 | `max-w-4xl` | 896 | `ContentPageShell` (11 routes), `legalPageShell`, `/embed` |
 | `max-w-[64rem]` | 1024 | `/`, `/pricing` |
 | `max-w-[72rem]` | 1152 | `reportShell`, `Shell` |
@@ -57,7 +57,7 @@ only in `3xl` vs `4xl` — they are the same shell with a different measure, wri
 
 ## The third finding: ten shells, and I added the tenth blind
 
-`Shell`, `hubPageShell`, `legalPageShell`, `pageShell`, `reportSection`, `reportShell`,
+`Shell`, `legalPageShell`, `pageShell`, `reportSection`, `reportShell`,
 `routeLoadingShell`, `secondaryPageShell`, `contentPageShell`, plus the route `layout.tsx` files.
 All are used; none of them documents how it relates to the others.
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { HubPageShell } from "./hubPageShell";
+import { PageShell } from "./pageShell";
 
 type LegalPageShellProps = {
   title: string;
@@ -7,7 +7,8 @@ type LegalPageShellProps = {
 };
 
 export const LegalPageShell = ({ title, children }: LegalPageShellProps) => (
-  <HubPageShell width="standard">
+  /* Was HubPageShell, whose only caller this was; its HubHero and HubSection had none. */
+  <PageShell backdropVariant="hub" className="weather-page-shell weather-page-shell-standard weather-hub-shell">
     <div className="weather-legal-content mx-auto w-full max-w-4xl space-y-8">
       <header className="weather-hub-section space-y-3">
         <p className="weather-hub-section-eyebrow">Whether Legal</p>
@@ -16,5 +17,5 @@ export const LegalPageShell = ({ title, children }: LegalPageShellProps) => (
       </header>
       {children}
     </div>
-  </HubPageShell>
+  </PageShell>
 );

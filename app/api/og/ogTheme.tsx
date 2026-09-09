@@ -10,15 +10,10 @@ import type { ReactElement } from "react";
  */
 export { OG_FONT_BODY, OG_FONT_DISPLAY } from "../../../lib/image/ogFonts";
 
-/** Mirrors --bg-body / --bg-panel / border tokens in app/styles/tokens.css. */
-export const OG_BG = "#08090b";
-export const OG_PANEL = "#111316";
-export const OG_RAISED = "#1a1d22";
-export const OG_BORDER = "rgba(226, 232, 240, 0.10)";
-export const OG_BORDER_STRONG = "rgba(226, 232, 240, 0.16)";
-export const OG_TEXT = "#f4f7fb";
-export const OG_TEXT_SECONDARY = "#cbd5e1";
-export const OG_TEXT_MUTED = "#94a3b8";
+export {
+  OG_BG, OG_PANEL, OG_RAISED, OG_BORDER, OG_BORDER_STRONG, OG_TEXT, OG_TEXT_SECONDARY, OG_TEXT_MUTED, OG_ACCENT,
+} from "../../../lib/image/ogTheme";
+import { OG_BORDER_STRONG } from "../../../lib/image/ogTheme";
 
 /**
  * The regime glyph language from app/components/illustrations/RegimeGlyph.tsx
