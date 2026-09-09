@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
@@ -292,10 +293,17 @@ async function PageContent({
               site-wide control and took a second header row on phones. */}
           {/* The month rail is a replay tool; it lives on History and Evidence.
               Here it was 120px of the past above the one thing the page is for. */}
+          {/* Sentence case, not the uppercase badge variant. Uppercase is this
+              design's section-header voice; spending it on a single link above
+              the call made a navigation aside read like the page's first
+              heading. */}
           <div className="flex items-center justify-between gap-3">
-            <ActionLink href="/history" variant="inline" className="text-fluid-nano text-slate-400 hover:text-slate-200">
+            <Link
+              href="/history"
+              className="text-fluid-nano font-medium text-slate-400 no-underline transition-colors hover:text-slate-200"
+            >
               Past months →
-            </ActionLink>
+            </Link>
             <CadenceSelector />
           </div>
           <SwipeableWeek

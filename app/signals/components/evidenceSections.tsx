@@ -98,7 +98,7 @@ export const SignalsModeSwitcherSection = ({
               ) : null}
             </span>
             <span className="min-w-0">
-              <span className="type-eyebrow">{item.label}</span>
+              <span className="type-card-label">{item.label}</span>
               <span className="mt-2 block text-xs leading-5 text-slate-300">
                 {item.detail}
               </span>
@@ -159,7 +159,7 @@ export const SignalsCurrentScoresSection = ({
           return (
             <article key={card.label} className="weather-surface space-y-3 p-4">
               <dl>
-                <dt className="flex min-h-[2.9em] items-baseline justify-between gap-3 type-eyebrow text-slate-300">
+                <dt className="flex min-h-[2.9em] items-baseline justify-between gap-3 type-card-label text-slate-300">
                   <span>{displaySignalLabel(card.label)}</span>
                   <span className="shrink-0 text-fluid-nano font-normal text-slate-500">
                     {indicatorTypeLabel[type]}
@@ -170,9 +170,13 @@ export const SignalsCurrentScoresSection = ({
                 </dd>
               </dl>
               <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
-                <div className="flex items-center justify-between gap-3 type-eyebrow">
+                {/* Every figure on the page is tabular, at one of two sizes: the
+                    card's own reading, and the labels around it. Right-aligned
+                    where they form a column, so the three cards' distances line
+                    up across the row instead of each floating to its own text. */}
+                <div className="flex items-center justify-between gap-3 type-card-label">
                   <span>Current vs watch line</span>
-                  <span>{card.watchDistanceLabel}</span>
+                  <span className="text-right tabular-nums">{card.watchDistanceLabel}</span>
                 </div>
                 {meterState ? (
                   <>
@@ -217,7 +221,7 @@ export const SignalsCurrentScoresSection = ({
                             LINE MORE ROOM"). It also did not mark the threshold's
                             position, and the line below already names the watch line
                             with its actual value. */}
-                    <div className="mt-1 flex items-start justify-between gap-4 type-eyebrow">
+                    <div className="mt-1 flex items-start justify-between gap-4 type-card-label">
                       <span className="text-left">{meterState.leftLabel}</span>
                       <span className="text-right">
                         {meterState.rightLabel}
@@ -225,13 +229,13 @@ export const SignalsCurrentScoresSection = ({
                     </div>
                     <p className="mt-2 text-fluid-xs text-slate-400">
                       Watch line:{" "}
-                      <span className="text-slate-200">
+                      <span className="tabular-nums text-slate-200">
                         {card.thresholdLabel}
                       </span>
                     </p>
                   </>
                 ) : (
-                  <p className="mt-2 text-xs text-slate-400">
+                  <p className="mt-2 text-xs tabular-nums text-slate-400">
                     Watch line: {card.thresholdLabel}
                   </p>
                 )}

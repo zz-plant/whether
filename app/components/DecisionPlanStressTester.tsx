@@ -205,29 +205,29 @@ export function DecisionPlanStressTester({
           give runway and monthly burn, against the cash you have to absorb it.
         </p>
         <p className="mt-1 text-fluid-nano text-slate-500">
-          Not your stage? Change it under Calibrate stage above; the default is Series A. Runway and burn stay in this browser and are shared with the runway planner.
+          Not your stage? Change it under Stage above; the default is Series A. Runway and burn stay in this browser and are shared with the runway planner.
         </p>
       </div>
 
       <form onSubmit={runTest} className="space-y-3">
-        <fieldset className="m-0 flex min-w-0 flex-wrap items-center gap-1.5 border-0 p-0">
-          <legend className="float-left text-fluid-nano text-slate-400">Try:</legend>
+        {/* Text links, not chips. These load an example into the field; they are
+            not one of a set of mutually exclusive states, and dressing them as
+            chips put them in the same visual language as the stage and cadence
+            segments, which are. Shape now says which is which. */}
+        <p className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-fluid-nano text-slate-400">
+          <span>Try</span>
           {EXAMPLE_PLANS.map((example) => (
             <button
               key={example.label}
               type="button"
               onClick={() => runExample(example)}
               aria-pressed={isExample && planText === example.text}
-              className={`inline-flex min-h-9 items-center rounded-md border px-2.5 text-fluid-nano font-medium transition-colors ${
-                isExample && planText === example.text
-                  ? "border-sky-500/50 bg-sky-500/10 text-sky-100"
-                  : "border-slate-700/70 text-slate-300 hover:border-sky-400/60 hover:text-white"
-              }`}
+              className="inline-flex min-h-9 items-center font-medium text-slate-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-white hover:decoration-slate-400 aria-pressed:text-sky-200 aria-pressed:decoration-sky-500/60"
             >
               {example.label}
             </button>
           ))}
-        </fieldset>
+        </p>
         <div>
           <label htmlFor={`${fieldId}-plan`} className="sr-only">
             The plan to stress-test

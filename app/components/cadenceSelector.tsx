@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { SegmentGroup } from "./ui/segmentGroup";
 
 const CADENCES = [
   { key: "weekly", label: "Weekly" },
@@ -9,10 +10,8 @@ const CADENCES = [
   { key: "quarterly", label: "Quarterly" },
 ] as const;
 
-type SegmentOption = { key: string; label: string };
-
 type SegmentControlProps = {
-  options: readonly SegmentOption[];
+  options: readonly { key: string; label: string }[];
   paramName: string;
   defaultKey: string;
   ariaLabel: string;
@@ -29,6 +28,8 @@ function buildHref(pathname: string, searchParams: URLSearchParams | null, param
   return qs ? `${pathname}?${qs}` : pathname;
 }
 
+/** The URL half of the control. The chrome is `SegmentGroup`, shared with every
+ *  other exclusive choice on the page. */
 function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentControlProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,76 +38,29 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
   useEffect(() => setMounted(true), []);
 
   const current = mounted ? (searchParams?.get(paramName) ?? defaultKey) : defaultKey;
-  const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
-
-  const activeIndex = Math.max(
-    options.findIndex((option) => option.key === current),
-    0,
-  );
 
   const navigate = useCallback(
     (key: string) => {
-      const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
-      router.replace(href, { scroll: false });
+      router.replace(buildHref(pathname, searchParams, paramName, key, defaultKey), { scroll: false });
     },
     [pathname, searchParams, paramName, defaultKey, router],
   );
 
   const prefetch = useCallback(
     (key: string) => {
-      const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
-      router.prefetch(href);
+      router.prefetch(buildHref(pathname, searchParams, paramName, key, defaultKey));
     },
     [pathname, searchParams, paramName, defaultKey, router],
   );
 
-  const moveFocus = (nextIndex: number) => {
-    buttonsRef.current[nextIndex]?.focus();
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-    const delta = event.key === "ArrowLeft" ? -1 : 1;
-    const nextIndex = (activeIndex + delta + options.length) % options.length;
-    const nextKey = options[nextIndex]?.key ?? defaultKey;
-    moveFocus(nextIndex);
-    navigate(nextKey);
-  };
-
   return (
-    <fieldset
-      aria-label={ariaLabel}
-      className="flex items-center gap-0.5 rounded-sm border border-white/[0.10] bg-[var(--bg-nested)] p-0.5"
-    >
-      {options.map((option, index) => {
-        const isActive = current === option.key;
-        return (
-          <button
-            key={option.key}
-            ref={(el) => {
-              buttonsRef.current[index] = el;
-            }}
-            type="button"
-            aria-current={isActive ? "true" : undefined}
-            onKeyDown={handleKeyDown}
-            onClick={() => navigate(option.key)}
-            onMouseEnter={() => prefetch(option.key)}
-            onFocus={() => prefetch(option.key)}
-            // 44px stays on touch; sm: drops to the 36px pointer size the header
-            // already uses for its primary action. The chips set the height of the
-            // first header band, which was 62px of a 109px two-band shell.
-            className={`min-h-[44px] sm:min-h-9 min-w-[2.75rem] rounded-sm px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-              isActive
-                ? "bg-sky-500/14 text-sky-100"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </fieldset>
+    <SegmentGroup
+      options={options}
+      activeKey={current}
+      onSelect={navigate}
+      onIntent={prefetch}
+      ariaLabel={ariaLabel}
+    />
   );
 }
 

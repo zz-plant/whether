@@ -25,16 +25,25 @@ const SignalMoveRow = ({ signal, headline }: { signal: RegimeSignalIndicator; he
   const tone = trendToneClass(direction, INCREASE_IS_POSITIVE[signal.key] ?? false);
   const points = signal.sparkline.map((value, index) => ({ label: String(index), value }));
   return (
-    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+    /* A grid, not a wrapping flex row. The readings sat after labels of
+       different lengths, so three numbers that are meant to be compared started
+       at three different x positions and no column formed. Every figure in the
+       block is tabular and right-aligned in its own track, which is the same
+       rule the rails below and the key-number cards on Evidence follow. */
+    <span className="grid w-full max-w-[34rem] grid-cols-[minmax(0,1fr)_2.5rem_8.5rem] items-center gap-x-3">
       <span className="sr-only">{headline}</span>
-      <span aria-hidden="true" className="min-w-[9rem] font-medium text-slate-200">{signal.label}</span>
-      <span aria-hidden="true" className="tabular-nums font-semibold text-slate-100">{signal.valueLabel}</span>
-      <span aria-hidden="true" className={`inline-flex items-center gap-1 tabular-nums ${tone}`}>
+      <span aria-hidden="true" className="min-w-0 font-medium text-slate-200">{signal.label}</span>
+      <span aria-hidden="true" className="text-right tabular-nums font-semibold text-slate-100">{signal.valueLabel}</span>
+      <span aria-hidden="true" className={`inline-flex items-center gap-1 whitespace-nowrap tabular-nums ${tone}`}>
         <TrendGlyph direction={direction} className="h-3 w-3" />
         {signal.trendDeltaLabel}
       </span>
-      {points.length >= 2 ? (
-        <span aria-hidden="true" className="ml-auto text-white/50">
+      {/* Four points, not two. A two-point series draws one straight diagonal
+          stroke, which carries no shape at all — it read as an ornament ruled
+          across the right edge of every row, and a decoration that looks like a
+          chart is worse than no chart. */}
+      {points.length >= 4 ? (
+        <span aria-hidden="true" className="col-span-3 justify-self-end text-white/50">
           <Sparkline points={points} label={signal.label} widthEm={5} tone={direction === "up" ? (INCREASE_IS_POSITIVE[signal.key] ? "easing" : "tightening") : direction === "down" ? (INCREASE_IS_POSITIVE[signal.key] ? "tightening" : "easing") : "unchanged"} />
         </span>
       ) : null}
@@ -208,8 +217,12 @@ const ChangeRow = ({
   </li>
 );
 
+/* Sentence case, not the uppercase eyebrow. Uppercase is this design's
+   section-header voice — the label that says a new part of the page has begun.
+   Inside one card, three of them in a row announced three new sections where
+   there was one block, and the card lost its own hierarchy to them. */
 const BandHeading = ({ children }: { children: React.ReactNode }) => (
-  <p className="text-fluid-nano type-eyebrow text-white/50">{children}</p>
+  <p className="text-fluid-nano font-medium text-white/50">{children}</p>
 );
 
 export function WeeklyChangeReport({
@@ -249,13 +262,11 @@ export function WeeklyChangeReport({
           <span className={`inline-block size-2 rounded-full ${attention ? "bg-amber-400" : "bg-emerald-400"}`} />
           What changed this week?
         </p>
-        <span
-          className={`shrink-0 rounded-sm border px-2.5 py-0.5 text-fluid-nano font-semibold uppercase tracking-[0.08em] ${
-            attention
-              ? "border-amber-500/40 bg-amber-500/20 text-semantic-caution-fg"
-              : "border-emerald-500/40 bg-emerald-500/20 text-semantic-easing-fg"
-          }`}
-        >
+        {/* Plain text. A filled, bordered, uppercase badge is the loudest object
+            the design system has, and it was spending that on a count the dot to
+            its left already encodes. One accent carries state on this card — the
+            dot — and the words say what it means. */}
+        <span className="shrink-0 text-fluid-nano tabular-nums text-slate-400">
           {attention ? `${consequenceCount} rules to recheck` : "No change"}
         </span>
       </div>
@@ -293,10 +304,20 @@ export function WeeklyChangeReport({
                 Nothing. The moves above stayed inside every threshold, so no decision reopens.
               </p>
             ) : (
-              <ul className="grid gap-1 text-fluid-xs sm:grid-cols-2">
+              /* Rows, not sentences with a bold run at the front. Each of these
+                 is one area and one instruction, and set as prose the bold label
+                 and the text after it ran together into a paragraph the eye
+                 could not enter at the item it wanted. A column of areas beside a
+                 column of instructions is scannable at the cost of nothing. */
+              <ul className="grid gap-y-2 text-fluid-xs sm:grid-cols-[max-content_minmax(0,1fr)] sm:gap-x-4 sm:gap-y-1">
                 {revisitQueue.map((item) => (
-                  <li key={item.id} className="text-slate-300">
-                    <span className="font-semibold text-slate-100">{item.label}:</span> {item.recheck}
+                  /* `contents` only from sm, where the two columns exist. On one
+                     column the rows have to stay real boxes, or the list's gap
+                     falls between every span rather than between every item and
+                     the pairs run together. */
+                  <li key={item.id} className="sm:contents">
+                    <span className="block font-medium text-slate-100">{item.label}</span>
+                    <span className="block text-slate-300">{item.recheck}</span>
                   </li>
                 ))}
               </ul>

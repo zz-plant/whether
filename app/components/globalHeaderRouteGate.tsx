@@ -152,7 +152,9 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
         </div>
 
-        <div className="hidden items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-1.5 md:flex">
+        {/* No vertical padding: the nav sets the band's height (h-9) so the
+            active tab's underline lands on the band's own bottom edge. */}
+        <div className="hidden items-stretch justify-between gap-2 border-t border-white/[0.05] px-3 md:flex">
           <GlobalHeaderNavClient pathname={pathname} />
         </div>
       </div>

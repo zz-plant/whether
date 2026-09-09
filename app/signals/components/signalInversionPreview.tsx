@@ -149,7 +149,7 @@ export function SignalInversionPreview({
             <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
           ) : null}
         </svg>
-        <div className="mt-2 flex items-center justify-between type-eyebrow">
+        <div className="mt-2 flex items-center justify-between type-card-label tabular-nums">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
           <span>{latest?.label}</span>
@@ -163,7 +163,7 @@ export function SignalInversionPreview({
             Vertical scale {spreadMin.toFixed(2)} to {spreadMax.toFixed(2)} pts
           </span>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 type-eyebrow">
+        <div className="mt-3 flex flex-wrap gap-2 type-card-label">
           <span className="rounded-sm border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">
             10Y-2Y inverted {monthsInverted10Y2Y} mo
           </span>

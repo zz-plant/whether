@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
-import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
-import { persistOperatorStage } from "./useOperatorStage";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
 
@@ -22,7 +19,7 @@ const markOrientationDismissed = () => {
 };
 
 const orientationLinkClass =
-  "inline-flex min-h-11 items-center font-medium text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-white hover:decoration-slate-400";
+  "font-medium text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-white hover:decoration-slate-400";
 
 const getBootstrappedDismissedState = () => {
   if (typeof document !== "undefined") {
@@ -49,7 +46,6 @@ const getBootstrappedDismissedState = () => {
  * dismissed (html[data-home-orientation-dismissed] + the injected style rule).
  */
 export function FirstVisitExplainer() {
-  const router = useRouter();
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -69,67 +65,43 @@ export function FirstVisitExplainer() {
     trackActivationEvent({ step: "oriented", path: "/" });
   };
 
-  // Asked once, here, instead of defaulted silently. The brief used to grade
-  // every stress test for a Series A team unless the reader noticed a pill row
-  // mid-page; a seed founder got the wrong answer and never learned why. The
-  // cookie is what the server renders the next request from, so the choice
-  // takes effect on this visit, and the hero's control stays as the place to
-  // change it later.
-  const handleStage = (stage: OperatorStage) => {
-    persistOperatorStage(stage);
-    router.refresh();
-    handleDismiss();
-  };
-
   return (
     <section
       data-weather-first-run-orientation="true"
       aria-label="What is Whether"
       data-testid="first-run-orientation"
       suppressHydrationWarning
-      className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-800/60 pb-2 text-fluid-xs text-slate-300"
+      className="mb-3 flex items-baseline gap-x-3 gap-y-1 border-b border-slate-800/60 pb-2 text-fluid-xs text-slate-300"
     >
-      {/* The line a first-time visitor reads. It previously opened with "Treasury
-          yields, credit spreads, and VIX" — three undefined terms in the one
-          sentence written for people with no context. Say the job first; the
-          inputs are one click away on /trust. */}
-      <p className="w-full min-w-0">
+      {/* One line, and the links live inside the sentence. This strip used to be four stacked rows — the sentence, a row of two
+        links, a "Grade it for your stage" ask with four buttons that wrapped to
+        two lines on a phone, and a Dismiss — and it sat above the weekly call.
+        On a 430px screen that pushed the one thing this page exists to say
+        below 440px, so the first screen of the product was its own preamble.
+        The stage question is not lost: the brief carries the same control, in
+        the block whose numbers the answer actually changes, where it can be
+        answered by someone who has seen what it is for. */}
+      <p className="min-w-0">
         How hard it is to raise money right now, and how much risk investors will fund, scored into
-        one operating call each Monday.
-      </p>
-      {/* Two links, not five. A cold visitor has two questions — how the number
-          is made, and whether the call has ever meant anything — and this strip
-          answers exactly those. The glossary is one click away inside the brief,
-          the source and the API live in the footer and under More; putting them
-          here made the product explain itself before showing itself. */}
-      <Link href="/trust#formula-reference" className={orientationLinkClass}>
-        How the score works
-      </Link>
-      {/* "How is this not a horoscope" is the first objection a cold visitor
+        one operating call each Monday —{" "}
+        <Link href="/trust#formula-reference" className={orientationLinkClass}>
+          how the score works
+        </Link>{" "}
+        ·{" "}
+        {/* "How is this not a horoscope" is the first objection a cold visitor
           forms, and the method page answers a different one — that the number is
           derived. What answers this one is the record of held and changed calls,
           which /history owns. */}
-      <Link href="/history#track-record-heading" className={orientationLinkClass}>
-        Track record
-      </Link>
-      <fieldset className="m-0 flex w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-1 border-0 p-0 pt-1">
-        <legend className="float-left text-slate-400">Grade it for your stage:</legend>
-        {OPERATOR_STAGE_OPTIONS.map((option) => (
-          <button
-            key={option.key}
-            type="button"
-            onClick={() => handleStage(option.key)}
-            className="inline-flex min-h-9 items-center rounded-md border border-slate-700/70 px-2 text-fluid-nano font-medium text-slate-200 hover:border-sky-400/60 hover:text-white"
-          >
-            {option.label}
-          </button>
-        ))}
-      </fieldset>
+        <Link href="/history#track-record-heading" className={orientationLinkClass}>
+          track record
+        </Link>
+        .
+      </p>
       <button
         type="button"
         onClick={handleDismiss}
         aria-label="Dismiss introduction"
-        className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center text-slate-400 hover:text-white"
+        className="ml-auto inline-flex min-h-11 shrink-0 items-center text-slate-400 hover:text-white"
       >
         Dismiss
       </button>
