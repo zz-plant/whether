@@ -116,7 +116,6 @@ export function useEntitlement(): EntitlementState {
     }
 
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-run only when the checkout redirect params change
   }, [checkoutStatus, sessionId]);
 
   return state;

@@ -97,7 +97,7 @@ describe("entitlement tokens", () => {
   it("rejects a tampered payload even with a valid-looking signature", async () => {
     process.env.WHETHER_ENTITLEMENT_SECRET = "test-secret";
     const token = await issueEntitlementToken({ plan: "pro", sessionId: "cs_6" });
-    const [body, signature] = token!.split(".");
+    const [, signature] = token!.split(".");
     const tamperedPayload = JSON.stringify({ plan: "team", sessionId: "cs_6", iat: Date.now(), exp: Date.now() + 1000 });
     const tamperedBody = Buffer.from(tamperedPayload).toString("base64url");
 

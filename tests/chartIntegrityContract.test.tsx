@@ -131,9 +131,10 @@ describe("HistoricalTrendChart", () => {
   it("states the autoscaled range in the SVG's own accessible label", () => {
     const html = renderToStaticMarkup(<HistoricalTrendChart label="Tightness" color="red" points={points} />);
 
-    assert.match(html, /role="img"/);
-    assert.match(html, /aria-label="[^"]*ranging 40–60/);
-    assert.match(html, /aria-label="[^"]*Latest 55/);
+    // The label sits on the <svg> itself, not on a wrapper. (`role="img"` is what
+    // the audit asked for; the repo lints it away as prefer-tag-over-role.)
+    assert.match(html, /<svg[^>]*aria-label="[^"]*ranging 40–60/);
+    assert.match(html, /aria-label="[^"]*Latest [^"]*55/);
   });
 
   it("shares its projection with the inline sparkline instead of a second implementation", () => {
