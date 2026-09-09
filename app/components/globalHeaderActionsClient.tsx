@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { History, Search, Settings } from "lucide-react";
-import { SettingsPanel } from "./settingsPanel";
-import { ProfileSheet } from "./profileSheet";
+import { Search } from "lucide-react";
 import { CommandPalette } from "./commandPalette";
 import { ThemeToggleButton } from "./themeToggleButton";
 import { PresentModeButton } from "./PresentModeButton";
@@ -18,7 +16,10 @@ type GlobalHeaderActionsClientProps = {
 };
 
 /**
- * One bordered group, not four or five boxes.
+ * One bordered group, not four or five boxes. Down to search, theme and
+ * (on the brief) present: the settings gear only held a stage selector the
+ * explainer and the hero already own, and the "History & export" sheet was a
+ * fourth door to three pages the footer, More and ⌘K already open.
  *
  * Each control used to carry its own border and fill, so the right edge of the
  * header read as a strip of identical squares — five of them on the home brief
@@ -38,8 +39,6 @@ const CELL =
   "inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center text-slate-400 transition-colors duration-150 hover:bg-slate-800/70 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sky-400";
 
 export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHeaderActionsClientProps = {}) {
-  const [showSettings, setShowSettings] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
 
   return (
@@ -49,10 +48,6 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
           <Search aria-hidden="true" size={16} strokeWidth={1.8} />
           <span className="hidden lg:inline text-fluid-nano text-slate-400" aria-hidden="true">⌘K</span>
         </button>
-        <button type="button" onClick={() => setShowProfile(true)} className={CELL} aria-label="History & export" title="History & export">
-          <History aria-hidden="true" size={16} strokeWidth={1.8} />
-          <span className="hidden lg:inline text-fluid-nano text-slate-400" aria-hidden="true">Export</span>
-        </button>
         {/* The light theme has a full token set in tokens.css and layout.tsx
             restores the saved choice pre-paint, but nothing rendered the control,
             so the theme was unreachable from the UI. Takes the cell class rather
@@ -61,12 +56,7 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
         {showPresentMode ? (
           <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
         ) : null}
-        <button type="button" onClick={() => setShowSettings(true)} className={CELL} aria-label="Settings" title="Settings">
-          <Settings aria-hidden="true" size={16} strokeWidth={1.8} />
-        </button>
       </div>
-      {showSettings ? <SettingsPanel onClose={() => setShowSettings(false)} /> : null}
-      {showProfile ? <ProfileSheet onClose={() => setShowProfile(false)} /> : null}
       {showPalette ? <CommandPalette onClose={() => setShowPalette(false)} /> : null}
     </>
   );

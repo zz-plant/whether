@@ -3,14 +3,14 @@ import { existsSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
-import ThresholdPage from "../app/threshold/page";
+import { FrameworkSection } from "../app/trust/frameworkSection";
 import { utilityLinks } from "../lib/navigation/informationArchitecture";
 
 const appPath = (route: string) => new URL(`../app${route}`, import.meta.url).pathname;
 
-describe("bounded decisions: framework and form on one page", () => {
+describe("bounded decisions: framework and form as a section of /trust", () => {
   it("carries both halves — the three parts and the blank form", () => {
-    const html = renderToStaticMarkup(<ThresholdPage />);
+    const html = renderToStaticMarkup(<FrameworkSection />);
 
     // From the framework half.
     assert.match(html, /The three parts/);
@@ -22,26 +22,29 @@ describe("bounded decisions: framework and form on one page", () => {
   });
 
   it("anchors the form so an external /template link lands on it", () => {
-    const html = renderToStaticMarkup(<ThresholdPage />);
+    const html = renderToStaticMarkup(<FrameworkSection />);
     assert.match(html, /id="template"/);
+    assert.match(html, /id="framework"/);
 
     // next.config.js ships no types, so this reads the pair as text rather than
     // importing the module into a typechecked test.
     const config = readFileSync(new URL("../next.config.js", import.meta.url).pathname, "utf8");
     assert.match(
       config,
-      /\["\/template", "\/threshold#template"\]/,
+      /\["\/template", "\/trust#template"\]/,
       "/template must keep a permanent redirect for external links",
     );
+    assert.match(config, /\["\/threshold", "\/trust#framework"\]/, "/threshold redirects to its section of /trust");
   });
 
   it("stops advertising the merged route as a separate destination", () => {
     assert.equal(existsSync(appPath("/template/page.tsx")), false);
+    assert.equal(existsSync(appPath("/threshold/page.tsx")), false);
     // `utilityLinks` is a const tuple, so TypeScript already refuses "/template"
     // as a member — this keeps the guarantee readable at runtime too.
     const hrefs: readonly string[] = utilityLinks.map((link) => link.href);
     assert.equal(hrefs.includes("/template"), false, "two rows must not point at halves of one page");
-    assert.equal(hrefs.filter((href) => href === "/threshold").length, 1);
+    assert.equal(hrefs.includes("/threshold"), false, "the framework is a section of /trust, not a utility row");
   });
 });
 
@@ -69,12 +72,13 @@ describe("routes folded into the surface that owned them", () => {
     assert.equal(hrefs.includes("/state"), false, "a redirect must not stay in the utility row");
   });
 
-  it("files the decision ledger under history, not planning", () => {
+  it("retires the decision ledger into the history the product keeps unasked", () => {
     assert.equal(existsSync(appPath("/operate/memory/page.tsx")), false);
-    assert.ok(existsSync(appPath("/history/decisions/page.tsx")));
-    assert.match(config, /\["\/operate\/memory", "\/history\/decisions"\]/);
-    // The older alias must land in one hop, not chain through /operate/memory.
-    assert.match(config, /\["\/planning\/memory", "\/history\/decisions"\]/);
+    assert.equal(existsSync(appPath("/history/decisions/page.tsx")), false);
+    assert.match(config, /\["\/operate\/memory", "\/history"\]/);
+    assert.match(config, /\["\/history\/decisions", "\/history"\]/);
+    // The older alias must land in one hop, not chain through a retired route.
+    assert.match(config, /\["\/planning\/memory", "\/history"\]/);
   });
 
   it("folds the embed builder into the share page", () => {

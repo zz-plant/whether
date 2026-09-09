@@ -7,11 +7,11 @@ import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBri
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { WeeklyCloseout } from "./components/weeklyCloseout";
-import { DecisionStalenessPanel } from "./components/home/DecisionStalenessPanel";
-import { YourWeekCard } from "./components/home/YourWeekCard";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
+import { LastWeekInHindsight } from "./components/home/LastWeekInHindsight";
+import { SinceLastVisit } from "./components/home/SinceLastVisit";
+import { DirectAnswersStrip } from "./components/home/DirectAnswersStrip";
 import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
 import { CompareStrip } from "./components/CompareStrip";
 import { ActivationTracker } from "./components/activationTracker";
@@ -27,7 +27,7 @@ import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
+import { formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
 import { guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
@@ -90,10 +90,6 @@ function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: stri
 }
 
 type BelowTheFoldEvidenceProps = {
-  tightness: number;
-  riskAppetite: number;
-  recordDate: string;
-  recentRecordDates: string[];
   operateHref?: string;
   /** Named for the selected cadence, so the one plan CTA on the page matches the
    *  horizon the reader is looking at. */
@@ -102,35 +98,15 @@ type BelowTheFoldEvidenceProps = {
 
 function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
   return (
-    <>
-      {/* One card for the reader's own state. Two empty panels under the brief
-          was two screens of nothing for a first-time reader. */}
-      <YourWeekCard
-        decisions={
-          <DecisionStalenessPanel
-            conditions={{ tightness: props.tightness, riskAppetite: props.riskAppetite }}
-            embedded
-          />
-        }
-        closeout={
-          <WeeklyCloseout
-            recordDate={props.recordDate}
-            recentRecordDates={props.recentRecordDates}
-            embedded
-          />
-        }
-      />
-
-      {/* `pill`, not `primary`. DD-005 settled Copy Brief in the hero as the one
-          canonical primary action on this page; a second full-weight blue button
-          further down competed with it and gave the reader no way to rank them.
-          §X reserves `pill` for exactly this — a secondary navigation CTA. */}
-      <div className="mt-4 border-t border-white/[0.06] pt-4">
-        <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
-          {props.planLabel ?? "Build this week’s plan →"}
-        </ActionLink>
-      </div>
-    </>
+    /* `pill`, not `primary`. DD-005 settled Copy Brief in the hero as the one
+       canonical primary action on this page; a second full-weight blue button
+       further down competed with it and gave the reader no way to rank them.
+       §X reserves `pill` for exactly this — a secondary navigation CTA. */
+    <div className="mt-4 border-t border-white/[0.06] pt-4">
+      <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
+        {props.planLabel ?? "Build this week’s plan →"}
+      </ActionLink>
+    </div>
   );
 }
 
@@ -388,18 +364,41 @@ async function PageContent({
             />
           </SwipeableWeek>
 
-          <BelowTheFoldEvidence
-            tightness={tightness}
-            riskAppetite={riskAppetite}
-            recordDate={homepage.reportShell.recordDateLabel}
-            recentRecordDates={macroTrendline.slice(-4).map((entry) => formatDateUTC(entry.record_date))}
-            operateHref={operateHref}
-            planLabel={cadenceCall?.planLabel}
+          {/* Directly under the call, not 3,000px below it. The one conversion
+              on the page used to sit under the stress tester, the decision
+              tracker and the week close-out; the recipient of a shared link
+              scrolled past everything the product asked of them to reach it. */}
+          <div id="subscribe" className="scroll-mt-28">
+            <SubscribeForm compact />
+          </div>
+
+          {/* Everything below the call computes its content or leaves. These
+              two replace "Decisions to reconsider" and "Close the week", which
+              asked the reader to keep state in this browser so the product could
+              be smarter later; the product now says what it can from what it
+              already holds. */}
+          <SinceLastVisit
+            current={{
+              recordDate: reportData.treasury.record_date,
+              recordDateLabel: homepage.reportShell.recordDateLabel,
+              regimeLabel: publicRegimeLabel,
+              call: primaryCall,
+            }}
           />
+          <LastWeekInHindsight
+            regime={regime}
+            scores={{ tightness, riskAppetite }}
+            deltas={{ tightness: tightnessDelta, riskAppetite: riskAppetiteDelta }}
+            thresholds={reportData.assessment.thresholds}
+            recordDateLabel={homepage.reportShell.recordDateLabel}
+          />
+
+          <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
+
+          <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
         </div>
 
-        <div id="subscribe" className="scroll-mt-28 space-y-4 border-t border-slate-800/70 pt-6">
-          <SubscribeForm />
+        <div className="space-y-4 border-t border-slate-800/70 pt-6">
           <CanonicalWeekPermalink currentRecordDate={reportData.treasury.record_date} />
         </div>
       </div>

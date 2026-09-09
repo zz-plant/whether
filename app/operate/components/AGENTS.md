@@ -2,7 +2,7 @@
 
 This directory owns the planning and artifact checkpoint after the weekly call.
 
-Use this guide when editing planning stepper content, guardrail approval, share/export flows, or decision-memory and delivery panels.
+Use this guide when editing planning stepper content, guardrail approval, share/export flows, or delivery panels.
 
 ## What this directory owns
 
@@ -42,7 +42,7 @@ Treat these as upstream when changing semantics:
 - Do not split export semantics across local component-specific builders if a shared builder can carry the change.
 - Keep override controls separate from the default artifact path so the baseline transmission stays clean.
 - If a planning surface adds explanation, pair it with an explicit action and a reopen or reverse condition.
-- Delivery controls and memory recall are support functions. They should not bury the main artifact path.
+- Delivery controls are support functions. They should not bury the main artifact path.
 
 ## Tests and docs to update
 

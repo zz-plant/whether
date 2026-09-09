@@ -3,7 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildBriefPermalinkLine } from "./briefPermalink";
 import { buildComplianceStamp } from "../exportNotices";
-import { formatRegimeLabel } from "../regimeFormat";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
@@ -308,7 +308,7 @@ export const buildBoardSlideBullets = (
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
 ) => [
-  `Posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? formatRegimeLabel(assessment.regime)}`,
+  `Posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
   `Funding pressure ${assessment.scores.tightness} / Risk appetite ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...buildBoundedDecisionLines(assessment, options),
@@ -333,7 +333,7 @@ export const buildSlackBrief = (
   const modeled = resolveModeledDecisionPayload(options);
   const citations = buildCitationLines(treasury, macros);
   const financialImplications = buildFinancialImplicationsBlock(assessment);
-  const postureLabel = modeled.postureWithStageLabel ?? formatRegimeLabel(assessment.regime);
+  const postureLabel = modeled.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime);
 
   return [
     `Whether Weekly Brief — ${treasury.record_date}`,
@@ -383,7 +383,7 @@ export const buildConstraintHeadlines = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
 ) => {
-  const regimeLabel = formatRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimePublicLabel(assessment.regime);
   const headline = `${regimeLabel}: funding pressure ${assessment.scores.tightness}/100 with risk appetite ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.map((item) => `• ${item}`);
 
@@ -407,7 +407,7 @@ export const buildCallCitation = (
   options?: ExportLayerOptions,
 ) => [
   `Whether Weekly Brief — ${treasury.record_date}`,
-  `Posture: ${options?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
+  `Posture: ${options?.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)} (${assessment.regime})`,
   `Confidence: Score-based posture confidence`,
   `Signal refresh cadence: 15m`,
   `Source note: ${treasury.source}`,

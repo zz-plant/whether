@@ -1,3 +1,4 @@
+import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { CrossingRiskLabel } from "./forecastModel";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
@@ -26,7 +27,7 @@ export const publicDecisionLabels = {
 
 export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   action: "Stage approvals",
-  threshold: "Pause if thresholds weaken",
+  threshold: FALLBACK_PAUSE_THRESHOLD,
   reversal: "Reverse only after threshold recovery",
 };
 

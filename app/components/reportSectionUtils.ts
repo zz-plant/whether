@@ -149,33 +149,31 @@ export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
   };
 };
 
-export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => REGIME_LABELS[regime];
-
 export const regimeBadges = [
   {
     key: "SCARCITY",
-    label: "Freezing",
+    label: REGIME_LABELS.SCARCITY,
     icon: "snowflake",
     description: "Cash is scarce; protect runway and defer bets.",
     classes: REGIME_STYLE_TOKENS.SCARCITY.badge,
   },
   {
     key: "DEFENSIVE",
-    label: "Cloudy",
+    label: REGIME_LABELS.DEFENSIVE,
     icon: "cloud",
     description: "Capital is cautious; prioritize durability and retention.",
     classes: REGIME_STYLE_TOKENS.DEFENSIVE.badge,
   },
   {
     key: "VOLATILE",
-    label: "Stormy",
+    label: REGIME_LABELS.VOLATILE,
     icon: "storm",
     description: "Evidence is mixed; balance experimentation with controls.",
     classes: REGIME_STYLE_TOKENS.VOLATILE.badge,
   },
   {
     key: "EXPANSION",
-    label: "Sunny",
+    label: REGIME_LABELS.EXPANSION,
     icon: "sun",
     description: "Risk appetite is open; scale initiatives responsibly.",
     classes: REGIME_STYLE_TOKENS.EXPANSION.badge,

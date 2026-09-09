@@ -8,7 +8,7 @@
  */
 import { writeFile } from "node:fs/promises";
 import { getSummaryArchive, type SummaryArchiveEntry } from "../lib/summary/summaryArchive";
-import { getRegimeOperatorLabel } from "../lib/regimeLabels";
+import { getRegimePublicLabel } from "../lib/regimePresentation";
 import type { RegimeKey } from "../lib/regimeEngine";
 import type { PostureArchivePeriod, PostureArchiveRegimeShare } from "../lib/summary/postureArchiveTypes";
 
@@ -60,7 +60,7 @@ const buildRegimeMix = (samples: Sample[]): PostureArchiveRegimeShare[] => {
   return [...counts.entries()]
     .map(([regime, periods]) => ({
       regime,
-      label: getRegimeOperatorLabel(regime),
+      label: getRegimePublicLabel(regime),
       periods,
       share: Math.round((periods / samples.length) * 100),
     }))
@@ -79,9 +79,9 @@ const buildTransitions = (samples: Sample[]) => {
       asOf: current.asOf,
       dateLabel: formatDate(current.asOf),
       from: previous.regime,
-      fromLabel: getRegimeOperatorLabel(previous.regime),
+      fromLabel: getRegimePublicLabel(previous.regime),
       to: current.regime,
-      toLabel: getRegimeOperatorLabel(current.regime),
+      toLabel: getRegimePublicLabel(current.regime),
     });
   }
 
@@ -122,7 +122,7 @@ const buildPeriod = ({
   recordDateLabel: entry.summary.recordDateLabel ?? formatDate(entry.asOf),
   regime: entry.summary.regime,
   regimeLabel: entry.summary.regimeLabel,
-  operatorLabel: getRegimeOperatorLabel(entry.summary.regime),
+  operatorLabel: getRegimePublicLabel(entry.summary.regime),
   headline: normalizeModeWording(entry.summary.summary),
   guidance: entry.summary.guidance,
   constraints: entry.summary.constraints,

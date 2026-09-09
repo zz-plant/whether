@@ -71,11 +71,13 @@ describe("redirect resolution", () => {
     for (const [from, to] of [
       ["/resolve/ceo", "/resolve/ceo"],
       ["/resolve/ceo/capital-raising", "/resolve/ceo/capital-raising"],
-      ["/resolve/ship-checklist", "/resolve/ship-checklist"],
+      ["/resolve/ship-checklist", "/resolve#direct-answers"],
       ["/evidence/capital-tightness-watch", "/signals/capital-tightness-watch"],
       ["/evidence/capital-tightness-watch/hiring", "/signals/capital-tightness-watch/hiring"],
-      ["/planning/memory", "/history/decisions"],
-      ["/operate/memory", "/history/decisions"],
+      ["/planning/memory", "/history"],
+      ["/operate/memory", "/history"],
+      ["/history/decisions", "/history"],
+      ["/threshold", "/trust#framework"],
       ["/planning/financial", "/operate/financial"],
     ] as const) {
       assert.equal(resolve(from).landing, to, `${from} should land on ${to}`);

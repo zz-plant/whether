@@ -46,7 +46,7 @@ import {
 } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
-import { formatRegimeLabel } from "../regimeFormat";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { logReportDependencyFailure } from "./reportError";
 import { buildSourceHealthRows, getLatestParseableTimestamp, type SourceFreshnessStatus } from "./sourceHealth";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
@@ -222,7 +222,7 @@ const loadReportDataUncached = async (
       resolveWeekEndingIsoDateUTC,
       formatTimestampUTC,
       formatAgeHours,
-      formatRegimeLabel,
+      formatRegimeLabel: getRegimePublicLabel,
       getLatestParseableTimestamp,
       buildGuidanceBundleFromAssessment,
       buildRegimeAlert,
@@ -345,7 +345,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
       resolveWeekEndingIsoDateUTC,
       formatTimestampUTC,
       formatAgeHours,
-      formatRegimeLabel,
+      formatRegimeLabel: getRegimePublicLabel,
       getLatestParseableTimestamp,
       buildGuidanceBundleFromAssessment,
       buildRegimeAlert,

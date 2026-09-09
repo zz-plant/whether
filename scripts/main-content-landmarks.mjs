@@ -7,6 +7,7 @@ const dynamicRouteSamples = {
   "/answers/[slug]": ["/answers/should-startups-hire-engineers-right-now"],
   "/brief/[week]": ["/brief/2026-w31"],
   "/history/[period]": ["/history/2025"],
+  "/operate/[workstream]": ["/operate/financial", "/operate/scenarios"],
   // This page branches between pillar and article renderers. Keep one of each
   // so a shared route file cannot hide a landmark regression in either branch.
   "/resources/[slug]": [

@@ -13,7 +13,7 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { formatNumberWithUnit } from "../formatters";
-import { formatRegimeLabel } from "../regimeFormat";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildBoundedDecisionLines, type ModeledExportDecisionPayload } from "./briefBuilders";
 
@@ -45,7 +45,7 @@ export const buildIssueTrackerMarkdownBrief = (
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = formatRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimePublicLabel(assessment.regime);
   const postureLabel = decisionModel?.postureWithStageLabel ?? regimeLabel;
   const isWiki = format === "wiki";
   const bullet = isWiki ? "*" : "-";

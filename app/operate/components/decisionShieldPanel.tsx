@@ -30,7 +30,6 @@ import {
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
-import { readDecisionMemorySaveResponse, rememberDecisionMemoryEntry } from "../../components/decisionMemoryLocalCache";
 import { useOperatorProfile } from "../../components/useOperatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
 import {
@@ -116,8 +115,6 @@ export const DecisionShieldPanel = ({
   const [presetName, setPresetName] = useState("");
   const [presetError, setPresetError] = useState<string | null>(null);
   const [presetStatus, setPresetStatus] = useState<string | null>(null);
-  const [memoryStatus, setMemoryStatus] = useState<string | null>(null);
-  const [isSavingMemory, setIsSavingMemory] = useState(false);
   const legacyPresetStorageKey = "whether.decisionShieldPresets";
   const { add } = Toast.useToastManager();
   const presetInputRef = useRef<HTMLInputElement | null>(null);
@@ -289,54 +286,6 @@ export const DecisionShieldPanel = ({
 
 
 
-  const handleSaveToDecisionMemory = () => {
-    if (isSavingMemory) {
-      return;
-    }
-    if (!clientId) {
-      setMemoryStatus("Preparing your operator profile. Try saving again in a second.");
-      return;
-    }
-
-    setIsSavingMemory(true);
-    setMemoryStatus("Saving to Decision Memory…");
-
-    void fetch("/api/decision-memory", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-whether-client-id": clientId },
-      body: JSON.stringify({
-        clientId,
-        recordDate: provenance.recordDateLabel,
-        decision: { lifecycle, category, action },
-        outcome: {
-          verdict: output.verdict,
-          summary: output.summary,
-          guardrail: output.guardrail,
-          reversalTrigger: output.reversalTrigger,
-        },
-        assessment,
-      }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          setMemoryStatus("Failed to save Decision Memory entry.");
-          return;
-        }
-
-        // Mirror the entry the server actually created. Minting a second id here
-        // would make the same save appear twice once the panel merges by id.
-        const { entry, degraded } = readDecisionMemorySaveResponse(await response.json());
-        if (entry) rememberDecisionMemoryEntry(clientId, entry);
-        setMemoryStatus(degraded ? "Saved in this browser; server memory is unavailable." : "Decision Memory entry saved.");
-      })
-      .catch(() => {
-        setMemoryStatus("Failed to save Decision Memory entry.");
-      })
-      .finally(() => {
-        setIsSavingMemory(false);
-      });
-  };
-
   useEffect(() => {
     if (status === lastClipboardStatusRef.current) {
       return;
@@ -374,11 +323,6 @@ export const DecisionShieldPanel = ({
     }
     lastClipboardStatusRef.current = status;
   }, [add, copiedTarget, errorReason, lastAttemptedTarget, status]);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setMemoryStatus(null), 2600);
-    return () => window.clearTimeout(timeout);
-  }, [memoryStatus]);
 
   const presetHintId = "preset-limit-hint";
 
@@ -418,15 +362,6 @@ export const DecisionShieldPanel = ({
               buttonLabels={{ copied: "Link copied" }}
               onClick={handleCopyLink}
             />
-            <button
-              type="button"
-              onClick={handleSaveToDecisionMemory}
-              disabled={isSavingMemory || !clientId}
-              aria-busy={isSavingMemory}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
-            >
-              {isSavingMemory ? "Saving" : !clientId ? "Preparing memory" : "Save to memory"}
-            </button>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
@@ -441,9 +376,6 @@ export const DecisionShieldPanel = ({
         </output>
         <output className="mt-2 block min-h-[20px] text-xs text-amber-200" aria-live="polite">
           {error && lastAttemptedTarget === "link" ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
-        </output>
-        <output className="mt-1 block min-h-[20px] text-xs text-slate-300" aria-live="polite">
-          {memoryStatus ?? ""}
         </output>
         <div className="mt-4 min-h-[260px]">
           {error && lastAttemptedTarget === "verdict" ? (

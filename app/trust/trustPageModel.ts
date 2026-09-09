@@ -115,6 +115,7 @@ export async function buildTrustPageModel() {
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
+    { href: "#framework", label: "Using the thresholds" },
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
   ];

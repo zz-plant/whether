@@ -1,6 +1,6 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
-import { REGIME_DISPLAY } from "../../viewModel";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
 
 /**
@@ -14,7 +14,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
   if (series.length < 2) return null;
 
   const record = buildRegimeTrackRecord(series);
-  const label = (regime: string) => REGIME_DISPLAY[regime] ?? regime;
+  const label = (regime: string) => getRegimePublicLabel(regime);
   const recentTransitions = [...record.transitions].reverse().slice(0, 8);
   const currentSpell = record.spells[record.spells.length - 1];
 

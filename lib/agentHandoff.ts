@@ -7,7 +7,7 @@ import type { PostureStateContract } from "./report/postureStateContract";
 import type { ReportDynamics } from "./report/reportData";
 import type { RegimeAssessment } from "./regimeEngine";
 import { agentSkills } from "./agentSkills";
-import { getRegimeOperatorLabel } from "./regimeLabels";
+import { getRegimePublicLabel } from "./regimePresentation";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "./types";
 
 const buildSignals = (
@@ -161,7 +161,7 @@ export const buildAgentPayload = (
     decisionSupport?: AgentDecisionSupport;
   },
 ) => {
-  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
+  const regimeLabel = getRegimePublicLabel(assessment.regime);
   const decisionRules = buildDecisionRules(assessment);
   const decisionDelta = options?.decisionSupport
     ? buildDecisionDelta(assessment, options.decisionSupport)

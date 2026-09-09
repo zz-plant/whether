@@ -7,8 +7,8 @@ export type OperationsWorkstreamLink = {
   description: string;
 };
 
-// Decision memory is not here: it is a record, not a plan, and lives at
-// /history/decisions with the rest of what happened.
+// No decision-memory link: the record the product keeps without asking is the
+// call itself, on /history.
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   {
     href: "/operate",

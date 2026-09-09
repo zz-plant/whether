@@ -59,7 +59,7 @@ type ReportShellInput = {
   primaryCta?: ReportCtaProps;
   secondaryCta?: SecondaryCtaProps;
   exportCta?: ExportCtaProps | null;
-  sharePayload?: React.ComponentProps<typeof ShareMenuDropdown> | null;
+  showShare?: boolean;
   structuredData?: unknown;
   historicalBanner?: ReactNode;
   currentPath: string;
@@ -82,7 +82,7 @@ type ReportShellModel = {
   page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "sectionLinks" | "currentPath">;
   trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
   chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome">;
-  actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "sharePayload" | "nextStep" | "nextRefreshLabel">;
+  actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "showShare" | "nextStep" | "nextRefreshLabel">;
   payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
 
@@ -98,7 +98,6 @@ export {
 } from "./report-shell/TrustBlocks";
 export { SidebarSequenceBlock } from "./report-shell/SidebarSequenceBlock";
 
-import { ShareMenuDropdown } from "./report-shell/ShareMenuDropdown";
 
 const normalizeReportShellInput = (props: ReportShellProps): ReportShellInput => {
   if ("model" in props && props.model) {
@@ -148,7 +147,7 @@ export const ReportShell = (props: ReportShellProps) => {
     primaryCta: inputPrimaryCta,
     secondaryCta: resolvedSecondaryCta,
     exportCta: inputExportCta,
-    sharePayload: resolvedSharePayload,
+    showShare: resolvedShowShare = false,
     structuredData: resolvedStructuredData,
     historicalBanner: resolvedHistoricalBanner,
     stageRail: resolvedStageRail,
@@ -260,7 +259,7 @@ export const ReportShell = (props: ReportShellProps) => {
                   nothing on a page with fewer than two sections. */}
               <MobileSectionChips sectionLinks={resolvedSectionLinks} />
 
-              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
+              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} showShare={resolvedShowShare} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 

@@ -77,7 +77,7 @@ type ReportDataLoaderDependencies = {
   resolveWeekEndingIsoDateUTC: (value: string) => string;
   formatTimestampUTC: (value: string) => string;
   formatAgeHours: typeof import("../formatters").formatAgeHours;
-  formatRegimeLabel: typeof import("../regimeFormat").formatRegimeLabel;
+  formatRegimeLabel: (regime: string) => string;
   getLatestParseableTimestamp: (values: Array<string | null | undefined>) => string | null;
   buildGuidanceBundleFromAssessment: (
     assessment: RegimeAssessment,

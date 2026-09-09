@@ -1,3 +1,4 @@
+import { formatSignedDeltaOrNull } from "../../../lib/formatters";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -50,10 +51,7 @@ const nearestLine = (
     .map((line) => toThresholdDistance(line, scores))
     .sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
 
-const formatDelta = (delta: number | null | undefined) =>
-  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
-    ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)}`
-    : null;
+const formatDelta = formatSignedDeltaOrNull;
 
 type Params = { week: string };
 

@@ -6,8 +6,9 @@ describe("persisted UI bootstrap", () => {
   it("boots theme and dismissed orientation before hydration", () => {
     const layoutSource = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
 
-    assert.match(layoutSource, /whether-theme/);
-    assert.match(layoutSource, /whether\.home\.orientation\.dismissed/);
+    // The keys come from the one registry, not literals retyped in the bootstrap.
+    assert.match(layoutSource, /STORAGE_KEYS\.theme/);
+    assert.match(layoutSource, /STORAGE_KEYS\.homeOrientationDismissed/);
     assert.match(layoutSource, /data-home-orientation-dismissed="true"/);
     assert.match(layoutSource, /data-weather-first-run-orientation="true"/);
   });

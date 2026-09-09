@@ -1,3 +1,4 @@
+import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeKey } from "../regimeEngine";
 import { formatThresholdNumber } from "../formatters";
 import {
@@ -213,7 +214,7 @@ export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doN
   formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep current approvals staged");
 
 export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
-  formatDecisionThreshold(rule.pauseTrigger, "Pause if thresholds weaken");
+  formatDecisionThreshold(rule.pauseTrigger, FALLBACK_PAUSE_THRESHOLD);
 
 export const formatBoundedDecisionReverse = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) =>
   formatDecisionReversal(rule.resumeTrigger, "Reverse only after threshold recovery");
@@ -225,7 +226,7 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
     reversal: rule.resumeTrigger,
     fallbacks: {
       action: "Keep current approvals staged",
-      threshold: "Pause if thresholds weaken",
+      threshold: FALLBACK_PAUSE_THRESHOLD,
       reversal: "Reverse only after threshold recovery",
     },
   });

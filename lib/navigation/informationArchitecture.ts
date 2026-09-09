@@ -133,13 +133,6 @@ export const utilityLinks = [
     description: "Compare current posture to 2001, 2008, and 2022 historical epochs",
   },
   {
-    // One row, not two: /template was a blank form for the three parts this page
-    // defines, and both rows pointed at halves of one idea.
-    href: "/threshold",
-    label: "Framework",
-    description: "Thresholds, vocabulary, reversal logic, and a blank form to fill in",
-  },
-  {
     // Carries the embed builder too: same artifact in a different container,
     // and it used to be a second door that said nothing about this one.
     href: "/share",

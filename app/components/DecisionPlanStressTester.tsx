@@ -1,14 +1,13 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { ShieldAlert, ShieldCheck, Zap, ArrowRight, Bookmark, CheckCircle2, Copy, AlertCircle } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Zap, ArrowRight, Copy } from "lucide-react";
 import {
   stressTestDecisionPlan,
   type PlanStressTestResult,
   type DecisionCategory,
   type DecisionVerdict,
 } from "../../lib/decisionShield";
-import { buildPlanStressTestMemoryPayload } from "../../lib/decisionMemory";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
@@ -16,8 +15,6 @@ import {
   operatorStageForVariantMode,
   operatorStageLabel,
 } from "../../lib/report/operatorStage";
-import { usePersistentClientId } from "./clientIdentity";
-import { readDecisionMemorySaveResponse, rememberDecisionMemoryEntry } from "./decisionMemoryLocalCache";
 import { OperatorProfileNumberField } from "./operatorProfileFields";
 import { useClipboardCopy, getClipboardUiState } from "./useClipboardCopy";
 import { useOperatorProfile } from "./useOperatorProfile";
@@ -25,6 +22,18 @@ import { ClipboardActionRow } from "./clipboardActionRow";
 
 /** "Detect" is the absence of an override, so it is not a `DecisionCategory`. */
 type CategoryChoice = DecisionCategory | "AUTO";
+
+/**
+ * Three plans the panel opens on, already graded. A form with an empty text box
+ * and no example of what a result looks like asked for effort before showing
+ * value; a graded verdict on screen at load shows what the tool does, and one
+ * tap swaps the example for the reader's own plan.
+ */
+export const EXAMPLE_PLANS: ReadonlyArray<{ label: string; text: string; category: DecisionCategory }> = [
+  { label: "Hire 3 senior engineers", text: "Hire 3 senior engineers at $180k each", category: "HIRING" },
+  { label: "Sign a $50k cloud commit", text: "Sign a $50k annual cloud commitment", category: "INFRASTRUCTURE" },
+  { label: "Open a second market", text: "Open a second geographic market with a 4-person team", category: "GEOGRAPHIC_EXPANSION" },
+];
 
 const CATEGORY_OPTIONS: { value: CategoryChoice; label: string }[] = [
   { value: "AUTO", label: "Detect from text" },
@@ -100,35 +109,16 @@ const buildShareText = (
     `Conditions as of ${recordDate}.`,
   ].join("\n");
 
-/**
- * "saved" means the server holds the entry; "saved-local" means the server
- * answered from its in-memory fallback, so the browser cache is the only copy
- * that outlives the request. The button says which, because "Tracked in
- * Memory" used to appear for a request the API had rejected outright.
- */
-type SaveState = "idle" | "saving" | "saved" | "saved-local" | "failed";
-
-const SAVE_LABELS: Record<SaveState, string> = {
-  idle: "Track in Memory",
-  saving: "Saving...",
-  saved: "Tracked in Memory",
-  "saved-local": "Saved in this browser",
-  failed: "Save failed — retry",
-};
-
 export function DecisionPlanStressTester({
   assessment,
   recordDate,
   activeStage,
   className = "",
 }: DecisionPlanStressTesterProps) {
-  const [planText, setPlanText] = useState("");
-  const [category, setCategory] = useState<CategoryChoice>("AUTO");
-  const [result, setResult] = useState<PlanStressTestResult | null>(null);
-  const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [planText, setPlanText] = useState(EXAMPLE_PLANS[0].text);
+  const [category, setCategory] = useState<CategoryChoice>(EXAMPLE_PLANS[0].category);
   const [error, setError] = useState<string | null>(null);
   const planInputRef = useRef<HTMLInputElement>(null);
-  const clientId = usePersistentClientId();
   const clipboard = useClipboardCopy();
   const fieldId = useId();
   const { profile, setProfileField } = useOperatorProfile();
@@ -138,6 +128,33 @@ export function DecisionPlanStressTester({
   const stage = operatorStageForVariantMode(activeStage);
   const lifecycle = lifecycleStageForOperatorStage[stage];
 
+  // Graded on first render, on the server too, so the panel never opens empty.
+  // The engine is pure and the example carries no cash position, so this is a
+  // real verdict about a plausible plan, marked as an example.
+  const [result, setResult] = useState<PlanStressTestResult | null>(() =>
+    stressTestDecisionPlan(assessment, {
+      planText: EXAMPLE_PLANS[0].text,
+      lifecycle,
+      category: EXAMPLE_PLANS[0].category,
+    }),
+  );
+  const [isExample, setIsExample] = useState(true);
+
+  const runExample = (example: (typeof EXAMPLE_PLANS)[number]) => {
+    setPlanText(example.text);
+    setCategory(example.category);
+    setError(null);
+    setIsExample(true);
+    setResult(
+      stressTestDecisionPlan(assessment, {
+        planText: example.text,
+        lifecycle,
+        category: example.category,
+        companyProfile: { runwayMonths: profile.runwayMonths, monthlyBurnUsd: profile.monthlyBurnUsd },
+      }),
+    );
+  };
+
   const runTest = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!planText.trim()) {
@@ -146,6 +163,7 @@ export function DecisionPlanStressTester({
       return;
     }
     setError(null);
+    setIsExample(false);
 
     setResult(
       stressTestDecisionPlan(assessment, {
@@ -160,38 +178,8 @@ export function DecisionPlanStressTester({
         },
       }),
     );
-    setSaveState("idle");
   };
 
-  const handleSaveToMemory = async () => {
-    if (!result || saveState === "saving" || saveState === "saved" || saveState === "saved-local") return;
-    if (!clientId) {
-      setSaveState("failed");
-      return;
-    }
-    setSaveState("saving");
-
-    try {
-      const response = await fetch("/api/decision-memory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-whether-client-id": clientId },
-        body: JSON.stringify(
-          buildPlanStressTestMemoryPayload({ clientId, recordDate, planText, lifecycle, result, assessment }),
-        ),
-      });
-      if (!response.ok) {
-        setSaveState("failed");
-        return;
-      }
-      const { entry, degraded } = readDecisionMemorySaveResponse(await response.json());
-      if (entry) rememberDecisionMemoryEntry(clientId, entry);
-      setSaveState(degraded ? "saved-local" : "saved");
-    } catch {
-      setSaveState("failed");
-    }
-  };
-
-  const saveSucceeded = saveState === "saved" || saveState === "saved-local";
 
   return (
     <section
@@ -222,6 +210,24 @@ export function DecisionPlanStressTester({
       </div>
 
       <form onSubmit={runTest} className="space-y-3">
+        <fieldset className="m-0 flex min-w-0 flex-wrap items-center gap-1.5 border-0 p-0">
+          <legend className="float-left text-fluid-nano text-slate-400">Try:</legend>
+          {EXAMPLE_PLANS.map((example) => (
+            <button
+              key={example.label}
+              type="button"
+              onClick={() => runExample(example)}
+              aria-pressed={isExample && planText === example.text}
+              className={`inline-flex min-h-9 items-center rounded-md border px-2.5 text-fluid-nano font-medium transition-colors ${
+                isExample && planText === example.text
+                  ? "border-sky-500/50 bg-sky-500/10 text-sky-100"
+                  : "border-slate-700/70 text-slate-300 hover:border-sky-400/60 hover:text-white"
+              }`}
+            >
+              {example.label}
+            </button>
+          ))}
+        </fieldset>
         <div>
           <label htmlFor={`${fieldId}-plan`} className="sr-only">
             The plan to stress-test
@@ -235,6 +241,7 @@ export function DecisionPlanStressTester({
             value={planText}
             onChange={(e) => {
               setPlanText(e.target.value);
+              setIsExample(false);
               if (error) setError(null);
             }}
             aria-invalid={error ? true : undefined}
@@ -249,7 +256,11 @@ export function DecisionPlanStressTester({
           ) : null}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <details className="weather-auto-chevron rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2" open={profile.runwayMonths != null || profile.monthlyBurnUsd != null}>
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-fluid-xs font-medium text-slate-200">
+            <span>Add your cash position to size the verdict{profile.runwayMonths != null || profile.monthlyBurnUsd != null ? "" : " (optional)"}</span>
+          </summary>
+        <div className="mt-2 grid gap-3 sm:grid-cols-3">
           <OperatorProfileNumberField
             field="runwayMonths"
             label="Runway (months)"
@@ -290,6 +301,7 @@ export function DecisionPlanStressTester({
             </select>
           </div>
         </div>
+        </details>
 
         {/* Not disabled when empty: a disabled submit hides the reason. The
             click is accepted and answered by focusing the field. */}
@@ -320,27 +332,12 @@ export function DecisionPlanStressTester({
                     {result.verdict}
                   </span>
                   <span className="ml-2 text-xs font-semibold text-white">{result.headline}</span>
+                  {isExample ? (
+                    <span className="ml-2 rounded-sm border border-white/[0.1] px-1.5 py-0.5 text-fluid-nano uppercase tracking-wider text-white/50">Example</span>
+                  ) : null}
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleSaveToMemory}
-                disabled={saveSucceeded || saveState === "saving"}
-                aria-busy={saveState === "saving"}
-                className="weather-button inline-flex min-h-[44px] shrink-0 items-center gap-1 text-fluid-xs font-medium"
-              >
-                {saveSucceeded ? (
-                  <CheckCircle2 className="size-3 text-emerald-400" />
-                ) : saveState === "failed" ? (
-                  <AlertCircle className="size-3 text-amber-400" />
-                ) : (
-                  <Bookmark className="size-3 text-slate-400" />
-                )}
-                <span className={saveSucceeded ? "text-emerald-300" : saveState === "failed" ? "text-amber-300" : undefined}>
-                  {SAVE_LABELS[saveState]}
-                </span>
-              </button>
             </div>
 
             {/* What it read, before what it concluded. A misparse is the failure

@@ -1,3 +1,4 @@
+import { FALLBACK_PAUSE_THRESHOLD } from "../reportCopy";
 import { buildWeeklyLockCommitment } from "../decisionKnobs";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import {
@@ -73,14 +74,14 @@ export const buildDecisionMatrixPayload = ({
           text: compactMatrixText(rule ? formatBoundedDecisionAction(rule) : "", fallbackApprove),
           detail: rule?.rationale ?? "Use current posture until signal quality improves.",
           action: rule ? formatBoundedDecisionAction(rule) : fallbackApprove,
-          threshold: rule ? formatBoundedDecisionThreshold(rule) : "Pause if thresholds weaken",
+          threshold: rule ? formatBoundedDecisionThreshold(rule) : FALLBACK_PAUSE_THRESHOLD,
           reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",
         },
         delay: {
           text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
           detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
           action: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
-          threshold: rule ? formatBoundedDecisionThreshold(rule) : "Pause if thresholds weaken",
+          threshold: rule ? formatBoundedDecisionThreshold(rule) : FALLBACK_PAUSE_THRESHOLD,
           reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",
         },
         flip: {

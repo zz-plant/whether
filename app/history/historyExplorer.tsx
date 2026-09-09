@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ActionLink } from "../components/ui/actionLink";
-import { ButtonLink } from "../components/ui/buttonLink";
 import { TimelineBar } from "../components/TimelineBar";
 import { formatMonthShortUtc, formatMonthLongYearUtc } from "../../lib/formatters";
 import type { TimeMachineRegimeEntry } from "../../lib/timeMachine/timeMachineCache";
@@ -153,13 +152,13 @@ export function HistoryExplorer({
       </div>
 
       {hasSelection ? (
-        <ButtonLink
+        <ActionLink
           href={`/?month=${selectedMonth}&year=${selectedYear}`}
           variant="primary"
           className="w-full sm:w-auto"
         >
           View the {formatMonthLongYearUtc(selectedYear, selectedMonth)} operating brief &rarr;
-        </ButtonLink>
+        </ActionLink>
       ) : null}
     </div>
   );

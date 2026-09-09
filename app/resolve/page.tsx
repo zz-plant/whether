@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Details } from "../components/details";
 import { ReportSection } from "../components/reportSection";
-import { ButtonLink } from "../components/ui/buttonLink";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -54,40 +53,20 @@ export default async function DecidePage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
   const { homeBriefModel } = snapshot;
-  const recommendedSituation = homeBriefModel.weeklyMovement.direction === "tightening"
-    ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
-    : (situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0]);
-  const shouldStartWithChecker = homeBriefModel.revisitDecisions;
   const liveCall = {
     posture: homeBriefModel.postureWithStageLabel,
     action: reportData.actionNowShort ?? homeBriefModel.operatingStanceLine,
     guardrail: homeBriefModel.guardrail,
     flip: reportData.flipThreshold ?? homeBriefModel.reversalTrigger,
   };
-  const recommendedPath = shouldStartWithChecker
-    ? {
-        href: "/resolve/ship-checklist",
-        kicker: "Best next step",
-        title: "Start with one decision check",
-        detail: "This week moved enough to check one decision before opening broader guidance.",
-        cta: "Open decision check",
-      }
-    : {
-        href: `/resolve/${recommendedSituation.slug}`,
-        kicker: "Best next step",
-        title: `Start with ${recommendedSituation.title}`,
-        detail: "Go straight to the decision that fits.",
-        cta: "Open focused path",
-      };
   const featuredStakeholders = stakeholderGuides.filter((guide) =>
     featuredStakeholderSlugs.includes(guide.slug as (typeof featuredStakeholderSlugs)[number]),
   );
-  const recommendedAnswerPages = featuredAnswerPages.slice(0, 2);
   const recommendedStakeholderGuides = featuredStakeholders.slice(0, 2);
   const recommendedStageGuides = stageGuides.slice(0, 2);
   const sectionLinks = [
-    { href: "#unresolved-question-router", label: "Best next step" },
-    { href: "#decide-secondary-paths", label: "More options" },
+    { href: "#direct-answers", label: "Direct answers" },
+    { href: "#decide-secondary-paths", label: "Browse the library" },
   ];
 
   return (
@@ -102,12 +81,12 @@ export default async function DecidePage({
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve one open decision"
       currentPath="/resolve"
-      pageSummary="Answer one decision without re-reading the whole brief."
-      pageSummaryLink={{ href: "#unresolved-question-router", label: "Start with the best next step ↓" }}
+      pageSummary="One yes-or-no answer per open decision, under this week's call."
+      pageSummaryLink={{ href: "#direct-answers", label: "Read the answers ↓" }}
       sectionLinks={sectionLinks.slice(0, 2)}
       heroVariant="compact"
       sidebarVariant="hidden"
-      primaryCta={{ href: "#unresolved-question-router", label: "Open the recommended decision" }}
+      primaryCta={{ href: "#direct-answers", label: "Direct answers" }}
       secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operate",
@@ -119,16 +98,14 @@ export default async function DecidePage({
         horizon: "This week",
         confidence: homeBriefModel.confidenceLabel,
         effectiveDate: reportData.recordDateLabel,
-        evidenceHref: "#unresolved-question-router",
+        evidenceHref: "#direct-answers",
       }}
       commandBar={{
         regime: reportData.assessment.regime,
         call: "Work one decision at a time.",
         doNow: [
           liveCall.action,
-          shouldStartWithChecker
-            ? "Run one decision check before opening broader help."
-            : "Open the decision that matches the situation.",
+          "Find your question below; each answer links to the rule behind it.",
         ],
         flipConditions: [liveCall.guardrail, liveCall.flip],
         updatedAt: reportData.fetchedAtLabel,
@@ -136,107 +113,79 @@ export default async function DecidePage({
       structuredData={breadcrumbStructuredData}
       >
         <OperatorWorkflowRouteTracker />
+      {/* The page is the answers. The old router asked "which decision is still
+          open?" and offered a recommended path, two answers, two roles, two
+          stages, a toolkit filter and a library — a taxonomy to navigate before
+          anything was answered. Most readers arrive with "should I hire?". */}
       <ReportSection
-        id="unresolved-question-router"
-        title="Which decision is still open?"
-        description="Start with the recommended next step."
+        id="direct-answers"
+        title="Direct answers"
+        description={`Under this week's call: ${liveCall.action}`}
       >
-        {/* Stacked, not side by side. The recommended path is three lines and a
-            button; the starting-points list is six links in two groups. Racing
-            them as columns gave the least content the widest track and stretched
-            the short card to the tall one's height. The recommendation now runs
-            full width as a banner — copy left, action right — and the
-            alternatives sit below it as a pair. */}
-        <div className="space-y-4">
-          <article className="weather-surface flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0 space-y-2">
-              <p className="type-eyebrow text-sky-200">{recommendedPath.kicker}</p>
-              <h3 className="text-lg font-semibold text-slate-100">{recommendedPath.title}</h3>
-              <p className="text-sm text-slate-200">{recommendedPath.detail}</p>
-            </div>
-            <ButtonLink href={recommendedPath.href} variant="primary" className="lg:shrink-0">
-              {recommendedPath.cta}
-            </ButtonLink>
-          </article>
-
-          {/* Two menus, not two panels of cards. The alternatives are six links;
-              boxing each in a surface inside a surface inside the section made a
-              link list read as a dashboard with nothing on it. A divided list
-              with a chevron is what a menu looks like. */}
-          <div className="scroll-mt-28 space-y-3">
-            <div className="space-y-1">
-              <p className="type-eyebrow">Other starting points</p>
-              <p className="text-sm text-slate-300">If the recommended step isn&apos;t the decision you need.</p>
-            </div>
-            <div className="grid gap-x-8 gap-y-4 lg:grid-cols-2">
-              <nav id="direct-answers" aria-labelledby="direct-answers-title">
-                <p id="direct-answers-title" className="type-eyebrow text-amber-200">Direct answers</p>
-                <ul className="mt-1 divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
-                  {recommendedAnswerPages.map((page) => (
-                    <li key={page.slug}>
-                      <Link
-                        href={answerPageHref(page.slug)}
-                        className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
-                      >
-                        <span className="min-w-0">
-                          <span className="block text-sm font-semibold text-slate-100">{page.title}</span>
-                          <span className="block text-xs text-slate-400">{page.shortAnswer}</span>
-                        </span>
-                        <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-              <nav id="guided-translation" aria-labelledby="guided-translation-title">
-                <p id="guided-translation-title" className="type-eyebrow text-violet-200">By role or stage</p>
-                <ul className="mt-1 divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
-                  {recommendedStakeholderGuides.map((guide) => (
-                    <li key={guide.slug}>
-                      <Link
-                        href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
-                        className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
-                      >
-                        <span className="min-w-0">
-                          <span className="block text-sm font-semibold text-slate-100">{guide.title}</span>
-                          <span className="block text-xs text-slate-400">{guide.tagline}</span>
-                        </span>
-                        <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
-                      </Link>
-                    </li>
-                  ))}
-                  {recommendedStageGuides.map((stage) => (
-                    <li key={stage.slug}>
-                      <Link
-                        href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
-                        className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
-                      >
-                        <span className="min-w-0">
-                          <span className="block text-sm font-semibold text-slate-100">{stage.title}</span>
-                          <span className="block text-xs text-slate-400">{stage.primaryValue}</span>
-                        </span>
-                        <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </div>
-          </div>
-        </div>
+        <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
+          {featuredAnswerPages.map((page) => (
+            <li key={page.slug}>
+              <Link
+                href={answerPageHref(page.slug)}
+                className="flex min-h-[44px] items-center justify-between gap-3 py-3 no-underline hover:bg-slate-900/40"
+              >
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-slate-100">{page.title}</span>
+                  <span className="block text-xs text-slate-400">{page.shortAnswer}</span>
+                </span>
+                <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </ReportSection>
 
       <Details id="decide-secondary-paths" className="weather-panel px-6 py-6"
-        summary={<span className="text-sm type-eyebrow text-sky-200">Browse more options</span>}
+        summary={<span className="text-sm type-eyebrow text-sky-200">Browse the library — by role, stage, situation, or toolkit</span>}
       >
-          <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
+          <section className="grid gap-4 lg:grid-cols-2">
+            <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
+              <h2 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">By role or stage</h2>
+              <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
+                {recommendedStakeholderGuides.map((guide) => (
+                  <li key={guide.slug}>
+                    <Link
+                      href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
+                      className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold text-slate-100">{guide.title}</span>
+                        <span className="block text-xs text-slate-400">{guide.tagline}</span>
+                      </span>
+                      <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                    </Link>
+                  </li>
+                ))}
+                {recommendedStageGuides.map((stage) => (
+                  <li key={stage.slug}>
+                    <Link
+                      href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
+                      className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold text-slate-100">{stage.title}</span>
+                        <span className="block text-xs text-slate-400">{stage.primaryValue}</span>
+                      </span>
+                      <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
+          </section>
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
               <h2 className="text-sm type-eyebrow text-slate-300">Help by role</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
-                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-chip">
+                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-hub-chip">
                     {role.title}
                   </Link>
                 ))}
@@ -246,7 +195,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">Help by situation</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
-                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-chip">
+                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-hub-chip">
                     {situation.title}
                   </Link>
                 ))}

@@ -13,7 +13,7 @@
  * call, its guardrail and its reversal, which is what this is.
  */
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
-import { getRegimeOperatorLabel } from "../regimeLabels";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { getMonthlyActionGuidance } from "../summary/monthlySummary";
 import { getQuarterlyActionGuidance } from "../summary/quarterlySummary";
 import {
@@ -217,7 +217,7 @@ const buildHistory = ({
   return points.slice(-length).map(({ label, entry }) => ({
     label,
     regime: entry.regime,
-    regimeLabel: getRegimeOperatorLabel(entry.regime),
+    regimeLabel: getRegimePublicLabel(entry.regime),
     isCurrent: periodKeyFor(horizon, entry.record_date) === currentKey,
   }));
 };
@@ -323,7 +323,7 @@ export const buildCadenceCallModel = ({
     periodLabel,
     headline: overrideReason ? POLICY_OVERRIDE_CALL.currentCall : asImperative(guidance),
     regime: assessment.regime,
-    regimeLabel: getRegimeOperatorLabel(assessment.regime),
+    regimeLabel: getRegimePublicLabel(assessment.regime),
     description: assessment.description,
     boundedRule,
     boundedBands: overrideReason ? [] : buildHorizonSignalBands({ assessment, previousScores }),

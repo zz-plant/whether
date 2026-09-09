@@ -51,8 +51,8 @@ describe("GlobalHeaderNavClient", () => {
     const html = renderToStaticMarkup(
       <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
     );
-    assert.ok(html.includes("Resources &amp; Framework") || html.includes("Resources & Framework"), "includes mobile resource section title");
-    assert.ok(html.includes("Framework"), "includes Framework link");
+    assert.ok(html.includes("Tools &amp; reference") || html.includes("Tools & reference"), "includes mobile resource section title");
+    assert.ok(html.includes("API &amp; MCP"), "includes API link");
     // The Template row is gone: the blank form is a section of the Framework
     // page now, so two rows pointing at halves of one page became one.
     assert.ok(!html.includes(">Template<"), "no separate Template row");

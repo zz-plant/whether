@@ -1,5 +1,4 @@
 import type { RegimeKey } from "../lib/regimeEngineCore";
-import { REGIME_PUBLIC_LABELS } from "../lib/regimePresentation";
 
 export type SignalDirection = "tighten" | "ease" | "hold";
 
@@ -36,8 +35,6 @@ export const REGIME_DESCRIPTOR: Record<string, string> = {
   SCARCITY: "capital is constrained",
   VOLATILE: "mixed signals",
 } satisfies Record<RegimeKey, string>;
-
-export const REGIME_DISPLAY: Record<string, string> = { ...REGIME_PUBLIC_LABELS } satisfies Record<RegimeKey, string>;
 
 export const REGIME_COLORS: Record<string, string> = {
   SCARCITY: "bg-rose-400/60",

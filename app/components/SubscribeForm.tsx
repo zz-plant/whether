@@ -7,15 +7,23 @@ import { requestSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { buildMondayCalendarUrl } from "./calendarButton";
 
-export function SubscribeForm() {
+/**
+ * One subscription, one promise: Monday's call, and a note the day it changes.
+ *
+ * The between-Monday alert used to be a second stream behind an unchecked box
+ * under the form, which sat 3,400px down the page — the single most useful
+ * proactive thing the product can do, gated behind scrolling, subscribing, and
+ * noticing a checkbox. It is now part of what the form says it does, consented
+ * to once, and every email still carries an unsubscribe link.
+ *
+ * `compact` is the inline row under the hero; the default is the fuller block
+ * that /share and /brief/[week] mount for a recipient arriving from a link.
+ */
+export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
   // The form is mounted on /, /share and /brief/[week]; attribute the conversion
   // to the route it happened on rather than crediting every one to the homepage.
   const pathname = usePathname() ?? "/";
   const [email, setEmail] = useState("");
-  // Default off. Alert mail is a second stream, and the person opting in is the only
-  // one who can consent to it — the alerts panel used to "record" a channel against a
-  // random device id that the delivery path could never resolve to an inbox.
-  const [alerts, setAlerts] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -23,7 +31,7 @@ export function SubscribeForm() {
     e.preventDefault();
     setStatus("loading");
 
-    const result = await requestSubscription(email, { alerts });
+    const result = await requestSubscription(email, { alerts: true });
     setStatus(result.ok ? "success" : "error");
     setMessage(result.message);
     if (result.ok) {
@@ -45,12 +53,15 @@ export function SubscribeForm() {
   }
 
   return (
-    <div className="weather-section-border space-y-3">
+    <div className={compact ? "space-y-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3" : "weather-section-border space-y-3"}>
       <div>
-        <p className="text-fluid-sm font-medium text-white">Get the weekly brief</p>
-        <p className="text-fluid-xs text-white/60 mt-0.5">
-          Monday morning: the regime, the one action it calls for, and a link to the evidence behind it.
-        </p>
+        <p className="text-fluid-sm font-medium text-white">Get the call every Monday, and a note the day it changes</p>
+        {compact ? null : (
+          <p className="text-fluid-xs text-white/60 mt-0.5">
+            Monday morning: the regime, the one action it calls for, and a link to the evidence behind it.
+            Between Mondays, one email if the call flips. Every email carries an unsubscribe link.
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
@@ -82,20 +93,6 @@ export function SubscribeForm() {
         </button>
       </form>
 
-      <label className="flex cursor-pointer items-start gap-2 text-fluid-xs text-white/60">
-        <input
-          type="checkbox"
-          checked={alerts}
-          onChange={(e) => setAlerts(e.target.checked)}
-          disabled={status === "loading"}
-          className="mt-0.5 size-4 shrink-0 accent-sky-400"
-        />
-        <span>
-          Also email me when the regime changes between Mondays. Off by default; every
-          email carries an unsubscribe link.
-        </span>
-      </label>
-
       {message && (
         <p id="subscribe-message" aria-live="polite" className="text-fluid-micro text-rose-400">
           {message}
@@ -103,7 +100,7 @@ export function SubscribeForm() {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-fluid-nano text-slate-400">
-        <span>Prefer calendar holds over email?</span>
+        <span>{compact ? "One email a week, one more if the call flips. Unsubscribe in one click." : "Prefer calendar holds over email?"}</span>
         <a
           href={buildMondayCalendarUrl(
             "Whether Weekly Posture Sync",

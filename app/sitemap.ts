@@ -115,7 +115,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
-    { path: "/threshold", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
     { path: "/history/compare", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.4 },

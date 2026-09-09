@@ -30,6 +30,9 @@ export type HighlightBullet = { text: string };
 // reversal). UI surfaces read the imperative forms (Do now, Pause if, Change
 // course if); exports and metadata use the noun slots (Action, Threshold,
 // Reversal). Consume these instead of hardcoding slot labels in components.
+/** The threshold slot when no rule supplied one. Was retyped in five modules. */
+export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
+
 export const DECISION_CONTRACT_LABELS = {
   slot: {
     action: "Action",
@@ -52,6 +55,8 @@ export const DECISION_CONTRACT_LABELS = {
   },
   watch: {
     flipWatch: "Flip watch",
+    /** The regime line, as distinct from a rule's guardrail: where the call itself changes. */
+    postureFlips: "Posture flips",
     watchThisWeek: "Watch this week",
     watchNext: "Watch next",
   },

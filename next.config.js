@@ -66,7 +66,7 @@ export const canonicalSurfaceRedirectPairs = [
   ["/planning/integrations", "/operate"],
   // The ledger moved under history. Pointed straight there rather than at
   // /operate/memory, which would chain through a second redirect.
-  ["/planning/memory", "/history/decisions"],
+  ["/planning/memory", "/history"],
   // The same aliases one level down. Matching only the bare path left every
   // legacy sub-path a 404 — /answer/ceo and /evidence/capital-tightness-watch
   // among them — so external links and anything still pointing at the old names
@@ -94,16 +94,21 @@ export const iaConsolidationRedirectPairs = [
   // Redirect stubs — kept as permanent redirects for external links
   ["/current-regime", "/"],
   ["/this-week", "/"],
-  // The blank bounded-decision form is a section of the framework page it used
-  // to link out to, so the form keeps its own entry point via the anchor.
-  ["/template", "/threshold#template"],
+  // The bounded-decision framework and its blank form are a section of /trust,
+  // beside the formula the thresholds come from. Both old doors keep an anchor.
+  ["/template", "/trust#template"],
+  ["/threshold", "/trust#framework"],
   // Orphaned export page — functionality lives in /share
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists
   ["/export", "/share"],
-  // Decision memory is a record of what was decided, which is history, not
-  // planning. /operate keeps the tools for deciding.
-  ["/operate/memory", "/history/decisions"],
+  // Decision memory asked the reader to save at decision time, in this browser,
+  // and come back to the same browser later. The record the product can keep
+  // without being asked is the call itself, which /history already holds.
+  ["/operate/memory", "/history"],
+  ["/history/decisions", "/history"],
+  // The ship checklist's one useful question is a direct answer now.
+  ["/resolve/ship-checklist", "/resolve#direct-answers"],
   // /state ran the brief's own pipeline and rendered a subset of the hero under
   // its own H1 — a view of `/` that read as a second, independently derived
   // answer, and competed with `/` and `/brief/[week]` for the same query.

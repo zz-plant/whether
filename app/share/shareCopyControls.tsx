@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
+import { useClipboardCopy } from "../components/useClipboardCopy";
 
 type ShareCopyControlsProps = {
   recordDate: string;
@@ -18,6 +19,8 @@ const copyLabels: Record<CopyTarget, string> = {
   email: "Email brief",
   meeting: "Meeting pack",
 };
+
+const isCopyTarget = (value: string | null): value is CopyTarget => value !== null && value in copyLabels;
 
 /** Copying an artifact is the act with intent — the funnel's `committed` step. */
 const copyCommitments: Record<CopyTarget, ActivationCommitment> = {
@@ -40,8 +43,19 @@ export function ShareCopyControls({
   meetingPack,
   calendarDetails,
 }: ShareCopyControlsProps) {
-  const [copiedTarget, setCopiedTarget] = useState<CopyTarget | null>(null);
-  const [copyError, setCopyError] = useState<string | null>(null);
+  const { status, error, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy();
+  const copiedTarget = isCopyTarget(copiedKey) ? copiedKey : null;
+  const copyError = error ? "Clipboard access failed. Select the preview text and copy it manually." : null;
+  const trackedRef = useRef<string | null>(null);
+  // The funnel's `committed` step fires once per successful copy, after the
+  // shared hook has confirmed the write actually happened.
+  useEffect(() => {
+    if (status === "copied" && copiedTarget && trackedRef.current !== copiedTarget) {
+      trackedRef.current = copiedTarget;
+      trackActivationEvent({ step: "committed", path: "/share", commitment: copyCommitments[copiedTarget] });
+    }
+    if (status !== "copied") trackedRef.current = null;
+  }, [status, copiedTarget]);
   const calendarHref = useMemo(() => {
     const date = nextMondayIsoDate();
     const params = new URLSearchParams({
@@ -54,18 +68,7 @@ export function ShareCopyControls({
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   }, [calendarDetails, recordDate]);
 
-  const copyText = async (target: CopyTarget, text: string) => {
-    setCopyError(null);
-
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedTarget(target);
-      trackActivationEvent({ step: "committed", path: "/share", commitment: copyCommitments[target] });
-    } catch {
-      setCopiedTarget(null);
-      setCopyError("Clipboard access failed. Select the preview text and copy it manually.");
-    }
-  };
+  const copyText = (target: CopyTarget, text: string) => copyToClipboard(text, target);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">

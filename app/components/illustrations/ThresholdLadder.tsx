@@ -1,3 +1,4 @@
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 export type ThresholdLadderProps = {
   idPrefix: string;
   /** Rail domain. */
@@ -74,9 +75,9 @@ export function ThresholdLadder({
   current,
   previous,
   trigger,
-  triggerLabel = "Trigger",
+  triggerLabel = DECISION_CONTRACT_LABELS.threshold.trigger,
   reversal,
-  reversalLabel = "Reversal",
+  reversalLabel = DECISION_CONTRACT_LABELS.reversal.reversal,
   unit = "",
   signalLabel,
   scaleDirection,

@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { OG_FONT_BODY, toImageSafeText } from "./ogFonts";
+import { OG_ACCENT, OG_BG, OG_BORDER, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
 
 export type BriefImageProps = {
   decision: string;
@@ -72,45 +73,45 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const confidenceBadge = `${confidenceLabel} CONFIDENCE`;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: 1200, height: 800, padding: 56, background: "linear-gradient(160deg, #020617 0%, #0f172a 100%)", color: "#f8fafc", fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`, justifyContent: "space-between" }}>
+    <div style={{ display: "flex", flexDirection: "column", width: 1200, height: 800, padding: 56, background: `linear-gradient(160deg, ${OG_BG} 0%, ${OG_PANEL} 100%)`, color: OG_TEXT, fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`, justifyContent: "space-between" }}>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 32 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: OG_ACCENT, marginBottom: 32 }}>
           {eyebrow}
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
           <span style={{ fontSize: 52, color: arrowColor, marginRight: 16 }}>{arrow}</span>
-          <span style={{ fontSize: 40, fontWeight: 800, color: "#f8fafc", maxWidth: 800 }}>{truncated}</span>
+          <span style={{ fontSize: 40, fontWeight: 800, color: OG_TEXT, maxWidth: 800 }}>{truncated}</span>
         </div>
-        <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#93c5fd", marginBottom: 48 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: OG_ACCENT, marginBottom: 48 }}>
           {postureLine}
         </div>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
           <div style={{ display: "flex", flexDirection: "column", marginRight: 32 }}>
-            <div style={{ fontSize: 60, fontWeight: 800, color: "#f8fafc" }}>{String(tightness)}</div>
-            <div style={{ fontSize: 13, fontWeight: 600, textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.08em", marginTop: 4 }}>Funding pressure</div>
+            <div style={{ fontSize: 60, fontWeight: 800, color: OG_TEXT }}>{String(tightness)}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, textTransform: "uppercase", color: OG_TEXT_MUTED, letterSpacing: "0.08em", marginTop: 4 }}>Funding pressure</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", width: 400 }}>
             <div style={{ display: "flex", height: 6, borderRadius: 3, background: "rgba(51,65,85,0.5)", overflow: "hidden" }}>
               <div style={{ height: 6, borderRadius: 3, width: `${gaugePct}%`, background: gaugeColor }} />
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748b", marginTop: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: OG_TEXT_MUTED, marginTop: 4 }}>
               <span>{tightness}</span><span>{gaugeThreshold}</span>
             </div>
           </div>
         </div>
-        {guardrail ? <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>{guardrail}</div> : null}
+        {guardrail ? <div style={{ fontSize: 13, color: OG_TEXT_MUTED, marginBottom: 8 }}>{guardrail}</div> : null}
         {flipConditions && flipConditions.length > 0 ? (
-          <div style={{ display: "flex", alignItems: "center", fontSize: 13, color: "#93c5fd", marginTop: 8 }}>
-            <div style={{ width: 6, height: 6, borderRadius: 6, background: "#38bdf8", marginRight: 6 }} />
+          <div style={{ display: "flex", alignItems: "center", fontSize: 13, color: OG_ACCENT, marginTop: 8 }}>
+            <div style={{ width: 6, height: 6, borderRadius: 6, background: OG_ACCENT, marginRight: 6 }} />
             <span>{watching}</span>
           </div>
         ) : null}
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 20, borderTop: "1px solid rgba(51,65,85,0.3)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 20, borderTop: `1px solid ${OG_BORDER}` }}>
         <span style={{ padding: "6px 16px", borderRadius: 999, backgroundColor: `${cc}20`, border: `1px solid ${cc}50`, color: cc, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em" }}>{confidenceBadge}</span>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <span style={{ fontSize: 12, color: "#64748b", marginRight: 16 }}>Data: FRED · Treasury · Yahoo Finance</span>
-          <span style={{ fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>whether.work</span>
+          <span style={{ fontSize: 12, color: OG_TEXT_MUTED, marginRight: 16 }}>Data: FRED · Treasury · Yahoo Finance</span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: OG_TEXT_SECONDARY }}>whether.work</span>
         </div>
       </div>
     </div>

@@ -113,7 +113,7 @@ export function MobileNavContent({ navigationLinks, currentPathname, onClose }: 
 
         <div className="border-t border-slate-800/60 pt-3">
           <p className="px-4 type-eyebrow mb-1.5">
-            Resources & Framework
+            Tools & reference
           </p>
           <nav className="space-y-0.5" aria-label="Resources and documentation">
             {utilityLinks.map((link: UtilityLink) => {

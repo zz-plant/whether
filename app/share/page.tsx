@@ -67,6 +67,9 @@ const buildCurrentShareArtifact = async () => {
 
   return {
     recordDate: treasury.record_date,
+    recordDateLabel: reportData.recordDateLabel,
+    assessment,
+    treasuryProvenance: reportData.treasuryProvenance,
     trustLine: `Source: ${treasury.source}`,
     // The picker's object, from the same snapshot the long-form builders read.
     briefArtifact: buildBriefArtifactFromSnapshot({
@@ -97,6 +100,7 @@ const buildCurrentShareArtifact = async () => {
 };
 
 import { SubscribeForm } from "../components/SubscribeForm";
+import { ExecutiveBriefingPanel } from "../operate/components/executiveBriefingPanel";
 
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
@@ -128,6 +132,19 @@ export default async function SharePage() {
             emailBrief={artifact.emailBrief}
             meetingPack={artifact.meetingPack}
             calendarDetails={artifact.calendarDetails}
+          />
+        </div>
+
+        {/* Role memos are share formats. They sat under the sixth collapsed
+            section of /operate, where nobody planning a week went looking for
+            a CFO memo; they belong beside Slack, email and the meeting pack. */}
+        <div id="role-memos" className="scroll-mt-28 space-y-3">
+          <h2 className="type-eyebrow">Brief your team by role</h2>
+          <ExecutiveBriefingPanel
+            assessment={artifact.assessment}
+            recordDateLabel={artifact.recordDateLabel}
+            provenance={artifact.treasuryProvenance}
+            showProvenance={false}
           />
         </div>
 

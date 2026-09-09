@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
+import { STORAGE_KEYS } from "../lib/storage/keys";
 import { navigationLayers, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalShareRail } from "./components/globalShareRail";
@@ -23,8 +24,8 @@ const WELL_KNOWN_MANIFEST_URL = `${siteUrl}/.well-known/whether-agent.json`;
 const siteName = websiteName;
 const siteDescription = defaultSiteDescription;
 const socialImageUrl = buildSocialImageUrl();
-const themeStorageKey = "whether-theme";
-const orientationDismissKey = "whether.home.orientation.dismissed";
+const themeStorageKey = STORAGE_KEYS.theme;
+const orientationDismissKey = STORAGE_KEYS.homeOrientationDismissed;
 
 export const buildThemeBootstrapScript = () => `
 (() => {

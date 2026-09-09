@@ -1,3 +1,4 @@
+import { FALLBACK_PAUSE_THRESHOLD } from "../../lib/report/reportCopy";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import {
@@ -179,7 +180,7 @@ export const buildSignalsPageModel = async (
       : "Use this evidence to confirm this week's call or change it now.";
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
-    : "Pause if thresholds weaken.";
+    : `${FALLBACK_PAUSE_THRESHOLD}.`;
   // The resume trigger, symmetric with the pause trigger in "Wrong if" above.
   // This rendered `flipThreshold` — the condition that BREAKS the call, which
   // /trust correctly labels "This recommendation breaks if". Printing it under

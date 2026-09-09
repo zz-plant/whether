@@ -1,3 +1,4 @@
+import { isRegimeKey } from "../../../lib/regimePresentation";
 /**
  * Open Graph image generator for shareable Capital Posture Governance pages.
  * Supports specialized templates for report, operations, signals, solutions, and guides.
@@ -18,15 +19,10 @@ const OG_HEIGHT = 630;
 
 type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart" | "compare";
 
-const regimeKeys = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
+const normalizeRegime = (value: string): RegimeKey => (isRegimeKey(value) ? value : "VOLATILE");
 
-const normalizeRegime = (value: string): RegimeKey =>
-  regimeKeys.find((key) => key === value) ?? "VOLATILE";
-
-const readRegime = (searchParams: URLSearchParams): RegimeKey => {
-  const value = searchParams.get("regime")?.trim().toUpperCase();
-  return regimeKeys.find((key) => key === value) ?? "VOLATILE";
-};
+const readRegime = (searchParams: URLSearchParams): RegimeKey =>
+  normalizeRegime(searchParams.get("regime")?.trim().toUpperCase() ?? "");
 
 /**
  * Posture timeline for the chart-forward social image, newest last.

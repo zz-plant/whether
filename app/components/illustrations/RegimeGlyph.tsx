@@ -1,7 +1,7 @@
 "use client";
 
 import type { RegimeKey } from "../../../lib/types";
-import { getRegimeOperatorLabel } from "../../../lib/regimeLabels";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { useState, useEffect } from "react";
 
 export type RegimeGlyphProps = {
@@ -76,7 +76,7 @@ export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
     >
-      <title id={`${idPrefix}-title`}>{getRegimeOperatorLabel(regime)}</title>
+      <title id={`${idPrefix}-title`}>{getRegimePublicLabel(regime)}</title>
       <desc id={`${idPrefix}-desc`}>{spec.description}</desc>
 
       <line

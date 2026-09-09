@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { evaluateRegime } from "../lib/regimeEngine";
-import { getRegimeOperatorLabel } from "../lib/regimeLabels";
+import { getRegimePublicLabel } from "../lib/regimePresentation";
 import {
   buildQuarterlySummary,
   getQuarterLabel,
@@ -71,7 +71,7 @@ describe("cadence summaries", () => {
       periodLabel: "Q1 2026",
     });
 
-    const expectedSummary = `${getRegimeOperatorLabel(assessment.regime)} mode. ${assessment.description} The job this quarter is to ${getQuarterlyActionGuidance(assessment.regime)}.`;
+    const expectedSummary = `${getRegimePublicLabel(assessment.regime)} mode. ${assessment.description} The job this quarter is to ${getQuarterlyActionGuidance(assessment.regime)}.`;
 
     assert.equal(summary.title, "Quarterly action summary — Q1 2026");
     assert.equal(summary.summary, expectedSummary);
@@ -90,7 +90,7 @@ describe("cadence summaries", () => {
       periodLabel: "2026",
     });
 
-    const expectedSummary = `${getRegimeOperatorLabel(assessment.regime)} mode. ${assessment.description} The job this year is to ${getYearlyActionGuidance(assessment.regime)}.`;
+    const expectedSummary = `${getRegimePublicLabel(assessment.regime)} mode. ${assessment.description} The job this year is to ${getYearlyActionGuidance(assessment.regime)}.`;
 
     assert.equal(summary.title, "Yearly action summary — 2026");
     assert.equal(summary.summary, expectedSummary);

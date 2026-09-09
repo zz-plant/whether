@@ -1,6 +1,6 @@
 import { insightDatabase } from "../../../data/recommendations";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import { CollapsibleDeepDive } from "../collapsibleDeepDive";
+import { Details } from "../details";
 import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
 
 export const FinanceStrategyPanel = ({
@@ -37,10 +37,11 @@ export const FinanceStrategyPanel = ({
             {entry?.runwayPosture ?? "Runway posture will update when data refreshes."}
           </p>
         </div>
-        <CollapsibleDeepDive
-          label="Deep dive: runway guidance and watchlist"
-          panelClassName="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]"
+        <Details
+          summary={<span className="text-xs font-semibold tracking-[0.12em] text-slate-300">Deep dive: runway guidance and watchlist</span>}
+          className="mt-4"
         >
+          <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Runway posture
@@ -84,7 +85,8 @@ export const FinanceStrategyPanel = ({
               Public data only. No internal finance inputs required.
             </p>
           </div>
-        </CollapsibleDeepDive>
+          </div>
+        </Details>
       </div>
     </section>
   );
