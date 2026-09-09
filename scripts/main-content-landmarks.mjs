@@ -2,8 +2,8 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 const dynamicRouteSamples = {
-  "/answer/[slug]": ["/answer/ceo"],
-  "/answer/[slug]/[cluster]": ["/answer/ceo/capital-raising"],
+  "/resolve/[slug]": ["/resolve/ceo"],
+  "/resolve/[slug]/[cluster]": ["/resolve/ceo/capital-raising"],
   "/answers/[slug]": ["/answers/should-startups-hire-engineers-right-now"],
   "/brief/[week]": ["/brief/2026-w31"],
   "/history/[period]": ["/history/2025"],

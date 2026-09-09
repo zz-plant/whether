@@ -226,7 +226,7 @@ export const buildSignalsPageModel = async (
   > = {
     all: [
       {
-        label: "Tightness",
+        label: "Funding pressure",
         why: "How hard current conditions make new long-payback commitments",
         href: "#current-scores",
       },

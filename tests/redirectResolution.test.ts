@@ -69,12 +69,13 @@ const resolve = (pathname: string) => {
 describe("redirect resolution", () => {
   it("sends legacy alias sub-paths to their renamed route", () => {
     for (const [from, to] of [
-      ["/resolve/ceo", "/answer/ceo"],
-      ["/resolve/ceo/capital-raising", "/answer/ceo/capital-raising"],
-      ["/resolve/ship-checklist", "/answer/ship-checklist"],
+      ["/resolve/ceo", "/resolve/ceo"],
+      ["/resolve/ceo/capital-raising", "/resolve/ceo/capital-raising"],
+      ["/resolve/ship-checklist", "/resolve/ship-checklist"],
       ["/evidence/capital-tightness-watch", "/signals/capital-tightness-watch"],
       ["/evidence/capital-tightness-watch/hiring", "/signals/capital-tightness-watch/hiring"],
-      ["/planning/memory", "/operate/memory"],
+      ["/planning/memory", "/history/decisions"],
+      ["/operate/memory", "/history/decisions"],
       ["/planning/financial", "/operate/financial"],
     ] as const) {
       assert.equal(resolve(from).landing, to, `${from} should land on ${to}`);
@@ -82,7 +83,7 @@ describe("redirect resolution", () => {
   });
 
   it("keeps the bare alias and the specific stubs ahead of the wildcard", () => {
-    assert.equal(resolve("/resolve").landing, "/answer");
+    assert.equal(resolve("/resolve").landing, "/resolve");
     assert.equal(resolve("/evidence").landing, "/signals");
     assert.equal(resolve("/planning").landing, "/operate");
     // /operate has no data, cli, or integrations child — the wildcard must not claim these.

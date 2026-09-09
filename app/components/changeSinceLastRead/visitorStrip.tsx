@@ -83,7 +83,7 @@ export const ReturningVisitorDeltaStrip = ({
   }
 
   const defaultImpactLinks = [
-    { label: "Tightness", href: "#weekly-action-summary", metric: "tightness" as const },
+    { label: "Funding pressure", href: "#weekly-action-summary", metric: "tightness" as const },
     { label: "Risk appetite", href: "#executive-snapshot", metric: "riskAppetite" as const },
     { label: "Base rate", href: "#signal-matrix", metric: "baseRate" as const },
   ];

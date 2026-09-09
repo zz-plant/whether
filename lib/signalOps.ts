@@ -270,7 +270,7 @@ export const buildWeeklyDigest = (
   return {
     summary: `${latest.payload.currentAssessment.regime} regime as of ${latest.payload.currentRecordDate}.`,
     bullets: [
-      `Tightness delta: ${tightnessDelta >= 0 ? "+" : ""}${tightnessDelta.toFixed(2)}.`,
+      `Funding pressure delta: ${tightnessDelta >= 0 ? "+" : ""}${tightnessDelta.toFixed(2)}.`,
       `Risk appetite delta: ${riskDelta >= 0 ? "+" : ""}${riskDelta.toFixed(2)}.`,
       ...latest.payload.decisionDeltas.map(
         (delta) => `${buildDecisionVerdictHeadline(delta)} — ${delta.actionText} Reversal: ${delta.reversalText}`,

@@ -23,7 +23,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.deepEqual(consequence, {
       pointsToThreshold: 3,
-      consequenceLabel: "hiring review",
+      consequenceLabel: "the hiring pause line",
       status: "approaching",
     });
   });
@@ -45,7 +45,7 @@ describe("buildHomeBriefModel", () => {
       revisitAreaPriority: ["expansion-bets", "hiring"],
     }), {
       pointsToThreshold: 4,
-      consequenceLabel: "expansion pauses",
+      consequenceLabel: "the expansion pause line",
       status: "approaching",
     });
   });
@@ -60,7 +60,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.deepEqual(consequence, {
       pointsToThreshold: 0,
-      consequenceLabel: "hiring review",
+      consequenceLabel: "the hiring pause line",
       status: "crossed",
     });
   });
@@ -622,11 +622,11 @@ describe("buildHomeBriefModel", () => {
     assert.equal(matrix.rows.length, 4);
     assert.equal(matrix.rows[0]?.cells.approve.text, "Stage approvals on short-cycle proof");
     assert.equal(matrix.rows[0]?.cells.delay.text, "Delay irreversible commitments");
-    assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Tightness ≤/);
+    assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Funding pressure ≤/);
     assert.match(matrix.rows[3]?.cells.flip.text ?? "", /resumes tighten stance/i);
     assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
     assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
-    assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Tightness ≤/);
+    assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Funding pressure ≤/);
   });
 
 
@@ -663,7 +663,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.sinceLastReview.items.length, 3);
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/signals"));
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/operate"));
-    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/answer"));
+    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/resolve"));
   });
 
   it("returns compact fallback start-route copy when no meaningful delta exists", () => {

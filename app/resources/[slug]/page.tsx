@@ -47,10 +47,18 @@ const RESOURCES_RETURN_LABEL = "Return to Planning";
 
 export const revalidate = 21600;
 
+/*
+ * No `resourceSupportingPages` here. Three of the four are downloadables, which
+ * the next line already emits; the fourth — decision-shield-overview — is
+ * neither a pillar, a downloadable nor an article, so this route reaches
+ * `notFound()` for it. Its own static segment shadows the dynamic one, which is
+ * why nothing showed. Emitting a slug this route cannot render is a trap for
+ * whoever next tries to delete that sibling on the belief that `[slug]` covers
+ * it: the page would 404 and the build would not object.
+ */
 export function generateStaticParams(): Array<{ slug: string }> {
   return [
     ...resourcePillarPages.map((page) => ({ slug: page.slug })),
-    ...Object.values(resourceSupportingPages).map((page) => ({ slug: page.path.split("/").pop() ?? "" })),
     ...Object.keys(downloadableResources).map((slug) => ({ slug })),
     ...resourceArticles.map((article) => ({ slug: article.slug })),
   ].filter((entry): entry is { slug: string } => entry.slug.length > 0);

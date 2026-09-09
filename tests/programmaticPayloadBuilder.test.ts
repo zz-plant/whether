@@ -20,8 +20,8 @@ describe("programmatic payload builder", () => {
     const output = await generateProgrammaticPayloadArtifacts();
     assert.ok(output.version.length > 0);
 
-    const record = await readProgrammaticPayload("/answer/ceo/capital-raising");
-    assert.equal(record.url, "/answer/ceo/capital-raising");
+    const record = await readProgrammaticPayload("/resolve/ceo/capital-raising");
+    assert.equal(record.url, "/resolve/ceo/capital-raising");
     assert.ok(record.delta.changedSignals.length >= 0);
     assert.ok(record.payload.currentCall.length > 0);
     assert.equal(record.payload.noindex, false);
@@ -56,7 +56,7 @@ describe("programmatic payload builder", () => {
  */
 describe("programmatic payload lookups match enumerated routes", () => {
   const CALLERS = [
-    "app/answer/[slug]/[cluster]/page.tsx",
+    "app/resolve/[slug]/[cluster]/page.tsx",
     "app/signals/[cluster]/[decision-scenario]/page.tsx",
     "app/toolkits/[slug]/[cluster]/page.tsx",
   ];

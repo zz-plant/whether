@@ -579,7 +579,7 @@ export async function buildPlanningPageModel(
           h("p", { className: "text-sm text-slate-300" }, "Open decision help when one specific question still needs an answer after this review."),
         ),
         h("div", { className: "flex flex-wrap gap-2" },
-          h(Link, { href: "/answer", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
+          h(Link, { href: "/resolve", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
           h(Link, { href: "/operate#ops-export-briefs", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Back to sharing options"),
         ),
       ),

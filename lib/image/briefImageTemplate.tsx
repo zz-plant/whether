@@ -87,7 +87,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
         <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
           <div style={{ display: "flex", flexDirection: "column", marginRight: 32 }}>
             <div style={{ fontSize: 60, fontWeight: 800, color: "#f8fafc" }}>{String(tightness)}</div>
-            <div style={{ fontSize: 13, fontWeight: 600, textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.08em", marginTop: 4 }}>Tightness</div>
+            <div style={{ fontSize: 13, fontWeight: 600, textTransform: "uppercase", color: "#94a3b8", letterSpacing: "0.08em", marginTop: 4 }}>Funding pressure</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", width: 400 }}>
             <div style={{ display: "flex", height: 6, borderRadius: 3, background: "rgba(51,65,85,0.5)", overflow: "hidden" }}>

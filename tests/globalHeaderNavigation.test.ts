@@ -18,14 +18,14 @@ describe("global header navigation helpers", () => {
     assert.equal(isReportShellRoute("/"), true);
     assert.equal(isReportShellRoute("/signals/overview"), true);
     assert.equal(isReportShellRoute("/operate/plan"), true);
-    assert.equal(isReportShellRoute("/answer"), true);
+    assert.equal(isReportShellRoute("/resolve"), true);
     assert.equal(isReportShellRoute("/trust"), true);
   });
 
   it("uses canonical IA labels for condensed report route context", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Evidence");
     assert.equal(resolveGlobalHeaderRouteLabel("/operate/cli"), "Plan");
-    assert.equal(resolveGlobalHeaderRouteLabel("/answer/use-cases"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/resolve/use-cases"), "Resolve");
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Trust");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
@@ -54,7 +54,7 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveReportHeaderNextStep("/"), null);
     assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/", label: "Weekly Brief" });
     assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/", label: "Weekly Brief" });
-    assert.deepEqual(resolveReportHeaderNextStep("/answer"), { href: "/", label: "Weekly Brief" });
+    assert.deepEqual(resolveReportHeaderNextStep("/resolve"), { href: "/", label: "Weekly Brief" });
     assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Weekly Brief" });
     assert.deepEqual(resolveReportHeaderNextStep("/history"), { href: "/", label: "Weekly Brief" });
     assert.equal(resolveReportHeaderNextStep("/nonexistent"), null);
@@ -72,10 +72,10 @@ describe("global header navigation helpers", () => {
   });
 
   it("does not let a section label shadow a real navigation layer", () => {
-    // /answer is the Resolve layer; /answers is the direct-answer pages. A
+    // /resolve is the Resolve layer; /answers is the direct-answer pages. A
     // prefix match must not confuse the two in either direction.
-    assert.equal(resolveGlobalHeaderRouteLabel("/answer"), "Resolve");
-    assert.equal(resolveGlobalHeaderRouteLabel("/answer/use-cases"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/resolve"), "Resolve");
+    assert.equal(resolveGlobalHeaderRouteLabel("/resolve/use-cases"), "Resolve");
     assert.equal(resolveGlobalHeaderRouteLabel("/signals/thresholds"), "Evidence");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
   });
@@ -87,7 +87,7 @@ describe("global header navigation helpers", () => {
 
     // Demoted report routes are not primary, so no primary link is active there;
     // the one-screen brief stays the single primary destination.
-    const reportLinks = resolveGlobalHeaderNavigationLinks("/answer/use-cases").filter((link) => link.isActive);
+    const reportLinks = resolveGlobalHeaderNavigationLinks("/resolve/use-cases").filter((link) => link.isActive);
     assert.equal(reportLinks.length, 0);
   });
 });

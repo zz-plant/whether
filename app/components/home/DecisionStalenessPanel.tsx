@@ -106,7 +106,7 @@ export function DecisionStalenessPanel({
           <span className="text-fluid-nano text-slate-400">0 tracked</span>
         </div>
         <p className="mt-1 text-fluid-nano text-slate-400">
-          Nothing tracked yet. <span className="font-medium text-slate-300">Log to Memory</span> on the call above, or <span className="font-medium text-slate-300">Track in Memory</span> on a plan verdict, watches its assumptions when conditions move.
+          Nothing tracked yet. <span className="font-medium text-slate-300">Save this call</span> on the call above, or <span className="font-medium text-slate-300">Track in Memory</span> on a plan verdict, watches its assumptions when conditions move.
         </p>
       </Wrapper>
     );

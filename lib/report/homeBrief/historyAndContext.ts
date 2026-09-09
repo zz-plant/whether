@@ -366,7 +366,7 @@ export const buildStartRouteDeltaBlock = ({
       id: "posture-shift" as const,
       label: "Posture shift",
       detail: `Posture moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check decision posture before committing irreversible work.`,
-      href: "/answer" as const,
+      href: "/resolve" as const,
     });
   }
 

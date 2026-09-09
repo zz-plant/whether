@@ -49,20 +49,20 @@ const renderHero = (thresholdBusinessConsequence: ThresholdBusinessConsequence) 
 
 describe("DecisionHero threshold consequence", () => {
   it("renders one affected decision as a one-line numeric consequence", () => {
-    const html = renderHero({ pointsToThreshold: 3, consequenceLabel: "hiring review", status: "approaching" });
-    assert.match(html, />3 points until hiring review</);
+    const html = renderHero({ pointsToThreshold: 3, consequenceLabel: "the hiring pause line", status: "approaching" });
+    assert.match(html, />3 points until the hiring pause line</);
     assert.doesNotMatch(html, /pts to pause/);
   });
 
   it("renders only the selected consequence for a shared threshold", () => {
-    const html = renderHero({ pointsToThreshold: 4, consequenceLabel: "expansion pauses", status: "approaching" });
-    assert.match(html, />4 points until expansion pauses</);
-    assert.doesNotMatch(html, /hiring review/);
+    const html = renderHero({ pointsToThreshold: 4, consequenceLabel: "the expansion pause line", status: "approaching" });
+    assert.match(html, />4 points until the expansion pause line</);
+    assert.doesNotMatch(html, /hiring pause/);
   });
 
   it("renders an already-crossed threshold without dropping its zero-distance state", () => {
-    const html = renderHero({ pointsToThreshold: 0, consequenceLabel: "hiring review", status: "crossed" });
-    assert.match(html, />0 points — hiring review threshold crossed</);
+    const html = renderHero({ pointsToThreshold: 0, consequenceLabel: "the hiring pause line", status: "crossed" });
+    assert.match(html, />0 points — the hiring pause line crossed</);
     assert.doesNotMatch(html, />0 points until/);
   });
 });

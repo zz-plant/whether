@@ -1,30 +1,35 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
-import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
-import { OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
-import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
-import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
+import { DecisionMemoryPanel } from "../../operate/components/decisionMemoryPanel";
 
 export const runtime = "edge";
 
+/*
+ * Moved from /operate/memory. The ledger is a record of what was decided, which
+ * is history, not planning: /operate answers "what do we do this week" and its
+ * other sub-routes (financial, scenarios) are tools for deciding that. A record
+ * sitting under the planning hub read as one more tool, and the planning
+ * workstream nav offered it beside the scenario studio as if it were. Decision
+ * memory still has its weekly slice on `/` — the staleness panel and the
+ * closeout — this is the full archive.
+ */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Decision Memory Ledger — What We Decided and Why",
-  description: "Immutable board-ready record of all macro posture decisions and overrides.",
-  path: "/operate/memory",
-  imageAlt: "Whether decision memory view",
+  title: "Decision Ledger — What We Decided and Why",
+  description: "Board-ready record of every saved posture decision and override, stamped with the readings at the time.",
+  path: "/history/decisions",
+  imageAlt: "Whether decision ledger",
   imagePath: "/social/planning.svg",
 });
 
-export default async function DecisionMemoryPage({
+export default async function DecisionLedgerPage({
   searchParams,
 }: {
   searchParams?: Promise<any>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
+  const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/history" });
   const reportData = weeklySnapshotResult.reportData;
   const { snapshot } = weeklySnapshotResult;
   const {
@@ -34,7 +39,6 @@ export default async function DecisionMemoryPage({
     statusLabel,
     treasury,
   } = reportData;
-
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
     trustStatusLabel,
@@ -42,7 +46,6 @@ export default async function DecisionMemoryPage({
     trustStatusAction,
     trustStatusTone,
   } = snapshot.trustStatus;
-
   const weeklyCall = snapshot.weeklyCall;
 
   return (
@@ -55,10 +58,10 @@ export default async function DecisionMemoryPage({
           treasurySource: treasury.source,
         },
         page: {
-          pageTitle: "Decision memory",
-          currentPath: "/operate/memory",
-          pageSummary: "Review saved weekly posture decisions, override notes, and print board-ready exports.",
-          sectionLinks: operationsSectionLinks.plan,
+          pageTitle: "Decision ledger",
+          currentPath: "/history/decisions",
+          pageSummary: "Every saved posture decision and override, with the readings that were true when it was made.",
+          sectionLinks: [],
         },
         trust: {
           trustStatusLabel,
@@ -68,17 +71,17 @@ export default async function DecisionMemoryPage({
           showOfflineBadge: isFallback && !reportData.historicalSelection,
         },
         actions: {
-          primaryCta: { href: "/operate", label: "Operations Checklists" },
+          primaryCta: { href: "/history", label: "Regime history" },
           secondaryCta: { href: "/", label: "Weekly Brief" },
         },
         payloads: {
           decisionBanner: {
-            label: "Audit Ledger",
+            label: "Audit ledger",
             decision: "Check previous posture commitments, download audit logs, and justify overrides to the board.",
-            horizon: "Historical Archive",
+            horizon: "Historical archive",
             confidence: trustStatusLabel,
             effectiveDate: recordDateLabel,
-            evidenceHref: "#ops-decision-memory",
+            evidenceHref: "#decision-ledger",
           },
           commandBar: {
             regime: assessment.regime,
@@ -92,17 +95,16 @@ export default async function DecisionMemoryPage({
     >
       <div className="space-y-4">
         <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400">
-          This audit ledger displays saved operating postures and overrides, stamped with exact macro signals at evaluation time. Use it to maintain governance compliance.
+          Saved operating postures and overrides, stamped with the macro readings at evaluation time.
+          Decisions are recorded from the weekly brief and the plan stress test, and stay in this
+          browser.
         </p>
-        <div id="ops-decision-memory">
+        <div id="decision-ledger">
           <DecisionMemoryPanel
             currentTightness={assessment.scores.tightness}
             currentRiskAppetite={assessment.scores.riskAppetite}
           />
         </div>
-        <Suspense fallback={<WorkstreamNavFallback />}>
-          <OperationsWorkstreamNav currentPath="/operate/memory" />
-        </Suspense>
       </div>
     </ReportShell>
   );

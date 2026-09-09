@@ -1,4 +1,5 @@
 import {
+  contentSections,
   navigationLayers,
   primaryNavigationLayers,
   reportShellPaths,
@@ -9,26 +10,11 @@ import { pathMatchesLink } from "./pathMatching";
 
 const fallbackLabel = "Page";
 
-/**
- * Labels for routes that no navigation layer or utility link claims.
- *
- * These all resolved to the bare fallback, so the header on the most linkable
- * URL on the site — a frozen, citable weekly record — read "Whether · Page"
- * while every other route named itself. Prefix-matched, longest first, so a
- * future exact entry can still win.
- */
-const sectionRouteLabels: ReadonlyArray<readonly [prefix: string, label: string]> = [
-  ["/answers", "Answer"],
-  ["/brief", "Published brief"],
-  ["/resources", "Resource"],
-  ["/toolkits", "Toolkit"],
-  ["/contact", "Contact"],
-];
-
+// Route families the IA names as content rather than as layers or utilities.
 const resolveSectionRouteLabel = (pathname: string) =>
-  [...sectionRouteLabels]
-    .sort((a, b) => b[0].length - a[0].length)
-    .find(([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`))?.[1] ?? null;
+  [...contentSections]
+    .sort((a, b) => b.prefix.length - a.prefix.length)
+    .find(({ prefix }) => pathname === prefix || pathname.startsWith(`${prefix}/`))?.label ?? null;
 
 export const normalizePathname = (pathname: string) =>
   pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
@@ -97,12 +83,11 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
   }));
 };
 
-// The operator loop as the desktop header shows it: brief → plan → evidence →
-// resolve → trust → history, in IA order, with only the deepest nested layer
-// (compare, under history) left to its parent page. The header used to render
-// the brief, an API link, and a More menu — the loop the IA file defines was
-// reachable only from the mobile drawer and in-page cues. Exactly one link is
-// active: the most specific layer matching the path.
+// The operator loop in IA order — brief → plan → evidence → resolve → trust →
+// history — with only the deepest nested layer (compare, under history) left to
+// its parent page. The desktop bar renders the primary tier from this list and
+// puts the supporting tier inside More; exactly one link is active, the most
+// specific layer matching the path.
 export const resolveGlobalHeaderLoopLinks = (pathname: string): GlobalHeaderNavigationLink[] => {
   const activeLayer = findActiveLayer(pathname);
 
@@ -117,15 +102,12 @@ export const resolveGlobalHeaderLoopLinks = (pathname: string): GlobalHeaderNavi
 /**
  * Whether the desktop nav row will visibly mark the current route.
  *
- * The header stopped printing the route beside the wordmark on the grounds that
- * the navigation names it — true for the six loop routes, and false everywhere
- * else. On `/pricing`, `/about`, `/brief/<week>` and `/resources/...` no loop
- * link is active, the mobile trigger is hidden from `md`, and a matching utility
- * link sits inside the closed More menu, so the desktop header was left with the
- * wordmark alone. Callers render the label when this returns false.
- *
- * `compare` is excluded from the loop links, so `/history/compare` reports false
- * and keeps its label — which is right: the nav row does not mark it either.
+ * The header drops the route label beside the wordmark only where the
+ * navigation names the route itself. That is now true for the brief alone: the
+ * supporting layers sit inside the closed More menu, the same place the utility
+ * links always were, so on `/operate` or `/trust` nothing in the bar is active
+ * and the label has to come back — exactly as it always did for `/pricing`.
+ * Callers render the label when this returns false.
  */
 export const hasVisibleActiveNavLink = (pathname: string) =>
-  resolveGlobalHeaderLoopLinks(pathname).some((link) => link.isActive);
+  resolveGlobalHeaderNavigationLinks(pathname).some((link) => link.isActive);

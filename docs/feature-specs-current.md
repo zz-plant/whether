@@ -13,7 +13,7 @@ Dynamic decision copy follows the same bounded contract across weekly, evidence,
 Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
 as supporting layers, deep links, or URL-driven states of `/`:
 - `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact (the product)
-- `/operate` (Plan), `/signals` (Evidence), `/answer` (Resolve), `/trust` (Trust): reachable
+- `/operate` (Plan), `/signals` (Evidence), `/resolve` (Resolve), `/trust` (Trust): reachable
   but **supporting**, one click from the brief — not peer routes that invite a second scan
 - `/history`, `/history/compare`: supporting archive and scrub/playback
 
@@ -24,8 +24,8 @@ Supporting surfaces are intentionally subordinate:
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
 - Secondary libraries such as `/guides`, `/toolkits`, `/posture`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
 - `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
-- `/guides` now acts as a compatibility redirect into query-selected translation states on `/answer`, so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
-- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/answer`, so toolkit search and browse state live inside the canonical Resolve workflow rather than as a standalone library route.
+- `/guides` now acts as a compatibility redirect into query-selected translation states on `/resolve`, so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
+- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/resolve`, so toolkit search and browse state live inside the canonical Resolve workflow rather than as a standalone library route.
 - `/posture` now acts as a compatibility redirect back to the Weekly Brief. Live posture reference no longer ships as a standalone workflow.
 - `/search` now acts as a command-only redirect into the next canonical workflow state instead of rendering its own browse surface.
 - `/resources` now redirects straight back into Planning's export/artifact checkpoint; deeper governance material still lives on focused `/resources/[slug]` detail pages.
@@ -36,7 +36,7 @@ Supporting surfaces are intentionally subordinate:
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
-Report-shell routes (`/signals`, `/operate`, `/answer`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
+Report-shell routes (`/signals`, `/operate`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
 Primary navigation now keeps the Weekly Brief as the only primary destination. Plan,
 Evidence, Resolve, and Trust are supporting layers under the brief, reachable from the mobile
 drawer, command palette, and in-flow CTAs (`Build this week's plan`) — never as equal-weight
@@ -817,7 +817,7 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 - `/posture`
 - `/signals`
 - `/operate`
-- `/answer`
+- `/resolve`
 - `/resources`
 - `/startup-macro-posture` and `/startup-macro-posture/index`
 - `/guides`
@@ -829,7 +829,7 @@ back into the canonical Resolve quick-answer path instead of maintaining a separ
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
-`/answer/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/answer` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
+`/resolve/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/resolve` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
 The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Resolve answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
@@ -933,7 +933,7 @@ This pilot remains additive at the scoring layer, but refusal is now binding at 
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status
-Decisions is an active first-class workflow surface in shipped navigation (`/answer`) with an
+Decisions is an active first-class workflow surface in shipped navigation (`/resolve`) with an
 action-first top fold anchored to the live weekly call:
 - one recommended next path derived from the live weekly call,
 - direct-answer and team-translation alternatives at lower visual weight,

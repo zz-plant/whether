@@ -3,7 +3,7 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { BriefArtifactScript } from "./components/briefArtifactScript";
-import type { BriefArtifact } from "../lib/report/briefArtifact";
+import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -23,14 +23,13 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
-import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
-import { decisionAreaLabel, guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
+import { guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 import { buildTimeMachineHref, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
@@ -237,29 +236,23 @@ async function PageContent({
     : "hold"
   );
 
-  const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
-  const primaryCall = canonicalDecision?.doNowLines?.[0] ?? homepage.weeklyDecisionCardModel.decision.actionNowShort ?? weeklyLeadershipSummary.shorthandLine;
-  const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
-  const revisitQueue = homepage.weeklyDecisionCardModel.decision.revisitQueue;
-  const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));
-  const noChangeAreas = homepage.weeklyDecisionCardModel.decision.decisionRules
-    .filter((rule) => !revisitAreaIds.has(rule.area))
-    .map((rule) => decisionAreaLabel(rule.area));
+  /* `/share` builds the same object from the same fields, so the derivation
+   * lives in lib/report rather than here — the guardrail label alone has three
+   * fallbacks, and a second copy of that is how two surfaces come to state
+   * different thresholds for one week. */
+  const {
+    primaryCall,
+    flipConditionLabels,
+    revisitQueue,
+    noChangeAreas,
+    guardrailLabel,
+    parsedGuardrailThreshold,
+    reversalTriggerLabel,
+    briefShareLines,
+  } = deriveBriefCallFields(homepage.weeklyDecisionCardModel);
 
   const v2HeroSignalData = buildV2HeroSignalData(reportData);
 
-  const guardrailThresholdRaw = homepage.weeklyDecisionCardModel.decision.guardrailThreshold;
-  const parsedGuardrailThreshold = typeof guardrailThresholdRaw === "number"
-    ? guardrailThresholdRaw
-    : Number.parseFloat(String(guardrailThresholdRaw ?? ""));
-
-  const numericGuardrailLabel = Number.isFinite(parsedGuardrailThreshold)
-    ? `Funding pressure crosses ${parsedGuardrailThreshold}`
-    : undefined;
-  const guardrailLabel = numericGuardrailLabel
-    ?? homepage.weeklyDecisionCardModel.decision.guardrail
-    ?? (typeof guardrailThresholdRaw === "string" ? guardrailThresholdRaw : undefined);
-  const reversalTriggerLabel = homepage.weeklyDecisionCardModel.decision.reversalTrigger;
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
   // the rails may draw — but only when that is in fact the sentence being
@@ -276,16 +269,6 @@ async function PageContent({
         resumeQualifier: corridorRule.resume.qualifier,
       }
     : undefined;
-  const briefShareLines = [
-    homepage.weeklyDecisionCardModel.decision.actionNowShort
-      ? `${DECISION_CONTRACT_LABELS.action.doNow}: ${homepage.weeklyDecisionCardModel.decision.actionNowShort}`
-      : null,
-    guardrailLabel ? `${DECISION_CONTRACT_LABELS.threshold.guardrail}: ${guardrailLabel}` : null,
-    reversalTriggerLabel ? `${DECISION_CONTRACT_LABELS.reversal.reversal}: ${reversalTriggerLabel}` : null,
-    flipConditionLabels.length > 0
-      ? `${DECISION_CONTRACT_LABELS.reversal.clearsWhen}: ${flipConditionLabels.join("; ")}`
-      : null,
-  ].filter((line): line is string => Boolean(line));
 
   /* One join, two labels. The `h1` is this page's accessible name, where the
    * product name would be noise; the artifact title is what lands in someone
@@ -295,34 +278,14 @@ async function PageContent({
     ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
     : null;
 
-  /* Published for the globally-mounted share panel, which sits outside this
-   * route's props. Only the frozen record is offered as a permalink: `/`
-   * re-renders every week under one URL, so a citation pointing at it has to say
-   * so rather than imply a fixed reference. `selectCitablePermalinkBrief`
-   * returns nothing once the archive falls behind, and the citation format
-   * degrades to the live page on its own. */
-  const citableBrief = selectCitablePermalinkBrief(reportData.treasury.record_date);
-  const briefArtifact: BriefArtifact = {
+  /* Published for the globally-mounted share panel and the presentation
+   * frames, which sit outside this route's props — and for `/share`, which
+   * builds the same object from the same builder. */
+  const briefArtifact = buildBriefArtifact({
+    homepage,
+    recordDate: reportData.treasury.record_date,
     title: cadenceTitle ?? "Whether Weekly Brief",
-    recordDateLabel: homepage.reportShell.recordDateLabel,
-    call: primaryCall,
-    actionNow: homepage.weeklyDecisionCardModel.decision.actionNowShort,
-    guardrail: guardrailLabel,
-    reversal: reversalTriggerLabel,
-    clearsWhen: flipConditionLabels,
-    regimeLabel: publicRegimeLabel,
-    postureLabel,
-    tightness,
-    riskAppetite,
-    confidenceLabel,
-    source: homepage.reportShell.treasurySource?.startsWith("http")
-      ? "FRED"
-      : homepage.reportShell.treasurySource ?? "FRED",
-    revisit: revisitQueue.map((item) => ({ label: item.label, recheck: item.recheck })),
-    noChangeAreas,
-    permalinkPath: citableBrief ? buildPublishedBriefPath(citableBrief.slug) : undefined,
-    isFallback: homepage.reportShell.showOfflineBadge,
-  };
+  });
 
   return (
     <>

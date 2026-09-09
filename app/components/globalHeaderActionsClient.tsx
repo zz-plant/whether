@@ -47,9 +47,11 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
       <div className="inline-flex items-stretch rounded-lg border border-slate-800/80 bg-slate-900/60 divide-x divide-slate-800/80 [&>*:first-child]:rounded-l-[7px] [&>*:last-child]:rounded-r-[7px]">
         <button type="button" onClick={() => setShowPalette(true)} className={CELL} aria-label="Search" title="Search ⌘K">
           <Search aria-hidden="true" size={16} strokeWidth={1.8} />
+          <span className="hidden lg:inline text-fluid-nano text-slate-400" aria-hidden="true">⌘K</span>
         </button>
         <button type="button" onClick={() => setShowProfile(true)} className={CELL} aria-label="History & export" title="History & export">
           <History aria-hidden="true" size={16} strokeWidth={1.8} />
+          <span className="hidden lg:inline text-fluid-nano text-slate-400" aria-hidden="true">Export</span>
         </button>
         {/* The light theme has a full token set in tokens.css and layout.tsx
             restores the saved choice pre-paint, but nothing rendered the control,

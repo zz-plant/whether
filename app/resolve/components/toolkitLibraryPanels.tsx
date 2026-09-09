@@ -10,12 +10,12 @@ const suggestedToolkitQueries = ["rollback", "roadmap", "pmf", "pricing", "capac
 export function buildToolkitLibraryHref(query?: string) {
   const normalizedQuery = query?.trim();
   if (!normalizedQuery) {
-    return "/answer#toolkit-library";
+    return "/resolve#toolkit-library";
   }
 
   const params = new URLSearchParams();
   params.set("toolkitQuery", normalizedQuery);
-  return `/answer?${params.toString()}#toolkit-library`;
+  return `/resolve?${params.toString()}#toolkit-library`;
 }
 
 export function resolveToolkitLibraryState(query?: string) {
@@ -64,25 +64,25 @@ export function ToolkitLibraryPanels({
         <p className="text-sm text-slate-300">
           {normalizedQuery
             ? "Use the filtered list below."
-            : "Default to this list. Search only when you know the tool you need."}
+            : "Default to this list, or filter it by the task in front of you. Site-wide search is under ⌘K."}
         </p>
       </div>
 
-      <form action="/answer" className="flex flex-col gap-3 sm:flex-row">
-        <label htmlFor="decide-toolkit-search-input" className="sr-only">Search tools by task</label>
+      <form action="/resolve" className="flex flex-col gap-3 sm:flex-row">
+        <label htmlFor="decide-toolkit-search-input" className="sr-only">Filter tools by task</label>
         <input
           id="decide-toolkit-search-input"
           type="search"
           name="toolkitQuery"
           defaultValue={query ?? ""}
           className="weather-input w-full px-4 py-2"
-          placeholder="Search by task (e.g. rollback, roadmap, PMF)…"
+          placeholder="Filter by task (e.g. rollback, roadmap, PMF)…"
           autoComplete="off"
-          aria-label="Search tools"
+          aria-label="Filter tools"
         />
-        <button type="submit" className="weather-button">Search</button>
+        <button type="submit" className="weather-button">Filter</button>
         {normalizedQuery ? (
-          <Link href="/answer#toolkit-library" className="weather-button inline-flex items-center justify-center">
+          <Link href="/resolve#toolkit-library" className="weather-button inline-flex items-center justify-center">
             Clear
           </Link>
         ) : null}
@@ -123,8 +123,8 @@ export function ToolkitLibraryPanels({
         <div className="space-y-3 rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-4 text-sm text-slate-200">
           <p>No tool matched “{normalizedQuery}”. Try a broader task label or return to the question chooser above.</p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/answer#unresolved-question-router" className="weather-hub-chip">Return to question chooser</Link>
-            <Link href="/answer#direct-answers" className="weather-hub-chip">Try direct answers</Link>
+            <Link href="/resolve#unresolved-question-router" className="weather-hub-chip">Return to question chooser</Link>
+            <Link href="/resolve#direct-answers" className="weather-hub-chip">Try direct answers</Link>
           </div>
           {closestToolkits.length > 0 ? (
             <div className="flex flex-wrap gap-2">

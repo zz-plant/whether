@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
@@ -240,7 +241,10 @@ export default async function SignalsPage({
               </div>
             </div>
             <p className="text-fluid-nano text-slate-500">
-              Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.
+              Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.{" "}
+              <Link href="/history/compare" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                Compare against any past month →
+              </Link>
             </p>
           </section>
         );

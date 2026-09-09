@@ -39,7 +39,7 @@ export const buildDecideClusterMetadata = ({
   const metadata = buildPageMetadata({
     title: `${roleTitle}: ${scenarioTitle} decision scenario`,
     description: roleDescription,
-    path: `/answer/${slug}/${cluster}`,
+    path: `/resolve/${slug}/${cluster}`,
     imageAlt: roleTitle,
   });
 
@@ -74,7 +74,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
 
   if (!routeDefinition || !roleDefinition || !scenarioDefinition) notFound();
 
-  const payloadRecord = await readProgrammaticPayload(`/answer/${slug}/${cluster}`);
+  const payloadRecord = await readProgrammaticPayload(`/resolve/${slug}/${cluster}`);
   const payload = payloadRecord.payload;
 
   return (
@@ -96,7 +96,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
-          <ActionLink href="/answer#unresolved-question-router" variant="pill">Decision help</ActionLink>
+          <ActionLink href="/resolve#unresolved-question-router" variant="pill">Decision help</ActionLink>
           <ActionLink href="/signals/capital-tightness-watch" variant="pill">Evidence page</ActionLink>
           <ActionLink href="/toolkits/focus" variant="pill">Decision toolkit</ActionLink>
         </div>

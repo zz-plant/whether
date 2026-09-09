@@ -105,21 +105,20 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
-    { path: "/answer", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
-    { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
+    { path: "/resolve", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
+    // Deep links, not destinations: the adoption plan's one-screen redraft ruled
+    // that trust is an inline line on `/` with the formula reference kept as a
+    // deep link, and compare is a disclosure under history. Both stay indexable;
+    // neither is ranked like a hub.
+    { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/operate", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
-    { path: "/embed", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
     { path: "/threshold", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
-    { path: "/history/compare", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.6 },
-    // Indexable pages that were absent here. /state carries its own canonical and
-    // social metadata and is built to be landed on from search, so omitting it
-    // left a page optimized for discovery that nothing could discover.
-    { path: "/state", lastModified: reportLastModified, changeFrequency: "daily", priority: 0.6 },
+    { path: "/history/compare", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.4 },
     { path: "/pricing", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
     { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },

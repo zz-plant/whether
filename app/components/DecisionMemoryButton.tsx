@@ -114,7 +114,7 @@ export function DecisionMemoryButton({
       ) : (
         <>
           <Bookmark size={13} className="text-sky-400" />
-          <span>{saveState === "saving" ? "Logging..." : "Log to Memory"}</span>
+          <span>{saveState === "saving" ? "Saving..." : "Save this call"}</span>
         </>
       )}
     </button>

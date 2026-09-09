@@ -7,7 +7,7 @@ import { describe, it } from "bun:test";
  * `path:` on buildPageMetadata becomes <link rel="canonical"> and og:url.
  *
  * A route rename left several pages naming their old path there, so production
- * served pages whose canonical URL was a 404 — /answer/ceo declared
+ * served pages whose canonical URL was a 404 — /resolve/ceo declared
  * https://whether.work/resolve/ceo, and /operate/memory declared
  * /planning/memory. That is worse than a broken link: it tells search engines
  * the real address of the page is a dead one.
@@ -15,8 +15,12 @@ import { describe, it } from "bun:test";
  * The aliases still exist as redirects for people who retype a nav label, which
  * is exactly why this needs a test — the alias resolving in a browser is what
  * made the canonicals look fine.
+ *
+ * /resolve left this list and /answer joined it when the hub took the name its
+ * nav, title and IA already used. Which spelling is canonical is the whole
+ * subject of this test, so the rename inverts one entry rather than relaxing it.
  */
-const ALIAS_PREFIXES = ["/resolve", "/evidence", "/planning"];
+const ALIAS_PREFIXES = ["/answer", "/evidence", "/planning"];
 
 const sourceFiles = (dir: string, found: string[] = []): string[] => {
   for (const entry of readdirSync(dir)) {

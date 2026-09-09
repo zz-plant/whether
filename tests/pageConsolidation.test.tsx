@@ -52,3 +52,72 @@ describe("mockups", () => {
     assert.equal(existsSync(appPath("/mockups/visual-system/page.tsx")), false);
   });
 });
+
+/*
+ * The 2026-09-08 pass. Each entry here is a route that read as a peer of the
+ * brief and was one of three things: a view of `/` under its own H1, a record
+ * filed under the planning hub, or a second door to the artifact `/share`
+ * already offered.
+ */
+describe("routes folded into the surface that owned them", () => {
+  const config = readFileSync(new URL("../next.config.js", import.meta.url).pathname, "utf8");
+
+  it("retires /state as a view of the brief under its own heading", () => {
+    assert.equal(existsSync(appPath("/state/page.tsx")), false);
+    assert.match(config, /\["\/state", "\/"\]/, "/state keeps a permanent redirect to /");
+    const hrefs: readonly string[] = utilityLinks.map((link) => link.href);
+    assert.equal(hrefs.includes("/state"), false, "a redirect must not stay in the utility row");
+  });
+
+  it("files the decision ledger under history, not planning", () => {
+    assert.equal(existsSync(appPath("/operate/memory/page.tsx")), false);
+    assert.ok(existsSync(appPath("/history/decisions/page.tsx")));
+    assert.match(config, /\["\/operate\/memory", "\/history\/decisions"\]/);
+    // The older alias must land in one hop, not chain through /operate/memory.
+    assert.match(config, /\["\/planning\/memory", "\/history\/decisions"\]/);
+  });
+
+  it("folds the embed builder into the share page", () => {
+    assert.equal(existsSync(appPath("/embed/page.tsx")), false);
+    assert.ok(existsSync(appPath("/share/embedBuilder.tsx")));
+    assert.match(config, /\["\/embed", "\/share#embed"\]/);
+    const share = readFileSync(appPath("/share/page.tsx"), "utf8");
+    assert.match(share, /id="embed"/, "the redirect target anchor must exist");
+    const hrefs: readonly string[] = utilityLinks.map((link) => link.href);
+    assert.equal(hrefs.includes("/embed"), false);
+  });
+
+  it("gives the share page the same picker as the share panel", () => {
+    const share = readFileSync(appPath("/share/sharePageFormats.tsx"), "utf8");
+    const rail = readFileSync(appPath("/components/shareRail.tsx"), "utf8");
+    // One component, imported by both — not a page and an overlay that build
+    // the same thing twice, which 1.1.9 of the specs left as the follow-up.
+    assert.match(share, /from "\.\.\/components\/briefFormatPicker"/);
+    assert.match(rail, /from "\.\/briefFormatPicker"/);
+    assert.doesNotMatch(rail, /^const BriefFormatPicker/m, "the rail no longer defines its own picker");
+  });
+});
+
+describe("resources static params", () => {
+  it("emits no slug the dynamic route cannot render", () => {
+    /*
+     * `generateStaticParams` spread `resourceSupportingPages`, whose only
+     * contribution beyond the downloadables is decision-shield-overview — not a
+     * pillar, not a downloadable, not an article, so `[slug]` reaches
+     * `notFound()` for it. Its own static segment shadows the dynamic route, so
+     * the page worked and the phantom param never showed. It was a trap for
+     * whoever tried to delete that sibling believing `[slug]` covered it.
+     */
+    const route = readFileSync(appPath("/resources/[slug]/page.tsx"), "utf8");
+    const params = route.slice(
+      route.indexOf("export function generateStaticParams"),
+      route.indexOf("const buildSectionAnchor"),
+    );
+    assert.ok(!params.includes("resourceSupportingPages"), "supporting pages are not all renderable here");
+
+    // The sibling is what actually serves it, so it has to stay until the route
+    // grows a branch that can.
+    assert.ok(existsSync(appPath("/resources/decision-shield-overview/page.tsx")));
+  });
+});
+

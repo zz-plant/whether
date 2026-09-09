@@ -7,6 +7,8 @@ export type OperationsWorkstreamLink = {
   description: string;
 };
 
+// Decision memory is not here: it is a record, not a plan, and lives at
+// /history/decisions with the rest of what happened.
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   {
     href: "/operate",
@@ -17,11 +19,6 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     href: "/operate/financial",
     label: "Financial strategy",
     description: "CFO runway planning, burn adjustments, and budget planning board memo exporter.",
-  },
-  {
-    href: "/operate/memory",
-    label: "Decision memory",
-    description: "Immutable timeline registry of committed posture overrides and audit checks.",
   },
   {
     href: "/operate/scenarios",

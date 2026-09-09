@@ -15,14 +15,14 @@ const buildPermanentRedirects = (pairs) =>
 export const solutionRedirectPairs = [
   ["/solutions/engineering-capacity", "/toolkits/ops-capacity"],
   ["/solutions/product-roadmapping", "/toolkits/focus"],
-  ["/solutions/market-regime-playbook", "/answer/ops-risk"],
-  ["/solutions/career-paths", "/answer/product"],
-  ["/solutions/career-paths/senior-product-manager", "/answer/product"],
-  ["/solutions/career-paths/group-product-manager", "/answer/product"],
-  ["/solutions/career-paths/director-of-product", "/answer/product"],
-  ["/solutions/career-paths/vp-product", "/answer/ceo"],
-  ["/solutions/career-paths/product-strategy-chief-of-staff", "/answer/ops-risk"],
-  ["/solutions/:path*", "/answer"],
+  ["/solutions/market-regime-playbook", "/resolve/ops-risk"],
+  ["/solutions/career-paths", "/resolve/product"],
+  ["/solutions/career-paths/senior-product-manager", "/resolve/product"],
+  ["/solutions/career-paths/group-product-manager", "/resolve/product"],
+  ["/solutions/career-paths/director-of-product", "/resolve/product"],
+  ["/solutions/career-paths/vp-product", "/resolve/ceo"],
+  ["/solutions/career-paths/product-strategy-chief-of-staff", "/resolve/ops-risk"],
+  ["/solutions/:path*", "/resolve"],
 ];
 
 export const canonicalSurfaceRedirectPairs = [
@@ -39,11 +39,13 @@ export const canonicalSurfaceRedirectPairs = [
   ["/sources", "/trust#sources-freshness"],
   ["/confidence", "/trust#confidence-limits"],
   // Decision answer root → Decide hub
-  ["/answers", "/answer#direct-answers"],
-  // Nav-label aliases — the header/footer say Evidence/Plan/Resolve but the
-  // filesystem routes are /signals, /operate, /answer. People retype the labels.
+  ["/answers", "/resolve#direct-answers"],
+  // Nav-label aliases. The header, the page title and the IA all said "Resolve"
+  // while the directory said /answer — one letter from the unrelated /answers
+  // corpus. /resolve is the filesystem route now, so this pair inverts: the old
+  // path is the legacy name that links and habits still carry.
   ["/evidence", "/signals"],
-  ["/resolve", "/answer"],
+  ["/answer", "/resolve"],
   ["/planning", "/operate"],
   // Learn root + failure modes → Trust hub
   ["/learn", "/trust"],
@@ -51,20 +53,26 @@ export const canonicalSurfaceRedirectPairs = [
   ["/learn/failure-modes/:slug", "/trust#revisit-call"],
   // Concepts (all paths) → Trust hub
   ["/concepts/:path*", "/trust"],
-  // Decide redirect stubs
+  // Decide redirect stubs. Both spellings, and both above the wildcard below:
+  // team-context is not a generated param on either route, so without these it
+  // would 404 rather than land on the plan.
   ["/resolve/team-context", "/operate#ops-monthly-action-summary"],
+  ["/answer/team-context", "/operate#ops-monthly-action-summary"],
   // Operations sub-pages flattened. These must precede the /planning wildcard
   // below: /operate has only financial and memory, so a wildcard would send
   // /planning/data to /operate/data, which does not exist.
   ["/planning/data", "/operate"],
   ["/planning/cli", "/operate"],
   ["/planning/integrations", "/operate"],
+  // The ledger moved under history. Pointed straight there rather than at
+  // /operate/memory, which would chain through a second redirect.
+  ["/planning/memory", "/history/decisions"],
   // The same aliases one level down. Matching only the bare path left every
-  // legacy sub-path a 404 — /resolve/ceo and /evidence/capital-tightness-watch
+  // legacy sub-path a 404 — /answer/ceo and /evidence/capital-tightness-watch
   // among them — so external links and anything still pointing at the old names
-  // died silently. Must stay below the specific /resolve/* rules above, which a
+  // died silently. Must stay below the specific /answer/* rules above, which a
   // wildcard would otherwise shadow.
-  ["/resolve/:path*", "/answer/:path*"],
+  ["/answer/:path*", "/resolve/:path*"],
   ["/evidence/:path*", "/signals/:path*"],
   ["/planning/:path*", "/operate/:path*"],
   // Resources root → Planning
@@ -75,7 +83,7 @@ export const canonicalSurfaceRedirectPairs = [
   ["/guides/:stakeholder", "/guides?stakeholder=:stakeholder"],
   // Retrofit redirects (links that soft-404)
   ["/settings", "/"],
-  ["/decision-tools", "/answer"],
+  ["/decision-tools", "/resolve"],
   ["/toolkits", "/"],
 ];
 
@@ -93,6 +101,16 @@ export const iaConsolidationRedirectPairs = [
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists
   ["/export", "/share"],
+  // Decision memory is a record of what was decided, which is history, not
+  // planning. /operate keeps the tools for deciding.
+  ["/operate/memory", "/history/decisions"],
+  // /state ran the brief's own pipeline and rendered a subset of the hero under
+  // its own H1 — a view of `/` that read as a second, independently derived
+  // answer, and competed with `/` and `/brief/[week]` for the same query.
+  ["/state", "/"],
+  // The embed builder is a section of the share page: same artifact, different
+  // container. Two doors to "get the brief out" said nothing about each other.
+  ["/embed", "/share#embed"],
 ];
 
 export const redirectEntries = [
@@ -136,13 +154,6 @@ const evidenceCacheHeaders = [
   },
 ];
 
-const stateCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, s-maxage=3600, stale-while-revalidate=3600",
-  },
-];
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -167,10 +178,6 @@ const nextConfig = {
       {
         source: "/signals",
         headers: evidenceCacheHeaders,
-      },
-      {
-        source: "/state",
-        headers: stateCacheHeaders,
       },
     ];
   },

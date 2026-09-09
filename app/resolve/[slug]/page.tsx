@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     ...buildPageMetadata({
       title: `Decision help: ${titleCase(slug)}`,
       description: "A practical entry point into the right toolkit and supporting context.",
-      path: `/answer/${slug}`,
+      path: `/resolve/${slug}`,
       imageAlt: `Decision help ${titleCase(slug)}`,
     }),
     robots: noindexRobots,

@@ -5,7 +5,7 @@ import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 describe("seo quality gates", () => {
   it("passes when decision, freshness, uniqueness, thin-page, and trust gates pass", () => {
     const result = evaluateSeoQualityGates({
-      pageKey: "/answer/ceo/capital-raising",
+      pageKey: "/resolve/ceo/capital-raising",
       currentCall: "Run financing decisions with strict term gates.",
       immediateAction: "Prioritize extension runway and diligence prep.",
       triggerThreshold: "Trigger tighter mode if tightness > 70.",
@@ -22,7 +22,7 @@ describe("seo quality gates", () => {
       interpretationLabel: "capital strategy",
       siblingsInCluster: [
         {
-          pageKey: "/answer/board/capital-raising",
+          pageKey: "/resolve/board/capital-raising",
           interpretationLabel: "board oversight",
           evidenceTitles: ["Treasury volatility"],
         },

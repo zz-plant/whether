@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { ReportSection } from "../components/reportSection";
 import { GlossaryLink } from "../components/ui/plainLanguage";
@@ -318,7 +319,11 @@ export function FormulaReference() {
           className="inline-flex min-h-[44px] items-center font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           Read the engine source →
-        </a>
+        </a>{" "}
+        For the act / pause / reverse method the thresholds feed, see{" "}
+        <Link href="/threshold" className="inline-flex min-h-[44px] items-center font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+          the bounded-decisions framework →
+        </Link>
       </p>
     </ReportSection>
   );

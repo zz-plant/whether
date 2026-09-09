@@ -6,23 +6,23 @@ import {
   buildGuidedTranslationHref,
   GuidedTranslationPanels,
   resolveGuidedTranslationState,
-} from "../app/answer/components/guidedTranslationPanels";
+} from "../app/resolve/components/guidedTranslationPanels";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 
 describe("guided translation routing", () => {
   it("routes guide selections into the canonical decide translation anchor", () => {
-    assert.equal(buildGuidedTranslationHref(), "/answer#guided-translation");
+    assert.equal(buildGuidedTranslationHref(), "/resolve#guided-translation");
     assert.equal(
       buildGuidedTranslationHref({ stakeholder: "founders-ceos" }),
-      "/answer?stakeholder=founders-ceos#guided-translation",
+      "/resolve?stakeholder=founders-ceos#guided-translation",
     );
     assert.equal(
       buildGuidedTranslationHref({ stage: "series-a", library: "stages" }),
-      "/answer?stage=series-a&library=stages#guided-translation",
+      "/resolve?stage=series-a&library=stages#guided-translation",
     );
     assert.equal(
       buildGuidedTranslationHref({ stakeholder: "heads-of-product", stage: "series-b" }),
-      "/answer?stakeholder=heads-of-product&stage=series-b#guided-translation",
+      "/resolve?stakeholder=heads-of-product&stage=series-b#guided-translation",
     );
   });
 

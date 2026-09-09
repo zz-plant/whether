@@ -58,6 +58,8 @@ export const pricingPlans: PricingPlan[] = [
       "Agent API and MCP endpoint — no key, no rate card",
       "Embeds for a dashboard or wiki",
       "The full call history and archive",
+      "Decision memory and week close-outs, saved in this browser",
+      "Email when the call changes between Mondays",
     ],
   },
   {
@@ -68,8 +70,8 @@ export const pricingPlans: PricingPlan[] = [
     audience: "One operator running the Monday meeting",
     features: [
       "Monday delivery to your inbox before the meeting",
-      "Alerts when the call flips or a threshold is crossed",
-      "Decision memory — what you decided, and when its assumptions move",
+      "Threshold alerts — when a score crosses a pause or reopen line, not only when the call flips",
+      "Decision memory that follows you across devices and survives a cleared browser",
       "Exports in your own framing rather than the default",
     ],
   },

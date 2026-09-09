@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import type { Metadata } from "next";
 import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
-import { metadata as decideMetadata } from "../app/answer/page";
+import { metadata as decideMetadata } from "../app/resolve/page";
 import { metadata as operationsMetadata } from "../app/operate/page";
 import { metadata as signalsMetadata } from "../app/signals/page";
 import { buildPageMetadata, buildSocialImageUrl } from "../lib/seo";

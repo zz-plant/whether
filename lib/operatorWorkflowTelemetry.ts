@@ -1,4 +1,4 @@
-export type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/answer";
+export type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/resolve";
 
 /**
  * One event, because one is what the client sends.
@@ -22,7 +22,7 @@ export const OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT = "/api/telemetry/operator-wor
 export const operatorWorkflowRouteStorageKey = "whether.operatorWorkflow.lastPath";
 
 export const isOperatorWorkflowRoute = (value: string): value is OperatorWorkflowRoute =>
-  value === "/" || value === "/signals" || value === "/operate" || value === "/answer";
+  value === "/" || value === "/signals" || value === "/operate" || value === "/resolve";
 
 export const isOperatorWorkflowEvent = (input: unknown): input is OperatorWorkflowEvent => {
   if (!input || typeof input !== "object") {

@@ -69,7 +69,7 @@ export const buildIssueTrackerMarkdownBrief = (
     // it was: the engine key is useful in a ticket, and dropping it would change
     // every existing exported brief.
     ...(postureLabel !== assessment.regime ? [`${strong("Regime")} ${assessment.regime}`] : []),
-    `${strong("Tightness")} ${assessment.scores.tightness} / ${strong("Risk appetite")} ${assessment.scores.riskAppetite}`,
+    `${strong("Funding pressure")} ${assessment.scores.tightness} / ${strong("Risk appetite")} ${assessment.scores.riskAppetite}`,
     `${strong("Base rate")} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `${strong("Curve slope")} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
