@@ -229,3 +229,12 @@ body::-webkit-scrollbar-thumb:hover{
   }
 }
 
+/* Its own block rather than a selector added to the one above, which is declared
+   before `.weather-slide-panel` and would lose the cascade at equal specificity.
+   Reduced motion gets the end state immediately, not a slower entrance. */
+@media (prefers-reduced-motion: reduce) {
+  .weather-slide-panel {
+    animation: none;
+  }
+}
+

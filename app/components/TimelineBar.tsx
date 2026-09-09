@@ -506,9 +506,16 @@ export function TimelineBar({
           ) : null}
         </div>
 
-        {/* Zoom Controls */}
+        {/* Zoom Controls. The presets are the discoverable control; the gesture is the
+            fast one. The wheel handler deliberately requires ctrl/meta so ordinary
+            scrolling past the bar does not rewrite the window (see the handler above),
+            which also means nothing on screen said the gesture existed — hence the title
+            on the group, where a reader already hovers when looking for zoom. */}
         {showZoomControls ? (
-          <div className="flex items-center gap-1 bg-slate-950/70 border border-white/10 p-0.5 rounded-lg text-fluid-micro">
+          <div
+            className="flex items-center gap-1 bg-slate-950/70 border border-white/10 p-0.5 rounded-lg text-fluid-micro"
+            title="Pinch, or hold ⌘/Ctrl and scroll, to zoom. Scroll sideways to pan."
+          >
             <span className="px-1.5 text-slate-500 flex items-center gap-0.5">
               <ZoomIn className="size-3 text-slate-400" />
               Zoom:

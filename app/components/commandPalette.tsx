@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
-import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal } from "lucide-react";
+import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal, History, Columns2 } from "lucide-react";
 import { loopNavigationLayers, utilityLinks } from "../../lib/navigation/informationArchitecture";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { openShareRail } from "./globalShareRail";
+import { openTimeMachine } from "./globalTimeMachine";
 
 type CommandItem = {
   id: string;
@@ -78,6 +79,28 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
           window.open(buildMondayCalendarUrl(), "_blank", "noopener,noreferrer");
           onClose();
         },
+      },
+      /*
+       * The two archive tools, which had no entry point outside a nested sheet and a
+       * hand-typed query string. Reading any covered month is the deepest thing this
+       * site does and the palette is where a reader looks for it.
+       */
+      {
+        id: "time-machine",
+        label: "Browse a past month",
+        description: "Re-read the brief as it stood in any covered month",
+        icon: History,
+        action: () => {
+          onClose();
+          openTimeMachine();
+        },
+      },
+      {
+        id: "compare-periods",
+        label: "Compare two months",
+        description: "Two months side by side — regime, budget, and operating rules",
+        icon: Columns2,
+        action: () => navigateTo("/history/compare"),
       },
       {
         id: "board-annex",

@@ -4,6 +4,7 @@ import { PageShell } from "../components/pageShell";
 import { ShareCopyControls } from "./shareCopyControls";
 import { SharePageFormats } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
+import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
@@ -116,8 +117,8 @@ export default async function SharePage() {
           <h1 className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s operating brief</h1>
           <p className="text-sm leading-relaxed text-white/60">
             Copy the live weekly call with its bounded conditions and source into Slack, a slide, or a
-            citation. Longer formats and a calendar hold are below; a live embed for a newsletter or
-            wiki is at the end.
+            citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
+            embed for a newsletter or wiki is at the end.
           </p>
           <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
         </div>
@@ -147,6 +148,9 @@ export default async function SharePage() {
             showProvenance={false}
           />
         </div>
+
+        {/* Text formats first, then the same call as a picture. */}
+        <ShareImageArtifacts />
 
         <div>
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100 no-underline">

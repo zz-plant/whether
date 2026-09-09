@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import { GET as getLlmsRoute } from "../app/llms.txt/route";
-import { GET as getDiscoveryRoute } from "../app/.well-known/whether-agent.json/route";
+import { agentManifestResponse } from "../lib/agentManifest";
 import { GET as getAgentRoute } from "../app/api/agent/route";
 import { agentApiCorsHeaders } from "../lib/agentApiCors";
 import { supportedAgentCadences } from "../lib/agentInterface";
@@ -34,10 +34,12 @@ describe("agent-facing routes", () => {
   });
 
   it("serves machine-readable discovery metadata", async () => {
-    const response = await getDiscoveryRoute();
+    const response = agentManifestResponse();
     const body = await response.json();
 
     assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
+    assert.equal(response.headers.get("access-control-allow-origin"), "*");
     assert.equal(body.defaultCadence, "weekly");
     assert.deepEqual(body.supportedCadences, ["weekly", "monthly", "quarterly", "yearly"]);
     assert.equal(body.endpoints.llms, "https://whether.work/llms.txt");

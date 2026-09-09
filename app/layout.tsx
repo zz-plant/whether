@@ -5,6 +5,7 @@ import { GlobalHeader } from "./components/globalHeader";
 import { STORAGE_KEYS } from "../lib/storage/keys";
 import { navigationLayers, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
+import { GlobalTimeMachine } from "./components/globalTimeMachine";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { MobileTabBar } from "./components/MobileTabBar";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
@@ -199,6 +200,7 @@ export default function RootLayout({
           </a>
           <GlobalHeader />
           <GlobalCommandPalette />
+          <GlobalTimeMachine />
           <GlobalShareRail />
           <MobileTabBar />
           <ScreenshotDetector />
