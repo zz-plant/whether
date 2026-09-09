@@ -19,6 +19,7 @@ export const STORAGE_KEYS = {
    * of the closeout record, so reading it would only invent one. */
   weeklyCloseouts: "whether.weeklyCloseouts",
   operatorProfile: OPERATOR_PROFILE_STORAGE_KEY,
+  entitlementToken: "whether.billing.entitlementToken",
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
   decisionMemory: (clientId: string) => `whether.decisionMemory:${clientId}`,
   decisionShieldPresets: (clientId?: string | null) =>

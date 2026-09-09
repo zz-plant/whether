@@ -51,6 +51,13 @@ existed nothing recorded it.
   while `returned` stays flat is a sharing product, not a ritual product, and would change what
   premium should package.
 
+Entitlement rail (added Aug 2026, rebased Sep 2026): the plumbing *behind* a paid plan now exists end
+to end — `checkout.session.completed` persists an entitlement, `POST /api/billing/confirm` and
+`/status` issue and re-verify a signed token, and `PremiumGate` can wrap a surface. It is wired but
+not exposed: `PremiumGate` renders its children ungated while `lib/pricing.ts` says the paid plans
+are not buyable, so the gate and the pricing page cannot disagree. Section 5 below describes the
+rail; flipping `PAID_PLANS_ON_SALE` is what turns it on.
+
 ## Goals
 - Preserve the free weekly posture ritual (`/`) as the acquisition and trust surface.
 - Measure where users hit premium intent (exports, integrations, API/data, planning depth).
@@ -121,6 +128,32 @@ carrying `data-premium-intent`, so a surface is measured only if something on it
 | `integrations` | `app/components/regimeAlertsPanel.tsx` — Slack/email/webhook channel toggles |
 | `team_workflow` | `app/operate/components/decisionMemoryPanel.tsx` — export CSV, copy latest JSON |
 
+### 5) Entitlement persistence and gating
+- `checkout.session.completed` now persists an `EntitlementRecord` (plan, Stripe
+  customer id, email, status) to KV, keyed by session id, email, and customer
+  id. `customer.subscription.deleted` flips it to `cancelled` in place —
+  entitlements are never deleted, only closed.
+- The success redirect carries `session_id={CHECKOUT_SESSION_ID}` (a literal
+  Stripe template, substituted at redirect time). `POST /api/billing/confirm`
+  exchanges that id for a signed entitlement token once the webhook has landed
+  (the client retries briefly — checkout and webhook race). `POST
+  /api/billing/status` re-verifies a stored token against the live record, so
+  a cancellation closes access before the token's own TTL would.
+- Tokens are HMAC-SHA256 (WebCrypto) under `WHETHER_ENTITLEMENT_SECRET`. Unset,
+  issuing and verifying both refuse outright rather than mint or accept an
+  unverifiable token — there is no silent bypass mode.
+- `app/operate/components/PremiumGate.tsx` is the first real gate: it wraps
+  `/operate`'s Runway planner, defaults to locked (including the first
+  server-rendered paint, before any client check has run), and offers
+  Pro/Team checkout inline. No other premium-intent surface is gated yet —
+  export/copy on the weekly brief stays free, matching the product's stance
+  that the core artifact must always be copyable.
+
+Env var to add to the readiness list above: `WHETHER_ENTITLEMENT_SECRET`.
+
+Source of truth: `lib/billing/entitlements.ts`, `app/api/billing/confirm/route.ts`,
+`app/api/billing/status/route.ts`, `app/operate/components/PremiumGate.tsx`.
+
 ## Pre-reveal go/no-go checks
 1. Confirm event volume for at least 1–2 weeks on free traffic.
 2. Validate `source` distribution lines up with product thesis (exports/integrations should dominate).
@@ -144,6 +177,14 @@ carries this fix, so earlier weeks have no share-rail data to compare against.
 5. Verify webhook receiver SLA and error handling before paid rollout.
 
 ## Recommended next steps before public premium reveal
-- Add explicit `premium_gate_view` events on prototype gate modals or locked actions.
-- Add explicit checkout entry CTAs from gated product actions into `/api/billing/checkout`.
+- Fire an explicit `premium_gate_view` event when `PremiumGate` renders locked
+  (currently only the checkout-click CTAs are instrumented, via the existing
+  click-delegated tracker; a view-on-render event needs its own dispatch).
+- Decide whether additional premium-intent surfaces (`export_brief`,
+  `integrations`, `api_access`, `team_workflow`) actually get gated, or stay
+  free with intent-only tracking — `export_brief` in particular should stay
+  free per the product's artifact-quality rule (AGENTS.md hard rule 3) unless
+  that stance changes deliberately.
 - Set dashboard alerts for funnel-drop regressions week-over-week.
+- Build a real `/pricing` page; `PremiumGate`'s inline Pro/Team buttons are a
+  functional stopgap, not a comparison page.

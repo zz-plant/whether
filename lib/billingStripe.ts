@@ -127,7 +127,11 @@ export const createStripeCheckoutSession = async ({
     throw new StripeBillingError("missing_price_id", 503);
   }
 
-  const successUrl = buildStripeCheckoutReturnUrl({ appBaseUrl: config.appBaseUrl, path, checkout: "success", plan });
+  /* {CHECKOUT_SESSION_ID} is a literal template Stripe substitutes at redirect
+     time — appended raw because URLSearchParams would percent-encode the braces.
+     The session id is what /api/billing/confirm exchanges for an entitlement
+     token, so without it the success redirect proves nothing. */
+  const successUrl = `${buildStripeCheckoutReturnUrl({ appBaseUrl: config.appBaseUrl, path, checkout: "success", plan })}&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = buildStripeCheckoutReturnUrl({ appBaseUrl: config.appBaseUrl, path, checkout: "cancelled", plan });
 
   const params = new URLSearchParams();

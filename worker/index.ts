@@ -5,6 +5,7 @@ import { writeAnalytics } from "../lib/telemetry/analyticsEngine";
 import { installWaitUntil } from "../lib/runtime/backgroundWork";
 import { withDeadline } from "../lib/withDeadline";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
+import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
@@ -128,6 +129,7 @@ export default {
        break cadence. */
     if (!isDailyIngestion && snapshot && weeklyCall) {
       await runCronStep("email/send-weekly", () => sendWeeklyBrief({ snapshot, weeklyCall }));
+      await runCronStep("slack/deliver-brief", deliverSlackBrief);
     }
 
     // Records the month in progress from the assessment the read path just computed, so the
