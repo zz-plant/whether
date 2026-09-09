@@ -72,7 +72,7 @@ graph TB
     subgraph "App Layer"
         C1 --> D1[/app/page.tsx - Weekly Brief]
         C2 --> D2[/signals - Evidence]
-        C3 --> D3[/answer - Resolve]
+        C3 --> D3[/resolve - Resolve]
         C4 --> D4[/api/* endpoints]
     end
     
@@ -236,7 +236,7 @@ app/
 │   └── page.tsx                      # 4-step progressive execution stepper
 ├── signals/                          # Evidence workflow (/signals)
 │   └── page.tsx                      # Dual-mode sensor array & diagnostics
-├── answer/                           # Resolve workflow (/answer)
+├── resolve/                          # Resolve workflow (/resolve)
 │   └── page.tsx                      # Action-first role translation & toolkits
 ├── trust/                            # Trust hub (/trust)
 │   └── page.tsx                      # System status, source board, formula ref

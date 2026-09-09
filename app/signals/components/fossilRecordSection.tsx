@@ -1,6 +1,7 @@
 import { insightDatabase } from "../../../data/recommendations";
+import { UrlDetails } from "../../components/ui/urlDetails";
 
-export function FossilRecordSection({ regime }: { regime?: string }) {
+export function FossilRecordSection({ regime, open = false }: { regime?: string; open?: boolean }) {
   const { fossilRecord } = insightDatabase;
   const isTightClimate = regime === "SCARCITY" || regime === "DEFENSIVE";
 
@@ -30,7 +31,18 @@ export function FossilRecordSection({ regime }: { regime?: string }) {
         </span>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Collapsed by default. This is architecture reference on the evidence
+          page, and a six-row, four-column table of prose is unreadable at phone
+          width; the header above states what it is, the disclosure carries the
+          table. URL-carried so a shared link opens it. */}
+      <UrlDetails
+        queryKey="fossil"
+        initialOpen={open}
+        className="weather-auto-chevron"
+        summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
+        summary={<span>Show the artifact table ({fossilRecord.rows.length} domains)</span>}
+      >
+      <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-fluid-xs">
           <colgroup>
             <col className="w-1/6" />
@@ -86,9 +98,10 @@ export function FossilRecordSection({ regime }: { regime?: string }) {
         </table>
       </div>
 
-      <p className="text-fluid-nano text-slate-500">
+      <p className="mt-3 text-fluid-nano text-slate-500">
         Source: Whether Insight Database · Precedents from 2001, 2008, and 2022 regime shifts.
       </p>
+      </UrlDetails>
     </section>
   );
 }

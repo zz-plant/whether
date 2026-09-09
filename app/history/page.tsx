@@ -5,6 +5,7 @@ import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { RegimeStats } from "../components/history/RegimeStats";
 import { TrackRecord } from "../components/history/TrackRecord";
+import { TrackRecordSection } from "../components/history/TrackRecordSection";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
@@ -72,19 +73,19 @@ export default async function HistoryPage({
         <ExportBoardAnnexButton record={trackRecord} />
       </div>
 
-      <TrackRecord
-        record={trackRecord}
-        allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
-      />
-
-      {/* Between the record's summary numbers and its archive: the numbers say how
-          often the call changed, this says where it changed and how near the next
-          one is, and the archive below says what each call was. */}
+      {/* The plane first. It is the one graphic on the page that shows where the
+          call sits and how near the next one is; the record below says how often
+          it moved and lists each call. It used to sit under a twelve-row table. */}
       <RegimePhaseMap
         series={phaseSeries}
         activeSpan={phaseSpan.key}
         spanHref={(span) => buildSpanHref(resolvedSearchParams, span)}
         totalMonths={fullSeries.length}
+      />
+
+      <TrackRecord
+        record={trackRecord}
+        allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
       />
 
       {publishedBriefs.length > 0 ? (
@@ -140,6 +141,10 @@ export default async function HistoryPage({
           </ActionLink>
         </div>
       </section>
+
+      {/* Grades the record above: which regime changes were visible in the near band
+          beforehand, and which were not. */}
+      <TrackRecordSection series={statsSeries} />
 
       <section className="weather-panel space-y-4 px-5 py-5">
         <h2 className="type-eyebrow">Posture by year</h2>

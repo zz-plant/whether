@@ -10,6 +10,7 @@ import {
   rangeLabel,
   sparklineDomain,
 } from "../app/components/ui/sparkline";
+import { HistoricalTrendChart } from "../app/components/historicalTrendChart";
 
 /**
  * These guard the property that made a homepage chart wrong for months: geometry
@@ -110,5 +111,55 @@ describe("sparkline", () => {
 
     assert.deepEqual(band, [20, 40]);
     assert.equal(interquartileRange([1, 2]), undefined, "too few points for a quartile");
+  });
+});
+
+describe("HistoricalTrendChart", () => {
+  const points = [
+    { date: "2026-01-01", value: 40 },
+    { date: "2026-02-01", value: 60 },
+    { date: "2026-03-01", value: 55 },
+  ];
+
+  it("renders nothing for a series too short to have shape", () => {
+    assert.equal(
+      renderToStaticMarkup(<HistoricalTrendChart label="Tightness" color="red" points={[points[0]]} />),
+      "",
+    );
+  });
+
+  it("states the autoscaled range in the SVG's own accessible label", () => {
+    const html = renderToStaticMarkup(<HistoricalTrendChart label="Tightness" color="red" points={points} />);
+
+    // The label sits on the <svg> itself, not on a wrapper. (`role="img"` is what
+    // the audit asked for; the repo lints it away as prefer-tag-over-role.)
+    assert.match(html, /<svg[^>]*aria-label="[^"]*ranging 40–60/);
+    assert.match(html, /aria-label="[^"]*Latest [^"]*55/);
+  });
+
+  it("shares its projection with the inline sparkline instead of a second implementation", () => {
+    const values = points.map((p) => p.value);
+    const domain = sparklineDomain(values);
+    const sharedPath = buildSparklinePath(values, domain, 100, 32, 2);
+
+    const html = renderToStaticMarkup(<HistoricalTrendChart label="Tightness" color="red" points={points} />);
+
+    assert.ok(html.includes(sharedPath.split(" ")[0]), "the chart's path starts where the shared projection does");
+  });
+
+  it("flips favorable/unfavorable tone with increaseIsPositive rather than hardcoding direction", () => {
+    const rising = [points[0], { date: "2026-02-01", value: 80 }];
+
+    const tightnessStyle = renderToStaticMarkup(
+      <HistoricalTrendChart label="Tightness" color="red" points={rising} />,
+    );
+    const appetiteStyle = renderToStaticMarkup(
+      <HistoricalTrendChart label="Risk appetite" color="green" points={rising} increaseIsPositive />,
+    );
+
+    // A rise is unfavorable by default (tightness-style) and favorable when
+    // increaseIsPositive is set (appetite-style) — the two must not render
+    // the same tone class for the same data.
+    assert.notEqual(tightnessStyle, appetiteStyle);
   });
 });

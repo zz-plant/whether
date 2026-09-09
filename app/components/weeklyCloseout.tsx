@@ -32,9 +32,12 @@ import {
 export function WeeklyCloseout({
   recordDate,
   recentRecordDates = [],
+  embedded = false,
 }: {
   recordDate?: string;
   recentRecordDates?: readonly string[];
+  /** Rendered inside `YourWeekCard`: no frame of its own, a smaller heading, no privacy footer. */
+  embedded?: boolean;
 }) {
   const artifact = useBriefArtifact();
   const [store, setStore] = useLocalStorageState<CloseoutStore>(STORAGE_KEYS.weeklyCloseouts, {});
@@ -108,16 +111,22 @@ export function WeeklyCloseout({
     </button>
   );
 
+  const Wrapper = embedded ? "div" : "section";
+  const Heading = embedded ? "h3" : "h2";
+
   return (
-    <section
+    <Wrapper
       aria-labelledby="weekly-closeout-heading"
-      data-sticky-strip-hide
-      className="rounded-xl border border-slate-800/70 bg-slate-900/40 p-4"
+      data-sticky-strip-hide={embedded ? undefined : true}
+      className={embedded ? "" : "rounded-xl border border-slate-800/70 bg-slate-900/40 p-4"}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="weekly-closeout-heading" className="type-section font-semibold tracking-tight text-white">
+        <Heading
+          id="weekly-closeout-heading"
+          className={embedded ? "text-fluid-xs font-semibold text-slate-200" : "type-section font-semibold tracking-tight text-white"}
+        >
           Close the week
-        </h2>
+        </Heading>
         {recentRecordDates.length > 0 ? (
           <span className="text-fluid-nano text-slate-400">
             {closedCount} of the last {recentRecordDates.length} weeks closed
@@ -229,6 +238,6 @@ export function WeeklyCloseout({
         </div>
       )}
 
-    </section>
+    </Wrapper>
   );
 }

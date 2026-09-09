@@ -45,8 +45,11 @@ const entryLabel = (entry: DecisionMemoryEntry): string => {
 
 export function DecisionStalenessPanel({
   conditions,
+  embedded = false,
 }: {
   conditions: CurrentStalenessConditions;
+  /** Rendered inside `YourWeekCard`: no frame of its own, a smaller heading, one-line empty state. */
+  embedded?: boolean;
 }) {
   const clientId = usePersistentClientId();
   const [entries, setEntries] = useState<DecisionMemoryEntry[]>([]);
@@ -84,38 +87,44 @@ export function DecisionStalenessPanel({
     });
   }, [entries, conditions]);
 
+  const Wrapper = embedded ? "div" : "section";
+  const Heading = embedded ? "h3" : "h2";
+  const headingClass = embedded
+    ? "text-fluid-xs font-semibold text-slate-200"
+    : "type-section font-semibold tracking-tight text-white";
+
   if (entries.length === 0) {
     return (
-      <section
+      <Wrapper
         aria-labelledby="decision-staleness-heading"
-        className="weather-section rounded-xl border border-slate-800/50 bg-slate-900/30 px-4 py-3"
+        className={embedded ? "" : "weather-section rounded-xl border border-slate-800/50 bg-slate-900/30 px-4 py-3"}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="decision-staleness-heading" className="type-section font-semibold tracking-tight text-white/90">
+          <Heading id="decision-staleness-heading" className={headingClass}>
             Decisions to reconsider
-          </h2>
+          </Heading>
           <span className="text-fluid-nano text-slate-400">0 tracked</span>
         </div>
-        <p className="mt-1.5 text-fluid-xs text-slate-400">
-          No decisions tracked yet. Save this week’s call with <span className="font-medium text-slate-300">Save this call</span> above, or a plan verdict with <span className="font-medium text-slate-300">Track in Memory</span>, to watch its assumptions when conditions move. Tracked decisions stay in this browser.
+        <p className="mt-1 text-fluid-nano text-slate-400">
+          Nothing tracked yet. <span className="font-medium text-slate-300">Save this call</span> on the call above, or <span className="font-medium text-slate-300">Track in Memory</span> on a plan verdict, watches its assumptions when conditions move.
         </p>
-      </section>
+      </Wrapper>
     );
   }
 
   const attentionCount = staleness.length;
 
   return (
-    <section
+    <Wrapper
       aria-labelledby="decision-staleness-heading"
-      className="weather-section rounded-xl border border-slate-800/70 bg-slate-900/40 p-4"
+      className={embedded ? "" : "weather-section rounded-xl border border-slate-800/70 bg-slate-900/40 p-4"}
     >
       {/* The heading names the list; the count and the all-clear live in the badge beside
           it, so a zero state never reads as "decisions need attention". */}
       <div className="flex items-center justify-between gap-3">
-        <h2 id="decision-staleness-heading" className="type-section font-semibold tracking-tight text-white">
+        <Heading id="decision-staleness-heading" className={headingClass}>
           Decisions to reconsider
-        </h2>
+        </Heading>
         {attentionCount > 0 ? (
           <span className="text-fluid-nano font-semibold text-amber-300">
             {attentionCount} need{attentionCount === 1 ? "s" : ""} attention
@@ -151,6 +160,6 @@ export function DecisionStalenessPanel({
           ))}
         </ul>
       )}
-    </section>
+    </Wrapper>
   );
 }

@@ -32,6 +32,14 @@ export type PricingPlan = {
   promise?: string;
 };
 
+/**
+ * Whether Pro and Team can be bought today. False means /pricing registers interest
+ * and every PremiumGate renders its children ungated — the entitlement rail behind
+ * checkout is wired (see docs/premium-launch-readiness.md) but nothing sells it.
+ * Flip this, not the gate, when the plans go on sale, so the two cannot disagree.
+ */
+export const PAID_PLANS_ON_SALE = false;
+
 export const FREE_FOREVER_PROMISE =
   "The weekly operating call, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans buy continuity and team ritual — never access to the call itself.";
 

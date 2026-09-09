@@ -56,22 +56,27 @@ export type SendWeeklyBriefResult = {
   sent: number;
   errors: number;
   total: number;
-  slackPosted: boolean;
+  /** "stub" means the EMAIL binding is missing and nothing was delivered. */
+  deliveryMode: "live" | "stub";
+  error?: string;
   message?: string;
 };
 
 /**
- * Send the weekly brief to all active subscribers, and mirror it to Slack when a
- * webhook is configured. Shared by the cron trigger (direct call from worker/index.ts)
- * and the POST /api/email/send-weekly route, projecting the authoritative OperatingSnapshot.
+ * Send the weekly brief to all active subscribers. Shared by the cron trigger
+ * (direct call from worker/index.ts) and the POST /api/email/send-weekly route,
+ * projecting the authoritative OperatingSnapshot. Slack delivery is its own cron
+ * step — lib/slack/deliverSlackBrief.
  */
 export const sendWeeklyBrief = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
 }): Promise<SendWeeklyBriefResult> => {
   const subscriptions = await getActiveSubscriptions();
+  const adapter = createCloudflareEmailAdapter();
+  const deliveryMode = adapter.mode ?? "live";
   if (subscriptions.length === 0) {
-    return { ok: true, sent: 0, errors: 0, total: 0, slackPosted: false, message: "No active subscriptions." };
+    return { ok: true, sent: 0, errors: 0, total: 0, deliveryMode, message: "No active subscriptions." };
   }
 
   let snapshot = options?.snapshot;
@@ -93,7 +98,6 @@ export const sendWeeklyBrief = async (options?: {
   const pauseIf = weeklyCall?.pauseIf ?? "Pause irreversible commitments if funding tightness rises.";
   const changeCourseIf = weeklyCall?.changeCourseIf ?? "Resume staged approvals when conditions stabilize.";
   const recordDate = snapshot?.provenance.recordDateLabel ?? "this week";
-  const adapter = createCloudflareEmailAdapter();
 
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
@@ -168,42 +172,12 @@ export const sendWeeklyBrief = async (options?: {
   const sent = results.filter((r) => r.status === "fulfilled" && r.value.ok).length;
   const errors = results.filter((r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.ok)).length;
 
-  /* Also post to Slack if a webhook is configured */
-  const slackWebhook = process.env.SLACK_WEBHOOK_URL;
-  let slackOk = false;
-  if (slackWebhook) {
-    try {
-      const blocks = [
-        { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief — ${recordDate}` } },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: [
-              `*Conditions:* ${regimeLabel}`,
-              ...readingsText(readings).map((line) => `*${line.replace(": ", ":* ")}`),
-              `*Action Now:* ${actionNow}`,
-              `*Pause If:* ${pauseIf}`,
-              `*Change Course If:* ${changeCourseIf}`,
-            ].join("\n"),
-          },
-        },
-        {
-          type: "actions",
-          elements: [
-            {
-              type: "button",
-              text: { type: "plain_text", text: "View Full Brief" },
-              url: "https://whether.work",
-              action_id: "open_brief",
-            },
-          ],
-        },
-      ];
-      await fetch(slackWebhook, { method: "POST", body: JSON.stringify({ blocks }) });
-      slackOk = true;
-    } catch { /* Slack post failure is non-fatal */ }
-  }
+  const ok = errors === 0;
+  const error = ok
+    ? undefined
+    : deliveryMode === "stub"
+      ? `email_binding_missing: 0/${subscriptions.length} delivered`
+      : `${errors}/${subscriptions.length} sends failed`;
 
-  return { ok: true, sent, errors, total: subscriptions.length, slackPosted: slackOk };
+  return { ok, sent, errors, total: subscriptions.length, deliveryMode, ...(error ? { error } : {}) };
 };

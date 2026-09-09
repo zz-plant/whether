@@ -323,6 +323,18 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
       const url = new URL(target.path, baseUrl).toString();
       const outputPath = path.resolve(process.cwd(), outDir, `${target.id}.png`);
 
+      // Collected regardless of whether the caller checks them, so a capture
+      // run doubles as UI standard VII's "console is clean" check for free —
+      // every render defect this session found lived in this layer and none
+      // of it showed up in the logic-heavy test suite.
+      const consoleErrors = [];
+      const onConsole = (message) => {
+        if (message.type() === "error") consoleErrors.push(message.text());
+      };
+      const onPageError = (error) => consoleErrors.push(`pageerror: ${error.message}`);
+      page.on("console", onConsole);
+      page.on("pageerror", onPageError);
+
       console.log(`Capturing ${target.id} -> ${outputPath}`);
       await page.goto(url, { waitUntil: "load" });
       await waitForCaptureReady(page, target);
@@ -331,6 +343,9 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
         path: outputPath,
         fullPage: target.fullPage ?? true,
       });
+
+      page.off("console", onConsole);
+      page.off("pageerror", onPageError);
       await page.close();
 
       captures.push({
@@ -342,6 +357,7 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
         outputPath,
         outputFileName: `${target.id}.png`,
         url,
+        consoleErrors,
       });
     }
   } finally {

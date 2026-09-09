@@ -152,7 +152,10 @@ export const buildBriefArtifactFromSnapshot = ({
   return {
     title,
     recordDateLabel: reportData.recordDateLabel,
-    call: weeklyCall.currentCall,
+    /* `actionNow`, not `currentCall`: the homepage artifact leads with the
+       canonical do-now line, and for the bundled fallback snapshot the two
+       differ — so the same Slack button copied two different calls. */
+    call: weeklyCall.actionNow,
     actionNow: weeklyCall.actionNow,
     guardrail: weeklyCall.pauseIf,
     reversal: weeklyCall.changeCourseIf,

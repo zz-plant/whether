@@ -423,3 +423,46 @@ button .weather-chip:active,
     color: #b91c1c !important;
   }
 }
+
+/*
+ * A four-column rule table has no room at phone width: every cell wraps and the
+ * row reads as a column of fragments. Below the `sm` breakpoint each row becomes
+ * a stacked block and every cell prints its column heading from `data-label`,
+ * so the table stays one element with one set of semantics at every width.
+ */
+@media (max-width: 639px) {
+  .weather-stack-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .weather-stack-table tbody,
+  .weather-stack-table tr,
+  .weather-stack-table th[scope="row"],
+  .weather-stack-table td {
+    display: block;
+    width: 100%;
+  }
+  .weather-stack-table tr {
+    padding: 0.625rem 0;
+  }
+  .weather-stack-table th[scope="row"] {
+    padding: 0 0 0.25rem;
+  }
+  .weather-stack-table td {
+    padding: 0.25rem 0 0;
+  }
+  .weather-stack-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #94a3b8);
+  }
+}
+

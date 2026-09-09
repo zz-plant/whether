@@ -13,7 +13,7 @@ Dynamic decision copy follows the same bounded contract across weekly, evidence,
 Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
 as supporting layers, deep links, or URL-driven states of `/`:
 - `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact (the product)
-- `/operate` (Plan), `/signals` (Evidence), `/answer` (Resolve), `/trust` (Trust): reachable
+- `/operate` (Plan), `/signals` (Evidence), `/resolve` (Resolve), `/trust` (Trust): reachable
   but **supporting**, one click from the brief — not peer routes that invite a second scan
 - `/history`, `/history/compare`: supporting archive and scrub/playback
 
@@ -24,8 +24,8 @@ Supporting surfaces are intentionally subordinate:
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
 - Secondary libraries such as `/guides`, `/toolkits`, `/posture`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
 - `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
-- `/guides` now acts as a compatibility redirect into query-selected translation states on `/answer`, so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
-- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/answer`, so toolkit search and browse state live inside the canonical Resolve workflow rather than as a standalone library route.
+- `/guides` now acts as a compatibility redirect into query-selected translation states on `/resolve`, so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
+- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/resolve`, so toolkit search and browse state live inside the canonical Resolve workflow rather than as a standalone library route.
 - `/posture` now acts as a compatibility redirect back to the Weekly Brief. Live posture reference no longer ships as a standalone workflow.
 - `/search` now acts as a command-only redirect into the next canonical workflow state instead of rendering its own browse surface.
 - `/resources` now redirects straight back into Planning's export/artifact checkpoint; deeper governance material still lives on focused `/resources/[slug]` detail pages.
@@ -36,7 +36,7 @@ Supporting surfaces are intentionally subordinate:
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
-Report-shell routes (`/signals`, `/operate`, `/answer`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
+Report-shell routes (`/signals`, `/operate`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
 Primary navigation now keeps the Weekly Brief as the only primary destination. Plan,
 Evidence, Resolve, and Trust are supporting layers under the brief, reachable from the mobile
 drawer, command palette, and in-flow CTAs (`Build this week's plan`) — never as equal-weight
@@ -211,6 +211,33 @@ the export panel), distance-to-line (`formatBoundaryDistance` in `reportFormatti
 homepage evidence list, both interpretation views and the evidence rows), and the meeting packs on
 `/share`, `/operate` and the export panel, which pasted the board brief — the whole Slack brief with
 the slide bullets appended — beside the Slack brief and now carry the slide bullets alone.
+
+### 1.1.1b Wayfinding and visual weight (2026-09-08)
+Every page buried its one strong graphic under text, and phones had no in-page navigation on
+pages between 2,500 and 8,000px tall. The changes, per surface:
+
+- **Shell.** `MobileSectionChips` (`app/components/mobileSectionChips.tsx`) renders the outline
+  rail's anchors as a sticky, horizontally scrolling chip row below `md`, marking the section on
+  screen with the same `useActiveSectionId` hook the rail uses. `regimeAccentStyle`
+  (`lib/regimeAccent.ts`) sets `--regime-accent` on both shells from `REGIME_HEX_COLORS`, and
+  `ReportSection`'s top rule and eyebrow, and the active chip, draw in it, so a page reads as "this
+  week is Sunny" outside the hero.
+- **History** leads with the phase-space plane; the month-by-month table sits inside the
+  `?months=1` disclosure under the track-record tiles, and dates print as "Jul 2026" below `sm`.
+- **Evidence** puts the reading-depth toggle directly under the decision summary, then the
+  key-number gauges and the inversion timeline; the two twelve-month lines are a
+  `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
+  the fossil-record table is behind a `?fossil=1` disclosure.
+- **Plan** opens with the shared corridor rails (`BoundedCorridorRails`) inside the weekly plan
+  step, and the rules table refers back to them; the six-step checklist is a sticky one-row
+  progress strip with the check toggle on each chip.
+- **Weekly brief** merges "Decisions to reconsider" and "Close the week" into one `YourWeekCard`
+  with one heading and one privacy line; both children take `embedded` and stay a row when empty.
+- **Trust** states system status as one five-cell strip (data, freshness, sources, confidence,
+  warnings) instead of five stacked cards.
+- **Resolve** renders its two link groups as divided menus with a chevron, not panels in panels.
+- The Plan and published-brief rule tables carry `weather-stack-table`, which stacks rows and
+  prints each cell's column heading from `data-label` below `sm`.
 
 These sit inside the hero's action bar and secondary provenance row, following a routine-first
 hierarchy: the Slack copy button is the primary visible action, while Present and developer access
@@ -790,7 +817,7 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 - `/posture`
 - `/signals`
 - `/operate`
-- `/answer`
+- `/resolve`
 - `/resources`
 - `/startup-macro-posture` and `/startup-macro-posture/index`
 - `/guides`
@@ -802,7 +829,7 @@ back into the canonical Resolve quick-answer path instead of maintaining a separ
 Full helper libraries remain below the featured paths when those surfaces render a library view.
 `/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
-`/answer/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/answer` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
+`/resolve/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/resolve` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
 The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Resolve answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
@@ -906,7 +933,7 @@ This pilot remains additive at the scoring layer, but refusal is now binding at 
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status
-Decisions is an active first-class workflow surface in shipped navigation (`/answer`) with an
+Decisions is an active first-class workflow surface in shipped navigation (`/resolve`) with an
 action-first top fold anchored to the live weekly call:
 - one recommended next path derived from the live weekly call,
 - direct-answer and team-translation alternatives at lower visual weight,
@@ -1129,10 +1156,18 @@ as a bar chart in the lower home band. Removed from home; the engine
 (`getMonthlyRegimeHistory`, `lib/summary/monthlyRegimeHistory.ts`) stays for evidence/replay
 surfaces.
 
-### 8.4 Decision journal and visitor context
-**Location**: `app/components/home/VisitorContext.tsx`, rendered on `/` below the hero.
+### 8.4 Decision records (canonical: decision memory)
+**Location**: `lib/decisionMemory.ts`, `/api/decision-memory`, `app/operate/memory/`,
+`app/components/DecisionMemoryButton.tsx`, `app/components/home/DecisionStalenessPanel.tsx`.
 
-Stores weekly decisions in localStorage on each visit. On return visits, shows "It's been a few days" or "Last visit: X posture · This week: Y posture" when posture has changed.
+The one system of record for "what did we decide and when": server-backed entries keyed by
+client id, saved from the hero, browsed on `/operate/memory`, and checked for staleness on `/`.
+
+Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
+a spec update, and with it the only writer of the `whether_decision_history` localStorage key.
+The `DecisionArchive` table on `/history` kept reading that key, so it rendered nothing for every
+visitor — it and `useDecisionHistory` are now deleted too. Do not add a second decision-record
+store; extend decision memory instead.
 
 ### 8.5 Reliability score
 **Location**: Computed in `app/page.tsx`, rendered in `BriefHero.tsx` next to the tightness number.

@@ -6,7 +6,8 @@ import { HistoricalBanner } from "../components/historicalBanner";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/visitorStrip";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
-import { HistoricalTrendChart } from "../components/historicalTrendChart";
+import { SignalSparklineStrip } from "./components/signalSparklineStrip";
+import { formatMonthYearShortFromValue } from "../../lib/formatters";
 import { DomainContextSection } from "./components/domainContextSection";
 import { FossilRecordSection } from "./components/fossilRecordSection";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
@@ -44,12 +45,16 @@ export default async function SignalsPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const model = await buildSignalsPageModel(resolvedSearchParams);
   const monthlyRegimeHistory = getMonthlyRegimeHistory().slice(-12);
-  const tightnessTrend = monthlyRegimeHistory
-    .filter((entry) => typeof entry.tightness === "number")
-    .map((entry) => ({ date: entry.record_date, value: entry.tightness as number }));
-  const riskAppetiteTrend = monthlyRegimeHistory
-    .filter((entry) => typeof entry.riskAppetite === "number")
-    .map((entry) => ({ date: entry.record_date, value: entry.riskAppetite as number }));
+  const tightnessTrend = monthlyRegimeHistory.flatMap((entry) =>
+    typeof entry.tightness === "number"
+      ? [{ label: formatMonthYearShortFromValue(entry.record_date), value: entry.tightness }]
+      : [],
+  );
+  const riskAppetiteTrend = monthlyRegimeHistory.flatMap((entry) =>
+    typeof entry.riskAppetite === "number"
+      ? [{ label: formatMonthYearShortFromValue(entry.record_date), value: entry.riskAppetite }]
+      : [],
+  );
 
   return (
     <ReportShell
@@ -124,6 +129,14 @@ export default async function SignalsPage({
         topDiagnosticCallouts={model.topDiagnosticCallouts}
       />
 
+      {/* The depth control comes before the content it controls. It sat at
+          the foot of the page, after the reader had scrolled everything the
+          short read shows, deciding nothing. */}
+      <SignalsModeSwitcherSection
+        activeSignalsView={model.activeSignalsView}
+        searchParams={resolvedSearchParams}
+      />
+
       <ReturningVisitorDeltaStrip
         assessment={model.assessment}
         recordDate={model.treasury.record_date}
@@ -135,14 +148,31 @@ export default async function SignalsPage({
         openPanelHref={model.timeMachineHref}
       />
 
+      {/* The gauges lead the evidence: each signal against its watch line is
+          the most useful block on the page for a reader without a macro
+          background, and it was two thirds of the way down. */}
+      {/* The model builds `scoreCardsByType` on every request and both view modes
+          list "Current scores" in their section nav, but nothing rendered it —
+          so #current-scores was a dead anchor from the nav and from the delta
+          strip. It is also the most useful block on the page for a reader
+          without a macro background: each signal's current value against its
+          watch line, with both ends of the scale labelled. */}
+      <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
+
+      {model.activeSignalsView === "implication" ? (
+        <SignalInversionPreview yieldCurveSeries={model.yieldCurveSeries} />
+      ) : null}
+
       <div id="trends" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
         <h2 className="type-eyebrow">Funding pressure and risk appetite over time</h2>
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
-        <div className="grid gap-6 sm:grid-cols-2">
-          <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
-          <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
-        </div>
+        <SignalSparklineStrip
+          series={[
+            { key: "tightness", label: "Funding pressure", points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
+            { key: "riskAppetite", label: "Risk appetite", points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
+          ]}
+        />
       </div>
 
       {/* The nearest of four hand-picked reference cycles, by four coordinates.
@@ -220,26 +250,12 @@ export default async function SignalsPage({
         );
       })()}
 
-      {/* The model builds `scoreCardsByType` on every request and both view modes
-          list "Current scores" in their section nav, but nothing rendered it —
-          so #current-scores was a dead anchor from the nav and from the delta
-          strip. It is also the most useful block on the page for a reader
-          without a macro background: each signal's current value against its
-          watch line, with both ends of the scale labelled. */}
-      <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
-
       <DomainContextSection regime={model.assessment.regime} />
 
-      <FossilRecordSection regime={model.assessment.regime} />
-
-      <SignalsModeSwitcherSection
-        activeSignalsView={model.activeSignalsView}
-        searchParams={resolvedSearchParams}
+      <FossilRecordSection
+        regime={model.assessment.regime}
+        open={resolvedSearchParams?.fossil === "1" || resolvedSearchParams?.fossil === "open"}
       />
-
-      {model.activeSignalsView === "implication" ? (
-        <SignalInversionPreview yieldCurveSeries={model.yieldCurveSeries} />
-      ) : null}
 
       {model.activeSignalsView === "implication" ? (
         <SignalsNeedMoreProofSection searchParams={resolvedSearchParams} />

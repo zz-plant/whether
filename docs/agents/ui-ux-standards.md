@@ -51,10 +51,10 @@
 - **Weekly Brief (`/`):** the only canonical weekly workspace and first stop for posture, decision delta, and shareable artifact.
 - **Evidence (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
 - **Plan (`/operate`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
-- **Resolve (`/answer`):** role translation only (founder, product, finance, strategy views).
+- **Resolve (`/resolve`):** role translation only (founder, product, finance, strategy views).
 - **Toolkits (`/toolkits`):** runnable instruments/templates only; do not restate posture logic or evidence narrative.
 - **Learn:** diagnostic and conceptual references only; no new canonical guidance should
-  originate here. There is no `/learn` route today — this content lives under `/answer` and
+  originate here. There is no `/learn` route today — this content lives under `/resolve` and
   `/toolkits`; the boundary still applies wherever it lands.
 - **Trust (`/trust`):** transparency only (formulas, sources, cadence, limitations).
 - Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.
@@ -78,7 +78,7 @@
 - Keep touch/manipulation and min-height behavior intact; only add `className` overrides for layout positioning (e.g., `mt-auto`, `justify-center`, icon gaps), not to remove focus affordances.
 
 ## XI. Report Shell Hierarchy
-- Scope: shared report-shell routes such as `/signals`, `/operate`, `/answer`, and `/trust`.
+- Scope: shared report-shell routes such as `/signals`, `/operate`, `/resolve`, and `/trust`.
 - MUST: get the first page-specific task block on screen quickly. Shared chrome should orient the user, not delay the workflow.
 - MUST: keep pre-content chrome to distinct tiers only:
   - global route context,

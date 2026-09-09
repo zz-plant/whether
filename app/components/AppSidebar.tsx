@@ -57,7 +57,7 @@ function OutlineItem({
  * band — mid-scroll between two sections, or at the very bottom — the last answer
  * stands rather than blanking.
  */
-const useActiveSectionId = (sectionLinks: ReportSectionLink[]) => {
+export const useActiveSectionId = (sectionLinks: ReportSectionLink[]) => {
   const sectionIds = useMemo(
     () => sectionIdsFromHrefs(sectionLinks.map((section) => section.href)),
     [sectionLinks],

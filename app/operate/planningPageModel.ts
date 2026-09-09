@@ -33,6 +33,7 @@ import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
 import { MonthlyActionSummaryPanel } from "../components/appendix/monthlyActionSummaryPanel";
 import { PlaybookPanel } from "../components/appendix/playbookPanel";
+import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import { RegimeAlertsPanel } from "../components/regimeAlertsPanel";
 import { ReportShell } from "../components/reportShell";
 import { DecisionMemoryPanel } from "./components/decisionMemoryPanel";
@@ -40,6 +41,7 @@ import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { ExecutiveBriefingPanel } from "./components/executiveBriefingPanel";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
+import { PremiumGate } from "./components/PremiumGate";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { ReportSection } from "../components/reportSection";
 
@@ -344,6 +346,15 @@ export async function buildPlanningPageModel(
               // bordered themselves. Three frames for one group, and the middle one
               // put the block on its own left edge. Same call the playbook panel
               // already records for its "Rules by area" group.
+              // The corridor leads the plan. It is the graphic every rule on
+              // this page refers to, and it sat 1,600px down inside a collapsed
+              // step under a checklist and three text cards.
+              h(BoundedCorridorRails, {
+                items: actionStripItems,
+                scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
+                idPrefix: "plan-corridor",
+                viewBoxWidth: 420,
+              }),
               h("section", { className: "space-y-4" },
                 h("div", { className: "space-y-2" },
                   h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "Weekly approval boundary"),
@@ -481,7 +492,6 @@ export async function buildPlanningPageModel(
                 showProvenance: false,
                 actionStripItems,
                 showAllActionLanes,
-                scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
               }),
               ),
             }),
@@ -518,7 +528,12 @@ export async function buildPlanningPageModel(
                 provenance: treasuryProvenance,
                 showProvenance: false,
               }),
-              h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
+              h(PremiumGate, {
+                source: "runway_planner",
+                title: "Runway planner",
+                description: "Model burn, revenue, and growth rate against the current regime to see how far your runway actually stretches.",
+                children: h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
+              }),
               ),
             }),
           },

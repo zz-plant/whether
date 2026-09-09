@@ -75,12 +75,16 @@ export function ReportSection({
           </HeadingTag>
         ) : (
         <div className="weather-panel relative overflow-hidden px-5 py-4">
+          {/* The regime's hue, not sky: the rule and the eyebrow are the two
+              marks every section repeats, so they are where a page can say
+              which week it is without a new component. */}
           <span
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{ backgroundImage: "linear-gradient(to right, transparent, color-mix(in srgb, var(--regime-accent, #7dd3fc) 45%, transparent), transparent)" }}
             aria-hidden="true"
           />
           {label ? (
-            <span className="type-eyebrow text-sky-200/80">
+            <span className="type-eyebrow" style={{ color: "var(--regime-accent, #94a3b8)" }}>
               {label}
             </span>
           ) : null}
@@ -122,7 +126,7 @@ export function ReportSection({
               section title therefore hand-rolled the whole section instead of
               using this component, which is a large part of why it only ever got
               adopted on /trust. */}
-          {label ? <p className="type-eyebrow mb-1">{label}</p> : null}
+          {label ? <p className="type-eyebrow mb-1" style={{ color: "var(--regime-accent, #94a3b8)" }}>{label}</p> : null}
           <div className="flex items-center gap-1">
             <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
               {title}

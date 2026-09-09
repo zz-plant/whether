@@ -22,7 +22,7 @@ Meanwhile `contentPageShell.tsx` and several pages render a bare `<main>` with n
 
 | Dead skip link | Cause |
 | --- | --- |
-| `/answer/ship-checklist`, `/history/2025` | `ContentPageShell` sets no id (11 routes total use it) |
+| `/resolve/ship-checklist`, `/history/2025` | `ContentPageShell` sets no id (11 routes total use it) |
 | `/about`, `/contact`, `/resources/decision-shield-overview` | bare `<main>`, no id — all three carry the same `max-w-3xl` chain longhand |
 | `/search`, `/template` | no `<main>` reaches the output |
 | `/embed` | bare `<main>`; arguably correct — see non-goals |

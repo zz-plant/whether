@@ -206,7 +206,7 @@ Ships as: `DecisionHero` (budget, delta, sparkline), `ThreeWhethersCard` (action
 
 ### Cut — primary nav collapses to `/`
 
-Today `navigationLayers` exposes five primary routes: `/`, `/operate`, `/signals`, `/answer`,
+Today `navigationLayers` exposes five primary routes: `/`, `/operate`, `/signals`, `/resolve`,
 `/trust`, plus supporting `/history` and `/history/compare`. The redraft demotes all but `/`:
 
 | Route | Current job | Redraft |
@@ -214,7 +214,7 @@ Today `navigationLayers` exposes five primary routes: `/`, `/operate`, `/signals
 | `/` | Weekly Brief | The product. Everything else is one click from here. |
 | `/operate` (Plan) | Execution stepper, export, memory, alerts | Deep link + `?view=plan` state on `/`. The "Action now / Pause if / Change course if" block already ships on `/`. |
 | `/signals` (Evidence) | "Why this call" + detail mode | `?detail=` disclosure on `/`. Evidence belongs under the call, not on a peer route. |
-| `/answer` (Resolve) | Role/stage translation, toolkits | Deep link only. "Tell me what matters to me" is solved by company decisions, not role views. |
+| `/resolve` (Resolve) | Role/stage translation, toolkits | Deep link only. "Tell me what matters to me" is solved by company decisions, not role views. |
 | `/trust` | Freshness, confidence, formula | Inline trust line + citation footer on `/`. Formula reference stays as a deep link. |
 | `/history`, `/history/compare` | Scrub/playback | Keep the immutable archive (`/brief/[week]`); scrub/playback stays behind a disclosure. |
 
@@ -252,7 +252,7 @@ The rest of `/` must not invite browsing either. Remove or demote to disclosure:
 ### One-screen cut — DONE (2026-08)
 
 Executed:
-- `navigationLayers`: `/operate`, `/signals`, `/answer`, `/trust` moved to `tier: "supporting"`
+- `navigationLayers`: `/operate`, `/signals`, `/resolve`, `/trust` moved to `tier: "supporting"`
   under `weekly-brief`. `primaryNavigationLayers` is now just `/`. All routes stay in
   `navigationLayers`, so report-shell chrome, command palette, deep links, MCP/API, and SEO
   remain intact. Demoted routes resolve their header next-step back to the brief.

@@ -7,7 +7,7 @@ This backlog tracks the six mobile-first improvements. P0/P1 items are now imple
 If we only pick three areas for the next UX/design cycle, prioritize these:
 
 1. **Resolve chooser compression**
-   - Why rethink: `/answer` is clearer than before, but advanced browse paths still compete with the recommended path when a user only needs one next move.
+   - Why rethink: `/resolve` is clearer than before, but advanced browse paths still compete with the recommended path when a user only needs one next move.
    - Rethink direction: keep one recommended path primary, keep alternatives secondary, and push the full library behind explicit browse intent.
 
 2. **Planning state board**

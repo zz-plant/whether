@@ -10,6 +10,7 @@ import { PageShell } from "./pageShell";
 import type { DataProvenance } from "./dataProvenanceStrip";
 import { type ReportSectionLink } from "./reportShellNavigation";
 import { AppSidebar } from "./AppSidebar";
+import { MobileSectionChips } from "./mobileSectionChips";
 import { type ReportStageItem } from "./reportRevampElements";
 import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
 import { ReportCta } from "./reportCta";
@@ -238,12 +239,15 @@ export const ReportShell = (props: ReportShellProps) => {
           {resolvedHistoricalBanner}
           {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
 
-          <div className={`mt-2 ${sidebarEnabled ? "md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
+          {/* The rail column exists only where the rail renders. `AppSidebar` is
+              hidden below lg, but the grid reserved its column from md, so a
+              tablet paid 12rem for an empty rail and got no outline at all. */}
+          <div className={`mt-2 ${sidebarEnabled ? "lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
             {/* max-h, not h: as a grid item a fixed height forces the whole row
                 to a viewport tall, so any page whose content was shorter than the
                 rail ended in a screenful of empty space. */}
             {sidebarEnabled ? (
-              <aside className="hidden md:block md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
+              <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
                 <AppSidebar sectionLinks={resolvedSectionLinks} />
               </aside>
             ) : null}
@@ -252,6 +256,10 @@ export const ReportShell = (props: ReportShellProps) => {
                 used between items *inside* a section, so section boundaries
                 carried no more weight than item boundaries. */}
             <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+              {/* The outline, in chip form, where the rail is hidden. Renders
+                  nothing on a page with fewer than two sections. */}
+              <MobileSectionChips sectionLinks={resolvedSectionLinks} />
+
               {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} sharePayload={resolvedSharePayload} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
