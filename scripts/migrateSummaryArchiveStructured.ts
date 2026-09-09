@@ -4,7 +4,7 @@ import { buildMonthlyStructured } from "../lib/summary/monthlySummary";
 import { buildWeeklyStructured } from "../lib/summary/weeklySummary";
 import { getGovernanceParametersForPosture } from "../lib/policy/governance";
 import type { RegimeAssessment } from "../lib/regimeEngine";
-import { getRegimeOperatorLabel } from "../lib/regimeLabels";
+import { getRegimePublicLabel } from "../lib/regimePresentation";
 
 type ArchiveEntry = {
   cadence?: "weekly" | "monthly" | "quarterly" | "yearly";
@@ -78,7 +78,7 @@ const run = async () => {
         summary: {
           ...normalizedEntry.summary,
           structured: buildMonthlyStructured({
-            regimeLabel: getRegimeOperatorLabel(normalizedEntry.summary?.regime ?? "VOLATILE"),
+            regimeLabel: getRegimePublicLabel(normalizedEntry.summary?.regime ?? "VOLATILE"),
             guidance: normalizedEntry.summary?.guidance ?? "keep monthly commitments inside reversible, bounded operating rules",
             confidence: normalizedEntry.summary?.confidence ?? "MEDIUM",
             intensity: normalizedEntry.summary?.intensity ?? "STANDARD",

@@ -14,31 +14,14 @@ export const REGIME_LABELS: Record<RegimeKey, string> = {
   EXPANSION: "Sunny",
 };
 
-export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Freezing",
-  DEFENSIVE: "Cloudy",
-  VOLATILE: "Stormy",
-  EXPANSION: "Sunny",
-};
-
-export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Freezing",
-  DEFENSIVE: "Cloudy",
-  VOLATILE: "Stormy",
-  EXPANSION: "Sunny",
-};
-
-export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Freezing",
-  DEFENSIVE: "Cloudy",
-  VOLATILE: "Stormy",
-  EXPANSION: "Sunny",
-};
-
-// Public/display label = the brand weather vocabulary. Every user-facing surface
-// (hero, state page, history archive, share image, JSON-LD) renders the same regime
-// name. Aliased to REGIME_WEATHER_LABELS so the two can never drift apart.
-export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_WEATHER_LABELS;
+// One table. SHORT, LEGEND, WEATHER and PUBLIC were four byte-identical literals
+// of the same four words; readers picked one at random and nothing stopped them
+// drifting. They are aliases now, kept as names so no import breaks, and the
+// only literal is REGIME_LABELS above.
+export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
+export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
+export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
+export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 
 export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
   SCARCITY: "Everything costs more to move, so protect heat, conserve cash, and avoid one-way commitments.",
@@ -70,7 +53,6 @@ export const isRegimeKey = (regime: string): regime is RegimeKey =>
 export const getRegimePublicLabel = (regime: string) =>
   isRegimeKey(regime) ? REGIME_PUBLIC_LABELS[regime] : regime;
 
-export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABELS[regime];
 export const getRegimeWeatherRationale = (regime: RegimeKey) => REGIME_WEATHER_RATIONALES[regime];
 
 export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {

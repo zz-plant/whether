@@ -1,3 +1,4 @@
+import { formatSignedDeltaOrNull } from "../formatters";
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
 import { unsubscribeFooterHtml, unsubscribeFooterText } from "../alert/alertTemplates";
 import type { OperatingSnapshot } from "../operatingState/types";
@@ -6,10 +7,7 @@ import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel } from "../regimePresentation";
 
-const formatDelta = (delta: number | undefined) =>
-  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
-    ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)}`
-    : null;
+const formatDelta = formatSignedDeltaOrNull;
 
 /**
  * The numbers the call was scored on, as one row.

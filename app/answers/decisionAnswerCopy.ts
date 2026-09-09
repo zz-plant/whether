@@ -1,4 +1,4 @@
-import { formatRegimeLabel } from "../../lib/regimeFormat";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { RegimeKey } from "../../lib/regimeEngine";
 
 export const buildDecisionAnswerContextSummary = ({
@@ -12,7 +12,7 @@ export const buildDecisionAnswerContextSummary = ({
   momentumLabel: string;
   revisitDecisions: boolean;
 }) => {
-  const canonicalLabel = formatRegimeLabel(canonicalRegime);
+  const canonicalLabel = getRegimePublicLabel(canonicalRegime);
   const classificationLine = canonicalLabel !== displayLabel
     ? `Underlying regime classification: ${canonicalLabel}.`
     : null;

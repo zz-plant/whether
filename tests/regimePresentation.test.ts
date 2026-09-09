@@ -1,9 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
-import { REGIME_DISPLAY } from "../app/viewModel";
 import { renderBriefImage } from "../lib/image/briefImageTemplate";
-import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
+import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
 
 const collectText = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === "boolean") {
@@ -50,17 +49,16 @@ describe("regime presentation labels", () => {
     });
 
     assert.equal(getRegimePublicLabel("VOLATILE"), "Stormy");
-    assert.equal(REGIME_DISPLAY.VOLATILE, getRegimePublicLabel("VOLATILE"));
     assert.match(collectText(image), /Stormy · Stormy — Mid/);
     assert.doesNotMatch(collectText(image), /Uncertain · Stormy/);
   });
 
 
   it("associates each regime with a weather type", () => {
-    assert.equal(getRegimeWeatherLabel("SCARCITY"), "Freezing");
-    assert.equal(getRegimeWeatherLabel("DEFENSIVE"), "Cloudy");
-    assert.equal(getRegimeWeatherLabel("VOLATILE"), "Stormy");
-    assert.equal(getRegimeWeatherLabel("EXPANSION"), "Sunny");
+    assert.equal(getRegimePublicLabel("SCARCITY"), "Freezing");
+    assert.equal(getRegimePublicLabel("DEFENSIVE"), "Cloudy");
+    assert.equal(getRegimePublicLabel("VOLATILE"), "Stormy");
+    assert.equal(getRegimePublicLabel("EXPANSION"), "Sunny");
   });
 
   it("includes weather labels in the ordered legend", () => {

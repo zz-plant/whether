@@ -4,7 +4,7 @@
  */
 import type { RegimeAssessment } from "../regimeEngine";
 import { formatThresholdNumber } from "../formatters";
-import { getRegimeOperatorLabel } from "../regimeLabels";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { buildHorizonOperatingRule, buildHorizonThresholdBands } from "./horizonOperatingRules";
 import { joinSentences } from "../report/reportFormatting";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
@@ -153,7 +153,7 @@ export const buildMonthlySummary = ({
   provenance: MonthlySummaryProvenance;
   recordDateLabel?: string;
 }): MonthlySummary => {
-  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
+  const regimeLabel = getRegimePublicLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
   const operatingRules = getMonthlyOperatingRules(assessment);
   const transitionCue = assessment.diagnostics.transitionWatch

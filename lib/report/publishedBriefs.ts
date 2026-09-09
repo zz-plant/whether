@@ -1,3 +1,4 @@
+import { formatSignedDeltaOrNull } from "../formatters";
 /**
  * Frozen weekly briefs.
  *
@@ -85,10 +86,10 @@ export const PublishedBriefIndexSchema = z.array(PublishedBriefSchema);
 export type PublishedBrief = z.infer<typeof PublishedBriefSchema>;
 export type PublishedRuleLine = z.infer<typeof PublishedRuleLineSchema>;
 
-const formatDelta = (delta: number | null | undefined) =>
-  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
-    ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`
-    : null;
+const formatDelta = (delta: number | null | undefined) => {
+  const formatted = formatSignedDeltaOrNull(delta);
+  return formatted ? `${formatted} vs last week` : null;
+};
 
 /**
  * The readings and the corridor as one fixed-width key/value block.

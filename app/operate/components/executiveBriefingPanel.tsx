@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import { formatRegimeLabel } from "../../../lib/regimeFormat";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { insightDatabase } from "../../../data/recommendations";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
@@ -23,7 +23,7 @@ export const buildExecutiveMemo = (
 
   return [
     `Executive Brief — ${recordDateLabel}`,
-    `Posture context: ${formatRegimeLabel(assessment.regime)}`,
+    `Posture context: ${getRegimePublicLabel(assessment.regime)}`,
     "",
     `Summary: ${template.executiveSummary}`,
     "",
@@ -48,7 +48,7 @@ export const buildGuardrailChecklist = (
   }
 
   return [
-    `Pause-if Checklist — ${formatRegimeLabel(assessment.regime)}`,
+    `Pause-if Checklist — ${getRegimePublicLabel(assessment.regime)}`,
     ...template.decisionGuardrails.map((item) => `• ${item}`),
   ].join("\n");
 };

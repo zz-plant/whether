@@ -1,6 +1,6 @@
 import { buildComplianceStamp } from "../exportNotices";
 import type { RegimeAssessment } from "../regimeEngine";
-import { getRegimeOperatorLabel } from "../regimeLabels";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { joinSentences } from "../report/reportFormatting";
 import { formatSourceLine } from "./summaryFormatting";
 
@@ -54,7 +54,7 @@ export const buildCadenceSummary = ({
   recordDateLabel,
   periodLabel,
 }: CadenceSummaryParams): CadenceSummaryBase => {
-  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
+  const regimeLabel = getRegimePublicLabel(assessment.regime);
   const guidance = guidanceMap[assessment.regime];
   const summary = joinSentences(
     `${regimeLabel} mode`,

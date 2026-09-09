@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { trackActivationEvent } from "../../lib/activationFunnel";
+import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
 import { persistOperatorStage } from "./useOperatorStage";
 
-const DISMISS_KEY = "whether.home.orientation.dismissed";
+const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
 
 /* Module-level on purpose: the dismissal writes to the document, which the
    React compiler's immutability rule refuses inside a component body. */

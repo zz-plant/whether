@@ -181,6 +181,12 @@ export const formatSignedDeltaWithUnit = (value: number | null, unit: string) =>
   return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
 };
 
+/** "+2.0" / "-3.0", or null for no delta — the shape a "vs last week" cell wants. Was retyped three times. */
+export const formatSignedDeltaOrNull = (delta: number | null | undefined, precision = 1): string | null =>
+  typeof delta === "number" && Number.isFinite(delta) && delta !== 0
+    ? `${delta > 0 ? "+" : ""}${delta.toFixed(precision)}`
+    : null;
+
 export const formatSignedDelta = (value: number, precision = 0): string => {
   const formatted = value.toFixed(precision);
   return value > 0 ? `+${formatted}` : formatted;

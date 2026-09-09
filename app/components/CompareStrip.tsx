@@ -3,7 +3,8 @@
 import { useEffect, useId, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
-import { REGIME_DISPLAY, REGIME_COLORS } from "../viewModel";
+import { REGIME_COLORS } from "../viewModel";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 
 /**
@@ -129,7 +130,7 @@ export function CompareStrip({
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className={`size-2 rounded-full ${REGIME_COLORS[previous.regime] ?? 'bg-slate-400/60'}`} />
-                <span className="text-fluid-sm text-white/70 font-medium">{REGIME_DISPLAY[previous.regime] ?? previous.regime}</span>
+                <span className="text-fluid-sm text-white/70 font-medium">{getRegimePublicLabel(previous.regime)}</span>
               </span>
               {previousTightness !== null ? (
                 <span className="text-fluid-nano text-white/50 font-mono">{previousTightness.toFixed(0)} pts</span>
@@ -151,7 +152,7 @@ export function CompareStrip({
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <span className={`size-2 rounded-full ${REGIME_COLORS[currentRegime] ?? 'bg-slate-400/60'}`} />
-                <span className="text-fluid-sm text-white/70 font-medium">{REGIME_DISPLAY[currentRegime] ?? currentRegime}</span>
+                <span className="text-fluid-sm text-white/70 font-medium">{getRegimePublicLabel(currentRegime)}</span>
               </span>
               <span className="text-fluid-nano text-white/50 font-mono">{currentTightness} pts</span>
             </div>
@@ -171,7 +172,7 @@ export function CompareStrip({
         <div className="mt-4 flex flex-wrap gap-2 text-fluid-xs">
           {previous.regime !== currentRegime ? (
             <span className="inline-flex items-center gap-1.5 rounded-sm bg-sky-500/10 px-2 py-0.5 text-sky-300">
-              Posture shift: {REGIME_DISPLAY[previous.regime] ?? previous.regime} → {REGIME_DISPLAY[currentRegime] ?? currentRegime}
+              Posture shift: {getRegimePublicLabel(previous.regime)} → {getRegimePublicLabel(currentRegime)}
             </span>
           ) : null}
           {/* Funding pressure rises when capital gets scarcer, so a rise is the

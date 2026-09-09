@@ -1,4 +1,5 @@
-import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, REGIME_DISPLAY, formatBoldnessDeltaLabel } from "../viewModel";
+import { DIRECTION_LABEL, DIRECTION_COLOR, REGIME_DESCRIPTOR, formatBoldnessDeltaLabel } from "../viewModel";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { SignalDirection } from "../viewModel";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { SignalWaterfall } from "./SignalWaterfall";
@@ -129,7 +130,7 @@ export function DecisionHero({
   signalData,
   activeStage = "series-a",
 }: Props) {
-  const regimeDisplay = REGIME_DISPLAY[regime] ?? regime;
+  const regimeDisplay = getRegimePublicLabel(regime);
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
   const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
@@ -535,7 +536,7 @@ export function DecisionHero({
                         posture itself flips, and it sits at a different number
                         from the rule's guardrail. Named so the reader is not
                         left with two unexplained pairs of thresholds. */}
-                    <dt className="shrink-0 font-medium text-semantic-reversal-fg">Posture flips:</dt>
+                    <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
                   </div>
                 ) : null}

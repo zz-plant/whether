@@ -1,5 +1,5 @@
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import { formatRegimeLabel } from "../../../lib/regimeFormat";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import {
   formatDecisionAction,
@@ -59,7 +59,7 @@ export const buildShareText = (
 ) => {
   const lines = [
     "Decision Shield — Whether Weekly Brief",
-    `Posture context: ${formatRegimeLabel(assessment.regime)}`,
+    `Posture context: ${getRegimePublicLabel(assessment.regime)}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,

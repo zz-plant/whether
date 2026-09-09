@@ -1,5 +1,5 @@
 import { resolveWeekEndingIsoDateUTC } from "../formatters";
-import { formatRegimeLabel } from "../regimeFormat";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
@@ -154,7 +154,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   return {
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
     boldnessBudget,
-    regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
+    regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? getRegimePublicLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
     currentCall,
     actionNow,

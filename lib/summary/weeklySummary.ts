@@ -3,7 +3,7 @@
  * Keeps weekly action copy consistent across UI and shared endpoints.
  */
 import type { RegimeAssessment } from "../regimeEngine";
-import { getRegimeOperatorLabel } from "../regimeLabels";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { joinSentences } from "../report/reportFormatting";
 import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
 import { formatConfidenceSentence } from "./summaryFormatting";
@@ -193,7 +193,7 @@ export const buildWeeklySummary = ({
   recordDateLabel?: string;
   stageLabel?: string;
 }): WeeklySummary => {
-  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
+  const regimeLabel = getRegimePublicLabel(assessment.regime);
   const guidance = getWeeklyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
     ? "Evidence is sitting near a regime boundary, so tighten the review cadence before expanding any commitment."
