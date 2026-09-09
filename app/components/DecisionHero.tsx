@@ -216,7 +216,7 @@ export function DecisionHero({
             <h2
               id="weekly-call-title"
               style={{ viewTransitionName: "page-title" }}
-              className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
+              className="max-w-2xl text-pretty text-display font-semibold leading-[1.2] tracking-[-0.005em] text-white"
             >
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
             </h2>
@@ -260,7 +260,9 @@ export function DecisionHero({
               numbers three times. */}
           <div className="space-y-3 border-t border-white/[0.06] pt-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-fluid-nano type-eyebrow">
+              {/* Sentence case: uppercase is reserved for page section headers,
+                  and this is a label inside a card. */}
+              <p className="text-fluid-nano font-medium text-white/50">
                 {DECISION_CONTRACT_LABELS.watch.watchThisWeek}
               </p>
               {thresholdBusinessConsequence ? (
@@ -396,6 +398,15 @@ export function DecisionHero({
         </div>
 
         <div className="order-2 sm:order-none sm:col-start-2 sm:row-start-1">
+          {/* Label first, then the number, then its move. The column used to
+              open with a 60px numeral and name itself three elements later,
+              under a delta — so the first thing on the phone's second screen was
+              a figure with no unit and no name. Eight elements are now five, and
+              on a phone four: the sparkline and its domain caption sit behind
+              `sm:`, because at 430px they are a 14em graphic below the fold-line
+              of the call itself, and the reading beside them is the thing the
+              reader came for. */}
+          <p className="text-fluid-xs font-medium text-white/50">Boldness budget</p>
           <SignalWaterfall data={signalData ?? {}} indicators={signalIndicators}>
             <div className="weather-glow-aura inline-flex items-baseline justify-center gap-1">
               <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]">
@@ -405,14 +416,11 @@ export function DecisionHero({
             </div>
           </SignalWaterfall>
           <div
-            className={`mt-2 flex items-center justify-center gap-1.5 text-base font-bold tabular-nums ${trendToneClass(trendDirectionFromDelta(boldnessDelta), true)}`}
+            className={`mt-2 flex items-center gap-1.5 text-fluid-sm font-semibold tabular-nums sm:justify-center ${trendToneClass(trendDirectionFromDelta(boldnessDelta), true)}`}
           >
             <TrendGlyph direction={trendDirectionFromDelta(boldnessDelta)} className="h-4 w-4" />
             <span>{boldnessDeltaLabel}</span>
           </div>
-          <p className="mt-1 text-fluid-xs font-medium text-white/50">
-            Boldness budget
-          </p>
           {trendPoints && trendDomain ? (
             /* Still a sparkline — no axes, no gridlines, no legend — but sized to
                the column instead of to a line of type. At six em on nano text it
@@ -421,7 +429,7 @@ export function DecisionHero({
                the one graphic that answers "is 57 a normal reading?" was the one
                nobody could decode. The domain stays in text beside it because the
                scale is still fitted to the window. */
-            <figure className="mt-1.5 flex flex-col items-center text-fluid-nano">
+            <figure className="mt-2 hidden flex-col items-center text-fluid-nano sm:flex">
               <Sparkline
                 points={trendPoints}
                 label="Boldness budget"
@@ -439,7 +447,7 @@ export function DecisionHero({
               </figcaption>
             </figure>
           ) : null}
-          <p className="text-fluid-nano leading-snug text-white/40">
+          <p className="mt-1.5 text-fluid-nano leading-snug text-white/40">
             How much room you have to hire, spend, and commit.
           </p>
         </div>

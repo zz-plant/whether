@@ -45,6 +45,22 @@
    change can happen here, once, rather than being decided per call site.
    Values are the dominant ones: fluid-xs at 0.12em (125 of the 282). */
 
+/* The in-card label. Same role as .type-eyebrow one tier down: the eyebrow
+   says a new section of the page has begun, this one names a field, a group or
+   a control inside a card that a section heading has already introduced.
+
+   They were one class, so a card holding four labelled groups printed four
+   uppercase eyebrows and read as four new sections stacked inside one box —
+   uppercase is the loudest thing in this type system and it was being spent
+   twelve times a screen. Sentence case here restores the difference; the size
+   and colour stay, so the labels still read as labels. */
+.type-card-label {
+  @apply font-medium text-slate-400;
+  font-size: var(--fs-xs);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .type-eyebrow {
   @apply font-semibold uppercase text-slate-400;
   font-size: var(--fs-xs);
@@ -84,14 +100,17 @@ svg :where(.type-eyebrow, .type-badge) {
 .text-fluid-lg { font-size: var(--fs-lg); }
  .text-fluid-xl { font-size: var(--fs-xl); }
  .text-fluid-2xl { font-size: var(--fs-2xl); }
-/* The weekly-call headline. Sets the family here rather than via a `font-sans`
-   utility on the element: this stylesheet is unlayered, so the `:where(h1, h2)`
-   display-face rule below outranks any layered Tailwind family utility and the
-   headline stayed serif. Same trap the --text-display comment in tokens.css
-   describes. */
+/* The weekly-call headline. It is the most important sentence the product
+   prints, and it was the only heading on the site not set in the display face:
+   report pages open in Fraunces ("Why the weekly brief changed") while the call
+   itself was sans, so the serif read as a decoration reports get rather than as
+   the voice the product speaks in. The family is named here rather than left to
+   the `:where(h1, h2)` rule below because this stylesheet is unlayered and a
+   `font-sans` utility at the call site could not have overridden it either way —
+   stating it makes the intent legible at the one place that sets the size. */
 .text-display {
   font-size: var(--text-display);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
 }
 .text-heading { font-size: var(--text-heading); }
 

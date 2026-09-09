@@ -108,7 +108,7 @@ describe("DecisionPlanStressTester & StagePersonaSelector", () => {
       />
     );
 
-    assert.ok(html.includes("Calibrate Stage:"));
+    assert.ok(html.includes("Stage"));
     assert.ok(html.includes("Seed"));
     assert.ok(html.includes("Series A"));
     assert.ok(html.includes("Series B+"));

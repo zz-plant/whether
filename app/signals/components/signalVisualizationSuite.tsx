@@ -307,7 +307,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               {twoYearSeries.lastPoint ? <text x="98" y={Math.min(34, twoYearSeries.lastPoint.y + 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-teal-200 uppercase tracking-[0.12em]">2Y</text> : null}
               {tenYearSeries.lastPoint ? <text x="98" y={Math.min(34, tenYearSeries.lastPoint.y + 6)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-indigo-200 uppercase tracking-[0.12em]">10Y</text> : null}
             </svg>
-            <div className="mt-2 flex items-center justify-between type-eyebrow">
+            <div className="mt-2 flex items-center justify-between type-card-label tabular-nums">
               <span>{points[0]?.label ?? "Start"}</span>
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>
@@ -415,7 +415,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="1.4" />
               ))}
             </svg>
-            <div className="mt-2 flex items-center justify-between type-eyebrow">
+            <div className="mt-2 flex items-center justify-between type-card-label tabular-nums">
               <span>{points[0]?.label ?? "Start"}</span>
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>

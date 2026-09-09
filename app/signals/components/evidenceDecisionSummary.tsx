@@ -47,7 +47,7 @@ export const SignalsDecisionSummarySection = ({
         {decisionDeltaLabel}
       </p>
       <article className="weather-surface space-y-3 p-4">
-        <p className="type-eyebrow text-sky-200">What this means now</p>
+        <p className="type-card-label text-sky-200">What this means now</p>
         <div className="grid gap-3 lg:grid-cols-3">
           <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
             <p className="text-xs font-semibold text-slate-400">
@@ -109,14 +109,14 @@ export const SignalsDecisionSummarySection = ({
               </dl>
             ) : (
               <p className="mt-2 text-sm text-slate-200">
-                <span className="mr-1 type-eyebrow text-amber-200">
+                <span className="mr-1 type-card-label text-amber-200">
                   Wrong if:
                 </span>{" "}
                 <span>{triggerCondition}</span>{" "}
                 <span aria-hidden="true" className="text-slate-400">
                   ·
                 </span>{" "}
-                <span className="mr-1 type-eyebrow text-amber-200">
+                <span className="mr-1 type-card-label text-amber-200">
                   Safe again when:
                 </span>{" "}
                 <span>{reversalCondition}</span>
@@ -142,7 +142,13 @@ export const SignalsDecisionSummarySection = ({
         restated the playbook card beside it and the Freshness cell above it,
         and it printed identical text every week on a page whose entire job is
         reporting what changed this week. */}
-      <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+      {/* Section scale, not hero scale. This sentence and the shell's page
+        title were both set at display size, so the page opened with two
+        headings competing to be the one thing you read first — and the second
+        of them was two screens down from the first. The route name stays the
+        page heading (it is what the nav, the metadata and the share card all
+        call this page); this is the heading of the block under it. */}
+      <h2 className="text-fluid-lg font-semibold text-slate-100">
         {regimeLabel} is the current funding environment.
       </h2>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -150,7 +156,7 @@ export const SignalsDecisionSummarySection = ({
           className="weather-surface space-y-3 p-5"
           aria-label="Founder decision playbook"
         >
-          <p className="type-eyebrow text-sky-200">This week</p>
+          <p className="type-card-label text-sky-200">This week</p>
           <h3 className="text-lg font-semibold text-slate-100">
             What founders should do this week
           </h3>
@@ -162,7 +168,7 @@ export const SignalsDecisionSummarySection = ({
             also shared the same sky eyebrow, which told the reader nothing about
             which list was which. */}
           <div className="border-l-2 border-semantic-easing-border pl-3">
-            <p className="type-eyebrow text-semantic-easing-fg">Lean in here</p>
+            <p className="type-card-label text-semantic-easing-fg">Lean in here</p>
             <ul
               className="mt-2 space-y-1 text-sm text-slate-100"
               aria-label="Start rules"
@@ -173,7 +179,7 @@ export const SignalsDecisionSummarySection = ({
             </ul>
           </div>
           <div className="border-l-2 border-semantic-tightening-border pl-3">
-            <p className="type-eyebrow text-semantic-tightening-fg">
+            <p className="type-card-label text-semantic-tightening-fg">
               Hold or gate
             </p>
             <ul
@@ -202,7 +208,7 @@ export const SignalsDecisionSummarySection = ({
           the same information without implying an absent row. */}
         {topDiagnosticCallouts.length > 1 ? (
           <article className="weather-surface space-y-3 p-5">
-            <p className="type-eyebrow text-sky-200">Also moved</p>
+            <p className="type-card-label text-sky-200">Also moved</p>
             <ul className="space-y-3" aria-label="Top mover callouts">
               {topDiagnosticCallouts.slice(1).map((item) => (
                 <li

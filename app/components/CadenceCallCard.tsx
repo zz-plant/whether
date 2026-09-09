@@ -95,7 +95,7 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
       <div className="space-y-2">
         <h2
           id={headingId}
-          className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
+          className="max-w-2xl text-pretty text-display font-semibold leading-[1.2] tracking-[-0.005em] text-white"
         >
           {model.headline}
         </h2>
