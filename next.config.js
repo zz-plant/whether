@@ -98,6 +98,8 @@ export const iaConsolidationRedirectPairs = [
   // beside the formula the thresholds come from. Both old doors keep an anchor.
   ["/template", "/trust#template"],
   ["/threshold", "/trust#framework"],
+  // A page of SaaS multiples with no product job; the number still ships via /api/comps.
+  ["/comps", "/signals"],
   // Orphaned export page — functionality lives in /share
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists

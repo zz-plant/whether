@@ -6,7 +6,8 @@ type OperationsExecutionStep = {
   id: string;
   label: string;
   title: string;
-  description: string;
+  /** Optional: a description that only restates the title is noise. */
+  description?: string;
   summary?: string;
   owner?: string;
   approvalStatus?: string;

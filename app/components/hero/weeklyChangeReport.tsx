@@ -242,11 +242,7 @@ export function WeeklyChangeReport({
     <section
       data-testid="weekly-top-fold"
       aria-label="What changed this week"
-      className={`rounded-lg border p-3.5 backdrop-blur-sm transition-all ${
-        attention
-          ? "border-amber-500/40 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.08)]"
-          : "border-emerald-500/30 bg-emerald-500/[0.07] shadow-[0_0_20px_rgba(16,185,129,0.06)]"
-      }`}
+      className="border-t border-white/[0.06] pt-3"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-fluid-xs font-semibold text-slate-100">
@@ -272,7 +268,6 @@ export function WeeklyChangeReport({
       ) : (
         <div className="mt-3 space-y-3">
           <div className="space-y-1.5">
-            <BandHeading>What changed</BandHeading>
             {rows.length === 0 ? (
               <p className="text-fluid-xs leading-5 text-slate-300">
                 No signal moved enough to register against last week.

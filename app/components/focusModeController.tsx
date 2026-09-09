@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Minimize2 } from "lucide-react";
 import { PresentationFrames } from "./presentationFrames";
 
-const defaultMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 transition-all weather-page-enter";
-const focusedMainClassName = "mx-auto max-w-[64rem] px-6 py-12 transition-all weather-page-enter shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 rounded-2xl bg-slate-950/90 my-6";
+const defaultMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 transition-all";
+const focusedMainClassName = "mx-auto max-w-[64rem] px-6 py-12 transition-all shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 rounded-2xl bg-slate-950/90 my-6";
 
 export function FocusModeController() {
   const [isFocusMode, setIsFocusMode] = useState(false);

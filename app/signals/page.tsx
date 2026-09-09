@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
+import { UrlDetails } from "../components/ui/urlDetails";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
@@ -175,6 +177,17 @@ export default async function SignalsPage({
         />
       </div>
 
+      {/* Context, not evidence. The reference cycle, the sector read and the
+          fossil record are each interesting and each optional; the page's
+          promise is "why the call changed", which the blocks above keep. */}
+      <UrlDetails
+        queryKey="context"
+        initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "context")}
+        className="weather-auto-chevron scroll-mt-28"
+        summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-4 py-3 text-sm font-medium text-slate-200"
+        summary={<span>Context: nearest reference cycle, sector read, fossil record</span>}
+      >
+        <div className="mt-4 space-y-6">
       {/* The nearest of four hand-picked reference cycles, by four coordinates.
           This used to headline a "90% Match" — a number clamped into 65–96 from
           a distance, on the page whose job is to be the proof behind the call.
@@ -257,6 +270,8 @@ export default async function SignalsPage({
         open={resolvedSearchParams?.fossil === "1" || resolvedSearchParams?.fossil === "open"}
       />
 
+        </div>
+      </UrlDetails>
       {model.activeSignalsView === "implication" ? (
         <SignalsNeedMoreProofSection searchParams={resolvedSearchParams} />
       ) : null}

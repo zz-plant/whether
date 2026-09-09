@@ -117,7 +117,6 @@ export async function buildTrustPageModel() {
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#framework", label: "Using the thresholds" },
     { href: "#revisit-call", label: "Revisit triggers" },
-    { href: "#meeting-snippet", label: "Meeting snippet" },
   ];
 
   const reportShellProps = {

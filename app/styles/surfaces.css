@@ -360,15 +360,10 @@ button .weather-chip:active,
   }
 }
 
-.weather-page-enter {
-  animation: weather-fade-in-up 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root),
-  ::view-transition-group(page-title),
-  .weather-page-enter {
+  ::view-transition-group(page-title) {
     animation: none !important;
   }
 }

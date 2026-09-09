@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Check, Calendar } from "lucide-react";
 import { requestSubscription } from "./subscribeRequest";
@@ -25,6 +25,15 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
   const pathname = usePathname() ?? "/";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  // Built from the clock, so it cannot be server-rendered without a hydration
+  // mismatch; the link resolves after mount and is inert until then.
+  const [calendarHref, setCalendarHref] = useState("#");
+  useEffect(() => {
+    setCalendarHref(buildMondayCalendarUrl(
+      "Whether Weekly Posture Sync",
+      "Review weekly macro regime & posture delta: https://whether.work",
+    ));
+  }, []);
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,10 +111,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
       <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-fluid-nano text-slate-400">
         <span>{compact ? "One email a week, one more if the call flips. Unsubscribe in one click." : "Prefer calendar holds over email?"}</span>
         <a
-          href={buildMondayCalendarUrl(
-            "Whether Weekly Posture Sync",
-            "Review weekly macro regime & posture delta: https://whether.work",
-          )}
+          href={calendarHref}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 font-medium text-sky-400 hover:text-sky-300 transition-colors"

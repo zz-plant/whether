@@ -2,14 +2,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import type { Route } from "../../lib/navigation/routeType";
 import { buildBreadcrumbList, websiteName } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
 import {
-  canonicalCapitalDisciplinePath,
-  resourcePillarPages,
-  resourceSupportingPages,
 } from "../../lib/resourcesContent";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
@@ -141,12 +137,6 @@ export async function buildPlanningPageModel(
   const showAllActionLanes = resolvedSearchParams?.actions === "all";
   const actionStripItems = snapshot.homeBriefModel.actionStripItems;
   const weeklyCall = snapshot.weeklyCall;
-  const operationsResourceLibrary = [
-    resourceSupportingPages.capitalPostureTemplate,
-    resourceSupportingPages.reversalTriggerChecklist,
-    resourceSupportingPages.quarterlyCapitalPostureMemoExample,
-    resourceSupportingPages.decisionShieldOverview,
-  ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
 
   return {
@@ -341,7 +331,6 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Rules",
             title: "Rules before you commit",
-            description: "Do, don't, and limit rules for new commitments.",
             hashAliases: ["ops-playbook-panel"],
             // The step header above states this, and PlaybookPanel carries its own header below.
             children: h(ReportSection, { variant: "split",
@@ -373,7 +362,6 @@ export async function buildPlanningPageModel(
             id: "ops-decision-shield",
             label: "Test",
             title: "Test a decision",
-            description: "Check if a specific move is safe right now — hiring, pricing, roadmap, M&A.",
             hashAliases: ["ops-decision-shield-panel"],
             // The question this header used to ask now heads DecisionShieldPanel itself, so the
             // step reads "Test a decision" → "Is this move safe right now?" with nothing between.
@@ -429,49 +417,6 @@ export async function buildPlanningPageModel(
         h("div", { className: "flex flex-wrap gap-2" },
           h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Recheck guardrails"),
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Trust risk checks"),
-        ),
-      ),
-      h("section", { id: "ops-edge-case-gate", className: "weather-panel scroll-mt-28 space-y-4 px-5 py-5", "aria-labelledby": "ops-edge-case-gate-title" },
-        h("div", { className: "space-y-2" },
-          h("p", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-slate-400" }, "Decision help"),
-          h("h2", { id: "ops-edge-case-gate-title", className: "text-lg font-semibold text-slate-100" }, "Still have one open question?"),
-          h("p", { className: "text-sm text-slate-300" }, "Open decision help when one specific question still needs an answer after this review."),
-        ),
-        h("div", { className: "flex flex-wrap gap-2" },
-          h(Link, { href: "/resolve", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
-          h(Link, { href: "/operate#ops-export-briefs", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Back to sharing options"),
-        ),
-      ),
-      h("details", { className: "weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5" },
-        h("summary", { className: "cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200" }, "Board-ready templates"),
-        h("div", { className: "mt-4 space-y-4 rounded-lg border border-slate-800/80 bg-slate-950/40 px-4 py-4" },
-          h("div", { className: "space-y-1" },
-            h("p", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-slate-400" }, "Resources"),
-            h("h2", { className: "text-lg font-semibold text-slate-100" }, "Board-ready templates"),
-            h("p", { className: "text-sm text-slate-300" }, "Templates for board and leadership reviews."),
-          ),
-          h("div", { className: "grid gap-3 md:grid-cols-3" },
-            resourcePillarPages.map((pillar) => h(Link, {
-              key: pillar.slug,
-              href: `/resources/${pillar.slug}` as Route,
-              className: "weather-surface border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
-            },
-              h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400" }, "Governance pillar"),
-              h("p", { className: "mt-2 font-semibold text-slate-100" }, pillar.h1),
-              h("p", { className: "mt-2 text-sm text-slate-300" }, pillar.description),
-            )),
-          ),
-          h("div", { className: "flex flex-wrap gap-2" },
-            operationsResourceLibrary.map((resource) => h(Link, {
-              key: resource.path,
-              href: resource.path,
-              className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100",
-            }, resource.title)),
-            h(Link, {
-              href: canonicalCapitalDisciplinePath as Route,
-              className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]",
-            }, "Open governance pillar"),
-          ),
         ),
       ),
     ),
