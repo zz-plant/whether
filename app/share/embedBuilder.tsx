@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useClipboardCopy } from "../components/useClipboardCopy";
 import { OPERATOR_STAGE_OPTIONS } from "../../lib/report/operatorStage";
 
 /**
@@ -21,7 +22,8 @@ const DEFAULT_TICKERS = ["", "GOOGL", "MSFT", "DOCU", "COIN", "UBER", "AAPL"];
 export function EmbedBuilder() {
   const [ticker, setTicker] = useState("");
   const [stage, setStage] = useState("");
-  const [copied, setCopied] = useState(false);
+  const { status, copyToClipboard } = useClipboardCopy();
+  const copied = status === "copied";
   const [previewKey, setPreviewKey] = useState(0);
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -30,22 +32,9 @@ export function EmbedBuilder() {
   }${stage ? ` data-whether-stage="${stage}"` : ""}></div>
 <script async src="https://whether.work/embed.js"></script>`;
 
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(embedCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = embedCode;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [embedCode]);
+  const handleCopy = useCallback(() => {
+    void copyToClipboard(embedCode, "embed");
+  }, [copyToClipboard, embedCode]);
 
   useEffect(() => {
     setPreviewKey((k) => k + 1);

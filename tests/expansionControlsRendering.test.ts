@@ -40,7 +40,10 @@ describe("expansion controls rendering", () => {
     );
 
     assert.match(html, /Deep dive: rule summary and detailed lists/);
-    assert.doesNotMatch(html, /Stop 1/);
+    // Native <details>: the body is in the HTML for crawlers and find-in-page,
+    // but the element ships without `open`, so it renders collapsed.
+    assert.match(html, /<details(?![^>]*\bopen)[^>]*>/);
+    assert.doesNotMatch(html, /<details[^>]*\bopen/);
   });
 
   it("tabulates each area's lines with a distance instead of reprinting the corridor per area", async () => {

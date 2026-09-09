@@ -10,7 +10,7 @@ import {
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
-import { ButtonLink } from "../components/ui/buttonLink";
+import { ActionLink } from "../components/ui/actionLink";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
@@ -177,12 +177,12 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title="Where to go next">
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/" variant="pill">Weekly brief</ButtonLink>
-            <ButtonLink href="/resolve#unresolved-question-router" variant="pill">Decision Tools</ButtonLink>
-            <ButtonLink href="/operate" variant="pill">Operating guardrails</ButtonLink>
-            <ButtonLink href="/resolve#direct-answers" variant="pill">More direct answers</ButtonLink>
+            <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
+            <ActionLink href="/resolve#unresolved-question-router" variant="pill">Decision Tools</ActionLink>
+            <ActionLink href="/operate" variant="pill">Operating guardrails</ActionLink>
+            <ActionLink href="/resolve#direct-answers" variant="pill">More direct answers</ActionLink>
             {relatedPages.map((related) => (
-              <ButtonLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ButtonLink>
+              <ActionLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ActionLink>
             ))}
           </div>
         </SecondaryPageSection>

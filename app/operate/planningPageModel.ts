@@ -14,15 +14,6 @@ import {
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
 import {
-  buildWeeklyBoardSnippetPlainText,
-  buildWeeklyCallSnapshotPlainText,
-  buildWeeklyOperatorBriefPayload,
-  buildWeeklyOperatorBriefPlainText,
-} from "../../lib/export/weeklyOperatorBrief";
-import { buildBoardBrief, buildBoardSlideBullets } from "../../lib/export/briefBuilders";
-import { formatRegimeLabel } from "../../lib/regimeFormat";
-import { resolveWeekEndingIsoDateUTC } from "../../lib/formatters";
-import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
 } from "../../lib/timeMachine/timeMachineSelection";
@@ -33,10 +24,11 @@ import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
 import { PlaybookPanel } from "../components/appendix/playbookPanel";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
-import { RegimeAlertsPanel } from "../components/regimeAlertsPanel";
 import { ReportShell } from "../components/reportShell";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
-import { ExportBriefPanel } from "./components/exportBriefPanel";
+import { SharePageFormats } from "../share/sharePageFormats";
+import { BriefArtifactScript } from "../components/briefArtifactScript";
+import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
 import { PremiumGate } from "./components/PremiumGate";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
@@ -157,82 +149,6 @@ export async function buildPlanningPageModel(
   ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
 
-  const decisionModel = {
-    postureWithStageLabel: snapshot.homeBriefModel.postureWithStageLabel,
-    currentCall: snapshot.canonicalDecisionCopy?.operatingCall ?? snapshot.homeBriefModel.operatingStanceLine,
-    actionNow:
-      snapshot.canonicalDecisionCopy?.doNowLines[0]
-      ?? snapshot.homeBriefModel.actionNowShort
-      ?? snapshot.homeBriefModel.operatingStanceLine,
-    operatingStanceLine: snapshot.homeBriefModel.operatingStanceLine,
-    guardrailThreshold: snapshot.homeBriefModel.guardrailThreshold,
-    reversalTrigger: snapshot.homeBriefModel.reversalTrigger,
-    actionStripItems: snapshot.homeBriefModel.actionStripItems,
-    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-    confidencePercent: snapshot.homeBriefModel.confidencePercent,
-    compactFlipConditionLabels: snapshot.homeBriefModel.compactFlipConditionLabels,
-    canonicalDecisionCopy: snapshot.canonicalDecisionCopy ?? undefined,
-    decisionShiftSummary: snapshot.homeBriefModel.decisionShiftSummary,
-    trendLabel: snapshot.homeBriefModel.trendLabel,
-  };
-
-  const citation = snapshot.callCitation;
-  const boardBrief = buildBoardBrief(assessment, treasury, sensors, macroSeries, { modeledDecision: decisionModel });
-  const boardSlideBullets = buildBoardSlideBullets(assessment, treasury, macroSeries, { modeledDecision: decisionModel });
-  const weeklyOperatorDate = resolveWeekEndingIsoDateUTC(treasury.record_date);
-  const weeklyOperatorPayload = buildWeeklyOperatorBriefPayload({
-    assessment,
-    treasury,
-    date: weeklyOperatorDate,
-    postureWithStageLabel: decisionModel.postureWithStageLabel,
-    confidenceLabel: decisionModel.confidenceLabel,
-    actionStripItems: decisionModel.actionStripItems,
-    flipConditionLabels: decisionModel.compactFlipConditionLabels,
-    canonicalDecisionCopy: decisionModel.canonicalDecisionCopy,
-  });
-  const weeklyOperatorPlainText = buildWeeklyOperatorBriefPlainText(weeklyOperatorPayload);
-
-  const deltaOnlyBriefText = snapshot.homeBriefModel.decisionShiftSummary || "Use the current weekly call as the operating baseline.";
-  const boardNote = buildWeeklyBoardSnippetPlainText({
-    trustLine: isFallback
-      ? `TRUST: FALLBACK SNAPSHOT · As of ${treasury.record_date}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
-      : `TRUST: LIVE · As of ${treasury.record_date}`,
-    postureLine: `POSTURE: ${decisionModel.canonicalDecisionCopy?.currentRegimeLabel ?? decisionModel.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} · ${decisionModel.confidenceLabel ?? "Score-based"} confidence${decisionModel.confidencePercent ? ` (${Math.round(decisionModel.confidencePercent)}%)` : ""}`,
-    changedLine: `CHANGED: ${deltaOnlyBriefText}`,
-    guardrailLine: `GUARDRAIL: ${decisionModel.guardrailThreshold ?? weeklyOperatorPayload.pauseIf}`,
-    flipLine: `FLIP: ${decisionModel.canonicalDecisionCopy?.flipTrigger ?? decisionModel.reversalTrigger ?? weeklyOperatorPayload.changeCourseIf}`,
-    stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
-  });
-  const callSnapshot = buildWeeklyCallSnapshotPlainText({
-    regime: decisionModel.canonicalDecisionCopy?.currentRegimeLabel ?? decisionModel.postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
-    call: decisionModel.canonicalDecisionCopy?.operatingCall ?? decisionModel.operatingStanceLine ?? weeklyOperatorPayload.currentCall,
-    trend: decisionModel.trendLabel ?? "Current",
-    confidence: decisionModel.confidencePercent
-      ? `${Math.round(decisionModel.confidencePercent)}% (${decisionModel.confidenceLabel})`
-      : decisionModel.confidenceLabel ?? "Score-based confidence",
-    doNow: decisionModel.canonicalDecisionCopy?.doNowLines[0] ?? decisionModel.actionNow ?? weeklyOperatorPayload.actionNow,
-    avoid: decisionModel.guardrailThreshold ?? weeklyOperatorPayload.pauseIf,
-    watch: decisionModel.canonicalDecisionCopy?.flipTrigger ?? decisionModel.reversalTrigger ?? weeklyOperatorPayload.changeCourseIf,
-    flipConditions: decisionModel.canonicalDecisionCopy?.flipConditions ?? decisionModel.compactFlipConditionLabels ?? weeklyOperatorPayload.flipConditionLabels,
-  });
-
-  const meetingPackText = [
-    "BOARD NOTE",
-    boardNote,
-    "",
-    "Call snapshot",
-    callSnapshot,
-    "",
-    "WEEKLY BRIEF",
-    weeklyOperatorPlainText,
-    "",
-    "BOARD SLIDE",
-    boardSlideBullets,
-    "",
-    "CITATION",
-    citation,
-  ].join("\n");
-
   return {
     reportShellModel: {
       status: {
@@ -261,21 +177,7 @@ export async function buildPlanningPageModel(
           label: "Review the weekly plan",
         },
         secondaryCta: { href: "/", label: "Return to Weekly Brief" },
-        sharePayload: {
-          recordDate: recordDateLabel,
-          postureLabel: snapshot.homeBriefModel.postureWithStageLabel,
-          confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-          operatingStance: snapshot.homeBriefModel.operatingStanceLine,
-          actionNow: decisionModel.actionNow,
-          guardrail: decisionModel.guardrailThreshold ?? undefined,
-          flipConditions: decisionModel.compactFlipConditionLabels ?? [],
-          citation: snapshot.callCitation,
-          weeklyCallSnapshotText: callSnapshot,
-          weeklyOperatorBriefText: weeklyOperatorPlainText,
-          deltaOnlyBriefText,
-          boardSummary: boardBrief,
-          meetingPackText,
-        },
+        showShare: true,
       },
       payloads: {
         decisionBanner: {
@@ -406,33 +308,16 @@ export async function buildPlanningPageModel(
                 id: "ops-export-briefs-panel",
                 title: "Share the brief",
                 children: h(Fragment, null,
-                h(ExportBriefPanel, {
-                  assessment,
-                  treasury,
-                  sensors,
-                  macroSeries,
-                  decisionModel: {
-                    postureWithStageLabel: snapshot.homeBriefModel.postureWithStageLabel,
-                    currentCall: snapshot.canonicalDecisionCopy?.operatingCall ?? snapshot.homeBriefModel.operatingStanceLine,
-                    actionNow:
-                      snapshot.canonicalDecisionCopy?.doNowLines[0]
-                      ?? snapshot.homeBriefModel.actionNowShort
-                      ?? snapshot.homeBriefModel.operatingStanceLine,
-                    operatingStanceLine: snapshot.homeBriefModel.operatingStanceLine,
-                    guardrailThreshold: snapshot.homeBriefModel.guardrailThreshold,
-                    reversalTrigger: snapshot.homeBriefModel.reversalTrigger,
-                    actionStripItems: snapshot.homeBriefModel.actionStripItems,
-                    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-                    confidencePercent: snapshot.homeBriefModel.confidencePercent,
-                    compactFlipConditionLabels: snapshot.homeBriefModel.compactFlipConditionLabels,
-                    canonicalDecisionCopy: snapshot.canonicalDecisionCopy ?? undefined,
-                    decisionShiftSummary: snapshot.homeBriefModel.decisionShiftSummary,
-                    trendLabel: snapshot.homeBriefModel.trendLabel,
-                  },
-                  provenance: treasuryProvenance,
-                  showProvenance: false,
-                }),
-                h(RegimeAlertsPanel),
+                // The same picker /share and the global rail use, reading the same
+                // island — one artifact pipeline. The eleven-button export panel
+                // that sat here built the brief a second way through its own lib.
+                h(BriefArtifactScript, { artifact: buildBriefArtifactFromSnapshot({ reportData, weeklyCall, title: "Whether Weekly Brief" }) }),
+                h(SharePageFormats),
+                h("p", { className: "text-xs leading-5 text-slate-400" },
+                  "Email, meeting pack, role memos, calendar hold and the embed live on ",
+                  h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),
+                  ".",
+                ),
                 ),
               }),
               h(ReportSection, { variant: "split",

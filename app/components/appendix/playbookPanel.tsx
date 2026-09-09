@@ -3,7 +3,7 @@ import type { PlaybookEntry } from "../../../lib/playbook";
 import type { ActionStripItem } from "../../../lib/report/operatingCalls";
 import { RuleLines } from "../boundedRuleLines";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { CollapsibleDeepDive } from "../collapsibleDeepDive";
+import { Details } from "../details";
 import { DataProvenanceStrip, type DataProvenance } from "../dataProvenanceStrip";
 
 export const getVisibleActionLaneItems = <T,>(items: T[], showAll: boolean) =>
@@ -124,10 +124,11 @@ export const PlaybookPanel = ({
             </table>
           </div>
         </div>
-        <CollapsibleDeepDive
-          label="Deep dive: rule summary and detailed lists"
-          panelClassName="mt-4 space-y-6"
+        <Details
+          summary={<span className="text-xs font-semibold tracking-[0.12em] text-slate-300">Deep dive: rule summary and detailed lists</span>}
+          className="mt-4"
         >
+          <div className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
             <div className="grid gap-4 lg:col-span-2 lg:grid-cols-3">
               <div className="weather-surface border-l-4 border-rose-500/50 bg-rose-500/10 p-4">
@@ -234,7 +235,8 @@ export const PlaybookPanel = ({
               </Collapsible.Root>
             </div>
           ) : null}
-        </CollapsibleDeepDive>
+          </div>
+        </Details>
       </div>
     </section>
   );

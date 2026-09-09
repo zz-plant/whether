@@ -185,7 +185,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">Help by role</h2>
               <div className="flex flex-wrap gap-2">
                 {useCaseRoles.map((role) => (
-                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-chip">
+                  <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-hub-chip">
                     {role.title}
                   </Link>
                 ))}
@@ -195,7 +195,7 @@ export default async function DecidePage({
               <h2 className="text-sm type-eyebrow text-slate-300">Help by situation</h2>
               <div className="flex flex-wrap gap-2">
                 {situationUseCaseDefinitions.map((situation) => (
-                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-chip">
+                  <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-hub-chip">
                     {situation.title}
                   </Link>
                 ))}

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { ReportCta } from "../reportCta";
 import { InternalAwareLink } from "./InternalAwareLink";
-import { ShareMenuDropdown } from "./ShareMenuDropdown";
+import { ShareRailButton } from "./ShareRailButton";
 import type {
   DecisionBanner,
   DecisionDiff,
@@ -21,7 +21,7 @@ export function CommandCenterNavBlock({
   primaryCta,
   secondaryCta,
   exportCta,
-  sharePayload,
+  showShare = false,
   nextStep,
   statusLabel,
   trustStatusLabel,
@@ -40,7 +40,8 @@ export function CommandCenterNavBlock({
   primaryCta?: ReportCtaProps;
   secondaryCta?: SecondaryCtaProps;
   exportCta?: ExportCtaProps | null;
-  sharePayload?: React.ComponentProps<typeof ShareMenuDropdown> | null;
+  /** Opens the one global share rail — the same formats, the same island, as / and /share. */
+  showShare?: boolean;
   nextStep?: { description: string; href: string };
   statusLabel: string;
   trustStatusLabel: string;
@@ -161,8 +162,8 @@ export function CommandCenterNavBlock({
                   {secondaryCta.label}
                 </InternalAwareLink>
               ) : null}
-              {sharePayload ? (
-                <ShareMenuDropdown {...sharePayload} />
+              {showShare ? (
+                <ShareRailButton />
               ) : exportCta ? (
                 <ReportCta
                   href={exportCta.href}
