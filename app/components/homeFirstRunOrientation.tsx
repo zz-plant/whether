@@ -1,10 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { trackActivationEvent } from "../../lib/activationFunnel";
+import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
+import { persistOperatorStage } from "./useOperatorStage";
 
 const DISMISS_KEY = "whether.home.orientation.dismissed";
+
+/* Module-level on purpose: the dismissal writes to the document, which the
+   React compiler's immutability rule refuses inside a component body. */
+const markOrientationDismissed = () => {
+  try {
+    window.localStorage.setItem(DISMISS_KEY, "1");
+  } catch {
+    // Ignore storage errors.
+  }
+  document.documentElement.dataset.homeOrientationDismissed = "true";
+};
 
 const orientationLinkClass =
   "inline-flex min-h-11 items-center font-medium text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-white hover:decoration-slate-400";
@@ -34,6 +48,7 @@ const getBootstrappedDismissedState = () => {
  * dismissed (html[data-home-orientation-dismissed] + the injected style rule).
  */
 export function FirstVisitExplainer() {
+  const router = useRouter();
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -45,17 +60,24 @@ export function FirstVisitExplainer() {
   }
 
   const handleDismiss = () => {
-    try {
-      window.localStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      // Ignore storage errors.
-    }
-    document.documentElement.dataset.homeOrientationDismissed = "true";
+    markOrientationDismissed();
     setDismissed(true);
     // Dismissing is the cheapest available proof that someone read the line and
     // knew what they were looking at, which is the step between arriving and
     // doing anything deliberate.
     trackActivationEvent({ step: "oriented", path: "/" });
+  };
+
+  // Asked once, here, instead of defaulted silently. The brief used to grade
+  // every stress test for a Series A team unless the reader noticed a pill row
+  // mid-page; a seed founder got the wrong answer and never learned why. The
+  // cookie is what the server renders the next request from, so the choice
+  // takes effect on this visit, and the hero's control stays as the place to
+  // change it later.
+  const handleStage = (stage: OperatorStage) => {
+    persistOperatorStage(stage);
+    router.refresh();
+    handleDismiss();
   };
 
   return (
@@ -89,6 +111,19 @@ export function FirstVisitExplainer() {
       <Link href="/history#track-record-heading" className={orientationLinkClass}>
         Track record
       </Link>
+      <fieldset className="m-0 flex w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-1 border-0 p-0 pt-1">
+        <legend className="float-left text-slate-400">Grade it for your stage:</legend>
+        {OPERATOR_STAGE_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            onClick={() => handleStage(option.key)}
+            className="inline-flex min-h-11 items-center rounded-md border border-slate-700/70 px-2.5 text-fluid-xs font-medium text-slate-200 hover:border-sky-400/60 hover:text-white"
+          >
+            {option.label}
+          </button>
+        ))}
+      </fieldset>
       <button
         type="button"
         onClick={handleDismiss}

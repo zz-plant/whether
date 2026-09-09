@@ -233,8 +233,13 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
   only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
 - **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
   2026-09-08: each asked the reader to maintain browser-local state the product could not pay
-  back). The subscribe row sits directly under the hero as one promise — Monday's call, and a
-  note the day it changes.
+  back). In their place, computed from data the product already holds: "Last week, in hindsight"
+  (`lib/report/hindsight.ts` — last week's readings from this week's deltas, the regime lines,
+  and whether either was crossed), "Since you were last here" (the call this browser last saw,
+  written on every visit, compared on the next), and the five most-asked direct answers. The
+  subscribe row sits directly under the hero as one promise — Monday's call, and a note the day
+  it changes. The stress tester opens on three graded example plans; the cash position is an
+  optional sharpener behind a disclosure. The first-visit explainer asks the stage once.
 - **Trust** states system status as one five-cell strip (data, freshness, sources, confidence,
   warnings) instead of five stacked cards.
 - **Resolve** renders its two link groups as divided menus with a chevron, not panels in panels.
@@ -367,7 +372,9 @@ publication, so a past call reads the way it did when it was made.
 A route-set pass against the IA boundary rules found three consolidations worth making, and one
 that looked worth making and was not.
 
-- **`/template` folded into `/threshold`.** `/threshold` explained the bounded-decision framework —
+- **`/threshold` folded into `/trust#framework` (2026-09-08)**, beside the formula its thresholds
+  come from; it had no inbound link from any primary surface. Before that,
+  **`/template` folded into `/threshold`.** `/threshold` explained the bounded-decision framework —
   action, threshold, reversal — and `/template` was a printable blank form asking for exactly those
   three parts. Each ended with a "next steps" row whose first suggestion was the other one. The form
   is now the `#template` section of the framework page, `/template` is a permanent redirect to that

@@ -9,6 +9,9 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
+import { LastWeekInHindsight } from "./components/home/LastWeekInHindsight";
+import { SinceLastVisit } from "./components/home/SinceLastVisit";
+import { DirectAnswersStrip } from "./components/home/DirectAnswersStrip";
 import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
 import { CompareStrip } from "./components/CompareStrip";
 import { ActivationTracker } from "./components/activationTracker";
@@ -368,6 +371,29 @@ async function PageContent({
           <div id="subscribe" className="scroll-mt-28">
             <SubscribeForm compact />
           </div>
+
+          {/* Everything below the call computes its content or leaves. These
+              two replace "Decisions to reconsider" and "Close the week", which
+              asked the reader to keep state in this browser so the product could
+              be smarter later; the product now says what it can from what it
+              already holds. */}
+          <SinceLastVisit
+            current={{
+              recordDate: reportData.treasury.record_date,
+              recordDateLabel: homepage.reportShell.recordDateLabel,
+              regimeLabel: publicRegimeLabel,
+              call: primaryCall,
+            }}
+          />
+          <LastWeekInHindsight
+            regime={regime}
+            scores={{ tightness, riskAppetite }}
+            deltas={{ tightness: tightnessDelta, riskAppetite: riskAppetiteDelta }}
+            thresholds={reportData.assessment.thresholds}
+            recordDateLabel={homepage.reportShell.recordDateLabel}
+          />
+
+          <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
 
           <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
         </div>

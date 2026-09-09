@@ -17,6 +17,8 @@ export const STORAGE_KEYS = {
   operatorProfile: OPERATOR_PROFILE_STORAGE_KEY,
   entitlementToken: "whether.billing.entitlementToken",
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
+  /** The call this browser last saw — written on every visit, read on the next. */
+  lastSeenCall: "whether.lastSeenCall",
   decisionMemory: (clientId: string) => `whether.decisionMemory:${clientId}`,
   decisionShieldPresets: (clientId?: string | null) =>
     clientId ? `whether.decisionShieldPresets:${clientId}` : "whether.decisionShieldPresets",
