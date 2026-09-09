@@ -44,9 +44,19 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
   return (
     <>
       <div className="inline-flex items-stretch rounded-lg border border-slate-800/80 bg-slate-900/60 divide-x divide-slate-800/80 [&>*:first-child]:rounded-l-[7px] [&>*:last-child]:rounded-r-[7px]">
-        <button type="button" onClick={() => setShowPalette(true)} className={CELL} aria-label="Search" title="Search ⌘K">
+        {/* Input-shaped, the way GitHub and Notion do it: the palette is the
+            richest way around the site and an unlabeled magnifier hid it. Below
+            md the bottom tab bar carries Search, so the icon is enough there. */}
+        <button
+          type="button"
+          onClick={() => setShowPalette(true)}
+          className={`${CELL} md:min-w-[13rem] md:justify-start md:gap-2 md:px-3 md:text-fluid-xs md:text-slate-400`}
+          aria-label="Search"
+          title="Search or jump to… ⌘K"
+        >
           <Search aria-hidden="true" size={16} strokeWidth={1.8} />
-          <span className="hidden lg:inline text-fluid-nano text-slate-400" aria-hidden="true">⌘K</span>
+          <span className="hidden md:inline flex-1 text-left">Search or jump to…</span>
+          <kbd aria-hidden="true" className="hidden md:inline rounded border border-slate-800 bg-slate-900/80 px-1.5 font-mono text-[10px] leading-4 text-slate-500">⌘K</kbd>
         </button>
         {/* The light theme has a full token set in tokens.css and layout.tsx
             restores the saved choice pre-paint, but nothing rendered the control,

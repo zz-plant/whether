@@ -95,13 +95,13 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
   return (
     <>
       <div
-        className="h-[calc(4.75rem+env(safe-area-inset-bottom))] lg:hidden"
+        className="h-[4.75rem] lg:hidden"
         aria-hidden="true"
       />
       {showStrip ? (
         <div
           data-testid="sticky-call-strip"
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-[calc(3.25rem+env(safe-area-inset-bottom))] z-40 px-3 pb-2 pt-2 md:bottom-0 md:pb-[max(0.65rem,env(safe-area-inset-bottom))] lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
         >
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-slate-800/90 bg-slate-900/95 px-3 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl lg:max-w-md lg:shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
             <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">

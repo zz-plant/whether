@@ -6,6 +6,7 @@ import { STORAGE_KEYS } from "../lib/storage/keys";
 import { navigationLayers, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalShareRail } from "./components/globalShareRail";
+import { MobileTabBar } from "./components/MobileTabBar";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
@@ -189,7 +190,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: buildOrientationBootstrapScript() }}
         />
       </head>
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-screen flex-col pb-[calc(3.25rem+env(safe-area-inset-bottom))] md:pb-0">
         <TooltipProvider>
         <ScrollProgressBar />
         <ToastProviderRoot>
@@ -199,6 +200,7 @@ export default function RootLayout({
           <GlobalHeader />
           <GlobalCommandPalette />
           <GlobalShareRail />
+          <MobileTabBar />
           <ScreenshotDetector />
           <PremiumFunnelTracker />
           {children}

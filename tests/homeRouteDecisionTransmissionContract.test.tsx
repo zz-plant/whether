@@ -98,7 +98,7 @@ describe("home route render contract", () => {
 
     // Demoted hubs stay reachable on demand: the command palette mounts every
     // IA navigation layer and its own history shortcut.
-    assert.ok(paletteSource.includes("navigationLayers"), "command palette mounts the IA navigation layers");
+    assert.ok(paletteSource.includes("loopNavigationLayers"), "command palette mounts the IA navigation layers");
     assert.ok(paletteSource.includes('navigateTo("/history")'), "command palette keeps the history deep link");
   });
 

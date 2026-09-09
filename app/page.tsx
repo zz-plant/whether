@@ -20,6 +20,7 @@ import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
+import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
@@ -296,6 +297,12 @@ async function PageContent({
               rule keyed on the data attribute (app/layout.tsx), so it stays
               pre-paint and CLS-free at either position. */}
           <FirstVisitExplainer />
+          {/* Weekly / Monthly / Quarterly is a view of the brief, so it lives in
+              the brief rather than in the global header where it read as a
+              site-wide control and took a second header row on phones. */}
+          <div className="flex items-center justify-end">
+            <CadenceSelector />
+          </div>
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}

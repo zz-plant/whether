@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal } from "lucide-react";
-import { navigationLayers } from "../../lib/navigation/informationArchitecture";
+import { loopNavigationLayers, utilityLinks } from "../../lib/navigation/informationArchitecture";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { openShareRail } from "./globalShareRail";
 
@@ -114,16 +114,28 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
     ];
 
-    const navCommands: CommandItem[] = navigationLayers.map((layer) => ({
+    const navCommands: CommandItem[] = loopNavigationLayers.map((layer) => ({
       id: `nav-${layer.key}`,
       label: layer.label,
       description: layer.description,
       icon: CornerRightUp,
       action: () => navigateTo(layer.href),
-      shortcut: layer.navLabel,
+      shortcut: layer.shortcut,
     }));
 
-    return [...actionCommands, ...navCommands];
+    // Every destination in one list: the utility routes used to live only in
+    // the footer and the More menu, so the palette could not jump to Pricing.
+    const utilityCommands: CommandItem[] = utilityLinks
+      .filter((link) => link.href !== "/search")
+      .map((link) => ({
+        id: `util-${link.href}`,
+        label: link.label,
+        description: link.description,
+        icon: CornerRightUp,
+        action: () => navigateTo(link.href),
+      }));
+
+    return [...actionCommands, ...navCommands, ...utilityCommands];
   }, [navigateTo, toggleFocusMode, onClose]);
 
   /*
@@ -227,7 +239,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search pages, actions, tools..."
+              placeholder="Search or jump to… e Evidence · p Plan · h History"
               className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none font-medium"
               aria-label="Search commands"
             />

@@ -22,7 +22,6 @@ export function CommandCenterNavBlock({
   secondaryCta,
   exportCta,
   showShare = false,
-  nextStep,
   statusLabel,
   trustStatusLabel,
   fetchedAtLabel,
@@ -42,7 +41,6 @@ export function CommandCenterNavBlock({
   exportCta?: ExportCtaProps | null;
   /** Opens the one global share rail — the same formats, the same island, as / and /share. */
   showShare?: boolean;
-  nextStep?: { description: string; href: string };
   statusLabel: string;
   trustStatusLabel: string;
   fetchedAtLabel: string;
@@ -117,7 +115,7 @@ export function CommandCenterNavBlock({
             <p className="text-fluid-micro leading-4 text-slate-400">
               {introMetaLine}
             </p>
-            <h1 className={headingClassName}>{pageTitle}</h1>
+            <h1 style={{ viewTransitionName: "page-title" }} className={headingClassName}>{pageTitle}</h1>
             <p className="flex max-w-3xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-300 sm:text-fluid-base">
               <span>{pageSummary}</span>
               {summaryLink}
@@ -139,7 +137,6 @@ export function CommandCenterNavBlock({
               {resolvedNextRefreshLabel ? (
                 <span>{resolvedNextRefreshLabel}</span>
               ) : null}
-              {nextStep ? <span>Next: {nextStep.description}</span> : null}
             </div>
 
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
