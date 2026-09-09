@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner } from "../components/historicalBanner";
+import { formatDateUTC } from "../../lib/formatters";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/visitorStrip";
 import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
@@ -108,7 +109,9 @@ export default async function SignalsPage({
       historicalBanner={
         model.historicalSelection ? (
           <HistoricalBanner
-            banner={model.historicalSelection.banner}
+            year={model.historicalSelection.year}
+            month={model.historicalSelection.month}
+            asOfLabel={formatDateUTC(model.historicalSelection.asOf)}
             liveHref="/signals"
             previousHref={model.previousHistoricalHref}
             timeMachineHref={model.historicalTimeMachineHref}

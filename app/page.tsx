@@ -28,12 +28,18 @@ import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatMonthYearShortFromValue } from "../lib/formatters";
+import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
 import { guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
-import { buildTimeMachineHref, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
+import {
+  buildTimeMachineHref,
+  getAdjacentTimeMachineRequest,
+  parseTimeMachineRequest,
+  resolveTimeMachineSelection,
+} from "../lib/timeMachine/timeMachineSelection";
+import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 
 export const revalidate = 300;
@@ -140,6 +146,24 @@ async function PageContent({
 
   const timeMachineRequest = parseTimeMachineRequest(searchParams);
   const operateHref = buildTimeMachineHref("/operate", timeMachineRequest);
+
+  /*
+   * `/signals` and `/operate` have marked the archived view since the time machine
+   * shipped; `/` never did, and `/` is where the picker in the header actually lands
+   * you (`router.push("/?month=…&year=…")`). The only signals were a "Mar 2020" chip
+   * inside the timeline rail, which reads as a timeline label rather than a mode, and
+   * a "PARTLY CACHED" line in the provenance strip. So the hero — the thing this
+   * product exists to have screenshotted into Slack — announced a March 2020 call in
+   * exactly the layout it uses for this week's.
+   *
+   * Resolved, not parsed: `resolveTimeMachineSelection` checks coverage, so a
+   * hand-typed `?month=99` falls back to the live brief instead of claiming an
+   * archived view of a month that has no data.
+   */
+  const historicalSelection = resolveTimeMachineSelection(searchParams);
+  const previousHistoricalRequest = historicalSelection
+    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
+    : null;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
@@ -285,6 +309,21 @@ async function PageContent({
             isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
             degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
           })}
+        </div>
+      ) : null}
+      {historicalSelection ? (
+        <div className="mx-auto max-w-[64rem]">
+          <HistoricalBanner
+            year={historicalSelection.year}
+            month={historicalSelection.month}
+            asOfLabel={formatDateUTC(historicalSelection.asOf)}
+            liveHref="/"
+            previousHref={
+              previousHistoricalRequest
+                ? buildTimeMachineHref("/", previousHistoricalRequest)
+                : undefined
+            }
+          />
         </div>
       ) : null}
       <div className="mx-auto max-w-[64rem] space-y-8">

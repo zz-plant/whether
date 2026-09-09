@@ -14,6 +14,14 @@ const monthShortFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+/* Spelled out, for prose and for the archived-view banner, where "Mar 2020" reads as
+   a chart tick rather than a statement about what the reader is looking at. */
+const monthLongFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
 export const formatMonthInput = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.valueOf())) {
@@ -58,5 +66,9 @@ export const formatMonthLabel = (year: number, month: number) => {
 
 export const formatMonthShortLabel = (year: number, month: number) => {
   return monthShortFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
+};
+
+export const formatMonthLongLabel = (year: number, month: number) => {
+  return monthLongFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 };
 

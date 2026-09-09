@@ -31,6 +31,11 @@ Machine-discovery routes:
 
 - `GET /llms.txt` provides a plain-text integration guide for autonomous agents.
 - `GET /.well-known/whether-agent.json` provides a machine-readable JSON manifest (endpoints, cadences, MCP tools).
+  It is served from `worker/index.ts`, not from a route under `app/` — vinext enumerates App Router
+  files with Node's `glob`, where `*` skips a leading dot, so a route under `app/.well-known/` is
+  never registered and 404s. It did, in production, for as long as it existed. The manifest body
+  lives in `lib/agentManifest.ts`; Invariant 10 in `tests/architectureInvariants.test.ts` fails if
+  any route file reappears under a dot-directory.
 
 ### Example
 

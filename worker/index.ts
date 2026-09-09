@@ -9,6 +9,7 @@ import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
+import { WHETHER_AGENT_MANIFEST_PATH, agentManifestResponse } from "../lib/agentManifest";
 
 /* Durable Object and Workflow classes must be exported from the Worker entry to exist. Both
    are trial infrastructure: declared everywhere, used only where the preview lane's vars
@@ -183,6 +184,16 @@ export default {
     }
 
     installBindings(env);
+
+    /* Served here rather than from `app/`: vinext enumerates App Router files with
+       Node's `glob`, where `*` skips a leading dot, so a route under `app/.well-known/`
+       is never registered and the request falls through to the app shell, which answers
+       with the HTML page rather than the manifest.
+       See lib/agentManifest.ts. installBindings must run first — the manifest reads
+       SITE_URL through resolveSiteUrl. */
+    if (url.pathname === WHETHER_AGENT_MANIFEST_PATH) {
+      return agentManifestResponse();
+    }
 
     const response = await handler.fetch(request);
 

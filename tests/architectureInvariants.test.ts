@@ -531,4 +531,44 @@ describe("Architecture Invariants", () => {
 
     assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
   });
+
+  /*
+   * Invariant 10 exists because `/.well-known/whether-agent.json` 404ed in production
+   * for as long as it existed, while `tests/agentRoutes.test.ts` imported the route
+   * module and called GET() directly and passed. vinext enumerates App Router files
+   * with Node's `glob`, where `*` does not match a leading dot, so any route under a
+   * dot-directory is silently unreachable — the request falls through to the app shell
+   * and answers HTML. The handler is fine; only the router never learns about it.
+   *
+   * A handler test cannot catch this class of defect, because the thing that is broken
+   * is the registration, not the handler. Walking `app/` is what notices.
+   */
+  it("Invariant 10: no route or page file is hidden from the router by a dot-directory", () => {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+    const appDir = join(repoRoot, "app");
+    const ROUTE_FILES = new Set(["route.ts", "route.tsx", "page.ts", "page.tsx"]);
+    const unreachable: string[] = [];
+
+    const walk = (dir: string, hiddenBy: string | null) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          // node_modules-style noise never appears under app/, so the only reason a
+          // segment starts with "." is that someone meant it as a URL segment.
+          walk(full, hiddenBy ?? (entry.name.startsWith(".") ? relative(repoRoot, full) : null));
+          continue;
+        }
+        if (hiddenBy && ROUTE_FILES.has(entry.name)) {
+          unreachable.push(
+            `${relative(repoRoot, full)} can never be served: "${hiddenBy}" starts with a dot, ` +
+              "which vinext's route scan skips. Serve it from worker/index.ts instead — see lib/agentManifest.ts.",
+          );
+        }
+      }
+    };
+
+    walk(appDir, null);
+
+    assert.deepEqual(unreachable, [], `\n${unreachable.join("\n")}\n`);
+  });
 });

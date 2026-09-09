@@ -11,6 +11,7 @@ import {
   resourcePillarPages,
   resourceSupportingPages,
 } from "../../lib/resourcesContent";
+import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
 import {
@@ -198,7 +199,9 @@ export async function buildPlanningPageModel(
         structuredData,
         historicalBanner: historicalSelection
           ? h(HistoricalBanner, {
-            banner: historicalSelection.banner,
+            year: historicalSelection.year,
+            month: historicalSelection.month,
+            asOfLabel: formatDateUTC(historicalSelection.asOf),
             liveHref: "/operate",
             previousHref: previousHistoricalHref,
             timeMachineHref: historicalTimeMachineHref,

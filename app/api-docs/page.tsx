@@ -116,6 +116,16 @@ export default function ApiDocsPage() {
           <h2 className="type-eyebrow">For developers</h2>
           <div className="space-y-3">
             <Endpoint
+              signature="GET /.well-known/whether-agent.json"
+              tryHref="/.well-known/whether-agent.json"
+              tryLabel="Try it"
+              tryCta="try_agent_manifest"
+            >
+              Discovery manifest. Every endpoint on this page, the supported cadences, and the
+              revisable-delegation conformance level with the third-party verifier that can check
+              it. Start here if you are wiring up an agent.
+            </Endpoint>
+            <Endpoint
               signature="GET /api/posture/current"
               tryHref="/api/posture/current"
               tryLabel="Try it"
@@ -168,6 +178,16 @@ export default function ApiDocsPage() {
             >
               Paginated history of regime-change alerts. Read access is open; writes are cron-owned.
             </Endpoint>
+            <Endpoint
+              signature="GET /api/decision-memory?format=records"
+              tryHref="/api/decision-memory?format=records"
+              tryLabel="Try it"
+              tryCta="try_delegation_records"
+            >
+              The call history in NDJSON, shaped by the Revisable Delegation record schema — one belief
+              record per published posture. The manifest above names the independent verifier that
+              can check these against the conformance level Whether claims.
+            </Endpoint>
           </div>
         </section>
 
@@ -192,6 +212,27 @@ export default function ApiDocsPage() {
             >
               The brief as a 1200×800 PNG for decks and threads. Accepts cadence and company-context
               params.
+            </Endpoint>
+            <Endpoint
+              signature="GET /api/image/slide?stage=seed"
+              tryHref="/api/image/slide?stage=seed"
+              tryLabel="View slide"
+              tryCta="try_image_slide"
+              tryAriaLabel="View the brief as a meeting slide"
+            >
+              The call as a 16:9 meeting slide — hand-written SVG, so it stays sharp at projector
+              size and the labels are still editable text in Figma or Keynote. Accepts seed,
+              series-a, series-b, or growth.
+            </Endpoint>
+            <Endpoint
+              signature="GET /api/embed?format=text|json|html"
+              tryHref="/api/embed?format=text"
+              tryLabel="Try it"
+              tryCta="try_embed_api"
+            >
+              The brief as a snippet a newsletter build step can insert at send time, in plain
+              text, JSON, or ready-to-paste HTML. Takes ticker and stage, so the call is calibrated
+              to one company rather than generic.
             </Endpoint>
             <Endpoint
               signature="GET /brief.md"
