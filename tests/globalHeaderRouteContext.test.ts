@@ -7,30 +7,24 @@ import { hasVisibleActiveNavLink, resolveGlobalHeaderRouteLabel } from "../lib/n
  * The header may drop the route label beside the wordmark only where the
  * navigation shows the route itself.
  *
- * "The nav names it" now holds for the brief alone. The supporting layers
- * render inside the closed More menu — the IA marked them supporting, and the
- * desktop bar used to show them anyway as `hidden lg:flex` — so on `/operate`
- * or `/trust` no bar link is active and the label comes back, the way it
- * always did for `/pricing`.
+ * The six loop layers render as tabs, so each of them (and any route nested
+ * under one) names itself. Utility and content routes — `/pricing`, `/about`,
+ * `/brief/<week>` — sit outside the loop, so the label comes back for those.
  */
 
 describe("route context in the global header", () => {
-  it("reports a visible active link only for the primary layer", () => {
-    assert.equal(hasVisibleActiveNavLink("/"), true);
+  it("reports a visible active link for every loop layer, nested routes included", () => {
+    for (const pathname of ["/", "/signals", "/signals/thresholds", "/operate", "/resolve", "/trust", "/history", "/history/compare"]) {
+      assert.equal(hasVisibleActiveNavLink(pathname), true, pathname);
+    }
   });
 
-  it("reports none for supporting, utility and unlisted routes, which then keep their label", () => {
+  it("reports none for utility and unlisted routes, which then keep their label", () => {
     for (const pathname of [
-      "/signals",
-      "/operate",
-      "/resolve",
-      "/trust",
-      "/history",
       "/pricing",
       "/about",
       "/brief/2026-w31",
       "/resources/some-article",
-      "/history/compare",
     ]) {
       assert.equal(hasVisibleActiveNavLink(pathname), false, pathname);
       // Whatever the header falls back to must actually name something.

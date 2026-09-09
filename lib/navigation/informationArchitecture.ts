@@ -18,6 +18,8 @@ export type NavigationLayer = {
   boundary: string;
   tier: "primary" | "supporting";
   parentKey?: NavigationLayerKey;
+  /** One-key jump. Rendered as a kbd hint in the header tabs and the palette; bound in KeyboardShortcuts. */
+  shortcut?: string;
 };
 
 // Primary layers are listed in operator-loop order: brief → plan → evidence →
@@ -35,6 +37,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "planning",
+    shortcut: "p",
     href: "/operate",
     label: "Plan",
     navLabel: "Plan",
@@ -45,6 +48,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "signals",
+    shortcut: "e",
     href: "/signals",
     label: "Evidence",
     navLabel: "Evidence",
@@ -55,6 +59,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "resolve",
+    shortcut: "r",
     href: "/resolve",
     label: "Resolve",
     navLabel: "Resolve",
@@ -65,6 +70,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "trust",
+    shortcut: "t",
     href: "/trust",
     label: "Trust",
     navLabel: "Trust",
@@ -75,6 +81,7 @@ export const navigationLayers: NavigationLayer[] = [
   },
   {
     key: "history",
+    shortcut: "h",
     href: "/history",
     label: "History",
     navLabel: "History",
@@ -96,6 +103,22 @@ export const navigationLayers: NavigationLayer[] = [
 ] as const;
 
 export const primaryNavigationLayers = navigationLayers.filter((layer) => layer.tier === "primary");
+
+/**
+ * The loop as the header shows it: every layer but the deepest nested one
+ * (compare, under history), in IA order. Desktop renders these as tabs; the
+ * mobile tab bar takes the first three and puts the rest behind More.
+ */
+export const loopNavigationLayers = navigationLayers.filter((layer) => layer.key !== "compare");
+
+/** The loop layers that declare a one-key jump, with the key narrowed for callers. */
+export const shortcutNavigationLayers: Array<NavigationLayer & { shortcut: string }> = loopNavigationLayers.flatMap((layer) =>
+  typeof layer.shortcut === "string" ? [{ ...layer, shortcut: layer.shortcut }] : [],
+);
+
+/** The three loop layers that fit a phone's bottom bar beside Search and More. */
+export const mobileTabLayerKeys: readonly NavigationLayerKey[] = ["weekly-brief", "planning", "signals"];
+export const mobileTabLayers = loopNavigationLayers.filter((layer) => mobileTabLayerKeys.includes(layer.key));
 
 // Routes that render the condensed report shell header. Supporting layers are
 // nested under primary hrefs, so listing every layer href is safe and keeps

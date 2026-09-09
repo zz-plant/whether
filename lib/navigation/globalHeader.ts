@@ -1,5 +1,6 @@
 import {
   contentSections,
+  loopNavigationLayers,
   navigationLayers,
   primaryNavigationLayers,
   reportShellPaths,
@@ -89,25 +90,30 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
 // puts the supporting tier inside More; exactly one link is active, the most
 // specific layer matching the path.
 export const resolveGlobalHeaderLoopLinks = (pathname: string): GlobalHeaderNavigationLink[] => {
-  const activeLayer = findActiveLayer(pathname);
+  // A layer the row does not render (compare, under history) lights its
+  // nearest rendered ancestor, so /history/compare marks the History tab.
+  let activeLayer = findActiveLayer(pathname);
+  while (activeLayer) {
+    const current = activeLayer;
+    if (loopNavigationLayers.some((layer) => layer.key === current.key)) break;
+    activeLayer = current.parentKey ? navigationLayers.find((layer) => layer.key === current.parentKey) : undefined;
+  }
+  const activeKey = activeLayer?.key;
 
-  return navigationLayers
-    .filter((layer) => layer.key !== "compare")
-    .map((link) => ({
-      ...link,
-      isActive: activeLayer?.key === link.key,
-    }));
+  return loopNavigationLayers.map((link) => ({
+    ...link,
+    isActive: activeKey === link.key,
+  }));
 };
 
 /**
  * Whether the desktop nav row will visibly mark the current route.
  *
  * The header drops the route label beside the wordmark only where the
- * navigation names the route itself. That is now true for the brief alone: the
- * supporting layers sit inside the closed More menu, the same place the utility
- * links always were, so on `/operate` or `/trust` nothing in the bar is active
- * and the label has to come back — exactly as it always did for `/pricing`.
- * Callers render the label when this returns false.
+ * navigation names the route itself. The six loop layers render as tabs, so
+ * any of them (and any route nested under one) counts; `/pricing`, `/about`,
+ * `/brief/<week>` and the content families sit outside the loop, so the label
+ * comes back for those. Callers render the label when this returns false.
  */
 export const hasVisibleActiveNavLink = (pathname: string) =>
-  resolveGlobalHeaderNavigationLinks(pathname).some((link) => link.isActive);
+  resolveGlobalHeaderLoopLinks(pathname).some((link) => link.isActive);

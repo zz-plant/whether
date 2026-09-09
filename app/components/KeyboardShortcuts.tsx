@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
+import { shortcutNavigationLayers } from "../../lib/navigation/informationArchitecture";
 
-const SHORTCUTS: Record<string, string> = {
-  "e": "/signals",
-  "p": "/operate",
-  "h": "/history",
-  "t": "/trust",
-  "r": "/resolve",
-  "/": "/search",
-};
+/* One source: the IA declares each layer's key, the header tabs show it on
+   hover, the palette lists it, and this binds it. */
+const SHORTCUTS: Record<string, string> = Object.fromEntries([
+  ...shortcutNavigationLayers.map((layer) => [layer.shortcut, layer.href]),
+  ["/", "/search"],
+]);
 
 export function KeyboardShortcuts() {
   const router = useRouter();

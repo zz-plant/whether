@@ -12,7 +12,6 @@ import {
 } from "../../lib/navigation/globalHeader";
 import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
-import { CadenceSelector } from "./cadenceSelector";
 import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
@@ -66,32 +65,23 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
   const reportHeaderAction = resolveReportHeaderNextStep(pathname);
   const reportHeaderUtilityAction = resolveReportHeaderUtilityAction(pathname);
 
-  // Home brief: one band on lg+ (brand · nav · cadence/view/icons) so the shell
-  // above the weekly call stays compressed. Below lg, cadence moves to a second
-  // rail; below md the nav collapses into the drawer trigger.
+  // Home brief: one band (brand · tabs · actions). The cadence control used to
+  // live here and, below lg, on a second rail; it belongs to the brief, not to
+  // the global header, and renders inside the page now. Below md the tabs are
+  // the bottom bar, so the phone header is wordmark, route and actions.
   if (isHomeBrief) {
     return (
       <GlobalHeaderScrollWrapper>
         <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
-          {/* px-2 under 360px: the wordmark, the drawer trigger and four 44px
-              controls leave no slack at that width, and the inset is the only
-              thing here that can give without shrinking a touch target. */}
-          <div className="flex items-center gap-1 min-[360px]:gap-2 px-2 min-[360px]:px-3 py-1.5 sm:gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
             <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
               Whether
             </Link>
+            <span className="text-fluid-xs font-medium tracking-[0.04em] text-[var(--app-text-muted)] md:hidden">Weekly Brief</span>
             <GlobalHeaderNavClient pathname={pathname} />
-            <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
-              <div className="hidden items-center gap-1.5 lg:flex">
-                <CadenceSelector />
-              </div>
-              <div className="flex items-center gap-1.5 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-sky-400">
-                <GlobalHeaderActionsClient showPresentMode />
-              </div>
+            <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-sky-400">
+              <GlobalHeaderActionsClient showPresentMode />
             </div>
-          </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto border-t border-white/[0.05] px-3 py-1.5 lg:hidden">
-            <CadenceSelector />
           </div>
         </div>
       </GlobalHeaderScrollWrapper>
@@ -112,11 +102,11 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white no-underline">
               Whether
             </Link>
-            {fallbackRouteLabel ? (
-              <span className="hidden truncate text-fluid-xs font-medium tracking-[0.04em] text-[var(--app-text-muted)] md:inline">
-                {fallbackRouteLabel}
-              </span>
-            ) : null}
+            {/* Desktop: only where no tab names the route. Phone: always, since
+                the bottom bar shows three of the six loop routes. */}
+            <span className={`truncate text-fluid-xs font-medium tracking-[0.04em] text-[var(--app-text-muted)] ${fallbackRouteLabel ? "" : "md:hidden"}`}>
+              {fallbackRouteLabel ?? resolveGlobalHeaderRouteLabel(pathname)}
+            </span>
           </div>
 
           <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2">
@@ -162,16 +152,8 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-1.5">
+        <div className="hidden items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-1.5 md:flex">
           <GlobalHeaderNavClient pathname={pathname} />
-          {isReportRoute && reportHeaderAction ? (
-            <Link
-              href={reportHeaderAction.href}
-              className="weather-button-primary inline-flex min-h-[44px] shrink-0 items-center justify-center px-3 py-1.5 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 sm:hidden"
-            >
-              {reportHeaderAction.label}
-            </Link>
-          ) : null}
         </div>
       </div>
     </GlobalHeaderScrollWrapper>

@@ -6,23 +6,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { shortcutNavigationLayers } from "../../../lib/navigation/informationArchitecture";
 
 type HelpModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
-const SHORTCUTS = [
+const SHORTCUTS: Array<[string, string]> = [
   ["C", "Copy Slack brief"],
   ["F", "Toggle presentation / focus mode"],
   ["J", "Next section"],
   ["K", "Previous section"],
-  ["E", "Evidence & signals"],
-  ["P", "Planning & operations"],
-  ["H", "History & track record"],
-  ["T", "Trust & provenance"],
-  ["R", "Resolve & methodology"],
-  ["/", "Search & command palette"],
+  ...shortcutNavigationLayers.map((layer): [string, string] => [layer.shortcut.toUpperCase(), layer.description]),
+  ["⌘K", "Search or jump to a page"],
+  ["/", "Search"],
   ["?", "Show this help"],
 ];
 

@@ -5,45 +5,46 @@ import { GlobalHeaderNavClient, MobileNavContent } from "../app/components/globa
 import { resolveGlobalHeaderNavigationLinks } from "../lib/navigation/globalHeader";
 
 describe("GlobalHeaderNavClient", () => {
-  it("renders only the brief in the bar and the loop inside More, in IA order", () => {
+  it("renders the whole loop as tabs in the bar, in IA order, with utilities inside More", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavClient pathname="/" />,
     );
     const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf("<details"));
     const more = html.slice(html.indexOf("<details"), html.indexOf("</details>"));
 
-    assert.ok(bar.includes("Weekly Brief"), "the bar renders the brief");
-    // The IA marks these supporting. They used to render in the bar anyway as
-    // `hidden lg:flex`, which made the one-screen cut true below 1024px and
-    // false above it.
-    for (const label of ["Plan", "Evidence", "Resolve", "Trust", "History"]) {
-      assert.ok(!bar.includes(`>${label}<`), `${label} is not a bar item`);
-    }
-
-    const positions = ["Plan", "Evidence", "Resolve", "Trust", "History"].map((label) => {
-      const index = more.indexOf(`>${label}<`);
-      assert.ok(index > -1, `More renders ${label}`);
+    // Six short words fit in a header at any desktop width. Hiding five of
+    // them behind a disclosure made the loop the product is built around
+    // invisible until a chevron was clicked.
+    const positions = ["Brief", "Plan", "Evidence", "Resolve", "Trust", "History"].map((label) => {
+      const index = bar.indexOf(`<span>${label}</span>`);
+      assert.ok(index > -1, `the bar renders ${label}`);
       return index;
     });
-    assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "loop links keep IA order");
-    assert.ok(more.indexOf(">Plan<") < more.indexOf('href="/api-docs"'), "the loop precedes the utility links");
-    assert.ok(!bar.includes('href="/api-docs"'), "API is not a top-level nav item");
+    assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "tabs keep IA order");
+    assert.ok(more.includes('href="/api-docs"'), "More carries the utility links");
+    assert.ok(!more.includes("<span>Plan</span>"), "the loop is not repeated inside More");
+    assert.ok(!bar.includes('href="/api-docs"'), "API is not a tab");
   });
 
-  it("marks the matching loop link current inside More on a nested report route", () => {
+  it("shows each tab's one-key shortcut so the keyboard layer is discoverable", () => {
+    const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
+    for (const key of ["p", "e", "r", "t", "h"]) {
+      assert.ok(html.includes(`<kbd aria-hidden="true" class="`) && html.includes(`>${key}</kbd>`), `tab shows the ${key} key`);
+    }
+  });
+
+  it("marks the matching tab current on a nested report route", () => {
     const html = renderToStaticMarkup(
       <GlobalHeaderNavClient pathname="/signals/thresholds" />,
     );
     const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf("<details"));
-    const more = html.slice(html.indexOf("<details"), html.indexOf("</details>"));
 
-    assert.equal(bar.split('aria-current="page"').length - 1, 0, "nothing in the bar is current off the brief");
     assert.match(
-      more,
+      bar,
       /<a[^>]*href="\/signals"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*href="\/signals"/,
-      "Evidence link is current",
+      "Evidence tab is current",
     );
-    assert.equal(more.split('aria-current="page"').length - 1, 1, "exactly one loop link is active");
+    assert.equal(bar.split('aria-current="page"').length - 1, 1, "exactly one tab is active");
   });
 
   it("renders resource and framework section in mobile navigation content", () => {

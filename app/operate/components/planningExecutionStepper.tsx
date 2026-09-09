@@ -170,6 +170,11 @@ export function OperationsExecutionStepper({
               </li>
             );
           })}
+          <li className="ml-2 hidden items-center gap-1 pr-1 text-fluid-nano text-slate-500 lg:flex" aria-hidden="true">
+            <kbd className="rounded border border-slate-800 px-1 font-mono">j</kbd>
+            <kbd className="rounded border border-slate-800 px-1 font-mono">k</kbd>
+            <span>next / previous</span>
+          </li>
         </ol>
       </div>
 

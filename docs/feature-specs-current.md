@@ -729,7 +729,10 @@ Two review-bot findings on the first pass, both real and both fixed in the same 
 - **"The nav names the route" holds for six routes and no others.** Dropping the label beside
   the wordmark left `/pricing`, `/about`, `/brief/<week>` and `/resources/...` showing the
   wordmark alone on desktop: no loop link is active there, the mobile trigger is hidden from
-  `md`, and a matching utility link sits inside the closed More menu. `hasVisibleActiveNavLink`
+  `md`, and a matching utility link sits inside the closed More menu. (Since 2026-09-09 the six
+  loop layers render as underlined tabs at `md+` with their one-key shortcut on hover, More holds
+  only the utility links, and below `md` a fixed bottom tab bar — Brief, Plan, Evidence, Search,
+  More — carries the loop; the cadence control lives in the brief.) `hasVisibleActiveNavLink`
   now gates the label, so it returns for exactly the routes the navigation does not mark —
   `/history/compare` included, since `compare` is filtered out of the loop links.
 - **The grouped icon cluster clipped its own focus rings.** `overflow-hidden` cut the top and

@@ -330,6 +330,20 @@ button .weather-chip:active,
   animation: 220ms cubic-bezier(0.16, 1, 0.3, 1) both weather-fade-in-up;
 }
 
+/* The title slot is the shared element between the brief's call and every
+   report page's heading: it morphs in place while the pages cross-fade, so the
+   reader's eye keeps its anchor across the loop. */
+::view-transition-group(page-title) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(page-title),
+::view-transition-new(page-title) {
+  height: 100%;
+  object-fit: none;
+}
+
 @keyframes weather-fade-out {
   from { opacity: 1; }
   to { opacity: 0.2; }
@@ -353,6 +367,7 @@ button .weather-chip:active,
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root),
+  ::view-transition-group(page-title),
   .weather-page-enter {
     animation: none !important;
   }

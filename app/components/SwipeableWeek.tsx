@@ -126,6 +126,7 @@ export function SwipeableWeek({
 
   return (
     <section
+      data-swipe-owner="cadence"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className="touch-pan-y outline-none space-y-3"

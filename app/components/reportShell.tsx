@@ -20,6 +20,7 @@ import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { InternalAwareLink } from "./report-shell/InternalAwareLink";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 import { SidebarSequenceBlock } from "./report-shell/SidebarSequenceBlock";
+import { NextStepCard } from "./report-shell/NextStepCard";
 import { InlineTrustBlock } from "./report-shell/TrustBlocks";
 import type {
   DecisionBanner,
@@ -259,7 +260,7 @@ export const ReportShell = (props: ReportShellProps) => {
                   nothing on a page with fewer than two sections. */}
               <MobileSectionChips sectionLinks={resolvedSectionLinks} />
 
-              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} showShare={resolvedShowShare} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
+              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} showShare={resolvedShowShare} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
 
               <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
@@ -308,6 +309,8 @@ export const ReportShell = (props: ReportShellProps) => {
               {/* INTERNAL_USE_LABEL is "" in lib/exportNotices, so this rendered
                   a rule with nothing under it — 49px of margin, border and
                   padding at the foot of every report route. */}
+              <NextStepCard nextStep={resolvedNextStep} />
+
               {INTERNAL_USE_LABEL ? (
                 <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
                   <p>{INTERNAL_USE_LABEL}</p>
