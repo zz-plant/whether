@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
 import { useClipboardCopy } from "../components/useClipboardCopy";
 
@@ -56,7 +56,8 @@ export function ShareCopyControls({
     }
     if (status !== "copied") trackedRef.current = null;
   }, [status, copiedTarget]);
-  const calendarHref = useMemo(() => {
+  const [calendarHref, setCalendarHref] = useState("#");
+  useEffect(() => {
     const date = nextMondayIsoDate();
     const params = new URLSearchParams({
       action: "TEMPLATE",
@@ -65,7 +66,7 @@ export function ShareCopyControls({
       details: calendarDetails,
     });
 
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    setCalendarHref(`https://calendar.google.com/calendar/render?${params.toString()}`);
   }, [calendarDetails, recordDate]);
 
   const copyText = (target: CopyTarget, text: string) => copyToClipboard(text, target);

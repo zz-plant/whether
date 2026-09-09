@@ -30,7 +30,7 @@ export function PageShell({
     <main
       id="main-content"
       tabIndex={-1}
-      className={`weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100${className ? ` ${className}` : ""}`}
+      className={`weather-shell relative isolate flex-1 overflow-x-clip text-slate-100${className ? ` ${className}` : ""}`}
       style={regimeAccentStyle(regime)}
     >
       {backdropVariant === "hub" ? <div className="weather-hub-backdrop" aria-hidden="true" /> : null}

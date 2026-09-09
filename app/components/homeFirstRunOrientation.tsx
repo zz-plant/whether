@@ -119,7 +119,7 @@ export function FirstVisitExplainer() {
             key={option.key}
             type="button"
             onClick={() => handleStage(option.key)}
-            className="inline-flex min-h-11 items-center rounded-md border border-slate-700/70 px-2.5 text-fluid-xs font-medium text-slate-200 hover:border-sky-400/60 hover:text-white"
+            className="inline-flex min-h-9 items-center rounded-md border border-slate-700/70 px-2 text-fluid-nano font-medium text-slate-200 hover:border-sky-400/60 hover:text-white"
           >
             {option.label}
           </button>

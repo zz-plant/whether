@@ -24,10 +24,15 @@ describe("home route render contract", () => {
     // The three bands are the contract, not decoration: a change with no stated
     // consequence and a consequence with no stated cause are both what this
     // block exists to prevent.
-    for (const band of ["What changed", "What that changes for you", "What stays the same"]) {
+    // "What changed" no longer carries its own eyebrow: the section heading
+    // directly above it already says so, and the band read as a second title.
+    for (const band of ["What that changes for you", "What stays the same"]) {
       assert.ok(changeReportSource.includes(`>${band}<`), `change report keeps the "${band}" band`);
     }
-    assert.ok(heroSource.includes("Why this call"), "diagnostics are progressively disclosed");
+    // The signal readout disclosure is gone; the two rails carry each score
+    // against its lines, and the glossary stays one link away under them.
+    assert.ok(!heroSource.includes("Why this call"), "no second readout of the scores the rails already show");
+    assert.ok(heroSource.includes("<GlossaryLink>"), "the glossary stays reachable from the hero");
     assert.ok(!routeSource.includes("DeltaTrustStrip"), "trust stays inline in the decision hero, not a duplicate summary card");
     assert.ok(!routeSource.includes("<FlipMeter"), "flip watch lives in the hero, not a separate barometer card");
 

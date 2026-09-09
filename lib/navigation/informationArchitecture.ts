@@ -146,11 +146,6 @@ export const navigationLabelByPath = navigationLayers.reduce<Record<string, stri
  */
 export const utilityLinks = [
   {
-    href: "/comps",
-    label: "SaaS Multiples",
-    description: "Median EV/Revenue multiples across 15 public SaaS comps",
-  },
-  {
     href: "/history/compare",
     label: "Macro Analogs",
     description: "Compare current posture to 2001, 2008, and 2022 historical epochs",

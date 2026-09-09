@@ -42,7 +42,6 @@ export default async function MethodPage({
     trustSummary,
     citationLine,
     warnings,
-    meetingSnippet,
     revisitBullets,
     trustVerdict,
     reportShellProps,
@@ -177,12 +176,6 @@ export default async function MethodPage({
             </ul>
           </article>
         </div>
-      </ReportSection>
-
-      <ReportSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
-        <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200 shadow-[0_10px_26px_-24px_rgba(0,0,0,0.55)]">
-          <code>{meetingSnippet}</code>
-        </pre>
       </ReportSection>
 
       <BeginnerGlossaryPanel />

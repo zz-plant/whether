@@ -16,8 +16,6 @@ import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester"
 import { CompareStrip } from "./components/CompareStrip";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
-import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
-import { FreshnessDot } from "./components/FreshnessDot";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
@@ -271,14 +269,6 @@ async function PageContent({
         {cadenceTitle ?? "Weekly Brief"}
       </h1>
       <ActivationTracker path="/" />
-      <FreshnessDot
-        label={homepage.reportShell.fetchedAtLabel}
-        recordDate={homepage.reportShell.recordDateLabel}
-        treasurySource={homepage.reportShell.treasurySource}
-        trustStatusLabel={homepage.reportShell.trustStatusLabel}
-        degradedSourceRows={homepage.reportShell.degradedSourceRows}
-        showOfflineBadge={homepage.reportShell.showOfflineBadge}
-      />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
           {resolveDataStatusGuidance({
@@ -300,10 +290,16 @@ async function PageContent({
           {/* Weekly / Monthly / Quarterly is a view of the brief, so it lives in
               the brief rather than in the global header where it read as a
               site-wide control and took a second header row on phones. */}
-          <div className="flex items-center justify-end">
+          {/* The month rail is a replay tool; it lives on History and Evidence.
+              Here it was 120px of the past above the one thing the page is for. */}
+          <div className="flex items-center justify-between gap-3">
+            <ActionLink href="/history" variant="inline" className="text-fluid-nano text-slate-400 hover:text-slate-200">
+              Past months →
+            </ActionLink>
             <CadenceSelector />
           </div>
           <SwipeableWeek
+            showTimeline={false}
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
             serverMonths={macroTrendline.map((entry) => {
@@ -350,7 +346,6 @@ async function PageContent({
               revisitQueue={revisitQueue}
               noChangeAreas={noChangeAreas}
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-              signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
               activeStage={activeStage}
             />
 

@@ -13,7 +13,7 @@ export function RouteLoadingShell({
   pageTitle = "Weekly Brief",
 }: RouteLoadingShellProps) {
   return (
-    <div className="weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100">
+    <div className="weather-shell relative isolate flex-1 overflow-x-clip text-slate-100">
       <div className="relative z-10 mx-auto w-full max-w-[96rem] px-[var(--weather-shell-pad-inline)] pb-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] sm:pt-4">
         <section
           aria-label={`Preparing ${pageTitle}`}

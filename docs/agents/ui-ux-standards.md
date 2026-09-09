@@ -117,7 +117,7 @@ Scope: every `<details>`, `Collapsible`, and `Accordion` in `app/`.
   threshold is actually near, rather than picking a fixed default.
 - SHOULD: state in the summary what is behind it. "Detailed verification & source board" earns its
   click; "inspect the signal breakdown" and "tap to expand" do not — they describe the gesture, not
-  the content. A summary that shows the current values (`Why this call · Funding pressure 50
+  the content. A summary that shows the current values (formerly `Why this call · Funding pressure 50
   moderate …`) is better still, because it pays the reader back without a click.
 
 ### Mechanism

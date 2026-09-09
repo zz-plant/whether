@@ -231,6 +231,17 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
 - **Plan** opens with the shared corridor rails (`BoundedCorridorRails`) inside the weekly plan
   step, and the rules table refers back to them; the sticky one-row strip is section navigation
   only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
+- **Subtraction pass (2026-09-09).** The hero is headline, score, and one rail per score:
+  the "Why this call" readout grid, the separate bounded-condition rails, and the "Posture
+  flips" row were three statements of the same two numbers. Each rail now carries the reading,
+  the guardrail or watch line, both scale ends, and one plain-English sentence. The month rail
+  left the brief for History and Evidence ("Past months →"); the freshness badge left the top
+  of the page (the hero's provenance line carries source, date, and confidence, and names the
+  status only when a source is cached). The plan page lost its "Decision help" and
+  "Board-ready templates" blocks; Trust lost the meeting snippet (the citation line remains);
+  Evidence folds the reference cycle, sector read, and fossil record behind one "Context"
+  disclosure; `/comps` redirects to `/signals`. The regime atmosphere tint and page-enter fade
+  are gone; the view transition and the freshness pulse stay because they carry meaning.
 - **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
   2026-09-08: each asked the reader to maintain browser-local state the product could not pay
   back). In their place, computed from data the product already holds: "Last week, in hindsight"

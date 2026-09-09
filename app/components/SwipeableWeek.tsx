@@ -36,8 +36,11 @@ export function SwipeableWeek({
   currentMonth,
   currentYear,
   defaultZoom = "3Y",
+  showTimeline = true,
 }: {
   children: React.ReactNode;
+  /** The brief keeps the swipe but not the rail; replay pages render the rail. */
+  showTimeline?: boolean;
   currentMonth?: number;
   currentYear?: number;
   serverMonths?: Array<{ recordDate: string; month: number; year: number }>;
@@ -132,14 +135,16 @@ export function SwipeableWeek({
       className="touch-pan-y outline-none space-y-3"
       aria-label="Weekly operating brief with interactive timeline"
     >
-      <TimelineBar
-        currentMonth={currentMonth}
-        currentYear={currentYear}
-        onSelect={handleSelectMonth}
-        defaultZoom={defaultZoom}
-        showZoomControls
-        className="mb-1"
-      />
+      {showTimeline ? (
+        <TimelineBar
+          currentMonth={currentMonth}
+          currentYear={currentYear}
+          onSelect={handleSelectMonth}
+          defaultZoom={defaultZoom}
+          showZoomControls
+          className="mb-1"
+        />
+      ) : null}
       {/* The brief below is what the scrub is actually changing, so it carries
           the pending state. Without it a release looked like nothing happened
           until the new month arrived. */}
