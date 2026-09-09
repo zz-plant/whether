@@ -98,7 +98,6 @@ export function OperationsExecutionStepper({
     () => new Set(resolveInitialOpenStepIds({ steps })),
   );
   const [currentStepId, setCurrentStepId] = useState(firstStepId);
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!firstStepId) {
@@ -127,18 +126,6 @@ export function OperationsExecutionStepper({
     };
   }, [firstStepId, steps]);
 
-  const toggleCompleted = (stepId: string) => {
-    setCompletedSteps((prev) => {
-      const next = new Set(prev);
-      if (next.has(stepId)) {
-        next.delete(stepId);
-      } else {
-        next.add(stepId);
-      }
-      return next;
-    });
-  };
-
   const toggleOpen = (stepId: string) => {
     setOpenStepIds((prev) => {
       const next = new Set(prev);
@@ -148,38 +135,20 @@ export function OperationsExecutionStepper({
     });
   };
 
-  const completedCount = steps.filter((step) =>
-    completedSteps.has(step.id),
-  ).length;
-
   return (
     <section
       id="planning-stepper"
       className="space-y-4"
-      aria-label="Planning checklist"
+      aria-label="Planning sections"
     >
-      {/* A strip, not a panel. Six rows of checkbox-plus-title was the first
-          screen of the page and said "0/6"; the same six steps, one chip each, in one
-          sticky row say it in 44px and stay in view while the reader works
-          down the page. The check toggle stays on each chip. */}
-      {/* Below lg the shell's section-chip row is sticky at the top of the
-          viewport and 52px tall, so this strip sits under it rather than on
-          it; at lg the chips are gone and the strip can take the top edge. */}
+      {/* Section navigation, nothing more. This was a 0/6 checklist whose
+          checkboxes did nothing but turn themselves on; the chips stay because
+          they keep the six sections one tap away while the reader works down
+          the page. */}
       <div className="sticky top-[3.5rem] z-10 -mx-1 overflow-x-auto rounded-xl border border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 py-1.5 backdrop-blur lg:top-2">
-        <ol className="flex min-w-max items-center gap-1.5" aria-label="This week's checklist">
-          <li className="flex items-center gap-2 pl-1 pr-2 text-fluid-nano font-semibold tabular-nums text-slate-400">
-            <span className="sr-only">Checklist progress</span>
-            <span aria-hidden="true">{completedCount}/{steps.length}</span>
-            <span className="flex h-1.5 w-12 overflow-hidden rounded-full bg-slate-800" aria-hidden="true">
-              <span
-                className="h-full bg-emerald-400 transition-[width]"
-                style={{ width: `${steps.length ? (completedCount / steps.length) * 100 : 0}%` }}
-              />
-            </span>
-          </li>
+        <ol className="flex min-w-max items-center gap-1.5" aria-label="Sections on this page">
           {steps.map((step) => {
             const isActive = step.id === currentStepId;
-            const isCompleted = completedSteps.has(step.id);
             const stepHref = buildOperationsExecutionStepHref(step.id);
 
             return (
@@ -189,37 +158,12 @@ export function OperationsExecutionStepper({
                   isActive ? "border-sky-500/50 bg-sky-500/10" : "border-transparent"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => toggleCompleted(step.id)}
-                  aria-label={
-                    isCompleted
-                      ? `Mark "${step.title}" as incomplete`
-                      : `Mark "${step.title}" as complete`
-                  }
-                  className={`flex h-11 w-9 items-center justify-center rounded-l-lg transition-colors ${
-                    isCompleted ? "text-emerald-300" : "text-slate-500 hover:text-slate-300"
-                  }`}
-                >
-                  <span
-                    className={`flex h-4 w-4 items-center justify-center rounded border-2 ${
-                      isCompleted ? "border-emerald-400 bg-emerald-500/20" : "border-current"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    {isCompleted ? (
-                      <svg viewBox="0 0 12 12" className="h-2.5 w-2.5">
-                        <path d="M2.5 6l2.5 2.5 4.5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    ) : null}
-                  </span>
-                </button>
                 <a
                   href={stepHref}
                   aria-current={isActive ? "step" : undefined}
-                  className={`flex h-11 items-center pr-3 text-fluid-xs font-semibold no-underline ${
+                  className={`flex h-11 items-center px-3 text-fluid-xs font-semibold no-underline ${
                     isActive ? "text-sky-100" : "text-slate-300"
-                  } ${isCompleted ? "line-through decoration-slate-600 opacity-70" : ""}`}
+                  }`}
                 >
                   {step.title}
                 </a>

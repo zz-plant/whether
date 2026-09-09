@@ -94,7 +94,7 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operate#ops-monthly-action-summary");
     assert.match(workspaceModel.translate.primaryPath.href, /^\/resolve\//);
-    assert.match(workspaceModel.translate.fallbackUtility.href, /^\/resolve\//);
+    assert.equal(workspaceModel.translate.fallbackUtility.href, "/resolve#direct-answers");
     assert.ok(workspaceModel.translate.toolkitShortcuts.length > 0);
   });
 

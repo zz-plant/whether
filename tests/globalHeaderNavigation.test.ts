@@ -31,9 +31,9 @@ describe("global header navigation helpers", () => {
   });
 
   it("labels utility routes without adding them to the operator loop", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/threshold"), "Framework");
-    // /template is a permanent redirect to /threshold#template; the form is a
-    // section of the framework page rather than a route of its own.
+    // /threshold and /template are permanent redirects into /trust; the
+    // framework is a section of the trust page rather than a route of its own.
+    assert.equal(resolveGlobalHeaderRouteLabel("/threshold"), "Page");
     assert.equal(resolveGlobalHeaderRouteLabel("/template"), "Page");
     assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API & MCP");
     assert.equal(resolveGlobalHeaderRouteLabel("/about"), "About");

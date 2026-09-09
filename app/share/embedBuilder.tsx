@@ -69,7 +69,10 @@ export function EmbedBuilder() {
         {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
             the embed snippet's <pre> pushed its column to 520px inside a 358px
             grid and the page scrolled sideways on a phone. */}
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_14rem]">
+        {/* The default snippet is what nearly everyone pastes. Ticker and stage
+            used to be asked for before any preview appeared; they are a
+            refinement now, after the copy button. */}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="min-w-0 space-y-5">
             <div className="weather-card">
               <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
@@ -84,15 +87,47 @@ export function EmbedBuilder() {
                 style={{ minHeight: "80px" }}
               >
                 <div className="text-fluid-micro text-white/50 py-3 px-3">
-                  {ticker || stage
-                    ? `Loading brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…`
-                    : "Configure your brief to see a live preview"}
+                  {`Loading the live brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…`}
                 </div>
               </div>
             </div>
           </div>
-
           <div className="min-w-0 space-y-5">
+            <div className="weather-card">
+              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
+                Embed code
+              </p>
+
+              <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-white/60">
+                <code>{embedCode}</code>
+              </pre>
+
+              <div className="mt-3">
+                <button
+                  onClick={handleCopy}
+                  className={`w-full rounded-lg px-3 py-2 text-fluid-xs font-semibold tracking-[0.04em] transition-colors active:scale-[0.97] ${
+                    copied
+                      ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
+                      : "bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 hover:text-sky-200 ring-1 ring-sky-500/30"
+                  }`}
+                >
+                  {copied ? "Copied" : "Copy code"}
+                </button>
+              </div>
+
+              <p className="mt-3 text-fluid-micro leading-relaxed text-white/60">
+                Paste this into any HTML newsletter or webpage. The brief renders live and
+                auto-updates weekly. No API key needed.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <details className="weather-auto-chevron rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-fluid-xs font-semibold text-white/70">
+            <span>Customise: ticker and company stage</span>
+          </summary>
+          <div className="mt-3 max-w-sm">
             <div className="weather-card">
               <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
                 Configure
@@ -152,42 +187,15 @@ export function EmbedBuilder() {
               </div>
             </div>
 
-            <div className="weather-card">
-              <p className="mb-3 text-fluid-micro font-semibold tracking-[0.04em] text-white/60">
-                Embed code
-              </p>
-
-              <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-white/60">
-                <code>{embedCode}</code>
-              </pre>
-
-              <div className="mt-3">
-                <button
-                  onClick={handleCopy}
-                  className={`w-full rounded-lg px-3 py-2 text-fluid-xs font-semibold tracking-[0.04em] transition-colors active:scale-[0.97] ${
-                    copied
-                      ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
-                      : "bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 hover:text-sky-200 ring-1 ring-sky-500/30"
-                  }`}
-                >
-                  {copied ? "Copied" : "Copy code"}
-                </button>
-              </div>
-
-              <p className="mt-3 text-fluid-micro leading-relaxed text-white/60">
-                Paste this into any HTML newsletter or webpage. The brief renders live and
-                auto-updates weekly. No API key needed.
-              </p>
-            </div>
           </div>
-        </div>
+        </details>
 
         <div className="mt-14 border-t border-white/[0.04] pt-10">
           <h3 className="mb-5 text-lg font-semibold text-white/70">How it works</h3>
           <div className="grid gap-5 sm:grid-cols-3">
             {[
-              { step: "Configure", desc: "Pick a ticker and company stage that fits your audience." },
               { step: "Copy", desc: "Paste the snippet into your newsletter HTML or website. No API key needed." },
+              { step: "Customise", desc: "Optional: pick a ticker and company stage that fits your audience." },
               { step: "Publish", desc: "The brief updates automatically every week. Fresh posture, zero maintenance." },
             ].map((item) => (
               <div key={item.step} className="weather-card">

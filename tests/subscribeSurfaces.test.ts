@@ -93,7 +93,7 @@ describe("requestSubscription", () => {
 
 describe("subscribe surfaces", () => {
   it("routes every subscribe control through the shared request", () => {
-    for (const file of ["app/components/SubscribeForm.tsx", "app/components/settingsPanel.tsx"]) {
+    for (const file of ["app/components/SubscribeForm.tsx"]) {
       const source = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
       assert.match(source, /requestSubscription/, `${file} uses the shared subscribe request`);
       assert.doesNotMatch(

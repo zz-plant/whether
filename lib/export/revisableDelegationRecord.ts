@@ -152,7 +152,7 @@ const describeDecision = (entry: DecisionMemoryEntry): string => {
 
 const buildUnsealedRecords = (entry: DecisionMemoryEntry, baseUrl: string): UnsealedRecord[] => {
   const kind = entry.kind ?? "decision";
-  const origin = `${baseUrl}/history/decisions`;
+  const origin = `${baseUrl}/history`;
   const checkUrl = `${baseUrl}/api/weekly`;
   const asOf = asOfFromRecordDate(entry.context.recordDate);
   const time = { as_of: asOf, recorded_at: entry.createdAt, valid_until: addDays(asOf, 7) };

@@ -63,30 +63,10 @@ export function ToolkitLibraryPanels({
         </h2>
         <p className="text-sm text-slate-300">
           {normalizedQuery
-            ? "Use the filtered list below."
-            : "Default to this list, or filter it by the task in front of you. Site-wide search is under ⌘K."}
+            ? "Matched from search. Clear to see the full shortlist."
+            : "Each opens a one-decision worksheet. Search the site with ⌘K."}
         </p>
       </div>
-
-      <form action="/resolve" className="flex flex-col gap-3 sm:flex-row">
-        <label htmlFor="decide-toolkit-search-input" className="sr-only">Filter tools by task</label>
-        <input
-          id="decide-toolkit-search-input"
-          type="search"
-          name="toolkitQuery"
-          defaultValue={query ?? ""}
-          className="weather-input w-full px-4 py-2"
-          placeholder="Filter by task (e.g. rollback, roadmap, PMF)…"
-          autoComplete="off"
-          aria-label="Filter tools"
-        />
-        <button type="submit" className="weather-button">Filter</button>
-        {normalizedQuery ? (
-          <Link href="/resolve#toolkit-library" className="weather-button inline-flex items-center justify-center">
-            Clear
-          </Link>
-        ) : null}
-      </form>
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
         <span className="rounded-sm border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.1em]">
@@ -101,7 +81,7 @@ export function ToolkitLibraryPanels({
 
       {normalizedQuery ? (
         <div className="rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">
-          Search mode is for a known tool.
+          Showing the tools that match your search.
         </div>
       ) : (
         <div className="rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">

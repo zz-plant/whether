@@ -32,7 +32,7 @@ const TEMPLATE_MARKDOWN = [
   "",
   "",
   "---",
-  "From whether.work/template",
+  "From whether.work/trust#template",
 ].join("\n");
 
 export function TemplateActions() {

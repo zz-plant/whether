@@ -4,7 +4,7 @@ import { operationsSectionLinks, operationsWorkstreamLinks } from "../lib/naviga
 
 describe("operations navigation", () => {
   it("keeps operations focused on the weekly plan route", () => {
-    // No /operate/memory: the ledger is a record, and moved to /history/decisions.
+    // No /operate/memory: the ledger was retired; the record the product keeps is /history.
     assert.deepEqual(operationsWorkstreamLinks.map((link) => link.href), ["/operate", "/operate/financial", "/operate/scenarios"]);
   });
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
-import { requestSubscription } from "./subscribeRequest";
 import { useOperatorStage } from "./useOperatorStage";
 
 import { Dialog } from "@base-ui/react/dialog";
@@ -12,11 +12,6 @@ import { CloseIcon } from "./uiIcons";
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const { stage, setStage } = useOperatorStage();
-  const [email, setEmail] = useState("");
-  const [alerts, setAlerts] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
-  const [subscribeMsg, setSubscribeMsg] = useState("");
-  const [isSubscribing, setIsSubscribing] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const showSaved = useCallback(() => {
@@ -32,16 +27,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     showSaved();
   }, [router, setStage, showSaved]);
 
-  const handleSubscribe = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsSubscribing(true);
-    const result = await requestSubscription(email, { alerts });
-    setSubscribed(result.ok);
-    setSubscribeMsg(result.message);
-    setIsSubscribing(false);
-    setSaved(false);
-    setTimeout(() => setSubscribeMsg(""), 6000);
-  }, [email, alerts]);
 
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
@@ -94,48 +79,10 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             </fieldset>
 
             <p className="type-eyebrow border-b border-slate-800/60 pb-2 mt-4">Notifications</p>
-
-          <fieldset>
-            <legend className="type-eyebrow">Weekly delivery</legend>
-            <p className="mt-1 text-xs leading-relaxed text-slate-400">
-              Get the weekly brief delivered to your inbox.
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">
+              The weekly email and the change alert are one subscription, on the brief itself:{" "}
+              <Link href="/#subscribe" className="font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200">subscribe under this week&apos;s call</Link>.
             </p>
-            <form onSubmit={handleSubscribe} className="mt-2 flex gap-2">
-              <label htmlFor="settings-email" className="sr-only">Email address</label>
-              <input
-                id="settings-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                className="weather-input min-h-[44px] flex-1 px-3 py-2 text-base sm:text-xs"
-              />
-              <button
-                type="submit"
-                disabled={isSubscribing}
-                className="weather-button-primary min-h-[44px] px-4 py-2 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isSubscribing ? "…" : subscribed ? "Check inbox" : "Subscribe"}
-              </button>
-            </form>
-            <label className="mt-2 flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-slate-400">
-              <input
-                type="checkbox"
-                checked={alerts}
-                onChange={(e) => setAlerts(e.target.checked)}
-                className="mt-0.5 size-4 shrink-0 accent-sky-400"
-              />
-              <span>Also email me when the regime changes between Mondays.</span>
-            </label>
-            {subscribeMsg ? (
-              <p
-                aria-live="polite"
-                className={`mt-1 text-fluid-micro ${subscribed ? "text-emerald-200" : "text-rose-300"}`}
-              >
-                {subscribeMsg}
-              </p>
-            ) : null}
-          </fieldset>
         </div>
 
           <div className="mt-4 flex items-center justify-between">

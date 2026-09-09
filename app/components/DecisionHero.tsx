@@ -23,7 +23,6 @@ import {
 } from "../../lib/report/signalTranslations";
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
-import { DecisionMemoryButton } from "./DecisionMemoryButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
@@ -109,7 +108,6 @@ export function DecisionHero({
   weeklyCall,
   actionNow,
   regime,
-  postureLabel,
   signalDirection,
   recordDate,
   confidenceLabel,
@@ -564,18 +562,6 @@ export function DecisionHero({
                 panel and the presentation frames read. The literal that used to
                 sit here made the hero a second definition of the week's call. */}
             <CopyMeetingSlideButton />
-            <DecisionMemoryButton
-              regime={regime}
-              recordDate={recordDate}
-              tightness={tightness}
-              riskAppetite={riskAppetite}
-              boldnessScore={boldnessScore}
-              primaryCall={weeklyCall ?? postureLabel}
-              guardrail={guardrail}
-              reversalTrigger={reversalTrigger}
-              tightnessThreshold={tightnessThreshold}
-              riskAppetiteThreshold={riskAppetiteThreshold}
-            />
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">

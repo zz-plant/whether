@@ -271,9 +271,9 @@ export const buildHomeWorkspaceModel = ({
         kicker: "Recommended unresolved path",
       },
       fallbackUtility: {
-        href: "/resolve/ship-checklist",
-        title: "Whether to ship checklist",
-        detail: "Score one go / wait / kill launch decision against the current regime.",
+        href: "/resolve#direct-answers",
+        title: "Direct answers",
+        detail: "One yes-or-no answer per open decision, under this week's call.",
       },
       toolkitShortcuts: toolkitShortcuts.map((toolkit) => ({
         href: `/toolkits/${toolkit.slug}`,

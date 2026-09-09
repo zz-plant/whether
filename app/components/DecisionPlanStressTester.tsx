@@ -1,14 +1,13 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { ShieldAlert, ShieldCheck, Zap, ArrowRight, Bookmark, CheckCircle2, Copy, AlertCircle } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Zap, ArrowRight, Copy } from "lucide-react";
 import {
   stressTestDecisionPlan,
   type PlanStressTestResult,
   type DecisionCategory,
   type DecisionVerdict,
 } from "../../lib/decisionShield";
-import { buildPlanStressTestMemoryPayload } from "../../lib/decisionMemory";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
@@ -16,8 +15,6 @@ import {
   operatorStageForVariantMode,
   operatorStageLabel,
 } from "../../lib/report/operatorStage";
-import { usePersistentClientId } from "./clientIdentity";
-import { readDecisionMemorySaveResponse, rememberDecisionMemoryEntry } from "./decisionMemoryLocalCache";
 import { OperatorProfileNumberField } from "./operatorProfileFields";
 import { useClipboardCopy, getClipboardUiState } from "./useClipboardCopy";
 import { useOperatorProfile } from "./useOperatorProfile";
@@ -100,22 +97,6 @@ const buildShareText = (
     `Conditions as of ${recordDate}.`,
   ].join("\n");
 
-/**
- * "saved" means the server holds the entry; "saved-local" means the server
- * answered from its in-memory fallback, so the browser cache is the only copy
- * that outlives the request. The button says which, because "Tracked in
- * Memory" used to appear for a request the API had rejected outright.
- */
-type SaveState = "idle" | "saving" | "saved" | "saved-local" | "failed";
-
-const SAVE_LABELS: Record<SaveState, string> = {
-  idle: "Track in Memory",
-  saving: "Saving...",
-  saved: "Tracked in Memory",
-  "saved-local": "Saved in this browser",
-  failed: "Save failed — retry",
-};
-
 export function DecisionPlanStressTester({
   assessment,
   recordDate,
@@ -125,10 +106,8 @@ export function DecisionPlanStressTester({
   const [planText, setPlanText] = useState("");
   const [category, setCategory] = useState<CategoryChoice>("AUTO");
   const [result, setResult] = useState<PlanStressTestResult | null>(null);
-  const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState<string | null>(null);
   const planInputRef = useRef<HTMLInputElement>(null);
-  const clientId = usePersistentClientId();
   const clipboard = useClipboardCopy();
   const fieldId = useId();
   const { profile, setProfileField } = useOperatorProfile();
@@ -160,38 +139,8 @@ export function DecisionPlanStressTester({
         },
       }),
     );
-    setSaveState("idle");
   };
 
-  const handleSaveToMemory = async () => {
-    if (!result || saveState === "saving" || saveState === "saved" || saveState === "saved-local") return;
-    if (!clientId) {
-      setSaveState("failed");
-      return;
-    }
-    setSaveState("saving");
-
-    try {
-      const response = await fetch("/api/decision-memory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-whether-client-id": clientId },
-        body: JSON.stringify(
-          buildPlanStressTestMemoryPayload({ clientId, recordDate, planText, lifecycle, result, assessment }),
-        ),
-      });
-      if (!response.ok) {
-        setSaveState("failed");
-        return;
-      }
-      const { entry, degraded } = readDecisionMemorySaveResponse(await response.json());
-      if (entry) rememberDecisionMemoryEntry(clientId, entry);
-      setSaveState(degraded ? "saved-local" : "saved");
-    } catch {
-      setSaveState("failed");
-    }
-  };
-
-  const saveSucceeded = saveState === "saved" || saveState === "saved-local";
 
   return (
     <section
@@ -323,24 +272,6 @@ export function DecisionPlanStressTester({
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleSaveToMemory}
-                disabled={saveSucceeded || saveState === "saving"}
-                aria-busy={saveState === "saving"}
-                className="weather-button inline-flex min-h-[44px] shrink-0 items-center gap-1 text-fluid-xs font-medium"
-              >
-                {saveSucceeded ? (
-                  <CheckCircle2 className="size-3 text-emerald-400" />
-                ) : saveState === "failed" ? (
-                  <AlertCircle className="size-3 text-amber-400" />
-                ) : (
-                  <Bookmark className="size-3 text-slate-400" />
-                )}
-                <span className={saveSucceeded ? "text-emerald-300" : saveState === "failed" ? "text-amber-300" : undefined}>
-                  {SAVE_LABELS[saveState]}
-                </span>
-              </button>
             </div>
 
             {/* What it read, before what it concluded. A misparse is the failure

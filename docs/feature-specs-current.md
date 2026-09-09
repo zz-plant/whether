@@ -229,10 +229,12 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
   `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
   the fossil-record table is behind a `?fossil=1` disclosure.
 - **Plan** opens with the shared corridor rails (`BoundedCorridorRails`) inside the weekly plan
-  step, and the rules table refers back to them; the six-step checklist is a sticky one-row
-  progress strip with the check toggle on each chip.
-- **Weekly brief** merges "Decisions to reconsider" and "Close the week" into one `YourWeekCard`
-  with one heading and one privacy line; both children take `embedded` and stay a row when empty.
+  step, and the rules table refers back to them; the sticky one-row strip is section navigation
+  only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
+- **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
+  2026-09-08: each asked the reader to maintain browser-local state the product could not pay
+  back). The subscribe row sits directly under the hero as one promise — Monday's call, and a
+  note the day it changes.
 - **Trust** states system status as one five-cell strip (data, freshness, sources, confidence,
   warnings) instead of five stacked cards.
 - **Resolve** renders its two link groups as divided menus with a chevron, not panels in panels.

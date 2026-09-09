@@ -13,6 +13,7 @@ import {
 import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
+import { FrameworkSection } from "./frameworkSection";
 import { buildTrustPageModel } from "./trustPageModel";
 
 export const runtime = "edge";
@@ -255,6 +256,8 @@ export default async function MethodPage({
       </ReportSection>
 
       <FormulaReference />
+
+      <FrameworkSection />
 
       {!isFallback && warnings.length === 0 ? (
         <UrlDetails
