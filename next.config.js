@@ -77,10 +77,18 @@ export const canonicalSurfaceRedirectPairs = [
   ["/planning/:path*", "/operate/:path*"],
   // Resources root → Planning
   ["/resources", "/operate#ops-export-briefs"],
-  // Guides staging redirects
-  ["/guides/stage/:stage", "/guides?stage=:stage"],
-  ["/guides/stage", "/guides?library=stages"],
-  ["/guides/:stakeholder", "/guides?stakeholder=:stakeholder"],
+  // Guides staging redirects. These pointed at `/guides`, which stopped existing in
+  // 14258b64 — so every one of them was a 308 into a 404, which is worse than a plain
+  // 404 because a permanent redirect gets cached and followed. The content itself moved
+  // rather than being retired: `/resolve` reads the same `stakeholder`, `stage` and
+  // `library` params (GuidedTranslationSearchParams) and still imports the guides data
+  // from `app/guides/`, so this is a base swap that preserves every parameter.
+  // `/guides` and `/guides/stage` stay ahead of `/guides/:stakeholder`, which would
+  // otherwise capture "stage" as a stakeholder slug.
+  ["/guides", "/resolve"],
+  ["/guides/stage/:stage", "/resolve?stage=:stage"],
+  ["/guides/stage", "/resolve?library=stages"],
+  ["/guides/:stakeholder", "/resolve?stakeholder=:stakeholder"],
   // Retrofit redirects (links that soft-404)
   ["/settings", "/"],
   ["/decision-tools", "/resolve"],

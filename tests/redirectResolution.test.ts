@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, it } from "bun:test";
 import { compile, match } from "path-to-regexp";
 
@@ -101,6 +104,63 @@ describe("redirect resolution", () => {
       const { landing, hops } = resolve(source);
       assert.equal(hops, 1, `${source} takes ${hops} hops to reach ${landing}`);
     }
+  });
+
+  /*
+   * The assertion both redirect tests were missing.
+   *
+   * Everything else here checks redirects against *other redirects* — that they settle in
+   * one hop, that they do not chain, that a specific rule outranks a wildcard. Nothing
+   * compared a destination to the route tree, so a redirect could point at a page that no
+   * longer exists and stay green.
+   *
+   * That is exactly what happened to `/guides`. The three `/guides/*` rules were correct
+   * when written; `14258b64` then deleted `app/guides/page.tsx` and left them pointing at
+   * it. In production `/guides/stage/seed` answered 308 to `/guides?stage=seed`, which
+   * answered 404 — worse than a plain 404, because a permanent redirect is cached and
+   * followed. Both existing tests passed the whole time: the chain settles in one hop, and
+   * `/guides` is not itself a redirect source.
+   */
+  const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+  /** Every servable path pattern under `app/`, as a matcher. */
+  const routeMatchers = (() => {
+    const patterns: string[] = [];
+    const walk = (dir: string, segments: string[]) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (entry.isDirectory()) {
+          // Route groups contribute no URL segment; `_` and `.` directories are not routes.
+          if (entry.name.startsWith("_") || entry.name.startsWith(".")) continue;
+          const isGroup = entry.name.startsWith("(") && entry.name.endsWith(")");
+          walk(join(dir, entry.name), isGroup ? segments : [...segments, entry.name]);
+        } else if (/^(page|route)\.tsx?$/.test(entry.name)) {
+          patterns.push(`/${segments.join("/")}`);
+        }
+      }
+    };
+    walk(join(repoRoot, "app"), []);
+
+    return patterns.map(
+      (pattern) =>
+        new RegExp(
+          `^${pattern.replace(/\[\.\.\.[^\]]+\]/g, ".+").replace(/\[[^\]]+\]/g, "[^/]+")}$`,
+        ),
+    );
+  })();
+
+  it("points every redirect at a route that exists", () => {
+    const dead: string[] = [];
+
+    for (const [source, destination] of PAIRS) {
+      // Strip the hash/query, and give any `:param` a stand-in so the shape can be tested.
+      const path = destination
+        .split(/[#?]/)[0]
+        .replace(/:[A-Za-z][A-Za-z0-9_]*\*?/g, "sample");
+      if (path === "" || routeMatchers.some((matcher) => matcher.test(path))) continue;
+      dead.push(`${source} -> ${destination} (no route serves ${path})`);
+    }
+
+    assert.deepEqual(dead, [], `\n${dead.join("\n")}\n`);
   });
 
   it("never lands on a path that is itself a redirect source", () => {
