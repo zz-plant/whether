@@ -3,7 +3,7 @@ import { buildAgentInterfaceResponse, isAgentCadence } from "../../../lib/agentI
 import { getRegimeContext, getRegimeProjection } from "../../../lib/report/regimeContext";
 import { subscribeAndSendVerification } from "../../../lib/email/subscriptionFlow";
 import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachineCache";
-import { fetchSaaSValuations } from "../../../lib/saasMultiples";
+import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
 
 export const runtime = "edge";
@@ -127,6 +127,19 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
+    /* An unreachable quote source is not a fault in this server. `/api/comps` has
+       answered 503 for exactly this since the "not an empty basket" fix; the MCP tool
+       wrapping the same call fell through to the generic catch and answered 500, so an
+       agent following the tool advertised in /llms.txt was told the server had broken
+       rather than that an upstream was down and the call is worth retrying. */
+    if (error instanceof QuoteSourceUnavailableError) {
+      return NextResponse.json({
+        ok: false,
+        error: "quote_source_unavailable",
+        detail: error.message,
+      }, { status: 503 });
+    }
+
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : String(error),
