@@ -105,9 +105,21 @@ export const metadata: Metadata = {
   authors: [{ name: publisherAuthor.name, url: `${siteUrl}${publisherProfilePath}` }],
   creator: publisherAuthor.name,
   publisher: "Whether",
-  alternates: {
-    canonical: "/"
-  },
+  /*
+   * No `alternates.canonical` here, deliberately.
+   *
+   * Next merges metadata down the segment tree, so a canonical set on the root
+   * layout is inherited by every page that does not set its own — and it pointed
+   * at "/". Four pages in the sitemap never overrode it (`/comps`, `/history`,
+   * `/share`, `/api-docs`), so each one submitted itself for indexing while its
+   * markup named the homepage as the canonical version. That is the standard
+   * recipe for a URL being crawled and then dropped.
+   *
+   * A page with no canonical tag self-canonicalises, which is the safe default;
+   * a page with the wrong one does not. Set `alternates.canonical` per page —
+   * `buildPageMetadata` does it for you — and leave this absent so a new route
+   * that forgets fails safe instead of pointing at "/".
+   */
   openGraph: {
     type: "website",
     url: siteUrl,
@@ -173,7 +185,12 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/operate" />
         <link rel="prefetch" href="/signals" />
-        <link rel="alternate" hrefLang="x-default" href={siteUrl} />
+        {/* No `hrefLang="x-default"` here. It lived in the layout, so every page
+            declared the homepage as its x-default target — the same inherited-
+            pointer problem as the canonical above. x-default names the fallback
+            among a set of language or region alternates, and this site publishes
+            one locale and no alternates, so the correct number of these links is
+            zero rather than one per page. */}
         {/* Agent discovery: machine-readable alternates for browser-based AI agents */}
         <link rel="alternate" type="text/markdown" href={BRIEF_MD_URL} title="Whether Weekly Brief (Markdown)" />
         <link rel="alternate" type="application/json" href={AGENT_API_URL} title="Whether Weekly Brief (JSON)" />

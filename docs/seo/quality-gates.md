@@ -19,7 +19,7 @@ All new SEO content must pass the following gates before publish.
 - Launch-readiness runs now enforce additional checklist gates:
   - decision transmission (scan/resolve in <=60s),
   - artifact readiness (decision bullets + copyable decision text),
-  - canonical progression (links to `/` and `/answer` or `/operate`).
+  - canonical progression (links to `/` and `/answers/<slug>` or `/operate`).
 
 ## Metadata and reporting gates
 - Content entry must include cluster classification + intent tag.
@@ -32,5 +32,5 @@ All new SEO content must pass the following gates before publish.
 - [ ] Distinct intent/value vs sibling pages in cluster.
 - [ ] Decision transmission <=60s.
 - [ ] Decision bullets and copyable decision text present.
-- [ ] Canonical links to `/` and `/answer` or `/operate`.
+- [ ] Canonical links to `/` and `/answers/<slug>` or `/operate`.
 - [ ] Measurement attributes verified.

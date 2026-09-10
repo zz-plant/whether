@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "API & Agent Tools",
   description: "Programmatic access to the weekly brief, regime data, SaaS multiples, and decision framework. MCP server, REST endpoints, CLI, and embeddable widget.",
   robots: { index: true, follow: true },
+  alternates: { canonical: "/api-docs" },
 };
 
 type EndpointProps = {

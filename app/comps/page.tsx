@@ -1,42 +1,63 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
+import { buildPageMetadata } from "../../lib/seo";
+import {
+  SAAS_BASKET,
+  fetchSaaSValuations,
+  QuoteSourceUnavailableError,
+  type SaaSValuationSnapshot,
+} from "../../lib/saasMultiples";
 
-type CompsData = {
-  medianEvToRevenue: number | null;
-  medianRevenueGrowth: number | null;
-  companyCount: number;
-  fetchedAt: string;
-};
+export const runtime = "edge";
+export const revalidate = 900;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Public SaaS Valuation Multiples",
+  description:
+    "Median EV/Revenue and revenue growth across a 15-company public SaaS basket, and what those multiples imply for private fundraising conditions.",
+  path: "/comps",
+  imageAlt: "Whether public SaaS valuation multiples",
+});
 
 const formatMultiple = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}x`);
 const formatPercent = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
 
-export default function CompsPage() {
-  const [data, setData] = useState<CompsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [sourceDown, setSourceDown] = useState(false);
+type CompsState =
+  | { status: "ok"; data: SaaSValuationSnapshot }
+  | { status: "source-down" }
+  | { status: "error" };
 
-  useEffect(() => {
-    let active = true;
-    fetch("/api/comps")
-      .then(async (response) => {
-        // 503 means the quote source turned us away, which is a different thing
-        // to say than a basket of dashes.
-        if (response.status === 503) throw new Error("quote_source_unavailable");
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
-      })
-      .then((payload) => { if (active) { setData(payload); setLoading(false); } })
-      .catch((error: Error) => {
-        if (!active) return;
-        setSourceDown(error.message === "quote_source_unavailable");
-        setLoading(false);
-      });
-    return () => { active = false; };
-  }, []);
+/*
+ * Read the basket here rather than through `/api/comps`.
+ *
+ * This page used to be the app's only `"use client"` route, fetching its own API
+ * from a `useEffect`. That put every number on the page — the medians, the
+ * company count, the whole reason the page exists — outside the server-rendered
+ * document, so a crawler saw two headings and a basket of nothing. It also made
+ * the page fetch the origin it is served from, which is the same self-fetch the
+ * cron path is forbidden from doing: `/api/comps` is a thin wrapper over
+ * `fetchSaaSValuations()`, so calling the function directly drops a network hop
+ * without changing an answer.
+ *
+ * Failures are states, not throws: an unreachable upstream is reported as an
+ * outage rather than a basket of dashes (the distinction `/api/comps` draws with
+ * its 503), and any other error still renders the page. Nothing here can fail a
+ * build or a request.
+ */
+const loadComps = async (): Promise<CompsState> => {
+  try {
+    return { status: "ok", data: await fetchSaaSValuations() };
+  } catch (error) {
+    if (error instanceof QuoteSourceUnavailableError) {
+      return { status: "source-down" };
+    }
+    return { status: "error" };
+  }
+};
+
+export default async function CompsPage() {
+  const comps = await loadComps();
 
   return (
     <PageShell backdropVariant="default">
@@ -45,28 +66,26 @@ export default function CompsPage() {
           Public SaaS valuation multiples
         </h1>
         <p className="text-sm text-slate-300">
-          Median enterprise value to revenue multiples for a basket of 15 public SaaS companies,
-          read from Yahoo Finance when the page loads.
+          Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public
+          SaaS companies, read from Yahoo Finance.
         </p>
 
-        {loading ? (
-          <div className="animate-pulse h-32 rounded-lg bg-slate-800/30" />
-        ) : data ? (
+        {comps.status === "ok" ? (
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="weather-surface px-4 py-4 space-y-1">
               <p className="type-eyebrow">Median EV/Revenue</p>
-              <p className="text-2xl font-semibold text-slate-100">{formatMultiple(data.medianEvToRevenue)}</p>
+              <p className="text-2xl font-semibold text-slate-100">{formatMultiple(comps.data.medianEvToRevenue)}</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-1">
               <p className="type-eyebrow">Median Revenue Growth</p>
-              <p className="text-2xl font-semibold text-slate-100">{formatPercent(data.medianRevenueGrowth)}</p>
+              <p className="text-2xl font-semibold text-slate-100">{formatPercent(comps.data.medianRevenueGrowth)}</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-1">
               <p className="type-eyebrow">Companies Tracked</p>
-              <p className="text-2xl font-semibold text-slate-100">{data.companyCount}/15</p>
+              <p className="text-2xl font-semibold text-slate-100">{comps.data.companyCount}/{SAAS_BASKET.length}</p>
             </div>
           </div>
-        ) : sourceDown ? (
+        ) : comps.status === "source-down" ? (
           <p className="text-sm text-slate-400">
             Yahoo Finance is not serving quotes to us right now, so there are no multiples to show.
             This is an upstream outage, not a reading of zero — the basket is unchanged.
@@ -81,7 +100,7 @@ export default function CompsPage() {
             Snowflake, Shopify, Salesforce, HubSpot, MongoDB, Datadog, Atlassian, Workday, ServiceNow, Zscaler, Confluent, Toast, GitLab, Cloudflare, Freshworks.
           </p>
           <p className="text-sm text-slate-300">
-            These 15 companies represent a cross-section of modern public SaaS — across cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
+            These {SAAS_BASKET.length} companies represent a cross-section of modern public SaaS — across cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
           </p>
         </section>
 

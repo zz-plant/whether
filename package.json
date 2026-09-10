@@ -47,6 +47,7 @@
     "brief:freeze": "bun scripts/freezeWeeklyBrief.ts",
     "brief:backfill": "bun scripts/backfillPublishedBriefs.ts",
     "brief:weekly:artifact": "bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
+    "seo:page-metrics": "bun scripts/seo-page-metrics.ts",
     "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs",
     "seo:answers:launch-readiness": "bun scripts/seo-answer-launch-readiness.ts",
     "seo:weekly-runbook": "bun scripts/freezeWeeklyBrief.ts && bun scripts/seo-weekly-runbook.ts",
