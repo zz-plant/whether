@@ -571,4 +571,64 @@ describe("Architecture Invariants", () => {
 
     assert.deepEqual(unreachable, [], `\n${unreachable.join("\n")}\n`);
   });
+
+  /*
+   * Invariant 11: a data attribute the app queries must be one the app also sets.
+   *
+   * `KeyboardShortcuts.tsx` moves between sections with
+   * `querySelectorAll("[data-page-section]")`, and that attribute appeared nowhere in
+   * the app — the query was its only mention. So J and K were dead on every page while
+   * three separate surfaces advertised them: the shortcut bar rendered in the footer of
+   * every page, the `?` help modal, and the "j k next / previous" hint printed beside
+   * the tab strip on /operate. `reportSection.tsx` even documented the behaviour in its
+   * own comment ("the outline sidebar links to them and J/K jumps between them").
+   *
+   * A consumer with no producer is invisible to every other check here: it type-checks,
+   * it lints, it renders, and the handler runs without throwing — it just never matches
+   * anything. Only comparing the two sides catches it.
+   */
+  it("Invariant 11: every data attribute the app queries is set somewhere in the app", () => {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+    const files = collectSourceFiles(join(repoRoot, "app"));
+    const sources = files.map((file) => ({ rel: relative(repoRoot, file), text: readFileSync(file, "utf8") }));
+
+    // Queries inside comments do not run. `briefArtifactScript.tsx` and
+    // `lib/report/briefArtifact.ts` both describe a retired `[data-share-section]`
+    // approach in prose, and counting those as live queries reported a defect that
+    // does not exist.
+    const queried = new Map<string, string>();
+    for (const { rel, text } of sources) {
+      const skip = commentLines(text);
+      text.split("\n").forEach((line, index) => {
+        if (skip.has(index + 1)) return;
+        // The generic is not optional in practice: the live call is
+        // `querySelectorAll<HTMLElement>("[data-page-section]")`, and a pattern that
+        // required `(` straight after the method name matched nothing at all — the
+        // first version of this test passed against a tree with the producers deleted.
+        for (const match of line.matchAll(/querySelector(?:All)?(?:<[^>]*>)?\(\s*["'`]\[(data-[a-z0-9-]+)[\]=]/g)) {
+          if (!queried.has(match[1])) queried.set(match[1], `${rel}:${index + 1}`);
+        }
+      });
+    }
+
+    const orphaned: string[] = [];
+    for (const [attribute, queriedAt] of queried) {
+      const queriedIn = queriedAt.split(":")[0];
+      /*
+       * A producer writes the attribute in JSX. It may carry a value
+       * (`data-page-section={id}`) or stand alone (`data-sticky-strip-hide`), so the
+       * match is "the name, not inside a selector bracket". Requiring `=` missed the
+       * valueless form and reported two live attributes as dead.
+       */
+      const producer = new RegExp(`(^|[\\s{])${attribute}(\\s|=|/|>|$)`, "m");
+      const setSomewhere = sources.some(({ rel, text }) => rel !== queriedIn && producer.test(text));
+      if (!setSomewhere) {
+        orphaned.push(
+          `${queriedAt} queries [${attribute}], but nothing in app/ sets it — the selector can never match.`,
+        );
+      }
+    }
+
+    assert.deepEqual(orphaned, [], `\n${orphaned.join("\n")}\n`);
+  });
 });

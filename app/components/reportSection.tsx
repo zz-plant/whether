@@ -68,7 +68,13 @@ export function ReportSection({
     // sections (reportShell's space-y-10). Previously all three were 16-24px,
     // which is why nothing on these pages chunked.
     return (
-      <section id={id} className="space-y-2 scroll-mt-28" aria-labelledby={headingId}>
+      <section
+        id={id}
+        data-page-section={id}
+        tabIndex={-1}
+        className="space-y-2 scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+        aria-labelledby={headingId}
+      >
         {hideHeader ? (
           <HeadingTag id={headingId} className="sr-only">
             {title}
@@ -116,8 +122,18 @@ export function ReportSection({
   return (
     <section
       id={id}
+      /* J and K move between these. The component's own doc comment has claimed
+         "J/K jumps between them" since it was written, but the handler in
+         KeyboardShortcuts.tsx queries `[data-page-section]`, and that attribute
+         appeared nowhere in the app — the only reference to it was the query
+         itself. So the shortcut was dead on every page while three surfaces
+         advertised it: the shortcut bar in the footer, the `?` modal, and the
+         "j k next / previous" hint printed beside the /operate tab strip.
+         tabIndex is required because the handler focuses the section it lands on. */
+      data-page-section={id}
+      tabIndex={-1}
       aria-labelledby={headingId}
-      className="weather-panel space-y-5 px-5 py-5 scroll-mt-28"
+      className="weather-panel space-y-5 px-5 py-5 scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">

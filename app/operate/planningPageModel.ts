@@ -159,7 +159,12 @@ export async function buildPlanningPageModel(
         treasurySource: treasury.source,
       },
       page: {
-        pageTitle: "Planning",
+        /* "Plan", matching `navigationLayers`, which declares both `label` and
+           `navLabel` as "Plan". The H1 said "Planning" while the tab said "Plan" and
+           the URL said /operate — three names for one section, which is the single
+           most repeated inconsistency in this IA. The <title> keeps its longer
+           descriptive form; only the on-page heading is the section's name. */
+        pageTitle: "Plan",
         currentPath: "/operate",
         pageSummary: "Prepare for this week's conditions: set guardrails, check runway, brief the team.",
         pageSummaryLink: { href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" },
