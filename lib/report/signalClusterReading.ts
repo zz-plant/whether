@@ -35,7 +35,7 @@ export type SignalReadingInput = { label: string; value: string };
  */
 export type SignalReadingSource = {
   assessment: Pick<RegimeAssessment, "scores" | "thresholds" | "inputs">;
-  reportDynamics: Pick<ReportData["reportDynamics"], "changedSignals">;
+  reportDynamics: Pick<ReportData["reportDynamics"], "changedSignals" | "anomalySignals">;
 };
 
 export type SignalClusterReading = {
@@ -94,8 +94,21 @@ export const isSignalClusterSlug = (value: string): value is SignalClusterSlug =
     || value === "risk-appetite-watch"
     || value === "yield-curve-flip-watch");
 
+/**
+ * The week's move, from both places it can be recorded.
+ *
+ * `buildReportDynamics` drops any signal whose |delta| is under 0.01 and diverts
+ * anything past its sanity threshold into `anomalySignals` — so a signal absent
+ * from `changedSignals` may have been flat, may have moved more than any other
+ * signal on the page, or may have had no prior week at all. Reading only
+ * `changedSignals` collapsed all three into one claim, and the claim it made
+ * ("No prior week to compare against") is false for two of them. The largest
+ * moves were the ones being hidden.
+ */
 const findDelta = (reportData: SignalReadingSource, key: "tightness" | "riskAppetite" | "curveSlope") =>
-  reportData.reportDynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? null;
+  reportData.reportDynamics.changedSignals.find((signal) => signal.key === key)?.delta
+  ?? reportData.reportDynamics.anomalySignals.find((signal) => signal.key === key)?.delta
+  ?? null;
 
 const findInputValue = (reportData: SignalReadingSource, id: string) =>
   reportData.assessment.inputs.find((input) => input.id === id);
@@ -119,7 +132,14 @@ const describeDirection = (
   formatter: Intl.NumberFormat,
 ): { label: string; tone: SignalClusterReading["directionTone"] } => {
   if (delta === null) {
-    return { label: "No prior week to compare against.", tone: "unchanged" };
+    /*
+     * True for every case that lands here — no prior week, a move under the
+     * 0.01 floor, or a signal the week did not resolve — where "no prior week"
+     * was true for only one of them. It also has to not contradict the
+     * saturation caveat, which says in the same panel that the weekly move
+     * reads as zero.
+     */
+    return { label: "No material move recorded this week.", tone: "unchanged" };
   }
   if (delta === 0) {
     return { label: `Unchanged from last week.`, tone: "unchanged" };
@@ -254,9 +274,16 @@ export const buildSignalClusterReading = (
     };
   }
 
-  const delta = findDelta(reportData, "curveSlope");
-  const direction = describeDirection(delta, "higher", "pp", SIGNED_TWO);
   const slope = scores.curveSlope;
+  /*
+   * No slope, no move. `buildReportDynamics` computes this delta as
+   * `(current ?? 0) - (previous ?? 0)`, so an unresolved leg produces a
+   * confident-looking number measured from zero — and the panel would quote
+   * "-0.29pp since last week" directly beneath a line saying the spread cannot
+   * be computed.
+   */
+  const delta = slope === null ? null : findDelta(reportData, "curveSlope");
+  const direction = describeDirection(delta, "higher", "pp", SIGNED_TWO);
 
   return {
     measure: "Curve slope",

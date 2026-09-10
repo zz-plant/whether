@@ -41,9 +41,18 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
    * the bar in AGENTS.md (current posture, immediate implication, citeable
    * summary, link back), so the remaining reason to withhold them is staleness,
    * which is the same rule the scenario pages already follow.
+   *
+   * Gated on `treasury.isLive`, not on `reportResult.ok`. `loadReportDataSafe`
+   * resolves `ok: true` whenever assembly *succeeded*, and assembly succeeds on
+   * the bundled snapshot — the exact trap CLAUDE.md records `freezeWeeklyBrief`
+   * publishing a ten-week-old week through. An `ok`-only check would have
+   * stamped `index: true` on a months-old reading headed "this week", and
+   * `dynamicParams = false` bakes these three at build time, so the stale copy
+   * would stick.
    */
   const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
-  if (!reportResult.ok) {
+  const isLiveReading = reportResult.ok && Boolean(reportResult.data.treasury.isLive);
+  if (!isLiveReading) {
     metadata.robots = { index: false, follow: true };
   }
 
