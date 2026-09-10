@@ -342,7 +342,8 @@ async function PageContent({
           <div className="flex items-center justify-end">
             <CadenceSelector />
           </div>
-          <div data-page-section="weekly-call" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <div data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
@@ -416,7 +417,8 @@ async function PageContent({
               on the page used to sit under the stress tester, the decision
               tracker and the week close-out; the recipient of a shared link
               scrolled past everything the product asked of them to reach it. */}
-          <div id="subscribe" data-page-section="subscribe" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <div id="subscribe" data-page-section="subscribe" tabIndex={-1} aria-labelledby="subscribe-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <h2 id="subscribe-heading" className="sr-only">Get the weekly call by email</h2>
             <SubscribeForm compact />
           </div>
 
@@ -427,7 +429,8 @@ async function PageContent({
               already holds. */}
           {/* Below the call: each of these is a section J and K can reach, which is
               what `data-page-section` is for — see app/components/reportSection.tsx. */}
-          <div data-page-section="since-last-visit" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <div data-page-section="since-last-visit" tabIndex={-1} aria-labelledby="since-last-visit-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <h2 id="since-last-visit-heading" className="sr-only">Since your last visit</h2>
           <SinceLastVisit
             current={{
               recordDate: reportData.treasury.record_date,
@@ -451,7 +454,8 @@ async function PageContent({
           <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
           </div>
 
-          <div data-page-section="plan-and-evidence" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <div data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <h2 id="plan-and-evidence-heading" className="sr-only">Build the plan, and the evidence behind the call</h2>
           <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
           </div>
         </div>
