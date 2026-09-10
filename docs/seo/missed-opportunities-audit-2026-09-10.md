@@ -114,10 +114,15 @@ but `llms.txt` names `GET /api/mcp?tool=get_actions` as the tool catalog and lis
 `/api/mcp` under Discovery, and `/api-docs` links it. The site tells agents to fetch a path its own
 robots file forbids.
 
-Also missing from `robots.txt`, on a product that ships `llms.txt`, `/brief.md`, `/api/agent`, an
-MCP server and a `.well-known` manifest: any named rule for `GPTBot`, `OAI-SearchBot`, `ClaudeBot`,
-`PerplexityBot`, or `Google-Extended`. Answer-engine crawlers are the audience this product has
-already built for, and the file says nothing to them.
+That is the whole of A7. A separate, weaker point, kept separate deliberately: there is no named
+group for `GPTBot`, `OAI-SearchBot`, `ClaudeBot`, `PerplexityBot`, or `Google-Extended`. This is
+**not** missing coverage — under the robots exclusion protocol a crawler with no group of its own
+matches `User-agent: *`, and that group is `Allow: /`, so every one of them is already permitted.
+Adding named groups changes no crawler's behaviour today; it only states the intent explicitly, and
+buys a place to diverge later (say, allowing a search-grounding agent while disallowing a training
+crawler). Treat it as optional documentation, not a fix — and note that duplicating the wildcard
+policy into named groups is a live risk of drift, since a future edit to `*` would no longer reach
+them.
 
 ### A8. No RSS autodiscovery, and the feed is a single item pointing at the homepage — **verified**
 
@@ -200,15 +205,29 @@ Same block, `app/page.tsx:471-491`:
 | `/history` | 81 period records + regime series | `Dataset`, `ItemList` |
 | `/history/[period]` | closed period record | `Article` present; no `temporalCoverage` |
 | `/api-docs` | MCP + REST + CLI + embed | `WebAPI` / `SoftwareApplication` |
-| `/answers/*` | one question, one bounded answer | `QAPage` (currently `FAQPage`) |
+| `/answers/*` | one question, one bounded answer | `Article` fields on the existing `FAQPage` — see below |
 | `/resolve`, `/trust` | full page content | breadcrumb only — no `WebPage`/`FAQPage` |
 | toolkits | `whenToUse` → steps → `decisionArtifact` | `HowTo` |
 
-Two notes on that table. `FAQPage` on `/answers/*` and on the resource articles has not produced
-rich results for non-government sites since Google's August 2023 change; `QAPage` is the better fit
-for a page that is literally one question. And `Organization` is emitted without `sameAs`,
-`description`, or `logo` dimensions anywhere, which leaves the brand entity unlinked to any external
-profile.
+Two notes on that table.
+
+**Do not switch `/answers/*` to `QAPage`.** An earlier draft of this audit recommended that, and it
+was wrong. `QAPage` describes a community question with user-submitted, competing answers that
+visitors can vote on; Google's Q&A structured data documentation says to use `FAQPage` instead when
+the page carries a single publisher-authored answer. `app/answers/decisionAnswerPageContent.tsx:73-85`
+emits exactly that — one `Question` with one `acceptedAnswer`, written by us, with no submission
+path — so `FAQPage` is the correct type and swapping it would make the markup invalid.
+
+The real gap is elsewhere. `FAQPage` has not earned rich results for non-government, non-health
+sites since Google's August 2023 change, so the markup's remaining value is entity and passage
+parsing, not a SERP feature — and on that axis these pages are thin. The `FAQPage` node carries no
+`author`, `publisher`, `datePublished`, `dateModified`, `url`, `mainEntityOfPage`, or `inLanguage`,
+and it is emitted standalone rather than joined to the site `@graph`. Adding those (via the existing
+`buildAuthorSchema()` / `buildPublisherSchema()`, as `/brief/[week]` already does) is the change
+worth making; the type is already right.
+
+**`Organization` is emitted without `sameAs`, `description`, or logo dimensions** anywhere on the
+site, which leaves the brand entity unlinked to any external profile.
 
 ---
 
@@ -278,6 +297,26 @@ It never compares the same scenario **across** clusters, which is where the dupl
 The payload is a pure function of `decisionScenario`. Across the 15 signal-scenario URLs there are
 **5 distinct payloads**; the three signal clusters are duplicates of one another. The gate that
 exists to catch exactly this is keyed so it cannot see it.
+
+**The fix is to group by scenario, not by both axes.** An earlier draft of this audit said to key on
+the cluster *and* the scenario; that is wrong, and worth stating explicitly because it fails
+silently in the direction of green. `buildUniquenessGate` opens with:
+
+```ts
+const siblings = (input.siblingsInCluster ?? []).filter((s) => s.pageKey !== input.pageKey);
+if (siblings.length === 0) {
+  return { passed: true, reasons: [], details: { uniquenessScore: 1 } };
+}
+```
+
+A `signal:${cluster}:${scenario}` key puts every route in a bucket of one, so every signal page
+takes that early return and the gate stops evaluating them at all — a strictly worse state than
+today, and one that reads as "all gates passing".
+
+Grouping on the scenario alone (`signal:${scenario}`) makes the three clusters that share a scenario
+siblings of one another, which is the axis the duplication lives on. Comparing across clusters
+explicitly would also work. Either way, expect the gate to start failing on these routes once it can
+see them — that is the point, and the payloads are what need to diverge, not the threshold.
 
 ### C4. Sub-headings carry no query language — **verified**
 
@@ -371,14 +410,17 @@ Ranked by recovered value per unit of change. Each is independent.
    already written and already tested.
 3. **C2 + C1** — descriptions from `shortAnswer`, related links from `mappedDecisionAreas`. Both are
    a few lines against data that already exists, and both are per-page rather than per-week.
-4. **C3** — key `clusterKeyForRoute` on the scenario as well as the cluster, so the uniqueness gate
-   can see the duplicate axis. Expect it to start failing, which is the point.
+4. **C3** — group signal routes in `clusterKeyForRoute` by **scenario alone** (`signal:${scenario}`),
+   so the uniqueness gate compares the clusters that duplicate each other. Not by both axes: that
+   gives every route a bucket of one and the gate's zero-sibling early return passes them all. Expect
+   it to start failing, which is the point.
 5. **A4** — metadata, self-canonical, and an `ItemList`/`CollectionPage` for `/history`, which is
    78% of the submitted sitemap.
 6. **A6** — split page-level `noindex` from block-level staleness so an outage stops resetting the
    answer corpus.
-7. **A7 + A8** — allow `/api/mcp`, add named AI-crawler rules, add RSS autodiscovery, and expand the
-   feed to one item per published week.
+7. **A7 + A8** — allow `/api/mcp` in `robots.txt`, add RSS autodiscovery, and expand the feed to one
+   item per published week. (Named AI-crawler groups are not part of this: the wildcard already
+   allows them.)
 8. **C7** — decide the cluster routes. Either give the 51 `noindex` pages a reason to be indexable
    or stop generating payloads for them.
 9. **C5 + C6** — either land the 7 declared keywords on a surface or delete them; either render
