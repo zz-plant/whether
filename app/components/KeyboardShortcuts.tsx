@@ -41,6 +41,29 @@ export const shortcutTargetIsNeutral = (active: Element | null): boolean => {
   return false;
 };
 
+/**
+ * What J and K move between, on any page.
+ *
+ * Sections are the intended stops, but only some routes declare them: `/` and `/trust`
+ * carry six and eight, while `/signals` and `/resolve` render most of theirs inside
+ * disclosures and expose one apiece. The shortcut bar sits in the footer of *every* page
+ * and says "J K Navigate sections" regardless, so on those routes the app advertised a
+ * key that did nothing — the same defect this shortcut was fixed for in the first place.
+ *
+ * Falling back to the page's own headings keeps the advertisement true everywhere, and is
+ * the better stop anyway for a screen reader: focusing a heading announces it.
+ */
+const sectionTargets = (): HTMLElement[] => {
+  const declared = Array.from(document.querySelectorAll<HTMLElement>("[data-page-section]"));
+  if (declared.length >= 2) return declared;
+
+  const main = document.getElementById("main-content") ?? document.body;
+  return Array.from(main.querySelectorAll<HTMLElement>("h2")).filter(
+    // Skip headings that are hidden or collapsed inside a closed disclosure.
+    (heading) => heading.offsetParent !== null || heading.getClientRects().length > 0,
+  );
+};
+
 export function KeyboardShortcuts() {
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
@@ -74,17 +97,21 @@ export function KeyboardShortcuts() {
       }
 
       if (e.key === "j" || e.key === "k") {
+        const sections = sectionTargets();
+        // Nothing to move between: leave the key to the page rather than swallowing it.
+        if (sections.length < 2) return;
         e.preventDefault();
-        const sections = document.querySelectorAll<HTMLElement>("[data-page-section]");
-        if (!sections.length) return;
-        const current = Array.from(sections).findIndex((s) =>
+        const current = sections.findIndex((s) =>
           s.contains(document.activeElement) || s === document.activeElement);
         const next = e.key === "j"
           ? (current < 0 ? 0 : Math.min(current + 1, sections.length - 1))
           : Math.max(0, current - 1);
-        if (sections[next]) {
-          (sections[next] as HTMLElement).focus({ preventScroll: false });
-          sections[next].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const target = sections[next];
+        if (target) {
+          // A heading picked up by the fallback is not focusable on its own.
+          if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
+          target.focus({ preventScroll: false });
+          target.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
         return;
       }

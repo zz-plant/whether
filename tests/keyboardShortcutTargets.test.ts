@@ -60,6 +60,33 @@ describe("global shortcut targets", () => {
     assert.match(source, /HTMLSelectElement/, "a focused <select> types ahead on letters");
     assert.match(source, /isContentEditable/, "a contenteditable takes letters literally");
   });
+
+  /*
+   * The shortcut bar sits in the footer of every page and says "J K Navigate sections"
+   * unconditionally, but only some routes declare sections: `/` and `/trust` carry six
+   * and eight, while `/signals` and `/resolve` render most of theirs inside disclosures
+   * and expose one apiece. Without a fallback the bar advertises a dead key on those
+   * routes — the exact defect J/K was fixed for.
+   */
+  it("has something for J and K to move between on a page with no declared sections", async () => {
+    const source = codeOnly(await componentSource("KeyboardShortcuts.tsx"));
+
+    assert.match(
+      source,
+      /querySelectorAll<HTMLElement>\("h2"\)/,
+      "J/K should fall back to the page's headings when it declares fewer than two sections",
+    );
+    assert.match(
+      source,
+      /sections\.length\s*<\s*2/,
+      "with nothing to move between, the key should be left to the page rather than swallowed",
+    );
+    assert.match(
+      source,
+      /hasAttribute\("tabindex"\)/,
+      "a heading picked up by the fallback is not focusable without one",
+    );
+  });
 });
 
 describe("tablists support the keyboard", () => {
