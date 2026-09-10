@@ -33,9 +33,12 @@ const overlapCount = (a: readonly DecisionArea[], b: readonly DecisionArea[]) =>
  * The strongest neighbours first.
  *
  * Shared decision areas dominate, because two pages that move the same lever are
- * the pair a reader most wants next. `thresholdFocus` breaks ties — two hiring
- * pages that both hinge on risk appetite are closer than two that do not — and
- * audience breaks the remainder, so a CFO page prefers another CFO page.
+ * the pair a reader most wants next. That is the term doing the work today: on
+ * the current corpus `thresholdFocus` is "both" on ten of eleven pages and every
+ * `audience` is a distinct free-text string, so those two terms almost never
+ * fire and the remainder resolves alphabetically. They are kept because they are
+ * the right comparison as the corpus grows and the fields are filled in properly
+ * — not because they are sorting anything now.
  *
  * Ties fall back to slug order rather than input order, so the block does not
  * silently reshuffle when someone appends a page to the JSON.
