@@ -64,7 +64,7 @@ authoritative, so a bad file is worse than none:
 
 | Condition | Result | Why |
 | --- | --- | --- |
-| No credentials | `skipped` | The state this repo has been in all along. The weekly runbook continues; the standalone command exits 1. |
+| No credentials | `skipped` | The state this repo has been in all along. The weekly runbook continues, but ranks pages **without metrics** — it points the queue at a path that is never written rather than letting it reuse a `page-metrics.json` left in the worktree by an earlier credentialed run. The standalone command exits 1. |
 | Query error, or a payload that does not parse | `failed` | An unreachable API is not a reading of zero traffic. |
 | Zero events in the window | `failed` | An empty file marks every page "low traffic, underperforming" and queues the whole site. |
 | Row count at `WHETHER_METRICS_ROW_LIMIT` | `failed` | A truncated window is indistinguishable from a complete one downstream; it undercounts entrances and silently demotes traffic tiers. Raise the limit or narrow the window. |

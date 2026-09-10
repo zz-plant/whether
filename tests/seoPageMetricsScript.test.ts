@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, it } from "bun:test";
-import { refreshPageMetrics } from "../scripts/seo-page-metrics";
+import { refreshPageMetrics, refreshQueueOptionsFor } from "../scripts/seo-page-metrics";
 
 /*
  * The guards, not the transport.
@@ -137,5 +138,44 @@ describe("refreshPageMetrics guards", () => {
 
     assert.equal(result.status, "failed");
     assert.match(result.status === "failed" ? result.reason : "", /WHETHER_METRICS_WINDOW_DAYS/);
+  });
+});
+
+describe("refreshQueueOptionsFor", () => {
+  /*
+   * `artifacts/seo-refresh/` is gitignored and per-worktree, so a tree that once
+   * ran with credentials keeps its `page-metrics.json` after those credentials
+   * go away. Handing the queue its default path would then rank pages against
+   * that stale file in the very run that reported metrics were skipped.
+   */
+  it("steers the queue away from a stale metrics file when the refresh was skipped", () => {
+    const options = refreshQueueOptionsFor({ status: "skipped", reason: "no credentials" });
+
+    assert.ok(options.metricsPath, "a skipped refresh overrides the queue's metrics path");
+    assert.ok(
+      !existsSync(options.metricsPath ?? ""),
+      "the override points at a path that is never written, so the queue reads 'no metrics yet'",
+    );
+    assert.notEqual(options.metricsPath, join(process.cwd(), "artifacts", "seo-refresh", "page-metrics.json"));
+  });
+
+  it("leaves the queue on its real metrics file after a successful refresh", () => {
+    const options = refreshQueueOptionsFor({
+      status: "written",
+      pages: 3,
+      eventsRead: 10,
+      eventsParsed: 10,
+      path: "/tmp/page-metrics.json",
+    });
+
+    assert.deepEqual(options, {});
+  });
+
+  /*
+   * A failed refresh never reaches the queue — the runbook exits first — so this
+   * pins that the helper does not quietly authorise one.
+   */
+  it("does not special-case a failed refresh", () => {
+    assert.deepEqual(refreshQueueOptionsFor({ status: "failed", reason: "boom" }), {});
   });
 });

@@ -1,5 +1,5 @@
 import { generateProgrammaticPayloadArtifacts } from "../lib/seo/programmaticPayloadBuilder";
-import { describeRefreshPageMetrics, refreshPageMetrics } from "./seo-page-metrics";
+import { describeRefreshPageMetrics, refreshPageMetrics, refreshQueueOptionsFor } from "./seo-page-metrics";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - mjs helper is intentionally JS for script portability.
 import { runSeoRefreshQueue } from "./seo-refresh-queue.mjs";
@@ -41,8 +41,11 @@ if (metricsResult.status === "failed") {
 
 console.log(metricsMessage);
 
-const refreshResult = await runSeoRefreshQueue();
+// A skipped refresh must not silently reuse an older run's numbers; see
+// `refreshQueueOptionsFor`.
+const refreshResult = await runSeoRefreshQueue(refreshQueueOptionsFor(metricsResult));
 
 console.log(
-  `Refresh queue generated: ${refreshResult.queueArtifact.totals.queued}/${refreshResult.queueArtifact.totals.pages} queued, ${refreshResult.queueArtifact.totals.noindexNow} immediate noindex.`,
+  `Refresh queue generated: ${refreshResult.queueArtifact.totals.queued}/${refreshResult.queueArtifact.totals.pages} queued, ${refreshResult.queueArtifact.totals.noindexNow} immediate noindex`
+  + `${metricsResult.status === "skipped" ? ", ranked without metrics" : ""}.`,
 );

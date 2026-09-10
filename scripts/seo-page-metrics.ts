@@ -151,6 +151,30 @@ export const refreshPageMetrics = async (): Promise<RefreshPageMetricsResult> =>
   };
 };
 
+/*
+ * A path that is never written, handed to the refresh queue when a refresh was
+ * skipped.
+ *
+ * `artifacts/seo-refresh/` is gitignored and per-worktree, so a tree where
+ * someone once ran this with credentials keeps a `page-metrics.json` after those
+ * credentials go away. A `skipped` refresh does not touch that file, and the
+ * queue's default metrics path would then read it as current — advancing
+ * underperformance streaks and ranking pages in the very run that reported
+ * metrics were skipped.
+ *
+ * Pointing the queue at a path that cannot exist makes it take the branch it
+ * already has: `readJsonOrDefault` returns `{ byUrl: {} }`, which is "no metrics
+ * yet". Deleting the operator's artifact would throw away data this script did
+ * not create; an age check would invent a policy the queue does not have.
+ */
+const ABSENT_METRICS_PATH = join(OUTPUT_DIR, "page-metrics.skipped-no-credentials");
+
+/** Queue options for a refresh outcome. Empty means "use the real metrics file". */
+export const refreshQueueOptionsFor = (
+  result: RefreshPageMetricsResult,
+): { metricsPath?: string } =>
+  (result.status === "skipped" ? { metricsPath: ABSENT_METRICS_PATH } : {});
+
 export const describeRefreshPageMetrics = (result: RefreshPageMetricsResult): string => {
   if (result.status === "written") {
     return `seo:page-metrics — ${result.pages} pages from ${result.eventsParsed}/${result.eventsRead} events → ${result.path}`;
