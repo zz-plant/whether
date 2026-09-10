@@ -12,13 +12,47 @@ const SHORTCUTS: Record<string, string> = Object.fromEntries([
   ["/", "/search"],
 ]);
 
+/**
+ * Whether a global single-key shortcut may act, given what currently has focus.
+ *
+ * Exported so the rule is testable without a DOM: the regression it encodes was
+ * invisible until J/K started working.
+ *
+ * Route shortcuts used to require `document.activeElement === document.body`, which was
+ * true only because nothing on the page ever took focus — `[data-page-section]` was set
+ * nowhere, so J and K did nothing. Once J and K began focusing sections, one press moved
+ * focus off `body` and silently killed E, P, H, T, R and `/` until the reader clicked
+ * somewhere else. The fix is to ask what has focus rather than to insist on `body`: a
+ * section is a passive container that consumes no keys, so shortcuts still belong to the
+ * page while one is focused.
+ */
+export const shortcutTargetIsNeutral = (active: Element | null): boolean => {
+  if (!active || active === document.body) return true;
+  if (active instanceof HTMLElement && active.isContentEditable) return false;
+  if (
+    active instanceof HTMLInputElement
+    || active instanceof HTMLTextAreaElement
+    || active instanceof HTMLSelectElement
+  ) {
+    return false;
+  }
+  // A section J/K parked focus on. It has no key behaviour of its own.
+  if (active instanceof HTMLElement && active.hasAttribute("data-page-section")) return true;
+  return false;
+};
+
 export function KeyboardShortcuts() {
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const typingTarget =
+        e.target instanceof HTMLInputElement
+        || e.target instanceof HTMLTextAreaElement
+        || e.target instanceof HTMLSelectElement
+        || (e.target instanceof HTMLElement && e.target.isContentEditable);
+      if (typingTarget) return;
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -65,7 +99,7 @@ export function KeyboardShortcuts() {
       }
 
       const href = SHORTCUTS[e.key.toLowerCase()];
-      if (href && document.activeElement === document.body) {
+      if (href && shortcutTargetIsNeutral(document.activeElement)) {
         router.push(href);
       }
     };

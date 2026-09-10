@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
@@ -30,6 +31,34 @@ export function StagePersonaSelector({
   const searchParams = useSearchParams();
   const selected = operatorStageForVariantMode(activeStage);
 
+  const tabsRef = useRef<Array<HTMLButtonElement | null>>([]);
+
+  /*
+   * A `role="tablist"` promises arrow-key movement between its tabs, and this one had no
+   * keyboard handler at all — so a screen reader announced "tab, 1 of 4" and the arrows
+   * did nothing. `cadenceSelector` is the same control drawn the same way and has always
+   * implemented this; the two disagreed.
+   *
+   * Roving tabindex, per the pattern: only the selected tab is tabbable, and the arrows
+   * move between the rest. Home and End jump to the ends, which the pattern also expects.
+   */
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const lastIndex = OPERATOR_STAGE_OPTIONS.length - 1;
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowLeft") nextIndex = (index - 1 + OPERATOR_STAGE_OPTIONS.length) % OPERATOR_STAGE_OPTIONS.length;
+    else if (event.key === "ArrowRight") nextIndex = (index + 1) % OPERATOR_STAGE_OPTIONS.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = lastIndex;
+
+    if (nextIndex === null) return;
+    event.preventDefault();
+    const nextStage = OPERATOR_STAGE_OPTIONS[nextIndex]?.key;
+    if (!nextStage) return;
+    tabsRef.current[nextIndex]?.focus();
+    handleSelectStage(nextStage);
+  };
+
   const handleSelectStage = (stage: OperatorStage) => {
     // The cookie is what makes the choice survive this page: the settings panel,
     // the runway planner, and the stress tests all read it, and the server
@@ -56,14 +85,20 @@ export function StagePersonaSelector({
         aria-label="Startup lifecycle stage selector"
         className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 p-1 backdrop-blur-sm"
       >
-        {OPERATOR_STAGE_OPTIONS.map((option) => {
+        {OPERATOR_STAGE_OPTIONS.map((option, index) => {
           const isSelected = selected === option.key;
           return (
             <button
               key={option.key}
               type="button"
               role="tab"
+              ref={(el) => {
+                tabsRef.current[index] = el;
+              }}
               aria-selected={isSelected}
+              // Roving: the tablist is one stop in the tab order, not four.
+              tabIndex={isSelected ? 0 : -1}
+              onKeyDown={(event) => handleKeyDown(event, index)}
               onClick={() => handleSelectStage(option.key)}
               title={`Tailor operating rules for ${option.label} (${option.sublabel})`}
               className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs transition-all ${
