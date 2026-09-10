@@ -23,12 +23,17 @@ This improves trust and recency for boards/operators reviewing the same page rep
 
 ## Automated queue artifact
 
-Two steps, in order:
+`bun run seo:weekly-runbook` runs the whole chain — payload artifacts, then metrics,
+then the queue — and is the command `docs/programmatic-seo-operations.md` points at.
+The two halves also run on their own:
 
 ```
 bun run seo:page-metrics    # telemetry  → artifacts/seo-refresh/page-metrics.json
 bun run seo:refresh-queue   # metrics    → queue.json + status.json
 ```
+
+Order matters: the queue ranks pages against whatever metrics file is on disk, so
+running it first ranks them against last week's numbers, or none.
 
 `seo:refresh-queue` produces the machine-readable outputs for editorial/ops:
 
@@ -50,12 +55,33 @@ numbers the policy is written in. If you are wondering why the queue looks
 undifferentiated, check whether this step ran.
 
 Requires `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Account Analytics: Read).
-Both are refused loudly rather than defaulted, and the script also refuses to write a
-file when the window returned no events: `seo-refresh-queue.mjs` reads a *missing*
-file as "no metrics yet" and an *empty* one as "every page has zero traffic", which
-would queue the entire site. Optional overrides: `WHETHER_METRICS_WINDOW_DAYS`
-(default 30), `WHETHER_METRICS_ROW_LIMIT` (default 100,000),
-`WHETHER_TELEMETRY_DATASET`.
+Optional overrides: `WHETHER_METRICS_WINDOW_DAYS` (default 30),
+`WHETHER_METRICS_ROW_LIMIT` (default 100,000), `WHETHER_TELEMETRY_DATASET`.
+
+**It refuses to write rather than write something wrong.** `seo-refresh-queue.mjs`
+reads a *missing* metrics file as "no metrics yet" and any file it finds as
+authoritative, so a bad file is worse than none:
+
+| Condition | Result | Why |
+| --- | --- | --- |
+| No credentials | `skipped` | The state this repo has been in all along. The weekly runbook continues, but ranks pages **without metrics** — it points the queue at a path that is never written rather than letting it reuse a `page-metrics.json` left in the worktree by an earlier credentialed run. The standalone command exits 1. |
+| Query error, or a payload that does not parse | `failed` | An unreachable API is not a reading of zero traffic. |
+| Zero events in the window | `failed` | An empty file marks every page "low traffic, underperforming" and queues the whole site. |
+| Row count at `WHETHER_METRICS_ROW_LIMIT` | `failed` | A truncated window is indistinguishable from a complete one downstream; it undercounts entrances and silently demotes traffic tiers. Raise the limit or narrow the window. |
+
+On `failed`, `seo:weekly-runbook` stops before generating the queue rather than
+ranking pages against metrics it could not refresh — the same defect
+`freezeWeeklyBrief` shipped a stale published week on.
+
+**`organicEntrances30d` counts all first-visit entrances, not organic ones.**
+`ContentMeasurementTracker` fires `organic_entrance` on the first visit to a page in
+a session without checking referrer, campaign parameters, or navigation source, so
+direct, paid and referral visits are in the number too. That inflates the traffic
+tier and raises the conversion target a page is judged against — biased towards
+queueing a page rather than skipping one, which is the safer direction, but wrong.
+The field name is the queue's contract so it is kept; the artifact records the real
+definition in `entranceDefinition`. Classifying acquisition means changing what the
+tracker emits, and would only apply to data collected after that change.
 
 Aggregation happens in JS rather than in SQL because `writeAnalytics` stores each
 event as a JSON blob in `blob2` and the Analytics Engine SQL dialect cannot reach

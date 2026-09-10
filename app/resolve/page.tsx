@@ -33,7 +33,11 @@ export const metadata: Metadata = buildPageMetadata({
   description: "One focused path per open decision: route by role, company stage, single answer, or a reusable toolkit.",
   path: "/resolve",
   imageAlt: "Whether decision tools",
-  imagePath: "/social/resolve.svg",
+  imageParams: {
+    template: "solutions",
+    title: "Resolve a Decision",
+    subtitle: "One focused path per open decision: by role, company stage, single answer, or a reusable toolkit.",
+  },
 });
 
 export default async function DecidePage({

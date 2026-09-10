@@ -184,7 +184,7 @@ bun run archive:index
 ## Notes
 
 - `seo:answers:launch-readiness` fails if any answer page cannot pass baseline completeness/trust/uniqueness checks.
-- `seo:weekly-runbook` generates payload artifacts and the refresh queue/status artifacts in one command, and freezes the current week's brief.
+- `seo:weekly-runbook` generates payload artifacts, refreshes page metrics from telemetry, then generates the refresh queue/status artifacts, and freezes the current week's brief. The metrics step runs before the queue because the queue ranks pages against whatever metrics file is on disk. It is skipped without Cloudflare credentials (the queue still runs, reading a missing file as "no metrics yet"); if it fails with credentials present, the runbook stops rather than ranking pages against metrics it could not refresh. See `docs/seo/refresh-loop.md`.
 - `brief:freeze` appends the current ISO week to `data/published_briefs.json`. It refuses to run on a degraded snapshot and never rewrites an existing week without `--force`, because a published brief that silently changes is not citable.
 - `archive:index` regenerates the `/history/[period]` period index from the summary archive. Run it after the summary archive changes.
 - Refresh queue records include `merge-or-prune-candidate` when high-intent pages underperform conversion targets for multiple evaluations.

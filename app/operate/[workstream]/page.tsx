@@ -77,7 +77,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: entry.description,
     path: `/operate/${entry.slug}`,
     imageAlt: entry.imageAlt,
-    imagePath: "/social/planning.svg",
+    imageParams: {
+      template: "operations",
+      title: entry.pageTitle,
+      subtitle: entry.pageSummary,
+    },
   });
 }
 

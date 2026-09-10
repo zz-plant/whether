@@ -35,7 +35,11 @@ export const metadata: Metadata = buildPageMetadata({
     "Why the weekly brief changed: what moved, why it matters, and what would make the recommendation change.",
   path: "/signals",
   imageAlt: "Why the weekly brief changed — evidence overview",
-  imagePath: "/social/evidence.svg",
+  imageParams: {
+    template: "signals",
+    title: "Why the Weekly Brief Changed",
+    subtitle: "What moved, why it matters, and what would make the recommendation change.",
+  },
 });
 
 export default async function SignalsPage({
