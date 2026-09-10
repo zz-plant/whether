@@ -22,6 +22,22 @@ export type TelemetryRow = {
 };
 
 export type PageMetric = {
+  /**
+   * **All first-visit entrances, not organic ones.** The name is the field
+   * `scripts/seo-refresh-queue.mjs` reads, so it is kept; the number is not what
+   * it says.
+   *
+   * `ContentMeasurementTracker` fires `organic_entrance` on the first visit to a
+   * page in a session and checks no referrer, campaign parameter, or navigation
+   * source, so direct, paid, and inbound-from-social visits are all counted here.
+   * That inflates the traffic tier the queue derives from this number and raises
+   * the conversion target a page is judged against — biasing towards queueing a
+   * page for refresh rather than skipping one, which is the safer direction to be
+   * wrong in, but wrong.
+   *
+   * Classifying acquisition means changing what the tracker emits, and only helps
+   * data collected after that change. Until then, read this as total entrances.
+   */
   organicEntrances30d: number;
   ctaConversions30d: number;
   /** Conversions per entrance. Null when there were no entrances to divide by. */
@@ -36,8 +52,14 @@ export type PageMetricsFile = {
   windowDays: number;
   eventsRead: number;
   eventsParsed: number;
+  /** Stated in the artifact so nobody reads `organicEntrances30d` as organic. */
+  entranceDefinition: string;
   byUrl: Record<string, PageMetric>;
 };
+
+const ENTRANCE_DEFINITION =
+  "All first-visit entrances per session. Acquisition source is not classified, so "
+  + "direct, paid, and referral visits are included in organicEntrances30d.";
 
 type ParsedEvent = {
   pagePath: string;
@@ -138,6 +160,7 @@ export const buildPageMetrics = (
     windowDays,
     eventsRead: rows.length,
     eventsParsed,
+    entranceDefinition: ENTRANCE_DEFINITION,
     byUrl,
   };
 };
