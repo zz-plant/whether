@@ -89,9 +89,14 @@ export default async function HistoryPage({
       />
 
       {publishedBriefs.length > 0 ? (
-        <section className="weather-panel space-y-4 px-5 py-5">
+        <section
+          data-page-section="published-briefs"
+          tabIndex={-1}
+          aria-labelledby="published-briefs-heading"
+          className="weather-panel space-y-4 px-5 py-5 scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+        >
           <div>
-            <h2 className="type-eyebrow">Published weekly briefs</h2>
+            <h2 id="published-briefs-heading" className="type-eyebrow">Published weekly briefs</h2>
             {/* Say what the archive holds, not what it aspires to. With one entry,
                 "permanent, immutable calls cited in board documents" promised a
                 record the page could not show. The count is the honest claim; the
@@ -129,8 +134,13 @@ export default async function HistoryPage({
           beforehand, and which were not. */}
       <TrackRecordSection series={statsSeries} />
 
-      <section className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="type-eyebrow">Posture by year</h2>
+      <section
+        data-page-section="posture-by-year"
+        tabIndex={-1}
+        aria-labelledby="posture-by-year-heading"
+        className="weather-panel space-y-4 px-5 py-5 scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      >
+        <h2 id="posture-by-year-heading" className="type-eyebrow">Posture by year</h2>
         <p className="text-sm text-slate-300">
           What the operating posture was in each closed period, with the regime splits and mid-period reversals behind it.
         </p>

@@ -12,13 +12,70 @@ const SHORTCUTS: Record<string, string> = Object.fromEntries([
   ["/", "/search"],
 ]);
 
+/**
+ * Whether a global single-key shortcut may act, given what currently has focus.
+ *
+ * Exported so the rule is testable without a DOM: the regression it encodes was
+ * invisible until J/K started working.
+ *
+ * Route shortcuts used to require `document.activeElement === document.body`, which was
+ * true only because nothing on the page ever took focus — `[data-page-section]` was set
+ * nowhere, so J and K did nothing. Once J and K began focusing sections, one press moved
+ * focus off `body` and silently killed E, P, H, T, R and `/` until the reader clicked
+ * somewhere else. The fix is to ask what has focus rather than to insist on `body`: a
+ * section is a passive container that consumes no keys, so shortcuts still belong to the
+ * page while one is focused.
+ */
+export const shortcutTargetIsNeutral = (active: Element | null): boolean => {
+  if (!active || active === document.body) return true;
+  if (active instanceof HTMLElement && active.isContentEditable) return false;
+  if (
+    active instanceof HTMLInputElement
+    || active instanceof HTMLTextAreaElement
+    || active instanceof HTMLSelectElement
+  ) {
+    return false;
+  }
+  // A section J/K parked focus on. It has no key behaviour of its own.
+  if (active instanceof HTMLElement && active.hasAttribute("data-page-section")) return true;
+  return false;
+};
+
+/**
+ * What J and K move between, on any page.
+ *
+ * Sections are the intended stops, but only some routes declare them: `/` and `/trust`
+ * carry six and eight, while `/signals` and `/resolve` render most of theirs inside
+ * disclosures and expose one apiece. The shortcut bar sits in the footer of *every* page
+ * and says "J K Navigate sections" regardless, so on those routes the app advertised a
+ * key that did nothing — the same defect this shortcut was fixed for in the first place.
+ *
+ * Falling back to the page's own headings keeps the advertisement true everywhere, and is
+ * the better stop anyway for a screen reader: focusing a heading announces it.
+ */
+const sectionTargets = (): HTMLElement[] => {
+  const declared = Array.from(document.querySelectorAll<HTMLElement>("[data-page-section]"));
+  if (declared.length >= 2) return declared;
+
+  const main = document.getElementById("main-content") ?? document.body;
+  return Array.from(main.querySelectorAll<HTMLElement>("h2")).filter(
+    // Skip headings that are hidden or collapsed inside a closed disclosure.
+    (heading) => heading.offsetParent !== null || heading.getClientRects().length > 0,
+  );
+};
+
 export function KeyboardShortcuts() {
   const router = useRouter();
   const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const typingTarget =
+        e.target instanceof HTMLInputElement
+        || e.target instanceof HTMLTextAreaElement
+        || e.target instanceof HTMLSelectElement
+        || (e.target instanceof HTMLElement && e.target.isContentEditable);
+      if (typingTarget) return;
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -40,17 +97,21 @@ export function KeyboardShortcuts() {
       }
 
       if (e.key === "j" || e.key === "k") {
+        const sections = sectionTargets();
+        // Nothing to move between: leave the key to the page rather than swallowing it.
+        if (sections.length < 2) return;
         e.preventDefault();
-        const sections = document.querySelectorAll<HTMLElement>("[data-page-section]");
-        if (!sections.length) return;
-        const current = Array.from(sections).findIndex((s) =>
+        const current = sections.findIndex((s) =>
           s.contains(document.activeElement) || s === document.activeElement);
         const next = e.key === "j"
           ? (current < 0 ? 0 : Math.min(current + 1, sections.length - 1))
           : Math.max(0, current - 1);
-        if (sections[next]) {
-          (sections[next] as HTMLElement).focus({ preventScroll: false });
-          sections[next].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const target = sections[next];
+        if (target) {
+          // A heading picked up by the fallback is not focusable on its own.
+          if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
+          target.focus({ preventScroll: false });
+          target.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
         return;
       }
@@ -65,7 +126,7 @@ export function KeyboardShortcuts() {
       }
 
       const href = SHORTCUTS[e.key.toLowerCase()];
-      if (href && document.activeElement === document.body) {
+      if (href && shortcutTargetIsNeutral(document.activeElement)) {
         router.push(href);
       }
     };
