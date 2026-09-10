@@ -68,6 +68,28 @@ describe("navigation information architecture", () => {
     assert.equal(trustLayer?.href.startsWith("#"), false);
   });
 
+  /*
+   * One URL, one name. `/history/compare` was "Compare periods" in `navigationLayers`
+   * and "Macro Analogs" in `utilityLinks` — two menus on the same site naming the same
+   * page differently, so a reader could not tell they were the same destination. Every
+   * other assertion in this file checks structure (which layer, which parent, which
+   * alias); none compared the words.
+   */
+  it("gives each route exactly one label across every navigation surface", () => {
+    const labelsByPath = new Map<string, Set<string>>();
+    for (const entry of [...navigationLayers, ...utilityLinks]) {
+      const path = entry.href.split(/[#?]/)[0];
+      if (!labelsByPath.has(path)) labelsByPath.set(path, new Set());
+      labelsByPath.get(path)!.add(entry.label);
+    }
+
+    const conflicts = [...labelsByPath.entries()]
+      .filter(([, labels]) => labels.size > 1)
+      .map(([path, labels]) => `${path} is called ${[...labels].map((l) => `"${l}"`).join(" and ")}`);
+
+    assert.deepEqual(conflicts, [], `\n${conflicts.join("\n")}\n`);
+  });
+
   it("matches primary route aliases consistently for active nav state", () => {
     const { pathMatchesLink } = require("../lib/navigation/pathMatching");
 

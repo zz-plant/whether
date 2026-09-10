@@ -342,6 +342,7 @@ async function PageContent({
           <div className="flex items-center justify-end">
             <CadenceSelector />
           </div>
+          <div data-page-section="weekly-call" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
@@ -409,12 +410,13 @@ async function PageContent({
               serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
             />
           </SwipeableWeek>
+          </div>
 
           {/* Directly under the call, not 3,000px below it. The one conversion
               on the page used to sit under the stress tester, the decision
               tracker and the week close-out; the recipient of a shared link
               scrolled past everything the product asked of them to reach it. */}
-          <div id="subscribe" className="scroll-mt-28">
+          <div id="subscribe" data-page-section="subscribe" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <SubscribeForm compact />
           </div>
 
@@ -423,6 +425,9 @@ async function PageContent({
               asked the reader to keep state in this browser so the product could
               be smarter later; the product now says what it can from what it
               already holds. */}
+          {/* Below the call: each of these is a section J and K can reach, which is
+              what `data-page-section` is for — see app/components/reportSection.tsx. */}
+          <div data-page-section="since-last-visit" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <SinceLastVisit
             current={{
               recordDate: reportData.treasury.record_date,
@@ -431,6 +436,8 @@ async function PageContent({
               call: primaryCall,
             }}
           />
+          </div>
+          <div data-page-section="last-week" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <LastWeekInHindsight
             regime={regime}
             scores={{ tightness, riskAppetite }}
@@ -438,10 +445,15 @@ async function PageContent({
             thresholds={reportData.assessment.thresholds}
             recordDateLabel={homepage.reportShell.recordDateLabel}
           />
+          </div>
 
+          <div data-page-section="direct-answers" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
+          </div>
 
+          <div data-page-section="plan-and-evidence" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
+          </div>
         </div>
 
         <div className="space-y-4 border-t border-slate-800/70 pt-6">

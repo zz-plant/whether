@@ -152,7 +152,9 @@ export const utilityLinks = [
   },
   {
     href: "/history/compare",
-    label: "Macro Analogs",
+    /* Was "Macro Analogs" here and "Compare periods" in the navigation layer above —
+       one URL under two names, in two menus, on the same site. */
+    label: "Compare periods",
     description: "Compare current posture to 2001, 2008, and 2022 historical epochs",
   },
   {
