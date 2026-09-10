@@ -178,15 +178,11 @@ export default function ApiDocsPage() {
             >
               Paginated history of regime-change alerts. Read access is open; writes are cron-owned.
             </Endpoint>
-            <Endpoint
-              signature="GET /api/decision-memory?format=records"
-              tryHref="/api/decision-memory?format=records"
-              tryLabel="Try it"
-              tryCta="try_delegation_records"
-            >
-              The call history in NDJSON, shaped by the Revisable Delegation record schema — one belief
-              record per published posture. The manifest above names the independent verifier that
-              can check these against the conformance level Whether claims.
+            <Endpoint signature="GET /api/decision-memory?format=records">
+              The call history in NDJSON, shaped by the Revisable Delegation record schema — one
+              belief record per published posture. Scoped to the caller: it reads your own decision
+              memory, so it needs an <span className="text-sky-200">x-whether-client-id</span> header
+              and answers 401 without one. No &quot;Try it&quot; link for that reason.
             </Endpoint>
           </div>
         </section>
