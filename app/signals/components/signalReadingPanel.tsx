@@ -53,10 +53,14 @@ export function SignalReadingPanel({
             <dd className="min-w-0">{reading.distanceLabel}</dd>
           </div>
         ) : null}
-        <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-slate-400">Week over week</dt>
-          <dd className={`min-w-0 ${directionClassName[reading.directionTone]}`}>{reading.directionLabel}</dd>
-        </div>
+        {/* Suppressed with the figure: a week-over-week line under "the spread
+            cannot be computed" is two contradictory claims about the same week. */}
+        {hasValue ? (
+          <div className="flex flex-wrap gap-x-2">
+            <dt className="shrink-0 font-semibold text-slate-400">Week over week</dt>
+            <dd className={`min-w-0 ${directionClassName[reading.directionTone]}`}>{reading.directionLabel}</dd>
+          </div>
+        ) : null}
         {reading.inputs.length > 0 ? (
           <div className="flex flex-wrap gap-x-2">
             <dt className="shrink-0 font-semibold text-slate-400">Built from</dt>

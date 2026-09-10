@@ -17,11 +17,13 @@ const buildReportData = ({
   scores = {},
   thresholds = {},
   changedSignals = [],
+  anomalySignals = [],
   inputs = [],
 }: {
   scores?: ScoreOverrides;
   thresholds?: ThresholdOverrides;
   changedSignals?: Array<{ key: "tightness" | "riskAppetite" | "curveSlope"; label: string; delta: number }>;
+  anomalySignals?: Array<{ key: "tightness" | "riskAppetite" | "curveSlope"; label: string; delta: number; reason: string }>;
   inputs?: Array<{ id: "base-rate" | "two-year" | "ten-year" | "curve-slope"; label: string; value: number | null; unit: string }>;
 } = {}): SignalReadingSource => {
   const assessment = buildAssessmentFixture();
@@ -38,7 +40,7 @@ const buildReportData = ({
         fetchedAt: "2026-06-17T00:00:00.000Z",
       })),
     },
-    reportDynamics: { changedSignals },
+    reportDynamics: { changedSignals, anomalySignals },
   };
 };
 
@@ -116,12 +118,58 @@ describe("signal cluster reading", () => {
     assert.equal(fallingAppetite.directionTone, "tightening");
   });
 
-  it("says so when there is no prior week rather than implying a flat one", () => {
+  /*
+   * A signal missing from `changedSignals` may have been flat, may have had no
+   * prior week, or may have moved so far it was diverted to `anomalySignals`.
+   * The wording has to be true for all three — an earlier version claimed "No
+   * prior week to compare against", which was false for two of them and
+   * contradicted the saturation caveat in the same panel.
+   */
+  it("does not claim there was no prior week when the move was merely immaterial", () => {
     const reading = buildSignalClusterReading("capital-tightness-watch", buildReportData());
 
     assert.equal(reading.delta, null);
     assert.equal(reading.directionTone, "unchanged");
-    assert.match(reading.directionLabel, /No prior week/);
+    assert.match(reading.directionLabel, /No material move/);
+    assert.ok(!/prior week/i.test(reading.directionLabel));
+  });
+
+  /*
+   * The largest moves on the page are exactly the ones `buildReportDynamics`
+   * routes away from `changedSignals`, so reading only that list hid them.
+   */
+  it("reports a move that was diverted to anomalySignals", () => {
+    const reading = buildSignalClusterReading(
+      "capital-tightness-watch",
+      buildReportData({
+        anomalySignals: [
+          { key: "tightness", label: "Funding pressure", delta: 31, reason: "Exceeded weekly sanity threshold." },
+        ],
+      }),
+    );
+
+    assert.equal(reading.delta, 31);
+    assert.equal(reading.directionTone, "tightening");
+    assert.match(reading.directionLabel, /\+31 points since last week/);
+  });
+
+  /*
+   * `buildReportDynamics` computes the slope delta as `(current ?? 0) -
+   * (previous ?? 0)`, so an unresolved leg yields a confident number measured
+   * from zero. Quoting it under "the spread cannot be computed" would be two
+   * contradictory claims about one week.
+   */
+  it("reports no move when the slope itself did not resolve", () => {
+    const reading = buildSignalClusterReading(
+      "yield-curve-flip-watch",
+      buildReportData({
+        scores: { curveSlope: null },
+        changedSignals: [{ key: "curveSlope", label: "Curve slope", delta: -0.29 }],
+      }),
+    );
+
+    assert.equal(reading.delta, null);
+    assert.equal(reading.displayValue, null);
   });
 
   /*

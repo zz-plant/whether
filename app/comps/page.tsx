@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
 import { buildPageMetadata } from "../../lib/seo";
-import { loadReportDataSafe } from "../../lib/report/reportData";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+// Slot labels come from the one vocabulary source; Invariant 8 fails the suite
+// when a surface spells them itself.
+import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import {
   SAAS_BASKET,
   fetchSaaSValuations,
@@ -67,8 +70,18 @@ export default async function CompsPage() {
    * changes about a raise they are considering now, and the posture that answers
    * it is one loader away.
    */
-  const [comps, reportResult] = await Promise.all([loadComps(), loadReportDataSafe(undefined, { route: "/comps" })]);
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const [comps, brief] = await Promise.all([loadComps(), loadWeeklyBriefSnapshot(undefined, { route: "/comps" })]);
+  const { reportData } = brief;
+  /*
+   * The capital-raising rule, not `actionNowShort`.
+   *
+   * `actionNowShort` is the regime's generic direction sentence — "Conditions
+   * holding — keep scaling proven bets at the current pace" — which concerns
+   * raising no more than it concerns anything else. Labelling it "Capital-raising
+   * call" on a page about valuation comparables put a heading on copy that does
+   * not answer it. `decisionRules` carries a real per-area rule.
+   */
+  const capitalRule = brief.snapshot.homeBriefModel.decisionRules.find((rule) => rule.area === "capital-raising");
 
   return (
     <PageShell backdropVariant="default">
@@ -115,14 +128,27 @@ export default async function CompsPage() {
               <dt className="shrink-0 font-semibold text-slate-400">Posture</dt>
               <dd className="min-w-0">{reportData.statusLabel}</dd>
             </div>
-            <div className="flex flex-wrap gap-x-2">
-              <dt className="shrink-0 font-semibold text-slate-400">Capital-raising call</dt>
-              <dd className="min-w-0">{reportData.actionNowShort}</dd>
-            </div>
-            <div className="flex flex-wrap gap-x-2">
-              <dt className="shrink-0 font-semibold text-slate-400">Re-open when</dt>
-              <dd className="min-w-0">{reportData.flipThreshold}</dd>
-            </div>
+            {capitalRule ? (
+              <>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-slate-400">Capital-raising call</dt>
+                  <dd className="min-w-0">{capitalRule.doNow[0] ?? capitalRule.recommendation}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-slate-400">{publicDecisionLabels.threshold}</dt>
+                  <dd className="min-w-0">{capitalRule.pauseTrigger}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-slate-400">{publicDecisionLabels.reversal}</dt>
+                  <dd className="min-w-0">{capitalRule.resumeTrigger}</dd>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="shrink-0 font-semibold text-slate-400">This week&apos;s action</dt>
+                <dd className="min-w-0">{reportData.actionNowShort}</dd>
+              </div>
+            )}
           </dl>
           <p className="text-sm text-slate-300">
             {comps.status === "ok" && comps.data.medianEvToRevenue !== null
