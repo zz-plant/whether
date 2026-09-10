@@ -8,6 +8,8 @@ import {
   getDecisionPageContentMeasurement,
 } from "./decisionPages";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
+import { selectRelatedAnswers } from "../../lib/seo/relatedAnswers";
+import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ActionLink } from "../components/ui/actionLink";
@@ -56,7 +58,13 @@ export async function DecisionAnswerPageContent({
   });
   const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
   const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
-  const relatedPages = answerPages.filter((candidate) => candidate.slug !== page.slug && candidate.category !== page.category).slice(0, 3);
+  /*
+   * Ranked by shared decision areas, and filtered to pages that are actually
+   * indexable — the old rule selected for a *different* category and took the
+   * first three, which made every decision page emit the identical three links
+   * and could point at pages the allowlist excludes.
+   */
+  const relatedPages = selectRelatedAnswers(page, answerPages, { isEligible: isIndexableAnswerSlug });
   const pagePath = `/answers/${page.slug}`;
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [

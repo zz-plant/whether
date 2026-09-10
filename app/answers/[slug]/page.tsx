@@ -27,14 +27,29 @@ export const buildDecisionAnswerMetadata = ({
   title,
   slug,
   payload,
+  shortAnswer,
 }: {
   title: string;
   slug: string;
   payload: ReturnType<typeof buildSeoDecisionPayload>;
+  /** The page's own one-line answer. See the description note below. */
+  shortAnswer?: string;
 }): Metadata => {
+  /*
+   * The page's answer first, this week's action second.
+   *
+   * The description was `${currentCall} Action: ${immediateAction}` — both drawn
+   * from the live posture filtered by the page's decision areas, so any two
+   * pages leading with the same area shipped byte-identical snippets. "Should
+   * startups hire engineers right now?" and "Should we expand sales headcount
+   * now?" were indistinguishable in results, while each page's hand-written
+   * `shortAnswer` — the one field that differs — never reached the SERP at all.
+   */
   const metadata = buildPageMetadata({
     title: `${title} (Live operator answer)`,
-    description: `${payload.currentCall} Action: ${payload.immediateAction}`,
+    description: shortAnswer
+      ? `${shortAnswer} ${payload.immediateAction}`
+      : `${payload.currentCall} Action: ${payload.immediateAction}`,
     path: `/answers/${slug}`,
     imageAlt: title,
     imageParams: {
@@ -103,7 +118,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
 
-  return buildDecisionAnswerMetadata({ title: page.title, slug: page.slug, payload });
+  return buildDecisionAnswerMetadata({ title: page.title, slug: page.slug, payload, shortAnswer: page.shortAnswer });
 }
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
