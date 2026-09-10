@@ -37,7 +37,12 @@ export const buildDecisionAnswerMetadata = ({
     description: `${payload.currentCall} Action: ${payload.immediateAction}`,
     path: `/answers/${slug}`,
     imageAlt: title,
-    imagePath: "/social/answers.svg",
+    imageParams: {
+      template: "solutions",
+      eyebrow: "Operator answer",
+      title,
+      subtitle: `${payload.currentCall} Action: ${payload.immediateAction}`,
+    },
   });
 
   if (payload.noindex || !isIndexableAnswerSlug(slug)) {
@@ -58,7 +63,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
         description: "This long-tail answer has been retired from the active answer set. Use Decision Tools for the canonical direct-answer flow.",
         path: "/resolve",
         imageAlt: "Whether decision tools",
-        imagePath: "/social/resolve.svg",
+        imageParams: { template: "solutions", title: "Operator answer moved" },
       }),
       robots: {
         ...noindexRobots,
@@ -72,7 +77,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
       description: "Macro-backed operator decision answer pages.",
       path: "/answers",
       imageAlt: "Whether operator answer",
-      imagePath: "/social/answers.svg",
+      imageParams: { template: "solutions", title: "Operator decision answer" },
     });
   }
 

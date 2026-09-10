@@ -19,7 +19,11 @@ export const metadata: Metadata = buildPageMetadata({
     "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",
   path: "/operate",
   imageAlt: "Whether planning view",
-  imagePath: "/social/planning.svg",
+  imageParams: {
+    template: "operations",
+    title: "Planning — Guardrails, Runway, and the Team Brief",
+    subtitle: "Approve the weekly plan, guardrails, finance direction, and the share-ready brief.",
+  },
 });
 
 export default async function OperationsPage({
