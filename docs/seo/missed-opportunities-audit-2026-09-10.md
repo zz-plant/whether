@@ -7,8 +7,8 @@ in rendered HTML; findings marked **read** come from source only.
 
 ## Status
 
-Findings are recorded as they were found. Four have since been fixed in the same pull
-request; the rest are open.
+Findings are recorded as they were found. Several have since been fixed; the rest are
+open. Status as of 2026-09-10.
 
 | Finding | Status |
 | --- | --- |
@@ -17,7 +17,12 @@ request; the rest are open.
 | A3 — doubled brand in titles | **fixed** — `/share`, `/terms-of-service`, `/acceptable-use-policy` |
 | A4 — `/history` has no metadata, canonical, or JSON-LD | **partly fixed** — metadata and self-canonical added; the `ItemList`/`CollectionPage` markup for its 81 children is still open |
 | B1/B2/B3 — homepage entity graph discarded, non-ISO dates, non-schema `result`, unescaped serializer | **fixed** — the assembled graph now renders, dates are ISO, posture moved to `Dataset.variableMeasured`, `serializeJsonLd` is used |
-| A5, A6, A7, A8, B4, C1–C8, D | open |
+| A7 — `/api/mcp` disallowed while advertised | **fixed** — allow rule added; the named-AI-crawler half was dropped as not a fix (the wildcard already permits them) |
+| A8 — no RSS autodiscovery, single-item feed | **fixed** — autodiscovery link added; feed carries one item per published week |
+| C1 — related answers filtered for a *different* category | **fixed** — ranked on shared `mappedDecisionAreas`, filtered to indexable slugs (`lib/seo/relatedAnswers.ts`) |
+| C2 — answer descriptions are a function of the week | **fixed** for `/answers/*` — each page's own `shortAnswer` leads. Still open on `/signals/[cluster]/[scenario]`, which carries the identical pattern |
+| C7 — `/signals/[cluster]` hubs thin and `noindex` | **fixed** for the three signal hubs — each now carries its own reading and is indexable while live. The 51 `/resolve` and `/toolkits` cluster pages are untouched |
+| A5, A6, B4, C3, C4, C5, C6, C8, D | open |
 
 Separately, and not a finding in this document: the refresh loop described in
 `docs/seo/refresh-loop.md` had no step producing `page-metrics.json`. `bun run

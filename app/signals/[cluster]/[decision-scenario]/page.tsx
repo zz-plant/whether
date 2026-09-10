@@ -75,7 +75,18 @@ export const buildSignalDecisionScenarioMetadata = ({
 }) => {
   const metadata = buildPageMetadata({
     title: `${signalTitle}: ${scenarioTitle} decisions`,
-    description: payload ? `${payload.currentCall} Action: ${payload.immediateAction}` : signalSummary,
+    /*
+     * Distinct on both axes, which is what these 15 URLs vary along.
+     *
+     * `${currentCall} Action: ${immediateAction}` is a function of the decision
+     * scenario alone, so the same scenario under all three signals shipped one
+     * description — the cross-cluster duplication the uniqueness gate is keyed
+     * not to see. Leading with the signal's own summary varies it by cluster and
+     * naming the scenario varies it by scenario; the live action still follows.
+     */
+    description: payload
+      ? `${signalSummary} For ${scenarioTitle.toLowerCase()} decisions: ${payload.immediateAction}`
+      : signalSummary,
     path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
   });

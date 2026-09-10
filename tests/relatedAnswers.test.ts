@@ -75,7 +75,19 @@ describe("related answers", () => {
         .map((entry) => entry.slug)
         .join("|"));
 
-    assert.ok(new Set(blocks).size > 1, `expected varied related blocks, got ${new Set(blocks).size} distinct`);
+    /*
+     * Not `size > 1`: that passes when seven of eight pages still share one
+     * block, which is the defect almost intact. Assert instead that no single
+     * block is shared by more than a third of them.
+     */
+    const counts = new Map<string, number>();
+    for (const block of blocks) counts.set(block, (counts.get(block) ?? 0) + 1);
+    const largestShare = Math.max(...counts.values());
+
+    assert.ok(
+      largestShare <= Math.ceil(decisionPages.length / 3),
+      `${largestShare} of ${decisionPages.length} decision pages share one related block`,
+    );
   });
 
   it("only offers pages that are indexable", () => {
