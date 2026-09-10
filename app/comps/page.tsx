@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
 import { buildPageMetadata } from "../../lib/seo";
+import { loadReportDataSafe } from "../../lib/report/reportData";
 import {
   SAAS_BASKET,
   fetchSaaSValuations,
@@ -57,7 +58,17 @@ const loadComps = async (): Promise<CompsState> => {
 };
 
 export default async function CompsPage() {
-  const comps = await loadComps();
+  /*
+   * The multiples and the current call, together.
+   *
+   * This page listed a median and then explained, in evergreen prose, that
+   * public multiples influence private rounds — true in every week, and so
+   * useful in none. The reader's actual question is what this week's reading
+   * changes about a raise they are considering now, and the posture that answers
+   * it is one loader away.
+   */
+  const [comps, reportResult] = await Promise.all([loadComps(), loadReportDataSafe(undefined, { route: "/comps" })]);
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return (
     <PageShell backdropVariant="default">
@@ -94,6 +105,35 @@ export default async function CompsPage() {
           <p className="text-sm text-slate-400">Unable to load data. Please try again later.</p>
         )}
 
+        <section className="weather-surface space-y-2 px-4 py-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 className="type-eyebrow text-slate-400">Against this week&apos;s call</h2>
+            <p className="text-xs text-slate-500">As of {reportData.recordDateLabel}</p>
+          </div>
+          <dl className="space-y-1.5 text-sm text-slate-200">
+            <div className="flex flex-wrap gap-x-2">
+              <dt className="shrink-0 font-semibold text-slate-400">Posture</dt>
+              <dd className="min-w-0">{reportData.statusLabel}</dd>
+            </div>
+            <div className="flex flex-wrap gap-x-2">
+              <dt className="shrink-0 font-semibold text-slate-400">Capital-raising call</dt>
+              <dd className="min-w-0">{reportData.actionNowShort}</dd>
+            </div>
+            <div className="flex flex-wrap gap-x-2">
+              <dt className="shrink-0 font-semibold text-slate-400">Re-open when</dt>
+              <dd className="min-w-0">{reportData.flipThreshold}</dd>
+            </div>
+          </dl>
+          <p className="text-sm text-slate-300">
+            {comps.status === "ok" && comps.data.medianEvToRevenue !== null
+              ? `Read the ${formatMultiple(comps.data.medianEvToRevenue)} median as the price the public market is paying for a dollar of recurring revenue this week. It sets the comparable a late-stage round is argued against, so it moves the burden of proof on a raise rather than the decision itself.`
+              : "With no median to read this week, the capital-raising call above stands on the rate stack alone — the comparable is missing, not zero."}
+          </p>
+          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            Open the weekly brief
+          </Link>
+        </section>
+
         <section className="space-y-3">
           <h2 className="type-eyebrow">Basket composition</h2>
           <p className="text-sm text-slate-300">
@@ -107,10 +147,10 @@ export default async function CompsPage() {
         <section className="space-y-3">
           <h2 className="type-eyebrow">Why this matters</h2>
           <p className="text-sm text-slate-300 leading-relaxed">
-            Public SaaS valuation multiples directly affect private startup fundraising. When public multiples compress, private valuations follow — because the same public market investors often lead or influence late-stage rounds. When multiples expand, fundraising conditions improve.
+            The same public-market investors often lead or influence late-stage rounds, so a compression in public multiples reaches private valuations with a lag rather than not at all. That lag is why this page is worth reading before a raise is priced, not after.
           </p>
           <p className="text-sm text-slate-300 leading-relaxed">
-            The current regime is displayed on the <Link href="/" className="text-sky-200 underline decoration-sky-600">homepage</Link> alongside fundraising guidance that incorporates this context. An AI agent can query this data via <code className="text-sky-200">GET /api/mcp?tool=get_comps</code>.
+            An AI agent can query this data via <code className="text-sky-200">GET /api/mcp?tool=get_comps</code>.
           </p>
         </section>
       </article>
