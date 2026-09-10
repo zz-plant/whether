@@ -3,7 +3,7 @@ import { buildPageMetadata } from "../../lib/seo";
 import { LegalPageShell } from "../components/legalPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Acceptable Use Policy — Whether",
+  title: "Acceptable Use Policy",
   description:
     "Acceptable use requirements for Whether platform access, outputs, APIs, and data services.",
   path: "/acceptable-use-policy",

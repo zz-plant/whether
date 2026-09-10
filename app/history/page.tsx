@@ -17,6 +17,22 @@ import { toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
+import type { Metadata } from "next";
+import { buildPageMetadata } from "../../lib/seo";
+
+/*
+ * /history had no `metadata` export at all, so it inherited the root layout's
+ * title, description and (until that was removed) its canonical — shipping the
+ * homepage's three identity tags on the hub that 81 archive-period URLs hang
+ * off, the largest single cluster in the sitemap.
+ */
+export const metadata: Metadata = buildPageMetadata({
+  title: "Regime History and Track Record",
+  description:
+    "Every monthly regime call on record, when the posture changed, how long each regime held, and the published weekly briefs behind the track record.",
+  path: "/history",
+  imageAlt: "Whether regime history and track record",
+});
 
 type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string };
 

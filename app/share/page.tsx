@@ -18,10 +18,13 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 export const runtime = "edge";
 export const revalidate = 300;
 
+// No "| Whether" in the title: the root layout's title template already appends
+// it, so carrying the brand here rendered "… | Whether | Whether".
 export const metadata: Metadata = {
-  title: "Share the Current Weekly Brief | Whether",
+  title: "Share the Current Weekly Brief",
   description:
     "Copy the current Whether weekly operating brief for Slack, a slide, or a citation; add a meeting pack or calendar hold; or embed a live brief in a newsletter or wiki.",
+  alternates: { canonical: "/share" },
 };
 
 const buildCurrentShareArtifact = async () => {

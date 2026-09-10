@@ -22,6 +22,7 @@ import { buildDiagnosticsLanePayload } from "./home/diagnosticsLane";
 import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
 import { buildHomeStructuredData } from "./home/structuredData";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { WeeklyCallContract } from "./weeklyCallContract";
 import type { OperatorContext } from "./operatorContext";
 import type {
@@ -404,7 +405,17 @@ export const assembleHomePage = async ({
       provenance: treasuryProvenance,
       showOfflineBadge: isFallback && !historicalSelection,
       sectionLinks,
-      structuredData: buildHomeStructuredData(),
+      structuredData: buildHomeStructuredData({
+        headline: `Whether Weekly Brief — ${recordDateLabel}`,
+        description: weeklyCall.currentCall,
+        // ISO, not the display labels beside them — see HomeBriefStructuredDataInput.
+        datePublishedIso: treasury.record_date,
+        dateModifiedIso: treasury.fetched_at,
+        postureLabel: weeklyDecisionCardModel.status.postureWithStageLabel
+          ?? weeklyDecisionCardModel.status.statusLabel,
+        regimeLabel: getRegimePublicLabel(assessment.regime),
+        confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
+      }),
       commandBar: buildCommandBarPayload({
         assessment,
         weeklyCall,

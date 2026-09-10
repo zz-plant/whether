@@ -5,7 +5,28 @@ Method: static read of `app/`, `lib/seo*`, `lib/search/`, `content/`, plus head/
 from a local `bun run dev` server at `127.0.0.1:3000`. Findings marked **verified** were observed
 in rendered HTML; findings marked **read** come from source only.
 
-This is an audit, not a change. Nothing in `app/` or `lib/` is modified by this document.
+## Status
+
+Findings are recorded as they were found. Four have since been fixed in the same pull
+request; the rest are open.
+
+| Finding | Status |
+| --- | --- |
+| A1 — four pages canonicalising to the homepage | **fixed** — root-layout canonical and `x-default` removed, self-canonicals added, pinned by `tests/crawlableRouteContract.test.ts` |
+| A2 — `/comps` renders nothing server-side | **fixed** — now a server component reading `fetchSaaSValuations()` directly |
+| A3 — doubled brand in titles | **fixed** — `/share`, `/terms-of-service`, `/acceptable-use-policy` |
+| A4 — `/history` has no metadata, canonical, or JSON-LD | **partly fixed** — metadata and self-canonical added; the `ItemList`/`CollectionPage` markup for its 81 children is still open |
+| B1/B2/B3 — homepage entity graph discarded, non-ISO dates, non-schema `result`, unescaped serializer | **fixed** — the assembled graph now renders, dates are ISO, posture moved to `Dataset.variableMeasured`, `serializeJsonLd` is used |
+| A5, A6, A7, A8, B4, C1–C8, D | open |
+
+Separately, and not a finding in this document: the refresh loop described in
+`docs/seo/refresh-loop.md` had no step producing `page-metrics.json`. `bun run
+seo:page-metrics` now does. Without it, none of the prioritisation below can be
+checked against what actually happened.
+
+---
+
+Below is the audit as originally written.
 
 Note on the local environment: FRED returns 403 in a sandbox, so the report ran on the bundled
 fallback snapshot. That flips the freshness gate, which is why `/answers/*` and

@@ -3,7 +3,7 @@ import { buildPageMetadata } from "../../lib/seo";
 import { LegalPageShell } from "../components/legalPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Terms of Service — Whether",
+  title: "Terms of Service",
   description:
     "Terms of Service governing access to Whether software, APIs, data outputs, and related services.",
   path: "/terms-of-service",

@@ -23,6 +23,7 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
+import { serializeJsonLd } from "../lib/seo";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
@@ -465,30 +466,24 @@ async function PageContent({
         </div>
       </div>
 
+      {/*
+        * The assembled graph, not a second one built here.
+        *
+        * This tag used to hold a hand-rolled Article/Report node while
+        * `buildHomeStructuredData()` — Organization, WebSite, CollectionPage,
+        * Dataset, FAQPage, BreadcrumbList — was assembled on every request and
+        * dropped, because nothing on this page read `reportShell.structuredData`.
+        * So the site's only brand-entity anchors were missing from the one URL
+        * search engines resolve them from, and the node that did ship carried
+        * display-string dates and a `result` object using no schema.org term.
+        *
+        * `serializeJsonLd` rather than `JSON.stringify`: the payload interpolates
+        * the headline and posture labels, and this was the only JSON-LD call site
+        * in the repo that skipped the escaper written for exactly that.
+        */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": ["Article", "Report"],
-            "headline": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-            "name": `Whether Weekly Brief — ${homepage.reportShell.recordDateLabel}`,
-            "about": "US Macro Operating Posture for Startup Leaders",
-            "datePublished": homepage.reportShell.recordDateLabel,
-            "dateModified": homepage.reportShell.fetchedAtLabel,
-            "result": {
-              "posture": postureLabel,
-              "regime": publicRegimeLabel,
-              "confidence": confidenceLabel,
-              "provenance": {
-                "source": homepage.reportShell.treasurySource ?? "FRED",
-                "dataDate": homepage.reportShell.recordDateLabel,
-                "refreshedAt": homepage.reportShell.fetchedAtLabel,
-                "confidence": confidenceLabel,
-              },
-            },
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(homepage.reportShell.structuredData) }}
       />
 
       <StickyCallStrip
