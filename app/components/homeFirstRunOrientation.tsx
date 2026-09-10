@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
-import { OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
+import { DEFAULT_OPERATOR_STAGE, OPERATOR_STAGE_OPTIONS, type OperatorStage } from "../../lib/report/operatorStage";
 import { persistOperatorStage } from "./useOperatorStage";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
@@ -50,6 +50,8 @@ const getBootstrappedDismissedState = () => {
  */
 export function FirstVisitExplainer() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -77,7 +79,22 @@ export function FirstVisitExplainer() {
   // change it later.
   const handleStage = (stage: OperatorStage) => {
     persistOperatorStage(stage);
-    router.refresh();
+    /*
+     * Write the choice to the URL, not just the cookie. `StagePersonaSelector` — the
+     * persistent control further down the same page — already does this, so the same
+     * setting was shareable when chosen there and invisible when chosen here. The
+     * difference is not observable to a reader: both are four buttons labelled with the
+     * same four stages. `router.push` also re-renders, so the `refresh()` this replaces
+     * is redundant. The default stage carries no param, matching the other control.
+     */
+    const params = new URLSearchParams(searchParams.toString());
+    if (stage === DEFAULT_OPERATOR_STAGE) {
+      params.delete("stage");
+    } else {
+      params.set("stage", stage);
+    }
+    const query = params.toString();
+    router.push(`${pathname}${query ? `?${query}` : ""}`);
     handleDismiss();
   };
 
