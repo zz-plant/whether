@@ -62,7 +62,7 @@ export function CopyMeetingSlideButton({
       type="button"
       onClick={handleCopy}
       title="Copy 16:9 Meeting Stance formatted for Notion, Keynote, or Google Slides"
-      className={`inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/80 px-2.5 py-1.5 text-xs font-semibold text-slate-200 shadow-sm transition hover:border-slate-500 hover:bg-slate-800 hover:text-white ${className}`}
+      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs font-semibold text-slate-200 shadow-sm transition hover:border-slate-500 hover:bg-slate-800 hover:text-white weather-focus-ring weather-press-scale ${className}`}
     >
       {didCopy ? (
         <>

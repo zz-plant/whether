@@ -184,11 +184,8 @@ summary.list-none:focus-visible {
     box-shadow: var(--cta-shadow-hover);
   }
 
-  .weather-cta-primary:hover{
-    transform: translateY(-1px);
-  }
-
   .weather-cta-primary:hover {
+    transform: translateY(-1px);
     border-color: rgba(125, 211, 252, 0.9);
     box-shadow: var(--cta-shadow-hover);
   }

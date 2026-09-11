@@ -65,7 +65,7 @@ export function FreshnessDot({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-11 items-center gap-2 px-2.5 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] text-fluid-nano text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+        className="inline-flex min-h-11 items-center gap-2 px-3 py-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] text-fluid-nano text-slate-300 transition-colors hover:border-[color:var(--border-default)] hover:text-white weather-focus-ring weather-press-scale"
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
@@ -87,52 +87,52 @@ export function FreshnessDot({
         <section
           id={menuId}
           aria-label="Data freshness"
-          className="absolute top-full left-0 mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-white/[0.08] bg-[var(--bg-raised)]/96 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl space-y-3 text-left overscroll-contain"
+          className="absolute top-full left-0 mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-[color:var(--border-default)] bg-[var(--bg-raised)] p-4 shadow-2xl backdrop-blur-xl space-y-3 text-left overscroll-contain"
         >
           <div>
-            <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase">Data status</p>
-            <p className="text-fluid-xs text-white/65 mt-1">
+            <p className="text-fluid-nano font-semibold tracking-[0.04em] text-slate-400 uppercase">Data status</p>
+            <p className="text-fluid-xs text-slate-200 mt-1">
               {resolveDataStatusGuidance({ isFallbackSnapshot: showOfflineBadge, degradedSourceCount: degradedSourceRows.length })}
             </p>
           </div>
 
-          <div className="space-y-1.5 text-fluid-nano border-t border-white/[0.06] pt-2">
+          <div className="space-y-1.5 text-fluid-nano border-t border-[color:var(--border-subtle)] pt-2">
             <div className="flex justify-between">
-              <span className="text-white/60">Data date</span>
-              <span className="text-white/65 font-mono">{recordDate ?? "N/A"}</span>
+              <span className="text-slate-400">Data date</span>
+              <span className="text-slate-200 font-mono">{recordDate ?? "N/A"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/60">Refreshed</span>
-              <span className="text-white/65 font-mono">{label}</span>
+              <span className="text-slate-400">Refreshed</span>
+              <span className="text-slate-200 font-mono">{label}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/60">Source</span>
-              <span className="text-white/65 font-mono">{treasurySource ?? "US Treasury"}</span>
+              <span className="text-slate-400">Source</span>
+              <span className="text-slate-200 font-mono">{treasurySource ?? "US Treasury"}</span>
             </div>
             {trustStatusLabel ? (
               <div className="flex justify-between">
-                <span className="text-white/60">Trust Rating</span>
-                <span className="text-white/65">{trustStatusLabel}</span>
+                <span className="text-slate-400">Trust Rating</span>
+                <span className="text-slate-200">{trustStatusLabel}</span>
               </div>
             ) : null}
           </div>
 
           {degradedSourceRows.length ? (
-            <div className="border-t border-white/[0.06] pt-2">
-              <p className="text-fluid-nano font-semibold tracking-[0.04em] text-white/60 uppercase mb-1.5">
+            <div className="border-t border-[color:var(--border-subtle)] pt-2">
+              <p className="text-fluid-nano font-semibold tracking-[0.04em] text-slate-400 uppercase mb-1.5">
                 Cached or delayed feeds
               </p>
               <div className="space-y-1">
                 {degradedSourceRows.map((row, index) => (
                   <div key={index} className="flex justify-between text-fluid-nano">
-                    <span className="text-white/60 truncate max-w-[12rem]" title={row.sourceName}>{row.sourceName}</span>
+                    <span className="text-slate-400 truncate max-w-[12rem]" title={row.sourceName}>{row.sourceName}</span>
                     <span className="text-amber-300/80 font-mono text-fluid-nano" title={`${row.sourceName}: ${row.freshnessStatus}`}>{row.freshnessStatus}</span>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 border-t border-white/[0.06] pt-2 text-fluid-nano text-emerald-300/80">
+            <div className="flex items-center gap-1.5 border-t border-[color:var(--border-subtle)] pt-2 text-fluid-nano text-emerald-300/90">
               <CheckIcon className="h-3 w-3 shrink-0" aria-hidden="true" />
               All macro feeds nominal.
             </div>

@@ -77,7 +77,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
   return (
     <fieldset
       aria-label={ariaLabel}
-      className="flex items-center gap-0.5 rounded-sm border border-white/[0.10] bg-[var(--bg-nested)] p-0.5"
+      className="flex items-center gap-0.5 rounded-sm border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-0.5"
     >
       {options.map((option, index) => {
         const isActive = current === option.key;
@@ -98,7 +98,7 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
             // first header band, which was 62px of a 109px two-band shell.
             className={`min-h-[44px] sm:min-h-9 min-w-[2.75rem] rounded-sm px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
               isActive
-                ? "bg-sky-500/14 text-sky-100"
+                ? "bg-sky-500/15 text-sky-100 font-semibold"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >

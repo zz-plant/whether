@@ -103,7 +103,7 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
           data-testid="sticky-call-strip"
           className="pointer-events-none fixed inset-x-0 bottom-[calc(3.25rem+env(safe-area-inset-bottom))] z-40 px-3 pb-2 pt-2 md:bottom-0 md:pb-[max(0.65rem,env(safe-area-inset-bottom))] lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
         >
-          <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-slate-800/90 bg-slate-900/95 px-3 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl lg:max-w-md lg:shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
+          <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl lg:max-w-md lg:shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
             <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">
               <span
                 className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold shadow-inner ${DIRECTION_BADGE[direction].tone}`}
@@ -121,7 +121,7 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
             <a
               href={imageBriefHref}
               download="whether-brief.png"
-              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-800/60 text-fluid-xs font-medium text-slate-300 transition-all hover:border-slate-700 hover:text-white hover:bg-slate-800 active:scale-[0.97] no-underline focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] text-fluid-xs font-medium text-slate-300 transition-all hover:border-[color:var(--border-strong)] hover:text-white hover:bg-[color:var(--bg-raised)] active:scale-[0.97] no-underline weather-focus-ring"
               aria-label="Download decision card image"
             >
               <ImageIcon className="h-4 w-4" aria-hidden="true" />
@@ -129,7 +129,7 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-slate-800 bg-slate-800/60 px-3 text-fluid-xs font-medium text-slate-300 transition-all hover:border-slate-700 hover:text-white hover:bg-slate-800 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-sky-400"
+              className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-3 text-fluid-xs font-medium text-slate-300 transition-all hover:border-[color:var(--border-strong)] hover:text-white hover:bg-[color:var(--bg-raised)] active:scale-[0.97] weather-focus-ring"
               aria-label={isCopied ? "Copied weekly call" : "Copy weekly call"}
             >
               {isCopied ? (

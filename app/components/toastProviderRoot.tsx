@@ -28,7 +28,7 @@ const ToastList = () => {
           <Toast.Root
             key={toast.id}
             toast={toast}
-            className={`flex w-full flex-col gap-2 rounded-lg border border-slate-800/80 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl data-[limited]:opacity-0 ${toneClassName}`}
+            className={`flex w-full flex-col gap-2 rounded-xl border border-[color:var(--border-default)] bg-[color:var(--bg-raised)]/95 px-4 py-3 text-slate-100 shadow-2xl backdrop-blur-lg data-[limited]:opacity-0 ${toneClassName}`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
@@ -45,7 +45,7 @@ const ToastList = () => {
                 ) : null}
               </div>
               <Toast.Close
-                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/70 text-xs text-slate-400 transition-colors hover:border-slate-600/70 hover:text-slate-200"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center -mr-2 -mt-1 rounded-lg text-xs text-slate-400 transition-colors hover:text-slate-200 weather-focus-ring"
                 aria-label="Dismiss notification"
               >
                 ✕
@@ -54,7 +54,7 @@ const ToastList = () => {
             {toast.actionProps ? (
               <Toast.Action
                 {...toast.actionProps}
-                className={`inline-flex min-h-[32px] items-center justify-center rounded-lg border border-slate-700/70 px-3 type-badge text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 ${
+                className={`inline-flex min-h-11 items-center justify-center rounded-lg border border-[color:var(--border-strong)] px-3 text-xs font-medium text-slate-200 transition-colors hover:border-sky-400/50 hover:text-white weather-focus-ring weather-press-scale ${
                   toast.actionProps.className ?? ""
                 }`}
               />

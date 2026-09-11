@@ -34,10 +34,10 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
               <a
                 href={section.href}
                 aria-current={isActive ? "location" : undefined}
-                className={`inline-flex min-h-[40px] items-center whitespace-nowrap rounded-md border px-3 text-fluid-nano font-medium no-underline transition-colors ${
+                className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-md border px-3 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
                   isActive
-                    ? "border-[color:var(--regime-accent)] bg-[color:var(--regime-accent)]/15 text-slate-100"
-                    : "border-slate-800/80 text-slate-400 hover:text-slate-200"
+                    ? "border-[color:var(--regime-accent)] bg-[color:var(--regime-accent)]/15 text-slate-100 font-semibold"
+                    : "border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-200"
                 }`}
               >
                 {section.label}

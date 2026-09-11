@@ -8,7 +8,7 @@
 /* Tier 2: Secondary surfaces — bands, section bodies */
 .weather-surface-secondary {
   @apply rounded-lg border backdrop-blur-sm;
-  border-color: var(--color-border-default);
+  border-color: var(--border-default);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008)),
     var(--bg-raised);
@@ -17,17 +17,9 @@
     inset 0 1px 0 var(--edge-highlight-faint);
 }
 
-/* Tier 3: Utility surfaces — chips,
-stat cards{
-  @apply rounded-md border;
-  border-color: var(--color-border-subtle);
-  background-color: transparent;
-  box-shadow: none;
-}
-
 .weather-panel-static {
   @apply rounded-lg border;
-  border-color: var(--color-border-default);
+  border-color: var(--border-default);
   background: var(--bg-raised);
 }
 

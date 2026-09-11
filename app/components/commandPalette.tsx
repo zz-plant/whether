@@ -254,8 +254,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Popup className="fixed z-50 top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-2xl border border-slate-800/80 bg-slate-950/95 shadow-2xl shadow-black/80 backdrop-blur-2xl overflow-hidden" aria-label="Command palette">
-          <div className="flex items-center gap-3 border-b border-slate-800/80 px-4 py-3.5 bg-slate-900/40">
+        <Dialog.Popup className="fixed z-50 top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--bg-panel)]/95 shadow-2xl backdrop-blur-2xl overflow-hidden" aria-label="Command palette">
+          <div className="flex items-center gap-3 border-b border-[color:var(--border-default)] px-4 py-3.5 bg-[color:var(--bg-raised)]/40">
             <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
             <input
               ref={searchInputRef}
@@ -263,10 +263,10 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search or jump to… e Evidence · p Plan · h History"
-              className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none font-medium"
+              className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 outline-none font-medium"
               aria-label="Search commands"
             />
-            <kbd className="text-[10px] text-slate-400 font-mono border border-slate-800 bg-slate-900 rounded-md px-2 py-0.5 shadow-inner">ESC</kbd>
+            <kbd className="text-[10px] text-slate-400 font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-2 py-0.5 shadow-inner">ESC</kbd>
           </div>
           <nav aria-label="Command results" className="max-h-80 overflow-y-auto py-2">
             {filtered.length === 0 ? (
@@ -296,7 +296,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                           ) : null}
                         </span>
                         {cmd.shortcut ? (
-                          <kbd className="text-[10px] text-slate-400 font-mono border border-slate-800 bg-slate-900/80 rounded-md px-2 py-0.5 shrink-0 shadow-inner">
+                          <kbd className="text-[10px] text-slate-400 font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-2 py-0.5 shrink-0 shadow-inner">
                             {cmd.shortcut}
                           </kbd>
                         ) : null}
@@ -307,10 +307,10 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               </ul>
             )}
           </nav>
-          <div className="border-t border-slate-800/80 px-4 py-2.5 bg-slate-900/40 flex items-center gap-4 text-[10px] text-slate-400 font-medium">
-            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-slate-800 bg-slate-900 rounded px-1.5 py-0.5 text-slate-300">↑↓</kbd> navigate</span>
-            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-slate-800 bg-slate-900 rounded px-1.5 py-0.5 text-slate-300">↵</kbd> select</span>
-            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-slate-800 bg-slate-900 rounded px-1.5 py-0.5 text-slate-300">esc</kbd> close</span>
+          <div className="border-t border-[color:var(--border-default)] px-4 py-2.5 bg-[color:var(--bg-raised)]/40 flex items-center gap-4 text-[10px] text-slate-400 font-medium">
+            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-1.5 py-0.5 text-slate-300">↑↓</kbd> navigate</span>
+            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-1.5 py-0.5 text-slate-300">↵</kbd> select</span>
+            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-1.5 py-0.5 text-slate-300">esc</kbd> close</span>
           </div>
         </Dialog.Popup>
       </Dialog.Portal>

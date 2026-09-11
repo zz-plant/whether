@@ -53,11 +53,11 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
   }
 
   return (
-    <div className={compact ? "space-y-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3" : "weather-section-border space-y-3"}>
+    <div className={compact ? "space-y-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-4 py-3" : "weather-section-border space-y-3"}>
       <div>
         <p className="text-fluid-sm font-medium text-white">Get the call every Monday, and a note the day it changes</p>
         {compact ? null : (
-          <p className="text-fluid-xs text-white/60 mt-0.5">
+          <p className="text-fluid-xs text-slate-400 mt-0.5">
             Monday morning: the regime, the one action it calls for, and a link to the evidence behind it.
             Between Mondays, one email if the call flips. Every email carries an unsubscribe link.
           </p>
@@ -82,7 +82,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
           disabled={status === "loading"}
           aria-invalid={status === "error" ? true : undefined}
           aria-describedby={message ? "subscribe-message" : undefined}
-          className="min-h-11 flex-1 rounded-lg border border-white/[0.08] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-white/85 transition-colors placeholder:text-white/25 disabled:opacity-50 weather-focus-ring weather-press-scale"
+          className="min-h-11 flex-1 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring weather-press-scale"
         />
         <button
           type="submit"
@@ -99,7 +99,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-fluid-nano text-slate-400">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[color:var(--border-subtle)] text-fluid-nano text-slate-400">
         <span>{compact ? "One email a week, one more if the call flips. Unsubscribe in one click." : "Prefer calendar holds over email?"}</span>
         <a
           href={buildMondayCalendarUrl(
