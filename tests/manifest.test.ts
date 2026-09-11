@@ -15,5 +15,8 @@ describe("web app manifest", () => {
     assert.equal(value.background_color, "#020617");
     assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/operate"));
     assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/signals"));
+    assert.ok(value.icons?.some((icon) => icon.src === "/icon-192.png" && icon.sizes === "192x192"));
+    assert.ok(value.icons?.some((icon) => icon.src === "/icon-512.png" && icon.sizes === "512x512"));
+    assert.ok(value.icons?.some((icon) => icon.src === "/icon.svg"));
   });
 });
