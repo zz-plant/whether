@@ -434,8 +434,8 @@ export function DecisionHero({
               )}
             </div>
 
-            <div className="text-xs text-slate-400 flex items-center gap-1" title="Calculated from funding pressure and risk appetite. Reflects operational latitude to hire, spend, and commit.">
-              <span>Room to act</span>
+            <div className="text-xs text-slate-400 flex items-center gap-1" title="Operating latitude: calculated from funding pressure and risk appetite. Reflects latitude to hire, spend, and commit.">
+              <span>Operating latitude</span>
               <Info size={13} className="text-slate-500 cursor-help" />
             </div>
 
@@ -443,7 +443,7 @@ export function DecisionHero({
               <figure className="mt-1 flex flex-col items-start sm:items-end text-fluid-nano">
                 <Sparkline
                   points={trendPoints}
-                  label="Room to act"
+                  label="Operating latitude"
                   domain={trendDomain}
                   band={trendBand}
                   tone={trendTone}

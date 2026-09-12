@@ -320,7 +320,7 @@ async function PageContent({
         href: `${operateHref}#${rule.area}`,
       })) ?? []);
 
-  const whatCouldChangeText = flipConditionLabels?.[0]
+  const primaryFlipText = flipConditionLabels?.[0]
     ?? reversalTriggerLabel
     ?? `Rises above ${reportData.assessment.thresholds.tightnessRegime} (${tightness} today), which could flip the call to Cloudy.`;
 
@@ -502,11 +502,30 @@ async function PageContent({
               />
 
               <WhatCouldChangeCard
-                metricName={whatCouldChangeText.toLowerCase().includes("risk appetite") ? "Risk appetite" : "Funding pressure"}
-                conditionText={whatCouldChangeText}
-                summaryText={homepage.weeklyDecisionCardModel.decision.actionNowShort
-                  ? `${homepage.weeklyDecisionCardModel.decision.actionNowShort} The overall call remains ${publicRegimeLabel} because risk appetite and operating performance still offset it.`
-                  : undefined}
+                items={[
+                  {
+                    id: "funding",
+                    label: `Funding pressure > ${reportData.assessment.thresholds.tightnessRegime}`,
+                    description: tightness >= reportData.assessment.thresholds.tightnessRegime
+                      ? "already above warning threshold; restricts hiring."
+                      : "increases likelihood of Cloudy posture.",
+                    icon: "alert",
+                  },
+                  {
+                    id: "risk",
+                    label: `Risk appetite < ${reportData.assessment.thresholds.riskAppetiteRegime}`,
+                    description: primaryFlipText.toLowerCase().includes("risk appetite")
+                      ? primaryFlipText
+                      : "likely flips call to Cloudy / Defensive.",
+                    icon: "arrow",
+                  },
+                  {
+                    id: "rates",
+                    label: "Further macro deterioration",
+                    description: "raises financing costs and debt burden.",
+                    icon: "percent",
+                  },
+                ]}
                 signalsHref="/signals"
               />
             </div>

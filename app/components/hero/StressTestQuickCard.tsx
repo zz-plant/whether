@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Zap, Users, Cloud, Globe, ArrowRight, ChevronRight } from "lucide-react";
+import { Zap, Users, Cloud, Globe, Sliders, ArrowRight, ChevronRight } from "lucide-react";
 
 export interface StressTestQuickCardProps {
   planHref?: string;
@@ -28,6 +28,13 @@ const SCENARIOS = [
     subtitle: "Model expansion impact",
     query: "market",
   },
+  {
+    id: "custom",
+    icon: Sliders,
+    title: "Custom scenario...",
+    subtitle: "Input your own burn",
+    query: "custom",
+  },
 ];
 
 export function StressTestQuickCard({
@@ -43,17 +50,17 @@ export function StressTestQuickCard({
         <div className="flex items-center gap-2">
           <Zap size={16} className="text-teal-400 fill-teal-400/20 shrink-0" />
           <h3 id="stress-test-quick-heading" className="text-sm font-semibold tracking-tight text-white">
-            Stress-test a decision
+            Considering a decision?
           </h3>
         </div>
         <span className="text-xs text-slate-400">
-          See how it changes the outlook
+          Test a hire, commitment, or expansion against this week&apos;s posture
         </span>
       </div>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         {/* Scenario Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 flex-1">
           {SCENARIOS.map((sc) => {
             const Icon = sc.icon;
             return (
@@ -86,7 +93,7 @@ export function StressTestQuickCard({
           href={planHref}
           className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-teal-400 px-6 py-2.5 text-xs font-semibold text-slate-950 shadow-md transition-all hover:bg-teal-300 hover:shadow-teal-500/20 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 no-underline"
         >
-          <span>Open Plan</span>
+          <span>Test a decision</span>
           <ArrowRight size={15} />
         </Link>
       </div>

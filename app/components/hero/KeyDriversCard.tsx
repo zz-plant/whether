@@ -17,10 +17,10 @@ export interface KeyDriversCardProps {
 export function KeyDriversCard({
   tightness,
   tightnessThreshold = 70,
-  tightnessDelta: _tightnessDelta = 0,
+  tightnessDelta = 0,
   riskAppetite = 56,
   riskAppetiteThreshold = 44,
-  riskAppetiteDelta: _riskAppetiteDelta = 0,
+  riskAppetiteDelta = 0,
   baseRate = 3.9,
   baseRateDelta = 0.1,
   thresholdBusinessConsequence,
@@ -57,22 +57,32 @@ export function KeyDriversCard({
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-teal-400">
                   <BarChart2 size={15} />
                 </div>
-                <div>
+                <div className="flex items-baseline gap-1.5 flex-wrap">
                   <span className="text-xs font-medium text-slate-200">Funding pressure</span>
-                  <span className="text-xs tabular-nums text-slate-400 ml-2">
+                  <span className="text-xs tabular-nums text-slate-400">
                     <strong className="font-semibold text-white">{tightness}</strong> / 100
                   </span>
+                  {tightnessDelta !== 0 && (
+                    <span className={`text-[11px] font-semibold tabular-nums ${tightnessDelta > 0 ? "text-rose-300" : "text-teal-300"}`}>
+                      {tightnessDelta > 0 ? `↑ +${tightnessDelta.toFixed(0)}` : `↓ ${tightnessDelta.toFixed(0)}`}
+                    </span>
+                  )}
                 </div>
               </div>
-              <span
-                className={`inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium border shrink-0 ${
-                  isTightnessAboveThreshold
-                    ? "border-rose-500/30 bg-rose-500/15 text-rose-300"
-                    : "border-teal-500/30 bg-teal-500/15 text-teal-300"
-                }`}
-              >
-                {isTightnessAboveThreshold ? "Above threshold" : "Within limits"}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-medium text-rose-300/90">
+                  {isTightnessAboveThreshold ? "↓ tighter" : "↑ normal"}
+                </span>
+                <span
+                  className={`inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium border ${
+                    isTightnessAboveThreshold
+                      ? "border-rose-500/30 bg-rose-500/15 text-rose-300"
+                      : "border-teal-500/30 bg-teal-500/15 text-teal-300"
+                  }`}
+                >
+                  {isTightnessAboveThreshold ? "Above threshold" : "Within limits"}
+                </span>
+              </div>
             </div>
 
             {/* Progress Rail with Threshold Marker */}
@@ -90,13 +100,16 @@ export function KeyDriversCard({
               />
             </div>
 
-            <p className="text-[11px] text-slate-400 text-right">
-              {isTightnessAboveThreshold
-                ? (thresholdBusinessConsequence?.consequenceLabel
-                    ? `${thresholdBusinessConsequence.consequenceLabel}.`
-                    : "Restricts hiring latitude.")
-                : "Normal hiring latitude."}
-            </p>
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span>Threshold: {tightnessThreshold}</span>
+              <span>
+                {isTightnessAboveThreshold
+                  ? (thresholdBusinessConsequence?.consequenceLabel
+                      ? `${thresholdBusinessConsequence.consequenceLabel}.`
+                      : "Restricts hiring latitude.")
+                  : "Normal hiring latitude."}
+              </span>
+            </div>
           </div>
 
           {/* Driver 2: Risk Appetite */}
@@ -106,24 +119,34 @@ export function KeyDriversCard({
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-teal-400">
                   <Shield size={15} />
                 </div>
-                <div>
+                <div className="flex items-baseline gap-1.5 flex-wrap">
                   <span className="text-xs font-medium text-slate-200">Risk appetite</span>
-                  <span className="text-xs tabular-nums text-slate-400 ml-2">
+                  <span className="text-xs tabular-nums text-slate-400">
                     <strong className="font-semibold text-white">{riskAppetite}</strong> / 100
                   </span>
+                  {riskAppetiteDelta !== 0 && (
+                    <span className={`text-[11px] font-semibold tabular-nums ${riskAppetiteDelta > 0 ? "text-teal-300" : "text-amber-300"}`}>
+                      {riskAppetiteDelta > 0 ? `↑ +${riskAppetiteDelta.toFixed(0)}` : `↓ ${riskAppetiteDelta.toFixed(0)}`}
+                    </span>
+                  )}
                 </div>
               </div>
-              <span
-                className={`inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium border shrink-0 ${
-                  riskAppetite < riskAppetiteThreshold
-                    ? "border-amber-500/30 bg-amber-500/15 text-amber-300"
-                    : "border-teal-500/30 bg-teal-500/15 text-teal-300"
-                }`}
-              >
-                {riskAppetite < riskAppetiteThreshold
-                  ? `${Math.abs(Math.round(riskAppetiteThreshold - riskAppetite))} pts below line`
-                  : `${cushionPoints} pts of cushion`}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-medium text-teal-300/90">
+                  {riskAppetite >= riskAppetiteThreshold ? "↑ supports" : "↓ pressure"}
+                </span>
+                <span
+                  className={`inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium border ${
+                    riskAppetite < riskAppetiteThreshold
+                      ? "border-amber-500/30 bg-amber-500/15 text-amber-300"
+                      : "border-teal-500/30 bg-teal-500/15 text-teal-300"
+                  }`}
+                >
+                  {riskAppetite < riskAppetiteThreshold
+                    ? `${Math.abs(Math.round(riskAppetiteThreshold - riskAppetite))} pts below line`
+                    : `${cushionPoints} pts of cushion`}
+                </span>
+              </div>
             </div>
 
             {/* Progress Rail with Cushion Marker */}
@@ -141,9 +164,10 @@ export function KeyDriversCard({
               />
             </div>
 
-            <p className="text-[11px] text-slate-400 text-right">
-              {riskAppetite < riskAppetiteThreshold ? "Compressed risk appetite." : "Moderate risk appetite."}
-            </p>
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span>Threshold: {riskAppetiteThreshold}</span>
+              <span>{riskAppetite < riskAppetiteThreshold ? "Compressed risk appetite." : "Moderate risk appetite."}</span>
+            </div>
           </div>
 
           {/* Driver 3: Fed rate */}
@@ -153,28 +177,38 @@ export function KeyDriversCard({
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-teal-400">
                   <Percent size={15} />
                 </div>
-                <div>
+                <div className="flex items-baseline gap-1.5 flex-wrap">
                   <span className="text-xs font-medium text-slate-200">Fed rate</span>
-                  <span className="text-xs tabular-nums text-slate-400 ml-2">
+                  <span className="text-xs tabular-nums text-slate-400">
                     <strong className="font-semibold text-white">{fedRateVal.toFixed(1)}</strong> %
                   </span>
+                  {fedRateDeltaVal !== 0 && (
+                    <span className={`text-[11px] font-semibold tabular-nums ${fedRateDeltaVal > 0 ? "text-rose-300" : "text-teal-300"}`}>
+                      {fedRateDeltaVal > 0 ? `↑ +${fedRateDeltaVal.toFixed(1)}` : `↓ ${Math.abs(fedRateDeltaVal).toFixed(1)}`}
+                    </span>
+                  )}
                 </div>
               </div>
-              <span
-                className={`inline-flex items-center gap-1 text-[11px] font-semibold tabular-nums shrink-0 ${
-                  fedRateDeltaVal > 0
-                    ? "text-rose-300"
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-medium text-amber-300/90">
+                  ↓ modest
+                </span>
+                <span
+                  className={`inline-flex items-center gap-1 text-[11px] font-semibold tabular-nums ${
+                    fedRateDeltaVal > 0
+                      ? "text-rose-300"
+                      : fedRateDeltaVal < 0
+                      ? "text-teal-300"
+                      : "text-slate-300"
+                  }`}
+                >
+                  {fedRateDeltaVal > 0
+                    ? `↑ +${fedRateDeltaVal.toFixed(1)}`
                     : fedRateDeltaVal < 0
-                    ? "text-teal-300"
-                    : "text-slate-300"
-                }`}
-              >
-                {fedRateDeltaVal > 0
-                  ? `↑ +${fedRateDeltaVal.toFixed(1)}`
-                  : fedRateDeltaVal < 0
-                  ? `↓ ${Math.abs(fedRateDeltaVal).toFixed(1)}`
-                  : "Unchanged"}
-              </span>
+                    ? `↓ ${Math.abs(fedRateDeltaVal).toFixed(1)}`
+                    : "Steady"}
+                </span>
+              </div>
             </div>
 
             {/* Progress Rail */}
@@ -185,13 +219,16 @@ export function KeyDriversCard({
               />
             </div>
 
-            <p className="text-[11px] text-slate-400 text-right">
-              {fedRateDeltaVal > 0
-                ? "Financing slightly tighter."
-                : fedRateDeltaVal < 0
-                ? "Financing slightly easing."
-                : "Financing rate steady."}
-            </p>
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span>Higher financing cost</span>
+              <span>
+                {fedRateDeltaVal > 0
+                  ? "Financing slightly tighter."
+                  : fedRateDeltaVal < 0
+                  ? "Financing slightly easing."
+                  : "Financing rate steady."}
+              </span>
+            </div>
           </div>
         </div>
       </div>
