@@ -187,8 +187,8 @@ export const buildRiskAppetiteDriverView = ({
     rulePauseLine && rulePauseLine.metric === "riskAppetite" && Number.isFinite(rulePauseLine.value)
       ? rulePauseLine.value
       : null;
-  const cushionToRulePause = rulePauseValue !== null
-    ? Math.max(0, distanceToRuleCondition(rulePauseLine as RuleCondition, riskAppetite))
+  const cushionToRulePause = rulePauseValue !== null && rulePauseLine
+    ? Math.max(0, distanceToRuleCondition(rulePauseLine, riskAppetite))
     : null;
 
   // The snapshot store is monthly, so the trend window is stated in months —
@@ -265,9 +265,14 @@ export const buildFinancingDriverView = ({
   /** The short rate, oldest first, one entry per month of the trailing window. */
   rateHistory: readonly (number | null)[];
 }): FinancingDriverView => {
+  // An unknown rung key resolves the same label a missing rate does, so a
+  // widened or renamed key degrades to "the short-rate anchor" rather than
+  // asserting a label the map never held.
+  const rateLabelByKey: Record<string, string> = BASE_RATE_SOURCE_LABELS;
   const resolvedRateLabel =
-    (Object.entries(BASE_RATE_SOURCE_LABELS) as Array<[string, string]>).find(([key]) => key === baseRateUsed)?.[1]
-    ?? BASE_RATE_SOURCE_LABELS.MISSING;
+    typeof baseRateUsed === "string" && baseRateUsed in rateLabelByKey
+      ? rateLabelByKey[baseRateUsed]
+      : BASE_RATE_SOURCE_LABELS.MISSING;
   const rateHistoryValue = (index: number) => {
     const value = rateHistory[index];
     return typeof value === "number" ? value : null;
