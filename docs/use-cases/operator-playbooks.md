@@ -26,7 +26,7 @@ Leadership teams frequently spend 20–30 minutes of their Monday morning meetin
    ```
    *(Or clicks **Copy Brief** from the top fold of [whether.work](https://whether.work))*
 2. Pastes the snippet into `#leadership` on Slack.
-3. The team uses the **Boldness Budget** as their baseline agenda constraint:
+3. The team uses the **Operating latitude** as their baseline agenda constraint:
    - **Score > 75 (Sunny / Expansion):** Fast-track hiring and expansion decisions.
    - **Score 50–74 (Guarded Expansion / Transitional):** Stage capital commitments; enforce 6-month payback limits.
    - **Score < 50 (Defensive / Scarcity):** Freeze fixed-cost commitments; review all pipeline assumptions.
@@ -36,7 +36,7 @@ Leadership teams frequently spend 20–30 minutes of their Monday morning meetin
 🌤️ WHETHER WEEKLY BRIEF · Week 34 (2026-w34)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Regime: GUARDED EXPANSION (Sunny)
-Boldness Budget: 62 / 100
+Operating latitude: 62 / 100
 Call: Stage decisions. Avoid irreversible fixed-cost commitments.
 
 OPERATING BOUNDARIES:

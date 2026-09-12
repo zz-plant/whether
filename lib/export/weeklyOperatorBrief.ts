@@ -1,5 +1,6 @@
 import { resolveWeekEndingIsoDateUTC } from "../formatters";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { OPERATING_LATITUDE_LABEL } from "../report/reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
@@ -184,8 +185,8 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
 
   return [
     `Weekly Operator Brief — ${payload.date}`,
-    payload.boldnessBudget ? `Boldness Budget: ${payload.boldnessBudget.score}/100 (${boldnessDeltaLabel})` : null,
-    payload.boldnessBudget?.line ? `Budget signal: ${payload.boldnessBudget.line}` : null,
+    payload.boldnessBudget ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${boldnessDeltaLabel})` : null,
+    payload.boldnessBudget?.line ? `Latitude signal: ${payload.boldnessBudget.line}` : null,
     `Posture: ${payload.regimeStage}`,
     `Confidence: ${payload.confidence}`,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
@@ -219,7 +220,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
         {
           type: "section",
           fields: [
-            ...(payload.boldnessBudget ? [{ type: "mrkdwn" as const, text: `*Boldness Budget*\n${payload.boldnessBudget.score}/100` }] : []),
+            ...(payload.boldnessBudget ? [{ type: "mrkdwn" as const, text: `*${OPERATING_LATITUDE_LABEL}*\n${payload.boldnessBudget.score}/100` }] : []),
             { type: "mrkdwn", text: `*Posture*\n${payload.regimeStage}` },
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],

@@ -22,7 +22,7 @@ If leaders start saying “we’re +1 bold this week,” the surface is working.
 ## Hard constraints (non-negotiable)
 1. **10-second readability:** first viewport answers posture and action delta without scroll.
 2. **30-second decisiveness:** user can state what changed and what to revisit.
-3. **Single anchor metric:** Boldness Budget is the canonical scalar.
+3. **Single anchor metric:** Operating latitude is the canonical scalar.
 4. **Bounded downside:** explicit conditional triggers define what changes if wrong.
 5. **Slack portability:** screenshot is decision-complete and clean at preview scale.
 
@@ -38,7 +38,7 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 
 **Required copy format (exact labels):**
 - `THIS WEEK`
-- `Boldness budget: +1 notch`
+- `Operating latitude: +1 notch`
 - `Hiring window: Open`
 - `Expansion window: Strong`
 - `Raise window: Improving`
@@ -59,15 +59,25 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 **Optional line (max one):**
 - `Baseline posture: [posture label].`
 
-### Block C — Boldness Budget module (single scalar)
+### Block C — Operating latitude module (single scalar)
 **Purpose:** establish one numeric anchor for cross-functional alignment.
 
 **Required structure:**
-- `Boldness Budget: 63 / 100`
+- `Operating latitude: 63 / 100`
 - `Change: +4`
 - driver chips (max 3):
   - `Risk appetite +4`
   - `Tightness unchanged`
+
+**Per-driver clocks.** The three driver rows render on the clock the decision
+they govern runs on, not a standardized KPI treatment: funding pressure as an
+action ladder (posture boundary → pause line) with crossed state and
+persistence; risk appetite as remaining cushion with its trailing pace; the
+short rate as a horizon trend against the model's contribution anchor, with no
+threshold bar (rates carry no posture breakpoint of their own). Views are built
+in `lib/report/driverDecisionViews.ts` from data the brief already loads; a
+claim the data cannot support (weekly persistence, a FOMC calendar) renders
+nowhere rather than invented.
   - `Curve stable`
 
 **Rules:**
@@ -98,7 +108,7 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 `If [trigger] → [policy consequence 1] → [policy consequence 2]`
 
 **Minimum two rows:**
-- `If tightness rises 20 points → Hiring window closes → Boldness budget drops 12 points`
+- `If tightness rises 20 points → Hiring window closes → Operating latitude drops 12 points`
 - `If curve inverts → Payback tolerance tightens to ≤ 9 months`
 
 **Rules:**
@@ -166,14 +176,14 @@ The homepage supports optional interpretation layers without changing the canoni
 Canonical top-fold order on homepage must remain:
 1. **This week strip** (compact posture, trend, confidence, and flip trigger metadata only; no second operating call)
 2. **Action-first weekly call** (single canonical decision block with readiness/trust chips, `Action now`, `Current call`, and the bounded `What changed` / `Pause if` / `Change course if` triplet)
-3. **Compact backdrop row** (`Boldness budget` plus external market backdrops for hiring, expansion, and raise conditions)
+3. **Compact backdrop row** (`Operating latitude` plus external market backdrops for hiring, expansion, and raise conditions)
 4. **Share actions + lower-emphasis detail** (one routine-first artifact card stays visible; citation and continuity remain secondary collapsed details)
 5. **Why this call** disclosure (supporting evidence hidden behind details/summary)
 6. **Decision matrix + action strip** (headed “What can we do this week?” and showing bounded rules as `Do now`, `Stop or tighten if`, and `Open up again when`)
 7. **Planning next / exception paths** (Planning visible as the default next step; proof stays visible and deeper paths stay behind an explicit optional disclosure)
 
 Implementation guardrails:
-- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Boldness Budget`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
+- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Operating latitude`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
 - The homepage action strip translates structured lane states into explicit action phrases (`Keep this closed`, `Proceed with guardrails`, `Stage the next move`, `Move ahead now`). The underlying `Closed` / `Guarded` / `Staged` / `Open` values remain stable for model consumers.
 - Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
@@ -195,7 +205,7 @@ Implementation guardrails:
 - The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
 - The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
 - Homepage utility search should stay demoted behind a secondary `Find a tool` action so the first-screen priority remains reading the weekly call.
-- The compact backdrop row should expose the scalar anchor (`Boldness budget`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance. V2 homepage variants should keep that same scalar hierarchy in the hero: Boldness Budget first, tightness only as a supporting driver or guardrail input.
+- The compact backdrop row should expose the scalar anchor (`Operating latitude`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance. V2 homepage variants should keep that same scalar hierarchy in the hero: Operating latitude first, tightness only as a supporting driver or guardrail input.
 - The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane and **why that lane is queued this week** — not the bounded action. The action is already stated verbatim in the bounded-decisions ledger below, and rendering it twice made the queue pure duplication. Each item carries `driver` (the signal move) and `recheck` (the area-specific instruction); because one signal can queue up to three lanes, a `driver` shared by every visible item is hoisted above the list instead of repeated per row.
@@ -353,7 +363,7 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` now render as a compact `Flip watch:` line inside `DecisionHero`. The distinct transition forecast follows as subordinate text with its modeled event and monthly horizon; it is never appended to the decision-reversal sentence. The tightness barometer visual duplicated hero metrics and was cut.
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **The revisit ritual now lives in the hero.** The adjacent `WeeklyTopFoldContract` was removed instead of restating posture delta and continuity. `DecisionHero` owns the binary revisit verdict plus at most two queued decision areas; comparison and history remain lower-emphasis continuity tools.
-- **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Boldness Budget, delta, and pause/reversal conditions remain visible.
+- **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Operating latitude, delta, and pause/reversal conditions remain visible.
 - **Threshold distance names the decision consequence.** The hero preserves the nearest bounded-rule distance but labels it with one associated surfaced decision (for example, `3 points until hiring review`). Shared thresholds use revisit priority rather than listing every affected lever; crossed lines render as crossed instead of implying distance remains.
 - **History no longer competes in a sticky rail.** Regime history, subscription, and the citable permalink now sit in a lower continuity-and-delivery section after the operating workflow.
 

@@ -98,7 +98,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   stays the label for the stance itself, not a description of what the product is. The cost
   of drift here is not tidiness: this product spreads by an operator repeating it in a Slack
   channel, and a category that changes per surface does not survive that retelling.
-- **The metric noun is "Boldness Budget"** — the one proper noun in this vocabulary a
+- **The metric noun is "Operating latitude"** — the one proper noun in this vocabulary a
   competitor cannot use, so it is spelled out on first mention rather than shortened to
   "the score". `buildBoldnessScore` in `lib/report/weeklyLeadershipBrief.ts` is the source.
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
@@ -136,7 +136,7 @@ inventory of every heading in `app/`:
 - **A nested section does not restate its host.** Inside a stepper step or a panel that already
   names it, pass `hideHeader` (`docs/agents/ui-ux-standards.md` → XI) or give it a strictly
   more specific title. Four "share" headings on one `/operate` step was the failure case.
-- **Sentence case everywhere.** Capitals only for proper nouns: Whether, Boldness Budget, the
+- **Sentence case everywhere.** Capitals only for proper nouns: Whether, Operating latitude, the
   weather regime names, FRED. No all-caps in source — `.type-eyebrow` uppercases in CSS — and no
   emoji in a heading or label.
 - **One name per thing, across surfaces.** The paste-a-plan tester is "Plan stress test" on `/`

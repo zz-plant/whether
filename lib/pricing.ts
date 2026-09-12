@@ -52,7 +52,7 @@ export const pricingPlans: PricingPlan[] = [
     audience: "Any operator who wants the Monday call",
     promise: FREE_FOREVER_PROMISE,
     features: [
-      "The weekly operating call and Boldness Budget",
+      "The weekly operating call and Operating latitude",
       "Published scoring, thresholds, and reversal conditions",
       "Copyable Slack, email, and meeting artifacts",
       "Agent API and MCP endpoint — no key, no rate card",

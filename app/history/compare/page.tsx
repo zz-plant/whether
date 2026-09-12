@@ -47,7 +47,7 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     title: "Compare periods — two months side by side",
-    description: "Side-by-side comparison of two past months: regime, Boldness Budget, and operating rules.",
+    description: "Side-by-side comparison of two past months: regime, Operating latitude, and operating rules.",
     path: "/history/compare",
     imageAlt: "Whether comparison of two past periods",
     imageParams,
@@ -198,7 +198,7 @@ export default async function HistoryComparePage({
           
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div className="weather-surface p-4 text-center">
-              <p className="type-eyebrow">Boldness Budget change</p>
+              <p className="type-eyebrow">Operating latitude change</p>
               <p className={`mt-2 text-2xl font-bold ${boldnessDelta > 0 ? "text-emerald-400" : boldnessDelta < 0 ? "text-rose-400" : "text-slate-300"}`}>
                 {boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts
               </p>

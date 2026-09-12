@@ -1,7 +1,7 @@
 import { REGIME_DESCRIPTOR, formatBoldnessDeltaLabel } from "../viewModel";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { SignalDirection } from "../viewModel";
-import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
@@ -434,8 +434,8 @@ export function DecisionHero({
               )}
             </div>
 
-            <div className="text-xs text-slate-400 flex items-center gap-1" title="Operating latitude: calculated from funding pressure and risk appetite. Reflects latitude to hire, spend, and commit.">
-              <span>Operating latitude</span>
+            <div className="text-xs text-slate-400 flex items-center gap-1" title={`${OPERATING_LATITUDE_LABEL}: calculated from funding pressure and risk appetite. Reflects latitude to hire, spend, and commit.`}>
+              <span>{OPERATING_LATITUDE_LABEL}</span>
               <Info size={13} className="text-slate-500 cursor-help" />
             </div>
 
@@ -443,7 +443,7 @@ export function DecisionHero({
               <figure className="mt-1 flex flex-col items-start sm:items-end text-fluid-nano">
                 <Sparkline
                   points={trendPoints}
-                  label="Operating latitude"
+                  label={OPERATING_LATITUDE_LABEL}
                   domain={trendDomain}
                   band={trendBand}
                   tone={trendTone}
