@@ -2,18 +2,17 @@ import { REGIME_DESCRIPTOR, formatBoldnessDeltaLabel } from "../viewModel";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { SignalDirection } from "../viewModel";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { SignalWaterfall } from "./SignalWaterfall";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
-import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
+import { trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../../lib/report/homeBriefModel";
 import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
 import { buildBoundedConditionRails, formatPointsToLine } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
-import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
+import { Sparkline, interquartileRange, sparklineDomain } from "./ui/sparkline";
 import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
 import { BoundedValue } from "./ui/boundedValue";
@@ -112,6 +111,7 @@ export function DecisionHero({
   weeklyCall,
   actionNow,
   regime,
+  postureLabel,
   signalDirection: _signalDirection,
   recordDate,
   confidenceLabel,
@@ -136,7 +136,7 @@ export function DecisionHero({
   const regimeDisplay = getRegimePublicLabel(regime);
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
   const tightnessDeltaLabel = tightnessDelta !== 0 ? `${tightnessDeltaSign}${tightnessDelta.toFixed(1)} pts` : "unchanged";
-  const boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
+  const _boldnessDeltaLabel = formatBoldnessDeltaLabel(boldnessDelta);
 
   // Band words and band sentences have to come from the same classification, or
   // the card says "low" above a sentence that says "balanced".
@@ -410,32 +410,52 @@ export function DecisionHero({
               {actionNow ?? (regimeKey ? REGIME_WEATHER_RATIONALES[regimeKey] : REGIME_DESCRIPTOR[regime]) ?? "Expand GTM and product bets only where activation and retention are tracking."}
             </p>
 
-            {/* Room to act score & delta row on mobile */}
-            <div className="pt-2 flex flex-wrap items-baseline gap-x-4 gap-y-2 sm:hidden">
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl sm:text-4xl font-bold tabular-nums text-white">
-                  {boldnessScore}
-                </span>
-                <span className="text-xs font-medium text-slate-400">/100</span>
-              </div>
-              <div className="text-xs text-slate-400 flex items-center gap-1">
-                <span>Room to act</span>
-                <Info size={13} className="text-slate-500" />
-              </div>
+            <p className="text-xs font-medium text-slate-400">
+              {postureLabel ? `${postureLabel} posture with steady inputs.` : "Steady posture with tightening inputs."}
+            </p>
+          </div>
+
+          {/* Executive Room to Act Score Block (All Viewports) */}
+          <div className="order-2 min-w-0 sm:order-none sm:col-start-2 sm:row-start-1 flex flex-col items-start sm:items-end justify-start gap-1">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl sm:text-5xl font-bold tabular-nums text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.12)]">
+                {boldnessScore}
+              </span>
+              <span className="text-xs sm:text-sm font-medium text-slate-400">/100</span>
               {boldnessDelta !== 0 ? (
-                <span className="inline-flex items-center gap-1 rounded-md bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-xs font-medium text-rose-300 tabular-nums">
+                <span className="ml-1 inline-flex items-center gap-1 rounded-md bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-xs font-medium text-rose-300 tabular-nums">
                   {boldnessDelta < 0 ? <ArrowDownRight size={13} /> : <ArrowUpRight size={13} />}
                   <span>{Math.abs(boldnessDelta)} this week</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-md bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 text-xs font-medium text-slate-300">
+                <span className="ml-1 inline-flex items-center gap-1 rounded-md bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 text-xs font-medium text-slate-300">
                   <span>Steady vs last week</span>
                 </span>
               )}
-              <span className="text-xs text-slate-400 ml-auto hidden sm:inline">
-                Steady vs last week
-              </span>
             </div>
+
+            <div className="text-xs text-slate-400 flex items-center gap-1" title="Calculated from funding pressure and risk appetite. Reflects operational latitude to hire, spend, and commit.">
+              <span>Room to act</span>
+              <Info size={13} className="text-slate-500 cursor-help" />
+            </div>
+
+            {trendPoints && trendDomain ? (
+              <figure className="mt-1 flex flex-col items-start sm:items-end text-fluid-nano">
+                <Sparkline
+                  points={trendPoints}
+                  label="Room to act"
+                  domain={trendDomain}
+                  band={trendBand}
+                  tone={trendTone}
+                  widthEm={12}
+                  className="text-teal-400"
+                />
+              </figure>
+            ) : null}
+
+            <span className="text-[11px] text-slate-500">
+              Steady vs last week
+            </span>
           </div>
 
         <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-span-2 sm:col-start-1 sm:row-start-2">
@@ -625,54 +645,6 @@ export function DecisionHero({
           </div>
         </div>
 
-        <div className="hidden sm:block sm:order-none sm:col-start-2 sm:row-start-1">
-          <SignalWaterfall data={signalData ?? {}} indicators={signalIndicators}>
-            <div className="weather-glow-aura inline-flex items-baseline justify-center gap-1">
-              <span className="text-[clamp(2.5rem,6vw,3.75rem)] font-bold leading-none text-white tabular-nums drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]">
-                {boldnessScore}
-              </span>
-              <span className="text-fluid-xs font-semibold text-white/40">/100</span>
-            </div>
-          </SignalWaterfall>
-          <div
-            className={`mt-2 flex items-center justify-center gap-1.5 text-base font-bold tabular-nums ${trendToneClass(trendDirectionFromDelta(boldnessDelta), true)}`}
-          >
-            <TrendGlyph direction={trendDirectionFromDelta(boldnessDelta)} className="h-4 w-4" />
-            <span>{boldnessDeltaLabel}</span>
-          </div>
-          <p className="mt-1 text-fluid-xs font-medium text-white/50">
-            Boldness budget
-          </p>
-          {trendPoints && trendDomain ? (
-            /* Still a sparkline — no axes, no gridlines, no legend — but sized to
-               the column instead of to a line of type. At six em on nano text it
-               drew 72x14px, which is under the width the series has points and
-               too short for the shaded quartile band to separate from the stroke:
-               the one graphic that answers "is 57 a normal reading?" was the one
-               nobody could decode. The domain stays in text beside it because the
-               scale is still fitted to the window. */
-            <figure className="mt-1.5 flex flex-col items-center text-fluid-nano">
-              <Sparkline
-                points={trendPoints}
-                label="Boldness budget"
-                domain={trendDomain}
-                band={trendBand}
-                tone={trendTone}
-                widthEm={14}
-                className="text-white/60"
-              />
-              <figcaption className="mt-1 w-full max-w-[14em] tabular-nums text-white/45">
-                <span className="flex items-baseline justify-between gap-2">
-                  <span>{trendPoints.length} mo</span>
-                  <span>{rangeLabel(trendDomain)}</span>
-                </span>
-              </figcaption>
-            </figure>
-          ) : null}
-          <p className="text-fluid-nano leading-snug text-white/40">
-            How much room you have to hire, spend, and commit.
-          </p>
-        </div>
       </div>
     </section>
   );

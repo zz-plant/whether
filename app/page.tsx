@@ -42,10 +42,15 @@ import {
 } from "../lib/timeMachine/timeMachineSelection";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { KeyDriversCard } from "./components/hero/KeyDriversCard";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { WhatCouldChangeCard } from "./components/hero/WhatCouldChangeCard";
 import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
+import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
+import { StageDropdownPill } from "./components/StageDropdownPill";
+import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -168,6 +173,16 @@ async function PageContent({
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const previousHistoricalRequest = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
+    : null;
+  const nextHistoricalRequest = historicalSelection
+    ? getAdjacentTimeMachineRequest(historicalSelection, "next")
+    : null;
+  const latestSnapshot = getLatestTimeMachineSnapshot();
+  const prevWeekHref = historicalSelection
+    ? (previousHistoricalRequest ? buildTimeMachineHref("/", previousHistoricalRequest) : null)
+    : (latestSnapshot ? buildTimeMachineHref("/", { month: latestSnapshot.month, year: latestSnapshot.year }) : null);
+  const nextWeekHref = historicalSelection
+    ? (nextHistoricalRequest ? buildTimeMachineHref("/", nextHistoricalRequest) : "/")
     : null;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
@@ -362,17 +377,48 @@ async function PageContent({
           {/* Weekly / Monthly / Quarterly is a view of the brief, so it lives in
               the brief rather than in the global header where it read as a
               site-wide control and took a second header row on phones. */}
-          {/* Header row: Week of Date, Data currency, Confidence pill, Cadence selector */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-1">
+          {/* Header row: Week of Date switcher, Data currency, Stage dropdown, Confidence pill, Cadence selector */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-1">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                {cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
-              </h2>
+              <div className="flex items-center gap-2">
+                {prevWeekHref ? (
+                  <Link
+                    href={prevWeekHref}
+                    aria-label="Previous week"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
+                  >
+                    <ChevronLeft size={16} />
+                  </Link>
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
+                    <ChevronLeft size={16} />
+                  </span>
+                )}
+
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                  {cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
+                </h2>
+
+                {nextWeekHref ? (
+                  <Link
+                    href={nextWeekHref}
+                    aria-label="Next week"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
+                  >
+                    <ChevronRight size={16} />
+                  </Link>
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
+                    <ChevronRight size={16} />
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Data through {homepage.reportShell.recordDateLabel} · refreshed {homepage.reportShell.fetchedAtLabel}
               </p>
             </div>
-            <div className="flex items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+              <StageDropdownPill className="hidden sm:inline-flex" />
               {confidenceLabel ? (
                 <span className="inline-flex items-center gap-1.5 rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300">
                   <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
@@ -436,36 +482,49 @@ async function PageContent({
               activeStage={activeStage}
             />
 
-            {/* Mockup Card 2: Why this call (3 key drivers) */}
-            <KeyDriversCard
-              tightness={tightness}
-              tightnessThreshold={reportData.assessment.thresholds.tightnessRegime}
-              tightnessDelta={tightnessDelta}
-              riskAppetite={riskAppetite}
-              riskAppetiteThreshold={reportData.assessment.thresholds.riskAppetiteRegime}
-              riskAppetiteDelta={riskAppetiteDelta}
-              baseRate={v2HeroSignalData.baseRate}
-              baseRateDelta={signalDeltas.get("baseRate") ?? 0}
-              thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-            />
+            {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch mt-4">
+              <KeyDriversCard
+                tightness={tightness}
+                tightnessThreshold={reportData.assessment.thresholds.tightnessRegime}
+                tightnessDelta={tightnessDelta}
+                riskAppetite={riskAppetite}
+                riskAppetiteThreshold={reportData.assessment.thresholds.riskAppetiteRegime}
+                riskAppetiteDelta={riskAppetiteDelta}
+                baseRate={v2HeroSignalData.baseRate}
+                baseRateDelta={signalDeltas.get("baseRate") ?? 0}
+                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+              />
 
-            {/* Mockup Card 3: Actions this week (Turn insight into progress) */}
-            <ActionsThisWeekCard
-              actions={cardActions}
-              operateHref={operateHref}
-            />
+              <ActionsThisWeekCard
+                actions={cardActions}
+                operateHref={operateHref}
+              />
 
-            {/* Mockup Card 4: What could change next (Monitor for shifts) */}
-            <WhatCouldChangeCard
-              metricName={whatCouldChangeText.toLowerCase().includes("risk appetite") ? "Risk appetite" : "Funding pressure"}
-              conditionText={whatCouldChangeText}
-              signalsHref="/signals"
-            />
+              <WhatCouldChangeCard
+                metricName={whatCouldChangeText.toLowerCase().includes("risk appetite") ? "Risk appetite" : "Funding pressure"}
+                conditionText={whatCouldChangeText}
+                summaryText={homepage.weeklyDecisionCardModel.decision.actionNowShort
+                  ? `${homepage.weeklyDecisionCardModel.decision.actionNowShort} The overall call remains ${publicRegimeLabel} because risk appetite and operating performance still offset it.`
+                  : undefined}
+                signalsHref="/signals"
+              />
+            </div>
 
-            {/* Mockup Card 5: Stress-test a decision (See how it changes the outlook) */}
-            <StressTestQuickCard
-              planHref={operateHref}
-            />
+            {/* Mockup Card: Recent posture history (Weekly outlook over time) */}
+            <div className="mt-5">
+              <RecentPostureHistoryCard
+                history={macroTrendline}
+                historyHref="/history"
+              />
+            </div>
+
+            {/* Mockup Card: Stress-test a decision (See how it changes the outlook) */}
+            <div className="mt-5">
+              <StressTestQuickCard
+                planHref={operateHref}
+              />
+            </div>
 
             <div className="hidden sm:block">
               <DecisionPlanStressTester
