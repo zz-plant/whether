@@ -74,14 +74,42 @@
 .weather-hero-card {
   position: relative;
   background:
-    radial-gradient(ellipse 70% 60% at 85% 15%, rgba(56, 189, 248, 0.09), transparent 70%),
+    radial-gradient(ellipse 75% 60% at 85% 20%, rgba(45, 212, 191, 0.14), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(20, 184, 166, 0.08), transparent 60%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%),
-    color-mix(in srgb, var(--bg-body) 42%, transparent);
-  border-color: rgba(125, 211, 252, 0.22);
+    color-mix(in srgb, var(--bg-body) 35%, #05181b 65%);
+  border-color: rgba(45, 212, 191, 0.24);
   box-shadow:
     var(--elev-3),
-    0 0 32px rgba(56, 189, 248, 0.06),
+    0 0 32px rgba(45, 212, 191, 0.08),
     inset 0 1px 0 var(--edge-highlight);
+}
+
+/* Mobile & desktop brief cards: high-contrast executive cards matching mockup */
+.weather-brief-card {
+  position: relative;
+  border-radius: var(--radius-2xl);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%),
+    rgba(10, 22, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 1.125rem 1.25rem;
+  box-shadow:
+    0 4px 20px -2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .weather-brief-card:hover {
+    border-color: rgba(45, 212, 191, 0.25);
+    box-shadow:
+      0 6px 24px -2px rgba(0, 0, 0, 0.6),
+      0 0 16px rgba(45, 212, 191, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
 }
 
 /* Lever decision micro-card for visual rhythm */
@@ -225,7 +253,7 @@
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-lever-card,
+    .weather-hero-card, .weather-brief-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card,
     .weather-trust-board, .weather-trust-lane,
@@ -233,7 +261,7 @@
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-lever-card,
+    .weather-hero-card, .weather-brief-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card,
     .weather-trust-board, .weather-trust-lane,
@@ -250,7 +278,7 @@
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-lever-card,
+    .weather-hero-card, .weather-brief-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card,
     .weather-trust-board, .weather-trust-lane,
@@ -258,7 +286,7 @@
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-lever-card,
+    .weather-hero-card, .weather-brief-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card,
     .weather-trust-board, .weather-trust-lane,
@@ -266,7 +294,7 @@
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-lever-card,
+    .weather-hero-card, .weather-brief-card, .weather-lever-card,
     .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-route-card, .weather-stat-card,
     .weather-trust-board, .weather-trust-lane,

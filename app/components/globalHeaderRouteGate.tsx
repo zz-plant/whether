@@ -16,6 +16,7 @@ import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
+import { StageDropdownPill } from "./StageDropdownPill";
 
 /**
  * The header's secondary destination, or null when there isn't a distinct one.
@@ -73,14 +74,24 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
     return (
       <GlobalHeaderScrollWrapper>
         <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
-          <div className="flex items-center gap-2 px-3 py-1.5 sm:gap-3">
-            <Link href="/" className="shrink-0 text-sm font-semibold tracking-[0.08em] text-white/80 no-underline">
-              Whether
+          <div className="flex items-center justify-between gap-2 px-3 py-2 sm:gap-3">
+            <Link href="/" className="flex items-center gap-2.5 no-underline">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-teal-400 shrink-0">
+                <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
+                <circle cx="5" cy="11" r="1.5" fill="currentColor" />
+                <circle cx="19" cy="11" r="1.5" fill="currentColor" />
+              </svg>
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-bold tracking-tight text-white">Whether</span>
+                <span className="text-[10.5px] font-medium text-slate-400">Weekly Brief</span>
+              </div>
             </Link>
-            <span className="text-fluid-xs font-medium tracking-[0.04em] text-[var(--app-text-muted)] md:hidden">Weekly Brief</span>
             <GlobalHeaderNavClient pathname={pathname} />
-            <div className="ml-auto flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-sky-400">
-              <GlobalHeaderActionsClient showPresentMode />
+            <div className="flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-teal-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-teal-400">
+              <StageDropdownPill className="sm:hidden" />
+              <div className="hidden sm:block">
+                <GlobalHeaderActionsClient showPresentMode />
+              </div>
             </div>
           </div>
         </div>
