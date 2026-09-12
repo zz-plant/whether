@@ -44,6 +44,8 @@ import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { KeyDriversCard } from "./components/hero/KeyDriversCard";
+import { buildDriverViews } from "../lib/report/driverDecisionViews";
+import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { WhatCouldChangeCard } from "./components/hero/WhatCouldChangeCard";
 import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
@@ -290,6 +292,27 @@ async function PageContent({
       }
     : undefined;
 
+  /* The three driver rows, each built for the clock the decision it governs
+   * runs on: funding pressure as an action ladder with persistence, risk
+   * appetite as remaining cushion with its consumption pace, financing as a
+   * horizon trend with no threshold bar. The pause lines are the printed
+   * corridor rule's own — the same discipline the hero's bounded rails follow —
+   * and the rate history is the snapshot store's rolling 1M-bill series, null
+   * for months with no snapshot rather than interpolated. */
+  const driverViews = buildDriverViews({
+    tightness,
+    tightnessDelta,
+    riskAppetite,
+    tightnessRegime: reportData.assessment.thresholds.tightnessRegime,
+    riskAppetiteRegime: reportData.assessment.thresholds.riskAppetiteRegime,
+    corridorPauseLines: boundedConditions?.pause,
+    corridorPauseVerb: corridorRule?.pause.verb,
+    baseRate: v2HeroSignalData.baseRate ?? null,
+    baseRateUsed: v2HeroSignalData.baseRateUsed,
+    history: macroTrendline,
+    rateHistory: getTimeMachineRollingYieldSeries(7, reportData.treasury.record_date).oneMonth.map((point) => point.value),
+  });
+
   /* One join, two labels. The `h1` is this page's accessible name, where the
    * product name would be noise; the artifact title is what lands in someone
    * else's Slack channel, where it is the only thing identifying the source. A
@@ -486,17 +509,7 @@ async function PageContent({
 
             {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch mt-4">
-              <KeyDriversCard
-                tightness={tightness}
-                tightnessThreshold={reportData.assessment.thresholds.tightnessRegime}
-                tightnessDelta={tightnessDelta}
-                riskAppetite={riskAppetite}
-                riskAppetiteThreshold={reportData.assessment.thresholds.riskAppetiteRegime}
-                riskAppetiteDelta={riskAppetiteDelta}
-                baseRate={v2HeroSignalData.baseRate}
-                baseRateDelta={signalDeltas.get("baseRate") ?? 0}
-                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-              />
+              <KeyDriversCard views={driverViews} />
 
               <ActionsThisWeekCard
                 actions={cardActions}
