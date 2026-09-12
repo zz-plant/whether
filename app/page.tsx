@@ -9,15 +9,14 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
-import { LastWeekInHindsight } from "./components/home/LastWeekInHindsight";
-import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { DirectAnswersStrip } from "./components/home/DirectAnswersStrip";
-import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
-import { CompareStrip } from "./components/CompareStrip";
+import { WeeklyRetrospectiveCard } from "./components/home/WeeklyRetrospectiveCard";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { FreshnessDot } from "./components/FreshnessDot";
+import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
+import { CompactTrustPopover } from "./components/CompactTrustPopover";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
@@ -395,9 +394,11 @@ async function PageContent({
                   </span>
                 )}
 
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                  {cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
-                </h2>
+                <TimeMachineCalendarPicker
+                  currentDateLabel={cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
+                  isHistorical={Boolean(historicalSelection)}
+                  history={alignedRegimeHistory}
+                />
 
                 {nextWeekHref ? (
                   <Link
@@ -419,13 +420,14 @@ async function PageContent({
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
               <StageDropdownPill className="hidden sm:inline-flex" />
-              {confidenceLabel ? (
-                <span className="inline-flex items-center gap-1.5 rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300">
-                  <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
-                  <span>{confidenceLabel}</span>
-                  <span className="text-teal-400/60 ml-0.5">ⓘ</span>
-                </span>
-              ) : null}
+              <CompactTrustPopover
+                confidenceLabel={confidenceLabel ?? "High confidence"}
+                isHistorical={Boolean(historicalSelection)}
+                fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
+                recordDateLabel={homepage.reportShell.recordDateLabel}
+                treasurySource={homepage.reportShell.treasurySource}
+                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+              />
               <CadenceSelector />
             </div>
           </div>
@@ -535,6 +537,13 @@ async function PageContent({
               <RecentPostureHistoryCard
                 history={macroTrendline}
                 historyHref="/history"
+                currentRegime={regime}
+                currentTightness={tightness}
+                tightnessDelta={tightnessDelta}
+                riskAppetite={riskAppetite}
+                riskAppetiteDelta={riskAppetiteDelta}
+                serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
+                currentRecordDate={homepage.reportShell.recordDateLabel}
               />
             </div>
 
@@ -542,26 +551,11 @@ async function PageContent({
             <div className="mt-5">
               <StressTestQuickCard
                 planHref={operateHref}
-              />
-            </div>
-
-            <div className="hidden sm:block">
-              <DecisionPlanStressTester
                 assessment={reportData.assessment}
                 recordDate={homepage.reportShell.recordDateLabel}
                 activeStage={activeStage}
               />
             </div>
-
-            <CompareStrip
-              currentRegime={regime}
-              currentTightness={tightness}
-              tightnessDelta={tightnessDelta}
-              riskAppetite={riskAppetite}
-              riskAppetiteDelta={riskAppetiteDelta}
-              currentRecordDate={homepage.reportShell.recordDateLabel}
-              serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-            />
           </SwipeableWeek>
           </div>
 
@@ -574,32 +568,24 @@ async function PageContent({
             <SubscribeForm compact />
           </div>
 
-          {/* Everything below the call computes its content or leaves. These
-              two replace "Decisions to reconsider" and "Close the week", which
-              asked the reader to keep state in this browser so the product could
-              be smarter later; the product now says what it can from what it
-              already holds. */}
-          {/* Below the call: each of these is a section J and K can reach, which is
-              what `data-page-section` is for — see app/components/reportSection.tsx. */}
+          {/* Below the call: unified retrospective card */}
           <div data-page-section="since-last-visit" tabIndex={-1} aria-labelledby="since-last-visit-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <h2 id="since-last-visit-heading" className="sr-only">Since your last visit</h2>
-          <SinceLastVisit
-            current={{
-              recordDate: reportData.treasury.record_date,
-              recordDateLabel: homepage.reportShell.recordDateLabel,
-              regimeLabel: publicRegimeLabel,
-              call: primaryCall,
-            }}
-          />
-          </div>
-          <div data-page-section="last-week" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <LastWeekInHindsight
-            regime={regime}
-            scores={{ tightness, riskAppetite }}
-            deltas={{ tightness: tightnessDelta, riskAppetite: riskAppetiteDelta }}
-            thresholds={reportData.assessment.thresholds}
-            recordDateLabel={homepage.reportShell.recordDateLabel}
-          />
+            <h2 id="since-last-visit-heading" className="sr-only">Weekly Retrospective</h2>
+            <WeeklyRetrospectiveCard
+              currentVisit={{
+                recordDate: reportData.treasury.record_date,
+                recordDateLabel: homepage.reportShell.recordDateLabel,
+                regimeLabel: publicRegimeLabel,
+                call: primaryCall,
+              }}
+              hindsight={{
+                regime: regime,
+                scores: { tightness, riskAppetite },
+                deltas: { tightness: tightnessDelta, riskAppetite: riskAppetiteDelta },
+                thresholds: reportData.assessment.thresholds,
+                recordDateLabel: homepage.reportShell.recordDateLabel,
+              }}
+            />
           </div>
 
           <div data-page-section="direct-answers" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">

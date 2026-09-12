@@ -85,11 +85,16 @@ export function WhatCouldChangeCard({
                       </p>
                     </div>
                   </div>
-                  <ChevronRight
-                    size={16}
-                    className="shrink-0 text-slate-500 transition-all group-hover:text-teal-400 group-hover:translate-x-0.5"
-                    aria-hidden="true"
-                  />
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[11px] text-teal-400/80 group-hover:text-teal-300 font-medium hidden sm:inline">
+                      Signals
+                    </span>
+                    <ChevronRight
+                      size={14}
+                      className="shrink-0 text-slate-500 transition-all group-hover:text-teal-400 group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </div>
                 </Link>
               </li>
             );

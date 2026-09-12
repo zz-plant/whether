@@ -1,5 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Copy, Check } from "lucide-react";
 
 export interface ActionItem {
   id: string | number;
@@ -36,7 +39,21 @@ export function ActionsThisWeekCard({
   operateHref = "/operate",
   className = "",
 }: ActionsThisWeekCardProps) {
+  const [copied, setCopied] = useState(false);
   const items = actions.length > 0 ? actions.slice(0, 3) : DEFAULT_ACTIONS;
+
+  const handleCopyList = async () => {
+    const text = items
+      .map((item, idx) => `${idx + 1}. ${item.text}`)
+      .join("\n");
+    try {
+      await navigator.clipboard.writeText(`*Whether Actions This Week:*\n${text}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
 
   return (
     <section
@@ -48,9 +65,29 @@ export function ActionsThisWeekCard({
           <h3 id="actions-this-week-heading" className="text-sm font-semibold tracking-tight text-white">
             Actions this week
           </h3>
-          <span className="text-xs font-medium text-slate-400">
-            Turn insight into progress
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyList}
+              aria-label="Copy actions list to clipboard"
+              className="inline-flex items-center gap-1 rounded-md border border-slate-800 bg-slate-900/90 px-2 py-1 text-[11px] font-medium text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
+            >
+              {copied ? (
+                <>
+                  <Check size={12} className="text-teal-400" />
+                  <span className="text-teal-300">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={12} className="text-slate-400" />
+                  <span>Copy list</span>
+                </>
+              )}
+            </button>
+            <span className="text-xs font-medium text-slate-400 hidden sm:inline">
+              Turn insight into progress
+            </span>
+          </div>
         </div>
 
         <ul className="space-y-3">
