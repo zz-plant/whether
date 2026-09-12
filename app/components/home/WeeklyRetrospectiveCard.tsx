@@ -95,7 +95,11 @@ export function WeeklyRetrospectiveCard({
       </div>
 
       <div>
-        {activeTab === "hindsight" ? (
+        {/* Both panels mount; the inactive one is hidden, not unmounted.
+            SinceLastVisit's effect is the only writer of `whether.lastSeenCall`,
+            so unmounting it on the default tab stopped recording ordinary visits
+            entirely — a reader who never opened the second tab was never seen. */}
+        <div className={activeTab === "hindsight" ? undefined : "hidden"}>
           <LastWeekInHindsight
             regime={hindsight.regime}
             scores={hindsight.scores}
@@ -103,11 +107,10 @@ export function WeeklyRetrospectiveCard({
             thresholds={hindsight.thresholds}
             recordDateLabel={hindsight.recordDateLabel}
           />
-        ) : (
-          <div className="rounded-xl border border-white/[0.04] bg-slate-950/40 p-4">
-            <SinceLastVisit current={currentVisit} />
-          </div>
-        )}
+        </div>
+        <div className={activeTab === "visit" ? "rounded-xl border border-white/[0.04] bg-slate-950/40 p-4" : "hidden"}>
+          <SinceLastVisit current={currentVisit} />
+        </div>
       </div>
     </div>
   );

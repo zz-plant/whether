@@ -417,10 +417,13 @@ async function PageContent({
                   </span>
                 )}
 
+                {/* Navigation coverage stays unfiltered: an archived month is a
+                    filtered chart, not a filtered calendar. Passing the aligned
+                    series here removed every period after the archived month. */}
                 <TimeMachineCalendarPicker
                   currentDateLabel={cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
                   isHistorical={Boolean(historicalSelection)}
-                  history={alignedRegimeHistory}
+                  history={regimeHistory}
                 />
 
                 {nextWeekHref ? (
