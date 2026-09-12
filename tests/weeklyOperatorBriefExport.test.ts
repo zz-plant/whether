@@ -78,8 +78,8 @@ describe("weekly operator brief export adapters", () => {
     const cardText = buildWeeklyOperatorBriefCardText(payload);
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
-    assert.match(text, /Boldness Budget: 58\/100 \(\+4 vs last week\)/);
-    assert.ok(text.indexOf("Boldness Budget:") < text.indexOf("Posture:"));
+    assert.match(text, /Operating latitude: 58\/100 \(\+4 vs last week\)/);
+    assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Posture:"));
     assert.match(text, /Posture:/);
     assert.match(text, /Posture:/); // replaces Forecast
     assert.match(text, /Do now:/);
@@ -104,7 +104,7 @@ describe("weekly operator brief export adapters", () => {
     const parsed = JSON.parse(blocksJson) as { blocks: Array<{ type: string }> };
 
     assert.equal(parsed.blocks[0]?.type, "header");
-    assert.ok(blocksJson.includes("Boldness Budget"));
+    assert.ok(blocksJson.includes("Operating latitude"));
     assert.ok(parsed.blocks.some((block) => block.type === "section"));
     assert.ok(parsed.blocks.some((block) => block.type === "context"));
   });

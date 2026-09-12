@@ -1,4 +1,5 @@
 import type { MacroSeriesReading, TreasuryMetadata } from "../types";
+import type { RegimeStateTransition } from "./regimeStateMachine";
 import type {
   DecisionTransmission,
   HistoricalAnalog,
@@ -60,6 +61,9 @@ export type HomeReportData = {
   historicalSelection?: { month: number; year: number; banner: string } | null;
   assessment: {
     regime: Regime;
+    /** The state machine's own transition, when the read path carried machine state.
+     *  Copy that describes a pending quadrant change gates on this, not on the readings. */
+    regimeTransition?: RegimeStateTransition;
     thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
     scores: {
       tightness: number;

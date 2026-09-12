@@ -9,15 +9,14 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
-import { LastWeekInHindsight } from "./components/home/LastWeekInHindsight";
-import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { DirectAnswersStrip } from "./components/home/DirectAnswersStrip";
-import { DecisionPlanStressTester } from "./components/DecisionPlanStressTester";
-import { CompareStrip } from "./components/CompareStrip";
+import { WeeklyRetrospectiveCard } from "./components/home/WeeklyRetrospectiveCard";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { FreshnessDot } from "./components/FreshnessDot";
+import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
+import { CompactTrustPopover } from "./components/CompactTrustPopover";
 import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
@@ -45,6 +44,8 @@ import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { KeyDriversCard } from "./components/hero/KeyDriversCard";
+import { buildDriverViews } from "../lib/report/driverDecisionViews";
+import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { WhatCouldChangeCard } from "./components/hero/WhatCouldChangeCard";
 import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
@@ -291,6 +292,27 @@ async function PageContent({
       }
     : undefined;
 
+  /* The three driver rows, each built for the clock the decision it governs
+   * runs on: funding pressure as an action ladder with persistence, risk
+   * appetite as remaining cushion with its consumption pace, financing as a
+   * horizon trend with no threshold bar. The pause lines are the printed
+   * corridor rule's own — the same discipline the hero's bounded rails follow —
+   * and the rate history is the snapshot store's rolling 1M-bill series, null
+   * for months with no snapshot rather than interpolated. */
+  const driverViews = buildDriverViews({
+    tightness,
+    tightnessDelta,
+    riskAppetite,
+    tightnessRegime: reportData.assessment.thresholds.tightnessRegime,
+    riskAppetiteRegime: reportData.assessment.thresholds.riskAppetiteRegime,
+    corridorPauseLines: boundedConditions?.pause,
+    corridorPauseVerb: corridorRule?.pause.verb,
+    baseRate: v2HeroSignalData.baseRate ?? null,
+    baseRateUsed: v2HeroSignalData.baseRateUsed,
+    history: macroTrendline,
+    rateHistory: getTimeMachineRollingYieldSeries(7, reportData.treasury.record_date).oneMonth.map((point) => point.value),
+  });
+
   /* One join, two labels. The `h1` is this page's accessible name, where the
    * product name would be noise; the artifact title is what lands in someone
    * else's Slack channel, where it is the only thing identifying the source. A
@@ -395,9 +417,14 @@ async function PageContent({
                   </span>
                 )}
 
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                  {cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
-                </h2>
+                {/* Navigation coverage stays unfiltered: an archived month is a
+                    filtered chart, not a filtered calendar. Passing the aligned
+                    series here removed every period after the archived month. */}
+                <TimeMachineCalendarPicker
+                  currentDateLabel={cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
+                  isHistorical={Boolean(historicalSelection)}
+                  history={regimeHistory}
+                />
 
                 {nextWeekHref ? (
                   <Link
@@ -419,13 +446,14 @@ async function PageContent({
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
               <StageDropdownPill className="hidden sm:inline-flex" />
-              {confidenceLabel ? (
-                <span className="inline-flex items-center gap-1.5 rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300">
-                  <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
-                  <span>{confidenceLabel}</span>
-                  <span className="text-teal-400/60 ml-0.5">ⓘ</span>
-                </span>
-              ) : null}
+              <CompactTrustPopover
+                confidenceLabel={confidenceLabel ?? "High confidence"}
+                isHistorical={Boolean(historicalSelection)}
+                fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
+                recordDateLabel={homepage.reportShell.recordDateLabel}
+                treasurySource={homepage.reportShell.treasurySource}
+                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+              />
               <CadenceSelector />
             </div>
           </div>
@@ -484,17 +512,7 @@ async function PageContent({
 
             {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch mt-4">
-              <KeyDriversCard
-                tightness={tightness}
-                tightnessThreshold={reportData.assessment.thresholds.tightnessRegime}
-                tightnessDelta={tightnessDelta}
-                riskAppetite={riskAppetite}
-                riskAppetiteThreshold={reportData.assessment.thresholds.riskAppetiteRegime}
-                riskAppetiteDelta={riskAppetiteDelta}
-                baseRate={v2HeroSignalData.baseRate}
-                baseRateDelta={signalDeltas.get("baseRate") ?? 0}
-                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-              />
+              <KeyDriversCard views={driverViews} />
 
               <ActionsThisWeekCard
                 actions={cardActions}
@@ -535,6 +553,13 @@ async function PageContent({
               <RecentPostureHistoryCard
                 history={macroTrendline}
                 historyHref="/history"
+                currentRegime={regime}
+                currentTightness={tightness}
+                tightnessDelta={tightnessDelta}
+                riskAppetite={riskAppetite}
+                riskAppetiteDelta={riskAppetiteDelta}
+                serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
+                currentRecordDate={homepage.reportShell.recordDateLabel}
               />
             </div>
 
@@ -542,26 +567,11 @@ async function PageContent({
             <div className="mt-5">
               <StressTestQuickCard
                 planHref={operateHref}
-              />
-            </div>
-
-            <div className="hidden sm:block">
-              <DecisionPlanStressTester
                 assessment={reportData.assessment}
                 recordDate={homepage.reportShell.recordDateLabel}
                 activeStage={activeStage}
               />
             </div>
-
-            <CompareStrip
-              currentRegime={regime}
-              currentTightness={tightness}
-              tightnessDelta={tightnessDelta}
-              riskAppetite={riskAppetite}
-              riskAppetiteDelta={riskAppetiteDelta}
-              currentRecordDate={homepage.reportShell.recordDateLabel}
-              serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-            />
           </SwipeableWeek>
           </div>
 
@@ -574,32 +584,24 @@ async function PageContent({
             <SubscribeForm compact />
           </div>
 
-          {/* Everything below the call computes its content or leaves. These
-              two replace "Decisions to reconsider" and "Close the week", which
-              asked the reader to keep state in this browser so the product could
-              be smarter later; the product now says what it can from what it
-              already holds. */}
-          {/* Below the call: each of these is a section J and K can reach, which is
-              what `data-page-section` is for — see app/components/reportSection.tsx. */}
+          {/* Below the call: unified retrospective card */}
           <div data-page-section="since-last-visit" tabIndex={-1} aria-labelledby="since-last-visit-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <h2 id="since-last-visit-heading" className="sr-only">Since your last visit</h2>
-          <SinceLastVisit
-            current={{
-              recordDate: reportData.treasury.record_date,
-              recordDateLabel: homepage.reportShell.recordDateLabel,
-              regimeLabel: publicRegimeLabel,
-              call: primaryCall,
-            }}
-          />
-          </div>
-          <div data-page-section="last-week" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <LastWeekInHindsight
-            regime={regime}
-            scores={{ tightness, riskAppetite }}
-            deltas={{ tightness: tightnessDelta, riskAppetite: riskAppetiteDelta }}
-            thresholds={reportData.assessment.thresholds}
-            recordDateLabel={homepage.reportShell.recordDateLabel}
-          />
+            <h2 id="since-last-visit-heading" className="sr-only">Weekly Retrospective</h2>
+            <WeeklyRetrospectiveCard
+              currentVisit={{
+                recordDate: reportData.treasury.record_date,
+                recordDateLabel: homepage.reportShell.recordDateLabel,
+                regimeLabel: publicRegimeLabel,
+                call: primaryCall,
+              }}
+              hindsight={{
+                regime: regime,
+                scores: { tightness, riskAppetite },
+                deltas: { tightness: tightnessDelta, riskAppetite: riskAppetiteDelta },
+                thresholds: reportData.assessment.thresholds,
+                recordDateLabel: homepage.reportShell.recordDateLabel,
+              }}
+            />
           </div>
 
           <div data-page-section="direct-answers" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">

@@ -215,6 +215,7 @@ export const buildWhyThisCall = ({
   riskDirection,
   reportDynamics,
   transitionWatch,
+  pendingFlipDetail,
 }: {
   tightnessGap: number;
   riskGap: number;
@@ -226,6 +227,9 @@ export const buildWhyThisCall = ({
   riskDirection: "riseAbove" | "fallToOrBelow";
   reportDynamics: HomeReportData["reportDynamics"];
   transitionWatch: "ON" | "OFF";
+  /** Set when the regime state machine already holds a pending quadrant change: replaces the
+   *  distance line, which would otherwise measure a boundary the readings have already crossed. */
+  pendingFlipDetail?: string;
 }): WhyThisCallItem[] => {
   const nearestIsTightness = tightnessGap <= riskGap;
   const nearestGap = nearestIsTightness ? tightnessGap : riskGap;
@@ -243,7 +247,7 @@ export const buildWhyThisCall = ({
     {
       key: "distance-to-regime-change",
       label: "Distance to regime change",
-      detail: `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
+      detail: pendingFlipDetail ?? `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
     },
     {
       key: "momentum",

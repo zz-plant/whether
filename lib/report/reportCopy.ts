@@ -33,6 +33,17 @@ export type HighlightBullet = { text: string };
 /** The threshold slot when no rule supplied one. Was retyped in five modules. */
 export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
 
+/**
+ * The one display name for the 0-100 composite scalar (`boldnessScore`:
+ * risk appetite × 0.7 + (100 − funding pressure) × 0.3) that the brief
+ * headlines. Every surface that names the score — the hero, the sticky call
+ * strip, the glossary, exports, pricing copy, history compare — reads this
+ * constant. Renamed from "Boldness Budget": the budget metaphor was memorable
+ * but not immediately interpretable, and two names for one scalar let surfaces
+ * drift into describing different verdicts.
+ */
+export const OPERATING_LATITUDE_LABEL = "Operating latitude";
+
 export const DECISION_CONTRACT_LABELS = {
   slot: {
     action: "Action",
@@ -261,9 +272,9 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "boldness-score",
-    term: "Boldness budget",
+    term: OPERATING_LATITUDE_LABEL,
     summary: "The inverse of funding pressure: how much room you have to hire, spend, and make long-term commitments. Calculated as (risk appetite × 0.7) + (100 − funding pressure) × 0.3.",
-    why: "Why it matters: boldness tells you how aggressively you can operate at a glance—higher budget means more expansion room, lower means conserve.",
+    why: "Why it matters: latitude tells you how aggressively you can operate at a glance—higher room means more expansion room, lower means conserve.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },

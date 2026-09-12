@@ -26,7 +26,20 @@ export type RegimeStateTransition = {
   snapshot: RegimeMachineSnapshot;
 };
 
-const classifyFromSignals = ({ tightness, riskAppetite, thresholds }: RegimeMachineSignals): RegimeState => {
+/**
+ * The quadrant the readings classify into, ignoring any committed state. This is
+ * the candidate the machine confirms or holds; exported so copy that describes
+ * the flip can state it against the same table the machine uses.
+ */
+export const classifyRegimeQuadrant = ({
+  tightness,
+  riskAppetite,
+  thresholds,
+}: {
+  tightness: number;
+  riskAppetite: number;
+  thresholds: Pick<RegimeThresholds, "tightnessRegime" | "riskAppetiteRegime">;
+}): RegimeState => {
   if (tightness > thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
     return "SCARCITY";
   }
@@ -38,6 +51,9 @@ const classifyFromSignals = ({ tightness, riskAppetite, thresholds }: RegimeMach
   }
   return "EXPANSION";
 };
+
+const classifyFromSignals = ({ tightness, riskAppetite, thresholds }: RegimeMachineSignals): RegimeState =>
+  classifyRegimeQuadrant({ tightness, riskAppetite, thresholds });
 
 const crossed = ({
   previous,

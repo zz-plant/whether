@@ -1,8 +1,17 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { Zap, Users, Cloud, Globe, Sliders, ArrowRight, ChevronRight } from "lucide-react";
+import { Zap, Users, Cloud, Globe, Sliders, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import { DecisionPlanStressTester } from "../DecisionPlanStressTester";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRules";
 
 export interface StressTestQuickCardProps {
   planHref?: string;
+  assessment?: RegimeAssessment;
+  recordDate?: string;
+  activeStage?: StartupVariantMode;
   className?: string;
 }
 
@@ -13,6 +22,8 @@ const SCENARIOS = [
     title: "Hire 3 senior engineers",
     subtitle: "Model headcount impact",
     query: "hire",
+    /** The plan this scenario grades, matching the tester's own example set. */
+    plan: { text: "Hire 3 senior engineers at $180k each", category: "HIRING" },
   },
   {
     id: "cloud",
@@ -20,6 +31,7 @@ const SCENARIOS = [
     title: "Sign a $50k cloud commit",
     subtitle: "Model spend impact",
     query: "cloud",
+    plan: { text: "Sign a $50k annual cloud commitment", category: "INFRASTRUCTURE" },
   },
   {
     id: "market",
@@ -27,6 +39,7 @@ const SCENARIOS = [
     title: "Open a second market",
     subtitle: "Model expansion impact",
     query: "market",
+    plan: { text: "Open a second geographic market with a 4-person team", category: "GEOGRAPHIC_EXPANSION" },
   },
   {
     id: "custom",
@@ -34,13 +47,23 @@ const SCENARIOS = [
     title: "Custom scenario...",
     subtitle: "Input your own burn",
     query: "custom",
+    /** No preset plan: the tester opens on the canonical example and the reader grades their own. */
+    plan: null,
   },
-];
+] as const;
 
 export function StressTestQuickCard({
   planHref = "/operate",
+  assessment,
+  recordDate,
+  activeStage,
   className = "",
 }: StressTestQuickCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  /** The scenario the reader selected, so the tester opens on that decision.
+   *  Without this every chip expanded the same hiring verdict. */
+  const [selectedScenario, setSelectedScenario] = useState<(typeof SCENARIOS)[number] | null>(null);
+
   return (
     <section
       aria-labelledby="stress-test-quick-heading"
@@ -64,10 +87,14 @@ export function StressTestQuickCard({
           {SCENARIOS.map((sc) => {
             const Icon = sc.icon;
             return (
-              <Link
+              <button
                 key={sc.id}
-                href={`${planHref}?plan=${sc.query}`}
-                className="group flex min-h-[52px] items-center justify-between gap-2.5 rounded-xl border border-white/[0.06] bg-slate-950/50 px-3.5 py-2.5 transition-colors hover:border-teal-500/40 hover:bg-slate-900/80 focus-visible:outline-2 focus-visible:outline-teal-400 no-underline"
+                type="button"
+                onClick={() => {
+                  setSelectedScenario(sc);
+                  setIsExpanded(true);
+                }}
+                className="group flex min-h-[52px] items-center justify-between gap-2.5 rounded-xl border border-white/[0.06] bg-slate-950/50 px-3.5 py-2.5 transition-colors hover:border-teal-500/40 hover:bg-slate-900/80 focus-visible:outline-2 focus-visible:outline-teal-400 text-left cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 group-hover:text-teal-400 group-hover:border-teal-500/30 transition-colors">
@@ -82,8 +109,12 @@ export function StressTestQuickCard({
                     </p>
                   </div>
                 </div>
-                <ChevronRight size={14} className="text-slate-500 group-hover:text-teal-400 shrink-0 transition-colors" />
-              </Link>
+                {isExpanded ? (
+                  <ChevronUp size={14} className="text-slate-500 group-hover:text-teal-400 shrink-0 transition-colors" />
+                ) : (
+                  <ChevronDown size={14} className="text-slate-500 group-hover:text-teal-400 shrink-0 transition-colors" />
+                )}
+              </button>
             );
           })}
         </div>
@@ -93,10 +124,25 @@ export function StressTestQuickCard({
           href={planHref}
           className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-teal-400 px-6 py-2.5 text-xs font-semibold text-slate-950 shadow-md transition-all hover:bg-teal-300 hover:shadow-teal-500/20 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 no-underline"
         >
-          <span>Test a decision</span>
+          <span>Open in Planning</span>
           <ArrowRight size={15} />
         </Link>
       </div>
+
+      {/* Expanded Interactive Stress Tester. Keyed on the selected scenario so
+          a second chip re-grades on that decision instead of leaving the first
+          verdict standing. */}
+      {isExpanded && assessment && recordDate ? (
+        <div className="mt-5 pt-5 border-t border-white/[0.06]">
+          <DecisionPlanStressTester
+            key={selectedScenario?.id ?? "default"}
+            assessment={assessment}
+            recordDate={recordDate}
+            activeStage={activeStage}
+            initialPlan={selectedScenario?.plan ?? undefined}
+          />
+        </div>
+      ) : null}
     </section>
   );
 }

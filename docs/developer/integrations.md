@@ -110,7 +110,7 @@ When integrating Whether with Cursor, Claude Desktop, or custom agent runtimes:
 ```text
 You have access to the 'whether' MCP server. Before generating recommendations for hiring,
 infrastructure refactoring, or budget allocations, call 'whether.get_weekly_brief' to obtain
-the current macroeconomic regime, Boldness Budget, and bounded decision rules.
+the current macroeconomic regime, Operating latitude, and bounded decision rules.
 Enforce the retrieved payback and reversal triggers strictly in your output.
 ```
 

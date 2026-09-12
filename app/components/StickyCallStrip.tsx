@@ -7,6 +7,7 @@ import { useClipboardCopy } from "./useClipboardCopy";
 import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass, type TrendDirection } from "./illustrations/TrendGlyph";
 import { DIRECTION_ARROW, DIRECTION_LABEL, type SignalDirection } from "../viewModel";
+import { OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 
 type Props = {
   call: string;
@@ -82,7 +83,7 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
 
   const handleCopy = async () => {
     const text = [
-      `Whether · Boldness budget ${boldnessScore}/100 (${deltaLabel})`,
+      `Whether · ${OPERATING_LATITUDE_LABEL} ${boldnessScore}/100 (${deltaLabel})`,
       // Plain-text artifact, so the compact glyph is right here — sourced from
       // the shared map rather than re-derived.
       `${DIRECTION_ARROW[direction]} ${call}`,

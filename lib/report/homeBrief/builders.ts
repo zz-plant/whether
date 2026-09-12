@@ -12,12 +12,14 @@ import {
 } from "../operatingCalls";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD, REGIME_CONFIDENCE_MEDIUM_THRESHOLD } from "../../regimeEngineCore";
+import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { formatThresholdNumber } from "../../formatters";
 import {
   REGIME_SEVERITY_RANK,
   deriveRegimeStage,
   getRegimeDisplayLabel,
+  getRegimePublicLabel,
   type RegimeConfidenceLabel,
   type RegimeMomentum,
 } from "../../regimePresentation";
@@ -51,7 +53,6 @@ import {
   buildWeeklyMovementMetric,
   buildWhyItMattersLine,
   resolvePrimaryShiftRegimeKey,
-  resolvePrimaryShiftRegimeLabel,
 } from "./decisionNarrative";
 import {
   buildFlipRiskMeterState as buildFlipRiskMeterStateInternal,
@@ -67,14 +68,11 @@ import {
 } from "./signalIndicators";
 import { buildWeeklyLeadershipBriefModel } from "../weeklyLeadershipBrief";
 import type {
-  BoundaryDimension,
-  BoundaryDirection,
   CanonicalFlipCondition,
   HomeBriefTrustWarning,
   HomeBriefHistoricalAnalog,
   HomeReportData,
   PostureTrajectoryState,
-  Regime,
   StartupVariantPolicy,
   WeeklyDecisionCardViewModel,
 } from "../homeBriefModel";
@@ -82,37 +80,6 @@ import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
 
 export { extractExecutiveOperationalStance, buildMemoryRail };
-
-const boundaryDirectionForRegime = (
-  regime: Regime,
-  dimension: BoundaryDimension,
-): BoundaryDirection => {
-  if (dimension === "tightness") {
-    return regime === "SCARCITY" || regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
-  }
-
-  return regime === "EXPANSION" || regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
-};
-
-const buildBoundaryTriggerText = ({
-  targetRegimeLabel,
-  dimension,
-  threshold,
-  current,
-  direction,
-}: {
-  targetRegimeLabel: string;
-  dimension: BoundaryDimension;
-  threshold: number;
-  current: number;
-  direction: BoundaryDirection;
-}) => {
-  // Phrased as a condition, not a statement, because callers prefix it with
-  // "Re-open when:" / "The call flips when:" as well as showing it standalone.
-  const dimensionLabel = dimension === "tightness" ? "Funding pressure" : "Risk appetite";
-  const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
-  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today), which flips the call to ${targetRegimeLabel}.`;
-};
 
 type RevisitDriverSignal = {
   key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
@@ -288,8 +255,6 @@ export const buildHomeBriefModelInternal = (
     scores: assessment.scores,
     thresholds: assessment.thresholds,
   });
-  const primaryShiftRegimeLabel = resolvePrimaryShiftRegimeLabel(assessment.regime);
-
   const geometricConfidence: RegimeConfidenceLabel = nearestThresholdGap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : nearestThresholdGap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
   const isFallbackData = Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection;
   const recordDateAgeHours = isFallbackData && treasury?.record_date
@@ -429,42 +394,36 @@ export const buildHomeBriefModelInternal = (
     distanceToFlip: nearestThresholdGap,
   });
 
-  const reversalDimension: BoundaryDimension = tightnessGap <= riskGap ? "tightness" : "riskAppetite";
-  const reversalDirection = boundaryDirectionForRegime(assessment.regime, reversalDimension);
-  const reversalTrigger =
-    reversalDimension === "tightness"
-      ? buildBoundaryTriggerText({
-          targetRegimeLabel: primaryShiftRegimeLabel,
-          dimension: "tightness",
-          threshold: tightnessThreshold,
-          current: assessment.scores.tightness,
-          direction: reversalDirection,
-        })
-      : buildBoundaryTriggerText({
-          targetRegimeLabel: primaryShiftRegimeLabel,
-          dimension: "riskAppetite",
-          threshold: riskThreshold,
-          current: assessment.scores.riskAppetite,
-          direction: reversalDirection,
-        });
+  const regimeFlipState = buildRegimeFlipState({
+    regime: assessment.regime,
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+    regimeTransition: assessment.regimeTransition,
+  });
+  const reversalTrigger = regimeFlipState.text;
 
+  // "Points to flip" measures the line worth watching, from the flip state —
+  // which is the nearest unsatisfied boundary when the call and readings agree,
+  // and the line that changes the flip target when a quadrant change is
+  // pending. Measuring the satisfied boundary instead reported points to a
+  // crossing that had already happened.
   const regimeDistance =
-    reversalDimension === "tightness"
+    regimeFlipState.watch.dimension === "tightness"
       ? {
           dimensionLabel: "Funding pressure",
           dimensionKey: "tightness" as const,
           currentValue: assessment.scores.tightness,
-          thresholdValue: tightnessThreshold,
-          pointsToFlip: Math.abs(tightnessThreshold - assessment.scores.tightness),
-          thresholdDirection: boundaryDirectionForRegime(assessment.regime, "tightness"),
+          thresholdValue: regimeFlipState.watch.threshold,
+          pointsToFlip: Math.abs(regimeFlipState.watch.threshold - assessment.scores.tightness),
+          thresholdDirection: regimeFlipState.watch.direction,
         }
       : {
           dimensionLabel: "Risk appetite",
           dimensionKey: "riskAppetite" as const,
           currentValue: assessment.scores.riskAppetite,
-          thresholdValue: riskThreshold,
-          pointsToFlip: Math.abs(assessment.scores.riskAppetite - riskThreshold),
-          thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
+          thresholdValue: regimeFlipState.watch.threshold,
+          pointsToFlip: Math.abs(regimeFlipState.watch.threshold - assessment.scores.riskAppetite),
+          thresholdDirection: regimeFlipState.watch.direction,
         };
 
   const likelyTransitionTarget = toForecastLabel(resolvePrimaryShiftRegimeKey(assessment.regime));
@@ -695,6 +654,9 @@ export const buildHomeBriefModelInternal = (
       riskDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
       reportDynamics,
       transitionWatch,
+      pendingFlipDetail: regimeFlipState.pendingCandidate
+        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — the call holds while the change waits on confirmation. The line that would change the flip target: ${regimeFlipState.watch.dimension === "tightness" ? "Funding pressure" : "Risk appetite"} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
+        : undefined,
     }),
   };
 };

@@ -54,6 +54,9 @@ export interface DecisionPlanStressTesterProps {
   recordDate: string;
   /** The stage the hero's Calibrate stage control settled on; this panel grades for the same team. */
   activeStage?: StartupVariantMode;
+  /** The plan the panel opens on, from a caller that already selected a scenario
+   *  (the quick card's scenario chips). Omit for the canonical first example. */
+  initialPlan?: { text: string; category: DecisionCategory };
   className?: string;
 }
 
@@ -113,10 +116,11 @@ export function DecisionPlanStressTester({
   assessment,
   recordDate,
   activeStage,
+  initialPlan,
   className = "",
 }: DecisionPlanStressTesterProps) {
-  const [planText, setPlanText] = useState(EXAMPLE_PLANS[0].text);
-  const [category, setCategory] = useState<CategoryChoice>(EXAMPLE_PLANS[0].category);
+  const [planText, setPlanText] = useState(initialPlan?.text ?? EXAMPLE_PLANS[0].text);
+  const [category, setCategory] = useState<CategoryChoice>(initialPlan?.category ?? EXAMPLE_PLANS[0].category);
   const [error, setError] = useState<string | null>(null);
   const planInputRef = useRef<HTMLInputElement>(null);
   const clipboard = useClipboardCopy();
@@ -129,16 +133,19 @@ export function DecisionPlanStressTester({
   const lifecycle = lifecycleStageForOperatorStage[stage];
 
   // Graded on first render, on the server too, so the panel never opens empty.
-  // The engine is pure and the example carries no cash position, so this is a
-  // real verdict about a plausible plan, marked as an example.
+  // The engine is pure and the opening plan carries no cash position, so this is
+  // a real verdict about a plausible plan, marked as an example.
   const [result, setResult] = useState<PlanStressTestResult | null>(() =>
     stressTestDecisionPlan(assessment, {
-      planText: EXAMPLE_PLANS[0].text,
+      planText: initialPlan?.text ?? EXAMPLE_PLANS[0].text,
       lifecycle,
-      category: EXAMPLE_PLANS[0].category,
+      category: initialPlan?.category ?? EXAMPLE_PLANS[0].category,
     }),
   );
-  const [isExample, setIsExample] = useState(true);
+  // A scenario the operator selected deliberately is their plan, not an
+  // example of what a verdict looks like; the canonical first example keeps
+  // the example marking.
+  const [isExample, setIsExample] = useState(!initialPlan);
 
   const runExample = (example: (typeof EXAMPLE_PLANS)[number]) => {
     setPlanText(example.text);
