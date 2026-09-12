@@ -42,6 +42,15 @@ import {
 } from "../lib/timeMachine/timeMachineSelection";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { KeyDriversCard } from "./components/hero/KeyDriversCard";
+import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
+import { WhatCouldChangeCard } from "./components/hero/WhatCouldChangeCard";
+import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
+import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
+import { StageDropdownPill } from "./components/StageDropdownPill";
+import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -164,6 +173,16 @@ async function PageContent({
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const previousHistoricalRequest = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
+    : null;
+  const nextHistoricalRequest = historicalSelection
+    ? getAdjacentTimeMachineRequest(historicalSelection, "next")
+    : null;
+  const latestSnapshot = getLatestTimeMachineSnapshot();
+  const prevWeekHref = historicalSelection
+    ? (previousHistoricalRequest ? buildTimeMachineHref("/", previousHistoricalRequest) : null)
+    : (latestSnapshot ? buildTimeMachineHref("/", { month: latestSnapshot.month, year: latestSnapshot.year }) : null);
+  const nextWeekHref = historicalSelection
+    ? (nextHistoricalRequest ? buildTimeMachineHref("/", nextHistoricalRequest) : "/")
     : null;
 
   const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
@@ -289,6 +308,22 @@ async function PageContent({
     title: cadenceTitle ?? "Whether Weekly Brief",
   });
 
+  const cardActions = (homepage.weeklyDecisionCardModel.decision.actionStripItems?.length ?? 0) > 0
+    ? homepage.weeklyDecisionCardModel.decision.actionStripItems!.map((item, idx) => ({
+        id: idx + 1,
+        text: item.areaActionNow,
+        href: `${operateHref}#${item.lever}`,
+      }))
+    : (homepage.weeklyDecisionCardModel.decision.decisionRules?.slice(0, 3).map((rule, idx) => ({
+        id: idx + 1,
+        text: rule.doNow[0] ?? rule.recommendation,
+        href: `${operateHref}#${rule.area}`,
+      })) ?? []);
+
+  const primaryFlipText = flipConditionLabels?.[0]
+    ?? reversalTriggerLabel
+    ?? `Rises above ${reportData.assessment.thresholds.tightnessRegime} (${tightness} today), which could flip the call to Cloudy.`;
+
   return (
     <>
       <BriefArtifactScript artifact={briefArtifact} />
@@ -296,14 +331,16 @@ async function PageContent({
         {cadenceTitle ?? "Weekly Brief"}
       </h1>
       <ActivationTracker path="/" />
-      <FreshnessDot
-        label={homepage.reportShell.fetchedAtLabel}
-        recordDate={homepage.reportShell.recordDateLabel}
-        treasurySource={homepage.reportShell.treasurySource}
-        trustStatusLabel={homepage.reportShell.trustStatusLabel}
-        degradedSourceRows={homepage.reportShell.degradedSourceRows}
-        showOfflineBadge={homepage.reportShell.showOfflineBadge}
-      />
+      <div className="hidden sm:block">
+        <FreshnessDot
+          label={homepage.reportShell.fetchedAtLabel}
+          recordDate={homepage.reportShell.recordDateLabel}
+          treasurySource={homepage.reportShell.treasurySource}
+          trustStatusLabel={homepage.reportShell.trustStatusLabel}
+          degradedSourceRows={homepage.reportShell.degradedSourceRows}
+          showOfflineBadge={homepage.reportShell.showOfflineBadge}
+        />
+      </div>
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
           {resolveDataStatusGuidance({
@@ -340,8 +377,57 @@ async function PageContent({
           {/* Weekly / Monthly / Quarterly is a view of the brief, so it lives in
               the brief rather than in the global header where it read as a
               site-wide control and took a second header row on phones. */}
-          <div className="flex items-center justify-end">
-            <CadenceSelector />
+          {/* Header row: Week of Date switcher, Data currency, Stage dropdown, Confidence pill, Cadence selector */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-1">
+            <div>
+              <div className="flex items-center gap-2">
+                {prevWeekHref ? (
+                  <Link
+                    href={prevWeekHref}
+                    aria-label="Previous week"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
+                  >
+                    <ChevronLeft size={16} />
+                  </Link>
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
+                    <ChevronLeft size={16} />
+                  </span>
+                )}
+
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                  {cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
+                </h2>
+
+                {nextWeekHref ? (
+                  <Link
+                    href={nextWeekHref}
+                    aria-label="Next week"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
+                  >
+                    <ChevronRight size={16} />
+                  </Link>
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
+                    <ChevronRight size={16} />
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Data through {homepage.reportShell.recordDateLabel} · refreshed {homepage.reportShell.fetchedAtLabel}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+              <StageDropdownPill className="hidden sm:inline-flex" />
+              {confidenceLabel ? (
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300">
+                  <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
+                  <span>{confidenceLabel}</span>
+                  <span className="text-teal-400/60 ml-0.5">ⓘ</span>
+                </span>
+              ) : null}
+              <CadenceSelector />
+            </div>
           </div>
           <div data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
@@ -396,11 +482,76 @@ async function PageContent({
               activeStage={activeStage}
             />
 
-            <DecisionPlanStressTester
-              assessment={reportData.assessment}
-              recordDate={homepage.reportShell.recordDateLabel}
-              activeStage={activeStage}
-            />
+            {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch mt-4">
+              <KeyDriversCard
+                tightness={tightness}
+                tightnessThreshold={reportData.assessment.thresholds.tightnessRegime}
+                tightnessDelta={tightnessDelta}
+                riskAppetite={riskAppetite}
+                riskAppetiteThreshold={reportData.assessment.thresholds.riskAppetiteRegime}
+                riskAppetiteDelta={riskAppetiteDelta}
+                baseRate={v2HeroSignalData.baseRate}
+                baseRateDelta={signalDeltas.get("baseRate") ?? 0}
+                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+              />
+
+              <ActionsThisWeekCard
+                actions={cardActions}
+                operateHref={operateHref}
+              />
+
+              <WhatCouldChangeCard
+                items={[
+                  {
+                    id: "funding",
+                    label: `Funding pressure > ${reportData.assessment.thresholds.tightnessRegime}`,
+                    description: tightness >= reportData.assessment.thresholds.tightnessRegime
+                      ? "already above warning threshold; restricts hiring."
+                      : "increases likelihood of Cloudy posture.",
+                    icon: "alert",
+                  },
+                  {
+                    id: "risk",
+                    label: `Risk appetite < ${reportData.assessment.thresholds.riskAppetiteRegime}`,
+                    description: primaryFlipText.toLowerCase().includes("risk appetite")
+                      ? primaryFlipText
+                      : "likely flips call to Cloudy / Defensive.",
+                    icon: "arrow",
+                  },
+                  {
+                    id: "rates",
+                    label: "Further macro deterioration",
+                    description: "raises financing costs and debt burden.",
+                    icon: "percent",
+                  },
+                ]}
+                signalsHref="/signals"
+              />
+            </div>
+
+            {/* Mockup Card: Recent posture history (Weekly outlook over time) */}
+            <div className="mt-5">
+              <RecentPostureHistoryCard
+                history={macroTrendline}
+                historyHref="/history"
+              />
+            </div>
+
+            {/* Mockup Card: Stress-test a decision (See how it changes the outlook) */}
+            <div className="mt-5">
+              <StressTestQuickCard
+                planHref={operateHref}
+              />
+            </div>
+
+            <div className="hidden sm:block">
+              <DecisionPlanStressTester
+                assessment={reportData.assessment}
+                recordDate={homepage.reportShell.recordDateLabel}
+                activeStage={activeStage}
+              />
+            </div>
 
             <CompareStrip
               currentRegime={regime}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Drawer } from "@base-ui/react/drawer";
-import { Compass, LayoutList, Menu as MenuIcon, Search, Sparkles } from "lucide-react";
+import { Home, LayoutGrid, FileText, Search, MoreHorizontal } from "lucide-react";
 import {
   loopNavigationLayers,
   mobileTabLayers,
@@ -17,14 +17,14 @@ import {
 } from "../../lib/navigation/globalHeader";
 import { MobileNavContent } from "./globalHeaderNavClient";
 
-const TAB_ICONS: Record<NavigationLayerKey, typeof Compass> = {
-  "weekly-brief": Sparkles,
-  planning: LayoutList,
-  signals: Compass,
-  resolve: Compass,
-  trust: Compass,
-  history: Compass,
-  compare: Compass,
+const TAB_ICONS: Record<NavigationLayerKey, typeof Home> = {
+  "weekly-brief": Home,
+  planning: LayoutGrid,
+  signals: FileText,
+  resolve: FileText,
+  trust: FileText,
+  history: FileText,
+  compare: FileText,
 };
 
 const SWIPE_MIN_PX = 72;
@@ -127,10 +127,13 @@ export function MobileTabBar() {
                 <Link
                   href={tab.href}
                   aria-current={tab.isActive ? "page" : undefined}
-                  className={`${TAB_CLASS} ${tab.isActive ? "text-sky-200" : "text-slate-400 hover:text-slate-200"}`}
+                  className={`relative ${TAB_CLASS} ${tab.isActive ? "text-teal-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
                 >
                   <Icon aria-hidden="true" size={20} strokeWidth={tab.isActive ? 2.2 : 1.8} />
                   <span>{tab.navLabel ?? tab.label}</span>
+                  {tab.isActive ? (
+                    <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-teal-400" aria-hidden="true" />
+                  ) : null}
                 </Link>
               </li>
             );
@@ -151,9 +154,9 @@ export function MobileTabBar() {
               type="button"
               onClick={() => setShowMore(true)}
               aria-expanded={showMore}
-              className={`${TAB_CLASS} ${moreIsActive ? "text-sky-200" : "text-slate-400 hover:text-slate-200"}`}
+              className={`${TAB_CLASS} ${moreIsActive ? "text-teal-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
             >
-              <MenuIcon aria-hidden="true" size={20} strokeWidth={moreIsActive ? 2.2 : 1.8} />
+              <MoreHorizontal aria-hidden="true" size={20} strokeWidth={moreIsActive ? 2.2 : 1.8} />
               <span>More</span>
             </button>
           </li>
