@@ -14,7 +14,6 @@ import { WeeklyRetrospectiveCard } from "./components/home/WeeklyRetrospectiveCa
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
-import { FreshnessDot } from "./components/FreshnessDot";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
 import { CompactTrustPopover } from "./components/CompactTrustPopover";
 import { SwipeableWeek } from "./components/SwipeableWeek";
@@ -353,16 +352,6 @@ async function PageContent({
         {cadenceTitle ?? "Weekly Brief"}
       </h1>
       <ActivationTracker path="/" />
-      <div className="hidden sm:block">
-        <FreshnessDot
-          label={homepage.reportShell.fetchedAtLabel}
-          recordDate={homepage.reportShell.recordDateLabel}
-          treasurySource={homepage.reportShell.treasurySource}
-          trustStatusLabel={homepage.reportShell.trustStatusLabel}
-          degradedSourceRows={homepage.reportShell.degradedSourceRows}
-          showOfflineBadge={homepage.reportShell.showOfflineBadge}
-        />
-      </div>
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
           {resolveDataStatusGuidance({
@@ -396,10 +385,7 @@ async function PageContent({
               rule keyed on the data attribute (app/layout.tsx), so it stays
               pre-paint and CLS-free at either position. */}
           <FirstVisitExplainer />
-          {/* Weekly / Monthly / Quarterly is a view of the brief, so it lives in
-              the brief rather than in the global header where it read as a
-              site-wide control and took a second header row on phones. */}
-          {/* Header row: Week of Date switcher, Data currency, Stage dropdown, Confidence pill, Cadence selector */}
+          {/* Header row: Week of Date switcher, Data currency, Stage dropdown, Confidence pill */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-1">
             <div>
               <div className="flex items-center gap-2">
@@ -454,7 +440,6 @@ async function PageContent({
                 treasurySource={homepage.reportShell.treasurySource}
                 degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
               />
-              <CadenceSelector />
             </div>
           </div>
           <div data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
@@ -611,6 +596,10 @@ async function PageContent({
           <div data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
           <h2 id="plan-and-evidence-heading" className="sr-only">Build the plan, and the evidence behind the call</h2>
           <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
+            <span className="text-fluid-sm text-slate-400">Planning horizon</span>
+            <CadenceSelector />
+          </div>
           </div>
         </div>
 

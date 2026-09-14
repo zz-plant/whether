@@ -60,6 +60,16 @@ describe("document-scoped controls stay at the document layer", () => {
 });
 
 describe("overlays open from the layer that owns them", () => {
+  it("mounts the command palette only from its global owner", () => {
+    const hosts = sourceFiles(APP_DIR)
+      .filter((file) => !file.endsWith("app/components/commandPalette.tsx"))
+      .filter((file) => /<CommandPalette\b/.test(stripComments(readFileSync(file, "utf8"))))
+      .map(relative)
+      .sort();
+
+    assert.deepEqual(hosts, ["app/components/globalCommandPalette.tsx"]);
+  });
+
   it("mounts ShareRail once, from the global instance", () => {
     const hosts = sourceFiles(APP_DIR)
       .filter((file) => !file.endsWith("app/components/shareRail.tsx"))

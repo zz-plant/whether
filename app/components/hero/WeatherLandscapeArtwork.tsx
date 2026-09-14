@@ -45,20 +45,20 @@ export function WeatherLandscapeArtwork({ regime, className = "" }: WeatherLands
             <stop offset="100%" stopColor="#0369a1" stopOpacity="0" />
           </radialGradient>
 
-          {/* Ridge Gradients */}
+          {/* Ridge Gradients - subtle, atmospheric transitions */}
           <linearGradient id="ridge-back" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#115e59" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#042f2e" stopOpacity="0.8" />
+            <stop offset="0%" stopColor="#115e59" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#042f2e" stopOpacity="0.4" />
           </linearGradient>
 
           <linearGradient id="ridge-mid" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#0f766e" stopOpacity="0.65" />
-            <stop offset="100%" stopColor="#042f2e" stopOpacity="0.95" />
+            <stop offset="0%" stopColor="#0f766e" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#042f2e" stopOpacity="0.5" />
           </linearGradient>
 
           <linearGradient id="ridge-front" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#042f2e" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#021c1c" stopOpacity="1" />
+            <stop offset="0%" stopColor="#042f2e" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#021c1c" stopOpacity="0.6" />
           </linearGradient>
         </defs>
 
@@ -66,39 +66,39 @@ export function WeatherLandscapeArtwork({ regime, className = "" }: WeatherLands
         {isSunny && (
           <>
             {/* Diffused outer aura */}
-            <circle cx="195" cy="65" r="75" fill="url(#sun-glow)" opacity="0.65" />
+            <circle cx="195" cy="65" r="75" fill="url(#sun-glow)" opacity="0.45" />
             {/* Crisp glowing sun sphere */}
-            <circle cx="195" cy="65" r="24" fill="#fef08a" />
+            <circle cx="195" cy="65" r="24" fill="#fef08a" opacity="0.75" />
           </>
         )}
 
         {isCloudy && (
           <>
-            <circle cx="190" cy="70" r="80" fill="url(#cloudy-glow)" />
+            <circle cx="190" cy="70" r="80" fill="url(#cloudy-glow)" opacity="0.4" />
             {/* Soft cloud silhouettes */}
             <path
               d="M140 75 C140 65 155 58 170 63 C180 52 205 52 215 62 C225 60 238 68 238 78 Z"
               fill="#475569"
-              fillOpacity="0.4"
+              fillOpacity="0.25"
             />
           </>
         )}
 
         {isStormy && (
           <>
-            <circle cx="190" cy="65" r="70" fill="url(#sun-glow)" opacity="0.3" />
+            <circle cx="190" cy="65" r="70" fill="url(#sun-glow)" opacity="0.2" />
             <path
               d="M150 70 C160 55 190 55 200 65 C215 60 235 70 235 85 Z"
               fill="#334155"
-              fillOpacity="0.6"
+              fillOpacity="0.35"
             />
           </>
         )}
 
         {isFreezing && (
           <>
-            <circle cx="195" cy="65" r="70" fill="url(#freezing-glow)" opacity="0.5" />
-            <circle cx="195" cy="65" r="18" fill="#e0f2fe" fillOpacity="0.75" />
+            <circle cx="195" cy="65" r="70" fill="url(#freezing-glow)" opacity="0.35" />
+            <circle cx="195" cy="65" r="18" fill="#e0f2fe" fillOpacity="0.5" />
           </>
         )}
 
@@ -117,7 +117,7 @@ export function WeatherLandscapeArtwork({ regime, className = "" }: WeatherLands
           d="M110 160 L160 112 C180 96 210 100 235 118 L260 132"
           stroke="#5eead4"
           strokeWidth="0.75"
-          strokeOpacity="0.4"
+          strokeOpacity="0.2"
         />
 
         {/* Foreground Rolling Slopes */}
@@ -129,7 +129,7 @@ export function WeatherLandscapeArtwork({ regime, className = "" }: WeatherLands
           d="M0 145 C45 130 95 138 140 120 C180 105 220 115 260 95"
           stroke="#2dd4bf"
           strokeWidth="1"
-          strokeOpacity="0.55"
+          strokeOpacity="0.25"
         />
       </svg>
     </div>

@@ -3,6 +3,14 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 
 describe("home route render contract", () => {
+  it("keeps cadence access below the decision content, out of the home fold", () => {
+    const source = readFileSync("app/page.tsx", "utf8");
+    assert.equal(source.split("<CadenceSelector").length - 1, 1);
+    assert.ok(source.indexOf("<CadenceSelector") > source.indexOf('<BelowTheFoldEvidence'), "read the call before choosing a longer horizon");
+    const header = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
+    assert.ok(!header.includes("<CadenceSelector"));
+  });
+
   it("keeps the active / route carrying the homepage decision contract", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
 
@@ -102,12 +110,12 @@ describe("home route render contract", () => {
     assert.ok(paletteSource.includes('navigateTo("/history")'), "command palette keeps the history deep link");
   });
 
-it("opens the command palette from the header search button", () => {
+  it("opens the shared command palette from the header search button", () => {
     const actionsSource = readFileSync("app/components/globalHeaderActionsClient.tsx", "utf8");
     const paletteSource = readFileSync("app/components/commandPalette.tsx", "utf8");
 
     assert.ok(actionsSource.includes('aria-label="Search"'), "header has a search button");
-    assert.ok(actionsSource.includes("setShowPalette(true)"), "search button opens the command palette");
+    assert.ok(actionsSource.includes('new CustomEvent("whether-open-command-palette")'), "header uses the same palette as mobile and keyboard shortcuts");
     assert.ok(paletteSource.includes("aria-label=\"Command palette\""), "command palette is accessible");
   });
 });

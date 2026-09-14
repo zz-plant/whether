@@ -43,9 +43,10 @@ export const SignalsDecisionSummarySection = ({
       className="weather-panel scroll-mt-28 space-y-6 px-6 py-5"
       aria-label="Decision summary"
     >
-      <p className="weather-surface flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-        {decisionDeltaLabel}
-      </p>
+      <div className="flex items-center gap-2.5 rounded-lg border border-slate-800/80 bg-slate-950/40 px-3.5 py-2.5 text-xs text-slate-300">
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true" />
+        <span className="font-medium tracking-[0.02em]">{decisionDeltaLabel}</span>
+      </div>
       <article className="weather-surface space-y-3 p-4">
         <p className="type-eyebrow text-sky-200">What this means now</p>
         <div className="grid gap-3 lg:grid-cols-3">
@@ -108,19 +109,20 @@ export const SignalsDecisionSummarySection = ({
                 </div>
               </dl>
             ) : (
-              <p className="mt-2 text-sm text-slate-200">
-                <span className="mr-1 type-eyebrow text-amber-200">
-                  Wrong if:
-                </span>{" "}
-                <span>{triggerCondition}</span>{" "}
-                <span aria-hidden="true" className="text-slate-400">
-                  ·
-                </span>{" "}
-                <span className="mr-1 type-eyebrow text-amber-200">
-                  Safe again when:
-                </span>{" "}
-                <span>{reversalCondition}</span>
-              </p>
+              <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-semantic-caution-fg">
+                    Wrong if:
+                  </dt>
+                  <dd className="min-w-0">{triggerCondition}</dd>
+                </div>
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="shrink-0 font-semibold text-semantic-easing-fg">
+                    Safe again when:
+                  </dt>
+                  <dd className="min-w-0">{reversalCondition}</dd>
+                </div>
+              </dl>
             )}
           </div>
         </div>
@@ -201,21 +203,26 @@ export const SignalsDecisionSummarySection = ({
           is titled "Also moved" and its items are in rank order, which carries
           the same information without implying an absent row. */}
         {topDiagnosticCallouts.length > 1 ? (
-          <article className="weather-surface space-y-3 p-5">
-            <p className="type-eyebrow text-sky-200">Also moved</p>
-            <ul className="space-y-3" aria-label="Top mover callouts">
-              {topDiagnosticCallouts.slice(1).map((item) => (
-                <li
-                  key={item.label}
-                  className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
-                >
-                  <p className="text-sm font-semibold text-slate-100">
-                    {displaySignalLabel(item.label)}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-                </li>
-              ))}
-            </ul>
+          <article className="weather-surface flex flex-col justify-between p-5">
+            <div className="space-y-3">
+              <p className="type-eyebrow text-sky-200">Also moved</p>
+              <ul className="space-y-3" aria-label="Top mover callouts">
+                {topDiagnosticCallouts.slice(1).map((item) => (
+                  <li
+                    key={item.label}
+                    className="rounded-md border border-slate-800/80 bg-slate-950/40 p-3"
+                  >
+                    <p className="text-sm font-semibold text-slate-100">
+                      {displaySignalLabel(item.label)}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="mt-4 border-t border-slate-800/60 pt-3 text-xs text-slate-400">
+              Check the scorecard below for watch lines and historical distance on each signal.
+            </p>
           </article>
         ) : null}
       </div>

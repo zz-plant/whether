@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { Search } from "lucide-react";
-import { CommandPalette } from "./commandPalette";
 import { ThemeToggleButton } from "./themeToggleButton";
 import { PresentModeButton } from "./PresentModeButton";
 
@@ -39,36 +37,31 @@ const CELL =
   "inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center text-slate-400 transition-colors duration-150 hover:bg-slate-800/70 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sky-400";
 
 export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHeaderActionsClientProps = {}) {
-  const [showPalette, setShowPalette] = useState(false);
-
   return (
-    <>
-      <div className="inline-flex items-stretch rounded-lg border border-slate-800/80 bg-slate-900/60 divide-x divide-slate-800/80 [&>*:first-child]:rounded-l-[7px] [&>*:last-child]:rounded-r-[7px]">
-        {/* Input-shaped, the way GitHub and Notion do it: the palette is the
-            richest way around the site and an unlabeled magnifier hid it. Below
-            md the bottom tab bar carries Search, so the icon is enough there. */}
-        <button
-          type="button"
-          onClick={() => setShowPalette(true)}
-          className={`${CELL} md:min-w-[13rem] md:justify-start md:gap-2 md:px-3 md:text-fluid-xs md:text-slate-400`}
-          aria-label="Search"
-          title="Search or jump to… ⌘K"
-        >
-          <Search aria-hidden="true" size={16} strokeWidth={1.8} />
-          <span className="hidden md:inline flex-1 text-left">Search or jump to…</span>
-          <kbd aria-hidden="true" className="hidden md:inline rounded border border-slate-800 bg-slate-900/80 px-1.5 font-mono text-[10px] leading-4 text-slate-500">⌘K</kbd>
-        </button>
-        {/* The light theme has a full token set in tokens.css and layout.tsx
-            restores the saved choice pre-paint, but nothing rendered the control,
-            so the theme was unreachable from the UI. Takes the cell class rather
-            than its own pill default, like the buttons either side. */}
-        <ThemeToggleButton className={`!rounded-none !shadow-none !outline-offset-[-2px] ${CELL}`} />
-        {showPresentMode ? (
-          <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
-        ) : null}
-      </div>
-      {showPalette ? <CommandPalette onClose={() => setShowPalette(false)} /> : null}
-    </>
+    <div className="inline-flex items-stretch rounded-lg border border-slate-800/80 bg-slate-900/60 divide-x divide-slate-800/80 [&>*:first-child]:rounded-l-[7px] [&>*:last-child]:rounded-r-[7px]">
+      {/* Input-shaped, the way GitHub and Notion do it: the palette is the
+          shared search entry point. Below md, the bottom tab bar owns Search.
+          Both triggers open the global palette so shortcuts cannot stack dialogs. */}
+      <button
+        type="button"
+        onClick={() => document.dispatchEvent(new CustomEvent("whether-open-command-palette"))}
+        className={`${CELL} max-md:hidden md:min-w-[13rem] md:justify-start md:gap-2 md:px-3 md:text-fluid-xs md:text-slate-400`}
+        aria-label="Search"
+        title="Search or jump to… ⌘K"
+      >
+        <Search aria-hidden="true" size={16} strokeWidth={1.8} />
+        <span className="hidden md:inline flex-1 text-left">Search or jump to…</span>
+        <kbd aria-hidden="true" className="hidden md:inline rounded border border-slate-800 bg-slate-900/80 px-1.5 font-mono text-[10px] leading-4 text-slate-500">⌘K</kbd>
+      </button>
+      {/* The light theme has a full token set in tokens.css and layout.tsx
+          restores the saved choice pre-paint, but nothing rendered the control,
+          so the theme was unreachable from the UI. Takes the cell class rather
+          than its own pill default, like the buttons either side. */}
+      <ThemeToggleButton className={`!rounded-none max-md:!rounded-l-lg !shadow-none !outline-offset-[-2px] ${CELL}`} />
+      {showPresentMode ? (
+        <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
+      ) : null}
+    </div>
   );
 }
 

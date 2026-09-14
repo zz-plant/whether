@@ -112,8 +112,8 @@ export function ReportSection({
             its own shadow reads as floating above the thing containing it —
             the depth ladder in surfaces.css exists to prevent exactly that, and
             cannot see a bespoke one written as a utility. */}
-        <div className="rounded border border-slate-800/55 bg-slate-950/35 p-4 sm:p-5">
-          <div className="space-y-6">{children}</div>
+        <div className={hideHeader ? "space-y-6" : "rounded border border-slate-800/55 bg-slate-950/35 p-4 sm:p-5"}>
+          {hideHeader ? children : <div className="space-y-6">{children}</div>}
         </div>
       </section>
     );

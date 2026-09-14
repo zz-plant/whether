@@ -155,8 +155,14 @@ export function SignalInversionPreview({
           <span>{latest?.label}</span>
         </div>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
-          <span>10Y−2Y {formatBp(latest?.spread10Y2Y ?? null)}</span>
-          <span>2Y−3M {formatBp(latest?.spread2Y3M ?? null)}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+            <span>10Y−2Y <strong className="font-semibold text-slate-100">{formatBp(latest?.spread10Y2Y ?? null)}</strong></span>
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
+            <span>2Y−3M <strong className="font-semibold text-slate-100">{formatBp(latest?.spread2Y3M ?? null)}</strong></span>
+          </span>
           <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
           {/* Autoscaled to the visible window, so the extent has to be stated. */}
           <span className="tabular-nums text-slate-400">

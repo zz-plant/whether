@@ -122,10 +122,10 @@ export function StressTestQuickCard({
         {/* Open Plan CTA */}
         <Link
           href={planHref}
-          className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-1.5 rounded-xl bg-teal-400 px-6 py-2.5 text-xs font-semibold text-slate-950 shadow-md transition-all hover:bg-teal-300 hover:shadow-teal-500/20 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 no-underline"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/15 px-5 py-2 text-xs font-semibold text-teal-300 transition-colors hover:bg-teal-500/25 hover:border-teal-500/50 weather-press-scale focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 no-underline"
         >
           <span>Open in Planning</span>
-          <ArrowRight size={15} />
+          <ArrowRight size={14} />
         </Link>
       </div>
 

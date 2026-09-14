@@ -34,6 +34,7 @@ artifacts/landmarks
 .sisyphus/
 .codex/
 .agent/
+.claude/
 
 # QA screenshots and snapshot dumps.
 # These are one-off local artifacts, never inputs. Keep the repo root scannable:
