@@ -98,7 +98,15 @@ export const PlaybookPanel = ({
               <tbody>
                 {visibleActionStripItems.map((item) => (
                   <tr key={item.lever} className="border-b border-slate-800/50 align-top">
-                    <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{item.label}</th>
+                    <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">
+                      {item.label}
+                      {item.ownerLabel ? (
+                        <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">Owner: {item.ownerLabel}</span>
+                      ) : null}
+                      {item.latencyLine ? (
+                        <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">{item.latencyLine}</span>
+                      ) : null}
+                    </th>
                     <td className="py-2 pr-3 text-emerald-100" data-label={DECISION_CONTRACT_LABELS.action.actionNow}>{item.areaActionNow}</td>
                     <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.threshold.pauseIf}>
                       <RuleLines

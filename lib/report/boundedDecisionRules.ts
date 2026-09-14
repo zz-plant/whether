@@ -1,6 +1,7 @@
 import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeKey } from "../regimeEngine";
 import { formatThresholdNumber } from "../formatters";
+import { decisionLatencyByArea, type DecisionLatency } from "./decisionLatency";
 import {
   extractCompactClause as extractCompactClauseFromFormatting,
   formatDecisionAction,
@@ -59,6 +60,12 @@ export type BoundedDecisionRule = {
   resumeTrigger: string;
   /** Additional conditions that would flip the regime/decision */
   flipConditions: RuleCondition[];
+  /**
+   * The clock this lever runs on: when the action is felt and what unwinding
+   * costs. Set by the canonical builder; hand-built rules (tests, fixtures)
+   * may omit it, and renderers must tolerate that.
+   */
+  latency?: DecisionLatency;
   rationale: string;
 };
 
@@ -147,9 +154,10 @@ export const formatRuleClause = (clause: BoundedRuleClause, side: "pause" | "res
 };
 
 const withDerivedTriggers = (
-  rule: Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions">,
+  rule: Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions" | "latency">,
 ): BoundedDecisionRule => ({
   ...rule,
+  latency: decisionLatencyByArea[rule.area],
   pauseTrigger: formatRuleClause(rule.pause, "pause"),
   resumeTrigger: formatRuleClause(rule.resume, "resume"),
   flipConditions: rule.resume.conditions,
@@ -277,7 +285,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
   const tightnessResumeLine = buildRuleCondition("tightness", "<", tightnessResume);
   const riskResumeLine = buildRuleCondition("riskAppetite", ">", riskResume);
 
-  const rulesByArea: Record<DecisionArea, Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions">> = {
+  const rulesByArea: Record<DecisionArea, Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions" | "latency">> = {
     hiring: {
       area: "hiring",
       recommendation: isExpansion

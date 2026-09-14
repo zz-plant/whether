@@ -71,4 +71,16 @@ describe("/brief.md", () => {
     assert.doesNotMatch(markdown, /\{"[a-zA-Z]+":/, "brief.md leaked a serialized object");
     assert.doesNotMatch(markdown, /\[object Object\]/);
   });
+
+  it("carries each decision's timing line into the Decisions section", async () => {
+    const markdown = await renderBrief();
+
+    const decisions = sectionsOf(markdown).find((section) => section.heading === "Decisions");
+    assert.ok(decisions, "expected a 'Decisions' section");
+
+    // Canonical action strip items always carry latency, so the published
+    // document answers "when does acting this week actually bite" per lever.
+    const timingCount = (decisions.body.match(/· Timing: /g) ?? []).length;
+    assert.ok(timingCount > 0, "expected at least one Timing entry in the Decisions section");
+  });
 });

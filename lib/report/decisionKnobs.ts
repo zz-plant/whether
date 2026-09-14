@@ -30,6 +30,21 @@ export const businessAreaLabel: Record<BusinessAreaKey, string> = {
   "risk-tolerance": "Risk tolerance",
 };
 
+/**
+ * The role that owns each lever's line, for tables and artifacts where the
+ * reader needs to route the decision, not just read it. Role nouns match the
+ * sales-pack ICP (VP Product, VP Engineering, founder-CEO, Finance lead);
+ * fundraising deliberately names the CEO + Finance pair, which the weekly lock
+ * commitment already assigns as review owners.
+ */
+export const businessAreaOwner: Record<BusinessAreaKey, string> = {
+  "hiring-stance": "VP Eng",
+  "investment-pace": "CEO",
+  "sales-posture": "CEO + Finance lead",
+  "product-priorities": "VP Product",
+  "risk-tolerance": "Finance lead",
+};
+
 export type DecisionKnob = {
   key: "approvalVelocity" | "reversibility" | "payback" | "experimentTolerance";
   label: string;

@@ -10,7 +10,8 @@ import {
   type RuleCondition,
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
-import { businessAreaLabel, businessAreaOrder, type BusinessAreaKey } from "./decisionKnobs";
+import { formatDecisionLatencyLine } from "./decisionLatency";
+import { businessAreaLabel, businessAreaOrder, businessAreaOwner, type BusinessAreaKey } from "./decisionKnobs";
 import { joinSentences } from "./reportFormatting";
 
 /**
@@ -39,6 +40,8 @@ import type { DecisionTransmissionBoundedRule } from "./reportData";
 export type ActionStripItem = {
   lever: BusinessAreaKey;
   label: string;
+  /** The role that owns this lever's line (see `businessAreaOwner`). Absent on hand-built rows. */
+  ownerLabel?: string;
   /** Per-area action imperative. Distinct from the top-level actionNowShort which is the overall weekly call. */
   areaActionNow: string;
   triggerThreshold: string;
@@ -47,6 +50,8 @@ export type ActionStripItem = {
   pauseConditions?: RuleCondition[];
   /** The resume lines as data. */
   resumeConditions?: RuleCondition[];
+  /** The lever's clock: when the action is felt and what unwinding costs. Absent for fallback rows. */
+  latencyLine?: string;
   /** A non-numeric pause condition stated alongside the lines, e.g. "two consecutive weaker weekly reads print". */
   pauseQualifier?: string;
   /** A non-numeric resume condition stated alongside the lines. */
@@ -463,11 +468,13 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
     return {
       lever,
       label: businessAreaLabel[lever],
+      ownerLabel: businessAreaOwner[lever],
       areaActionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.areaActionNow,
       triggerThreshold: rule ? formatActionStripThresholdText(rule) : OPERATING_LEVER_FALLBACK.triggerThreshold,
       reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,
       pauseConditions: rule?.pause.conditions ?? [],
       resumeConditions: rule?.resume.conditions ?? [],
+      latencyLine: rule?.latency ? formatDecisionLatencyLine(rule.latency) : undefined,
       pauseQualifier: rule?.pause.qualifier,
       resumeQualifier: rule?.resume.qualifier,
       nearestPause: laneState?.nearestPause,

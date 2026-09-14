@@ -40,7 +40,14 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const decisions = actionItems
-    .map((item) => `- ${item.areaActionNow} (Threshold: ${item.triggerThreshold} · Reversal: ${item.reversalCondition})`)
+    .map((item) =>
+      [
+        `- ${item.areaActionNow}`,
+        `(Threshold: ${item.triggerThreshold} · Reversal: ${item.reversalCondition}`,
+        ...(item.latencyLine ? [` · Timing: ${item.latencyLine}`] : []),
+        ")",
+      ].join(""),
+    )
     .join("\n");
 
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];

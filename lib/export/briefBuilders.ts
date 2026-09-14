@@ -6,6 +6,7 @@ import { buildComplianceStamp } from "../exportNotices";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import {
@@ -105,6 +106,7 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
       `• ${item.label}: ${item.areaActionNow}`,
       `  ${publicDecisionLabels.threshold}: ${formatItemLines(item, "pause")}`,
       `  ${publicDecisionLabels.reversal}: ${formatItemLines(item, "resume")}`,
+      ...(item.latencyLine ? [`  ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
     ]),
   ];
 };
@@ -195,6 +197,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `  ${publicDecisionLabels.action}: ${item.areaActionNow}`,
     `  ${publicDecisionLabels.threshold}: ${item.triggerThreshold}`,
     `  ${publicDecisionLabels.reversal}: ${item.reversalCondition}`,
+    ...(item.latencyLine ? [`  ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
   ]);
 
   return [
