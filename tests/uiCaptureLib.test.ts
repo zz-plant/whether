@@ -51,10 +51,10 @@ describe("ui capture helpers", () => {
     };
 
     const waited = await waitForCaptureReady(page, {
-      id: "mockups",
-      label: "Mockups",
-      path: "/mockups",
-      viewport: { width: 1440, height: 1000 },
+      id: "trust-desktop",
+      label: "Trust / desktop",
+      path: "/trust",
+      viewport: { width: 1600, height: 1400 },
     });
 
     assert.equal(waited, false);

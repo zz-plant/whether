@@ -49,8 +49,8 @@ Prefer changing these before changing home presentation:
 ## Tests and docs to update
 
 When home orchestration or section order changes, update:
-- `tests/homeWeeklyComposition.test.tsx`
-- `tests/homeWorkspaceBandsSections.test.tsx`
+- `tests/homeRouteDecisionTransmissionContract.test.tsx` (section/cadence placement contract)
+- `tests/homePageHeading.test.ts`
 - `tests/reportShellSections.test.tsx` if shell behavior changes
 - `docs/feature-specs-current.md`
 
