@@ -46,7 +46,6 @@ import { KeyDriversCard } from "./components/hero/KeyDriversCard";
 import { buildDriverViews } from "../lib/report/driverDecisionViews";
 import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
-import { WhatCouldChangeCard } from "./components/hero/WhatCouldChangeCard";
 import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { StageDropdownPill } from "./components/StageDropdownPill";
@@ -343,10 +342,6 @@ async function PageContent({
         href: `${operateHref}#${rule.area}`,
       })) ?? []);
 
-  const primaryFlipText = flipConditionLabels?.[0]
-    ?? reversalTriggerLabel
-    ?? `Rises above ${reportData.assessment.thresholds.tightnessRegime} (${tightness} today), which could flip the call to Cloudy.`;
-
   return (
     <>
       <BriefArtifactScript artifact={briefArtifact} />
@@ -508,40 +503,12 @@ async function PageContent({
                 title="Key drivers & actions"
                 description="Threshold proximity, action ladder, and counterfactual triggers"
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
                 <KeyDriversCard views={driverViews} />
 
                 <ActionsThisWeekCard
                   actions={cardActions}
                   operateHref={operateHref}
-                />
-
-                <WhatCouldChangeCard
-                  items={[
-                    {
-                      id: "funding",
-                      label: `Funding pressure > ${reportData.assessment.thresholds.tightnessRegime}`,
-                      description: tightness >= reportData.assessment.thresholds.tightnessRegime
-                        ? "already above warning threshold; restricts hiring."
-                        : "increases likelihood of Cloudy posture.",
-                      icon: "alert",
-                    },
-                    {
-                      id: "risk",
-                      label: `Risk appetite < ${reportData.assessment.thresholds.riskAppetiteRegime}`,
-                      description: primaryFlipText.toLowerCase().includes("risk appetite")
-                        ? primaryFlipText
-                        : "likely flips call to Cloudy / Defensive.",
-                      icon: "arrow",
-                    },
-                    {
-                      id: "rates",
-                      label: "Further macro deterioration",
-                      description: "raises financing costs and debt burden.",
-                      icon: "percent",
-                    },
-                  ]}
-                  signalsHref="/signals"
                 />
               </div>
 
@@ -629,7 +596,20 @@ async function PageContent({
             <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
               <span className="text-fluid-sm text-slate-400">Planning horizon</span>
-              <CadenceSelector />
+              <CadenceSelector
+                onNavigate={() => {
+                  /*
+                   * The selector sits below the fold but the cadence card it controls
+                   * renders in `#weekly-call` — a change otherwise moved content only
+                   * where the reader could not see it. The scroll stays out of the
+                   * selector itself so the control keeps its one job.
+                   */
+                  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                  document
+                    .getElementById("weekly-call")
+                    ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+                }}
+              />
             </div>
           </div>
         </div>
