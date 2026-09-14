@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReportSectionLink } from "./reportShellNavigation";
-import { primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
+import { loopNavigationLayers } from "../../lib/navigation/informationArchitecture";
 import {
   resolveActiveSectionId,
   sectionIdsFromHrefs,
@@ -14,32 +14,58 @@ function OutlineItem({
   href,
   label,
   isActive,
+  stepNumber,
+  shortcut,
 }: {
   href: string;
   label: string;
   isActive: boolean;
+  stepNumber?: string;
+  shortcut?: string;
 }) {
   const isHash = href.startsWith("#");
-  const linkClass = `block rounded-md px-3 py-2 md:py-1.5 text-sm no-underline transition-colors min-h-[44px] md:min-h-0 flex items-center ${
+  const linkClass = `rounded-lg px-2.5 py-1.5 text-fluid-xs no-underline transition-colors min-h-[38px] flex items-center justify-between group weather-focus-ring ${
     isActive
-      ? "bg-sky-500/10 text-sky-100 font-medium"
-      : "text-slate-400 hover:bg-slate-800/30 hover:text-slate-200"
+      ? "bg-sky-500/15 text-white font-semibold border-l-2 border-sky-400 pl-2"
+      : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 border-l-2 border-transparent pl-2"
   }`;
+
+  const content = (
+    <>
+      <span className="flex items-center gap-2 truncate">
+        {stepNumber ? (
+          <span
+            className={`font-mono text-[10px] tabular-nums ${
+              isActive ? "font-bold text-sky-300" : "text-slate-500"
+            }`}
+          >
+            {stepNumber}
+          </span>
+        ) : null}
+        <span className="truncate">{label}</span>
+      </span>
+      {shortcut ? (
+        <kbd
+          aria-hidden="true"
+          className="rounded border border-slate-800 bg-slate-900/80 px-1 font-mono text-[9.5px] leading-3 text-slate-500 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+        >
+          {shortcut}
+        </kbd>
+      ) : null}
+    </>
+  );
 
   if (isHash) {
     return (
-      // aria-current="location" is the ARIA value for "the current place within
-      // a page", which is exactly what an outline entry marks. Without it the
-      // active state was colour only.
       <a href={href} className={linkClass} aria-current={isActive ? "location" : undefined}>
-        {label}
+        {content}
       </a>
     );
   }
 
   return (
-    <Link href={href} className={linkClass}>
-      {label}
+    <Link href={href} className={linkClass} aria-current={isActive ? "page" : undefined}>
+      {content}
     </Link>
   );
 }
@@ -124,7 +150,7 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
             On this page
           </p>
           <nav aria-label="Page sections" className="space-y-0.5">
-            {sectionLinks.map((section) => {
+            {sectionLinks.map((section, index) => {
               const isActive = section.href === `#${activeSectionId}`;
               return (
                 <OutlineItem
@@ -132,6 +158,7 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
                   href={section.href}
                   label={section.label}
                   isActive={isActive}
+                  stepNumber={`0${index + 1}`}
                 />
               );
             })}
@@ -145,7 +172,7 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
         Workflow
       </p>
       <nav aria-label="Workflow" className="space-y-0.5">
-        {primaryNavigationLayers.map((route) => {
+        {loopNavigationLayers.map((route, index) => {
           const isActive =
             route.href === "/"
               ? pathname === "/"
@@ -156,6 +183,8 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
               href={route.href}
               label={route.navLabel ?? route.label}
               isActive={isActive}
+              stepNumber={`0${index + 1}`}
+              shortcut={route.shortcut}
             />
           );
         })}

@@ -8,6 +8,7 @@ import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { Tag } from "../../components/ui/tag";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import {
   buildBreadcrumbList,
   buildCanonicalUrl,
@@ -160,6 +161,14 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "History", href: "/history" },
+          { label: `Week of ${brief.recordDateLabel}` },
+        ]}
+      />
 
       <article className="flex flex-col gap-6">
         <header className="weather-panel space-y-4 px-6 py-6">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
-import { OperationsWorkstreamNav } from "./components/planningWorkstreamNav";
+import { CompactWorkstreamSwitcher, OperationsWorkstreamNav } from "./components/planningWorkstreamNav";
 import { WorkstreamNavFallback } from "../components/suspenseFallbacks";
 import {
   buildPlanningPageModel,
@@ -34,6 +34,9 @@ export default async function OperationsPage({
   const { reportShellModel, children } = await buildPlanningPageModel(searchParams);
   return (
     <ReportShell model={reportShellModel}>
+      <Suspense fallback={<WorkstreamNavFallback />}>
+        <CompactWorkstreamSwitcher currentPath="/operate" />
+      </Suspense>
       {children}
       <Suspense fallback={<WorkstreamNavFallback />}>
         <OperationsWorkstreamNav currentPath="/operate" />

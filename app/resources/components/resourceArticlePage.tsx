@@ -14,6 +14,7 @@ import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } fr
 import { CopyAnchorButton } from "./copyAnchorButton";
 import { isIndexableResourceArticleSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
 
@@ -161,6 +162,14 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }} />
 
       <div className="space-y-6 print:text-black">
+        <Breadcrumbs
+          className="print:hidden"
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Resources", href: "/resources" },
+            { label: article.title },
+          ]}
+        />
         {decisionArtifact ? (
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
             <p className="type-eyebrow">This week&apos;s call</p>

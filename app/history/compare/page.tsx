@@ -127,6 +127,12 @@ export default async function HistoryComparePage({
   // Combine actions for the shell
   const isFallback = Boolean(reportA.treasury?.fallback_at || reportA.treasury?.fallback_reason);
 
+  const compareSectionLinks = [
+    { href: "#compare-selectors", label: "Period selection" },
+    { href: "#compare-key-deltas", label: "Macro deltas" },
+    { href: "#ops-compare-grid", label: "Side-by-side rules" },
+  ];
+
   return (
     <ReportShell
       model={{
@@ -140,7 +146,7 @@ export default async function HistoryComparePage({
           pageTitle: "Compare two periods",
           currentPath: "/history/compare",
           pageSummary: "Signals and operating calls for any two past months, side by side.",
-          sectionLinks: [],
+          sectionLinks: compareSectionLinks,
         },
         trust: {
           trustStatusLabel: snapA.trustStatus.trustStatusLabel,
@@ -174,7 +180,7 @@ export default async function HistoryComparePage({
     >
       <div className="space-y-6">
         {/* Date Selectors Row */}
-        <div className="grid gap-6 md:grid-cols-2 p-6 rounded-lg border border-slate-800 bg-slate-950/60 backdrop-blur-md">
+        <div id="compare-selectors" className="grid gap-6 md:grid-cols-2 p-6 rounded-lg border border-slate-800 bg-slate-950/60 backdrop-blur-md">
           <DateSelector
             label="Period A"
             paramPrefix="A"
@@ -192,7 +198,7 @@ export default async function HistoryComparePage({
         </div>
 
         {/* Delta Analysis Panel */}
-        <section className="weather-panel p-6">
+        <section id="compare-key-deltas" className="weather-panel p-6">
           <p className="type-label text-slate-400">Difference</p>
           <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
           

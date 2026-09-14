@@ -12,6 +12,7 @@ import {
 } from "../../../lib/decisionDomainCatalog";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 type Params = { slug: string };
 
@@ -58,6 +59,13 @@ export default async function DecideDetailPage({
   if (role) {
     return (
       <ContentPageShell>
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Resolve", href: "/resolve" },
+            { label: `For ${role.title}` },
+          ]}
+        />
         <section className="weather-panel space-y-4 px-6 py-6">
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {role.title}</h1>
           <p className="text-sm text-slate-300">Current decisions</p>
@@ -91,6 +99,13 @@ export default async function DecideDetailPage({
 
   return (
     <ContentPageShell>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Resolve", href: "/resolve" },
+          { label: situationUseCase?.title || titleCase(slug) },
+        ]}
+      />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>
         <p className="text-sm text-slate-300">The strongest paths for this decision.</p>

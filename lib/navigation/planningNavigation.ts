@@ -27,7 +27,11 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   },
 ];
 
-export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
+export const operationsSectionLinks: {
+  plan: ReportSectionLink[];
+  financial: ReportSectionLink[];
+  scenarios: ReportSectionLink[];
+} = {
   plan: [
     { href: "#ops-monthly-action-summary", label: "Start here" },
     { href: "#ops-failure-patterns", label: "Risk checks" },
@@ -35,5 +39,16 @@ export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
     { href: "#ops-finance-strategy", label: "Finance strategy" },
     { href: "#ops-export-briefs", label: "Share brief" },
     { href: "#ops-operator-requests", label: "Operator requests" },
+  ],
+  financial: [
+    { href: "#ops-runway-inputs", label: "Financial inputs" },
+    { href: "#ops-runway-risk", label: "Runway analysis" },
+    { href: "#ops-board-memo", label: "Board memo" },
+  ],
+  scenarios: [
+    { href: "#scenario-presets-heading", label: "Presets" },
+    { href: "#sliders-controls-heading", label: "Simulation controls" },
+    { href: "#deltas-heading", label: "Score deltas" },
+    { href: "#playbook-deltas-heading", label: "Playbook deltas" },
   ],
 };

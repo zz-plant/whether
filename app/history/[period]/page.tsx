@@ -28,6 +28,7 @@ import {
   type PostureArchivePeriod,
 } from "../../../lib/summary/postureArchive";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 type Params = { period: string };
 
@@ -113,6 +114,15 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
     <ContentPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleStructuredData) }} />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "History", href: "/history" },
+          ...(parent ? [{ label: parent.title, href: buildPostureArchivePath(parent.slug) }] : []),
+          { label: period.title },
+        ]}
+      />
 
       <nav aria-label="Archive navigation" className="flex flex-wrap gap-2">
         <ActionLink href="/history" variant="pill">

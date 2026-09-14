@@ -6,9 +6,10 @@ import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
-import { OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
+import { CompactWorkstreamSwitcher, OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
 import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 export const runtime = "edge";
 
@@ -112,7 +113,7 @@ export default async function OperateWorkstreamPage({
           pageTitle: entry.pageTitle,
           currentPath,
           pageSummary: entry.pageSummary,
-          sectionLinks: operationsSectionLinks.plan,
+          sectionLinks: operationsSectionLinks[entry.slug] ?? operationsSectionLinks.plan,
         },
         trust: {
           trustStatusLabel,
@@ -142,6 +143,16 @@ export default async function OperateWorkstreamPage({
       }}
     >
       <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Plan", href: "/operate" },
+            { label: entry.pageTitle },
+          ]}
+        />
+        <Suspense fallback={<WorkstreamNavFallback />}>
+          <CompactWorkstreamSwitcher currentPath={currentPath} />
+        </Suspense>
         {entry.intro ? (
           <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400">
             {entry.intro}

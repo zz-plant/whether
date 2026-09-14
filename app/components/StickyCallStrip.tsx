@@ -119,6 +119,79 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
             </span>
             <span className={`hidden flex-shrink-0 text-fluid-xs tabular-nums font-medium ${deltaColor} min-[430px]:inline`}>{deltaLabel}</span>
+            <details className="group relative hidden min-[480px]:block">
+              <summary
+                tabIndex={0}
+                className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-2.5 text-fluid-xs font-medium text-slate-300 transition-all hover:border-[color:var(--border-strong)] hover:text-white hover:bg-[color:var(--bg-raised)] active:scale-[0.97] weather-focus-ring cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+                aria-label="Jump to brief section"
+              >
+                <span>Jump</span>
+                <span aria-hidden="true" className="text-slate-400 text-[10px] transition-transform group-open:rotate-180">▾</span>
+              </summary>
+              <div className="absolute bottom-full right-0 z-50 mb-2 w-48 rounded-xl border border-slate-800/80 bg-slate-950/95 p-1.5 shadow-2xl backdrop-blur-xl">
+                <p className="px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-slate-500 uppercase">Brief sections</p>
+                <a
+                  href="#weekly-call"
+                  onClick={(e) => {
+                    e.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors no-underline"
+                >
+                  <span className="font-mono text-[10px] text-slate-500">01</span>
+                  <span>The call</span>
+                </a>
+                <a
+                  href="#key-drivers"
+                  onClick={(e) => {
+                    e.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors no-underline"
+                >
+                  <span className="font-mono text-[10px] text-slate-500">02</span>
+                  <span>Key drivers</span>
+                </a>
+                <a
+                  href="#since-last-visit"
+                  onClick={(e) => {
+                    e.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors no-underline"
+                >
+                  <span className="font-mono text-[10px] text-slate-500">03</span>
+                  <span>Retrospective</span>
+                </a>
+                <a
+                  href="#direct-answers"
+                  onClick={(e) => {
+                    e.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors no-underline"
+                >
+                  <span className="font-mono text-[10px] text-slate-500">04</span>
+                  <span>Direct answers</span>
+                </a>
+                <a
+                  href="#plan-and-evidence"
+                  onClick={(e) => {
+                    e.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors no-underline"
+                >
+                  <span className="font-mono text-[10px] text-slate-500">05</span>
+                  <span>Plan &amp; horizon</span>
+                </a>
+                <div className="my-1 border-t border-slate-800/60" />
+                <a
+                  href="#top"
+                  onClick={(e) => {
+                    e.currentTarget.closest("details")?.removeAttribute("open");
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-slate-400 hover:bg-slate-800/60 hover:text-white transition-colors no-underline"
+                >
+                  <span>↑ Back to top</span>
+                </a>
+              </div>
+            </details>
             <a
               href={imageBriefHref}
               download="whether-brief.png"

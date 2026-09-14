@@ -40,6 +40,7 @@ import {
 } from "../../../lib/seo/indexationPolicy";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 type Params = { slug: string };
 const RESOURCES_RETURN_HREF = "/operate" as const;
@@ -213,6 +214,14 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationSchema) }} />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Resources", href: "/resources" },
+          { label: page.h1 },
+        ]}
+      />
 
       <section className="weather-panel space-y-4 px-6 py-6">
         <div className="flex flex-wrap gap-2">

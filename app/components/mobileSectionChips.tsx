@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { ReportSectionLink } from "./reportShellNavigation";
 import { useActiveSectionId } from "./AppSidebar";
 
@@ -14,33 +15,49 @@ import { useActiveSectionId } from "./AppSidebar";
  */
 export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSectionLink[] }) {
   const activeSectionId = useActiveSectionId(sectionLinks);
+  const activeChipRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    if (activeChipRef.current) {
+      activeChipRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [activeSectionId]);
+
   if (sectionLinks.length < 2) return null;
 
   return (
     <nav
       aria-label="Page sections"
-      // The nav is the width-constrained scroll container and the list is the
-      // thing wider than it: overflow on the list itself, with min-w-max, gave
-      // the list nothing to scroll and let the page clip the trailing chips.
-      // Shown until the rail appears at lg, not md — between the two the shell
-      // used to reserve a rail column with nothing in it.
       className="sticky top-0 z-20 -mx-4 overflow-x-auto border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-4 py-1.5 backdrop-blur [scrollbar-width:none] lg:hidden"
     >
-      <ul className="flex min-w-max gap-1.5 pb-0.5">
-        {sectionLinks.map((section) => {
+      <ul className="flex min-w-max items-center gap-1.5 pb-0.5">
+        {sectionLinks.map((section, index) => {
           const isActive = section.href === `#${activeSectionId}`;
+          const stepNum = `0${index + 1}`;
           return (
             <li key={section.href}>
               <a
+                ref={isActive ? activeChipRef : undefined}
                 href={section.href}
                 aria-current={isActive ? "location" : undefined}
-                className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-md border px-3 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
+                className={`inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
                   isActive
                     ? "border-[color:var(--regime-accent)] bg-[color:var(--regime-accent)]/15 text-slate-100 font-semibold"
                     : "border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-200"
                 }`}
               >
-                {section.label}
+                <span
+                  className={`font-mono text-[9.5px] tabular-nums ${
+                    isActive ? "font-bold text-sky-300" : "text-slate-500"
+                  }`}
+                >
+                  {stepNum}
+                </span>
+                <span>{section.label}</span>
               </a>
             </li>
           );

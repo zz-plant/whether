@@ -10,73 +10,31 @@ import {
 } from "../../lib/navigation/globalHeader";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import {
-  navigationLayers,
   utilityLinks,
   type UtilityLink,
 } from "../../lib/navigation/informationArchitecture";
 
 type MobileNavContentProps = {
-  navigationLinks: GlobalHeaderNavigationLink[];
+  navigationLinks?: GlobalHeaderNavigationLink[];
+  loopLinks?: GlobalHeaderNavigationLink[];
   currentPathname: string;
   onClose: () => void;
 };
 
-function SupportingLayerItem({
-  link,
-  currentPathname,
-  onClose,
-  depth,
-}: {
-  link: typeof navigationLayers[number];
-  currentPathname: string;
-  onClose: () => void;
-  depth: number;
-}) {
-  const isActive = pathMatchesLink(link.href, currentPathname);
-  const children = navigationLayers.filter((l) => l.parentKey === link.key);
+export function MobileNavContent({ loopLinks: propLoopLinks, currentPathname, onClose }: MobileNavContentProps) {
+  const items = propLoopLinks ?? resolveGlobalHeaderLoopLinks(currentPathname);
 
-  return (
-    <>
-      <Link
-        key={link.href}
-        href={link.href}
-        aria-current={isActive ? "page" : undefined}
-        onClick={onClose}
-        className={`flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium no-underline transition-colors ${
-          isActive
-            ? "bg-sky-500/14 text-sky-100 font-semibold"
-            : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
-        }`}
-        style={{ paddingLeft: `${1 + depth * 0.75}rem` }}
-      >
-        {link.navLabel ?? link.label}
-      </Link>
-      {children.map((child) => (
-        <SupportingLayerItem
-          key={child.href}
-          link={child}
-          currentPathname={currentPathname}
-          onClose={onClose}
-          depth={depth + 1}
-        />
-      ))}
-    </>
-  );
-}
-
-export function MobileNavContent({ navigationLinks, currentPathname, onClose }: MobileNavContentProps) {
   return (
     <div className="w-full px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
       <div className="mx-auto mb-3 h-1 w-10 rounded-sm bg-slate-700" />
       <div className="space-y-4">
         <div>
           <p className="px-4 type-eyebrow mb-1.5">
-            Product
+            Operator loop
           </p>
           <nav className="space-y-0.5" aria-label="Primary operator routes">
-            {navigationLinks.map((link) => {
+            {items.map((link, idx) => {
               const isActive = link.isActive;
-              const supportingChildren = navigationLayers.filter((l) => l.parentKey === link.key);
 
               return (
                 <div key={link.href}>
@@ -84,23 +42,24 @@ export function MobileNavContent({ navigationLinks, currentPathname, onClose }: 
                     href={link.href}
                     aria-current={isActive ? "page" : undefined}
                     onClick={onClose}
-                    className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
+                    className={`flex items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
                       isActive
                         ? "bg-sky-500/14 text-sky-100 font-semibold"
                         : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
                     }`}
                   >
-                    {link.label}
+                    <span className="flex items-center gap-2.5">
+                      <span className="font-mono text-[11px] text-slate-500">
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                      <span>{link.label}</span>
+                    </span>
+                    {link.shortcut ? (
+                      <kbd className="rounded border border-slate-800 bg-slate-900/80 px-1.5 font-mono text-[10px] text-slate-500 uppercase">
+                        {link.shortcut}
+                      </kbd>
+                    ) : null}
                   </Link>
-                  {supportingChildren.map((child) => (
-                    <SupportingLayerItem
-                      key={child.href}
-                      link={child}
-                      currentPathname={currentPathname}
-                      onClose={onClose}
-                      depth={1}
-                    />
-                  ))}
                 </div>
               );
             })}
