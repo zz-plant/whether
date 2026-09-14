@@ -47,6 +47,20 @@ const weeklyActionGuidance: Record<RegimeAssessment["regime"], string> = {
   EXPANSION: "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
 };
 
+/**
+ * The expansion call when the financing read has saturated its own scale — the
+ * base-rate component alone has hit its ceiling, meaning conditions are as tight
+ * as the model can express while the quadrant still reads expansion. Publishing
+ * "scale the highest-ROI bets" into that state is how the 2026 brief ended up
+ * telling operators to move quickly while the posture layer said to freeze new
+ * commitments. One bounded rule: saturation flips the tempo word, nothing else.
+ */
+const weeklyActionGuidanceSaturatedFinancing: Record<RegimeAssessment["regime"], string> = {
+  ...weeklyActionGuidance,
+  EXPANSION:
+    "scale selectively inside proven demand lanes, and keep rollback criteria explicit",
+};
+
 const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemplate> = {
   SCARCITY: {
     climateLabel: "⚠️ RISK-OFF / CAPITAL-TIGHT",
@@ -123,7 +137,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
   EXPANSION: {
     climateLabel: "✅ RISK-ON / CAPITAL-LOOSE",
     climateSummary: [
-      "Capital is accessible and risk appetite is healthy.",
+      "Capital is accessible and financing conditions are supportive.",
       "Expect faster approvals and higher tolerance for bold bets.",
     ],
     productMeaning: [
@@ -146,20 +160,54 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
   },
 };
 
-export const getWeeklyActionGuidance = (regime: RegimeAssessment["regime"]) =>
-  weeklyActionGuidance[regime];
+/**
+ * The saturated-financing variant of the expansion template: same regime, same
+ * constraints, one honest change of tempo. The financing read is at its ceiling
+ * while the quadrant still says expansion, so the copy stops promising faster
+ * approvals the conditions cannot support.
+ */
+const weeklyOutputTemplatesSaturatedFinancing: Record<RegimeAssessment["regime"], WeeklyOutputTemplate> = {
+  ...weeklyOutputTemplates,
+  EXPANSION: {
+    ...weeklyOutputTemplates.EXPANSION,
+    climateSummary: [
+      weeklyOutputTemplates.EXPANSION.climateSummary[0],
+      "Conditions are late-cycle, so approvals stay fast only inside proven demand lanes.",
+    ],
+    productMeaning: [
+      "Scale selectively inside proven demand lanes before widening coverage",
+      weeklyOutputTemplates.EXPANSION.productMeaning[1],
+      weeklyOutputTemplates.EXPANSION.productMeaning[2],
+    ],
+  },
+};
+
+export const getWeeklyActionGuidance = (
+  regime: RegimeAssessment["regime"],
+  options: { financingSaturated?: boolean } = {},
+) =>
+  options.financingSaturated
+    ? weeklyActionGuidanceSaturatedFinancing[regime]
+    : weeklyActionGuidance[regime];
 
 
 export const buildWeeklyStructured = ({
   regime,
   constraints,
   governanceParameters,
+  financingSaturated = false,
 }: {
   regime: RegimeAssessment["regime"];
   constraints: string[];
   governanceParameters: RegimeAssessment["policyAssessment"]["governanceParameters"];
+  /** Set when the financing read has saturated while the quadrant still reads
+   *  expansion; swaps the expansion template to its selective-tempo variant. */
+  financingSaturated?: boolean;
 }): WeeklyStructured => {
-  const template = weeklyOutputTemplates[regime];
+  const template =
+    financingSaturated
+      ? weeklyOutputTemplatesSaturatedFinancing[regime]
+      : weeklyOutputTemplates[regime];
 
   return {
     climate: {
@@ -194,9 +242,13 @@ export const buildWeeklySummary = ({
   stageLabel?: string;
 }): WeeklySummary => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
-  const guidance = getWeeklyActionGuidance(assessment.regime);
+  const financingSaturated = assessment.scores.tightnessSaturated === true;
+  const guidance = getWeeklyActionGuidance(assessment.regime, { financingSaturated });
   const transitionCue = assessment.diagnostics.transitionWatch
     ? "Evidence is sitting near a regime boundary, so tighten the review cadence before expanding any commitment."
+    : "";
+  const shockCue = assessment.diagnostics.shockCrossing
+    ? "This flip crossed its line in one jump, so no published reversal condition fired — treat the call as unconfirmed until the next read."
     : "";
   const refusalCue = assessment.policyAssessment.refusal.refused
     ? joinSentences(
@@ -212,6 +264,7 @@ export const buildWeeklySummary = ({
     `The priority this week is to ${guidance}`,
     formatConfidenceSentence(assessment.diagnostics.confidence, assessment.diagnostics.intensity),
     transitionCue,
+    shockCue,
     refusalCue,
   );
   const title = recordDateLabel
@@ -221,6 +274,7 @@ export const buildWeeklySummary = ({
     regime: assessment.regime,
     constraints: assessment.constraints,
     governanceParameters: assessment.policyAssessment.governanceParameters,
+    financingSaturated: assessment.regime === "EXPANSION" && financingSaturated,
   });
   const copy = renderWeeklySummaryCopy({
     title,

@@ -5,11 +5,18 @@
 import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
+import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
 import { execFileSync } from "node:child_process";
 import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
 import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
+import {
+  resolveBaseRateWindow,
+  resolveVixReading,
+  type SeriesDataset,
+  type SeriesPoint,
+} from "./regimeArchiveContext";
 
 const START_YEAR = 2018;
 const END_YEAR = new Date().getUTCFullYear();
@@ -63,8 +70,6 @@ const seriesSourceUrls = {
 } as const;
 
 type SeriesKey = keyof typeof seriesCatalog;
-type SeriesPoint = { date: string; time: number; value: number | null };
-type SeriesDataset = { points: SeriesPoint[]; map: Map<string, number> };
 
 type WeekDescriptor = {
   year: number;
@@ -311,6 +316,16 @@ const generateWeeklySummaries = async () => {
     twoYear: await fetchSeries(seriesCatalog.twoYear),
     tenYear: await fetchSeries(seriesCatalog.tenYear),
   };
+  // Volatility drives the shock haircut and the market-stress veto; unavailable
+  // means the replay proceeds without it, with a warning, never a crash.
+  let vixDataset: SeriesDataset | null = null;
+  try {
+    vixDataset = await fetchSeries("VIXCLS");
+  } catch (error) {
+    console.warn(
+      `VIX series unavailable (${error instanceof Error ? error.message : error}); replaying without the market-stress adjustments.`,
+    );
+  }
   const basePoints = datasets.tenYear.points;
   const requiredMaps = [datasets.twoYear, datasets.tenYear];
   const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
@@ -348,8 +363,20 @@ const generateWeeklySummaries = async () => {
   const historyWeeksLimit = resolveHistoryWeeksLimit();
   const scopedWeeks =
     historyWeeksLimit === null ? weeks : weeks.slice(Math.max(0, weeks.length - historyWeeksLimit));
+  const scopedAsOfs = new Set(scopedWeeks.map((week) => week.asOf));
 
-  for (const { year, week, asOf } of scopedWeeks) {
+  /**
+   * The replay is one threaded walk over every week, not independent point
+   * reads of the scoped window: machine state carries forward (flips confirm
+   * through the gate, shocks commit and get marked), each week supplies its
+   * trailing base-rate window for the tightening-speed term, and each week
+   * supplies its VIX reading for the haircut and the market-stress veto. A
+   * partial `HISTORY_WEEKS` run still threads from the start so a merge lands
+   * with the same confirmations a full replay would have produced.
+   */
+  let machineState: RegimeMachineSnapshot | null = null;
+
+  for (const { year, week, asOf } of weeks) {
     const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
     assertCoverageForAsOf(asOf, asOfTime, datasets);
     const recordDate = findLatestCommonDate(
@@ -364,7 +391,18 @@ const generateWeeklySummaries = async () => {
     }
 
     const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
-    const assessment = evaluateRegime(treasury);
+    const vixReading = resolveVixReading(vixDataset, recordDate, asOfTime, fetchedAt);
+    const assessment = evaluateRegime(
+      treasury,
+      undefined,
+      vixReading ? [vixReading] : [],
+      machineState,
+      { baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, recordDate, asOfTime) },
+    );
+    machineState = assessment.regimeTransition?.snapshot ?? machineState;
+    if (!scopedAsOfs.has(asOf)) {
+      continue;
+    }
     // Weekly artifacts should display the week-ending label even when the
     // underlying Treasury series falls back to the latest common prior day.
     const recordDateLabel = formatDateValue(asOf);

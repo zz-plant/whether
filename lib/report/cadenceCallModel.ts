@@ -281,7 +281,9 @@ export const buildCadenceCallModel = ({
   const copy = HORIZON_COPY[horizon];
   const guidance =
     horizon === "monthly"
-      ? getMonthlyActionGuidance(assessment.regime)
+      ? getMonthlyActionGuidance(assessment.regime, {
+          financingSaturated: assessment.regime === "EXPANSION" && assessment.scores.tightnessSaturated === true,
+        })
       : getQuarterlyActionGuidance(assessment.regime);
 
 

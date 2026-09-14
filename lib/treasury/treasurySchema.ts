@@ -25,6 +25,9 @@ export const TreasuryDataSchema = z.object({
   isLive: z.boolean(),
   fallback_at: z.string().nullable().optional(),
   fallback_reason: z.string().nullable().optional(),
+  oneMonthHistory: z
+    .array(z.object({ date: z.string(), value: z.number().nullable() }))
+    .optional(),
   yields: TreasuryYieldsSchema,
 });
 

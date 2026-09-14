@@ -1,5 +1,5 @@
 import type { GovernanceParameterSet } from "./policy/governance";
-import { advanceRegimeState, type RegimeStateTransition } from "./report/regimeStateMachine";
+import { classifyRegimeQuadrant, type RegimeStateTransition } from "./report/regimeStateMachine";
 import type { TreasuryData, TreasuryYields, RegimeKey } from "./types";
 
 export type { RegimeKey };
@@ -27,6 +27,16 @@ export interface RegimeScores {
   baseRateUsed: "FED" | "1M" | "3M" | "MISSING";
   baseRate: number;
   curveSlope: number | null;
+  /**
+   * Points contributed by the base-rate velocity term: 0 when no rate history
+   * was supplied, otherwise the capped ramp over the trailing-window rate move.
+   * Exposed so a reader can tell a tightness score built on the level ramp alone
+   * from one that includes the tightening-speed term.
+   */
+  baseRateVelocityPoints?: number;
+  /** The trailing-window base-rate move the velocity term measured, in points.
+   *  Absent with the points when no history was supplied. */
+  baseRateVelocityDelta?: number;
 }
 
 export type RegimeInput = {
@@ -63,6 +73,13 @@ export type RegimeDiagnostics = {
   boundaryContributors: string[];
   weakReadCount: number;
   twoWeakReadsWarning: boolean;
+  /**
+   * True when the current call flipped via a shock crossing — the axis jumped its
+   * classification line by `SHOCK_CROSSING_POINTS` or more in one step, so no
+   * published reversal condition fired. Set by `evaluateRegime`, not by
+   * `computeDiagnostics`, which has no machine state to read.
+   */
+  shockCrossing?: boolean;
 };
 
 export type RegimeChangeReason = {
@@ -208,6 +225,34 @@ export const MISSING_SLOPE_FALLBACK = RISK_APPETITE_MIN_SLOPE;
  *  than "which quadrant are we in". */
 export const TIGHTNESS_REGIME_THRESHOLD = 70;
 export const RISK_APPETITE_REGIME_THRESHOLD = 50;
+
+/**
+ * Tightening-speed term.
+ *
+ * The level ramp above starts at 3.5% and contributes nothing below it, which is
+ * why the fastest hiking cycle in 40 years (Mar 2022, from 0%) read as tightness 0
+ * for eight months: the score measured how expensive money *was*, never how fast
+ * it was getting there. The velocity term closes that gap with data the engine
+ * already reads — the same DGS1MO window the client fetches — so a tightening
+ * cycle registers by its second meeting instead of its eighth.
+ *
+ * Calibrated against the one place the level ramp is a known miss: Mar 2022 the
+ * 1M bill was ~0% and the 3-month move ~0.5%; a 0.4% threshold makes that read as
+ * 6 points (VOLATILE-side "pressure rising"), Jun 2022 the 3-month move was ~0.9%
+ * and the term saturates — tightness 60 on velocity alone, SCARCITY-side once the
+ * curve inversion adds its 25. A mid-90s-style 300bp cycle saturates the term;
+ * the gradual 2015-18 liftoff (~25bp/quarter) stays at 0, as it should.
+ */
+export const BASE_RATE_VELOCITY_LOOKBACK_DAYS = 91;
+export const BASE_RATE_VELOCITY_MIN_GAP_DAYS = 60;
+export const BASE_RATE_VELOCITY_MAX_GAP_DAYS = 130;
+/** Trailing-window base-rate move, in points, above which tightening starts
+ *  counting. Roughly one meeting at 50bp per quarter. */
+export const BASE_RATE_VELOCITY_THRESHOLD = 0.4;
+/** Points of tightness per point of trailing move past the threshold. Saturates
+ *  at a 0.9% three-month move. Same units as the level ramp above. */
+export const BASE_RATE_VELOCITY_MULTIPLIER = 120;
+export const BASE_RATE_VELOCITY_POINTS = 60;
 /** How long conditions must hold before a reversal is described as durable.
  *  Product choice: one month is the shortest window a team can plan against. */
 export const REGIME_REVERSAL_DAYS = 30;
@@ -293,7 +338,7 @@ export const DEFAULT_THRESHOLDS: RegimeThresholds = {
 
 const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
   SCARCITY: {
-    description: "Capital is expensive and risk appetite is low. Prioritize survival over growth.",
+    description: "Capital is expensive and lenders are pulling back. Prioritize survival over growth.",
     constraints: [
       "Shorten payback windows and preserve cash.",
       "Delay speculative hiring or large platform rewrites.",
@@ -301,7 +346,7 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
     ],
   },
   DEFENSIVE: {
-    description: "Capital is expensive but risk appetite is moderate. Operate for efficiency.",
+    description: "Capital is expensive but funding stays selective. Operate for efficiency.",
     constraints: [
       "Focus on margin expansion and retention.",
       "Cut low-leverage experiments.",
@@ -309,7 +354,7 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
     ],
   },
   VOLATILE: {
-    description: "Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    description: "Capital is cheaper but funding is wary. Build trust and resilience.",
     constraints: [
       "Ship reliability and security before novelty.",
       "Avoid disruptive pivots that spook buyers.",
@@ -317,7 +362,7 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
     ],
   },
   EXPANSION: {
-    description: "Capital is available and risk appetite is healthy. The weekly call sets the tempo inside that window.",
+    description: "Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window.",
     constraints: [
       "Prioritize reach and learning velocity over perfect finish.",
       "Spend with clear guardrails, even if some experiments fail.",
@@ -329,13 +374,30 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
 export const getRegimeProfile = (regime: RegimeKey) => REGIME_PROFILES[regime];
 
 export const buildTightnessExplanation = (thresholds: RegimeThresholds) =>
-  `Tightness score blends two components capped at ${TIGHTNESS_CAP}: ` +
-  `base rate points ramp from 0 to ${TIGHTNESS_BASE_RATE_POINTS} as rates move above ${thresholds.baseRateTightness}%, ` +
-  `and inversion points ramp from 0 to ${TIGHTNESS_INVERSION_POINTS} as slope moves below 0%.`;
+  `Tightness score blends up to three components capped at ${TIGHTNESS_CAP}: ` +
+  `base rate points ramp from 0 to ${TIGHTNESS_BASE_RATE_POINTS} when rates move above ${thresholds.baseRateTightness}%, ` +
+  `inversion points ramp from 0 to ${TIGHTNESS_INVERSION_POINTS} when slope moves below 0%, ` +
+  `and tightening-speed points ramp from 0 to ${BASE_RATE_VELOCITY_POINTS} when the trailing ${BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day ` +
+  `base-rate move exceeds ${BASE_RATE_VELOCITY_THRESHOLD} points (the term needs base-rate history; without it it is 0).`;
 
+/**
+ * What the risk-appetite axis actually measures, in the reader's words.
+ *
+ * The score is a *financing-conditions* proxy: it maps the 10Y-2Y slope onto a
+ * 0-100 scale. The slope moves when the market reprices expected monetary policy,
+ * so the score rises when the central bank eases — March 2020's emergency cuts
+ * steepened the curve and lifted the score during the fastest crash on record.
+ * Calling that "risk appetite is healthy" published a claim about market
+ * psychology that this reading cannot see; observed risk appetite (volatility,
+ * credit stress) enters through the separate macro adjustments, which haircut
+ * this score but never the other way around. The axis name stays — it is the
+ * published vocabulary — but the explanation now says what drives it.
+ */
 export const RISK_APPETITE_EXPLANATION =
-  `Risk appetite score maps the 10Y-2Y slope from ${RISK_APPETITE_MIN_SLOPE}% (very cautious) ` +
-  `to ${RISK_APPETITE_MAX_SLOPE}% (confident), scaled to 0-100.`;
+  `Risk-appetite score is a financing-conditions proxy: it maps the 10Y-2Y slope from ` +
+  `${RISK_APPETITE_MIN_SLOPE}% (capital pulling back) to ${RISK_APPETITE_MAX_SLOPE}% (capital leaning in), scaled to 0-100. ` +
+  `The slope is a monetary-expectations read, not observed market appetite — ` +
+  `volatility and credit stress enter through separate adjustments.`;
 
 /**
  * What the base rate reading actually is, in the reader's words.
@@ -355,6 +417,89 @@ export const BASE_RATE_SOURCE_LABELS: Record<RegimeScores["baseRateUsed"], strin
 };
 
 export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+/**
+ * Optional evaluation inputs a caller supplies when it has base-rate history.
+ *
+ * Callers without history (point queries, fixtures, scenario studios) omit the
+ * context and the velocity term reads 0 — the same call the engine published
+ * before the term existed, which keeps every omitting call site comparable.
+ */
+export interface RegimeEvaluationContext {
+  /** Base-rate observations ascending by date. Only the trailing window is
+   *  read; the rest is ignored. */
+  baseRateHistory?: readonly { date: string; value: number | null }[] | null;
+}
+
+const daysBetweenDates = (laterIso: string, earlierIso: string): number => {
+  const later = Date.parse(`${laterIso}T00:00:00.000Z`);
+  const earlier = Date.parse(`${earlierIso}T00:00:00.000Z`);
+  if (Number.isNaN(later) || Number.isNaN(earlier)) {
+    return Number.NaN;
+  }
+  return (later - earlier) / (24 * 60 * 60 * 1000);
+};
+
+/**
+ * The trailing-window base-rate move, or null when history cannot answer.
+ *
+ * Picks the observation closest to the lookback target whose gap stays inside
+ * the bounds, so weekly (7d rows) and monthly (30d rows) callers resolve the
+ * same ~3-month window without per-caller window math. Rate observations for
+ * DGS1MO are complete for modern history, so null values simply skip a row.
+ */
+export const resolveBaseRateVelocityDelta = (
+  baseRateHistory: RegimeEvaluationContext["baseRateHistory"],
+  lookbackDays: number = BASE_RATE_VELOCITY_LOOKBACK_DAYS,
+): number | null => {
+  if (!baseRateHistory || baseRateHistory.length === 0) {
+    return null;
+  }
+  const observations = baseRateHistory.filter(
+    (point): point is { date: string; value: number } => typeof point.value === "number",
+  );
+  if (observations.length < 2) {
+    return null;
+  }
+  const latest = observations.at(-1);
+  if (!latest) {
+    return null;
+  }
+
+  let best: { value: number; gap: number } | null = null;
+  for (const observation of observations) {
+    const gap = daysBetweenDates(latest.date, observation.date);
+    if (Number.isNaN(gap) || gap < BASE_RATE_VELOCITY_MIN_GAP_DAYS || gap > BASE_RATE_VELOCITY_MAX_GAP_DAYS) {
+      continue;
+    }
+    const distance = Math.abs(gap - lookbackDays);
+    if (!best || distance < Math.abs(best.gap - lookbackDays)) {
+      best = { value: observation.value, gap };
+    }
+  }
+
+  if (!best) {
+    return null;
+  }
+  return latest.value - best.value;
+};
+
+/** Points of tightness from the trailing move, floored at 0 so easing never
+ *  tightens. Null moves (no usable history) read as 0. */
+export const computeBaseRateVelocityPoints = (
+  baseRateHistory: RegimeEvaluationContext["baseRateHistory"],
+): { points: number; delta: number | null } => {
+  const delta = resolveBaseRateVelocityDelta(baseRateHistory);
+  if (delta === null) {
+    return { points: 0, delta: null };
+  }
+  const points = clamp(
+    Math.round((delta - BASE_RATE_VELOCITY_THRESHOLD) * BASE_RATE_VELOCITY_MULTIPLIER),
+    0,
+    BASE_RATE_VELOCITY_POINTS,
+  );
+  return { points, delta };
+};
 
 export const getBaseRate = (yields: TreasuryYields) => {
   if (typeof yields.fedFunds === "number") {
@@ -468,6 +613,7 @@ export const computeTightnessPressure = (
   baseRate: number,
   curveSlope: number,
   baseRateThreshold: number,
+  baseRateVelocityPoints = 0,
 ) => {
   const baseRatePoints = Math.max(
     SCORE_MIN,
@@ -477,13 +623,14 @@ export const computeTightnessPressure = (
     curveSlope < SCORE_MIN
       ? Math.round(Math.abs(curveSlope) * CURVE_INVERSION_TIGHTNESS_MULTIPLIER)
       : SCORE_MIN;
-  return baseRatePoints + inversionPoints;
+  return baseRatePoints + inversionPoints + baseRateVelocityPoints;
 };
 
 export const computeTightnessScore = (
   baseRate: number,
   curveSlope: number,
   baseRateThreshold: number,
+  baseRateVelocityPoints = 0,
 ) => {
   const baseRatePoints = clamp(
     Math.round((baseRate - baseRateThreshold) * BASE_RATE_TIGHTNESS_MULTIPLIER),
@@ -498,7 +645,7 @@ export const computeTightnessScore = (
           TIGHTNESS_INVERSION_POINTS,
         )
       : SCORE_MIN;
-  const score = baseRatePoints + inversionPoints;
+  const score = baseRatePoints + inversionPoints + baseRateVelocityPoints;
 
   return clamp(score, SCORE_MIN, TIGHTNESS_CAP);
 };
@@ -509,18 +656,20 @@ export const computeRiskAppetiteScore = (curveSlope: number) => {
   return clamp(Math.round(normalized * SCORE_MAX), SCORE_MIN, SCORE_MAX);
 };
 
+/**
+ * What the readings classify into, right now, with no committed state.
+ *
+ * This used to route through `advanceRegimeState(null, …)` with diagnostics
+ * forced to HIGH confidence and infinite boundary distance — a call that made
+ * every point evaluation commit a quadrant flip instantly while claiming the
+ * confirmation gate had been consulted. It had not: with no previous state the
+ * gate is 1-of-1. Naming the function for what it is keeps the instant-commit
+ * path (scenario studios, what-if quadrants) from being mistaken for the
+ * governed path (threaded evaluations, which confirm flips through
+ * `advanceRegimeState` with a real machine snapshot).
+ */
 export const classifyRegime = (
   tightness: number,
   riskAppetite: number,
   thresholds: RegimeThresholds,
-): RegimeKey =>
-  advanceRegimeState(null, {
-    tightness,
-    riskAppetite,
-    thresholds,
-    diagnostics: {
-      confidence: "HIGH",
-      nearestThresholdDelta: Number.POSITIVE_INFINITY,
-      transitionWatch: false,
-    },
-  }).nextState;
+): RegimeKey => classifyRegimeQuadrant({ tightness, riskAppetite, thresholds });

@@ -3,16 +3,21 @@
  * Keeps historical lookups local to avoid third-party calls in replay mode.
  */
 import { z } from "zod";
-import type { SeriesHistoryPoint, TreasuryData } from "../types";
+import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
 import { TreasuryDataSchema } from "../treasury/treasurySchema";
 import { evaluateRegime } from "../regimeEngine";
 import type { RegimeThresholds } from "../regimeEngine";
+import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
 import rawCache from "../../data/time_machine_cache.json";
 import { snapshotData } from "../snapshot";
 
 const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
   year: z.number(),
   month: z.number(),
+  /** VIX close for the period, when the generator fetched one. Feeds the
+   *  market-stress haircut and veto in the replay walk; absent for caches
+   *  written before the field existed, which replay without the veto. */
+  vix: z.number().nullable().optional(),
 });
 
 export type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
@@ -191,6 +196,11 @@ export type TimeMachineRegimeEntry = {
   summary: string;
   tightness: number;
   riskAppetite: number;
+  /** True when this entry's flip committed as a shock crossing — the axis
+   *  jumped its line from beyond the near-band, so no published reversal
+   *  condition fired. Surfaces list the change either way; this marks the ones
+   *  that were structurally unforecastable. */
+  shock?: boolean;
 };
 
 const timeMachineRegimeSeriesCache = new Map<string, TimeMachineRegimeEntry[]>();
@@ -232,6 +242,91 @@ const buildRegimeSeriesCacheKey = (
   ].join(":");
 };
 
+/** Overrides serialization for the full-walk memo: an asOf only selects a slice
+ *  of the same walk, so the walk is memoized per threshold set, not per window. */
+const buildRegimeWalkCacheKey = (overrides?: Partial<RegimeThresholds>) =>
+  overrides
+    ? [
+        overrides.baseRateTightness ?? "default",
+        overrides.tightnessRegime ?? "default",
+        overrides.riskAppetiteRegime ?? "default",
+      ].join(":")
+    : "default";
+
+const regimeWalkMemo = new Map<string, TimeMachineRegimeEntry[]>();
+
+/**
+ * The regime series replayed as one threaded walk.
+ *
+ * Each entry used to be evaluated independently — `evaluateRegime(snapshot)` per
+ * point — which is an instant-commit quadrant read. Every published flip
+ * committed the moment a line crossed, no confirmation, no shock marking, and
+ * the resulting record showed it: 22 flips over 176 months, 9 of them
+ * single-month spells. The walk threads the machine snapshot forward (flips
+ * confirm through the gate, shocks commit and get marked) and supplies each
+ * entry its trailing base-rate window (the velocity term) plus its VIX reading
+ * (the haircut and the market-stress veto) when the cache carries one.
+ */
+const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMachineRegimeEntry[] => {
+  const walkKey = buildRegimeWalkCacheKey(overrides);
+  const memoized = regimeWalkMemo.get(walkKey);
+  if (memoized) {
+    return memoized;
+  }
+
+  const walk: TimeMachineRegimeEntry[] = [];
+  let machineState: RegimeMachineSnapshot | null = null;
+  const vixHistory: { date: string; value: number | null }[] = [];
+
+  sortedSnapshots.forEach((snapshot, index) => {
+    const baseRateHistory = sortedSnapshots
+      .slice(Math.max(0, index - 5), index + 1)
+      .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
+
+    const macroSeries: MacroSeriesReading[] = [];
+    if (typeof snapshot.vix === "number") {
+      vixHistory.push({ date: snapshot.record_date, value: snapshot.vix });
+      macroSeries.push({
+        id: "VIX_INDEX",
+        label: "CBOE volatility index (VIX)",
+        value: snapshot.vix,
+        unit: "index",
+        explanation: "Implied equity volatility used as a short-cycle shock and regime-boundary warning signal.",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
+        formulaUrl: "/formulas#vix",
+        record_date: snapshot.record_date,
+        fetched_at: snapshot.fetched_at,
+        isLive: false,
+        history: vixHistory.slice(-10),
+      });
+    }
+
+    const assessment = evaluateRegime(
+      snapshot,
+      overrides,
+      macroSeries,
+      machineState,
+      { baseRateHistory },
+    );
+    machineState = assessment.regimeTransition?.snapshot ?? machineState;
+
+    walk.push({
+      year: snapshot.year,
+      month: snapshot.month,
+      recordDate: snapshot.record_date,
+      regime: assessment.regime,
+      summary: assessment.description,
+      tightness: assessment.scores.tightness,
+      riskAppetite: assessment.scores.riskAppetite,
+      shock: assessment.regimeTransition?.shock || undefined,
+    });
+  });
+
+  regimeWalkMemo.set(walkKey, walk);
+  return walk;
+};
+
 export const getTimeMachineRegimeSeries = (
   months = DEFAULT_REGIME_SERIES_MONTHS,
   overrides?: Partial<RegimeThresholds>,
@@ -253,18 +348,7 @@ export const getTimeMachineRegimeSeries = (
       ? asOfIndex
       : sortedSnapshots.length - 1;
   const sliceStart = Math.max(lastIndex + 1 - resolvedMonths, 0);
-  const series = sortedSnapshots.slice(sliceStart, lastIndex + 1).map((snapshot) => {
-    const assessment = evaluateRegime(snapshot, overrides);
-    return {
-      year: snapshot.year,
-      month: snapshot.month,
-      recordDate: snapshot.record_date,
-      regime: assessment.regime,
-      summary: assessment.description,
-      tightness: assessment.scores.tightness,
-      riskAppetite: assessment.scores.riskAppetite,
-    };
-  });
+  const series = buildThreadedRegimeWalk(overrides).slice(sliceStart, lastIndex + 1);
   setRegimeSeriesCache(cacheKey, series);
   return series;
 };

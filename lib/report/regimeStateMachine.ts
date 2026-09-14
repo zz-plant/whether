@@ -2,6 +2,22 @@ import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEn
 
 export type RegimeState = RegimeKey;
 
+/**
+ * One-step move, in score points, past which a crossing is a shock rather than a
+ * near-band arrival.
+ *
+ * The near-band (`transitionWatch`) can only warn when a score *travels through*
+ * the band. Both published lines can be jumped from outside it: tightness sat at
+ * 0-19 while the rate sat below its 3.5% ramp floor, then crossed 70 in one step
+ * (Nov 2022, 19 to 62); DEFENSIVE sat 20 points above the line, then crossed in
+ * one step (Dec 2025, 90 to 43). Neither published reversal condition could have
+ * fired. Past this distance the machine commits immediately — a delay during the
+ * event is worse than an instant call — and marks the transition `shock`, which
+ * the surfaces publish as an admitted unconfirmed call instead of pretending the
+ * published condition was met.
+ */
+export const SHOCK_CROSSING_POINTS = 25;
+
 export type RegimeMachineSignals = {
   tightness: number;
   riskAppetite: number;
@@ -23,6 +39,13 @@ export type RegimeStateTransition = {
   pending: boolean;
   transitionReason: string;
   transitionPendingCount?: number;
+  /**
+   * True when the flip crossed a classification line with a one-step move of at
+   * least `SHOCK_CROSSING_POINTS`, so it committed without the confirmation gate
+   * and no published reversal condition fired. Surfaces owe the reader that
+   * admission rather than a confident-flavored flip.
+   */
+  shock?: boolean;
   snapshot: RegimeMachineSnapshot;
 };
 
@@ -120,13 +143,31 @@ const advanceRegimeStateBase = (
     }),
   ].filter((reason): reason is string => Boolean(reason));
 
+  /**
+   * A crossing is a shock when the axis moved `SHOCK_CROSSING_POINTS` or more in
+   * one step on the axis it crossed — the case where the near-band warning was
+   * structurally impossible. Requires a previous reading: the first observation
+   * of a window has no one-step move to measure.
+   */
+  const shockCrossed = previousState?.lastSignals
+    ? [
+        { label: "tightness", line: currentSignals.thresholds.tightnessRegime, previous: previousState.lastSignals.tightness, current: currentSignals.tightness },
+        { label: "riskAppetite", line: currentSignals.thresholds.riskAppetiteRegime, previous: previousState.lastSignals.riskAppetite, current: currentSignals.riskAppetite },
+      ].some((axis) => {
+        const crossedLine =
+          (axis.previous <= axis.line && axis.current > axis.line) ||
+          (axis.previous > axis.line && axis.current <= axis.line);
+        return crossedLine && Math.abs(axis.current - axis.previous) >= SHOCK_CROSSING_POINTS;
+      })
+    : false;
+
   const confidenceBlocked = currentSignals.diagnostics.confidence === "LOW";
   const nearBoundary = currentSignals.diagnostics.transitionWatch || currentSignals.diagnostics.nearestThresholdDelta <= 8;
   const requiresConfirmation = confidenceBlocked || nearBoundary || currentSignals.diagnostics.confidence === "MEDIUM";
 
   const pendingCount = previousState?.pendingState === candidateState ? previousState.pendingCount + 1 : 1;
   const confirmationGate = requiresConfirmation ? 2 : 1;
-  const committed = !confidenceBlocked && pendingCount >= confirmationGate;
+  const committed = (!confidenceBlocked && pendingCount >= confirmationGate) || shockCrossed;
 
   const transitionReason = crossingReasons.length > 0
     ? `${crossingReasons.join("; ")}.`
@@ -157,8 +198,11 @@ const advanceRegimeStateBase = (
     candidateState,
     committed: true,
     pending: false,
-    transitionReason: `${transitionReason} Transition committed.`,
+    transitionReason: shockCrossed
+      ? `${transitionReason} Committed as a shock crossing — the one-step move bypassed the near-band, so no published reversal condition fired.`
+      : `${transitionReason} Transition committed.`,
     transitionPendingCount: pendingCount,
+    shock: shockCrossed || undefined,
     snapshot: {
       committedState: candidateState,
       pendingState: null,

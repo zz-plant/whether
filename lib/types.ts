@@ -26,6 +26,14 @@ export interface TreasuryMetadata extends SourceProvenance {
 
 export interface TreasuryData extends TreasuryMetadata {
   yields: TreasuryYields;
+  /**
+   * The trailing one-month-bill observations the engine fetched alongside the
+   * latest read, ascending by date. Feeds the base-rate velocity term. Absent
+   * from sources with a single-row payload (the Treasury.gov year-CSV fallback)
+   * and from cached snapshots written before the field existed — in both cases
+   * the velocity term reads 0, which is the documented degradation.
+   */
+  oneMonthHistory?: { date: string; value: number | null }[];
 }
 
 export interface SeriesHistoryPoint {

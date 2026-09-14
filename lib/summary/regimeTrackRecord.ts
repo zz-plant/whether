@@ -33,6 +33,8 @@ export type RegimeSpellRecord = {
 
 export type FlippedAxis = "tightness" | "riskAppetite";
 
+const ALL_AXES: FlippedAxis[] = ["tightness", "riskAppetite"];
+
 export type RegimeTransitionRecord = {
   /** First observation inside the new regime. */
   atDate: string;
@@ -70,6 +72,31 @@ const median = (values: number[]): number | null => {
   return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 };
 
+/**
+ * Which side of an axis's classification line a regime quadrant sits on.
+ *
+ * Every quadrant pins both axes (SCARCITY = tight above the line, appetite
+ * below; DEFENSIVE = both above; VOLATILE = both below; EXPANSION = tightness
+ * below, appetite above), so the axes a flip moved are read off the two
+ * quadrants — not off a side change between the last two published
+ * observations. Under the confirmation gate the label moves a read after the
+ * score crossed (Aug 2022 sat in the SCARCITY quadrant at tightness 75 while
+ * still publishing VOLATILE), so a consecutive-observation comparison sees no
+ * crossing at all and grades a banded, gated flip as unsignaled.
+ */
+const regimeSide = (regime: string, axis: FlippedAxis): boolean => {
+  switch (regime) {
+    case "SCARCITY":
+      return axis === "tightness";
+    case "DEFENSIVE":
+      return true;
+    case "VOLATILE":
+      return false;
+    default:
+      return axis === "riskAppetite";
+  }
+};
+
 export const buildRegimeTrackRecord = (
   series: readonly TrackRecordObservation[],
   thresholds: Pick<RegimeThresholds, "tightnessRegime" | "riskAppetiteRegime"> = DEFAULT_THRESHOLDS,
@@ -77,9 +104,6 @@ export const buildRegimeTrackRecord = (
 ): RegimeTrackRecord => {
   const spells: RegimeSpellRecord[] = [];
   const transitions: RegimeTransitionRecord[] = [];
-
-  const tightSide = (obs: TrackRecordObservation) => obs.tightness >= thresholds.tightnessRegime;
-  const appetiteSide = (obs: TrackRecordObservation) => obs.riskAppetite >= thresholds.riskAppetiteRegime;
 
   for (let i = 0; i < series.length; i += 1) {
     const obs = series[i];
@@ -101,14 +125,19 @@ export const buildRegimeTrackRecord = (
     if (i === 0) continue;
 
     const prev = series[i - 1];
-    const flippedAxes: FlippedAxis[] = [];
-    if (tightSide(prev) !== tightSide(obs)) flippedAxes.push("tightness");
-    if (appetiteSide(prev) !== appetiteSide(obs)) flippedAxes.push("riskAppetite");
+    const flippedAxes: FlippedAxis[] = ALL_AXES.filter(
+      (axis) => regimeSide(prev.regime, axis) !== regimeSide(obs.regime, axis),
+    );
 
     /* Lead: walk back through the old regime counting months where a crossing
-       axis was already inside the near band of the line it went on to cross.
-       An axis that jumped the line from far outside the band contributes no
-       lead — that is exactly the unsignaled case this surface exists to admit. */
+       axis sat within the near band of the line it went on to cross — either
+       side of the line. The band is a warning zone, not a side: under the
+       confirmation gate a flip publishes after the score has already crossed
+       and dwelt in the band on the new side (Jul 2022 tightness 71, Aug 75,
+       published Sep), and counting only old-side dwell would call every gated
+       flip unsignaled. An axis that jumped the line from far outside the band
+       contributes no lead — that is exactly the unsignaled case this surface
+       exists to admit. */
     let leadMonths = 0;
     for (let j = i - 1; j >= 0; j -= 1) {
       const back = series[j];
@@ -116,9 +145,7 @@ export const buildRegimeTrackRecord = (
       const inBand = flippedAxes.some((axis) => {
         const line = axis === "tightness" ? thresholds.tightnessRegime : thresholds.riskAppetiteRegime;
         const value = axis === "tightness" ? back.tightness : back.riskAppetite;
-        const oldSide = axis === "tightness" ? tightSide(prev) : appetiteSide(prev);
-        const backSide = value >= line;
-        return backSide === oldSide && Math.abs(value - line) <= nearBandPts;
+        return Math.abs(value - line) <= nearBandPts;
       });
       if (!inBand) break;
       leadMonths += 1;

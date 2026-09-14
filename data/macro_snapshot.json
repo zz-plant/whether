@@ -991,13 +991,13 @@
     {
       "id": "VC_FUNDING_VELOCITY",
       "label": "VC funding velocity (quarterly trend)",
-      "value": -4.5,
+      "value": -32.8,
       "unit": "%",
       "explanation": "Quarter-over-quarter change in startup funding flow to reflect private capital availability.",
       "sourceLabel": "Whether startup capital snapshot",
-      "sourceUrl": "https://www.crunchbase.com/",
+      "sourceUrl": "https://news.crunchbase.com/venture/global-startup-exits-ipo-ma-soar-ai-q2-h1-2026/",
       "formulaUrl": "/formulas#vc-funding-velocity",
-      "record_date": "2026-02-01",
+      "record_date": "2026-09-01",
       "history": [
         {
           "date": "2024-01-01",
@@ -1014,21 +1014,25 @@
         {
           "date": "2026-02-01",
           "value": -4.5
+        },
+        {
+          "date": "2026-09-01",
+          "value": -32.8
         }
       ],
-      "fetched_at": "2026-02-02T00:00:00Z",
+      "fetched_at": "2026-09-14T18:00:00Z",
       "isLive": false
     },
     {
       "id": "TECH_LAYOFF_TREND",
       "label": "Tech layoff trend",
-      "value": 62,
+      "value": 66,
       "unit": "index",
       "explanation": "Composite layoff pressure index from public layoff trackers and labor releases.",
       "sourceLabel": "Whether labor stress snapshot",
       "sourceUrl": "https://layoffs.fyi/",
       "formulaUrl": "/formulas#tech-layoff-trend",
-      "record_date": "2026-02-01",
+      "record_date": "2026-09-01",
       "history": [
         {
           "date": "2024-06-01",
@@ -1049,21 +1053,25 @@
         {
           "date": "2026-02-01",
           "value": 62
+        },
+        {
+          "date": "2026-09-01",
+          "value": 66
         }
       ],
-      "fetched_at": "2026-02-02T00:00:00Z",
+      "fetched_at": "2026-09-14T18:00:00Z",
       "isLive": false
     },
     {
       "id": "SAAS_VALUATION_MULTIPLE",
       "label": "Public SaaS EV/Revenue median",
-      "value": 5.9,
+      "value": 4.1,
       "unit": "x",
       "explanation": "Public SaaS median EV/revenue multiple as a proxy for growth capital pricing discipline.",
       "sourceLabel": "Whether valuation snapshot",
-      "sourceUrl": "https://www.meritechcapital.com/software-public-comps",
+      "sourceUrl": "https://meritech.substack.com/p/meritech-software-pulse-31-july-2026",
       "formulaUrl": "/formulas#saas-valuation-multiple",
-      "record_date": "2026-02-01",
+      "record_date": "2026-09-01",
       "history": [
         {
           "date": "2024-06-01",
@@ -1084,21 +1092,25 @@
         {
           "date": "2026-02-01",
           "value": 5.9
+        },
+        {
+          "date": "2026-09-01",
+          "value": 4.1
         }
       ],
-      "fetched_at": "2026-02-02T00:00:00Z",
+      "fetched_at": "2026-09-14T18:00:00Z",
       "isLive": false
     },
     {
       "id": "EARNINGS_REVISION_INDEX",
       "label": "Tech earnings revision index",
-      "value": 48,
+      "value": 86,
       "unit": "index",
-      "explanation": "Forward EPS revision breadth index for tech-heavy baskets.",
+      "explanation": "Forward EPS revision breadth index for tech-heavy baskets (share of IT-sector companies with positive EPS revisions).",
       "sourceLabel": "Whether earnings revisions snapshot",
-      "sourceUrl": "https://www.spglobal.com/spdji/",
+      "sourceUrl": "https://seekingalpha.com/news/4638631-tech-leads-sp-500-sectors-in-positive-2026-eps-revisions-since-july",
       "formulaUrl": "/formulas#earnings-revisions",
-      "record_date": "2026-02-01",
+      "record_date": "2026-09-01",
       "history": [
         {
           "date": "2024-06-01",
@@ -1119,21 +1131,25 @@
         {
           "date": "2026-02-01",
           "value": 48
+        },
+        {
+          "date": "2026-09-01",
+          "value": 86
         }
       ],
-      "fetched_at": "2026-02-02T00:00:00Z",
+      "fetched_at": "2026-09-14T18:00:00Z",
       "isLive": false
     },
     {
       "id": "AI_COMPUTE_COST_TREND",
       "label": "AI compute cost trend",
-      "value": -9.2,
+      "value": -6.5,
       "unit": "%",
       "explanation": "Trend in GPU/cloud inference unit economics used to calibrate AI roadmap capital risk.",
       "sourceLabel": "Whether compute-cost snapshot",
-      "sourceUrl": "https://cloud.google.com/compute/gpus-pricing",
+      "sourceUrl": "https://cloud.google.com/products/compute/pricing/accelerator-optimized",
       "formulaUrl": "/formulas#ai-compute-cost",
-      "record_date": "2026-02-01",
+      "record_date": "2026-09-01",
       "history": [
         {
           "date": "2024-06-01",
@@ -1154,21 +1170,25 @@
         {
           "date": "2026-02-01",
           "value": -9.2
+        },
+        {
+          "date": "2026-09-01",
+          "value": -6.5
         }
       ],
-      "fetched_at": "2026-02-02T00:00:00Z",
+      "fetched_at": "2026-09-14T18:00:00Z",
       "isLive": false
     },
     {
       "id": "REGULATORY_RISK_TRACKER",
       "label": "AI/platform regulatory risk tracker",
-      "value": 41,
+      "value": 52,
       "unit": "index",
       "explanation": "Composite policy volatility index built from major enforcement and milestone events.",
       "sourceLabel": "Whether policy-risk snapshot",
       "sourceUrl": "https://artificialintelligenceact.eu/",
       "formulaUrl": "/formulas#regulatory-risk",
-      "record_date": "2026-02-01",
+      "record_date": "2026-09-01",
       "history": [
         {
           "date": "2024-06-01",
@@ -1189,9 +1209,13 @@
         {
           "date": "2026-02-01",
           "value": 41
+        },
+        {
+          "date": "2026-09-01",
+          "value": 52
         }
       ],
-      "fetched_at": "2026-02-02T00:00:00Z",
+      "fetched_at": "2026-09-14T18:00:00Z",
       "isLive": false
     }
   ]

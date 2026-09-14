@@ -5,6 +5,7 @@
 import { buildMonthlySummary, type MonthlySummary } from "../lib/summary/monthlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
+import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
@@ -12,6 +13,13 @@ import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
 import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
+import {
+  resolveBaseRateWindow,
+  resolveVixCacheValue,
+  resolveVixReading,
+  type SeriesDataset,
+  type SeriesPoint,
+} from "./regimeArchiveContext";
 
 const DEFAULT_START_YEAR = 2012;
 const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
@@ -64,8 +72,6 @@ const seriesSourceUrls = {
 } as const;
 
 type SeriesKey = keyof typeof seriesCatalog;
-type SeriesPoint = { date: string; time: number; value: number | null };
-type SeriesDataset = { points: SeriesPoint[]; map: Map<string, number> };
 
 const parseSeries = (csv: string) => {
   const lines = csv.trim().split("\n");
@@ -223,6 +229,7 @@ type MonthlySummaryArchiveEntry = {
 type TimeMachineCacheEntry = TreasuryData & {
   year: number;
   month: number;
+  vix?: number | null;
 };
 
 const writeJson = async (filePath: string, value: unknown) => {
@@ -278,6 +285,18 @@ const generateMonthlySummaries = async () => {
     twoYear: await fetchSeries(seriesCatalog.twoYear),
     tenYear: await fetchSeries(seriesCatalog.tenYear),
   };
+  // Volatility drives the shock haircut and the market-stress veto, so the
+  // replay needs the period's reading, not just the curve. Fetched separately
+  // because it is not a yield: unavailable means the replay proceeds without
+  // it, with a warning, never a crash.
+  let vixDataset: SeriesDataset | null = null;
+  try {
+    vixDataset = await fetchSeries("VIXCLS");
+  } catch (error) {
+    console.warn(
+      `VIX series unavailable (${error instanceof Error ? error.message : error}); replaying without the market-stress adjustments.`,
+    );
+  }
   const basePoints = datasets.tenYear.points;
   const requiredMaps = [datasets.twoYear, datasets.tenYear];
   const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
@@ -306,6 +325,15 @@ const generateMonthlySummaries = async () => {
     maxYear: effectiveEndYear,
   });
 
+  /**
+   * The replay is one threaded walk, not independent point reads. The machine
+   * snapshot carries forward so flips confirm through the gate (or commit as
+   * marked shocks), each month supplies its trailing base-rate window for the
+   * tightening-speed term, and each month supplies its VIX reading. Point
+   * evaluation here is what produced the old record's 22 instant-commit flips.
+   */
+  let machineState: RegimeMachineSnapshot | null = null;
+
   for (let year = startYear; year <= endYear; year += 1) {
     for (let month = 1; month <= 12; month += 1) {
       const asOf = resolveHistoricalDate(year, month);
@@ -333,12 +361,21 @@ const generateMonthlySummaries = async () => {
       }
 
       const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
+      const vixReading = resolveVixReading(vixDataset, recordDate, asOfTime, fetchedAt);
+      const assessment = evaluateRegime(
+        treasury,
+        undefined,
+        vixReading ? [vixReading] : [],
+        machineState,
+        { baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, recordDate, asOfTime) },
+      );
+      machineState = assessment.regimeTransition?.snapshot ?? machineState;
       timeMachineEntries.push({
         year,
         month,
+        vix: resolveVixCacheValue(vixDataset, recordDate, asOfTime),
         ...treasury,
       });
-      const assessment = evaluateRegime(treasury);
       const recordDateLabel = formatDateValue(treasury.record_date);
       const baseRateSourceUrl =
         assessment.scores.baseRateUsed === "3M"

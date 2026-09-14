@@ -252,16 +252,27 @@ const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
   return null;
 };
 
-// Only the latest common observation date is consumed, so bound the default
-// FRED requests to a recent window instead of the series' full history
-// (hundreds of KB per series without `cosd`). Custom endpoints keep whatever
-// range parameters the caller encoded.
+// Only the latest common observation date is consumed by the yields payload, so
+// bound the default FRED requests to a recent window instead of the series'
+// full history (hundreds of KB per series without `cosd`). Custom endpoints
+// keep whatever range parameters the caller encoded. The one-month bill gets a
+// wider window: its trailing observations feed the base-rate velocity term
+// (~91 days back), so the series the engine already fetches has to carry the
+// window that term reads.
 const SERIES_LOOKBACK_DAYS = 90;
+const BASE_RATE_HISTORY_LOOKBACK_DAYS = 130;
 
-const withRecentObservationWindow = (endpoint: string) => {
+const withRecentObservationWindow = (
+  endpoint: string,
+  lookbackDays: number = SERIES_LOOKBACK_DAYS,
+) => {
   const url = new URL(endpoint);
-  const start = new Date(Date.now() - SERIES_LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
-  url.searchParams.set("cosd", start.toISOString().slice(0, 10));
+  // Custom endpoints keep whatever range parameters the caller encoded; only
+  // the default series URLs (no `cosd`) get the bounded recent window.
+  if (!url.searchParams.has("cosd")) {
+    const start = new Date(Date.now() - lookbackDays * 24 * 60 * 60 * 1000);
+    url.searchParams.set("cosd", start.toISOString().slice(0, 10));
+  }
   return url.toString();
 };
 
@@ -416,10 +427,33 @@ export const fetchTreasuryData = async (
     tenYear: buildSeriesEndpoint(baseEndpoint, "DGS10", TREASURY_ENDPOINTS.tenYear),
   };
 
+  /**
+   * The trailing one-month-bill window the base-rate velocity term reads.
+   *
+   * Built from the series the client already parses; the yields payload keeps
+   * only the latest common date, and before this the rest of every CSV response
+   * was parsed and discarded. Empty rather than absent when the window cannot be
+   * read, so consumers can tell "no history" from "history not requested".
+   */
+  const buildOneMonthHistory = (
+    series: Map<string, number | null>,
+    latestDate: string,
+  ): { date: string; value: number | null }[] => {
+    const cutoffMs =
+      Date.parse(`${latestDate}T00:00:00.000Z`) - BASE_RATE_HISTORY_LOOKBACK_DAYS * 24 * 60 * 60 * 1000;
+    return Array.from(series.entries())
+      .map(([date, value]) => ({ date, value }))
+      .filter((point) => {
+        const pointMs = Date.parse(`${point.date}T00:00:00.000Z`);
+        return Number.isFinite(pointMs) && pointMs >= cutoffMs;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+  };
+
   try {
     const [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse] =
       await Promise.all([
-        fetchSeriesWithRetry(fetcher, endpoints.oneMonth),
+        fetchSeriesWithRetry(fetcher, withRecentObservationWindow(endpoints.oneMonth, BASE_RATE_HISTORY_LOOKBACK_DAYS)),
         fetchSeriesWithRetry(fetcher, endpoints.threeMonth),
         fetchSeriesWithRetry(fetcher, endpoints.twoYear),
         fetchSeriesWithRetry(fetcher, endpoints.tenYear),
@@ -456,6 +490,7 @@ export const fetchTreasuryData = async (
       record_date: recordDate,
       fetched_at,
       isLive: true,
+      oneMonthHistory: buildOneMonthHistory(oneMonthSeries, recordDate),
       yields: {
         oneMonth: oneMonthSeries.get(recordDate) ?? null,
         threeMonth: threeMonthSeries.get(recordDate) ?? null,

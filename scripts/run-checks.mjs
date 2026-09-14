@@ -31,6 +31,10 @@ const TASKS = [
   // finding instead of fixing it, and no other task here notices. This counts
   // the suppressions themselves, so the shortcut costs more than the fix.
   { name: "suppressions", script: "check:suppressions" },
+  // The hand-curated macro series have no live fetcher, so nothing in the
+  // ingest path refreshes them and nothing else notices when the quarterly
+  // curation pass slips. Warn-only by default; see the script header for why.
+  { name: "curated-freshness", script: "check:curated-freshness" },
   // Gated at `critical` on purpose. There are currently 38 high advisories, all
   // in transitive dev/build dependencies (picomatch via vinext's glob chain, for
   // one) rather than anything the Worker ships. Blocking on those would make

@@ -1,5 +1,6 @@
 import type { TreasuryData } from "../types";
 import { evaluateRegime } from "../regimeEngine";
+import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
 import { resolveDistanceToFlip as resolveDistanceToFlipFromInputs } from "./confidence";
 import { buildReportDynamics } from "./reportEvidence";
 import type {
@@ -58,6 +59,7 @@ export const buildHistoricalAnalogs = ({
   limit = 3,
 }: {
   current: ReturnType<typeof evaluateRegime>;
+  /** Ascending by record date; the walk below threads state in that order. */
   snapshots: TreasuryData[];
   thresholds: ReturnType<typeof import("../thresholds").parseThresholdsFromSearchParams>;
   currentTrendDirection: ReportDynamics["directionLabel"];
@@ -68,10 +70,40 @@ export const buildHistoricalAnalogs = ({
   }
 
   const historicalCandidates = snapshots.slice(0, -1);
+  /**
+   * Analog regimes are read off one threaded walk, not independent point
+   * evaluations: the machine snapshot carries forward, each candidate supplies
+   * its trailing base-rate window for the tightening-speed term, and the
+   * velocity context is cut from the candidate list's own one-month values so
+   * analogs built from cache snapshots (which carry no history arrays) still
+   * score the same way the archive did.
+   */
+  const baseRateSeries = snapshots
+    .map((snapshot) => ({ date: snapshot.record_date, value: snapshot.yields.oneMonth ?? null }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const velocityWindowFor = (recordDate: string) => {
+    const cutoffMs = Date.parse(`${recordDate}T00:00:00.000Z`) - 130 * 24 * 60 * 60 * 1000;
+    return baseRateSeries.filter(
+      (point) =>
+        Date.parse(`${point.date}T00:00:00.000Z`) <= Date.parse(`${recordDate}T00:00:00.000Z`) &&
+        Date.parse(`${point.date}T00:00:00.000Z`) >= cutoffMs,
+    );
+  };
+
+  let machineState: RegimeMachineSnapshot | null = null;
+  const assessments = historicalCandidates.map((snapshot) => {
+    const assessment = evaluateRegime(snapshot, thresholds, [], machineState, {
+      baseRateHistory: velocityWindowFor(snapshot.record_date),
+    });
+    machineState = assessment.regimeTransition?.snapshot ?? machineState;
+    return assessment;
+  });
+
   const scored = historicalCandidates
     .map((snapshot, index) => {
+      const candidateAssessment = assessments[index];
       const priorSnapshot = index > 0 ? historicalCandidates[index - 1] ?? null : null;
-      const candidateAssessment = evaluateRegime(snapshot, thresholds);
+      const priorAssessment = priorSnapshot ? assessments[index - 1] : null;
       const candidateDistanceToFlip = resolveDistanceToFlip(candidateAssessment);
       const currentDistanceToFlip = resolveDistanceToFlip(current);
       const maxDistanceDomain = 30;
@@ -82,7 +114,7 @@ export const buildHistoricalAnalogs = ({
         trendDirection:
           buildReportDynamics({
             current: candidateAssessment,
-            previous: priorSnapshot ? evaluateRegime(priorSnapshot, thresholds) : null,
+            previous: priorAssessment,
           }).directionLabel === currentTrendDirection
             ? 1
             : 0,
