@@ -71,6 +71,10 @@ export const DECISION_CONTRACT_LABELS = {
     watchThisWeek: "Watch this week",
     watchNext: "Watch next",
   },
+  timing: {
+    /** When acting this week is felt and what unwinding costs (decision latency). */
+    latency: "Timing",
+  },
 } as const;
 
 /**

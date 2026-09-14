@@ -114,6 +114,56 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Change-course trigger:/);
   });
 
+  it("carries each lever's timing line into the per-lever bullets", async () => {
+    const { buildCanonicalBoundedDecisionRules } = await import("../lib/report/boundedDecisionRules");
+    const { buildActionStripItems } = await import("../lib/report/operatingCalls");
+    const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+    const rules = buildCanonicalBoundedDecisionRules({ regime: "EXPANSION", thresholds: assessment.thresholds, scores });
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      modeledDecision: { actionStripItems: buildActionStripItems(rules, scores) },
+    });
+
+    // Canonical rows always carry latency, so the per-lever bullets (items after
+    // the first) each state when the action is felt and what unwinding costs.
+    // First per-lever row is investment-pace, whose canonical area is burn
+    // discipline — the lever label and the latency clock are different nouns.
+    const timingLines = brief.match(/^  Timing: .+$/gm) ?? [];
+    assert.equal(timingLines.length, 2, `expected two Timing lines, got ${timingLines.length}`);
+    assert.match(timingLines[0], /Burn changes this month/);
+  });
+
+  it("omits the Timing line when a hand-built item carries none", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      modeledDecision: {
+        actionStripItems: [
+          {
+            lever: "hiring-stance",
+            label: "Hiring stance",
+            areaActionNow: "Limit net new hiring.",
+            triggerThreshold: "Pause approvals when tightness > 70.",
+            reversalCondition: "Resume when tightness < 64.",
+          },
+          {
+            lever: "investment-pace",
+            label: "Investment pace",
+            areaActionNow: "Stage discretionary spend behind proof milestones.",
+            triggerThreshold: "Stage spend behind milestones.",
+            reversalCondition: "Resume after proof milestones clear.",
+          },
+          {
+            lever: "product-priorities",
+            label: "Product priorities",
+            areaActionNow: "Protect core roadmap tempo.",
+            triggerThreshold: "Pause long-payback bets on weak reads.",
+            reversalCondition: "Resume when weekly direction stabilizes.",
+          },
+        ],
+      },
+    });
+
+    assert.doesNotMatch(brief, /^  Timing: /m);
+  });
+
   it("optionally appends interpretation layer content for handoff", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
       interpretationLayer: {
