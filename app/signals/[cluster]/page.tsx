@@ -7,6 +7,7 @@ import { findSignalsCluster, isSignalsClusterSlug, signalsClusterStaticParams } 
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { SignalReadingPanel } from "../components/signalReadingPanel";
 import { buildSignalClusterReading, isSignalClusterSlug } from "../../../lib/report/signalClusterReading";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 type Params = { cluster: string };
 
@@ -71,6 +72,13 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
 
   return (
     <ContentPageShell>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Evidence", href: "/signals" },
+          { label: clusterDefinition.title },
+        ]}
+      />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{clusterDefinition.title}</h1>
         <p className="text-sm text-slate-300">{clusterDefinition.summary}</p>

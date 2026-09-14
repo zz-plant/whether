@@ -7,6 +7,7 @@ import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -40,6 +41,14 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
 
   return (
     <ContentPageShell>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Resolve", href: "/resolve" },
+          { label: "Toolkits", href: "/resolve#toolkit-library" },
+          { label: toolkit.title },
+        ]}
+      />
       <Link href="/resolve#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         ← Back to Decision Tools toolkit library
       </Link>

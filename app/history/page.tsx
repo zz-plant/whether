@@ -67,6 +67,12 @@ export default async function HistoryPage({
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
 
+  const historySectionLinks = [
+    { href: "#regime-map", label: "Regime plane" },
+    { href: "#track-record", label: "Track record" },
+    ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
+  ];
+
   return (
     <ReportShell
       model={{
@@ -78,7 +84,7 @@ export default async function HistoryPage({
           fetchedAtLabel: "",
           treasurySource: "https://fred.stlouisfed.org",
         },
-        page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: [], currentPath: "/history" },
+        page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: historySectionLinks, currentPath: "/history" },
         trust: { trustStatusLabel: "Stable", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "stable" },
         chrome: { sidebarVariant: "full" },
       }}
@@ -92,20 +98,25 @@ export default async function HistoryPage({
       {/* The plane first. It is the one graphic on the page that shows where the
           call sits and how near the next one is; the record below says how often
           it moved and lists each call. It used to sit under a twelve-row table. */}
-      <RegimePhaseMap
-        series={phaseSeries}
-        activeSpan={phaseSpan.key}
-        spanHref={(span) => buildSpanHref(resolvedSearchParams, span)}
-        totalMonths={fullSeries.length}
-      />
+      <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        <RegimePhaseMap
+          series={phaseSeries}
+          activeSpan={phaseSpan.key}
+          spanHref={(span) => buildSpanHref(resolvedSearchParams, span)}
+          totalMonths={fullSeries.length}
+        />
+      </div>
 
-      <TrackRecord
-        record={trackRecord}
-        allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
-      />
+      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        <TrackRecord
+          record={trackRecord}
+          allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
+        />
+      </div>
 
       {publishedBriefs.length > 0 ? (
         <section
+          id="published-briefs"
           data-page-section="published-briefs"
           tabIndex={-1}
           aria-labelledby="published-briefs-heading"

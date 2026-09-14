@@ -13,7 +13,6 @@ import {
 import {
   normalizePathname,
   resolveGlobalHeaderLoopLinks,
-  resolveGlobalHeaderNavigationLinks,
 } from "../../lib/navigation/globalHeader";
 import { MobileNavContent } from "./globalHeaderNavClient";
 
@@ -75,7 +74,8 @@ export function MobileTabBar() {
     [loopLinks],
   );
   const activeInTabs = tabs.some((tab) => tab.isActive);
-  const moreIsActive = !activeInTabs && loopLinks.some((link) => link.isActive);
+  const activeLoopLayer = loopLinks.find((link) => link.isActive);
+  const moreIsActive = !activeInTabs && Boolean(activeLoopLayer);
 
   useEffect(() => {
     // The brief owns its swipe (it moves the month); every other loop route
@@ -154,10 +154,13 @@ export function MobileTabBar() {
               type="button"
               onClick={() => setShowMore(true)}
               aria-expanded={showMore}
-              className={`${TAB_CLASS} ${moreIsActive ? "text-teal-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
+              className={`relative ${TAB_CLASS} ${moreIsActive ? "text-teal-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
             >
               <MoreHorizontal aria-hidden="true" size={20} strokeWidth={moreIsActive ? 2.2 : 1.8} />
-              <span>More</span>
+              <span>{moreIsActive && activeLoopLayer ? (activeLoopLayer.navLabel ?? activeLoopLayer.label) : "More"}</span>
+              {moreIsActive ? (
+                <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-teal-400" aria-hidden="true" />
+              ) : null}
             </button>
           </li>
         </ul>
@@ -170,7 +173,7 @@ export function MobileTabBar() {
           <Drawer.Viewport className="fixed inset-0 z-50 flex items-end md:hidden">
             <Drawer.Popup className="w-full max-h-[85vh] overflow-y-auto rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-lg">
               <MobileNavContent
-                navigationLinks={resolveGlobalHeaderNavigationLinks(pathname)}
+                loopLinks={loopLinks}
                 currentPathname={pathname}
                 onClose={() => setShowMore(false)}
               />

@@ -51,6 +51,8 @@ import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { StageDropdownPill } from "./components/StageDropdownPill";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
+import { BriefSectionNav } from "./components/home/briefSectionNav";
+import { SectionSignpost } from "./components/home/sectionSignpost";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -442,8 +444,7 @@ async function PageContent({
               />
             </div>
           </div>
-          <div data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
+          <BriefSectionNav />
           <SwipeableWeek
             currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
             currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
@@ -456,109 +457,120 @@ async function PageContent({
               };
             })}
           >
-            {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
-            <DecisionHero
-              tightness={tightness}
-              tightnessDelta={tightnessDelta}
-              tightnessPressure={tightnessPressure}
-              tightnessSaturated={tightnessSaturated}
-              riskAppetite={riskAppetite}
-              riskAppetiteDelta={riskAppetiteDelta}
-              boldnessScore={weeklyLeadershipSummary.boldnessScore}
-              boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-              boldnessTrend={boldnessTrend}
-              boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
-              weeklyCall={primaryCall}
-              actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
-              regime={regime}
-              postureLabel={postureLabel}
-              signalDirection={signalDirection}
-              recordDate={homepage.reportShell.recordDateLabel}
-              fetchedAt={homepage.reportShell.fetchedAtLabel}
-              confidenceLabel={confidenceLabel}
-              trustStatusLabel={homepage.reportShell.trustStatusLabel}
-              treasurySource={homepage.reportShell.treasurySource}
-              degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-              isFallback={homepage.reportShell.showOfflineBadge}
-              signalData={v2HeroSignalData}
-              signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
-              flipConditions={flipConditionLabels}
-              guardrail={guardrailLabel}
-              reversalTrigger={reversalTriggerLabel}
-              boundedConditions={boundedConditions}
-              shareLines={briefShareLines}
-              revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
-              revisitQueue={revisitQueue}
-              noChangeAreas={noChangeAreas}
-              thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-              signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
-              activeStage={activeStage}
-            />
-
-            {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch mt-4">
-              <KeyDriversCard views={driverViews} />
-
-              <ActionsThisWeekCard
-                actions={cardActions}
-                operateHref={operateHref}
-              />
-
-              <WhatCouldChangeCard
-                items={[
-                  {
-                    id: "funding",
-                    label: `Funding pressure > ${reportData.assessment.thresholds.tightnessRegime}`,
-                    description: tightness >= reportData.assessment.thresholds.tightnessRegime
-                      ? "already above warning threshold; restricts hiring."
-                      : "increases likelihood of Cloudy posture.",
-                    icon: "alert",
-                  },
-                  {
-                    id: "risk",
-                    label: `Risk appetite < ${reportData.assessment.thresholds.riskAppetiteRegime}`,
-                    description: primaryFlipText.toLowerCase().includes("risk appetite")
-                      ? primaryFlipText
-                      : "likely flips call to Cloudy / Defensive.",
-                    icon: "arrow",
-                  },
-                  {
-                    id: "rates",
-                    label: "Further macro deterioration",
-                    description: "raises financing costs and debt burden.",
-                    icon: "percent",
-                  },
-                ]}
-                signalsHref="/signals"
-              />
-            </div>
-
-            {/* Mockup Card: Recent posture history (Weekly outlook over time) */}
-            <div className="mt-5">
-              <RecentPostureHistoryCard
-                history={macroTrendline}
-                historyHref="/history"
-                currentRegime={regime}
-                currentTightness={tightness}
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+              <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
+              {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
+              <DecisionHero
+                tightness={tightness}
                 tightnessDelta={tightnessDelta}
+                tightnessPressure={tightnessPressure}
+                tightnessSaturated={tightnessSaturated}
                 riskAppetite={riskAppetite}
                 riskAppetiteDelta={riskAppetiteDelta}
-                serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-                currentRecordDate={homepage.reportShell.recordDateLabel}
-              />
-            </div>
-
-            {/* Mockup Card: Stress-test a decision (See how it changes the outlook) */}
-            <div className="mt-5">
-              <StressTestQuickCard
-                planHref={operateHref}
-                assessment={reportData.assessment}
+                boldnessScore={weeklyLeadershipSummary.boldnessScore}
+                boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+                boldnessTrend={boldnessTrend}
+                boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
+                weeklyCall={primaryCall}
+                actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+                regime={regime}
+                postureLabel={postureLabel}
+                signalDirection={signalDirection}
                 recordDate={homepage.reportShell.recordDateLabel}
+                fetchedAt={homepage.reportShell.fetchedAtLabel}
+                confidenceLabel={confidenceLabel}
+                trustStatusLabel={homepage.reportShell.trustStatusLabel}
+                treasurySource={homepage.reportShell.treasurySource}
+                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+                isFallback={homepage.reportShell.showOfflineBadge}
+                signalData={v2HeroSignalData}
+                signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
+                flipConditions={flipConditionLabels}
+                guardrail={guardrailLabel}
+                reversalTrigger={reversalTriggerLabel}
+                boundedConditions={boundedConditions}
+                shareLines={briefShareLines}
+                revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
+                revisitQueue={revisitQueue}
+                noChangeAreas={noChangeAreas}
+                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+                signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
                 activeStage={activeStage}
               />
             </div>
+
+            {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
+            <div id="key-drivers" data-page-section="key-drivers" tabIndex={-1} aria-labelledby="key-drivers-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+              <SectionSignpost
+                index="02"
+                id="key-drivers"
+                headingId="key-drivers-heading"
+                title="Key drivers & actions"
+                description="Threshold proximity, action ladder, and counterfactual triggers"
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+                <KeyDriversCard views={driverViews} />
+
+                <ActionsThisWeekCard
+                  actions={cardActions}
+                  operateHref={operateHref}
+                />
+
+                <WhatCouldChangeCard
+                  items={[
+                    {
+                      id: "funding",
+                      label: `Funding pressure > ${reportData.assessment.thresholds.tightnessRegime}`,
+                      description: tightness >= reportData.assessment.thresholds.tightnessRegime
+                        ? "already above warning threshold; restricts hiring."
+                        : "increases likelihood of Cloudy posture.",
+                      icon: "alert",
+                    },
+                    {
+                      id: "risk",
+                      label: `Risk appetite < ${reportData.assessment.thresholds.riskAppetiteRegime}`,
+                      description: primaryFlipText.toLowerCase().includes("risk appetite")
+                        ? primaryFlipText
+                        : "likely flips call to Cloudy / Defensive.",
+                      icon: "arrow",
+                    },
+                    {
+                      id: "rates",
+                      label: "Further macro deterioration",
+                      description: "raises financing costs and debt burden.",
+                      icon: "percent",
+                    },
+                  ]}
+                  signalsHref="/signals"
+                />
+              </div>
+
+              {/* Mockup Card: Recent posture history (Weekly outlook over time) */}
+              <div className="mt-5">
+                <RecentPostureHistoryCard
+                  history={macroTrendline}
+                  historyHref="/history"
+                  currentRegime={regime}
+                  currentTightness={tightness}
+                  tightnessDelta={tightnessDelta}
+                  riskAppetite={riskAppetite}
+                  riskAppetiteDelta={riskAppetiteDelta}
+                  serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
+                  currentRecordDate={homepage.reportShell.recordDateLabel}
+                />
+              </div>
+
+              {/* Mockup Card: Stress-test a decision (See how it changes the outlook) */}
+              <div className="mt-5">
+                <StressTestQuickCard
+                  planHref={operateHref}
+                  assessment={reportData.assessment}
+                  recordDate={homepage.reportShell.recordDateLabel}
+                  activeStage={activeStage}
+                />
+              </div>
+            </div>
           </SwipeableWeek>
-          </div>
 
           {/* Directly under the call, not 3,000px below it. The one conversion
               on the page used to sit under the stress tester, the decision
@@ -570,8 +582,14 @@ async function PageContent({
           </div>
 
           {/* Below the call: unified retrospective card */}
-          <div data-page-section="since-last-visit" tabIndex={-1} aria-labelledby="since-last-visit-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-            <h2 id="since-last-visit-heading" className="sr-only">Weekly Retrospective</h2>
+          <div id="since-last-visit" data-page-section="since-last-visit" tabIndex={-1} aria-labelledby="since-last-visit-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <SectionSignpost
+              index="03"
+              id="since-last-visit"
+              headingId="since-last-visit-heading"
+              title="Weekly retrospective"
+              description="Prior call review and decision hindsight against threshold movements"
+            />
             <WeeklyRetrospectiveCard
               currentVisit={{
                 recordDate: reportData.treasury.record_date,
@@ -589,17 +607,30 @@ async function PageContent({
             />
           </div>
 
-          <div data-page-section="direct-answers" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
+          <div id="direct-answers" data-page-section="direct-answers" tabIndex={-1} aria-labelledby="direct-answers-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <SectionSignpost
+              index="04"
+              id="direct-answers"
+              headingId="direct-answers-heading"
+              title="Direct answers"
+              description="Immediate answers for hiring, spend, and burn guardrails"
+            />
+            <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
           </div>
 
-          <div data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-          <h2 id="plan-and-evidence-heading" className="sr-only">Build the plan, and the evidence behind the call</h2>
-          <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
-            <span className="text-fluid-sm text-slate-400">Planning horizon</span>
-            <CadenceSelector />
-          </div>
+          <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <SectionSignpost
+              index="05"
+              id="plan-and-evidence"
+              headingId="plan-and-evidence-heading"
+              title="Plan & horizon"
+              description="Turn this week’s brief into approvals, finance posture, and team briefs"
+            />
+            <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
+              <span className="text-fluid-sm text-slate-400">Planning horizon</span>
+              <CadenceSelector />
+            </div>
           </div>
         </div>
 

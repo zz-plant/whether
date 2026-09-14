@@ -45,7 +45,7 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
       <button
         type="button"
         onClick={() => document.dispatchEvent(new CustomEvent("whether-open-command-palette"))}
-        className={`${CELL} max-md:hidden md:min-w-[13rem] md:justify-start md:gap-2 md:px-3 md:text-fluid-xs md:text-slate-400`}
+        className={`${CELL} max-sm:hidden sm:px-2.5 md:min-w-[13rem] md:justify-start md:gap-2 md:px-3 md:text-fluid-xs md:text-slate-400`}
         aria-label="Search"
         title="Search or jump to… ⌘K"
       >
@@ -57,7 +57,7 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
           restores the saved choice pre-paint, but nothing rendered the control,
           so the theme was unreachable from the UI. Takes the cell class rather
           than its own pill default, like the buttons either side. */}
-      <ThemeToggleButton className={`!rounded-none max-md:!rounded-l-lg !shadow-none !outline-offset-[-2px] ${CELL}`} />
+      <ThemeToggleButton className={`!rounded-none max-sm:!rounded-l-lg !shadow-none !outline-offset-[-2px] ${CELL}`} />
       {showPresentMode ? (
         <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
       ) : null}

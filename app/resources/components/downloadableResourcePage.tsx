@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/pageMetadata";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 export type DownloadableResourceMetadataConfig = {
   title: string;
@@ -85,6 +86,13 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
     <ContentPageShell
       data-resource-path={config.metadata.path}
     >
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Resources", href: "/resources" },
+          { label: config.metadata.title },
+        ]}
+      />
       <section
         className={`weather-panel space-y-3 px-6 py-6 ${printModeClassNames.heroPanel}`.trim()}
       >
