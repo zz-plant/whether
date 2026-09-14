@@ -29,6 +29,7 @@ const code = (path: string) =>
 const COPY_SURFACES = [
   "app/components/shareBriefButton.tsx",
   "app/components/history/ExportBoardAnnexButton.tsx",
+  "app/components/hero/ActionsThisWeekCard.tsx",
 ];
 
 describe("copy controls report what actually happened", () => {

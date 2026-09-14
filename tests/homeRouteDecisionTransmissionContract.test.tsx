@@ -102,7 +102,6 @@ describe("home route render contract", () => {
     assert.ok(!routeSource.includes("<DecisionRouteRail"), "home route no longer mounts a peer-route handoff rail");
     assert.ok(!routeSource.includes("<StageSwitcher"), "the interpretation-layer switch is gone from /");
     assert.ok(!routeSource.includes("<ViewSelector"), "the view selector is gone from /");
-    assert.ok(!routeSource.includes("autoExpand="), "CompareStrip is a manual disclosure, not an auto-opened panel");
 
     // Demoted hubs stay reachable on demand: the command palette mounts every
     // IA navigation layer and its own history shortcut.

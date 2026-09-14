@@ -746,6 +746,34 @@ Not changed, and worth naming: the home brief still spends a second full band on
 chips, ~240px of chrome on a 430px viewport before any content. Narrowing that is an IA
 question about whether monthly and quarterly deserve top-level persistence, not a styling one.
 
+### 1.1.15 What the removal audit could not justify keeping (2026-09-14)
+
+A justified-removal pass over the remaining UI. Four removals, two repairs:
+
+- **`WhatCouldChangeCard` is gone from `/`.** Its first two items restated the hero's flip
+  conditions and bounded-condition rails — the same two thresholds at lower fidelity — and its
+  third item ("further macro deterioration raises financing costs") was evergreen. The band-02
+  grid is two cards now (`KeyDriversCard`, `ActionsThisWeekCard`).
+- **`ActionsThisWeekCard` stays and its copy list was repaired.** The card is the homepage's only
+  per-area action surface and the only place `Do now` rows deep-link into `/operate#lever`, so it
+  is not a duplicate of the hero's lane-level ledger. Its clipboard write was hand-rolled with a
+  swallowed failure; it now goes through `useClipboardCopy`, shows `Copy failed`, and tells screen
+  readers (pinned in `tests/clipboardFailureReporting.test.tsx`).
+- **The cadence selector scrolls to the card it controls.** The selector sits below the fold by
+  contract (the home render-contract test pins its position), while the monthly/quarterly call it
+  renders appears above the fold in `#weekly-call` — a change moved content only where the reader
+  could not see it. Selection now scrolls to that section, honoring `prefers-reduced-motion`.
+  Whether monthly and quarterly deserve a slot on `/` at all stays the open IA question from
+  §1.1.14; no cadence telemetry exists to settle it, so it is a product decision, not a measurement.
+- **The sticky call strip's `Jump` menu is gone.** It listed the same five anchors as
+  `BriefSectionNav`, on the same page, at the same widths. The strip keeps the call, the copy
+  control, and the image download.
+- **`CompareStrip` deleted.** It was exported with no render site anywhere in `app/`; the only
+  remaining trace was a render-contract line asserting its old `autoExpand` prop, which went too.
+- **`/mockups` index deleted.** One mockup remained, so the index was portal chrome around a single
+  destination. `/mockups/operator-brief` stays — the one-screen weekly-brief spec cites it — behind
+  the same preview-gated layout, and the UI-capture set no longer photographs the index.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

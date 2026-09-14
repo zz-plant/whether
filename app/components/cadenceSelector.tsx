@@ -16,6 +16,8 @@ type SegmentControlProps = {
   paramName: string;
   defaultKey: string;
   ariaLabel: string;
+  /** Runs after the URL updates. Lets a caller reveal the content the new cadence renders. */
+  onNavigate?: (key: string) => void;
 };
 
 function buildHref(pathname: string, searchParams: URLSearchParams | null, paramName: string, value: string, defaultKey: string) {
@@ -29,7 +31,7 @@ function buildHref(pathname: string, searchParams: URLSearchParams | null, param
   return qs ? `${pathname}?${qs}` : pathname;
 }
 
-function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentControlProps) {
+function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate }: SegmentControlProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? "/";
@@ -48,8 +50,9 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
     (key: string) => {
       const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
       router.replace(href, { scroll: false });
+      onNavigate?.(key);
     },
-    [pathname, searchParams, paramName, defaultKey, router],
+    [pathname, searchParams, paramName, defaultKey, router, onNavigate],
   );
 
   const prefetch = useCallback(
@@ -110,13 +113,14 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel }: SegmentCo
   );
 }
 
-export function CadenceSelector() {
+export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => void }) {
   return (
     <SegmentControl
       options={CADENCES}
       paramName="cadence"
       defaultKey="weekly"
       ariaLabel="Cadence"
+      onNavigate={onNavigate}
     />
   );
 }

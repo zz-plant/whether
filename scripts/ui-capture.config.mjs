@@ -43,13 +43,6 @@ const liveTargets = liveRoutes.flatMap(({ slug, label, path }) => [
 export const uiCaptureTargets = [
   ...liveTargets,
   {
-    id: "mockups-index-desktop",
-    label: "Mockups index / desktop",
-    path: "/mockups",
-    viewport: { width: 1440, height: 1200 },
-    fullPage: true,
-  },
-  {
     id: "operator-brief-mobile",
     label: "Operator brief / mobile compact",
     path: "/mockups/operator-brief?viewport=mobile&density=compact",

@@ -51,6 +51,7 @@ describe("bounded decisions: framework and form as a section of /trust", () => {
 describe("mockups", () => {
   it("keeps only the one the weekly-brief spec cites", () => {
     assert.ok(existsSync(appPath("/mockups/operator-brief/page.tsx")));
+    assert.equal(existsSync(appPath("/mockups/page.tsx")), false, "a one-item index is portal chrome around a single destination");
     assert.equal(existsSync(appPath("/mockups/identicons/page.tsx")), false);
     assert.equal(existsSync(appPath("/mockups/visual-system/page.tsx")), false);
   });
