@@ -40,7 +40,7 @@ describe("runway-conditioned notes", () => {
     const defensiveRaise = defensive.find((note) => note.area === "capital-raising");
     assert.ok(expansionRaise);
     assert.ok(defensiveRaise);
-    assert.match(expansionRaise.note, /favorable window argues for starting it early/);
+    assert.match(expansionRaise.note, /favorable window widens it/);
     assert.doesNotMatch(defensiveRaise.note, /favorable window/);
   });
 
@@ -67,5 +67,29 @@ describe("runway-conditioned notes", () => {
       monthlyBurnUsd: 80_000,
     });
     assert.ok(notes.length <= 3);
+  });
+
+  it("states consequences only: no directives and no alternate re-open conditions", () => {
+    // The CR contract: notes add the operator's cash position, not a second
+    // corridor. A note that directs ("check it first") or conditions ("until
+    // runway clears a year") replaces canonical action/threshold semantics.
+    const directivePatterns =
+      /act on first|check it first|belongs on|until runway clears|keep raise discipline|spend attention|is the window to spend/i;
+    for (const regime of ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const) {
+      for (const runwayMonths of [4, 9, 14, 24]) {
+        const notes = buildRunwayConditionedNotes({
+          regime,
+          runwayMonths,
+          monthlyBurnUsd: 100_000,
+        });
+        for (const note of notes) {
+          assert.doesNotMatch(
+            note.note,
+            directivePatterns,
+            `${regime} @ ${runwayMonths}mo (${note.area}) directs instead of explaining: ${note.note}`,
+          );
+        }
+      }
+    }
   });
 });

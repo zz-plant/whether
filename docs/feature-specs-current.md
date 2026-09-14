@@ -795,10 +795,16 @@ shared with the runway planner and both stress tests) never reached the canonica
 `?view=company` interpretation layer is band-based and illustrative by default. These notes close
 that gap under the same translation-only contract: they render below the weekly call once the
 operator has given a runway figure, never restate a threshold number, and never mutate the call,
-lane states, or confidence. Band thresholds follow the profile's existing boundaries (critical < 6,
-tight < 12, long ≥ 18 months); burn-cut extension math is derived from the operator's own months
-(a 10% cut stretches runway by roughly a ninth of it), not a flat claim. Blank means not given —
-a missing runway never reads like zero, and readers without a figure see a canonical brief.
+lane states, or confidence. A note states a consequence of the corridor, never a directive and
+never an alternate action or re-open condition — no "check this lane first", no "until runway
+clears a year" (2026-09-14 review fix, pinned in `tests/runwayConditionedNotes.test.ts`). Band
+thresholds follow the profile's existing boundaries (critical < 6, tight < 12, long ≥ 18 months);
+burn-cut extension math is derived from the operator's own months (a 10% cut stretches runway by
+roughly a ninth of it), not a flat claim. Blank means not given — a missing runway never reads
+like zero, and readers without a figure see a canonical brief. The panel renders on live briefs
+only: under a Time Machine selection it is omitted entirely, because the profile holds the
+operator's runway as of today and combining it with an archived regime would date the company's
+cash position to the archived week.
 
 **Same round, follow-through.** Latency now travels into the exports: the per-lever bullets in the
 Slack/board briefs and the `Decisions` section of `/brief.md` print a `Timing` line

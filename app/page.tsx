@@ -493,7 +493,12 @@ async function PageContent({
                 signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
                 activeStage={activeStage}
               />
-              <RunwayConditionedNotes regime={regime} />
+              {/* Live briefs only. The profile holds the operator's runway as of
+                  today; combining it with an archived regime would date the
+                  company's cash position to the archived week, and a screenshot
+                  of a historical call would carry a stress that never existed
+                  then. The canonical historical brief stays exactly as published. */}
+              {!historicalSelection ? <RunwayConditionedNotes regime={regime} /> : null}
             </div>
 
             {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}

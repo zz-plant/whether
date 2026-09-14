@@ -167,6 +167,9 @@ below, not `?view=company`.
   weekly call) follows the same translation-only contract but keys on the browser-held operator
   profile instead of a query param. It renders nothing until the operator has given a runway figure,
   never restates a threshold number, and never mutates canonical call, lane, or threshold semantics.
+  Its sentences state consequences of the corridor, not directives and not alternate actions or
+  re-open conditions. It renders on live briefs only — under a Time Machine selection it is omitted,
+  since the profile is present-day and an archived regime must not borrow it.
 - Expected layer semantics (screenshot-safe bullets; bounded action framing):
   - `default`: `Action` (decision delta) + `Trigger` (guardrail) + `Reverse` (reversal condition)
   - `sector`: one sector-adjusted action line plus explicit tighten/reverse conditions; still translation-only

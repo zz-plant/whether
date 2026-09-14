@@ -4,11 +4,13 @@
  *
  * Translation-only, under the same contract as the interpretation layers
  * (docs/one-screen-weekly-brief-spec.md): a note changes explanatory copy only.
- * It never restates a threshold number, never mutates a lane state, and never
- * changes the canonical call. The one dimension it adds is the one the macro
- * engine cannot see — how much cash the reader has to act with.
+ * It never restates a threshold number, never mutates a lane state, never
+ * introduces an alternate action or re-open condition, and never issues a
+ * directive — it states what the company's own cash position changes about the
+ * urgency of the call, the one dimension the macro engine cannot see. Every
+ * sentence below is a consequence of the corridor, not a second corridor.
  *
- * Blank means not given. A missing runway never reads as zero: without the
+ * Blank means not given. A missing runway never reads like zero: without the
  * figure there is no note and the brief stays canonical.
  */
 import type { DecisionArea } from "./boundedDecisionRules";
@@ -57,16 +59,16 @@ export const buildRunwayConditionedNotes = ({
       {
         area: "burn-discipline",
         note: monthlyBurnUsd
-          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months — the burn lane is the one to act on first.`
-          : `At ${runwayMonths} months of runway, cash durability is this week's binding constraint — the burn lane is the one to act on first.`,
+          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months — burn is the lane where the printed call moves runway fastest.`
+          : `At ${runwayMonths} months of runway, cash durability is this week's binding constraint, and burn is the lane where the printed call moves it fastest.`,
       },
       {
         area: "capital-raising",
-        note: `At ${runwayMonths} months, the raise is not a background task — a process started this quarter is what lands cash before the corridor matters.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
+        note: `At ${runwayMonths} months, a raise process started this quarter is what lands cash before runway ends — waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
       },
       {
         area: "hiring",
-        note: `At ${runwayMonths} months, the hiring pause is what protects the runway every other lane assumes — check it first.`,
+        note: `At ${runwayMonths} months, the runway every other lane assumes is protected most by the hiring lane — reversing that pause is what spends it.`,
       },
     ];
     return notes;
@@ -76,11 +78,11 @@ export const buildRunwayConditionedNotes = ({
     const notes: RunwayConditionedNote[] = [
       {
         area: "capital-raising",
-        note: `At ${runwayMonths} months, raise planning belongs on this quarter's calendar${isExpansion ? ", and a favorable window argues for starting it early" : ""}.`,
+        note: `At ${runwayMonths} months, raise planning is the lane with the least slack — the corridor's window has to fit inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
       },
       {
         area: "hiring",
-        note: `At ${runwayMonths} months, keep new roles tied to revenue or delivery risk until runway clears a year.`,
+        note: `At ${runwayMonths} months, each net-new role commits fixed cost against months you cannot extend — its payback proof carries that weight.`,
       },
     ];
     if (monthlyBurnUsd) {
@@ -102,7 +104,7 @@ export const buildRunwayConditionedNotes = ({
     if (isExpansion) {
       notes.push({
         area: "expansion-bets",
-        note: "With runway above a year, this is the window to spend on reversible bets the call allows.",
+        note: "With runway above a year, spare runway goes furthest into the reversible bets the call allows.",
       });
     }
     return notes;
@@ -111,13 +113,13 @@ export const buildRunwayConditionedNotes = ({
   const notes: RunwayConditionedNote[] = [
     {
       area: "burn-discipline",
-      note: `At ${runwayMonths} months, runway is not this week's binding constraint — the corridor is. Spend attention on the levers, not the cash line.`,
+      note: `At ${runwayMonths} months, runway is not this week's binding constraint — the corridor is.`,
     },
   ];
   if (isTightening) {
     notes.push({
       area: "capital-raising",
-      note: "The exception: keep raise discipline active anyway — long runway is cheapest to preserve when windows are poor.",
+      note: "The exception: in a tightening window, raise discipline is where long runway earns its keep.",
     });
   }
   return notes;
