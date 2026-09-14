@@ -7,6 +7,7 @@ import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBri
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
+import { RunwayConditionedNotes } from "./components/RunwayConditionedNotes";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { DirectAnswersStrip } from "./components/home/DirectAnswersStrip";
@@ -492,6 +493,7 @@ async function PageContent({
                 signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
                 activeStage={activeStage}
               />
+              <RunwayConditionedNotes regime={regime} />
             </div>
 
             {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}

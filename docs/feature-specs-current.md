@@ -113,8 +113,9 @@ decimal it reports is not a change: `formatTrendArrow` returns `→` only for an
 `-0.04` arrives as `↓` beside the label "-0.0 vs last week". Below-the-fold tool racks (transition
 probability, regime history chart, what-if simulators, ticker, source-disagreement, evidence
 drawer) were removed from `/` as surfaces that competed with the decision-attention block; their
-engines stay internal (see section 8). The only remaining below-fold company context is the
-`Your numbers` panel (`CompanyMetricsPanel`) feeding company-adjusted guidance.
+engines stay internal (see section 8). Company context below the call is the browser-held
+runway-conditioned notes panel (see section 1.1.9); the removed `CompanyMetricsPanel` "Your
+numbers" widget has no successor component, only that panel and the shared operator profile.
 
 The evidence handoff keeps trust compact on home by showing one summary plus explicit route
 ownership for `/signals` and `/trust` instead of reproducing those workflows inline.
@@ -773,6 +774,41 @@ A justified-removal pass over the remaining UI. Four removals, two repairs:
 - **`/mockups` index deleted.** One mockup remained, so the index was portal chrome around a single
   destination. `/mockups/operator-brief` stays — the one-screen weekly-brief spec cites it — behind
   the same preview-gated layout, and the UI-capture set no longer photographs the index.
+
+### 1.1.16 Decision latency and runway-conditioned notes (2026-09-14)
+
+Two additions that answer questions the bounded rules themselves do not: *when does acting this
+week actually bite*, and *what does my own cash position change about the call*.
+
+**Decision latency** (`lib/report/decisionLatency.ts`). Every canonical bounded rule now carries a
+`latency` (`effectLandsLabel`, `reversalLabel`) — when the action is felt and what unwinding costs,
+as properties of the lever rather than the regime. A hire lands in 4–6 weeks whether funding
+pressure reads 40 or 80; the regime sets the call, latency states what acting on it commits you to.
+`buildActionStripItems` surfaces it as `latencyLine`, and the rules-by-area table (Planning, and the
+home appendix context) prints it as a sub-line under the area label. The field is optional on the
+type because hand-built rules in tests and fixtures legitimately omit it; the canonical builder
+always sets it.
+
+**Runway-conditioned notes** (`lib/report/runwayConditionedNotes.ts`, `app/components/RunwayConditionedNotes.tsx`).
+The weekly call on `/` was company-agnostic: the operator profile (runway, burn — browser-held,
+shared with the runway planner and both stress tests) never reached the canonical surface; the
+`?view=company` interpretation layer is band-based and illustrative by default. These notes close
+that gap under the same translation-only contract: they render below the weekly call once the
+operator has given a runway figure, never restate a threshold number, and never mutate the call,
+lane states, or confidence. Band thresholds follow the profile's existing boundaries (critical < 6,
+tight < 12, long ≥ 18 months); burn-cut extension math is derived from the operator's own months
+(a 10% cut stretches runway by roughly a ninth of it), not a flat claim. Blank means not given —
+a missing runway never reads as zero, and readers without a figure see a canonical brief.
+
+**Same round, follow-through.** Latency now travels into the exports: the per-lever bullets in the
+Slack/board briefs and the `Decisions` section of `/brief.md` print a `Timing` line
+(`DECISION_CONTRACT_LABELS.timing.latency`), omitted for rows without latency rather than printing
+a placeholder. Each action-strip row also carries an `ownerLabel` (`businessAreaOwner` in
+`decisionKnobs.ts` — VP Eng / CEO / CEO + Finance lead / VP Product / Finance lead), printed in the
+rules-by-area table so the artifact routes the decision, not just reads it. The `?view=company`
+layer keeps its band-based illustrative profile: the interpretation layers have no on-page render
+site (exports only, server-built), and the browser-held profile cannot reach a server build
+without a new sync surface — the runway notes panel is the sanctioned on-page path.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:

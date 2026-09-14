@@ -154,11 +154,19 @@ nowhere rather than invented.
 
 
 ### Interpretation-layer contract (optional, URL-driven)
-The homepage supports optional interpretation layers without changing the canonical weekly posture call.
+Interpretation layers change explanatory copy without changing the canonical weekly posture call.
+As of the 2026-09 removal audit, no on-page render site reads these layers on `/`; they surface in
+the export artifacts built from the homepage assembly (board summary, call citation) and in the
+share-preview URL param. On-page company conditioning is the profile-driven runway notes panel
+below, not `?view=company`.
 
 - Query param: `?view=default|sector|company|financial|forecast`
 - Default behavior: missing/invalid `view` resolves to `default`.
 - Layer scope: interpretation layers change only explanatory bullets and do **not** change regime classification, confidence labels, or bounded-rule thresholds.
+- Profile-driven variant: the runway-conditioned notes panel (`RunwayConditionedNotes`, under the
+  weekly call) follows the same translation-only contract but keys on the browser-held operator
+  profile instead of a query param. It renders nothing until the operator has given a runway figure,
+  never restates a threshold number, and never mutates canonical call, lane, or threshold semantics.
 - Expected layer semantics (screenshot-safe bullets; bounded action framing):
   - `default`: `Action` (decision delta) + `Trigger` (guardrail) + `Reverse` (reversal condition)
   - `sector`: one sector-adjusted action line plus explicit tighten/reverse conditions; still translation-only
