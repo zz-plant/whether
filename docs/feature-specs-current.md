@@ -798,7 +798,7 @@ operator has given a runway figure, never restate a threshold number, and never 
 lane states, or confidence. Band thresholds follow the profile's existing boundaries (critical < 6,
 tight < 12, long ≥ 18 months); burn-cut extension math is derived from the operator's own months
 (a 10% cut stretches runway by roughly a ninth of it), not a flat claim. Blank means not given —
-a missing runway never reads as zero, and readers without a figure see a canonical brief.
+a missing runway never reads like zero, and readers without a figure see a canonical brief.
 
 **Same round, follow-through.** Latency now travels into the exports: the per-lever bullets in the
 Slack/board briefs and the `Decisions` section of `/brief.md` print a `Timing` line

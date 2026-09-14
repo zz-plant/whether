@@ -96,7 +96,7 @@ export const buildRunwayConditionedNotes = ({
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
-        note: `At ${runwayMonths} months of runway you can act on the call as printed — no emergency cuts while funding pressure stays this side of the pause line.`,
+        note: `At ${runwayMonths} months of runway you can act on the printed call — no emergency cuts while funding pressure stays this side of the pause line.`,
       },
     ];
     if (isExpansion) {
