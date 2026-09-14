@@ -177,10 +177,9 @@ export const buildRegimeFlipState = ({
       : `${label} (${formatThresholdNumber(riskAppetite)}) has already risen above its ${formatThresholdNumber(thresholds.riskAppetiteRegime)} line`;
   };
 
-  const causes: BoundaryDimension[] = [
-    ...(tightnessCause ? (["tightness"] as BoundaryDimension[]) : []),
-    ...(riskCause ? (["riskAppetite"] as BoundaryDimension[]) : []),
-  ];
+  const causes: BoundaryDimension[] = [];
+  if (tightnessCause) causes.push("tightness");
+  if (riskCause) causes.push("riskAppetite");
   const causeClause = causes
     .map((dimension, index) => beyondClause(dimension, index > 0))
     .join("; ");

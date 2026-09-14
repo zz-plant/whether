@@ -104,52 +104,47 @@ export function FirstVisitExplainer() {
       aria-label="What is Whether"
       data-testid="first-run-orientation"
       suppressHydrationWarning
-      className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-800/60 pb-2 text-fluid-xs text-slate-300"
+      className="mb-4 rounded-xl border border-slate-800/80 bg-slate-900/40 p-3.5 sm:p-4 text-fluid-xs text-slate-300 backdrop-blur-sm"
     >
-      {/* The line a first-time visitor reads. It previously opened with "Treasury
-          yields, credit spreads, and VIX" — three undefined terms in the one
-          sentence written for people with no context. Say the job first; the
-          inputs are one click away on /trust. */}
-      <p className="w-full min-w-0">
-        How hard it is to raise money right now, and how much risk investors will fund, scored into
-        one operating call each Monday.
-      </p>
-      {/* Two links, not five. A cold visitor has two questions — how the number
-          is made, and whether the call has ever meant anything — and this strip
-          answers exactly those. The glossary is one click away inside the brief,
-          the source and the API live in the footer and under More; putting them
-          here made the product explain itself before showing itself. */}
-      <Link href="/trust#formula-reference" className={orientationLinkClass}>
-        How the score works
-      </Link>
-      {/* "How is this not a horoscope" is the first objection a cold visitor
-          forms, and the method page answers a different one — that the number is
-          derived. What answers this one is the record of held and changed calls,
-          which /history owns. */}
-      <Link href="/history#track-record-heading" className={orientationLinkClass}>
-        Track record
-      </Link>
-      <fieldset className="m-0 flex w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-1 border-0 p-0 pt-1">
-        <legend className="float-left text-slate-400">Grade it for your stage:</legend>
-        {OPERATOR_STAGE_OPTIONS.map((option) => (
-          <button
-            key={option.key}
-            type="button"
-            onClick={() => handleStage(option.key)}
-            className="inline-flex min-h-11 items-center rounded-md border border-slate-700/70 px-2.5 text-fluid-xs font-medium text-slate-200 hover:border-sky-400/60 hover:text-white"
-          >
-            {option.label}
-          </button>
-        ))}
-      </fieldset>
-      <button
-        type="button"
-        onClick={handleDismiss}
-        aria-label="Dismiss introduction"
-        className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center text-slate-400 hover:text-white"
-      >
-        Dismiss
-      </button>
+      <div className="flex items-start justify-between gap-3">
+        <p className="min-w-0 font-normal text-slate-200 leading-relaxed">
+          How hard it is to raise money right now, and how much risk investors will fund, scored into
+          one operating call each Monday.
+        </p>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          aria-label="Dismiss introduction"
+          className="shrink-0 -mr-1 -mt-1 inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+        >
+          Dismiss
+        </button>
+      </div>
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/[0.06] pt-2.5">
+        <div className="flex items-center gap-3">
+          <Link href="/trust#formula-reference" className={orientationLinkClass}>
+            How the score works
+          </Link>
+          <span className="text-slate-600" aria-hidden="true">·</span>
+          <Link href="/history#track-record-heading" className={orientationLinkClass}>
+            Track record
+          </Link>
+        </div>
+        <fieldset className="m-0 flex min-w-0 flex-wrap items-center gap-1.5 border-0 p-0 sm:ml-auto">
+          <legend className="sr-only">Grade it for your stage:</legend>
+          <span className="text-xs text-slate-400 mr-1" aria-hidden="true">Stage:</span>
+          {OPERATOR_STAGE_OPTIONS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => handleStage(option.key)}
+              className="inline-flex min-h-[32px] items-center rounded-md border border-slate-700/60 bg-slate-800/50 px-2 py-0.5 text-xs font-medium text-slate-200 hover:border-teal-500/50 hover:text-white transition-colors"
+            >
+              {option.label}
+            </button>
+          ))}
+        </fieldset>
+      </div>
     </section>
   );
 }

@@ -14,7 +14,6 @@ import { primaryNavigationLayers } from "../../lib/navigation/informationArchite
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
-import { GlobalHeaderSearchForm } from "./globalHeaderSearchForm";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 import { StageDropdownPill } from "./StageDropdownPill";
 
@@ -149,16 +148,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 </div>
               </>
             ) : (
-              <>
-                {/* Hidden below sm. The inline field's min-content width (a 13rem
-                    input plus the Search button) cannot shrink, so on a 430px
-                    viewport it forced the whole document to ~650px and the page
-                    scrolled horizontally — against §VI. Search is not lost: the
-                    magnifier in GlobalHeaderActionsClient opens the command
-                    palette, which is how report routes have always offered it. */}
-                <GlobalHeaderSearchForm className="hidden sm:grid w-full gap-2 sm:w-auto sm:grid-cols-[minmax(0,16rem)_auto] sm:items-center" />
-                <GlobalHeaderActionsClient />
-              </>
+              <GlobalHeaderActionsClient />
             )}
           </div>
         </div>

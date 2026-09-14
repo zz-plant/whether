@@ -39,8 +39,8 @@ export const PlaybookPanel = ({
   ];
 
   return (
-    <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
-      <div className="weather-panel p-6">
+    <section id="playbook" aria-labelledby="playbook-title" className="mt-4 space-y-4">
+      <div className="space-y-4">
         <div>
           <p className="type-label text-slate-400">Rules for this week</p>
           <h3 id="playbook-title" className="type-section text-slate-100">

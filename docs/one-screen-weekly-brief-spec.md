@@ -204,7 +204,7 @@ Implementation guardrails:
 - The top strip is metadata-only. The operator-facing call appears once, in the canonical weekly-call block.
 - The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
 - The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
-- Homepage utility search should stay demoted behind a secondary `Find a tool` action so the first-screen priority remains reading the weekly call.
+- Search has one visible global entry point per viewport: the header launcher at `md` and above, and the bottom navigation Search control below `md`. Both open the single global command palette, which also handles free-text guidance queries; informational pages do not add a second header search form.
 - The compact backdrop row should expose the scalar anchor (`Operating latitude`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance. V2 homepage variants should keep that same scalar hierarchy in the hero: Operating latitude first, tightness only as a supporting driver or guardrail input.
 - The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
@@ -481,3 +481,7 @@ same thing, the earlier one keeps it.
   viewport shifts layout after hydration (an effect-driven open was tried and rejected for
   desktop pop-in). Glyph SVG ids are suffixed per render to stay unique. Nothing in the do-not-cut
   list moved; the collapse hides only deltas and descriptors (~115px of hero height at 430w).
+
+### Home cadence placement (2026-09-12)
+
+The weekly call precedes horizon selection on mobile and desktop. Weekly / Monthly / Quarterly stays available under the lower plan-and-evidence handoff, using the existing selector. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header. This completes the home-fold work deferred in PR #1351.

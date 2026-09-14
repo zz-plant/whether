@@ -85,6 +85,19 @@
     inset 0 1px 0 var(--edge-highlight);
 }
 
+html[data-theme="light"] .weather-hero-card {
+  background:
+    radial-gradient(ellipse 75% 60% at 85% 20%, rgba(45, 212, 191, 0.08), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(20, 184, 166, 0.05), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%),
+    var(--bg-panel, #ffffff);
+  border-color: rgba(13, 148, 136, 0.25);
+  box-shadow:
+    var(--elev-2),
+    0 0 24px rgba(20, 184, 166, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 /* Mobile & desktop brief cards: high-contrast executive cards matching mockup */
 .weather-brief-card {
   position: relative;
@@ -100,6 +113,16 @@
     0 4px 20px -2px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+html[data-theme="light"] .weather-brief-card {
+  border-color: var(--border-default);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%),
+    var(--bg-panel, #ffffff);
+  box-shadow:
+    var(--elev-2),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 @media (hover: hover) and (pointer: fine) {

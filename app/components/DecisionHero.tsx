@@ -385,7 +385,7 @@ export function DecisionHero({
       {/* Weather Landscape Artwork on the right side */}
       <WeatherLandscapeArtwork
         regime={regime}
-        className="absolute -top-2 right-0 h-full w-[200px] sm:w-[280px] md:w-[320px] pointer-events-none opacity-85"
+        className="absolute -top-2 right-0 h-full w-[200px] sm:w-[280px] md:w-[320px] pointer-events-none opacity-30"
       />
 
       <div className="relative z-10 flex flex-col gap-6 sm:grid sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start sm:gap-y-3">
@@ -407,7 +407,7 @@ export function DecisionHero({
             </h2>
 
             <p className="text-xs sm:text-sm font-normal text-slate-300 max-w-xl leading-relaxed">
-              {actionNow ?? (regimeKey ? REGIME_WEATHER_RATIONALES[regimeKey] : REGIME_DESCRIPTOR[regime]) ?? "Expand GTM and product bets only where activation and retention are tracking."}
+              {(_showActionNow ? actionNow : (regimeKey ? REGIME_WEATHER_RATIONALES[regimeKey] : REGIME_DESCRIPTOR[regime])) ?? "Expand GTM and product bets only where activation and retention are tracking."}
             </p>
 
             <p className="text-xs font-medium text-slate-400">
@@ -423,9 +423,13 @@ export function DecisionHero({
               </span>
               <span className="text-xs sm:text-sm font-medium text-slate-400">/100</span>
               {boldnessDelta !== 0 ? (
-                <span className="ml-1 inline-flex items-center gap-1 rounded-md bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-xs font-medium text-rose-300 tabular-nums">
+                <span className={`ml-1 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium tabular-nums ${
+                  boldnessDelta < 0
+                    ? "bg-rose-500/15 border border-rose-500/30 text-rose-300"
+                    : "bg-emerald-500/15 border border-emerald-500/30 text-emerald-300"
+                }`}>
                   {boldnessDelta < 0 ? <ArrowDownRight size={13} /> : <ArrowUpRight size={13} />}
-                  <span>{Math.abs(boldnessDelta)} this week</span>
+                  <span>{boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} this week</span>
                 </span>
               ) : (
                 <span className="ml-1 inline-flex items-center gap-1 rounded-md bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 text-xs font-medium text-slate-300">
@@ -453,8 +457,10 @@ export function DecisionHero({
               </figure>
             ) : null}
 
-            <span className="text-[11px] text-slate-500">
-              Steady vs last week
+            <span className="text-[11px] text-slate-500 tabular-nums">
+              {boldnessDelta !== 0
+                ? `${boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts vs last week`
+                : "Steady vs last week"}
             </span>
           </div>
 
