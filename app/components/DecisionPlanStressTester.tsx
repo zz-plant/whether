@@ -29,7 +29,7 @@ type CategoryChoice = DecisionCategory | "AUTO";
  * value; a graded verdict on screen at load shows what the tool does, and one
  * tap swaps the example for the reader's own plan.
  */
-export const EXAMPLE_PLANS: ReadonlyArray<{ label: string; text: string; category: DecisionCategory }> = [
+const EXAMPLE_PLANS: ReadonlyArray<{ label: string; text: string; category: DecisionCategory }> = [
   { label: "Hire 3 senior engineers", text: "Hire 3 senior engineers at $180k each", category: "HIRING" },
   { label: "Sign a $50k cloud commit", text: "Sign a $50k annual cloud commitment", category: "INFRASTRUCTURE" },
   { label: "Open a second market", text: "Open a second geographic market with a 4-person team", category: "GEOGRAPHIC_EXPANSION" },

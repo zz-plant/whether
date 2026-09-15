@@ -20,7 +20,7 @@ type PostureDefinition = {
 
 export { failureModes, startSituations };
 
-export type ToolkitSlug = (typeof toolkitSlugs)[number];
+type ToolkitSlug = (typeof toolkitSlugs)[number];
 
 type UseCaseRole = {
   slug: string;

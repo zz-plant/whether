@@ -326,10 +326,6 @@ export const CONFIDENCE_PERCENT_CEILING = 92;
  *  should read as weaker than the weakest call built on real ones. */
 export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
 
-export const FORECAST_CONE_HIGH = 3.5;
-export const FORECAST_CONE_MEDIUM = 5;
-export const FORECAST_CONE_LOW = 7;
-
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
   tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,

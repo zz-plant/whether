@@ -84,8 +84,4 @@ const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
 
 export const tierOneDecisionPages = answerPages;
 
-export const tierTwoKeywords = answerMetaContent.tierTwoKeywords;
-
-export const tierThreeKeywords = answerMetaContent.tierThreeKeywords;
-
 export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);

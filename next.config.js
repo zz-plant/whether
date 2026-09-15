@@ -75,6 +75,11 @@ export const canonicalSurfaceRedirectPairs = [
   ["/answer/:path*", "/resolve/:path*"],
   ["/evidence/:path*", "/signals/:path*"],
   ["/planning/:path*", "/operate/:path*"],
+  // The role × decision-area and toolkit × signal cluster pages (51 of them)
+  // were retired on 2026-09-15. Each rendered the same site-wide call as its
+  // parent, was noindex, and had no inbound link, so the parent is the page.
+  ["/resolve/:slug/:cluster", "/resolve/:slug"],
+  ["/toolkits/:slug/:cluster", "/toolkits/:slug"],
   // Resources root → Planning
   ["/resources", "/operate#ops-export-briefs"],
   // Guides staging redirects. These pointed at `/guides`, which stopped existing in

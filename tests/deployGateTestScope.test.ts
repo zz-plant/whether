@@ -113,7 +113,7 @@ describe("deploy gate test scope", () => {
   it("skips only the checks a record proves for this very commit", () => {
     assert.deepEqual(outstandingChecks(GATE_TASKS), []);
     assert.deepEqual(outstandingChecks([]), GATE_TASKS);
-    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "landmarks"]);
+    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "dead-exports", "landmarks"]);
   });
 });
 

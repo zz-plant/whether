@@ -30,8 +30,6 @@ const answerMetaSchema = z.object({
       label: z.string().min(1),
     }),
   ).min(1),
-  tierTwoKeywords: z.array(z.string().min(1)),
-  tierThreeKeywords: z.array(z.string().min(1)),
 });
 
 export type AnswerPageData = z.infer<typeof answerPageSchema>;

@@ -28,7 +28,6 @@
 import { BASE_RATE_TIGHTNESS_THRESHOLD, TIGHTNESS_BASE_RATE_POINTS, BASE_RATE_TIGHTNESS_MULTIPLIER, BASE_RATE_SOURCE_LABELS } from "../regimeEngineCore";
 import type { RuleCondition } from "./boundedDecisionRules";
 import { distanceToRuleCondition, isRuleConditionMet } from "./boundedDecisionRules";
-import { formatThresholdNumber } from "../formatters";
 
 /** One monthly regime-series entry: the brief's macro trendline. Absent inputs
  *  carry null — a gap in the history is not a flat reading. */
@@ -61,7 +60,7 @@ const countConsecutiveMonthsBeyond = ({
 
 // ── Funding pressure: control variable — action ladder + persistence ──
 
-export type FundingPressureLadderLine = {
+type FundingPressureLadderLine = {
   value: number;
   /** The consequence the line gates, e.g. "posture boundary" or "pause net-new hiring". */
   action: string;
@@ -391,8 +390,3 @@ export const resolveLadderSubject = (
     ?? [...ladder].filter((line) => !line.crossed).sort((left, right) => left.points - right.points)[0]
     ?? null;
 };
-
-export const formatLadderLine = (line: FundingPressureLadderLine) =>
-  line.crossed
-    ? `${formatThresholdNumber(line.value)} — ${line.action} ✓ crossed`
-    : `${formatThresholdNumber(line.value)} — ${line.action}`;

@@ -36,7 +36,7 @@ export const buildDecisionAnswerMetadata = ({
   shortAnswer?: string;
 }): Metadata => {
   /*
-   * The page's answer first, this week's action second.
+   * The page's own answer, and nothing that moves week to week.
    *
    * The description was `${currentCall} Action: ${immediateAction}` — both drawn
    * from the live posture filtered by the page's decision areas, so any two
@@ -44,12 +44,13 @@ export const buildDecisionAnswerMetadata = ({
    * startups hire engineers right now?" and "Should we expand sales headcount
    * now?" were indistinguishable in results, while each page's hand-written
    * `shortAnswer` — the one field that differs — never reached the SERP at all.
+   * A later revision led with `shortAnswer` and kept the live action as a tail,
+   * which still rewrote the snippet every week; the live call belongs on the
+   * page and in the social card, not in a description a crawler caches.
    */
   const metadata = buildPageMetadata({
     title: `${title} (Live operator answer)`,
-    description: shortAnswer
-      ? `${shortAnswer} ${payload.immediateAction}`
-      : `${payload.currentCall} Action: ${payload.immediateAction}`,
+    description: shortAnswer ?? `${payload.currentCall} Action: ${payload.immediateAction}`,
     path: `/answers/${slug}`,
     imageAlt: title,
     imageParams: {

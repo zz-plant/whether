@@ -73,7 +73,11 @@ describe("redirect resolution", () => {
   it("sends legacy alias sub-paths to their renamed route", () => {
     for (const [from, to] of [
       ["/resolve/ceo", "/resolve/ceo"],
-      ["/resolve/ceo/capital-raising", "/resolve/ceo/capital-raising"],
+      // The role × decision-area cluster pages were retired on 2026-09-15; the
+      // parent role page is where they land, one hop from the legacy alias too.
+      ["/resolve/ceo/capital-raising", "/resolve/ceo"],
+      ["/answer/ceo/capital-raising", "/resolve/ceo"],
+      ["/toolkits/pmf/risk-appetite-watch", "/toolkits/pmf"],
       ["/resolve/ship-checklist", "/resolve#direct-answers"],
       ["/evidence/capital-tightness-watch", "/signals/capital-tightness-watch"],
       ["/evidence/capital-tightness-watch/hiring", "/signals/capital-tightness-watch/hiring"],
