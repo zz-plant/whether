@@ -18,12 +18,35 @@
 import { z } from "zod";
 import { getWhetherKv, type KvNamespace } from "./runtime/kv";
 
-export const SAAS_BASKET = [
-  "SNOW", "SHOP", "CRM", "HUBS", "MDB", "DDOG", "TEAM", "WDAY",
-  "NOW", "ZS", "CFLT", "TOST", "GTLB", "NET", "FRSH",
+/**
+ * The basket, with the names the page prints.
+ *
+ * /comps listed the fifteen companies as hand-typed prose beside a count read
+ * from this array, so the two could drift apart silently — add a ticker here
+ * and the page would say "these 16 companies" above a list of fifteen names.
+ * One source, both uses.
+ */
+export const SAAS_BASKET_COMPANIES = [
+  { ticker: "SNOW", name: "Snowflake" },
+  { ticker: "SHOP", name: "Shopify" },
+  { ticker: "CRM", name: "Salesforce" },
+  { ticker: "HUBS", name: "HubSpot" },
+  { ticker: "MDB", name: "MongoDB" },
+  { ticker: "DDOG", name: "Datadog" },
+  { ticker: "TEAM", name: "Atlassian" },
+  { ticker: "WDAY", name: "Workday" },
+  { ticker: "NOW", name: "ServiceNow" },
+  { ticker: "ZS", name: "Zscaler" },
+  { ticker: "CFLT", name: "Confluent" },
+  { ticker: "TOST", name: "Toast" },
+  { ticker: "GTLB", name: "GitLab" },
+  { ticker: "NET", name: "Cloudflare" },
+  { ticker: "FRSH", name: "Freshworks" },
 ] as const;
 
-export type MarketDataProvider = "yahoo" | "alpha-vantage";
+export const SAAS_BASKET = SAAS_BASKET_COMPANIES.map((company) => company.ticker);
+
+type MarketDataProvider = "yahoo" | "alpha-vantage";
 
 export type SaaSValuationSnapshot = {
   medianEvToRevenue: number | null;
@@ -67,7 +90,7 @@ const quoteResponseSchema = z.object({
   }),
 });
 
-export type YahooQuote = z.infer<typeof yahooQuoteSchema>;
+type YahooQuote = z.infer<typeof yahooQuoteSchema>;
 
 /** Raised when the quote source itself is unreachable, not when a ticker is unknown. */
 export class QuoteSourceUnavailableError extends Error {
@@ -77,7 +100,7 @@ export class QuoteSourceUnavailableError extends Error {
   }
 }
 
-export type QuoteResult =
+type QuoteResult =
   /** The source answered with data for this symbol. */
   | { status: "ok"; quote: YahooQuote }
   /** The source answered, and has nothing for this symbol. */
@@ -87,11 +110,11 @@ export type QuoteResult =
 
 /* ---------- Per-ticker quote cache ---------- */
 
-export const QUOTE_CACHE_PREFIX = "comps:quote:";
+const QUOTE_CACHE_PREFIX = "comps:quote:";
 /** A quote is a daily figure; an hour keeps a busy day inside a couple of dozen upstream calls per symbol. */
-export const QUOTE_CACHE_TTL_SECONDS = 60 * 60;
+const QUOTE_CACHE_TTL_SECONDS = 60 * 60;
 /** An unknown symbol stays unknown; shorter so a newly listed one is not hidden for an hour. */
-export const QUOTE_MISSING_TTL_SECONDS = 15 * 60;
+const QUOTE_MISSING_TTL_SECONDS = 15 * 60;
 
 /* Validated on the way out of KV, not asserted: the cache is JSON written by an older
    deploy, and a shape change must read as a miss rather than as a quote. */
@@ -181,19 +204,19 @@ export async function fetchQuote(
 }
 
 /** The two numbers the basket median is built from, whichever source supplied them. */
-export type ValuationMetrics = {
+type ValuationMetrics = {
   /** Enterprise value over trailing revenue; null when the source has no usable figure. */
   evToRevenue: number | null;
   /** Year-over-year revenue growth as a fraction (0.18 is 18%); null when unknown. */
   revenueGrowth: number | null;
 };
 
-export type ValuationResult =
+type ValuationResult =
   | ({ status: "ok" } & ValuationMetrics)
   | { status: "missing" }
   | { status: "unavailable"; reason: string };
 
-export const valuationFromYahooQuote = (quote: YahooQuote): ValuationMetrics => {
+const valuationFromYahooQuote = (quote: YahooQuote): ValuationMetrics => {
   const price = quote.price?.regularMarketPrice ?? 0;
   const shares = quote.defaultKeyStatistics?.sharesOutstanding ?? 0;
   const revenue = quote.financialData?.totalRevenue ?? 0;
@@ -219,7 +242,7 @@ const ALPHA_VANTAGE_REVALIDATE_SECONDS = 24 * 60 * 60;
  * A Worker secret (`wrangler secret put ALPHA_VANTAGE_API_KEY`) installed on globalThis by
  * worker/index.ts, or an environment variable for scripts. Absent, the basket stays on Yahoo.
  */
-export const resolveAlphaVantageApiKey = (): string | null => {
+const resolveAlphaVantageApiKey = (): string | null => {
   const fromBinding: unknown = Reflect.get(globalThis, "ALPHA_VANTAGE_API_KEY");
   if (typeof fromBinding === "string" && fromBinding.trim() !== "") {
     return fromBinding.trim();
@@ -297,7 +320,7 @@ export async function fetchAlphaVantageValuation(symbol: string, apiKey: string)
 }
 
 /** One symbol's valuation inputs from the configured provider. */
-export async function fetchValuationMetrics(
+async function fetchValuationMetrics(
   symbol: string,
   provider: MarketDataProvider = resolveMarketDataProvider(),
 ): Promise<ValuationResult> {

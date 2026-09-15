@@ -4,7 +4,7 @@
  * via a minimal adapter interface.
  */
 
-export type EmailRecipient = {
+type EmailRecipient = {
   email: string;
   name?: string;
   tickerConfig?: string;
@@ -78,7 +78,7 @@ export const createCloudflareEmailAdapter = (
   };
 };
 
-import { getSubscriberStore, resetSubscriberStore } from "./subscriberStore";
+import { getSubscriberStore } from "./subscriberStore";
 
 export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
   const store = getSubscriberStore();
@@ -86,8 +86,4 @@ export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
   // Carries the token, which the weekly brief's unsubscribe link needs. This returned
   // bare addresses until 2026-09-07, which is why that mail went out without one.
   return subscribers.map((sub) => ({ email: sub.email, token: sub.token }));
-};
-
-export const clearSubscriptions = async (): Promise<void> => {
-  resetSubscriberStore();
 };

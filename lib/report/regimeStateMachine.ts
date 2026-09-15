@@ -1,7 +1,7 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
 
-export type RegimeState = RegimeKey;
+type RegimeState = RegimeKey;
 
 /**
  * One-step move, in score points, past which a crossing is a shock rather than a
@@ -27,7 +27,7 @@ export type RegimeState = RegimeKey;
  */
 export const SHOCK_CROSSING_POINTS = 25;
 
-export type RegimeMachineSignals = {
+type RegimeMachineSignals = {
   tightness: number;
   riskAppetite: number;
   thresholds: RegimeThresholds;

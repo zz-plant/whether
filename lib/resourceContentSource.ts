@@ -115,9 +115,7 @@ const resourceArticleSchema = z.object({
 });
 
 export type GovernanceLexiconTermData = z.infer<typeof governanceLexiconTermSchema>;
-export type ResourceMetaData = z.infer<typeof resourceMetaSchema>;
 export type ResourcePillarPageData = z.infer<typeof resourcePillarPageSchema>;
-export type ResourcePillarSection = ResourcePillarSectionData;
 export type ResourceArticleEmbedData = z.infer<typeof resourceArticleEmbedSchema>;
 export type ResourceArticleSectionData = z.infer<typeof resourceArticleSectionSchema>;
 export type ResourceArticleData = z.infer<typeof resourceArticleSchema>;

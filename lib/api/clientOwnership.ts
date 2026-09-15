@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { constantTimeCompare } from "../constantTimeCompare";
 
-export const CLIENT_ID_HEADER = "x-whether-client-id";
+const CLIENT_ID_HEADER = "x-whether-client-id";
 
 export const requireClientOwner = (request: Request, claimedClientId?: unknown) => {
   const ownerId = request.headers.get(CLIENT_ID_HEADER)?.trim();

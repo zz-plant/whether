@@ -4,7 +4,7 @@ import type { RegimeKey } from "../../../lib/types";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { useState, useEffect } from "react";
 
-export type RegimeGlyphProps = {
+type RegimeGlyphProps = {
   idPrefix: string;
   regime: RegimeKey;
   className?: string;

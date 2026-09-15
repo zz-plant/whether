@@ -43,8 +43,3 @@ export const saveRegimeMachineSnapshot = async (snapshot: RegimeMachineSnapshot)
     // non-fatal — in-memory snapshot is still current for this request
   }
 };
-
-export const resetRegimeMachineSnapshot = () => {
-  inMemorySnapshot = null;
-  lastLoadedAt = 0;
-};

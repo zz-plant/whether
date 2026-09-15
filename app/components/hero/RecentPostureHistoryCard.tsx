@@ -2,14 +2,14 @@ import Link from "next/link";
 import { formatMonthShortUtc } from "../../../lib/formatters";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 
-export interface PostureHistoryEntry {
+interface PostureHistoryEntry {
   record_date: string;
   regime: string;
   tightness?: number | null;
   riskAppetite?: number | null;
 }
 
-export interface RecentPostureHistoryCardProps {
+interface RecentPostureHistoryCardProps {
   history: PostureHistoryEntry[];
   historyHref?: string;
   className?: string;

@@ -1,74 +1,142 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
+import { siteUrl } from "../../lib/siteUrl";
 
 export const runtime = "edge";
 export const revalidate = 3600;
 
-export async function GET() {
-  try {
-    const brief = await buildAgentInterfaceResponse("weekly");
-    /* These read `summary.action` and `summary.recordDate` through an `as any`,
-       and neither field exists on WeeklySummary — so every item in this public
-       feed published "Hold" as the action and the generation date as the record
-       date, whatever the week actually said. The real fields are `guidance` and
-       `recordDateLabel`. */
-    const summary = brief.summary;
-    const regime = String(summary.regime ?? "Stable");
-    const action = String(summary.guidance ?? "Hold");
-    const recordDate = String(summary.recordDateLabel ?? new Date().toISOString().split("T")[0]);
-    const confidence = String(summary.confidence ?? "MED");
+const FEED_PATH = "/feed.xml";
+const CHANNEL_TITLE = "Whether Weekly Brief";
+const CHANNEL_DESCRIPTION =
+  "Macro signals → operating posture for startup and product leaders. Updated weekly.";
 
-    const pubDate = new Date(recordDate).toUTCString();
-    const link = "https://whether.work";
+/** RSS text nodes are XML; a `&` in a call or a headline broke the document. */
+const escapeXml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Whether Weekly Brief</title>
-    <link>${link}</link>
-    <description>Macro signals → operating posture for startup and product leaders. Updated weekly.</description>
-    <language>en</language>
-    <lastBuildDate>${pubDate}</lastBuildDate>
-    <item>
-      <title>Weekly Brief — ${regime}: ${action}</title>
-      <link>${link}</link>
-      <guid isPermaLink="false">whether-brief-${recordDate}</guid>
-      <pubDate>${pubDate}</pubDate>
-      <description>Regime: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.</description>
+const toRfc822 = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? new Date().toUTCString() : date.toUTCString();
+};
+
+type FeedItem = {
+  title: string;
+  link: string;
+  guid: string;
+  isPermaLink: boolean;
+  pubDate: string;
+  description: string;
+  html: string;
+};
+
+const renderItem = (item: FeedItem) => `    <item>
+      <title>${escapeXml(item.title)}</title>
+      <link>${escapeXml(item.link)}</link>
+      <guid isPermaLink="${item.isPermaLink ? "true" : "false"}">${escapeXml(item.guid)}</guid>
+      <pubDate>${item.pubDate}</pubDate>
+      <description>${escapeXml(item.description)}</description>
       <content:encoded><![CDATA[
-        <p><strong>Regime:</strong> ${regime}</p>
-        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${action}</p>
-        <p><strong>Confidence:</strong> ${confidence}</p>
-        <p><strong>Record date:</strong> ${recordDate}</p>
-        <p><a href="${link}">View full brief →</a></p>
-        <p style="font-size:0.85rem;color:#64748b;">Based on public data. Your situation may vary.</p>
+${item.html}
       ]]></content:encoded>
-    </item>
+    </item>`;
+
+const renderChannel = (items: FeedItem[], lastBuildDate: string) => `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>${CHANNEL_TITLE}</title>
+    <link>${siteUrl}</link>
+    <atom:link href="${siteUrl}${FEED_PATH}" rel="self" type="application/rss+xml" />
+    <description>${escapeXml(CHANNEL_DESCRIPTION)}</description>
+    <language>en</language>
+    <lastBuildDate>${lastBuildDate}</lastBuildDate>
+${items.map(renderItem).join("\n")}
   </channel>
 </rss>`;
 
-    return new Response(xml, {
+/**
+ * One item per published week, each at its permalink.
+ *
+ * The archive is the feed's real content: a frozen record with a `publishedAt`
+ * stamp and a page that will not change. The feed used to ignore it and emit a
+ * single item pointing at the homepage, so a reader saw the same entry rewrite
+ * itself every week and never got a link that stayed true.
+ */
+const publishedItems = (): FeedItem[] =>
+  getPublishedBriefs().map((brief) => {
+    const link = `${siteUrl}${buildPublishedBriefPath(brief.slug)}`;
+    return {
+      title: `Week ${brief.slug}: ${brief.postureLabel} — ${brief.headline}`,
+      link,
+      guid: link,
+      isPermaLink: true,
+      pubDate: toRfc822(brief.publishedAt),
+      description: brief.summary,
+      html: [
+        `        <p><strong>Posture:</strong> ${escapeXml(brief.postureLabel)}</p>`,
+        `        <p>${escapeXml(brief.summary)}</p>`,
+        `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
+        `        <p><strong>What changed:</strong> ${escapeXml(brief.whatChanged)}</p>`,
+        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · <strong>Confidence:</strong> ${escapeXml(brief.confidenceLabel)}</p>`,
+        `        <p><a href="${escapeXml(link)}">Read the published brief →</a></p>`,
+      ].join("\n"),
+    };
+  });
+
+export async function GET() {
+  const published = publishedItems();
+
+  try {
+    const brief = await buildAgentInterfaceResponse("weekly");
+    const summary = brief.summary;
+    const regime = summary.regimeLabel;
+    const action = summary.guidance;
+    const recordDateIso = brief.agentHandoff.payload.report_date;
+    const recordDateLabel = summary.recordDateLabel ?? recordDateIso;
+    const confidence = String(summary.confidence);
+
+    /*
+     * The current week, until it is frozen. Once the archive holds a record for
+     * this record date the permalink item carries it, and a second entry for
+     * the same week would only make readers show it twice.
+     */
+    const alreadyPublished = getPublishedBriefs().some((entry) => entry.recordDate === recordDateIso);
+    const liveItem: FeedItem[] = alreadyPublished
+      ? []
+      : [{
+          title: `This week — ${regime}: ${action}`,
+          link: `${siteUrl}/`,
+          guid: `whether-brief-live-${recordDateIso}`,
+          isPermaLink: false,
+          pubDate: toRfc822(recordDateIso),
+          description: `Regime: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.`,
+          html: [
+            `        <p><strong>Regime:</strong> ${escapeXml(regime)}</p>`,
+            `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(action)}</p>`,
+            `        <p><strong>Confidence:</strong> ${escapeXml(confidence)}</p>`,
+            `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)}</p>`,
+            `        <p><a href="${siteUrl}/">View the live brief →</a></p>`,
+            `        <p style="font-size:0.85rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
+          ].join("\n"),
+        }];
+
+    return new Response(renderChannel([...liveItem, ...published], toRfc822(recordDateIso)), {
       headers: {
         "content-type": "application/rss+xml; charset=utf-8",
         "cache-control": "public, max-age=3600",
       },
     });
   } catch {
-    const fallbackXml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-  <channel>
-    <title>Whether Weekly Brief</title>
-    <link>https://whether.work</link>
-    <description>Macro signals → operating posture.</description>
-    <item>
-      <title>Weekly Brief</title>
-      <link>https://whether.work</link>
-      <guid isPermaLink="false">whether-brief</guid>
-      <description>Brief unavailable. Please visit the site.</description>
-    </item>
-  </channel>
-</rss>`;
-    return new Response(fallbackXml, {
+    /*
+     * The live brief failed to assemble. The archive does not depend on it, so
+     * the feed still carries every published week rather than an apology.
+     */
+    const lastBuildDate = published[0]?.pubDate ?? new Date().toUTCString();
+    return new Response(renderChannel(published, lastBuildDate), {
       headers: { "content-type": "application/rss+xml; charset=utf-8" },
     });
   }

@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it } from "bun:test";
+import { afterEach, beforeEach, describe, it } from "bun:test";
 import {
   buildCronStepQuery,
   loadCronRunHistory,
   resetRunHistoryCacheForTests,
-  resolveAnalyticsReadConfig,
   summarizeCronSteps,
 } from "../lib/telemetry/runHistory";
+import { resolveAnalyticsReadConfig } from "../lib/telemetry/analyticsQuery";
 import { requestBodyText, requestUrl } from "./fixtures/requestTarget";
 
 const row = (timestamp: string, event: unknown) => ({ timestamp, blob2: JSON.stringify(event) });
@@ -15,9 +15,32 @@ const config = { accountId: "acct-1", token: "tok", dataset: "whether_telemetry"
 
 const SETTINGS = ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_ANALYTICS_READ_TOKEN", "WHETHER_TELEMETRY_DATASET"] as const;
 
+/*
+ * `resolveAnalyticsReadConfig` reads `globalThis` first and `process.env` second, so these
+ * assertions are only about the bindings if the environment is empty of them too. It was
+ * not, in the one place it mattered: Workers Builds exports CLOUDFLARE_ACCOUNT_ID and
+ * CLOUDFLARE_API_TOKEN so wrangler can deploy, and the resolver accepts that second token
+ * name. "Unconfigured" was true on every developer machine and false in the build
+ * container, and the build that caught it was the one whose log could not be read.
+ * `scripts/run-tests.mjs` strips all four from the suite; this file does not rely on that.
+ */
+const ENV_SETTINGS = [...SETTINGS, "CLOUDFLARE_API_TOKEN"] as const;
+const originalEnv: Partial<Record<string, string | undefined>> = {};
+
+beforeEach(() => {
+  for (const name of ENV_SETTINGS) {
+    originalEnv[name] = process.env[name];
+    delete process.env[name];
+  }
+});
+
 afterEach(() => {
   resetRunHistoryCacheForTests();
   for (const name of SETTINGS) Reflect.deleteProperty(globalThis, name);
+  for (const name of ENV_SETTINGS) {
+    if (originalEnv[name] === undefined) delete process.env[name];
+    else process.env[name] = originalEnv[name];
+  }
 });
 
 describe("summarizeCronSteps", () => {

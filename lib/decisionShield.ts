@@ -196,7 +196,7 @@ export interface CompanyFinancialProfile {
  * threshold". An operator reading that could not reproduce the verdict from the
  * stated rule, which is the one thing every bounded rule here has to allow.
  */
-export const RUNWAY_CRITICAL_MONTHS = 12;
+const RUNWAY_CRITICAL_MONTHS = 12;
 
 /**
  * Share of available cash a single first-year commitment can consume before the
@@ -206,8 +206,8 @@ export const RUNWAY_CRITICAL_MONTHS = 12;
  * wrong regime is still a bet in the wrong direction, so there is no de-escalation
  * rung here — the regime matrix owns direction and this owns magnitude.
  */
-export const COMMITMENT_SHARE_ELEVATED = 0.25;
-export const COMMITMENT_SHARE_SEVERE = 0.5;
+const COMMITMENT_SHARE_ELEVATED = 0.25;
+const COMMITMENT_SHARE_SEVERE = 0.5;
 
 /**
  * The last rule to move the verdict, so the headline can name the real cause.
@@ -216,7 +216,7 @@ export const COMMITMENT_SHARE_SEVERE = 0.5;
  * plan graded dangerous purely on size — crediting the week for a call the week
  * did not make, directly above a sizing line that said otherwise.
  */
-export type VerdictDriver = "REGIME" | "RUNWAY" | "REVERSIBILITY" | "SIZE";
+type VerdictDriver = "REGIME" | "RUNWAY" | "REVERSIBILITY" | "SIZE";
 
 export const isBusinessModel = (
   value: string,

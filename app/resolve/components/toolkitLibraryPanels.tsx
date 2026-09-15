@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { decideHomeRecommendedToolkitSlugs, findToolkitDefinition, toolkitDefinitions } from "../../../lib/decisionDomainCatalog";
 
-export type ToolkitLibrarySearchParams = {
-  toolkitQuery?: string;
-};
-
 const suggestedToolkitQueries = ["rollback", "roadmap", "pmf", "pricing", "capacity"] as const;
 
 export function buildToolkitLibraryHref(query?: string) {

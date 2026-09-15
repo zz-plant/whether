@@ -1,9 +1,9 @@
-export interface SignalStats {
+interface SignalStats {
   mean: number;
   stdDev: number;
 }
 
-export type DirectionalMode = "HIGHER_IS_TIGHTER" | "HIGHER_IS_LOOSER";
+type DirectionalMode = "HIGHER_IS_TIGHTER" | "HIGHER_IS_LOOSER";
 
 const MIN_STD_DEV = 1e-9;
 

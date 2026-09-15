@@ -15,7 +15,7 @@ import { assessPublishReadiness } from "./briefPublishGuard";
 import type { PublishedBrief } from "./publishedBriefs";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
 
-export type PublishedBriefRecordInput = {
+type PublishedBriefRecordInput = {
   reportData: WeeklyBriefSnapshotResult["reportData"];
   snapshot: WeeklyBriefSnapshot;
   recordDate: string;
@@ -77,11 +77,11 @@ export const buildPublishedBriefRecord = ({
   };
 };
 
-export type AssembleCurrentWeekBriefResult =
+type AssembleCurrentWeekBriefResult =
   | { ok: true; record: PublishedBrief; slug: string; recordDate: string }
   | { ok: false; reason: string; recordDate: string | null };
 
-export type AssembleCurrentWeekBriefOptions = {
+type AssembleCurrentWeekBriefOptions = {
   now?: Date;
   /** Names the caller in the report path's context, as the script and the Workflow do. */
   route?: string;

@@ -39,7 +39,7 @@ export interface RegimeScores {
   baseRateVelocityDelta?: number;
 }
 
-export type RegimeInput = {
+type RegimeInput = {
   id: "base-rate" | "two-year" | "ten-year" | "curve-slope";
   label: string;
   value: number | null;
@@ -52,7 +52,7 @@ export type RegimeInput = {
   notes?: string;
 };
 
-export type RegimeSignalInfluenceKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+type RegimeSignalInfluenceKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
 export type RegimeSignalInfluence = {
   key: RegimeSignalInfluenceKey;
@@ -97,14 +97,14 @@ export interface PolicySignalNormalization {
   clippedZ: number | null;
 }
 
-export interface PolicyCompositeScores {
+interface PolicyCompositeScores {
   cts: number;
   ras: number;
 }
 
 export type PolicyBand = "NEUTRAL" | "ELEVATED" | "EXTREME";
 
-export interface PolicyConfidenceIndex {
+interface PolicyConfidenceIndex {
   /**
    * How far apart the two composites sit, as |cts - ras|. Larger means they
    * disagree more, which is why it gates a refusal. It was named `agreement`,
@@ -287,8 +287,8 @@ export const CURVE_INVERSION_TIGHTNESS_MULTIPLIER = 50;
  * slope than in the underlying rate, so the risk axis looked closer to its
  * boundary almost always, purely because its scale is compressed.
  */
-export const TIGHTNESS_POINTS_PER_RATE_POINT = BASE_RATE_TIGHTNESS_MULTIPLIER;
-export const RISK_POINTS_PER_SLOPE_POINT =
+const TIGHTNESS_POINTS_PER_RATE_POINT = BASE_RATE_TIGHTNESS_MULTIPLIER;
+const RISK_POINTS_PER_SLOPE_POINT =
   SCORE_MAX / (RISK_APPETITE_MAX_SLOPE - RISK_APPETITE_MIN_SLOPE);
 /** Multiplier that puts a risk-appetite gap on the tightness points scale, so the
  *  existing percent calibration keeps its meaning. */
@@ -325,10 +325,6 @@ export const CONFIDENCE_PERCENT_CEILING = 92;
  *  the floor the scale otherwise reports, because a call built on imputed inputs
  *  should read as weaker than the weakest call built on real ones. */
 export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
-
-export const FORECAST_CONE_HIGH = 3.5;
-export const FORECAST_CONE_MEDIUM = 5;
-export const FORECAST_CONE_LOW = 7;
 
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,

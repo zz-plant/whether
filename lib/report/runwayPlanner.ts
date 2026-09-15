@@ -16,7 +16,7 @@ export type RunwayPlannerRequest = {
   stage: PlannerStage;
 };
 
-export type RunwayPlannerActionOutput = {
+type RunwayPlannerActionOutput = {
   runwayRisk: {
     level: "low" | "moderate" | "high" | "critical";
     score: number;
@@ -38,14 +38,14 @@ export type RunwayPlannerActionOutput = {
   };
 };
 
-export type RunwayPlannerInput = RunwayPlannerRequest & {
+type RunwayPlannerInput = RunwayPlannerRequest & {
   regime: RegimeKey;
   posture: PlannerPosture;
   tightnessScore?: number;
   riskAppetiteScore?: number;
 };
 
-export type RunwayPlannerOutput = {
+type RunwayPlannerOutput = {
   runwayRisk: RunwayPlannerActionOutput["runwayRisk"];
   safeRunwayBand: {
     minMonths: number;

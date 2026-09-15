@@ -9,7 +9,7 @@ import {
 } from "./cadenceSummaryBuilder";
 import { formatYearLabel } from "./summaryFormatting";
 
-export type YearlySummaryProvenance = CadenceSummaryProvenance;
+type YearlySummaryProvenance = CadenceSummaryProvenance;
 
 export type YearlySummary = {
   title: string;

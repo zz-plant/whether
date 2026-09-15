@@ -12,7 +12,7 @@ import {
 } from "../../lib/report/operatorStage";
 import { persistOperatorStage } from "./useOperatorStage";
 
-export interface StageDropdownPillProps {
+interface StageDropdownPillProps {
   activeStage?: StartupVariantMode;
   className?: string;
 }

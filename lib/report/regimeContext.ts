@@ -1,6 +1,6 @@
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 
-export type RegimeContext = {
+type RegimeContext = {
   currentRegime: string;
   weeksActive: number;
   historicalAvgWeeks: number | null;
@@ -8,7 +8,7 @@ export type RegimeContext = {
   outcomeProbability: number | null;
 };
 
-export type RegimeProjection = {
+type RegimeProjection = {
   weeksToFlip: number | null;
   projectedRegime: string | null;
   velocityLabel: string;

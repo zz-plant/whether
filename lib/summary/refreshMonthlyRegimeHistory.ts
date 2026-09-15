@@ -24,12 +24,12 @@ import {
 
 /** The slice of the report result this needs, narrowed so a test can supply one without
  *  standing up the whole report path. */
-export type ReportSnapshotForHistory = {
+type ReportSnapshotForHistory = {
   assessment: { regime: RegimeKey; scores: { tightness: number; riskAppetite: number } };
   treasury?: { record_date?: string; isLive?: boolean };
 };
 
-export type MonthlyRegimeHistoryRefresh = {
+type MonthlyRegimeHistoryRefresh = {
   ok: boolean;
   error?: string;
   month?: string;

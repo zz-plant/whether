@@ -102,7 +102,7 @@ const recordDelivery = async (
   }
 };
 
-export type DeliveryResult = {
+type DeliveryResult = {
   sent: number;
   skipped: number;
   errors: number;
@@ -155,7 +155,7 @@ export const deliverAlertToSubscriber = async (
   }
 };
 
-export const trackAlertDelivery = async (
+const trackAlertDelivery = async (
   email: string,
   alertType: string,
 ): Promise<void> => {

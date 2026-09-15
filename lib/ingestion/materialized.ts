@@ -187,7 +187,7 @@ export const ingestCanonicalSignals = async ({
   return settled;
 };
 
-export const loadMaterializedSignals = async (store: IngestionStore = getDefaultIngestionStore()) =>
+const loadMaterializedSignals = async (store: IngestionStore = getDefaultIngestionStore()) =>
   store.readLatestMaterialized();
 
 const getLatestFamilyIngestedAt = (model: MaterializedSignalReadModel, family: SignalFamily) => {

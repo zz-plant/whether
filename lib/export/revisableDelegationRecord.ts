@@ -37,7 +37,7 @@ const WHETHER_VERSION = "0.1.0";
 
 type InvalidationCondition = { condition: string; check?: string; clock?: string };
 
-export type WhetherRevisableDelegationRecord = {
+type WhetherRevisableDelegationRecord = {
   schema_version: typeof REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION;
   record_id: string;
   kind: "belief";

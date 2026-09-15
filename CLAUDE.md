@@ -16,6 +16,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
+| `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
@@ -88,6 +89,29 @@ deploys every push, which is the only remote gate left.
   suppressions, 0 skipped tests, 2 disabled rules, 2 override-disabled rules, and a floor of 212
   test files. Lower it in the script when work earns it; raising one is a policy change and belongs
   in its own PR with the reason.
+- **An unused export is a gated metric too (2026-09-15).** `bun run check:dead-exports`
+  (`scripts/check-dead-exports.ts`) counts exported declarations under `app/`, `lib/` and
+  `worker/` that no other scanned file mentions, against a baseline of **zero**. A sweep that
+  day found 556 of them — 232 runtime, 324 types — plus nine modules nothing imported, and
+  nothing in the gate had noticed: an unused export is not a lint finding, not a type error,
+  and not a failing test, it is surface every reader has to rule out before trusting a module.
+  "Referenced" is deliberately cheap (the name appears as an identifier in another file, across
+  every source, config and workflow extension this repo uses), which mostly over-counts, so a
+  reported orphan is nearly always real — but it is a scan, not a proof: a symbol reached only
+  through a runtime string, or named only from a file type the scan does not read, shows as dead.
+  If it fails on an export you know is live, widen the scan rather than deleting the export. The
+  names Next.js and the Workers runtime consume by convention are exempt. It runs in `bun run check`,
+  on pre-push, and in the deploy gate.
+
+  **The scan refuses an unreadable tree rather than scoring it.** Every verdict it makes is "no
+  other file mentions this name", so a checkout it cannot fully read reports *more* dead exports,
+  not fewer: a container missing `tests/` would condemn hundreds of live exports and the failure
+  would read as a real finding. That is the landmark audit's trap from the other side, where a
+  container reaching no route at all would have reported zero violations and gone green. So the CLI
+  names any required reference root that comes back empty and exits without a count, and `statSync`
+  is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
+  and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
+  by design (`requireCompleteTree`): a two-file tree is what they measure.
 - **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
   type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared
@@ -103,6 +127,17 @@ deploys every push, which is the only remote gate left.
   `BUN_TEST_SEED=<n> bun run test` replays the container's order locally. The runner also strips
   `FRED_API_KEY` and `ALPHA_VANTAGE_API_KEY` from the suite's environment, so a key in a shell
   cannot route a fixture-driven test to a real upstream.
+- **The build container always has Cloudflare credentials, and the suite must not see them
+  (2026-09-15).** Workers Builds exports `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` so
+  wrangler can deploy. `resolveAnalyticsReadConfig` reads both — it accepts `CLOUDFLARE_API_TOKEN`
+  as well as `CLOUDFLARE_ANALYTICS_READ_TOKEN`, because they name the same permission — so a test
+  asserting the reader is *unconfigured*, which is the state of every developer machine, was true
+  here and false there. `scripts/run-tests.mjs` now strips all four (both tokens, the account id,
+  and `WHETHER_TELEMETRY_DATASET`), and `tests/runHistory.test.ts` clears them itself rather than
+  relying on that. This cost five red builds, and it was slow to find for one reason worth
+  remembering: **the only environment that disagreed was the one whose log could not be read.**
+  When a check passes everywhere you can look, enumerate what the place you cannot look *has* that
+  you do not — credentials first.
 - **The suite runs offline.** `bunfig.toml` preloads `scripts/test-network-guard.ts` for every
   `bun test`, and an outbound fetch throws instead of leaving the box; loopback stays open, because
   `tests/whetherCli.test.ts` starts its own server. This is the same argument as the stripped API
@@ -206,7 +241,7 @@ visitors. The archive fills forward, once the allowlist lets a real run through.
 
 Cloudflare's build is the remote gate, and it gates **production too**. The build command
 configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 that script *is* the
-deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets`, then
+deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions`, then
 `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks` on its own. So every push, `main`
 included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
 before anything is built or deployed. The audit runs second and alone because it spawns a dev
@@ -265,6 +300,24 @@ Two things that made a red build hard to read, both fixed 2026-09-01:
   `unauditable` bucket, which only warns — otherwise a container that reaches no route at all would
   report "0 violations" and go green.
 
+A third, same shape, fixed 2026-09-15: **`run-checks.mjs` repeats every failure at the end of the
+run**, with the lines that named it and the tail of that task's output. The per-task report is
+printed as each task finishes, and the gate's own output can bury the reason — a `bun` that prints
+a line per test makes a *passing* suite ~1,700 lines, and Cloudflare's log viewer keeps a bounded
+window. A branch that failed the build five times running showed nothing in any reachable log but
+passing tests and `exited with code 1`; the `❌` line and the assertion had scrolled out of reach.
+Whatever that window keeps, it keeps the end, so the end now carries enough to act on.
+`CHECK_FAILURE_TAIL_LINES` (default 40) sizes it.
+
+That block also names **the `bun` it ran on**, and says so when that is older than `engines.bun`.
+Nothing enforces the declared range, so a build image shipping its own `bun` runs this gate on
+whatever it has — and the container above was on 1.1.x while `packageManager` pinned 1.3.14. The
+tell was the per-test output itself: only 1.1.x prints a line per passing test; 1.2 and 1.3 are
+silent on a pass. Inferring the toolchain from its output formatting is not a thing a reader should
+have to do twice, and a mismatch that could explain a failure must be printed beside it. It is a
+note, not a hard stop: an older runtime may still be fine, and turning an unexplained failure into a
+different unexplained failure buys nothing.
+
 **If a local `check` passes and the remote build fails, suspect ordering or environment, not the
 doc.** `mock.module` patches the module registry process-wide, so a test file can pass only because
 another file ran first and installed its mock; CI orders the suite differently. Run the file alone
@@ -310,7 +363,8 @@ recapture correctly.
 
 | Command | What it does |
 | --- | --- |
-| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. |
+| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. Default range is the last commit **plus** uncommitted changes; `--base <sha>` is commit-to-commit and sees no dirty tree; `--working-tree` is uncommitted only. The printed range says which. |
+| `bun run telemetry:streams` | Rows per Analytics Engine stream over a window, with each stream's consumer. A stream at zero is dead code or a broken emitter. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |

@@ -10,6 +10,7 @@ import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
 import { renderCompareOgImage } from "./compareTemplate";
 import { renderStaticOgImage } from "./staticTemplate";
+import { renderAnswerOgImage } from "./answerImageTemplate";
 import { loadComparePreview } from "../../../lib/image/compareImagePayload";
 import postureTimeline from "../../../data/posture_og_timeline.json";
 import type { RegimeKey } from "../../../lib/regimeEngine";
@@ -17,7 +18,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 
-type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart" | "compare";
+type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart" | "compare" | "answers";
 
 const normalizeRegime = (value: string): RegimeKey => (isRegimeKey(value) ? value : "VOLATILE");
 
@@ -58,6 +59,7 @@ const readTemplate = (searchParams: URLSearchParams): OgTemplate => {
     case "guides":
     case "brief-chart":
     case "compare":
+    case "answers":
       return template;
     default:
       return "report";
@@ -101,6 +103,23 @@ export async function GET(request: Request) {
       monthB: searchParams.get("monthB") ?? undefined,
     });
     const image = new ImageResponse(renderCompareOgImage(preview), imageOptions);
+
+    image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
+
+    return image;
+  }
+
+  if (template === "answers") {
+    const image = new ImageResponse(
+      renderAnswerOgImage({
+        question: readParam(searchParams, "title", "An operator answer", 72),
+        shortAnswer: readParam(searchParams, "subtitle", "", 170),
+        call: readParam(searchParams, "call", "This week's call", 90),
+        action: readParam(searchParams, "action", "", 120),
+        kicker: readParam(searchParams, "kicker", "Whether — weekly operating call", 72),
+      }),
+      imageOptions,
+    );
 
     image.headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
 

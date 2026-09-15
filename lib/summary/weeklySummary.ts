@@ -10,7 +10,7 @@ import { formatConfidenceSentence } from "./summaryFormatting";
 
 import type { SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
-export type WeeklySummaryProvenance = SummaryProvenance;
+type WeeklySummaryProvenance = SummaryProvenance;
 export type { WeeklyStructured } from "./summaryTypes";
 
 export type WeeklySummary = {
@@ -182,7 +182,7 @@ const weeklyOutputTemplatesSaturatedFinancing: Record<RegimeAssessment["regime"]
   },
 };
 
-export const getWeeklyActionGuidance = (
+const getWeeklyActionGuidance = (
   regime: RegimeAssessment["regime"],
   options: { financingSaturated?: boolean } = {},
 ) =>

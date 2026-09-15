@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, Info, ExternalLink } from "lucide-react";
 
-export interface CompactTrustPopoverProps {
+interface CompactTrustPopoverProps {
   confidenceLabel: string;
   isHistorical?: boolean;
   fetchedAtLabel?: string;

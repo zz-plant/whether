@@ -6,7 +6,7 @@ export type LastReadSnapshot = {
   readAt: string;
 };
 
-export const LAST_READ_SNAPSHOT_STORAGE_KEY = "whether.lastReadSnapshot";
+const LAST_READ_SNAPSHOT_STORAGE_KEY = "whether.lastReadSnapshot";
 
 /**
  * Impact tone for a signed weekly move.

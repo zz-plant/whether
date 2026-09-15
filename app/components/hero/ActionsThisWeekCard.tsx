@@ -4,13 +4,13 @@ import Link from "next/link";
 import { ChevronRight, Copy, Check } from "lucide-react";
 import { useClipboardCopy } from "../useClipboardCopy";
 
-export interface ActionItem {
+interface ActionItem {
   id: string | number;
   text: string;
   href?: string;
 }
 
-export interface ActionsThisWeekCardProps {
+interface ActionsThisWeekCardProps {
   actions?: ActionItem[];
   operateHref?: string;
   className?: string;

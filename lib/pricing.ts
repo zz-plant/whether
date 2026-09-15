@@ -18,7 +18,7 @@
  * audience it launches to rests on not being a bait-and-switch. Paid packages
  * continuity and team ritual, never access to the call itself.
  */
-export type PricingPlanId = "free" | "pro" | "team";
+type PricingPlanId = "free" | "pro" | "team";
 
 export type PricingPlan = {
   id: PricingPlanId;

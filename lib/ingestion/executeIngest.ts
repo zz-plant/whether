@@ -2,7 +2,7 @@ import { loadCanonicalReportInputs } from "./materialized";
 import { writeAnalytics } from "../telemetry/analyticsEngine";
 import { revalidateReportDataCaches } from "../report/cacheTags";
 
-export type IngestResult = {
+type IngestResult = {
   ok: boolean;
   treasury?: { recordDate: string; isLive: boolean };
   macroLive?: number;

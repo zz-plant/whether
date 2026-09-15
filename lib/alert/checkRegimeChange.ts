@@ -5,7 +5,7 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 
-export type CheckRegimeChangeResult = {
+type CheckRegimeChangeResult = {
   ok: boolean;
   error?: string;
   previousRegime?: string | null;

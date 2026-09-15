@@ -9,7 +9,7 @@ import type { RegimeKey } from "../regimeEngine";
 
 const RegimeSchema = z.enum(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"]) as z.ZodType<RegimeKey>;
 
-export const PostureArchiveRegimeShareSchema = z.object({
+const PostureArchiveRegimeShareSchema = z.object({
   regime: RegimeSchema,
   label: z.string(),
   periods: z.number(),
@@ -40,7 +40,7 @@ const PostureArchiveChildSchema = z.object({
   guidance: z.string(),
 });
 
-export const PostureArchivePeriodSchema = z.object({
+const PostureArchivePeriodSchema = z.object({
   slug: z.string(),
   kind: z.enum(["year", "quarter"]),
   year: z.number(),
@@ -73,5 +73,4 @@ export const PostureArchivePeriodSchema = z.object({
 export const PostureArchiveIndexSchema = z.array(PostureArchivePeriodSchema);
 
 export type PostureArchiveRegimeShare = z.infer<typeof PostureArchiveRegimeShareSchema>;
-export type PostureArchiveTransition = z.infer<typeof PostureArchiveTransitionSchema>;
 export type PostureArchivePeriod = z.infer<typeof PostureArchivePeriodSchema>;

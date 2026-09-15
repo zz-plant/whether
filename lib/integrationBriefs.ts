@@ -2,7 +2,7 @@ import type { RegimeAssessment } from "./regimeEngine";
 import type { TreasuryData } from "./types";
 import type { PostureStateContract } from "./report/postureStateContract";
 
-export type IntegrationTarget = "slack" | "notion" | "linear";
+type IntegrationTarget = "slack" | "notion" | "linear";
 
 export const integrationTargets: IntegrationTarget[] = ["slack", "notion", "linear"];
 
@@ -13,7 +13,7 @@ export const parseIntegrationTarget = (value: string | null): IntegrationTarget 
   return integrationTargets.find((target) => target === value) ?? null;
 };
 
-export type WeeklyMandateEnvelope = {
+type WeeklyMandateEnvelope = {
   title: string;
   summary: string;
   recordDate: string;

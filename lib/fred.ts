@@ -2,7 +2,7 @@ import { fetchWithTimeout } from "./fetchWithTimeout";
 
 export const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv";
 
-export const FRED_FETCH_HEADERS = {
+const FRED_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
   "user-agent": "WhetherDataBot/1.0 (+https://whether.work)",
 } as const;
@@ -126,7 +126,7 @@ export const isRetryableFredError = (error: unknown): boolean => {
   return true;
 };
 
-export interface RetryOptions {
+interface RetryOptions {
   attempts?: number;
   backoffMs?: number;
   /** Ceiling for all attempts combined, including backoff. */
@@ -185,7 +185,7 @@ export const withRetry = async <T>(
   throw lastError ?? new Error("FRED request failed before any attempt was made");
 };
 
-export const buildFredSeriesUrl = (seriesId: string, observationStartDate?: string): string => {
+const buildFredSeriesUrl = (seriesId: string, observationStartDate?: string): string => {
   const base = `${FRED_BASE_URL}?id=${encodeURIComponent(seriesId)}`;
   return observationStartDate ? `${base}&cosd=${encodeURIComponent(observationStartDate)}` : base;
 };
@@ -194,13 +194,13 @@ export const buildFredSeriesUrl = (seriesId: string, observationStartDate?: stri
 // rows, hundreds of KB per series). Every consumer needs a bounded window, so
 // callers pass a lookback and we request only that range.
 /** `anchor` is an ISO date to count back from; a vintage's window ends at its `asOf`, not today. */
-export const observationStartDateForLookback = (lookbackDays: number, anchor?: string): string => {
+const observationStartDateForLookback = (lookbackDays: number, anchor?: string): string => {
   const end = anchor ? new Date(`${anchor}T00:00:00.000Z`).getTime() : Date.now();
   const start = new Date(end - lookbackDays * 24 * 60 * 60 * 1000);
   return start.toISOString().slice(0, 10);
 };
 
-export interface FetchFredCsvOptions {
+interface FetchFredCsvOptions {
   timeoutMs?: number;
   revalidateSeconds?: number;
   attempts?: number;
@@ -281,15 +281,15 @@ export const fetchFredCsv = async (
   }, options);
 };
 
-export type FredRow = { date: string; value: number };
+type FredRow = { date: string; value: number };
 
-export interface FredApiUrlOptions {
+interface FredApiUrlOptions {
   observationStart?: string;
   /** ISO date. Return the series as it was known on that date (an ALFRED vintage). */
   asOf?: string;
 }
 
-export const buildFredApiUrl = (seriesId: string, apiKey: string, options: FredApiUrlOptions = {}): string => {
+const buildFredApiUrl = (seriesId: string, apiKey: string, options: FredApiUrlOptions = {}): string => {
   const url = new URL(FRED_API_BASE_URL);
   url.searchParams.set("series_id", seriesId);
   url.searchParams.set("api_key", apiKey);
@@ -340,7 +340,7 @@ export const parseFredApiObservations = (payload: unknown): FredRow[] => {
   });
 };
 
-export interface FetchFredRowsOptions extends FetchFredCsvOptions {
+interface FetchFredRowsOptions extends FetchFredCsvOptions {
   /** ISO date: observations as known on that date. Needs the API; the CSV export cannot serve it. */
   asOf?: string;
   /** Overrides key resolution. `null` forces the CSV path; omit to read the binding or env. */
@@ -457,9 +457,6 @@ export const latestFredObservation = (rows: FredRow[], seriesId?: string): { obs
     value: latest.value,
   };
 };
-
-export const findLatestFredRow = (csv: string): { observedAt: string; value: number } =>
-  latestFredObservation(parseFredCsvRows(csv));
 
 const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
 

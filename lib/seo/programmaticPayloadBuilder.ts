@@ -1,10 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import { decideClusterStaticParams } from "../../app/resolve/clusterRoutes";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../app/seoRouteClusters";
-import { toolkitClusterStaticParams } from "../../app/toolkits/clusterRoutes";
-import { findUseCaseRole, findToolkitDefinition } from "../decisionDomainCatalog";
 import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoDecisionPayload";
 import type { DecisionArea } from "../report/boundedDecisionRules";
 import type { ReportData } from "../report/reportData";
@@ -37,15 +34,24 @@ const seoPayloadSchema = z.object({
   citationMeta: z.string().min(1),
 });
 
-const programmaticRouteSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("decide"), slug: z.string().min(1), cluster: z.string().min(1), url: z.string().min(1) }),
-  z.object({ kind: z.literal("toolkit"), slug: z.string().min(1), cluster: z.string().min(1), url: z.string().min(1) }),
-  z.object({ kind: z.literal("signal-scenario"), cluster: z.string().min(1), scenario: z.string().min(1), url: z.string().min(1) }),
-]);
+/*
+ * One kind, since 2026-09-15. The `decide` (role × decision area, 30 routes)
+ * and `toolkit` (toolkit × signal, 21 routes) kinds rendered the same
+ * site-wide call as their parent pages, were hardcoded noindex, and had no
+ * inbound link; they redirect to their parents now (next.config.js). What is
+ * left is the set the uniqueness gate was written for: one decision scenario
+ * read through each of the three signal watches.
+ */
+const programmaticRouteSchema = z.object({
+  kind: z.literal("signal-scenario"),
+  cluster: z.string().min(1),
+  scenario: z.string().min(1),
+  url: z.string().min(1),
+});
 
 const payloadRecordSchema = z.object({
   url: z.string().min(1),
-  kind: z.enum(["decide", "toolkit", "signal-scenario"]),
+  kind: z.literal("signal-scenario"),
   title: z.string().min(1),
   generatedAtIso: z.string().min(1),
   snapshot: z.object({
@@ -67,8 +73,8 @@ const manifestSchema = z.object({
   urls: z.record(z.string(), z.string()),
 });
 
-export type ProgrammaticPayloadRecord = z.infer<typeof payloadRecordSchema>;
-export type ProgrammaticRouteDefinition = z.infer<typeof programmaticRouteSchema>;
+type ProgrammaticPayloadRecord = z.infer<typeof payloadRecordSchema>;
+type ProgrammaticRouteDefinition = z.infer<typeof programmaticRouteSchema>;
 
 type PayloadContext = {
   reportData: ReportData;
@@ -86,39 +92,42 @@ const versionFromReportData = (reportData: ReportData) => {
 
 const toRouteFileName = (url: string) => `${url.replace(/^\//, "").replace(/\//g, "__") || "home"}.json`;
 
-export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] => {
-  const decideRoutes = decideClusterStaticParams.map((route) => ({
-    kind: "decide" as const,
-    slug: route.slug,
-    cluster: route.cluster,
-    url: `/resolve/${route.slug}/${route.cluster}`,
-  }));
-
-  const toolkitRoutes = toolkitClusterStaticParams.map((route) => ({
-    kind: "toolkit" as const,
-    slug: route.slug,
-    cluster: route.cluster,
-    url: `/toolkits/${route.slug}/${route.cluster}`,
-  }));
-
-  const signalRoutes = signalScenarioRoutes.map((route) => ({
-    kind: "signal-scenario" as const,
-    cluster: route.signalSlug,
-    scenario: route.decisionScenario,
-    url: `/signals/${route.signalSlug}/${route.decisionScenario}`,
-  }));
-
-  return [...decideRoutes, ...toolkitRoutes, ...signalRoutes]
-    .map((route) => programmaticRouteSchema.parse(route))
+export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] =>
+  signalScenarioRoutes
+    .map((route) => programmaticRouteSchema.parse({
+      kind: "signal-scenario",
+      cluster: route.signalSlug,
+      scenario: route.decisionScenario,
+      url: `/signals/${route.signalSlug}/${route.decisionScenario}`,
+    }))
     .sort((a, b) => a.url.localeCompare(b.url));
-};
 
+/**
+ * Which records the uniqueness gate compares a page against.
+ *
+ * The three pages for one scenario — `/signals/<each watch>/hiring` — draw
+ * their call and action from the same decision rule, so they are the pages
+ * that can collapse into copies of each other. The previous key grouped by
+ * watch instead, which put the five *scenarios* of one watch in a bucket: pages
+ * that differ by construction, because each maps a different rule. The gate
+ * passed every page and never saw the duplication it exists to catch.
+ */
+const siblingKeyForRoute = (route: ProgrammaticRouteDefinition): string => `scenario:${route.scenario}`;
 
-
-const clusterKeyForRoute = (route: ProgrammaticRouteDefinition): string => {
-  if (route.kind === "decide") return `decide:${route.slug}:${route.cluster}`;
-  if (route.kind === "toolkit") return `toolkit:${route.slug}:${route.cluster}`;
-  return `signal:${route.cluster}`;
+/**
+ * The evidence a watch page cites is the evidence for its own signal.
+ *
+ * Every route used to take the first three site-wide evidence items, so the
+ * three watch pages for one scenario cited identical data points under
+ * identical calls, and the only thing telling them apart was the URL. Keyed
+ * by the watch's own signals, each page carries the reading its watch is for,
+ * which is both what a reader of "hiring, through the funding-pressure lens"
+ * came for and the distinct data point the uniqueness gate looks for.
+ */
+const evidenceForCluster = (cluster: string, items: ReportData["reportEvidenceItems"]) => {
+  const keys = findSignalsCluster(cluster)?.evidenceKeys ?? [];
+  const own = items.filter((item) => keys.includes(item.key));
+  return own.length > 0 ? own : items;
 };
 
 const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: PayloadContext, siblingsInCluster: { pageKey: string; interpretationLabel?: string; currentCall?: string; immediateAction?: string; evidenceTitles?: string[]; }[] = []): ProgrammaticPayloadRecord => {
@@ -129,29 +138,17 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
   const { reportData, isFallbackSnapshot, snapshot } = context;
   const { homeBriefModel } = snapshot;
 
-  const mappedDecisionAreas: DecisionArea[] =
-    route.kind === "signal-scenario"
-      ? [route.scenario as DecisionArea]
-      : route.kind === "decide"
-        ? [route.cluster as DecisionArea]
-        : homeBriefModel.decisionRules.map((rule) => rule.area);
+  const mappedDecisionAreas: DecisionArea[] = [route.scenario as DecisionArea];
 
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => mappedDecisionAreas.includes(rule.area));
-
-  const fallbackImmediateAction = (() => {
-    if (route.kind === "toolkit") {
-      return findToolkitDefinition(route.slug)?.decisionThisSession ?? reportData.actionNowShort;
-    }
-    return reportData.actionNowShort;
-  })();
 
   const payload: SeoDecisionPayload = buildSeoDecisionPayload({
     assessment: reportData.assessment,
     mappedRules,
     mappedDecisionAreas,
     fallbackCurrentCall: reportData.statusLabel,
-    fallbackImmediateAction,
-    reportEvidenceItems: reportData.reportEvidenceItems,
+    fallbackImmediateAction: reportData.actionNowShort,
+    reportEvidenceItems: evidenceForCluster(route.cluster, reportData.reportEvidenceItems),
     freshnessLabel: seoFreshnessLabel,
     recordDateLabel: reportData.recordDateLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
@@ -164,21 +161,9 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
 
-  const title = (() => {
-    if (route.kind === "decide") {
-      const role = findUseCaseRole(route.slug);
-      const scenario = decisionScenarioDefinitions.find((item) => item.slug === route.cluster);
-      return `${role?.title ?? route.slug} · ${scenario?.title ?? route.cluster}`;
-    }
-    if (route.kind === "toolkit") {
-      const toolkit = findToolkitDefinition(route.slug);
-      const cluster = findSignalsCluster(route.cluster);
-      return `${toolkit?.title ?? route.slug} · ${cluster?.title ?? route.cluster}`;
-    }
-    const cluster = findSignalsCluster(route.cluster);
-    const scenario = decisionScenarioDefinitions.find((item) => item.slug === route.scenario);
-    return `${cluster?.title ?? route.cluster} · ${scenario?.title ?? route.scenario}`;
-  })();
+  const cluster = findSignalsCluster(route.cluster);
+  const scenario = decisionScenarioDefinitions.find((item) => item.slug === route.scenario);
+  const title = `${cluster?.title ?? route.cluster} · ${scenario?.title ?? route.scenario}`;
 
   return payloadRecordSchema.parse({
     url: route.url,
@@ -268,15 +253,15 @@ const computeProgrammaticRecords = async (): Promise<{
     snapshot,
   }));
 
+  const routeByUrl = new Map(routes.map((route) => [route.url, route]));
+  const siblingKeyByUrl = new Map(routes.map((route) => [route.url, siblingKeyForRoute(route)]));
+
   const records = preliminaryRecords.map((record) => {
-    const route = routes.find((item) => item.url === record.url);
+    const route = routeByUrl.get(record.url);
     if (!route) return record;
-    const clusterKey = clusterKeyForRoute(route);
+    const siblingKey = siblingKeyByUrl.get(record.url);
     const siblings = preliminaryRecords
-      .filter((candidate) => {
-        const candidateRoute = routes.find((item) => item.url === candidate.url);
-        return candidateRoute ? clusterKeyForRoute(candidateRoute) === clusterKey : false;
-      })
+      .filter((candidate) => siblingKeyByUrl.get(candidate.url) === siblingKey)
       .map((candidate) => ({
         pageKey: candidate.url,
         interpretationLabel: `${candidate.payload.currentCall}|${candidate.payload.immediateAction}`,

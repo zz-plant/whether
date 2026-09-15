@@ -20,8 +20,8 @@
 import { getWhetherKv, type KvNamespace } from "../runtime/kv";
 import { resolveSiteUrl } from "../siteUrl";
 
-export const BRIEF_SCREENSHOT_ROUTE = "/api/image/brief-screenshot";
-export const BRIEF_SCREENSHOT_KEY_PREFIX = "artifact:brief-screenshot:";
+const BRIEF_SCREENSHOT_ROUTE = "/api/image/brief-screenshot";
+const BRIEF_SCREENSHOT_KEY_PREFIX = "artifact:brief-screenshot:";
 export const BRIEF_SCREENSHOT_LATEST_KEY = `${BRIEF_SCREENSHOT_KEY_PREFIX}latest`;
 /** Two months keeps the current quarter's posts resolvable; the archive page is the permanent record. */
 export const BRIEF_SCREENSHOT_TTL_SECONDS = 60 * 24 * 60 * 60;
@@ -30,7 +30,7 @@ export const BRIEF_SCREENSHOT_SELECTOR = "#weekly-call";
 
 export const isRecordDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
-export type BrowserRenderingConfig = { accountId: string; token: string };
+type BrowserRenderingConfig = { accountId: string; token: string };
 
 const readSetting = (name: string): string | null => {
   const fromBinding: unknown = Reflect.get(globalThis, name);
@@ -39,14 +39,14 @@ const readSetting = (name: string): string | null => {
   return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
 };
 
-export const resolveBrowserRenderingConfig = (): BrowserRenderingConfig | null => {
+const resolveBrowserRenderingConfig = (): BrowserRenderingConfig | null => {
   const accountId = readSetting("CLOUDFLARE_ACCOUNT_ID");
   const token = readSetting("CLOUDFLARE_BROWSER_RENDERING_TOKEN");
   return accountId && token ? { accountId, token } : null;
 };
 
 /** The body for POST /accounts/{id}/browser-rendering/screenshot, kept in one place so a test can pin it. */
-export const buildScreenshotRequest = (siteUrl: string) => ({
+const buildScreenshotRequest = (siteUrl: string) => ({
   url: `${siteUrl}/?screenshot=1`,
   selector: BRIEF_SCREENSHOT_SELECTOR,
   viewport: { width: 1200, height: 900, deviceScaleFactor: 2 },
@@ -54,9 +54,9 @@ export const buildScreenshotRequest = (siteUrl: string) => ({
   screenshotOptions: { type: "png", omitBackground: false },
 });
 
-export type CaptureResult = { ok: true; png: Uint8Array } | { ok: false; reason: string };
+type CaptureResult = { ok: true; png: Uint8Array } | { ok: false; reason: string };
 
-export const captureBriefScreenshot = async ({
+const captureBriefScreenshot = async ({
   fetcher = fetch,
   config,
   siteUrl = resolveSiteUrl(),
@@ -115,7 +115,7 @@ const base64ToBytes = (encoded: string): Uint8Array<ArrayBuffer> => {
 export const briefScreenshotUrl = (recordDate: string, siteUrl = resolveSiteUrl()) =>
   `${siteUrl}${BRIEF_SCREENSHOT_ROUTE}?date=${encodeURIComponent(recordDate)}`;
 
-export const storeBriefScreenshot = async (
+const storeBriefScreenshot = async (
   kv: Pick<KvNamespace, "put">,
   recordDate: string,
   png: Uint8Array,
@@ -141,7 +141,7 @@ export const readBriefScreenshot = async (
   }
 };
 
-export type BriefScreenshotStepResult = {
+type BriefScreenshotStepResult = {
   ok: boolean;
   status: "stored" | "skipped_unconfigured" | "failed";
   imageUrl?: string;

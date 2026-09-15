@@ -21,13 +21,13 @@
  * did before this file existed rather than refusing everyone.
  */
 
-export type RateLimiterName = "WHETHER_SUBSCRIBE_RATE_LIMITER" | "WHETHER_PUBLIC_WRITE_RATE_LIMITER";
+type RateLimiterName = "WHETHER_SUBSCRIBE_RATE_LIMITER" | "WHETHER_PUBLIC_WRITE_RATE_LIMITER";
 
 type RateLimiterBinding = {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 };
 
-export type RateLimitDecision =
+type RateLimitDecision =
   | { allowed: true; enforced: boolean }
   | { allowed: false; enforced: true };
 

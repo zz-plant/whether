@@ -15,7 +15,7 @@ import { TimeMachineDatePicker } from "./timeMachineDatePicker";
  * Same shape as `GlobalCommandPalette`: mounted once in the layout, opened by a
  * document event, so any surface can offer the feature without owning a copy of it.
  */
-export const OPEN_TIME_MACHINE_EVENT = "whether-open-time-machine";
+const OPEN_TIME_MACHINE_EVENT = "whether-open-time-machine";
 
 export function GlobalTimeMachine() {
   const [open, setOpen] = useState(false);

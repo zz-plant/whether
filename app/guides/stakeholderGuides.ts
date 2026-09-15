@@ -1,6 +1,6 @@
 import { stageGuides } from "./stageGuides";
 
-export type StakeholderGuide = {
+type StakeholderGuide = {
   slug: string;
   title: string;
   seoTitle: string;
@@ -297,8 +297,6 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     ],
   },
 ] as const;
-
-export const stakeholderPositioning = stakeholderGuides.map((guide) => guide.positioning);
 
 export const findStakeholderGuide = (slug: string) =>
   stakeholderGuides.find((guide) => guide.slug === slug);

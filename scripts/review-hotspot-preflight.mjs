@@ -37,9 +37,29 @@ function sanitizeBaseRef(base) {
   }
 }
 
+/**
+ * What the scan compares, and whether that includes uncommitted work.
+ *
+ * The two modes differ in a way nothing said out loud. `--base` produces a
+ * three-dot range, which is commit-to-commit and ignores the working tree
+ * entirely. The default produces a single ref, and `git diff <ref>` compares
+ * the working tree against it — so the default scan covers the last commit
+ * *and* every uncommitted edit, while the CI mode covers neither's overlap.
+ * Someone running `bun run check` before committing was reading a result that
+ * included a commit they had already pushed, and someone reading a CI run was
+ * reading one that could not see a dirty tree at all.
+ *
+ * `--working-tree` is the third, explicit case: uncommitted changes only.
+ * `describeDiffRange` names whichever applies in the printed output, so the
+ * line in the gate log says what was actually compared.
+ */
 function getDiffRange() {
   const base = sanitizeBaseRef(readArg("--base", process.env.REVIEW_HOTSPOT_BASE || ""));
   const head = readArg("--head", process.env.REVIEW_HOTSPOT_HEAD || "HEAD");
+
+  if (hasFlag("--working-tree")) {
+    return "HEAD";
+  }
 
   if (base) {
     return `${base}...${head}`;
@@ -55,6 +75,17 @@ function getDiffRange() {
   }
 
   return "HEAD";
+}
+
+/** Says, in words, which commits and which uncommitted edits a range covers. */
+export function describeDiffRange(diffRange) {
+  if (diffRange.includes("...")) {
+    return `${diffRange} (commits only — uncommitted changes are NOT scanned)`;
+  }
+  if (diffRange === "HEAD") {
+    return "HEAD (uncommitted changes only)";
+  }
+  return `${diffRange} (the last commit plus any uncommitted changes)`;
 }
 
 function changedFiles(diffRange) {
@@ -181,7 +212,18 @@ function isTestFile(file) {
 
 function main() {
   if (hasFlag("--help") || hasFlag("-h")) {
-    console.log(`Review hotspot preflight\n\nUsage:\n  node scripts/review-hotspot-preflight.mjs [--base <sha>] [--head <sha>]\n`);
+    console.log([
+      "Review hotspot preflight",
+      "",
+      "Usage:",
+      "  node scripts/review-hotspot-preflight.mjs [--base <sha>] [--head <sha>] [--working-tree]",
+      "",
+      "What each mode compares:",
+      "  (default)       the last commit plus any uncommitted changes",
+      "  --base <sha>    commit-to-commit; uncommitted changes are NOT scanned",
+      "  --working-tree  uncommitted changes only",
+      "",
+    ].join("\n"));
     process.exit(0);
   }
 
@@ -211,7 +253,7 @@ function main() {
     );
   }
 
-  console.log(`Review hotspot preflight range: ${diffRange}`);
+  console.log(`Review hotspot preflight range: ${describeDiffRange(diffRange)}`);
   console.log(`Changed files: ${files.length}`);
   console.log(`Risk-tagged source files: ${riskySourceChanges.length}`);
   console.log(`Test files changed: ${hasTestChanges ? "yes" : "no"}`);

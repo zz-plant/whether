@@ -219,7 +219,7 @@ export type RuleThresholdDistance = RuleCondition & {
   satisfied: boolean;
 };
 
-export type DecisionLaneState = {
+type DecisionLaneState = {
   currentStateLabel: "Closed" | "Guarded" | "Staged" | "Open";
   currentStateStep: 0 | 1 | 2 | 3;
   currentLane: "blocked" | "caution" | "allowed";
@@ -258,7 +258,7 @@ export const toThresholdDistance = (condition: RuleCondition, scores: CurrentSco
  * reader to subtract. `ThresholdLadder` draws that directly, so this turns the
  * rule into rail coordinates.
  */
-export type BoundedConditionRail = {
+type BoundedConditionRail = {
   metric: RuleConditionMetric;
   /** What the surface calls the signal, e.g. "Funding pressure". */
   label: string;

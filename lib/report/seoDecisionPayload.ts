@@ -5,7 +5,7 @@ import type { ReportEvidenceItem } from "./reportData";
 import { buildCompactTrustSummary, buildTrustWarnings, buildWeeklyCitationMetaLine } from "./trustStatus";
 import { evaluateSeoQualityGates, type SeoQualitySiblingInput } from "./seoQualityGates";
 
-export type SeoDecisionEvidence = {
+type SeoDecisionEvidence = {
   title: string;
   summary: string;
   confidenceLabel: string;

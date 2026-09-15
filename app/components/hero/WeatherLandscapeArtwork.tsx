@@ -1,5 +1,5 @@
 
-export interface WeatherLandscapeArtworkProps {
+interface WeatherLandscapeArtworkProps {
   regime: string;
   className?: string;
 }

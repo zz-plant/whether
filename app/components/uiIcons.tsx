@@ -2,29 +2,18 @@ import type { LucideProps } from "lucide-react";
 
 import {
   ArrowRight,
-  Bookmark,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Copy,
-  Download,
-  FileText,
-  Flame,
-  Grid2x2,
-  History,
   Moon,
-  ScanSearch,
-  Settings,
   Share2,
-  Shield,
   SlidersHorizontal,
   Sun,
   Target,
   TrendingUp,
-  Waypoints,
   X,
-  Zap,
 } from 'lucide-react';
 
 import type { SVGProps } from "react";
@@ -44,20 +33,8 @@ export const ChevronDownIcon = ({ className = "h-4 w-4", title: _title, ...props
   <ChevronDown className={className} {...baseProps} {...props} />
 );
 
-export const BoltIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Zap className={className} {...baseProps} {...props} />
-);
-
 export const CircleTargetIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <Target className={className} {...baseProps} {...props} />
-);
-
-export const LayoutGridIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Grid2x2 className={className} {...baseProps} {...props} />
-);
-
-export const SectionJumpIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Waypoints className={className} {...baseProps} {...props} />
 );
 
 export const CheckIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
@@ -68,32 +45,8 @@ export const CopyIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }:
   <Copy className={className} {...baseProps} {...props} />
 );
 
-export const DocumentIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <FileText className={className} {...baseProps} {...props} />
-);
-
-export const DownloadIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Download className={className} {...baseProps} {...props} />
-);
-
-export const ShieldIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Shield className={className} {...baseProps} {...props} />
-);
-
-export const HistoryIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <History className={className} {...baseProps} {...props} />
-);
-
-export const AuditIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <ScanSearch className={className} {...baseProps} {...props} />
-);
-
 export const CloseIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
   <X className={className} {...baseProps} {...props} />
-);
-
-export const SettingsIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
-  <Settings className={className} {...baseProps} {...props} />
 );
 
 export const ChevronLeftIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
@@ -122,14 +75,6 @@ export const MoonIcon = ({ className = "h-4 w-4", title: _title, ...props }: Ico
 
 export const ShareIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <Share2 className={className} {...baseProps} {...props} />
-);
-
-export const BookmarkIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Bookmark className={className} {...baseProps} {...props} />
-);
-
-export const FlameIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Flame className={className} {...baseProps} {...props} />
 );
 
 export const StatusLiveIcon = ({ className = "h-2.5 w-2.5", title, ...props }: SVGProps<SVGSVGElement> & { title?: string }) => (

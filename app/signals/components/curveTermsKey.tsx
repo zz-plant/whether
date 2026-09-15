@@ -9,7 +9,7 @@ import { GlossaryLink } from "../../components/ui/plainLanguage";
  * them. Shared so the two curve surfaces cannot drift apart on what a term means.
  */
 
-export type CurveTerm = "spread10Y2Y" | "spread2Y3M" | "maturities" | "bp";
+type CurveTerm = "spread10Y2Y" | "spread2Y3M" | "maturities" | "bp";
 
 const TERM_COPY: Record<CurveTerm, { label: string; toneClass: string; definition: string }> = {
   spread10Y2Y: {

@@ -32,9 +32,9 @@ export type PostureTransitionEvent = DurableLineage & {
 
 export type PostureDecisionEvent = PostureTransitionEvent;
 export type RegimeDecisionEvent = PostureTransitionEvent;
-export type PostureDecisionCursor = string | null;
+type PostureDecisionCursor = string | null;
 
-export interface PostureTransitionEventRepository {
+interface PostureTransitionEventRepository {
   append(event: PostureTransitionEvent): Promise<void>;
   list(options?: { cursor?: PostureDecisionCursor; limit?: number }): Promise<{ events: PostureTransitionEvent[]; nextCursor: PostureDecisionCursor }>;
   listSince(cursor?: string | null, limit?: number): Promise<{ events: PostureTransitionEvent[]; cursor: string | null }>;
@@ -85,7 +85,7 @@ const isConfidence = (value: unknown): boolean => {
     && CONFIDENCE_BANDS.has(value.band);
 };
 
-export const isPostureTransitionEvent = (value: unknown): value is PostureTransitionEvent => {
+const isPostureTransitionEvent = (value: unknown): value is PostureTransitionEvent => {
   if (!isRecord(value)) return false;
   return typeof value.eventId === "string"
     && typeof value.sourceVersion === "string"
@@ -111,12 +111,12 @@ export const isPostureTransitionEvent = (value: unknown): value is PostureTransi
         && value.reversalConditions.every((condition) => typeof condition === "string")));
 };
 
-export const parsePostureTransitionEvent = (value: unknown): PostureTransitionEvent | null =>
+const parsePostureTransitionEvent = (value: unknown): PostureTransitionEvent | null =>
   isPostureTransitionEvent(value) ? value : null;
 
 const clone = <T>(value: T): T => structuredClone(value);
 
-export class InMemoryPostureTransitionEventRepository implements PostureTransitionEventRepository {
+class InMemoryPostureTransitionEventRepository implements PostureTransitionEventRepository {
   private readonly events: PostureTransitionEvent[] = [];
   private readonly idempotencyMap = new Map<string, PostureTransitionEvent>();
 
@@ -301,7 +301,7 @@ export const getPostureTransitionEventRepository = (): PostureTransitionEventRep
   return sharedRepository;
 };
 
-export const resetPostureTransitionEventRepository = (): PostureTransitionEventRepository => {
+const resetPostureTransitionEventRepository = (): PostureTransitionEventRepository => {
   sharedRepository = new InMemoryPostureTransitionEventRepository();
   return sharedRepository;
 };

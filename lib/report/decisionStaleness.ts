@@ -1,9 +1,8 @@
 import type { DecisionAssumptionSnapshot } from "../decisionMemory";
 
 export type StalenessVerdict = "STAND" | "WATCH" | "RECONSIDER";
-export type DecisionStalenessVerdict = StalenessVerdict;
 
-export type StalenessDimension = "capital" | "risk";
+type StalenessDimension = "capital" | "risk";
 
 export type MovedAssumption = {
   dimension: StalenessDimension;
@@ -11,13 +10,13 @@ export type MovedAssumption = {
   detail: string;
 };
 
-export type DecisionStaleness = {
+type DecisionStaleness = {
   verdict: StalenessVerdict;
   moved: MovedAssumption[];
   why: string;
 };
 
-export type CurrentStalenessConditions = {
+type CurrentStalenessConditions = {
   tightness: number;
   riskAppetite: number;
 };
@@ -49,7 +48,7 @@ const riskMoved = (
   current: CurrentStalenessConditions,
 ): boolean => current.riskAppetite < Math.min(recorded.riskAppetite, recorded.riskAppetiteThreshold);
 
-export const buildMovedAssumptions = (
+const buildMovedAssumptions = (
   recorded: DecisionAssumptionSnapshot,
   current: CurrentStalenessConditions,
 ): MovedAssumption[] => {
@@ -105,10 +104,6 @@ export const assessDecisionStaleness = (
     moved,
     why: moved.length > 0 ? composeWhy(moved) : "Conditions remain inside the range recorded when this decision was made.",
   };
-};
-
-export const DecisionStalenessEngine = {
-  assess: assessDecisionStaleness,
 };
 
 export const stalenessVerdictLabel = (verdict: StalenessVerdict | "no-change"): string => {

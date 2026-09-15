@@ -10,6 +10,7 @@ import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
+import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
 import { formatDateUTC } from "../../lib/formatters";
@@ -73,6 +74,23 @@ export default async function HistoryPage({
     ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
   ];
 
+  /*
+   * The hub's markup: a CollectionPage over the regime-history Dataset, with an
+   * ItemList naming the 82 archive periods and every published week that hang
+   * off it. Until now the largest cluster in the sitemap had no declared parent.
+   */
+  const structuredData = buildHistoryStructuredData({
+    /* The year strip below is what this page links; the quarters are reachable
+       from their parent year. Declaring them here would name URLs the rendered
+       page does not contain. */
+    periods: postureArchiveYears.map((year) => ({ slug: year.slug, title: year.title, kind: "year" as const })),
+    publishedBriefs,
+    coverage:
+      fullSeries.length > 0
+        ? { from: fullSeries[0].recordDate, to: fullSeries[fullSeries.length - 1].recordDate }
+        : null,
+  });
+
   return (
     <ReportShell
       model={{
@@ -91,6 +109,7 @@ export default async function HistoryPage({
         page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: historySectionLinks },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
+        payloads: { structuredData },
       }}
     >
       {/* The shell's h1 already says History and TrackRecord names itself directly below, so a

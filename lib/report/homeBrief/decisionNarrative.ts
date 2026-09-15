@@ -1,4 +1,4 @@
-import { REGIME_SHORT_LABELS, type RegimeConfidenceLabel } from "../../regimePresentation";
+import type { RegimeConfidenceLabel } from "../../regimePresentation";
 import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
 
@@ -8,9 +8,6 @@ const regimeShiftTargets = {
   VOLATILE: { defensive: "SCARCITY" },
   EXPANSION: { defensive: "DEFENSIVE" },
 } as const;
-
-export const resolvePrimaryShiftRegimeLabel = (regime: Regime) =>
-  REGIME_SHORT_LABELS[regimeShiftTargets[regime].defensive];
 
 export const resolvePrimaryShiftRegimeKey = (regime: Regime) =>
   regimeShiftTargets[regime].defensive;

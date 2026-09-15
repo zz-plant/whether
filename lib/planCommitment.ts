@@ -25,7 +25,7 @@
  */
 
 /** How often the commitment recurs, as the sentence describes it. */
-export type CommitmentCadence = "MONTHLY" | "ANNUAL" | "ONE_OFF";
+type CommitmentCadence = "MONTHLY" | "ANNUAL" | "ONE_OFF";
 
 export type ParsedCommitment = {
   /** People named by the plan, when it names any. */
@@ -44,9 +44,6 @@ export type ParsedCommitment = {
    */
   basis: string | null;
 };
-
-export const SALARY_SCOPE_NOTE =
-  "Figures are the amounts in your sentence. Benefits, payroll tax and tooling are not added.";
 
 /** Beyond this a parse is a typo or a units mix-up, not a plan. */
 const MAX_PLAUSIBLE_USD = 1e12;

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
+type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
 type ClipboardCopyErrorReason = "unavailable" | "write-failed";
 type ClipboardUiStateTarget = Pick<
   ClipboardCopyState,

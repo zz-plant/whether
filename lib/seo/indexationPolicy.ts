@@ -6,11 +6,6 @@ export const noindexRobots = {
   follow: true,
 } satisfies NonNullable<Metadata["robots"]>;
 
-export const withNoindex = <T extends Metadata>(metadata: T): T => ({
-  ...metadata,
-  robots: noindexRobots,
-});
-
 export const indexableAnswerSlugs = [
   "should-startups-hire-engineers-right-now",
   "should-startups-raise-capital-now",

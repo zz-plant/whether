@@ -3,7 +3,7 @@ import { getWhetherKv, type KvNamespace } from "../runtime/kv";
 
 type Cursor = string | null;
 
-export interface DecisionMemoryRepository {
+interface DecisionMemoryRepository {
   append(entry: DecisionMemoryEntry): Promise<void>;
   list(options: { cursor?: Cursor; limit?: number; clientId: string }): Promise<{ entries: DecisionMemoryEntry[]; nextCursor: Cursor }>;
   backendStatus(): "durable" | "local-fallback";

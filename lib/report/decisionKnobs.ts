@@ -45,7 +45,7 @@ export const businessAreaOwner: Record<BusinessAreaKey, string> = {
   "risk-tolerance": "Finance lead",
 };
 
-export type DecisionKnob = {
+type DecisionKnob = {
   key: "approvalVelocity" | "reversibility" | "payback" | "experimentTolerance";
   label: string;
   value: number;
@@ -54,7 +54,7 @@ export type DecisionKnob = {
   rationale: string;
 };
 
-export const knobsByRegime: Record<RegimeKey, Record<DecisionKnob["key"], number>> = {
+const knobsByRegime: Record<RegimeKey, Record<DecisionKnob["key"], number>> = {
   SCARCITY: {
     approvalVelocity: 0,
     reversibility: 3,
@@ -111,7 +111,7 @@ const regimeRank: Record<RegimeKey, number> = {
   EXPANSION: 3,
 };
 
-export type DecisionKnobContext = {
+type DecisionKnobContext = {
   committedState: RegimeKey;
   transition: Pick<RegimeStateTransition, "pending" | "committed" | "candidateState" | "transitionReason">;
   nearestThresholdGap: number;
@@ -122,7 +122,7 @@ export type DecisionKnobContext = {
   riskAppetiteScore: number;
 };
 
-export type WeeklyLockCommitment = {
+type WeeklyLockCommitment = {
   currentCall: string;
   flipConditions: string[];
   /**

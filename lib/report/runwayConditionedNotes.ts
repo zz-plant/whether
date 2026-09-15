@@ -16,13 +16,13 @@
 import type { DecisionArea } from "./boundedDecisionRules";
 import type { RegimeKey } from "../regimeEngine";
 
-export type RunwayConditionedNoteInput = {
+type RunwayConditionedNoteInput = {
   regime: RegimeKey;
   runwayMonths?: number;
   monthlyBurnUsd?: number;
 };
 
-export type RunwayConditionedNote = {
+type RunwayConditionedNote = {
   area: DecisionArea;
   note: string;
 };

@@ -10,14 +10,6 @@ export const DIRECTION_LABEL: Record<SignalDirection, string> = {
   tighten: "Tightening", ease: "Easing", hold: "Steady",
 };
 
-export const DIRECTION_COLOR: Record<SignalDirection, string> = {
-  tighten: "text-rose-300", ease: "text-emerald-300", hold: "text-slate-400",
-};
-
-export const DIRECTION_ACCENT: Record<SignalDirection, string> = {
-  tighten: "border-t-rose-400/30", ease: "border-t-emerald-400/30", hold: "border-t-sky-400/30",
-};
-
 export const CONFIDENCE_COLOR = (label: string) =>
   label === "HIGH" ? "text-emerald-300" : label === "MED" ? "text-amber-300" : "text-rose-300";
 
@@ -64,7 +56,7 @@ export const computeReliabilityScore = ({
   return Math.round((c + f + Math.round(((t - degradedCount) / t) * 100)) / 3);
 };
 
-export type V2HeroSignalData = {
+type V2HeroSignalData = {
   baseRate?: number | null;
   baseRateUsed?: string;
   curveSlope?: number | null;

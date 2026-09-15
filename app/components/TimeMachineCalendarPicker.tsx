@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, ChevronDown, Check, Sparkles } from "lucide-react";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
-export interface TimeMachineCalendarPickerProps {
+interface TimeMachineCalendarPickerProps {
   currentDateLabel: string;
   isHistorical: boolean;
   history: Array<{

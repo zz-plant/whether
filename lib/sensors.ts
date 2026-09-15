@@ -19,7 +19,7 @@ const BASE_RATE_EXPLANATION =
 const CURVE_SLOPE_EXPLANATION =
   "Curve slope is the 10-year yield minus the 2-year yield, a proxy for risk appetite.";
 
-export const sensorGroups = [
+const sensorGroups = [
   {
     id: "Rates",
     label: "Rates",
@@ -42,8 +42,6 @@ export const sensorGroups = [
   },
 ] as const satisfies SensorGroupMeta[];
 
-export const sensorCategories: SensorCategory[] = sensorGroups.map((group) => group.id);
-
 const sensorGroupLookup = sensorGroups.reduce<Record<SensorCategory, SensorGroupMeta>>(
   (accumulator, group) => {
     accumulator[group.id] = group;
@@ -52,7 +50,7 @@ const sensorGroupLookup = sensorGroups.reduce<Record<SensorCategory, SensorGroup
   {} as Record<SensorCategory, SensorGroupMeta>
 );
 
-export const sensorTimeWindows = [
+const sensorTimeWindows = [
   { id: "1M", label: "1M", months: 1, description: "Past month" },
   { id: "3M", label: "3M", months: 3, description: "Past quarter" },
   { id: "6M", label: "6M", months: 6, description: "Past half year" },
@@ -63,13 +61,6 @@ export const sensorTimeWindows = [
   months: number;
   description: string;
 }[];
-
-export type SensorCategoryGroup = {
-  category: SensorCategory;
-  label: string;
-  description: string;
-  sensors: SensorReading[];
-};
 
 const findLatestNumericPoint = (series: SeriesHistoryPoint[]) => {
   for (let index = series.length - 1; index >= 0; index -= 1) {
@@ -119,36 +110,6 @@ const buildSensorWindowAggregations = (
     };
   });
 };
-
-export const filterSensorsByCategory = (
-  sensors: SensorReading[],
-  categories: SensorCategory[]
-) => {
-  if (categories.length === 0) {
-    return [];
-  }
-  const categorySet = new Set(categories);
-  return sensors.filter((sensor) => categorySet.has(sensor.category));
-};
-
-export const groupSensorsByCategory = (
-  sensors: SensorReading[],
-  categories: SensorCategory[] = sensorCategories
-): SensorCategoryGroup[] =>
-  categories.map((category) => {
-    const metadata = sensorGroupLookup[category];
-    return {
-      category,
-      label: metadata.label,
-      description: metadata.description,
-      sensors: sensors.filter((sensor) => sensor.category === category),
-    };
-  });
-
-export const getSensorWindowAggregation = (
-  sensor: SensorReading,
-  window: SensorTimeWindow
-) => sensor.timeWindows?.find((entry) => entry.window === window);
 
 export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => {
   const baseRate = getBaseRate(treasury.yields);

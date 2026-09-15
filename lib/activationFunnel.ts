@@ -27,12 +27,10 @@
  */
 import { formatIsoWeekSlug, getIsoWeekInfo } from "./isoWeek";
 
-export const ACTIVATION_TELEMETRY_ENDPOINT = "/api/telemetry/activation";
+const ACTIVATION_TELEMETRY_ENDPOINT = "/api/telemetry/activation";
 
 /** Holds an ISO week slug, e.g. "2026-w31". Never an identifier. */
 export const activationLastWeekStorageKey = "whether.activation.lastWeek";
-
-export type ActivationStep = "visited" | "oriented" | "committed" | "returned";
 
 /** What the visitor did to reach `committed`. */
 export type ActivationCommitment =
@@ -46,9 +44,9 @@ export type ActivationCommitment =
  * Bucketed rather than exact so the value cannot narrow a browser down to one
  * person: "next_week" is the ritual working, "lapsed" is a reader who drifted.
  */
-export type ActivationReturnGap = "same_week" | "next_week" | "within_month" | "lapsed";
+type ActivationReturnGap = "same_week" | "next_week" | "within_month" | "lapsed";
 
-export type ActivationEvent =
+type ActivationEvent =
   | { step: "visited" | "oriented"; path: string }
   | { step: "committed"; path: string; commitment: ActivationCommitment }
   | { step: "returned"; path: string; gap: ActivationReturnGap };

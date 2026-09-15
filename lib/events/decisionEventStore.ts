@@ -30,7 +30,7 @@ type ListSinceResult = {
   cursor: Cursor;
 };
 
-export type CloudflareKvNamespaceLike = KvNamespace;
+type CloudflareKvNamespaceLike = KvNamespace;
 
 const EVENT_PREFIX = "decision-event:";
 const EVENT_INDEX_KEY = "meta:decision-event:index";
@@ -84,14 +84,6 @@ const isRegimeDecisionEvent = (value: unknown): value is RegimeDecisionEvent => 
   }
   const event = value as Partial<RegimeDecisionEvent>;
   return event.type === "RegimeDecisionEvent" && typeof event.id === "string";
-};
-
-const sortByOccurredAtThenId = (left: RegimeDecisionEvent, right: RegimeDecisionEvent) => {
-  const occurredCompare = left.occurredAt.localeCompare(right.occurredAt);
-  if (occurredCompare !== 0) {
-    return occurredCompare;
-  }
-  return left.id.localeCompare(right.id);
 };
 
 export class DecisionEventStore {
@@ -360,6 +352,3 @@ export const resetDecisionEventStore = () => {
   sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
   return sharedDecisionEventStore;
 };
-
-export const sortRegimeDecisionEvents = (events: RegimeDecisionEvent[]) =>
-  [...events].sort(sortByOccurredAtThenId);

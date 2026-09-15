@@ -29,7 +29,7 @@ export type WeeklyOperatorBriefPayload = {
   customTeamNote?: string;
 };
 
-export type WeeklyCallSnapshotPayload = {
+type WeeklyCallSnapshotPayload = {
   regime: string;
   call: string;
   trend: string;
@@ -40,7 +40,7 @@ export type WeeklyCallSnapshotPayload = {
   flipConditions: string[];
 };
 
-export type WeeklyBoardSnippetPayload = {
+type WeeklyBoardSnippetPayload = {
   trustLine: string;
   postureLine: string;
   changedLine: string;

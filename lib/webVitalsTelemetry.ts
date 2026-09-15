@@ -1,4 +1,4 @@
-export type WebVitalMetricName =
+type WebVitalMetricName =
   | "CLS"
   | "FCP"
   | "INP"
@@ -15,7 +15,7 @@ export type WebVitalMetric = {
   navigationType: string;
 };
 
-export const WEB_VITALS_TELEMETRY_ENDPOINT = "/api/telemetry/web-vitals";
+const WEB_VITALS_TELEMETRY_ENDPOINT = "/api/telemetry/web-vitals";
 
 const isRating = (value: unknown): value is WebVitalMetric["rating"] =>
   value === "good" || value === "needs-improvement" || value === "poor";

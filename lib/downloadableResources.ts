@@ -131,7 +131,7 @@ export const downloadableResources = {
   },
 } satisfies Record<string, DownloadableResourcePageConfig>;
 
-export type DownloadableResourceSlug = keyof typeof downloadableResources;
+type DownloadableResourceSlug = keyof typeof downloadableResources;
 
 export const downloadableResourceSlugs = Object.keys(downloadableResources) as DownloadableResourceSlug[];
 

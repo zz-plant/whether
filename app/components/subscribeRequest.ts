@@ -8,7 +8,7 @@
  * drift back into reporting a local write as a subscription.
  */
 
-export type SubscribeResult = { ok: boolean; message: string };
+type SubscribeResult = { ok: boolean; message: string };
 
 export type SubscribeOptions = {
   /** Also send regime-change alerts between Mondays. Omitted leaves a standing choice alone. */

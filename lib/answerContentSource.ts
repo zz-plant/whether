@@ -30,12 +30,9 @@ const answerMetaSchema = z.object({
       label: z.string().min(1),
     }),
   ).min(1),
-  tierTwoKeywords: z.array(z.string().min(1)),
-  tierThreeKeywords: z.array(z.string().min(1)),
 });
 
 export type AnswerPageData = z.infer<typeof answerPageSchema>;
-export type AnswerMetaData = z.infer<typeof answerMetaSchema>;
 
 export const answerPageContent = z.array(answerPageSchema).parse(answerPagesData);
 export const answerMetaContent = answerMetaSchema.parse(answerMetaData);

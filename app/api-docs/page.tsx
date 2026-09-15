@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PageShell } from "../components/pageShell";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
 
 export const metadata: Metadata = {
   title: "API & Agent Tools",
@@ -52,7 +53,7 @@ const embedSnippet = `<div data-whether-embed="brief"></div>
 
 export default function ApiDocsPage() {
   return (
-    <PageShell backdropVariant="default">
+    <PageShell backdropVariant="default" structuredData={buildApiDocsStructuredData()}>
       <article className="weather-panel space-y-6 px-5 py-5 max-w-3xl">
         <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">

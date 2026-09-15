@@ -8,13 +8,13 @@ import {
   type PlannerStage,
 } from "./runwayPlanner";
 
-export type ProfileStage = "seed" | "series-b" | "late-stage";
-export type CompanyRevenueBand = "pre-revenue" | "sub-1m-arr" | "1-10m-arr" | "10m-plus-arr";
-export type CompanyRunwayBand = "under-12m" | "12-18m" | "18m-plus";
-export type CompanyGrowthBand = "contracting" | "flat" | "moderate" | "high";
-export type CompanyTeamSizeBand = "1-20" | "21-100" | "101-500" | "500-plus";
-export type CompanySector = PlannerSector;
-export type CompanyBusinessModel = "b2b" | "b2c" | "marketplace" | "usage-based";
+type ProfileStage = "seed" | "series-b" | "late-stage";
+type CompanyRevenueBand = "pre-revenue" | "sub-1m-arr" | "1-10m-arr" | "10m-plus-arr";
+type CompanyRunwayBand = "under-12m" | "12-18m" | "18m-plus";
+type CompanyGrowthBand = "contracting" | "flat" | "moderate" | "high";
+type CompanyTeamSizeBand = "1-20" | "21-100" | "101-500" | "500-plus";
+type CompanySector = PlannerSector;
+type CompanyBusinessModel = "b2b" | "b2c" | "marketplace" | "usage-based";
 
 export type CompanyProfile = {
   stage: ProfileStage;
@@ -26,7 +26,7 @@ export type CompanyProfile = {
   businessModel: CompanyBusinessModel;
 };
 
-export type CompanyAdjustedRule = BoundedDecisionRule & {
+type CompanyAdjustedRule = BoundedDecisionRule & {
   priority: number;
 };
 
@@ -147,7 +147,7 @@ const baseAreaPriority: Record<DecisionArea, number> = {
   "expansion-bets": 80,
 };
 
-export const resolveCompanyProfile = (profile?: Partial<CompanyProfile>): CompanyProfile => {
+const resolveCompanyProfile = (profile?: Partial<CompanyProfile>): CompanyProfile => {
   const definedOverrides = Object.fromEntries(Object.entries(profile ?? {}).filter(([, value]) => value !== undefined)) as Partial<
     CompanyProfile
   >;

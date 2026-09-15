@@ -213,11 +213,11 @@ export type InputInfluenceItem = {
 
 export type HomeBriefTrustWarning = TrustWarning;
 
-export type DecisionMatrixColumnKey = "approve" | "delay" | "flip";
+type DecisionMatrixColumnKey = "approve" | "delay" | "flip";
 
 export type DecisionMatrixRowKey = "hiring" | "product" | "capital" | "burn";
 
-export type DecisionMatrixCell = {
+type DecisionMatrixCell = {
   text: string;
   detail: string;
   action: string;
@@ -244,7 +244,7 @@ export type CanonicalFlipCondition = {
   label: string;
 };
 
-export type StartupVariantOption = { mode: StartupVariantMode; label: string };
+type StartupVariantOption = { mode: StartupVariantMode; label: string };
 
 export type StartupVariantPolicy = {
   selectedMode: StartupVariantMode;
@@ -252,23 +252,23 @@ export type StartupVariantPolicy = {
   adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
 };
 
-export type StartRouteDeltaRoute = "/signals" | "/operate" | "/resolve";
+type StartRouteDeltaRoute = "/signals" | "/operate" | "/resolve";
 
-export type StartRouteDeltaItem = {
+type StartRouteDeltaItem = {
   id: "posture-shift" | "top-driver" | "trigger-risk";
   label: string;
   detail: string;
   href: StartRouteDeltaRoute;
 };
 
-export type StartRouteDeltaBlock = {
+type StartRouteDeltaBlock = {
   isReturningUser: boolean;
   hasMeaningfulDelta: boolean;
   fallbackCopy: string;
   items: StartRouteDeltaItem[];
 };
 
-export type WeeklyLeadershipSummary = {
+type WeeklyLeadershipSummary = {
   boldnessScore: number;
   boldnessDelta: number;
   /**

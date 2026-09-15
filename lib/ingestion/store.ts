@@ -31,7 +31,7 @@ export interface IngestionStore {
 
 const DEFAULT_DIR = path.join(process.cwd(), ".cache", "ingestion");
 
-export class FileIngestionStore implements IngestionStore {
+class FileIngestionStore implements IngestionStore {
   constructor(
     private readonly baseDir = DEFAULT_DIR,
     private readonly snapshotsFile = path.join(baseDir, "snapshots.ndjson"),

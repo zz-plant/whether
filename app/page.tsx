@@ -314,10 +314,10 @@ async function PageContent({
     rateHistory: getTimeMachineRollingYieldSeries(7, reportData.treasury.record_date).oneMonth.map((point) => point.value),
   });
 
-  /* One join, two labels. The `h1` is this page's accessible name, where the
-   * product name would be noise; the artifact title is what lands in someone
-   * else's Slack channel, where it is the only thing identifying the source. A
-   * selected horizon names itself in both. */
+  /* The selected horizon, named once. The page's `h1` is the weekly call
+   * itself (`DecisionHero`); this labels the copied artifact, which lands in
+   * someone else's Slack channel where it is the only thing identifying the
+   * source, and the meta row's date. */
   const cadenceTitle = cadenceCall
     ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
     : null;
@@ -346,9 +346,6 @@ async function PageContent({
   return (
     <>
       <BriefArtifactScript artifact={briefArtifact} />
-      <h1 className="sr-only" id="share-ready-artifact">
-        {cadenceTitle ?? "Weekly Brief"}
-      </h1>
       <ActivationTracker path="/" />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
@@ -444,10 +441,15 @@ async function PageContent({
               and calendar picker are the period controls; the regime stripe
               below the drivers is the memory rail (spec Block G: last months, no
               full chart). The zoomable scrubber lives on /history. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-              <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
-              {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
+            {/* `aria-label`, not a visually hidden `h2`. The label named the
+                region, but it rendered as a heading *above* the page's `h1` and
+                so was the first thing a screen-reader heading list announced —
+                the call itself was second. The region still has a name; it is
+                no longer a heading competing with the one that matters. */}
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating call" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+              {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
+                titleLevel={cadenceCall ? "h2" : "h1"}
                 tightness={tightness}
                 tightnessDelta={tightnessDelta}
                 tightnessPressure={tightnessPressure}

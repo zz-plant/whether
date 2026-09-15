@@ -18,12 +18,12 @@ import { isSignalsClusterSlug } from "../../app/signals/clusterRoutes";
  * without rendering.
  */
 
-export type SignalClusterSlug =
+type SignalClusterSlug =
   | "capital-tightness-watch"
   | "risk-appetite-watch"
   | "yield-curve-flip-watch";
 
-export type SignalReadingInput = { label: string; value: string };
+type SignalReadingInput = { label: string; value: string };
 
 /**
  * Only what the reading needs.

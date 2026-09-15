@@ -11,9 +11,9 @@ const WeeklyPostureEntrySchema = z.object({
 
 const WeeklyPostureHistorySchema = z.array(WeeklyPostureEntrySchema);
 
-export type WeeklyPostureHistoryEntry = z.infer<typeof WeeklyPostureEntrySchema>;
+type WeeklyPostureHistoryEntry = z.infer<typeof WeeklyPostureEntrySchema>;
 
-export const parseWeeklyPostureHistory = (input: unknown): WeeklyPostureHistoryEntry[] => {
+const parseWeeklyPostureHistory = (input: unknown): WeeklyPostureHistoryEntry[] => {
   const parsed = WeeklyPostureHistorySchema.safeParse(input);
 
   if (parsed.success) {

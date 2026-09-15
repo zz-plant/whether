@@ -21,7 +21,7 @@ import { PublishedBriefIndexSchema, type PublishedBrief } from "./publishedBrief
 
 export const PUBLISHED_BRIEFS_FILE_PATH = "data/published_briefs.json";
 
-export type PublishedBriefFileUpdate = {
+type PublishedBriefFileUpdate = {
   /** False when the base branch already carries this week. */
   changed: boolean;
   /** The next file body: two-space JSON with a trailing newline, as the freeze script writes it. */
@@ -76,7 +76,7 @@ export const buildPublishedBriefUpdateAgainstBase = async ({
 /** One branch per week, so an unmerged week is never reset by the next one. Matches the manual GitHub workflow's naming. */
 export const publishedBriefBranchName = (slug: string) => `automation/weekly-brief-freeze-${slug}`;
 
-export const buildPublishedBriefPullRequestBody = (update: PublishedBriefFileUpdate, now: Date) =>
+const buildPublishedBriefPullRequestBody = (update: PublishedBriefFileUpdate, now: Date) =>
   [
     "## Summary",
     `- Appends week \`${update.slug}\` to \`${PUBLISHED_BRIEFS_FILE_PATH}\`.`,
@@ -101,7 +101,7 @@ export const buildPublishedBriefPullRequestBody = (update: PublishedBriefFileUpd
     `_Generated ${now.toISOString()} by the weekly brief freeze Workflow._`,
   ].join("\n");
 
-export type OpenPublishedBriefPullRequestInput = {
+type OpenPublishedBriefPullRequestInput = {
   client: GitHubRepoClient;
   update: PublishedBriefFileUpdate;
   base?: string;

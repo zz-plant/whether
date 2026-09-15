@@ -1,4 +1,4 @@
-export type DeltaGlyphProps = {
+type DeltaGlyphProps = {
   idPrefix: string;
   /** Reading at the start of the period. */
   previous: number;

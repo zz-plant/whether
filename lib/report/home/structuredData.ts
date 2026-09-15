@@ -3,6 +3,7 @@ import {
   buildOgImageUrl,
   defaultSiteDescription,
   organizationName,
+  organizationSameAs,
   websiteName,
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
@@ -13,7 +14,7 @@ import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
 /** A JSON-LD document. Typed loosely on purpose — this is serialized to JSON, and
  *  a consumer (or a test) reads nodes by key rather than by a TS shape. Giving the
  *  builder a declared return type is what keeps every call site from casting. */
-export type JsonLdDocument = {
+type JsonLdDocument = {
   "@context": string;
   "@graph": Array<Record<string, unknown>>;
 };
@@ -60,6 +61,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       url: siteUrl,
       logo: `${siteUrl}/icon.svg`,
       description: defaultSiteDescription,
+      sameAs: [...organizationSameAs],
     },
     {
       "@type": "WebSite",

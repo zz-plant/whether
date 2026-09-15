@@ -5,13 +5,13 @@
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
-export type EmailContent = {
+type EmailContent = {
   subject: string;
   html: string;
   text: string;
 };
 
-export const UNSUBSCRIBE_BASE_URL = "https://whether.work/api/email/unsubscribe";
+const UNSUBSCRIBE_BASE_URL = "https://whether.work/api/email/unsubscribe";
 
 /**
  * The one-click unsubscribe URL for a subscriber token, or null without one.
@@ -21,7 +21,7 @@ export const UNSUBSCRIBE_BASE_URL = "https://whether.work/api/email/unsubscribe"
  * while alert mail reached nobody; it is not, now that an opt-in actually enrolls
  * someone. A missing token yields no link rather than a broken one.
  */
-export const buildUnsubscribeUrl = (token: string | null | undefined): string | null =>
+const buildUnsubscribeUrl = (token: string | null | undefined): string | null =>
   token ? `${UNSUBSCRIBE_BASE_URL}?token=${encodeURIComponent(token)}` : null;
 
 export const unsubscribeFooterHtml = (token: string | null | undefined): string => {
@@ -168,31 +168,6 @@ export const thresholdCrossingEmail = (
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
-  );
-  return { subject, html, text };
-};
-
-/**
- * Weekly brief ready notification — signals that the weekly brief has been generated.
- */
-export const weeklyBriefReadyEmail = (
-  regime: string,
-): EmailContent => {
-  const subject = `Whether — Weekly Brief Ready`;
-  const text = [
-    `Whether Weekly Brief`,
-    `Current regime: ${regime}`,
-    ``,
-    `View full brief: https://whether.work`,
-    `---`,
-    `Whether · weekly operating brief`,
-  ].join("\n");
-  const html = baseHtml(
-    "Whether Weekly Brief",
-    [
-      `<p style="color:#94a3b8;font-size:0.85rem;margin:0 0 20px;">Your weekly operating brief is ready.</p>`,
-      sectionBlock("Current Regime", regime),
-    ].join("\n"),
   );
   return { subject, html, text };
 };

@@ -9,7 +9,7 @@ import {
 } from "./cadenceSummaryBuilder";
 import { formatQuarterLabel } from "./summaryFormatting";
 
-export type QuarterlySummaryProvenance = CadenceSummaryProvenance;
+type QuarterlySummaryProvenance = CadenceSummaryProvenance;
 
 export type QuarterlySummary = {
   title: string;

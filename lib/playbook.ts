@@ -32,7 +32,7 @@ export interface PlaybookEntry {
   metric: string;
 }
 
-export interface PlaybookGuidance {
+interface PlaybookGuidance {
   playbook: PlaybookEntry | null;
   stopItems: string[];
   startItems: string[];

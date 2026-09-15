@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { DecisionContractBlock } from "../../components/decisionContractBlock";
 import { buildPageMetadata } from "../../../lib/seo";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
+import { isStaleForIndexing } from "../../../lib/seo/freshnessIndexation";
 import { findSignalsCluster, isSignalsClusterSlug, signalsClusterStaticParams } from "../clusterRoutes";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { SignalReadingPanel } from "../components/signalReadingPanel";
@@ -43,17 +44,24 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
    * summary, link back), so the remaining reason to withhold them is staleness,
    * which is the same rule the scenario pages already follow.
    *
-   * Gated on `treasury.isLive`, not on `reportResult.ok`. `loadReportDataSafe`
-   * resolves `ok: true` whenever assembly *succeeded*, and assembly succeeds on
-   * the bundled snapshot — the exact trap CLAUDE.md records `freezeWeeklyBrief`
-   * publishing a ten-week-old week through. An `ok`-only check would have
-   * stamped `index: true` on a months-old reading headed "this week", and
-   * `dynamicParams = false` bakes these three at build time, so the stale copy
-   * would stick.
+   * Gated on the reading's age and on `treasury.isLive`, not on
+   * `reportResult.ok`. `loadReportDataSafe` resolves `ok: true` whenever
+   * assembly *succeeded*, and assembly succeeds on the bundled snapshot — the
+   * exact trap CLAUDE.md records `freezeWeeklyBrief` publishing a ten-week-old
+   * week through. An `ok`-only check would have stamped `index: true` on a
+   * months-old reading headed "this week", and `dynamicParams = false` bakes
+   * these three at build time, so the stale copy would stick. The age window
+   * is the one every other live-posture page uses (72h), so a read that is a
+   * few hours past its refresh is still indexed and one older than the window
+   * is not, whichever store it came from.
    */
   const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
-  const isLiveReading = reportResult.ok && Boolean(reportResult.data.treasury.isLive);
-  if (!isLiveReading) {
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const stale = isStaleForIndexing({
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
+  });
+  if (stale) {
     metadata.robots = { index: false, follow: true };
   }
 

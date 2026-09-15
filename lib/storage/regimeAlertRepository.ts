@@ -1,10 +1,9 @@
 import type { AlertDeliveryEvent, RegimeAlertEvent } from "../signalOps";
-import { buildLineage } from "./lineage";
 import { DurableEventLog, type KvNamespaceLike } from "./eventLog";
 
 type Cursor = string | null;
 
-export interface RegimeAlertRepository {
+interface RegimeAlertRepository {
   appendAlert(event: RegimeAlertEvent): Promise<void>;
   listAlerts(options?: { cursor?: Cursor; limit?: number }): Promise<{ alerts: RegimeAlertEvent[]; nextCursor: Cursor }>;
   latestAlert(): Promise<RegimeAlertEvent | null>;
@@ -112,5 +111,3 @@ export const resetRegimeAlertRepository = (): RegimeAlertRepository => {
   sharedRepository = new InMemoryRegimeAlertRepository();
   return sharedRepository;
 };
-
-export const buildRegimeAlertLineage = () => buildLineage("request-received-at");

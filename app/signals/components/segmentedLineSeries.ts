@@ -10,7 +10,7 @@
  * `linePath`) and `signalInversionPreview`.
  */
 
-export type SegmentedLineSeries = {
+type SegmentedLineSeries = {
   /** One path per unbroken run of readings. Runs shorter than 2 points are dropped. */
   paths: string[];
   missingColumns: Array<{ x: number; width: number }>;
