@@ -56,14 +56,16 @@ against the 10s read deadline, what wrote to KV on a read) need a fraction of tr
 ## Secrets and provider keys
 
 Secrets are set per lane with `bunx wrangler secret put <NAME>` (add `--env preview` for the
-preview lane) and reach library code through `globalThis`, like every binding. None is required;
-each one switches a read from a keyless path to a keyed one.
+preview lane) and reach library code through `globalThis`, like every binding. The site serves
+without any of them: each provider key switches a read from a keyless path to a keyed one, and
+the Slack signing secret gates one webhook route.
 
 | Secret | Read by | Without it |
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
 | `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts` | The regime-history Workflow fails at its PR step, loudly. Fine-grained token: contents and pull requests, write, on this repository only. |
+| `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 
 The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
 which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
