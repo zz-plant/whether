@@ -289,6 +289,15 @@ Two things that made a red build hard to read, both fixed 2026-09-01:
   `unauditable` bucket, which only warns — otherwise a container that reaches no route at all would
   report "0 violations" and go green.
 
+A third, same shape, fixed 2026-09-15: **`run-checks.mjs` repeats every failure at the end of the
+run**, with the lines that named it and the tail of that task's output. The per-task report is
+printed as each task finishes, and the gate's own output can bury the reason — a `bun` that prints
+a line per test makes a *passing* suite ~1,700 lines, and Cloudflare's log viewer keeps a bounded
+window. A branch that failed the build five times running showed nothing in any reachable log but
+passing tests and `exited with code 1`; the `❌` line and the assertion had scrolled out of reach.
+Whatever that window keeps, it keeps the end, so the end now carries enough to act on.
+`CHECK_FAILURE_TAIL_LINES` (default 40) sizes it.
+
 **If a local `check` passes and the remote build fails, suspect ordering or environment, not the
 doc.** `mock.module` patches the module registry process-wide, so a test file can pass only because
 another file ran first and installed its mock; CI orders the suite differently. Run the file alone

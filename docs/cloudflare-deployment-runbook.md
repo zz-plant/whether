@@ -39,7 +39,10 @@ cold start. It did once also drop to "2 workers"; `--max-concurrency` never boun
 knob is gone. `audit` needs the network and `hotspot-preflight` needs git history, so both stay
 on `bun run check` and pre-push rather than the deploy path. It runs on every push, `main` included,
 so a red gate is a blocked deploy — read the build log in the dashboard, where `run-checks.mjs` names the failing
-task and attaches its output.
+task and attaches its output. **Read it from the bottom.** The viewer keeps a bounded window and the
+gate's own output can be thousands of lines, so the per-task `❌` scrolls out of reach; since
+2026-09-15 the run ends by repeating each failure with the lines that named it, which is the part
+that survives.
 
 If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
 in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.

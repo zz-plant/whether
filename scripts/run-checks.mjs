@@ -157,6 +157,13 @@ const runTask = (task) =>
     child.on("close", (code) => settle(code === 0));
   });
 
+/** How much of a failing task's output the end-of-run repeat carries. */
+const FAILURE_TAIL_LINES = Number.parseInt(process.env.CHECK_FAILURE_TAIL_LINES ?? "40", 10);
+
+/** Lines worth lifting out of a long run: what each of these tools calls a failure. */
+const FAILURE_LINE_PATTERN = /\(fail\)|^\s*✗|AssertionError|error: |Error: |^\s*✘|FAIL /;
+const FAILURE_MARKED_LINES = 20;
+
 const formatDuration = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
 const report = ({ task, ok, output, ms }) => {
@@ -216,5 +223,43 @@ process.stdout.write(
   `\n${failed.length === 0 ? "All checks passed" : `${failed.length} check(s) failed: ${failed.map((r) => r.task.name).join(", ")}`}` +
     ` in ${formatDuration(Date.now() - startedAt)}${notRun > 0 ? ` (${notRun} not run)` : ""}\n`,
 );
+
+/*
+ * Repeat each failure at the very end, with the tail of its own output.
+ *
+ * The full report above is printed task by task as they finish, and a passing
+ * `test` task alone can be 1,700 lines on a runner whose `bun` prints a line
+ * per test. Cloudflare's build log viewer keeps a bounded window, so on a red
+ * build the `❌` line and the assertion that caused it scroll out of reach and
+ * the only thing left is `exited with code 1` — which is the whole diagnosis,
+ * and the same "a red build is unreadable" failure this file already fixed once
+ * with per-task timeouts. Whatever the window keeps, it keeps the end, so the
+ * end has to carry enough to act on.
+ */
+if (failed.length > 0) {
+  for (const result of failed) {
+    const lines = result.output.trimEnd().split("\n");
+    const tail = lines.slice(-FAILURE_TAIL_LINES);
+    process.stdout.write(`\n───── ${result.task.name} failed (\`bun run ${result.task.script}\`) ─────\n`);
+
+    /*
+     * The tail alone is not enough for the suite: bun reports a failing test
+     * where it runs, which on 1,700 tests is hundreds of lines before the end.
+     * These lines are the answer to "what failed", so they are lifted out and
+     * printed first, and the tail follows as context.
+     */
+    const marked = lines.filter((line) => FAILURE_LINE_PATTERN.test(line) && !tail.includes(line));
+    if (marked.length > 0) {
+      const shown = marked.slice(0, FAILURE_MARKED_LINES);
+      process.stdout.write(`[run-checks] failure lines${marked.length > shown.length ? ` (first ${shown.length} of ${marked.length})` : ""}:\n`);
+      process.stdout.write(`${shown.join("\n")}\n\n`);
+    }
+
+    if (lines.length > tail.length) {
+      process.stdout.write(`[run-checks] last ${tail.length} of ${lines.length} lines; the rest is above.\n`);
+    }
+    process.stdout.write(`${tail.join("\n")}\n`);
+  }
+}
 
 process.exit(failed.length === 0 ? 0 : 1);
