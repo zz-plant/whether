@@ -127,6 +127,17 @@ deploys every push, which is the only remote gate left.
   `BUN_TEST_SEED=<n> bun run test` replays the container's order locally. The runner also strips
   `FRED_API_KEY` and `ALPHA_VANTAGE_API_KEY` from the suite's environment, so a key in a shell
   cannot route a fixture-driven test to a real upstream.
+- **The build container always has Cloudflare credentials, and the suite must not see them
+  (2026-09-15).** Workers Builds exports `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` so
+  wrangler can deploy. `resolveAnalyticsReadConfig` reads both — it accepts `CLOUDFLARE_API_TOKEN`
+  as well as `CLOUDFLARE_ANALYTICS_READ_TOKEN`, because they name the same permission — so a test
+  asserting the reader is *unconfigured*, which is the state of every developer machine, was true
+  here and false there. `scripts/run-tests.mjs` now strips all four (both tokens, the account id,
+  and `WHETHER_TELEMETRY_DATASET`), and `tests/runHistory.test.ts` clears them itself rather than
+  relying on that. This cost five red builds, and it was slow to find for one reason worth
+  remembering: **the only environment that disagreed was the one whose log could not be read.**
+  When a check passes everywhere you can look, enumerate what the place you cannot look *has* that
+  you do not — credentials first.
 - **The suite runs offline.** `bunfig.toml` preloads `scripts/test-network-guard.ts` for every
   `bun test`, and an outbound fetch throws instead of leaving the box; loopback stays open, because
   `tests/whetherCli.test.ts` starts its own server. This is the same argument as the stripped API
