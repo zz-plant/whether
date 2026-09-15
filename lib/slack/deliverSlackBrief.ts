@@ -31,7 +31,11 @@ export const isSlackWebhookUrl = (value: string): boolean =>
 /* Slack caps a section's mrkdwn text at 3000 characters. */
 const SECTION_TEXT_LIMIT = 2900;
 
-export const buildSlackBriefBlocks = (briefText: string, recordDate: string) => {
+export const buildSlackBriefBlocks = (
+  briefText: string,
+  recordDate: string,
+  options: { imageUrl?: string } = {},
+) => {
   const body =
     briefText.length > SECTION_TEXT_LIMIT
       ? `${briefText.slice(0, SECTION_TEXT_LIMIT)}\n… (truncated — full brief on the site)`
@@ -39,6 +43,11 @@ export const buildSlackBriefBlocks = (briefText: string, recordDate: string) => 
 
   return [
     { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief — ${recordDate}` } },
+    /* The weekly call as rendered, when the Monday cron captured one (lib/export/briefScreenshot.ts).
+       Slack fetches the URL once and proxies it, so the block costs one read of the stored PNG. */
+    ...(options.imageUrl
+      ? [{ type: "image", image_url: options.imageUrl, alt_text: `Whether weekly call card for ${recordDate}` }]
+      : []),
     { type: "section", text: { type: "mrkdwn", text: body } },
     {
       type: "actions",
@@ -85,6 +94,8 @@ export const deliverSlackBrief = async (options?: {
   webhookUrls?: string[];
   fetchImpl?: typeof fetch;
   payload?: { text: string; recordDate: string };
+  /** Public URL of this week's stored screenshot; omitted, the post is text blocks as before. */
+  imageUrl?: string;
 }): Promise<SlackDeliveryResult> => {
   const urls = options?.webhookUrls ?? resolveConfiguredSlackWebhooks();
   if (urls.length === 0) {
@@ -111,7 +122,7 @@ export const deliverSlackBrief = async (options?: {
   }
 
   const { text, recordDate } = payload;
-  const blocks = buildSlackBriefBlocks(text, recordDate);
+  const blocks = buildSlackBriefBlocks(text, recordDate, { imageUrl: options?.imageUrl });
   const results = await Promise.allSettled(
     urls.map(async (url) => {
       const response = await doFetch(url, {

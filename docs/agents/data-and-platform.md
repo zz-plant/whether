@@ -65,3 +65,24 @@ it stands at run time, never the series bundled into the running deployment, so 
 from an older commit cannot undo months that reached `main` after it was built. It adds only what the Worker observed: no
 backfill, no regenerated history — the canonical series is still the generator scripts' job.
 On for the preview lane only (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.
+
+## Brief freeze Workflow (trial)
+
+`worker/workflows/weeklyBriefFreeze.ts` appends this week's brief to `data/published_briefs.json`
+behind a pull request, from inside Cloudflare. The routine it stands in for ran in a sandbox whose
+egress proxy denies FRED, so every run failed before it had a week to write. The record comes from
+`lib/report/publishedBriefRecord.ts`, which `scripts/freezeWeeklyBrief.ts` also uses, and passes
+`assessPublishReadiness` before anything is built; a week that is not publishable makes the first
+step throw, and the platform retries it hourly up to five times. The archive is append-only at the
+merge: a slug the base branch already carries is left exactly as it is. On for the preview lane
+only (`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`.
+
+## Reading telemetry back
+
+The Analytics Engine binding is write-only from a Worker. `lib/telemetry/runHistory.ts` reads the
+`cron-step` stream through the SQL API with `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_ANALYTICS_READ_TOKEN`, and `/trust` renders it as "Scheduled runs": one row per cron
+step with runs, failures, and last success over 30 days. Unconfigured renders nothing; a failed
+read renders its reason. Every scheduled step writes that stream, including the signal refresh
+itself since 2026-09-14, so an empty window means the cron did not fire, not that nothing was
+measured.

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchQuote, SAAS_BASKET } from "../../../lib/saasMultiples";
+import { checkRateLimit, clientKeyFor, rateLimitedResponse } from "../../../lib/runtime/rateLimit";
 
 export const runtime = "edge";
 
@@ -43,6 +44,14 @@ export async function GET(request: Request) {
 
   if (!ticker || ticker.length > 5) {
     return NextResponse.json({ error: "Valid ticker required" }, { status: 400 });
+  }
+
+  /* The upstream rate-limits this Worker, not the caller, so one abusive address used to
+     cost every visitor the comps. The per-ticker cache inside fetchQuote absorbs repeats;
+     this bounds what one address can make it fetch. */
+  const limit = await checkRateLimit("WHETHER_PUBLIC_WRITE_RATE_LIMITER", clientKeyFor(request));
+  if (!limit.allowed) {
+    return rateLimitedResponse();
   }
 
   const result = await fetchQuote(ticker);

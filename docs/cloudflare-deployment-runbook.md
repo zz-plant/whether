@@ -53,6 +53,16 @@ Grafana Cloud, Axiom, and Sentry all accept it. Spans are billed from October 20
 `head_sampling_rate` is the cost knob — the invariant-level questions (how long did FRED take
 against the 10s read deadline, what wrote to KV on a read) need a fraction of traffic.
 
+## Source maps
+
+`upload_source_maps = true` on both lanes, and `vite.config.ts` sets `build.sourcemap` for the
+`rsc` and `ssr` environments only. Together they give Workers Logs stack traces that name a file
+and a line in this repository instead of an offset into `index.js`; Wrangler fetches the map after
+the invocation completes, so there is no runtime cost, and the client build stays map-free so no
+source reaches a browser. The entry's map is under 1MB against the 15MB limit. Until 2026-09-14
+the flag was `false` while `[observability]` was on, which is the combination that leaves every
+stack trace pointing into minified code.
+
 ## Secrets and provider keys
 
 Secrets are set per lane with `bunx wrangler secret put <NAME>` (add `--env preview` for the
@@ -66,6 +76,9 @@ the Slack signing secret gates one webhook route.
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
 | `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts` | The regime-history Workflow fails at its PR step, loudly. Fine-grained token: contents and pull requests, write, on this repository only. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
+| `CLOUDFLARE_ACCOUNT_ID` | `lib/telemetry/runHistory.ts`, `lib/export/briefScreenshot.ts` | Both readers below report themselves unconfigured. The account id is not a secret, but it is set the same way so the two tokens cannot be present without it. |
+| `CLOUDFLARE_ANALYTICS_READ_TOKEN` | `lib/telemetry/runHistory.ts` (`loadCronRunHistory`), from `app/trust/trustPageModel.ts` | `/trust` renders no "Scheduled runs" section. With it, the page reads the `cron-step` stream back through the Analytics Engine SQL API and shows runs, failures, and last success per scheduled step for the trailing 30 days, cached 15 minutes per isolate under a 2.5s deadline. Token permission: Account Analytics: Read. |
+| `CLOUDFLARE_BROWSER_RENDERING_TOKEN` | `lib/export/briefScreenshot.ts` (`captureAndStoreBriefScreenshot`), from the Monday cron | The `artifact/brief-screenshot` cron step reports `skipped_unconfigured` and the Slack brief goes out as text blocks. With it, the cron captures the weekly-call block at `/?screenshot=1` through the Browser Rendering screenshot endpoint, stores the PNG in KV under the record date for 60 days, and the Slack post carries it as an image block served from `/api/image/brief-screenshot?date=YYYY-MM-DD`. Token permission: Browser Rendering: Edit. One capture a week sits well inside the free plan's ten minutes of browser time a day. |
 
 The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
 which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
@@ -87,9 +100,23 @@ only, so production keeps its current behavior until the trial is promoted:
   cron start one instance (`bunx wrangler workflows instances list whether-regime-history-refresh
   --env preview` shows the runs). It needs `GITHUB_TOKEN` and `GITHUB_REPOSITORY`.
 
-To promote either, copy its var into the production `[vars]` block; to retire it, remove the
-binding and add a `deleted_sqlite_classes` migration for the object. The DO migration list is
-top-level and applies to both lanes, which is why the class is declared on both.
+- **`WeeklyBriefFreezeWorkflow`** (`worker/workflows/weeklyBriefFreeze.ts`), bound as
+  `BRIEF_FREEZE_WORKFLOW`, freezes this week's brief into `data/published_briefs.json` behind a
+  pull request, from inside Cloudflare where FRED is reachable. `WHETHER_BRIEF_FREEZE_WORKFLOW =
+  "1"` makes the Monday cron start one instance after the email and Slack steps. Its first step
+  runs the same readiness guard as `bun run brief:freeze` (`lib/report/publishedBriefRecord.ts`
+  builds the record for both) and retries hourly, up to five times, when the live read is not
+  publishable yet. The archive stays append-only: a week the base branch already carries is left
+  untouched and the run reports no change. It needs `GITHUB_TOKEN` and `GITHUB_REPOSITORY`; the
+  branch is `automation/weekly-brief-freeze-<slug>`, the same name the manual GitHub workflow uses,
+  so the two never collide on a week.
+
+To promote any of them, copy its var into the production `[vars]` block; to retire one, remove
+the binding and, for the object, add a `deleted_sqlite_classes` migration. The DO migration list
+is top-level and applies to both lanes, which is why the class is declared on both. The
+coordinator's promotion criterion, so it is a decision and not a drift: two consecutive weeks on
+the preview lane in which its `GET /status` reports a model and a scheduled alarm on every check,
+and the `refresh-operating-state` row on the preview `/trust` run history shows no failures.
 
 ## Validating config without deploying
 
@@ -168,8 +195,9 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 - `ASSETS` — Workers Static Assets binding for vinext output.
 - `IMAGES` — Workers Images binding used by the `/_vinext/image` worker route.
+- `WHETHER_SUBSCRIBE_RATE_LIMITER` and `WHETHER_PUBLIC_WRITE_RATE_LIMITER` — Workers [rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) bindings (`[[ratelimits]]`), read through `lib/runtime/rateLimit.ts`. The first fronts every path that sends a verification email (`/api/email/subscribe`, `/api/subscribe`, `/api/mcp?tool=subscribe`, all through `subscribeAndSendVerification`) at 5 a minute per connecting address; the second fronts the browser telemetry intake and `/api/company` at 60 a minute. A refused request answers 429 with `Retry-After`. Counters are per Cloudflare location and eventually consistent, so this is abuse control, not accounting. `namespace_id` is account-wide and shared counters follow it, which is why the preview lane declares its own ids. Absent (tests, `bun run dev`), every check allows.
 - `CF_VERSION_METADATA` — Workers [Version Metadata](https://developers.cloudflare.com/workers/runtime-apis/bindings/version-metadata/) binding. Surfaces `id`, `tag`, and `timestamp` for the live deploy. `app/api/health/route.ts` reads `globalThis.CF_VERSION_METADATA.id` to populate the `commitSha` field, replacing the previous Pages-only `CF_PAGES_COMMIT_SHA` lookup.
-- `ANALYTICS` — Workers [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) dataset (`whether_telemetry` on production, `whether_telemetry_preview` on the preview lane). All three first-party telemetry routes (`/api/telemetry/web-vitals`, `/api/telemetry/operator-workflow`, `/api/telemetry/content-measurement`) write through `lib/telemetry/analyticsEngine.ts`. Schema: `index1 = stream`, `blob1 = stream`, `blob2 = JSON event payload`, with optional typed `doubles` (e.g. web-vitals `value` and `delta`). Datasets auto-create on first write — no extra provisioning needed. When the binding is absent (local dev / tests) the helper falls back to a tagged `console.info` line so behavior matches the previous black-hole path without throwing. **Querying**: the Analytics Engine binding only supports `writeDataPoint` from Workers; to read the data, use the [Cloudflare GraphQL Analytics API](https://developers.cloudflare.com/analytics/graphql-api/) with an API token that has `Workers Analytics Engine` read permissions. Filter on `dataset = 'whether_telemetry'` and extract fields from the JSON blob in `blob2`.
+- `ANALYTICS` — Workers [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) dataset (`whether_telemetry` on production, `whether_telemetry_preview` on the preview lane). All three first-party telemetry routes (`/api/telemetry/web-vitals`, `/api/telemetry/operator-workflow`, `/api/telemetry/content-measurement`) write through `lib/telemetry/analyticsEngine.ts`. Schema: `index1 = stream`, `blob1 = stream`, `blob2 = JSON event payload`, with optional typed `doubles` (e.g. web-vitals `value` and `delta`). Datasets auto-create on first write — no extra provisioning needed. When the binding is absent (local dev / tests) the helper falls back to a tagged `console.info` line so behavior matches the previous black-hole path without throwing. **Querying**: the Analytics Engine binding only supports `writeDataPoint` from Workers; to read the data, use the [Cloudflare GraphQL Analytics API](https://developers.cloudflare.com/analytics/graphql-api/) with an API token that has `Workers Analytics Engine` read permissions. Filter on `dataset = 'whether_telemetry'` and extract fields from the JSON blob in `blob2`. `lib/telemetry/runHistory.ts` does this from the Worker for the `cron-step` stream so `/trust` can show what the scheduled jobs did (see `CLOUDFLARE_ANALYTICS_READ_TOKEN` above); `WHETHER_TELEMETRY_DATASET` names the lane's dataset for that read, and is set on the preview lane only.
 
 `[observability] enabled = true` is set on both lanes so tail logs and runtime errors land in the Workers dashboard for the active deploy without extra plumbing. `head_sampling_rate` is `1` (no sampling) until invocation volume warrants tuning.
 

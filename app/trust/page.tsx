@@ -14,6 +14,7 @@ import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
+import { RunHistorySection } from "./runHistorySection";
 import { buildTrustPageModel } from "./trustPageModel";
 
 export const runtime = "edge";
@@ -45,6 +46,7 @@ export default async function MethodPage({
     meetingSnippet,
     revisitBullets,
     trustVerdict,
+    runHistory,
     reportShellProps,
   } = await buildTrustPageModel();
 
@@ -254,6 +256,8 @@ export default async function MethodPage({
           {PRIMARY_AUDIENCE_SUMMARY} Verify source data and combine it with company-specific metrics before acting on irreversible decisions.
         </p>
       </ReportSection>
+
+      <RunHistorySection runHistory={runHistory} />
 
       <FormulaReference />
 

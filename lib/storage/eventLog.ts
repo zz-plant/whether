@@ -1,4 +1,4 @@
-import type { KvNamespace } from "../runtime/kv";
+import { readKvValues, type KvNamespace } from "../runtime/kv";
 
 type Cursor = string | null;
 
@@ -26,8 +26,14 @@ const DEFAULT_LIST_LIMIT = 64;
  */
 const MAX_SCAN_ENTRIES = 1000;
 
-/** KV round-trips dominate; batch them instead of bursting a whole page at once. */
-const READ_CONCURRENCY = 64;
+/**
+ * What the log accepts back from KV. The log wrote every entry itself, so the default trusts
+ * the stored shape; a repository with a validator passes it here so reads narrow at runtime
+ * instead of asserting, and a record an older deploy wrote in another shape is skipped.
+ */
+export type StoredEntryGuard<T> = (value: unknown) => value is T;
+
+const trustStoredEntry = <T>(value: unknown): value is T => value !== undefined;
 
 export class DurableEventLog<T> {
   private readonly prefix: string;
@@ -38,6 +44,7 @@ export class DurableEventLog<T> {
   constructor(
     private readonly topic: string,
     private readonly kv: KvNamespaceLike | null,
+    private readonly isEntry: StoredEntryGuard<T> = trustStoredEntry,
   ) {
     this.prefix = `${topic}:`;
     this.indexKey = `meta:${topic}:index`;
@@ -163,24 +170,22 @@ export class DurableEventLog<T> {
   ): Promise<Array<{ index: number; item: T }>> {
     const collected: Array<{ index: number; item: T }> = [];
 
-    for (let offset = 0; offset < indexes.length; offset += READ_CONCURRENCY) {
-      const batch = indexes.slice(offset, offset + READ_CONCURRENCY);
-      /* Entries are append-only and never rewritten, so a short edge cache absorbs
-       * repeated scans of the same window. 60s is the KV minimum; it also caches
-       * misses, which bounds how quickly another isolate's fresh append becomes
-       * visible here — acceptable for list views, so latest() stays uncached. */
-      const raws = await Promise.all(batch.map((index) => this.kv!.get(this.toKey(index), { cacheTtl: 60 })));
+    /* Entries are append-only and never rewritten, so a short edge cache absorbs
+     * repeated scans of the same window. 60s is the KV minimum; it also caches
+     * misses, which bounds how quickly another isolate's fresh append becomes
+     * visible here — acceptable for list views, so latest() stays uncached. */
+    const raws = await readKvValues(this.kv!, indexes.map((index) => this.toKey(index)), { cacheTtl: 60 });
 
-      for (let i = 0; i < batch.length; i++) {
-        const raw = raws[i];
-        if (!raw) continue;
-        try {
-          const parsed = JSON.parse(raw) as T;
-          if (filter && !filter(parsed)) continue;
-          collected.push({ index: batch[i], item: parsed });
-        } catch {
-          /* Skip invalid JSON */
-        }
+    for (let i = 0; i < indexes.length; i++) {
+      const raw = raws[i];
+      if (!raw) continue;
+      try {
+        const parsed: unknown = JSON.parse(raw);
+        if (!this.isEntry(parsed)) continue;
+        if (filter && !filter(parsed)) continue;
+        collected.push({ index: indexes[i], item: parsed });
+      } catch {
+        /* Skip invalid JSON */
       }
     }
 
@@ -199,6 +204,8 @@ export class DurableEventLog<T> {
     if (current < 0 || Number.isNaN(current)) return null;
 
     const raw = await this.kv.get(this.toKey(current));
-    return raw ? clone(JSON.parse(raw) as T) : null;
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    return this.isEntry(parsed) ? clone(parsed) : null;
   }
 }

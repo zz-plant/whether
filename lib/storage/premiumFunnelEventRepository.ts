@@ -1,4 +1,4 @@
-import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
 import { isValidPremiumFunnelEvent } from "../premiumFunnel";
 import type { PremiumFunnelEvent, PremiumIntentSource, PremiumFunnelEventType } from "../premiumFunnel";
 
@@ -39,7 +39,6 @@ const RETENTION_SECONDS = 180 * 24 * 60 * 60;
 
 const DEFAULT_LIMIT = 500;
 const MAX_LIMIT = 1000;
-const READ_CONCURRENCY = 64;
 
 export type PremiumFunnelCursor = string | null;
 
@@ -127,19 +126,16 @@ const readKeys = async (
 ): Promise<StoredPremiumFunnelEvent[]> => {
   const collected: StoredPremiumFunnelEvent[] = [];
 
-  for (let offset = 0; offset < keys.length; offset += READ_CONCURRENCY) {
-    const batch = keys.slice(offset, offset + READ_CONCURRENCY);
-    /* Entries are write-once and never rewritten, so an edge cache is safe here. */
-    const raws = await Promise.all(batch.map((key) => kv.get(key, { cacheTtl: 60 })));
+  /* Entries are write-once and never rewritten, so an edge cache is safe here. */
+  const raws = await readKvValues(kv, keys, { cacheTtl: 60 });
 
-    for (const raw of raws) {
-      if (!raw) continue;
-      try {
-        const parsed = toStoredEvent(JSON.parse(raw));
-        if (parsed) collected.push(parsed);
-      } catch {
-        /* Skip invalid JSON rather than failing the whole read. */
-      }
+  for (const raw of raws) {
+    if (!raw) continue;
+    try {
+      const parsed = toStoredEvent(JSON.parse(raw));
+      if (parsed) collected.push(parsed);
+    } catch {
+      /* Skip invalid JSON rather than failing the whole read. */
     }
   }
 

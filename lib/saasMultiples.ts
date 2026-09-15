@@ -16,6 +16,7 @@
  */
 
 import { z } from "zod";
+import { getWhetherKv, type KvNamespace } from "./runtime/kv";
 
 export const SAAS_BASKET = [
   "SNOW", "SHOP", "CRM", "HUBS", "MDB", "DDOG", "TEAM", "WDAY",
@@ -84,7 +85,49 @@ export type QuoteResult =
   /** The source refused or never answered; nothing was learned about the symbol. */
   | { status: "unavailable"; reason: string };
 
-export async function fetchQuote(symbol: string): Promise<QuoteResult> {
+/* ---------- Per-ticker quote cache ---------- */
+
+export const QUOTE_CACHE_PREFIX = "comps:quote:";
+/** A quote is a daily figure; an hour keeps a busy day inside a couple of dozen upstream calls per symbol. */
+export const QUOTE_CACHE_TTL_SECONDS = 60 * 60;
+/** An unknown symbol stays unknown; shorter so a newly listed one is not hidden for an hour. */
+export const QUOTE_MISSING_TTL_SECONDS = 15 * 60;
+
+/* Validated on the way out of KV, not asserted: the cache is JSON written by an older
+   deploy, and a shape change must read as a miss rather than as a quote. */
+const cachedQuoteSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ok"), quote: yahooQuoteSchema, cachedAt: z.string() }),
+  z.object({ status: z.literal("missing"), cachedAt: z.string() }),
+]);
+
+type QuoteCache = Pick<KvNamespace, "get" | "put">;
+
+const readCachedQuote = async (cache: QuoteCache, symbol: string): Promise<QuoteResult | null> => {
+  try {
+    const raw = await cache.get(QUOTE_CACHE_PREFIX + symbol);
+    if (!raw) return null;
+    const parsed = cachedQuoteSchema.safeParse(JSON.parse(raw));
+    if (!parsed.success) return null;
+    return parsed.data.status === "ok" ? { status: "ok", quote: parsed.data.quote } : { status: "missing" };
+  } catch {
+    return null;
+  }
+};
+
+const writeCachedQuote = async (cache: QuoteCache, symbol: string, result: QuoteResult) => {
+  if (result.status === "unavailable") return;
+  const record = result.status === "ok"
+    ? { status: "ok" as const, quote: result.quote, cachedAt: new Date().toISOString() }
+    : { status: "missing" as const, cachedAt: new Date().toISOString() };
+  const ttl = result.status === "ok" ? QUOTE_CACHE_TTL_SECONDS : QUOTE_MISSING_TTL_SECONDS;
+  try {
+    await cache.put(QUOTE_CACHE_PREFIX + symbol, JSON.stringify(record), { expirationTtl: ttl });
+  } catch {
+    /* A cache write failure costs one more upstream read, nothing else. */
+  }
+};
+
+const fetchQuoteFromSource = async (symbol: string): Promise<QuoteResult> => {
   const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics,cashflowStatementHistory`;
 
   let res: Response;
@@ -110,6 +153,31 @@ export async function fetchQuote(symbol: string): Promise<QuoteResult> {
   return parsed.success
     ? { status: "ok", quote: parsed.data.quoteSummary.result[0] }
     : { status: "missing" };
+}
+
+/**
+ * One symbol's quote, served from the durable KV cache when a fresh copy exists.
+ *
+ * The upstream is unofficial and rate-limits this Worker as a whole, and before the cache
+ * every visitor with a ticker cookie sent it fifteen requests (the ticker and its peers).
+ * A refused or unreachable source is never cached: "unavailable" says nothing about the
+ * symbol, and caching it would turn a one-minute outage into an hour of missing comps.
+ * Off Cloudflare (tests, scripts) there is no binding and every call reads the source.
+ */
+export async function fetchQuote(
+  symbol: string,
+  options: { cache?: QuoteCache | null } = {},
+): Promise<QuoteResult> {
+  const cache = options.cache === undefined ? getWhetherKv() : options.cache;
+
+  if (cache) {
+    const cached = await readCachedQuote(cache, symbol);
+    if (cached) return cached;
+  }
+
+  const result = await fetchQuoteFromSource(symbol);
+  if (cache) await writeCachedQuote(cache, symbol, result);
+  return result;
 }
 
 /** The two numbers the basket median is built from, whichever source supplied them. */
