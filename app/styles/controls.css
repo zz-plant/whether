@@ -114,7 +114,7 @@
 
 /* Rule VI: eliminate the 300ms tap delay on discrete interactive controls.
    Scoped to non-scrolling elements only; scroll/pan containers keep their
-   own touch-action (e.g. SwipeableWeek uses touch-pan-y). */
+   own touch-action (horizontally scrolling rails, the timeline scrubber). */
 button,
 [type="button"],
 [type="submit"],

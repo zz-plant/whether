@@ -146,41 +146,15 @@ export default async function HistoryComparePage({
           statusLabel: reportA.statusLabel,
           recordDateLabel: reportA.recordDateLabel,
           fetchedAtLabel: reportA.fetchedAtLabel,
-          treasurySource: reportA.treasury?.source,
         },
         page: {
           pageTitle: "Compare two periods",
-          currentPath: "/history/compare",
           pageSummary: "Signals and operating calls for any two past months, side by side.",
           sectionLinks: compareSectionLinks,
         },
         trust: {
-          trustStatusLabel: snapA.trustStatus.trustStatusLabel,
-          trustStatusDetail: snapA.trustStatus.trustStatusDetail,
-          trustStatusAction: snapA.trustStatus.trustStatusAction,
           trustStatusTone: snapA.trustStatus.trustStatusTone,
           showOfflineBadge: isFallback && !reportA.historicalSelection,
-        },
-        actions: {
-          primaryCta: { href: "/", label: "Weekly Brief" },
-          secondaryCta: { href: "/history", label: "Regime History" },
-        },
-        payloads: {
-          decisionBanner: {
-            label: "Compare",
-            decision: "Pick any two past months below to compare their signals and operating rules side by side.",
-            horizon: "Replay Mode",
-            confidence: snapA.trustStatus.trustStatusLabel,
-            effectiveDate: reportA.recordDateLabel,
-            evidenceHref: "#ops-compare-grid",
-          },
-          commandBar: {
-            regime: reportA.assessment.regime,
-            call: snapA.weeklyCall.currentCall,
-            doNow: snapA.weeklyCall.doNowBullets,
-            flipConditions: [snapA.weeklyCall.changeCourseIf, ...snapA.weeklyCall.flipConditionLabels].slice(0, 4),
-            updatedAt: reportA.fetchedAtLabel,
-          },
         },
       }}
     >

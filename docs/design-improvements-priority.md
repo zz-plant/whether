@@ -29,6 +29,7 @@ If we only pick three areas for the next UX/design cycle, prioritize these:
    - Added a mobile-only bottom decision bar with posture confidence and one primary action in thumb reach.
    - Same strip becomes a compact floating pill on desktop (bottom-right) so the call persists while the brief scrolls.
    - Actions consolidated to `Copy` + `Download image`; native share was redundant with copy and removed from the bar.
+   - **Retired on phones (2026-09-15).** The bottom tab bar (2026-09-08) took the thumb zone, so the strip sat on top of it — two fixed bars, roughly 128px of a 932px viewport, plus a spacer the strip reserved for itself while hidden. With the brief at about three phone screens after the sitewide declutter, the hero's Copy Brief is one flick away. The desktop floating pill stays.
 
 2. **P0 — First-screen rewrite for “decision in 5 seconds” clarity** ✅ Implemented
    - Added a dedicated “Decision in 5 seconds” panel that answers what changed, what to do, and urgency.

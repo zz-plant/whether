@@ -122,6 +122,47 @@ describe("home route render contract", () => {
     assert.ok(paletteSource.includes('navigateTo("/history")'), "command palette keeps the history deep link");
   });
 
+  it("keeps the 2026-09-15 declutter: one control per job, one timeline, one plan CTA", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+
+    // Each of these restated something the hero already carries, or recreated a
+    // downstream page inline. The restatement it resolved is recorded in
+    // docs/feature-specs-current.md; a render site returning here is a regression.
+    for (const tag of [
+      "<TimelineBar",
+      "<SwipeableWeek",
+      "<StressTestQuickCard",
+      "<DirectAnswersStrip",
+      "<WeeklyRetrospectiveCard",
+      "<StageDropdownPill",
+      "<SectionSignpost",
+      "<BriefSectionNav",
+    ]) {
+      assert.ok(!routeSource.includes(tag), `${tag} has no render site on /`);
+    }
+
+    // One stage control at every width: the header's phone-only pill and the
+    // hero's tablist above `sm` are complementary, and nothing else asks.
+    const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
+    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
+    assert.match(headerSource, /<StageDropdownPill className="sm:hidden"/, "the header keeps the phone pill");
+    assert.match(heroSource, /<div className="hidden sm:block">\s*<StagePersonaSelector/, "the hero keeps the sm+ tablist");
+    const explainerSource = readFileSync("app/components/homeFirstRunOrientation.tsx", "utf8");
+    assert.ok(!explainerSource.includes("OPERATOR_STAGE_OPTIONS"), "the first-run line no longer asks the stage a third time");
+
+    // One planning CTA: the pill in the handoff.
+    assert.equal(routeSource.split("<BelowTheFoldEvidence").length - 1, 1);
+    assert.ok(!routeSource.includes("Open in Planning"), "no second plan CTA above the handoff");
+
+    // The record date prints once, in the hero's trust line.
+    assert.ok(!routeSource.includes("Data through {"), "the meta row does not restate the record date");
+
+    // The sticky strip is the desktop floating pill; phones have the tab bar.
+    const stripSource = readFileSync("app/components/StickyCallStrip.tsx", "utf8");
+    assert.match(stripSource, /className="[^"]*\bhidden\b[^"]*\bmd:block\b/, "the strip renders from md up");
+    assert.ok(!stripSource.includes("h-[4.75rem]"), "no spacer reserved for a strip phones no longer show");
+  });
+
   it("opens the shared command palette from the header search button", () => {
     const actionsSource = readFileSync("app/components/globalHeaderActionsClient.tsx", "utf8");
     const paletteSource = readFileSync("app/components/commandPalette.tsx", "utf8");

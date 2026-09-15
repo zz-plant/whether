@@ -1,25 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
-  isReportShellRoute,
   normalizePathname,
   resolveGlobalHeaderNavigationLinks,
   resolveGlobalHeaderRouteLabel,
-  resolveReportHeaderNextStep,
 } from "../lib/navigation/globalHeader";
 
 describe("global header navigation helpers", () => {
   it("normalizes trailing slash paths", () => {
     assert.equal(normalizePathname("/signals/"), "/signals");
     assert.equal(normalizePathname("/"), "/");
-  });
-
-  it("derives report-shell visibility from canonical route list", () => {
-    assert.equal(isReportShellRoute("/"), true);
-    assert.equal(isReportShellRoute("/signals/overview"), true);
-    assert.equal(isReportShellRoute("/operate/plan"), true);
-    assert.equal(isReportShellRoute("/resolve"), true);
-    assert.equal(isReportShellRoute("/trust"), true);
   });
 
   it("uses canonical IA labels for condensed report route context", () => {
@@ -38,26 +28,11 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API & MCP");
     assert.equal(resolveGlobalHeaderRouteLabel("/about"), "About");
     assert.equal(resolveGlobalHeaderRouteLabel("/about/"), "About");
-
-    // Utility routes must not leak into nav ordering or next-step cues.
-    assert.equal(resolveReportHeaderNextStep("/threshold"), null);
-    assert.equal(resolveReportHeaderNextStep("/about"), null);
-    assert.equal(isReportShellRoute("/about"), false);
   });
 
   it("does not match a utility label on an unrelated path that merely shares a prefix", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/thresholdish"), "Page");
     assert.equal(resolveGlobalHeaderRouteLabel("/templating"), "Page");
-  });
-
-  it("resolves report routes back to the one-screen brief", () => {
-    assert.equal(resolveReportHeaderNextStep("/"), null);
-    assert.deepEqual(resolveReportHeaderNextStep("/operate"), { href: "/", label: "Weekly Brief" });
-    assert.deepEqual(resolveReportHeaderNextStep("/signals/thresholds"), { href: "/", label: "Weekly Brief" });
-    assert.deepEqual(resolveReportHeaderNextStep("/resolve"), { href: "/", label: "Weekly Brief" });
-    assert.deepEqual(resolveReportHeaderNextStep("/trust"), { href: "/", label: "Weekly Brief" });
-    assert.deepEqual(resolveReportHeaderNextStep("/history"), { href: "/", label: "Weekly Brief" });
-    assert.equal(resolveReportHeaderNextStep("/nonexistent"), null);
   });
 
   it("names every public route rather than falling back to \"Page\"", () => {

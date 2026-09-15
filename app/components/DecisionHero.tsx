@@ -30,7 +30,7 @@ import { StagePersonaSelector } from "./StagePersonaSelector";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
 import { describeInputMovement } from "../../lib/report/inputMovement";
-import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight, Info } from "lucide-react";
+import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { WeatherLandscapeArtwork } from "./hero/WeatherLandscapeArtwork";
 
 type Props = {
@@ -439,10 +439,7 @@ export function DecisionHero({
               )}
             </div>
 
-            <div className="text-xs text-slate-400 flex items-center gap-1" title={`${OPERATING_LATITUDE_LABEL}: calculated from funding pressure and risk appetite. Reflects latitude to hire, spend, and commit.`}>
-              <span>{OPERATING_LATITUDE_LABEL}</span>
-              <Info size={13} className="text-slate-500 cursor-help" />
-            </div>
+            <div className="text-xs text-slate-400">{OPERATING_LATITUDE_LABEL}</div>
 
             {trendPoints && trendDomain ? (
               <figure className="mt-1 flex flex-col items-start sm:items-end text-fluid-nano">
@@ -457,12 +454,6 @@ export function DecisionHero({
                 />
               </figure>
             ) : null}
-
-            <span className="text-[11px] text-slate-500 tabular-nums">
-              {boldnessDelta !== 0
-                ? `${boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts vs last week`
-                : "Steady vs last week"}
-            </span>
           </div>
 
         <div className="order-3 min-w-0 space-y-3 sm:order-none sm:col-span-2 sm:col-start-1 sm:row-start-2">
@@ -493,7 +484,13 @@ export function DecisionHero({
             <fieldset className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Signal readout">
               {renderSignalCells("details")}
             </fieldset>
+            {/* The gloss for the headline score sits with the signal glosses rather
+                than in a hover-only `title` on the label, which never showed on touch. */}
             <p className="mt-2 text-fluid-nano text-white/45">
+              {OPERATING_LATITUDE_LABEL} is calculated from funding pressure and risk appetite, and
+              reads as the room to hire, spend, and commit this week.
+            </p>
+            <p className="mt-1 text-fluid-nano text-white/45">
               Unfamiliar with a term here? <GlossaryLink>Open the glossary</GlossaryLink>
             </p>
           </UrlDetails>

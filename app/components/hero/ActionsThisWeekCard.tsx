@@ -94,9 +94,6 @@ export function ActionsThisWeekCard({
             <output className="sr-only" aria-live="polite">
               {didCopy ? "Actions list copied." : didFail ? "Copy failed. Select the actions text to copy it manually." : ""}
             </output>
-            <span className="text-xs font-medium text-slate-400 hidden sm:inline">
-              Turn insight into progress
-            </span>
           </div>
         </div>
 
