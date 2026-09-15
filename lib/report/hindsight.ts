@@ -1,5 +1,6 @@
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeKey } from "../regimeEngineCore";
+import type { RegimeStateTransition } from "./regimeStateMachine";
 
 /**
  * Last week, in hindsight — computed, never typed.
@@ -21,6 +22,15 @@ export type HindsightInput = {
   deltas: { tightness?: number; riskAppetite?: number };
   thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
   recordDateLabel: string;
+  /**
+   * The governed transition behind the published call. A crossing does not
+   * change the call by itself: the state machine holds the committed regime
+   * behind a confirmation gate, so a week can cross a line while the call
+   * stays where it was. Without this the headline reads every crossing as a
+   * flip, and on 2026-09-15 it published "A line was crossed. The call is
+   * Sunny now." over readings the machine had already classified as Freezing.
+   */
+  regimeTransition?: Pick<RegimeStateTransition, "pending" | "candidateState" | "transitionPendingCount">;
 };
 
 export type HindsightLine = {
@@ -43,6 +53,8 @@ export type Hindsight = {
   anyCrossed: boolean;
   /** True when neither score moved at all, so there is nothing to grade. */
   quiet: boolean;
+  /** The regime the readings classify into while the call is held, or null when they agree. */
+  pendingLabel: string | null;
   headline: string;
   detail: string;
 };
@@ -90,18 +102,36 @@ export const buildHindsight = (input: HindsightInput): Hindsight => {
     .map((line) => `${line.label} ${line.previous} → ${line.current}`)
     .join(", ");
 
+  const transition = input.regimeTransition;
+  const pendingCandidate =
+    transition?.pending && transition.candidateState !== input.regime ? transition.candidateState : null;
+  const pendingLabel = pendingCandidate ? getRegimePublicLabel(pendingCandidate) : null;
+  const pendingReads = transition?.transitionPendingCount ?? 1;
+
   const headline = quiet
     ? `Nothing moved. The read is still ${regimeLabel}.`
     : anyCrossed
-      ? `A line was crossed. The call is ${regimeLabel} now.`
-      : `The call held. Still ${regimeLabel}.`;
+      ? pendingLabel
+        ? `A line was crossed. The call holds at ${regimeLabel} until the next read confirms ${pendingLabel}.`
+        : `A line was crossed. The call is ${regimeLabel} now.`
+      : pendingLabel
+        ? `The call held at ${regimeLabel}. The readings still say ${pendingLabel}.`
+        : `The call held. Still ${regimeLabel}.`;
+
+  // A flip that has waited more than one read is not waiting on the gate any
+  // more; it is blocked by low confidence, and the reader is owed that reason.
+  const pendingClause = pendingLabel
+    ? pendingReads >= 2
+      ? ` The flip to ${pendingLabel} has waited ${pendingReads} reads for confidence to clear.`
+      : ` The flip to ${pendingLabel} is waiting on a confirming read.`
+    : "";
 
   const nearest = [...lines].sort((a, b) => a.room - b.room)[0];
   const detail = quiet
     ? `Both scores match last week, so every rule still stands.`
     : anyCrossed
-      ? `${movement}. ${lines.filter((l) => l.crossed).map((l) => `${l.label} went ${l.crossesWhen} ${l.line}`).join("; ")}.`
-      : `${movement}. The lines were ${lines[0].line} and ${lines[1].line}; neither was reached. Closest is ${nearest.label.toLowerCase()}, ${Math.abs(nearest.room)} pts from its line.`;
+      ? `${movement}. ${lines.filter((l) => l.crossed).map((l) => `${l.label} went ${l.crossesWhen} ${l.line}`).join("; ")}.${pendingClause}`
+      : `${movement}. The lines were ${lines[0].line} and ${lines[1].line}; neither was reached. Closest is ${nearest.label.toLowerCase()}, ${Math.abs(nearest.room)} pts from its line.${pendingClause}`;
 
-  return { regimeLabel, previous, lines, anyCrossed, quiet, headline, detail };
+  return { regimeLabel, previous, lines, anyCrossed, quiet, pendingLabel, headline, detail };
 };

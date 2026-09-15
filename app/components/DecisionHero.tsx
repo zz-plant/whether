@@ -29,6 +29,7 @@ import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
+import { describeInputMovement } from "../../lib/report/inputMovement";
 import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight, Info } from "lucide-react";
 import { WeatherLandscapeArtwork } from "./hero/WeatherLandscapeArtwork";
 
@@ -411,7 +412,7 @@ export function DecisionHero({
             </p>
 
             <p className="text-xs font-medium text-slate-400">
-              {postureLabel ? `${postureLabel} posture with steady inputs.` : "Steady posture with tightening inputs."}
+              {`${postureLabel || "Steady"} posture with ${describeInputMovement(tightnessDelta, riskAppetiteDelta ?? 0)}.`}
             </p>
           </div>
 

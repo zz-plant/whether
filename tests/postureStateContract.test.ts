@@ -127,3 +127,53 @@ describe("posture state contract consumers", () => {
     );
   });
 });
+
+describe("posture state contract under a held call", () => {
+  it("carries the pending transition the machine is holding", () => {
+    // 2026-09-15: committed EXPANSION, candidate SCARCITY at 1/2. The contract
+    // reported regime EXPANSION and transition watch OFF, with nothing to say the
+    // readings had already crossed.
+    const held: RegimeAssessment = {
+      ...assessment,
+      regime: "EXPANSION",
+      scores: { ...assessment.scores, tightness: 77, riskAppetite: 42 },
+      diagnostics: { ...assessment.diagnostics, nearestThresholdDelta: 7, confidence: "MEDIUM", transitionWatch: false },
+      regimeTransition: {
+        nextState: "EXPANSION",
+        candidateState: "SCARCITY",
+        committed: false,
+        pending: true,
+        transitionReason: "Risk appetite crossed below 50. Transition pending confidence gate (1/2).",
+        transitionPendingCount: 1,
+        snapshot: { committedState: "EXPANSION", pendingState: "SCARCITY", pendingCount: 1 },
+      },
+    };
+
+    const postureState = buildPostureStateContract({
+      assessment: held,
+      recordDate: "2026-09-11",
+      postureLabel: "Sunny",
+      decisionEventStore: [],
+    });
+
+    assert.equal(postureState.currentState.regime, "EXPANSION");
+    assert.equal(postureState.currentState.transitionWatch, "OFF");
+    assert.deepEqual(postureState.pendingTransition, {
+      candidate: "SCARCITY",
+      candidateLabel: "Freezing",
+      pendingCount: 1,
+      reason: "Risk appetite crossed below 50. Transition pending confidence gate (1/2).",
+    });
+  });
+
+  it("reports null when the readings agree with the call", () => {
+    const postureState = buildPostureStateContract({
+      assessment,
+      recordDate: "2026-03-01",
+      postureLabel: "Cloudy",
+      decisionEventStore: [],
+    });
+
+    assert.equal(postureState.pendingTransition, null);
+  });
+});

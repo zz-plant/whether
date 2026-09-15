@@ -130,27 +130,55 @@ const buildDecisionDelta = (assessment: RegimeAssessment, support: AgentDecision
   };
 };
 
-const buildFlipWatch = (assessment: RegimeAssessment, support: AgentDecisionSupport) => ({
-  summary:
+/**
+ * The governed transition the state machine is holding, if any. The near-band
+ * `transition_watch` flag only knows distance from a line; a reading that has
+ * already crossed and is waiting on the confirmation gate sits *past* the band,
+ * so the watch reads OFF at the exact moment the call is most likely to flip.
+ * Agents consuming `regime.key` alone would otherwise act on a call the machine
+ * has already contradicted.
+ */
+const resolvePendingTransition = (assessment: RegimeAssessment) => {
+  const transition = assessment.regimeTransition;
+  if (!transition?.pending || transition.candidateState === assessment.regime) {
+    return null;
+  }
+  return {
+    candidate: transition.candidateState,
+    candidate_label: getRegimePublicLabel(transition.candidateState),
+    pending_count: transition.transitionPendingCount ?? 1,
+    reason: transition.transitionReason,
+  };
+};
+
+const buildFlipWatch = (assessment: RegimeAssessment, support: AgentDecisionSupport) => {
+  const pendingTransition = resolvePendingTransition(assessment);
+  const watchSummary =
     support.postureState.currentState.transitionWatch === "ON"
       ? `Transition watch is ON. ${support.postureState.whatFlipsNext.flipTrigger}`
-      : `Transition watch is OFF. Primary trigger: ${support.postureState.whatFlipsNext.flipTrigger}`,
-  transition_watch: support.postureState.currentState.transitionWatch,
-  nearest_threshold_delta: Number(assessment.diagnostics.nearestThresholdDelta.toFixed(2)),
-  boundary_contributors: assessment.diagnostics.boundaryContributors,
-  weak_read_count: assessment.diagnostics.weakReadCount,
-  two_weak_reads_warning: assessment.diagnostics.twoWeakReadsWarning,
-  flip_trigger: support.postureState.whatFlipsNext.flipTrigger,
-  thresholds: [...support.postureState.whatFlipsNext.thresholds],
-  reversal_conditions: [...support.postureState.whatFlipsNext.reversalConditions],
-  last_committed_change: {
-    timestamp: support.postureState.lastCommittedChangeEvent.timestamp,
-    from_state: support.postureState.lastCommittedChangeEvent.fromState,
-    to_state: support.postureState.lastCommittedChangeEvent.toState,
-    reason: support.postureState.lastCommittedChangeEvent.reason,
-    source: support.postureState.lastCommittedChangeEvent.source,
-  },
-});
+      : `Transition watch is OFF. Primary trigger: ${support.postureState.whatFlipsNext.flipTrigger}`;
+  return {
+    summary: pendingTransition
+      ? `Flip to ${pendingTransition.candidate_label} is pending confirmation; the call holds at ${getRegimePublicLabel(assessment.regime)} until the next read confirms it. ${pendingTransition.reason} ${watchSummary}`
+      : watchSummary,
+    pending_transition: pendingTransition,
+    transition_watch: support.postureState.currentState.transitionWatch,
+    nearest_threshold_delta: Number(assessment.diagnostics.nearestThresholdDelta.toFixed(2)),
+    boundary_contributors: assessment.diagnostics.boundaryContributors,
+    weak_read_count: assessment.diagnostics.weakReadCount,
+    two_weak_reads_warning: assessment.diagnostics.twoWeakReadsWarning,
+    flip_trigger: support.postureState.whatFlipsNext.flipTrigger,
+    thresholds: [...support.postureState.whatFlipsNext.thresholds],
+    reversal_conditions: [...support.postureState.whatFlipsNext.reversalConditions],
+    last_committed_change: {
+      timestamp: support.postureState.lastCommittedChangeEvent.timestamp,
+      from_state: support.postureState.lastCommittedChangeEvent.fromState,
+      to_state: support.postureState.lastCommittedChangeEvent.toState,
+      reason: support.postureState.lastCommittedChangeEvent.reason,
+      source: support.postureState.lastCommittedChangeEvent.source,
+    },
+  };
+};
 
 export const buildAgentPayload = (
   assessment: RegimeAssessment,

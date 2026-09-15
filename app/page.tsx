@@ -577,6 +577,7 @@ async function PageContent({
                 deltas: { tightness: tightnessDelta, riskAppetite: riskAppetiteDelta },
                 thresholds: reportData.assessment.thresholds,
                 recordDateLabel: homepage.reportShell.recordDateLabel,
+                regimeTransition: reportData.assessment.regimeTransition,
               }}
             />
           </div>

@@ -1,4 +1,5 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { PostureDecisionEvent } from "../storage/postureDecisionEventRepository";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import { type RuleCondition } from "./boundedDecisionRules";
@@ -26,6 +27,20 @@ export type PostureStateContract = {
     thresholdLines?: readonly (readonly RuleCondition[])[];
     reversalConditions: readonly string[];
   };
+  /**
+   * Set while the state machine holds the published call behind its
+   * confirmation gate: the readings classify as `candidate`, and the call has
+   * not flipped. Null when the readings and the call agree. Consumers that
+   * only read `currentState.regime` otherwise publish a call the machine has
+   * already contradicted, with nothing in the contract to say so.
+   */
+  pendingTransition?: {
+    candidate: RegimeKey;
+    candidateLabel: string;
+    /** Consecutive reads the candidate has held; two or more while pending means confidence is blocking. */
+    pendingCount: number;
+    reason: string;
+  } | null;
 };
 
 const resolveConfidence = (assessment: RegimeAssessment) => {
@@ -61,8 +76,19 @@ export const buildPostureStateContract = ({
 
   const latestEvent = decisionEventStore[0];
   const committedTransition = assessment.regimeTransition?.committed ? assessment.regimeTransition : null;
+  const transition = assessment.regimeTransition;
+  const pendingTransition =
+    transition?.pending && transition.candidateState !== assessment.regime
+      ? {
+          candidate: transition.candidateState,
+          candidateLabel: getRegimePublicLabel(transition.candidateState),
+          pendingCount: transition.transitionPendingCount ?? 1,
+          reason: transition.transitionReason,
+        }
+      : null;
 
   return {
+    pendingTransition,
     currentState: {
       regime: assessment.regime,
       postureLabel,
