@@ -260,7 +260,7 @@ export const SignalsEvidencePrioritiesSection = ({
 }) => (
   <section
     id="evidence-priorities"
-    className="weather-panel scroll-mt-28 space-y-4 px-6 py-5"
+    className="weather-panel space-y-4 px-6 py-5"
     aria-label="Signal diagnostics queue"
   >
     <header className="space-y-2">

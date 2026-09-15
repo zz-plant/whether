@@ -142,7 +142,7 @@ export default async function SharePage() {
         {/* Role memos are share formats. They sat under the sixth collapsed
             section of /operate, where nobody planning a week went looking for
             a CFO memo; they belong beside Slack, email and the meeting pack. */}
-        <div id="role-memos" className="scroll-mt-28 space-y-3">
+        <div id="role-memos" className="space-y-3">
           <h2 className="type-eyebrow">Brief your team by role</h2>
           <ExecutiveBriefingPanel
             assessment={artifact.assessment}
@@ -163,7 +163,7 @@ export default async function SharePage() {
       </section>
 
       {/* Anchored so the retired /embed route lands on it. */}
-      <section id="embed" className="weather-panel scroll-mt-28 px-5 py-5">
+      <section id="embed" className="weather-panel px-5 py-5">
         <EmbedBuilder />
       </section>
 

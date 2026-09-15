@@ -9,7 +9,7 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
     <section
       id="fossil-record"
       aria-labelledby="fossil-record-title"
-      className="weather-panel scroll-mt-28 space-y-5 p-5"
+      className="weather-panel space-y-5 p-5"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>

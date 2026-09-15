@@ -157,7 +157,7 @@ export function OperationsExecutionStepper({
             <section
               key={step.id}
               id={step.id}
-              className={`weather-step-panel scroll-mt-28 space-y-4 rounded-xl border p-4 sm:p-5 transition-all ${activeClass}`}
+              className={`weather-step-panel space-y-4 rounded-xl border p-4 sm:p-5 transition-all ${activeClass}`}
             >
               {/* The rule divides the header from the step body, so a closed step
                   drew a divider with nothing under it. */}

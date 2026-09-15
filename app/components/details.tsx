@@ -42,7 +42,7 @@ export const Details = ({
 }: DetailsProps) => (
   <details
     id={id}
-    className={`weather-auto-chevron ${variantClasses[variant]} scroll-mt-28 px-4 py-4 ${className ?? ""}`}
+    className={`weather-auto-chevron ${variantClasses[variant]} px-4 py-4 ${className ?? ""}`}
     open={open}
   >
     <summary className="select-none">{summary}</summary>

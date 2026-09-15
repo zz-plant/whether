@@ -6,7 +6,7 @@ import {
 } from "../../../lib/report/reportCopy";
 
 export const BeginnerGlossaryPanel = () => (
-  <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10 scroll-mt-28">
+  <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
     <div className="weather-panel weather-panel-static p-6">
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-start">
         <div>

@@ -102,7 +102,6 @@ svg :where(.type-eyebrow, .type-badge) {
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
-  scroll-margin-top: 72px;
   text-wrap: balance;
 }
 
@@ -132,8 +131,15 @@ summary {
   -webkit-tap-highlight-color: rgba(15, 23, 42, 0.6);
 }
 
+/* The one anchor offset. Every way a target reaches the top of the viewport — a hash link,
+   J/K, focus(), scrollIntoView — aligns it to this padding edge, so it is the only place the
+   sticky stack is described: 7rem clears the tallest global header (the two-row one on
+   /trust at 108px) and a section-chip row (54px) under the hidden mobile header.
+   Nothing else may add `scroll-margin-top`: scroll-padding and scroll-margin are additive,
+   and until 2026-09-15 headings carried 72px and every section 112px on top of an 80px
+   padding here, so a tapped section landed a quarter of a phone screen down. */
 html {
-  scroll-padding-top: calc(env(safe-area-inset-top) + 5rem);
+  scroll-padding-top: calc(env(safe-area-inset-top) + 7rem);
   scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
 

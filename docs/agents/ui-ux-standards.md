@@ -6,6 +6,21 @@
 - MUST: 60fps (16ms) animation budget. If an animation drops frames on a mid-tier device (e.g., standard generic Android), it is removed.
 - NEVER: Animate width, height, top, left, margin, or padding. Only animate transform and opacity.
 - NEVER: Use JavaScript for layout that CSS can achieve (e.g., masonry, grid alignment, aspect ratios).
+- MUST: One anchor offset. The sticky stack is described once, as `scroll-padding-top` on
+  `html` in `app/styles/typography.css`, and every way a target reaches the top — a hash link,
+  J/K, `focus()`, `scrollIntoView` — aligns to it. NEVER add `scroll-margin-top` or a `scroll-mt-*`
+  utility to a target: scroll padding and scroll margin are additive, and on 2026-09-15 the app
+  carried both (80px on the root plus 112px on every section and 72px on every heading), so a
+  tapped section landed a quarter of a phone screen down. `tests/scrollHandling.test.ts` fails
+  on any new margin.
+- MUST: A row that keeps its current item in view scrolls itself. Use `scrollRowToItem`
+  (`app/components/scrollRowToItem.ts`), never `scrollIntoView`, which scrolls every ancestor: on
+  a row stuck to the top of the window that meant moving the page 71px whenever the header
+  slid back over it, cutting short the anchor jump the reader had just made.
+- MUST: Every JS-driven scroll honours `prefers-reduced-motion`. Pass `scrollBehaviorFor(true)`
+  rather than a literal `"smooth"`; the CSS `scroll-behavior: auto` override under reduced motion
+  does not reach a `behavior` argument. Focus with `preventScroll: true` before a programmatic
+  scroll, or the key press moves twice.
 
 ## II. Strict accessibility (the "no mouse" rule)
 - MUST: Pass the "Unplugged Mouse" Test. The entire feature must work with only a keyboard.

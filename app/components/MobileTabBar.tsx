@@ -171,7 +171,7 @@ export function MobileTabBar() {
           <Drawer.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
           {/* Viewport is what gives the sheet its swipe-to-dismiss and scroll lock. */}
           <Drawer.Viewport className="fixed inset-0 z-50 flex items-end md:hidden">
-            <Drawer.Popup className="w-full max-h-[85vh] overflow-y-auto rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-lg">
+            <Drawer.Popup className="w-full max-h-[85vh] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-lg">
               <MobileNavContent
                 loopLinks={loopLinks}
                 currentPathname={pathname}

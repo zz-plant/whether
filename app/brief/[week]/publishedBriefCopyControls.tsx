@@ -118,7 +118,7 @@ export function PublishedBriefCopyControls({
             overlay scrollbars stay hidden until you scroll, so the block just
             appeared sliced in half on the most linkable page on the site. */}
         <div className="relative">
-          <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200 font-mono">
+          <pre className="max-h-64 overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200 font-mono">
             {activeText}
           </pre>
           <div

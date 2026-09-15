@@ -141,7 +141,7 @@ export function ShareCopyControls({
           </span>
         </div>
         {copyError ? <p className="text-xs text-amber-200">{copyError}</p> : null}
-        <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200">
+        <pre className="max-h-[32rem] overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200">
           {slackBrief}
         </pre>
       </article>

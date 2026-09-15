@@ -88,7 +88,7 @@ export function TimeMachineCalendarPicker({
       {open && (
         <div
           aria-label="Select brief period"
-          className="absolute left-0 top-full mt-2 z-50 w-80 max-h-96 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+          className="absolute left-0 top-full mt-2 z-50 w-80 max-h-96 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
         >
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08]">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
