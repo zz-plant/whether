@@ -7,17 +7,20 @@ import type { MacroSeriesReading, TreasuryData } from "./types";
 import {
   RISK_APPETITE_EXPLANATION,
   MISSING_SLOPE_FALLBACK,
+  TIGHTNESS_CAP,
   buildRegimeInputs,
   buildTightnessExplanation,
+  computeBaseRateVelocityPoints,
   computeCurveSlope,
   computeRiskAppetiteScore,
-  TIGHTNESS_CAP,
   computeTightnessPressure,
   computeTightnessScore,
   getBaseRate,
   getRegimeProfile,
   resolveThresholds,
   type RegimeAssessment,
+  type RegimeDiagnostics,
+  type RegimeEvaluationContext,
   type RegimeThresholds,
 } from "./regimeEngineCore";
 import {
@@ -42,6 +45,7 @@ export const evaluateRegime = (
   overrides?: Partial<RegimeThresholds>,
   macroSeries: MacroSeriesReading[] = [],
   previousMachineState: RegimeMachineSnapshot | null = null,
+  context: RegimeEvaluationContext = {},
 ): RegimeAssessment => {
   const dataWarnings: string[] = [];
   const baseRate = getBaseRate(treasury.yields);
@@ -56,6 +60,13 @@ export const evaluateRegime = (
     dataWarnings.push("Curve slope missing; defaulted to cautious floor for scoring.");
   }
 
+  const velocity = computeBaseRateVelocityPoints(context.baseRateHistory);
+  if (velocity.points > 0) {
+    dataWarnings.push(
+      `Tightening-speed term active: the base rate moved ${velocity.delta?.toFixed(2)}% over its trailing window, contributing ${velocity.points} tightness points.`,
+    );
+  }
+
   const baseRateForScore =
     baseRate.used === "MISSING" ? thresholds.baseRateTightness : baseRate.value;
   const curveSlopeForScore = curveSlope ?? MISSING_SLOPE_FALLBACK;
@@ -64,16 +75,23 @@ export const evaluateRegime = (
     baseRateForScore,
     curveSlopeForScore,
     thresholds.baseRateTightness,
+    velocity.points,
   );
   const tightnessPressure = computeTightnessPressure(
     baseRateForScore,
     curveSlopeForScore,
     thresholds.baseRateTightness,
+    velocity.points,
   );
   const baselineRiskAppetite = computeRiskAppetiteScore(curveSlopeForScore);
   const macroAdjusted = applyMacroAdjustments(baselineTightness, baselineRiskAppetite, macroSeries);
   const tightness = macroAdjusted.tightness;
   const riskAppetite = macroAdjusted.riskAppetite;
+  if (macroAdjusted.marketStressVetoApplied) {
+    dataWarnings.push(
+      "Market stress veto is capping the risk-appetite score: realized volatility, not the curve, is setting the ceiling.",
+    );
+  }
   const diagnostics = computeDiagnostics(
     tightness,
     riskAppetite,
@@ -88,6 +106,26 @@ export const evaluateRegime = (
     thresholds,
     diagnostics,
   });
+  /**
+   * A shock crossing commits without the confirmation gate because the axis
+   * jumped its line from beyond the near-band — exactly the case where no
+   * published reversal condition can have fired. Publishing that flip at the
+   * distance-derived confidence would dress an unconfirmed call in a confirmed
+   * flavor, so the call is downgraded and flagged for the surfaces to name.
+   */
+  if (regimeTransition.shock) {
+    dataWarnings.push(
+      "Shock crossing: the published reversal condition did not fire, so this flip is unconfirmed until the next read.",
+    );
+  }
+  const diagnosticsWithShock: RegimeDiagnostics = regimeTransition.shock
+    ? {
+        ...diagnostics,
+        confidence: "LOW",
+        transitionWatch: true,
+        shockCrossing: true,
+      }
+    : diagnostics;
   const regime = regimeTransition.nextState;
   const profile = getRegimeProfile(regime);
   const policyAssessment = computePolicyAssessment(
@@ -109,8 +147,12 @@ export const evaluateRegime = (
       baseRateUsed: baseRate.used,
       baseRate: baseRate.value,
       curveSlope,
+      baseRateVelocityPoints: velocity.points,
+      // Set only when measured: a JSON round-trip drops undefined keys, and a
+      // snapshot that re-reads must equal the one that was written.
+      ...(velocity.delta === null ? {} : { baseRateVelocityDelta: velocity.delta }),
     },
-    diagnostics,
+    diagnostics: diagnosticsWithShock,
     description: profile.description,
     constraints: profile.constraints,
     tightnessExplanation: buildTightnessExplanation(thresholds),

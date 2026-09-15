@@ -60,9 +60,33 @@ export const buildWeeklyConfidenceSeries = ({
     new Map(snapshotsBeforeAsOf.map((snapshot) => [snapshot.record_date, snapshot])).values(),
   );
 
+  /**
+   * The tightening-speed term reads the trailing base-rate window, and these
+   * snapshots carry none (monthly cache entries) — so the window is cut from
+   * the series' own one-month values, the same way the analog builder does it.
+   * Without this, confidence for a tightening month measured a distance the
+   * governed record never published.
+   */
+  const baseRateSeries = deduped.map((snapshot) => ({
+    date: snapshot.record_date,
+    value: snapshot.yields.oneMonth ?? null,
+  }));
+  const velocityWindowFor = (recordDate: string) => {
+    const atMs = Date.parse(`${recordDate}T00:00:00.000Z`);
+    const cutoffMs = atMs - 130 * 24 * 60 * 60 * 1000;
+    return baseRateSeries.filter((point) => {
+      const pointMs = Date.parse(`${point.date}T00:00:00.000Z`);
+      return pointMs <= atMs && pointMs >= cutoffMs;
+    });
+  };
+
   const actualPoints = deduped.map((snapshot) => ({
     recordDate: snapshot.record_date,
-    confidencePercent: resolveConfidencePercent(evaluateRegime(snapshot, thresholds)),
+    confidencePercent: resolveConfidencePercent(
+      evaluateRegime(snapshot, thresholds, [], null, {
+        baseRateHistory: velocityWindowFor(snapshot.record_date),
+      }),
+    ),
     isMissing: false,
   }));
 

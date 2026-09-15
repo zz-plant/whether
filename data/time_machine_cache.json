@@ -2,9 +2,10 @@
   {
     "year": 2012,
     "month": 1,
+    "vix": 19.44,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -16,9 +17,10 @@
   {
     "year": 2012,
     "month": 2,
+    "vix": 18.43,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-02-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -30,9 +32,10 @@
   {
     "year": 2012,
     "month": 3,
+    "vix": 15.5,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-03-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -44,9 +47,10 @@
   {
     "year": 2012,
     "month": 4,
+    "vix": 17.15,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -58,9 +62,10 @@
   {
     "year": 2012,
     "month": 5,
+    "vix": 24.06,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -72,9 +77,10 @@
   {
     "year": 2012,
     "month": 6,
+    "vix": 17.08,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-06-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -86,9 +92,10 @@
   {
     "year": 2012,
     "month": 7,
+    "vix": 18.93,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -100,9 +107,10 @@
   {
     "year": 2012,
     "month": 8,
+    "vix": 17.47,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.09,
@@ -114,9 +122,10 @@
   {
     "year": 2012,
     "month": 9,
+    "vix": 15.73,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-09-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.06,
@@ -128,9 +137,10 @@
   {
     "year": 2012,
     "month": 10,
+    "vix": 18.6,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.09,
@@ -142,9 +152,10 @@
   {
     "year": 2012,
     "month": 11,
+    "vix": 15.87,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.11,
@@ -156,9 +167,10 @@
   {
     "year": 2012,
     "month": 12,
+    "vix": 18.02,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -170,9 +182,10 @@
   {
     "year": 2013,
     "month": 1,
+    "vix": 14.28,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -184,9 +197,10 @@
   {
     "year": 2013,
     "month": 2,
+    "vix": 15.51,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -198,9 +212,10 @@
   {
     "year": 2013,
     "month": 3,
+    "vix": 0,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-03-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -212,9 +227,10 @@
   {
     "year": 2013,
     "month": 4,
+    "vix": 13.52,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -226,9 +242,10 @@
   {
     "year": 2013,
     "month": 5,
+    "vix": 16.3,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -240,9 +257,10 @@
   {
     "year": 2013,
     "month": 6,
+    "vix": 16.86,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-06-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -254,9 +272,10 @@
   {
     "year": 2013,
     "month": 7,
+    "vix": 13.45,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -268,9 +287,10 @@
   {
     "year": 2013,
     "month": 8,
+    "vix": 17.01,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-08-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -282,9 +302,10 @@
   {
     "year": 2013,
     "month": 9,
+    "vix": 16.6,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -296,9 +317,10 @@
   {
     "year": 2013,
     "month": 10,
+    "vix": 13.75,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -310,9 +332,10 @@
   {
     "year": 2013,
     "month": 11,
+    "vix": 13.7,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-11-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -324,9 +347,10 @@
   {
     "year": 2013,
     "month": 12,
+    "vix": 13.72,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -338,9 +362,10 @@
   {
     "year": 2014,
     "month": 1,
+    "vix": 18.41,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -352,9 +377,10 @@
   {
     "year": 2014,
     "month": 2,
+    "vix": 14,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -366,9 +392,10 @@
   {
     "year": 2014,
     "month": 3,
+    "vix": 13.88,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -380,9 +407,10 @@
   {
     "year": 2014,
     "month": 4,
+    "vix": 13.41,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -394,9 +422,10 @@
   {
     "year": 2014,
     "month": 5,
+    "vix": 11.4,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-05-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -408,9 +437,10 @@
   {
     "year": 2014,
     "month": 6,
+    "vix": 11.57,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -422,9 +452,10 @@
   {
     "year": 2014,
     "month": 7,
+    "vix": 16.95,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -436,9 +467,10 @@
   {
     "year": 2014,
     "month": 8,
+    "vix": 11.98,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-08-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -450,9 +482,10 @@
   {
     "year": 2014,
     "month": 9,
+    "vix": 16.31,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -464,9 +497,10 @@
   {
     "year": 2014,
     "month": 10,
+    "vix": 14.03,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -478,9 +512,10 @@
   {
     "year": 2014,
     "month": 11,
+    "vix": 13.33,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-11-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -492,9 +527,10 @@
   {
     "year": 2014,
     "month": 12,
+    "vix": 19.2,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -506,9 +542,10 @@
   {
     "year": 2015,
     "month": 1,
+    "vix": 20.97,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-01-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -520,9 +557,10 @@
   {
     "year": 2015,
     "month": 2,
+    "vix": 13.34,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-02-27",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -534,9 +572,10 @@
   {
     "year": 2015,
     "month": 3,
+    "vix": 15.29,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -548,9 +587,10 @@
   {
     "year": 2015,
     "month": 4,
+    "vix": 14.55,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -562,9 +602,10 @@
   {
     "year": 2015,
     "month": 5,
+    "vix": 13.84,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-05-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -576,9 +617,10 @@
   {
     "year": 2015,
     "month": 6,
+    "vix": 18.23,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -590,9 +632,10 @@
   {
     "year": 2015,
     "month": 7,
+    "vix": 12.12,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -604,9 +647,10 @@
   {
     "year": 2015,
     "month": 8,
+    "vix": 28.43,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -618,9 +662,10 @@
   {
     "year": 2015,
     "month": 9,
+    "vix": 24.5,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -632,9 +677,10 @@
   {
     "year": 2015,
     "month": 10,
+    "vix": 15.07,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-10-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -646,9 +692,10 @@
   {
     "year": 2015,
     "month": 11,
+    "vix": 16.13,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.11,
@@ -660,9 +707,10 @@
   {
     "year": 2015,
     "month": 12,
+    "vix": 18.21,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.14,
@@ -674,9 +722,10 @@
   {
     "year": 2016,
     "month": 1,
+    "vix": 20.2,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-01-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.22,
@@ -688,9 +737,10 @@
   {
     "year": 2016,
     "month": 2,
+    "vix": 20.55,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-02-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.23,
@@ -702,9 +752,10 @@
   {
     "year": 2016,
     "month": 3,
+    "vix": 13.95,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.18,
@@ -716,9 +767,10 @@
   {
     "year": 2016,
     "month": 4,
+    "vix": 15.7,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-04-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.16,
@@ -730,9 +782,10 @@
   {
     "year": 2016,
     "month": 5,
+    "vix": 14.19,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.27,
@@ -744,9 +797,10 @@
   {
     "year": 2016,
     "month": 6,
+    "vix": 15.63,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.2,
@@ -758,9 +812,10 @@
   {
     "year": 2016,
     "month": 7,
+    "vix": 11.87,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-07-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.19,
@@ -772,9 +827,10 @@
   {
     "year": 2016,
     "month": 8,
+    "vix": 13.42,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.26,
@@ -786,9 +842,10 @@
   {
     "year": 2016,
     "month": 9,
+    "vix": 13.29,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.2,
@@ -800,9 +857,10 @@
   {
     "year": 2016,
     "month": 10,
+    "vix": 17.06,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.2,
@@ -814,9 +872,10 @@
   {
     "year": 2016,
     "month": 11,
+    "vix": 13.33,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.38,
@@ -828,9 +887,10 @@
   {
     "year": 2016,
     "month": 12,
+    "vix": 14.04,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-12-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.44,
@@ -842,9 +902,10 @@
   {
     "year": 2017,
     "month": 1,
+    "vix": 11.99,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.5,
@@ -856,9 +917,10 @@
   {
     "year": 2017,
     "month": 2,
+    "vix": 12.92,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.4,
@@ -870,9 +932,10 @@
   {
     "year": 2017,
     "month": 3,
+    "vix": 12.37,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.74,
@@ -884,9 +947,10 @@
   {
     "year": 2017,
     "month": 4,
+    "vix": 10.82,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-04-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.68,
@@ -898,9 +962,10 @@
   {
     "year": 2017,
     "month": 5,
+    "vix": 10.41,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.86,
@@ -912,9 +977,10 @@
   {
     "year": 2017,
     "month": 6,
+    "vix": 11.18,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.84,
@@ -926,9 +992,10 @@
   {
     "year": 2017,
     "month": 7,
+    "vix": 10.26,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1,
@@ -940,9 +1007,10 @@
   {
     "year": 2017,
     "month": 8,
+    "vix": 10.59,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.95,
@@ -954,9 +1022,10 @@
   {
     "year": 2017,
     "month": 9,
+    "vix": 9.51,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-09-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.96,
@@ -968,9 +1037,10 @@
   {
     "year": 2017,
     "month": 10,
+    "vix": 10.18,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.99,
@@ -982,9 +1052,10 @@
   {
     "year": 2017,
     "month": 11,
+    "vix": 11.28,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.14,
@@ -996,9 +1067,10 @@
   {
     "year": 2017,
     "month": 12,
+    "vix": 11.04,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-12-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.28,
@@ -1010,9 +1082,10 @@
   {
     "year": 2018,
     "month": 1,
+    "vix": 13.54,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.43,
@@ -1024,9 +1097,10 @@
   {
     "year": 2018,
     "month": 2,
+    "vix": 19.85,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.5,
@@ -1038,9 +1112,10 @@
   {
     "year": 2018,
     "month": 3,
+    "vix": 0,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-03-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -1052,9 +1127,10 @@
   {
     "year": 2018,
     "month": 4,
+    "vix": 15.93,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.65,
@@ -1066,9 +1142,10 @@
   {
     "year": 2018,
     "month": 5,
+    "vix": 15.43,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.76,
@@ -1080,9 +1157,10 @@
   {
     "year": 2018,
     "month": 6,
+    "vix": 16.09,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-06-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.77,
@@ -1094,9 +1172,10 @@
   {
     "year": 2018,
     "month": 7,
+    "vix": 12.83,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.94,
@@ -1108,9 +1187,10 @@
   {
     "year": 2018,
     "month": 8,
+    "vix": 12.86,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.95,
@@ -1122,9 +1202,10 @@
   {
     "year": 2018,
     "month": 9,
+    "vix": 12.12,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-09-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.12,
@@ -1136,9 +1217,10 @@
   {
     "year": 2018,
     "month": 10,
+    "vix": 21.23,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.2,
@@ -1150,9 +1232,10 @@
   {
     "year": 2018,
     "month": 11,
+    "vix": 18.07,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.31,
@@ -1164,9 +1247,10 @@
   {
     "year": 2018,
     "month": 12,
+    "vix": 25.42,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.44,
@@ -1178,9 +1262,10 @@
   {
     "year": 2019,
     "month": 1,
+    "vix": 16.57,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.42,
@@ -1192,9 +1277,10 @@
   {
     "year": 2019,
     "month": 2,
+    "vix": 14.78,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.44,
@@ -1206,9 +1292,10 @@
   {
     "year": 2019,
     "month": 3,
+    "vix": 13.71,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-03-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.43,
@@ -1220,9 +1307,10 @@
   {
     "year": 2019,
     "month": 4,
+    "vix": 13.12,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.43,
@@ -1234,9 +1322,10 @@
   {
     "year": 2019,
     "month": 5,
+    "vix": 18.71,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.35,
@@ -1248,9 +1337,10 @@
   {
     "year": 2019,
     "month": 6,
+    "vix": 15.08,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-06-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.18,
@@ -1262,9 +1352,10 @@
   {
     "year": 2019,
     "month": 7,
+    "vix": 16.12,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.01,
@@ -1276,9 +1367,10 @@
   {
     "year": 2019,
     "month": 8,
+    "vix": 18.98,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-08-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.1,
@@ -1290,9 +1382,10 @@
   {
     "year": 2019,
     "month": 9,
+    "vix": 16.24,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.91,
@@ -1304,9 +1397,10 @@
   {
     "year": 2019,
     "month": 10,
+    "vix": 13.22,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.59,
@@ -1318,9 +1412,10 @@
   {
     "year": 2019,
     "month": 11,
+    "vix": 12.62,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-11-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.62,
@@ -1332,9 +1427,10 @@
   {
     "year": 2019,
     "month": 12,
+    "vix": 13.78,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.48,
@@ -1346,9 +1442,10 @@
   {
     "year": 2020,
     "month": 1,
+    "vix": 18.84,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.56,
@@ -1360,9 +1457,10 @@
   {
     "year": 2020,
     "month": 2,
+    "vix": 40.11,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.45,
@@ -1374,9 +1472,10 @@
   {
     "year": 2020,
     "month": 3,
+    "vix": 53.54,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -1388,9 +1487,10 @@
   {
     "year": 2020,
     "month": 4,
+    "vix": 34.15,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.1,
@@ -1402,9 +1502,10 @@
   {
     "year": 2020,
     "month": 5,
+    "vix": 27.51,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-05-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.13,
@@ -1416,9 +1517,10 @@
   {
     "year": 2020,
     "month": 6,
+    "vix": 30.43,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.13,
@@ -1430,9 +1532,10 @@
   {
     "year": 2020,
     "month": 7,
+    "vix": 24.46,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.09,
@@ -1444,9 +1547,10 @@
   {
     "year": 2020,
     "month": 8,
+    "vix": 26.41,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -1458,9 +1562,10 @@
   {
     "year": 2020,
     "month": 9,
+    "vix": 26.37,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -1472,9 +1577,10 @@
   {
     "year": 2020,
     "month": 10,
+    "vix": 38.02,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-10-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -1486,9 +1592,10 @@
   {
     "year": 2020,
     "month": 11,
+    "vix": 20.57,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -1500,9 +1607,10 @@
   {
     "year": 2020,
     "month": 12,
+    "vix": 22.75,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -1514,9 +1622,10 @@
   {
     "year": 2021,
     "month": 1,
+    "vix": 33.09,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-01-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -1528,9 +1637,10 @@
   {
     "year": 2021,
     "month": 2,
+    "vix": 27.95,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-02-26",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -1542,9 +1652,10 @@
   {
     "year": 2021,
     "month": 3,
+    "vix": 19.4,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -1556,9 +1667,10 @@
   {
     "year": 2021,
     "month": 4,
+    "vix": 18.61,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -1570,9 +1682,10 @@
   {
     "year": 2021,
     "month": 5,
+    "vix": 0,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -1584,9 +1697,10 @@
   {
     "year": 2021,
     "month": 6,
+    "vix": 15.83,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -1598,9 +1712,10 @@
   {
     "year": 2021,
     "month": 7,
+    "vix": 18.24,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-07-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -1612,9 +1727,10 @@
   {
     "year": 2021,
     "month": 8,
+    "vix": 16.48,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -1626,9 +1742,10 @@
   {
     "year": 2021,
     "month": 9,
+    "vix": 23.14,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -1640,9 +1757,10 @@
   {
     "year": 2021,
     "month": 10,
+    "vix": 16.26,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-10-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.06,
@@ -1654,9 +1772,10 @@
   {
     "year": 2021,
     "month": 11,
+    "vix": 27.19,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.11,
@@ -1668,9 +1787,10 @@
   {
     "year": 2021,
     "month": 12,
+    "vix": 17.22,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.06,
@@ -1682,9 +1802,10 @@
   {
     "year": 2022,
     "month": 1,
+    "vix": 24.83,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -1696,9 +1817,10 @@
   {
     "year": 2022,
     "month": 2,
+    "vix": 30.15,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.06,
@@ -1710,9 +1832,10 @@
   {
     "year": 2022,
     "month": 3,
+    "vix": 20.56,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.17,
@@ -1724,9 +1847,10 @@
   {
     "year": 2022,
     "month": 4,
+    "vix": 33.4,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-04-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.37,
@@ -1738,9 +1862,10 @@
   {
     "year": 2022,
     "month": 5,
+    "vix": 26.19,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.73,
@@ -1752,9 +1877,10 @@
   {
     "year": 2022,
     "month": 6,
+    "vix": 28.71,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.28,
@@ -1766,9 +1892,10 @@
   {
     "year": 2022,
     "month": 7,
+    "vix": 21.33,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-07-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.22,
@@ -1780,9 +1907,10 @@
   {
     "year": 2022,
     "month": 8,
+    "vix": 25.87,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.4,
@@ -1794,9 +1922,10 @@
   {
     "year": 2022,
     "month": 9,
+    "vix": 31.62,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.79,
@@ -1808,9 +1937,10 @@
   {
     "year": 2022,
     "month": 10,
+    "vix": 25.88,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.73,
@@ -1822,9 +1952,10 @@
   {
     "year": 2022,
     "month": 11,
+    "vix": 20.58,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.07,
@@ -1836,9 +1967,10 @@
   {
     "year": 2022,
     "month": 12,
+    "vix": 21.67,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-12-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.12,
@@ -1850,9 +1982,10 @@
   {
     "year": 2023,
     "month": 1,
+    "vix": 19.4,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.58,
@@ -1864,9 +1997,10 @@
   {
     "year": 2023,
     "month": 2,
+    "vix": 20.7,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.65,
@@ -1878,9 +2012,10 @@
   {
     "year": 2023,
     "month": 3,
+    "vix": 18.7,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.74,
@@ -1892,9 +2027,10 @@
   {
     "year": 2023,
     "month": 4,
+    "vix": 15.78,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-04-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.35,
@@ -1906,9 +2042,10 @@
   {
     "year": 2023,
     "month": 5,
+    "vix": 17.94,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.28,
@@ -1920,9 +2057,10 @@
   {
     "year": 2023,
     "month": 6,
+    "vix": 13.59,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.24,
@@ -1934,9 +2072,10 @@
   {
     "year": 2023,
     "month": 7,
+    "vix": 13.63,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.48,
@@ -1948,9 +2087,10 @@
   {
     "year": 2023,
     "month": 8,
+    "vix": 13.57,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.52,
@@ -1962,9 +2102,10 @@
   {
     "year": 2023,
     "month": 9,
+    "vix": 17.52,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-09-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.55,
@@ -1976,9 +2117,10 @@
   {
     "year": 2023,
     "month": 10,
+    "vix": 18.14,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.56,
@@ -1990,9 +2132,10 @@
   {
     "year": 2023,
     "month": 11,
+    "vix": 12.92,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-11-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.56,
@@ -2004,9 +2147,10 @@
   {
     "year": 2023,
     "month": 12,
+    "vix": 12.45,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-12-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.6,
@@ -2018,9 +2162,10 @@
   {
     "year": 2024,
     "month": 1,
+    "vix": 14.35,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.53,
@@ -2032,9 +2177,10 @@
   {
     "year": 2024,
     "month": 2,
+    "vix": 13.4,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-02-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.53,
@@ -2046,9 +2192,10 @@
   {
     "year": 2024,
     "month": 3,
+    "vix": 0,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-03-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -2060,9 +2207,10 @@
   {
     "year": 2024,
     "month": 4,
+    "vix": 15.65,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.48,
@@ -2074,9 +2222,10 @@
   {
     "year": 2024,
     "month": 5,
+    "vix": 12.92,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-05-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.48,
@@ -2088,9 +2237,10 @@
   {
     "year": 2024,
     "month": 6,
+    "vix": 12.44,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-06-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.47,
@@ -2102,9 +2252,10 @@
   {
     "year": 2024,
     "month": 7,
+    "vix": 16.36,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.49,
@@ -2116,9 +2267,10 @@
   {
     "year": 2024,
     "month": 8,
+    "vix": 15,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-08-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.41,
@@ -2130,9 +2282,10 @@
   {
     "year": 2024,
     "month": 9,
+    "vix": 16.73,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.93,
@@ -2144,9 +2297,10 @@
   {
     "year": 2024,
     "month": 10,
+    "vix": 23.16,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.76,
@@ -2158,9 +2312,10 @@
   {
     "year": 2024,
     "month": 11,
+    "vix": 13.51,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-11-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.76,
@@ -2172,9 +2327,10 @@
   {
     "year": 2024,
     "month": 12,
+    "vix": 17.35,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.4,
@@ -2186,9 +2342,10 @@
   {
     "year": 2025,
     "month": 1,
+    "vix": 16.43,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-01-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.37,
@@ -2200,9 +2357,10 @@
   {
     "year": 2025,
     "month": 2,
+    "vix": 19.63,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-02-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.38,
@@ -2214,9 +2372,10 @@
   {
     "year": 2025,
     "month": 3,
+    "vix": 22.28,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.38,
@@ -2228,9 +2387,10 @@
   {
     "year": 2025,
     "month": 4,
+    "vix": 24.7,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.35,
@@ -2242,9 +2402,10 @@
   {
     "year": 2025,
     "month": 5,
+    "vix": 18.57,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-05-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.33,
@@ -2256,9 +2417,10 @@
   {
     "year": 2025,
     "month": 6,
+    "vix": 16.73,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.28,
@@ -2270,9 +2432,10 @@
   {
     "year": 2025,
     "month": 7,
+    "vix": 16.72,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.49,
@@ -2284,9 +2447,10 @@
   {
     "year": 2025,
     "month": 8,
+    "vix": 15.36,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-08-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.41,
@@ -2298,9 +2462,10 @@
   {
     "year": 2025,
     "month": 9,
+    "vix": 16.28,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-09-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.2,
@@ -2312,9 +2477,10 @@
   {
     "year": 2025,
     "month": 10,
+    "vix": 17.44,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-10-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.06,
@@ -2326,9 +2492,10 @@
   {
     "year": 2025,
     "month": 11,
+    "vix": 16.35,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-11-28",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.05,
@@ -2340,9 +2507,10 @@
   {
     "year": 2025,
     "month": 12,
+    "vix": 14.95,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-12-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.74,
@@ -2354,9 +2522,10 @@
   {
     "year": 2026,
     "month": 1,
+    "vix": 17.44,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-01-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
@@ -2368,9 +2537,10 @@
   {
     "year": 2026,
     "month": 2,
+    "vix": 19.86,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-02-27",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.74,
@@ -2382,9 +2552,10 @@
   {
     "year": 2026,
     "month": 3,
+    "vix": 25.25,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-03-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.74,
@@ -2396,9 +2567,10 @@
   {
     "year": 2026,
     "month": 4,
+    "vix": 16.89,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-04-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
@@ -2410,9 +2582,10 @@
   {
     "year": 2026,
     "month": 5,
+    "vix": 15.32,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-05-29",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
@@ -2424,9 +2597,10 @@
   {
     "year": 2026,
     "month": 6,
+    "vix": 16.45,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-06-30",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.7,
@@ -2438,9 +2612,10 @@
   {
     "year": 2026,
     "month": 7,
+    "vix": 15.99,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-07-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.78,
@@ -2452,9 +2627,10 @@
   {
     "year": 2026,
     "month": 8,
+    "vix": 14.92,
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-08-31",
-    "fetched_at": "2026-09-09T20:02:56.841Z",
+    "fetched_at": "2026-09-14T21:39:29.538Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.85,

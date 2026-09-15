@@ -1,5 +1,6 @@
 import type { MacroSeriesReading } from "./types";
 import {
+  RISK_APPETITE_REGIME_THRESHOLD,
   clamp,
   type RegimeAssessment,
   type RegimeChangeReason,
@@ -40,6 +41,24 @@ const CHICAGO_FCI_TIGHTNESS_CAP = 10;
 const VIX_SHOCK_THRESHOLD = 20;
 const VIX_RISK_APPETITE_MULTIPLIER = 1.5;
 const VIX_RISK_APPETITE_CAP = 20;
+/**
+ * Market-stress veto bands, on the trailing 10-observation VIX mean.
+ *
+ * The haircut above can only subtract 20 points, which is not enough for the
+ * weeks where the haircut and the financing read disagree the hardest: Mar-Apr
+ * 2020, emergency cuts had steepened the curve (risk-appetite proxy ~59) while
+ * VIX averaged 50-80. The haircut took ~20; the score still published
+ * "risk appetite is healthy" mid-crash. The veto is a bounded cap with its own
+ * reversal, so the call can never be EXPANSION while realized market stress is
+ * extreme: mean 30+ caps the proxy at the regime line (posture cannot read
+ * better than VOLATILE), mean 22-30 caps it 5 points above (late-unwind), and
+ * below 22 the cap lifts entirely. Trailing mean over the reading's own history,
+ * not the spot, so a one-day spike does not veto a week.
+ */
+const VIX_MARKET_STRESS_VETO_MEAN = 30;
+const VIX_MARKET_STRESS_UNWIND_MEAN = 22;
+const VIX_VETO_SOFT_CAP = 55;
+const VIX_VETO_MEAN_WINDOW = 10;
 /** Quarter-over-quarter percent change in venture funding flow. Anything worse
  *  than -5% counts as a slowdown. Capped lower than the VIX haircut, so a soft
  *  funding quarter cannot outweigh live market turbulence. */
@@ -78,6 +97,10 @@ export const MACRO_ADJUSTMENT_CONSTANTS = {
   chicagoFciTightnessCap: CHICAGO_FCI_TIGHTNESS_CAP,
   vixShockThreshold: VIX_SHOCK_THRESHOLD,
   vixRiskAppetiteCap: VIX_RISK_APPETITE_CAP,
+  vixMarketStressVetoMean: VIX_MARKET_STRESS_VETO_MEAN,
+  vixMarketStressUnwindMean: VIX_MARKET_STRESS_UNWIND_MEAN,
+  vixVetoSoftCap: VIX_VETO_SOFT_CAP,
+  vixVetoMeanWindow: VIX_VETO_MEAN_WINDOW,
   vcVelocitySlowdownThreshold: VC_VELOCITY_SLOWDOWN_THRESHOLD,
   vcVelocityRiskAppetiteCap: VC_VELOCITY_RISK_APPETITE_CAP,
   layoffPressureThreshold: LAYOFF_PRESSURE_THRESHOLD,
@@ -86,6 +109,21 @@ export const MACRO_ADJUSTMENT_CONSTANTS = {
 
 const getMacroValue = (series: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
   series.find((entry) => entry.id === id)?.value ?? null;
+
+/** Trailing-mean helper for a reading that carries its own history. Falls back
+ *  to the spot value when history is absent or too thin, so the veto degrades to
+ *  a spot check rather than silently switching off. */
+const trailingMean = (reading: MacroSeriesReading | undefined, window: number): number | null => {
+  const spot = typeof reading?.value === "number" ? reading.value : null;
+  const values = (reading?.history ?? [])
+    .map((point) => point.value)
+    .filter((value): value is number => typeof value === "number")
+    .slice(-window);
+  if (values.length >= window) {
+    return values.reduce((sum, value) => sum + value, 0) / values.length;
+  }
+  return spot;
+};
 
 export const applyMacroAdjustments = (
   tightness: number,
@@ -96,6 +134,7 @@ export const applyMacroAdjustments = (
   let adjustedRiskAppetite = riskAppetite;
   const contributors: string[] = [];
   let weakReadCount = 0;
+  let vetoApplied = false;
 
   const hySpread = getMacroValue(macroSeries, "HY_CREDIT_SPREAD");
   if (typeof hySpread === "number" && hySpread >= HY_SPREAD_STRESS_THRESHOLD) {
@@ -142,6 +181,23 @@ export const applyMacroAdjustments = (
     weakReadCount += 1;
   }
 
+  const vixReading = macroSeries.find((entry) => entry.id === "VIX_INDEX");
+  const vixMean = trailingMean(vixReading, VIX_VETO_MEAN_WINDOW);
+  if (vixMean !== null && vixMean >= VIX_MARKET_STRESS_UNWIND_MEAN) {
+    const vetoCap = vixMean >= VIX_MARKET_STRESS_VETO_MEAN
+      ? RISK_APPETITE_REGIME_THRESHOLD
+      : VIX_VETO_SOFT_CAP;
+    if (adjustedRiskAppetite > vetoCap) {
+      adjustedRiskAppetite = vetoCap;
+      contributors.push(
+        vixMean >= VIX_MARKET_STRESS_VETO_MEAN
+          ? "Market stress veto — posture cannot read better than transitional"
+          : "Market stress unwinding — expansion tempo capped",
+      );
+      vetoApplied = true;
+    }
+  }
+
   const vcVelocity = getMacroValue(macroSeries, "VC_FUNDING_VELOCITY");
   if (typeof vcVelocity === "number" && vcVelocity <= VC_VELOCITY_SLOWDOWN_THRESHOLD) {
     adjustedRiskAppetite = clamp(
@@ -180,6 +236,7 @@ export const applyMacroAdjustments = (
     riskAppetite: adjustedRiskAppetite,
     boundaryContributors: contributors,
     weakReadCount,
+    marketStressVetoApplied: vetoApplied,
   };
 };
 
@@ -255,7 +312,12 @@ export const buildSignalInfluence = ({
   },
   {
     key: "baseRate",
-    label: "Fed interest rate",
+    /**
+     * Names the series actually read, matching `BASE_RATE_SOURCE_LABELS` in the
+     * engine core. This used to say "Fed interest rate" while the reading fell
+     * through to the one-month bill on every render.
+     */
+    label: "Short rate (1M bill)",
     influence:
       typeof baseRate === "number" ? Math.abs(baseRate - thresholds.baseRateTightness) : null,
     unavailable: typeof baseRate !== "number",
@@ -386,11 +448,11 @@ export const buildRegimeChangeReasons = (
     currentThreshold: currentBaseRateThreshold,
     up: {
       code: "base-rate-upshift",
-      message: `Fed interest rate crossed above ${currentBaseRateThreshold}%.`,
+      message: `Short rate crossed above ${currentBaseRateThreshold}%.`,
     },
     down: {
       code: "base-rate-downshift",
-      message: `Fed interest rate fell below ${currentBaseRateThreshold}%.`,
+      message: `Short rate fell below ${currentBaseRateThreshold}%.`,
     },
   });
 

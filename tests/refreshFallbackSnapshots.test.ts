@@ -90,7 +90,10 @@ describe("refreshFallbackSnapshots", () => {
 });
 
 describe("summarizeCarriedForward", () => {
-  const now = new Date("2026-08-22T16:00:00.000Z");
+  // Pinned after the September 2026 curated curation so the carried-forward
+  // ages read in days/months, not the fresh-minute span a pre-curation clock
+  // produces (Math.max(0, …) clamps a clock older than the timestamps to 0s).
+  const now = new Date("2026-09-22T16:00:00.000Z");
 
   const LIVE_CAPABLE = [
     "CPI_YOY",

@@ -17,6 +17,11 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
   const label = (regime: string) => getRegimePublicLabel(regime);
   const recentTransitions = [...record.transitions].reverse().slice(0, 8);
   const currentSpell = record.spells[record.spells.length - 1];
+  // Shock flags come from the replay walk itself: a flip that jumped its line
+  // from beyond the near-band committed without the confirmation gate, and no
+  // published reversal condition could have fired. The grader already calls
+  // these "unsignaled"; the marker says why — structurally, not just this time.
+  const shockByDate = new Map(series.map((entry) => [entry.recordDate, entry.shock === true]));
 
   return (
     <section
@@ -84,7 +89,9 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
                   <td className={`py-2.5 ${transition.signaled ? "text-emerald-300/90" : "text-amber-300/90"}`}>
                     {transition.signaled
                       ? `in the near band ${transition.leadMonths} mo before`
-                      : "no advance signal"}
+                      : shockByDate.get(transition.atDate)
+                        ? "no advance signal — shock crossing, no reversal condition could fire"
+                        : "no advance signal"}
                   </td>
                 </tr>
               ))}
@@ -99,9 +106,10 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
       ) : null}
 
       <p className="text-fluid-nano leading-relaxed text-slate-400">
-        Signaled = the score that crossed had already spent at least a month within{" "}
-        {record.nearBandPts} pts of its classification line, so the flip was visible before it
-        happened. Unsignaled changes are listed just the same — that is the point of this table.
+        Signaled = the score that crossed had spent at least a month within {record.nearBandPts}{" "}
+        pts of its classification line before the flip published — on either side, since the
+        confirmation gate publishes a dwelt crossing one read after it crosses. Unsignaled
+        changes are listed just the same — that is the point of this table.
       </p>
     </section>
   );

@@ -27,7 +27,7 @@
     "record_date": "2012-05-31",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 93
+    "riskAppetite": 87
   },
   {
     "record_date": "2012-06-29",
@@ -219,7 +219,7 @@
     "record_date": "2015-01-30",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 88
+    "riskAppetite": 87
   },
   {
     "record_date": "2015-02-27",
@@ -261,13 +261,13 @@
     "record_date": "2015-08-31",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 99
+    "riskAppetite": 55
   },
   {
     "record_date": "2015-09-30",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 97
+    "riskAppetite": 55
   },
   {
     "record_date": "2015-10-30",
@@ -297,7 +297,7 @@
     "record_date": "2016-02-29",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 78
+    "riskAppetite": 77
   },
   {
     "record_date": "2016-03-31",
@@ -451,7 +451,7 @@
   },
   {
     "record_date": "2018-04-30",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
     "riskAppetite": 58
   },
@@ -464,7 +464,7 @@
   {
     "record_date": "2018-06-29",
     "regime": "EXPANSION",
-    "tightness": 0,
+    "tightness": 60,
     "riskAppetite": 53
   },
   {
@@ -475,13 +475,13 @@
   },
   {
     "record_date": "2018-08-31",
-    "regime": "VOLATILE",
+    "regime": "EXPANSION",
     "tightness": 0,
     "riskAppetite": 50
   },
   {
     "record_date": "2018-09-28",
-    "regime": "VOLATILE",
+    "regime": "EXPANSION",
     "tightness": 0,
     "riskAppetite": 50
   },
@@ -489,11 +489,11 @@
     "record_date": "2018-10-31",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 51
+    "riskAppetite": 49
   },
   {
     "record_date": "2018-11-30",
-    "regime": "VOLATILE",
+    "regime": "EXPANSION",
     "tightness": 0,
     "riskAppetite": 48
   },
@@ -501,7 +501,7 @@
     "record_date": "2018-12-31",
     "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 48
+    "riskAppetite": 40
   },
   {
     "record_date": "2019-01-31",
@@ -571,7 +571,7 @@
   },
   {
     "record_date": "2019-12-31",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
     "riskAppetite": 54
   },
@@ -583,81 +583,81 @@
   },
   {
     "record_date": "2020-02-28",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
+    "tightness": 0,
+    "riskAppetite": 31
+  },
+  {
+    "record_date": "2020-03-31",
+    "regime": "VOLATILE",
+    "tightness": 0,
+    "riskAppetite": 39
+  },
+  {
+    "record_date": "2020-04-30",
+    "regime": "VOLATILE",
+    "tightness": 0,
+    "riskAppetite": 38
+  },
+  {
+    "record_date": "2020-05-29",
+    "regime": "VOLATILE",
+    "tightness": 0,
+    "riskAppetite": 49
+  },
+  {
+    "record_date": "2020-06-30",
+    "regime": "VOLATILE",
+    "tightness": 0,
+    "riskAppetite": 44
+  },
+  {
+    "record_date": "2020-07-31",
+    "regime": "VOLATILE",
     "tightness": 0,
     "riskAppetite": 51
   },
   {
-    "record_date": "2020-03-31",
-    "regime": "EXPANSION",
-    "tightness": 0,
-    "riskAppetite": 59
-  },
-  {
-    "record_date": "2020-04-30",
-    "regime": "EXPANSION",
-    "tightness": 0,
-    "riskAppetite": 58
-  },
-  {
-    "record_date": "2020-05-29",
-    "regime": "EXPANSION",
-    "tightness": 0,
-    "riskAppetite": 60
-  },
-  {
-    "record_date": "2020-06-30",
-    "regime": "EXPANSION",
-    "tightness": 0,
-    "riskAppetite": 60
-  },
-  {
-    "record_date": "2020-07-31",
-    "regime": "EXPANSION",
-    "tightness": 0,
-    "riskAppetite": 58
-  },
-  {
     "record_date": "2020-08-31",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 63
+    "riskAppetite": 53
   },
   {
     "record_date": "2020-09-30",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 62
+    "riskAppetite": 52
   },
   {
     "record_date": "2020-10-30",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 70
+    "riskAppetite": 50
   },
   {
     "record_date": "2020-11-30",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 67
+    "riskAppetite": 66
   },
   {
     "record_date": "2020-12-31",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 72
+    "riskAppetite": 68
   },
   {
     "record_date": "2021-01-29",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 80
+    "riskAppetite": 55
   },
   {
     "record_date": "2021-02-26",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 92
+    "riskAppetite": 80
   },
   {
     "record_date": "2021-03-31",
@@ -699,7 +699,7 @@
     "record_date": "2021-09-30",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 90
+    "riskAppetite": 85
   },
   {
     "record_date": "2021-10-29",
@@ -711,7 +711,7 @@
     "record_date": "2021-11-30",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 76
+    "riskAppetite": 65
   },
   {
     "record_date": "2021-12-31",
@@ -723,73 +723,73 @@
     "record_date": "2022-01-31",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 64
+    "riskAppetite": 55
   },
   {
     "record_date": "2022-02-28",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 56
+    "riskAppetite": 41
   },
   {
     "record_date": "2022-03-31",
     "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 42
+    "riskAppetite": 41
   },
   {
     "record_date": "2022-04-29",
     "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 48
+    "riskAppetite": 28
   },
   {
     "record_date": "2022-05-31",
-    "regime": "EXPANSION",
-    "tightness": 0,
-    "riskAppetite": 53
+    "regime": "VOLATILE",
+    "tightness": 26,
+    "riskAppetite": 44
   },
   {
     "record_date": "2022-06-30",
     "regime": "VOLATILE",
-    "tightness": 0,
-    "riskAppetite": 42
+    "tightness": 60,
+    "riskAppetite": 29
   },
   {
     "record_date": "2022-07-29",
     "regime": "VOLATILE",
-    "tightness": 11,
-    "riskAppetite": 31
+    "tightness": 71,
+    "riskAppetite": 29
   },
   {
     "record_date": "2022-08-31",
     "regime": "VOLATILE",
-    "tightness": 15,
-    "riskAppetite": 28
+    "tightness": 75,
+    "riskAppetite": 19
   },
   {
     "record_date": "2022-09-30",
-    "regime": "VOLATILE",
-    "tightness": 19,
-    "riskAppetite": 24
+    "regime": "SCARCITY",
+    "tightness": 79,
+    "riskAppetite": 7
   },
   {
     "record_date": "2022-10-31",
-    "regime": "VOLATILE",
-    "tightness": 62,
-    "riskAppetite": 24
+    "regime": "SCARCITY",
+    "tightness": 100,
+    "riskAppetite": 15
   },
   {
     "record_date": "2022-11-30",
     "regime": "SCARCITY",
     "tightness": 100,
-    "riskAppetite": 12
+    "riskAppetite": 11
   },
   {
     "record_date": "2022-12-30",
     "regime": "SCARCITY",
     "tightness": 100,
-    "riskAppetite": 19
+    "riskAppetite": 16
   },
   {
     "record_date": "2023-01-31",
@@ -801,7 +801,7 @@
     "record_date": "2023-02-28",
     "regime": "SCARCITY",
     "tightness": 100,
-    "riskAppetite": 4
+    "riskAppetite": 3
   },
   {
     "record_date": "2023-03-31",
@@ -921,7 +921,7 @@
     "record_date": "2024-10-31",
     "regime": "SCARCITY",
     "tightness": 90,
-    "riskAppetite": 45
+    "riskAppetite": 40
   },
   {
     "record_date": "2024-11-29",
@@ -931,13 +931,13 @@
   },
   {
     "record_date": "2024-12-31",
-    "regime": "DEFENSIVE",
+    "regime": "SCARCITY",
     "tightness": 90,
     "riskAppetite": 53
   },
   {
     "record_date": "2025-01-31",
-    "regime": "DEFENSIVE",
+    "regime": "SCARCITY",
     "tightness": 90,
     "riskAppetite": 54
   },
@@ -949,15 +949,15 @@
   },
   {
     "record_date": "2025-03-31",
-    "regime": "DEFENSIVE",
+    "regime": "SCARCITY",
     "tightness": 90,
-    "riskAppetite": 54
+    "riskAppetite": 51
   },
   {
     "record_date": "2025-04-30",
-    "regime": "DEFENSIVE",
+    "regime": "SCARCITY",
     "tightness": 90,
-    "riskAppetite": 63
+    "riskAppetite": 55
   },
   {
     "record_date": "2025-05-30",
@@ -1023,7 +1023,7 @@
     "record_date": "2026-03-31",
     "regime": "EXPANSION",
     "tightness": 43,
-    "riskAppetite": 60
+    "riskAppetite": 52
   },
   {
     "record_date": "2026-04-30",

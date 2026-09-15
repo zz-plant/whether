@@ -362,9 +362,13 @@ export const loadReportDataUncachedInternal = async ({
   const previousMachineSnapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
   const assessment = projectsOperatingSnapshot && operatingSnapshot
     ? operatingSnapshot.assessment
-    : deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot);
+    : deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot, {
+        baseRateHistory: treasury.oneMonthHistory,
+      });
   const liveAssessment = shouldLoadHistoricalLiveComparison
-    ? deps.evaluateRegime(liveTreasury, thresholds, macroSeries, previousMachineSnapshot)
+    ? deps.evaluateRegime(liveTreasury, thresholds, macroSeries, previousMachineSnapshot, {
+        baseRateHistory: liveTreasury.oneMonthHistory,
+      })
     : null;
   const { playbook, startItems, stopItems, actionStripItems } = deps.buildGuidanceBundleFromAssessment(assessment);
   const fenceItems = assessment.constraints;

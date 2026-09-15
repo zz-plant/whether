@@ -44,7 +44,9 @@ export const buildOperatingSnapshot = ({
   previousMachineState?: RegimeMachineSnapshot | null;
   now?: Date;
 }): OperatingSnapshot => {
-  const assessment = evaluateRegime(treasury, thresholds, macroSeries, previousMachineState);
+  const assessment = evaluateRegime(treasury, thresholds, macroSeries, previousMachineState, {
+    baseRateHistory: treasury.oneMonthHistory,
+  });
   const machineState = assessment.regimeTransition?.snapshot ?? {
     committedState: assessment.regime,
     pendingState: null,

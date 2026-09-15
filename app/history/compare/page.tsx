@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
-import { getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
@@ -111,11 +111,17 @@ export default async function HistoryComparePage({
   const scoreB = snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.boldnessScore;
   const boldnessDelta = scoreA - scoreB;
 
-  // Build options list from cache
+  // Build options list from cache. Regime labels come off the same threaded walk
+  // /history serves — a point evaluation here would label a tightening month by
+  // what an instant quadrant read says, disagreeing with the record the reader
+  // can cross-check one page away.
+  const governedRegimes = new Map(
+    getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER).map((entry) => [entry.recordDate, entry.regime]),
+  );
   const snapshots = getTimeMachineSnapshots();
   const dateOptions: DateOption[] = snapshots
     .map((s) => {
-      const regime = evaluateRegime(s).regime;
+      const regime = governedRegimes.get(s.record_date) ?? evaluateRegime(s).regime;
       return {
         year: s.year,
         month: s.month,

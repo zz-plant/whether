@@ -43,9 +43,23 @@ const monthlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
     "scale proven bets, invest in durable growth channels, and keep payback discipline",
 };
 
+/** Saturated-financing variant: same rule as the weekly builder — when the
+ *  financing read sits at its own ceiling inside expansion, the tempo word
+ *  changes and nothing else does. */
+const monthlyActionGuidanceSaturatedFinancing: Record<RegimeAssessment["regime"], string> = {
+  ...monthlyActionGuidance,
+  EXPANSION:
+    "scale proven bets selectively, hold rollback criteria explicit, and keep payback discipline",
+};
 
-export const getMonthlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
-  monthlyActionGuidance[regime];
+
+export const getMonthlyActionGuidance = (
+  regime: RegimeAssessment["regime"],
+  options: { financingSaturated?: boolean } = {},
+) =>
+  options.financingSaturated
+    ? monthlyActionGuidanceSaturatedFinancing[regime]
+    : monthlyActionGuidance[regime];
 
 export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructured["operatingRules"] => {
   const { tightnessPause, tightnessResume, riskPause, riskResume } =
@@ -154,16 +168,21 @@ export const buildMonthlySummary = ({
   recordDateLabel?: string;
 }): MonthlySummary => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
-  const guidance = getMonthlyActionGuidance(assessment.regime);
+  const financingSaturated = assessment.scores.tightnessSaturated === true;
+  const guidance = getMonthlyActionGuidance(assessment.regime, { financingSaturated });
   const operatingRules = getMonthlyOperatingRules(assessment);
   const transitionCue = assessment.diagnostics.transitionWatch
     ? "Evidence is sitting near a regime boundary, so hold major scope changes until the next read."
+    : "";
+  const shockCue = assessment.diagnostics.shockCrossing
+    ? "This flip crossed its line in one jump, so no published reversal condition fired — hold the call as unconfirmed until the next read."
     : "";
   const summary = joinSentences(
     `${regimeLabel}: ${assessment.description}`,
     `The priority this month is to ${guidance}`,
     formatConfidenceSentence(assessment.diagnostics.confidence, assessment.diagnostics.intensity),
     transitionCue,
+    shockCue,
   );
   const title = recordDateLabel
     ? `Monthly action summary — ${recordDateLabel}`

@@ -310,6 +310,15 @@ export const buildCanonicalTreasuryFromReadModel = (
   const twoYear = getSignalValue(model, "TREASURY_2Y");
   const tenYear = getSignalValue(model, "TREASURY_10Y");
 
+  /**
+   * The trailing one-month-bill window the read model already materializes
+   * (92 days per signal key). The tightening-speed term reads a ~91-day move,
+   * so without this the canonical read path — the default — would evaluate the
+   * velocity term at 0 while the direct-fetch path measured it, and the two
+   * would disagree about the same week.
+   */
+  const oneMonthHistory = model.recentHistory?.TREASURY_1M ?? undefined;
+
   const liveValues = { oneMonth, threeMonth, twoYear, tenYear };
   const allLive = Object.values(liveValues).every((v) => typeof v === "number");
 
@@ -321,6 +330,7 @@ export const buildCanonicalTreasuryFromReadModel = (
       record_date: observedAt.slice(0, 10),
       fetched_at: model.asOf,
       isLive: true,
+      oneMonthHistory,
       yields: {
         oneMonth,
         threeMonth,
@@ -366,6 +376,7 @@ export const buildCanonicalTreasuryFromReadModel = (
     isLive: false,
     fallback_at: model.asOf,
     fallback_reason: "Partial treasury data — missing series filled from snapshot",
+    oneMonthHistory,
     yields: resolvedYields,
   };
 };

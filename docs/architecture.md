@@ -133,24 +133,21 @@ This is the central compression step in the system. Instead of asking the user t
 graph TD
     A[Treasury Data] --> B[Compute Base Rate]
     A --> C[Compute Curve Slope]
-    
+    A -.trailing window.-> B2[Tightening-speed term]
+
     B --> D[Calculate Tightness Score]
+    B2 --> D
     C --> E[Calculate Risk Appetite Score]
-    
-    D --> F[Apply Macro Adjustments]
+
+    D --> F[Apply Macro Adjustments<br/>incl. VIX haircut + market-stress veto]
     E --> F
-    
-    F --> G{Regime Thresholds}
-    G -->|Tightness > 70| H[SCARCITY]
-    G -->|Risk < 50 & Tightness > 50| I[DEFENSIVE]
-    G -->|High Volatility| J[VOLATILE]
-    G -->|Loose Conditions| K[EXPANSION]
-    
-    H --> L[Posture: Burn Discipline]
-    I --> L
-    J --> L
-    K --> L
-    
+
+    F --> G{Regime Thresholds<br/>70 / 50}
+    G --> H[Quadrant: SCARCITY / DEFENSIVE / VOLATILE / EXPANSION]
+    H --> I{State machine<br/>confirm flip or mark shock}
+    I --> J[Committed Regime]
+
+    J --> L[Posture: Burn Discipline]
     L --> M[Action Strip Items]
     M --> N[Bounded Decision Rules]
 ```
@@ -159,10 +156,10 @@ graph TD
 
 | Regime | Tightness | Risk Appetite | Plain-English meaning | Default posture |
 |--------|-----------|---------------|-----------------------|-----------------|
-| SCARCITY | > 70 | Any | Capital is expensive and conditions are tight | Tighten aggressively |
-| DEFENSIVE | 50-70 | < 50 | Conditions are not broken, but they do not justify relaxed bets | Preserve capital and be selective |
-| VOLATILE | Any | High variance | Signals are moving around enough that confidence should stay lower | Monitor closely and avoid overcommitting |
-| EXPANSION | < 50 | > 50 | Conditions support more forward movement and investment | Loosen selectively and invest |
+| SCARCITY | > 70 | ≤ 50 | Capital is expensive and lenders are pulling back | Tighten aggressively |
+| DEFENSIVE | > 70 | > 50 | Capital is expensive but funding stays selective | Preserve capital and be selective |
+| VOLATILE | ≤ 70 | ≤ 50 | Capital is cheaper but funding is wary | Monitor closely and avoid overcommitting |
+| EXPANSION | ≤ 70 | > 50 | Capital is available and financing conditions are supportive | Loosen selectively and invest |
 
 ---
 
@@ -175,17 +172,27 @@ These modules form the core reasoning path of the product. They matter more than
 The core classification engine. It takes normalized market inputs and decides what kind of environment the operator is in.
 
 **Key Functions:**
-- `evaluateRegime()` — Main scoring function
-- `computeTightnessScore()` — Base rate + curve slope → tightness
-- `computeRiskAppetiteScore()` — Curve slope → risk appetite
-- `applyMacroAdjustments()` — Apply macro signal adjustments
+- `evaluateRegime()` — Main scoring function; accepts a threaded machine snapshot and a context carrying base-rate history
+- `computeTightnessScore()` — Base-rate ramp + curve-inversion points + tightening-speed term → tightness
+- `computeRiskAppetiteScore()` — Curve slope → risk-appetite proxy (a monetary-expectations read, not observed market appetite)
+- `applyMacroAdjustments()` — Macro corroboration: HY spread, Chicago FCI, VIX haircut, and the market-stress veto (VIX 10-obs mean ≥ 30 caps the proxy at the regime line; 22–30 caps it 5 points above)
+- `classifyRegime()` — Instant quadrant read for point queries and what-if scenarios; no machine state
+
+**Flip governance (`lib/report/regimeStateMachine.ts`):**
+- A flip commits after two consecutive confirming observations (one when clear of boundaries and at HIGH confidence)
+- A crossing that jumps its line by ≥ 25 points in one step commits immediately and is marked `shock` — no published reversal condition could have fired — and the call publishes at LOW confidence with an explicit warning
+- Archive and replay paths thread the same machine state the live path does, so `/history` and the weekly archive grade the same flips
 
 **Outputs:**
 ```typescript
 {
   regime: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
   thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
-  scores: { tightness: number; riskAppetite: number; baseRate?: number; curveSlope?: number | null };
+  scores: {
+    tightness: number; riskAppetite: number;
+    baseRate?: number; curveSlope?: number | null;
+    baseRateVelocityPoints?: number; baseRateVelocityDelta?: number;
+  };
 }
 ```
 
