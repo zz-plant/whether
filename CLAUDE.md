@@ -16,6 +16,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
+| `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
@@ -88,6 +89,16 @@ deploys every push, which is the only remote gate left.
   suppressions, 0 skipped tests, 2 disabled rules, 2 override-disabled rules, and a floor of 212
   test files. Lower it in the script when work earns it; raising one is a policy change and belongs
   in its own PR with the reason.
+- **An unused export is a gated metric too (2026-09-15).** `bun run check:dead-exports`
+  (`scripts/check-dead-exports.ts`) counts exported declarations under `app/`, `lib/` and
+  `worker/` that no other scanned file mentions, against a baseline of **zero**. A sweep that
+  day found 556 of them — 232 runtime, 324 types — plus nine modules nothing imported, and
+  nothing in the gate had noticed: an unused export is not a lint finding, not a type error,
+  and not a failing test, it is surface every reader has to rule out before trusting a module.
+  "Referenced" is deliberately cheap (the name appears as an identifier in another file), which
+  over-counts and never under-counts, so a failure is always a real orphan; the names Next.js
+  and the Workers runtime consume by convention are exempt. It runs in `bun run check`, on
+  pre-push, and in the deploy gate.
 - **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
   type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared
@@ -206,7 +217,7 @@ visitors. The archive fills forward, once the allowlist lets a real run through.
 
 Cloudflare's build is the remote gate, and it gates **production too**. The build command
 configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 that script *is* the
-deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets`, then
+deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions dead-exports`, then
 `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks` on its own. So every push, `main`
 included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
 before anything is built or deployed. The audit runs second and alone because it spawns a dev
@@ -310,7 +321,8 @@ recapture correctly.
 
 | Command | What it does |
 | --- | --- |
-| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. |
+| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. Default range is the last commit **plus** uncommitted changes; `--base <sha>` is commit-to-commit and sees no dirty tree; `--working-tree` is uncommitted only. The printed range says which. |
+| `bun run telemetry:streams` | Rows per Analytics Engine stream over a window, with each stream's consumer. A stream at zero is dead code or a broken emitter. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |

@@ -51,7 +51,10 @@ type AnalyticsQueryResult<Row> =
   | { ok: true; rows: Row[]; truncated: boolean }
   | { ok: false; reason: string };
 
-const responseSchema = <Row extends z.ZodTypeAny>(rowSchema: Row) =>
+/* The return type is declared rather than inferred: `z.object` widens the row
+   type through the optional array, and leaving it inferred is what forced the
+   call site to assert the parsed rows back into shape. */
+const responseSchema = <Row extends z.ZodTypeAny>(rowSchema: Row): z.ZodType<{ data?: z.infer<Row>[] }> =>
   z.object({ data: z.array(rowSchema).optional() });
 
 type AnalyticsQueryOptions<Row extends z.ZodTypeAny> = {
@@ -96,7 +99,7 @@ export const queryAnalyticsEngine = async <Row extends z.ZodTypeAny>({
       return { ok: false, reason: "Analytics Engine answered with an unexpected payload" };
     }
 
-    const rows = (parsed.data.data ?? []) as z.infer<Row>[];
+    const rows = parsed.data.data ?? [];
     return { ok: true, rows, truncated: rows.length >= rowLimit };
   } catch (error) {
     return { ok: false, reason: `Analytics Engine query threw: ${error instanceof Error ? error.message : String(error)}` };

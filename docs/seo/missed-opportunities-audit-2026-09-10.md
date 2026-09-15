@@ -7,27 +7,50 @@ in rendered HTML; findings marked **read** come from source only.
 
 ## Status
 
-Findings are recorded as they were found. Several have since been fixed; the rest are
-open. Status as of 2026-09-10.
+Findings are recorded as they were found. Every one of them is now closed; where a fix
+differs from the remedy this document proposed, the row says so. Status as of 2026-09-15.
 
 | Finding | Status |
 | --- | --- |
 | A1 — four pages canonicalising to the homepage | **fixed** — root-layout canonical and `x-default` removed, self-canonicals added, pinned by `tests/crawlableRouteContract.test.ts` |
 | A2 — `/comps` renders nothing server-side | **fixed** — now a server component reading `fetchSaaSValuations()` directly |
 | A3 — doubled brand in titles | **fixed** — `/share`, `/terms-of-service`, `/acceptable-use-policy` |
-| A4 — `/history` has no metadata, canonical, or JSON-LD | **partly fixed** — metadata and self-canonical added; the `ItemList`/`CollectionPage` markup for its 81 children is still open |
+| A4 — `/history` has no metadata, canonical, or JSON-LD | **fixed** — metadata and self-canonical first; then a `CollectionPage` over a regime-history `Dataset`, with an `ItemList` naming all 82 archive periods and every published week (`lib/seo/pageStructuredData.ts`) |
+| A5 — sitemap is four-fifths archive periods; two indexable `/operate` pages submitted nowhere | **fixed** — the workstream map moved out of the page file so the sitemap can read it, the three signal watch hubs are submitted, and archive periods drop below every hub and live page |
+| A6 — a data outage flips every live page to `noindex` at once | **fixed** — one rule in `lib/seo/freshnessIndexation.ts`, on the same 72-hour window the payload gate uses. A reading a few hours past its refresh stays indexed; the first failed fetch no longer de-indexes anything |
+| A7 — `/api/mcp` disallowed while advertised | **fixed** — allow rule added, and `tests/robotsRoute.test.ts` reads llms.txt and checks every `/api` path it advertises against the allow list. The named-AI-crawler half stays withdrawn: the wildcard already permits them |
+| A8 — no RSS autodiscovery, single-item feed | **fixed** — autodiscovery link in the root layout; one item per published week at its permalink, plus the live week until it is frozen |
 | B1/B2/B3 — homepage entity graph discarded, non-ISO dates, non-schema `result`, unescaped serializer | **fixed** — the assembled graph now renders, dates are ISO, posture moved to `Dataset.variableMeasured`, `serializeJsonLd` is used |
-| A7 — `/api/mcp` disallowed while advertised | **open** — a previous revision of this table said fixed; it was not. The named-AI-crawler half was withdrawn as not a fix (the wildcard already permits them); the `/api/mcp` allow rule is still missing |
-| A8 — no RSS autodiscovery, single-item feed | **open** — a previous revision of this table said fixed; it was not. No `rel="alternate" type="application/rss+xml"` link, and the feed still carries one item |
+| B4 — schema types the content supports and does not declare | **fixed** — `Product`/`Offer` on `/pricing` (paid plans `PreOrder`, which is what the page says), `Dataset` on `/comps` and `/history`, `WebAPI` on `/api-docs`, `HowTo` on toolkits, `Organization.sameAs`, and author/publisher/dates on the answer `FAQPage` |
 | C1 — related answers filtered for a *different* category | **fixed** — ranked on shared `mappedDecisionAreas`, filtered to indexable slugs (`lib/seo/relatedAnswers.ts`) |
-| C2 — answer descriptions are a function of the week | **fixed** for `/answers/*` — each page's own `shortAnswer` leads. Still open on `/signals/[cluster]/[scenario]`, which carries the identical pattern |
-| C7 — `/signals/[cluster]` hubs thin and `noindex` | **fixed** for the three signal hubs — each now carries its own reading and is indexable while live. The 51 `/resolve` and `/toolkits` cluster pages are untouched |
-| A5, A6, B4, C3, C4, C5, C6, C8, D | open |
+| C2 — answer descriptions are a function of the week | **fixed** — each page's own `shortAnswer` is the whole description now. The live action used to trail it, which still rewrote the snippet weekly; it belongs on the page and on the social card, not in a cached snippet. Same on `/signals/[cluster]/[scenario]` |
+| C3 — the uniqueness gate cannot see the duplication it exists to catch | **fixed**, and not as proposed. Keying on the scenario is right, but keyed honestly the gate *failed*: the three watch pages for one scenario cited the same site-wide evidence under the same call. Each watch now cites its own signals' evidence (`evidenceKeys`), which is both what the page is for and the distinct data point the gate looks for |
+| C4 — identical generic H2s across 11 answer pages; homepage H1 is `sr-only` | **fixed** — four of six answer headings derive from the page's audience, areas and threshold focus, with a test that no two pages share a set; the weekly call is the homepage `h1` |
+| C5 — tier-two and tier-three keyword arrays read by nothing | **fixed** — removed from the content, the schema, and the exports |
+| C6 — `/search` substring matching, always 308s, no query logging | **fixed** — whole-word matching (a non-matching query returned the *entire index* before, because `routePriority` made every score positive), a real results page with the old redirect offered rather than forced, and a `search` stream recording the routed job and match count. The query text is deliberately not stored |
+| C7 — thin `noindex` cluster pages with payloads generated anyway | **fixed** — the three signal hubs carry their own reading and are indexable while live. The 51 `/resolve` and `/toolkits` cluster pages are retired: they rendered their parent's call, were hardcoded `noindex`, and had no inbound link. They redirect to their parents, and the builder enumerates only the 15 signal-scenario routes |
+| C8 — `/resources` redirects away while six of its URLs are submitted | **fixed** — `/resources` is a real hub, and `tests/resourceHub.test.ts` asserts every `/resources` URL the sitemap emits is one the hub links |
+| D — llms.txt claims `schema.org/Report` the homepage did not emit | **closed by B1** — the homepage graph emits `["Article", "Report"]`, so the claim is true. It was recorded as open after that landed; it was not |
 
-Separately, and not a finding in this document: the refresh loop described in
-`docs/seo/refresh-loop.md` had no step producing `page-metrics.json`. `bun run
-seo:page-metrics` now does. Without it, none of the prioritisation below can be
-checked against what actually happened.
+Three things outside the original findings, found while closing them:
+
+- The refresh loop in `docs/seo/refresh-loop.md` had no step producing `page-metrics.json`.
+  `bun run seo:page-metrics` now does, and reads the window in narrowing time slices rather
+  than refusing the whole run when one query hits the row cap.
+- `organic_entrance` checked no referrer, so direct, paid and social visits were counted as
+  organic — which inflated the traffic tier the refresh queue derives. The tracker sends a
+  coarse bucket now; see `docs/seo/refresh-loop.md`.
+- 556 exported declarations under `app/`, `lib/` and `worker/` were referenced by nothing, and
+  nothing in the gate noticed. `bun run check:dead-exports` holds the count at zero.
+
+### A note on how these landed
+
+Five of the pull requests in the first pass merged at a stale head: commits pushed to the
+branch before the merge were not in the merge commit. The cause was never established — the
+GitHub webhooks named pre-rebase SHAs, and the branch tip at merge time did not match what
+had been pushed. Until it is, two habits avoid it: keep a pull request to a single commit,
+and after a merge verify with `git merge-base --is-ancestor <sha> origin/main` rather than
+trusting the merge notification.
 
 ---
 

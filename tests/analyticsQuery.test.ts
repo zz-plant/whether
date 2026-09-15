@@ -92,8 +92,8 @@ describe("queryAnalyticsEngine", () => {
       sql: "SELECT 1",
       fetcher: async (url, init) => {
         seenUrl = String(url);
-        const headers = (init ?? {}).headers as Record<string, string> | undefined;
-        seenAuth = String(headers?.authorization ?? "");
+        // `new Headers` narrows HeadersInit at runtime; an assertion would only move the risk.
+        seenAuth = new Headers(init?.headers).get("authorization") ?? "";
         return jsonResponse({ data: [] });
       },
     });

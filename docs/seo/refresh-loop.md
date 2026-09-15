@@ -39,7 +39,7 @@ running it first ranks them against last week's numbers, or none.
 
 - `artifacts/seo-refresh/queue.json` — pages currently queued for refresh, including `noindexNow` for stale pages.
 - `artifacts/seo-refresh/status.json` — per-page status ledger with `lastEvaluatedAtIso`, refresh request/refreshed timestamps, `slaDueAtIso`, and `slaState`.
-- Input: `artifacts/seo-refresh/page-metrics.json` with `byUrl` metrics (`trafficTier` or `organicEntrances30d`, plus `ctaConversionRate`).
+- Input: `artifacts/seo-refresh/page-metrics.json` with `byUrl` metrics (`trafficTier` or `entrances30d`, plus `ctaConversionRate`).
 
 ### Where the metrics come from
 
@@ -67,21 +67,34 @@ authoritative, so a bad file is worse than none:
 | No credentials | `skipped` | The state this repo has been in all along. The weekly runbook continues, but ranks pages **without metrics** — it points the queue at a path that is never written rather than letting it reuse a `page-metrics.json` left in the worktree by an earlier credentialed run. The standalone command exits 1. |
 | Query error, or a payload that does not parse | `failed` | An unreachable API is not a reading of zero traffic. |
 | Zero events in the window | `failed` | An empty file marks every page "low traffic, underperforming" and queues the whole site. |
-| Row count at `WHETHER_METRICS_ROW_LIMIT` | `failed` | A truncated window is indistinguishable from a complete one downstream; it undercounts entrances and silently demotes traffic tiers. Raise the limit or narrow the window. |
+| A slice under 15 minutes still at `WHETHER_METRICS_ROW_LIMIT` | `failed` | A window denser than one query is **paged**, not refused: Analytics Engine has no cursor, so the next page is a narrower time range, and a clipped slice is re-read as four shorter ones. Only below a quarter of an hour is the cap, rather than the window, the constraint. |
 
 On `failed`, `seo:weekly-runbook` stops before generating the queue rather than
 ranking pages against metrics it could not refresh — the same defect
 `freezeWeeklyBrief` shipped a stale published week on.
 
-**`organicEntrances30d` counts all first-visit entrances, not organic ones.**
-`ContentMeasurementTracker` fires `organic_entrance` on the first visit to a page in
-a session without checking referrer, campaign parameters, or navigation source, so
-direct, paid and referral visits are in the number too. That inflates the traffic
-tier and raises the conversion target a page is judged against — biased towards
-queueing a page rather than skipping one, which is the safer direction, but wrong.
-The field name is the queue's contract so it is kept; the artifact records the real
-definition in `entranceDefinition`. Classifying acquisition means changing what the
-tracker emits, and would only apply to data collected after that change.
+**Entrances are split by acquisition, since 2026-09-15.** `ContentMeasurementTracker`
+used to fire `organic_entrance` without checking referrer, campaign parameters, or
+navigation source, so direct, paid and social visits were all counted as organic —
+inflating the traffic tier and the conversion target each page was judged against.
+It now classifies `document.referrer` into five coarse buckets (`search`, `social`,
+`referral`, `direct`, `internal`) and sends **only the bucket**: the referring URL,
+its path, and any campaign parameters stay in the browser, because this product
+tells readers it runs no trackers and the loop needs nothing finer.
+
+The artifact carries three numbers per URL, and `entranceDefinition` states what
+each means:
+
+| Field | Meaning |
+| --- | --- |
+| `entrances30d` | Every first-visit entrance. This is what the queue tiers on, and what `organicEntrances30d` always actually held. |
+| `organicSearchEntrances30d` | The ones a search engine referred. |
+| `entrancesBySource` | The full split, including `unclassified`. |
+
+Rows written before the change land in `unclassified`, so a window spanning it
+under-reports every classified bucket rather than assuming they were all search.
+The queue still tiers on the total: reading the genuinely-organic field there would
+silently demote every page the moment the field appeared.
 
 Aggregation happens in JS rather than in SQL because `writeAnalytics` stores each
 event as a JSON blob in `blob2` and the Analytics Engine SQL dialect cannot reach
@@ -89,5 +102,5 @@ inside it. The upside is that this works against telemetry already collected —
 change to the write path, no waiting for new data to accumulate.
 
 The script deliberately does not emit `trafficTier`. `seo-refresh-queue.mjs` derives
-one from `organicEntrances30d` when the field is absent, and those thresholds are the
+one from `entrances30d` when the field is absent, and those thresholds are the
 policy; a second copy is how two numbers that must agree start disagreeing.
