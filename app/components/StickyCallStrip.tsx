@@ -18,9 +18,18 @@ type Props = {
   shareLines?: string[];
 };
 
-/** The badge is the only place the weekly direction appears once scrolled, so it
- *  states the direction in words rather than leaving a bare arrow character for
- *  a screen reader to announce as "upwards arrow". */
+/**
+ * Rendered from `md` up only. Below `md` the bottom tab bar owns the thumb zone,
+ * and this strip used to sit on top of it — two fixed bars, roughly 128px of a
+ * 932px viewport, plus a spacer the strip reserved for itself even while hidden.
+ * With the brief at about three phone screens the hero's Copy Brief is one flick
+ * away, which is what the strip existed to shortcut. (Reverses the 2026-08
+ * thumb-zone strip in docs/design-improvements-priority.md, P0 #1.)
+ *
+ * The badge is the only place the weekly direction appears once scrolled, so it
+ * states the direction in words rather than leaving a bare arrow character for
+ * a screen reader to announce as "upwards arrow".
+ */
 const DIRECTION_BADGE: Record<SignalDirection, { glyph: TrendDirection; tone: string }> = {
   tighten: { glyph: "up", tone: "bg-rose-500/20 text-rose-300 border border-rose-500/30" },
   ease: { glyph: "down", tone: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" },
@@ -95,14 +104,10 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
 
   return (
     <>
-      <div
-        className="h-[4.75rem] lg:hidden"
-        aria-hidden="true"
-      />
       {showStrip ? (
         <div
           data-testid="sticky-call-strip"
-          className="pointer-events-none fixed inset-x-0 bottom-[calc(3.25rem+env(safe-area-inset-bottom))] z-40 px-3 pb-2 pt-2 md:bottom-0 md:pb-[max(0.65rem,env(safe-area-inset-bottom))] lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-40 hidden px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 md:block lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
         >
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl lg:max-w-md lg:shadow-[0_12px_32px_rgba(0,0,0,0.45)]">
             <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">
@@ -118,7 +123,7 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
               <span className="text-slate-400 tabular-nums text-xs">{boldnessScore}/100</span>
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
             </span>
-            <span className={`hidden flex-shrink-0 text-fluid-xs tabular-nums font-medium ${deltaColor} min-[430px]:inline`}>{deltaLabel}</span>
+            <span className={`flex-shrink-0 text-fluid-xs tabular-nums font-medium ${deltaColor}`}>{deltaLabel}</span>
             <a
               href={imageBriefHref}
               download="whether-brief.png"
@@ -136,12 +141,12 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
               {isCopied ? (
                 <>
                   <CopyCheck className="h-4 w-4 text-emerald-400" aria-hidden="true" />
-                  <span className="max-[420px]:sr-only text-emerald-400 font-semibold">Copied</span>
+                  <span className="text-emerald-400 font-semibold">Copied</span>
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4" aria-hidden="true" />
-                  <span className="max-[420px]:sr-only font-medium">Copy</span>
+                  <span className="font-medium">Copy</span>
                 </>
               )}
             </button>

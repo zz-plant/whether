@@ -10,14 +10,12 @@ import { DecisionHero } from "./components/DecisionHero";
 import { RunwayConditionedNotes } from "./components/RunwayConditionedNotes";
 import { SubscribeForm } from "./components/SubscribeForm";
 import { StickyCallStrip } from "./components/StickyCallStrip";
-import { DirectAnswersStrip } from "./components/home/DirectAnswersStrip";
-import { WeeklyRetrospectiveCard } from "./components/home/WeeklyRetrospectiveCard";
+import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
 import { CompactTrustPopover } from "./components/CompactTrustPopover";
-import { SwipeableWeek } from "./components/SwipeableWeek";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
@@ -47,12 +45,8 @@ import { KeyDriversCard } from "./components/hero/KeyDriversCard";
 import { buildDriverViews } from "../lib/report/driverDecisionViews";
 import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
-import { StressTestQuickCard } from "./components/hero/StressTestQuickCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
-import { StageDropdownPill } from "./components/StageDropdownPill";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
-import { BriefSectionNav } from "./components/home/briefSectionNav";
-import { SectionSignpost } from "./components/home/sectionSignpost";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -121,9 +115,15 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
        canonical primary action on this page; a second full-weight blue button
        further down competed with it and gave the reader no way to rank them.
        §X reserves `pill` for exactly this — a secondary navigation CTA. */
-    <div className="mt-4 border-t border-white/[0.06] pt-4">
+    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.06] pt-4">
       <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
         {props.planLabel ?? "Build this week’s plan →"}
+      </ActionLink>
+      {/* A text link, not a second button: the five direct answers used to render
+          here as their own band, restating a list /resolve owns. The plan CTA
+          stays the one button in the handoff (home AGENTS.md). */}
+      <ActionLink href="/resolve#direct-answers" variant="inline">
+        Direct answers →
       </ActionLink>
     </div>
   );
@@ -383,7 +383,11 @@ async function PageContent({
               rule keyed on the data attribute (app/layout.tsx), so it stays
               pre-paint and CLS-free at either position. */}
           <FirstVisitExplainer />
-          {/* Header row: Week of Date switcher, Data currency, Stage dropdown, Confidence pill */}
+          {/* Meta row: week switcher and the confidence popover. The "Data through …
+              · refreshed …" line that sat under the switcher restated the hero's
+              trust line and the popover's timestamp; the stage pill that sat beside
+              the popover overlapped the hero's own stage control at every width
+              above `sm` (the header carries the phone-only pill). */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-1">
             <div>
               <div className="flex items-center gap-2">
@@ -424,12 +428,8 @@ async function PageContent({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Data through {homepage.reportShell.recordDateLabel} · refreshed {homepage.reportShell.fetchedAtLabel}
-              </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
-              <StageDropdownPill className="hidden sm:inline-flex" />
               <CompactTrustPopover
                 confidenceLabel={confidenceLabel ?? "High confidence"}
                 isHistorical={Boolean(historicalSelection)}
@@ -440,19 +440,10 @@ async function PageContent({
               />
             </div>
           </div>
-          <BriefSectionNav />
-          <SwipeableWeek
-            currentMonth={searchParams?.month ? parseInt(searchParams.month, 10) : undefined}
-            currentYear={searchParams?.year ? parseInt(searchParams.year, 10) : undefined}
-            serverMonths={macroTrendline.map((entry) => {
-              const d = new Date(entry.record_date);
-              return {
-                recordDate: entry.record_date,
-                month: d.getMonth() + 1,
-                year: d.getFullYear(),
-              };
-            })}
-          >
+          {/* No timeline scrubber above the call any more. The meta row's chevrons
+              and calendar picker are the period controls; the regime stripe
+              below the drivers is the memory rail (spec Block G: last months, no
+              full chart). The zoomable scrubber lives on /history. */}
             <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
               <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
               {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
@@ -499,17 +490,28 @@ async function PageContent({
                   of a historical call would carry a stress that never existed
                   then. The canonical historical brief stays exactly as published. */}
               {!historicalSelection ? <RunwayConditionedNotes regime={regime} /> : null}
+              {/* Returning readers only: renders nothing on a first visit or when the
+                  call last seen is this week's. It sits under the call it compares
+                  against; the tabbed retrospective card that used to hold it, and
+                  the hindsight panel beside it, restated the hero's own delta. Live
+                  briefs only, for the same reason as the runway notes: an archived
+                  month must not become the "last seen" call. */}
+              {!historicalSelection ? (
+                <SinceLastVisit
+                  current={{
+                    recordDate: reportData.treasury.record_date,
+                    recordDateLabel: homepage.reportShell.recordDateLabel,
+                    regimeLabel: publicRegimeLabel,
+                    call: primaryCall,
+                  }}
+                />
+              ) : null}
             </div>
 
-            {/* 3-Column Executive Grid on Desktop, 2-Column on Tablet, Stack on Mobile */}
             <div id="key-drivers" data-page-section="key-drivers" tabIndex={-1} aria-labelledby="key-drivers-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-              <SectionSignpost
-                index="02"
-                id="key-drivers"
-                headingId="key-drivers-heading"
-                title="Key drivers & actions"
-                description="Threshold proximity, action ladder, and counterfactual triggers"
-              />
+              {/* The cards carry their own titles; the numbered signpost that sat
+                  here repeated them with a description in framework vocabulary. */}
+              <h2 id="key-drivers-heading" className="sr-only">Key drivers and actions this week</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
                 <KeyDriversCard views={driverViews} />
 
@@ -519,32 +521,14 @@ async function PageContent({
                 />
               </div>
 
-              {/* Mockup Card: Recent posture history (Weekly outlook over time) */}
+              {/* The memory rail: the stripe and a link to the record. Its prior-read
+                  chips and side-by-side comparison restated the hero's What-changed
+                  rows and were cut; the stress-test card that followed it recreated
+                  /operate's tester inline and was the second plan CTA on the page. */}
               <div className="mt-5">
-                <RecentPostureHistoryCard
-                  history={macroTrendline}
-                  historyHref="/history"
-                  currentRegime={regime}
-                  currentTightness={tightness}
-                  tightnessDelta={tightnessDelta}
-                  riskAppetite={riskAppetite}
-                  riskAppetiteDelta={riskAppetiteDelta}
-                  serverPrevious={macroTrendline.length >= 2 ? { regime: macroTrendline[macroTrendline.length - 2].regime, recordDate: macroTrendline[macroTrendline.length - 2].record_date } : null}
-                  currentRecordDate={homepage.reportShell.recordDateLabel}
-                />
-              </div>
-
-              {/* Mockup Card: Stress-test a decision (See how it changes the outlook) */}
-              <div className="mt-5">
-                <StressTestQuickCard
-                  planHref={operateHref}
-                  assessment={reportData.assessment}
-                  recordDate={homepage.reportShell.recordDateLabel}
-                  activeStage={activeStage}
-                />
+                <RecentPostureHistoryCard history={macroTrendline} historyHref="/history" />
               </div>
             </div>
-          </SwipeableWeek>
 
           {/* Directly under the call, not 3,000px below it. The one conversion
               on the page used to sit under the stress tester, the decision
@@ -555,52 +539,8 @@ async function PageContent({
             <SubscribeForm compact />
           </div>
 
-          {/* Below the call: unified retrospective card */}
-          <div id="since-last-visit" data-page-section="since-last-visit" tabIndex={-1} aria-labelledby="since-last-visit-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-            <SectionSignpost
-              index="03"
-              id="since-last-visit"
-              headingId="since-last-visit-heading"
-              title="Weekly retrospective"
-              description="Prior call review and decision hindsight against threshold movements"
-            />
-            <WeeklyRetrospectiveCard
-              currentVisit={{
-                recordDate: reportData.treasury.record_date,
-                recordDateLabel: homepage.reportShell.recordDateLabel,
-                regimeLabel: publicRegimeLabel,
-                call: primaryCall,
-              }}
-              hindsight={{
-                regime: regime,
-                scores: { tightness, riskAppetite },
-                deltas: { tightness: tightnessDelta, riskAppetite: riskAppetiteDelta },
-                thresholds: reportData.assessment.thresholds,
-                recordDateLabel: homepage.reportShell.recordDateLabel,
-                regimeTransition: reportData.assessment.regimeTransition,
-              }}
-            />
-          </div>
-
-          <div id="direct-answers" data-page-section="direct-answers" tabIndex={-1} aria-labelledby="direct-answers-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-            <SectionSignpost
-              index="04"
-              id="direct-answers"
-              headingId="direct-answers-heading"
-              title="Direct answers"
-              description="Immediate answers for hiring, spend, and burn guardrails"
-            />
-            <DirectAnswersStrip actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort ?? primaryCall} />
-          </div>
-
           <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-            <SectionSignpost
-              index="05"
-              id="plan-and-evidence"
-              headingId="plan-and-evidence-heading"
-              title="Plan & horizon"
-              description="Turn this week’s brief into approvals, finance posture, and team briefs"
-            />
+            <h2 id="plan-and-evidence-heading" className="sr-only">Turn this week’s call into a plan</h2>
             <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
               <span className="text-fluid-sm text-slate-400">Planning horizon</span>
