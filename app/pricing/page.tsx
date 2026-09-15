@@ -4,8 +4,10 @@ import { Check } from "lucide-react";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
 import { buildCanonicalUrl } from "../../lib/seo";
+import { buildPricingStructuredData } from "../../lib/seo/pageStructuredData";
 import {
   FREE_FOREVER_PROMISE,
+  PAID_PLANS_ON_SALE,
   formatMonthlyPrice,
   pricingPlans,
   type PricingPlan,
@@ -85,7 +87,10 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
 
 export default function PricingPage() {
   return (
-    <PageShell backdropVariant="hub">
+    <PageShell
+      backdropVariant="hub"
+      structuredData={buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: PAID_PLANS_ON_SALE })}
+    >
       <div className="mx-auto max-w-[64rem] space-y-8 px-4 py-8">
         <header className="space-y-3">
           <h1 className="text-fluid-lg font-semibold text-white">Pricing</h1>

@@ -3,6 +3,7 @@ import {
   buildOgImageUrl,
   defaultSiteDescription,
   organizationName,
+  organizationSameAs,
   websiteName,
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
@@ -60,6 +61,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       url: siteUrl,
       logo: `${siteUrl}/icon.svg`,
       description: defaultSiteDescription,
+      sameAs: [...organizationSameAs],
     },
     {
       "@type": "WebSite",

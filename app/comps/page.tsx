@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
 import { buildPageMetadata } from "../../lib/seo";
+import { buildCompsStructuredData } from "../../lib/seo/pageStructuredData";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 // Slot labels come from the one vocabulary source; Invariant 8 fails the suite
 // when a surface spells them itself.
@@ -84,7 +85,10 @@ export default async function CompsPage() {
   const capitalRule = brief.snapshot.homeBriefModel.decisionRules.find((rule) => rule.area === "capital-raising");
 
   return (
-    <PageShell backdropVariant="default">
+    <PageShell
+      backdropVariant="default"
+      structuredData={buildCompsStructuredData({ data: comps.status === "ok" ? comps.data : null, tickers: SAAS_BASKET })}
+    >
       <article className="weather-panel space-y-6 px-5 py-5">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">
           Public SaaS valuation multiples

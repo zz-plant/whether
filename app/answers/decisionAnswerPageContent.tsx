@@ -9,6 +9,7 @@ import {
 } from "./decisionPages";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { selectRelatedAnswers } from "../../lib/seo/relatedAnswers";
+import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
@@ -78,20 +79,19 @@ export async function DecisionAnswerPageContent({
     `Freshness: ${fetchedAtLabel}`,
   ].join("\n");
 
-  const faqData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: page.title,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: `${liveShortAnswer} Threshold context: risk appetite ${assessment.scores.riskAppetite.toFixed(0)} vs ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)} vs ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
-        },
-      },
-    ],
-  };
+  /*
+   * The FAQPage used to be a bare node: one question, no author, publisher,
+   * dates, URL, or link to the site entities. It now carries all of those, and
+   * a second question for the thresholds, which the page already answers.
+   */
+  const faqData = buildAnswerFaqStructuredData({
+    slug: page.slug,
+    question: page.title,
+    answer: `${liveShortAnswer} Threshold context: risk appetite ${assessment.scores.riskAppetite.toFixed(0)} vs ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)} vs ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
+    payload,
+    datePublishedIso: reportData.treasury.record_date,
+    dateModifiedIso: reportData.treasury.fetched_at,
+  });
 
   const thresholdTrigger =
     page.thresholdFocus === "tightness"
