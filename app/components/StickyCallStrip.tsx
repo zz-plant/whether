@@ -65,9 +65,8 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
     // hook it also honoured was set by the stress-test quick card, which left
     // the homepage on 2026-09-15; a selector nothing sets is what Invariant 11
     // exists to catch.
-    const blockingTargets = [document.getElementById("subscribe-email")].filter(
-      (target): target is Element => target instanceof Element,
-    );
+    const subscribeField = document.getElementById("subscribe-email");
+    const blockingTargets: Element[] = subscribeField ? [subscribeField] : [];
 
     const observer = blockingTargets.length > 0 && "IntersectionObserver" in window
       ? new IntersectionObserver(
