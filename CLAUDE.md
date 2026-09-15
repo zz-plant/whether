@@ -374,4 +374,10 @@ reading the set. Product specs live in `docs/`.
   audits, PR hygiene, provenance audits, executive briefs, skill authoring, subagent handoffs, React/
   Next.js performance rules). These are mirrored at `.codex/skills/` for the Codex runtime; keep both
   in sync when editing.
+- **FRED marks a missing observation with an empty CSV field, not only `"."`.** `Number("")`
+  is `0`, so any parser that guards only against the dot reads a market holiday as a zero print.
+  Seven month-ends in `data/time_machine_cache.json` carried all-zero yields, and the stress
+  veto's trailing VIX mean was pulled down by holiday zeros, until 2026-09-14. Route every FRED
+  value through `isMissingFredValue` (`lib/fred.ts`); the archive generators share one parser in
+  `scripts/regimeArchiveContext.ts` for the same reason.
 - Use `rg` for discovery; avoid `ls -R` and `grep -R`.

@@ -26,7 +26,6 @@
  * carries no value there rather than an invented one.
  */
 import { BASE_RATE_TIGHTNESS_THRESHOLD, TIGHTNESS_BASE_RATE_POINTS, BASE_RATE_TIGHTNESS_MULTIPLIER, BASE_RATE_SOURCE_LABELS } from "../regimeEngineCore";
-import type { RegimeAssessment } from "../regimeEngine";
 import type { RuleCondition } from "./boundedDecisionRules";
 import { distanceToRuleCondition, isRuleConditionMet } from "./boundedDecisionRules";
 import { formatThresholdNumber } from "../formatters";
@@ -261,7 +260,7 @@ export const buildFinancingDriverView = ({
   baseRate: number | null;
   /** The engine's rung key. `string` because display callers carry the widened
    *  type; an unknown key resolves the same label a missing rate does. */
-  baseRateUsed: RegimeAssessment["scores"]["baseRateUsed"] | string | undefined;
+  baseRateUsed: string | undefined;
   /** The short rate, oldest first, one entry per month of the trailing window. */
   rateHistory: readonly (number | null)[];
 }): FinancingDriverView => {
@@ -360,7 +359,7 @@ export const buildDriverViews = ({
   corridorPauseLines?: readonly RuleCondition[];
   corridorPauseVerb?: string;
   baseRate: number | null;
-  baseRateUsed: RegimeAssessment["scores"]["baseRateUsed"] | string | undefined;
+  baseRateUsed: string | undefined;
   history: readonly DriverHistoryEntry[];
   rateHistory: readonly (number | null)[];
 }): DriverViews => ({

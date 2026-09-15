@@ -9,6 +9,9 @@ import {
   fetchFredApiRows,
   fetchFredCsv,
   fetchFredRows,
+  isMissingFredValue,
+  parseFredApiObservations,
+  parseFredCsvRows,
   isRetryableFredError,
   resetFredCircuitBreaker,
   resolveFredApiKey,
@@ -438,5 +441,43 @@ describe("fetchFredRows — API path", () => {
         process.env.FRED_API_KEY = previous;
       }
     }
+  });
+});
+
+describe("missing FRED observations", () => {
+  /**
+   * The API marks a missing value with "."; the CSV export used to and now
+   * leaves the field empty. `Number("")` is 0, so a parser that guarded only
+   * against "." read every market holiday as a print of 0 — the shipped time
+   * machine cache carried seven month-ends with every yield at 0 until this
+   * guard existed.
+   */
+  it("treats an empty field, whitespace, and a dot as absent", () => {
+    assert.equal(isMissingFredValue(""), true);
+    assert.equal(isMissingFredValue("   "), true);
+    assert.equal(isMissingFredValue("."), true);
+    assert.equal(isMissingFredValue(" . "), true);
+    assert.equal(isMissingFredValue(undefined), true);
+    assert.equal(isMissingFredValue("0"), false);
+    assert.equal(isMissingFredValue("4.25"), false);
+  });
+
+  it("drops an empty CSV field instead of reading it as zero", () => {
+    const rows = parseFredCsvRows(buildFredCsv(["2024-03-28,5.49", "2024-03-29,", "2024-04-01,.", "2024-04-02,5.49"]));
+    assert.deepEqual(rows, [
+      { date: "2024-03-28", value: 5.49 },
+      { date: "2024-04-02", value: 5.49 },
+    ]);
+  });
+
+  it("drops an empty API observation the same way", () => {
+    const rows = parseFredApiObservations({
+      observations: [
+        { date: "2024-03-28", value: "5.49" },
+        { date: "2024-03-29", value: "" },
+        { date: "2024-04-01", value: "." },
+      ],
+    });
+    assert.deepEqual(rows, [{ date: "2024-03-28", value: 5.49 }]);
   });
 });

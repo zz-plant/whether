@@ -1,4 +1,5 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
+import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
 
 export type RegimeState = RegimeKey;
 
@@ -15,6 +16,14 @@ export type RegimeState = RegimeKey;
  * event is worse than an instant call — and marks the transition `shock`, which
  * the surfaces publish as an admitted unconfirmed call instead of pretending the
  * published condition was met.
+ *
+ * The distance alone does not prove the warning was impossible. A reading one
+ * point from the line that then jumps 26 points crossed by a shock-sized move,
+ * but its near-band warning was live the whole time, so the published reversal
+ * condition *could* have fired. A shock therefore also requires the prior
+ * reading to sit outside the canonical near band
+ * (`REGIME_CONFIDENCE_NEAR_THRESHOLD`); from inside it, the flip confirms
+ * through the gate like any other.
  */
 export const SHOCK_CROSSING_POINTS = 25;
 
@@ -145,9 +154,11 @@ const advanceRegimeStateBase = (
 
   /**
    * A crossing is a shock when the axis moved `SHOCK_CROSSING_POINTS` or more in
-   * one step on the axis it crossed — the case where the near-band warning was
-   * structurally impossible. Requires a previous reading: the first observation
-   * of a window has no one-step move to measure.
+   * one step on the axis it crossed *and* started outside the near band — the
+   * case where the near-band warning was structurally impossible. A move that
+   * started inside the band could have been warned about, however far it
+   * travelled, so it is not a shock. Requires a previous reading: the first
+   * observation of a window has no one-step move to measure.
    */
   const shockCrossed = previousState?.lastSignals
     ? [
@@ -157,7 +168,8 @@ const advanceRegimeStateBase = (
         const crossedLine =
           (axis.previous <= axis.line && axis.current > axis.line) ||
           (axis.previous > axis.line && axis.current <= axis.line);
-        return crossedLine && Math.abs(axis.current - axis.previous) >= SHOCK_CROSSING_POINTS;
+        const startedOutsideNearBand = Math.abs(axis.previous - axis.line) > REGIME_CONFIDENCE_NEAR_THRESHOLD;
+        return crossedLine && startedOutsideNearBand && Math.abs(axis.current - axis.previous) >= SHOCK_CROSSING_POINTS;
       })
     : false;
 

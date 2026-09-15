@@ -13,6 +13,7 @@ import {
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
+import { resolveConfidencePercent } from "../lib/report/confidence";
 
 const makeTreasury = (
   record_date: string,
@@ -258,6 +259,38 @@ describe("buildHistoricalAnalogs", () => {
     assert.equal(analogs[1]?.recordDate, "2025-01-31");
   });
 
+  it("scores a candidate on its governed assessment when the record has one", () => {
+    const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
+    const snapshots = [
+      makeSnapshot("2025-01-31", 4.3, 4.2, 4.4),
+      makeSnapshot("2025-02-28", 4.3, 4.2, 4.4),
+      makeSnapshot("2025-03-31", 4.3, 4.2, 4.4),
+    ];
+    const current = evaluateRegime(snapshots[2], thresholds);
+    // Identical curves tie on a bare re-evaluation. The record says February
+    // sat in a different quadrant (a stress veto the curve alone cannot see),
+    // so it must lose the posture match and fall behind January.
+    const governedFebruary = evaluateRegime(makeSnapshot("2025-02-28", 0.1, 0.2, 2.5), thresholds);
+    assert.notEqual(governedFebruary.regime, current.regime);
+    const consulted: string[] = [];
+
+    const analogs = buildHistoricalAnalogs({
+      current,
+      snapshots,
+      thresholds,
+      currentTrendDirection: "stable",
+      resolveGovernedAssessment: (recordDate) => {
+        consulted.push(recordDate);
+        return recordDate === "2025-02-28" ? governedFebruary : null;
+      },
+    });
+
+    assert.deepEqual(consulted, ["2025-01-31", "2025-02-28"]);
+    assert.equal(analogs[0]?.recordDate, "2025-01-31");
+    assert.equal(analogs[0]?.dimensions.postureMatch, 1);
+    assert.equal(analogs.find((item) => item.recordDate === "2025-02-28")?.dimensions.postureMatch, 0);
+  });
+
   it("keeps deterministic ordering across equivalent runs", () => {
     const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
     const snapshots = [
@@ -307,6 +340,39 @@ describe("weekly confidence history", () => {
 
     assert.equal(series.at(-1)?.recordDate, "2025-01-24");
     assert.equal(series.at(-1)?.isMissing, false);
+  });
+
+  it("reads a point's confidence from the governed assessment when the record has one", () => {
+    const snapshots = [
+      makeTreasury("2025-01-03", 5.2, 4.8, 4.4),
+      makeTreasury("2025-01-10", 5.1, 4.7, 4.4),
+      makeTreasury("2025-01-17", 5.0, 4.6, 4.4),
+    ];
+    const bare = buildWeeklyConfidenceSeries({ snapshots, thresholds, asOf: "2025-01-17", window: 8 });
+    // The record for the middle week carries a veto the bare curve cannot see,
+    // which puts it on the risk-appetite line; the point must show that distance.
+    const governed = evaluateRegime(makeTreasury("2025-01-10", 4.0, 4.0, 4.25), thresholds);
+    const withRecord = buildWeeklyConfidenceSeries({
+      snapshots,
+      thresholds,
+      asOf: "2025-01-17",
+      window: 8,
+      resolveGovernedAssessment: (recordDate) => (recordDate === "2025-01-10" ? governed : null),
+    });
+
+    const barePoint = bare.find((point) => point.recordDate === "2025-01-10");
+    const recordPoint = withRecord.find((point) => point.recordDate === "2025-01-10");
+    assert.ok(barePoint && recordPoint);
+    assert.notEqual(recordPoint.confidencePercent, barePoint.confidencePercent);
+    assert.equal(
+      recordPoint.confidencePercent,
+      resolveConfidencePercent({ scores: governed.scores, thresholds: governed.thresholds }),
+    );
+    // Dates the record does not cover keep the bare evaluation.
+    assert.equal(
+      withRecord.find((point) => point.recordDate === "2025-01-03")?.confidencePercent,
+      bare.find((point) => point.recordDate === "2025-01-03")?.confidencePercent,
+    );
   });
 
   it("returns the last eight weekly points and injects missing-week markers", () => {

@@ -31,12 +31,12 @@
   },
   {
     "label": "Q3 2011",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "intensity": 0.5
   },
   {
     "label": "Q4 2011",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "intensity": 0.5
   },
   {
@@ -61,8 +61,8 @@
   },
   {
     "label": "Q1 2013",
-    "regime": "VOLATILE",
-    "intensity": 0.67
+    "regime": "EXPANSION",
+    "intensity": 1
   },
   {
     "label": "Q2 2013",
@@ -161,8 +161,8 @@
   },
   {
     "label": "Q1 2018",
-    "regime": "VOLATILE",
-    "intensity": 0.92
+    "regime": "EXPANSION",
+    "intensity": 1
   },
   {
     "label": "Q2 2018",
@@ -172,12 +172,12 @@
   {
     "label": "Q3 2018",
     "regime": "EXPANSION",
-    "intensity": 0.69
+    "intensity": 1
   },
   {
     "label": "Q4 2018",
     "regime": "VOLATILE",
-    "intensity": 0.54
+    "intensity": 0.69
   },
   {
     "label": "Q1 2019",
@@ -186,38 +186,38 @@
   },
   {
     "label": "Q2 2019",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "VOLATILE",
+    "intensity": 1
   },
   {
     "label": "Q3 2019",
     "regime": "VOLATILE",
-    "intensity": 0.92
+    "intensity": 1
   },
   {
     "label": "Q4 2019",
-    "regime": "EXPANSION",
-    "intensity": 0.85
+    "regime": "VOLATILE",
+    "intensity": 1
   },
   {
     "label": "Q1 2020",
-    "regime": "EXPANSION",
-    "intensity": 0.57
+    "regime": "VOLATILE",
+    "intensity": 0.93
   },
   {
     "label": "Q2 2020",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "VOLATILE",
+    "intensity": 1
   },
   {
     "label": "Q3 2020",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "VOLATILE",
+    "intensity": 1
   },
   {
     "label": "Q4 2020",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "VOLATILE",
+    "intensity": 0.69
   },
   {
     "label": "Q1 2021",
@@ -237,7 +237,7 @@
   {
     "label": "Q4 2021",
     "regime": "EXPANSION",
-    "intensity": 0.93
+    "intensity": 1
   },
   {
     "label": "Q1 2022",
@@ -247,27 +247,27 @@
   {
     "label": "Q2 2022",
     "regime": "VOLATILE",
-    "intensity": 0.69
+    "intensity": 1
   },
   {
     "label": "Q3 2022",
     "regime": "VOLATILE",
-    "intensity": 1
+    "intensity": 0.64
   },
   {
     "label": "Q4 2022",
-    "regime": "VOLATILE",
+    "regime": "SCARCITY",
     "intensity": 1
   },
   {
     "label": "Q1 2023",
-    "regime": "VOLATILE",
+    "regime": "SCARCITY",
     "intensity": 1
   },
   {
     "label": "Q2 2023",
     "regime": "SCARCITY",
-    "intensity": 0.62
+    "intensity": 0.92
   },
   {
     "label": "Q3 2023",
@@ -281,8 +281,8 @@
   },
   {
     "label": "Q1 2024",
-    "regime": "VOLATILE",
-    "intensity": 0.92
+    "regime": "SCARCITY",
+    "intensity": 1
   },
   {
     "label": "Q2 2024",
@@ -291,36 +291,41 @@
   },
   {
     "label": "Q3 2024",
-    "regime": "VOLATILE",
-    "intensity": 0.69
+    "regime": "SCARCITY",
+    "intensity": 1
   },
   {
     "label": "Q4 2024",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "SCARCITY",
+    "intensity": 1
   },
   {
     "label": "Q1 2025",
-    "regime": "EXPANSION",
-    "intensity": 0.69
+    "regime": "SCARCITY",
+    "intensity": 1
   },
   {
     "label": "Q2 2025",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "DEFENSIVE",
+    "intensity": 0.54
   },
   {
     "label": "Q3 2025",
-    "regime": "EXPANSION",
-    "intensity": 0.92
+    "regime": "DEFENSIVE",
+    "intensity": 1
   },
   {
     "label": "Q4 2025",
     "regime": "EXPANSION",
-    "intensity": 1
+    "intensity": 0.69
   },
   {
     "label": "Q1 2026",
+    "regime": "EXPANSION",
+    "intensity": 1
+  },
+  {
+    "label": "Q2 2026",
     "regime": "EXPANSION",
     "intensity": 1
   }

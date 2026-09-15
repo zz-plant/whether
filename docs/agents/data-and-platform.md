@@ -25,6 +25,15 @@ the one provenance error this product cannot afford. An API failure on a non-vin
 back to the CSV export with one redacted warning; the key never appears in a URL that is logged
 or an error that is thrown.
 
+The two paths mark a missing observation differently, and the CSV export changed its mark. The
+API sends `"."`; the export used to, and now leaves the field empty. `isMissingFredValue` in
+`lib/fred.ts` is the one guard, and every parser — the client's CSV and API readers and the
+archive generators' shared `parseSeries` in `scripts/regimeArchiveContext.ts` — goes through it,
+because `Number("")` is `0` and a parser that only checks for `"."` reads a market holiday as a
+zero print. That is how seven month-end Treasury records shipped with every yield at 0, and ~160
+holiday VIX closes sat at 0 in the veto's trailing mean, until 2026-09-14. A holiday stays in a
+generator's series as a null point, so a period that ends on one resolves to the last real close.
+
 Vintages are not yet stored. The time machine still reconstructs months from today's series;
 the next step is a design note on carrying a vintage date per observation so `/history` can say
 what a month's call was made on.

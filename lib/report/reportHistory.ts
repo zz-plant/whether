@@ -56,6 +56,7 @@ export const buildHistoricalAnalogs = ({
   snapshots,
   thresholds,
   currentTrendDirection,
+  resolveGovernedAssessment,
   limit = 3,
 }: {
   current: ReturnType<typeof evaluateRegime>;
@@ -64,6 +65,15 @@ export const buildHistoricalAnalogs = ({
   thresholds: ReturnType<typeof import("../thresholds").parseThresholdsFromSearchParams>;
   currentTrendDirection: ReportDynamics["directionLabel"];
   limit?: number;
+  /**
+   * The governed assessment for a candidate's record date — the threaded
+   * walk's, with that month's VIX haircut and veto — or null when the date has
+   * none. Candidates that resolve here are scored on the record's confidence
+   * and distance to flip; the local walk below is the fallback for snapshots
+   * the record does not cover. Without it, stress periods such as 2020 were
+   * ranked on a bare curve that never had the veto applied.
+   */
+  resolveGovernedAssessment?: (recordDate: string) => ReturnType<typeof evaluateRegime> | null;
 }): HistoricalAnalog[] => {
   if (snapshots.length <= 1) {
     return [];
@@ -92,9 +102,11 @@ export const buildHistoricalAnalogs = ({
 
   let machineState: RegimeMachineSnapshot | null = null;
   const assessments = historicalCandidates.map((snapshot) => {
-    const assessment = evaluateRegime(snapshot, thresholds, [], machineState, {
-      baseRateHistory: velocityWindowFor(snapshot.record_date),
-    });
+    const assessment =
+      resolveGovernedAssessment?.(snapshot.record_date)
+      ?? evaluateRegime(snapshot, thresholds, [], machineState, {
+        baseRateHistory: velocityWindowFor(snapshot.record_date),
+      });
     machineState = assessment.regimeTransition?.snapshot ?? machineState;
     return assessment;
   });

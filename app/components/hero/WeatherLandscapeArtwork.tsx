@@ -1,7 +1,6 @@
-import type { RegimeKey } from "../../../lib/types";
 
 export interface WeatherLandscapeArtworkProps {
-  regime: RegimeKey | string;
+  regime: string;
   className?: string;
 }
 
