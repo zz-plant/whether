@@ -79,8 +79,8 @@ describe("regime colour contract", () => {
 
   it("defines accent and ink per regime in the token layer, with a light ink for each", () => {
     const tokens = readRepoFile("app/styles/tokens.css");
-    for (const regime of Object.keys(REGIME_HEX_COLORS)) {
-      const rule = new RegExp(`\\[data-regime="${regime}"\\]\\s*\\{[^}]*--regime-accent:\\s*${REGIME_HEX_COLORS[regime as keyof typeof REGIME_HEX_COLORS]}[^}]*--regime-ink:\\s*var\\(--color-`);
+    for (const [regime, hex] of Object.entries(REGIME_HEX_COLORS)) {
+      const rule = new RegExp(`\\[data-regime="${regime}"\\]\\s*\\{[^}]*--regime-accent:\\s*${hex}[^}]*--regime-ink:\\s*var\\(--color-`);
       assert.match(tokens, rule, `${regime} maps to its plane hue and a themed ink token`);
     }
   });
