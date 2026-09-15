@@ -382,7 +382,17 @@ export function DecisionHero({
   const regimeWeatherLabel = (regimeKey ? REGIME_WEATHER_LABELS[regimeKey] : regimeDisplay).toUpperCase();
 
   return (
-    <section className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
+    /*
+     * `id="share-ready-artifact"` lives here, on the card that actually is the
+     * share-ready artifact. It used to sit on a visually hidden `h1` in
+     * `app/page.tsx`, which meant the screenshot capture waited on a zero-size
+     * element and the "copy weekly brief" anchor jumped to nothing.
+     */
+    <section
+      id="share-ready-artifact"
+      className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7"
+      aria-labelledby="weekly-call-title"
+    >
       {/* Weather Landscape Artwork on the right side */}
       <WeatherLandscapeArtwork
         regime={regime}
@@ -399,13 +409,18 @@ export function DecisionHero({
               </span>
             </div>
 
-            <h2
+            {/* The homepage's `h1`. It was an `h2` under a visually hidden
+                `h1` reading "Weekly Brief", so the one heading a crawler and a
+                screen-reader user meet first said nothing this week that it did
+                not say every week, while the sentence that carries the call was
+                a level down. The call is the page. */}
+            <h1
               id="weekly-call-title"
               style={{ viewTransitionName: "page-title" }}
               className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.2] tracking-[-0.012em] text-white"
             >
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
-            </h2>
+            </h1>
 
             <p className="text-xs sm:text-sm font-normal text-slate-300 max-w-xl leading-relaxed">
               {(_showActionNow ? actionNow : (regimeKey ? REGIME_WEATHER_RATIONALES[regimeKey] : REGIME_DESCRIPTOR[regime])) ?? "Expand GTM and product bets only where activation and retention are tracking."}

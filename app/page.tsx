@@ -314,10 +314,10 @@ async function PageContent({
     rateHistory: getTimeMachineRollingYieldSeries(7, reportData.treasury.record_date).oneMonth.map((point) => point.value),
   });
 
-  /* One join, two labels. The `h1` is this page's accessible name, where the
-   * product name would be noise; the artifact title is what lands in someone
-   * else's Slack channel, where it is the only thing identifying the source. A
-   * selected horizon names itself in both. */
+  /* The selected horizon, named once. The page's `h1` is the weekly call
+   * itself (`DecisionHero`); this labels the copied artifact, which lands in
+   * someone else's Slack channel where it is the only thing identifying the
+   * source, and the meta row's date. */
   const cadenceTitle = cadenceCall
     ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
     : null;
@@ -346,9 +346,6 @@ async function PageContent({
   return (
     <>
       <BriefArtifactScript artifact={briefArtifact} />
-      <h1 className="sr-only" id="share-ready-artifact">
-        {cadenceTitle ?? "Weekly Brief"}
-      </h1>
       <ActivationTracker path="/" />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
