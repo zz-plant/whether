@@ -65,4 +65,18 @@ describe("run-checks failure report", () => {
     );
     assert.match(trailer, /last \d+ of \d+ lines/, "the end says the output was trimmed");
   });
+
+  /*
+   * `engines.bun` is declared and nothing enforces it, so a build image that
+   * ships its own `bun` runs this gate on whatever it has. A container failing
+   * this gate in September 2026 was printing a line per passing test, which
+   * only `bun` 1.1.x does, while the repo pinned 1.3.14 — and no log said so.
+   * A mismatch that could explain a failure has to be printed beside it.
+   */
+  it("names the runtime it ran on, beside the failure", () => {
+    const result = runNoisyFailure();
+    const trailer = result.stdout.slice(result.stdout.indexOf("check(s) failed"));
+
+    assert.match(trailer, /\[run-checks\] ran on bun \d+\.\d+\.\d+/);
+  });
 });

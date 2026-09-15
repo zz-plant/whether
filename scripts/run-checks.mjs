@@ -17,6 +17,7 @@
  *   bun scripts/run-checks.mjs --serial            # fail-fast sequencing
  */
 import { spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 
 import { recordPassedChecks } from "./check-gate-marker.mjs";
@@ -160,6 +161,31 @@ const runTask = (task) =>
 /** How much of a failing task's output the end-of-run repeat carries. */
 const FAILURE_TAIL_LINES = Number.parseInt(process.env.CHECK_FAILURE_TAIL_LINES ?? "40", 10);
 
+/**
+ * A one-line note when the running `bun` does not satisfy `engines.bun`.
+ *
+ * Deliberately a note and not a failure: the declared range is what this repo
+ * develops against, and a build image on something older may still be fine.
+ * What must not happen is the mismatch going unmentioned next to a failure it
+ * could explain.
+ */
+const engineMismatch = () => {
+  try {
+    const declared = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).engines?.bun;
+    if (typeof declared !== "string") return null;
+    const floor = declared.match(/(\d+)\.(\d+)\.(\d+)/);
+    if (!floor) return null;
+    const [runningMajor, runningMinor, runningPatch] = Bun.version.split(".").map(Number);
+    const [, major, minor, patch] = floor.map(Number);
+    const older =
+      runningMajor < major ||
+      (runningMajor === major && (runningMinor < minor || (runningMinor === minor && runningPatch < patch)));
+    return older ? ` — older than engines.bun "${declared}", which is what this repo is developed against` : null;
+  } catch {
+    return null;
+  }
+};
+
 /** Lines worth lifting out of a long run: what each of these tools calls a failure. */
 const FAILURE_LINE_PATTERN = /\(fail\)|^\s*✗|AssertionError|error: |Error: |^\s*✘|FAIL /;
 const FAILURE_MARKED_LINES = 20;
@@ -237,6 +263,18 @@ process.stdout.write(
  * end has to carry enough to act on.
  */
 if (failed.length > 0) {
+  /*
+   * The runtime, in the part of the log that survives.
+   *
+   * `package.json` declares `engines.bun`, and nothing enforces it: a build
+   * image that ships its own `bun` runs the gate on whatever it has. That is
+   * not a hypothetical — a container failing this gate in September 2026 was
+   * printing a line per passing test, which only `bun` 1.1.x does, while the
+   * repo pinned 1.3.14. Whoever reads the failure should not have to infer the
+   * toolchain from its output formatting.
+   */
+  process.stdout.write(`\n[run-checks] ran on bun ${Bun.version}${engineMismatch() ?? ""}\n`);
+
   for (const result of failed) {
     const lines = result.output.trimEnd().split("\n");
     const tail = lines.slice(-FAILURE_TAIL_LINES);

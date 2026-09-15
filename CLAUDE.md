@@ -298,6 +298,15 @@ passing tests and `exited with code 1`; the `❌` line and the assertion had scr
 Whatever that window keeps, it keeps the end, so the end now carries enough to act on.
 `CHECK_FAILURE_TAIL_LINES` (default 40) sizes it.
 
+That block also names **the `bun` it ran on**, and says so when that is older than `engines.bun`.
+Nothing enforces the declared range, so a build image shipping its own `bun` runs this gate on
+whatever it has — and the container above was on 1.1.x while `packageManager` pinned 1.3.14. The
+tell was the per-test output itself: only 1.1.x prints a line per passing test; 1.2 and 1.3 are
+silent on a pass. Inferring the toolchain from its output formatting is not a thing a reader should
+have to do twice, and a mismatch that could explain a failure must be printed beside it. It is a
+note, not a hard stop: an older runtime may still be fine, and turning an unexplained failure into a
+different unexplained failure buys nothing.
+
 **If a local `check` passes and the remote build fails, suspect ordering or environment, not the
 doc.** `mock.module` patches the module registry process-wide, so a test file can pass only because
 another file ran first and installed its mock; CI orders the suite differently. Run the file alone
