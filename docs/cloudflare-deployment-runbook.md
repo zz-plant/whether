@@ -24,7 +24,7 @@ The build command configured in the Workers Builds dashboard is `bun run check:v
 the deploy gate, not the full local check:
 
 ```bash
-WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions dead-exports \
+WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions \
   && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks
 ```
 
@@ -36,8 +36,9 @@ slow route into one that "never answered".
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
 not guarantee), and gives the landmark audit's dev-server readiness and per-route bounds room for a
 cold start. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
-knob is gone. `audit` needs the network and `hotspot-preflight` needs git history, so both stay on
-`bun run check` and pre-push rather than the deploy path. It runs on every push, `main` included,
+knob is gone. `audit` needs the network, `hotspot-preflight` needs git history, and
+`dead-exports` needs a complete working tree, so all three stay on `bun run check` and
+pre-push rather than the deploy path. It runs on every push, `main` included,
 so a red gate is a blocked deploy — read the build log in the dashboard, where `run-checks.mjs` names the failing
 task and attaches its output.
 

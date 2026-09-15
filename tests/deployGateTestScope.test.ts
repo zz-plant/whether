@@ -80,8 +80,12 @@ describe("deploy gate test scope", () => {
     for (const task of ["lint", "typecheck", "test", "assets", "suppressions", "landmarks"]) {
       assert.match(command, new RegExp(`\\b${task}\\b`), `check:vinext no longer runs ${task}`);
     }
-    // Network and git-history checks stay on pre-push and `bun run check`, where they can run.
-    assert.doesNotMatch(command, /\baudit\b|hotspot-preflight/);
+    // Checks whose prerequisite the build image does not guarantee stay on pre-push and
+    // `bun run check`, where they have what they need: `audit` wants the network,
+    // `hotspot-preflight` wants git history, and `dead-exports` wants a complete working
+    // tree — every one of its verdicts is "no other file mentions this name", so a tree it
+    // cannot fully read reports live exports as dead and blocks a deploy on a scan artefact.
+    assert.doesNotMatch(command, /\baudit\b|hotspot-preflight|dead-exports/);
     // The landmark audit spawns a dev server and compiles every route against it. Run
     // alongside lint, tsc, and the suite on a small box, that server competes for the same
     // cores and memory, and a route that compiles slowly reads as a route that never
@@ -113,7 +117,7 @@ describe("deploy gate test scope", () => {
   it("skips only the checks a record proves for this very commit", () => {
     assert.deepEqual(outstandingChecks(GATE_TASKS), []);
     assert.deepEqual(outstandingChecks([]), GATE_TASKS);
-    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "dead-exports", "landmarks"]);
+    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "landmarks"]);
   });
 });
 

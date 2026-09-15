@@ -104,6 +104,19 @@ export const DEAD_EXPORT_BASELINE = 0;
 
 export type DeadExport = { file: string; name: string; kind: "runtime" | "type" };
 
+/**
+ * `statSync` throws on a dangling symlink and on a path that disappears between
+ * the `readdirSync` and the stat. Neither is hypothetical in a build container,
+ * and either one crashed the whole census rather than skipping one entry.
+ */
+const isDirectory = (path: string): boolean | null => {
+  try {
+    return statSync(path).isDirectory();
+  } catch {
+    return null;
+  }
+};
+
 const walk = (directory: string, extensions: Set<string>, into: string[]) => {
   let entries: string[];
   try {
@@ -114,8 +127,9 @@ const walk = (directory: string, extensions: Set<string>, into: string[]) => {
   for (const entry of entries) {
     if (IGNORED_DIRECTORIES.has(entry)) continue;
     const path = join(directory, entry);
-    const stats = statSync(path);
-    if (stats.isDirectory()) {
+    const directoryEntry = isDirectory(path);
+    if (directoryEntry === null) continue;
+    if (directoryEntry) {
       walk(path, extensions, into);
     } else if (extensions.has(extname(entry))) {
       into.push(path);
@@ -135,7 +149,7 @@ const collect = (
   if (includeRootConfig) {
     for (const entry of readdirSync(root)) {
       const path = join(root, entry);
-      if (statSync(path).isFile() && ROOT_CONFIG_EXTENSIONS.has(extname(entry)) && !entry.endsWith(".d.ts")) {
+      if (isDirectory(path) === false && ROOT_CONFIG_EXTENSIONS.has(extname(entry)) && !entry.endsWith(".d.ts")) {
         paths.push(path);
       }
     }
@@ -143,17 +157,66 @@ const collect = (
   const files = new Map<string, string>();
   for (const path of paths) {
     if (skipAmbient && path.endsWith(".d.ts")) continue;
-    files.set(relative(root, path), readFileSync(path, "utf8"));
+    try {
+      files.set(relative(root, path), readFileSync(path, "utf8"));
+    } catch {
+      /* Unreadable here means unscannable, which `assertScanIsPlausible` judges. */
+    }
   }
   return files;
+};
+
+/**
+ * Roots a healthy checkout always has. `packages` and `.github` are excluded:
+ * either can be legitimately absent, and a missing one costs precision, not
+ * soundness.
+ */
+const REQUIRED_REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests"];
+
+const countByRoot = (files: Map<string, string>): Map<string, number> => {
+  const counts = new Map<string, number>();
+  for (const path of files.keys()) {
+    const root = path.split(/[\\/]/)[0] ?? "";
+    counts.set(root, (counts.get(root) ?? 0) + 1);
+  }
+  return counts;
+};
+
+/**
+ * Refuse to answer from a tree this cannot read.
+ *
+ * Every verdict here is "no other file mentions this name", so a scan that
+ * reaches fewer files reports *more* dead exports — a checkout missing
+ * `tests/` would condemn hundreds of live exports, and the failure would read
+ * as a real finding. This is the same trap the landmark audit records, where a
+ * container that reached no route at all would have reported zero violations:
+ * an unreadable tree must fail as an unreadable tree, by name, not be scored.
+ *
+ * Only callers that pass `requireCompleteTree` are judged: the unit tests
+ * scaffold two-file trees on purpose, and a partial tree is exactly what they
+ * are measuring.
+ */
+const assertScanIsPlausible = (references: Map<string, string>) => {
+  const counts = countByRoot(references);
+  const empty = REQUIRED_REFERENCE_ROOTS.filter((root) => (counts.get(root) ?? 0) === 0);
+  if (empty.length === 0) return;
+  throw new Error(
+    `[dead-exports] refusing to report: no files found under ${empty.join(", ")}. ` +
+      "Every verdict is \"nothing else mentions this name\", so a tree this scan cannot read " +
+      "reports live exports as dead. Run it from a complete checkout.",
+  );
 };
 
 /**
  * Every exported declaration under the declaration roots whose name no other
  * scanned file mentions. Sorted by file then name so the output is stable.
  */
-export const censusDeadExports = (root = REPO_ROOT): DeadExport[] => {
+export const censusDeadExports = (
+  root = REPO_ROOT,
+  { requireCompleteTree = false }: { requireCompleteTree?: boolean } = {},
+): DeadExport[] => {
   const references = collect(root, REFERENCE_ROOTS, REFERENCE_EXTENSIONS, true);
+  if (requireCompleteTree) assertScanIsPlausible(references);
   const declarations = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false, { skipAmbient: true });
 
   const identifiersByFile = new Map<string, Set<string>>();
@@ -184,7 +247,7 @@ export const censusDeadExports = (root = REPO_ROOT): DeadExport[] => {
 };
 
 const main = () => {
-  const dead = censusDeadExports();
+  const dead = censusDeadExports(REPO_ROOT, { requireCompleteTree: true });
   const runtime = dead.filter((entry) => entry.kind === "runtime").length;
   const types = dead.length - runtime;
 

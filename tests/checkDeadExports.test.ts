@@ -70,11 +70,30 @@ describe("dead export census", () => {
   });
 
   /*
+   * Every verdict here is "no other file mentions this name", so a scan that
+   * reaches fewer files reports more dead exports, not fewer. A checkout
+   * missing `tests/` would condemn hundreds of live exports and read as a real
+   * finding — which is how a container that cannot see the tree turns into a
+   * blocked deploy nobody can diagnose. It has to refuse instead.
+   */
+  it("refuses to report from a tree it cannot read, rather than scoring it", () => {
+    const root = scaffold({
+      "lib/a.ts": "export const referencedFromTests = 1;\n",
+    });
+
+    assert.deepEqual(censusDeadExports(root), [{ file: "lib/a.ts", name: "referencedFromTests", kind: "runtime" }]);
+    assert.throws(
+      () => censusDeadExports(root, { requireCompleteTree: true }),
+      /refusing to report: no files found under app, worker, scripts, tests/,
+    );
+  });
+
+  /*
    * The repo itself. This is the assertion the gate makes on every push; the
    * test repeats it so a red gate has a failing test naming the export.
    */
   it("holds the repo at its baseline", () => {
-    const dead = censusDeadExports();
+    const dead = censusDeadExports(undefined, { requireCompleteTree: true });
     assert.ok(
       dead.length <= DEAD_EXPORT_BASELINE,
       `${dead.length} unreferenced export(s):\n${dead.map((entry) => `  ${entry.file}: ${entry.name}`).join("\n")}`,
