@@ -83,6 +83,13 @@ type Props = {
   /** Server-resolved from `?why=1`, so a shared link opens on the same panel. */
   signalBreakdownOpen?: boolean;
   activeStage?: StartupVariantMode;
+  /**
+   * The heading level for the call. `h1` by default — it is the page's subject.
+   * `h2` on the one state where a cadence card above it carries the call the
+   * reader asked for; an `h2` above an `h1`, or two `h1`s, both invert the
+   * document outline.
+   */
+  titleLevel?: "h1" | "h2";
   signalData?: {
     baseRate?: number | null;
     baseRateUsed?: string;
@@ -130,6 +137,7 @@ export function DecisionHero({
   noChangeAreas = [],
   thresholdBusinessConsequence,
   signalBreakdownOpen = false,
+  titleLevel = "h1",
   signalData,
   activeStage = "series-a",
 }: Props) {
@@ -378,6 +386,7 @@ export function DecisionHero({
     SCARCITY: Snowflake,
   };
   const WeatherIcon = regimeKey ? weatherIconMap[regimeKey] : Sun;
+  const TitleTag = titleLevel;
   const regimeWeatherLabel = (regimeKey ? REGIME_WEATHER_LABELS[regimeKey] : regimeDisplay).toUpperCase();
 
   /* The card names its own regime so the surface, the stamp and the sparkline
@@ -387,7 +396,14 @@ export function DecisionHero({
      200px block above the call in every viewport, and in light mode as a
      hard-edged grey rectangle. The stamp's glyph carries the weather. */
   return (
+    /*
+     * `id="share-ready-artifact"` lives here, on the card that actually is the
+     * share-ready artifact. It used to sit on a visually hidden `h1` in
+     * `app/page.tsx`, which meant the screenshot capture waited on a zero-size
+     * element and the "copy weekly brief" anchor jumped to nothing.
+     */
     <section
+      id="share-ready-artifact"
       className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7"
       aria-labelledby="weekly-call-title"
       data-regime={regimeKey ?? undefined}
@@ -409,13 +425,24 @@ export function DecisionHero({
               </span>
             </div>
 
-            <h2
+            {/* The homepage's `h1`. It was an `h2` under a visually hidden
+                `h1` reading "Weekly Brief", so the one heading a crawler and a
+                screen-reader user meet first said nothing this week that it did
+                not say every week, while the sentence that carries the call was
+                a level down. The call is the page.
+
+                `titleLevel` drops it to `h2` on the one state where something
+                above it outranks it: with a cadence selected, that card's
+                headline is the call the reader asked for and this one is the
+                weekly detail beneath it. Two `h1`s, or an `h2` above the `h1`,
+                would both invert the outline. */}
+            <TitleTag
               id="weekly-call-title"
               style={{ viewTransitionName: "page-title" }}
               className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.2] tracking-[-0.012em] text-white"
             >
               {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
-            </h2>
+            </TitleTag>
 
             <p className="text-xs sm:text-sm font-normal text-slate-300 max-w-xl leading-relaxed">
               {(_showActionNow ? actionNow : (regimeKey ? REGIME_WEATHER_RATIONALES[regimeKey] : REGIME_DESCRIPTOR[regime])) ?? "Expand GTM and product bets only where activation and retention are tracking."}

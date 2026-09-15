@@ -22,7 +22,3 @@ export const monthOptions = [
 export const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
 export const formatScore = (value: number) => value.toFixed(0);
-
-
-export const formatCurve = (value: number | null) =>
-  value === null ? "—" : `${value.toFixed(2)}%`;

@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
 import { buildPageMetadata } from "../../lib/seo";
+import { buildCompsStructuredData } from "../../lib/seo/pageStructuredData";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 // Slot labels come from the one vocabulary source; Invariant 8 fails the suite
 // when a surface spells them itself.
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import {
   SAAS_BASKET,
+  SAAS_BASKET_COMPANIES,
   fetchSaaSValuations,
   QuoteSourceUnavailableError,
   type SaaSValuationSnapshot,
@@ -84,7 +86,10 @@ export default async function CompsPage() {
   const capitalRule = brief.snapshot.homeBriefModel.decisionRules.find((rule) => rule.area === "capital-raising");
 
   return (
-    <PageShell backdropVariant="default">
+    <PageShell
+      backdropVariant="default"
+      structuredData={buildCompsStructuredData({ data: comps.status === "ok" ? comps.data : null, tickers: SAAS_BASKET })}
+    >
       <article className="weather-panel space-y-6 px-5 py-5">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">
           Public SaaS valuation multiples
@@ -162,11 +167,13 @@ export default async function CompsPage() {
 
         <section className="space-y-3">
           <h2 className="type-eyebrow">Basket composition</h2>
+          {/* Derived, not retyped: the names and the count came from two places
+              and could disagree the moment a ticker was added. */}
           <p className="text-sm text-slate-300">
-            Snowflake, Shopify, Salesforce, HubSpot, MongoDB, Datadog, Atlassian, Workday, ServiceNow, Zscaler, Confluent, Toast, GitLab, Cloudflare, Freshworks.
+            {SAAS_BASKET_COMPANIES.map((company) => company.name).join(", ")}.
           </p>
           <p className="text-sm text-slate-300">
-            These {SAAS_BASKET.length} companies represent a cross-section of modern public SaaS — across cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
+            These {SAAS_BASKET_COMPANIES.length} companies represent a cross-section of modern public SaaS — across cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
           </p>
         </section>
 

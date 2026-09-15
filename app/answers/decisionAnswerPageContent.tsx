@@ -9,6 +9,8 @@ import {
 } from "./decisionPages";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { selectRelatedAnswers } from "../../lib/seo/relatedAnswers";
+import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
+import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
@@ -78,20 +80,28 @@ export async function DecisionAnswerPageContent({
     `Freshness: ${fetchedAtLabel}`,
   ].join("\n");
 
-  const faqData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: page.title,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: `${liveShortAnswer} Threshold context: risk appetite ${assessment.scores.riskAppetite.toFixed(0)} vs ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)} vs ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
-        },
-      },
-    ],
-  };
+  /*
+   * The FAQPage used to be a bare node: one question, no author, publisher,
+   * dates, URL, or link to the site entities. It now carries all of those, and
+   * a second question for the thresholds, which the page already answers.
+   */
+  const faqData = buildAnswerFaqStructuredData({
+    slug: page.slug,
+    question: page.title,
+    answer: `${liveShortAnswer} Threshold context: risk appetite ${assessment.scores.riskAppetite.toFixed(0)} vs ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)} vs ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
+    payload,
+    datePublishedIso: reportData.treasury.record_date,
+    dateModifiedIso: reportData.treasury.fetched_at,
+  });
+
+  /*
+   * All eleven pages shipped the same six section headings, so the outline a
+   * reader skims said nothing about which answer they were reading. Four of the
+   * six are built from this page's audience, decision areas and threshold
+   * focus; "Copy this answer" and "Citation" label a button and a provenance
+   * block, which are the same thing everywhere.
+   */
+  const headings = buildAnswerSectionHeadings(page);
 
   const thresholdTrigger =
     page.thresholdFocus === "tightness"
@@ -123,7 +133,7 @@ export async function DecisionAnswerPageContent({
           )}
         />
 
-        <SecondaryPageSection title="Copy this answer">
+        <SecondaryPageSection title={headings.copy}>
           <div className="space-y-3">
             <p className="text-sm text-slate-200">
               Copy the bounded answer, threshold, and citation as a meeting-ready brief.
@@ -144,7 +154,7 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="This week's posture">
+        <SecondaryPageSection title={headings.posture}>
           <div className="space-y-2 text-sm text-slate-200">
             <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</p>
             <p><span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</p>
@@ -155,7 +165,7 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="Bounded calls">
+        <SecondaryPageSection title={headings.rules}>
           <div className="grid gap-3 sm:grid-cols-2">
             {mappedRules.map((rule) => (
               <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
@@ -172,18 +182,18 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="What would change this answer">
+        <SecondaryPageSection title={headings.threshold}>
           <p className="text-sm text-slate-200">{thresholdTrigger}</p>
           <p className="text-sm text-slate-200">Current risk appetite: {assessment.scores.riskAppetite.toFixed(0)} / 100 · current tightness: {assessment.scores.tightness.toFixed(0)} / 100.</p>
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="Citation">
+        <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
           <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
           {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {(payload.noindexReasons ?? []).join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
         </SecondaryPageSection>
 
-        <SecondaryPageSection title="Where to go next">
+        <SecondaryPageSection title={headings.next}>
           <div className="flex flex-wrap gap-2">
             <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
             <ActionLink href="/resolve#unresolved-question-router" variant="pill">Decision Tools</ActionLink>

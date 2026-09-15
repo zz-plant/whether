@@ -18,15 +18,19 @@
  */
 import { z } from "zod";
 import { withDeadline } from "../withDeadline";
+import {
+  queryAnalyticsEngine,
+  resolveAnalyticsReadConfig,
+  type AnalyticsReadConfig,
+} from "./analyticsQuery";
 
-export const RUN_HISTORY_WINDOW_DAYS = 30;
-export const RUN_HISTORY_CACHE_MS = 15 * 60 * 1000;
-export const RUN_HISTORY_TIMEOUT_MS = 2_500;
-const DEFAULT_DATASET = "whether_telemetry";
+const RUN_HISTORY_WINDOW_DAYS = 30;
+const RUN_HISTORY_CACHE_MS = 15 * 60 * 1000;
+const RUN_HISTORY_TIMEOUT_MS = 2_500;
 const ROW_LIMIT = 5_000;
 
 /** Operator-facing names for the step labels `runCronStep` writes. Unknown steps show their raw label. */
-export const CRON_STEP_LABELS: Record<string, string> = {
+const CRON_STEP_LABELS: Record<string, string> = {
   "refresh-operating-state": "Signal refresh",
   "email/send-weekly": "Weekly email",
   "slack/deliver-brief": "Slack brief",
@@ -38,7 +42,7 @@ export const CRON_STEP_LABELS: Record<string, string> = {
   "brief-freeze-workflow": "Brief freeze pull request",
 };
 
-export type CronStepSummary = {
+type CronStepSummary = {
   step: string;
   label: string;
   runs: number;
@@ -56,35 +60,15 @@ export type CronRunHistory =
       steps: CronStepSummary[];
       totalRuns: number;
       totalFailures: number;
+      /** Set when the window held more rows than one query returns. */
+      truncated?: boolean;
     }
   | { status: "unconfigured" }
   | { status: "unavailable"; reason: string };
 
-export type AnalyticsReadConfig = { accountId: string; token: string; dataset: string };
-
-const readSetting = (name: string): string | null => {
-  const fromBinding: unknown = Reflect.get(globalThis, name);
-  if (typeof fromBinding === "string" && fromBinding.trim() !== "") return fromBinding.trim();
-  const fromEnv = typeof process !== "undefined" ? process.env?.[name] : undefined;
-  return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
-};
-
-/** Dataset names are identifiers, and this one comes from a var; anything else is refused rather than interpolated. */
-const isDatasetName = (value: string) => /^[a-z][a-z0-9_]{0,63}$/i.test(value);
-
-export const resolveAnalyticsReadConfig = (): AnalyticsReadConfig | null => {
-  const accountId = readSetting("CLOUDFLARE_ACCOUNT_ID");
-  const token = readSetting("CLOUDFLARE_ANALYTICS_READ_TOKEN");
-  const dataset = readSetting("WHETHER_TELEMETRY_DATASET") ?? DEFAULT_DATASET;
-  if (!accountId || !token || !isDatasetName(dataset)) return null;
-  return { accountId, token, dataset };
-};
-
 /* Validated rather than asserted: this is a remote API response, and an error body would
    otherwise be counted as "zero runs". */
-const sqlResponseSchema = z.object({
-  data: z.array(z.object({ timestamp: z.string(), blob2: z.string().nullable().optional() })).optional(),
-});
+const cronStepRowSchema = z.object({ timestamp: z.string(), blob2: z.string().nullable().optional() });
 
 const cronStepEventSchema = z.object({
   step: z.string().min(1),
@@ -92,7 +76,7 @@ const cronStepEventSchema = z.object({
   error: z.string().nullable().optional(),
 });
 
-export type CronStepRow = { timestamp: string; blob2?: string | null };
+type CronStepRow = { timestamp: string; blob2?: string | null };
 
 /** Analytics Engine stamps rows as "YYYY-MM-DD HH:MM:SS" in UTC; normalise to ISO. */
 const toIsoTimestamp = (value: string): string | null => {
@@ -162,7 +146,7 @@ export const buildCronStepQuery = (dataset: string, windowDays: number) =>
     `LIMIT ${ROW_LIMIT}`,
   ].join("\n");
 
-export type LoadCronRunHistoryOptions = {
+type LoadCronRunHistoryOptions = {
   fetcher?: typeof fetch;
   now?: Date;
   windowDays?: number;
@@ -173,27 +157,35 @@ export type LoadCronRunHistoryOptions = {
 
 const queryCronSteps = async (
   config: AnalyticsReadConfig,
-  options: Required<Pick<LoadCronRunHistoryOptions, "fetcher" | "now" | "windowDays">>,
+  options: Required<Pick<LoadCronRunHistoryOptions, "fetcher" | "now" | "windowDays" | "timeoutMs">>,
 ): Promise<CronRunHistory> => {
-  const response = await options.fetcher(
-    `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(config.accountId)}/analytics_engine/sql`,
-    {
-      method: "POST",
-      headers: { authorization: `Bearer ${config.token}`, "content-type": "text/plain" },
-      body: buildCronStepQuery(config.dataset, options.windowDays),
-    },
-  );
+  const result = await queryAnalyticsEngine({
+    config,
+    sql: buildCronStepQuery(config.dataset, options.windowDays),
+    rowSchema: cronStepRowSchema,
+    rowLimit: ROW_LIMIT,
+    fetcher: options.fetcher,
+    /*
+     * The deadline belongs on the request, not only on the promise. `withDeadline`
+     * below resolves this page's read on time either way, but it leaves the POST
+     * in flight inside the Worker; aborting it is what actually frees the isolate.
+     */
+    timeoutMs: options.timeoutMs,
+  });
 
-  if (!response.ok) {
-    return { status: "unavailable", reason: `Analytics Engine answered HTTP ${response.status}` };
+  if (!result.ok) {
+    return { status: "unavailable", reason: result.reason };
   }
 
-  const parsed = sqlResponseSchema.safeParse(await response.json());
-  if (!parsed.success) {
-    return { status: "unavailable", reason: "Analytics Engine answered with an unexpected payload" };
-  }
-
-  return summarizeCronSteps(parsed.data.data ?? [], { windowDays: options.windowDays, now: options.now });
+  const summary = summarizeCronSteps(result.rows, { windowDays: options.windowDays, now: options.now });
+  /*
+   * A window busier than the row cap used to be summarised as if it were the
+   * whole window, so a month with more than 5,000 cron steps would under-report
+   * runs and failures on the page whose subject is what the pipeline did. The
+   * count is still useful when clipped; saying so is the difference between a
+   * partial answer and a wrong one.
+   */
+  return result.truncated ? { ...summary, truncated: true } : summary;
 };
 
 let cached: { at: number; value: Promise<CronRunHistory> } | null = null;
@@ -217,6 +209,7 @@ export const loadCronRunHistory = async (options: LoadCronRunHistoryOptions = {}
       fetcher: options.fetcher ?? fetch,
       now,
       windowDays: options.windowDays ?? RUN_HISTORY_WINDOW_DAYS,
+      timeoutMs: options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS,
     }),
     options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS,
     "run-history",

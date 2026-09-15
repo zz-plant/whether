@@ -1,6 +1,6 @@
 import type { DecisionDepartment } from "../decisionMemory";
 
-export type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
+type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
 
 export type AlertConditions = {
   regime: string;
@@ -20,7 +20,7 @@ export type LastAlertState = {
 /** Which score crossed. Structural, because delivery picks the email template
  *  from it — it used to substring-match the headline for "tightness", which made
  *  a copy edit able to silently misroute every threshold alert. */
-export type AlertMetric = "credit" | "sentiment";
+type AlertMetric = "credit" | "sentiment";
 
 export type AlertDecision = {
   type: "regime_change" | "threshold";
@@ -42,7 +42,7 @@ export const checkRegimeChange = (
   lastRegime: string,
 ): boolean => currentRegime !== lastRegime;
 
-export const checkThresholdCrossing = (
+const checkThresholdCrossing = (
   currentScore: number,
   threshold: number,
   lastScore?: number,

@@ -12,7 +12,7 @@ export type CadenceSummaryProvenance = {
   statusLabel: string;
 };
 
-export type CadenceSummaryName = "quarterly" | "yearly";
+type CadenceSummaryName = "quarterly" | "yearly";
 
 type CadenceSummaryParams = {
   cadence: CadenceSummaryName;

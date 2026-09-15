@@ -71,7 +71,7 @@ const bundledMonthlyRegimeHistory = parseMonthlyRegimeHistory(rawMonthlyRegimeHi
 let primedHistory: MonthlyRegimeHistoryEntry[] | null = null;
 let primedAt = 0;
 
-export type MonthlyRegimeHistorySource = "kv" | "bundled";
+type MonthlyRegimeHistorySource = "kv" | "bundled";
 
 /**
  * Pull the cron-written months into the module so the sync readers can see them. Safe to

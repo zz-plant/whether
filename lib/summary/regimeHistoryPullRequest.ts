@@ -27,7 +27,7 @@ import {
 
 export const REGIME_HISTORY_FILE_PATH = "data/summary_monthly_regime_history.json";
 
-export type RegimeHistoryFileUpdate = {
+type RegimeHistoryFileUpdate = {
   /** False when the current file already carries every month KV has, in the same shape. */
   changed: boolean;
   /** The next file body: two-space JSON with a trailing newline, as the generator scripts write it. */
@@ -98,7 +98,7 @@ export const buildRegimeHistoryUpdateAgainstBase = async ({
 
 export const regimeHistoryBranchName = (now: Date) => `automation/regime-history-${now.toISOString().slice(0, 10)}`;
 
-export const buildRegimeHistoryPullRequestBody = (update: RegimeHistoryFileUpdate, now: Date) =>
+const buildRegimeHistoryPullRequestBody = (update: RegimeHistoryFileUpdate, now: Date) =>
   [
     "## Summary",
     `Records the month in progress from the Worker's KV copy of the regime history into the bundled series (\`${REGIME_HISTORY_FILE_PATH}\`). Months added or rewritten: ${update.changedMonths.join(", ")}.`,
@@ -122,7 +122,7 @@ export const buildRegimeHistoryPullRequestBody = (update: RegimeHistoryFileUpdat
     `_Generated ${now.toISOString()} by the regime history Workflow._`,
   ].join("\n");
 
-export type OpenRegimeHistoryPullRequestInput = {
+type OpenRegimeHistoryPullRequestInput = {
   client: GitHubRepoClient;
   update: RegimeHistoryFileUpdate;
   base?: string;

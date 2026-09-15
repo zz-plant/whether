@@ -3,7 +3,7 @@
  * Captures expected expansion demand while preserving traceability and plain-English framing.
  */
 
-export type OperatorRequestStatus = "DELIVERED" | "BACKLOG";
+type OperatorRequestStatus = "DELIVERED" | "BACKLOG";
 
 export const operatorRequests: Array<{
   title: string;

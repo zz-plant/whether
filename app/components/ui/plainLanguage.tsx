@@ -5,7 +5,6 @@ import {
   compositeSignalScales,
   plainEnglishScoreDescription,
   scoreBandReference,
-  signalPlainEnglish,
   type CompositeSignalKey,
 } from "../../../lib/report/signalTranslations";
 import { ActionLink } from "./actionLink";
@@ -50,34 +49,6 @@ export function PlainEnglishScoreNote({
       {lead ? <span className="text-white/40">{lead}: </span> : null}
       {plainEnglishScoreDescription(signalKey, score)}
     </p>
-  );
-}
-
-/**
- * Several signals' readings as a labelled list. Each sentence carries its own
- * signal name, so the pairing survives a single-column layout — a bare stack of
- * sentences under a row of cards loses which one belongs to which.
- */
-export function SignalMeaningList({
-  signals,
-  className,
-}: {
-  signals: ReadonlyArray<{ signalKey: RegimeSignalKey; score: number }>;
-  className?: string;
-}) {
-  return (
-    <dl className={joinClasses("grid gap-2 sm:grid-cols-2", className)}>
-      {signals.map(({ signalKey, score }) => (
-        <div key={signalKey}>
-          <dt className="text-fluid-nano font-medium text-slate-300">
-            {signalPlainEnglish[signalKey].plainLabel}
-          </dt>
-          <dd className="mt-0.5 text-fluid-micro leading-snug text-slate-400">
-            {plainEnglishScoreDescription(signalKey, score)}
-          </dd>
-        </div>
-      ))}
-    </dl>
   );
 }
 
@@ -135,38 +106,6 @@ export function ScoreBandReference({
         );
       })}
     </dl>
-  );
-}
-
-/**
- * The full plain-English readout for one signal: what it measures, where this
- * week sits, and the question to ask yourself about it.
- */
-export function SignalMeaningCard({
-  signalKey,
-  score,
-  className,
-}: {
-  signalKey: RegimeSignalKey;
-  score: number;
-  className?: string;
-}) {
-  const entry = signalPlainEnglish[signalKey];
-
-  return (
-    <div
-      className={joinClasses(
-        "rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2.5",
-        className,
-      )}
-    >
-      <p className="text-fluid-xs font-semibold text-white/85">{entry.plainLabel}</p>
-      <p className="mt-1 text-fluid-nano leading-snug text-white/55">{entry.whatItMeasures}</p>
-      <ScoreBandReference signalKey={signalKey} score={score} className="mt-2" />
-      <p className="mt-2 border-t border-white/[0.06] pt-2 text-fluid-nano leading-snug text-white/45">
-        <span className="font-medium text-white/60">Ask yourself:</span> {entry.operatorPrompt}
-      </p>
-    </div>
   );
 }
 

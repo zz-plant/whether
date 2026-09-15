@@ -19,13 +19,13 @@ import {
   type OpenRegimeHistoryPullRequestResult,
 } from "../../lib/summary/regimeHistoryPullRequest";
 
-export type RegimeHistoryWorkflowEnv = {
+type RegimeHistoryWorkflowEnv = {
   WHETHER_DURABLE_KV: Pick<KvNamespace, "get">;
   GITHUB_TOKEN?: string;
   GITHUB_REPOSITORY?: string;
 };
 
-export type RegimeHistoryWorkflowParams = {
+type RegimeHistoryWorkflowParams = {
   /** Base branch for the pull request. Defaults to main. */
   base?: string;
 };

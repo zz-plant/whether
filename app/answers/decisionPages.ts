@@ -3,7 +3,7 @@ import type { ContentCluster, ContentIntent } from "../../lib/contentMeasurement
 import type { AnswerPageData } from "../../lib/answerContentSource";
 import { answerMetaContent, answerPageContent } from "../../lib/answerContentSource";
 
-export type AnswerCategory = "climate" | "decision" | "explanation";
+type AnswerCategory = "climate" | "decision" | "explanation";
 
 export type DecisionPageDefinition = AnswerPageData & {
   mappedDecisionAreas: DecisionArea[];
@@ -74,19 +74,14 @@ export const answerCategories = answerMetaContent.answerCategories;
 
 const HIGH_VALUE_STATIC_CATEGORIES: readonly AnswerCategory[] = ["decision", "climate"] as const;
 
-export const highValueStaticAnswerPages = answerPages.filter((page) =>
+const highValueStaticAnswerPages = answerPages.filter((page) =>
   HIGH_VALUE_STATIC_CATEGORIES.includes(page.category),
 );
 export const highValueStaticAnswerSlugs = highValueStaticAnswerPages.map((page) => page.slug);
-export const allAnswerStaticParams = answerPages.map((page) => ({ slug: page.slug }));
 export const highValueAnswerStaticParams = highValueStaticAnswerPages.map((page) => ({ slug: page.slug }));
 
 const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
 
 export const tierOneDecisionPages = answerPages;
-
-export const tierTwoKeywords = answerMetaContent.tierTwoKeywords;
-
-export const tierThreeKeywords = answerMetaContent.tierThreeKeywords;
 
 export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);

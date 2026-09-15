@@ -1,7 +1,7 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 
-export type TrendLabel = "Strengthening" | "Flat" | "Cooling";
+type TrendLabel = "Strengthening" | "Flat" | "Cooling";
 
 type WindowThresholds = {
   open: number;
@@ -19,7 +19,7 @@ type WeeklyLeadershipAssessment = Pick<RegimeAssessment, "regime"> & {
 
 type WeeklyLeadershipTreasury = Pick<TreasuryData, "isLive">;
 
-export type WeeklyLeadershipBriefInputs = {
+type WeeklyLeadershipBriefInputs = {
   assessment: WeeklyLeadershipAssessment;
   previousAssessment: WeeklyLeadershipAssessment | null;
   treasury: WeeklyLeadershipTreasury;

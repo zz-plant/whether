@@ -1,10 +1,10 @@
 import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCatalog";
 
-export type SearchEntityType = "toolkit" | "failure-mode" | "doc";
+type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
-export type SearchPrimaryHub = "/signals" | "/operate" | "/resolve" | "/trust";
+type SearchPrimaryHub = "/signals" | "/operate" | "/resolve" | "/trust";
 
-export type SearchEntity = {
+type SearchEntity = {
   id: string;
   type: SearchEntityType;
   job: SearchEntityJob;
@@ -16,14 +16,6 @@ export type SearchEntity = {
   summary: string;
   intentLabel: string;
   keywords: string[];
-};
-
-export const searchJobLabels: Record<SearchEntityJob, string> = {
-  check: "Check what changed",
-  approve: "Approve or hold this week",
-  resolve: "Resolve one remaining edge case",
-  risk: "Diagnose what could break",
-  trust: "Defend the call",
 };
 
 const keyDocs: SearchEntity[] = [
@@ -186,6 +178,31 @@ export const buildSearchIndex = (): SearchEntity[] => {
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
+/**
+ * Whether `term` appears in `text` as a word, not as a fragment of one.
+ *
+ * The scorer used `String.includes`, so "cat" matched "allocate" and "risk"
+ * matched "asterisks". Every entity here is prose, and a substring hit inside
+ * an unrelated word is noise that outranks nothing but still fills the page.
+ * A prefix match is kept deliberately — "hir" should find "hiring" — so the
+ * boundary is required only before the term.
+ */
+const matchesTerm = (text: string, term: string) => {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?:^|[^a-z0-9])${escaped}`, "i").test(text);
+};
+
+/**
+ * Entities matching the query, strongest first.
+ *
+ * `routePriority` used to be added to every entity's score unconditionally, so
+ * every score was positive, the `score > 0` filter removed nothing, and a query
+ * matching no entity at all came back as the whole index ordered by priority.
+ * A search that always "finds" everything cannot report that it found nothing,
+ * which is why `/search` could never tell a good query from a typo. Priority is
+ * a tie-break among things that matched, so it is applied only after one term
+ * hits.
+ */
 export const searchIndex = (query: string): SearchEntity[] => {
   const normalizedQuery = normalize(query);
 
@@ -197,20 +214,27 @@ export const searchIndex = (query: string): SearchEntity[] => {
 
   return buildSearchIndex()
     .map((entity) => {
-      const haystack = [entity.title, entity.summary, entity.intentLabel, ...entity.keywords]
-        .join(" ")
-        .toLowerCase();
-      const score = terms.reduce((total, term) => {
-        if (entity.title.toLowerCase().includes(term)) return total + 3;
-        if (entity.summary.toLowerCase().includes(term)) return total + 2;
-        if (haystack.includes(term)) return total + 1;
+      const haystack = [entity.title, entity.summary, entity.intentLabel, ...entity.keywords].join(" ");
+      const matchScore = terms.reduce((total, term) => {
+        if (matchesTerm(entity.title, term)) return total + 3;
+        if (matchesTerm(entity.summary, term)) return total + 2;
+        if (matchesTerm(haystack, term)) return total + 1;
         return total;
-      }, 0) + entity.routePriority;
-      return { entity, score };
+      }, 0);
+      return { entity, score: matchScore === 0 ? 0 : matchScore + entity.routePriority };
     })
     .filter((entry) => entry.score > 0)
     .sort((left, right) => right.score - left.score || left.entity.title.localeCompare(right.entity.title))
     .map((entry) => entry.entity);
+};
+
+/** Human names for the five jobs, for the results page's group headings. */
+export const searchJobLabels: Record<SearchEntityJob, string> = {
+  check: "Check what changed",
+  approve: "Approve or hold this week",
+  resolve: "Resolve one remaining edge case",
+  risk: "Diagnose what could break",
+  trust: "Defend the call",
 };
 
 export const groupSearchResultsByJob = (results: SearchEntity[]) => {

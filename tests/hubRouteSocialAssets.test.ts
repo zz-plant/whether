@@ -84,16 +84,38 @@ describe("hub route social assets", () => {
       title: "Should Startups Raise Capital Now?",
       slug: "should-startups-raise-capital-now",
       payload,
+      shortAnswer: "Raise while terms are still negotiable.",
     });
 
     const url = readFirstImageUrl(metadata) ?? "";
     assert.ok(!/\.svg(\?|$)/i.test(url), `answer og:image is not an SVG (got ${url})`);
 
+    /*
+     * The `solutions` lens draws a fixed right-hand panel, so every answer card
+     * carried the same three lines and neither the question nor the call
+     * reached it. The answers template puts both on the card.
+     */
     const params = new URL(url).searchParams;
-    assert.equal(params.get("template"), "solutions");
+    assert.equal(params.get("template"), "answers");
     assert.equal(params.get("title"), "Should Startups Raise Capital Now?");
-    assert.match(params.get("subtitle") ?? "", /Raise from leverage/);
-    assert.match(params.get("subtitle") ?? "", /Start the process now/);
+    assert.equal(params.get("subtitle"), "Raise while terms are still negotiable.");
+    assert.equal(params.get("call"), "Raise from leverage.");
+    assert.equal(params.get("action"), "Start the process now.");
+  });
+
+  it("falls back to the live call when a page has no short answer of its own", () => {
+    const metadata = buildDecisionAnswerMetadata({
+      title: "Should Startups Raise Capital Now?",
+      slug: "should-startups-raise-capital-now",
+      payload: {
+        currentCall: "Raise from leverage.",
+        immediateAction: "Start the process now.",
+        noindex: false,
+      } as Parameters<typeof buildDecisionAnswerMetadata>[0]["payload"],
+    });
+
+    const params = new URL(readFirstImageUrl(metadata) ?? "").searchParams;
+    assert.equal(params.get("subtitle"), "Raise from leverage.");
   });
 });
 

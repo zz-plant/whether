@@ -24,18 +24,18 @@ import {
 } from "../../lib/report/publishedBriefPullRequest";
 import { DEFAULT_GITHUB_REPOSITORY } from "./regimeHistoryRefresh";
 
-export type WeeklyBriefFreezeWorkflowEnv = Record<string, unknown> & {
+type WeeklyBriefFreezeWorkflowEnv = Record<string, unknown> & {
   GITHUB_TOKEN?: string;
   GITHUB_REPOSITORY?: string;
 };
 
-export type WeeklyBriefFreezeWorkflowParams = {
+type WeeklyBriefFreezeWorkflowParams = {
   /** Base branch for the pull request. Defaults to main. */
   base?: string;
 };
 
 /** Five hourly attempts covers a data provider that is down for a Monday afternoon. */
-export const ASSEMBLE_RETRIES = { limit: 5, delay: "1 hour", backoff: "constant" as const };
+const ASSEMBLE_RETRIES = { limit: 5, delay: "1 hour", backoff: "constant" as const };
 
 export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFreezeWorkflowEnv, WeeklyBriefFreezeWorkflowParams> {
   async run(

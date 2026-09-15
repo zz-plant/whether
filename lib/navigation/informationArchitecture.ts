@@ -117,7 +117,7 @@ export const shortcutNavigationLayers: Array<NavigationLayer & { shortcut: strin
 );
 
 /** The three loop layers that fit a phone's bottom bar beside Search and More. */
-export const mobileTabLayerKeys: readonly NavigationLayerKey[] = ["weekly-brief", "planning", "signals"];
+const mobileTabLayerKeys: readonly NavigationLayerKey[] = ["weekly-brief", "planning", "signals"];
 export const mobileTabLayers = loopNavigationLayers.filter((layer) => mobileTabLayerKeys.includes(layer.key));
 
 // Routes that render the condensed report shell header. Supporting layers are
@@ -209,5 +209,3 @@ export const contentSections = [
   { prefix: "/toolkits", label: "Toolkit" },
   { prefix: "/contact", label: "Contact" },
 ] as const;
-
-export type ContentSection = typeof contentSections[number];

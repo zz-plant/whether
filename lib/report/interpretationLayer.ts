@@ -16,7 +16,7 @@ import {
 import { deriveSectorAdjustedPosture, type SectorKey } from "./sectorSensitivity";
 
 
-export const interpretationViews = [
+const interpretationViews = [
   "default",
   "sector",
   "company",

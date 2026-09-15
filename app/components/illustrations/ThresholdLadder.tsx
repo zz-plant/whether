@@ -1,5 +1,5 @@
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-export type ThresholdLadderProps = {
+type ThresholdLadderProps = {
   idPrefix: string;
   /** Rail domain. */
   min: number;

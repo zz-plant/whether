@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BarChart2, Shield, Percent } from "lucide-react";
 import type { DriverViews } from "../../../lib/report/driverDecisionViews";
 
-export interface KeyDriversCardProps {
+interface KeyDriversCardProps {
   views: DriverViews;
   className?: string;
 }

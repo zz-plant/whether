@@ -17,6 +17,7 @@
  *   bun scripts/run-checks.mjs --serial            # fail-fast sequencing
  */
 import { spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 
 import { recordPassedChecks } from "./check-gate-marker.mjs";
@@ -31,6 +32,10 @@ const TASKS = [
   // finding instead of fixing it, and no other task here notices. This counts
   // the suppressions themselves, so the shortcut costs more than the fix.
   { name: "suppressions", script: "check:suppressions" },
+  // An export nothing references is not a lint finding, a type error, or a
+  // failing test, so nothing else here notices one. A 2026-09-15 sweep found
+  // 556 of them; this holds the count at zero.
+  { name: "dead-exports", script: "check:dead-exports" },
   // The hand-curated macro series have no live fetcher, so nothing in the
   // ingest path refreshes them and nothing else notices when the quarterly
   // curation pass slips. Warn-only by default; see the script header for why.
@@ -153,6 +158,38 @@ const runTask = (task) =>
     child.on("close", (code) => settle(code === 0));
   });
 
+/** How much of a failing task's output the end-of-run repeat carries. */
+const FAILURE_TAIL_LINES = Number.parseInt(process.env.CHECK_FAILURE_TAIL_LINES ?? "40", 10);
+
+/**
+ * A one-line note when the running `bun` does not satisfy `engines.bun`.
+ *
+ * Deliberately a note and not a failure: the declared range is what this repo
+ * develops against, and a build image on something older may still be fine.
+ * What must not happen is the mismatch going unmentioned next to a failure it
+ * could explain.
+ */
+const engineMismatch = () => {
+  try {
+    const declared = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).engines?.bun;
+    if (typeof declared !== "string") return null;
+    const floor = declared.match(/(\d+)\.(\d+)\.(\d+)/);
+    if (!floor) return null;
+    const [runningMajor, runningMinor, runningPatch] = Bun.version.split(".").map(Number);
+    const [, major, minor, patch] = floor.map(Number);
+    const older =
+      runningMajor < major ||
+      (runningMajor === major && (runningMinor < minor || (runningMinor === minor && runningPatch < patch)));
+    return older ? ` — older than engines.bun "${declared}", which is what this repo is developed against` : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Lines worth lifting out of a long run: what each of these tools calls a failure. */
+const FAILURE_LINE_PATTERN = /\(fail\)|^\s*✗|AssertionError|error: |Error: |^\s*✘|FAIL /;
+const FAILURE_MARKED_LINES = 20;
+
 const formatDuration = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
 const report = ({ task, ok, output, ms }) => {
@@ -212,5 +249,55 @@ process.stdout.write(
   `\n${failed.length === 0 ? "All checks passed" : `${failed.length} check(s) failed: ${failed.map((r) => r.task.name).join(", ")}`}` +
     ` in ${formatDuration(Date.now() - startedAt)}${notRun > 0 ? ` (${notRun} not run)` : ""}\n`,
 );
+
+/*
+ * Repeat each failure at the very end, with the tail of its own output.
+ *
+ * The full report above is printed task by task as they finish, and a passing
+ * `test` task alone can be 1,700 lines on a runner whose `bun` prints a line
+ * per test. Cloudflare's build log viewer keeps a bounded window, so on a red
+ * build the `❌` line and the assertion that caused it scroll out of reach and
+ * the only thing left is `exited with code 1` — which is the whole diagnosis,
+ * and the same "a red build is unreadable" failure this file already fixed once
+ * with per-task timeouts. Whatever the window keeps, it keeps the end, so the
+ * end has to carry enough to act on.
+ */
+if (failed.length > 0) {
+  /*
+   * The runtime, in the part of the log that survives.
+   *
+   * `package.json` declares `engines.bun`, and nothing enforces it: a build
+   * image that ships its own `bun` runs the gate on whatever it has. That is
+   * not a hypothetical — a container failing this gate in September 2026 was
+   * printing a line per passing test, which only `bun` 1.1.x does, while the
+   * repo pinned 1.3.14. Whoever reads the failure should not have to infer the
+   * toolchain from its output formatting.
+   */
+  process.stdout.write(`\n[run-checks] ran on bun ${Bun.version}${engineMismatch() ?? ""}\n`);
+
+  for (const result of failed) {
+    const lines = result.output.trimEnd().split("\n");
+    const tail = lines.slice(-FAILURE_TAIL_LINES);
+    process.stdout.write(`\n───── ${result.task.name} failed (\`bun run ${result.task.script}\`) ─────\n`);
+
+    /*
+     * The tail alone is not enough for the suite: bun reports a failing test
+     * where it runs, which on 1,700 tests is hundreds of lines before the end.
+     * These lines are the answer to "what failed", so they are lifted out and
+     * printed first, and the tail follows as context.
+     */
+    const marked = lines.filter((line) => FAILURE_LINE_PATTERN.test(line) && !tail.includes(line));
+    if (marked.length > 0) {
+      const shown = marked.slice(0, FAILURE_MARKED_LINES);
+      process.stdout.write(`[run-checks] failure lines${marked.length > shown.length ? ` (first ${shown.length} of ${marked.length})` : ""}:\n`);
+      process.stdout.write(`${shown.join("\n")}\n\n`);
+    }
+
+    if (lines.length > tail.length) {
+      process.stdout.write(`[run-checks] last ${tail.length} of ${lines.length} lines; the rest is above.\n`);
+    }
+    process.stdout.write(`${tail.join("\n")}\n`);
+  }
+}
 
 process.exit(failed.length === 0 ? 0 : 1);

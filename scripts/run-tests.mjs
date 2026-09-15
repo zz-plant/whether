@@ -234,8 +234,25 @@ const childEnv = { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?
  * it, would name it. The guard redacts to an origin (scripts/test-network-guard.ts), but
  * the suite should not be holding the secret in the first place. Tests that need one set
  * their own; tests/apiBillingWebhookRoute.test.ts does.
+ *
+ * The Cloudflare four are here because the build container *always* has them: Workers
+ * Builds exports CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN so wrangler can deploy.
+ * `resolveAnalyticsReadConfig` reads both, so a test asserting "unconfigured" — which is
+ * the state a developer machine is in — was true here and false there. That is exactly the
+ * defect this list exists to prevent, and it cost five red builds to find, because the one
+ * environment that disagreed was the one whose log could not be read. A real analytics
+ * token in scope would also let a read leave the box for the live API.
  */
-for (const key of ['FRED_API_KEY', 'ALPHA_VANTAGE_API_KEY', 'SLACK_WEBHOOK_URL', 'PREMIUM_FUNNEL_WEBHOOK_URL']) {
+for (const key of [
+  'FRED_API_KEY',
+  'ALPHA_VANTAGE_API_KEY',
+  'SLACK_WEBHOOK_URL',
+  'PREMIUM_FUNNEL_WEBHOOK_URL',
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_API_TOKEN',
+  'CLOUDFLARE_ANALYTICS_READ_TOKEN',
+  'WHETHER_TELEMETRY_DATASET',
+]) {
   delete childEnv[key];
 }
 

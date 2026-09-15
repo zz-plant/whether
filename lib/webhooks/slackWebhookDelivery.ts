@@ -7,7 +7,7 @@ import { buildWeeklyOperatorBriefSlackBlocks } from "../export/weeklyOperatorBri
 import type { DecisionAssumptionVerdict, DecisionMemoryEntry } from "../decisionMemory";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
-export interface SlackWebhookDeliveryOptions {
+interface SlackWebhookDeliveryOptions {
   webhookUrl: string;
   channelName?: string;
   fetchFn?: typeof fetch;
@@ -54,7 +54,7 @@ export async function dispatchWeeklyBriefSlackWebhook(
   }
 }
 
-export interface AssumptionAlertPayload {
+interface AssumptionAlertPayload {
   decision: DecisionMemoryEntry;
   verdict: DecisionAssumptionVerdict;
   reason: string;

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 
-export type EntitlementState = {
+type EntitlementState = {
   /** True once the confirm/status round trip has resolved (success or not). */
   ready: boolean;
   active: boolean;

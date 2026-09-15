@@ -141,7 +141,7 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
  * The sentences elsewhere in the brief say the rule; this says where the
  * reading sits against it, so nobody pastes a paragraph to answer "how close".
  */
-export const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
+const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
   const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
   const rails = buildSharedCorridorRails(items, scores);
@@ -380,28 +380,6 @@ export const buildBoardBrief = (
   const briefing = buildSlackBrief(assessment, treasury, sensors, macros, options);
   const slideBullets = buildBoardSlideBullets(assessment, treasury, macros, options);
   return [briefing, "", "---", "", slideBullets].join("\n");
-};
-
-export const buildConstraintHeadlines = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-) => {
-  const regimeLabel = getRegimePublicLabel(assessment.regime);
-  const headline = `${regimeLabel}: funding pressure ${assessment.scores.tightness}/100 with risk appetite ${assessment.scores.riskAppetite}/100.`;
-  const constraints = assessment.constraints.map((item) => `• ${item}`);
-
-  return [
-    `Whether Weekly Brief Headlines — ${treasury.record_date}`,
-    headline,
-    "",
-    "Operating limits:",
-    ...constraints,
-    "",
-    `Source: ${treasury.source}`,
-    buildBriefPermalinkLine(treasury.record_date),
-    "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
 };
 
 export const buildCallCitation = (

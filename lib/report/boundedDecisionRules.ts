@@ -13,7 +13,7 @@ import {
 export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "burn-discipline" | "expansion-bets";
 
 export type RuleConditionMetric = "tightness" | "riskAppetite";
-export type RuleConditionOperator = ">" | ">=" | "<" | "<=";
+type RuleConditionOperator = ">" | ">=" | "<" | "<=";
 
 /** One numeric line on one composite signal. */
 export type RuleCondition = {
@@ -33,7 +33,7 @@ export type RuleCondition = {
  * see `formatRuleClause` — so a rail can never state a line the sentence under
  * it does not, and no consumer has to parse prose.
  */
-export type BoundedRuleClause = {
+type BoundedRuleClause = {
   /** The imperative the conditions attach to, e.g. "Pause net-new hiring". */
   verb: string;
   /** Numeric lines. Empty when the clause is purely qualitative. */
@@ -143,7 +143,7 @@ const describeRuleCondition = (condition: RuleCondition, side: "pause" | "resume
 };
 
 /** The sentence every surface prints for a clause, derived from its data. */
-export const formatRuleClause = (clause: BoundedRuleClause, side: "pause" | "resume"): string => {
+const formatRuleClause = (clause: BoundedRuleClause, side: "pause" | "resume"): string => {
   const parts = [
     ...clause.conditions.map((condition) => describeRuleCondition(condition, side)),
     ...(clause.qualifier ? [clause.qualifier] : []),

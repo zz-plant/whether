@@ -1,7 +1,7 @@
 import { getWhetherKv, type KvNamespace } from "./kv";
 import { runInBackground } from "./backgroundWork";
 
-export interface RuntimeBoundary {
+interface RuntimeBoundary {
   storage: KvNamespace | null;
   backgroundWork: (taskName: string, work: () => Promise<void>) => void;
   clock: { now(): Date };

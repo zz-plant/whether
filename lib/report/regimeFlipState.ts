@@ -35,7 +35,7 @@ const requiresWillingRisk = (regime: Regime) => regime === "EXPANSION" || regime
 const TIGHTNESS_BOUNDARY_LABEL = "Funding pressure";
 const RISK_BOUNDARY_LABEL = "Risk appetite";
 
-export type RegimeFlipState = {
+type RegimeFlipState = {
   /**
    * The regime the current readings classify into, when that differs from the
    * committed call — i.e. a quadrant change is pending the state machine's

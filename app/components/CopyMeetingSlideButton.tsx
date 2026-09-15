@@ -6,7 +6,7 @@ import { formatMeetingSlideHtml, formatMeetingSlideMarkdown } from "../../lib/ex
 import { briefArtifactToSlidePayload } from "../../lib/report/briefArtifact";
 import { useBriefArtifact } from "./useBriefArtifact";
 
-export interface CopyMeetingSlideButtonProps {
+interface CopyMeetingSlideButtonProps {
   className?: string;
 }
 

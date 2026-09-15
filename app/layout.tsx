@@ -22,6 +22,7 @@ const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
 const LLMS_TXT_URL = `${siteUrl}/llms.txt`;
 const WELL_KNOWN_MANIFEST_URL = `${siteUrl}/.well-known/whether-agent.json`;
+const FEED_URL = `${siteUrl}/feed.xml`;
 
 const siteName = websiteName;
 const siteDescription = defaultSiteDescription;
@@ -29,7 +30,7 @@ const socialImageUrl = buildSocialImageUrl();
 const themeStorageKey = STORAGE_KEYS.theme;
 const orientationDismissKey = STORAGE_KEYS.homeOrientationDismissed;
 
-export const buildThemeBootstrapScript = () => `
+const buildThemeBootstrapScript = () => `
 (() => {
   try {
     const root = document.documentElement;
@@ -54,7 +55,7 @@ export const buildThemeBootstrapScript = () => `
  * The orientation half is the part that always worked — it injects the rule
  * that consumes its own attribute, three lines below where it sets it.
  */
-export const buildOrientationBootstrapScript = () => `
+const buildOrientationBootstrapScript = () => `
 (() => {
   try {
     const root = document.documentElement;
@@ -191,6 +192,9 @@ export default function RootLayout({
             among a set of language or region alternates, and this site publishes
             one locale and no alternates, so the correct number of these links is
             zero rather than one per page. */}
+        {/* Feed autodiscovery. The footer linked /feed.xml as text, which a
+            reader app never sees; this is the link readers and crawlers look for. */}
+        <link rel="alternate" type="application/rss+xml" href={FEED_URL} title="Whether Weekly Brief (RSS)" />
         {/* Agent discovery: machine-readable alternates for browser-based AI agents */}
         <link rel="alternate" type="text/markdown" href={BRIEF_MD_URL} title="Whether Weekly Brief (Markdown)" />
         <link rel="alternate" type="application/json" href={AGENT_API_URL} title="Whether Weekly Brief (JSON)" />

@@ -1,5 +1,3 @@
-export const INTERNAL_USE_LABEL = "";
-
 export const buildComplianceStamp = ({
   sourceLine,
   timestamp,

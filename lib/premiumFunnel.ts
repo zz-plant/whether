@@ -39,7 +39,7 @@ export const PREMIUM_EVENT_ENDPOINT = "/api/telemetry/premium-funnel";
 export const isPremiumIntentSource = (value: string): value is PremiumIntentSource =>
   PREMIUM_INTENT_SOURCES.includes(value as PremiumIntentSource);
 
-export const isPremiumFunnelEventType = (value: string): value is PremiumFunnelEventType =>
+const isPremiumFunnelEventType = (value: string): value is PremiumFunnelEventType =>
   value === "premium_intent" ||
   value === "premium_gate_view" ||
   value === "premium_checkout_start" ||
@@ -51,8 +51,8 @@ export const isPremiumPlanCandidate = (value: string): value is PremiumPlanCandi
 export const isPremiumSeatBand = (value: string): value is PremiumSeatBand =>
   value === "1" || value === "2-5" || value === "6-20" || value === "21+";
 
-export const MAX_PATH_LENGTH = 512;
-export const MAX_LABEL_LENGTH = 128;
+const MAX_PATH_LENGTH = 512;
+const MAX_LABEL_LENGTH = 128;
 const MAX_TIMESTAMP_LENGTH = 64;
 
 /** Optional unless `required`; when present must be a string within `max`. */

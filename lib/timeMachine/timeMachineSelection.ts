@@ -5,12 +5,12 @@
 import { formatHistoricalBanner, resolveHistoricalDate } from "./timeMachine";
 import { getAdjacentTimeMachineEntry, hasTimeMachineEntry } from "./timeMachineCache";
 
-export interface TimeMachineRequest {
+interface TimeMachineRequest {
   month: number;
   year: number;
 }
 
-export interface TimeMachineSelection extends TimeMachineRequest {
+interface TimeMachineSelection extends TimeMachineRequest {
   asOf: string;
   banner: string;
 }

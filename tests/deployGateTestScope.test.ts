@@ -77,7 +77,7 @@ describe("deploy gate test scope", () => {
     const command = packageJson.scripts?.["check:vinext"] ?? "";
 
     assert.match(command, /^WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs\b/);
-    for (const task of ["lint", "typecheck", "test", "assets", "suppressions", "landmarks"]) {
+    for (const task of ["lint", "typecheck", "test", "assets", "suppressions", "dead-exports", "landmarks"]) {
       assert.match(command, new RegExp(`\\b${task}\\b`), `check:vinext no longer runs ${task}`);
     }
     // Network and git-history checks stay on pre-push and `bun run check`, where they can run.
@@ -113,7 +113,7 @@ describe("deploy gate test scope", () => {
   it("skips only the checks a record proves for this very commit", () => {
     assert.deepEqual(outstandingChecks(GATE_TASKS), []);
     assert.deepEqual(outstandingChecks([]), GATE_TASKS);
-    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "landmarks"]);
+    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "dead-exports", "landmarks"]);
   });
 });
 

@@ -27,7 +27,7 @@ type SourceLineInput = {
 export const formatSourceLine = ({ sourceLabel, sourceUrl }: SourceLineInput) =>
   sourceUrl ? `${sourceLabel} (${sourceUrl})` : sourceLabel;
 
-export const parseIsoDateLabel = (value: string) => {
+const parseIsoDateLabel = (value: string) => {
   const date = new Date(`${value}T00:00:00Z`);
   return Number.isNaN(date.valueOf()) ? null : date;
 };

@@ -17,9 +17,9 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildBoundedDecisionLines, type ModeledExportDecisionPayload } from "./briefBuilders";
 
-export type IssueTrackerFormat = "markdown" | "wiki";
+type IssueTrackerFormat = "markdown" | "wiki";
 
-export type ExportDecisionModel = ModeledExportDecisionPayload & {
+type ExportDecisionModel = ModeledExportDecisionPayload & {
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   confidencePercent?: number;
   compactFlipConditionLabels?: string[];

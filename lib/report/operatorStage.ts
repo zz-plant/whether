@@ -18,7 +18,7 @@ import type { PlannerStage } from "./runwayPlanner";
 
 export type OperatorStage = Extract<StartupVariantMode, "seed" | "series-a" | "series-b" | "bootstrapped">;
 
-export type OperatorStageOption = {
+type OperatorStageOption = {
   key: OperatorStage;
   label: string;
   sublabel: string;
@@ -35,7 +35,7 @@ export const OPERATOR_STAGE_OPTIONS: readonly OperatorStageOption[] = [
 export const DEFAULT_OPERATOR_STAGE: OperatorStage = "series-a";
 
 export const OPERATOR_STAGE_COOKIE = "whether-company-stage";
-export const OPERATOR_STAGE_COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
+const OPERATOR_STAGE_COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
 
 const OPERATOR_STAGES: ReadonlySet<string> = new Set(OPERATOR_STAGE_OPTIONS.map((option) => option.key));
 

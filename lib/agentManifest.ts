@@ -29,7 +29,7 @@ import {
  */
 export const WHETHER_AGENT_MANIFEST_PATH = "/.well-known/whether-agent.json";
 
-export const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
+const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
   service: "whether",
   version: "v1",
   generatedAt: new Date().toISOString(),

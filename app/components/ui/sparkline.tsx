@@ -34,7 +34,7 @@ const TONE_COLOR = {
 
 export type SparklineTone = keyof typeof TONE_COLOR;
 
-export type SparklineDomain = readonly [number, number];
+type SparklineDomain = readonly [number, number];
 
 /**
  * Series → SVG path, in a fixed 120x24 user space. Shared with

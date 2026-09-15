@@ -24,12 +24,12 @@ import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "../lib/i
  */
 export const REFRESH_ALARM_INTERVAL_MS = 60 * 60 * 1000;
 
-export type CoordinatorAlarmStorage = CoordinatorStorage & {
+type CoordinatorAlarmStorage = CoordinatorStorage & {
   getAlarm(): Promise<number | null>;
   setAlarm(scheduledTime: number): Promise<void>;
 };
 
-export type CoordinatorState = {
+type CoordinatorState = {
   storage: CoordinatorAlarmStorage;
 };
 
@@ -46,7 +46,7 @@ const isMaterializedModel = (value: unknown): value is MaterializedSignalReadMod
 const isSnapshotList = (value: unknown): value is SignalEntitySnapshot[] =>
   Array.isArray(value) && value.every((entry) => isRecord(entry) && typeof entry.signalKey === "string");
 
-export type CoordinatorOptions = {
+type CoordinatorOptions = {
   /** Upstream fetch, injectable for tests. Defaults to the global fetch. */
   fetcher?: typeof fetch;
   now?: () => number;

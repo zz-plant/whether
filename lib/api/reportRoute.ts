@@ -1,6 +1,6 @@
 import { loadReportDataSafe, type ReportData, type ReportDataFallback, type ReportSearchParams } from "../report/reportData";
 
-export type ReportRouteContext = {
+type ReportRouteContext = {
   reportData: ReportData | ReportDataFallback;
   degraded: boolean;
 };

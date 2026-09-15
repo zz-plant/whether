@@ -20,7 +20,7 @@ export const ZOOM_ORDER: ZoomPreset[] = ["1Y", "3Y", "5Y", "MAX"];
 /** MAX is "the whole record", whatever length that happens to be, rather than
  *  the 180 it used to hard-code — a number that silently became a window rather
  *  than the maximum the day the record passed 180 months. */
-export const ZOOM_MONTH_COUNTS: Record<ZoomPreset, number> = {
+const ZOOM_MONTH_COUNTS: Record<ZoomPreset, number> = {
   "1Y": 12,
   "3Y": 36,
   "5Y": 60,
@@ -35,7 +35,7 @@ export const TIMELINE_PAGE_MONTHS = 12;
  *  quarter-speed mode is what makes those months individually reachable. */
 export const FINE_SCRUB_SCALE = 0.25;
 
-export interface TimelineWindow {
+interface TimelineWindow {
   /** First absolute index in view. */
   start: number;
   /** One past the last absolute index in view. */
@@ -43,7 +43,7 @@ export interface TimelineWindow {
   length: number;
 }
 
-export const clampIndex = (index: number, seriesLength: number): number => {
+const clampIndex = (index: number, seriesLength: number): number => {
   if (seriesLength <= 0) return 0;
   return Math.max(0, Math.min(seriesLength - 1, index));
 };
@@ -172,7 +172,7 @@ export const shouldUseYearRail = (
   return trackWidthPx / tickCount < YEAR_AXIS_MIN_PITCH_PX;
 };
 
-export interface YearTick {
+interface YearTick {
   year: number;
   /** Absolute index of the first month of that year inside the window. */
   index: number;

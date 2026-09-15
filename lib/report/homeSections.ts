@@ -11,7 +11,7 @@ export const homeSectionSequence = [
   { href: "#historical-replay-workspace", label: "Depth" },
 ] as const;
 
-export const homeSectionCompactLabelByHref: Record<(typeof homeSectionSequence)[number]["href"], string> = {
+const homeSectionCompactLabelByHref: Record<(typeof homeSectionSequence)[number]["href"], string> = {
   "#weekly-posture-brief-title": "Call",
   "#stress-test": "Stress-test",
   "#audit-this-call": "Evidence",

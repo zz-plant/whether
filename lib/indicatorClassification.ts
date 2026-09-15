@@ -1,4 +1,4 @@
-export type IndicatorType = "leading" | "lagging";
+type IndicatorType = "leading" | "lagging";
 
 export const indicatorTypeByScoreLabel = {
   Tightness: "lagging",

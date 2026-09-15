@@ -2,7 +2,7 @@ import { formatAgeSpan } from "../formatters";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
-export type SourceModeStatus = "live" | "snapshot" | "fallback";
+type SourceModeStatus = "live" | "snapshot" | "fallback";
 
 export type SourceHealthRow = {
   sourceName: string;
@@ -16,7 +16,7 @@ export type SourceHealthRow = {
   mode: SourceModeStatus;
 };
 
-export type SourceHealthCoverageSummary = {
+type SourceHealthCoverageSummary = {
   liveCount: number;
   cachedCount: number;
   missingCount: number;
@@ -107,7 +107,7 @@ const macroSourceGroups: SourceGroupDefinition[] = [
   },
 ];
 
-export const getBusinessDayElapsedHours = (timestamp: string, now: Date): number => {
+const getBusinessDayElapsedHours = (timestamp: string, now: Date): number => {
   const then = Date.parse(timestamp);
   if (Number.isNaN(then)) return Infinity;
 

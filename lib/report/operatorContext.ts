@@ -24,7 +24,7 @@ const parseCookieValue = (cookieHeader: string, name: string): string | null => 
   return match ? decodeURIComponent(match[1]) : null;
 };
 
-export const EMPTY_OPERATOR_CONTEXT: OperatorContext = { companyStage: null, ticker: null };
+const EMPTY_OPERATOR_CONTEXT: OperatorContext = { companyStage: null, ticker: null };
 
 /**
  * Parse operator context from a cookie header string (from request.headers.get("cookie")).

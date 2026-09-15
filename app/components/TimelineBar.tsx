@@ -50,7 +50,7 @@ const PREVIEW_SEGMENT_OPACITY = 0.85;
  *  round-trip, so hold-to-repeat costs one navigation rather than twenty. */
 const KEY_COMMIT_COALESCE_MS = 140;
 
-export interface TimelineBarProps {
+interface TimelineBarProps {
   currentMonth?: number;
   currentYear?: number;
   onSelect?: (target: { month: number; year: number }) => void;

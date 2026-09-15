@@ -74,7 +74,18 @@ function BoundedBandRail({ band, idSuffix }: { band: HorizonSignalBand; idSuffix
  * No nested boxes: §XIII gives elevation to the outermost container, and the run of
  * period chips is a list of controls-sized marks rather than a frame inside the frame.
  */
-export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
+export function CadenceCallCard({
+  model,
+  /**
+   * `h2` by default. The homepage passes `h1`, because when this card renders
+   * the reader has asked for this horizon and its headline is the page's
+   * subject — the weekly hero below then takes `h2`.
+   */
+  titleLevel: TitleTag = "h2",
+}: {
+  model: CadenceCallModel;
+  titleLevel?: "h1" | "h2";
+}) {
   const headingId = `${model.horizon}-call-title`;
 
   return (
@@ -93,12 +104,12 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
       </div>
 
       <div className="space-y-2">
-        <h2
+        <TitleTag
           id={headingId}
           className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
         >
           {model.headline}
-        </h2>
+        </TitleTag>
         {/* Before the regime description, not after it. Under a refusal the headline is
             the hold and the description is still "capital is cheap" — read in that order
             they contradict, and the sentence that reconciles them arrives too late.

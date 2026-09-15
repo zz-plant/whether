@@ -11,47 +11,13 @@ import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
+import { WORKSTREAMS, isWorkstream, workstreamSlugs } from "../workstreams";
+
 export const runtime = "edge";
-
-/*
- * /operate/financial and /operate/scenarios were two files that differed in
- * the imported panel, the metadata, and the banner — everything else (the
- * snapshot load, the shell model, the workstream nav) was copied line for
- * line. One route, one map.
- */
-type Workstream = {
-  slug: "financial" | "scenarios";
-  title: string;
-  description: string;
-  imageAlt: string;
-  pageTitle: string;
-  pageSummary: string;
-};
-
-const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
-  financial: {
-    slug: "financial",
-    title: "Financial Strategy — Capital Posture This Week",
-    description: "CFO and financial operating guardrails aligned with current interest rates and credit conditions.",
-    imageAlt: "Whether financial strategy view",
-    pageTitle: "Financial strategy",
-    pageSummary: "CFO runway planning and capital efficiency settings for the current macro regime.",
-  },
-  scenarios: {
-    slug: "scenarios",
-    title: "Scenario Studio — Counterfactual Macro Simulator",
-    description: "Interactive counterfactual simulation: test rate cuts, inversions, and stress scenarios against live posture.",
-    imageAlt: "Whether scenario studio counterfactual simulator view",
-    pageTitle: "Scenario studio",
-    pageSummary: "Simulate counterfactual macro conditions, rate cuts, or deeper inversions to stress-test your operating plan.",
-  },
-};
-
-const isWorkstream = (value: string): value is Workstream["slug"] => value in WORKSTREAMS;
 
 type Params = { workstream: string };
 
-export const generateStaticParams = () => Object.keys(WORKSTREAMS).map((workstream) => ({ workstream }));
+export const generateStaticParams = () => workstreamSlugs.map((workstream) => ({ workstream }));
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { workstream } = await params;

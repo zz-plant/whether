@@ -47,7 +47,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const startOfUtcDay = (value: Date) =>
   Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate());
 
-export type PublishReadinessInput = {
+type PublishReadinessInput = {
   /** `!reportResult.ok` — report assembly failed outright. */
   degraded: boolean;
   /** Treasury data came from the bundled snapshot rather than a live fetch. */
@@ -60,7 +60,7 @@ export type PublishReadinessInput = {
   now: Date;
 };
 
-export type PublishReadiness =
+type PublishReadiness =
   | { ok: true }
   | { ok: false; reason: string };
 

@@ -12,9 +12,9 @@ import type { OperatorProfile } from "../operatorProfile";
 import { plannerStageForOperatorStage, type OperatorStage } from "./operatorStage";
 import type { RunwayPlannerRequest } from "./runwayPlanner";
 
-export type RunwayPlannerRequiredField = "runwayMonths" | "monthlyBurnUsd" | "monthlyRevenueUsd";
+type RunwayPlannerRequiredField = "runwayMonths" | "monthlyBurnUsd" | "monthlyRevenueUsd";
 
-export const RUNWAY_PLANNER_REQUIRED_FIELDS: readonly RunwayPlannerRequiredField[] = [
+const RUNWAY_PLANNER_REQUIRED_FIELDS: readonly RunwayPlannerRequiredField[] = [
   "runwayMonths",
   "monthlyBurnUsd",
   "monthlyRevenueUsd",
@@ -26,7 +26,7 @@ const FIELD_LABELS: Record<RunwayPlannerRequiredField, string> = {
   monthlyRevenueUsd: "monthly revenue",
 };
 
-export type RunwayPlannerInputResolution =
+type RunwayPlannerInputResolution =
   | { ready: true; request: RunwayPlannerRequest; growthAssumedFlat: boolean }
   | { ready: false; missing: RunwayPlannerRequiredField[] };
 

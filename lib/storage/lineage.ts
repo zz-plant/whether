@@ -1,4 +1,4 @@
-export type CanonicalTimestampSource = "source-ingested-at" | "record-date-midnight" | "request-received-at";
+type CanonicalTimestampSource = "source-ingested-at" | "record-date-midnight" | "request-received-at";
 
 export type DurableLineage = {
   eventId: string;
@@ -6,7 +6,7 @@ export type DurableLineage = {
   canonicalTimestampSource: CanonicalTimestampSource;
 };
 
-export const DEFAULT_SOURCE_VERSION = "whether-v1";
+const DEFAULT_SOURCE_VERSION = "whether-v1";
 
 export const buildLineage = (
   canonicalTimestampSource: CanonicalTimestampSource,

@@ -79,7 +79,7 @@ const buildRuns = (points: PhasePoint[]) => {
 
 const percent = (share: number) => `${Math.round(share * 100)}%`;
 
-export type RegimePhaseMapProps = {
+type RegimePhaseMapProps = {
   /** Oldest first, already windowed to the active span by the caller. */
   series: PhaseSeriesEntry[];
   activeSpan: PhaseSpanKey;

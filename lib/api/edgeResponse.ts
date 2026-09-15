@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export type VersionedApiEnvelope = {
+type VersionedApiEnvelope = {
   generatedAt: string;
   version: string;
   degraded?: boolean;

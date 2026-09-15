@@ -18,9 +18,9 @@ export type ForecastRegimeLabel =
   | "Scarcity"
   | "Defensive";
 export type SignalDirection = "up" | "down" | "flat";
-export type SignalTrajectoryLabel = "improving" | "deteriorating" | "stable";
-export type CrossingRiskLabel = "low" | "medium" | "high";
-export type BoundaryMomentum =
+type SignalTrajectoryLabel = "improving" | "deteriorating" | "stable";
+type CrossingRiskLabel = "low" | "medium" | "high";
+type BoundaryMomentum =
   | "toward-threshold"
   | "away-from-threshold"
   | "mixed"

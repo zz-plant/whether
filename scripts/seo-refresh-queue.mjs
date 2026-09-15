@@ -23,7 +23,15 @@ const toTrafficTier = (metric) => {
     return metric.trafficTier;
   }
 
-  const entrances = Number(metric?.organicEntrances30d ?? 0);
+  /*
+   * Total entrances, not search-referred ones. A page's tier is about how much
+   * traffic it carries, whatever referred it; `organicSearchEntrances30d` is
+   * the separate question of where that traffic comes from. The field was
+   * called `organicEntrances30d` and held the total anyway, because nothing
+   * classified acquisition — reading the new, genuinely-organic field here
+   * would silently demote every page.
+   */
+  const entrances = Number(metric?.entrances30d ?? metric?.organicEntrances30d ?? 0);
   if (entrances >= 1000) return "high";
   if (entrances >= 250) return "medium";
   return "low";

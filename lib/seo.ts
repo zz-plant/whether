@@ -19,7 +19,20 @@ export const canonicalPositioningLine =
   "Whether turns macro conditions into a weekly operating call for startup leaders.";
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
-export const defaultSocialImagePath = "/api/og?template=report";
+
+/**
+ * Where else the organization is on record. Search engines use `sameAs` to
+ * tie the `Organization` node to profiles they already know; without it the
+ * brand entity was anchored to nothing but its own homepage. Only the
+ * organization's own presences belong here (the author's site is on the
+ * Person node, in lib/publisher.ts).
+ */
+export const organizationSameAs = ["https://github.com/zz-plant/whether"] as const;
+
+/** The site-level entity ids every page's graph points at. */
+export const organizationId = `${siteUrl}#organization`;
+export const websiteId = `${siteUrl}#website`;
+const defaultSocialImagePath = "/api/og?template=report";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();
 export const buildSocialImageUrl = (path = defaultSocialImagePath) =>

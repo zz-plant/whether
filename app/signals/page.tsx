@@ -21,6 +21,7 @@ import {
 } from "./components/evidenceSections";
 import { SignalsDecisionSummarySection } from "./components/evidenceDecisionSummary";
 import { getHistoricalAnalogPlaybook } from "../../lib/analogPlaybook";
+import { indexableSignalsClusters } from "./clusterRoutes";
 
 export { buildDiagnosticsExpansionHref } from "./evidenceQueryState";
 
@@ -126,6 +127,25 @@ export default async function SignalsPage({
           without a macro background: each signal's current value against its
           watch line, with both ends of the scale labelled. */}
       <SignalsCurrentScoresSection scoreCardsByType={model.scoreCardsByType} />
+
+      {/* The three watch pages, one per signal, each with its own reading and
+          the five decision scenarios read through it. Nothing on this hub
+          linked them, so the chain /signals → watch → scenario was broken at
+          its first link and the scenario pages hung off parents no crawler
+          reached. */}
+      <nav aria-labelledby="signal-watches-heading" className="weather-panel space-y-3 px-5 py-5">
+        <h2 id="signal-watches-heading" className="type-eyebrow">Signal watches</h2>
+        <ul className="grid gap-3 sm:grid-cols-3">
+          {indexableSignalsClusters.map((watch) => (
+            <li key={watch.slug}>
+              <Link href={`/signals/${watch.slug}`} className="weather-surface block space-y-1 px-4 py-4 text-sm text-slate-100 hover:border-sky-500/50">
+                <span className="block font-semibold">{watch.title}</span>
+                <span className="block text-fluid-xs text-slate-400">{watch.summary}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       {model.activeSignalsView === "implication" ? (
         <SignalInversionPreview yieldCurveSeries={model.yieldCurveSeries} />

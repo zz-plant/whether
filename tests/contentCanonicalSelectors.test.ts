@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { featuredAnswerPages } from "../app/answers/selectors";
 import { answerPages } from "../app/answers/decisionPages";
 import { getResourceArticleDecisionAreas } from "../lib/resourceArticles";
+import { indexableAnswerSlugs } from "../lib/seo/indexationPolicy";
 
 describe("canonical content selectors", () => {
   it("keeps featured answer pages sourced from canonical answer registry", () => {
@@ -19,6 +20,14 @@ describe("canonical content selectors", () => {
     for (const page of featuredAnswerPages) {
       assert.ok(answerPages.some((candidate) => candidate.slug === page.slug));
     }
+  });
+
+  it("lists every indexable answer on the hub, not only the ordered ones", () => {
+    const listed = new Set(featuredAnswerPages.map((page) => page.slug));
+    for (const slug of indexableAnswerSlugs) {
+      assert.ok(listed.has(slug), `${slug} is in the sitemap but not on /resolve`);
+    }
+    assert.equal(new Set(featuredAnswerPages.map((page) => page.slug)).size, featuredAnswerPages.length);
   });
 
   it("maps resource article intents to bounded decision areas", () => {

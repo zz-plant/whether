@@ -15,13 +15,13 @@
 /** The box either side of the calculation needs; every HTMLElement satisfies it. */
 type Boxed = { getBoundingClientRect(): { left: number; width: number } };
 
-export type ScrollRow = Boxed & {
+type ScrollRow = Boxed & {
   scrollLeft: number;
   clientWidth: number;
   scrollTo?: (options: { left: number; behavior: ScrollBehavior }) => void;
 };
 
-export const prefersReducedMotion = (): boolean =>
+const prefersReducedMotion = (): boolean =>
   typeof window !== "undefined"
   && typeof window.matchMedia === "function"
   && window.matchMedia("(prefers-reduced-motion: reduce)").matches;

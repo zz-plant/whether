@@ -8,41 +8,53 @@ import {
 } from "../lib/seo/programmaticPayloadBuilder";
 
 describe("programmatic payload builder", () => {
-  it("enumerates all cluster-derived programmatic routes", () => {
+  it("enumerates one route per signal watch and decision scenario", () => {
     const routes = enumerateProgrammaticRoutes();
     assert.ok(routes.length > 0);
-    assert.ok(routes.some((route) => route.kind === "decide"));
-    assert.ok(routes.some((route) => route.kind === "toolkit"));
-    assert.ok(routes.some((route) => route.kind === "signal-scenario"));
+    assert.ok(routes.every((route) => route.kind === "signal-scenario"));
+    assert.ok(routes.every((route) => route.url.startsWith("/signals/")));
+
+    const watches = new Set(routes.map((route) => route.cluster));
+    const scenarios = new Set(routes.map((route) => route.scenario));
+    assert.equal(routes.length, watches.size * scenarios.size);
   });
 
   it("generates and reads validated payload artifacts", async () => {
     const output = await generateProgrammaticPayloadArtifacts();
     assert.ok(output.version.length > 0);
 
-    const record = await readProgrammaticPayload("/resolve/ceo/capital-raising");
-    assert.equal(record.url, "/resolve/ceo/capital-raising");
+    const record = await readProgrammaticPayload("/signals/capital-tightness-watch/hiring");
+    assert.equal(record.url, "/signals/capital-tightness-watch/hiring");
     assert.ok(record.delta.changedSignals.length >= 0);
     assert.ok(record.payload.currentCall.length > 0);
     assert.equal(record.payload.noindex, false);
+  });
 
-    const routes = enumerateProgrammaticRoutes();
-    const decideCluster = routes
-      .filter((route): route is Extract<(typeof routes)[number], { kind: "decide" }> => route.kind === "decide")
-      .reduce<Map<string, string[]>>((clusters, route) => {
-        const existing = clusters.get(route.cluster) ?? [];
-        existing.push(route.url);
-        clusters.set(route.cluster, existing);
-        return clusters;
-      }, new Map());
+  /*
+   * The three watch pages for one scenario share a decision rule, so their
+   * call and action match by construction. What has to differ is the evidence:
+   * each page cites its own watch's signals. The uniqueness gate is keyed on
+   * the scenario so that it compares exactly these three, and passes only
+   * because the evidence differs.
+   */
+  it("gives the three watch pages for one scenario distinct evidence", async () => {
+    const { records } = await generateProgrammaticPayloadArtifacts();
+    const byScenario = new Map<string, typeof records>();
+    for (const record of records) {
+      const scenario = record.url.split("/")[3];
+      byScenario.set(scenario, [...(byScenario.get(scenario) ?? []), record]);
+    }
 
-    const multiSlugCluster = [...decideCluster.entries()].find(([, urls]) => urls.length > 1);
-    assert.ok(multiSlugCluster, "expected at least one decide cluster with multiple role variants");
-
-    for (const url of multiSlugCluster[1]) {
-      const clusterRecord = output.records.find((candidate) => candidate.url === url);
-      assert.ok(clusterRecord, `expected generated record for ${url}`);
-      assert.equal(clusterRecord.payload.noindex, false);
+    assert.ok(byScenario.size > 0);
+    for (const [scenario, group] of byScenario) {
+      assert.ok(group.length > 1, `${scenario} is read through more than one watch`);
+      const seen = new Set<string>();
+      for (const record of group) {
+        const titles = record.payload.evidence.map((item) => item.title).sort().join("|");
+        assert.ok(!seen.has(titles), `${record.url} cites the same evidence as a sibling`);
+        seen.add(titles);
+        assert.equal(record.payload.noindex, false, `${record.url}: ${record.payload.noindexReasons?.join(", ")}`);
+      }
     }
   });
 });
@@ -55,11 +67,7 @@ describe("programmatic payload builder", () => {
  * page and a literal in the builder.
  */
 describe("programmatic payload lookups match enumerated routes", () => {
-  const CALLERS = [
-    "app/resolve/[slug]/[cluster]/page.tsx",
-    "app/signals/[cluster]/[decision-scenario]/page.tsx",
-    "app/toolkits/[slug]/[cluster]/page.tsx",
-  ];
+  const CALLERS = ["app/signals/[cluster]/[decision-scenario]/page.tsx"];
 
   it("asks only for URL prefixes the builder emits", () => {
     const enumerated = new Set(
@@ -80,6 +88,13 @@ describe("programmatic payload lookups match enumerated routes", () => {
           `${caller} requests /${prefix}/..., which enumerateProgrammaticRoutes never emits (it emits: ${[...enumerated].join(", ")})`,
         );
       }
+    }
+  });
+
+  it("no longer emits the retired resolve and toolkit cluster routes", () => {
+    for (const route of enumerateProgrammaticRoutes()) {
+      assert.ok(!route.url.startsWith("/resolve/"), `${route.url} was retired`);
+      assert.ok(!route.url.startsWith("/toolkits/"), `${route.url} was retired`);
     }
   });
 });

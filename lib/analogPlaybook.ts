@@ -5,7 +5,7 @@
  */
 import type { RegimeScores } from "./regimeEngine";
 
-export type AnalogCoordinate = {
+type AnalogCoordinate = {
   key: "baseRate" | "curveSlope" | "tightness" | "riskAppetite";
   label: string;
   /** The reference cycle's value. */

@@ -3,7 +3,6 @@ import path from "node:path";
 
 const dynamicRouteSamples = {
   "/resolve/[slug]": ["/resolve/ceo"],
-  "/resolve/[slug]/[cluster]": ["/resolve/ceo/capital-raising"],
   "/answers/[slug]": ["/answers/should-startups-hire-engineers-right-now"],
   "/brief/[week]": ["/brief/2026-w31"],
   "/history/[period]": ["/history/2025"],
@@ -19,7 +18,6 @@ const dynamicRouteSamples = {
     "/signals/capital-tightness-watch/hiring",
   ],
   "/toolkits/[slug]": ["/toolkits/pmf"],
-  "/toolkits/[slug]/[cluster]": ["/toolkits/pmf/risk-appetite-watch"],
 };
 
 const countMatches = (value, pattern) => [...value.matchAll(pattern)].length;

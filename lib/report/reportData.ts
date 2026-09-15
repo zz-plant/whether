@@ -111,7 +111,7 @@ export type ReportDataLoadOptions = {
   includeHistoricalLiveComparison?: boolean;
 };
 
-export type DecisionTransmissionConfidenceLabel = "high" | "medium" | "low" | "unknown";
+type DecisionTransmissionConfidenceLabel = "high" | "medium" | "low" | "unknown";
 
 export type DecisionTransmissionBoundedRule = {
   action: string;

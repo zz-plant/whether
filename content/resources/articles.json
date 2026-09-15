@@ -49,7 +49,7 @@
         ]
       },
       {
-        "heading": "What operators should do this week",
+        "heading": "What operators should do first",
         "paragraphs": [
           "Build a role inventory with four fields: role purpose, downside if unfilled, expected evidence window, and reversibility. Then classify every open req and planned backfill as SAFE, RISKY, or DANGEROUS.",
           "Run a one-hour cross-functional review with finance, product, and hiring managers. Remove narrative arguments and require one measurable indicator for each approval request.",

@@ -14,7 +14,7 @@
 import type { PlannerSector } from "./report/runwayPlanner";
 
 export const OPERATOR_PROFILE_STORAGE_KEY = "whether.operatorProfile";
-export const OPERATOR_PROFILE_VERSION = 1;
+const OPERATOR_PROFILE_VERSION = 1;
 
 export type OperatorProfileNumberKey =
   | "runwayMonths"

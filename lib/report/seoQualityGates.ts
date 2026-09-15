@@ -1,6 +1,7 @@
-const DEFAULT_FRESHNESS_WINDOW_HOURS = 72;
+/** How old a reading may be and still be published as current. Shared with `lib/seo/freshnessIndexation.ts`. */
+export const DEFAULT_FRESHNESS_WINDOW_HOURS = 72;
 
-export type SeoQualityGateId =
+type SeoQualityGateId =
   | "decision-completeness"
   | "decision-transmission"
   | "freshness"
@@ -10,7 +11,7 @@ export type SeoQualityGateId =
   | "artifact-readiness"
   | "canonical-progression";
 
-export type SeoQualityGateStatus = {
+type SeoQualityGateStatus = {
   passed: boolean;
   reasons: string[];
   details?: Record<string, unknown>;
@@ -31,7 +32,7 @@ export type SeoQualitySiblingInput = {
   evidenceTitles?: string[];
 };
 
-export type EvaluateSeoQualityGatesInput = {
+type EvaluateSeoQualityGatesInput = {
   pageKey: string;
   currentCall?: string;
   immediateAction?: string;

@@ -57,9 +57,9 @@ export const REGIME_HEX_COLORS: Record<RegimeKey, string> = {
 /** Score at which `tightness` stops distinguishing between expensive and very
  *  expensive money. Points sitting exactly here are clipped readings, not
  *  measurements, and the plane says so rather than drawing them as ordinary. */
-export const TIGHTNESS_SCORE_CEILING = 100;
+const TIGHTNESS_SCORE_CEILING = 100;
 
-export type PhaseAxis = "tightness" | "riskAppetite";
+type PhaseAxis = "tightness" | "riskAppetite";
 
 export type PhasePoint = {
   recordDate: string;
@@ -75,7 +75,7 @@ export type PhasePoint = {
   saturated: boolean;
 };
 
-export type PhaseGap = {
+type PhaseGap = {
   axis: PhaseAxis;
   /** What the axis is called on screen. */
   label: string;
@@ -88,7 +88,7 @@ export type PhaseGap = {
   flipsToLabel: string;
 };
 
-export type PhaseOccupancy = {
+type PhaseOccupancy = {
   regime: RegimeKey;
   regimeLabel: string;
   months: number;
@@ -96,7 +96,7 @@ export type PhaseOccupancy = {
   share: number;
 };
 
-export type RegimePhaseModel = {
+type RegimePhaseModel = {
   /** Whole record, oldest first. */
   points: PhasePoint[];
   current: PhasePoint;
@@ -181,7 +181,7 @@ const buildGap = (
   };
 };
 
-export const PHASE_AXIS_LABELS: Record<PhaseAxis, string> = {
+const PHASE_AXIS_LABELS: Record<PhaseAxis, string> = {
   tightness: "Funding pressure",
   riskAppetite: "Risk appetite",
 };
@@ -280,7 +280,7 @@ export const PHASE_SPANS = [
 
 export type PhaseSpanKey = (typeof PHASE_SPANS)[number]["key"];
 
-export const DEFAULT_PHASE_SPAN: PhaseSpanKey = "5y";
+const DEFAULT_PHASE_SPAN: PhaseSpanKey = "5y";
 
 /** Unknown or absent values fall back rather than throwing: this reads a query
  *  string, so anything at all can arrive here. */

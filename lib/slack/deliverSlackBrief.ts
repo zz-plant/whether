@@ -13,7 +13,7 @@ import { buildPostureState } from "../report/postureStateSource";
  * three outcomes actually happened.
  */
 
-export type SlackDeliveryStatus = "posted" | "partial" | "skipped_unconfigured" | "failed";
+type SlackDeliveryStatus = "posted" | "partial" | "skipped_unconfigured" | "failed";
 
 export type SlackDeliveryResult = {
   /** True when every configured webhook accepted the post, or none are configured. */
@@ -64,7 +64,7 @@ export const buildSlackBriefBlocks = (
 };
 
 /** Same data path as GET /api/brief/slack, so both surfaces say the same thing. */
-export const buildSlackBriefPayload = async (): Promise<{
+const buildSlackBriefPayload = async (): Promise<{
   text: string;
   recordDate: string;
   degraded: boolean;

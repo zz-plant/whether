@@ -1,8 +1,8 @@
 import type { MacroSeriesId } from "../types";
 
-export type PolicySignalId = "BASE_RATE" | "CURVE_SLOPE" | "BBB_CREDIT_SPREAD" | "CPI_YOY" | "UNEMPLOYMENT_RATE";
+type PolicySignalId = "BASE_RATE" | "CURVE_SLOPE" | "BBB_CREDIT_SPREAD" | "CPI_YOY" | "UNEMPLOYMENT_RATE";
 
-export interface PolicySignalConfig {
+interface PolicySignalConfig {
   id: PolicySignalId;
   source: "TREASURY" | "FRED";
   cadence: "DAILY" | "MONTHLY";
@@ -10,24 +10,24 @@ export interface PolicySignalConfig {
   macroSeriesId?: Extract<MacroSeriesId, "BBB_CREDIT_SPREAD" | "CPI_YOY" | "UNEMPLOYMENT_RATE">;
 }
 
-export interface CompositeWeights {
+interface CompositeWeights {
   baseRate: number;
   bbbSpread: number;
   curveSlope: number;
 }
 
-export interface PolicyThresholdBands {
+interface PolicyThresholdBands {
   neutralMax: number;
   elevatedMax: number;
 }
 
-export interface PolicyRefusalConfig {
+interface PolicyRefusalConfig {
   disagreementThreshold: number;
   dispersionThreshold: number;
   maxMissingSignalCount: number;
 }
 
-export interface PolicySpecConfig {
+interface PolicySpecConfig {
   version: string;
   rollingWindowYears: number;
   zClip: number;

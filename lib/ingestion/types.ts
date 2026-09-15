@@ -12,9 +12,9 @@ export type SignalKey =
   | "CHICAGO_FCI"
   | "VIX_INDEX";
 
-export type SignalUnit = "%" | "bps" | "index";
+type SignalUnit = "%" | "bps" | "index";
 
-export interface SignalSourceMetadata {
+interface SignalSourceMetadata {
   label: string;
   url: string;
   seriesId?: string;
@@ -37,7 +37,7 @@ export interface SignalCadenceControl {
   staleAfterMs: number;
 }
 
-export interface MaterializedSignalState {
+interface MaterializedSignalState {
   snapshot: SignalEntitySnapshot;
   staleness: {
     status: "fresh" | "stale";

@@ -19,7 +19,7 @@ export const REGIME_LABELS: Record<RegimeKey, string> = {
 // drifting. They are aliases now, kept as names so no import breaks, and the
 // only literal is REGIME_LABELS above.
 export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
-export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
+const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 
@@ -30,7 +30,7 @@ export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
   EXPANSION: "Visibility is high and footing is firm, so move faster while keeping guardrails in place.",
 };
 
-export const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
+const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
   SCARCITY: "Scarcity regime: freezing weather; capital is constrained and each move needs protection.",
   DEFENSIVE: "Defensive regime: cloudy weather; conditions are workable but visibility is muted.",
   VOLATILE: "Transitional regime: stormy weather; windows open and close quickly.",
@@ -113,9 +113,8 @@ export const REGIME_STYLE_TOKENS: Record<
 };
 
 export type RegimeMomentum = "improving" | "deteriorating" | "mixed" | "stable";
-export type RegimeStageLabel = "Early" | "Mid" | "Late";
+type RegimeStageLabel = "Early" | "Mid" | "Late";
 export type RegimeConfidenceLabel = "LOW" | "MED" | "HIGH";
-export type RegimeDisplayModifier = "Guarded" | "Transitional" | null;
 
 export const getRegimeDisplayLabel = ({
   regime,

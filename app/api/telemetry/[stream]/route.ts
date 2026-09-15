@@ -4,6 +4,7 @@ import { isWebVitalMetric } from "../../../../lib/webVitalsTelemetry";
 import { isOperatorWorkflowEvent } from "../../../../lib/operatorWorkflowTelemetry";
 import { isActivationEvent } from "../../../../lib/activationFunnel";
 import { isContentMeasurementEvent } from "../../../../lib/contentMeasurement";
+import { isSearchTelemetryEvent } from "../../../../lib/searchTelemetry";
 import { checkRateLimit, clientKeyFor, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 
 export const runtime = "edge";
@@ -18,6 +19,7 @@ const VALID_STREAMS = new Set<string>([
   "cron-step",
   "regime-transition",
   "degraded-state",
+  "search",
 ]);
 
 const isTelemetryStream = (value: string): value is TelemetryStream => VALID_STREAMS.has(value);
@@ -58,6 +60,13 @@ export async function POST(
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
   if (stream === "content-measurement" && !isContentMeasurementEvent(payload)) {
+    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
+  }
+
+  /* Strict, and strict about extras: the search stream promises to hold no
+     query text, so a payload carrying an unexpected key is refused rather than
+     stored with the key ignored. */
+  if (stream === "search" && !isSearchTelemetryEvent(payload)) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 

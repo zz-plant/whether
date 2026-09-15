@@ -12,7 +12,7 @@ import { formatConfidenceSentence, formatSourceLine } from "./summaryFormatting"
 
 import type { MonthlyStructured, SummaryProvenance } from "./summaryTypes";
 
-export type MonthlySummaryProvenance = SummaryProvenance;
+type MonthlySummaryProvenance = SummaryProvenance;
 export type { MonthlyStructured } from "./summaryTypes";
 
 export type MonthlySummary = {
@@ -61,7 +61,7 @@ export const getMonthlyActionGuidance = (
     ? monthlyActionGuidanceSaturatedFinancing[regime]
     : monthlyActionGuidance[regime];
 
-export const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructured["operatingRules"] => {
+const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructured["operatingRules"] => {
   const { tightnessPause, tightnessResume, riskPause, riskResume } =
     buildHorizonThresholdBands(assessment);
 

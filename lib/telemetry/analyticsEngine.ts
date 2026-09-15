@@ -56,9 +56,17 @@ export type TelemetryStream =
   | "ingest-pipeline"
   | "cron-step"
   | "regime-transition"
-  | "degraded-state";
+  | "degraded-state"
+  /**
+   * The shape of a search: which job the query routed to, how many entities
+   * matched, whether it matched nothing. Not the text typed, which this product
+   * promises it does not collect — `isSearchTelemetryEvent` refuses a payload
+   * carrying any key beyond those four, so the promise is enforced at the
+   * intake rather than left as a convention.
+   */
+  | "search";
 
-export type WriteAnalyticsOptions = {
+type WriteAnalyticsOptions = {
   doubles?: number[];
 };
 
@@ -94,5 +102,3 @@ export const writeAnalytics = (
     console.warn(`[telemetry:${stream}:write-failed]`, error);
   }
 };
-
-export const isAnalyticsEngineBound = (): boolean => getBinding() !== null;
