@@ -816,6 +816,98 @@ layer keeps its band-based illustrative profile: the interpretation layers have 
 site (exports only, server-built), and the browser-held profile cannot reach a server build
 without a new sync surface — the runway notes panel is the sanctioned on-page path.
 
+### 1.1.17 Sitewide declutter (2026-09-15)
+
+A justified-removal pass over every surface, on the one rule the repo already had: when two
+surfaces state the same thing, the earlier one keeps it (§XI: state gets stated once). The captures
+that prompted it measured `/` at 4,244px desktop and 6,030px phone — double the 2026-08-29
+facelift baseline — with the funding pressure score printed in six places, the stage selector
+rendered three times (four on a first visit), two regime timelines on one page, and three CTAs
+pointing at /operate; on a 430px phone the call headline sat at the bottom edge of the first
+viewport. Report routes stacked up to six chrome bands before the first task block against §XI's
+three, and every one of them computed hero props the shell never read. Each removal names the
+restatement it resolved; the measured result is in the table at the end.
+
+**Homepage `/`.** Above the call: `FirstVisitExplainer` keeps its sentence and Dismiss and loses
+its two links (Trust and History are header tabs) and its stage fieldset (the header pill covers
+phones, the hero's tablist covers `sm` and up); the meta row loses the "Data through … ·
+refreshed …" line (the hero's trust line and the confidence popover carry both) and the stage
+pill that overlapped the hero's tablist at every width above `sm`; `TimelineBar` and the
+swipe-anywhere month gesture leave with `SwipeableWeek` (the chevrons and the calendar picker are
+the period controls; `/history` keeps the scrubber); `BriefSectionNav` goes (three sections do
+not need a sticky index; J/K still step the `data-page-section` ids). In the hero: the delta
+caption under the sparkline repeated the badge beside the score, and the Operating latitude gloss
+moved from a hover-only `title` into the Why-this-call disclosure. Below the call: the four
+numbered `SectionSignpost`s (the cards carry their titles); `KeyDriversCard`'s threshold rows (the
+hero's rails encode them — §XV, one encoding per concept per screen) and its rate-derivation
+paragraphs (method exposition on the primary screen); `RecentPostureHistoryCard`'s prior-read
+chips and comparison panel (the hero's What-changed rows) and the placeholder months it invented
+for an empty history; `StressTestQuickCard` (recreated /operate's tester inline and was the
+second plan CTA); the tabbed `WeeklyRetrospectiveCard` with `LastWeekInHindsight` (the hero's
+revisit badge and delta — `lib/report/hindsight.ts` went with it); `DirectAnswersStrip` (the
+list /resolve owns; the handoff gets a text link). `SinceLastVisit` stays, directly under the
+call on live briefs. `StickyCallStrip` renders from `md` up only: on phones it stacked on the
+tab bar (reverses P0 #1 in `docs/design-improvements-priority.md`).
+
+**Global chrome.** One header band on every route — wordmark, tabs, actions — reversing the
+2026-08-11 two-band note in the weekly-brief spec: the `Weekly Brief` button duplicated the Brief
+tab 40px below it, and the `Toolkits` pill beside it only ever resolved for `/`, which rendered
+the other shape. `AppSidebar` keeps the page outline and loses its second wordmark and the
+`Workflow` group that repeated the six header tabs. Dead and deleted: `globalHeaderSearchForm`,
+`globalHeaderShared`, `resolveReportHeaderNextStep`, `isReportShellRoute`.
+
+**Report shell.** Gone, end to end: `commandBar` (rendered only for `/`, which never mounts the
+shell; the home assembler built one too), `decisionBanner`, `missionSupportText`,
+`trustStatusDetail` and `trustStatusAction` (accepted by the hero, never read), `trustStatusLabel`
+(discarded for the readiness headline the shell derives), `stageRail`, `hideHeroChrome`,
+`inlineTrustPlacement`, `provenance`, `treasurySource` and the outage props (fed a rail and two
+trust blocks no route switched on), `heroVariant` and `roleSwitcher` (one kicker; one name per
+thing), `pageSummaryLink`, `secondaryCta`, `currentPath` and the default `primaryCta` (every "↓"
+link and secondary button targeted the block beneath the hero or the `/` the header reaches, and
+the default pointed at an anchor no route renders — how /history shipped a dead button). Deleted
+with them: `RegimeCommandBar`, `SidebarSequenceBlock`, `TrustBlocks`, `reportRevampElements`. The
+refresh stamp no longer prints "Updated " with nothing after it.
+
+**Routes.** `/signals` (evidence only, §VIII): the instruction strip above the summary, the h2
+restating the regime the status line names one screen above, the "What founders should do this
+week" playbook (the operating call — `/operate` prints the rules by area, and the directory's own
+AGENTS.md forbids owning it), "What this means for your team" (`/resolve` owns role translation),
+and the tail "Need more detail?" button (the reading-depth control, again); the fossil record is
+a deeper-mode read. `/operate`: one index in page order (`operationsSectionLinks.plan`) instead of
+three (the sidebar list, the stepper's sticky chip row, an "Other planning pages" grid that
+repeated the workstream switcher); the intro paragraph under the hero; the "Decision help"
+section, now the shell's next-step card; the workstream pages' banner and intro. `/resolve`: two
+duplicate CTAs and a dead variable. `/trust`: the "Confidence now" bullet its status grid carries.
+
+**Guards.** `tests/homeRouteDecisionTransmissionContract.test.tsx` pins the homepage shape;
+`tests/pageConsolidation.test.tsx` fails if a retired file returns under `app/`;
+`tests/reportShellSections.test.tsx` pins a hero with no default button and no empty stamp;
+`tests/planningCliPage.test.tsx` pins the one plan index. Invariant 11 caught the one selector the
+pass orphaned (`[data-sticky-strip-hide]`, set only by the retired quick card).
+
+**Left alone, deliberately.** The cadence selector at the tail of `/` (§1.1.15's open product
+question, unchanged). `primaryCta` and `exportCta` stay on the shell as its action API, used by
+no route today. The `/history` export control stays as its own row under the hero: it is a
+clipboard button, not a link, and the hero's action slot takes a link. `tests/hindsight.test.ts`
+went with its module; the census floor (212) sits well under the 258 files that remain.
+
+**Measured (2026-09-15, same day, same data; full-page captures at 1600 and 430 wide).**
+
+| Route | Desktop before → after | Phone before → after |
+| --- | --- | --- |
+| `/` | 4,838 → 2,976 px | 6,352 → 3,718 px |
+| `/signals` | 4,989 → 3,856 px | 7,836 → 6,065 px |
+| `/operate` | 3,883 → 3,338 px | 5,418 → 4,552 px |
+| `/resolve` | 1,801 → 1,737 px | 2,162 → 2,060 px |
+| `/trust` | 5,614 → 5,551 px | 7,824 → 7,722 px |
+| `/history` | 3,884 → 3,823 px | 4,621 → 4,571 px |
+
+On a 430×932 phone the call, the score and the delta now sit inside the first viewport, with the
+tab bar as the only fixed element. What remains below is one of each thing: the change report, the
+rails, the drivers and actions, the posture stripe, subscribe, the handoff, the footer. Height is
+data-dependent (a wide week prints more What-changed rows), so the guards above are the acceptance
+check and these numbers are the record.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

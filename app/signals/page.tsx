@@ -9,7 +9,6 @@ import { SignalInversionPreview } from "./components/signalInversionPreview";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { SignalSparklineStrip } from "./components/signalSparklineStrip";
 import { formatMonthYearShortFromValue } from "../../lib/formatters";
-import { DomainContextSection } from "./components/domainContextSection";
 import { FossilRecordSection } from "./components/fossilRecordSection";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
@@ -19,7 +18,6 @@ import {
   SignalsDiagnosticsSection,
   SignalsEvidencePrioritiesSection,
   SignalsModeSwitcherSection,
-  SignalsNeedMoreProofSection,
 } from "./components/evidenceSections";
 import { SignalsDecisionSummarySection } from "./components/evidenceDecisionSummary";
 import { getHistoricalAnalogPlaybook } from "../../lib/analogPlaybook";
@@ -66,48 +64,14 @@ export default async function SignalsPage({
       statusLabel={model.statusLabel}
       recordDateLabel={model.recordDateLabel}
       fetchedAtLabel={model.fetchedAtLabel}
-      treasurySource={model.treasury.source}
-      trustStatusLabel={model.trust.trustStatusLabel}
-      trustStatusDetail={model.trust.trustStatusDetail}
-      trustStatusAction={model.trust.trustStatusAction}
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
       pageTitle="Why the weekly brief changed"
-      currentPath="/signals"
       pageSummary="What moved, why it matters, and what would flip the call."
-      pageSummaryLink={{
-        href: "#decision-summary",
-        label: "Summary ↓",
-      }}
       sectionLinks={model.sectionLinks}
-      heroVariant="compact"
-      primaryCta={{ href: "#decision-summary", label: "What changed" }}
-      secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operate",
         description: "Set guardrails for this week's plan",
-      }}
-      decisionBanner={{
-        label: "Evidence",
-        decision: "Use this to confirm or challenge the weekly recommendation before changing the plan.",
-        horizon: "Current cycle",
-        confidence: model.trust.trustStatusLabel,
-        effectiveDate: model.recordDateLabel,
-        evidenceHref: "#decision-summary",
-      }}
-      decisionDiffs={[{ label: `Backdrop: ${model.regimeLabel}`, tone: "neutral" }]}
-      commandBar={{
-        regime: model.assessment.regime,
-        call: "Check what changed before you change the plan.",
-        doNow: [
-          model.actionNowShort,
-          model.startItems[0] ?? "Use the strongest proof item before changing the plan.",
-        ],
-        flipConditions: [
-          model.reportData.flipThreshold,
-          model.stopItems[0] ?? "Pause irreversible commitments if confidence degrades.",
-        ],
-        updatedAt: model.fetchedAtLabel,
       }}
       structuredData={model.structuredData}
       historicalBanner={
@@ -125,14 +89,10 @@ export default async function SignalsPage({
     >
       <OperatorWorkflowRouteTracker />
       <SignalsDecisionSummarySection
-        decisionDeltaLabel={model.decisionDeltaLabel}
         triggerCondition={model.triggerCondition}
         reversalCondition={model.reversalCondition}
         showMicroDecisionRows={model.showMicroDecisionRows}
-        regimeLabel={model.regimeLabel}
         actionNowShort={model.actionNowShort}
-        startItems={model.startItems}
-        stopItems={model.stopItems}
         topDiagnosticCallouts={model.topDiagnosticCallouts}
       />
 
@@ -257,15 +217,16 @@ export default async function SignalsPage({
         );
       })()}
 
-      <DomainContextSection regime={model.assessment.regime} />
-
-      <FossilRecordSection
-        regime={model.assessment.regime}
-        open={resolvedSearchParams?.fossil === "1" || resolvedSearchParams?.fossil === "open"}
-      />
-
-      {model.activeSignalsView === "implication" ? (
-        <SignalsNeedMoreProofSection searchParams={resolvedSearchParams} />
+      {/* Evidence only (ui-ux-standards §VIII). The per-team translation that
+          sat here belongs to /resolve, which owns the role pages; the fossil
+          record is unique content but a read for the deeper mode, not the short
+          one; and the "Need more detail?" button that followed repeated the
+          reading-depth control near the top of the page. */}
+      {model.activeSignalsView === "detail" ? (
+        <FossilRecordSection
+          regime={model.assessment.regime}
+          open={resolvedSearchParams?.fossil === "1" || resolvedSearchParams?.fossil === "open"}
+        />
       ) : null}
 
       {model.activeSignalsView === "detail" ? (

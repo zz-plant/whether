@@ -38,7 +38,6 @@ describe("assembleHomePage streaming contract", () => {
     );
 
     assert.match(homepage.weeklyDecisionCardModel.decision.immediateDecision, /stage|revise|hold/i);
-    assert.ok(homepage.reportShell.commandBar.doNow.length > 0);
     assert.equal(homepage.fallbackActive, false);
 
     let diagnosticsSettled = false;

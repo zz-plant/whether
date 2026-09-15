@@ -141,43 +141,10 @@ export function OperationsExecutionStepper({
       className="space-y-4"
       aria-label="Planning sections"
     >
-      {/* Section navigation, nothing more. This was a 0/6 checklist whose
-          checkboxes did nothing but turn themselves on; the chips stay because
-          they keep the six sections one tap away while the reader works down
-          the page. */}
-      <div className="sticky top-[3.5rem] z-10 -mx-1 overflow-x-auto rounded-xl border border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 py-1.5 backdrop-blur lg:top-2">
-        <ol className="flex min-w-max items-center gap-1.5" aria-label="Sections on this page">
-          {steps.map((step) => {
-            const isActive = step.id === currentStepId;
-            const stepHref = buildOperationsExecutionStepHref(step.id);
-
-            return (
-              <li
-                key={step.id}
-                className={`flex items-center rounded-lg border ${
-                  isActive ? "border-sky-500/50 bg-sky-500/10" : "border-transparent"
-                }`}
-              >
-                <a
-                  href={stepHref}
-                  aria-current={isActive ? "step" : undefined}
-                  className={`flex h-11 items-center px-3 text-fluid-xs font-semibold no-underline ${
-                    isActive ? "text-sky-100" : "text-slate-300"
-                  }`}
-                >
-                  {step.title}
-                </a>
-              </li>
-            );
-          })}
-          <li className="ml-2 hidden items-center gap-1 pr-1 text-fluid-nano text-slate-500 lg:flex" aria-hidden="true">
-            <kbd className="rounded border border-slate-800 px-1 font-mono">j</kbd>
-            <kbd className="rounded border border-slate-800 px-1 font-mono">k</kbd>
-            <span>next / previous</span>
-          </li>
-        </ol>
-      </div>
-
+      {/* No chip row of its own. The shell's sidebar (from lg) and mobile chips
+          list the same steps from `operationsSectionLinks.plan`, so this row was
+          the page's second index — a third, counting the card grid that used to
+          close the page. The `aria-current="step"` state lives on the panels. */}
       <div className="space-y-6">
         {steps.map((step) => {
           const isOpen = openStepIds.has(step.id);

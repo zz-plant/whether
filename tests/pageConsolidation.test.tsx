@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -126,3 +126,42 @@ describe("resources static params", () => {
   });
 });
 
+/*
+ * The 2026-09-15 sitewide declutter. Each file here rendered a block that restated
+ * something an earlier block on the same page already said, or recreated a
+ * downstream route inline; the restatement each one resolved is recorded in
+ * docs/feature-specs-current.md. A render site returning is a regression, so the
+ * files stay gone and no import of them may reappear under app/.
+ */
+describe("surfaces removed by the 2026-09-15 declutter", () => {
+  const retired = [
+    "/components/hero/StressTestQuickCard.tsx",
+    "/components/home/DirectAnswersStrip.tsx",
+    "/components/home/WeeklyRetrospectiveCard.tsx",
+    "/components/home/LastWeekInHindsight.tsx",
+    "/components/home/sectionSignpost.tsx",
+    "/components/home/briefSectionNav.tsx",
+    "/components/SwipeableWeek.tsx",
+  ];
+
+  it("keeps the retired homepage surfaces retired", () => {
+    for (const file of retired) {
+      assert.equal(existsSync(appPath(file)), false, `${file} was removed and must not return`);
+    }
+  });
+
+  it("imports none of them anywhere under app/", () => {
+    const names = retired.map((file) => file.slice(file.lastIndexOf("/") + 1).replace(/\.tsx$/, ""));
+    const appRoot = appPath("");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory() ? walk(`${dir}/${entry.name}`) : /\.tsx?$/.test(entry.name) ? [`${dir}/${entry.name}`] : [],
+      );
+    for (const file of walk(appRoot)) {
+      const source = readFileSync(file, "utf8");
+      for (const name of names) {
+        assert.ok(!source.includes(`/${name}"`), `${file.slice(appRoot.length)} imports retired ${name}`);
+      }
+    }
+  });
+});

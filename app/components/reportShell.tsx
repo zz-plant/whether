@@ -4,87 +4,72 @@
  *
  * Uses PageShell for the outer container structure so hub and report pages
  * share consistent page-level padding, backdrop, and ambient behavior.
+ *
+ * What the shell stopped accepting on 2026-09-15, and why. Every route built
+ * these, and the shell rendered none of them:
+ * - `commandBar`: rendered only when `currentPath === "/"`, and `/` never
+ *   mounts this shell.
+ * - `decisionBanner`, `missionSupportText`, `trustStatusDetail`,
+ *   `trustStatusAction`: the hero accepted them and never read them; the one
+ *   other consumer was a phone-only card gated on a condition that was always
+ *   false.
+ * - `trustStatusLabel`: the hero prints `resolveTrustReadinessCopy().headline`,
+ *   derived from tone, fallback and degraded count, so every route-authored
+ *   phrase was discarded.
+ * - `stageRail`, `hideHeroChrome`, `inlineTrustPlacement`, `provenance`,
+ *   `treasurySource` and the outage props: no route set the switches, so the
+ *   trust blocks and the sequence rail they fed never rendered.
+ * - `heroVariant` and `roleSwitcher`: no route passed a role switcher, and the
+ *   "Weekly operating brief" kicker only appeared on the two routes that forgot
+ *   to ask for `compact`. One name per thing.
+ * - `pageSummaryLink`, `secondaryCta`, the default `primaryCta`, and
+ *   `currentPath`: every inline "↓" link and secondary button targeted either
+ *   the block directly beneath the hero or the `/` the header tab already
+ *   reaches; the default pointed at an anchor no route renders; and the path
+ *   was read only to decide those.
  */
 import { Children, type ReactNode, isValidElement } from "react";
 import { PageShell } from "./pageShell";
-import type { DataProvenance } from "./dataProvenanceStrip";
 import { type ReportSectionLink } from "./reportShellNavigation";
 import { AppSidebar } from "./AppSidebar";
 import { MobileSectionChips } from "./mobileSectionChips";
-import { type ReportStageItem } from "./reportRevampElements";
-import { INTERNAL_USE_LABEL } from "../../lib/exportNotices";
-import { ReportCta } from "./reportCta";
 import type { RegimeIconType } from "./pageShell";
-import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
-import { InternalAwareLink } from "./report-shell/InternalAwareLink";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
-import { SidebarSequenceBlock } from "./report-shell/SidebarSequenceBlock";
 import { NextStepCard } from "./report-shell/NextStepCard";
-import { InlineTrustBlock } from "./report-shell/TrustBlocks";
-import type {
-  DecisionBanner,
-  DecisionDiff,
-  ExportCtaProps,
-  ReportCtaProps,
-  RoleSwitcher,
-  SecondaryCtaProps,
-} from "./report-shell/types";
+import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 
 type ReportShellInput = {
   statusLabel: string;
   regime?: RegimeIconType;
   recordDateLabel: string;
   fetchedAtLabel: string;
-  treasurySource: string;
   pageTitle: string;
   pageSummary: string;
-  pageSummaryLink?: { href: string; label: string };
   sectionLinks: ReportSectionLink[];
-  trustStatusLabel: string;
-  trustStatusDetail: string;
-  trustStatusAction: string;
   trustStatusTone: "stable" | "warning" | "historical";
-  outageType?: "live-data" | "feed-unavailable" | "stale-cache" | "source-divergence" | "historical-snapshot";
-  outageSeverity?: "advisory" | "blocking" | "critical";
-  decisionImpactWindow?: string;
-  approvalBuckets?: Array<{ label: string; detail: string }>;
-  recoveryPlan?: { owner: string; nextCheckpoint: string; exitCondition: string };
-  outageExitGate?: { label: string; summary: string; metCount: number; totalCount: number };
   degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
   showOfflineBadge?: boolean;
   offlineBadgeLabel?: string;
-  heroVariant?: "full" | "compact";
   sidebarVariant?: "full" | "hidden";
-  hideHeroChrome?: boolean;
+  /** A hero action, for a destination the header and the page index do not
+   *  already reach. No route needs one today; the slot stays for the one that does. */
   primaryCta?: ReportCtaProps;
-  secondaryCta?: SecondaryCtaProps;
   exportCta?: ExportCtaProps | null;
   showShare?: boolean;
   structuredData?: unknown;
   historicalBanner?: ReactNode;
-  currentPath: string;
-  stageRail?: {
-    title?: string;
-    items: ReportStageItem[];
-  };
-  decisionBanner?: DecisionBanner;
-  roleSwitcher?: RoleSwitcher;
-  decisionDiffs?: DecisionDiff[];
   nextStep?: { description: string; href: string };
   nextRefreshLabel?: string;
-  inlineTrustPlacement?: "before-content" | "after-first-section" | "hidden";
-  provenance?: DataProvenance;
-  commandBar?: RegimeCommandBarProps;
 };
 
 type ReportShellModel = {
-  status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
-  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "pageSummaryLink" | "sectionLinks" | "currentPath">;
-  trust: Pick<ReportShellInput, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "outageType" | "outageSeverity" | "decisionImpactWindow" | "approvalBuckets" | "recoveryPlan" | "outageExitGate" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
-  chrome?: Pick<ReportShellInput, "heroVariant" | "sidebarVariant" | "hideHeroChrome">;
-  actions?: Pick<ReportShellInput, "primaryCta" | "secondaryCta" | "exportCta" | "showShare" | "nextStep" | "nextRefreshLabel">;
-  payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
+  status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel">;
+  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "sectionLinks">;
+  trust: Pick<ReportShellInput, "trustStatusTone" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel">;
+  chrome?: Pick<ReportShellInput, "sidebarVariant">;
+  actions?: Pick<ReportShellInput, "primaryCta" | "exportCta" | "showShare" | "nextStep" | "nextRefreshLabel">;
+  payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner">;
 };
 
 type ReportShellProps = { children: ReactNode } & (
@@ -93,12 +78,6 @@ type ReportShellProps = { children: ReactNode } & (
 );
 
 export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
-export {
-  HeroTrustProvenanceBlock,
-  resolveTrustProvenance,
-} from "./report-shell/TrustBlocks";
-export { SidebarSequenceBlock } from "./report-shell/SidebarSequenceBlock";
-
 
 const normalizeReportShellInput = (props: ReportShellProps): ReportShellInput => {
   if ("model" in props && props.model) {
@@ -118,209 +97,123 @@ const normalizeReportShellInput = (props: ReportShellProps): ReportShellInput =>
 
 export const ReportShell = (props: ReportShellProps) => {
   const { children } = props;
-  const input = normalizeReportShellInput(props);
   const {
-    statusLabel: resolvedStatusLabel,
-    regime: resolvedRegime,
-    recordDateLabel: resolvedRecordDateLabel,
-    fetchedAtLabel: resolvedFetchedAtLabel,
-    treasurySource: resolvedTreasurySource,
-    pageTitle: resolvedPageTitle,
-    pageSummary: resolvedPageSummary,
-    pageSummaryLink: resolvedPageSummaryLink,
-    sectionLinks: resolvedSectionLinks,
-    currentPath: resolvedCurrentPath,
-    trustStatusDetail: resolvedTrustStatusDetail,
-    trustStatusAction: resolvedTrustStatusAction,
-    trustStatusTone: resolvedTrustStatusTone,
-    outageType: resolvedOutageType,
-    outageSeverity: resolvedOutageSeverity,
-    decisionImpactWindow: resolvedDecisionImpactWindow,
-    approvalBuckets: resolvedApprovalBuckets,
-    recoveryPlan: resolvedRecoveryPlan,
-    outageExitGate: resolvedOutageExitGate,
-    degradedSourceRows: resolvedDegradedSourceRows,
-    showOfflineBadge: resolvedShowOfflineBadge = false,
-    offlineBadgeLabel: resolvedOfflineBadgeLabel = "Cached snapshot",
-    heroVariant: resolvedHeroVariant = "full",
-    sidebarVariant: resolvedSidebarVariant = "full",
-    hideHeroChrome: resolvedHideHeroChrome = false,
-    primaryCta: inputPrimaryCta,
-    secondaryCta: resolvedSecondaryCta,
-    exportCta: inputExportCta,
-    showShare: resolvedShowShare = false,
-    structuredData: resolvedStructuredData,
-    historicalBanner: resolvedHistoricalBanner,
-    stageRail: resolvedStageRail,
-    decisionBanner: resolvedDecisionBanner,
-    roleSwitcher: resolvedRoleSwitcher,
-    decisionDiffs: resolvedDecisionDiffs,
-    nextStep: resolvedNextStep,
+    statusLabel,
+    regime,
+    recordDateLabel,
+    fetchedAtLabel,
+    pageTitle,
+    pageSummary,
+    sectionLinks,
+    trustStatusTone,
+    degradedSourceRows,
+    showOfflineBadge = false,
+    offlineBadgeLabel = "Cached snapshot",
+    sidebarVariant = "full",
+    primaryCta,
+    exportCta = null,
+    showShare = false,
+    structuredData,
+    historicalBanner,
+    nextStep,
     nextRefreshLabel,
-    inlineTrustPlacement: resolvedInlineTrustPlacement = "before-content",
-    provenance: resolvedProvenance,
-    commandBar: resolvedCommandBar,
-  } = input;
-  const resolvedPrimaryCta =
-    inputPrimaryCta ?? (resolvedCurrentPath === "/" ? undefined : { href: "#weekly-action-summary", label: "This week" });
-  const resolvedExportCta = inputExportCta ?? null;
+  } = normalizeReportShellInput(props);
   // Only a historical selection has a refresh state worth a label. The live
   // masthead used to add "15m cadence" beside the decision date and the refresh
   // timestamp — a third time marker, advertising a poll interval on a product
   // whose whole premise is a Monday call.
-  const resolvedNextRefreshLabel = nextRefreshLabel ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : undefined);
+  const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : undefined);
   const contentSections = Children.toArray(children);
-  const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
   /*
    * A rail with no outline in it is just 13rem of empty column — /history asked
    * for "full" while passing an empty sectionLinks array, and rendered a rail
    * containing one static link. The outline is the reason the rail exists.
    */
-  const hasSidebar = resolvedSidebarVariant === "full";
-  const sidebarEnabled = hasSidebar && resolvedSectionLinks.length > 0;
-  const sourceHref = resolvedTreasurySource.startsWith("http") ? resolvedTreasurySource : undefined;
-  const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
-  const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
-  /*
-   * Also requires a decision to state. The card's sentence fell back to
-   * `${primaryCta.label}.` when no banner existed, so on a route without one
-   * (/history) it rendered "Current posture / This week. / [This week]" — a
-   * heading, the button's own label as a sentence, and a duplicate of a control
-   * already in the header. A card that restates its own button is chrome.
-   */
-  const showMobileActionCard =
-    Boolean(resolvedPrimaryCta) &&
-    Boolean(resolvedDecisionBanner?.decision) &&
-    !isPrimaryActionInSectionLinks;
-  const showIntroBlock = !resolvedHideHeroChrome;
-  const renderTrustBeforeContent =
-    !showIntroBlock
-    && !hasSidebar
-    && resolvedInlineTrustPlacement === "before-content";
-  const renderTrustAfterFirstSection =
-    !showIntroBlock
-    && resolvedInlineTrustPlacement !== "hidden"
-    && (hasSidebar || resolvedInlineTrustPlacement === "after-first-section");
+  const sidebarEnabled = sidebarVariant === "full" && sectionLinks.length > 0;
   const trustReadiness = resolveTrustReadinessCopy({
-    trustStatusTone: resolvedTrustStatusTone,
-    degradedSourceRows: resolvedDegradedSourceRows,
-    isFallbackSnapshot: resolvedShowOfflineBadge,
+    trustStatusTone,
+    degradedSourceRows,
+    isFallbackSnapshot: showOfflineBadge,
   });
-  const controlHeadline = trustReadiness.headline;
-  const trustStatusDetailForDisplay = resolvedTrustStatusDetail;
-  const trustStatusActionForDisplay = resolvedTrustStatusAction;
-  const extendedCommandBar =
-    showIntroBlock && resolvedCurrentPath === "/" ? resolvedCommandBar : undefined;
-  const trustBlockProps = {
-    trustStatusTone: trustReadiness.tone,
-    trustStatusLabel: controlHeadline,
-    trustStatusDetail: trustStatusDetailForDisplay,
-    trustStatusAction: trustStatusActionForDisplay,
-    outageType: resolvedOutageType,
-    outageSeverity: resolvedOutageSeverity,
-    decisionImpactWindow: resolvedDecisionImpactWindow,
-    approvalBuckets: resolvedApprovalBuckets,
-    recoveryPlan: resolvedRecoveryPlan,
-    outageExitGate: resolvedOutageExitGate,
-    degradedSourceRows: resolvedDegradedSourceRows,
-    statusLabel: resolvedStatusLabel,
-    fetchedAtLabel: resolvedFetchedAtLabel,
-    resolvedNextRefreshLabel,
-    sourceLabel,
-    sourceHref,
-    provenance: resolvedProvenance,
-  } as const;
 
   return (
-    <PageShell
-      regime={resolvedRegime}
-      structuredData={resolvedStructuredData}
-    >
-          {resolvedHistoricalBanner}
-          {extendedCommandBar ? <div className="mt-2"><RegimeCommandBar {...extendedCommandBar} /></div> : null}
+    <PageShell regime={regime} structuredData={structuredData}>
+      {historicalBanner}
 
-          {/* The rail column exists only where the rail renders. `AppSidebar` is
-              hidden below lg, but the grid reserved its column from md, so a
-              tablet paid 12rem for an empty rail and got no outline at all. */}
-          <div className={`mt-2 ${sidebarEnabled ? "lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
-            {/* max-h, not h: as a grid item a fixed height forces the whole row
-                to a viewport tall, so any page whose content was shorter than the
-                rail ended in a screenful of empty space. */}
-            {sidebarEnabled ? (
-              <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
-                <AppSidebar sectionLinks={resolvedSectionLinks} />
-              </aside>
-            ) : null}
+      {/* The rail column exists only where the rail renders. `AppSidebar` is
+          hidden below lg, but the grid reserved its column from md, so a
+          tablet paid 12rem for an empty rail and got no outline at all. */}
+      <div className={`mt-2 ${sidebarEnabled ? "lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5" : ""}`}>
+        {/* max-h, not h: as a grid item a fixed height forces the whole row
+            to a viewport tall, so any page whose content was shorter than the
+            rail ended in a screenful of empty space. */}
+        {sidebarEnabled ? (
+          <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+            <AppSidebar sectionLinks={sectionLinks} />
+          </aside>
+        ) : null}
 
-            {/* Between whole report sections. Was space-y-5/6, the same 20-24px
-                used between items *inside* a section, so section boundaries
-                carried no more weight than item boundaries. */}
-            <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
-              {/* The outline, in chip form, where the rail is hidden. Renders
-                  nothing on a page with fewer than two sections. */}
-              <MobileSectionChips sectionLinks={resolvedSectionLinks} />
+        {/* Between whole report sections. Was space-y-5/6, the same 20-24px
+            used between items *inside* a section, so section boundaries
+            carried no more weight than item boundaries. */}
+        <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+          {/* The outline, in chip form, where the rail is hidden. Renders
+              nothing on a page with fewer than two sections. */}
+          <MobileSectionChips sectionLinks={sectionLinks} />
 
-              {showIntroBlock ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} showShare={resolvedShowShare} statusLabel={resolvedStatusLabel} trustStatusLabel={controlHeadline} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusActionForDisplay} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={trustStatusDetailForDisplay} decisionDiffs={resolvedDecisionDiffs} /> : null}
+          <CommandCenterNavBlock
+            pageTitle={pageTitle}
+            pageSummary={pageSummary}
+            recordDateLabel={recordDateLabel}
+            primaryCta={primaryCta}
+            exportCta={exportCta}
+            showShare={showShare}
+            statusLabel={statusLabel}
+            trustStatusLabel={trustReadiness.headline}
+            fetchedAtLabel={fetchedAtLabel}
+            resolvedNextRefreshLabel={resolvedNextRefreshLabel}
+            showOfflineBadge={showOfflineBadge}
+            offlineBadgeLabel={offlineBadgeLabel}
+          />
 
-              <SidebarSequenceBlock stageRail={resolvedStageRail} />
-
-              {renderTrustBeforeContent ? <InlineTrustBlock {...trustBlockProps} /> : null}
-
-              {/* The section rule was white/[0.04] — below the visible threshold
-                  by this repo's own measure (see the border-alpha note in
-                  tokens.css, which raised the floor to 0.10 for exactly this
-                  reason). So report pages had no visible section boundary at
-                  all, and the only thing chunking them was 24px of padding that
-                  matched the spacing used *inside* sections. A visible rule plus
-                  a wider outer gap makes the boundary the strongest horizontal
-                  signal on the page. */}
-              {/* Token, not divide-white/[0.10]: a hardcoded white rule is
-                  invisible on the light theme's near-white ground, and 0.10 is
-                  not one of the four alphas the light escape-hatch block
-                  remaps. */}
-              <div className="divide-y divide-[color:var(--border-default)]">
-                {contentSections.map((section, index) => {
-                  const sectionKey =
-                    isValidElement(section) && section.key != null
-                      ? section.key
-                      : `section-${index}`;
-                  return (
-                    // `empty:hidden` because a section can decide at render time not to
-                    // render — ReturningVisitorDeltaStrip returns null for anyone without
-                    // a stored previous read, which is every first-time visitor.
-                    // Children.toArray only drops children that are already null at the
-                    // JSX level, so such a section still claimed a padded row and drew its
-                    // divider: an empty ~64px band between two rules on a first visit.
-                    <div
-                      key={sectionKey}
-                      className={`empty:hidden ${index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}`}
-                    >
-                      {section}
-                      {renderTrustAfterFirstSection && index === 0 ? (
-                        <div className="mt-4">
-                          <InlineTrustBlock {...trustBlockProps} />
-                        </div>
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* INTERNAL_USE_LABEL is "" in lib/exportNotices, so this rendered
-                  a rule with nothing under it — 49px of margin, border and
-                  padding at the foot of every report route. */}
-              <NextStepCard nextStep={resolvedNextStep} />
-
-              {INTERNAL_USE_LABEL ? (
-                <footer className="mt-8 border-t border-white/[0.04] pt-4 text-fluid-xs font-semibold tracking-[0.18em] text-slate-400">
-                  <p>{INTERNAL_USE_LABEL}</p>
-                </footer>
-              ) : null}
-            </div>
+          {/* The section rule was white/[0.04] — below the visible threshold
+              by this repo's own measure (see the border-alpha note in
+              tokens.css, which raised the floor to 0.10 for exactly this
+              reason). So report pages had no visible section boundary at
+              all, and the only thing chunking them was 24px of padding that
+              matched the spacing used *inside* sections. A visible rule plus
+              a wider outer gap makes the boundary the strongest horizontal
+              signal on the page. */}
+          {/* Token, not divide-white/[0.10]: a hardcoded white rule is
+              invisible on the light theme's near-white ground, and 0.10 is
+              not one of the four alphas the light escape-hatch block
+              remaps. */}
+          <div className="divide-y divide-[color:var(--border-default)]">
+            {contentSections.map((section, index) => {
+              const sectionKey =
+                isValidElement(section) && section.key != null
+                  ? section.key
+                  : `section-${index}`;
+              return (
+                // `empty:hidden` because a section can decide at render time not to
+                // render — ReturningVisitorDeltaStrip returns null for anyone without
+                // a stored previous read, which is every first-time visitor.
+                // Children.toArray only drops children that are already null at the
+                // JSX level, so such a section still claimed a padded row and drew its
+                // divider: an empty ~64px band between two rules on a first visit.
+                <div
+                  key={sectionKey}
+                  className={`empty:hidden ${index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}`}
+                >
+                  {section}
+                </div>
+              );
+            })}
           </div>
 
-        {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-fluid-xs font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{resolvedDecisionBanner?.decision}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
-
+          <NextStepCard nextStep={nextStep} />
+        </div>
+      </div>
     </PageShell>
   );
 };

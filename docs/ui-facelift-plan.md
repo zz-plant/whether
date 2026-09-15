@@ -236,6 +236,16 @@ Phases 1–3 shipped; Phase 0 was abandoned for the reason recorded above.
 | `/` mobile under ~2600px | **Not met.** Measured 3112px against a 3066px baseline, but the two captures do not contain the same page: the later one renders a timeline rail the baseline lacks. Page height here is data-dependent and is not a reliable regression signal at this granularity — the same caveat DD-004 records. |
 | Reduced-motion coverage | Done. 5/14 stylesheets → 9/14; the four files holding 27 unguarded transitions now have blocks. |
 
+The two missed targets were revisited by the 2026-09-15 sitewide declutter
+(`docs/feature-specs-current.md` §1.1.17), which took the content-scope decision this plan said a
+facelift could not. Measured against a same-day baseline of the tree as it stood that morning:
+
+| Claim | Result (2026-09-15) |
+| --- | --- |
+| `/signals` under ~3200px | **Still not met, but closer.** 4989px → 3856px (−1133px). The founder playbook, the team translation, the fossil record (short read), the instruction strip and the tail button were the repetition; the rest is evidence. |
+| `/` mobile under ~2600px | **Not met as stated; met in substance.** 6352px → 3718px (−2634px), and the call, score and delta are inside the first 430×932 viewport, which is the constraint the number stood for. What remains below is one of each thing. |
+| `/` desktop | 4838px → 2976px (−1862px), from three screens to about two. |
+
 Two of the plan's numeric targets were set before the work and missed. They were estimates from
 de-duplication, and the honest read is that `/signals` and `/` are long because they carry a lot of
 content, not mainly because they repeat themselves — one page's worth of repetition existed and it

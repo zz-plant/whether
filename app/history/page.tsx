@@ -87,10 +87,9 @@ export default async function HistoryPage({
           statusLabel: trackRecord?.currentRegimeLabel ?? "Historical",
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
-          treasurySource: "https://fred.stlouisfed.org",
         },
-        page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: historySectionLinks, currentPath: "/history" },
-        trust: { trustStatusLabel: "Historical snapshot", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "historical" },
+        page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: historySectionLinks },
+        trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
       }}
     >

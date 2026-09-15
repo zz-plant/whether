@@ -3,7 +3,6 @@ import {
   loopNavigationLayers,
   navigationLayers,
   primaryNavigationLayers,
-  reportShellPaths,
   utilityLinks,
   type NavigationLayer,
 } from "./informationArchitecture";
@@ -19,11 +18,6 @@ const resolveSectionRouteLabel = (pathname: string) =>
 
 export const normalizePathname = (pathname: string) =>
   pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-
-export const isReportShellRoute = (pathname: string) => {
-  const normalizedPathname = normalizePathname(pathname);
-  return reportShellPaths.some((route) => pathMatchesLink(route, normalizedPathname));
-};
 
 // Prefer the most specific layer when hrefs nest (e.g. /history/compare under
 // /history).
@@ -54,23 +48,6 @@ export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
     ?? resolveSectionRouteLabel(normalizedPathname)
     ?? fallbackLabel
   );
-};
-
-// Next step in the operator loop. The weekly brief is the only primary layer,
-// so any other report-shell route resolves back to the one-screen brief rather
-// than promoting a further hub. Non-report routes return null.
-export const resolveReportHeaderNextStep = (pathname: string) => {
-  const normalizedPathname = normalizePathname(pathname);
-
-  if (normalizedPathname === "/") {
-    return null;
-  }
-
-  if (isReportShellRoute(normalizedPathname)) {
-    return { href: "/", label: "Weekly Brief" } as const;
-  }
-
-  return null;
 };
 
 export type GlobalHeaderNavigationLink = NavigationLayer & { isActive: boolean };

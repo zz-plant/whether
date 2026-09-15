@@ -130,7 +130,6 @@ export default async function MethodPage({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">What to watch</p>
             <ul className="space-y-2 text-sm text-slate-200">
-              <li><span className="text-slate-400">Confidence now:</span> {confidenceLabel}</li>
               <li><span className="text-slate-400">This recommendation breaks if:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
               <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and the transition warning clears before you reopen fixed-cost approvals.</li>

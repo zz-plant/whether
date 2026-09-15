@@ -173,11 +173,6 @@ export const buildSignalsPageModel = async (
   const freshnessSummaryLabel = historicalSelection
     ? `Historical snapshot fixed at ${recordDateLabel}.`
     : `Decision as-of ${recordDateLabel}; live data refreshed ${fetchedAtLabel}.`;
-  const decisionDeltaLabel = historicalSelection
-    ? "Historical snapshot for review only — switch to live data before approving new bets."
-    : isFallback
-      ? "Live update delayed — avoid irreversible decisions until signals refresh."
-      : "Use this evidence to confirm this week's call or change it now.";
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
     : `${FALLBACK_PAUSE_THRESHOLD}.`;
@@ -203,7 +198,6 @@ export const buildSignalsPageModel = async (
           { href: "#decision-summary", label: "Decision summary" },
           { href: "#current-scores", label: "Current scores" },
           { href: "#trends", label: "Trends" },
-          { href: "#team-context", label: "What this means for your team" },
           { href: "#fossil-record", label: "Fossil record" },
           { href: "#evidence-priorities", label: "Evidence priorities" },
           { href: "#advanced-controls", label: "Advanced controls" },
@@ -217,8 +211,6 @@ export const buildSignalsPageModel = async (
           { href: "#current-scores", label: "Current scores" },
           { href: "#curve-context", label: "Curve context" },
           { href: "#trends", label: "Trends" },
-          { href: "#team-context", label: "What this means for your team" },
-          { href: "#fossil-record", label: "Fossil record" },
         ];
 
   const prioritizedSignalsByFocus: Record<
@@ -438,7 +430,6 @@ export const buildSignalsPageModel = async (
     trust,
     nextRefreshLabel,
     freshnessSummaryLabel,
-    decisionDeltaLabel,
     triggerCondition,
     reversalCondition,
     showMicroDecisionRows,

@@ -2,9 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { ReportSectionLink } from "./reportShellNavigation";
-import { loopNavigationLayers } from "../../lib/navigation/informationArchitecture";
 import {
   resolveActiveSectionId,
   sectionIdsFromHrefs,
@@ -15,13 +13,11 @@ function OutlineItem({
   label,
   isActive,
   stepNumber,
-  shortcut,
 }: {
   href: string;
   label: string;
   isActive: boolean;
   stepNumber?: string;
-  shortcut?: string;
 }) {
   const isHash = href.startsWith("#");
   const linkClass = `rounded-lg px-2.5 py-1.5 text-fluid-xs no-underline transition-colors min-h-[38px] flex items-center justify-between group weather-focus-ring ${
@@ -44,14 +40,6 @@ function OutlineItem({
         ) : null}
         <span className="truncate">{label}</span>
       </span>
-      {shortcut ? (
-        <kbd
-          aria-hidden="true"
-          className="rounded border border-slate-800 bg-slate-900/80 px-1 font-mono text-[9.5px] leading-3 text-slate-500 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-        >
-          {shortcut}
-        </kbd>
-      ) : null}
     </>
   );
 
@@ -124,67 +112,35 @@ export const useActiveSectionId = (sectionLinks: ReportSectionLink[]) => {
   return activeId;
 };
 
+/**
+ * The page outline, and only that. The rail used to open with a second
+ * `Whether` wordmark 80px under the header's, and close with a `Workflow`
+ * group listing the six loop routes the header tabs list 100px above it —
+ * numbered and with the same hover shortcuts. Both named things the header
+ * already named on the same screen (ui-ux-standards §XI: state gets stated
+ * once), so the rail keeps the one job the header cannot do: say where on this
+ * page the reader is.
+ */
 function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] }) {
-  const currentPathname = usePathname() ?? "/";
-  const [pathname, setPathname] = useState("/");
   const activeSectionId = useActiveSectionId(sectionLinks);
 
-  useEffect(() => {
-    setPathname(currentPathname);
-  }, [currentPathname]);
+  if (sectionLinks.length === 0) return null;
 
   return (
     <>
-      <Link
-        href="/"
-        className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 no-underline hover:bg-slate-800/30"
-      >
-        <span className="text-lg font-semibold tracking-tight text-slate-100">
-          Whether
-        </span>
-      </Link>
-
-      {sectionLinks.length > 0 ? (
-        <>
-          <p className="px-3 type-eyebrow mb-2">
-            On this page
-          </p>
-          <nav aria-label="Page sections" className="space-y-0.5">
-            {sectionLinks.map((section, index) => {
-              const isActive = section.href === `#${activeSectionId}`;
-              return (
-                <OutlineItem
-                  key={section.href}
-                  href={section.href}
-                  label={section.label}
-                  isActive={isActive}
-                  stepNumber={`0${index + 1}`}
-                />
-              );
-            })}
-          </nav>
-        </>
-      ) : null}
-
-      <div className="my-4 border-t border-slate-800/60" />
-
       <p className="px-3 type-eyebrow mb-2">
-        Workflow
+        On this page
       </p>
-      <nav aria-label="Workflow" className="space-y-0.5">
-        {loopNavigationLayers.map((route, index) => {
-          const isActive =
-            route.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(route.href);
+      <nav aria-label="Page sections" className="space-y-0.5">
+        {sectionLinks.map((section, index) => {
+          const isActive = section.href === `#${activeSectionId}`;
           return (
             <OutlineItem
-              key={route.href}
-              href={route.href}
-              label={route.navLabel ?? route.label}
+              key={section.href}
+              href={section.href}
+              label={section.label}
               isActive={isActive}
               stepNumber={`0${index + 1}`}
-              shortcut={route.shortcut}
             />
           );
         })}

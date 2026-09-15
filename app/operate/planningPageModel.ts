@@ -132,12 +132,7 @@ export async function buildPlanningPageModel(
     : undefined;
   const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const {
-    trustStatusLabel,
-    trustStatusDetail,
-    trustStatusAction,
-    trustStatusTone,
-  } = snapshot.trustStatus;
+  const { trustStatusTone } = snapshot.trustStatus;
 
   const showAllActionLanes = resolvedSearchParams?.actions === "all";
   const actionStripItems = snapshot.homeBriefModel.actionStripItems;
@@ -156,7 +151,6 @@ export async function buildPlanningPageModel(
         statusLabel,
         recordDateLabel,
         fetchedAtLabel,
-        treasurySource: treasury.source,
       },
       page: {
         /* "Plan", matching `navigationLayers`, which declares both `label` and
@@ -165,42 +159,28 @@ export async function buildPlanningPageModel(
            most repeated inconsistency in this IA. The <title> keeps its longer
            descriptive form; only the on-page heading is the section's name. */
         pageTitle: "Plan",
-        currentPath: "/operate",
         pageSummary: "Prepare for this week's conditions: set guardrails, check runway, brief the team.",
-        pageSummaryLink: { href: "#ops-monthly-action-summary", label: "Open weekly plan ↓" },
         sectionLinks: operationsSectionLinks.plan,
       },
       trust: {
-        trustStatusLabel,
-        trustStatusDetail,
-        trustStatusAction,
         trustStatusTone,
         showOfflineBadge: isFallback && !historicalSelection,
       },
       actions: {
-        primaryCta: {
-          href: "#ops-monthly-action-summary",
-          label: "Review the weekly plan",
-        },
-        secondaryCta: { href: "/", label: "Return to Weekly Brief" },
+        // Share is the one hero action: it opens the global rail. The "Review
+        // the weekly plan" button scrolled to the step directly beneath the
+        // hero, and "Return to Weekly Brief" duplicated the header's Brief tab.
         showShare: true,
+        // The handoff to Resolve, in the shell's one predictable place. It used
+        // to be a "Decision help" section of its own at the tail — a sentence,
+        // this link, and a "Back to sharing options" link to a step on the same
+        // page.
+        nextStep: {
+          href: "/resolve",
+          description: "One question still open? Resolve it",
+        },
       },
       payloads: {
-        decisionBanner: {
-          label: "Review",
-          decision: "Approve the plan, keep the stop line visible, then package the update.",
-          horizon: "This week + month",
-          confidence: trustStatusLabel,
-          effectiveDate: recordDateLabel,
-          evidenceHref: "#ops-monthly-action-summary",
-        },
-        commandBar: {
-          regime: assessment.regime,
-          call: weeklyCall.currentCall,
-          doNow: weeklyCall.doNowBullets,
-          flipConditions: [weeklyCall.changeCourseIf, ...weeklyCall.flipConditionLabels].slice(0, 4),
-          updatedAt: fetchedAtLabel,
-        },
         structuredData,
         historicalBanner: historicalSelection
           ? h(HistoricalBanner, {
@@ -220,13 +200,6 @@ export async function buildPlanningPageModel(
       // arrival, and the island has to exist before the nav block's Share
       // button or the picker can read it.
       h(BriefArtifactScript, { artifact: buildBriefArtifactFromSnapshot({ reportData, weeklyCall, title: "Whether Weekly Brief" }) }),
-      h("p", { className: "rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400" },
-        "This page turns the weekly call from the ",
-        h(Link, { href: "/", className: "font-semibold text-sky-200 hover:text-sky-100" }, "homepage brief"),
-        " into a plan with guardrails, finance direction, and share-ready formats. Red-team a specific hire, pricing, or infra move under ",
-        h(Link, { href: "#ops-decision-shield", className: "font-semibold text-sky-200 hover:text-sky-100" }, "Test a decision"),
-        ".",
-      ),
       !historicalSelection && isFallback
         ? h(LiveDataFallbackAlert, {
           lastCachedTimestamp: reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp,
@@ -437,17 +410,6 @@ export async function buildPlanningPageModel(
         h("div", { className: "flex flex-wrap gap-2" },
           h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Recheck guardrails"),
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Trust risk checks"),
-        ),
-      ),
-      h("section", { id: "ops-edge-case-gate", className: "weather-panel scroll-mt-28 space-y-4 px-5 py-5", "aria-labelledby": "ops-edge-case-gate-title" },
-        h("div", { className: "space-y-2" },
-          h("p", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-slate-400" }, "Decision help"),
-          h("h2", { id: "ops-edge-case-gate-title", className: "text-lg font-semibold text-slate-100" }, "Still have one open question?"),
-          h("p", { className: "text-sm text-slate-300" }, "Open decision help when one specific question still needs an answer after this review."),
-        ),
-        h("div", { className: "flex flex-wrap gap-2" },
-          h(Link, { href: "/resolve", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Open decision help"),
-          h(Link, { href: "/operate#ops-export-briefs", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Back to sharing options"),
         ),
       ),
       h("details", { className: "weather-panel weather-auto-chevron scroll-mt-28 space-y-3 px-5 py-5" },

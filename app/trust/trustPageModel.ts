@@ -93,11 +93,6 @@ export async function buildTrustPageModel() {
     : decisionReadiness.tone === "warning"
       ? "warning"
       : "stable";
-  const trustStatusAction = trustStatusTone === "stable"
-    ? "Safe for this week's plan while freshness and confidence hold."
-    : trustStatusTone === "historical"
-      ? "Comparison only. Switch to live brief before approving anything new."
-      : "Use for staged moves only until confidence improves.";
   const trustVerdict = trustStatusTone === "stable"
     ? {
         label: "Ready to use",
@@ -133,54 +128,16 @@ export async function buildTrustPageModel() {
     statusLabel: reportData.statusLabel,
     recordDateLabel: reportData.recordDateLabel,
     fetchedAtLabel: reportData.fetchedAtLabel,
-    treasurySource: reportData.treasury.source,
-    trustStatusLabel: trustSummary,
-    trustStatusDetail: `Coverage: ${sourceCoverage}`,
-    trustStatusAction,
     trustStatusTone,
     degradedSourceRows,
     showOfflineBadge: isFallback,
     pageTitle: "How much to trust this week's call",
-
-    currentPath: "/trust",
     pageSummary: "Check whether this week's forecast is current enough to act on.",
-    pageSummaryLink: { href: "#trust-snapshot", label: "Snapshot ↓" },
     sectionLinks,
-    heroVariant: "compact",
     sidebarVariant: "full",
-    primaryCta: { href: "#trust-snapshot", label: "Check trust snapshot" },
-    secondaryCta: { href: "/", label: "Weekly Brief" },
     nextStep: {
       href: "/signals",
       description: "Check evidence",
-    },
-    decisionBanner: {
-      label: "Trust",
-      decision: "Is this week's brief ready to use, or only useful for comparison?",
-      horizon: "This week",
-      confidence: trustSummary,
-      effectiveDate: reportData.recordDateLabel,
-      evidenceHref: "#trust-snapshot",
-    },
-    commandBar: {
-      regime: reportData.assessment.regime,
-      call: "Check whether this week's brief is current enough and reliable enough to use.",
-      doNow: [
-        reportData.actionNowShort,
-        "Slow fixed-cost approvals if trust weakens.",
-      ],
-      trustChecklist: {
-        label: "What matters",
-        items: [
-          `Confirm freshness: ${reportData.fetchedAtLabel}.`,
-          `Confirm confidence: ${confidenceLabel}.`,
-        ],
-      },
-      flipConditions: [
-        reportData.flipThreshold,
-        "If trust degrades, hold irreversible approvals until live evidence stabilizes.",
-      ],
-      updatedAt: reportData.fetchedAtLabel,
     },
     structuredData: breadcrumbStructuredData,
   } satisfies ReportShellProps;
