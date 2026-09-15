@@ -71,12 +71,14 @@ type WeeklyChange = {
   signal: RegimeSignalIndicator | undefined;
   consequences: RevisitQueueItem[];
   /**
-   * True when this move reopened nothing of its own because another, larger
-   * move claimed every area first. `buildRevisitQueue` hands each area to one
-   * driver, so on a week where both inputs cross their lines the second row
-   * arrives empty — and "stayed inside every threshold" would then be false.
+   * True when this move's own rules never reached the list because a larger
+   * move filled it first. `buildRevisitQueue` hands each area to one driver and
+   * caps the queue at three, so on a week where both inputs cross their lines
+   * the second row arrives empty — and "stayed inside every threshold" would
+   * then be false. Its rules were not listed, and the row says so; it does not
+   * claim they appear elsewhere, because the cap may have dropped them.
    */
-  claimedByLargerMove: boolean;
+  crowdedOut: boolean;
 };
 
 /**
@@ -133,14 +135,14 @@ const buildChangeRows = (
     // rule rather than a second key mapping that could drift from the first.
     const signal = movedSignals.find((indicator) => driver.startsWith(indicator.label));
     if (signal) claimedSignals.add(signal.key);
-    rows.push({ key: signal?.key ?? driver, headline: driver, signal, consequences: items, claimedByLargerMove: false });
+    rows.push({ key: signal?.key ?? driver, headline: driver, signal, consequences: items, crowdedOut: false });
   }
 
   // Moves that changed no rule. Named, with the consequence band left empty, so
   // "nothing follows from this" is a statement rather than an omission. When a
-  // larger move already claimed every area, the empty band means something else,
+  // larger move already filled the list, the empty band means something else,
   // and the row says which.
-  const someAreaClaimed = rows.some((row) => row.consequences.length > 0);
+  const listFilledByLargerMove = rows.some((row) => row.consequences.length > 0);
   for (const indicator of movedSignals) {
     if (claimedSignals.has(indicator.key)) continue;
     rows.push({
@@ -148,7 +150,7 @@ const buildChangeRows = (
       headline: signalSentence(indicator),
       signal: indicator,
       consequences: [],
-      claimedByLargerMove: someAreaClaimed,
+      crowdedOut: listFilledByLargerMove,
     });
   }
 
@@ -161,7 +163,7 @@ const buildChangeRows = (
       headline: "Conditions moved enough to reopen these decisions.",
       signal: undefined,
       consequences: undriven,
-      claimedByLargerMove: false,
+      crowdedOut: false,
     });
   }
 
@@ -210,8 +212,8 @@ const ChangeRow = ({
           <dd className="text-slate-300">
             {row.consequences.length > 0
               ? row.consequences.map((item) => item.label).join(" · ")
-              : row.claimedByLargerMove
-                ? "The decisions it reopens are listed under the larger move above."
+              : row.crowdedOut
+                ? "Its rules were not listed: the larger move above took the three slots."
                 : "No rule this week — the move stayed inside every threshold."}
           </dd>
         </dl>

@@ -578,6 +578,7 @@ async function PageContent({
                 thresholds: reportData.assessment.thresholds,
                 recordDateLabel: homepage.reportShell.recordDateLabel,
                 regimeTransition: reportData.assessment.regimeTransition,
+                confidence: reportData.assessment.diagnostics.confidence,
               }}
             />
           </div>

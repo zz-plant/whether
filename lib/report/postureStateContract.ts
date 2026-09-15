@@ -39,6 +39,8 @@ export type PostureStateContract = {
     candidateLabel: string;
     /** Consecutive reads the candidate has held; two or more while pending means confidence is blocking. */
     pendingCount: number;
+    /** True while the LOW band blocks the gate: another read at this confidence cannot confirm the flip. */
+    confidenceBlocked: boolean;
     reason: string;
   } | null;
 };
@@ -83,6 +85,7 @@ export const buildPostureStateContract = ({
           candidate: transition.candidateState,
           candidateLabel: getRegimePublicLabel(transition.candidateState),
           pendingCount: transition.transitionPendingCount ?? 1,
+          confidenceBlocked: assessment.diagnostics.confidence === "LOW",
           reason: transition.transitionReason,
         }
       : null;

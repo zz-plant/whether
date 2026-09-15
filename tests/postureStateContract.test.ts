@@ -162,6 +162,7 @@ describe("posture state contract under a held call", () => {
       candidate: "SCARCITY",
       candidateLabel: "Freezing",
       pendingCount: 1,
+      confidenceBlocked: false,
       reason: "Risk appetite crossed below 50. Transition pending confidence gate (1/2).",
     });
   });

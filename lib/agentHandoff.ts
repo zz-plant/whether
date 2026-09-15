@@ -147,6 +147,7 @@ const resolvePendingTransition = (assessment: RegimeAssessment) => {
     candidate: transition.candidateState,
     candidate_label: getRegimePublicLabel(transition.candidateState),
     pending_count: transition.transitionPendingCount ?? 1,
+    confidence_blocked: assessment.diagnostics.confidence === "LOW",
     reason: transition.transitionReason,
   };
 };
@@ -158,8 +159,13 @@ const buildFlipWatch = (assessment: RegimeAssessment, support: AgentDecisionSupp
       ? `Transition watch is ON. ${support.postureState.whatFlipsNext.flipTrigger}`
       : `Transition watch is OFF. Primary trigger: ${support.postureState.whatFlipsNext.flipTrigger}`;
   return {
+    // A LOW read never commits, so the summary must not promise the next read.
     summary: pendingTransition
-      ? `Flip to ${pendingTransition.candidate_label} is pending confirmation; the call holds at ${getRegimePublicLabel(assessment.regime)} until the next read confirms it. ${pendingTransition.reason} ${watchSummary}`
+      ? `Flip to ${pendingTransition.candidate_label} is pending confirmation; the call holds at ${getRegimePublicLabel(assessment.regime)} ${
+          pendingTransition.confidence_blocked
+            ? "and cannot confirm while confidence is LOW"
+            : "while the flip waits on confirmation"
+        }. ${pendingTransition.reason} ${watchSummary}`
       : watchSummary,
     pending_transition: pendingTransition,
     transition_watch: support.postureState.currentState.transitionWatch,

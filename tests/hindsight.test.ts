@@ -49,12 +49,48 @@ describe("buildHindsight", () => {
       thresholds,
       recordDateLabel: "Sep 11, 2026",
       regimeTransition: { pending: true, candidateState: "SCARCITY", transitionPendingCount: 1 },
+      confidence: "MEDIUM",
     });
 
     assert.equal(hindsight.anyCrossed, true);
     assert.equal(hindsight.pendingLabel, "Freezing");
-    assert.equal(hindsight.headline, "A line was crossed. The call holds at Sunny until the next read confirms Freezing.");
-    assert.match(hindsight.detail, /Funding pressure went above 70; Risk appetite went below 50\. The flip to Freezing is waiting on a confirming read\.$/);
+    assert.equal(hindsight.headline, "A line was crossed. The call holds at Sunny while a flip to Freezing waits on confirmation.");
+    assert.match(hindsight.detail, /Funding pressure went above 70; Risk appetite went below 50\. The flip to Freezing needs one more read at this confidence to confirm\.$/);
+  });
+
+  it("does not promise the next read when low confidence blocks the gate", () => {
+    // `advanceRegimeState` never commits a LOW read, whatever the pending count,
+    // so "needs one more read" would be false on the first pending LOW read.
+    const hindsight = buildHindsight({
+      regime: "EXPANSION",
+      scores: { tightness: 74, riskAppetite: 56 },
+      deltas: { tightness: 18, riskAppetite: 0 },
+      thresholds,
+      recordDateLabel: "Sep 10, 2026",
+      regimeTransition: { pending: true, candidateState: "DEFENSIVE", transitionPendingCount: 1 },
+      confidence: "LOW",
+    });
+
+    assert.equal(hindsight.headline, "A line was crossed. The call holds at Sunny while a flip to Cloudy waits on confirmation.");
+    assert.match(hindsight.detail, /Confidence is low, so the flip to Cloudy cannot confirm until the readings sit further from the line\.$/);
+  });
+
+  it("keeps the held candidate visible on a flat read", () => {
+    // Both scores unchanged, count still advancing: the quiet branch used to say
+    // only "The read is still Sunny" and hide the candidate entirely.
+    const hindsight = buildHindsight({
+      regime: "EXPANSION",
+      scores: { tightness: 74, riskAppetite: 56 },
+      deltas: {},
+      thresholds,
+      recordDateLabel: "Sep 12, 2026",
+      regimeTransition: { pending: true, candidateState: "DEFENSIVE", transitionPendingCount: 3 },
+      confidence: "LOW",
+    });
+
+    assert.equal(hindsight.quiet, true);
+    assert.equal(hindsight.headline, "Nothing moved. The call holds at Sunny; the readings still say Cloudy.");
+    assert.match(hindsight.detail, /every rule still stands\. Confidence is low, so the flip to Cloudy cannot confirm until the readings sit further from the line \(held 3 reads so far\)\.$/);
   });
 
   it("names low confidence when a pending flip has waited more than one read", () => {

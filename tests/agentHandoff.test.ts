@@ -267,10 +267,22 @@ describe("flip watch under a held call", () => {
       candidate: "SCARCITY",
       candidate_label: "Freezing",
       pending_count: 1,
+      confidence_blocked: false,
       reason: "Risk appetite crossed below 50. Transition pending confidence gate (1/2).",
     });
-    assert.match(payload.flip_watch?.summary ?? "", /^Flip to Freezing is pending confirmation; the call holds at Sunny/);
+    assert.match(payload.flip_watch?.summary ?? "", /^Flip to Freezing is pending confirmation; the call holds at Sunny while the flip waits on confirmation\./);
     assert.match(payload.flip_watch?.summary ?? "", /Transition watch is OFF/);
+  });
+
+  it("names low confidence as the blocker instead of promising the next read", () => {
+    const blockedAssessment: RegimeAssessment = {
+      ...heldAssessment,
+      diagnostics: { ...heldAssessment.diagnostics, nearestThresholdDelta: 4, confidence: "LOW", transitionWatch: true },
+    };
+    const payload = buildAgentPayload(blockedAssessment, treasuryData, sensors, macroSignals, { decisionSupport });
+
+    assert.equal(payload.flip_watch?.pending_transition?.confidence_blocked, true);
+    assert.match(payload.flip_watch?.summary ?? "", /the call holds at Sunny and cannot confirm while confidence is LOW\./);
   });
 
   it("reports no pending transition once the crossing has committed", () => {

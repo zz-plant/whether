@@ -103,11 +103,13 @@ describe("WeeklyChangeReport", () => {
     assert.match(html, /FRED/);
   });
 
-  it("says where a second crossing's decisions went instead of calling it inside every threshold", () => {
+  it("admits a second crossing's rules were not listed instead of calling it inside every threshold", () => {
     // 2026-09-15: both inputs moved 14 points and both crossed their lines, but
-    // `buildRevisitQueue` hands each area to one driver, so funding pressure
-    // claimed all three and the risk-appetite row rendered "stayed inside every
-    // threshold" — false, and beside a reading its own evidence showed crossing.
+    // `buildRevisitQueue` hands each area to one driver and caps the queue at
+    // three, so funding pressure took every slot and the risk-appetite row
+    // rendered "stayed inside every threshold" — false, and beside a reading its
+    // own evidence showed crossing. Its areas (product tempo, expansion bets)
+    // were dropped by the cap, so the row must not claim they appear elsewhere.
     const riskAppetiteFell: RegimeSignalIndicator = {
       key: "riskAppetite",
       label: "Risk appetite",
@@ -131,7 +133,8 @@ describe("WeeklyChangeReport", () => {
     });
 
     assert.match(html, /Risk appetite fell to 42/);
-    assert.match(html, /listed under the larger move above/);
+    assert.match(html, /Its rules were not listed: the larger move above took the three slots/);
+    assert.doesNotMatch(html, /listed under/);
     assert.doesNotMatch(html, /stayed inside every threshold/);
   });
 

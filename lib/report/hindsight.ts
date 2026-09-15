@@ -1,5 +1,5 @@
 import { getRegimePublicLabel } from "../regimePresentation";
-import type { RegimeKey } from "../regimeEngineCore";
+import type { RegimeDiagnostics, RegimeKey } from "../regimeEngineCore";
 import type { RegimeStateTransition } from "./regimeStateMachine";
 
 /**
@@ -31,6 +31,12 @@ export type HindsightInput = {
    * Sunny now." over readings the machine had already classified as Freezing.
    */
   regimeTransition?: Pick<RegimeStateTransition, "pending" | "candidateState" | "transitionPendingCount">;
+  /**
+   * The confidence band the machine gated on. A LOW read never commits, however
+   * many times it repeats, so the copy must not promise that the next read
+   * confirms the flip; it can only say that once it knows the band.
+   */
+  confidence?: RegimeDiagnostics["confidence"];
 };
 
 export type HindsightLine = {
@@ -108,27 +114,40 @@ export const buildHindsight = (input: HindsightInput): Hindsight => {
   const pendingLabel = pendingCandidate ? getRegimePublicLabel(pendingCandidate) : null;
   const pendingReads = transition?.transitionPendingCount ?? 1;
 
+  const confidenceBlocked = input.confidence === "LOW";
+
+  // A flat read still advances the machine's count, so a held candidate has to
+  // show through the quiet branch too; hiding it there is the omission this
+  // card exists to close.
   const headline = quiet
-    ? `Nothing moved. The read is still ${regimeLabel}.`
+    ? pendingLabel
+      ? `Nothing moved. The call holds at ${regimeLabel}; the readings still say ${pendingLabel}.`
+      : `Nothing moved. The read is still ${regimeLabel}.`
     : anyCrossed
       ? pendingLabel
-        ? `A line was crossed. The call holds at ${regimeLabel} until the next read confirms ${pendingLabel}.`
+        ? `A line was crossed. The call holds at ${regimeLabel} while a flip to ${pendingLabel} waits on confirmation.`
         : `A line was crossed. The call is ${regimeLabel} now.`
       : pendingLabel
         ? `The call held at ${regimeLabel}. The readings still say ${pendingLabel}.`
         : `The call held. Still ${regimeLabel}.`;
 
-  // A flip that has waited more than one read is not waiting on the gate any
-  // more; it is blocked by low confidence, and the reader is owed that reason.
+  // The gate needs a second read *and* a band above LOW. A LOW read never
+  // commits however often it repeats, so the clause names the band as the
+  // blocker when it knows it; a flip that has waited more than one read is not
+  // waiting on the gate at all, and the reader is owed that reason either way.
   const pendingClause = pendingLabel
-    ? pendingReads >= 2
-      ? ` The flip to ${pendingLabel} has waited ${pendingReads} reads for confidence to clear.`
-      : ` The flip to ${pendingLabel} is waiting on a confirming read.`
+    ? confidenceBlocked
+      ? ` Confidence is low, so the flip to ${pendingLabel} cannot confirm until the readings sit further from the line${pendingReads >= 2 ? ` (held ${pendingReads} reads so far)` : ""}.`
+      : pendingReads >= 2
+        ? ` The flip to ${pendingLabel} has waited ${pendingReads} reads for confidence to clear.`
+        : input.confidence
+          ? ` The flip to ${pendingLabel} needs one more read at this confidence to confirm.`
+          : ` The flip to ${pendingLabel} is waiting on confirmation.`
     : "";
 
   const nearest = [...lines].sort((a, b) => a.room - b.room)[0];
   const detail = quiet
-    ? `Both scores match last week, so every rule still stands.`
+    ? `Both scores match last week, so every rule still stands.${pendingClause}`
     : anyCrossed
       ? `${movement}. ${lines.filter((l) => l.crossed).map((l) => `${l.label} went ${l.crossesWhen} ${l.line}`).join("; ")}.${pendingClause}`
       : `${movement}. The lines were ${lines[0].line} and ${lines[1].line}; neither was reached. Closest is ${nearest.label.toLowerCase()}, ${Math.abs(nearest.room)} pts from its line.${pendingClause}`;
