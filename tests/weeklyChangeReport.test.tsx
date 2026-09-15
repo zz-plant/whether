@@ -103,6 +103,38 @@ describe("WeeklyChangeReport", () => {
     assert.match(html, /FRED/);
   });
 
+  it("says where a second crossing's decisions went instead of calling it inside every threshold", () => {
+    // 2026-09-15: both inputs moved 14 points and both crossed their lines, but
+    // `buildRevisitQueue` hands each area to one driver, so funding pressure
+    // claimed all three and the risk-appetite row rendered "stayed inside every
+    // threshold" — false, and beside a reading its own evidence showed crossing.
+    const riskAppetiteFell: RegimeSignalIndicator = {
+      key: "riskAppetite",
+      label: "Risk appetite",
+      valueLabel: "42",
+      rawValue: 42,
+      trendArrow: "↓",
+      trendDeltaLabel: "-14.0 vs last week",
+      sparkline: [56, 42],
+      isFallback: false,
+    };
+    const html = render({
+      ...baseProps,
+      revisitDecisions: true,
+      revisitQueue: [
+        revisitItem("hiring", "Hiring", "Recheck fixed-cost approvals."),
+        revisitItem("burn-discipline", "Burn discipline", "Recheck payback proof."),
+        revisitItem("capital-raising", "Capital raising", "Recheck raise timing."),
+      ],
+      noChangeAreas: [],
+      signalIndicators: [tightnessRose, riskAppetiteFell],
+    });
+
+    assert.match(html, /Risk appetite fell to 42/);
+    assert.match(html, /listed under the larger move above/);
+    assert.doesNotMatch(html, /stayed inside every threshold/);
+  });
+
   it("names a move that changed no rule instead of dropping it", () => {
     // `revisitDecisions` is false whenever the direction is "stable", which empties
     // the queue. The block this replaced rendered the queue only, so a week that
