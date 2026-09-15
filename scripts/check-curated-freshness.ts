@@ -60,6 +60,40 @@ type SnapshotPayload = {
   series?: CuratedSeries[];
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const parseCuratedSeriesEntry = (entry: unknown): CuratedSeries => {
+  const source = isRecord(entry) ? entry : {};
+  const stringField = (key: string): string | undefined => {
+    const value = source[key];
+    return typeof value === 'string' ? value : undefined;
+  };
+  return {
+    id: stringField('id') ?? '',
+    record_date: stringField('record_date'),
+    fetched_at: stringField('fetched_at'),
+  };
+};
+
+const parseSnapshotPayload = (raw: string): SnapshotPayload | null => {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  if (!isRecord(parsed)) {
+    return null;
+  }
+  const fetchedAt = parsed.fetched_at;
+  const series = parsed.series;
+  return {
+    fetched_at: typeof fetchedAt === 'string' ? fetchedAt : undefined,
+    series: Array.isArray(series) ? series.map(parseCuratedSeriesEntry) : undefined,
+  };
+};
+
 export const findStaleCuratedSeries = (
   payload: SnapshotPayload,
   now: Date = new Date(),
@@ -97,8 +131,17 @@ export const findStaleCuratedSeries = (
 
 const main = () => {
   const strict = process.argv.includes('--strict');
-  const payload = JSON.parse(readFileSync(SNAPSHOT_PATH, 'utf8')) as SnapshotPayload;
-  const stale = findStaleCuratedSeries(payload);
+  const parsed = parseSnapshotPayload(readFileSync(SNAPSHOT_PATH, 'utf8'));
+  if (!parsed) {
+    const message = `Curated freshness check could not parse ${SNAPSHOT_PATH} as a macro snapshot.`;
+    if (strict) {
+      console.error(message);
+      process.exit(1);
+    }
+    console.warn(message);
+    return;
+  }
+  const stale = findStaleCuratedSeries(parsed);
 
   if (stale.length === 0) {
     console.log(`✅ Curated macro series are within the ${CURATED_SNAPSHOT_SLA_HOURS / 24}-day SLA.`);

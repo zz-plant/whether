@@ -12,11 +12,11 @@ It is intentionally implementation-oriented: what changes are required, where th
 
 ## Current implementation (as built)
 - Two primary regime dimensions are scored on a **0–100 deterministic scale**:
-  - Tightness score from base rate + inversion points.
-  - Risk appetite score from linear 10Y-2Y mapping.
-- Regime classification is a four-quadrant threshold model (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`).
-- Macro overlays (HY OAS, NFCI, VIX, VC funding velocity, tech layoffs) adjust scores near boundaries.
-- Diagnostics include confidence, intensity, transition watch, and multi-weak-read warnings.
+  - Tightness score from base-rate points + inversion points + tightening-speed points (trailing base-rate move).
+  - Risk-appetite score from linear 10Y-2Y mapping (a financing-conditions proxy, not observed market appetite).
+- Regime classification is a four-quadrant threshold model (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`), published through a confirmation gate (two consecutive reads near a boundary; instant on shock crossings, which are marked).
+- Macro overlays (HY OAS, NFCI, VIX, VC funding velocity, tech layoffs) adjust scores near boundaries; a market-stress veto (trailing VIX mean) caps the risk-appetite proxy at the regime line.
+- Diagnostics include confidence, intensity, transition watch, shock crossings, and multi-weak-read warnings.
 
 ## Target policy specification
 - Inputs include base rate, slope, BBB OAS, CPI YoY, unemployment.

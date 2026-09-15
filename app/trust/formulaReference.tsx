@@ -5,6 +5,10 @@ import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/sign
 import {
   BASE_RATE_TIGHTNESS_MULTIPLIER,
   BASE_RATE_TIGHTNESS_THRESHOLD,
+  BASE_RATE_VELOCITY_LOOKBACK_DAYS,
+  BASE_RATE_VELOCITY_MULTIPLIER,
+  BASE_RATE_VELOCITY_POINTS,
+  BASE_RATE_VELOCITY_THRESHOLD,
   CURVE_INVERSION_TIGHTNESS_MULTIPLIER,
   MACRO_ADJUSTMENT_CONSTANTS,
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
@@ -262,6 +266,14 @@ export function FormulaReference() {
               />
             </li>
             <li>
+              <code className="text-sky-200">
+                + min({BASE_RATE_VELOCITY_POINTS}, (trailing {BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day
+                base-rate move − {BASE_RATE_VELOCITY_THRESHOLD}) × {BASE_RATE_VELOCITY_MULTIPLIER})
+              </code>{" "}
+              when base-rate history is available; the tightening-speed term, so a fast hiking
+              cycle counts before the level alone crosses the ramp.
+            </li>
+            <li>
               <span className="text-slate-400">Stress add-ons:</span> HY spread ≥{" "}
               {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; Chicago FCI ≥{" "}
               {adj.chicagoFciTighteningThreshold} adds up to +{adj.chicagoFciTightnessCap}.
@@ -280,6 +292,14 @@ export function FormulaReference() {
               subtracts up to {adj.vixRiskAppetiteCap}; VC funding velocity ≤{" "}
               {adj.vcVelocitySlowdownThreshold}% subtracts up to {adj.vcVelocityRiskAppetiteCap};
               layoff trend ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
+            </li>
+            <li>
+              <span className="text-slate-400">Market-stress veto:</span> when the trailing{" "}
+              {adj.vixVetoMeanWindow}-observation VIX mean is {adj.vixMarketStressVetoMean}+, the
+              score is capped at the regime line ({RISK_APPETITE_REGIME_THRESHOLD}); between{" "}
+              {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
+              {adj.vixVetoSoftCap}. Extreme realized stress, not the curve, sets the ceiling — the
+              posture cannot read better than transitional while it holds.
             </li>
           </ul>
         </FormulaCard>
