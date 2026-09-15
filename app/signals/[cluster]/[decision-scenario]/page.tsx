@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
+import { shouldNoindexPayload } from "../../../../lib/seo/freshnessIndexation";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../../../lib/report/reportCopy";
@@ -52,11 +53,6 @@ export function generateStaticParams() {
   return signalScenarioRoutes.map((route) => ({ cluster: route.signalSlug, "decision-scenario": route.decisionScenario }));
 }
 
-const shouldNoindexForPayload = (payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">) => {
-  if (!payload) return true;
-  if (payload.noindex || payload.degraded) return true;
-  return (payload.noindexReasons ?? []).some((reason) => reason.startsWith("freshness-") || reason.includes("provenance"));
-};
 
 export const buildSignalDecisionScenarioMetadata = ({
   cluster,
@@ -90,7 +86,7 @@ export const buildSignalDecisionScenarioMetadata = ({
     imageAlt: `${signalTitle} ${scenarioTitle}`,
   });
 
-  if (shouldNoindexForPayload(payload)) {
+  if (shouldNoindexPayload(payload)) {
     metadata.robots = { index: false, follow: true };
   }
 

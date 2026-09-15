@@ -9,6 +9,9 @@ import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { readProgrammaticPayload } from "../lib/seo/programmaticPayloadBuilder";
+import { shouldNoindexPayload } from "../lib/seo/freshnessIndexation";
+import { signalsClusterStaticParams } from "./signals/clusterRoutes";
+import { workstreamSlugs } from "./operate/workstreams";
 import {
   isIndexableAnswerSlug,
   isIndexableArchivePeriodSlug,
@@ -56,18 +59,10 @@ const buildEntry = ({
   priority,
 });
 
+/* The same predicate the scenario page applies to its own robots tag. */
 const isSignalScenarioIndexable = async (path: `/${string}`): Promise<boolean> => {
   try {
-    const payloadRecord = await readProgrammaticPayload(path);
-    const payload = payloadRecord.payload;
-
-    if (payload.noindex || payload.degraded) {
-      return false;
-    }
-
-    return !(payload.noindexReasons ?? []).some(
-      (reason) => reason.startsWith("freshness-") || reason.includes("provenance"),
-    );
+    return !shouldNoindexPayload((await readProgrammaticPayload(path)).payload);
   } catch {
     return false;
   }
@@ -112,6 +107,15 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     // neither is ranked like a hub.
     { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/operate", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
+    // The two workstreams are indexable pages with their own metadata; they
+    // were submitted nowhere because the page file kept its route map private.
+    ...workstreamSlugs.map((slug): SitemapEntryDescriptor => ({
+      path: `/operate/${slug}`,
+      lastModified: reportLastModified,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })),
+    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
@@ -171,15 +175,30 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   }));
 
   // Archive periods are closed records, so they are exempt from the programmatic
-  // freshness gate that governs live-posture pages.
+  // freshness gate that governs live-posture pages. They are also 82 of the
+  // ~130 URLs here, so they sit below every hub and live page: a quarter at
+  // 0.55 outranked the two operate workstreams and the resource guides.
   const archivePeriodEntries: SitemapEntryDescriptor[] = getPostureArchivePeriods()
     .filter((period) => isIndexableArchivePeriodSlug(period.slug))
     .map((period) => ({
       path: buildPostureArchivePath(period.slug),
       lastModified: resolveLastModified(period.asOf),
       changeFrequency: "yearly",
-      priority: period.kind === "year" ? 0.62 : 0.55,
+      priority: period.kind === "year" ? 0.55 : 0.4,
     }));
+
+  // The three signal watch hubs are indexable while their reading is live, on
+  // the same freshness rule as the scenario pages beneath them. They were in
+  // no sitemap and linked from no hub, so the 15 scenario URLs hung off
+  // parents a crawler never saw.
+  const signalWatchEntries: SitemapEntryDescriptor[] = programmaticEligible
+    ? signalsClusterStaticParams.map(({ cluster }) => ({
+        path: `/signals/${cluster}`,
+        lastModified: reportLastModified,
+        changeFrequency: "weekly",
+        priority: 0.72,
+      }))
+    : [];
 
   const signalScenarioEntryCandidates: Array<SitemapEntryDescriptor | null> = programmaticEligible
     ? await Promise.all(
@@ -209,6 +228,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...resourceArticleEntries,
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
+    ...signalWatchEntries,
     ...signalsClusterEntries,
     ...archivePeriodEntries,
     ...publishedBriefEntries,

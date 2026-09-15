@@ -1,4 +1,5 @@
-const DEFAULT_FRESHNESS_WINDOW_HOURS = 72;
+/** How old a reading may be and still be published as current. Shared with `lib/seo/freshnessIndexation.ts`. */
+export const DEFAULT_FRESHNESS_WINDOW_HOURS = 72;
 
 type SeoQualityGateId =
   | "decision-completeness"

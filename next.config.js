@@ -80,8 +80,6 @@ export const canonicalSurfaceRedirectPairs = [
   // parent, was noindex, and had no inbound link, so the parent is the page.
   ["/resolve/:slug/:cluster", "/resolve/:slug"],
   ["/toolkits/:slug/:cluster", "/toolkits/:slug"],
-  // Resources root → Planning
-  ["/resources", "/operate#ops-export-briefs"],
   // Guides staging redirects. These pointed at `/guides`, which stopped existing in
   // 14258b64 — so every one of them was a 308 into a 404, which is worse than a plain
   // 404 because a permanent redirect gets cached and followed. The content itself moved
