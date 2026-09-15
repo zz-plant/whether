@@ -444,7 +444,7 @@ async function PageContent({
               and calendar picker are the period controls; the regime stripe
               below the drivers is the memory rail (spec Block G: last months, no
               full chart). The zoomable scrubber lives on /history. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
               <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
               {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
               <DecisionHero
@@ -508,7 +508,7 @@ async function PageContent({
               ) : null}
             </div>
 
-            <div id="key-drivers" data-page-section="key-drivers" tabIndex={-1} aria-labelledby="key-drivers-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <div id="key-drivers" data-page-section="key-drivers" tabIndex={-1} aria-labelledby="key-drivers-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
               {/* The cards carry their own titles; the numbered signpost that sat
                   here repeated them with a description in framework vocabulary. */}
               <h2 id="key-drivers-heading" className="sr-only">Key drivers and actions this week</h2>
@@ -534,12 +534,12 @@ async function PageContent({
               on the page used to sit under the stress tester, the decision
               tracker and the week close-out; the recipient of a shared link
               scrolled past everything the product asked of them to reach it. */}
-          <div id="subscribe" data-page-section="subscribe" tabIndex={-1} aria-labelledby="subscribe-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <div id="subscribe" data-page-section="subscribe" tabIndex={-1} aria-labelledby="subscribe-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <h2 id="subscribe-heading" className="sr-only">Get the weekly call by email</h2>
             <SubscribeForm compact />
           </div>
 
-          <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+          <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <h2 id="plan-and-evidence-heading" className="sr-only">Turn this week’s call into a plan</h2>
             <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">

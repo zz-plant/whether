@@ -253,7 +253,7 @@ export const ThresholdsPanel = ({
   };
 
   return (
-    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10 scroll-mt-28">
+    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Watch-line settings"

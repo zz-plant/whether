@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { ReportSectionLink } from "./reportShellNavigation";
 import { useActiveSectionId } from "./AppSidebar";
+import { scrollRowToItem } from "./scrollRowToItem";
 
 /**
  * The outline rail, for phones.
@@ -15,15 +16,13 @@ import { useActiveSectionId } from "./AppSidebar";
  */
 export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSectionLink[] }) {
   const activeSectionId = useActiveSectionId(sectionLinks);
+  const navRef = useRef<HTMLElement>(null);
   const activeChipRef = useRef<HTMLAnchorElement>(null);
 
+  // The row scrolls; the page it is stuck to does not (scrollRowToItem.ts).
   useEffect(() => {
-    if (activeChipRef.current) {
-      activeChipRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
+    if (navRef.current && activeChipRef.current) {
+      scrollRowToItem(navRef.current, activeChipRef.current, { smooth: true });
     }
   }, [activeSectionId]);
 
@@ -31,6 +30,7 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
 
   return (
     <nav
+      ref={navRef}
       aria-label="Page sections"
       className="sticky top-0 z-20 -mx-4 overflow-x-auto border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-4 py-1.5 backdrop-blur [scrollbar-width:none] lg:hidden"
     >

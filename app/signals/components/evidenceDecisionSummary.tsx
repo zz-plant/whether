@@ -29,7 +29,7 @@ export const SignalsDecisionSummarySection = ({
 }) => (
   <section
     id="decision-summary"
-    className="weather-panel scroll-mt-28 space-y-6 px-6 py-5"
+    className="weather-panel space-y-6 px-6 py-5"
     aria-label="Decision summary"
   >
     <article className="weather-surface space-y-3 p-4">

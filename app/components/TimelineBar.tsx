@@ -9,6 +9,7 @@ import {
   useTransition,
 } from "react";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { scrollRowToItem } from "./scrollRowToItem";
 import {
   getTimeMachineRegimeSeries,
   type TimeMachineRegimeEntry,
@@ -341,10 +342,8 @@ export function TimelineBar({
     const rail = yearRailRef.current;
     const active = rail?.querySelector<HTMLElement>('[aria-current="true"]');
     if (!rail || !active) return;
-    // scrollLeft directly rather than scrollIntoView, which also scrolls every
-    // ancestor — including the page the brief is on.
-    rail.scrollLeft =
-      active.offsetLeft - (rail.clientWidth - active.offsetWidth) / 2;
+    // The rail scrolls, never the page the brief is on (scrollRowToItem.ts).
+    scrollRowToItem(rail, active);
   }, [handleIndex, trackWidth]);
 
   // Wheel is a native non-passive listener because React attaches its own at the

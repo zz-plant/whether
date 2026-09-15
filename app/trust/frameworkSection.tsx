@@ -70,7 +70,7 @@ export function FrameworkSection() {
 
         {/* The anchor /template redirects to, so an external link to the form
             still lands on the form rather than the top of the explainer. */}
-        <section id="template" className="space-y-4 scroll-mt-24 border-t border-slate-700/50 pt-6">
+        <section id="template" className="space-y-4 border-t border-slate-700/50 pt-6">
           <h3 className="type-eyebrow">Fill one in</h3>
           <p className="text-sm text-slate-300 leading-relaxed">
             Fill these out before the decision is urgent — that is when the framework is most useful.

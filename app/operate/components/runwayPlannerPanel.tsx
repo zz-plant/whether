@@ -446,7 +446,7 @@ This memo aligns our company budget and operating guardrails with the current cl
                   compact
                 />
               </div>
-              <pre className="max-h-72 overflow-y-auto whitespace-pre-wrap rounded bg-slate-950/90 p-3 font-mono text-[11px] leading-relaxed text-slate-300 border border-slate-900">
+              <pre className="max-h-72 overflow-y-auto overscroll-contain whitespace-pre-wrap rounded bg-slate-950/90 p-3 font-mono text-[11px] leading-relaxed text-slate-300 border border-slate-900">
                 {memoMarkdown}
               </pre>
             </div>

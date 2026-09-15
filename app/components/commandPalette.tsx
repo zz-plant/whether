@@ -268,7 +268,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             />
             <kbd className="text-[10px] text-slate-400 font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-2 py-0.5 shadow-inner">ESC</kbd>
           </div>
-          <nav aria-label="Command results" className="max-h-80 overflow-y-auto py-2">
+          <nav aria-label="Command results" className="max-h-80 overflow-y-auto overscroll-contain py-2">
             {filtered.length === 0 ? (
               <p className="px-4 py-8 text-center text-sm text-slate-500 font-medium">No matching commands</p>
             ) : (

@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { scrollBehaviorFor } from "./scrollRowToItem";
 
 const CADENCES = [
   { key: "weekly", label: "Weekly" },
@@ -59,10 +60,9 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate,
       const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
       router.replace(href, { scroll: false });
       if (revealTargetId) {
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         document
           .getElementById(revealTargetId)
-          ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+          ?.scrollIntoView({ behavior: scrollBehaviorFor(true), block: "start" });
       }
       onNavigate?.(key);
     },

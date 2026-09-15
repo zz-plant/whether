@@ -130,7 +130,7 @@ export default async function SignalsPage({
         <SignalInversionPreview yieldCurveSeries={model.yieldCurveSeries} />
       ) : null}
 
-      <div id="trends" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5">
+      <div id="trends" className="weather-panel space-y-4 px-5 py-5">
         <h2 className="type-eyebrow">Funding pressure and risk appetite over time</h2>
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
@@ -151,7 +151,7 @@ export default async function SignalsPage({
         const formatCoordinate = (value: number, unit: "%" | "pts") =>
           unit === "%" ? `${value.toFixed(2)}%` : value.toFixed(0);
         return (
-          <section id="analog-pattern" aria-labelledby="analog-pattern-title" className="weather-panel scroll-mt-28 space-y-4 p-5">
+          <section id="analog-pattern" aria-labelledby="analog-pattern-title" className="weather-panel space-y-4 p-5">
             <div>
               <p className="type-eyebrow">Nearest reference cycle</p>
               <h3 id="analog-pattern-title" className="text-base font-semibold text-slate-100">

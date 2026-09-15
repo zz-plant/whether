@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
+import { scrollBehaviorFor } from "./scrollRowToItem";
 import { shortcutNavigationLayers } from "../../lib/navigation/informationArchitecture";
 
 /* One source: the IA declares each layer's key, the header tabs show it on
@@ -110,8 +111,12 @@ export function KeyboardShortcuts() {
         if (target) {
           // A heading picked up by the fallback is not focusable on its own.
           if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
-          target.focus({ preventScroll: false });
-          target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          // focus() scrolls on its own, instantly, and the smooth scroll after it then
+          // started from wherever that jump landed: two movements per key. Focus without
+          // scrolling, then make the one scroll — to the section's start, under the sticky
+          // stack the html scroll-padding describes, the way a hash link lands it.
+          target.focus({ preventScroll: true });
+          target.scrollIntoView({ behavior: scrollBehaviorFor(true), block: "start" });
         }
         return;
       }

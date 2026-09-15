@@ -102,7 +102,7 @@ export default async function HistoryPage({
       {/* The plane first. It is the one graphic on the page that shows where the
           call sits and how near the next one is; the record below says how often
           it moved and lists each call. It used to sit under a twelve-row table. */}
-      <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+      <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap
           series={phaseSeries}
           activeSpan={phaseSpan.key}
@@ -111,7 +111,7 @@ export default async function HistoryPage({
         />
       </div>
 
-      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <TrackRecord
           record={trackRecord}
           allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
@@ -124,7 +124,7 @@ export default async function HistoryPage({
           data-page-section="published-briefs"
           tabIndex={-1}
           aria-labelledby="published-briefs-heading"
-          className="weather-panel space-y-4 px-5 py-5 scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+          className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <div>
             <h2 id="published-briefs-heading" className="type-eyebrow">Published weekly briefs</h2>
@@ -169,7 +169,7 @@ export default async function HistoryPage({
         data-page-section="posture-by-year"
         tabIndex={-1}
         aria-labelledby="posture-by-year-heading"
-        className="weather-panel space-y-4 px-5 py-5 scroll-mt-28 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+        className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       >
         <h2 id="posture-by-year-heading" className="type-eyebrow">Posture by year</h2>
         <p className="text-sm text-slate-300">
