@@ -16,8 +16,16 @@ type SegmentControlProps = {
   paramName: string;
   defaultKey: string;
   ariaLabel: string;
-  /** Runs after the URL updates. Lets a caller reveal the content the new cadence renders. */
+  /** Runs after the URL updates. Lets a client caller reveal the content the new cadence renders. */
   onNavigate?: (key: string) => void;
+  /**
+   * Element to scroll into view after the URL updates, by id. A server page
+   * cannot hand a client control a function — React refuses the render — so
+   * the reveal is declared as data. The homepage selector sits below the fold
+   * while the cadence card it controls renders in `#weekly-call`; without the
+   * reveal a change moved content only where the reader could not see it.
+   */
+  revealTargetId?: string;
 };
 
 function buildHref(pathname: string, searchParams: URLSearchParams | null, paramName: string, value: string, defaultKey: string) {
@@ -31,7 +39,7 @@ function buildHref(pathname: string, searchParams: URLSearchParams | null, param
   return qs ? `${pathname}?${qs}` : pathname;
 }
 
-function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate }: SegmentControlProps) {
+function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate, revealTargetId }: SegmentControlProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? "/";
@@ -50,9 +58,15 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate 
     (key: string) => {
       const href = buildHref(pathname, searchParams, paramName, key, defaultKey);
       router.replace(href, { scroll: false });
+      if (revealTargetId) {
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        document
+          .getElementById(revealTargetId)
+          ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      }
       onNavigate?.(key);
     },
-    [pathname, searchParams, paramName, defaultKey, router, onNavigate],
+    [pathname, searchParams, paramName, defaultKey, router, onNavigate, revealTargetId],
   );
 
   const prefetch = useCallback(
@@ -113,7 +127,13 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate 
   );
 }
 
-export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => void }) {
+export function CadenceSelector({
+  onNavigate,
+  revealTargetId,
+}: {
+  onNavigate?: (key: string) => void;
+  revealTargetId?: string;
+}) {
   return (
     <SegmentControl
       options={CADENCES}
@@ -121,6 +141,7 @@ export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => 
       defaultKey="weekly"
       ariaLabel="Cadence"
       onNavigate={onNavigate}
+      revealTargetId={revealTargetId}
     />
   );
 }
