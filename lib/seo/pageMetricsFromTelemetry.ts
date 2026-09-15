@@ -144,7 +144,15 @@ export const buildPageMetrics = (
   rows: TelemetryRow[],
   { windowDays = 30, now = new Date() }: { windowDays?: number; now?: Date } = {},
 ): PageMetricsFile => {
-  const byUrl: Record<string, PageMetric> = {};
+  /*
+   * `Object.create(null)`, not `{}`. `pagePath` is whatever an unauthenticated
+   * browser posted to the public telemetry intake, which only checks that it is
+   * a non-empty string — so one row with `pagePath: "constructor"` made
+   * `byUrl[path] ?? emptyMetric()` return `Object` instead of undefined, and the
+   * per-source counter then dereferenced a field that does not exist and threw.
+   * A single such row would have killed every later metrics run.
+   */
+  const byUrl: Record<string, PageMetric> = Object.create(null);
   let eventsParsed = 0;
 
   for (const row of rows) {
@@ -182,6 +190,7 @@ export const buildPageMetrics = (
     eventsRead: rows.length,
     eventsParsed,
     entranceDefinition: ENTRANCE_DEFINITION,
-    byUrl,
+    /* Back to a normal object for JSON.stringify and for callers that spread it. */
+    byUrl: { ...byUrl },
   };
 };

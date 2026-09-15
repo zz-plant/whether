@@ -40,6 +40,7 @@ const DEFAULT_WINDOW_DAYS = 30;
 const DEFAULT_ROW_LIMIT = 100_000;
 /** Below this a slice is dense enough that the cap, not the window, is the problem. */
 const MIN_SLICE_MS = 15 * 60 * 1000;
+const SLICE_TIMEOUT_MS = 30_000;
 
 const OUTPUT_DIR = join(process.cwd(), "artifacts", "seo-refresh");
 const OUTPUT_PATH = join(OUTPUT_DIR, "page-metrics.json");
@@ -96,6 +97,9 @@ export const refreshPageMetrics = async (): Promise<RefreshPageMetricsResult> =>
         config,
         rowSchema,
         rowLimit: Math.trunc(rowLimit),
+        /* Bounded per slice: up to 64 sequential POSTs, and one that never
+           answers would otherwise hang the whole nightly job. */
+        timeoutMs: SLICE_TIMEOUT_MS,
         sql: buildStreamQuery({
           dataset: config.dataset,
           stream: "content-measurement",

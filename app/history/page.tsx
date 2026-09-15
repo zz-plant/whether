@@ -9,7 +9,6 @@ import { TrackRecordSection } from "../components/history/TrackRecordSection";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { getPostureArchivePeriods } from "../../lib/summary/postureArchive";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
@@ -81,7 +80,10 @@ export default async function HistoryPage({
    * off it. Until now the largest cluster in the sitemap had no declared parent.
    */
   const structuredData = buildHistoryStructuredData({
-    periods: getPostureArchivePeriods(),
+    /* The year strip below is what this page links; the quarters are reachable
+       from their parent year. Declaring them here would name URLs the rendered
+       page does not contain. */
+    periods: postureArchiveYears.map((year) => ({ slug: year.slug, title: year.title, kind: "year" as const })),
     publishedBriefs,
     coverage:
       fullSeries.length > 0

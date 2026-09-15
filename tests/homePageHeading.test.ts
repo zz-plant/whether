@@ -13,9 +13,22 @@ describe("homepage heading contract", () => {
    * this week that it did not say every week.
    */
   it("makes the visible weekly call the page's h1", () => {
-    assert.match(hero, /<h1\s+id="weekly-call-title"/);
-    assert.doesNotMatch(hero, /<h2\s+id="weekly-call-title"/);
+    assert.match(hero, /titleLevel = "h1"/, "the hero's call is an h1 by default");
+    assert.match(hero, /<TitleTag\s+id="weekly-call-title"/);
     assert.doesNotMatch(page, /<h1\b/, "the route no longer renders a competing h1");
+  });
+
+  /*
+   * A visually hidden `h2` labelled the region and rendered above the `h1`, so
+   * a screen-reader heading list announced it before the call. With a cadence
+   * selected, that card's `h2` did the same. Both are resolved by level, not by
+   * hiding: the card the reader asked for takes the `h1`.
+   */
+  it("puts no heading above the h1 in either state", () => {
+    assert.doesNotMatch(page, /weekly-call-heading/, "the sr-only label is an aria-label now");
+    assert.match(page, /aria-label="This week\u2019s operating call"/);
+    assert.match(page, /<CadenceCallCard model=\{cadenceCall\} titleLevel="h1" \/>/);
+    assert.match(page, /titleLevel=\{cadenceCall \? "h2" : "h1"\}/);
   });
 
   it("anchors the share-ready artifact on the card that is the artifact", () => {

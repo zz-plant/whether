@@ -441,10 +441,15 @@ async function PageContent({
               and calendar picker are the period controls; the regime stripe
               below the drivers is the memory rail (spec Block G: last months, no
               full chart). The zoomable scrubber lives on /history. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-labelledby="weekly-call-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-              <h2 id="weekly-call-heading" className="sr-only">This week’s operating call</h2>
-              {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
+            {/* `aria-label`, not a visually hidden `h2`. The label named the
+                region, but it rendered as a heading *above* the page's `h1` and
+                so was the first thing a screen-reader heading list announced —
+                the call itself was second. The region still has a name; it is
+                no longer a heading competing with the one that matters. */}
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating call" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+              {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
+                titleLevel={cadenceCall ? "h2" : "h1"}
                 tightness={tightness}
                 tightnessDelta={tightnessDelta}
                 tightnessPressure={tightnessPressure}

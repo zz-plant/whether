@@ -7,7 +7,7 @@ import {
   searchJobLabels,
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
-import { writeAnalytics } from "../../lib/telemetry/analyticsEngine";
+import { SearchTelemetry } from "./searchTelemetry";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
 import { PageShell } from "../components/pageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
@@ -60,34 +60,22 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
   }
 
   if (commandJob === "approve") {
-    return "/planning#ops-monthly-action-summary";
+    /* `/operate`, not `/planning`: next.config.js 308s the latter, and this is
+       now a rendered link rather than a redirect target, so the hop would show. */
+    return "/operate#ops-monthly-action-summary";
   }
 
   return "/signals#decision-summary";
 };
 
-/**
- * What a search did, without what it said.
- *
- * The page recorded nothing, so the one question it can answer — are people
- * finding anything — had no data behind it. What is recorded is the routed job,
- * the number of entities matched, and whether the query matched none of them;
- * a zero-result rate is the signal worth acting on. The query text is
- * deliberately not stored: this product tells readers it runs no trackers, and
- * free text typed into a box is the thing that promise is about.
- */
-const recordSearch = (resultCount: number, routedJob: SearchEntityJob | null, filtered: boolean) => {
-  writeAnalytics(
-    "search",
-    { type: "search", resultCount, routedJob, filtered, zeroResults: resultCount === 0 },
-    { doubles: [resultCount] },
-  );
-};
-
-const SearchForm = ({ query }: { query: string }) => (
+const SearchForm = ({ query, activeJob }: { query: string; activeJob?: SearchEntityJob }) => (
   <search>
   <form action="/search" className="flex flex-wrap items-center gap-2">
     <label htmlFor="search-query" className="sr-only">Search Whether guidance</label>
+    {/* A GET form rebuilds the query string from its own fields, so without
+        this a reader who arrived with `?job=` and refined their query lost the
+        filter silently. */}
+    {activeJob ? <input type="hidden" name="job" value={activeJob} /> : null}
     <input
       id="search-query"
       name="q"
@@ -130,12 +118,17 @@ export default async function SearchPage({
   const commandHref = query ? resolveSearchCommandHref(query, results, activeJob) : null;
   const grouped = groupSearchResultsByJob(results);
 
-  if (query) {
-    recordSearch(results.length, activeJob ?? results[0]?.job ?? null, Boolean(activeJob));
-  }
-
   return (
     <PageShell backdropVariant="hub">
+      {/* Recorded from the browser, not from this render: a render is not an
+          action, and a prefetch or a retry would each add a phantom row to the
+          zero-result rate the stream exists to measure. */}
+      <SearchTelemetry
+        query={query}
+        routedJob={activeJob ?? results[0]?.job ?? null}
+        resultCount={results.length}
+        filtered={Boolean(activeJob)}
+      />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Search" }]} />
       <article className="weather-panel space-y-6 px-5 py-5">
         <header className="space-y-3">
@@ -143,7 +136,15 @@ export default async function SearchPage({
           <p className="text-sm text-slate-300">
             Route a question to the surface that answers it: evidence, guardrails, toolkits, or the method behind the call.
           </p>
-          <SearchForm query={query} />
+          <SearchForm query={query} activeJob={activeJob} />
+          {activeJob ? (
+            <p className="text-fluid-xs text-slate-400">
+              Filtered to “{searchJobLabels[activeJob]}”.{" "}
+              <Link href={`/search?q=${encodeURIComponent(query)}`} className="text-sky-200 underline decoration-sky-600">
+                Show every job
+              </Link>
+            </p>
+          ) : null}
         </header>
 
         {!query ? (

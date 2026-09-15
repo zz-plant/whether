@@ -12,11 +12,16 @@
  * number from climbing back.
  *
  * "Referenced" is deliberately cheap: the export's name appears as an
- * identifier in any other scanned file. That over-counts (a comment or an
- * unrelated symbol with the same name keeps an export alive) and never
- * under-counts, so a failure here is always a real orphan. Names Next.js and
- * the Workers runtime consume by convention (`metadata`, `GET`, `scheduled`,
- * ...) are exempt because the framework is the reference.
+ * identifier in any other scanned file, across every source, config and
+ * workflow extension this repo uses. That mostly over-counts — a comment or an
+ * unrelated symbol with the same name keeps an export alive — so a reported
+ * orphan is nearly always real. It is not a proof: a symbol named only from a
+ * file type outside `REFERENCE_EXTENSIONS`, or reached only through a runtime
+ * string, reads as dead. When this check fails on an export you believe is
+ * live, say where it is consumed from; that is a gap in the scan, not a
+ * verdict. Names Next.js and the Workers runtime consume by convention
+ * (`metadata`, `GET`, `scheduled`, ...) are exempt because the framework is
+ * the reference.
  *
  * Like the suppression census, the baseline is inline: lowering it is an edit
  * to this file that lands with the work that earned it.
@@ -38,8 +43,17 @@ const DECLARATION_EXTENSIONS = new Set([".ts", ".tsx"]);
  * roots on purpose: a script, a test, the private decision-engine package or
  * `wrangler.toml` naming a Durable Object class is a real consumer.
  */
-const REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests", "packages"];
-const REFERENCE_EXTENSIONS = new Set([".ts", ".tsx", ".mts", ".js", ".mjs"]);
+const REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests", "packages", ".github"];
+/*
+ * Wider than the declaration set on purpose. A symbol can be named from a
+ * `.jsx` file, an ambient `.d.ts`, a nested `wrangler.toml` naming a Durable
+ * Object class, or a workflow YAML — and each one that the scan cannot see
+ * turns a live export into a reported orphan.
+ */
+const REFERENCE_EXTENSIONS = new Set([
+  ".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs", ".jsx",
+  ".json", ".jsonc", ".toml", ".yml", ".yaml",
+]);
 const ROOT_CONFIG_EXTENSIONS = new Set([".ts", ".js", ".mjs", ".toml", ".jsonc", ".json"]);
 
 const IGNORED_DIRECTORIES = new Set([".next", ".open-next", ".wrangler", "artifacts", "coverage", "dist", "node_modules", "out"]);
@@ -103,13 +117,19 @@ const walk = (directory: string, extensions: Set<string>, into: string[]) => {
     const stats = statSync(path);
     if (stats.isDirectory()) {
       walk(path, extensions, into);
-    } else if (extensions.has(extname(entry)) && !entry.endsWith(".d.ts")) {
+    } else if (extensions.has(extname(entry))) {
       into.push(path);
     }
   }
 };
 
-const collect = (root: string, roots: string[], extensions: Set<string>, includeRootConfig: boolean) => {
+const collect = (
+  root: string,
+  roots: string[],
+  extensions: Set<string>,
+  includeRootConfig: boolean,
+  { skipAmbient = false }: { skipAmbient?: boolean } = {},
+) => {
   const paths: string[] = [];
   for (const name of roots) walk(join(root, name), extensions, paths);
   if (includeRootConfig) {
@@ -121,7 +141,10 @@ const collect = (root: string, roots: string[], extensions: Set<string>, include
     }
   }
   const files = new Map<string, string>();
-  for (const path of paths) files.set(relative(root, path), readFileSync(path, "utf8"));
+  for (const path of paths) {
+    if (skipAmbient && path.endsWith(".d.ts")) continue;
+    files.set(relative(root, path), readFileSync(path, "utf8"));
+  }
   return files;
 };
 
@@ -131,7 +154,7 @@ const collect = (root: string, roots: string[], extensions: Set<string>, include
  */
 export const censusDeadExports = (root = REPO_ROOT): DeadExport[] => {
   const references = collect(root, REFERENCE_ROOTS, REFERENCE_EXTENSIONS, true);
-  const declarations = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false);
+  const declarations = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false, { skipAmbient: true });
 
   const identifiersByFile = new Map<string, Set<string>>();
   for (const [path, source] of references) {

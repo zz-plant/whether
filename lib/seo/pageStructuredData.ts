@@ -49,6 +49,11 @@ const isoDate = (value: string | null | undefined) => {
  * history `Dataset`, with an `ItemList` naming every archive period it links to
  * and every published week. The hub used to carry no markup at all, so the
  * largest cluster in the sitemap had no declared parent.
+ *
+ * `periods` must be the periods the page actually links. It renders the year
+ * strip only — the 66 quarters hang off their parent year page — and an
+ * `ItemList` naming URLs absent from the rendered HTML is markup that does not
+ * reflect visible content, which is the defect this file removes elsewhere.
  */
 export const buildHistoryStructuredData = ({
   periods,
@@ -64,7 +69,7 @@ export const buildHistoryStructuredData = ({
   const periodItems = periods.map((period) => ({
     "@type": "WebPage",
     url: buildCanonicalUrl(`/history/${period.slug}`),
-    name: period.kind === "year" ? `${period.title} operating posture` : `${period.title} operating posture`,
+    name: `${period.title} operating posture`,
   }));
   const briefItems = publishedBriefs.map((brief) => ({
     "@type": "Article",
@@ -144,7 +149,12 @@ export const buildPricingStructuredData = ({
       name: "Whether Weekly Brief",
       description:
         "A weekly operating call for startup leaders, with the API, MCP endpoint and embeds free forever. Paid plans add delivery, alerts and team ritual.",
-      brand: { "@id": buildPublisherSchema(organizationName)["@id"] },
+      /* Inlined, not referenced. An `@id` only resolves against nodes on the
+         same page (see the header), and this graph carries no Organization —
+         the reference dangled, which is the unresolvable entity these builders
+         exist to avoid. `buildPublisherSchema` carries the same `@id`, so the
+         two still describe one entity. */
+      brand: buildPublisherSchema(organizationName),
       offers: plans.map((plan) => ({
         "@type": "Offer",
         name: plan.name,

@@ -3,13 +3,15 @@ import { siteUrl } from "../lib/siteUrl";
 import { snapshotData } from "../lib/snapshot";
 import { resourcePillarPages } from "../lib/resourcesContent";
 import { resourceArticles } from "../lib/resourceArticles";
+import { buildResourceHubEntries } from "../lib/resourceHub";
 import { tierOneDecisionPages } from "./answers/decisionPages";
 import { signalScenarioRoutes } from "./seoRouteClusters";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { readProgrammaticPayload } from "../lib/seo/programmaticPayloadBuilder";
-import { shouldNoindexPayload } from "../lib/seo/freshnessIndexation";
+import { isStaleForIndexing, shouldNoindexPayload } from "../lib/seo/freshnessIndexation";
+import { loadReportDataSafe } from "../lib/report/reportData";
 import { signalsClusterStaticParams } from "./signals/clusterRoutes";
 import { workstreamSlugs } from "./operate/workstreams";
 import {
@@ -147,14 +149,20 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.58,
     }));
 
-  const vcAuthorityEntries: SitemapEntryDescriptor[] = [
-    {
-      path: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
+  /*
+   * From the hub's list, not a second copy. This page is neither a
+   * `resourcePillarPage` nor a `resourceArticle`, so it was declared once here
+   * and once in `lib/resourceHub.ts`; renaming it required editing both files
+   * and nothing failed if only one was.
+   */
+  const vcAuthorityEntries: SitemapEntryDescriptor[] = buildResourceHubEntries()
+    .filter((entry) => entry.kind === "standalone")
+    .map((entry) => ({
+      path: entry.href,
       lastModified: staticContentLastModified,
       changeFrequency: "monthly",
       priority: 0.59,
-    },
-  ];
+    }));
 
   const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? tierOneDecisionPages : [])
     .filter((page) => isIndexableAnswerSlug(page.slug))
@@ -187,17 +195,34 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       priority: period.kind === "year" ? 0.55 : 0.4,
     }));
 
-  // The three signal watch hubs are indexable while their reading is live, on
-  // the same freshness rule as the scenario pages beneath them. They were in
-  // no sitemap and linked from no hub, so the 15 scenario URLs hung off
-  // parents a crawler never saw.
+  /*
+   * The three signal watch hubs, on the rule their own pages apply.
+   *
+   * They were in no sitemap and linked from no hub, so the 15 scenario URLs
+   * hung off parents a crawler never saw. Submitting them on
+   * `programmaticEligible` alone was not enough: that gate treats only a
+   * fallback snapshot as degraded, while `app/signals/[cluster]/page.tsx` also
+   * withholds a read that is not `treasury.isLive`. The sitemap would then list
+   * three URLs whose pages render `noindex` — the self-contradiction this file
+   * removes elsewhere. Same call, same inputs, same answer.
+   */
   const signalWatchEntries: SitemapEntryDescriptor[] = programmaticEligible
-    ? signalsClusterStaticParams.map(({ cluster }) => ({
-        path: `/signals/${cluster}`,
-        lastModified: reportLastModified,
-        changeFrequency: "weekly",
-        priority: 0.72,
-      }))
+    ? await (async () => {
+        const reportResult = await loadReportDataSafe(undefined, { route: "/sitemap:signal-watches" });
+        const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+        const stale = isStaleForIndexing({
+          fetchedAtIso: reportData.treasury.fetched_at,
+          isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
+        });
+        if (stale) return [];
+
+        return signalsClusterStaticParams.map(({ cluster }): SitemapEntryDescriptor => ({
+          path: `/signals/${cluster}`,
+          lastModified: reportLastModified,
+          changeFrequency: "weekly",
+          priority: 0.72,
+        }));
+      })()
     : [];
 
   const signalScenarioEntryCandidates: Array<SitemapEntryDescriptor | null> = programmaticEligible

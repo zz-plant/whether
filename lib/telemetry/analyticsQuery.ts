@@ -169,11 +169,21 @@ export const queryWindowPaged = async <Row extends z.ZodTypeAny>({
   window,
   minSliceMs,
   maxQueries = 64,
+  maxRows = 250_000,
   run,
 }: {
   window: AnalyticsWindow;
   minSliceMs: number;
   maxQueries?: number;
+  /**
+   * How many rows the accumulated result may hold.
+   *
+   * Refusing at the per-query cap used to bound this implicitly: one query, one
+   * cap, one array. Paging removed that bound, so a busy window could gather
+   * `maxQueries` capfuls — hundreds of megabytes of JSON blobs — and die of
+   * memory instead of returning the actionable refusal it used to.
+   */
+  maxRows?: number;
   run: (slice: AnalyticsWindow) => Promise<AnalyticsQueryResult<z.infer<Row>>>;
 }): Promise<{ ok: true; rows: z.infer<Row>[]; queries: number } | { ok: false; reason: string; queries: number }> => {
   const pending: AnalyticsWindow[] = [window];
@@ -195,6 +205,14 @@ export const queryWindowPaged = async <Row extends z.ZodTypeAny>({
     if (!result.ok) return { ok: false, reason: result.reason, queries };
 
     if (!result.truncated) {
+      if (rows.length + result.rows.length > maxRows) {
+        return {
+          ok: false,
+          queries,
+          reason: `the window holds more than ${maxRows} rows; narrow WHETHER_METRICS_WINDOW_DAYS `
+            + "rather than reading a set this large into memory.",
+        };
+      }
       rows.push(...result.rows);
       continue;
     }

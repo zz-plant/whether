@@ -157,7 +157,7 @@ type LoadCronRunHistoryOptions = {
 
 const queryCronSteps = async (
   config: AnalyticsReadConfig,
-  options: Required<Pick<LoadCronRunHistoryOptions, "fetcher" | "now" | "windowDays">>,
+  options: Required<Pick<LoadCronRunHistoryOptions, "fetcher" | "now" | "windowDays" | "timeoutMs">>,
 ): Promise<CronRunHistory> => {
   const result = await queryAnalyticsEngine({
     config,
@@ -165,6 +165,12 @@ const queryCronSteps = async (
     rowSchema: cronStepRowSchema,
     rowLimit: ROW_LIMIT,
     fetcher: options.fetcher,
+    /*
+     * The deadline belongs on the request, not only on the promise. `withDeadline`
+     * below resolves this page's read on time either way, but it leaves the POST
+     * in flight inside the Worker; aborting it is what actually frees the isolate.
+     */
+    timeoutMs: options.timeoutMs,
   });
 
   if (!result.ok) {
@@ -203,6 +209,7 @@ export const loadCronRunHistory = async (options: LoadCronRunHistoryOptions = {}
       fetcher: options.fetcher ?? fetch,
       now,
       windowDays: options.windowDays ?? RUN_HISTORY_WINDOW_DAYS,
+      timeoutMs: options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS,
     }),
     options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS,
     "run-history",

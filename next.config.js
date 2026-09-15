@@ -75,6 +75,17 @@ export const canonicalSurfaceRedirectPairs = [
   ["/answer/:path*", "/resolve/:path*"],
   ["/evidence/:path*", "/signals/:path*"],
   ["/planning/:path*", "/operate/:path*"],
+  /*
+   * `/resources` is a real hub again and is NOT listed here. Removing a rule
+   * from this list does not undo it for anyone who already followed it: every
+   * pair below becomes a 308, browsers cache a permanent redirect indefinitely,
+   * and Google treats it as a canonicalisation signal. So a returning reader
+   * whose browser saw the old `/resources` -> `/operate#ops-export-briefs` keeps
+   * landing on /operate until their cache clears, while a crawler re-fetching
+   * the URL gets the hub and re-canonicalises on its own schedule. Nothing in
+   * this file can shorten the first half; it is the standing cost of having
+   * made the redirect permanent, and the same trap the `/guides` note records.
+   */
   // The role × decision-area and toolkit × signal cluster pages (51 of them)
   // were retired on 2026-09-15. Each rendered the same site-wide call as its
   // parent, was noindex, and had no inbound link, so the parent is the page.

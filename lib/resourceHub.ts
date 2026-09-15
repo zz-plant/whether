@@ -6,7 +6,7 @@ type ResourceHubEntry = {
   href: `/resources/${string}`;
   title: string;
   description: string;
-  kind: "pillar" | "article";
+  kind: "pillar" | "article" | "standalone";
 };
 
 /**
@@ -35,11 +35,16 @@ export const buildResourceHubEntries = (): ResourceHubEntry[] => [
       description: article.description,
       kind: "article",
     })),
+  /*
+   * `standalone`: its own route, in neither content list. It was declared here
+   * and again in `app/sitemap.ts`; the sitemap reads this entry now, so the URL
+   * is stated once.
+   */
   {
     href: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
     title: "How VC firms can enforce capital discipline across portfolios",
     description:
       "A portfolio-level operating standard: one posture read, one set of reversal triggers, applied across every company a firm backs.",
-    kind: "article",
+    kind: "standalone",
   },
 ];

@@ -22,7 +22,7 @@ export const metadata: Metadata = buildPageMetadata({
 export default function ResourcesHubPage() {
   const entries = buildResourceHubEntries();
   const pillars = entries.filter((entry) => entry.kind === "pillar");
-  const articles = entries.filter((entry) => entry.kind === "article");
+  const articles = entries.filter((entry) => entry.kind !== "pillar");
 
   return (
     <PageShell backdropVariant="hub">

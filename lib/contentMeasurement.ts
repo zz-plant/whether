@@ -69,8 +69,35 @@ export const classifyAcquisitionSource = (referrer: string, currentHost: string)
   return "referral";
 };
 
+/** Marks that this tab has already recorded the visit that started the session. */
+const LANDING_RECORDED_KEY = "whether.content-measurement.landed";
+
+/**
+ * The source for this entrance, once per session.
+ *
+ * `document.referrer` belongs to the document, not the route, and a Next.js
+ * soft navigation does not change it. Classifying every entrance from it would
+ * stamp `search` on each page a reader clicked through to after arriving from
+ * Google, so `organicSearchEntrances30d` — the number the classification exists
+ * to make trustworthy — would over-count by the click depth of every search
+ * session, and `internal` would essentially never appear.
+ *
+ * So the referrer decides only the session's first recorded entrance; every
+ * later one in the same tab is what it is, an internal navigation. The flag
+ * lives in `sessionStorage`, which is per-tab, so opening a result in a new tab
+ * is correctly a new landing.
+ */
 const currentAcquisitionSource = (): ContentAcquisitionSource | undefined => {
   if (typeof document === "undefined" || typeof window === "undefined") return undefined;
+
+  try {
+    if (window.sessionStorage.getItem(LANDING_RECORDED_KEY) === "1") return "internal";
+    window.sessionStorage.setItem(LANDING_RECORDED_KEY, "1");
+  } catch {
+    /* Private mode, or storage blocked. The referrer is still the best available
+       answer for this page view; it can only over-count, never invent a visit. */
+  }
+
   return classifyAcquisitionSource(document.referrer ?? "", window.location.hostname);
 };
 

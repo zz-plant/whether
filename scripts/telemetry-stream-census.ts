@@ -82,6 +82,7 @@ export const censusTelemetryStreams = async (): Promise<StreamCensusResult> => {
     config,
     rowSchema,
     rowLimit: ROW_LIMIT,
+    timeoutMs: 30_000,
     sql: [
       "SELECT index1, count() AS count",
       `FROM ${config.dataset}`,

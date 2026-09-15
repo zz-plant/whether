@@ -95,9 +95,12 @@ deploys every push, which is the only remote gate left.
   day found 556 of them — 232 runtime, 324 types — plus nine modules nothing imported, and
   nothing in the gate had noticed: an unused export is not a lint finding, not a type error,
   and not a failing test, it is surface every reader has to rule out before trusting a module.
-  "Referenced" is deliberately cheap (the name appears as an identifier in another file), which
-  over-counts and never under-counts, so a failure is always a real orphan; the names Next.js
-  and the Workers runtime consume by convention are exempt. It runs in `bun run check`, on
+  "Referenced" is deliberately cheap (the name appears as an identifier in another file, across
+  every source, config and workflow extension this repo uses), which mostly over-counts, so a
+  reported orphan is nearly always real — but it is a scan, not a proof: a symbol reached only
+  through a runtime string, or named only from a file type the scan does not read, shows as dead.
+  If it fails on an export you know is live, widen the scan rather than deleting the export. The
+  names Next.js and the Workers runtime consume by convention are exempt. It runs in `bun run check`, on
   pre-push, and in the deploy gate.
 - **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the

@@ -58,11 +58,11 @@ export type TelemetryStream =
   | "regime-transition"
   | "degraded-state"
   /**
-   * Written server-side from `/search` only, and deliberately absent from the
-   * public intake's `VALID_STREAMS`: nothing in a browser should be able to
-   * post rows into it. It records the shape of a search — which job the query
-   * routed to, how many entities matched, whether it matched nothing — and not
-   * the text typed, which this product promises it does not collect.
+   * The shape of a search: which job the query routed to, how many entities
+   * matched, whether it matched nothing. Not the text typed, which this product
+   * promises it does not collect — `isSearchTelemetryEvent` refuses a payload
+   * carrying any key beyond those four, so the promise is enforced at the
+   * intake rather than left as a convention.
    */
   | "search";
 
