@@ -195,7 +195,7 @@ export default {
       return agentManifestResponse();
     }
 
-    const response = await handler.fetch(request);
+    const response = await handler.fetch(request, env, ctx);
 
     const cookieHeader = request.headers.get("cookie");
     if (cookieHeader && /whether-(company-stage|rate-sensitivity|ticker)=/.test(cookieHeader)) {
