@@ -38,6 +38,9 @@ interface Env {
     }): Promise<unknown>;
   };
   WHETHER_CRON_SECRET?: string;
+  /* Slack app signing secret. Read by lib/api/slackSignature.ts off globalThis; without it
+     the interactive-actions webhook answers 503 in production. */
+  SLACK_SIGNING_SECRET?: string;
   SITE_URL?: string;
   /* Data-provider secrets. Read by lib/fred.ts and lib/saasMultiples.ts off globalThis;
      absent, both stay on the keyless paths they have always used. */
