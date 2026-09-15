@@ -78,6 +78,11 @@ export default async function HistoryPage({
       model={{
         // The newest month the record actually covers. This was an empty string,
         // which rendered a dangling "As of" on the one page whose subject is dates.
+        // The line describes the record, not the live brief: every other page
+        // fills this slot from the live read, and with a "stable" tone this page
+        // printed "Live" beside the archive's latest month — two different
+        // current calls one click apart. The historical tone names what the
+        // numbers are.
         status: {
           statusLabel: trackRecord?.currentRegimeLabel ?? "Historical",
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
@@ -85,7 +90,7 @@ export default async function HistoryPage({
           treasurySource: "https://fred.stlouisfed.org",
         },
         page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: historySectionLinks, currentPath: "/history" },
-        trust: { trustStatusLabel: "Stable", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "stable" },
+        trust: { trustStatusLabel: "Historical snapshot", trustStatusDetail: "", trustStatusAction: "", trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
       }}
     >

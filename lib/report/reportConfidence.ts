@@ -41,12 +41,22 @@ export const buildWeeklyConfidenceSeries = ({
   thresholds,
   asOf,
   window = 8,
+  resolveGovernedAssessment,
 }: {
   snapshots: TreasuryData[];
   currentSnapshot?: TreasuryData;
   thresholds: ReturnType<typeof import("../thresholds").parseThresholdsFromSearchParams>;
   asOf: string;
   window?: number;
+  /**
+   * The governed assessment for a record date — the threaded walk's, with the
+   * month's VIX haircut and market-stress veto applied — or null when the date
+   * has none. A point that resolves here is the record; a bare re-evaluation of
+   * the curve is the fallback, and in a stress month it measures a boundary
+   * distance the record never published (February 2020: risk appetite 51 off
+   * the curve, 31 in the record).
+   */
+  resolveGovernedAssessment?: (recordDate: string) => ReturnType<typeof evaluateRegime> | null;
 }): WeeklyConfidencePoint[] => {
   const asOfTime = new Date(asOf).getTime();
   const snapshotsBeforeAsOf = [...snapshots, ...(currentSnapshot ? [currentSnapshot] : [])]
@@ -83,9 +93,10 @@ export const buildWeeklyConfidenceSeries = ({
   const actualPoints = deduped.map((snapshot) => ({
     recordDate: snapshot.record_date,
     confidencePercent: resolveConfidencePercent(
-      evaluateRegime(snapshot, thresholds, [], null, {
-        baseRateHistory: velocityWindowFor(snapshot.record_date),
-      }),
+      resolveGovernedAssessment?.(snapshot.record_date)
+        ?? evaluateRegime(snapshot, thresholds, [], null, {
+          baseRateHistory: velocityWindowFor(snapshot.record_date),
+        }),
     ),
     isMissing: false,
   }));

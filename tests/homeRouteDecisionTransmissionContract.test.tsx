@@ -11,6 +11,19 @@ describe("home route render contract", () => {
     assert.ok(!header.includes("<CadenceSelector"));
   });
 
+  it("hands the client cadence selector data, never a function", () => {
+    // `app/page.tsx` renders on the server. A function prop crossing into the
+    // client control is not a warning: React refuses the whole render and the
+    // homepage shows "This brief isn't rendering right now". The reveal the
+    // selector performs is declared by id instead.
+    const source = readFileSync("app/page.tsx", "utf8");
+    const tag = source.slice(source.indexOf("<CadenceSelector"), source.indexOf("/>", source.indexOf("<CadenceSelector")) + 2);
+    assert.match(tag, /revealTargetId="weekly-call"/, "the selector reveals the cadence card by id");
+    assert.doesNotMatch(tag, /=\{\s*(async\s*)?\(/, "no inline function crosses the server/client boundary");
+    assert.doesNotMatch(tag, /onNavigate=/, "the callback form is for client callers only");
+    assert.ok(source.includes('id="weekly-call"'), "the reveal target exists on the page");
+  });
+
   it("keeps the active / route carrying the homepage decision contract", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
 

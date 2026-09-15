@@ -180,7 +180,7 @@ The core classification engine. It takes normalized market inputs and decides wh
 
 **Flip governance (`lib/report/regimeStateMachine.ts`):**
 - A flip commits after two consecutive confirming observations (one when clear of boundaries and at HIGH confidence)
-- A crossing that jumps its line by ≥ 25 points in one step commits immediately and is marked `shock` — no published reversal condition could have fired — and the call publishes at LOW confidence with an explicit warning
+- A crossing that jumps its line by ≥ 25 points in one step, from a reading outside the 5-point near band, commits immediately and is marked `shock` — no published reversal condition could have fired — and the call publishes at LOW confidence with an explicit warning. A jump that started inside the band is not a shock, however large: the warning could have fired, so the flip confirms through the gate like any other
 - Archive and replay paths thread the same machine state the live path does, so `/history` and the weekly archive grade the same flips
 
 **Outputs:**
@@ -320,7 +320,7 @@ The data layer uses structured files, live fetchers with fallback caches, and KV
 | File | Purpose |
 |------|---------|
 | `snapshot_fallback.json` | Offline baseline for latest Treasury reading |
-| `time_machine_cache.json` | Accelerates historical queries |
+| `time_machine_cache.json` | Accelerates historical queries; each entry carries the period's daily VIX tail and base-rate velocity pair so the runtime replay matches the archive generators |
 
 ---
 

@@ -603,20 +603,14 @@ async function PageContent({
             <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
               <span className="text-fluid-sm text-slate-400">Planning horizon</span>
-              <CadenceSelector
-                onNavigate={() => {
-                  /*
-                   * The selector sits below the fold but the cadence card it controls
-                   * renders in `#weekly-call` — a change otherwise moved content only
-                   * where the reader could not see it. The scroll stays out of the
-                   * selector itself so the control keeps its one job.
-                   */
-                  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-                  document
-                    .getElementById("weekly-call")
-                    ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-                }}
-              />
+              {/*
+                * The selector sits below the fold but the cadence card it controls
+                * renders in `#weekly-call` — a change otherwise moved content only
+                * where the reader could not see it. The reveal is declared by id:
+                * this page renders on the server, and a function prop handed to the
+                * client control fails the whole render.
+                */}
+              <CadenceSelector revealTargetId="weekly-call" />
             </div>
           </div>
         </div>

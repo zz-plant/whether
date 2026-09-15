@@ -28,6 +28,7 @@ import {
   getTimeMachineRegimeSeries,
   getTimeMachineYieldCurveSeries,
   findTimeMachineSnapshot,
+  findTimeMachineGovernedAssessment,
   DEFAULT_REGIME_SERIES_MONTHS,
   getTimeMachineSnapshots,
 } from "../timeMachine/timeMachineCache";
@@ -213,6 +214,7 @@ const loadReportDataUncached = async (
       getTimeMachineSnapshots,
       getPreviousTimeMachineSnapshot,
       findTimeMachineSnapshot,
+      findTimeMachineGovernedAssessment,
       DEFAULT_REGIME_SERIES_MONTHS,
       loadCanonicalReportInputsIfAvailable,
       loadLatestOperatingSnapshot: () => getOperatingSnapshotStore().readLatest(),
@@ -336,6 +338,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
       getTimeMachineSnapshots,
       getPreviousTimeMachineSnapshot,
       findTimeMachineSnapshot,
+      findTimeMachineGovernedAssessment,
       DEFAULT_REGIME_SERIES_MONTHS,
       loadCanonicalReportInputsIfAvailable,
       loadLatestOperatingSnapshot: () => getOperatingSnapshotStore().readLatest(),

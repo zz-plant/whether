@@ -7,15 +7,16 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
-import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
 import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
 import {
+  resolveBaseRateVelocityWindow,
+  fetchSeries,
+  getLatestValidDate,
   resolveBaseRateWindow,
-  resolveVixCacheValue,
   resolveVixReading,
   type SeriesDataset,
   type SeriesPoint,
@@ -54,7 +55,6 @@ const formatAgeLabel = (value: string, now: Date) => {
   return `${hours}h.`;
 };
 
-const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=";
 const FRED_SERIES_URL = "https://fred.stlouisfed.org/series/";
 
 const seriesCatalog = {
@@ -72,66 +72,6 @@ const seriesSourceUrls = {
 } as const;
 
 type SeriesKey = keyof typeof seriesCatalog;
-
-const parseSeries = (csv: string) => {
-  const lines = csv.trim().split("\n");
-  const points: SeriesPoint[] = [];
-
-  for (const line of lines.slice(1)) {
-    const [date, rawValue] = line.split(",");
-    if (!date) {
-      continue;
-    }
-    const value = rawValue === "." ? null : Number(rawValue);
-    points.push({
-      date,
-      time: Date.parse(`${date}T00:00:00Z`),
-      value: Number.isFinite(value) ? value : null,
-    });
-  }
-
-  const map = new Map<string, number>();
-  points.forEach((point) => {
-    if (point.value !== null) {
-      map.set(point.date, point.value);
-    }
-  });
-
-  return { points, map };
-};
-
-const getLatestValidDate = (points: SeriesPoint[]) => {
-  for (let index = points.length - 1; index >= 0; index -= 1) {
-    if (points[index].value !== null) {
-      return points[index];
-    }
-  }
-  return null;
-};
-
-const fetchSeries = async (seriesId: string) => {
-  const sourceUrl = `${FRED_BASE_URL}${seriesId}`;
-
-  try {
-    const response = await fetch(sourceUrl);
-    if (!response.ok) {
-      throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
-    }
-    const csv = await response.text();
-    return parseSeries(csv);
-  } catch (error) {
-    const csv = execFileSync("curl", ["-fsSL", sourceUrl], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    if (error instanceof Error) {
-      console.warn(
-        `fetch() failed for ${seriesId}; retried with curl fallback (${error.message}).`
-      );
-    }
-    return parseSeries(csv);
-  }
-};
 
 const isSameMonthAndYear = (value: string, asOf: string) => {
   const valueDate = new Date(`${value}T00:00:00Z`);
@@ -167,7 +107,7 @@ const assertCoverageForAsOf = (
 
   const fallbackLatest = fallbackCoverage
     .map((series) => getLatestValidDate(datasets[series.key].points))
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .sort((a, b) => b.time - a.time)[0];
 
   if (!fallbackLatest || fallbackLatest.time < asOfTime) {
@@ -230,6 +170,20 @@ type TimeMachineCacheEntry = TreasuryData & {
   year: number;
   month: number;
   vix?: number | null;
+  /** Trailing daily VIX observations for the entry. The runtime replay's
+   *  market-stress veto means the last 10 daily closes, the same cadence this
+   *  walk uses; without the stored tail it could only approximate the veto with
+   *  month-end values and drift from the archives. */
+  vixHistory?: { date: string; value: number | null }[] | null;
+  /** The two observations the tightening-speed term resolves its delta from.
+   *  The runtime replay evaluates the same delta from this pair that this walk
+   *  computes from the full daily window. */
+  baseRateVelocityWindow?: {
+    compareDate: string;
+    compareValue: number;
+    latestDate: string;
+    latestValue: number;
+  } | null;
 };
 
 const writeJson = async (filePath: string, value: unknown) => {
@@ -294,7 +248,7 @@ const generateMonthlySummaries = async () => {
     vixDataset = await fetchSeries("VIXCLS");
   } catch (error) {
     console.warn(
-      `VIX series unavailable (${error instanceof Error ? error.message : error}); replaying without the market-stress adjustments.`,
+      `VIX series unavailable (${error instanceof Error ? error.message : String(error)}); replaying without the market-stress adjustments.`,
     );
   }
   const basePoints = datasets.tenYear.points;
@@ -305,14 +259,14 @@ const generateMonthlySummaries = async () => {
     getLatestValidDate(datasets.twoYear.points),
     getLatestValidDate(datasets.tenYear.points),
   ]
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .map((point) => point.time)
     .reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
   const latestFallback = [
     getLatestValidDate(datasets.oneMonth.points),
     getLatestValidDate(datasets.threeMonth.points),
   ]
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .map((point) => point.time)
     .reduce((max, value) => Math.max(max, value), 0);
   const effectiveEndTime = Math.min(latestRequired, latestFallback);
@@ -331,10 +285,17 @@ const generateMonthlySummaries = async () => {
    * marked shocks), each month supplies its trailing base-rate window for the
    * tightening-speed term, and each month supplies its VIX reading. Point
    * evaluation here is what produced the old record's 22 instant-commit flips.
+   *
+   * A partial run (`HISTORY_START_YEAR`, which `time-machine:update-summaries`
+   * sets to 2024 by default) still walks from the first year and only filters
+   * which records it writes. Starting the walk at the requested year began it
+   * with no machine state, so the first selected month instant-committed its
+   * quadrant and later confirmations could differ from the full replay the
+   * merge target was built from.
    */
   let machineState: RegimeMachineSnapshot | null = null;
 
-  for (let year = startYear; year <= endYear; year += 1) {
+  for (let year = DEFAULT_START_YEAR; year <= endYear; year += 1) {
     for (let month = 1; month <= 12; month += 1) {
       const asOf = resolveHistoricalDate(year, month);
       const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
@@ -370,10 +331,15 @@ const generateMonthlySummaries = async () => {
         { baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, recordDate, asOfTime) },
       );
       machineState = assessment.regimeTransition?.snapshot ?? machineState;
+      if (year < startYear) {
+        continue;
+      }
       timeMachineEntries.push({
         year,
         month,
-        vix: resolveVixCacheValue(vixDataset, recordDate, asOfTime),
+        vix: vixReading?.value ?? null,
+        vixHistory: vixReading?.history ?? null,
+        baseRateVelocityWindow: resolveBaseRateVelocityWindow(datasets.oneMonth, asOfTime),
         ...treasury,
       });
       const recordDateLabel = formatDateValue(treasury.record_date);

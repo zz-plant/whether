@@ -27,7 +27,7 @@
     "record_date": "2012-05-31",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 87
+    "riskAppetite": 55
   },
   {
     "record_date": "2012-06-29",
@@ -84,10 +84,10 @@
     "riskAppetite": 100
   },
   {
-    "record_date": "2013-03-29",
-    "regime": "VOLATILE",
+    "record_date": "2013-03-28",
+    "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 40
+    "riskAppetite": 100
   },
   {
     "record_date": "2013-04-30",
@@ -291,7 +291,7 @@
     "record_date": "2016-01-29",
     "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 87
+    "riskAppetite": 55
   },
   {
     "record_date": "2016-02-29",
@@ -444,14 +444,14 @@
     "riskAppetite": 65
   },
   {
-    "record_date": "2018-03-30",
-    "regime": "VOLATILE",
-    "tightness": 0,
-    "riskAppetite": 40
+    "record_date": "2018-03-29",
+    "regime": "EXPANSION",
+    "tightness": 5,
+    "riskAppetite": 59
   },
   {
     "record_date": "2018-04-30",
-    "regime": "VOLATILE",
+    "regime": "EXPANSION",
     "tightness": 0,
     "riskAppetite": 58
   },
@@ -464,7 +464,7 @@
   {
     "record_date": "2018-06-29",
     "regime": "EXPANSION",
-    "tightness": 60,
+    "tightness": 0,
     "riskAppetite": 53
   },
   {
@@ -637,27 +637,27 @@
   },
   {
     "record_date": "2020-11-30",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 66
+    "riskAppetite": 55
   },
   {
     "record_date": "2020-12-31",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 68
+    "riskAppetite": 55
   },
   {
     "record_date": "2021-01-29",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
     "riskAppetite": 55
   },
   {
     "record_date": "2021-02-26",
-    "regime": "EXPANSION",
+    "regime": "VOLATILE",
     "tightness": 0,
-    "riskAppetite": 80
+    "riskAppetite": 55
   },
   {
     "record_date": "2021-03-31",
@@ -672,10 +672,10 @@
     "riskAppetite": 100
   },
   {
-    "record_date": "2021-05-31",
-    "regime": "VOLATILE",
+    "record_date": "2021-05-28",
+    "regime": "EXPANSION",
     "tightness": 0,
-    "riskAppetite": 40
+    "riskAppetite": 98
   },
   {
     "record_date": "2021-06-30",
@@ -876,10 +876,10 @@
     "riskAppetite": 24
   },
   {
-    "record_date": "2024-03-29",
-    "regime": "VOLATILE",
-    "tightness": 0,
-    "riskAppetite": 40
+    "record_date": "2024-03-28",
+    "regime": "SCARCITY",
+    "tightness": 100,
+    "riskAppetite": 24
   },
   {
     "record_date": "2024-04-30",

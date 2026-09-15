@@ -16,6 +16,9 @@ import { advanceRegimeState, SHOCK_CROSSING_POINTS } from "../lib/report/regimeS
 import { applyMacroAdjustments } from "../lib/regimeEngineDiagnostics";
 import { buildWeeklySummary } from "../lib/summary/weeklySummary";
 import { buildMonthlySummary } from "../lib/summary/monthlySummary";
+import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import summaryArchive from "../data/summary_archive.json";
+import { z } from "zod";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { MacroSeriesReading } from "../lib/types";
 
@@ -158,6 +161,17 @@ describe("flip governance", () => {
     assert.equal(shock.committed, true);
     assert.equal(shock.shock, true);
     assert.ok(shock.transitionReason.includes("no published reversal condition fired"));
+  });
+
+  it("does not mark a shock when the prior reading sat inside the near band", () => {
+    // 69 is one point from the 70-line: the near-band warning was live, so the
+    // published reversal condition could have fired. The 26-point jump crosses
+    // by a shock-sized move but is not a shock; it confirms through the gate.
+    const first = advanceRegimeState(null, machineSignals(69, 30));
+    const crossing = advanceRegimeState(first.snapshot, machineSignals(95, 30));
+    assert.equal(crossing.candidateState, "SCARCITY");
+    assert.equal(crossing.shock, undefined);
+    assert.ok(!crossing.transitionReason.includes("no published reversal condition fired"));
   });
 
   it("requires two confirmations for a near-boundary gradual crossing", () => {
@@ -303,5 +317,89 @@ describe("shock-crossing honesty in published copy", () => {
 describe("lookback window constant", () => {
   it("stays inside the resolver's gap bounds", () => {
     assert.ok(BASE_RATE_VELOCITY_LOOKBACK_DAYS >= 60 && BASE_RATE_VELOCITY_LOOKBACK_DAYS <= 130);
+  });
+});
+
+describe("governed replay parity", () => {
+  /**
+   * The runtime walk and the archive generators replay the same months with
+   * the same inputs — the stored daily VIX tail and the resolved base-rate
+   * velocity pair — so they must publish the same record. They drifted when
+   * the walk approximated daily cadence with month-end values: November and
+   * December 2020 published 50/VOLATILE from /history while the archives
+   * recorded 66/68 EXPANSION. (Those archive numbers were themselves inflated:
+   * the generators read FRED's empty holiday fields as a VIX of 0, which pulled
+   * the veto's trailing mean under its unwind band. With holidays as nulls the
+   * corrected record is 55/VOLATILE for both months, and both walks agree.)
+   *
+   * The archive loader's zod schema keeps only the copy surfaces need, so the
+   * scores the generator writes at the entry level are read through a minimal
+   * schema here. Skipping is loud: a month whose scores went missing must fail
+   * the test, not silently leave the parity set.
+   */
+  const MonthlyArchiveScoresSchema = z.object({
+    cadence: z.literal("monthly"),
+    year: z.number(),
+    month: z.number(),
+    tightness: z.number(),
+    riskAppetite: z.number(),
+    summary: z.object({ regime: z.string() }),
+  });
+
+  const rawArchiveEntries = z.array(z.record(z.string(), z.unknown())).parse(summaryArchive);
+  const monthlyRawCount = rawArchiveEntries.filter((entry) => entry.cadence === "monthly").length;
+  const monthlyArchive = rawArchiveEntries.flatMap((entry) => {
+    const parsed = MonthlyArchiveScoresSchema.safeParse(entry);
+    return parsed.success ? [parsed.data] : [];
+  });
+
+  it("reads every monthly archive entry with its scores", () => {
+    assert.equal(monthlyArchive.length, monthlyRawCount);
+    assert.equal(monthlyArchive.length > 100, true);
+  });
+
+  it("publishes the same regime and scores as the archive for every month on record", () => {
+    const walk = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
+    const byMonth = new Map(walk.map((entry) => [`${entry.year}-${entry.month}`, entry]));
+    assert.equal(monthlyArchive.length > 100, true);
+
+    const diffs: string[] = [];
+    for (const entry of monthlyArchive) {
+      const replayed = byMonth.get(`${entry.year}-${entry.month}`);
+      if (!replayed) {
+        diffs.push(`${entry.year}-${entry.month}: missing from the runtime walk`);
+        continue;
+      }
+      if (
+        replayed.regime !== entry.summary.regime ||
+        replayed.tightness !== entry.tightness ||
+        replayed.riskAppetite !== entry.riskAppetite
+      ) {
+        diffs.push(
+          `${entry.year}-${entry.month}: walk ${replayed.regime} ${replayed.tightness}/${replayed.riskAppetite}` +
+            ` vs archive ${entry.summary.regime} ${entry.tightness}/${entry.riskAppetite}`,
+        );
+      }
+    }
+    assert.deepEqual(diffs, []);
+  });
+
+  it("scores the 2020 stress unwind from the daily VIX tail, not a monthly mean", () => {
+    const byMonth = new Map(
+      getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER).map((entry) => [
+        `${entry.year}-${entry.month}`,
+        entry,
+      ]),
+    );
+    // Late Nov and late Dec 2020 the daily VIX averaged 22-23, inside the
+    // late-unwind band, so the veto caps risk appetite at 55. A month-end-only
+    // mean read those months at 50/VOLATILE; a holiday read as 0 lifted the cap
+    // and published 66/68 EXPANSION. Either defect moves these numbers.
+    const november = byMonth.get("2020-11");
+    const december = byMonth.get("2020-12");
+    assert.equal(november?.riskAppetite, 55);
+    assert.equal(december?.riskAppetite, 55);
+    assert.equal(november?.regime, "VOLATILE");
+    assert.equal(december?.regime, "VOLATILE");
   });
 });

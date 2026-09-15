@@ -6,12 +6,13 @@ import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySum
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
-import { execFileSync } from "node:child_process";
 import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
 import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
 import {
+  fetchSeries,
+  getLatestValidDate,
   resolveBaseRateWindow,
   resolveVixReading,
   type SeriesDataset,
@@ -52,7 +53,6 @@ const formatAgeLabel = (value: string, now: Date) => {
   return `${hours}h.`;
 };
 
-const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=";
 const FRED_SERIES_URL = "https://fred.stlouisfed.org/series/";
 
 const seriesCatalog = {
@@ -97,66 +97,6 @@ const resolveHistoryWeeksLimit = () => {
   return parsed;
 };
 
-const parseSeries = (csv: string) => {
-  const lines = csv.trim().split("\n");
-  const points: SeriesPoint[] = [];
-
-  for (const line of lines.slice(1)) {
-    const [date, rawValue] = line.split(",");
-    if (!date) {
-      continue;
-    }
-    const value = rawValue === "." ? null : Number(rawValue);
-    points.push({
-      date,
-      time: Date.parse(`${date}T00:00:00Z`),
-      value: Number.isFinite(value) ? value : null,
-    });
-  }
-
-  const map = new Map<string, number>();
-  points.forEach((point) => {
-    if (point.value !== null) {
-      map.set(point.date, point.value);
-    }
-  });
-
-  return { points, map };
-};
-
-const getLatestValidDate = (points: SeriesPoint[]) => {
-  for (let index = points.length - 1; index >= 0; index -= 1) {
-    if (points[index].value !== null) {
-      return points[index];
-    }
-  }
-  return null;
-};
-
-const fetchSeries = async (seriesId: string) => {
-  const sourceUrl = `${FRED_BASE_URL}${seriesId}`;
-
-  try {
-    const response = await fetch(sourceUrl);
-    if (!response.ok) {
-      throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
-    }
-    const csv = await response.text();
-    return parseSeries(csv);
-  } catch (error) {
-    const csv = execFileSync("curl", ["-fsSL", sourceUrl], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    if (error instanceof Error) {
-      console.warn(
-        `fetch() failed for ${seriesId}; retried with curl fallback (${error.message}).`
-      );
-    }
-    return parseSeries(csv);
-  }
-};
-
 const assertCoverageForAsOf = (
   asOf: string,
   asOfTime: number,
@@ -186,7 +126,7 @@ const assertCoverageForAsOf = (
 
   const fallbackLatest = fallbackCoverage
     .map((series) => getLatestValidDate(datasets[series.key].points))
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .sort((a, b) => b.time - a.time)[0];
 
   if (
@@ -323,7 +263,7 @@ const generateWeeklySummaries = async () => {
     vixDataset = await fetchSeries("VIXCLS");
   } catch (error) {
     console.warn(
-      `VIX series unavailable (${error instanceof Error ? error.message : error}); replaying without the market-stress adjustments.`,
+      `VIX series unavailable (${error instanceof Error ? error.message : String(error)}); replaying without the market-stress adjustments.`,
     );
   }
   const basePoints = datasets.tenYear.points;
@@ -334,14 +274,14 @@ const generateWeeklySummaries = async () => {
     getLatestValidDate(datasets.twoYear.points),
     getLatestValidDate(datasets.tenYear.points),
   ]
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .map((point) => point.time)
     .reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
   const latestFallback = [
     getLatestValidDate(datasets.oneMonth.points),
     getLatestValidDate(datasets.threeMonth.points),
   ]
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .map((point) => point.time)
     .reduce((max, value) => Math.max(max, value), 0);
   const effectiveEndTime = Math.min(latestRequired, latestFallback);

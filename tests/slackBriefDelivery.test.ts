@@ -24,7 +24,7 @@ describe("Slack brief delivery", () => {
   it("posts the full brief text and reports posted", async () => {
     let sentBody: string | undefined;
     const capture: typeof fetch = (async (_url: unknown, init?: RequestInit) => {
-      sentBody = String(init?.body);
+      sentBody = typeof init?.body === "string" ? init.body : undefined;
       return new Response("ok", { status: 200 });
     }) as typeof fetch;
 

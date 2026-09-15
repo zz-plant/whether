@@ -304,7 +304,22 @@ export const buildFredApiUrl = (seriesId: string, apiKey: string, options: FredA
   return url.toString();
 };
 
-/** The API's JSON body, reduced to the same rows the CSV parser produces. Missing values are ".". */
+/**
+ * Whether a raw FRED observation is a missing value.
+ *
+ * The API marks one with ".", and the CSV export used to as well, but the
+ * export now leaves the field empty — and `Number("")` is 0, a finite number
+ * that a parser guarding only against "." accepts as a real print. That is how
+ * seven month-end Treasury records and some 160 holiday VIX closes were zeros
+ * in the shipped archives until 2026-09-14. Route every FRED value through
+ * this before converting it.
+ */
+export const isMissingFredValue = (raw: string | undefined): boolean => {
+  const trimmed = raw?.trim() ?? "";
+  return trimmed === "" || trimmed === ".";
+};
+
+/** The API's JSON body, reduced to the same rows the CSV parser produces. Missing values are "." (`isMissingFredValue`). */
 export const parseFredApiObservations = (payload: unknown): FredRow[] => {
   if (!isRecord(payload)) {
     throw new Error("FRED API returned no observations payload");
@@ -319,7 +334,7 @@ export const parseFredApiObservations = (payload: unknown): FredRow[] => {
   return observations.flatMap((entry): FredRow[] => {
     if (!isRecord(entry)) return [];
     const { date, value } = entry;
-    if (typeof date !== "string" || typeof value !== "string" || value === ".") return [];
+    if (typeof date !== "string" || typeof value !== "string" || isMissingFredValue(value)) return [];
     const parsed = Number(value);
     return Number.isFinite(parsed) ? [{ date, value: parsed }] : [];
   });
@@ -423,7 +438,7 @@ export const parseFredCsvRows = (csv: string): { date: string; value: number }[]
     .split(/\r?\n/)
     .slice(1)
     .map((row) => row.split(","))
-    .filter((parts) => parts.length >= 2 && parts[1] !== "." && !Number.isNaN(Number(parts[1])))
+    .filter((parts) => parts.length >= 2 && !isMissingFredValue(parts[1]) && !Number.isNaN(Number(parts[1])))
     .map((parts) => ({
       date: parts[0] ?? "",
       value: Number(parts[1]),

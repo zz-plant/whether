@@ -9,12 +9,14 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
-import { execFileSync } from "node:child_process";
 import { resolveYearRange } from "./summaryRange";
 import {
+  fetchSeries,
+  getLatestValidDate,
   resolveBaseRateWindow,
   resolveVixReading,
   type SeriesDataset,
+  type SeriesPoint,
 } from "./regimeArchiveContext";
 
 const START_YEAR = 2010;
@@ -48,7 +50,6 @@ const formatAgeLabel = (value: string, now: Date) => {
   return `${hours}h.`;
 };
 
-const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=";
 const FRED_SERIES_URL = "https://fred.stlouisfed.org/series/";
 
 const seriesCatalog = {
@@ -66,67 +67,6 @@ const seriesSourceUrls = {
 } as const;
 
 type SeriesKey = keyof typeof seriesCatalog;
-type SeriesPoint = { date: string; time: number; value: number | null };
-
-const parseSeries = (csv: string) => {
-  const lines = csv.trim().split("\n");
-  const points: SeriesPoint[] = [];
-
-  for (const line of lines.slice(1)) {
-    const [date, rawValue] = line.split(",");
-    if (!date) {
-      continue;
-    }
-    const value = rawValue === "." ? null : Number(rawValue);
-    points.push({
-      date,
-      time: Date.parse(`${date}T00:00:00Z`),
-      value: Number.isFinite(value) ? value : null,
-    });
-  }
-
-  const map = new Map<string, number>();
-  points.forEach((point) => {
-    if (point.value !== null) {
-      map.set(point.date, point.value);
-    }
-  });
-
-  return { points, map };
-};
-
-const getLatestValidDate = (points: SeriesPoint[]) => {
-  for (let index = points.length - 1; index >= 0; index -= 1) {
-    if (points[index].value !== null) {
-      return points[index];
-    }
-  }
-  return null;
-};
-
-const fetchSeries = async (seriesId: string) => {
-  const sourceUrl = `${FRED_BASE_URL}${seriesId}`;
-
-  try {
-    const response = await fetch(sourceUrl);
-    if (!response.ok) {
-      throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
-    }
-    const csv = await response.text();
-    return parseSeries(csv);
-  } catch (error) {
-    const csv = execFileSync("curl", ["-fsSL", sourceUrl], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    if (error instanceof Error) {
-      console.warn(
-        `fetch() failed for ${seriesId}; retried with curl fallback (${error.message}).`
-      );
-    }
-    return parseSeries(csv);
-  }
-};
 
 const isSameQuarterAndYear = (value: string, asOf: string) => {
   const valueDate = new Date(`${value}T00:00:00Z`);
@@ -170,7 +110,7 @@ const assertCoverageForAsOf = (
 
   const fallbackLatest = fallbackCoverage
     .map((series) => getLatestValidDate(datasets[series.key].points))
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .sort((a, b) => b.time - a.time)[0];
 
   if (!fallbackLatest || fallbackLatest.time < asOfTime) {
@@ -273,13 +213,15 @@ const generateQuarterlyAndYearlySummaries = async () => {
     vixDataset = await fetchSeries("VIXCLS");
   } catch (error) {
     console.warn(
-      `VIX series unavailable (${error instanceof Error ? error.message : error}); replaying without the market-stress adjustments.`,
+      `VIX series unavailable (${error instanceof Error ? error.message : String(error)}); replaying without the market-stress adjustments.`,
     );
   }
   /**
    * One threaded walk across quarters and years: machine state carries forward
    * so flips confirm through the gate, and each period supplies its trailing
-   * base-rate window and VIX reading.
+   * base-rate window and VIX reading. A partial run (`HISTORY_START_YEAR`)
+   * still walks from the first year and only filters which records it writes,
+   * so a merge lands with the same confirmations a full replay produces.
    */
   let machineState: RegimeMachineSnapshot | null = null;
   const basePoints = datasets.tenYear.points;
@@ -289,14 +231,14 @@ const generateQuarterlyAndYearlySummaries = async () => {
     getLatestValidDate(datasets.twoYear.points),
     getLatestValidDate(datasets.tenYear.points),
   ]
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .map((point) => point.time)
     .reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
   const latestFallback = [
     getLatestValidDate(datasets.oneMonth.points),
     getLatestValidDate(datasets.threeMonth.points),
   ]
-    .filter((point): point is SeriesPoint => Boolean(point))
+    .filter((point) => point !== null)
     .map((point) => point.time)
     .reduce((max, value) => Math.max(max, value), 0);
   const effectiveEndTime = Math.min(latestRequired, latestFallback);
@@ -308,7 +250,7 @@ const generateQuarterlyAndYearlySummaries = async () => {
     maxYear: effectiveEndYear,
   });
 
-  for (let year = startYear; year <= endYear; year += 1) {
+  for (let year = START_YEAR; year <= endYear; year += 1) {
     for (let quarter = 1; quarter <= 4; quarter += 1) {
       const month = quarter * 3;
       const asOf = resolveHistoricalDate(year, month);
@@ -343,6 +285,9 @@ const generateQuarterlyAndYearlySummaries = async () => {
         { baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, recordDate, asOfTime) },
       );
       machineState = assessment.regimeTransition?.snapshot ?? machineState;
+      if (year < startYear) {
+        continue;
+      }
       const recordDateLabel = formatDateValue(treasury.record_date);
       const inputSourceUrls = buildInputSourceUrls(assessment.scores.baseRateUsed);
       const provenance = buildProvenance(treasury.fetched_at, now);
@@ -402,6 +347,9 @@ const generateQuarterlyAndYearlySummaries = async () => {
       { baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, yearRecordDate, yearAsOfTime) },
     );
     machineState = yearAssessment.regimeTransition?.snapshot ?? machineState;
+    if (year < startYear) {
+      continue;
+    }
     const yearRecordDateLabel = formatDateValue(yearTreasury.record_date);
     const yearInputSourceUrls = buildInputSourceUrls(yearAssessment.scores.baseRateUsed);
     const yearProvenance = buildProvenance(yearTreasury.fetched_at, now);

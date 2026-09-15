@@ -64,6 +64,10 @@ type ReportDataLoaderDependencies = {
   getTimeMachineSnapshots: () => Array<TreasuryData & { year: number; month: number }>;
   getPreviousTimeMachineSnapshot: (recordDate: string) => TreasuryData | null;
   findTimeMachineSnapshot: (recordDate: string) => TreasuryData | null;
+  findTimeMachineGovernedAssessment: (
+    recordDate: string,
+    overrides?: Partial<RegimeThresholds>,
+  ) => RegimeAssessment | null;
   DEFAULT_REGIME_SERIES_MONTHS: number;
   loadCanonicalReportInputsIfAvailable: (options: { fetcher?: typeof fetch }) => Promise<{
     treasury: TreasuryData;
@@ -122,6 +126,7 @@ type ReportDataLoaderDependencies = {
     thresholds: RegimeThresholds;
     asOf: string;
     window?: number;
+    resolveGovernedAssessment?: (recordDate: string) => RegimeAssessment | null;
   }) => WeeklyConfidencePoint[];
   classifyConfidenceTrend: (points: WeeklyConfidencePoint[]) => ConfidenceTrendFraming;
   buildHistoricalAnalogs: (args: {
@@ -130,6 +135,7 @@ type ReportDataLoaderDependencies = {
     thresholds: RegimeThresholds;
     currentTrendDirection: ReportDynamics["directionLabel"];
     limit?: number;
+    resolveGovernedAssessment?: (recordDate: string) => RegimeAssessment | null;
   }) => HistoricalAnalog[];
   buildActionNowShort: (args: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & { regime?: RegimeAssessment["regime"] }) => string;
   buildFlipThreshold: (assessment: RegimeAssessment) => string;
@@ -360,9 +366,22 @@ export const loadReportDataUncachedInternal = async ({
   const treasuryAgeLabel = deps.formatAgeHours(treasury.fetched_at, now);
   const sensors = deps.buildSensorReadings(treasury);
   const previousMachineSnapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
+  /**
+   * A historical selection is a replay, not a point read: it must resolve
+   * against the governed walk whose machine state was threaded through the full
+   * prefix. Evaluating the snapshot against today's live machine snapshot
+   * published a different regime than /history and the archives list for the
+   * same month — the compare cards contradicted the very options that selected
+   * them. Falls back to the point evaluation only when the date sits outside
+   * the walk.
+   */
+  const governedHistoricalAssessment = historicalSelection
+    ? deps.findTimeMachineGovernedAssessment(treasury.record_date, thresholds)
+    : null;
   const assessment = projectsOperatingSnapshot && operatingSnapshot
     ? operatingSnapshot.assessment
-    : deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot, {
+    : governedHistoricalAssessment ??
+      deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot, {
         baseRateHistory: treasury.oneMonthHistory,
       });
   const liveAssessment = shouldLoadHistoricalLiveComparison
@@ -476,12 +495,25 @@ export const loadReportDataUncachedInternal = async ({
           priorRecordDate: lastYearSnapshot.record_date,
         })
       : null;
+  /**
+   * Historical confidence points and analog candidates resolve to the governed
+   * record — the threaded walk, with each month's VIX haircut and veto — not a
+   * bare re-evaluation of the curve. The current record date resolves to the
+   * assessment above, which already carries the live macro series. Off the
+   * bare curve February 2020 read risk appetite 51 where the record says 31,
+   * so its confidence history and analog rank were both wrong by that gap.
+   */
+  const resolveGovernedAssessment = (recordDate: string) =>
+    recordDate === treasury.record_date
+      ? assessment
+      : deps.findTimeMachineGovernedAssessment(recordDate, thresholds);
   const confidenceHistory = deps.buildWeeklyConfidenceSeries({
     snapshots: timeMachineSnapshots.map(({ year: _year, month: _month, ...snapshot }) => snapshot),
     currentSnapshot: treasury,
     thresholds,
     asOf: treasury.record_date,
     window: 8,
+    resolveGovernedAssessment,
   });
   const confidenceTrend = deps.classifyConfidenceTrend(confidenceHistory);
   const historicalAnalogs = deps.buildHistoricalAnalogs({
@@ -491,6 +523,7 @@ export const loadReportDataUncachedInternal = async ({
       .map(({ year: _year, month: _month, ...snapshot }) => snapshot),
     thresholds,
     currentTrendDirection: reportDynamics.directionLabel,
+    resolveGovernedAssessment,
   });
   const actionNowShort = deps.buildActionNowShort({ ...reportDynamics, regime: assessment.regime });
   // A threshold, not a playbook "stop" item. This read stopItems[0], so the
@@ -592,7 +625,11 @@ export const buildFallbackReportDataInternal = ({
   const cacheMonthsByYear = deps.getTimeMachineMonthsByYear();
   const regimeSeries = deps.getTimeMachineRegimeSeries(deps.DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = deps.getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
-  const assessment = deps.evaluateRegime(fallbackTreasury, thresholds, []);
+  // Same policy as the primary path: a historical replay resolves against the
+  // governed walk, which needs no network — exactly what a degraded read wants.
+  const assessment = (historicalSelection
+    ? deps.findTimeMachineGovernedAssessment(fallbackTreasury.record_date, thresholds)
+    : null) ?? deps.evaluateRegime(fallbackTreasury, thresholds, []);
   const liveAssessment = deps.evaluateRegime(fallbackTreasury, thresholds, []);
   const sensors = deps.buildSensorReadings(fallbackTreasury);
   const recordDateLabel = deps.formatDateUTC(fallbackTreasury.record_date);

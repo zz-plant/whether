@@ -7,18 +7,18 @@
     "asOf": "2010-12-31",
     "recordDateLabel": "Dec 31, 2010",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.07,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -54,28 +54,28 @@
         "slug": "2010-q1",
         "title": "Q1 2010",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2010-q2",
         "title": "Q2 2010",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2010-q3",
         "title": "Q3 2010",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2010-q4",
         "title": "Q4 2010",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -90,19 +90,19 @@
     "title": "2011",
     "asOf": "2011-12-31",
     "recordDateLabel": "Dec 30, 2011",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this year is to keep the plan flexible, sequence bets with exit ramps, and protect the core business.",
+    "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.01,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -138,29 +138,29 @@
         "slug": "2011-q1",
         "title": "Q1 2011",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2011-q2",
         "title": "Q2 2011",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2011-q3",
         "title": "Q3 2011",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2011-q4",
         "title": "Q4 2011",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       }
     ],
     "parentSlug": null,
@@ -175,18 +175,18 @@
     "asOf": "2012-12-31",
     "recordDateLabel": "Dec 31, 2012",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -218,7 +218,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 12,
         "share": 100
       }
@@ -229,28 +229,28 @@
         "slug": "2012-q1",
         "title": "Q1 2012",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2012-q2",
         "title": "Q2 2012",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2012-q3",
         "title": "Q3 2012",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2012-q4",
         "title": "Q4 2012",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -266,18 +266,18 @@
     "asOf": "2013-12-31",
     "recordDateLabel": "Dec 31, 2013",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.01,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -309,62 +309,39 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 11,
-        "share": 92
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Sunny",
+        "periods": 12,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2013-03-31",
-        "dateLabel": "Mar 31, 2013",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2013-04-30",
-        "dateLabel": "Apr 30, 2013",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [
       {
         "slug": "2013-q1",
         "title": "Q1 2013",
-        "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "EXPANSION",
+        "operatorLabel": "Sunny",
+        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2013-q2",
         "title": "Q2 2013",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2013-q3",
         "title": "Q3 2013",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2013-q4",
         "title": "Q4 2013",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -380,18 +357,18 @@
     "asOf": "2014-12-31",
     "recordDateLabel": "Dec 31, 2014",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.03,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -423,7 +400,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 12,
         "share": 100
       }
@@ -434,28 +411,28 @@
         "slug": "2014-q1",
         "title": "Q1 2014",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2014-q2",
         "title": "Q2 2014",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2014-q3",
         "title": "Q3 2014",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2014-q4",
         "title": "Q4 2014",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -471,18 +448,18 @@
     "asOf": "2015-12-31",
     "recordDateLabel": "Dec 31, 2015",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.14,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -514,7 +491,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 12,
         "share": 100
       }
@@ -525,28 +502,28 @@
         "slug": "2015-q1",
         "title": "Q1 2015",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2015-q2",
         "title": "Q2 2015",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2015-q3",
         "title": "Q3 2015",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2015-q4",
         "title": "Q4 2015",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -562,18 +539,18 @@
     "asOf": "2016-12-31",
     "recordDateLabel": "Dec 30, 2016",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.44,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -605,7 +582,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 12,
         "share": 100
       }
@@ -616,28 +593,28 @@
         "slug": "2016-q1",
         "title": "Q1 2016",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2016-q2",
         "title": "Q2 2016",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2016-q3",
         "title": "Q3 2016",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2016-q4",
         "title": "Q4 2016",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -653,18 +630,18 @@
     "asOf": "2017-12-31",
     "recordDateLabel": "Dec 29, 2017",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.28,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -696,7 +673,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 12,
         "share": 100
       }
@@ -707,28 +684,28 @@
         "slug": "2017-q1",
         "title": "Q1 2017",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2017-q2",
         "title": "Q2 2017",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2017-q3",
         "title": "Q3 2017",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2017-q4",
         "title": "Q4 2017",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -744,9 +721,9 @@
     "asOf": "2018-12-31",
     "recordDateLabel": "Dec 31, 2018",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This year, operate in Safety Mode: keep the plan flexible, sequence bets with exit ramps, and protect the core business. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this year is to keep the plan flexible, sequence bets with exit ramps, and protect the core business.",
     "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -755,7 +732,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 2.44,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -787,118 +764,54 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 35,
-        "share": 67
+        "label": "Sunny",
+        "periods": 48,
+        "share": 92
       },
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 17,
-        "share": 33
+        "label": "Stormy",
+        "periods": 4,
+        "share": 8
       }
     ],
     "transitions": [
       {
-        "asOf": "2018-03-30",
-        "dateLabel": "Mar 30, 2018",
+        "asOf": "2018-12-07",
+        "dateLabel": "Dec 7, 2018",
         "from": "EXPANSION",
-        "fromLabel": "Expand",
+        "fromLabel": "Sunny",
         "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2018-04-06",
-        "dateLabel": "Apr 6, 2018",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2018-07-13",
-        "dateLabel": "Jul 13, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2018-07-20",
-        "dateLabel": "Jul 20, 2018",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2018-08-10",
-        "dateLabel": "Aug 10, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2018-10-05",
-        "dateLabel": "Oct 5, 2018",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2018-11-09",
-        "dateLabel": "Nov 9, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2018-11-16",
-        "dateLabel": "Nov 16, 2018",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2018-11-23",
-        "dateLabel": "Nov 23, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "toLabel": "Stormy"
       }
     ],
     "children": [
       {
         "slug": "2018-q1",
         "title": "Q1 2018",
-        "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "EXPANSION",
+        "operatorLabel": "Sunny",
+        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2018-q2",
         "title": "Q2 2018",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2018-q3",
         "title": "Q3 2018",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2018-q4",
         "title": "Q4 2018",
         "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
+        "operatorLabel": "Stormy",
         "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       }
     ],
@@ -913,19 +826,19 @@
     "title": "2019",
     "asOf": "2019-12-31",
     "recordDateLabel": "Dec 31, 2019",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this year is to keep the plan flexible, sequence bets with exit ramps, and protect the core business.",
+    "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.48,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -957,87 +870,40 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 48,
-        "share": 92
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 4,
-        "share": 8
+        "label": "Stormy",
+        "periods": 52,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2019-06-21",
-        "dateLabel": "Jun 21, 2019",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2019-06-28",
-        "dateLabel": "Jun 28, 2019",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2019-07-12",
-        "dateLabel": "Jul 12, 2019",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2019-07-19",
-        "dateLabel": "Jul 19, 2019",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2019-12-20",
-        "dateLabel": "Dec 20, 2019",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [
       {
         "slug": "2019-q1",
         "title": "Q1 2019",
         "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
+        "operatorLabel": "Stormy",
         "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2019-q2",
         "title": "Q2 2019",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2019-q3",
         "title": "Q3 2019",
         "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
+        "operatorLabel": "Stormy",
         "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2019-q4",
         "title": "Q4 2019",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       }
     ],
     "parentSlug": null,
@@ -1051,19 +917,19 @@
     "title": "2020",
     "asOf": "2020-12-31",
     "recordDateLabel": "Dec 31, 2020",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this year is to keep the plan flexible, sequence bets with exit ramps, and protect the core business.",
+    "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.08,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1094,120 +960,56 @@
     "sampleCount": 53,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 42,
-        "share": 79
+        "regime": "VOLATILE",
+        "label": "Stormy",
+        "periods": 48,
+        "share": 91
       },
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 11,
-        "share": 21
+        "regime": "EXPANSION",
+        "label": "Sunny",
+        "periods": 5,
+        "share": 9
       }
     ],
     "transitions": [
       {
-        "asOf": "2020-01-17",
-        "dateLabel": "Jan 17, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-02-28",
-        "dateLabel": "Feb 28, 2020",
+        "asOf": "2020-12-04",
+        "dateLabel": "Dec 4, 2020",
         "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
+        "fromLabel": "Stormy",
         "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2020-03-06",
-        "dateLabel": "Mar 6, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-03-13",
-        "dateLabel": "Mar 13, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2020-04-10",
-        "dateLabel": "Apr 10, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-04-17",
-        "dateLabel": "Apr 17, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2020-07-03",
-        "dateLabel": "Jul 3, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-07-10",
-        "dateLabel": "Jul 10, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2020-12-25",
-        "dateLabel": "Dec 25, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "toLabel": "Sunny"
       }
     ],
     "children": [
       {
         "slug": "2020-q1",
         "title": "Q1 2020",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2020-q2",
         "title": "Q2 2020",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2020-q3",
         "title": "Q3 2020",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2020-q4",
         "title": "Q4 2020",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "VOLATILE",
+        "operatorLabel": "Stormy",
+        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       }
     ],
     "parentSlug": null,
@@ -1222,18 +1024,18 @@
     "asOf": "2021-12-31",
     "recordDateLabel": "Dec 31, 2021",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.06,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1265,62 +1067,39 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 51,
-        "share": 98
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 2
+        "label": "Sunny",
+        "periods": 52,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2021-12-24",
-        "dateLabel": "Dec 24, 2021",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2021-12-31",
-        "dateLabel": "Dec 31, 2021",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [
       {
         "slug": "2021-q1",
         "title": "Q1 2021",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2021-q2",
         "title": "Q2 2021",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2021-q3",
         "title": "Q3 2021",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2021-q4",
         "title": "Q4 2021",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -1335,19 +1114,19 @@
     "title": "2022",
     "asOf": "2022-12-31",
     "recordDateLabel": "Dec 30, 2022",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This year, operate in Safety Mode: keep the plan flexible, sequence bets with exit ramps, and protect the core business. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this year is to commit only to survival priorities, extend runway, and reset plans around cash preservation.",
+    "guidance": "commit only to survival priorities, extend runway, and reset plans around cash preservation",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.12,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1379,15 +1158,21 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 40,
-        "share": 77
+        "label": "Stormy",
+        "periods": 22,
+        "share": 42
+      },
+      {
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 22,
+        "share": 42
       },
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 23
+        "label": "Sunny",
+        "periods": 8,
+        "share": 15
       }
     ],
     "transitions": [
@@ -1395,41 +1180,17 @@
         "asOf": "2022-03-04",
         "dateLabel": "Mar 4, 2022",
         "from": "EXPANSION",
-        "fromLabel": "Expand",
+        "fromLabel": "Sunny",
         "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "toLabel": "Stormy"
       },
       {
-        "asOf": "2022-05-06",
-        "dateLabel": "May 6, 2022",
+        "asOf": "2022-08-05",
+        "dateLabel": "Aug 5, 2022",
         "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2022-05-20",
-        "dateLabel": "May 20, 2022",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2022-05-27",
-        "dateLabel": "May 27, 2022",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2022-06-10",
-        "dateLabel": "Jun 10, 2022",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "fromLabel": "Stormy",
+        "to": "SCARCITY",
+        "toLabel": "Freezing"
       }
     ],
     "children": [
@@ -1437,29 +1198,29 @@
         "slug": "2022-q1",
         "title": "Q1 2022",
         "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
+        "operatorLabel": "Stormy",
         "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2022-q2",
         "title": "Q2 2022",
         "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
+        "operatorLabel": "Stormy",
         "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2022-q3",
         "title": "Q3 2022",
         "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
+        "operatorLabel": "Stormy",
         "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
       },
       {
         "slug": "2022-q4",
         "title": "Q4 2022",
-        "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       }
     ],
     "parentSlug": null,
@@ -1474,9 +1235,9 @@
     "asOf": "2023-12-31",
     "recordDateLabel": "Dec 29, 2023",
     "regime": "SCARCITY",
-    "regimeLabel": "Survival Mode",
-    "operatorLabel": "Defend",
-    "headline": "This year, operate in Survival Mode: commit only to survival priorities, extend runway, and reset plans around cash preservation. Capital is expensive and risk appetite is low. Prioritize survival over growth.",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this year is to commit only to survival priorities, extend runway, and reset plans around cash preservation.",
     "guidance": "commit only to survival priorities, extend runway, and reset plans around cash preservation",
     "constraints": [
       "Shorten payback windows and preserve cash.",
@@ -1485,7 +1246,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 5.6,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1517,70 +1278,62 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
-        "periods": 31,
-        "share": 60
+        "label": "Freezing",
+        "periods": 51,
+        "share": 98
       },
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 21,
-        "share": 40
+        "label": "Stormy",
+        "periods": 1,
+        "share": 2
       }
     ],
     "transitions": [
       {
-        "asOf": "2023-05-05",
-        "dateLabel": "May 5, 2023",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "SCARCITY",
-        "toLabel": "Defend"
-      },
-      {
-        "asOf": "2023-06-09",
-        "dateLabel": "Jun 9, 2023",
+        "asOf": "2023-04-21",
+        "dateLabel": "Apr 21, 2023",
         "from": "SCARCITY",
-        "fromLabel": "Defend",
+        "fromLabel": "Freezing",
         "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "toLabel": "Stormy"
       },
       {
-        "asOf": "2023-07-07",
-        "dateLabel": "Jul 7, 2023",
+        "asOf": "2023-04-28",
+        "dateLabel": "Apr 28, 2023",
         "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
+        "fromLabel": "Stormy",
         "to": "SCARCITY",
-        "toLabel": "Defend"
+        "toLabel": "Freezing"
       }
     ],
     "children": [
       {
         "slug": "2023-q1",
         "title": "Q1 2023",
-        "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2023-q2",
         "title": "Q2 2023",
         "regime": "SCARCITY",
-        "operatorLabel": "Defend",
+        "operatorLabel": "Freezing",
         "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2023-q3",
         "title": "Q3 2023",
         "regime": "SCARCITY",
-        "operatorLabel": "Defend",
+        "operatorLabel": "Freezing",
         "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2023-q4",
         "title": "Q4 2023",
         "regime": "SCARCITY",
-        "operatorLabel": "Defend",
+        "operatorLabel": "Freezing",
         "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       }
     ],
@@ -1595,19 +1348,19 @@
     "title": "2024",
     "asOf": "2024-12-31",
     "recordDateLabel": "Dec 31, 2024",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this year is to commit only to survival priorities, extend runway, and reset plans around cash preservation.",
+    "guidance": "commit only to survival priorities, extend runway, and reset plans around cash preservation",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.4,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1639,85 +1392,40 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
-        "periods": 34,
-        "share": 65
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 17,
-        "share": 33
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 1,
-        "share": 2
+        "label": "Freezing",
+        "periods": 52,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2024-03-29",
-        "dateLabel": "Mar 29, 2024",
-        "from": "SCARCITY",
-        "fromLabel": "Defend",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2024-04-05",
-        "dateLabel": "Apr 5, 2024",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "SCARCITY",
-        "toLabel": "Defend"
-      },
-      {
-        "asOf": "2024-09-06",
-        "dateLabel": "Sep 6, 2024",
-        "from": "SCARCITY",
-        "fromLabel": "Defend",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2024-12-27",
-        "dateLabel": "Dec 27, 2024",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [
       {
         "slug": "2024-q1",
         "title": "Q1 2024",
-        "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2024-q2",
         "title": "Q2 2024",
         "regime": "SCARCITY",
-        "operatorLabel": "Defend",
+        "operatorLabel": "Freezing",
         "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2024-q3",
         "title": "Q3 2024",
-        "regime": "VOLATILE",
-        "operatorLabel": "Guarded Expand",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2024-q4",
         "title": "Q4 2024",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       }
     ],
     "parentSlug": null,
@@ -1732,18 +1440,18 @@
     "asOf": "2025-12-31",
     "recordDateLabel": "Dec 31, 2025",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This year, operate in Growth Mode: commit to growth investments, scale core winners, and maintain payback discipline. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
     "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 3.74,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1774,95 +1482,69 @@
     "sampleCount": 52,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 46,
-        "share": 88
+        "regime": "DEFENSIVE",
+        "label": "Cloudy",
+        "periods": 29,
+        "share": 56
       },
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 6,
-        "share": 12
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 19,
+        "share": 37
+      },
+      {
+        "regime": "EXPANSION",
+        "label": "Sunny",
+        "periods": 4,
+        "share": 8
       }
     ],
     "transitions": [
       {
-        "asOf": "2025-02-07",
-        "dateLabel": "Feb 7, 2025",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "asOf": "2025-05-16",
+        "dateLabel": "May 16, 2025",
+        "from": "SCARCITY",
+        "fromLabel": "Freezing",
+        "to": "DEFENSIVE",
+        "toLabel": "Cloudy"
       },
       {
-        "asOf": "2025-03-07",
-        "dateLabel": "Mar 7, 2025",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
+        "asOf": "2025-12-05",
+        "dateLabel": "Dec 5, 2025",
+        "from": "DEFENSIVE",
+        "fromLabel": "Cloudy",
         "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2025-04-18",
-        "dateLabel": "Apr 18, 2025",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2025-04-25",
-        "dateLabel": "Apr 25, 2025",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2025-07-04",
-        "dateLabel": "Jul 4, 2025",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2025-07-11",
-        "dateLabel": "Jul 11, 2025",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
+        "toLabel": "Sunny"
       }
     ],
     "children": [
       {
         "slug": "2025-q1",
         "title": "Q1 2025",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2025-q2",
         "title": "Q2 2025",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "DEFENSIVE",
+        "operatorLabel": "Cloudy",
+        "guidance": "prioritize durable revenue, reduce structural cost, and sequence bets around resilience"
       },
       {
         "slug": "2025-q3",
         "title": "Q3 2025",
-        "regime": "EXPANSION",
-        "operatorLabel": "Expand",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "DEFENSIVE",
+        "operatorLabel": "Cloudy",
+        "guidance": "prioritize durable revenue, reduce structural cost, and sequence bets around resilience"
       },
       {
         "slug": "2025-q4",
         "title": "Q4 2025",
         "regime": "EXPANSION",
-        "operatorLabel": "Expand",
+        "operatorLabel": "Sunny",
         "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
@@ -1879,18 +1561,18 @@
     "asOf": "2010-03-31",
     "recordDateLabel": "Mar 31, 2010",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.15,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1935,18 +1617,18 @@
     "asOf": "2010-06-30",
     "recordDateLabel": "Jun 30, 2010",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.17,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -1991,18 +1673,18 @@
     "asOf": "2010-09-30",
     "recordDateLabel": "Sep 30, 2010",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.14,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2047,18 +1729,18 @@
     "asOf": "2010-12-31",
     "recordDateLabel": "Dec 31, 2010",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.07,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2103,18 +1785,18 @@
     "asOf": "2011-03-31",
     "recordDateLabel": "Mar 31, 2011",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.05,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2159,18 +1841,18 @@
     "asOf": "2011-06-30",
     "recordDateLabel": "Jun 30, 2011",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.01,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2214,19 +1896,19 @@
     "title": "Q3 2011",
     "asOf": "2011-09-30",
     "recordDateLabel": "Sep 30, 2011",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2270,19 +1952,19 @@
     "title": "Q4 2011",
     "asOf": "2011-12-31",
     "recordDateLabel": "Dec 30, 2011",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.01,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2327,18 +2009,18 @@
     "asOf": "2012-03-31",
     "recordDateLabel": "Mar 30, 2012",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.05,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2370,7 +2052,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2390,18 +2072,18 @@
     "asOf": "2012-06-30",
     "recordDateLabel": "Jun 29, 2012",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.04,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2433,7 +2115,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2453,18 +2135,18 @@
     "asOf": "2012-09-30",
     "recordDateLabel": "Sep 28, 2012",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.06,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2496,7 +2178,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2516,18 +2198,18 @@
     "asOf": "2012-12-31",
     "recordDateLabel": "Dec 31, 2012",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2559,7 +2241,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2577,39 +2259,39 @@
     "quarter": 1,
     "title": "Q1 2013",
     "asOf": "2013-03-31",
-    "recordDateLabel": "Mar 29, 2013",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "recordDateLabel": "Mar 28, 2013",
+    "regime": "EXPANSION",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
+    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
-        "value": 0,
+        "label": "The 1-month Treasury bill (1M)",
+        "value": 0.04,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
       },
       {
         "label": "US Treasury 2Y",
-        "value": 0,
+        "value": 0.25,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
       },
       {
         "label": "US Treasury 10Y",
-        "value": 0,
+        "value": 1.87,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
       },
       {
         "label": "Yield curve slope (10Y - 2Y)",
-        "value": 0,
+        "value": 1.62,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
       }
@@ -2622,27 +2304,12 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 2,
-        "share": 67
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 33
+        "label": "Sunny",
+        "periods": 3,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2013-03-31",
-        "dateLabel": "Mar 31, 2013",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2013",
     "previousSlug": "2012-q4",
@@ -2657,18 +2324,18 @@
     "asOf": "2013-06-30",
     "recordDateLabel": "Jun 28, 2013",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2700,7 +2367,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2720,18 +2387,18 @@
     "asOf": "2013-09-30",
     "recordDateLabel": "Sep 30, 2013",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.03,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2763,7 +2430,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2783,18 +2450,18 @@
     "asOf": "2013-12-31",
     "recordDateLabel": "Dec 31, 2013",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.01,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2826,7 +2493,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2846,18 +2513,18 @@
     "asOf": "2014-03-31",
     "recordDateLabel": "Mar 31, 2014",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.03,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2889,7 +2556,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2909,18 +2576,18 @@
     "asOf": "2014-06-30",
     "recordDateLabel": "Jun 30, 2014",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -2952,7 +2619,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -2972,18 +2639,18 @@
     "asOf": "2014-09-30",
     "recordDateLabel": "Sep 30, 2014",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3015,7 +2682,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3035,18 +2702,18 @@
     "asOf": "2014-12-31",
     "recordDateLabel": "Dec 31, 2014",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.03,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3078,7 +2745,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3098,18 +2765,18 @@
     "asOf": "2015-03-31",
     "recordDateLabel": "Mar 31, 2015",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.05,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3141,7 +2808,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3161,18 +2828,18 @@
     "asOf": "2015-06-30",
     "recordDateLabel": "Jun 30, 2015",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.02,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3204,7 +2871,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3224,18 +2891,18 @@
     "asOf": "2015-09-30",
     "recordDateLabel": "Sep 30, 2015",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3267,7 +2934,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3287,18 +2954,18 @@
     "asOf": "2015-12-31",
     "recordDateLabel": "Dec 31, 2015",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.14,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3330,7 +2997,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3350,18 +3017,18 @@
     "asOf": "2016-03-31",
     "recordDateLabel": "Mar 31, 2016",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.18,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3393,7 +3060,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3413,18 +3080,18 @@
     "asOf": "2016-06-30",
     "recordDateLabel": "Jun 30, 2016",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.2,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3456,7 +3123,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3476,18 +3143,18 @@
     "asOf": "2016-09-30",
     "recordDateLabel": "Sep 30, 2016",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.2,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3519,7 +3186,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3539,18 +3206,18 @@
     "asOf": "2016-12-31",
     "recordDateLabel": "Dec 30, 2016",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.44,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3582,7 +3249,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3602,18 +3269,18 @@
     "asOf": "2017-03-31",
     "recordDateLabel": "Mar 31, 2017",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.74,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3645,7 +3312,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3665,18 +3332,18 @@
     "asOf": "2017-06-30",
     "recordDateLabel": "Jun 30, 2017",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.84,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3708,7 +3375,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3728,18 +3395,18 @@
     "asOf": "2017-09-30",
     "recordDateLabel": "Sep 29, 2017",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.96,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3771,7 +3438,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3791,18 +3458,18 @@
     "asOf": "2017-12-31",
     "recordDateLabel": "Dec 29, 2017",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.28,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3834,7 +3501,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 3,
         "share": 100
       }
@@ -3852,39 +3519,39 @@
     "quarter": 1,
     "title": "Q1 2018",
     "asOf": "2018-03-31",
-    "recordDateLabel": "Mar 30, 2018",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "recordDateLabel": "Mar 29, 2018",
+    "regime": "EXPANSION",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
+    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
-        "value": 0,
+        "label": "The 1-month Treasury bill (1M)",
+        "value": 1.63,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
       },
       {
         "label": "US Treasury 2Y",
-        "value": 0,
+        "value": 2.27,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
       },
       {
         "label": "US Treasury 10Y",
-        "value": 0,
+        "value": 2.74,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
       },
       {
         "label": "Yield curve slope (10Y - 2Y)",
-        "value": 0,
+        "value": 0.4700000000000002,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
       }
@@ -3897,27 +3564,12 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Sunny",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2018-03-30",
-        "dateLabel": "Mar 30, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2018",
     "previousSlug": "2017-q4",
@@ -3932,18 +3584,18 @@
     "asOf": "2018-06-30",
     "recordDateLabel": "Jun 29, 2018",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.77,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -3975,7 +3627,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 13,
         "share": 100
       }
@@ -3995,18 +3647,18 @@
     "asOf": "2018-09-30",
     "recordDateLabel": "Sep 28, 2018",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 2.12,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4037,44 +3689,13 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 9,
-        "share": 69
-      },
-      {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 4,
-        "share": 31
+        "label": "Sunny",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2018-07-13",
-        "dateLabel": "Jul 13, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2018-07-20",
-        "dateLabel": "Jul 20, 2018",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2018-08-10",
-        "dateLabel": "Aug 10, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2018",
     "previousSlug": "2018-q2",
@@ -4089,9 +3710,9 @@
     "asOf": "2018-12-31",
     "recordDateLabel": "Dec 31, 2018",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
     "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -4100,7 +3721,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 2.44,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4131,42 +3752,26 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 7,
-        "share": 54
+        "regime": "EXPANSION",
+        "label": "Sunny",
+        "periods": 9,
+        "share": 69
       },
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 6,
-        "share": 46
+        "regime": "VOLATILE",
+        "label": "Stormy",
+        "periods": 4,
+        "share": 31
       }
     ],
     "transitions": [
       {
-        "asOf": "2018-11-09",
-        "dateLabel": "Nov 9, 2018",
+        "asOf": "2018-12-07",
+        "dateLabel": "Dec 7, 2018",
         "from": "EXPANSION",
-        "fromLabel": "Expand",
+        "fromLabel": "Sunny",
         "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2018-11-16",
-        "dateLabel": "Nov 16, 2018",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2018-11-23",
-        "dateLabel": "Nov 23, 2018",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "toLabel": "Stormy"
       }
     ],
     "children": [],
@@ -4183,9 +3788,9 @@
     "asOf": "2019-03-31",
     "recordDateLabel": "Mar 29, 2019",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
     "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -4194,7 +3799,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 2.43,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4226,7 +3831,7 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
+        "label": "Stormy",
         "periods": 13,
         "share": 100
       }
@@ -4245,19 +3850,19 @@
     "title": "Q2 2019",
     "asOf": "2019-06-30",
     "recordDateLabel": "Jun 28, 2019",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 2.18,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4289,35 +3894,12 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Stormy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2019-06-21",
-        "dateLabel": "Jun 21, 2019",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2019-06-28",
-        "dateLabel": "Jun 28, 2019",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2019",
     "previousSlug": "2019-q1",
@@ -4332,9 +3914,9 @@
     "asOf": "2019-09-30",
     "recordDateLabel": "Sep 30, 2019",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
     "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -4343,7 +3925,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.91,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4375,35 +3957,12 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Stormy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2019-07-12",
-        "dateLabel": "Jul 12, 2019",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2019-07-19",
-        "dateLabel": "Jul 19, 2019",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2019",
     "previousSlug": "2019-q2",
@@ -4417,19 +3976,19 @@
     "title": "Q4 2019",
     "asOf": "2019-12-31",
     "recordDateLabel": "Dec 31, 2019",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.48,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4461,27 +4020,12 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 11,
-        "share": 85
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 2,
-        "share": 15
+        "label": "Stormy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2019-12-20",
-        "dateLabel": "Dec 20, 2019",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2019",
     "previousSlug": "2019-q3",
@@ -4495,19 +4039,19 @@
     "title": "Q1 2020",
     "asOf": "2020-03-31",
     "recordDateLabel": "Mar 31, 2020",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.05,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4539,57 +4083,25 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 8,
-        "share": 57
+        "label": "Stormy",
+        "periods": 13,
+        "share": 93
       },
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 6,
-        "share": 43
+        "label": "Sunny",
+        "periods": 1,
+        "share": 7
       }
     ],
     "transitions": [
       {
-        "asOf": "2020-01-17",
-        "dateLabel": "Jan 17, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-02-28",
-        "dateLabel": "Feb 28, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2020-03-06",
-        "dateLabel": "Mar 6, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-03-13",
-        "dateLabel": "Mar 13, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
         "asOf": "2021-01-01",
         "dateLabel": "Jan 1, 2021",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "from": "VOLATILE",
+        "fromLabel": "Stormy",
+        "to": "EXPANSION",
+        "toLabel": "Sunny"
       }
     ],
     "children": [],
@@ -4605,19 +4117,19 @@
     "title": "Q2 2020",
     "asOf": "2020-06-30",
     "recordDateLabel": "Jun 30, 2020",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.13,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4648,36 +4160,13 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Stormy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2020-04-10",
-        "dateLabel": "Apr 10, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2020-04-17",
-        "dateLabel": "Apr 17, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2020",
     "previousSlug": "2020-q1",
@@ -4691,19 +4180,19 @@
     "title": "Q3 2020",
     "asOf": "2020-09-30",
     "recordDateLabel": "Sep 30, 2020",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.08,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4734,28 +4223,13 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Stormy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2020-07-10",
-        "dateLabel": "Jul 10, 2020",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2020",
     "previousSlug": "2020-q2",
@@ -4769,19 +4243,19 @@
     "title": "Q4 2020",
     "asOf": "2020-12-31",
     "recordDateLabel": "Dec 31, 2020",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "VOLATILE",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
+    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.08,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4812,26 +4286,26 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 92
+        "regime": "VOLATILE",
+        "label": "Stormy",
+        "periods": 9,
+        "share": 69
       },
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "regime": "EXPANSION",
+        "label": "Sunny",
+        "periods": 4,
+        "share": 31
       }
     ],
     "transitions": [
       {
-        "asOf": "2020-12-25",
-        "dateLabel": "Dec 25, 2020",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "asOf": "2020-12-04",
+        "dateLabel": "Dec 4, 2020",
+        "from": "VOLATILE",
+        "fromLabel": "Stormy",
+        "to": "EXPANSION",
+        "toLabel": "Sunny"
       }
     ],
     "children": [],
@@ -4848,18 +4322,18 @@
     "asOf": "2021-03-31",
     "recordDateLabel": "Mar 31, 2021",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.01,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4891,7 +4365,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 12,
         "share": 100
       }
@@ -4911,18 +4385,18 @@
     "asOf": "2021-06-30",
     "recordDateLabel": "Jun 30, 2021",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.05,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -4954,7 +4428,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 13,
         "share": 100
       }
@@ -4974,18 +4448,18 @@
     "asOf": "2021-09-30",
     "recordDateLabel": "Sep 30, 2021",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.07,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5017,7 +4491,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 13,
         "share": 100
       }
@@ -5037,18 +4511,18 @@
     "asOf": "2021-12-31",
     "recordDateLabel": "Dec 31, 2021",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.06,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5080,35 +4554,12 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 13,
-        "share": 93
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 7
+        "label": "Sunny",
+        "periods": 14,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2021-12-24",
-        "dateLabel": "Dec 24, 2021",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2021-12-31",
-        "dateLabel": "Dec 31, 2021",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2021",
     "previousSlug": "2021-q3",
@@ -5123,9 +4574,9 @@
     "asOf": "2022-03-31",
     "recordDateLabel": "Mar 31, 2022",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
     "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -5134,7 +4585,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 0.17,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5166,13 +4617,13 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 8,
         "share": 67
       },
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
+        "label": "Stormy",
         "periods": 4,
         "share": 33
       }
@@ -5182,9 +4633,9 @@
         "asOf": "2022-03-04",
         "dateLabel": "Mar 4, 2022",
         "from": "EXPANSION",
-        "fromLabel": "Expand",
+        "fromLabel": "Sunny",
         "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "toLabel": "Stormy"
       }
     ],
     "children": [],
@@ -5201,9 +4652,9 @@
     "asOf": "2022-06-30",
     "recordDateLabel": "Jun 30, 2022",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
     "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -5212,7 +4663,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 1.28,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5244,51 +4695,12 @@
     "regimeMix": [
       {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 9,
-        "share": 69
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 4,
-        "share": 31
+        "label": "Stormy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2022-05-06",
-        "dateLabel": "May 6, 2022",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2022-05-20",
-        "dateLabel": "May 20, 2022",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2022-05-27",
-        "dateLabel": "May 27, 2022",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      },
-      {
-        "asOf": "2022-06-10",
-        "dateLabel": "Jun 10, 2022",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2022",
     "previousSlug": "2022-q1",
@@ -5303,9 +4715,9 @@
     "asOf": "2022-09-30",
     "recordDateLabel": "Sep 30, 2022",
     "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
+    "regimeLabel": "Stormy",
+    "operatorLabel": "Stormy",
+    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
     "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
     "constraints": [
       "Ship reliability and security before novelty.",
@@ -5314,7 +4726,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 2.79,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5345,13 +4757,28 @@
     "sampleCount": 14,
     "regimeMix": [
       {
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 9,
+        "share": 64
+      },
+      {
         "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 14,
-        "share": 100
+        "label": "Stormy",
+        "periods": 5,
+        "share": 36
       }
     ],
-    "transitions": [],
+    "transitions": [
+      {
+        "asOf": "2022-08-05",
+        "dateLabel": "Aug 5, 2022",
+        "from": "VOLATILE",
+        "fromLabel": "Stormy",
+        "to": "SCARCITY",
+        "toLabel": "Freezing"
+      }
+    ],
     "children": [],
     "parentSlug": "2022",
     "previousSlug": "2022-q2",
@@ -5365,19 +4792,19 @@
     "title": "Q4 2022",
     "asOf": "2022-12-31",
     "recordDateLabel": "Dec 30, 2022",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.12,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5408,8 +4835,8 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
+        "regime": "SCARCITY",
+        "label": "Freezing",
         "periods": 13,
         "share": 100
       }
@@ -5428,19 +4855,19 @@
     "title": "Q1 2023",
     "asOf": "2023-03-31",
     "recordDateLabel": "Mar 31, 2023",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.74,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5471,8 +4898,8 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
+        "regime": "SCARCITY",
+        "label": "Freezing",
         "periods": 13,
         "share": 100
       }
@@ -5492,9 +4919,9 @@
     "asOf": "2023-06-30",
     "recordDateLabel": "Jun 30, 2023",
     "regime": "SCARCITY",
-    "regimeLabel": "Survival Mode",
-    "operatorLabel": "Defend",
-    "headline": "This quarter, operate in Survival Mode: lock discretionary spend, extend runway, and demand tighter payback before expanding plans. Capital is expensive and risk appetite is low. Prioritize survival over growth.",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
     "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
       "Shorten payback windows and preserve cash.",
@@ -5503,7 +4930,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 5.24,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5534,34 +4961,34 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 8,
-        "share": 62
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 12,
+        "share": 92
       },
       {
-        "regime": "SCARCITY",
-        "label": "Defend",
-        "periods": 5,
-        "share": 38
+        "regime": "VOLATILE",
+        "label": "Stormy",
+        "periods": 1,
+        "share": 8
       }
     ],
     "transitions": [
       {
-        "asOf": "2023-05-05",
-        "dateLabel": "May 5, 2023",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "SCARCITY",
-        "toLabel": "Defend"
+        "asOf": "2023-04-21",
+        "dateLabel": "Apr 21, 2023",
+        "from": "SCARCITY",
+        "fromLabel": "Freezing",
+        "to": "VOLATILE",
+        "toLabel": "Stormy"
       },
       {
-        "asOf": "2023-06-09",
-        "dateLabel": "Jun 9, 2023",
-        "from": "SCARCITY",
-        "fromLabel": "Defend",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
+        "asOf": "2023-04-28",
+        "dateLabel": "Apr 28, 2023",
+        "from": "VOLATILE",
+        "fromLabel": "Stormy",
+        "to": "SCARCITY",
+        "toLabel": "Freezing"
       }
     ],
     "children": [],
@@ -5578,9 +5005,9 @@
     "asOf": "2023-09-30",
     "recordDateLabel": "Sep 29, 2023",
     "regime": "SCARCITY",
-    "regimeLabel": "Survival Mode",
-    "operatorLabel": "Defend",
-    "headline": "This quarter, operate in Survival Mode: lock discretionary spend, extend runway, and demand tighter payback before expanding plans. Capital is expensive and risk appetite is low. Prioritize survival over growth.",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
     "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
       "Shorten payback windows and preserve cash.",
@@ -5589,7 +5016,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 5.55,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5621,7 +5048,7 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
+        "label": "Freezing",
         "periods": 13,
         "share": 100
       }
@@ -5641,9 +5068,9 @@
     "asOf": "2023-12-31",
     "recordDateLabel": "Dec 29, 2023",
     "regime": "SCARCITY",
-    "regimeLabel": "Survival Mode",
-    "operatorLabel": "Defend",
-    "headline": "This quarter, operate in Survival Mode: lock discretionary spend, extend runway, and demand tighter payback before expanding plans. Capital is expensive and risk appetite is low. Prioritize survival over growth.",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
     "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
       "Shorten payback windows and preserve cash.",
@@ -5652,7 +5079,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 5.6,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5684,7 +5111,7 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
+        "label": "Freezing",
         "periods": 13,
         "share": 100
       }
@@ -5702,39 +5129,39 @@
     "quarter": 1,
     "title": "Q1 2024",
     "asOf": "2024-03-31",
-    "recordDateLabel": "Mar 29, 2024",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "recordDateLabel": "Mar 28, 2024",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
-        "value": 0,
+        "label": "The 1-month Treasury bill (1M)",
+        "value": 5.49,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
       },
       {
         "label": "US Treasury 2Y",
-        "value": 0,
+        "value": 4.59,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
       },
       {
         "label": "US Treasury 10Y",
-        "value": 0,
+        "value": 4.2,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
       },
       {
         "label": "Yield curve slope (10Y - 2Y)",
-        "value": 0,
+        "value": -0.3899999999999997,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
       }
@@ -5747,27 +5174,12 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
-        "periods": 12,
-        "share": 92
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "label": "Freezing",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2024-03-29",
-        "dateLabel": "Mar 29, 2024",
-        "from": "SCARCITY",
-        "fromLabel": "Defend",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2024",
     "previousSlug": "2023-q4",
@@ -5782,9 +5194,9 @@
     "asOf": "2024-06-30",
     "recordDateLabel": "Jun 28, 2024",
     "regime": "SCARCITY",
-    "regimeLabel": "Survival Mode",
-    "operatorLabel": "Defend",
-    "headline": "This quarter, operate in Survival Mode: lock discretionary spend, extend runway, and demand tighter payback before expanding plans. Capital is expensive and risk appetite is low. Prioritize survival over growth.",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
     "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
       "Shorten payback windows and preserve cash.",
@@ -5793,7 +5205,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 5.47,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5825,7 +5237,7 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
+        "label": "Freezing",
         "periods": 13,
         "share": 100
       }
@@ -5844,19 +5256,19 @@
     "title": "Q3 2024",
     "asOf": "2024-09-30",
     "recordDateLabel": "Sep 30, 2024",
-    "regime": "VOLATILE",
-    "regimeLabel": "Safety Mode",
-    "operatorLabel": "Guarded Expand",
-    "headline": "This quarter, operate in Safety Mode: balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs. Capital is cheaper but risk appetite is weak. Build trust and resilience.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.93,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5888,27 +5300,12 @@
     "regimeMix": [
       {
         "regime": "SCARCITY",
-        "label": "Defend",
-        "periods": 9,
-        "share": 69
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 4,
-        "share": 31
+        "label": "Freezing",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2024-09-06",
-        "dateLabel": "Sep 6, 2024",
-        "from": "SCARCITY",
-        "fromLabel": "Defend",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2024",
     "previousSlug": "2024-q2",
@@ -5922,19 +5319,19 @@
     "title": "Q4 2024",
     "asOf": "2024-12-31",
     "recordDateLabel": "Dec 31, 2024",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.4,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -5965,28 +5362,13 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 1,
-        "share": 8
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2024-12-27",
-        "dateLabel": "Dec 27, 2024",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2024",
     "previousSlug": "2024-q3",
@@ -6000,19 +5382,19 @@
     "title": "Q1 2025",
     "asOf": "2025-03-31",
     "recordDateLabel": "Mar 31, 2025",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.38,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -6043,36 +5425,13 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 9,
-        "share": 69
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 4,
-        "share": 31
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2025-02-07",
-        "dateLabel": "Feb 7, 2025",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2025-03-07",
-        "dateLabel": "Mar 7, 2025",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2025",
     "previousSlug": "2024-q4",
@@ -6086,19 +5445,19 @@
     "title": "Q2 2025",
     "asOf": "2025-06-30",
     "recordDateLabel": "Jun 30, 2025",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "DEFENSIVE",
+    "regimeLabel": "Cloudy",
+    "operatorLabel": "Cloudy",
+    "headline": "Cloudy mode. Capital is expensive but funding stays selective. Operate for efficiency. The job this quarter is to prioritize durable revenue, reduce structural cost, and sequence bets around resilience.",
+    "guidance": "prioritize durable revenue, reduce structural cost, and sequence bets around resilience",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Focus on margin expansion and retention.",
+      "Cut low-leverage experiments.",
+      "Convert demand with tighter sales cycles."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.28,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -6129,34 +5488,26 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 92
+        "regime": "DEFENSIVE",
+        "label": "Cloudy",
+        "periods": 7,
+        "share": 54
       },
       {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "regime": "SCARCITY",
+        "label": "Freezing",
+        "periods": 6,
+        "share": 46
       }
     ],
     "transitions": [
       {
-        "asOf": "2025-04-18",
-        "dateLabel": "Apr 18, 2025",
-        "from": "EXPANSION",
-        "fromLabel": "Expand",
-        "to": "VOLATILE",
-        "toLabel": "Guarded Expand"
-      },
-      {
-        "asOf": "2025-04-25",
-        "dateLabel": "Apr 25, 2025",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
+        "asOf": "2025-05-16",
+        "dateLabel": "May 16, 2025",
+        "from": "SCARCITY",
+        "fromLabel": "Freezing",
+        "to": "DEFENSIVE",
+        "toLabel": "Cloudy"
       }
     ],
     "children": [],
@@ -6172,19 +5523,19 @@
     "title": "Q3 2025",
     "asOf": "2025-09-30",
     "recordDateLabel": "Sep 30, 2025",
-    "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "DEFENSIVE",
+    "regimeLabel": "Cloudy",
+    "operatorLabel": "Cloudy",
+    "headline": "Cloudy mode. Capital is expensive but funding stays selective. Operate for efficiency. The job this quarter is to prioritize durable revenue, reduce structural cost, and sequence bets around resilience.",
+    "guidance": "prioritize durable revenue, reduce structural cost, and sequence bets around resilience",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Focus on margin expansion and retention.",
+      "Cut low-leverage experiments.",
+      "Convert demand with tighter sales cycles."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 4.2,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -6215,28 +5566,13 @@
     "sampleCount": 13,
     "regimeMix": [
       {
-        "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 12,
-        "share": 92
-      },
-      {
-        "regime": "VOLATILE",
-        "label": "Guarded Expand",
-        "periods": 1,
-        "share": 8
+        "regime": "DEFENSIVE",
+        "label": "Cloudy",
+        "periods": 13,
+        "share": 100
       }
     ],
-    "transitions": [
-      {
-        "asOf": "2025-07-11",
-        "dateLabel": "Jul 11, 2025",
-        "from": "VOLATILE",
-        "fromLabel": "Guarded Expand",
-        "to": "EXPANSION",
-        "toLabel": "Expand"
-      }
-    ],
+    "transitions": [],
     "children": [],
     "parentSlug": "2025",
     "previousSlug": "2025-q2",
@@ -6251,18 +5587,18 @@
     "asOf": "2025-12-31",
     "recordDateLabel": "Dec 31, 2025",
     "regime": "EXPANSION",
-    "regimeLabel": "Growth Mode",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Growth Mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 3.74,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -6293,13 +5629,28 @@
     "sampleCount": 13,
     "regimeMix": [
       {
+        "regime": "DEFENSIVE",
+        "label": "Cloudy",
+        "periods": 9,
+        "share": 69
+      },
+      {
         "regime": "EXPANSION",
-        "label": "Expand",
-        "periods": 13,
-        "share": 100
+        "label": "Sunny",
+        "periods": 4,
+        "share": 31
       }
     ],
-    "transitions": [],
+    "transitions": [
+      {
+        "asOf": "2025-12-05",
+        "dateLabel": "Dec 5, 2025",
+        "from": "DEFENSIVE",
+        "fromLabel": "Cloudy",
+        "to": "EXPANSION",
+        "toLabel": "Sunny"
+      }
+    ],
     "children": [],
     "parentSlug": "2025",
     "previousSlug": "2025-q3",
@@ -6314,9 +5665,9 @@
     "asOf": "2026-03-31",
     "recordDateLabel": "Mar 31, 2026",
     "regime": "EXPANSION",
-    "regimeLabel": "Expand",
-    "operatorLabel": "Expand",
-    "headline": "This quarter, operate in Expand mode: scale the strongest plays, invest in growth engines, and keep payback discipline steady. Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
     "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
       "Prioritize reach and learning velocity over perfect finish.",
@@ -6325,7 +5676,7 @@
     ],
     "rates": [
       {
-        "label": "Policy base rate (1M)",
+        "label": "The 1-month Treasury bill (1M)",
         "value": 3.74,
         "unit": "%",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
@@ -6357,7 +5708,7 @@
     "regimeMix": [
       {
         "regime": "EXPANSION",
-        "label": "Expand",
+        "label": "Sunny",
         "periods": 13,
         "share": 100
       }
@@ -6366,6 +5717,69 @@
     "children": [],
     "parentSlug": null,
     "previousSlug": "2025-q4",
+    "nextSlug": "2026-q2"
+  },
+  {
+    "slug": "2026-q2",
+    "kind": "quarter",
+    "year": 2026,
+    "quarter": 2,
+    "title": "Q2 2026",
+    "asOf": "2026-06-30",
+    "recordDateLabel": "Jun 30, 2026",
+    "regime": "EXPANSION",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
+    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "constraints": [
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
+    ],
+    "rates": [
+      {
+        "label": "The 1-month Treasury bill (1M)",
+        "value": 3.7,
+        "unit": "%",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "label": "US Treasury 2Y",
+        "value": 4.14,
+        "unit": "%",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
+      },
+      {
+        "label": "US Treasury 10Y",
+        "value": 4.44,
+        "unit": "%",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
+      },
+      {
+        "label": "Yield curve slope (10Y - 2Y)",
+        "value": 0.3000000000000007,
+        "unit": "%",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
+      }
+    ],
+    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+    "statusLabel": "Historical (simulated)",
+    "sampleCadence": "weekly",
+    "sampleCount": 13,
+    "regimeMix": [
+      {
+        "regime": "EXPANSION",
+        "label": "Sunny",
+        "periods": 13,
+        "share": 100
+      }
+    ],
+    "transitions": [],
+    "children": [],
+    "parentSlug": null,
+    "previousSlug": "2026-q1",
     "nextSlug": null
   }
 ]

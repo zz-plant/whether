@@ -5,11 +5,23 @@
 import { z } from "zod";
 import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
 import { TreasuryDataSchema } from "../treasury/treasurySchema";
-import { evaluateRegime } from "../regimeEngine";
+import { evaluateRegime, type RegimeAssessment } from "../regimeEngine";
 import type { RegimeThresholds } from "../regimeEngine";
 import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
 import rawCache from "../../data/time_machine_cache.json";
 import { snapshotData } from "../snapshot";
+
+const SeriesHistoryPointSchema = z.object({
+  date: z.string(),
+  value: z.number().nullable(),
+});
+
+const BaseRateVelocityWindowSchema = z.object({
+  compareDate: z.string(),
+  compareValue: z.number(),
+  latestDate: z.string(),
+  latestValue: z.number(),
+});
 
 const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
   year: z.number(),
@@ -18,6 +30,19 @@ const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
    *  market-stress haircut and veto in the replay walk; absent for caches
    *  written before the field existed, which replay without the veto. */
   vix: z.number().nullable().optional(),
+  /** Trailing daily VIX observations stored with the entry. The market-stress
+   *  veto means the last 10 *daily* closes, the cadence the archive generators
+   *  replay with; without the stored tail the walk could only approximate it
+   *  with month-end values and published a different regime than the archives
+   *  for the same dates. Absent for caches written before the field existed. */
+  vixHistory: z.array(SeriesHistoryPointSchema).nullable().optional(),
+  /** The two observations the tightening-speed term resolves its delta from —
+   *  the latest daily base-rate print for the period and the one the 91-day
+   *  lookback favors. The archive generators resolve this from the full daily
+   *  series; a month-cadence approximation here scored tightening speed
+   *  differently than the archives for the same dates. Absent for caches
+   *  written before the field existed. */
+  baseRateVelocityWindow: BaseRateVelocityWindowSchema.nullable().optional(),
 });
 
 export type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
@@ -254,6 +279,10 @@ const buildRegimeWalkCacheKey = (overrides?: Partial<RegimeThresholds>) =>
     : "default";
 
 const regimeWalkMemo = new Map<string, TimeMachineRegimeEntry[]>();
+/** Full assessments per walk key, keyed by record date. The walk is the
+ *  canonical governed record — surfaces that resolve a historical read must
+ *  evaluate against its threaded machine state, not a point read. */
+const regimeAssessmentMemo = new Map<string, Map<string, RegimeAssessment>>();
 
 /**
  * The regime series replayed as one threaded walk.
@@ -265,7 +294,8 @@ const regimeWalkMemo = new Map<string, TimeMachineRegimeEntry[]>();
  * single-month spells. The walk threads the machine snapshot forward (flips
  * confirm through the gate, shocks commit and get marked) and supplies each
  * entry its trailing base-rate window (the velocity term) plus its VIX reading
- * (the haircut and the market-stress veto) when the cache carries one.
+ * with the daily tail stored alongside it (the haircut and the market-stress
+ * veto) when the cache carries one.
  */
 const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMachineRegimeEntry[] => {
   const walkKey = buildRegimeWalkCacheKey(overrides);
@@ -275,17 +305,22 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
   }
 
   const walk: TimeMachineRegimeEntry[] = [];
+  const assessments = new Map<string, RegimeAssessment>();
   let machineState: RegimeMachineSnapshot | null = null;
-  const vixHistory: { date: string; value: number | null }[] = [];
 
   sortedSnapshots.forEach((snapshot, index) => {
-    const baseRateHistory = sortedSnapshots
-      .slice(Math.max(0, index - 5), index + 1)
-      .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
+    const velocityWindow = snapshot.baseRateVelocityWindow;
+    const baseRateHistory = velocityWindow
+      ? [
+          { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
+          { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
+        ]
+      : sortedSnapshots
+          .slice(Math.max(0, index - 5), index + 1)
+          .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
 
     const macroSeries: MacroSeriesReading[] = [];
     if (typeof snapshot.vix === "number") {
-      vixHistory.push({ date: snapshot.record_date, value: snapshot.vix });
       macroSeries.push({
         id: "VIX_INDEX",
         label: "CBOE volatility index (VIX)",
@@ -298,7 +333,7 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
         record_date: snapshot.record_date,
         fetched_at: snapshot.fetched_at,
         isLive: false,
-        history: vixHistory.slice(-10),
+        history: snapshot.vixHistory ?? [],
       });
     }
 
@@ -310,6 +345,7 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
       { baseRateHistory },
     );
     machineState = assessment.regimeTransition?.snapshot ?? machineState;
+    assessments.set(snapshot.record_date, assessment);
 
     walk.push({
       year: snapshot.year,
@@ -324,7 +360,29 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
   });
 
   regimeWalkMemo.set(walkKey, walk);
+  regimeAssessmentMemo.set(walkKey, assessments);
   return walk;
+};
+
+/**
+ * The governed assessment for a cache record date, replayed with the machine
+ * state threaded through the full prefix walk. Historical selections resolve
+ * against this instead of a point evaluation, which would read today's live
+ * machine snapshot and disagree with /history and the archives for the same
+ * dates. Null when the date is outside the walk or the overrides key has not
+ * been walked.
+ */
+export const findTimeMachineGovernedAssessment = (
+  recordDate: string,
+  overrides?: Partial<RegimeThresholds>,
+): RegimeAssessment | null => {
+  const walkKey = buildRegimeWalkCacheKey(overrides);
+  let assessments = regimeAssessmentMemo.get(walkKey);
+  if (!assessments) {
+    buildThreadedRegimeWalk(overrides);
+    assessments = regimeAssessmentMemo.get(walkKey);
+  }
+  return assessments?.get(recordDate) ?? null;
 };
 
 export const getTimeMachineRegimeSeries = (

@@ -4,10 +4,14 @@ export function buildMondayCalendarUrl(
   title = "Whether Weekly Posture Sync",
   description = "Review weekly macro regime & posture delta: https://whether.work",
 ) {
+  // UTC on purpose: the times below carry a Z, and this renders on the server
+  // (UTC) before it hydrates in the reader's zone. Local getters gave the two
+  // sides different days after 7pm Central, and React reported the href as a
+  // hydration mismatch on every evening load of the homepage.
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(now.getUTCDate()).padStart(2, "0");
   const start = `${year}${month}${day}T130000Z`;
   const end = `${year}${month}${day}T133000Z`;
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(description)}&recur=RRULE:FREQ=WEEKLY;BYDAY=MO`;

@@ -940,6 +940,28 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
 
 ### 2.3 Time Machine cache
 - Historical Treasury snapshots are served from `data/time_machine_cache.json`.
+- Each entry also carries the period's VIX reading with a trailing daily tail
+  (`vixHistory`) and the resolved base-rate velocity pair
+  (`baseRateVelocityWindow`), so the runtime replay evaluates the market-stress
+  veto and tightening-speed term on the same daily cadence the archive
+  generators use. The runtime governed walk must publish the same regime and
+  scores as `data/summary_archive.json` for every month on record; the parity
+  test in `tests/regimeGovernance.test.ts` pins this.
+- Historical selections resolve their assessment from the governed walk
+  (`findTimeMachineGovernedAssessment`), not a point evaluation against the
+  live machine snapshot, so a selected month reads the same call on every
+  surface — brief, compare cards, and `/history`.
+- The confidence history and the analog ranking resolve each historical month
+  from that same governed walk, so a stress month's confidence and distance to
+  flip carry the VIX haircut and veto the record was published with. The
+  current record date resolves to the live assessment instead.
+- A partial generator run (`HISTORY_START_YEAR`, which
+  `time-machine:update-summaries` sets to 2024) walks from the first year and
+  filters only which records it writes, so a merge lands the same
+  confirmations a full replay produces.
+- A flip is a shock only when the one-step move is 25 points or more *and* the
+  prior reading sat outside the 5-point near band; from inside the band the
+  warning could have fired, so the flip confirms through the gate.
 - The Time Machine UI validates available months, shows cache coverage, and uses cached
   summary archives for weekly/monthly/quarterly/yearly playback.
 - Historical assessment now attempts to align macro-series history to the selected `asOf` date and records explicit coverage labels (`historical aligned`, `historical aligned partial`, or `treasury-only`) so historical vs. live comparisons stay structurally comparable when data exists and honestly degraded when it does not.
