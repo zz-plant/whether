@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { isContentCluster, isContentIntent, type ContentCluster, type ContentIntent } from "../contentMeasurement";
+import {
+  isContentAcquisitionSource,
+  isContentCluster,
+  isContentIntent,
+  type ContentAcquisitionSource,
+  type ContentCluster,
+  type ContentIntent,
+} from "../contentMeasurement";
 
 /**
  * The missing middle of the SEO refresh loop.
@@ -23,22 +30,25 @@ export type TelemetryRow = {
 
 type PageMetric = {
   /**
-   * **All first-visit entrances, not organic ones.** The name is the field
-   * `scripts/seo-refresh-queue.mjs` reads, so it is kept; the number is not what
-   * it says.
+   * Every first-visit entrance in the window, whatever the source.
    *
-   * `ContentMeasurementTracker` fires `organic_entrance` on the first visit to a
-   * page in a session and checks no referrer, campaign parameter, or navigation
-   * source, so direct, paid, and inbound-from-social visits are all counted here.
-   * That inflates the traffic tier the queue derives from this number and raises
-   * the conversion target a page is judged against — biasing towards queueing a
-   * page for refresh rather than skipping one, which is the safer direction to be
-   * wrong in, but wrong.
-   *
-   * Classifying acquisition means changing what the tracker emits, and only helps
-   * data collected after that change. Until then, read this as total entrances.
+   * This is what the refresh queue tiers traffic on, and it is the right
+   * number for that: a page's audience is everyone who lands on it.
    */
-  organicEntrances30d: number;
+  entrances30d: number;
+  /**
+   * Entrances a search engine referred.
+   *
+   * The event was called `organic_entrance` and checked no referrer at all, so
+   * this used to be indistinguishable from the total — direct, paid, and
+   * inbound-from-social visits were all counted as organic. The tracker now
+   * classifies the referrer into a coarse bucket, so the two numbers are
+   * separate. Rows written before that land in `unclassified`, which is why
+   * this can read far below `entrances30d` on a window that spans the change.
+   */
+  organicSearchEntrances30d: number;
+  /** The full split, so a reader can see what share is still unclassified. */
+  entrancesBySource: Record<ContentAcquisitionSource | "unclassified", number>;
   ctaConversions30d: number;
   /** Conversions per entrance. Null when there were no entrances to divide by. */
   ctaConversionRate: number | null;
@@ -58,14 +68,17 @@ type PageMetricsFile = {
 };
 
 const ENTRANCE_DEFINITION =
-  "All first-visit entrances per session. Acquisition source is not classified, so "
-  + "direct, paid, and referral visits are included in organicEntrances30d.";
+  "entrances30d counts every first-visit entrance per session. organicSearchEntrances30d "
+  + "counts the ones a search engine referred; entrancesBySource.unclassified counts rows "
+  + "written before the tracker classified acquisition, so a window spanning that change "
+  + "under-reports every classified bucket.";
 
 type ParsedEvent = {
   pagePath: string;
   type: string;
   cluster?: ContentCluster;
   intent?: ContentIntent;
+  source?: ContentAcquisitionSource;
 };
 
 /**
@@ -81,6 +94,7 @@ const telemetryEventSchema = z.object({
   type: z.string().min(1),
   cluster: z.string().optional(),
   intent: z.string().optional(),
+  source: z.string().optional(),
 });
 
 const parseRow = (row: TelemetryRow): ParsedEvent | null => {
@@ -98,18 +112,21 @@ const parseRow = (row: TelemetryRow): ParsedEvent | null => {
   const parsed = telemetryEventSchema.safeParse(value);
   if (!parsed.success) return null;
 
-  const { pagePath, type, cluster, intent } = parsed.data;
+  const { pagePath, type, cluster, intent, source } = parsed.data;
 
   return {
     pagePath,
     type,
     cluster: cluster && isContentCluster(cluster) ? cluster : undefined,
     intent: intent && isContentIntent(intent) ? intent : undefined,
+    source: source && isContentAcquisitionSource(source) ? source : undefined,
   };
 };
 
 const emptyMetric = (): PageMetric => ({
-  organicEntrances30d: 0,
+  entrances30d: 0,
+  organicSearchEntrances30d: 0,
+  entrancesBySource: { search: 0, social: 0, referral: 0, direct: 0, internal: 0, unclassified: 0 },
   ctaConversions30d: 0,
   ctaConversionRate: null,
   assistedConversions30d: 0,
@@ -137,7 +154,11 @@ export const buildPageMetrics = (
 
     const metric = byUrl[event.pagePath] ?? emptyMetric();
 
-    if (event.type === "organic_entrance") metric.organicEntrances30d += 1;
+    if (event.type === "organic_entrance") {
+      metric.entrances30d += 1;
+      metric.entrancesBySource[event.source ?? "unclassified"] += 1;
+      if (event.source === "search") metric.organicSearchEntrances30d += 1;
+    }
     else if (event.type === "cta_conversion") metric.ctaConversions30d += 1;
     else if (event.type === "assisted_conversion") metric.assistedConversions30d += 1;
 
@@ -150,8 +171,8 @@ export const buildPageMetrics = (
   }
 
   for (const metric of Object.values(byUrl)) {
-    metric.ctaConversionRate = metric.organicEntrances30d > 0
-      ? metric.ctaConversions30d / metric.organicEntrances30d
+    metric.ctaConversionRate = metric.entrances30d > 0
+      ? metric.ctaConversions30d / metric.entrances30d
       : null;
   }
 

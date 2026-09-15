@@ -2,6 +2,12 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
 import { buildPageMetrics, type TelemetryRow } from "../lib/seo/pageMetricsFromTelemetry";
+import {
+  buildStreamQuery,
+  queryAnalyticsEngine,
+  queryWindowPaged,
+  resolveAnalyticsReadConfig,
+} from "../lib/telemetry/analyticsQuery";
 
 /*
  * Pull content-measurement telemetry out of Analytics Engine and write the
@@ -17,9 +23,11 @@ import { buildPageMetrics, type TelemetryRow } from "../lib/seo/pageMetricsFromT
  * which is the state this repo has been in all along.
  *
  * Every other unhappy path refuses to write. A metrics file built from zero rows
- * would mark every page "low traffic, underperforming" and queue the whole site;
- * one built from a truncated window would undercount entrances and silently
- * demote traffic tiers. Both are worse than no file, because both look like data.
+ * would mark every page "low traffic, underperforming" and queue the whole site,
+ * which is worse than no file because it looks like data. A window too dense for
+ * one query is no longer such a path: it is read as successively narrower time
+ * slices (`queryWindowPaged`), and only a slice below a quarter of an hour that
+ * still fills the cap gives up.
  *
  * Events are read as JSON blobs and aggregated in `buildPageMetrics` rather than
  * with SQL aggregates. `writeAnalytics` stores the whole event in blob2, and the
@@ -28,18 +36,17 @@ import { buildPageMetrics, type TelemetryRow } from "../lib/seo/pageMetricsFromT
  * telemetry already collected, with no change to the write path.
  */
 
-const DEFAULT_DATASET = "whether_telemetry";
 const DEFAULT_WINDOW_DAYS = 30;
 const DEFAULT_ROW_LIMIT = 100_000;
+/** Below this a slice is dense enough that the cap, not the window, is the problem. */
+const MIN_SLICE_MS = 15 * 60 * 1000;
 
 const OUTPUT_DIR = join(process.cwd(), "artifacts", "seo-refresh");
 const OUTPUT_PATH = join(OUTPUT_DIR, "page-metrics.json");
 
 /* Validated rather than asserted: this is a remote API response, and an error
    body or a schema change would otherwise be counted as "zero events". */
-const sqlResponseSchema = z.object({
-  data: z.array(z.object({ blob2: z.string().nullable().optional() })).optional(),
-});
+const rowSchema = z.object({ blob2: z.string().nullable().optional() });
 
 export type RefreshPageMetricsResult =
   | { status: "written"; pages: number; eventsRead: number; eventsParsed: number; path: string }
@@ -47,16 +54,15 @@ export type RefreshPageMetricsResult =
   | { status: "failed"; reason: string };
 
 export const refreshPageMetrics = async (): Promise<RefreshPageMetricsResult> => {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-  const dataset = process.env.WHETHER_TELEMETRY_DATASET ?? DEFAULT_DATASET;
+  const config = resolveAnalyticsReadConfig();
   const windowDays = Number(process.env.WHETHER_METRICS_WINDOW_DAYS ?? DEFAULT_WINDOW_DAYS);
   const rowLimit = Number(process.env.WHETHER_METRICS_ROW_LIMIT ?? DEFAULT_ROW_LIMIT);
 
-  if (!accountId || !apiToken) {
+  if (!config) {
     return {
       status: "skipped",
-      reason: "CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN are not both set "
+      reason: "CLOUDFLARE_ACCOUNT_ID and an analytics read token "
+        + "(CLOUDFLARE_ANALYTICS_READ_TOKEN or CLOUDFLARE_API_TOKEN) are not both set "
         + "(the token needs Account Analytics: Read).",
     };
   }
@@ -68,64 +74,43 @@ export const refreshPageMetrics = async (): Promise<RefreshPageMetricsResult> =>
     return { status: "failed", reason: "WHETHER_METRICS_ROW_LIMIT must be a positive number." };
   }
 
-  const sql = [
-    "SELECT blob2",
-    `FROM ${dataset}`,
-    "WHERE index1 = 'content-measurement'",
-    `  AND timestamp > now() - INTERVAL '${Math.trunc(windowDays)}' DAY`,
-    `LIMIT ${Math.trunc(rowLimit)}`,
-  ].join("\n");
-
-  let rows: TelemetryRow[];
-  try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/analytics_engine/sql`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "text/plain" },
-        body: sql,
-      },
-    );
-
-    if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      return {
-        status: "failed",
-        reason: `Analytics Engine query failed: HTTP ${response.status} ${detail.slice(0, 400)}`,
-      };
-    }
-
-    const parsed = sqlResponseSchema.safeParse(await response.json());
-    if (!parsed.success) {
-      return {
-        status: "failed",
-        reason: `Analytics Engine returned an unexpected payload: ${parsed.error.message.slice(0, 400)}`,
-      };
-    }
-    rows = parsed.data.data ?? [];
-  } catch (error) {
-    return {
-      status: "failed",
-      reason: `Analytics Engine query threw: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
-
   /*
-   * A full result set is indistinguishable from a truncated one once it reaches
-   * `buildPageMetrics`, which counts whatever it is handed. Hitting the cap
-   * means the window held more events than were returned, so entrances are
-   * undercounted by an unknown amount — enough to demote a page's traffic tier
-   * and shift the conversion target it is judged against. Refuse rather than
-   * publish a number that is confidently wrong.
+   * Paged by time, not refused at the cap.
+   *
+   * Analytics Engine's SQL has no cursor, so "the next page" is a narrower time
+   * range. A slice that comes back at the row cap is re-read as four shorter
+   * ones. The previous behaviour was to fail the whole run the moment a single
+   * query reached the cap, which made a busy month unreadable rather than
+   * slower — and the run that most needed metrics was the one that produced
+   * none.
    */
-  if (rows.length >= Math.trunc(rowLimit)) {
-    return {
-      status: "failed",
-      reason: `query returned ${rows.length} rows, at or above the ${Math.trunc(rowLimit)} row cap, `
-        + "so the window is truncated and entrance counts would be undercounted. "
-        + "Raise WHETHER_METRICS_ROW_LIMIT or narrow WHETHER_METRICS_WINDOW_DAYS.",
-    };
+  const now = new Date();
+  const paged = await queryWindowPaged<typeof rowSchema>({
+    window: {
+      startIso: new Date(now.getTime() - Math.trunc(windowDays) * 24 * 60 * 60 * 1000).toISOString(),
+      endIso: now.toISOString(),
+    },
+    minSliceMs: MIN_SLICE_MS,
+    run: (slice) =>
+      queryAnalyticsEngine({
+        config,
+        rowSchema,
+        rowLimit: Math.trunc(rowLimit),
+        sql: buildStreamQuery({
+          dataset: config.dataset,
+          stream: "content-measurement",
+          window: slice,
+          columns: ["blob2"],
+          limit: Math.trunc(rowLimit),
+        }),
+      }),
+  });
+
+  if (!paged.ok) {
+    return { status: "failed", reason: `Analytics Engine read failed after ${paged.queries} queries: ${paged.reason}` };
   }
+
+  const rows: TelemetryRow[] = paged.rows;
 
   const metrics = buildPageMetrics(rows, { windowDays });
   const pageCount = Object.keys(metrics.byUrl).length;

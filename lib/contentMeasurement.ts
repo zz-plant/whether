@@ -2,13 +2,76 @@ export type ContentCluster = "authority" | "pain" | "tool" | "vc";
 export type ContentIntent = "cfo" | "board" | "vp-product" | "vc-partner";
 type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conversion";
 
+/**
+ * How a visit arrived, in five buckets and nothing finer.
+ *
+ * The event was named `organic_entrance` and checked no referrer at all, so
+ * direct, paid, and inbound-from-social visits were all counted as organic —
+ * which inflated the traffic tier the refresh queue derives and the conversion
+ * target each page was judged against.
+ *
+ * Only the bucket is sent. The referring URL, its path, and any campaign
+ * parameters stay in the browser: this product tells readers it runs no
+ * trackers, and "someone arrived from a search engine" is the whole of what
+ * the refresh loop needs to know.
+ */
+export type ContentAcquisitionSource = "search" | "social" | "referral" | "direct" | "internal";
+
 export type ContentMeasurementEvent = {
   pagePath: string;
   cluster: ContentCluster;
   intent: ContentIntent;
   type: ContentEventType;
+  /** Set on entrances. Absent on rows written before classification existed. */
+  source?: ContentAcquisitionSource;
   ctaId?: string;
   internalPath?: string;
+};
+
+const SEARCH_HOST_PATTERN = /(^|\.)(google|bing|duckduckgo|yahoo|ecosia|startpage|brave|baidu|yandex|qwant|kagi)\./i;
+const SOCIAL_HOSTS = new Set([
+  "t.co",
+  "x.com",
+  "twitter.com",
+  "www.linkedin.com",
+  "linkedin.com",
+  "lnkd.in",
+  "news.ycombinator.com",
+  "www.reddit.com",
+  "reddit.com",
+  "out.reddit.com",
+  "www.facebook.com",
+  "facebook.com",
+  "bsky.app",
+  "substack.com",
+  "mastodon.social",
+]);
+
+export const isContentAcquisitionSource = (value: string): value is ContentAcquisitionSource =>
+  value === "search" || value === "social" || value === "referral" || value === "direct" || value === "internal";
+
+/** Classify a referrer into a bucket. Exported for the test; the caller passes `document.referrer`. */
+export const classifyAcquisitionSource = (referrer: string, currentHost: string): ContentAcquisitionSource => {
+  const trimmed = referrer.trim();
+  if (!trimmed) return "direct";
+
+  let host: string;
+  try {
+    host = new URL(trimmed).hostname.toLowerCase();
+  } catch {
+    return "direct";
+  }
+
+  if (!host) return "direct";
+  if (host === currentHost.toLowerCase()) return "internal";
+  if (SEARCH_HOST_PATTERN.test(host)) return "search";
+  if (SOCIAL_HOSTS.has(host)) return "social";
+  return "referral";
+};
+
+const currentAcquisitionSource = (): ContentAcquisitionSource | undefined => {
+  if (typeof document === "undefined" || typeof window === "undefined") return undefined;
+  return classifyAcquisitionSource(document.referrer ?? "", window.location.hostname);
 };
 
 export const CONTENT_MEASUREMENT_ENDPOINT = "/api/telemetry/content-measurement";
@@ -34,7 +97,8 @@ export const isContentMeasurementEvent = (input: unknown): input is ContentMeasu
     payload.pagePath.length > 0 &&
     isContentCluster(String(payload.cluster)) &&
     isContentIntent(String(payload.intent)) &&
-    isContentEventType(String(payload.type))
+    isContentEventType(String(payload.type)) &&
+    (payload.source === undefined || isContentAcquisitionSource(String(payload.source)))
   );
 };
 
@@ -66,6 +130,7 @@ export const trackContentOrganicEntrance = (
   trackContentMeasurementEvent({
     ...event,
     type: "organic_entrance",
+    source: currentAcquisitionSource(),
   });
 };
 

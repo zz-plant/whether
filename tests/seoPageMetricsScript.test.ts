@@ -56,6 +56,7 @@ describe("refreshPageMetrics guards", () => {
   it("reports missing credentials as skipped so the weekly runbook still runs", async () => {
     delete process.env.CLOUDFLARE_ACCOUNT_ID;
     delete process.env.CLOUDFLARE_API_TOKEN;
+    delete process.env.CLOUDFLARE_ANALYTICS_READ_TOKEN;
 
     const result = await refreshPageMetrics();
 
@@ -64,19 +65,47 @@ describe("refreshPageMetrics guards", () => {
   });
 
   /*
-   * A result set at the cap is indistinguishable from a complete one by the time
-   * it reaches buildPageMetrics, and an undercount demotes a page's traffic tier
-   * and moves the conversion target it is judged against.
+   * A window denser than one query used to fail the whole run, so the month
+   * that most needed metrics was the one that produced none. Analytics Engine
+   * has no cursor, so the next page is a narrower time range: a slice that
+   * comes back at the cap is re-read as four shorter ones.
    */
-  it("refuses to publish when the row cap truncated the window", async () => {
+  it("pages a dense window into narrower slices instead of refusing it", async () => {
     process.env.WHETHER_METRICS_ROW_LIMIT = "5";
-    stubFetch(jsonResponse({ data: rows(5) }));
+    let call = 0;
+    stubFetch(async () => {
+      call += 1;
+      // The full window fills the cap; each quarter of it does not.
+      return jsonResponse({ data: call === 1 ? rows(5) : rows(2) });
+    });
+
+    const result = await refreshPageMetrics();
+
+    assert.equal(result.status, "written", result.status === "failed" ? result.reason : "");
+    assert.equal(call, 5, "one clipped query, then its four slices");
+
+    const written = result.status === "written" ? result.path : "";
+    try {
+      assert.equal(result.status === "written" ? result.eventsRead : 0, 8);
+    } finally {
+      rmSync(written, { force: true });
+    }
+  });
+
+  /*
+   * Splitting stops somewhere. Below a quarter of an hour the cap, not the
+   * window, is the constraint, and the honest answer is to say so rather than
+   * publish a short count that reads as complete.
+   */
+  it("gives up when even a short slice fills the cap", async () => {
+    process.env.WHETHER_METRICS_ROW_LIMIT = "5";
+    // A fresh Response per call: a body can only be read once, and paging reads many.
+    stubFetch(async () => jsonResponse({ data: rows(5) }));
 
     const result = await refreshPageMetrics();
 
     assert.equal(result.status, "failed");
-    assert.match(result.status === "failed" ? result.reason : "", /truncated/);
-    assert.match(result.status === "failed" ? result.reason : "", /WHETHER_METRICS_ROW_LIMIT/);
+    assert.match(result.status === "failed" ? result.reason : "", /row cap/);
   });
 
   /*
@@ -96,8 +125,11 @@ describe("refreshPageMetrics guards", () => {
     const written = result.status === "written" ? result.path : "";
     try {
       const artifact = JSON.parse(readFileSync(written, "utf8"));
-      assert.equal(artifact.byUrl["/trust"].organicEntrances30d, 4);
-      assert.match(artifact.entranceDefinition, /not classified/);
+      assert.equal(artifact.byUrl["/trust"].entrances30d, 4);
+      // These rows carry no source, so none of them counts as search-referred.
+      assert.equal(artifact.byUrl["/trust"].organicSearchEntrances30d, 0);
+      assert.equal(artifact.byUrl["/trust"].entrancesBySource.unclassified, 4);
+      assert.match(artifact.entranceDefinition, /unclassified/);
     } finally {
       rmSync(written, { force: true });
     }

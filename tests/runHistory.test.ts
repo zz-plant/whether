@@ -4,9 +4,9 @@ import {
   buildCronStepQuery,
   loadCronRunHistory,
   resetRunHistoryCacheForTests,
-  resolveAnalyticsReadConfig,
   summarizeCronSteps,
 } from "../lib/telemetry/runHistory";
+import { resolveAnalyticsReadConfig } from "../lib/telemetry/analyticsQuery";
 import { requestBodyText, requestUrl } from "./fixtures/requestTarget";
 
 const row = (timestamp: string, event: unknown) => ({ timestamp, blob2: JSON.stringify(event) });

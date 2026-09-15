@@ -64,6 +64,7 @@
     "lint:types": "oxlint --type-aware --deny-warnings",
     "check:suppressions": "bun run scripts/check-suppression-census.ts",
     "check:dead-exports": "bun run scripts/check-dead-exports.ts",
+    "telemetry:streams": "bun run scripts/telemetry-stream-census.ts",
     "check:curated-freshness": "bun run scripts/check-curated-freshness.ts"
   },
   "engines": {
