@@ -1,14 +1,23 @@
+import { z } from "zod";
+
 const SEARCH_TELEMETRY_ENDPOINT = "/api/telemetry/search";
 
-type SearchTelemetryEvent = {
-  type: "search";
+/*
+ * `strictObject`, not a hand-rolled guard with a cast. Extra keys are rejected
+ * rather than ignored, which is the whole promise: an intake that dropped an
+ * unexpected field would still have accepted a payload carrying the query text.
+ */
+const searchEventSchema = z.strictObject({
+  type: z.literal("search"),
   /** Which job the query routed to, or null when nothing matched. */
-  routedJob: string | null;
-  resultCount: number;
+  routedJob: z.string().nullable(),
+  resultCount: z.number().finite().min(0),
   /** Whether a `job` filter was applied to the results. */
-  filtered: boolean;
-  zeroResults: boolean;
-};
+  filtered: z.boolean(),
+  zeroResults: z.boolean(),
+});
+
+type SearchTelemetryEvent = z.infer<typeof searchEventSchema>;
 
 /**
  * What a search did, without what it said.
@@ -23,24 +32,8 @@ type SearchTelemetryEvent = {
  * about — so the payload has no field that could hold it, rather than a
  * convention that it will not be filled.
  */
-export const isSearchTelemetryEvent = (input: unknown): input is SearchTelemetryEvent => {
-  if (!input || typeof input !== "object") return false;
-  const payload = input as Record<string, unknown>;
-
-  return (
-    payload.type === "search"
-    && (payload.routedJob === null || typeof payload.routedJob === "string")
-    && typeof payload.resultCount === "number"
-    && Number.isFinite(payload.resultCount)
-    && payload.resultCount >= 0
-    && typeof payload.filtered === "boolean"
-    && typeof payload.zeroResults === "boolean"
-    /* No other key is accepted: an intake that ignored extras would let a
-       browser post the query text into a stream that promises not to hold it. */
-    && Object.keys(payload).every((key) =>
-      ["type", "routedJob", "resultCount", "filtered", "zeroResults"].includes(key))
-  );
-};
+export const isSearchTelemetryEvent = (input: unknown): input is SearchTelemetryEvent =>
+  searchEventSchema.safeParse(input).success;
 
 export const trackSearch = (event: Omit<SearchTelemetryEvent, "type">) => {
   const body = JSON.stringify({ type: "search", ...event } satisfies SearchTelemetryEvent);
