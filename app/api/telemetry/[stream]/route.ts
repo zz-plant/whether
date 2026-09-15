@@ -4,6 +4,7 @@ import { isWebVitalMetric } from "../../../../lib/webVitalsTelemetry";
 import { isOperatorWorkflowEvent } from "../../../../lib/operatorWorkflowTelemetry";
 import { isActivationEvent } from "../../../../lib/activationFunnel";
 import { isContentMeasurementEvent } from "../../../../lib/contentMeasurement";
+import { checkRateLimit, clientKeyFor, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 
 export const runtime = "edge";
 
@@ -30,6 +31,13 @@ export async function POST(
 
   if (!stream || !isTelemetryStream(stream)) {
     return NextResponse.json({ ok: false, error: "invalid_stream" }, { status: 400 });
+  }
+
+  /* Public by necessity (browser telemetry), so per-address volume is the only guard the
+     intake has. The limiter is a Workers binding; absent, the check allows. */
+  const limit = await checkRateLimit("WHETHER_PUBLIC_WRITE_RATE_LIMITER", clientKeyFor(request));
+  if (!limit.allowed) {
+    return rateLimitedResponse();
   }
 
   let payload: unknown;

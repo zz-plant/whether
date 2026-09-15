@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dispatchPremiumFunnelEvent, isValidPremiumFunnelEvent } from "../../../../lib/premiumFunnel";
 import { requireCronAuth } from "../../../../lib/api/cronAuth";
+import { checkRateLimit, clientKeyFor, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 import {
   listPremiumFunnelEvents,
   summarizePremiumFunnelEvents,
@@ -14,6 +15,13 @@ export const runtime = "edge";
 const MAX_BODY_BYTES = 4096;
 
 export async function POST(request: Request) {
+  /* docs/premium-launch-readiness.md asked for this at the WAF layer before the counts are
+     treated as decision-grade; the Workers binding is the in-code form of the same rule. */
+  const limit = await checkRateLimit("WHETHER_PUBLIC_WRITE_RATE_LIMITER", clientKeyFor(request));
+  if (!limit.allowed) {
+    return rateLimitedResponse();
+  }
+
   const declaredLength = Number.parseInt(request.headers.get("content-length") ?? "", 10);
   if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) {
     return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });

@@ -5,6 +5,7 @@ import { subscribeAndSendVerification } from "../../../lib/email/subscriptionFlo
 import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachineCache";
 import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
+import { RateLimitedError, rateLimitedResponse } from "../../../lib/runtime/rateLimit";
 
 export const runtime = "edge";
 
@@ -169,6 +170,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: `Unknown tool: ${tool}`, available: ["subscribe"] }, { status: 400 });
   } catch (error) {
+    if (error instanceof RateLimitedError) {
+      return rateLimitedResponse(error.retryAfterSeconds);
+    }
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : String(error),

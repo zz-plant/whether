@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "./types";
 import { buildLineage, type DurableLineage } from "../storage/lineage";
-import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
 import { IngestCoordinatorStore, coordinatorStubFor, resolveIngestCoordinatorNamespace } from "./coordinatorStore";
 
 export type StoredSnapshotRecord = DurableLineage & {
@@ -117,10 +117,18 @@ const REFRESH_LOCK_KEY = "ingestion:refresh-lock";
  */
 const DEFAULT_SNAPSHOT_READ_LIMIT = 1500;
 
-/** KV round-trips dominate this read; issue them in parallel batches rather than serially. */
-const SNAPSHOT_READ_CONCURRENCY = 64;
-
 const formatSnapshotKey = (sequence: number) => `${SNAPSHOT_PREFIX}${String(sequence).padStart(12, "0")}`;
+
+/* Narrowed rather than asserted: this is JSON out of KV, written by an earlier deploy. A
+   record without a numeric sequence and a keyed snapshot is skipped like unparseable JSON. */
+const isStoredSnapshotRecord = (value: unknown): value is StoredSnapshotRecord => {
+  if (typeof value !== "object" || value === null) return false;
+  const snapshot: unknown = Reflect.get(value, "snapshot");
+  return typeof Reflect.get(value, "sequence") === "number"
+    && typeof snapshot === "object"
+    && snapshot !== null
+    && typeof Reflect.get(snapshot, "signalKey") === "string";
+};
 
 const getKvBinding = () => {
   const binding = getWhetherKv("INGESTION_KV");
@@ -211,21 +219,19 @@ export class KvIngestionStore implements IngestionStore {
   private async readSequences(sequences: number[]): Promise<StoredSnapshotRecord[]> {
     const collected: StoredSnapshotRecord[] = [];
 
-    for (let offset = 0; offset < sequences.length; offset += SNAPSHOT_READ_CONCURRENCY) {
-      const batch = sequences.slice(offset, offset + SNAPSHOT_READ_CONCURRENCY);
-      /* Snapshot records are immutable once written; edge-cache them so repeated
-       * legacy-path scans of the same window stop paying origin reads. */
-      const raws = await Promise.all(batch.map((sequence) => this.kv.get(formatSnapshotKey(sequence), { cacheTtl: 3600 })));
+    /* Snapshot records are immutable once written; edge-cache them so repeated
+     * legacy-path scans of the same window stop paying origin reads. */
+    const raws = await readKvValues(this.kv, sequences.map(formatSnapshotKey), { cacheTtl: 3600 });
 
-      for (const raw of raws) {
-        if (!raw) {
-          continue;
-        }
-        try {
-          collected.push(JSON.parse(raw) as StoredSnapshotRecord);
-        } catch {
-          // Skip unparseable records rather than failing the whole read.
-        }
+    for (const raw of raws) {
+      if (!raw) {
+        continue;
+      }
+      try {
+        const parsed: unknown = JSON.parse(raw);
+        if (isStoredSnapshotRecord(parsed)) collected.push(parsed);
+      } catch {
+        // Skip unparseable records rather than failing the whole read.
       }
     }
 

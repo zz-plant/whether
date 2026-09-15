@@ -1,5 +1,6 @@
 import { createCloudflareEmailAdapter, type EmailDeliveryAdapter } from "./emailDelivery";
 import { getSubscriberStore } from "./subscriberStore";
+import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
 
 const DEFAULT_APP_BASE_URL = "https://whether.work";
 
@@ -41,6 +42,15 @@ export const subscribeAndSendVerification = async ({
   request?: Request;
   adapter?: EmailDeliveryAdapter;
 }) => {
+  /* Checked before anything is written or sent: every accepted call mails a stranger's
+     address from this domain, so the limit has to sit in front of the store, not after
+     it. Throws so the three routes that share this flow each answer 429 in their own
+     shape (lib/runtime/rateLimit.ts). */
+  if (request) {
+    const decision = await checkRateLimit("WHETHER_SUBSCRIBE_RATE_LIMITER", clientKeyFor(request));
+    if (!decision.allowed) throw new RateLimitedError();
+  }
+
   const store = getSubscriberStore();
   const subscriber = await store.subscribe(email, { alerts });
   const verifyUrl = buildEmailActionUrl(

@@ -141,6 +141,13 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 | Whether — regime history refresh | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
 | Whether — weekly brief refresh & freeze | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md`, `artifacts/weekly-slack-brief.txt`, and current week appended to `data/published_briefs.json` |
 
+Since 2026-09-14 the freeze also runs as a Cloudflare Workflow (`worker/workflows/weeklyBriefFreeze.ts`),
+started by the Worker's Monday cron where `WHETHER_BRIEF_FREEZE_WORKFLOW=1` (the preview lane, for
+now). It runs inside Cloudflare, where FRED is reachable, so the egress allowlist below is not in
+its way; it shares the record builder with `brief:freeze` and opens the same
+`automation/weekly-brief-freeze-<slug>` branch, so it and the routine cannot both freeze a week
+differently. Details: `docs/cloudflare-deployment-runbook.md` ("Trial infrastructure").
+
 The site no longer waits on any of them to show a current month. The Worker cron records the month
 in progress to KV on every run (`lib/summary/refreshMonthlyRegimeHistory.ts`), and the read path
 merges it over the bundled snapshot, so the month rail stays current between deploys. The regime

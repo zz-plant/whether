@@ -111,19 +111,33 @@ describe("staleness boundary", () => {
 describe("wiring", () => {
   it("is consulted by both writers that publish a current-week artifact", async () => {
     // The audit that produced this guard found the same defect in two scripts and
-    // verified the other two data writers fail loudly. This asserts the two that
+    // verified the other two data writers fail loudly. This asserts the writers that
     // needed it keep it — a future edit that drops the import is the regression.
-    for (const script of [
-      "scripts/freezeWeeklyBrief.ts",
-      "scripts/generateWeeklySlackBrief.ts",
-    ]) {
-      const source = await readFile(script, "utf8");
-      assert.ok(
-        source.includes("assessPublishReadiness"),
-        `${script} no longer checks publish readiness`,
-      );
-      assert.ok(source.includes("process.exit(1)"), `${script} no longer fails the run`);
+    //
+    // The freeze has two writers now — the script and the Workflow — and both build
+    // their record through lib/report/publishedBriefRecord.ts, which is where the guard
+    // is consulted for them. So the chain is asserted link by link: the shared builder
+    // checks readiness, and each writer goes through the shared builder.
+    const recordBuilder = await readFile("lib/report/publishedBriefRecord.ts", "utf8");
+    assert.ok(
+      recordBuilder.includes("assessPublishReadiness"),
+      "lib/report/publishedBriefRecord.ts no longer checks publish readiness",
+    );
+
+    for (const writer of ["scripts/freezeWeeklyBrief.ts", "worker/workflows/weeklyBriefFreeze.ts"]) {
+      const source = await readFile(writer, "utf8");
+      assert.ok(source.includes("assembleCurrentWeekBrief"), `${writer} no longer builds its record through the guarded path`);
     }
+
+    const freezeScript = await readFile("scripts/freezeWeeklyBrief.ts", "utf8");
+    assert.ok(freezeScript.includes("process.exit(1)"), "scripts/freezeWeeklyBrief.ts no longer fails the run");
+
+    const workflow = await readFile("worker/workflows/weeklyBriefFreeze.ts", "utf8");
+    assert.ok(workflow.includes("throw new Error(`not ready to publish"), "the Workflow no longer fails its step on an unready week");
+
+    const slackArtifact = await readFile("scripts/generateWeeklySlackBrief.ts", "utf8");
+    assert.ok(slackArtifact.includes("assessPublishReadiness"), "scripts/generateWeeklySlackBrief.ts no longer checks publish readiness");
+    assert.ok(slackArtifact.includes("process.exit(1)"), "scripts/generateWeeklySlackBrief.ts no longer fails the run");
   });
 
   it("keeps the record-age limit aligned with the homepage permalink gate", async () => {

@@ -1,4 +1,4 @@
-import type { KvNamespace } from "../runtime/kv";
+import { readKvValues, type KvNamespace } from "../runtime/kv";
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 
 export type RegimeDecisionEvent = {
@@ -37,9 +37,6 @@ const EVENT_INDEX_KEY = "meta:decision-event:index";
 
 /** Ceiling on a single unpaginated read so log length cannot stall the route. */
 const MAX_EVENT_SCAN = 1000;
-
-/** KV round-trips dominate; batch rather than bursting a whole page of keys at once. */
-const EVENT_READ_CONCURRENCY = 64;
 
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
@@ -230,28 +227,25 @@ export class DecisionEventStore {
     const scanCeiling = limit === undefined ? MAX_EVENT_SCAN : Math.min(limit + 1, MAX_EVENT_SCAN);
     const selected = available.slice(0, scanCeiling);
 
-    for (let offset = 0; offset < selected.length; offset += EVENT_READ_CONCURRENCY) {
-      const batch = selected.slice(offset, offset + EVENT_READ_CONCURRENCY);
-      const raws = await Promise.all(batch.map((index) => this.cloudflareKv!.get(toEventKey(index))));
+    const raws = await readKvValues(this.cloudflareKv, selected.map(toEventKey));
 
-      for (let i = 0; i < batch.length; i++) {
-        const raw = raws[i];
-        if (!raw) {
-          continue;
-        }
-
-        let parsed: unknown;
-        try {
-          parsed = JSON.parse(raw);
-        } catch {
-          continue;
-        }
-        if (!isRegimeDecisionEvent(parsed)) {
-          continue;
-        }
-
-        collected.push({ index: batch[i], event: parsed });
+    for (let i = 0; i < selected.length; i++) {
+      const raw = raws[i];
+      if (!raw) {
+        continue;
       }
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        continue;
+      }
+      if (!isRegimeDecisionEvent(parsed)) {
+        continue;
+      }
+
+      collected.push({ index: selected[i], event: parsed });
     }
 
     collected.sort((left, right) => left.index - right.index);

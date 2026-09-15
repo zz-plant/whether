@@ -161,3 +161,59 @@ describe("Alpha Vantage provider", () => {
     }
   });
 });
+
+describe("fetchQuote cache", () => {
+  const createCache = () => {
+    const store = new Map<string, { value: string; ttl?: number }>();
+    return {
+      store,
+      cache: {
+        async get(key: string) {
+          return store.get(key)?.value ?? null;
+        },
+        async put(key: string, value: string, options?: { expirationTtl?: number }) {
+          store.set(key, { value, ttl: options?.expirationTtl });
+        },
+      },
+    };
+  };
+
+  it("serves a repeat read from KV without touching the source", async () => {
+    const { cache, store } = createCache();
+    let calls = 0;
+    stubFetch(() => {
+      calls += 1;
+      return new Response(quoteBody(2_000_000, 0.3));
+    });
+
+    const first = await fetchQuote("CRM", { cache });
+    const second = await fetchQuote("CRM", { cache });
+
+    assert.equal(first.status, "ok");
+    assert.equal(second.status, "ok");
+    assert.equal(calls, 1, "one upstream read for two calls");
+    assert.equal(store.get("comps:quote:CRM")?.ttl, 60 * 60);
+  });
+
+  it("caches an unknown symbol for a shorter window and never caches a refused source", async () => {
+    const { cache, store } = createCache();
+
+    stubFetch(() => new Response("not found", { status: 404 }));
+    assert.equal((await fetchQuote("NOTATICKER", { cache })).status, "missing");
+    assert.equal(store.get("comps:quote:NOTATICKER")?.ttl, 15 * 60);
+
+    stubFetch(() => new Response("Edge: Too Many Requests", { status: 429 }));
+    assert.equal((await fetchQuote("MSFT", { cache })).status, "unavailable");
+    assert.equal(store.has("comps:quote:MSFT"), false, "an outage is not a fact about the symbol");
+  });
+
+  it("treats an unreadable cache record as a miss", async () => {
+    const { cache, store } = createCache();
+    store.set("comps:quote:CRM", { value: "{\"status\":\"ok\",\"quote\":\"nope\"}" });
+    stubFetch(() => new Response(quoteBody(1_000_000, 0.2)));
+
+    const result = await fetchQuote("CRM", { cache });
+    assert.equal(result.status, "ok");
+    assert.match(store.get("comps:quote:CRM")?.value ?? "", /cachedAt/, "the bad record was replaced");
+  });
+});

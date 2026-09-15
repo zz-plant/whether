@@ -12,6 +12,7 @@ import {
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { loadCronRunHistory } from "../../lib/telemetry/runHistory";
 
 type ReportShellProps = Omit<ComponentProps<typeof ReportShell>, "children">;
 
@@ -25,7 +26,12 @@ export async function buildTrustPageModel() {
       ]),
     ),
   };
-  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/trust" });
+  /* Read alongside the brief, not after it: the run history has its own deadline and
+     fails soft, so it never lengthens the page past the report path's own bound. */
+  const [{ reportData, snapshot }, runHistory] = await Promise.all([
+    loadWeeklyBriefSnapshot(undefined, { route: "/trust" }),
+    loadCronRunHistory(),
+  ]);
   const homeBriefModel = snapshot.homeBriefModel;
   const isFallback = snapshot.isFallback;
   const degradedSourceRows = buildDegradedSourceRows(reportData.sourceHealth);
@@ -111,6 +117,9 @@ export async function buildTrustPageModel() {
         };
   const sectionLinks = [
     { href: "#trust-snapshot", label: "Snapshot" },
+    // Only when the telemetry read is configured: an index entry for a section that
+    // never renders is a broken anchor.
+    ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
     { href: "#source-board", label: "Sources" },
     { href: "#sources-freshness", label: "Sources & freshness" },
     { href: "#confidence-limits", label: "Confidence & limits" },
@@ -192,6 +201,7 @@ export async function buildTrustPageModel() {
     meetingSnippet,
     revisitBullets,
     trustVerdict,
+    runHistory,
     reportShellProps,
   };
 }

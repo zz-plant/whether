@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { subscribeAndSendVerification } from "../../../../lib/email/subscriptionFlow";
+import { RateLimitedError, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 
 export const runtime = "edge";
 
@@ -21,6 +22,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {
+    if (error instanceof RateLimitedError) {
+      return rateLimitedResponse(error.retryAfterSeconds);
+    }
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : String(error),

@@ -1,6 +1,6 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 import { buildLineage, type DurableLineage } from "./lineage";
-import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
 
 export type PostureTransitionEvent = DurableLineage & {
   id: string;
@@ -225,9 +225,7 @@ export class KvPostureTransitionEventRepository implements PostureTransitionEven
 
     const events: PostureTransitionEvent[] = [];
     if (page.keys.length > 0) {
-      const raws = await Promise.all(
-        page.keys.map((k) => this.kv.get(k.name, { cacheTtl: 60 })),
-      );
+      const raws = await readKvValues(this.kv, page.keys.map((k) => k.name), { cacheTtl: 60 });
       for (const raw of raws) {
         if (!raw) continue;
         try {
