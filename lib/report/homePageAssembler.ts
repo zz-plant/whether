@@ -23,7 +23,6 @@ import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
 import { buildHomeStructuredData } from "./home/structuredData";
 import { getRegimePublicLabel } from "../regimePresentation";
-import type { WeeklyCallContract } from "./weeklyCallContract";
 import type { OperatorContext } from "./operatorContext";
 import type {
   HomePageAssembly,
@@ -54,30 +53,6 @@ const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
   loadHomePageReportData,
   buildPostureState,
 };
-
-const buildCommandBarPayload = ({
-  assessment,
-  weeklyCall,
-  weeklyDecisionCardModel,
-  updatedAt,
-}: {
-  assessment: ReportData["assessment"];
-  weeklyCall: WeeklyCallContract;
-  weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
-  updatedAt: string;
-}) => ({
-  regime: assessment.regime,
-  call: weeklyCall.currentCall,
-  doNow: weeklyCall.doNowBullets,
-  flipConditions: [weeklyCall.changeCourseIf, ...weeklyCall.flipConditionLabels].slice(0, 4),
-  updatedAt,
-  postureLabel: weeklyDecisionCardModel.status.postureWithStageLabel ?? weeklyDecisionCardModel.status.statusLabel,
-  trendLabel: weeklyDecisionCardModel.status.trendLabel,
-  confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
-  confidencePercent: weeklyDecisionCardModel.status.confidencePercent,
-  postureTrajectory: weeklyDecisionCardModel.diagnostics.postureTrajectory,
-  regimeDistance: weeklyDecisionCardModel.diagnostics.regimeDistance,
-});
 
 const buildDeferredHomeSupportModels = ({
   reportData,
@@ -415,12 +390,6 @@ export const assembleHomePage = async ({
           ?? weeklyDecisionCardModel.status.statusLabel,
         regimeLabel: getRegimePublicLabel(assessment.regime),
         confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
-      }),
-      commandBar: buildCommandBarPayload({
-        assessment,
-        weeklyCall,
-        weeklyDecisionCardModel,
-        updatedAt: freshnessMeta.updatedAtLabel,
       }),
       historicalBanner: historicalSelection
         ? {

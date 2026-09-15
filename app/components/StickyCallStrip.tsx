@@ -61,10 +61,13 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
       setShowStrip(window.scrollY > revealOffset && !blockingControlInView);
     };
 
-    const blockingTargets = [
-      document.getElementById("subscribe-email"),
-      ...Array.from(document.querySelectorAll("[data-sticky-strip-hide]")),
-    ].filter((target): target is Element => target instanceof Element);
+    // Only the subscribe field hides the strip now. The `[data-sticky-strip-hide]`
+    // hook it also honoured was set by the stress-test quick card, which left
+    // the homepage on 2026-09-15; a selector nothing sets is what Invariant 11
+    // exists to catch.
+    const blockingTargets = [document.getElementById("subscribe-email")].filter(
+      (target): target is Element => target instanceof Element,
+    );
 
     const observer = blockingTargets.length > 0 && "IntersectionObserver" in window
       ? new IntersectionObserver(

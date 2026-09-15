@@ -58,7 +58,6 @@ export default async function DecidePage({
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
   const { homeBriefModel } = snapshot;
   const liveCall = {
-    posture: homeBriefModel.postureWithStageLabel,
     action: reportData.actionNowShort ?? homeBriefModel.operatingStanceLine,
     guardrail: homeBriefModel.guardrail,
     flip: reportData.flipThreshold ?? homeBriefModel.reversalTrigger,
@@ -78,41 +77,14 @@ export default async function DecidePage({
       statusLabel={reportData.statusLabel}
       recordDateLabel={reportData.recordDateLabel}
       fetchedAtLabel={reportData.fetchedAtLabel}
-      treasurySource={reportData.treasury.source}
-      trustStatusLabel={`Confidence ${homeBriefModel.confidenceLabel}`}
-      trustStatusDetail="One decision, closed with a bounded rule."
-      trustStatusAction="Return to Planning after the decision is closed."
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve one open decision"
-      currentPath="/resolve"
       pageSummary="One yes-or-no answer per open decision, under this week's call."
-      pageSummaryLink={{ href: "#direct-answers", label: "Read the answers ↓" }}
       sectionLinks={sectionLinks.slice(0, 2)}
-      heroVariant="compact"
       sidebarVariant="hidden"
-      primaryCta={{ href: "#direct-answers", label: "Direct answers" }}
-      secondaryCta={{ href: "/", label: "Weekly Brief" }}
       nextStep={{
         href: "/operate",
         description: "Return to Planning next",
-      }}
-      decisionBanner={{
-        label: "Help options",
-        decision: "Close the last open decision, then return to planning.",
-        horizon: "This week",
-        confidence: homeBriefModel.confidenceLabel,
-        effectiveDate: reportData.recordDateLabel,
-        evidenceHref: "#direct-answers",
-      }}
-      commandBar={{
-        regime: reportData.assessment.regime,
-        call: "Work one decision at a time.",
-        doNow: [
-          liveCall.action,
-          "Find your question below; each answer links to the rule behind it.",
-        ],
-        flipConditions: [liveCall.guardrail, liveCall.flip],
-        updatedAt: reportData.fetchedAtLabel,
       }}
       structuredData={breadcrumbStructuredData}
       >

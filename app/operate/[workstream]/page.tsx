@@ -6,7 +6,7 @@ import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
-import { CompactWorkstreamSwitcher, OperationsWorkstreamNav } from "../components/planningWorkstreamNav";
+import { CompactWorkstreamSwitcher } from "../components/planningWorkstreamNav";
 import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
@@ -26,8 +26,6 @@ type Workstream = {
   imageAlt: string;
   pageTitle: string;
   pageSummary: string;
-  banner: { label: string; decision: string; horizon: string; confidence?: string; evidenceHref: string };
-  intro?: string;
 };
 
 const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
@@ -38,13 +36,6 @@ const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
     imageAlt: "Whether financial strategy view",
     pageTitle: "Financial strategy",
     pageSummary: "CFO runway planning and capital efficiency settings for the current macro regime.",
-    banner: {
-      label: "CFO Align",
-      decision: "Set capital allocation discipline, test runway limits, and export aligned board updates.",
-      horizon: "This quarter",
-      evidenceHref: "#ops-runway-planner",
-    },
-    intro: "This financial workspace lets you run scenario planning based on your startup stage and sector sensitivity, and export macro-aligned budget planning memos for your board.",
   },
   scenarios: {
     slug: "scenarios",
@@ -53,13 +44,6 @@ const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
     imageAlt: "Whether scenario studio counterfactual simulator view",
     pageTitle: "Scenario studio",
     pageSummary: "Simulate counterfactual macro conditions, rate cuts, or deeper inversions to stress-test your operating plan.",
-    banner: {
-      label: "Scenario Studio",
-      decision: "Simulate policy rate and curve slope shifts to test how your operating commitments hold under stress.",
-      horizon: "Counterfactual Model",
-      confidence: "Hypothetical",
-      evidenceHref: "#sliders-controls-heading",
-    },
   },
 };
 
@@ -102,43 +86,20 @@ export default async function OperateWorkstreamPage({
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
   const { assessment, sensors, macroSeries, recordDateLabel, fetchedAtLabel, statusLabel, treasury } = reportData;
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const { trustStatusLabel, trustStatusDetail, trustStatusAction, trustStatusTone } = snapshot.trustStatus;
-  const weeklyCall = snapshot.weeklyCall;
+  const { trustStatusTone } = snapshot.trustStatus;
 
   return (
     <ReportShell
       model={{
-        status: { statusLabel, recordDateLabel, fetchedAtLabel, treasurySource: treasury.source },
+        status: { statusLabel, recordDateLabel, fetchedAtLabel },
         page: {
           pageTitle: entry.pageTitle,
-          currentPath,
           pageSummary: entry.pageSummary,
           sectionLinks: operationsSectionLinks[entry.slug] ?? operationsSectionLinks.plan,
         },
         trust: {
-          trustStatusLabel,
-          trustStatusDetail,
-          trustStatusAction,
           trustStatusTone,
           showOfflineBadge: isFallback && !reportData.historicalSelection,
-        },
-        actions: {
-          primaryCta: { href: "/operate", label: "Operations Checklists" },
-          secondaryCta: { href: "/", label: "Weekly Brief" },
-        },
-        payloads: {
-          decisionBanner: {
-            ...entry.banner,
-            confidence: entry.banner.confidence ?? trustStatusLabel,
-            effectiveDate: recordDateLabel,
-          },
-          commandBar: {
-            regime: assessment.regime,
-            call: weeklyCall.currentCall,
-            doNow: weeklyCall.doNowBullets,
-            flipConditions: [weeklyCall.changeCourseIf, ...weeklyCall.flipConditionLabels].slice(0, 4),
-            updatedAt: fetchedAtLabel,
-          },
         },
       }}
     >
@@ -153,11 +114,6 @@ export default async function OperateWorkstreamPage({
         <Suspense fallback={<WorkstreamNavFallback />}>
           <CompactWorkstreamSwitcher currentPath={currentPath} />
         </Suspense>
-        {entry.intro ? (
-          <p className="rounded-lg border border-slate-800/70 bg-slate-950/55 px-3 py-2 text-fluid-xs leading-5 text-slate-400">
-            {entry.intro}
-          </p>
-        ) : null}
         {entry.slug === "financial" ? (
           <div id="ops-runway-planner">
             <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
@@ -167,9 +123,6 @@ export default async function OperateWorkstreamPage({
             <ScenarioStudioSimulator liveTreasury={treasury} liveAssessment={assessment} />
           </Suspense>
         )}
-        <Suspense fallback={<WorkstreamNavFallback />}>
-          <OperationsWorkstreamNav currentPath={currentPath} />
-        </Suspense>
       </div>
     </ReportShell>
   );

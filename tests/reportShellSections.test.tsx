@@ -21,178 +21,105 @@ mockAny.module("next/link", () => ({
   },
 }));
 
-import {
-  CommandCenterNavBlock,
-  HeroTrustProvenanceBlock,
-  ReportShell,
-  SidebarSequenceBlock,
-  resolveTrustProvenance,
-} from "../app/components/reportShell";
+import { CommandCenterNavBlock, ReportShell } from "../app/components/reportShell";
 
 describe("ReportShell extracted sections", () => {
-  it("renders hero trust and provenance block", () => {
-    const html = renderToStaticMarkup(
-      <HeroTrustProvenanceBlock
-        trustStatusTone="stable"
-        trustStatusLabel="HIGH"
-        trustStatusDetail="Stable feed"
-        trustStatusAction="Proceed with planning"
-        outageType="live-data"
-        outageSeverity="advisory"
-        decisionImpactWindow="Live window: safe for approvals."
-        approvalBuckets={[
-          { label: "Allowed now", detail: "Proceed with standard approvals." },
-          { label: "Hold", detail: "None." },
-          { label: "Blocked", detail: "None." },
-        ]}
-        recoveryPlan={{
-          owner: "CEO + Finance lead",
-          nextCheckpoint: "Weekly planning cadence",
-          exitCondition: "Keep standard approvals while confidence remains above LOW.",
-        }}
-        outageExitGate={{
-          label: "Outage mode exits when 3/3 checks pass.",
-          summary: "3/3 checks passed this refresh.",
-          metCount: 3,
-          totalCount: 3,
-        }}
-        statusLabel="DEFENSIVE"
-        fetchedAtLabel="Mar 6, 2026"
-        resolvedNextRefreshLabel="15m cadence"
-        sourceLabel="FRED"
-        sourceHref="https://fred.stlouisfed.org"
-      />,
-    );
-
-    assert.match(html, /Approval readiness/);
-    assert.match(html, /What you can approve/);
-    assert.match(html, /Data reliability/);
-    assert.match(html, /Source board/);
-    assert.match(html, /\/trust#source-board/);
-  });
-
-  it("prefers canonical treasury source attribution when provenance is present", () => {
-    const resolved = resolveTrustProvenance({
-      sourceLabel: "Treasury Fiscal Data",
-      sourceHref: "https://fiscaldata.treasury.gov",
-      provenance: {
-        sourceLabel: "Federal Reserve Economic Data (FRED)",
-        sourceUrl: "https://fred.stlouisfed.org",
-        recordDateLabel: "Mar 5, 2026",
-        timestampLabel: "Mar 6, 2026 10:15 UTC",
-        ageLabel: "2h ago",
-        statusLabel: "Cached (medium)",
-      },
-    });
-
-    assert.ok(resolved);
-    assert.equal(resolved.sourceLabel, "Treasury Fiscal Data");
-    assert.equal(resolved.sourceUrl, "https://fiscaldata.treasury.gov");
-  });
-
-  it("renders command center/nav block", () => {
+  it("renders the intro block: kicker, status line, title, summary, stamp, actions", () => {
     const html = renderToStaticMarkup(
       <CommandCenterNavBlock
-        heroVariant="full"
         pageTitle="Weekly Operating Posture Brief"
         pageSummary="Decision summary"
-        summaryLink={null}
         recordDateLabel="Mar 5"
-        primaryCta={{ href: "#weekly", label: "Start" }}
-        secondaryCta={{ href: "#evidence", label: "Evidence" }}
+        primaryCta={{ href: "/share", label: "Start" }}
         exportCta={{ href: "/operate", label: "Export" }}
         statusLabel="DEFENSIVE"
         trustStatusLabel="HIGH"
         fetchedAtLabel="Mar 6"
         resolvedNextRefreshLabel="15m cadence"
-        trustStatusAction="Proceed"
         showOfflineBadge={false}
         offlineBadgeLabel="Cached"
-        missionSupportText="Stable feed"
       />,
     );
 
-    assert.match(html, /Weekly operating brief/);
+    // One kicker on every report route. "Weekly operating brief" used to appear
+    // on whichever routes forgot to ask for the compact variant.
+    assert.match(html, /Weekly brief/);
+    assert.doesNotMatch(html, /Weekly operating brief/);
+    assert.match(html, /DEFENSIVE • HIGH • As of Mar 5/);
     assert.match(html, /Decision summary/);
+    assert.match(html, /Updated Mar 6/);
     assert.match(html, /Start/);
+    assert.match(html, /Export/);
   });
 
-  it("keeps compact command-center intros to one decision block without a second status rail", () => {
+  it("omits the refresh stamp when the route has no fetch time", () => {
+    // /history describes a record, not a live read, and passes no fetch time.
+    // The block printed "Updated " with nothing after it.
     const html = renderToStaticMarkup(
       <CommandCenterNavBlock
-        heroVariant="compact"
-        pageTitle="Resolve one question"
-        pageSummary="Take the smallest useful path for the one question that is still open."
-        summaryLink={null}
-        recordDateLabel="Apr 1"
-        primaryCta={{ href: "#router", label: "Start with the recommended path" }}
-        secondaryCta={{ href: "/", label: "Weekly Brief" }}
-        statusLabel="DEFENSIVE"
-        trustStatusLabel="HIGH"
-        fetchedAtLabel="Apr 2"
-        resolvedNextRefreshLabel="15m cadence"
-        trustStatusAction="Proceed"
+        pageTitle="History"
+        pageSummary="Past calls, as they were published."
+        recordDateLabel="Jul 31, 2026"
+        statusLabel="Sunny"
+        trustStatusLabel="Historical snapshot"
+        fetchedAtLabel=""
         showOfflineBadge={false}
         offlineBadgeLabel="Cached"
-        decisionBanner={{ label: "Resolve one question", decision: "Resolve one remaining question without reopening the weekly brief.", horizon: "This week", confidence: "HIGH", effectiveDate: "Apr 1", evidenceHref: "#router" }}
-        missionSupportText="Use the recommended path first."
       />,
     );
 
-    assert.match(html, /Resolve one question/);
-    assert.match(html, /As of Apr 1/);
-    assert.match(html, /Updated Apr 2/);
-    assert.doesNotMatch(html, /Current report status/);
-    assert.doesNotMatch(html, /Review order/);
+    assert.doesNotMatch(html, /Updated/);
+    assert.match(html, /As of Jul 31, 2026/);
   });
 
-  it("renders sidebar sequence rail", () => {
-    const html = renderToStaticMarkup(
-      <SidebarSequenceBlock
-        stageRail={{
-          title: "Decision flow",
-          items: [{ id: "one", label: "Call", href: "#call", status: "current" }],
-        }}
-      />,
-    );
-
-    assert.match(html, /Decision flow/);
-    assert.match(html, /Call/);
-  });
-
-  it("keeps in-page hero actions as actual links when they target report sections", () => {
+  it("renders no hero button unless a route asks for one", () => {
+    // The shell used to default a primary action to "#weekly-action-summary",
+    // an anchor no route renders, so /history shipped a dead button.
     const html = renderToStaticMarkup(
       <ReportShell
         statusLabel="DEFENSIVE"
         recordDateLabel="Mar 5, 2026"
         fetchedAtLabel="Mar 6, 2026"
-        treasurySource="https://fred.stlouisfed.org"
         pageTitle="Signals"
         pageSummary="Deep evidence appendix."
-        pageSummaryLink={{ href: "#thresholds", label: "See thresholds" }}
         sectionLinks={[
           { href: "#current-scores", label: "Current scores" },
           { href: "#thresholds", label: "Thresholds" },
         ]}
-        trustStatusLabel="HIGH"
-        trustStatusDetail="Stable feed"
-        trustStatusAction="Proceed with planning."
         trustStatusTone="stable"
-        currentPath="/signals"
-        primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
-        secondaryCta={{ href: "#thresholds", label: "See thresholds" }}
       >
         <section>Body</section>
       </ReportShell>,
     );
 
+    assert.doesNotMatch(html, /weekly-action-summary/);
+    assert.doesNotMatch(html, /This week/);
+    assert.doesNotMatch(html, /weather-cta-primary/);
+    assert.match(html, /Deep evidence appendix\./);
+    // The outline still carries the anchors the hero no longer duplicates.
     assert.match(html, /href="#current-scores"/);
     assert.match(html, /href="#thresholds"/);
-    assert.match(html, /Open evidence appendix/);
-    assert.match(html, /See thresholds/);
+  });
+
+  it("keeps a hero action a real link when a route passes one", () => {
+    const html = renderToStaticMarkup(
+      <ReportShell
+        statusLabel="DEFENSIVE"
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel="Mar 6, 2026"
+        pageTitle="Signals"
+        pageSummary="Deep evidence appendix."
+        sectionLinks={[{ href: "#current-scores", label: "Current scores" }]}
+        trustStatusTone="stable"
+        primaryCta={{ href: "/history/compare", label: "Compare periods" }}
+      >
+        <section>Body</section>
+      </ReportShell>,
+    );
+
+    assert.match(html, /href="\/history\/compare"/);
+    assert.match(html, /Compare periods/);
     assert.doesNotMatch(html, /Copy aligned brief/);
-    assert.doesNotMatch(html, /href="#ops-export-briefs"/);
-    assert.match(html, /Deep evidence appendix\./);
   });
 
   it("renders the home brief share action in the header and keeps the body CTA rail quiet", () => {
@@ -201,15 +128,10 @@ describe("ReportShell extracted sections", () => {
         statusLabel="DEFENSIVE"
         recordDateLabel="Mar 5, 2026"
         fetchedAtLabel="Mar 6, 2026"
-        treasurySource="https://fred.stlouisfed.org"
         pageTitle="Weekly Brief"
         pageSummary="This week's call and the share-ready path."
         sectionLinks={[]}
-        trustStatusLabel="HIGH"
-        trustStatusDetail="Stable feed"
-        trustStatusAction="Proceed with planning."
         trustStatusTone="stable"
-        currentPath="/"
         exportCta={{
           href: "#share-ready-artifact",
           label: "Copy weekly brief",
@@ -225,5 +147,26 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /href="#share-ready-artifact"/);
     assert.match(html, /share-ready path\./);
     assert.doesNotMatch(html, /Review order/);
+  });
+
+  it("puts the next-step card at the end of the page, once", () => {
+    const html = renderToStaticMarkup(
+      <ReportShell
+        statusLabel="DEFENSIVE"
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel="Mar 6, 2026"
+        pageTitle="Plan"
+        pageSummary="Prepare for this week's conditions."
+        sectionLinks={[]}
+        trustStatusTone="stable"
+        nextStep={{ href: "/resolve", description: "One question still open? Resolve it" }}
+      >
+        <section>Body</section>
+      </ReportShell>,
+    );
+
+    assert.equal(html.split('data-testid="next-step-card"').length - 1, 1);
+    assert.ok(html.indexOf("Body") < html.indexOf("next-step-card"));
+    assert.match(html, /href="\/resolve"/);
   });
 });

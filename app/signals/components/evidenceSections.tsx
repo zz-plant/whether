@@ -245,26 +245,6 @@ export const SignalsCurrentScoresSection = ({
   </ReportSection>
 );
 
-export const SignalsNeedMoreProofSection = ({
-  searchParams,
-}: {
-  searchParams?: Record<string, string | undefined>;
-}) => (
-  <section className="weather-panel space-y-3 px-6 py-5">
-    {/* The Depth switcher near the top already explains the short-vs-deep choice — this is
-        the same switch repeated at the end of the page, so it carries the action only. */}
-    <h2 className="text-lg font-semibold text-slate-100">Need more detail?</h2>
-    <a
-      href={
-        buildSignalsViewHref(searchParams, "detail") + "#evidence-priorities"
-      }
-      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
-    >
-      Open deeper evidence
-    </a>
-  </section>
-);
-
 export const SignalsEvidencePrioritiesSection = ({
   activeFocus,
   focusLabelByTab,

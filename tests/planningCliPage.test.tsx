@@ -8,14 +8,17 @@ describe("operations navigation", () => {
     assert.deepEqual(operationsWorkstreamLinks.map((link) => link.href), ["/operate", "/operate/financial", "/operate/scenarios"]);
   });
 
-  it("keeps planning navigation centered on plan execution and sharing checkpoints", () => {
+  it("indexes the plan page in page order, one entry per section", () => {
+    // The five stepper steps, then the risk-checks tail — the order a reader
+    // meets them. This used to be six labels in a different order, two of which
+    // named panels inside other steps, and none of which named the Test step.
     assert.deepEqual(operationsSectionLinks.plan.map((link) => link.href), [
       "#ops-monthly-action-summary",
-      "#ops-failure-patterns",
-      "#ops-playbook",
-      "#ops-finance-strategy",
       "#ops-export-briefs",
-      "#ops-operator-requests",
+      "#ops-playbook",
+      "#ops-decision-shield",
+      "#ops-finance-strategy",
+      "#ops-failure-patterns",
     ]);
   });
 });

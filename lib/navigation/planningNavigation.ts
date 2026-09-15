@@ -32,13 +32,17 @@ export const operationsSectionLinks: {
   financial: ReportSectionLink[];
   scenarios: ReportSectionLink[];
 } = {
+  // One index for the page, in page order, under the names the sections use.
+  // /operate used to carry three: this list (six labels in a different order,
+  // two of them naming panels inside other steps and none naming the Test
+  // step), the stepper's own sticky chip row, and a card grid at the tail.
   plan: [
-    { href: "#ops-monthly-action-summary", label: "Start here" },
-    { href: "#ops-failure-patterns", label: "Risk checks" },
-    { href: "#ops-playbook", label: "Guardrails" },
+    { href: "#ops-monthly-action-summary", label: "Weekly plan" },
+    { href: "#ops-export-briefs", label: "Share the brief" },
+    { href: "#ops-playbook", label: "Rules before you commit" },
+    { href: "#ops-decision-shield", label: "Test a decision" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
-    { href: "#ops-export-briefs", label: "Share brief" },
-    { href: "#ops-operator-requests", label: "Operator requests" },
+    { href: "#ops-failure-patterns", label: "Risk checks" },
   ],
   financial: [
     { href: "#ops-runway-inputs", label: "Financial inputs" },

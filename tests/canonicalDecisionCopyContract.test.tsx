@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { renderToStaticMarkup } from "react-dom/server";
-import { RegimeCommandBar } from "../app/components/RegimeCommandBar";
 import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyCallSnapshotPlainText } from "../lib/export/weeklyOperatorBrief";
 import type { RegimeAssessment } from "../lib/regimeEngine";
@@ -100,16 +98,6 @@ describe("canonical decision copy contract", () => {
       postureState,
     });
 
-    const commandBarHtml = renderToStaticMarkup(
-      <RegimeCommandBar
-        regime="DEFENSIVE"
-        call={canonical.operatingCall}
-        doNow={canonical.doNowLines}
-        flipConditions={[canonical.flipTrigger]}
-        updatedAt="Mar 8, 2026"
-      />,
-    );
-
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
@@ -134,7 +122,6 @@ describe("canonical decision copy contract", () => {
     assert.equal(payload.doNowBullets[0], canonical.doNowLines[0]);
     assert.equal(payload.flipTrigger, canonical.flipTrigger);
     assert.equal(payload.flipConditionLabels[0], canonical.flipConditions[0]);
-    assert.match(commandBarHtml, new RegExp(canonical.operatingCall.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     assert.match(snapshot, /REGIME: Defensive — Watchful/);
     assert.match(snapshot, /CALL: Stage approvals and protect runway\./);
     assert.match(snapshot, /DO NOW: Pause net-new fixed burn commitments this week\./);
