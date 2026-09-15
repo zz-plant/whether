@@ -95,6 +95,14 @@
   (e.g. step "Test a decision" → section "Is this move safe right now?").
 - NEVER: repeat a section's full description in both a checklist/index entry and that section's own
   header. The index carries titles; the section carries the description.
+- MUST: keep one in-page index per page, derived from the shell's `sectionLinks`, in page order and
+  under the sections' own names. Until 2026-09-15 `/operate` carried three — the sidebar list, the
+  stepper's own sticky chip row, and a card grid at the tail — with three vocabularies for the same
+  five sections.
+- NEVER: give the hero an action that targets the block directly beneath it, or a button to a route
+  the header tab already reaches. Four routes pointed the hero button, an inline "↓" link and the
+  first index entry at the same anchor, and every secondary button pointed at `/`. A hero action
+  earns its place only by leading somewhere the page index and the header do not.
 - Heading *copy* — what a heading may say, casing, one name per thing — is governed by
   `docs/editorial-guardrails.md` → Headings. This section governs where headers appear; that one
   governs what they say.

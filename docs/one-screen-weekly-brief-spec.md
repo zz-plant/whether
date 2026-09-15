@@ -409,7 +409,8 @@ Compressed the shell chrome and unified control vocabulary on `/`.
   than competing with current conditions in the header or hero.
 - **One header band on `lg+` home.** Brand · nav · cadence · icons stay in a single row;
   below `lg`, cadence drops to a second rail; below `md` the nav collapses to the drawer trigger.
-  Report sub-routes keep the two-band layout with the next-step CTA.
+  Report sub-routes keep the two-band layout with the next-step CTA. *(Reversed 2026-09-15 —
+  see "Declutter pass" below: one band everywhere.)*
 - **Nav de-glowed.** Active links lost the glow shadow and status dot (filled state carries it);
   the mobile drawer trigger swapped its pulsing dot + glow for a menu icon — it read as a status
   chip, not a button. No perpetual motion remains in the header.
@@ -496,3 +497,27 @@ same thing, the earlier one keeps it.
 ### Home cadence placement (2026-09-12)
 
 The weekly call precedes horizon selection on mobile and desktop. Weekly / Monthly / Quarterly stays available under the lower plan-and-evidence handoff, using the existing selector. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header. This completes the home-fold work deferred in PR #1351.
+
+### Declutter pass (2026-09-15)
+
+The sitewide pass recorded in `docs/feature-specs-current.md` §1.1.17. What it changes in this
+contract:
+
+- **One header band on every route.** The 2026-08-11 note above ("report sub-routes keep the
+  two-band layout with the next-step CTA") is reversed: the CTA duplicated the Brief tab directly
+  under it. Wordmark · tabs · actions, everywhere.
+- **Block C's per-driver clocks stay; the threshold rows and rate prose go.** `KeyDriversCard`
+  prints each driver's value, its pace or persistence, and the rate's horizon move. The
+  posture-boundary and pause-line rows re-encoded the hero's bounded rails (§XV: one encoding per
+  concept per screen), and the paragraphs explaining how the rate feeds the score were
+  methodology on the primary screen.
+- **One stage control at every width.** The header pill below `sm`, the hero's tablist from `sm`
+  up. The first-run line no longer asks a third time.
+- **One period control set.** The chevrons and the calendar picker in the meta row. The timeline
+  scrubber and the swipe-anywhere month gesture left `/`; `/history` keeps the scrubber.
+- **The phone sticky strip is gone; the desktop pill stays.** The bottom tab bar owns the thumb
+  zone, and with the brief at about three phone screens the hero's Copy Brief is one flick away.
+- **Below the call:** drivers and actions, the posture stripe, subscribe, the since-last-visit
+  line when there is one, and the plan handoff with a text link to the direct answers. The
+  stress-test card, the retrospective card and the direct-answers band restated the hero or
+  recreated another route inline.
