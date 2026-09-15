@@ -118,12 +118,15 @@ export function PublishedBriefCopyControls({
             overlay scrollbars stay hidden until you scroll, so the block just
             appeared sliced in half on the most linkable page on the site. */}
         <div className="relative">
-          <pre className="max-h-64 overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200 font-mono">
+          {/* The block and its fade share one token so the fade is the block's
+              own colour on both themes; a slate-950 gradient stayed black on
+              the light theme while the remap turned the block near-white. */}
+          <pre className="max-h-64 overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-[color:var(--bg-nested)] p-3 text-xs leading-relaxed text-slate-200 font-mono">
             {activeText}
           </pre>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-px bottom-px h-10 rounded-b-md bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent"
+            className="pointer-events-none absolute inset-x-px bottom-px h-10 rounded-b-md bg-gradient-to-t from-[color:var(--bg-nested)] to-transparent"
           />
         </div>
       </div>

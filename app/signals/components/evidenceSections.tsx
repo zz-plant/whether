@@ -33,7 +33,7 @@ export const SignalsModeSwitcherSection = ({
       aria-label="Evidence view"
     >
       <div className="space-y-1">
-        <p className="type-eyebrow text-sky-200">Reading depth</p>
+        <p className="type-eyebrow">Reading depth</p>
         {/* The paragraph that sat here restated both radio options, which carry
             their own descriptions a few lines below. */}
         <h2 className="text-base font-semibold text-slate-100">

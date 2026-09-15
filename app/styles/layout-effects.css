@@ -12,8 +12,6 @@
   .weather-page-shell > div:first-child > div:first-child,
   [data-print-hide],
   [data-page-section] button,
-  .framework-card button,
-  .framework-card [class*="border-t"],
   .skip-link,
   [role="dialog"] {
     display: none !important;

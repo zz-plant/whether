@@ -38,6 +38,26 @@ export const resolveCaptureTargets = (onlyIds = []) => {
 export const listCaptureTargets = () =>
   uiCaptureTargets.map((target) => `${target.id}\t${target.label}\t${target.path}`);
 
+const CAPTURE_THEMES = new Set(["dark", "light"]);
+
+/**
+ * `--theme light` captures the light theme. The app reads its theme from
+ * localStorage in a bootstrap script that runs before first paint
+ * (`buildThemeBootstrapScript` in app/layout.tsx), so the capture seeds the
+ * same key from an init script and the page renders light from the first
+ * frame — no toggle click, no flash of the dark shell in the PNG. Files land
+ * as `<id>-light.png` so a light set can sit beside the dark one it is
+ * compared against. Until 2026-09-15 the harness could not capture light at
+ * all, which is how the light theme shipped contrast bugs nobody saw.
+ */
+export const parseCaptureTheme = (args) => {
+  const theme = readArgValue(args, "--theme", "dark");
+  if (!CAPTURE_THEMES.has(theme)) {
+    throw new Error(`\`--theme\` must be one of ${[...CAPTURE_THEMES].join(", ")}; got "${theme}".`);
+  }
+  return theme;
+};
+
 export const parseCaptureOptions = (args) => {
   const onlyIds = parseOnlyIds(readArgValue(args, "--only", ""));
 
@@ -46,6 +66,7 @@ export const parseCaptureOptions = (args) => {
     baseUrl: readArgValue(args, "--base-url", DEFAULT_UI_CAPTURE_BASE_URL),
     outDir: readArgValue(args, "--out-dir", DEFAULT_UI_CAPTURE_OUT_DIR),
     onlyIds,
+    theme: parseCaptureTheme(args),
     targets: resolveCaptureTargets(onlyIds),
   };
 };
@@ -311,7 +332,12 @@ const launchChromium = async () => {
   }
 };
 
-export const captureTargets = async ({ baseUrl, outDir, targets }) => {
+const THEME_STORAGE_KEY = "whether-theme";
+
+export const captureFileName = (targetId, theme = "dark") =>
+  theme === "light" ? `${targetId}-light.png` : `${targetId}.png`;
+
+export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" }) => {
   await mkdir(outDir, { recursive: true });
 
   const browser = await launchChromium();
@@ -320,8 +346,15 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
   try {
     for (const target of targets) {
       const page = await browser.newPage({ viewport: target.viewport });
+      if (theme === "light") {
+        await page.addInitScript(
+          ([key, value]) => window.localStorage.setItem(key, value),
+          [THEME_STORAGE_KEY, "light"],
+        );
+      }
       const url = new URL(target.path, baseUrl).toString();
-      const outputPath = path.resolve(process.cwd(), outDir, `${target.id}.png`);
+      const outputFileName = captureFileName(target.id, theme);
+      const outputPath = path.resolve(process.cwd(), outDir, outputFileName);
 
       // Collected regardless of whether the caller checks them, so a capture
       // run doubles as UI standard VII's "console is clean" check for free —
@@ -350,12 +383,13 @@ export const captureTargets = async ({ baseUrl, outDir, targets }) => {
 
       captures.push({
         id: target.id,
-        label: target.label,
+        label: theme === "light" ? `${target.label} / light` : target.label,
         path: target.path,
         viewport: target.viewport,
         fullPage: target.fullPage ?? true,
+        theme,
         outputPath,
-        outputFileName: `${target.id}.png`,
+        outputFileName,
         url,
         consoleErrors,
       });
@@ -537,14 +571,15 @@ export const buildCaptureGalleryHtml = ({ baseUrl, captures, generatedAt }) => {
 </html>`;
 };
 
-export const writeCaptureArtifacts = async ({ baseUrl, outDir, captures }) => {
-  const manifestPath = path.resolve(process.cwd(), outDir, "manifest.json");
-  const galleryPath = path.resolve(process.cwd(), outDir, "index.html");
+export const writeCaptureArtifacts = async ({ baseUrl, outDir, captures, theme = "dark" }) => {
+  const suffix = theme === "light" ? "-light" : "";
+  const manifestPath = path.resolve(process.cwd(), outDir, `manifest${suffix}.json`);
+  const galleryPath = path.resolve(process.cwd(), outDir, `index${suffix}.html`);
   const generatedAt = new Date().toISOString();
 
   await writeFile(
     manifestPath,
-    `${JSON.stringify({ baseUrl, generatedAt, captures }, null, 2)}\n`,
+    `${JSON.stringify({ baseUrl, generatedAt, theme, captures }, null, 2)}\n`,
     "utf8",
   );
   await writeFile(

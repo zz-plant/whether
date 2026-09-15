@@ -75,6 +75,7 @@ export default async function DecidePage({
   return (
     <ReportShell
       statusLabel={reportData.statusLabel}
+      regime={reportData.assessment.regime}
       recordDateLabel={reportData.recordDateLabel}
       fetchedAtLabel={reportData.fetchedAtLabel}
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}

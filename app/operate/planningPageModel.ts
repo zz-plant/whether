@@ -149,6 +149,7 @@ export async function buildPlanningPageModel(
     reportShellModel: {
       status: {
         statusLabel,
+        regime: assessment.regime,
         recordDateLabel,
         fetchedAtLabel,
       },

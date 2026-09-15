@@ -17,17 +17,6 @@
   animation: weather-panel-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.weather-disclosure-panel {
-  overflow: hidden;
-  transform-origin: top center;
-}
-
-.weather-disclosure-trigger-indicator {
-  transition:
-    transform var(--transition-fast) var(--ease-out),
-    color var(--transition-fast) var(--ease-out);
-}
-
 button:focus-visible,
 a:focus-visible,
 select:focus-visible,
@@ -81,19 +70,6 @@ summary:focus-visible {
   text-decoration: none;
 }
 
-.weather-meta-list__item {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.35rem;
-  white-space: nowrap;
-}
-
-.weather-meta-list__item:not(:last-child)::after {
-  content: "·";
-  margin-left: 0.35rem;
-  color: var(--app-text-muted);
-}
-
 :where(details) {
   border-radius: var(--radius-md);
 }
@@ -119,13 +95,9 @@ summary:focus-visible {
   text-wrap: pretty;
 }
 
-
 /* §IX: end state immediately, not a slowed reveal. */
 @media (prefers-reduced-motion: reduce) {
   .weather-step-panel {
     animation: none;
-  }
-  .weather-disclosure-trigger-indicator {
-    transition: none;
   }
 }

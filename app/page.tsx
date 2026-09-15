@@ -65,11 +65,13 @@ export default async function Page({
   const resolved = searchParams ? await searchParams : undefined;
   const regimeHistory = getMonthlyRegimeHistory();
 
-  return (
-    <Shell regime={regimeHistory.at(-1)?.regime}>
-      <PageContent searchParams={resolved} regimeHistory={regimeHistory} />
-    </Shell>
-  );
+  /* PageContent mounts the Shell itself so the page's atmosphere is keyed to
+     the week the hero states. It used to be keyed here, to the last month-end
+     in the regime history, and the two disagree whenever the call moves
+     inside a month: on 2026-09-15 the shell painted a Sunny wash under a
+     Freezing call. There is no streaming boundary between the two — app/
+     loading.tsx carries the pending state — so nothing is lost by waiting. */
+  return <PageContent searchParams={resolved} regimeHistory={regimeHistory} />;
 }
 
 /**
@@ -150,7 +152,11 @@ async function PageContent({
   try {
     data = await loadHomePageAssembly(searchParams);
   } catch {
-    return <HomeBriefLoadError />;
+    return (
+      <Shell>
+        <HomeBriefLoadError />
+      </Shell>
+    );
   }
 
   const { homepage, reportData } = data;
@@ -344,7 +350,7 @@ async function PageContent({
       })) ?? []);
 
   return (
-    <>
+    <Shell regime={regime}>
       <BriefArtifactScript artifact={briefArtifact} />
       <ActivationTracker path="/" />
       {isDegraded ? (
@@ -590,6 +596,6 @@ async function PageContent({
         boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
         shareLines={briefShareLines}
       />
-    </>
+    </Shell>
   );
 }

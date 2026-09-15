@@ -73,9 +73,14 @@ export function FirstVisitExplainer() {
       aria-label="What is Whether"
       data-testid="first-run-orientation"
       suppressHydrationWarning
-      className="mb-4 flex items-start justify-between gap-3 rounded-xl border border-slate-800/80 bg-slate-900/40 p-3.5 sm:p-4 text-fluid-xs text-slate-300 backdrop-blur-sm"
+      /* A standfirst, not a notice. Boxed, blurred and sitting first on the
+         page, this read as a cookie banner — the one register a product's
+         opening line must not have. A line over a hairline keeps the
+         orientation and lets the week title be the first thing that is
+         framed. */
+      className="mb-3 flex items-start justify-between gap-4 border-b border-white/[0.08] pb-3 text-fluid-xs text-slate-300"
     >
-      <p className="min-w-0 font-normal text-slate-200 leading-relaxed">
+      <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
         How hard it is to raise money right now, and how much risk investors will fund, scored into
         one operating call each Monday.
       </p>
@@ -83,7 +88,7 @@ export function FirstVisitExplainer() {
         type="button"
         onClick={handleDismiss}
         aria-label="Dismiss introduction"
-        className="shrink-0 -mr-1 -mt-1 inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+        className="shrink-0 -mr-2 -mt-2 inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
       >
         Dismiss
       </button>

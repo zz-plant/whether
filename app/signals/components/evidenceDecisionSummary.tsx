@@ -33,7 +33,7 @@ export const SignalsDecisionSummarySection = ({
     aria-label="Decision summary"
   >
     <article className="weather-surface space-y-3 p-4">
-      <p className="type-eyebrow text-sky-200">What this means now</p>
+      <p className="type-eyebrow">What this means now</p>
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
           <p className="text-xs font-semibold text-slate-400">
@@ -124,7 +124,7 @@ export const SignalsDecisionSummarySection = ({
     {topDiagnosticCallouts.length > 1 ? (
       <article className="weather-surface flex flex-col justify-between p-5">
         <div className="space-y-3">
-          <p className="type-eyebrow text-sky-200">Also moved</p>
+          <p className="type-eyebrow">Also moved</p>
           <ul className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0" aria-label="Top mover callouts">
             {topDiagnosticCallouts.slice(1).map((item) => (
               <li

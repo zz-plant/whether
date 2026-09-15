@@ -70,31 +70,36 @@
   }
 }
 
-/* Hero card elevation with radiant specular gradient */
+/* Hero card. The one surface whose colour is allowed to say something: its
+   wash, border and top-edge light all come from --regime-accent, which the
+   hero sets on itself from the week's regime (data-regime), so the card is
+   emerald in a Sunny week, rose in a Freezing one, and cannot disagree with
+   the stamp inside it. Before this it was fixed teal — the stripe's colour
+   for Sunny — under every call. The wash sits high and right, where the
+   score is, and fades before it reaches the text; no outer glow, since a box
+   that glows lifts off its page, and the depth ladder below already gives
+   the hero the only elevation on the brief. */
 .weather-hero-card {
   position: relative;
   background:
-    radial-gradient(ellipse 75% 60% at 85% 20%, rgba(45, 212, 191, 0.14), transparent 70%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(20, 184, 166, 0.08), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%),
-    color-mix(in srgb, var(--bg-body) 35%, #05181b 65%);
-  border-color: rgba(45, 212, 191, 0.24);
+    radial-gradient(ellipse 70% 55% at 88% 0%, color-mix(in srgb, var(--regime-accent) 15%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--regime-accent) 4%, transparent) 0%, transparent 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%),
+    color-mix(in srgb, var(--bg-panel) 94%, var(--regime-accent) 6%);
+  border-color: color-mix(in srgb, var(--regime-accent) 34%, var(--border-strong));
   box-shadow:
     var(--elev-3),
-    0 0 32px rgba(45, 212, 191, 0.08),
-    inset 0 1px 0 var(--edge-highlight);
+    inset 0 1px 0 color-mix(in srgb, var(--regime-accent) 22%, var(--edge-highlight));
 }
 
 html[data-theme="light"] .weather-hero-card {
   background:
-    radial-gradient(ellipse 75% 60% at 85% 20%, rgba(45, 212, 191, 0.08), transparent 70%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(20, 184, 166, 0.05), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%),
+    radial-gradient(ellipse 70% 55% at 88% 0%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--regime-accent) 4%, transparent) 0%, transparent 45%),
     var(--bg-panel, #ffffff);
-  border-color: rgba(13, 148, 136, 0.25);
+  border-color: color-mix(in srgb, var(--regime-accent) 30%, var(--border-strong));
   box-shadow:
     var(--elev-2),
-    0 0 24px rgba(20, 184, 166, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -136,37 +141,8 @@ html[data-theme="light"] .weather-brief-card {
 }
 
 /* Lever decision micro-card for visual rhythm */
-.weather-lever-card {
-  position: relative;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-subtle);
-  background: rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 1rem 1.25rem;
-  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.weather-lever-card:hover {
-  background: rgba(15, 23, 42, 0.65);
-  border-color: rgba(125, 211, 252, 0.28);
-  transform: translateX(2px);
-}
 
 /* Glow aura for key scores and metric accents */
-.weather-glow-aura {
-  position: relative;
-}
-
-.weather-glow-aura::before {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: -1;
-  pointer-events: none;
-}
 
 /* New surface system: typographic hierarchy over container hierarchy.
    Sections replace stacked cards — pure spacing + optional top border.
@@ -191,27 +167,9 @@ html[data-theme="light"] .weather-brief-card {
   padding-top: var(--space-xl);
 }
 
-.weather-transmission-segment {
-  border-radius: var(--radius-md);
-  background: rgba(14, 14, 14, 0.25);
-}
-
-.weather-trust-board {
-  border-color: rgba(251, 191, 36, 0.14);
-  background: rgba(28, 28, 28, 0.65);
-  box-shadow: var(--elev-1);
-}
-
-.weather-trust-lane {
-  border: 1px solid var(--border-faint);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-muted);
-}
-
 :where(.weather-hub-section > .weather-hub-card, .weather-hub-section > .weather-panel, .weather-hub-section > .weather-surface, .weather-secondary-section > .weather-panel, .weather-secondary-section > .weather-surface) {
-  border-color: rgba(71, 85, 105, 0.14);
-  background:
-    linear-gradient(180deg, rgba(9, 16, 30, 0.74), rgba(5, 10, 22, 0.82));
+  border-color: var(--border-subtle);
+  background: var(--bg-nested);
   box-shadow:
     var(--elev-2),
     inset 0 1px 0 var(--edge-highlight-faint),
@@ -219,8 +177,8 @@ html[data-theme="light"] .weather-brief-card {
 }
 
 .weather-surface-sky {
-  border-color: rgba(56, 189, 248, 0.18);
-  background: rgba(14, 24, 24, 0.15);
+  border-color: var(--accent-border-soft);
+  background: color-mix(in srgb, var(--accent-action) 6%, transparent);
 }
 
 .weather-data-mode {
@@ -230,18 +188,13 @@ html[data-theme="light"] .weather-brief-card {
 .weather-data-mode-dynamic {
   border-color: rgba(16, 185, 129, 0.30);
   background-color: rgba(16, 185, 129, 0.08);
-  color: rgb(167 243 208);
+  color: var(--color-semantic-easing-fg);
 }
 
 .weather-data-mode-static {
   border-color: var(--border-strong);
-  background-color: rgba(30, 41, 59, 0.30);
-  color: rgb(226 232 240);
-}
-
-.weather-surface-indigo {
-  border-color: rgba(129, 140, 248, 0.16);
-  background: rgba(30, 27, 75, 0.12);
+  background-color: var(--bg-nested-light);
+  color: var(--app-text-secondary);
 }
 
 /* Depth de-escalation ---------------------------------------------------
@@ -276,19 +229,13 @@ html[data-theme="light"] .weather-brief-card {
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-lever-card,
-    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-lever-card,
-    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card,
-    .weather-trust-board, .weather-trust-lane,
-    .weather-surface-secondary){
+    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-surface-secondary) {
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -301,33 +248,24 @@ html[data-theme="light"] .weather-brief-card {
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-lever-card,
-    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-lever-card,
-    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card,
-    .weather-trust-board, .weather-trust-lane,
+    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-lever-card,
-    .weather-hub-hero, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-route-card, .weather-stat-card,
-    .weather-trust-board, .weather-trust-lane,
-    .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]){
+    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
 }
 
 /* Chip base — normalizes sizing across all chip-like elements */
-:where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-brief-meta-chip, .weather-nav-card-index, .weather-data-mode) {
+:where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-data-mode) {
   border-radius: var(--radius-sm);
   font-size: 0.625rem;
   font-weight: 600;
@@ -353,14 +291,14 @@ button .weather-chip:hover,
 [role="button"] .weather-chip:hover,
 .weather-chip:hover {
   border-color: var(--border-strong);
-  background: rgba(15, 23, 42, 0.52);
+  background: var(--bg-nested-light);
 }
 
 a .weather-chip:active,
 button .weather-chip:active,
 .weather-chip:active {
-  border-color: rgba(148, 163, 184, 0.34);
-  background: rgba(15, 23, 42, 0.6);
+  border-color: var(--border-strong);
+  background: var(--bg-nested);
 }
 
 .weather-chip:focus-visible {

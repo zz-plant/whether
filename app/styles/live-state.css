@@ -1,29 +1,11 @@
 
 
-.weather-command-bar {
-}
-
-.weather-command-bar__card {
-  height: 100%;
-  transition:
-    transform var(--transition-fast) var(--ease-out),
-    border-color var(--transition-fast) var(--ease-out),
-    box-shadow var(--transition-fast) var(--ease-out);
-}
-
-.weather-command-bar__card:hover,
-.weather-command-bar__card:focus-within {
-  transform: translateY(-1px);
-  border-color: rgba(125, 211, 252, 0.36);
-  box-shadow: var(--elev-2), var(--glow-soft);
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .weather-skeleton__shimmer{
+  .weather-skeleton__shimmer {
     animation: none;
   }
 
@@ -33,10 +15,8 @@
   .weather-button-primary,
   .weather-cta,
   .weather-icon-chip,
-  .weather-route-card,
   .weather-hub-link-card,
-  .weather-command-bar__card,
-  .weather-delta-card{
+  .weather-delta-card {
     transition: none;
   }
 }

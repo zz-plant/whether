@@ -3,6 +3,9 @@ import { describe, it } from "bun:test";
 // @ts-ignore Runtime-only .mjs helper is validated by these tests.
 import {
   buildCaptureGalleryHtml,
+  captureFileName,
+  parseCaptureOptions,
+  parseCaptureTheme,
   probeBaseUrl,
   probeHtmlAssetIntegrity,
   resolveCaptureTargets,
@@ -10,6 +13,15 @@ import {
 } from "../scripts/ui-capture.lib.mjs";
 
 describe("ui capture helpers", () => {
+  it("captures dark by default and light on request, keeping the two sets apart on disk", () => {
+    assert.equal(parseCaptureTheme([]), "dark");
+    assert.equal(parseCaptureTheme(["--theme", "light"]), "light");
+    assert.throws(() => parseCaptureTheme(["--theme", "sepia"]), /--theme/);
+    assert.equal(parseCaptureOptions(["--theme", "light"]).theme, "light");
+    assert.equal(captureFileName("home-mobile"), "home-mobile.png");
+    assert.equal(captureFileName("home-mobile", "light"), "home-mobile-light.png");
+  });
+
   it("keeps the full configured capture set when no filters are provided", () => {
     const targets = resolveCaptureTargets();
 
@@ -71,6 +83,7 @@ describe("ui capture helpers", () => {
           path: "/mockups/operator-brief?viewport=mobile&density=compact",
           viewport: { width: 430, height: 932 },
           fullPage: true,
+          theme: "dark",
           outputPath: "/tmp/operator-brief-mobile.png",
           outputFileName: "operator-brief-mobile.png",
           url: "http://127.0.0.1:3000/mockups/operator-brief?viewport=mobile&density=compact",

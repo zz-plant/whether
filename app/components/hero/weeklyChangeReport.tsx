@@ -252,15 +252,18 @@ export function WeeklyChangeReport({
    */
   const quiet = rows.length === 0 && !attention;
 
+  /*
+   * The same nested surface as the "Why this call" and "Watch this week" panels
+   * under it. It used to be a full amber (or emerald) box with a glow, which
+   * made it a second coloured region competing with the regime-tinted card it
+   * sits in; the state is carried by the dot and the stamp, which is where the
+   * eye checks it anyway.
+   */
   return (
     <section
       data-testid="weekly-top-fold"
       aria-label="What changed this week"
-      className={`rounded-lg border p-3.5 backdrop-blur-sm transition-all ${
-        attention
-          ? "border-amber-500/40 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.08)]"
-          : "border-emerald-500/30 bg-emerald-500/[0.07] shadow-[0_0_20px_rgba(16,185,129,0.06)]"
-      }`}
+      className="rounded-lg border border-slate-800/60 bg-slate-950/30 p-3.5"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-fluid-xs font-semibold text-slate-100">

@@ -63,6 +63,7 @@ export default async function SignalsPage({
   return (
     <ReportShell
       statusLabel={model.statusLabel}
+      regime={model.assessment.regime}
       recordDateLabel={model.recordDateLabel}
       fetchedAtLabel={model.fetchedAtLabel}
       trustStatusTone={model.trust.trustStatusTone}

@@ -20,7 +20,7 @@ import { centredScrollLeft, scrollBehaviorFor, scrollRowToItem } from "../app/co
 const walk = async (dir: string): Promise<string[]> => {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
-    entries.map((entry) => (entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)])),
+    entries.map(async (entry) => (entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)])),
   );
   return files.flat();
 };

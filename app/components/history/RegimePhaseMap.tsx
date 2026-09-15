@@ -291,16 +291,23 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
                 construction in the busiest part of the plot — between the reading
                 and the rule — so relying on placement alone to keep it off the
                 trace does not survive a change of window. */}
+            {/* Each label sits at the rule end of its own gap line, just past
+                the rule, on the side away from the marker. They used to sit at
+                the midpoints, which for a reading near both rules — the usual
+                case, since a call is made near its lines — put the two labels
+                on the same few units of plot and on the marker's halo. */}
             <g fontSize="9" fontWeight="600" fill="var(--app-text-secondary)" stroke="var(--bg-panel)" strokeWidth="3.5" paintOrder="stroke">
-              {/* Clear of the marker's halo (r=9), which the knocked-out box
-                  otherwise punches a hole in. */}
-              <text x={(currentX + boundaryX) / 2} y={currentY - 13} textAnchor="middle">
+              <text
+                x={boundaryX + (boundaryX < currentX ? -5 : 5)}
+                y={currentY + 3.2}
+                textAnchor={boundaryX < currentX ? "end" : "start"}
+              >
                 {gaps.riskAppetite.distance} pts
               </text>
               <text
-                x={currentX + (current.riskAppetite > thresholds.riskAppetite ? -6 : 6)}
-                y={(currentY + boundaryY) / 2}
-                textAnchor={current.riskAppetite > thresholds.riskAppetite ? "end" : "start"}
+                x={currentX}
+                y={boundaryY < currentY ? boundaryY - 5 : boundaryY + 11}
+                textAnchor="middle"
               >
                 {gaps.tightness.distance} pts
               </text>

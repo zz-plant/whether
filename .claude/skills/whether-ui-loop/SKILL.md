@@ -23,6 +23,14 @@ bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
 
 `bun run ui:iterate:list` shows the available targets. If you already own a running dev server and only want raw capture, `bun run ui:shots` skips the server management.
 
+Capture **both themes**. The default is dark; `--theme light` seeds the theme key the layout bootstrap reads and writes `<id>-light.png` beside the dark set, with its own `index-light.html` and `manifest-light.json`:
+
+```bash
+bun run ui:iterate -- --theme light --only home-mobile,home-desktop
+```
+
+Until 2026-09-15 the harness could only capture dark, which is how the light theme shipped a white title on a cream page (`/answers`), invisible posture tags (`/brief`), and a grey slab behind `/pricing` without anyone seeing them. A visual change is not reviewed until it has been looked at in both.
+
 **2. Look.** Read the captured PNGs from `artifacts/ui/` with the Read tool. This is the step that gets skipped, and skipping it defeats the whole loop — you cannot critique a layout you haven't seen. Compare mobile against desktop for the same target rather than judging either alone; most density problems in this app are mobile-only.
 
 **3. Critique.** Judge against `whether-ui-standards` — especially section XI (report shell hierarchy) and section VIII (IA boundaries), since those govern whether a screen earns its vertical space. Useful questions: what does the eye hit first, and is that the decision? How many stacked chrome layers come before the first task block? Does anything restate posture that a card above already stated?
@@ -42,7 +50,7 @@ Full details on the harness — how it detects a stale dev server, port fallback
 
 ## When the work is aesthetic direction rather than correction
 
-If the task is to give a surface a distinctive point of view rather than fix defects in an existing one, load the `frontend-design` skill alongside this one. It covers palette, typographic personality, and taking a defensible aesthetic risk. Note the tension worth resolving deliberately: Whether already has a committed visual identity in `tokens.css` and `theme-variants.css`, so the goal is usually sharpening that identity, not replacing it. A redesign that abandons the semantic posture colors breaks the product's visual vocabulary, since operators read `--color-semantic-tightening-*` and `--color-semantic-easing-*` as meaning, not decoration.
+If the task is to give a surface a distinctive point of view rather than fix defects in an existing one, load the `frontend-design` skill alongside this one. It covers palette, typographic personality, and taking a defensible aesthetic risk. Note the tension worth resolving deliberately: Whether already has a committed visual identity in `tokens.css` (the light theme is the `html[data-theme="light"]` block of the same file), so the goal is usually sharpening that identity, not replacing it. A redesign that abandons the semantic posture colors breaks the product's visual vocabulary, since operators read `--color-semantic-tightening-*` and `--color-semantic-easing-*` as meaning, not decoration.
 
 ## Known debt
 

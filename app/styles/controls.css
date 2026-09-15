@@ -49,7 +49,8 @@
 }
 
 .weather-input::placeholder {
-  color: rgba(191, 219, 254, 0.68);
+  color: var(--app-text-muted);
+  opacity: 0.85;
 }
 
 .weather-button {
@@ -148,7 +149,6 @@ input:not([type="range"]) {
 .weather-button-primary:focus-visible,
 .weather-cta:focus-visible,
 .weather-icon-chip:focus-visible,
-.weather-route-card:focus-visible,
 .weather-hub-link-card:focus-visible,
 summary[data-chevron]:focus-visible,
 summary.list-none:focus-visible {

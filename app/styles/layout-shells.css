@@ -87,35 +87,26 @@
   pointer-events: none;
 }
 
- .weather-hub-eyebrow,
+/* The two shell backdrops are navy washes tuned for the dark ground. On the
+   light theme a 40% navy over cream is a grey slab, and /pricing, /answers
+   and the 404 sat on one; here they fade to the page. */
+html[data-theme="light"] .weather-hub-backdrop,
+html[data-theme="light"] .weather-secondary-shell-backdrop {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 100%);
+}
+
 .weather-hub-section-eyebrow {
   font-size: var(--fs-xs);
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: none;
-  color: rgb(148 163 184 / 0.85);
+  color: var(--app-text-muted);
 }
 
-.weather-hub-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.3rem, 1.8rem + 2.1vw, 4.35rem);
-  line-height: 0.98;
-  letter-spacing: 0;
-  color: white;
-  text-wrap: balance;
-}
-
-.weather-hub-hero {
-  display: grid;
-  gap: 0.9rem;
-  padding: clamp(1rem, 0.75rem + 1.25vw, 2rem);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  background: var(--bg-surface);
-  box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 var(--edge-highlight-faint);
-}
+/* Ink from the text roles, never a literal white: these shells render on
+   both themes, and until 2026-09-15 every title and description here was
+   white or slate-200 by value, so the /answers pages — the routes search
+   sends people to — showed a blank hero on the light theme. */
 
 .weather-hub-section {
   display: grid;
@@ -132,6 +123,11 @@
 .weather-hub-card {
   display: grid;
   gap: 0.8rem;
+  /* Rows pack at the top. Grid's default stretches the auto rows to fill the
+     card, so wherever a hub card shares a grid row with a taller sibling the
+     free height was split between its eyebrow and its body, and the body
+     dropped a hundred pixels below the label — the "Inputs" card on /trust. */
+  align-content: start;
   min-width: 0;
   position: relative;
   overflow: hidden;
@@ -143,15 +139,11 @@
     inset 0 1px 0 var(--edge-highlight-faint);
 }
 
-.weather-hub-sidecar {
-  min-width: 0;
-}
-
 .weather-legal-content :where(section:not(:first-of-type)) {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   padding: clamp(0.95rem, 0.82rem + 0.6vw, 1.35rem);
-  background: rgba(34, 34, 34, 0.55);
+  background: var(--bg-surface);
   box-shadow:
     var(--elev-2),
     inset 0 1px 0 var(--edge-highlight-faint);
@@ -202,14 +194,14 @@
   align-items: center;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-strong);
-  background: rgba(30, 30, 30, 0.60);
+  background: var(--bg-surface-muted);
   padding: 0.45rem 0.85rem;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: none;
   text-decoration: none;
-  color: rgb(226 232 240);
+  color: var(--app-text-secondary);
   cursor: pointer;
   touch-action: manipulation;
   transition:
@@ -221,7 +213,7 @@
 .weather-hub-chip:hover {
   transform: translateY(-1px);
   border-color: rgba(56, 189, 248, 0.30);
-  color: rgb(248 250 252);
+  color: var(--app-text);
 }
 
 .weather-hub-chip:focus-visible {
@@ -229,73 +221,10 @@
   outline-offset: 2px;
 }
 
-.weather-hub-stat-grid {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.weather-hub-stat {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  padding: 0.95rem 1rem;
-  background: rgba(15, 23, 42, 0.46);
-  font-variant-numeric: tabular-nums;
-}
-
-.weather-hub-stat-label {
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.10em;
-  text-transform: none;
-  color: rgb(148 163 184);
-}
-
-.weather-hub-stat-value {
-  margin-top: 0.35rem;
-  color: white;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.weather-page-grid-3{
+.weather-page-grid-3 {
   display: grid;
   gap: clamp(0.85rem, 0.75rem + 0.6vw, 1.25rem);
   grid-template-columns: minmax(0, 1fr);
-}
-
-.weather-route-card {
-  @apply rounded-lg border px-4 py-4 text-left;
-  touch-action: manipulation;
-  padding: 1.05rem;
-  border-color: var(--border-default);
-  background: var(--bg-surface);
-  box-shadow: var(--elev-2);
-  transition:
-    transform var(--transition-base) var(--ease-out),
-    border-color var(--transition-base) var(--ease-out),
-    background-color var(--transition-base) var(--ease-out),
-    box-shadow var(--transition-base) var(--ease-out);
-}
-
-.weather-route-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.38);
-  box-shadow:
-    var(--elev-3),
-    var(--glow-soft);
-}
-
-.weather-route-card:focus-visible {
-  outline: 2px solid rgba(125, 211, 252, 0.85);
-  outline-offset: 3px;
-}
-
-.weather-stat-card {
-  @apply rounded-md border px-3 py-3;
-  border-color: var(--border-faint);
-  background: var(--bg-surface-muted);
-  box-shadow: var(--elev-1);
-  font-variant-numeric: tabular-nums;
 }
 
 .weather-secondary-header {
@@ -319,7 +248,7 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: none;
-  color: rgb(148 163 184 / 0.85);
+  color: var(--app-text-muted);
 }
 
 .weather-secondary-title {
@@ -327,7 +256,7 @@
   font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
   line-height: 0.98;
   letter-spacing: 0;
-  color: white;
+  color: var(--app-text);
   text-wrap: balance;
 }
 
@@ -335,7 +264,7 @@
   max-width: 54rem;
   font-size: 1rem;
   line-height: 1.75;
-  color: rgb(226 232 240 / 0.92);
+  color: var(--app-text-secondary);
 }
 
 .weather-secondary-actions {
@@ -365,14 +294,14 @@
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 0;
-  color: rgb(248 250 252);
+  color: var(--app-text);
 }
 
 .weather-secondary-section-description {
   max-width: 48rem;
   font-size: 0.95rem;
   line-height: 1.75;
-  color: rgb(203 213 225);
+  color: var(--app-text-secondary);
 }
 
 .weather-panel-header {
@@ -459,18 +388,26 @@
   color: rgb(209 250 229);
 }
 
+/* The tinted tags carry 100-level ink for the dark ground; on the light
+   theme that is pastel on cream, and the posture and confidence stamps at
+   the top of every published brief were unreadable. 700-level here, the
+   same floor the utility remap in tokens.css applies to text-<hue>-*. */
+html[data-theme="light"] .weather-tag-sky { color: #075985; background: rgba(14, 165, 233, 0.10); }
+html[data-theme="light"] .weather-tag-cyan { color: #155e75; background: rgba(6, 182, 212, 0.10); }
+html[data-theme="light"] .weather-tag-amber { color: #92400e; background: rgba(245, 158, 11, 0.12); }
+html[data-theme="light"] .weather-tag-rose { color: #b91c1c; background: rgba(244, 63, 94, 0.09); }
+html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba(16, 185, 129, 0.10); }
+
 .weather-tag-slate {
   border-color: var(--border-strong);
-  background: rgba(15, 23, 42, 0.30);
-  color: rgb(203 213 225);
+  background: var(--bg-nested-light);
+  color: var(--app-text-secondary);
 }
 
 .weather-panel,
 .weather-panel-static,
-.weather-route-card,
-.weather-stat-card,
 .weather-secondary-header,
-.weather-secondary-section{
+.weather-secondary-section {
   min-width: 0;
 }
 
@@ -478,17 +415,7 @@
   padding: var(--space-lg) var(--space-lg);
 }
 
-@media (min-width: 640px) {
-  .weather-hub-stat-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
 @media (min-width: 1024px) {
-  .weather-hub-hero {
-    grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
-    align-items: start;
-  }
 
   .weather-secondary-header-layout {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
@@ -503,13 +430,11 @@
 
 }
 
-
 /* §IX: reduced-motion users get the end state, not a slower version of the
    animation. These shells transition transform/border/background/shadow. */
 @media (prefers-reduced-motion: reduce) {
   .weather-hub-link-card,
-  .weather-hub-chip,
-  .weather-route-card {
+  .weather-hub-chip {
     transition: none;
   }
 }
