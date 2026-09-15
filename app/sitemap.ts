@@ -11,7 +11,6 @@ import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { readProgrammaticPayload } from "../lib/seo/programmaticPayloadBuilder";
 import { isStaleForIndexing, shouldNoindexPayload } from "../lib/seo/freshnessIndexation";
-import { loadReportDataSafe } from "../lib/report/reportData";
 import { signalsClusterStaticParams } from "./signals/clusterRoutes";
 import { workstreamSlugs } from "./operate/workstreams";
 import {
@@ -70,12 +69,32 @@ const isSignalScenarioIndexable = async (path: `/${string}`): Promise<boolean> =
   }
 };
 
-const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
+/**
+ * Both freshness questions this file asks, from one read.
+ *
+ * `programmaticEligible` governs the answer and scenario URLs; `watchHubsFresh`
+ * governs the three signal watch hubs, on the rule their own pages apply. They
+ * were two separate report loads, which on a build container — where the
+ * upstreams are reachable and a read can trigger an ingest — meant doing that
+ * work twice to answer one question about one snapshot.
+ */
+const resolveSitemapReadiness = async (): Promise<{ programmaticEligible: boolean; watchHubsFresh: boolean }> => {
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/sitemap" });
   const homeBriefModel = snapshot.homeBriefModel;
   const primaryRule = homeBriefModel.decisionRules[0];
 
-  return evaluateSeoQualityGates({
+  /*
+   * The same call `app/signals/[cluster]/page.tsx` makes for its own robots
+   * tag. Submitting these on the programmatic gate alone would list three URLs
+   * whose pages render `noindex`: that gate treats only a fallback snapshot as
+   * degraded, while the page also withholds a read that is not `treasury.isLive`.
+   */
+  const watchHubsFresh = !isStaleForIndexing({
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: degraded || !reportData.treasury.isLive,
+  });
+
+  const programmaticEligible = evaluateSeoQualityGates({
     pageKey: "sitemap-programmatic",
     currentCall: primaryRule?.recommendation,
     immediateAction: primaryRule?.doNow[0],
@@ -93,11 +112,17 @@ const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
     citationMeta: reportData.recordDateLabel,
     interpretationLabel: `${primaryRule?.recommendation ?? ""}|${primaryRule?.doNow[0] ?? ""}`,
   }).eligible;
+
+  return { programmaticEligible, watchHubsFresh };
 };
 
 export default async function sitemap(options?: { programmaticEligible?: boolean }): Promise<MetadataRoute.Sitemap> {
   const reportLastModified = resolveLastModified(snapshotData.record_date, snapshotData.fetched_at);
-  const programmaticEligible = options?.programmaticEligible ?? (await isProgrammaticSitemapEligible());
+  /* One read for both questions; the override skips it, as it always has. */
+  const readiness = options?.programmaticEligible === undefined
+    ? await resolveSitemapReadiness()
+    : { programmaticEligible: options.programmaticEligible, watchHubsFresh: options.programmaticEligible };
+  const { programmaticEligible } = readiness;
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
@@ -196,33 +221,18 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     }));
 
   /*
-   * The three signal watch hubs, on the rule their own pages apply.
-   *
-   * They were in no sitemap and linked from no hub, so the 15 scenario URLs
-   * hung off parents a crawler never saw. Submitting them on
-   * `programmaticEligible` alone was not enough: that gate treats only a
-   * fallback snapshot as degraded, while `app/signals/[cluster]/page.tsx` also
-   * withholds a read that is not `treasury.isLive`. The sitemap would then list
-   * three URLs whose pages render `noindex` — the self-contradiction this file
-   * removes elsewhere. Same call, same inputs, same answer.
+   * The three signal watch hubs. They were in no sitemap and linked from no
+   * hub, so the 15 scenario URLs hung off parents a crawler never saw — and
+   * they are submitted only while their reading is fresh enough for their own
+   * pages to be indexable (`resolveSitemapReadiness`).
    */
-  const signalWatchEntries: SitemapEntryDescriptor[] = programmaticEligible
-    ? await (async () => {
-        const reportResult = await loadReportDataSafe(undefined, { route: "/sitemap:signal-watches" });
-        const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-        const stale = isStaleForIndexing({
-          fetchedAtIso: reportData.treasury.fetched_at,
-          isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
-        });
-        if (stale) return [];
-
-        return signalsClusterStaticParams.map(({ cluster }): SitemapEntryDescriptor => ({
-          path: `/signals/${cluster}`,
-          lastModified: reportLastModified,
-          changeFrequency: "weekly",
-          priority: 0.72,
-        }));
-      })()
+  const signalWatchEntries: SitemapEntryDescriptor[] = programmaticEligible && readiness.watchHubsFresh
+    ? signalsClusterStaticParams.map(({ cluster }): SitemapEntryDescriptor => ({
+        path: `/signals/${cluster}`,
+        lastModified: reportLastModified,
+        changeFrequency: "weekly",
+        priority: 0.72,
+      }))
     : [];
 
   const signalScenarioEntryCandidates: Array<SitemapEntryDescriptor | null> = programmaticEligible
