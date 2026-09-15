@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
+import { z } from "zod";
 import {
   buildAnswerFaqStructuredData,
   buildApiDocsStructuredData,
@@ -137,6 +139,32 @@ describe("/toolkits/[slug]", () => {
     assert.equal(steps.length, toolkit.runSequence.length);
     assert.equal((howTo.supply as unknown[]).length, toolkit.prepChecklist.length);
     assert.match(String(howTo.totalTime), /^PT\d+[MH]$/);
+  });
+
+  /*
+   * Every step carried a `#step-N` url while the page rendered the matching
+   * `<li>` without an id, so each one identified nothing and a deep link from
+   * the structured data dropped the reader at the top of the page. The page is
+   * read as source rather than rendered because the assertion is about the
+   * anchor existing and being numbered the same way, which is a property of
+   * the markup, not of a particular toolkit's data.
+   */
+  it("points each step at an anchor the page actually renders", () => {
+    const toolkit = findToolkitDefinition("pmf");
+    assert.ok(toolkit);
+    /* Parsed, not cast: the assertion is that these fields are really there. */
+    const steps = z
+      .array(z.object({ url: z.string(), position: z.number() }))
+      .parse(one(buildToolkitHowTo(toolkit), "HowTo").step);
+    const page = readFileSync(new URL("../app/toolkits/[slug]/page.tsx", import.meta.url), "utf8");
+
+    assert.match(page, /runSequence\.map\(\(step, index\) =>/);
+    assert.match(page, /id=\{`step-\$\{index \+ 1\}`\}/);
+
+    for (const [index, step] of steps.entries()) {
+      assert.ok(String(step.url).endsWith(`#step-${index + 1}`), `step ${index + 1} url: ${String(step.url)}`);
+      assert.equal(step.position, index + 1);
+    }
   });
 
   it("omits totalTime when the runtime copy is not a duration", () => {

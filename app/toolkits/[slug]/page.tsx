@@ -86,8 +86,15 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Run sequence</h2>
         <ol className="space-y-3 text-sm text-slate-200">
-          {toolkit.runSequence.map((step) => (
-            <li key={step.phase} className="weather-surface space-y-2 px-4 py-4">
+          {/*
+            * `id` is load-bearing, not decoration: the HowTo node in
+            * `buildToolkitHowTo` gives every step a `#step-N` url, and without a
+            * matching anchor here those urls identify nothing and a deep link
+            * drops the reader at the top of the page. The numbering is the same
+            * `index + 1` the builder uses.
+            */}
+          {toolkit.runSequence.map((step, index) => (
+            <li key={step.phase} id={`step-${index + 1}`} className="weather-surface space-y-2 px-4 py-4">
               <p className="type-eyebrow text-slate-300">{step.phase}</p>
               <p><span className="font-semibold text-slate-100">Objective:</span> {step.objective}</p>
               <p className="font-semibold text-slate-100">Prompts</p>

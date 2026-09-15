@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { classifyAcquisitionSource, isContentMeasurementEvent } from "../lib/contentMeasurement";
+import { classifyAcquisitionSource, isContentMeasurementEvent, resolveEntranceSource } from "../lib/contentMeasurement";
 
 /*
  * The entrance event was named `organic_entrance` and checked no referrer at
@@ -50,6 +50,85 @@ describe("acquisition classification", () => {
     ]);
 
     assert.deepEqual([...buckets].sort(), ["direct", "internal", "referral", "search", "social"]);
+  });
+});
+
+/*
+ * `document.referrer` belongs to the document, not the route. The session flag
+ * alone was not enough, because it is set when a tracker first mounts and most
+ * routes carry none: a reader arriving from Google at `/` and clicking through
+ * to an answer page hit the first tracker on a page they reached internally,
+ * with the referrer still naming Google. That is the very number the
+ * classification exists to make trustworthy.
+ */
+describe("which entrance counts as a landing", () => {
+  const host = "whether.work";
+
+  it("uses the referrer for the page the document was actually loaded with", () => {
+    assert.equal(
+      resolveEntranceSource({
+        alreadyRecorded: false,
+        documentUrl: "https://whether.work/answers/should-startups-hire-engineers-right-now",
+        currentPathname: "/answers/should-startups-hire-engineers-right-now",
+        referrer: "https://www.google.com/",
+        currentHost: host,
+      }),
+      "search",
+    );
+  });
+
+  it("reads a soft navigation away from the landing page as internal", () => {
+    assert.equal(
+      resolveEntranceSource({
+        alreadyRecorded: false,
+        documentUrl: "https://whether.work/",
+        currentPathname: "/answers/should-startups-hire-engineers-right-now",
+        referrer: "https://www.google.com/",
+        currentHost: host,
+      }),
+      "internal",
+    );
+  });
+
+  it("still reads a landing whose query string the app rewrote as a landing", () => {
+    assert.equal(
+      resolveEntranceSource({
+        alreadyRecorded: false,
+        documentUrl: "https://whether.work/resources/capital-discipline?utm_source=newsletter",
+        currentPathname: "/resources/capital-discipline",
+        referrer: "https://news.ycombinator.com/item?id=1",
+        currentHost: host,
+      }),
+      "social",
+    );
+  });
+
+  it("counts every later entrance in the tab as internal", () => {
+    assert.equal(
+      resolveEntranceSource({
+        alreadyRecorded: true,
+        documentUrl: "https://whether.work/answers/x",
+        currentPathname: "/answers/x",
+        referrer: "https://www.google.com/",
+        currentHost: host,
+      }),
+      "internal",
+    );
+  });
+
+  it("falls back to the referrer when navigation timing says nothing usable", () => {
+    for (const documentUrl of [undefined, "not a url"]) {
+      assert.equal(
+        resolveEntranceSource({
+          alreadyRecorded: false,
+          documentUrl,
+          currentPathname: "/trust",
+          referrer: "https://duckduckgo.com/",
+          currentHost: host,
+        }),
+        "search",
+      );
+    }
   });
 });
 

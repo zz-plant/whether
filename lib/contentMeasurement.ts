@@ -73,6 +73,56 @@ export const classifyAcquisitionSource = (referrer: string, currentHost: string)
 const LANDING_RECORDED_KEY = "whether.content-measurement.landed";
 
 /**
+ * Which bucket an entrance belongs to, from readings rather than from globals.
+ *
+ * Two things make an entrance internal, and the second is the one that was
+ * missing. The session flag is set when a tracker first mounts, and most routes
+ * carry no tracker — `/` among them. So a reader arriving from Google at `/`
+ * and clicking through to an answer page reaches the *first* tracker on a page
+ * they navigated to internally, with `document.referrer` still naming Google:
+ * exactly the over-count the flag exists to prevent, one hop further along.
+ *
+ * `documentUrl` is the URL the document was loaded with, which a soft
+ * navigation does not change. A current pathname that differs from it is a
+ * client-side navigation, whatever mounted first. Compared on pathname alone,
+ * so a landing whose query string the app rewrites still reads as a landing.
+ */
+export const resolveEntranceSource = ({
+  alreadyRecorded,
+  documentUrl,
+  currentPathname,
+  referrer,
+  currentHost,
+}: {
+  alreadyRecorded: boolean;
+  /** `PerformanceNavigationTiming.name`, absent when the API is unavailable. */
+  documentUrl?: string;
+  currentPathname: string;
+  referrer: string;
+  currentHost: string;
+}): ContentAcquisitionSource => {
+  if (alreadyRecorded) return "internal";
+
+  if (documentUrl) {
+    try {
+      if (new URL(documentUrl).pathname !== currentPathname) return "internal";
+    } catch {
+      /* An unparseable entry name tells us nothing; fall through to the referrer. */
+    }
+  }
+
+  return classifyAcquisitionSource(referrer, currentHost);
+};
+
+const documentLoadUrl = (): string | undefined => {
+  try {
+    return performance.getEntriesByType("navigation")[0]?.name;
+  } catch {
+    return undefined;
+  }
+};
+
+/**
  * The source for this entrance, once per session.
  *
  * `document.referrer` belongs to the document, not the route, and a Next.js
@@ -82,23 +132,31 @@ const LANDING_RECORDED_KEY = "whether.content-measurement.landed";
  * to make trustworthy — would over-count by the click depth of every search
  * session, and `internal` would essentially never appear.
  *
- * So the referrer decides only the session's first recorded entrance; every
- * later one in the same tab is what it is, an internal navigation. The flag
- * lives in `sessionStorage`, which is per-tab, so opening a result in a new tab
- * is correctly a new landing.
+ * So the referrer decides only the entrance that is actually a landing: the
+ * first one recorded in the tab, and only while the reader is still on the page
+ * the document was loaded with. Every later one is what it is, an internal
+ * navigation. The flag lives in `sessionStorage`, which is per-tab, so opening
+ * a result in a new tab is correctly a new landing.
  */
 const currentAcquisitionSource = (): ContentAcquisitionSource | undefined => {
   if (typeof document === "undefined" || typeof window === "undefined") return undefined;
 
+  let alreadyRecorded = false;
   try {
-    if (window.sessionStorage.getItem(LANDING_RECORDED_KEY) === "1") return "internal";
+    alreadyRecorded = window.sessionStorage.getItem(LANDING_RECORDED_KEY) === "1";
     window.sessionStorage.setItem(LANDING_RECORDED_KEY, "1");
   } catch {
     /* Private mode, or storage blocked. The referrer is still the best available
        answer for this page view; it can only over-count, never invent a visit. */
   }
 
-  return classifyAcquisitionSource(document.referrer ?? "", window.location.hostname);
+  return resolveEntranceSource({
+    alreadyRecorded,
+    documentUrl: documentLoadUrl(),
+    currentPathname: window.location.pathname,
+    referrer: document.referrer ?? "",
+    currentHost: window.location.hostname,
+  });
 };
 
 export const CONTENT_MEASUREMENT_ENDPOINT = "/api/telemetry/content-measurement";
