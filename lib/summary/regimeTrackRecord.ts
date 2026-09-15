@@ -15,14 +15,14 @@ import {
  * its own near-band constant, not by numbers this module made up.
  */
 
-export type TrackRecordObservation = {
+type TrackRecordObservation = {
   recordDate: string;
   regime: string;
   tightness: number;
   riskAppetite: number;
 };
 
-export type RegimeSpellRecord = {
+type RegimeSpellRecord = {
   regime: string;
   startDate: string;
   endDate: string;
@@ -31,11 +31,11 @@ export type RegimeSpellRecord = {
   completed: boolean;
 };
 
-export type FlippedAxis = "tightness" | "riskAppetite";
+type FlippedAxis = "tightness" | "riskAppetite";
 
 const ALL_AXES: FlippedAxis[] = ["tightness", "riskAppetite"];
 
-export type RegimeTransitionRecord = {
+type RegimeTransitionRecord = {
   /** First observation inside the new regime. */
   atDate: string;
   from: string;
@@ -51,7 +51,7 @@ export type RegimeTransitionRecord = {
   signaled: boolean;
 };
 
-export type RegimeTrackRecord = {
+type RegimeTrackRecord = {
   observations: number;
   windowStart: string | null;
   windowEnd: string | null;

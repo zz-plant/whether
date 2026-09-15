@@ -45,11 +45,11 @@ const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
   baseRateVelocityWindow: BaseRateVelocityWindowSchema.nullable().optional(),
 });
 
-export type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
+type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
 
 const TimeMachineCacheSchema = z.array(TimeMachineSnapshotSchema);
 export const DEFAULT_REGIME_SERIES_MONTHS = 24;
-export const DEFAULT_ROLLING_YIELD_MONTHS = 12;
+const DEFAULT_ROLLING_YIELD_MONTHS = 12;
 const MIN_ROLLING_YIELD_MONTHS = 1;
 const TIME_MACHINE_STRICT_CACHE_VALIDATION_ENV =
   process.env.TIME_MACHINE_STRICT_CACHE_VALIDATION;
@@ -153,12 +153,6 @@ const timeMachineCoverage = (() => {
   };
 })();
 
-const timeMachineYears = (() => {
-  const years = new Set<number>();
-  sortedSnapshots.forEach((snapshot) => years.add(snapshot.year));
-  return Array.from(years).sort((a, b) => b - a);
-})();
-
 const timeMachineMonthsByYear = (() => {
   const monthsByYear: Record<number, number[]> = {};
   sortedSnapshots.forEach((snapshot) => {
@@ -177,10 +171,6 @@ const timeMachineMonthsByYear = (() => {
 
 export const getTimeMachineCoverage = () => {
   return timeMachineCoverage;
-};
-
-export const getTimeMachineYears = () => {
-  return timeMachineYears;
 };
 
 export const getTimeMachineMonthsByYear = () => {

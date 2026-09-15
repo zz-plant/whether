@@ -1,10 +1,10 @@
 import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCatalog";
 
-export type SearchEntityType = "toolkit" | "failure-mode" | "doc";
+type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
-export type SearchPrimaryHub = "/signals" | "/operate" | "/resolve" | "/trust";
+type SearchPrimaryHub = "/signals" | "/operate" | "/resolve" | "/trust";
 
-export type SearchEntity = {
+type SearchEntity = {
   id: string;
   type: SearchEntityType;
   job: SearchEntityJob;
@@ -16,14 +16,6 @@ export type SearchEntity = {
   summary: string;
   intentLabel: string;
   keywords: string[];
-};
-
-export const searchJobLabels: Record<SearchEntityJob, string> = {
-  check: "Check what changed",
-  approve: "Approve or hold this week",
-  resolve: "Resolve one remaining edge case",
-  risk: "Diagnose what could break",
-  trust: "Defend the call",
 };
 
 const keyDocs: SearchEntity[] = [

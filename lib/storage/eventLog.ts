@@ -31,7 +31,7 @@ const MAX_SCAN_ENTRIES = 1000;
  * the stored shape; a repository with a validator passes it here so reads narrow at runtime
  * instead of asserting, and a record an older deploy wrote in another shape is skipped.
  */
-export type StoredEntryGuard<T> = (value: unknown) => value is T;
+type StoredEntryGuard<T> = (value: unknown) => value is T;
 
 const trustStoredEntry = <T>(value: unknown): value is T => value !== undefined;
 

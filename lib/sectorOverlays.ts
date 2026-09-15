@@ -4,9 +4,9 @@
  */
 import type { RegimeAssessment } from "./regimeEngine";
 
-export type SectorType = "b2b_saas" | "ai_compute" | "biotech" | "hardware";
+type SectorType = "b2b_saas" | "ai_compute" | "biotech" | "hardware";
 
-export interface SectorOverlayConfig {
+interface SectorOverlayConfig {
   id: SectorType;
   label: string;
   tightnessModifier: number;
@@ -15,7 +15,7 @@ export interface SectorOverlayConfig {
   sectorDirective: string;
 }
 
-export const SECTOR_CONFIGS: Record<SectorType, SectorOverlayConfig> = {
+const SECTOR_CONFIGS: Record<SectorType, SectorOverlayConfig> = {
   b2b_saas: {
     id: "b2b_saas",
     label: "B2B SaaS / Enterprise Software",
@@ -50,7 +50,7 @@ export const SECTOR_CONFIGS: Record<SectorType, SectorOverlayConfig> = {
   },
 };
 
-export interface SectorAssessmentResult {
+interface SectorAssessmentResult {
   sector: SectorOverlayConfig;
   effectiveTightness: number;
   effectiveRiskAppetite: number;

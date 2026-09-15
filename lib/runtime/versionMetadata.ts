@@ -13,7 +13,7 @@
  * `installBindings`), and structurally typed rather than via @cloudflare/workers-types so
  * the same code typechecks under bun tests and node scripts where it is absent.
  */
-export type DeployedVersion = {
+type DeployedVersion = {
   id: string;
   tag: string;
   timestamp: string;

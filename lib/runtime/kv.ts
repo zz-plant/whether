@@ -118,7 +118,7 @@ export const readKvValues = async (
   return values;
 };
 
-export const isKvNamespace = (value: unknown): value is KvNamespace =>
+const isKvNamespace = (value: unknown): value is KvNamespace =>
   typeof value === "object"
   && value !== null
   && typeof Reflect.get(value, "get") === "function"

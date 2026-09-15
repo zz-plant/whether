@@ -1,9 +1,9 @@
 import type { RegimeAssessment } from "../regimeEngine";
 
 export type DecisionArea = "posture" | "hiring" | "spend" | "risk";
-export type ConfidenceLevel = RegimeAssessment["diagnostics"]["confidence"];
+type ConfidenceLevel = RegimeAssessment["diagnostics"]["confidence"];
 
-export type DecisionDeltaRule = {
+type DecisionDeltaRule = {
   code: string;
   decisionArea: DecisionArea;
   action: string;
@@ -22,7 +22,7 @@ const confidenceRank: Record<ConfidenceLevel, number> = {
   HIGH: 3,
 };
 
-export const MIN_ALERT_CONFIDENCE: ConfidenceLevel = "MEDIUM";
+const MIN_ALERT_CONFIDENCE: ConfidenceLevel = "MEDIUM";
 
 const isConfidenceBelowMinimum = (confidence: ConfidenceLevel) =>
   confidenceRank[confidence] < confidenceRank[MIN_ALERT_CONFIDENCE];

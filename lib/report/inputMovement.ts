@@ -7,9 +7,9 @@
  */
 
 /** Points either input must move before the line stops calling it steady; matches the hero's "notable" cut. */
-export const INPUT_MOVEMENT_NOTABLE_POINTS = 3;
+const INPUT_MOVEMENT_NOTABLE_POINTS = 3;
 
-export type InputMovement = "steady inputs" | "tightening inputs" | "easing inputs" | "mixed inputs";
+type InputMovement = "steady inputs" | "tightening inputs" | "easing inputs" | "mixed inputs";
 
 export const describeInputMovement = (tightnessDelta: number, riskAppetiteDelta: number): InputMovement => {
   const tightnessMoved = Math.abs(tightnessDelta) >= INPUT_MOVEMENT_NOTABLE_POINTS;

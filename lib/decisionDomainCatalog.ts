@@ -8,9 +8,9 @@ import {
 } from "./decisionDomainCatalogContent";
 import { parseDecisionDomainCatalog } from "./decisionDomainCatalogSchema";
 
-export type PostureKey = (typeof postureKeys)[number];
+type PostureKey = (typeof postureKeys)[number];
 
-export type PostureDefinition = {
+type PostureDefinition = {
   slug: PostureKey;
   title: string;
   summary: string;
@@ -22,7 +22,7 @@ export { failureModes, startSituations };
 
 export type ToolkitSlug = (typeof toolkitSlugs)[number];
 
-export type UseCaseRole = {
+type UseCaseRole = {
   slug: string;
   title: string;
   decisions: string[];
@@ -31,15 +31,15 @@ export type UseCaseRole = {
   recommendedToolkitSlugs: ToolkitSlug[];
 };
 
-export type SituationUseCaseSlug = (typeof situationUseCaseSlugs)[number];
+type SituationUseCaseSlug = (typeof situationUseCaseSlugs)[number];
 
-export type SituationUseCase = {
+type SituationUseCase = {
   slug: SituationUseCaseSlug;
   title: string;
   recommendedToolkitSlugs: ToolkitSlug[];
 };
 
-export type ToolkitDefinition = {
+type ToolkitDefinition = {
   slug: ToolkitSlug;
   title: string;
   whenToUse: string;
@@ -67,7 +67,7 @@ export type ToolkitDefinition = {
   canonLinks: { label: string; href: string }[];
 };
 
-export type FailureModeDefinition = {
+type FailureModeDefinition = {
   slug: (typeof failureModes)[number];
   title: string;
   summary: string;
@@ -84,7 +84,7 @@ export const postureDefinitions: PostureDefinition[] = decisionDomainCatalog.pos
 export const useCaseRoles: UseCaseRole[] = decisionDomainCatalog.useCaseRoles;
 export const situationUseCaseDefinitions: SituationUseCase[] =
   decisionDomainCatalog.situationUseCaseDefinitions;
-export const situationUseCases = [...situationUseCaseSlugs] as [
+const situationUseCases = [...situationUseCaseSlugs] as [
   SituationUseCaseSlug,
   ...SituationUseCaseSlug[],
 ];
@@ -94,8 +94,8 @@ export const toolkitDefinitions: ToolkitDefinition[] = decisionDomainCatalog.too
 export const failureModeDefinitions: FailureModeDefinition[] =
   decisionDomainCatalog.failureModeDefinitions;
 
-export const useCaseRoleStaticParams = useCaseRoles.map((entry) => ({ slug: entry.slug }));
-export const situationUseCaseStaticParams = situationUseCases.map((slug) => ({ slug }));
+const useCaseRoleStaticParams = useCaseRoles.map((entry) => ({ slug: entry.slug }));
+const situationUseCaseStaticParams = situationUseCases.map((slug) => ({ slug }));
 export const decideStaticParams = [...useCaseRoleStaticParams, ...situationUseCaseStaticParams];
 
 const useCaseRoleBySlug = new Map<string, UseCaseRole>(useCaseRoles.map((entry) => [entry.slug, entry]));

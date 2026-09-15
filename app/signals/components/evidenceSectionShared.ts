@@ -7,7 +7,7 @@ import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefMo
  * 747-line file, fifty lines under the budget `app/**` enforces. The sections
  * are independent; only these two helpers were actually common to them.
  */
-export const SIGNAL_LABEL_COPY: Record<string, string> = {
+const SIGNAL_LABEL_COPY: Record<string, string> = {
   Tightness: "Funding pressure",
   "Curve slope": "Recession warning gauge",
   "Base rate": "Base rate",

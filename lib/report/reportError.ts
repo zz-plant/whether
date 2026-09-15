@@ -1,4 +1,4 @@
-export type ReportDependencyFailureLog = {
+type ReportDependencyFailureLog = {
   route: string;
   requestId: string;
   dependency: "treasury" | "macro" | "report";

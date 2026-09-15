@@ -4,7 +4,7 @@ import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData } from "../report/reportData";
 import { buildCompactFreshnessMeta } from "../report/reportFormatting";
 
-export type CliFreshnessContract = {
+type CliFreshnessContract = {
   updatedAt: string;
   line: string;
   maxAge: "fresh" | "stale";
@@ -12,7 +12,7 @@ export type CliFreshnessContract = {
   degraded: boolean;
 };
 
-export type CliStatusContract = {
+type CliStatusContract = {
   version: "v1";
   generatedAt: string;
   updatedAt: string;
@@ -31,7 +31,7 @@ export type CliStatusContract = {
   degraded: boolean;
 };
 
-export type CliStatusExpandedContract = CliStatusContract & {
+type CliStatusExpandedContract = CliStatusContract & {
   view: "expanded";
   boundedDecision: {
     guardrailThreshold: string;
@@ -41,7 +41,7 @@ export type CliStatusExpandedContract = CliStatusContract & {
   };
 };
 
-export type CliCallContract = {
+type CliCallContract = {
   version: "v1";
   generatedAt: string;
   freshness: CliFreshnessContract;
@@ -51,7 +51,7 @@ export type CliCallContract = {
   degraded: boolean;
 };
 
-export type CliChangesContract = {
+type CliChangesContract = {
   version: "v1";
   generatedAt: string;
   freshness: CliFreshnessContract;
@@ -70,7 +70,7 @@ export type CliChangesContract = {
   degraded: boolean;
 };
 
-export type CliRegimeContract = {
+type CliRegimeContract = {
   version: "v1";
   generatedAt: string;
   regime: string;

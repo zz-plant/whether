@@ -7,7 +7,7 @@
  * built from a URL or a status can carry it.
  */
 
-export type GitHubRepoClientOptions = {
+type GitHubRepoClientOptions = {
   /** Fine-grained token with contents:write and pull-requests:write on the one repository. */
   token: string;
   /** "owner/repo". */
@@ -17,7 +17,7 @@ export type GitHubRepoClientOptions = {
   userAgent?: string;
 };
 
-export type GitHubFile = { sha: string; content: string };
+type GitHubFile = { sha: string; content: string };
 export type GitHubPullRequest = { number: number; html_url: string };
 
 export class GitHubApiError extends Error {

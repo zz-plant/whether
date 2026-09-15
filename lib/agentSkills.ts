@@ -2,7 +2,7 @@
  * Agent skill definitions for autonomous PM assistants.
  * These guide downstream agents on expected outputs and inputs.
  */
-export interface AgentSkill {
+interface AgentSkill {
   id: string;
   label: string;
   purpose: string;

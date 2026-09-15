@@ -5,7 +5,7 @@ import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
-export type DownloadableResourceMetadataConfig = {
+type DownloadableResourceMetadataConfig = {
   title: string;
   description: string;
   path: string;
@@ -61,7 +61,7 @@ export const buildDownloadableResourceMetadata = (
   robots: noindexRobots,
 });
 
-export function InternalLinksPanel({ links }: { links: ResourceLink[] }) {
+function InternalLinksPanel({ links }: { links: ResourceLink[] }) {
   return (
     <section className="weather-panel space-y-2 px-6 py-6">
       <h2 className="text-lg font-semibold text-slate-100">Related pages</h2>

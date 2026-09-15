@@ -8,7 +8,7 @@ import {
 } from "../../components/ui/sparkline";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "../../components/illustrations/TrendGlyph";
 
-export type SignalSparklineSeries = {
+type SignalSparklineSeries = {
   key: string;
   label: string;
   points: SparklinePoint[];

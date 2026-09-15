@@ -13,7 +13,7 @@ import { constantTimeCompare } from "../constantTimeCompare";
  * before any form parsing and hands that text in unchanged.
  */
 
-export const SLACK_SIGNATURE_VERSION = "v0";
+const SLACK_SIGNATURE_VERSION = "v0";
 
 /** Slack's own guidance: refuse a timestamp more than five minutes from local time. */
 export const SLACK_SIGNATURE_TOLERANCE_SECONDS = 300;
@@ -29,7 +29,7 @@ const toHex = (bytes: Uint8Array): string =>
  * Read the way `WHETHER_CRON_SECRET` is: the Worker installs every binding on
  * `globalThis` (`worker/index.ts`), and `process.env` is the local and test path.
  */
-export const readSlackSigningSecret = (): string | undefined => {
+const readSlackSigningSecret = (): string | undefined => {
   const fromGlobal: unknown = Reflect.get(globalThis, "SLACK_SIGNING_SECRET");
   if (typeof fromGlobal === "string" && fromGlobal.length > 0) {
     return fromGlobal;
@@ -38,7 +38,7 @@ export const readSlackSigningSecret = (): string | undefined => {
   return typeof fromEnv === "string" && fromEnv.length > 0 ? fromEnv : undefined;
 };
 
-export const computeSlackSignature = async ({
+const computeSlackSignature = async ({
   secret,
   timestamp,
   rawBody,
@@ -59,7 +59,7 @@ export const computeSlackSignature = async ({
   return `${SLACK_SIGNATURE_VERSION}=${toHex(new Uint8Array(digest))}`;
 };
 
-export type SlackSignatureVerdict =
+type SlackSignatureVerdict =
   | { ok: true }
   | { ok: false; error: "missing_signature" | "stale_timestamp" | "invalid_signature" };
 

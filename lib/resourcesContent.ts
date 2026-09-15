@@ -2,12 +2,10 @@ import type { Route } from "./navigation/routeType";
 import type {
   GovernanceLexiconTermData,
   ResourcePillarPageData,
-  ResourcePillarSection,
 } from "./resourceContentSource";
 import { resourceMetaContent, resourcePillarContent } from "./resourceContentSource";
 
 export type GovernanceLexiconTerm = GovernanceLexiconTermData;
-export type PillarSection = ResourcePillarSection;
 export type ResourcePillarPage = Omit<ResourcePillarPageData, "canonicalPath"> & {
   canonicalPath: Route;
 };

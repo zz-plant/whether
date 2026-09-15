@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export const PERSISTENT_CLIENT_ID_STORAGE_KEY = "whether-client-id";
+const PERSISTENT_CLIENT_ID_STORAGE_KEY = "whether-client-id";
 
 export const createOpaqueId = () => {
   const cryptoRef = typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
@@ -29,7 +29,7 @@ export const createOpaqueId = () => {
   return `fallback-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 };
 
-export const getOrCreatePersistentClientId = () => {
+const getOrCreatePersistentClientId = () => {
   if (typeof window === "undefined") {
     return null;
   }

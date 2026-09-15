@@ -238,16 +238,6 @@ export const buildAgentPayload = (
   };
 };
 
-export const buildAgentPayloadJson = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[],
-  options?: {
-    decisionSupport?: AgentDecisionSupport;
-  },
-) => JSON.stringify(buildAgentPayload(assessment, treasury, sensors, macros, options), null, 2);
-
 export const buildAgentPrompt = (
   assessment: RegimeAssessment,
   treasury: TreasuryData

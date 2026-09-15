@@ -100,7 +100,7 @@ const isWeeklyCall = (value: unknown): boolean => {
     && (typeof value.policyOverrideReason === "string" || value.policyOverrideReason === null);
 };
 
-export const isOperatingSnapshot = (value: unknown): value is OperatingSnapshot => {
+const isOperatingSnapshot = (value: unknown): value is OperatingSnapshot => {
   if (!isRecord(value) || !isRecord(value.provenance) || !isRecord(value.freshness)) {
     return false;
   }
@@ -139,14 +139,14 @@ const parseOperatingSnapshot = (raw: string): OperatingSnapshot | null => {
   }
 };
 
-export interface OperatingSnapshotStore {
+interface OperatingSnapshotStore {
   write(snapshot: OperatingSnapshot): Promise<void>;
   readLatest(): Promise<OperatingSnapshot | null>;
   readByRecordDateAndHash(recordDate: string, inputHash: string): Promise<OperatingSnapshot | null>;
   clear?(): void;
 }
 
-export class InMemoryOperatingSnapshotStore implements OperatingSnapshotStore {
+class InMemoryOperatingSnapshotStore implements OperatingSnapshotStore {
   private latestSnapshot: OperatingSnapshot | null = null;
   private readonly snapshots = new Map<string, OperatingSnapshot>();
 

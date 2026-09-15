@@ -4,7 +4,7 @@
  */
 export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
-export interface SourceProvenance {
+interface SourceProvenance {
   fetched_at: string;
   isLive: boolean;
   fallback_at?: string | null;

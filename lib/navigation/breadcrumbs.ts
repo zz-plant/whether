@@ -1,4 +1,4 @@
-export type BreadcrumbItem = {
+type BreadcrumbItem = {
   name: string;
   path: string;
 };
@@ -35,7 +35,7 @@ export const getBreadcrumbLabel = (path: string, fallbackLabel?: string) => {
   return segments.length ? toTitleCase(segments[segments.length - 1]) : "Home";
 };
 
-export const createBreadcrumbItem = (path: string, label?: string): BreadcrumbItem => ({
+const createBreadcrumbItem = (path: string, label?: string): BreadcrumbItem => ({
   name: getBreadcrumbLabel(path, label),
   path,
 });

@@ -7,24 +7,24 @@ type TrustOutageSeverity = "advisory" | "blocking" | "critical";
 
 type TrustOutageType = "live-data" | "feed-unavailable" | "stale-cache" | "source-divergence" | "historical-snapshot";
 
-export type TrustApprovalBucket = {
+type TrustApprovalBucket = {
   label: "Allowed now" | "Hold" | "Blocked";
   detail: string;
 };
 
-export type TrustRecoveryPlan = {
+type TrustRecoveryPlan = {
   owner: string;
   nextCheckpoint: string;
   exitCondition: string;
 };
 
-export type TrustExitGateCriterion = {
+type TrustExitGateCriterion = {
   key: "live-mode" | "freshness" | "confidence";
   label: string;
   met: boolean;
 };
 
-export type TrustExitGate = {
+type TrustExitGate = {
   label: string;
   summary: string;
   metCount: number;
@@ -44,7 +44,7 @@ export type DecisionReadinessState = {
   detail: string;
 };
 
-export type SourceFreshnessState = Pick<
+type SourceFreshnessState = Pick<
   CompactFreshnessMeta,
   "updatedAtLabel" | "freshnessStatus" | "mode" | "timestamp" | "ageHours"
 >;
@@ -334,14 +334,14 @@ export const buildCompactTrustSummary = ({
  * from here. They used to say DEGRADED, Trust clear, Trust constrained and All
  * systems operational about the same read at the same moment.
  */
-export const DATA_STATUS_LABELS = {
+const DATA_STATUS_LABELS = {
   live: "Live",
   partlyCached: "Partly cached",
   cachedSnapshot: "Cached snapshot",
   historical: "Historical snapshot",
 } as const;
 
-export type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
+type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
 
 /**
  * What each data state means for approvals, in one sentence each. The homepage
@@ -349,7 +349,7 @@ export type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
  * different ways for the same boolean; a reader comparing them could not tell
  * whether they described one state or three.
  */
-export const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
+const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
   partlyCached: "Some sources are cached. Stage decisions; do not commit until every source is current.",
   cachedSnapshot: "Cached snapshot. Stage decisions; do not lock hiring, spend or vendor commitments until live data returns.",
@@ -359,7 +359,7 @@ export const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
 export const resolveDataStatusGuidance = (input: Parameters<typeof resolveDataStatus>[0]) =>
   DATA_STATUS_GUIDANCE[resolveDataStatus(input)];
 
-export const resolveDataStatus = ({
+const resolveDataStatus = ({
   isHistoricalSelection = false,
   isFallbackSnapshot = false,
   degradedSourceCount = 0,

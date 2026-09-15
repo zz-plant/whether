@@ -73,7 +73,7 @@ const isSignalScenarioIndexable = async (path: `/${string}`): Promise<boolean> =
   }
 };
 
-export const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
+const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/sitemap" });
   const homeBriefModel = snapshot.homeBriefModel;
   const primaryRule = homeBriefModel.decisionRules[0];

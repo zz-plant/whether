@@ -106,7 +106,7 @@ const decisionDomainCatalogSchema = z.object({
   failureModeDefinitions: z.array(failureModeDefinitionSchema),
 });
 
-export type ParsedDecisionDomainCatalog = z.infer<typeof decisionDomainCatalogSchema>;
+type ParsedDecisionDomainCatalog = z.infer<typeof decisionDomainCatalogSchema>;
 
 export const parseDecisionDomainCatalog = (input: unknown): ParsedDecisionDomainCatalog => {
   const parsed = decisionDomainCatalogSchema.safeParse(input);

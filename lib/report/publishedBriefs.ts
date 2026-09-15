@@ -217,7 +217,7 @@ export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as con
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });
 
-export const decisionAreaLabels: Record<string, string> = {
+const decisionAreaLabels: Record<string, string> = {
   hiring: "Hiring",
   "product-tempo": "Product tempo",
   "capital-raising": "Capital raising",

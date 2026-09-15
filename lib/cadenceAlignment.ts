@@ -5,9 +5,9 @@
 import type { MonthlySummary } from "./summary/monthlySummary";
 import type { WeeklySummary } from "./summary/weeklySummary";
 
-export type CadenceAlignmentStatus = "aligned" | "watch" | "mismatch";
+type CadenceAlignmentStatus = "aligned" | "watch" | "mismatch";
 
-export type CadenceAlignment = {
+type CadenceAlignment = {
   status: CadenceAlignmentStatus;
   weeklyThemes: string[];
   monthlyThemes: string[];

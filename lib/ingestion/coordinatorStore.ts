@@ -19,8 +19,8 @@ import {
 import type { IngestionStore } from "./store";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "./types";
 
-export const INGEST_COORDINATOR_FLAG = "WHETHER_INGEST_COORDINATOR";
-export const INGEST_COORDINATOR_BINDING = "INGEST_COORDINATOR";
+const INGEST_COORDINATOR_FLAG = "WHETHER_INGEST_COORDINATOR";
+const INGEST_COORDINATOR_BINDING = "INGEST_COORDINATOR";
 
 const readFlag = (): boolean => {
   const fromBinding: unknown = Reflect.get(globalThis, INGEST_COORDINATOR_FLAG);

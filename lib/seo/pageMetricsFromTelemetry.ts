@@ -21,7 +21,7 @@ export type TelemetryRow = {
   blob2?: string | null;
 };
 
-export type PageMetric = {
+type PageMetric = {
   /**
    * **All first-visit entrances, not organic ones.** The name is the field
    * `scripts/seo-refresh-queue.mjs` reads, so it is kept; the number is not what
@@ -47,7 +47,7 @@ export type PageMetric = {
   intent?: ContentIntent;
 };
 
-export type PageMetricsFile = {
+type PageMetricsFile = {
   generatedAtIso: string;
   windowDays: number;
   eventsRead: number;

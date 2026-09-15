@@ -1,5 +1,4 @@
 import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
-import type { CrossingRiskLabel } from "./forecastModel";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue } from "../formatters";
@@ -8,7 +7,7 @@ import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
-export type DecisionPhraseTriplet = {
+type DecisionPhraseTriplet = {
   action: string;
   threshold: string;
   reversal: string;
@@ -25,7 +24,7 @@ export const publicDecisionLabels = {
   evidence: "Evidence",
 } as const;
 
-export const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
+const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   action: "Stage approvals",
   threshold: FALLBACK_PAUSE_THRESHOLD,
   reversal: "Reverse only after threshold recovery",
@@ -88,12 +87,6 @@ export const buildRegimeAlert = (
   };
 };
 
-const crossingRiskLabels: Record<CrossingRiskLabel, string> = {
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-};
-
 const confidencePlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
   LOW: "Low (near threshold, stage decisions)",
   MED: "Medium (mixed signal reliability)",
@@ -117,16 +110,6 @@ export const formatBoundaryDistance = ({
   points: number;
   threshold: number;
 }): string => `${label} is ${points.toFixed(1)} points from its ${threshold.toFixed(1)} line.`;
-
-export const formatProbabilityPercent = (probability: number, fractionDigits = 0): string => {
-  const bounded = Math.min(100, Math.max(0, probability));
-  return `${bounded.toFixed(fractionDigits)}%`;
-};
-
-export const formatRegimeProbability = (probability: number): string =>
-  formatProbabilityPercent(probability, 0);
-
-export const formatCrossingRiskLabel = (risk: CrossingRiskLabel): string => crossingRiskLabels[risk];
 
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
   confidencePlainLabels[confidence];
@@ -328,7 +311,7 @@ export type CompactFreshnessMeta = {
   line: string;
 };
 
-export type TrustStripDisplay = {
+type TrustStripDisplay = {
   freshnessBadge: string;
   confidenceBadge: string;
   provenanceBadge: string;

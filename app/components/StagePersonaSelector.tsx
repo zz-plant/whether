@@ -8,16 +8,13 @@ import {
   OPERATOR_STAGE_OPTIONS,
   operatorStageForVariantMode,
   type OperatorStage,
-  type OperatorStageOption,
 } from "../../lib/report/operatorStage";
 import { persistOperatorStage } from "./useOperatorStage";
-
-export type StagePersonaOption = OperatorStageOption;
 
 /** The four stages, from the one module every stage control reads. */
 export const STAGE_PERSONA_OPTIONS = OPERATOR_STAGE_OPTIONS;
 
-export interface StagePersonaSelectorProps {
+interface StagePersonaSelectorProps {
   activeStage: StartupVariantMode;
   className?: string;
 }

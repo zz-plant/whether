@@ -29,7 +29,7 @@ const socialImageUrl = buildSocialImageUrl();
 const themeStorageKey = STORAGE_KEYS.theme;
 const orientationDismissKey = STORAGE_KEYS.homeOrientationDismissed;
 
-export const buildThemeBootstrapScript = () => `
+const buildThemeBootstrapScript = () => `
 (() => {
   try {
     const root = document.documentElement;
@@ -54,7 +54,7 @@ export const buildThemeBootstrapScript = () => `
  * The orientation half is the part that always worked — it injects the rule
  * that consumes its own attribute, three lines below where it sets it.
  */
-export const buildOrientationBootstrapScript = () => `
+const buildOrientationBootstrapScript = () => `
 (() => {
   try {
     const root = document.documentElement;

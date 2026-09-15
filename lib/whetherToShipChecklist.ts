@@ -1,14 +1,14 @@
 import type { RegimeAssessment } from "./regimeEngine";
 import { REGIME_LABELS } from "./regimePresentation";
 
-export type ChecklistInput = {
+type ChecklistInput = {
   evidenceStrength: "low" | "medium" | "high";
   reversibility: "hard" | "moderate" | "easy";
   blastRadius: "large" | "medium" | "small";
   strategicAlignment: "low" | "medium" | "high";
 };
 
-export type ShipVerdict = "go" | "wait" | "kill";
+type ShipVerdict = "go" | "wait" | "kill";
 
 const valueMap = {
   low: 0,

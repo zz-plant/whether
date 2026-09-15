@@ -11,7 +11,7 @@ export const resolveSectorKey = (
   fallback: SectorKey = "b2b-saas",
 ): SectorKey => (value && sectorKeys.includes(value as SectorKey) ? (value as SectorKey) : fallback);
 
-export type SectorSensitivityConfig = {
+type SectorSensitivityConfig = {
   label: string;
   tightnessMultiplier: number;
   riskAppetiteMultiplier: number;
@@ -64,7 +64,7 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
   },
 };
 
-export type SectorAdjustedPosture = {
+type SectorAdjustedPosture = {
   basePostureLabel: string;
   adjustedPostureLabel: string;
   postureVariant: "minus" | "neutral" | "plus";

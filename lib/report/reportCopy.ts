@@ -1,16 +1,16 @@
-export type ReportLinkCopy = {
+type ReportLinkCopy = {
   href: string;
   label: string;
   description?: string;
 };
 
-export type FirstTimeGuideStep = {
+type FirstTimeGuideStep = {
   label: string;
   detail: string;
   example: string;
 };
 
-export type GlossaryEntry = {
+type GlossaryEntry = {
   value: string;
   term: string;
   summary: string;
@@ -19,12 +19,12 @@ export type GlossaryEntry = {
   usedInHref: string;
 };
 
-export type GlossaryUsageNote = {
+type GlossaryUsageNote = {
   title: string;
   bullets: Array<{ emphasis: string; detail: string }>;
 };
 
-export type HighlightBullet = { text: string };
+type HighlightBullet = { text: string };
 
 // Single vocabulary for the bounded-decision contract (action / threshold /
 // reversal). UI surfaces read the imperative forms (Do now, Pause if, Change
@@ -93,21 +93,8 @@ export const POLICY_OVERRIDE_CALL = {
     "Resume normal posture changes only after policy disagreement clears and the weekly flip thresholds recover.",
 } as const;
 
-/**
- * A flat week is the common case and a useful answer in itself: it means the
- * standing calls survive another week. State the consequence rather than
- * repeating the delta, which the score block already carries.
- */
-export const STEADY_WEEK_LABEL = "No change";
-export const STEADY_WEEK_CONSEQUENCE = "Last week's calls stand.";
-
-export const PRIMARY_AUDIENCE_LABEL = "U.S. market starting point";
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
-export const PRIMARY_AUDIENCE_ACTION =
-  "Before you commit, pressure-test that read against your own demand, retention, and cash signals. Do not use this as the sole basis for irreversible hiring, fundraising, budget, or investment decisions.";
-export const PRIMARY_AUDIENCE_SHARE_GUIDANCE =
-  "Start with the leadership team brief. Switch to the plain-English brief when the audience needs less shorthand.";
 
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {

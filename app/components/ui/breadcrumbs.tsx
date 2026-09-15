@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
 
-export type BreadcrumbEntry = {
+type BreadcrumbEntry = {
   label: string;
   href?: Route;
 };

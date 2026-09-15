@@ -4,7 +4,7 @@ import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoD
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "../report/weeklyBriefSnapshot";
 import { evaluateSeoQualityGates, type SeoQualityGateResult, type SeoQualitySiblingInput } from "../report/seoQualityGates";
 
-export type AnswerLaunchReadinessRecord = {
+type AnswerLaunchReadinessRecord = {
   slug: string;
   keyword: string;
   eligible: boolean;
@@ -74,7 +74,7 @@ const buildPayloadRecords = (
     };
   });
 
-export const loadAnswerLaunchReadinessInputs = async (route = "/answers/[slug]:launch-readiness"): Promise<AnswerLaunchReadinessLiveInputs> => {
+const loadAnswerLaunchReadinessInputs = async (route = "/answers/[slug]:launch-readiness"): Promise<AnswerLaunchReadinessLiveInputs> => {
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
   return { reportData, degraded, snapshot };
 };

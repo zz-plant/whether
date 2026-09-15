@@ -4,7 +4,7 @@ export const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as
 
 export type FocusTab = (typeof focusTabs)[number];
 export type SignalsView = "implication" | "detail";
-export type SignalsSearchParamRecord = Record<string, string | undefined>;
+type SignalsSearchParamRecord = Record<string, string | undefined>;
 
 type SearchParamsLike = {
   get(name: string): string | null;
@@ -50,7 +50,7 @@ const buildHrefFromParams = (
   return query ? `${pathname}?${query}${hash}` : `${pathname}${hash}`;
 };
 
-export const buildSignalsHref = ({
+const buildSignalsHref = ({
   pathname = "/signals",
   searchParams,
   remove = [],

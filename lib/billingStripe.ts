@@ -34,7 +34,7 @@ const getStripePriceId = (plan: PremiumPlan): string | undefined => {
   return process.env.STRIPE_PRICE_TEAM_MONTHLY;
 };
 
-export const getStripeBillingConfig = () => {
+const getStripeBillingConfig = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const appBaseUrl = normalizeBaseUrl(process.env.APP_BASE_URL);
 

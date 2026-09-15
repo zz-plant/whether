@@ -13,7 +13,7 @@ import { ShareRail } from "./shareRail";
  * the reader to the sheet rather than the page on close. Dispatch this and let
  * the global instance own it, the way the command palette does.
  */
-export const OPEN_SHARE_RAIL_EVENT = "whether-open-share-rail";
+const OPEN_SHARE_RAIL_EVENT = "whether-open-share-rail";
 
 export const openShareRail = () => {
   document.dispatchEvent(new CustomEvent(OPEN_SHARE_RAIL_EVENT));

@@ -2,7 +2,7 @@ import type { DecisionArea } from "../lib/report/boundedDecisionRules";
 import { useCaseRoles, type ToolkitSlug } from "../lib/decisionDomainCatalog";
 import { indexableSignalsClusters } from "./signals/clusterRoutes";
 
-export type DecisionScenarioDefinition = {
+type DecisionScenarioDefinition = {
   slug: DecisionArea;
   title: string;
 };
@@ -60,9 +60,3 @@ export const signalScenarioRoutes = indexableSignalsClusters.flatMap((signal) =>
 
 export const findDecisionScenario = (slug: string) =>
   decisionScenarioDefinitions.find((scenario) => scenario.slug === slug);
-
-export const findCanonicalDecideRoute = (role: string, scenario: string) =>
-  decideCanonicalRoutes.find((route) => route.role === role && route.scenario === scenario);
-
-export const findCanonicalToolkitRoute = (toolkitType: string, macroContext: string) =>
-  toolkitCanonicalRoutes.find((route) => route.toolkitType === toolkitType && route.macroContext === macroContext);

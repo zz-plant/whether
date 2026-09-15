@@ -49,7 +49,7 @@ const CATEGORY_OPTIONS: { value: CategoryChoice; label: string }[] = [
 const isCategoryChoice = (value: string): value is CategoryChoice =>
   CATEGORY_OPTIONS.some((option) => option.value === value);
 
-export interface DecisionPlanStressTesterProps {
+interface DecisionPlanStressTesterProps {
   assessment: RegimeAssessment;
   recordDate: string;
   /** The stage the hero's Calibrate stage control settled on; this panel grades for the same team. */

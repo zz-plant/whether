@@ -28,13 +28,13 @@ const SUPPORTED_IMAGE_BRIEF_PARAM_KEYS = [
   "company",
 ] as const;
 
-export type ImageBriefSearchParamKey = typeof SUPPORTED_IMAGE_BRIEF_PARAM_KEYS[number];
+type ImageBriefSearchParamKey = typeof SUPPORTED_IMAGE_BRIEF_PARAM_KEYS[number];
 
-export type SearchParamReader = {
+type SearchParamReader = {
   get(name: string): string | null;
 };
 
-export type ImageBriefRequestContext = {
+type ImageBriefRequestContext = {
   searchParams?: HomePageSearchParams;
   operatorContext?: OperatorContext;
 };
@@ -107,7 +107,7 @@ const normalizeView = (value: string | undefined) => {
   return normalized && VALID_INTERPRETATION_VIEWS.has(normalized) ? normalized : undefined;
 };
 
-export const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
+const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
   const params = new URLSearchParams();
   const month = normalizeMonth(readTrimmed(source, "month"));
   const year = normalizeYear(readTrimmed(source, "year"));

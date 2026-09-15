@@ -35,7 +35,6 @@ const answerMetaSchema = z.object({
 });
 
 export type AnswerPageData = z.infer<typeof answerPageSchema>;
-export type AnswerMetaData = z.infer<typeof answerMetaSchema>;
 
 export const answerPageContent = z.array(answerPageSchema).parse(answerPagesData);
 export const answerMetaContent = answerMetaSchema.parse(answerMetaData);

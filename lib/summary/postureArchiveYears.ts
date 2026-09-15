@@ -13,9 +13,9 @@ const PostureArchiveYearSchema = z.object({
   operatorLabel: z.string(),
 });
 
-export type PostureArchiveYear = z.infer<typeof PostureArchiveYearSchema>;
+type PostureArchiveYear = z.infer<typeof PostureArchiveYearSchema>;
 
-export const parsePostureArchiveYears = (input: unknown): PostureArchiveYear[] => {
+const parsePostureArchiveYears = (input: unknown): PostureArchiveYear[] => {
   const parsed = z.array(PostureArchiveYearSchema).safeParse(input);
 
   if (parsed.success) {

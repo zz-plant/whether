@@ -71,7 +71,7 @@ export type FundingPressureLadderLine = {
   points: number;
 };
 
-export type FundingPressureDriverView = {
+type FundingPressureDriverView = {
   key: "funding-pressure";
   label: "Funding pressure";
   current: number;
@@ -143,7 +143,7 @@ export const buildFundingPressureDriverView = ({
 
 // ── Risk appetite: buffer — cushion + consumption pace ──
 
-export type RiskAppetiteDriverView = {
+type RiskAppetiteDriverView = {
   key: "risk-appetite";
   label: "Risk appetite";
   current: number;
@@ -227,7 +227,7 @@ export const buildRiskAppetiteDriverView = ({
 
 // ── Financing: trend that acts through funding pressure — no threshold bar ──
 
-export type FinancingDriverView = {
+type FinancingDriverView = {
   key: "financing";
   label: "Financing conditions";
   /** What the engine actually read, e.g. "The 1-month Treasury bill". */

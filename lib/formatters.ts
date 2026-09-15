@@ -30,12 +30,6 @@ const monthLongYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-const monthYearShort2DigitUtcFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  year: "2-digit",
-  timeZone: "UTC",
-});
-
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -129,20 +123,11 @@ export const formatAgeHours = (value: string | null, now: Date) => {
   return span ? `${span}.` : "—";
 };
 
-export const formatNumberValue = (value: number | null) => {
+const formatNumberValue = (value: number | null) => {
   if (value === null || Number.isNaN(value)) {
     return "—";
   }
   return numberFormatter.format(value);
-};
-
-export const formatSignedDeltaValue = (value: number | null) => {
-  const formatted = formatNumberValue(value);
-  if (formatted === "—") {
-    return formatted;
-  }
-  const sign = value !== null && value > 0 ? "+" : "";
-  return `${sign}${formatted}`;
 };
 
 export const formatScoreValue = (value: number) => value.toFixed(0);
@@ -154,30 +139,16 @@ export const formatScoreValue = (value: number) => value.toFixed(0);
 export const formatThresholdNumber = (value: number) =>
   Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
 
-export const formatMonthYearShortUtc = (date: Date) => monthYearShortUtcFormatter.format(date);
-
 export const formatMonthYearShortFromValue = (value: string) =>
   formatDateValue(value, monthYearShortUtcFormatter);
-
-export const formatMonthYear2DigitFromValue = (value: string) =>
-  formatDateValue(value, monthYearShort2DigitUtcFormatter);
 
 export const formatMonthShortUtc = (month: number) =>
   monthShortUtcFormatter.format(new Date(Date.UTC(2020, month - 1, 1)));
 
 export const formatMonthLongYearUtc = (year: number, month: number) =>
   monthLongYearUtcFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
-
-export const formatConceptPublishedLabel = (year: number, month: number) =>
-  formatMonthYearShortUtc(new Date(Date.UTC(year, month - 1, 1)));
-
 export const formatNumberWithUnit = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
-  return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
-};
-
-export const formatSignedDeltaWithUnit = (value: number | null, unit: string) => {
-  const formatted = formatSignedDeltaValue(value);
   return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
 };
 

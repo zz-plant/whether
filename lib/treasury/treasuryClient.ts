@@ -44,7 +44,7 @@ export const TREASURY_ENDPOINTS = {
   tenYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
 } as const;
 
-export interface TreasuryFetchOptions {
+interface TreasuryFetchOptions {
   fetcher?: typeof fetch;
   endpoint?: string;
   snapshotFallback?: TreasuryData;

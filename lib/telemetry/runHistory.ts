@@ -19,14 +19,14 @@
 import { z } from "zod";
 import { withDeadline } from "../withDeadline";
 
-export const RUN_HISTORY_WINDOW_DAYS = 30;
-export const RUN_HISTORY_CACHE_MS = 15 * 60 * 1000;
-export const RUN_HISTORY_TIMEOUT_MS = 2_500;
+const RUN_HISTORY_WINDOW_DAYS = 30;
+const RUN_HISTORY_CACHE_MS = 15 * 60 * 1000;
+const RUN_HISTORY_TIMEOUT_MS = 2_500;
 const DEFAULT_DATASET = "whether_telemetry";
 const ROW_LIMIT = 5_000;
 
 /** Operator-facing names for the step labels `runCronStep` writes. Unknown steps show their raw label. */
-export const CRON_STEP_LABELS: Record<string, string> = {
+const CRON_STEP_LABELS: Record<string, string> = {
   "refresh-operating-state": "Signal refresh",
   "email/send-weekly": "Weekly email",
   "slack/deliver-brief": "Slack brief",
@@ -38,7 +38,7 @@ export const CRON_STEP_LABELS: Record<string, string> = {
   "brief-freeze-workflow": "Brief freeze pull request",
 };
 
-export type CronStepSummary = {
+type CronStepSummary = {
   step: string;
   label: string;
   runs: number;
@@ -60,7 +60,7 @@ export type CronRunHistory =
   | { status: "unconfigured" }
   | { status: "unavailable"; reason: string };
 
-export type AnalyticsReadConfig = { accountId: string; token: string; dataset: string };
+type AnalyticsReadConfig = { accountId: string; token: string; dataset: string };
 
 const readSetting = (name: string): string | null => {
   const fromBinding: unknown = Reflect.get(globalThis, name);
@@ -92,7 +92,7 @@ const cronStepEventSchema = z.object({
   error: z.string().nullable().optional(),
 });
 
-export type CronStepRow = { timestamp: string; blob2?: string | null };
+type CronStepRow = { timestamp: string; blob2?: string | null };
 
 /** Analytics Engine stamps rows as "YYYY-MM-DD HH:MM:SS" in UTC; normalise to ISO. */
 const toIsoTimestamp = (value: string): string | null => {
@@ -162,7 +162,7 @@ export const buildCronStepQuery = (dataset: string, windowDays: number) =>
     `LIMIT ${ROW_LIMIT}`,
   ].join("\n");
 
-export type LoadCronRunHistoryOptions = {
+type LoadCronRunHistoryOptions = {
   fetcher?: typeof fetch;
   now?: Date;
   windowDays?: number;

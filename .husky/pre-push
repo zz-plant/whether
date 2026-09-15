@@ -23,4 +23,4 @@
 # wrong index. Both pass standalone and failed only here, which is the tell.
 unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX GIT_QUARANTINE_PATH GIT_REFLOG_ACTION
 
-bun scripts/run-checks.mjs lint typecheck test assets suppressions hotspot-preflight landmarks
+bun scripts/run-checks.mjs lint typecheck test assets suppressions dead-exports hotspot-preflight landmarks

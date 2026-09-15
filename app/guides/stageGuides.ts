@@ -1,4 +1,4 @@
-export type StageGuide = {
+type StageGuide = {
   slug: string;
   title: string;
   teamSize: string;

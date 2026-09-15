@@ -58,7 +58,7 @@ export type TelemetryStream =
   | "regime-transition"
   | "degraded-state";
 
-export type WriteAnalyticsOptions = {
+type WriteAnalyticsOptions = {
   doubles?: number[];
 };
 
@@ -94,5 +94,3 @@ export const writeAnalytics = (
     console.warn(`[telemetry:${stream}:write-failed]`, error);
   }
 };
-
-export const isAnalyticsEngineBound = (): boolean => getBinding() !== null;

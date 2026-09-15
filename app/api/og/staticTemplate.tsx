@@ -8,7 +8,7 @@ import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG
  * Discover reject `image/svg+xml` outright, so these render through
  * `ImageResponse` as PNG like every other template here.
  */
-export type StaticOgTemplate = "operations" | "signals" | "method" | "solutions" | "guides";
+type StaticOgTemplate = "operations" | "signals" | "method" | "solutions" | "guides";
 
 const templateAccent: Record<StaticOgTemplate, string> = {
   operations: "#22d3ee",
@@ -45,11 +45,6 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
     body: "Help leaders align product, finance, and strategy on one posture.",
   },
 };
-
-export const staticOgTemplates = Object.keys(templateAccent) as StaticOgTemplate[];
-
-export const isStaticOgTemplate = (value: string): value is StaticOgTemplate =>
-  Object.prototype.hasOwnProperty.call(templateAccent, value);
 
 const frameStyle: CSSProperties = {
   display: "flex",

@@ -1,6 +1,6 @@
 import { getTimeMachineRegimeSeries } from "./timeMachineCache";
 
-export type TransitionForecastDisplay = {
+type TransitionForecastDisplay = {
   probabilityPercent: number;
   eventLabel: "Chance conditions change";
   horizonLabel: "by next month";

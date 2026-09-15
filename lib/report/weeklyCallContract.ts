@@ -8,7 +8,7 @@ import {
 } from "./boundedDecisionRules";
 import { POLICY_OVERRIDE_CALL } from "./reportCopy";
 
-export type StageScopedAdjustment = {
+type StageScopedAdjustment = {
   mode: StartupVariantMode;
   label: string;
   actionNow: string;

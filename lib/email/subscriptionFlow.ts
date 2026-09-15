@@ -13,7 +13,7 @@ const normalizeBaseUrl = (value: string | null | undefined) => {
   }
 };
 
-export const resolvePublicAppBaseUrl = (request?: Request) => {
+const resolvePublicAppBaseUrl = (request?: Request) => {
   const configured = normalizeBaseUrl(process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL);
   if (configured) return configured;
 
@@ -25,7 +25,7 @@ export const resolvePublicAppBaseUrl = (request?: Request) => {
   return DEFAULT_APP_BASE_URL;
 };
 
-export const buildEmailActionUrl = (path: string, request?: Request) => {
+const buildEmailActionUrl = (path: string, request?: Request) => {
   const baseUrl = resolvePublicAppBaseUrl(request);
   return new URL(path, baseUrl).toString();
 };

@@ -23,5 +23,3 @@ export const STORAGE_KEYS = {
   decisionShieldPresets: (clientId?: string | null) =>
     clientId ? `whether.decisionShieldPresets:${clientId}` : "whether.decisionShieldPresets",
 } as const;
-
-export type StorageKey = keyof typeof STORAGE_KEYS;

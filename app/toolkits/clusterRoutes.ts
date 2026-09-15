@@ -27,5 +27,3 @@ export const findToolkitCluster = (slug: string, cluster: string) =>
   toolkitClusterDefinitions.find(
     (entry) => entry.slug === slug && entry.cluster === cluster && entry.isIndexable,
   );
-
-export const indexableToolkitClusters = toolkitClusterDefinitions.filter((cluster) => cluster.isIndexable && cluster.isCanonical);

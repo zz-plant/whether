@@ -18,7 +18,7 @@ import type { PremiumPlan } from "../billingStripe";
  * verifying both refuse loudly rather than minting unverifiable proofs.
  */
 
-export type EntitlementRecord = {
+type EntitlementRecord = {
   plan: PremiumPlan;
   sessionId: string;
   customerEmail?: string;
@@ -85,7 +85,7 @@ export const resetEntitlementMemoryStore = (): void => {
 
 /* ---------------------------------------------------------------- tokens --- */
 
-export type EntitlementTokenPayload = {
+type EntitlementTokenPayload = {
   plan: PremiumPlan;
   sessionId: string;
   email?: string;
@@ -93,7 +93,7 @@ export type EntitlementTokenPayload = {
   exp: number;
 };
 
-export type EntitlementTokenVerification =
+type EntitlementTokenVerification =
   | { ok: true; payload: EntitlementTokenPayload }
   | { ok: false; reason: "unconfigured" | "malformed" | "bad_signature" | "expired" };
 

@@ -29,7 +29,7 @@ import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL } from "./reportCopy";
 /** The two horizons the selector offers beside the weekly default. */
 export type CadenceCallHorizon = "monthly" | "quarterly";
 
-export type CadenceHistoryPoint = {
+type CadenceHistoryPoint = {
   label: string;
   regime: RegimeKey;
   regimeLabel: string;

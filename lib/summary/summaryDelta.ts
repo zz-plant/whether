@@ -1,7 +1,7 @@
 import type { MonthlySummary } from "./monthlySummary";
 import type { WeeklySummary } from "./weeklySummary";
 
-export type SummaryDelta = {
+type SummaryDelta = {
   regime: {
     from: WeeklySummary["regime"];
     to: MonthlySummary["regime"];

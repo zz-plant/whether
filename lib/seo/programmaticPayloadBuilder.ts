@@ -67,8 +67,8 @@ const manifestSchema = z.object({
   urls: z.record(z.string(), z.string()),
 });
 
-export type ProgrammaticPayloadRecord = z.infer<typeof payloadRecordSchema>;
-export type ProgrammaticRouteDefinition = z.infer<typeof programmaticRouteSchema>;
+type ProgrammaticPayloadRecord = z.infer<typeof payloadRecordSchema>;
+type ProgrammaticRouteDefinition = z.infer<typeof programmaticRouteSchema>;
 
 type PayloadContext = {
   reportData: ReportData;

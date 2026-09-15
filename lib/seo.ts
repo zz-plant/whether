@@ -19,7 +19,7 @@ export const canonicalPositioningLine =
   "Whether turns macro conditions into a weekly operating call for startup leaders.";
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
-export const defaultSocialImagePath = "/api/og?template=report";
+const defaultSocialImagePath = "/api/og?template=report";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();
 export const buildSocialImageUrl = (path = defaultSocialImagePath) =>

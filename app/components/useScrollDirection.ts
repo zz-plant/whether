@@ -8,7 +8,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export type ScrollDirection = "up" | "down";
+type ScrollDirection = "up" | "down";
 
 type ScrollDirectionState = {
   direction: ScrollDirection;

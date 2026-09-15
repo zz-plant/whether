@@ -20,8 +20,8 @@ export const publisherAuthor = {
 export const publisherProfilePath = "/about";
 export const publisherContactPath = "/contact";
 
-export const publisherProfileUrl = () => buildCanonicalUrl(publisherProfilePath);
-export const publisherContactUrl = () => buildCanonicalUrl(publisherContactPath);
+const publisherProfileUrl = () => buildCanonicalUrl(publisherProfilePath);
+const publisherContactUrl = () => buildCanonicalUrl(publisherContactPath);
 
 /** schema.org Person for article bylines. */
 export const buildAuthorSchema = () => ({

@@ -12,7 +12,7 @@ import { formatThresholdNumber } from "../formatters";
 import { deltaLabelBySignal } from "../report/briefFormatting";
 import { compositeSignalScales } from "../report/signalTranslations";
 
-export type HorizonNoun = "month" | "quarter";
+type HorizonNoun = "month" | "quarter";
 
 export type HorizonOperatingRule = {
   action: string;
@@ -21,7 +21,7 @@ export type HorizonOperatingRule = {
 };
 
 /** The two composite signals the horizon rule is written against. */
-export type HorizonBandSignalKey = "tightness" | "riskAppetite";
+type HorizonBandSignalKey = "tightness" | "riskAppetite";
 
 /**
  * One signal's half of the horizon rule, as numbers rather than as a sentence.

@@ -31,6 +31,10 @@ const TASKS = [
   // finding instead of fixing it, and no other task here notices. This counts
   // the suppressions themselves, so the shortcut costs more than the fix.
   { name: "suppressions", script: "check:suppressions" },
+  // An export nothing references is not a lint finding, a type error, or a
+  // failing test, so nothing else here notices one. A 2026-09-15 sweep found
+  // 556 of them; this holds the count at zero.
+  { name: "dead-exports", script: "check:dead-exports" },
   // The hand-curated macro series have no live fetcher, so nothing in the
   // ingest path refreshes them and nothing else notices when the quarterly
   // curation pass slips. Warn-only by default; see the script header for why.

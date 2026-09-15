@@ -40,14 +40,14 @@ const RETENTION_SECONDS = 180 * 24 * 60 * 60;
 const DEFAULT_LIMIT = 500;
 const MAX_LIMIT = 1000;
 
-export type PremiumFunnelCursor = string | null;
+type PremiumFunnelCursor = string | null;
 
-export type StoredPremiumFunnelEvent = PremiumFunnelEvent & {
+type StoredPremiumFunnelEvent = PremiumFunnelEvent & {
   /** Server receive time. Trustworthy, unlike the client-supplied `occurredAt`. */
   receivedAt: string;
 };
 
-export type PremiumFunnelSummary = {
+type PremiumFunnelSummary = {
   total: number;
   bySource: Record<PremiumIntentSource, number>;
   byType: Record<PremiumFunnelEventType, number>;
@@ -70,7 +70,7 @@ const buildKey = (receivedAtMs: number): string => {
 /* Newest-first, mirroring the KV key order so both backends read identically. */
 const memoryEvents: StoredPremiumFunnelEvent[] = [];
 
-export const premiumFunnelBackendStatus = (): "durable" | "local-fallback" =>
+const premiumFunnelBackendStatus = (): "durable" | "local-fallback" =>
   getWhetherKv() ? "durable" : "local-fallback";
 
 /**

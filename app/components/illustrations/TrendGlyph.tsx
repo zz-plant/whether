@@ -22,7 +22,7 @@ export type TrendDirection = "up" | "down" | "mixed" | "flat";
 
 const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
-export const formatTrendValue = (value: number) => numberFormatter.format(value);
+const formatTrendValue = (value: number) => numberFormatter.format(value);
 
 export const trendDirectionFromDelta = (delta: number | null | undefined): TrendDirection => {
   if (delta === null || delta === undefined || !Number.isFinite(delta) || delta === 0) {
@@ -38,15 +38,6 @@ export const trendDirectionFromDelta = (delta: number | null | undefined): Trend
  */
 export const trendDirectionFromArrow = (arrow: "↑" | "↓" | "→"): TrendDirection =>
   arrow === "↑" ? "up" : arrow === "↓" ? "down" : "flat";
-
-/** Maps the `directionLabel` vocabulary from `reportDynamics` onto a glyph direction. */
-export const trendDirectionFromLabel = (trendLabel?: string): TrendDirection => {
-  const key = trendLabel?.trim().toLowerCase() ?? "";
-  if (key === "improving" || key === "strengthening" || key === "easing") return "up";
-  if (key === "deteriorating" || key === "weakening" || key === "tightening") return "down";
-  if (key === "mixed" || key === "unstable") return "mixed";
-  return "flat";
-};
 
 /**
  * Tone for a movement. `increaseIsPositive` defaults to false because
@@ -91,14 +82,6 @@ export const describeTrend = ({
     : `${label} fell ${size} ${period}${at}.`;
 };
 
-/**
- * Screen-reader-only movement sentence. Pair with an `aria-hidden` glyph so the
- * arrow is not announced as a stray "upwards arrow" character.
- */
-export const TrendDescription = (props: Parameters<typeof describeTrend>[0]) => (
-  <span className="sr-only">{describeTrend(props)}</span>
-);
-
 const GLYPH_PATHS: Record<TrendDirection, string> = {
   up: "M3.5 11.5 11.5 3.5M7.5 3.5h4v4",
   down: "M3.5 4.5 11.5 12.5M7.5 12.5h4v-4",
@@ -128,37 +111,3 @@ export const TrendGlyph = ({
     />
   </svg>
 );
-
-/**
- * Glyph + tone + accessible sentence in one span — the default way to render a
- * delta. Callers supply their own numeric label as `children` so the visible
- * text stays in each surface's own voice.
- */
-export const TrendMark = ({
-  label,
-  delta,
-  unit,
-  current,
-  increaseIsPositive = false,
-  className = "",
-  children,
-}: {
-  label: string;
-  delta: number | null | undefined;
-  unit?: string;
-  current?: number;
-  increaseIsPositive?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-}) => {
-  const direction = trendDirectionFromDelta(delta);
-  return (
-    <span
-      className={`inline-flex items-center gap-1 ${trendToneClass(direction, increaseIsPositive)} ${className}`}
-    >
-      <TrendGlyph direction={direction} />
-      <TrendDescription label={label} delta={delta} unit={unit} current={current} />
-      {children ? <span aria-hidden="true">{children}</span> : null}
-    </span>
-  );
-};

@@ -9,7 +9,7 @@ import type {
 } from "../decisionShield";
 import type { AnalogPlaybookResult } from "../analogPlaybook";
 
-export interface WhetherClientConfig {
+interface WhetherClientConfig {
   baseUrl?: string;
   apiKey?: string;
   fetchFn?: typeof fetch;

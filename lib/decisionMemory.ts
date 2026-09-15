@@ -6,7 +6,7 @@ import type { RegimeAssessment } from "./regimeEngine";
  * the verdict engine. "posture-snapshot" entries come from the weekly brief, which
  * logs the standing operating call and has no decision triple or verdict to record.
  */
-export type DecisionMemoryEntryKind = "decision" | "posture-snapshot";
+type DecisionMemoryEntryKind = "decision" | "posture-snapshot";
 
 /**
  * The conditions that had to be true for a recorded decision to keep making
@@ -167,7 +167,7 @@ const isAssumptionSnapshot = (value: unknown): boolean => {
       || (Array.isArray(value.assumptionLabels) && value.assumptionLabels.every((label) => typeof label === "string")));
 };
 
-export const isDecisionMemoryEntry = (value: unknown): value is DecisionMemoryEntry => {
+const isDecisionMemoryEntry = (value: unknown): value is DecisionMemoryEntry => {
   if (!isRecord(value) || !isRecord(value.context) || !isRecord(value.outcome) || !isRecord(value.regime)) {
     return false;
   }
@@ -361,7 +361,7 @@ import {
 
 export type DecisionAssumptionVerdict = StalenessVerdict;
 
-export type DecisionAssumptionHealthResult = {
+type DecisionAssumptionHealthResult = {
   verdict: DecisionAssumptionVerdict;
   reason: string;
   tightnessDelta: number;
@@ -402,7 +402,7 @@ export const evaluateDecisionAssumptionHealth = ({
   };
 };
 
-export type CohortDecisionAuditResult = {
+type CohortDecisionAuditResult = {
   stand: DecisionMemoryEntry[];
   watch: Array<{ entry: DecisionMemoryEntry; health: DecisionAssumptionHealthResult }>;
   reconsider: Array<{ entry: DecisionMemoryEntry; health: DecisionAssumptionHealthResult }>;

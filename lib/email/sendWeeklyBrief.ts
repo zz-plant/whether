@@ -49,7 +49,7 @@ const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
         `</tr></table>`,
       ].join("");
 
-export type SendWeeklyBriefResult = {
+type SendWeeklyBriefResult = {
   ok: boolean;
   sent: number;
   errors: number;

@@ -1,6 +1,6 @@
 export type ContentCluster = "authority" | "pain" | "tool" | "vc";
 export type ContentIntent = "cfo" | "board" | "vp-product" | "vc-partner";
-export type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conversion";
+type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conversion";
 
 export type ContentMeasurementEvent = {
   pagePath: string;
@@ -19,7 +19,7 @@ export const isContentCluster = (value: string): value is ContentCluster =>
 export const isContentIntent = (value: string): value is ContentIntent =>
   value === "cfo" || value === "board" || value === "vp-product" || value === "vc-partner";
 
-export const isContentEventType = (value: string): value is ContentEventType =>
+const isContentEventType = (value: string): value is ContentEventType =>
   value === "organic_entrance" || value === "cta_conversion" || value === "assisted_conversion";
 
 export const isContentMeasurementEvent = (input: unknown): input is ContentMeasurementEvent => {
@@ -38,7 +38,7 @@ export const isContentMeasurementEvent = (input: unknown): input is ContentMeasu
   );
 };
 
-export const trackContentMeasurementEvent = (payload: ContentMeasurementEvent) => {
+const trackContentMeasurementEvent = (payload: ContentMeasurementEvent) => {
   const body = JSON.stringify(payload);
 
   if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
@@ -87,7 +87,7 @@ export const trackContentAssistedConversion = (
   });
 };
 
-export type ContentMeasurementReport = {
+type ContentMeasurementReport = {
   organicEntrancesByCluster: Record<ContentCluster, number>;
   ctaConversionsByPage: Record<string, number>;
   ctaConversionsByCluster: Record<ContentCluster, number>;

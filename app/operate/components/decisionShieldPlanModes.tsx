@@ -15,7 +15,7 @@ import type { OperatorProfile } from "../../../lib/operatorProfile";
 
 type BusinessModel = NonNullable<CompanyFinancialProfile["businessModel"]>;
 
-export type PlanStressTestModeProps = {
+type PlanStressTestModeProps = {
   planText: string;
   setPlanText: (value: string) => void;
   planReady: boolean;
@@ -150,7 +150,7 @@ export function PlanStressTestMode({
   );
 }
 
-export type ComparePlansModeProps = {
+type ComparePlansModeProps = {
   planText: string;
   setPlanText: (value: string) => void;
   planBText: string;
