@@ -14,7 +14,7 @@ const PRODUCTION_BRANCH = "main";
  * command, and the deploy command that lands here afterwards. Exported so a test
  * can compare it against the configured command without parsing this file.
  */
-export const GATE_TASKS = ["lint", "typecheck", "test", "assets", "suppressions", "landmarks"];
+export const GATE_TASKS = ["lint", "typecheck", "test", "assets", "suppressions", "dead-exports", "landmarks"];
 
 /**
  * The gate tasks still owed for this commit.

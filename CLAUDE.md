@@ -16,7 +16,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
-| `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check` and pre-push, not the deploy gate. |
+| `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
@@ -100,14 +100,18 @@ deploys every push, which is the only remote gate left.
   reported orphan is nearly always real — but it is a scan, not a proof: a symbol reached only
   through a runtime string, or named only from a file type the scan does not read, shows as dead.
   If it fails on an export you know is live, widen the scan rather than deleting the export. The
-  names Next.js and the Workers runtime consume by convention are exempt. It runs in `bun run check`
-  and on pre-push, and deliberately **not** in the deploy gate: every verdict it makes is "no other
-  file mentions this name", so a checkout it cannot fully read reports *more* dead exports, not
-  fewer, and a container missing `tests/` would condemn hundreds of live exports as a finding that
-  reads like a real one. It sits beside `audit` (wants the network) and `hotspot-preflight` (wants
-  git history) as a check whose prerequisite the build image does not guarantee. `main()` now
-  refuses to score a tree with an empty required root rather than reporting one, so the failure at
-  least names itself; put it back in the gate once the build container is known to satisfy it.
+  names Next.js and the Workers runtime consume by convention are exempt. It runs in `bun run check`,
+  on pre-push, and in the deploy gate.
+
+  **The scan refuses an unreadable tree rather than scoring it.** Every verdict it makes is "no
+  other file mentions this name", so a checkout it cannot fully read reports *more* dead exports,
+  not fewer: a container missing `tests/` would condemn hundreds of live exports and the failure
+  would read as a real finding. That is the landmark audit's trap from the other side, where a
+  container reaching no route at all would have reported zero violations and gone green. So the CLI
+  names any required reference root that comes back empty and exits without a count, and `statSync`
+  is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
+  and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
+  by design (`requireCompleteTree`): a two-file tree is what they measure.
 - **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
   type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared

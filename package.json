@@ -53,7 +53,7 @@
     "seo:weekly-runbook": "bun scripts/freezeWeeklyBrief.ts && bun scripts/seo-weekly-runbook.ts",
     "cli:whether": "node scripts/whether-cli.mjs",
     "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts",
-    "check:vinext": "WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks",
+    "check:vinext": "WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions dead-exports && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks",
     "prepare": "husky",
     "check:production-edge": "bash scripts/check_production_edge.sh",
     "check:production-assets": "node scripts/verify-prd-assets.mjs https://whether.work",
