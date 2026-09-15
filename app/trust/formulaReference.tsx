@@ -134,7 +134,7 @@ function RampPlot({ id, from, to, points, unit, label }: { id: string; from: num
       <polyline
         points={`${x(x0)},${y(0)} ${x(from)},${y(0)} ${x(to)},${y(points)} ${x(x1)},${y(points)}`}
         fill="none"
-        stroke="#7dd3fc"
+        stroke="var(--accent-action)"
         strokeWidth="2"
       />
       <text x={x(from)} y={H - 6} textAnchor="middle" fontSize="9" fill="currentColor">{fmt(from)}</text>

@@ -24,3 +24,16 @@ export const regimeAccentStyle = (regime?: string | null): RegimeAccentStyle => 
   const style: RegimeAccentStyle = { "--regime-accent": accent };
   return style;
 };
+
+/**
+ * The same regime as a `data-regime` value, which is what tokens.css keys
+ * `--regime-ink` on — the accent as text, at the level each theme needs.
+ * `--regime-accent` above is the 500-level hue and is fine for rules and
+ * tints; as 12px text on the light ground it sits near 3:1, so anything that
+ * prints in the regime's colour reads `--regime-ink` instead. Undefined for
+ * an unknown regime, so the attribute is absent and the neutral defaults hold.
+ */
+export const regimeDataAttribute = (regime?: string | null): RegimeKey | undefined => {
+  const key = (regime ?? "").toUpperCase();
+  return isRegimeKey(key) ? key : undefined;
+};

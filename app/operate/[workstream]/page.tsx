@@ -91,7 +91,7 @@ export default async function OperateWorkstreamPage({
   return (
     <ReportShell
       model={{
-        status: { statusLabel, recordDateLabel, fetchedAtLabel },
+        status: { statusLabel, regime: assessment.regime, recordDateLabel, fetchedAtLabel },
         page: {
           pageTitle: entry.pageTitle,
           pageSummary: entry.pageSummary,

@@ -31,7 +31,6 @@ import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
 import { describeInputMovement } from "../../lib/report/inputMovement";
 import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight } from "lucide-react";
-import { WeatherLandscapeArtwork } from "./hero/WeatherLandscapeArtwork";
 
 type Props = {
   tightness: number;
@@ -381,20 +380,31 @@ export function DecisionHero({
   const WeatherIcon = regimeKey ? weatherIconMap[regimeKey] : Sun;
   const regimeWeatherLabel = (regimeKey ? REGIME_WEATHER_LABELS[regimeKey] : regimeDisplay).toUpperCase();
 
+  /* The card names its own regime so the surface, the stamp and the sparkline
+     take their colour from `data-regime` (tokens.css) — the same source as the
+     copy, so they cannot disagree with it. The landscape artwork that used to
+     sit here is gone: its `relative` beat its `absolute`, so it rendered as a
+     200px block above the call in every viewport, and in light mode as a
+     hard-edged grey rectangle. The stamp's glyph carries the weather. */
   return (
-    <section className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7" aria-labelledby="weekly-call-title">
-      {/* Weather Landscape Artwork on the right side */}
-      <WeatherLandscapeArtwork
-        regime={regime}
-        className="absolute -top-2 right-0 h-full w-[200px] sm:w-[280px] md:w-[320px] pointer-events-none opacity-30"
-      />
-
+    <section
+      className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7"
+      aria-labelledby="weekly-call-title"
+      data-regime={regimeKey ?? undefined}
+    >
       <div className="relative z-10 flex flex-col gap-6 sm:grid sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start sm:gap-y-3">
           <div className="order-1 min-w-0 space-y-2 sm:col-start-1 sm:row-start-1">
-            {/* Top Weather Regime Pill */}
+            {/* The regime stamp: sharp (§XIV), in the regime's own ink. */}
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-teal-500/20 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-teal-300 border border-teal-500/30 shadow-sm backdrop-blur-sm">
-                <WeatherIcon size={14} className="text-teal-300" aria-hidden="true" />
+              <span
+                className="inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
+                style={{
+                  color: "var(--regime-ink)",
+                  borderColor: "color-mix(in srgb, var(--regime-accent) 40%, transparent)",
+                  backgroundColor: "color-mix(in srgb, var(--regime-accent) 14%, transparent)",
+                }}
+              >
+                <WeatherIcon size={14} aria-hidden="true" />
                 <span>{regimeWeatherLabel}</span>
               </span>
             </div>
@@ -419,7 +429,7 @@ export function DecisionHero({
           {/* Executive Room to Act Score Block (All Viewports) */}
           <div className="order-2 min-w-0 sm:order-none sm:col-start-2 sm:row-start-1 flex flex-col items-start sm:items-end justify-start gap-1">
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl sm:text-5xl font-bold tabular-nums text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.12)]">
+              <span className="text-4xl sm:text-5xl font-bold tabular-nums tracking-[-0.02em] text-white">
                 {boldnessScore}
               </span>
               <span className="text-xs sm:text-sm font-medium text-slate-400">/100</span>
@@ -450,7 +460,7 @@ export function DecisionHero({
                   band={trendBand}
                   tone={trendTone}
                   widthEm={12}
-                  className="text-teal-400"
+                  className="text-[color:var(--regime-ink)]"
                 />
               </figure>
             ) : null}

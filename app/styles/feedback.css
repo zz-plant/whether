@@ -1,7 +1,5 @@
 
-.weather-hub-link-card:active,
-.weather-route-card:active,
-.weather-command-bar__card:active{
+.weather-hub-link-card:active {
   transform: scale(0.99);
   transition-duration: 50ms;
 }
@@ -9,9 +7,7 @@
 /* Touch press feedback — brief opacity dip simulates press */
 @media (hover: none) and (pointer: coarse) {
   .weather-hub-link-card:active,
-.weather-route-card:active,
-.weather-command-bar__card:active,
-.weather-delta-card:active{
+.weather-delta-card:active {
     opacity: 0.7;
     transition: opacity 60ms ease;
   }
@@ -40,19 +36,6 @@
   100% { background-position: -200% 0; }
 }
 
-.weather-loading-stage__badge {
-  flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: rgba(15, 23, 42, 0.70);
-  padding: 0.35rem 0.6rem;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: none;
-  color: rgba(226, 232, 240, 0.80);
-}
-
 .weather-section-stage {
   animation: weather-stream-reveal 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: opacity, transform;
@@ -62,15 +45,13 @@
   content-visibility: auto;
 }
 
-
 /* §IX: the looping shimmer and pulse are the most costly motion on the page for
    a motion-sensitive reader, because they never end. The static gradient still
    reads as a placeholder, and the reveals land on their end state. */
 @media (prefers-reduced-motion: reduce) {
-  .weather-skeleton__shimmer{
+  .weather-skeleton__shimmer {
     animation: none;
   }
-  .weather-stream-reveal,
   .weather-section-stage {
     animation: none;
   }

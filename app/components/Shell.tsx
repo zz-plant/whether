@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { FocusModeController } from "./focusModeController";
-import { regimeAccentStyle } from "../../lib/regimeAccent";
+import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
 
 const shellMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 transition-all weather-page-enter";
 
@@ -62,6 +62,7 @@ export function Shell({
   return (
     <div
       className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
+      data-regime={regimeDataAttribute(regime)}
       style={{
         ...regimeAccentStyle(regime),
         ...(atmosphereTint ? { backgroundImage: `linear-gradient(to bottom, ${atmosphereTint} 0%, transparent 60%)` } : {}),

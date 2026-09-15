@@ -6,13 +6,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.type-headline {
-  @apply font-semibold leading-[1.08] tracking-tight;
-  font-size: clamp(1.875rem, 1.25rem + 2.5vw, 3.75rem);
-  font-family: var(--font-display);
-  letter-spacing: 0;
-}
-
 .type-section {
   @apply font-semibold leading-snug;
   font-size: clamp(1.5rem, 1.125rem + 1.5vw, 1.875rem);
@@ -94,11 +87,13 @@ svg :where(.type-eyebrow, .type-badge) {
   line-height: 1.7;
 }
 
+/* Tokens, not a fixed dark block: this is unlayered, so it outranks any
+   utility on the element, and the literal ink it carried stayed pale when
+   the light theme remapped the background — the Slack preview on /brief
+   rendered slate-300 on near-white. */
 :where(.weather-panel pre, .weather-surface pre) {
-  color: rgb(213 222 236);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)),
-    rgba(7, 9, 12, 0.82);
+  color: var(--app-text-secondary);
+  background: var(--bg-nested);
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
@@ -109,10 +104,18 @@ svg :where(.type-eyebrow, .type-badge) {
   font-family: var(--font-display);
 }
 
-img,
-svg {
-  display: block;
-  max-width: 100%;
+/* In the base layer, so a utility on the element wins. Unlayered, this rule
+   outranked every Tailwind utility regardless of specificity, which is how the
+   regime plane on /history and the formula charts on /trust ignored their
+   max-w-[30rem] / max-w-[20rem] and stretched to the column — an SVG whose
+   text is set in viewBox units grows with it, so the plane's 10-unit tick
+   labels rendered at 24px against a 13px page. */
+@layer base {
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
 }
 
 a:focus-visible {

@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { formatMonthShortUtc } from "../../../lib/formatters";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
+import {
+  REGIME_ORDER,
+  REGIME_WEATHER_LABELS,
+  getRegimePublicLabel,
+  isRegimeKey,
+} from "../../../lib/regimePresentation";
+import type { RegimeKey } from "../../../lib/types";
 
 export interface PostureHistoryEntry {
   record_date: string;
@@ -15,16 +22,17 @@ export interface RecentPostureHistoryCardProps {
   className?: string;
 }
 
-const getRegimeColorClass = (regime: string) => {
+/* Same hue per regime as the regime plane on /history and the hero's own
+   stamp — the reader learns the four colours once. Until 2026-09-15 this
+   stripe folded Freezing and Stormy into one rose and painted Sunny teal, and
+   its legend named the rose "Stormy" under two years of Freezing months. */
+const resolveRegimeKey = (regime: string): RegimeKey | null => {
   const norm = regime.toUpperCase();
-  if (norm.includes("EXPANSION") || norm.includes("SUNNY")) {
-    return "bg-teal-400/90 hover:bg-teal-300";
-  }
-  if (norm.includes("DEFENSIVE") || norm.includes("CLOUDY")) {
-    return "bg-amber-400/90 hover:bg-amber-300";
-  }
-  return "bg-rose-400/90 hover:bg-rose-300";
+  return isRegimeKey(norm) ? norm : null;
 };
+
+const regimeSwatchColor = (regime: RegimeKey | null) =>
+  regime ? REGIME_HEX_COLORS[regime] : "var(--app-text-muted)";
 
 /**
  * The brief's memory rail: the trailing two years of monthly calls as a stripe,
@@ -40,6 +48,10 @@ export function RecentPostureHistoryCard({
 }: RecentPostureHistoryCardProps) {
   const entries = history.slice(-24);
   if (entries.length === 0) return null;
+
+  // Only the regimes the stripe actually shows, in the canonical order.
+  const present = new Set(entries.map((entry) => resolveRegimeKey(entry.regime)));
+  const legend = REGIME_ORDER.filter((regime) => present.has(regime));
 
   // Pick ~6 evenly spaced indices for month labels across the stripe.
   const labelIndices = new Set<number>();
@@ -74,18 +86,16 @@ export function RecentPostureHistoryCard({
 
         <div className="flex items-center gap-4 self-start sm:self-auto flex-wrap">
           <div className="flex items-center gap-3 text-xs text-slate-400" aria-label="Regime legend">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-teal-400" aria-hidden="true" />
-              <span>Sunny</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
-              <span>Cloudy</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-rose-400" aria-hidden="true" />
-              <span>Stormy</span>
-            </span>
+            {legend.map((regime) => (
+              <span key={regime} className="flex items-center gap-1.5">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: regimeSwatchColor(regime) }}
+                  aria-hidden="true"
+                />
+                <span>{REGIME_WEATHER_LABELS[regime]}</span>
+              </span>
+            ))}
           </div>
 
           <Link
@@ -109,7 +119,8 @@ export function RecentPostureHistoryCard({
             return (
               <div
                 key={`${entry.record_date}-${idx}`}
-                className={`flex-1 h-full rounded-[1px] transition-colors ${getRegimeColorClass(entry.regime)}`}
+                className="flex-1 h-full rounded-[1px] opacity-90 transition-opacity hover:opacity-100"
+                style={{ backgroundColor: regimeSwatchColor(resolveRegimeKey(entry.regime)) }}
                 title={`${dateStr}: ${publicLabel} (${entry.regime})`}
               />
             );

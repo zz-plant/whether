@@ -13,7 +13,7 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="type-eyebrow text-sky-300">
+          <p className="type-eyebrow">
             {fossilRecord.title} · {fossilRecord.subtitle}
           </p>
           <h3 id="fossil-record-title" className="mt-1 text-base font-semibold text-slate-100">

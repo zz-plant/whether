@@ -17,14 +17,13 @@ import { describe, it } from "bun:test";
 const STYLES_DIR = fileURLToPath(new URL("../app/styles/", import.meta.url));
 
 /** Boxes that are controls, chips, or modifiers rather than containers. A
- *  button inside a card is not a nested container, and the -sky/-indigo tints
- *  are applied alongside .weather-surface, which the ladder already names. */
+ *  button inside a card is not a nested container, and the -sky tint is
+ *  applied alongside .weather-surface, which the ladder already names. */
 const NOT_CONTAINERS = new Set([
   "weather-pill", "weather-pill-muted", "weather-button", "weather-button-primary",
   "weather-cta", "weather-cta-primary", "weather-input", "weather-control",
   "weather-tab", "weather-icon-chip", "weather-chip", "weather-hub-chip",
-  "weather-hub-stat", "weather-brief-meta-chip", "weather-nav-card-index",
-  "weather-surface-sky", "weather-surface-indigo", "weather-surface-amber",
+  "weather-surface-sky",
 ]);
 
 const isPrefixedNonContainer = (name: string) =>

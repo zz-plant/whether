@@ -13,11 +13,15 @@ export function resolveCaptureTargets(onlyIds?: string[]): Array<{
   fullPage?: boolean;
 }>;
 export function listCaptureTargets(): string[];
+export type CaptureTheme = "dark" | "light";
+export function parseCaptureTheme(args: string[]): CaptureTheme;
+export function captureFileName(targetId: string, theme?: CaptureTheme): string;
 export function parseCaptureOptions(args: string[]): {
   args: string[];
   baseUrl: string;
   outDir: string;
   onlyIds: string[];
+  theme: CaptureTheme;
   targets: ReturnType<typeof resolveCaptureTargets>;
 };
 export function probeHtmlAssetIntegrity(baseUrl: string): Promise<{
@@ -44,12 +48,14 @@ export function captureTargets(options: {
   baseUrl: string;
   outDir: string;
   targets: ReturnType<typeof resolveCaptureTargets>;
+  theme?: CaptureTheme;
 }): Promise<Array<{
   id: string;
   label: string;
   path: string;
   viewport: { width: number; height: number };
   fullPage: boolean;
+  theme: CaptureTheme;
   outputPath: string;
   outputFileName: string;
   url: string;
@@ -63,4 +69,5 @@ export function writeCaptureArtifacts(options: {
   baseUrl: string;
   outDir: string;
   captures: Awaited<ReturnType<typeof captureTargets>>;
+  theme?: CaptureTheme;
 }): Promise<{ manifestPath: string; galleryPath: string; generatedAt: string }>;

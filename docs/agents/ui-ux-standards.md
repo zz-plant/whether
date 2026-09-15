@@ -222,8 +222,8 @@ take the other's job.
   pill" decision in `docs/one-screen-weekly-brief-spec.md`, which made the hero's secondary
   actions round so they would read quieter and produced exactly that mixed row.
 - NEVER: a named container on the control radius, and never a `rounded-*` utility on one. The
-  classes that own a card or surface radius are `.weather-card`, `.weather-surface`,
-  `.weather-lever-card`, and the hub hero, section, card and link-card shells; they are `xl` or
+  classes that own a card or surface radius are `.weather-card`, `.weather-surface`, and the hub
+  section, card and link-card shells; they are `xl` or
   `2xl`, and a shell at 6px reads as a giant button and stops separating the furniture from the
   controls inside it. `.weather-panel` is a layout tier and owns no radius, so a panel that draws
   a border takes `rounded-xl` itself. Inner segments inside a card may sit at `md` or `lg`.
@@ -276,3 +276,47 @@ Scope: any surface that states a reading, a threshold, or the distance between t
   source to both. A second derivation eventually disagrees with the sentence under it, and a
   graphic that contradicts its own caption costs more trust than no graphic at all — so copy that
   will not parse renders nothing.
+
+## XVI. Colour that means something (the regime accent)
+
+Scope: every surface that tints, rules, or labels itself by the week's regime.
+
+- MUST: take the regime's colour from the two tokens, never from a hue picked at the call site.
+  `--regime-accent` is the 500-level hue the regime plane and the posture stripe draw in
+  (`REGIME_HEX_COLORS`), for tints, rules and washes through `color-mix`. `--regime-ink` is the
+  same hue as text — the pastel that reads on the dark surfaces, the 700-level that clears 4.5:1
+  on the light ground. Both resolve from a `data-regime` attribute (`tokens.css`), which the page
+  shells and `DecisionHero` carry via `regimeDataAttribute` (`lib/regimeAccent.ts`). Every
+  `ReportShell` caller passes `regime` from its report data — `regimeAccentStyle` was written for
+  the section eyebrows and rules to read the week, and until 2026-09-15 no report page fed it, so
+  every shell rendered slate under a call its own intro line named. `/history/compare` is the one
+  deliberate exception: two weeks on one page, and keying it to either would mislead.
+- SHOULD: keep the regime ink for section-level marks — the `ReportSection` eyebrow and rule. A
+  card's own eyebrow inside a section is neutral (`.type-eyebrow` alone); `/signals` carried sky
+  card eyebrows beside a rose section eyebrow, two accents for one hierarchy. Sky stays for
+  what it means elsewhere: links, and the cards whose border is already sky.
+- NEVER: print text in `--regime-accent`. At 12–13px on the light ground it sits near 3:1; the
+  section eyebrows did this until 2026-09-15.
+- MUST: key a surface's colour to the regime the copy on it states, from the same source. The
+  hero used to be fixed teal — the stripe's colour for Sunny — under every call, and the page
+  atmosphere was keyed to the last month-end in the regime history while the hero stated the
+  week, so a Freezing call sat on a Sunny wash. `PageContent` mounts the Shell now so the two
+  cannot disagree.
+- MUST: draw the four regimes in the four canonical hues everywhere they are drawn, and let a
+  legend list only what is on the surface. The brief's posture stripe folded Freezing and Stormy
+  into one rose and labelled it "Stormy" under two years of Freezing months.
+- NEVER: a literal ink or fill in a stylesheet under `app/styles/` (`color: white`,
+  `rgb(226 232 240)`, `background: rgba(34, 34, 34, 0.55)`). Those rules are unlayered, outrank
+  any utility, and read the same on both themes; every one found on 2026-09-15 was a blank
+  heading, an invisible tag, or a dark slab on the light theme — the legal pages rendered their
+  sections as grey blocks. Use the text roles (`--app-text`, `--app-text-secondary`,
+  `--app-text-muted`), the surface ladder (`--bg-*`), or a semantic token. Print rules are the
+  exception: they commit to paper.
+- MUST: delete a stylesheet rule when its last consumer goes. A rule nothing renders still ships
+  and still carries whatever colour it was written in; the 2026-09-15 sweep removed 52 dead
+  classes (the `home-band` system, the cadence checklist, the hub hero and stat tiles, the lever
+  and trust cards), most of them dark-only, and the depth ladder had been naming five of them.
+- MUST: review a visual change in both themes. `bun run ui:iterate -- --theme light` captures
+  the light set beside the dark one; until 2026-09-15 the harness could not, and the light theme
+  carried a hard-edged artwork rectangle, invisible tags, and a grey slab behind `/pricing` that
+  no capture had shown.

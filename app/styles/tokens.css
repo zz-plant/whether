@@ -91,7 +91,7 @@
   --font-sans: var(--font-sans-google, "IBM Plex Sans", system-ui, sans-serif);
   /* Deliberately outside @theme: there is no `font-display` utility, and adding
      the key here would mint one. The serif reaches the page through real rules
-     only — :where(h1, h2), .type-headline, .type-section — which keeps its use
+     only — :where(h1, h2) and .type-section — which keeps its use
      bounded to headings. A `className="font-display"` is a silent no-op; if a
      non-heading needs the serif, set font-family in CSS rather than minting the
      utility. See the --text-display note above for why serif is rationed. */
@@ -204,10 +204,21 @@
 
   /* Regime atmosphere — a top-of-page posture tint that fades into --bg-body.
      Must stay theme-aware: a fixed dark tint washes out the light surface. */
-  --atmosphere-expansion: rgba(6, 78, 59, 0.40);
-  --atmosphere-defensive: rgba(69, 39, 3, 0.30);
-  --atmosphere-scarcity: rgba(76, 5, 25, 0.40);
-  --atmosphere-volatile: rgba(8, 47, 73, 0.30);
+  --atmosphere-expansion: rgba(6, 78, 59, 0.34);
+  --atmosphere-defensive: rgba(69, 39, 3, 0.28);
+  --atmosphere-scarcity: rgba(76, 5, 25, 0.30);
+  --atmosphere-volatile: rgba(8, 47, 73, 0.28);
+
+  /* Regime accent, resolved from a `data-regime` attribute rather than picked at
+     the call site. `--regime-accent` is the 500-level hue the regime plane and
+     the posture stripe already draw in (REGIME_HEX_COLORS), usable at any tint
+     through color-mix on either ground. `--regime-ink` is the same hue as text:
+     the pastel that reads on the dark surfaces here, the 700-level that clears
+     AA on the light ground below. Until 2026-09-15 the hero painted itself teal
+     whatever the week said, so a Freezing call sat in the colour the stripe
+     uses for Sunny. The neutral fallback is slate, the same as regimeAccent.ts. */
+  --regime-accent: #94a3b8;
+  --regime-ink: var(--app-text-secondary);
 
   /* Regime phase map (app/components/history/RegimePhaseMap.tsx) ---------
      Quadrant washes for the plane the classifier actually cuts. Held far below
@@ -530,12 +541,23 @@ html[data-theme="light"] {
   --footer-link-hover: #0f172a;
   --footer-legal: #475569;
   --footer-legal-hover: #334155;
+  /* One temperature. The ground and the section surface were warm (a cream,
+     a bone) while raised and nested were stock slate — so the report-shell
+     intro card, every toast and popover, and the sticky call strip rendered
+     as blue-grey slabs on a warm page. Raised is now white: on a light ground
+     a surface that floats reads lighter than what it floats over, and the
+     elevation ladder already gives it the shadow; nested steps below the
+     ground in the ground's own hue. */
   --bg-body: #faf8f5;
   --bg-panel: #ffffff;
-  --bg-surface: #f5f2ed;
-  --bg-surface-muted: rgba(241, 245, 249, 0.75);
-  --bg-raised: #e2e8f0;
-  --bg-nested: #e8edf2;
+  /* Lighter than the ground, like every other tier that sits on it: the dark
+     ladder reads "closer is lighter", and a surface darker than the body
+     read as sunken on the light theme while the raised tier beside it read
+     as lifted — two directions for one metaphor. */
+  --bg-surface: #fdfcfa;
+  --bg-surface-muted: rgba(253, 252, 250, 0.8);
+  --bg-raised: #ffffff;
+  --bg-nested: #f0ede7;
   --bg-nested-light: rgba(0, 0, 0, 0.035);
 
   /* Matched to the dark ladder's measured contrast against its own ground.
@@ -552,8 +574,8 @@ html[data-theme="light"] {
   --border-strong: rgba(0, 0, 0, 0.195);
 
   --app-surface: #ffffff;
-  --app-raised: #f1f5f9;
-  --app-nested: #e2e8f0;
+  --app-raised: #f4f1ec;
+  --app-nested: #e9e5de;
   --app-text: #0f172a;
   --app-text-secondary: #334155;
   /* slate-600, not slate-500: muted text is the target of text-slate-400/500 and
@@ -672,6 +694,16 @@ html[data-theme="light"] {
   --input: oklch(0.922 0 0);
   --ring: oklch(0.205 0 0);
 }
+
+/* The regime map. Attribute values are the RegimeKey names; the inline
+   `--regime-accent` that regimeAccentStyle sets on page shells still wins
+   where present, and these give any element that names its regime the same
+   accent without a style prop. Ink comes from the semantic families, which
+   already carry a per-theme value, so a stamp is legible on both grounds. */
+[data-regime="EXPANSION"] { --regime-accent: #10b981; --regime-ink: var(--color-semantic-easing-fg); }
+[data-regime="SCARCITY"] { --regime-accent: #f43f5e; --regime-ink: var(--color-semantic-reversal-fg); }
+[data-regime="DEFENSIVE"] { --regime-accent: #f59e0b; --regime-ink: var(--color-semantic-caution-fg); }
+[data-regime="VOLATILE"] { --regime-accent: #0ea5e9; --regime-ink: var(--color-decision-flip); }
 
 /* Light mode: remap opacity-based v2 styles onto the three text roles.
    154 usages spread across 12 alpha steps used to be mapped one line at a time,
@@ -816,11 +848,34 @@ html[data-theme="light"] [class^="text-rose-2"], html[data-theme="light"] [class
 html[data-theme="light"] [class^="text-rose-3"], html[data-theme="light"] [class*=" text-rose-3"],
 html[data-theme="light"] [class^="text-rose-4"], html[data-theme="light"] [class*=" text-rose-4"] { color: #b91c1c !important; }
 
+/* Teal is the brand accent — the logo, the active tab, the confidence chip,
+   the hero cards' icon wells and their "View history" links — and it was the
+   one hue this layer did not cover, so all 47 call sites kept text-teal-300
+   (#5eead4) on the light ground at 1.6:1. teal-800 clears 4.5:1 on --bg-body
+   and on the teal-500/10 tint the chips sit on. */
+html[data-theme="light"] [class^="text-teal-1"], html[data-theme="light"] [class*=" text-teal-1"],
+html[data-theme="light"] [class^="text-teal-2"], html[data-theme="light"] [class*=" text-teal-2"],
+html[data-theme="light"] [class^="text-teal-3"], html[data-theme="light"] [class*=" text-teal-3"],
+html[data-theme="light"] [class^="text-teal-4"], html[data-theme="light"] [class*=" text-teal-4"] { color: #115e59 !important; }
+
+/* The two remaining hues, each a handful of call sites: violet is the
+   "change course if" eyebrow on /operate and /history/compare, cyan a
+   scenario label. Same 100-400 floor as the rest. */
+html[data-theme="light"] [class^="text-violet-1"], html[data-theme="light"] [class*=" text-violet-1"],
+html[data-theme="light"] [class^="text-violet-2"], html[data-theme="light"] [class*=" text-violet-2"],
+html[data-theme="light"] [class^="text-violet-3"], html[data-theme="light"] [class*=" text-violet-3"],
+html[data-theme="light"] [class^="text-violet-4"], html[data-theme="light"] [class*=" text-violet-4"] { color: #6d28d9 !important; }
+html[data-theme="light"] [class^="text-cyan-1"], html[data-theme="light"] [class*=" text-cyan-1"],
+html[data-theme="light"] [class^="text-cyan-2"], html[data-theme="light"] [class*=" text-cyan-2"],
+html[data-theme="light"] [class^="text-cyan-3"], html[data-theme="light"] [class*=" text-cyan-3"],
+html[data-theme="light"] [class^="text-cyan-4"], html[data-theme="light"] [class*=" text-cyan-4"] { color: #155e75 !important; }
+
 /* Hover lands one step darker so the state stays readable as a change. */
 html[data-theme="light"] [class*="hover:text-emerald-"]:hover { color: #065f46 !important; }
 html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #78350f !important; }
 html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #0c4a6e !important; }
 html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !important; }
+html[data-theme="light"] [class*="hover:text-teal-"]:hover { color: #134e4a !important; }
 
 /* Focus rings are authored as sky-200/300/400 (51 usages) — bright cyan that
    reads on the dark surface and washes out on white. The ring is the primary

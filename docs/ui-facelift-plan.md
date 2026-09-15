@@ -81,6 +81,25 @@ Remaining, unmigrated: **587** semantic-hue call sites (emerald/amber/sky/rose 1
 This is listed second by visibility and first by sequence: **you cannot safely recolour anything while
 a layer overrides by class name.** Phase 1 depends on this landing first.
 
+*Addendum, 2026-09-15.* The capture harness learned `--theme light` and the first light captures of
+every route showed what "verified unaffected" had been hiding. Two kinds of defect, fixed the same
+day: the patch layer was missing three hues (teal — the brand accent, 47 call sites — plus violet
+and cyan), so the confidence chip, the hero cards' links and the "change course if" eyebrow were
+pastel on cream; and a second class of failure the patch layer cannot reach at all — literal inks
+in `app/styles/layout-shells.css` (`color: white`, `rgb(226 232 240)`) and the `.weather-tag-*`
+and `pre` rules, which are unlayered and outrank any utility — so `/answers` rendered a white
+title on a grey slab and `/brief` an invisible posture tag over a preview that faded to black. The
+light surface ladder also mixed temperatures (a warm ground under slate-200 raised surfaces) and is
+now one hue. The patch-layer conclusion above stands; the new rule is §XVI of the standards.
+
+A second pass the same day swept `app/styles/` for every literal colour outside a print block.
+Most sat in rules nothing rendered — 52 dead classes, deleted — and the live ones (the legal
+pages' section fill, the input placeholder, the provenance chips, the delta card, the hub-section
+nested cards, the scrollbar track) moved onto tokens. The light surface ladder also now runs the
+same direction as the dark one: a surface is lighter than the ground it sits on, so cards read as
+lifted rather than sunken. And the report shells finally pass their regime, so the section
+eyebrows and rules read the week the way `regimeAccentStyle` always intended.
+
 ### C. `/signals` restates its own state four times before the first task block
 
 §XI of the standards says never to stack repeated state summaries ahead of page content. The capture

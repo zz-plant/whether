@@ -85,6 +85,7 @@ export default async function HistoryPage({
         // numbers are.
         status: {
           statusLabel: trackRecord?.currentRegimeLabel ?? "Historical",
+          regime: trackRecord?.currentRegime,
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },

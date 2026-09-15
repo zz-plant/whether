@@ -29,6 +29,7 @@ const run = async () => {
   const artifacts = await writeCaptureArtifacts({
     baseUrl: options.baseUrl,
     outDir: options.outDir,
+    theme: options.theme,
     captures,
   });
 

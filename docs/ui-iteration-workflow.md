@@ -34,10 +34,19 @@ Useful options:
 
 ```bash
 bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
+bun run ui:iterate -- --theme light --only home-mobile,home-desktop
 bun run ui:iterate -- --base-url http://127.0.0.1:3001
 bun run ui:iterate -- --dev-script dev
 bun run ui:iterate -- --no-dev
 ```
+
+`--theme light` captures the light theme. The app reads its theme from localStorage in a
+bootstrap script that runs before first paint, so the capture seeds the same key from a page
+init script and the page renders light from the first frame. Light captures land as
+`<id>-light.png` with their own `index-light.html` and `manifest-light.json`, so a light set sits
+beside the dark one it is compared against instead of overwriting it. The default is dark.
+Review both before calling a visual change done — the harness could only capture dark until
+2026-09-15, and the light theme accumulated defects nobody had seen.
 
 What `ui:iterate` does:
 
