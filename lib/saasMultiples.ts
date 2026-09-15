@@ -18,10 +18,33 @@
 import { z } from "zod";
 import { getWhetherKv, type KvNamespace } from "./runtime/kv";
 
-export const SAAS_BASKET = [
-  "SNOW", "SHOP", "CRM", "HUBS", "MDB", "DDOG", "TEAM", "WDAY",
-  "NOW", "ZS", "CFLT", "TOST", "GTLB", "NET", "FRSH",
+/**
+ * The basket, with the names the page prints.
+ *
+ * /comps listed the fifteen companies as hand-typed prose beside a count read
+ * from this array, so the two could drift apart silently — add a ticker here
+ * and the page would say "these 16 companies" above a list of fifteen names.
+ * One source, both uses.
+ */
+export const SAAS_BASKET_COMPANIES = [
+  { ticker: "SNOW", name: "Snowflake" },
+  { ticker: "SHOP", name: "Shopify" },
+  { ticker: "CRM", name: "Salesforce" },
+  { ticker: "HUBS", name: "HubSpot" },
+  { ticker: "MDB", name: "MongoDB" },
+  { ticker: "DDOG", name: "Datadog" },
+  { ticker: "TEAM", name: "Atlassian" },
+  { ticker: "WDAY", name: "Workday" },
+  { ticker: "NOW", name: "ServiceNow" },
+  { ticker: "ZS", name: "Zscaler" },
+  { ticker: "CFLT", name: "Confluent" },
+  { ticker: "TOST", name: "Toast" },
+  { ticker: "GTLB", name: "GitLab" },
+  { ticker: "NET", name: "Cloudflare" },
+  { ticker: "FRSH", name: "Freshworks" },
 ] as const;
+
+export const SAAS_BASKET = SAAS_BASKET_COMPANIES.map((company) => company.ticker);
 
 type MarketDataProvider = "yahoo" | "alpha-vantage";
 

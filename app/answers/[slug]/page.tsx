@@ -53,11 +53,21 @@ export const buildDecisionAnswerMetadata = ({
     description: shortAnswer ?? `${payload.currentCall} Action: ${payload.immediateAction}`,
     path: `/answers/${slug}`,
     imageAlt: title,
+    /*
+     * The answers template, not the shared `solutions` lens. That lens draws a
+     * fixed right-hand panel — "SOLUTIONS LENS / Decision support / Turn
+     * climate calls into role-based operating guardrails" — so every answer
+     * page unfurled with the same three lines and neither the question nor the
+     * week's call reached the card. Here the question leads, the page's own
+     * short answer sits under it, and the panel carries the live call and
+     * action.
+     */
     imageParams: {
-      template: "solutions",
-      eyebrow: "Operator answer",
+      template: "answers",
       title,
-      subtitle: `${payload.currentCall} Action: ${payload.immediateAction}`,
+      subtitle: shortAnswer ?? payload.currentCall,
+      call: payload.currentCall,
+      action: payload.immediateAction,
     },
   });
 

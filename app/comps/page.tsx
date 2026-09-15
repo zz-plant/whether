@@ -9,6 +9,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import {
   SAAS_BASKET,
+  SAAS_BASKET_COMPANIES,
   fetchSaaSValuations,
   QuoteSourceUnavailableError,
   type SaaSValuationSnapshot,
@@ -166,11 +167,13 @@ export default async function CompsPage() {
 
         <section className="space-y-3">
           <h2 className="type-eyebrow">Basket composition</h2>
+          {/* Derived, not retyped: the names and the count came from two places
+              and could disagree the moment a ticker was added. */}
           <p className="text-sm text-slate-300">
-            Snowflake, Shopify, Salesforce, HubSpot, MongoDB, Datadog, Atlassian, Workday, ServiceNow, Zscaler, Confluent, Toast, GitLab, Cloudflare, Freshworks.
+            {SAAS_BASKET_COMPANIES.map((company) => company.name).join(", ")}.
           </p>
           <p className="text-sm text-slate-300">
-            These {SAAS_BASKET.length} companies represent a cross-section of modern public SaaS — across cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
+            These {SAAS_BASKET_COMPANIES.length} companies represent a cross-section of modern public SaaS — across cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
           </p>
         </section>
 
