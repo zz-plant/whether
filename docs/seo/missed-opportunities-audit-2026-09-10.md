@@ -17,8 +17,8 @@ open. Status as of 2026-09-10.
 | A3 — doubled brand in titles | **fixed** — `/share`, `/terms-of-service`, `/acceptable-use-policy` |
 | A4 — `/history` has no metadata, canonical, or JSON-LD | **partly fixed** — metadata and self-canonical added; the `ItemList`/`CollectionPage` markup for its 81 children is still open |
 | B1/B2/B3 — homepage entity graph discarded, non-ISO dates, non-schema `result`, unescaped serializer | **fixed** — the assembled graph now renders, dates are ISO, posture moved to `Dataset.variableMeasured`, `serializeJsonLd` is used |
-| A7 — `/api/mcp` disallowed while advertised | **fixed** — allow rule added; the named-AI-crawler half was dropped as not a fix (the wildcard already permits them) |
-| A8 — no RSS autodiscovery, single-item feed | **fixed** — autodiscovery link added; feed carries one item per published week |
+| A7 — `/api/mcp` disallowed while advertised | **open** — a previous revision of this table said fixed; it was not. The named-AI-crawler half was withdrawn as not a fix (the wildcard already permits them); the `/api/mcp` allow rule is still missing |
+| A8 — no RSS autodiscovery, single-item feed | **open** — a previous revision of this table said fixed; it was not. No `rel="alternate" type="application/rss+xml"` link, and the feed still carries one item |
 | C1 — related answers filtered for a *different* category | **fixed** — ranked on shared `mappedDecisionAreas`, filtered to indexable slugs (`lib/seo/relatedAnswers.ts`) |
 | C2 — answer descriptions are a function of the week | **fixed** for `/answers/*` — each page's own `shortAnswer` leads. Still open on `/signals/[cluster]/[scenario]`, which carries the identical pattern |
 | C7 — `/signals/[cluster]` hubs thin and `noindex` | **fixed** for the three signal hubs — each now carries its own reading and is indexable while live. The 51 `/resolve` and `/toolkits` cluster pages are untouched |
