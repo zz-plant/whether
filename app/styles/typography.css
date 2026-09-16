@@ -37,6 +37,22 @@
   @apply font-semibold uppercase text-slate-400;
   font-size: var(--fs-xs);
   letter-spacing: 0.12em;
+  /* An eyebrow is a label, whatever element carries it. Without this, the
+     `:where(h1, h2)` display-face rule below set every h2 eyebrow in the serif
+     while the p eyebrows beside them stayed sans — "SIGNAL WATCHES" in
+     Fraunces above "CURVE CONTEXT" in Plex, on the same page, in the same
+     colour. Same trap .text-display documents. */
+  font-family: var(--font-sans);
+}
+
+/* Section-level eyebrow: the mark above a page section's title, in the week's
+   ink (ui-ux-standards §XVI). ReportSection sets it; a hand-rolled section
+   adds it beside .type-eyebrow. A card's own eyebrow inside a section stays on
+   the plain primitive — the ink says "this is a section of the page", and it
+   only says that if cards do not also wear it. Declared after .type-eyebrow so
+   it wins at equal specificity; the light ink is resolved by the token. */
+.type-eyebrow-section {
+  color: var(--regime-ink);
 }
 
 /* SVG <text> sizes itself from the fontSize presentation attribute, which a CSS

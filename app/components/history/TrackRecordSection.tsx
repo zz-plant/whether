@@ -31,7 +31,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
       aria-labelledby="track-record-grading-heading"
     >
       <div>
-        <h2 id="track-record-grading-heading" className="type-eyebrow">How the record held up</h2>
+        <h2 id="track-record-grading-heading" className="type-eyebrow type-eyebrow-section">How the record held up</h2>
         <p className="text-sm text-slate-300">
           How the calls held up, graded against the same data that produced them.
         </p>

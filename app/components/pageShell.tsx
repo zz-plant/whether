@@ -35,7 +35,7 @@ export function PageShell({
       style={regimeAccentStyle(regime)}
     >
       {backdropVariant === "hub" ? <div className="weather-hub-backdrop" aria-hidden="true" /> : null}
-      {backdropVariant === "default" ? <ClimateBackdrop regime={regime || "NEUTRAL"} /> : null}
+      {backdropVariant === "default" ? <ClimateBackdrop /> : null}
       <WebVitalsTracker />
       {structuredData ? <JsonLdScript data={structuredData} /> : null}
       {/* Renders nothing until the hash matches one of its target ids, and it is

@@ -85,6 +85,36 @@ describe("regime colour contract", () => {
     }
   });
 
+  it("keeps the regime hues off the action accent", () => {
+    // Sky is what every link, button and focus ring here is drawn in. Until
+    // 2026-09-16 Stormy was sky-500, so under that call the regime and the
+    // controls were one colour. `--accent-action` is the token; the check
+    // reads it rather than pinning a hex so a retuned accent still holds.
+    const tokens = readRepoFile("app/styles/tokens.css");
+    const accent = tokens.match(/--accent-action:\s*(#[0-9a-f]{6})/i)?.[1]?.toLowerCase();
+    assert.ok(accent, "tokens.css declares --accent-action as a hex");
+    const skyHue = /^#(38bdf8|0ea5e9|7dd3fc|0284c7|0369a1)$/i;
+    for (const [regime, hex] of Object.entries(REGIME_HEX_COLORS)) {
+      assert.notEqual(hex.toLowerCase(), accent, `${regime} is not drawn in the action accent`);
+      assert.doesNotMatch(hex, skyHue, `${regime} is not on the sky ramp the controls use`);
+    }
+  });
+
+  it("paints one atmosphere from the token on both shells", () => {
+    // The brief's container and the report backdrop each carried their own
+    // regime → tint table; the report one had Sunny in teal. Both now read
+    // `--regime-atmosphere`, resolved in the data-regime map beside the accent.
+    const tokens = readRepoFile("app/styles/tokens.css");
+    for (const regime of Object.keys(REGIME_HEX_COLORS)) {
+      const rule = new RegExp(`\\[data-regime="${regime}"\\]\\s*\\{[^}]*--regime-atmosphere:\\s*var\\(--atmosphere-`);
+      assert.match(tokens, rule, `${regime} resolves its atmosphere in the token layer`);
+    }
+    for (const path of ["app/components/Shell.tsx", "app/components/climateBackdrop.tsx"]) {
+      assert.match(readRepoFile(path), /weather-regime-ground/, `${path} paints the shared wash`);
+      assert.doesNotMatch(readRepoFile(path), /rgba\(|--atmosphere-/, `${path} carries no tint of its own`);
+    }
+  });
+
   it("keys the home page's atmosphere to the week the hero states", () => {
     const page = readRepoFile("app/page.tsx");
     const shellOpen = page.indexOf("<Shell regime={regime}>");

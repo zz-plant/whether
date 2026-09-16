@@ -51,7 +51,10 @@ export const REGIME_HEX_COLORS: Record<RegimeKey, string> = {
   EXPANSION: "#10b981", // emerald-500
   SCARCITY: "#f43f5e", // rose-500
   DEFENSIVE: "#f59e0b", // amber-500
-  VOLATILE: "#0ea5e9", // sky-500
+  // Violet, not sky. Sky is the action accent — every link, button and focus
+  // ring on the site — so under a Stormy call the regime and the controls
+  // were one colour. The regime set is now four hues no control borrows.
+  VOLATILE: "#8b5cf6", // violet-500
 };
 
 /** Score at which `tightness` stops distinguishing between expensive and very

@@ -38,8 +38,10 @@ export function CommandCenterNavBlock({
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
 }) {
-  const introMetaLine = [
-    statusLabel,
+  // The status word leads and prints in the regime ink — it is this page's
+  // equivalent of the hero's stamp, and the only word on the route that
+  // names the week. The rest of the line stays neutral.
+  const introMetaRest = [
     trustStatusLabel,
     // Interpolated only when there is a date. `As of ${x}` is a truthy string
     // even when x is "", so the filter below could never drop it, and a caller
@@ -56,7 +58,7 @@ export function CommandCenterNavBlock({
 
   return (
     <section
-      className="weather-surface-secondary relative min-w-0 px-4 py-4 sm:px-5 sm:py-5"
+      className="weather-surface-secondary weather-page-intro relative min-w-0 px-4 py-4 sm:px-5 sm:py-5"
       aria-label="Page introduction"
     >
       {/* Two columns from lg up: the reading block keeps its measure on the
@@ -68,7 +70,11 @@ export function CommandCenterNavBlock({
         <div className="min-w-0 space-y-2">
           <p className="type-label text-slate-400">Weekly brief</p>
           <p className="text-fluid-micro leading-4 text-slate-400">
-            {introMetaLine}
+            {statusLabel ? (
+              <span className="font-semibold text-[color:var(--regime-ink)]">{statusLabel}</span>
+            ) : null}
+            {statusLabel && introMetaRest ? " • " : null}
+            {introMetaRest}
           </p>
           <h1 style={{ viewTransitionName: "page-title" }} className="max-w-3xl font-semibold text-slate-100 text-fluid-2xl">{pageTitle}</h1>
           <p className="max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base">

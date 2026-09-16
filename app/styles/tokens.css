@@ -31,6 +31,13 @@
   --color-semantic-reversal-fg: #fda4af;
   --color-semantic-reversal-border: #fb7185;
   --color-semantic-reversal-bg: #3c1420;
+  /* The Stormy regime as text. Violet, not sky: sky is the action accent on
+     every link, button and focus ring here, so a Stormy week used to paint
+     the call in the colour that elsewhere means "click". A regime hue that
+     no control borrows is the only way the call stays tellable from the
+     chrome around it. Same levels as the families above — 300 on the dark
+     ground, 700 in the light block. */
+  --color-semantic-stormy-fg: #c4b5fd;
 
   /* Decision semantics */
   --color-decision-do: #6ee7b7;
@@ -207,7 +214,13 @@
   --atmosphere-expansion: rgba(6, 78, 59, 0.34);
   --atmosphere-defensive: rgba(69, 39, 3, 0.28);
   --atmosphere-scarcity: rgba(76, 5, 25, 0.30);
-  --atmosphere-volatile: rgba(8, 47, 73, 0.28);
+  --atmosphere-volatile: rgba(46, 16, 101, 0.28);
+  /* Resolved by the data-regime map below; transparent under no regime, so a
+     page with no call to make sits on --bg-body itself rather than under the
+     flat 3% sky wash the interior backdrop used to paint over every route.
+     That wash lifted the ground from #08090b to #100e10 and cost the card
+     ladder half its separation — the page read grey, not dark. */
+  --regime-atmosphere: transparent;
 
   /* Regime accent, resolved from a `data-regime` attribute rather than picked at
      the call site. `--regime-accent` is the 500-level hue the regime plane and
@@ -229,7 +242,7 @@
      ground colours — so only the washes and the chart furniture live here. */
   --phase-scarcity: rgba(244, 63, 94, 0.11);
   --phase-defensive: rgba(245, 158, 11, 0.10);
-  --phase-volatile: rgba(14, 165, 233, 0.10);
+  --phase-volatile: rgba(139, 92, 246, 0.10);
   --phase-expansion: rgba(16, 185, 129, 0.08);
   --phase-grid: rgba(148, 163, 184, 0.14);
   --phase-boundary: rgba(226, 232, 240, 0.45);
@@ -589,7 +602,7 @@ html[data-theme="light"] {
   --atmosphere-expansion: rgba(16, 185, 129, 0.10);
   --atmosphere-defensive: rgba(217, 119, 6, 0.10);
   --atmosphere-scarcity: rgba(225, 29, 72, 0.09);
-  --atmosphere-volatile: rgba(2, 132, 199, 0.09);
+  --atmosphere-volatile: rgba(124, 58, 237, 0.09);
 
   /* Phase-map quadrants and furniture. Same hues, re-mixed for a white plot
      ground: the dark washes rely on a light tint lifting off a dark ground and
@@ -597,7 +610,7 @@ html[data-theme="light"] {
      rather than lighten to stay visible at all. */
   --phase-scarcity: rgba(225, 29, 72, 0.10);
   --phase-defensive: rgba(217, 119, 6, 0.11);
-  --phase-volatile: rgba(2, 132, 199, 0.09);
+  --phase-volatile: rgba(124, 58, 237, 0.09);
   --phase-expansion: rgba(5, 150, 105, 0.08);
   --phase-grid: rgba(15, 23, 42, 0.10);
   --phase-boundary: rgba(15, 23, 42, 0.34);
@@ -630,6 +643,7 @@ html[data-theme="light"] {
   --color-semantic-reversal-fg: #be123c;
   --color-semantic-reversal-border: #f43f5e;
   --color-semantic-reversal-bg: #ffe4e6;
+  --color-semantic-stormy-fg: #6d28d9;
 
   --color-decision-do: #047857;
   --color-decision-do-bg: rgba(4, 120, 87, 0.08);
@@ -699,11 +713,14 @@ html[data-theme="light"] {
    `--regime-accent` that regimeAccentStyle sets on page shells still wins
    where present, and these give any element that names its regime the same
    accent without a style prop. Ink comes from the semantic families, which
-   already carry a per-theme value, so a stamp is legible on both grounds. */
-[data-regime="EXPANSION"] { --regime-accent: #10b981; --regime-ink: var(--color-semantic-easing-fg); }
-[data-regime="SCARCITY"] { --regime-accent: #f43f5e; --regime-ink: var(--color-semantic-reversal-fg); }
-[data-regime="DEFENSIVE"] { --regime-accent: #f59e0b; --regime-ink: var(--color-semantic-caution-fg); }
-[data-regime="VOLATILE"] { --regime-accent: #0ea5e9; --regime-ink: var(--color-decision-flip); }
+   already carry a per-theme value, so a stamp is legible on both grounds.
+   Atmosphere is the top-of-page wash both shells paint (.weather-regime-ground),
+   resolved here so the brief and the report routes cannot key it differently —
+   the report backdrop used to hold its own hue table, with Sunny in teal. */
+[data-regime="EXPANSION"] { --regime-accent: #10b981; --regime-ink: var(--color-semantic-easing-fg); --regime-atmosphere: var(--atmosphere-expansion); }
+[data-regime="SCARCITY"] { --regime-accent: #f43f5e; --regime-ink: var(--color-semantic-reversal-fg); --regime-atmosphere: var(--atmosphere-scarcity); }
+[data-regime="DEFENSIVE"] { --regime-accent: #f59e0b; --regime-ink: var(--color-semantic-caution-fg); --regime-atmosphere: var(--atmosphere-defensive); }
+[data-regime="VOLATILE"] { --regime-accent: #8b5cf6; --regime-ink: var(--color-semantic-stormy-fg); --regime-atmosphere: var(--atmosphere-volatile); }
 
 /* Light mode: remap opacity-based v2 styles onto the three text roles.
    154 usages spread across 12 alpha steps used to be mapped one line at a time,

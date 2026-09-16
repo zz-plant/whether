@@ -52,21 +52,13 @@ export function Shell({
     );
   }
 
-  const regimeLower = (regime ?? "").toLowerCase();
-  const atmosphereTint = regimeLower === "expansion" ? "var(--atmosphere-expansion)"
-    : regimeLower === "defensive" ? "var(--atmosphere-defensive)"
-    : regimeLower === "scarcity" ? "var(--atmosphere-scarcity)"
-    : regimeLower === "volatile" ? "var(--atmosphere-volatile)"
-    : "";
-
   return (
+    // The atmosphere resolves from data-regime (tokens.css), so the brief and
+    // the report routes paint the same wash from the same table.
     <div
-      className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
+      className="weather-regime-ground min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
       data-regime={regimeDataAttribute(regime)}
-      style={{
-        ...regimeAccentStyle(regime),
-        ...(atmosphereTint ? { backgroundImage: `linear-gradient(to bottom, ${atmosphereTint} 0%, transparent 60%)` } : {}),
-      }}
+      style={regimeAccentStyle(regime)}
     >
       <FocusModeController />
       <main id="main-content" data-home-shell-main className={shellMainClassName}>

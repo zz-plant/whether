@@ -90,7 +90,7 @@ export function ReportSection({
             aria-hidden="true"
           />
           {label ? (
-            <span className="type-eyebrow" style={{ color: "var(--regime-ink)" }}>
+            <span className="type-eyebrow type-eyebrow-section">
               {label}
             </span>
           ) : null}
@@ -142,7 +142,7 @@ export function ReportSection({
               section title therefore hand-rolled the whole section instead of
               using this component, which is a large part of why it only ever got
               adopted on /trust. */}
-          {label ? <p className="type-eyebrow mb-1" style={{ color: "var(--regime-ink)" }}>{label}</p> : null}
+          {label ? <p className="type-eyebrow type-eyebrow-section mb-1">{label}</p> : null}
           <div className="flex items-center gap-1">
             <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
               {title}
