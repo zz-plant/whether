@@ -8,6 +8,7 @@ import { ContentPageShell } from "../app/components/ui/contentPageShell";
 import {
   auditMainContentRoutes,
   collectMainContentRouteSamples,
+  inspectInPageAnchors,
   inspectMainContentHtml,
 } from "../scripts/main-content-landmarks.mjs";
 
@@ -148,5 +149,36 @@ describe("fetch-based main-content guard", () => {
 
     // Still overridable, so a box that disagrees needs no code change.
     assert.match(audit, /readArgValue\("--concurrency", String\(defaultConcurrency\)\)/);
+  });
+});
+
+/*
+ * A dead `#anchor` fails silently — the browser stays put — and nothing in a
+ * type check or a unit test sees it. The four found by hand on 2026-09-16 were
+ * all invisible for one reason: they sat in code that never rendered, so no
+ * reader could click one and report it. The audit reads links and ids off the
+ * same served response, which is the only place both are true at once.
+ */
+describe("in-page anchor targets", () => {
+  it("reports a link whose target the page does not render", () => {
+    const html = '<a href="#present">go</a><a href="#absent">go</a><div id="present"></div>';
+
+    assert.deepEqual(inspectInPageAnchors(html), ["absent"]);
+  });
+
+  it("accepts an id that arrives in the flight payload, as a streamed route's does", () => {
+    /* The shape a streamed <main id="main-content"> takes in the served HTML.
+       Reading only literal markup called the skip link on five routes dead. */
+    const html = '<a href="#main-content">skip</a>' + String.raw`\"id\":\"main-content\"`;
+
+    assert.deepEqual(inspectInPageAnchors(html), []);
+  });
+
+  it("leaves #top alone, which needs no id", () => {
+    assert.deepEqual(inspectInPageAnchors('<a href="#top">top</a>'), []);
+  });
+
+  it("says nothing about a link to another route's anchor", () => {
+    assert.deepEqual(inspectInPageAnchors('<a href="/trust#beginner-glossary">glossary</a>'), []);
   });
 });

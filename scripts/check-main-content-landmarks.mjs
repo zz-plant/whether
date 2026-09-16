@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Fails the build when a route does not own exactly one `<main id="main-content">`.
+ * Fails the build when a route does not own exactly one `<main id="main-content">`,
+ * or links to an `#anchor` it does not render.
  *
  * The skip link is the only way a keyboard or screen-reader user gets past the
  * nav, and it is a single anchor pointed at a single id — so a duplicated,
@@ -156,15 +157,15 @@ const reportResults = (results) => {
 
   if (violations.length > 0) {
     console.error(
-      `\n${violations.length} of ${audited} rendered routes have main-landmark problems.`,
+      `\n${violations.length} of ${audited} rendered routes have landmark or in-page link problems.`,
     );
     console.error(
-      'Each route needs exactly one <main id="main-content">, and exactly one link to it.',
+      'Each route needs exactly one <main id="main-content"> with exactly one link to it, and every #anchor it renders must resolve on the page.',
     );
     return 1;
   }
 
-  console.log(`\n✅ ${audited} rendered routes each own one <main id="main-content">`);
+  console.log(`\n✅ ${audited} rendered routes own one <main id="main-content"> and render every #anchor they link to`);
   return 0;
 };
 

@@ -27,6 +27,13 @@ export interface MainContentRouteResult extends MainContentInspection {
 export function inspectMainContentHtml(html: string): MainContentInspection;
 
 /**
+ * Same-page `#anchor` targets the rendered page does not carry, sorted. Reads
+ * the flight payload's ids as well as the literal markup's, because a streamed
+ * route's landmark arrives escaped rather than as an element.
+ */
+export function inspectInPageAnchors(html: string): string[];
+
+/**
  * Every page route under `appDir`, with dynamic segments replaced by the
  * representative URLs pinned in `main-content-landmarks.mjs`. Throws when a
  * dynamic page has no sample, so a new route cannot silently skip the audit.
