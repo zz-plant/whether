@@ -436,6 +436,36 @@ recapture correctly.
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |
 
+## Tests that read source instead of behaviour
+
+22 of 276 test files match a regex against a file's source rather than asserting on what it does.
+That is not automatically wrong, and the split is sharp enough to state as a rule.
+
+**Legitimate, and most of them.** A `.husky` hook, a workflow YAML, `package.json`, `next.config.js`
+and a `scripts/*.mjs` are configuration: there is no behaviour to render, and the fact *is* the text.
+So is a module-level declaration a render cannot see — `"use client"`, `alternates.canonical`,
+`export const revalidate` — which `tests/crawlableRouteContract.test.ts` explains where it uses one.
+A third case is narrower and real: `tests/feedRoute.test.ts` reads its route to check no URL is
+hardcoded, which no rendered assertion can distinguish, because the hardcoded literal and the
+configured default are the same string.
+
+**The failure mode, when it is one.** A source regex breaks on a rename and passes on a regression.
+`tests/homePageHeading.test.tsx` carried the evidence in its own comment: one assertion "failed when
+the ternary became a `??`, with the rendered heading unchanged". A test that fails on a refactor and
+passes on a behaviour change is answering a different question from the one in its name.
+
+**The rule.** If the claim is about rendered output and the thing renders in this suite, render it.
+Pages and components do: `renderToStaticMarkup` works for a component, and for a page that reads no
+upstream (`tests/toolkitHowToAnchors.test.tsx` renders `/toolkits/[slug]` and checks the HowTo's
+`#step-N` fragments resolve to real anchors). A route handler is even easier — call it and parse the
+response, as the feed test does for everything except that one literal. What does **not** render here
+is a page behind the report read path: the suite serves no upstreams, so `app/page.tsx` suspends at
+its data boundary and streams a shell. Assertions about that route stay source-level and say so at
+the site.
+
+Two files were converted on 2026-09-16 under this rule; the remaining source reads were checked
+against it and left.
+
 ## Regime scoring: what the numbers do and do not claim
 
 The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
