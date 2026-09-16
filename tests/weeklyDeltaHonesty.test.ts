@@ -52,17 +52,33 @@ describe("the weekly email labels what it shows", () => {
     },
   };
 
-  it("carries the distance from the regime line, not a claim about last week", () => {
+  it("carries the distance from the line, not a claim about last week", () => {
     const readings = buildWeeklyEmailReadings(snapshot);
     const funding = readings.find((reading) => reading.label === "Funding pressure");
 
     assert.equal(funding?.value, "79/100");
-    assert.equal(funding?.delta, "+9.0", "79 sits 9 points above the 70 line");
+    assert.equal(funding?.distance?.label, "9 pts above the line that changes the call");
+    assert.equal(funding?.distance?.worse, true, "above the funding line is the tighter side");
   });
 
-  it("renders the distance with a label that is true of it", () => {
+  /*
+   * The side is read off the model rather than off the sign of a formatted
+   * string, because the two lines face opposite ways: 53 above a 50 risk floor
+   * is the good side, and 79 above a 70 funding line is not.
+   */
+  it("knows which side of each line is the worse one", () => {
+    const risk = buildWeeklyEmailReadings(snapshot).find((reading) => reading.label === "Risk appetite");
+
+    assert.equal(risk?.distance?.label, "3 pts above the line that changes the call");
+    assert.equal(risk?.distance?.worse, false);
+  });
+
+  it("renders the distance with a label that is true of it, in the recipient's terms", () => {
     const lines = readingsText(buildWeeklyEmailReadings(snapshot));
-    assert.ok(lines.includes("Funding pressure: 79/100 (+9.0 vs the regime line)"), lines.join(" | "));
-    assert.ok(!lines.join(" ").includes("vs last week"), "the readings block claims a weekly move it cannot compute");
+    const joined = lines.join(" | ");
+
+    assert.ok(lines.includes("Funding pressure: 79/100 (9 pts above the line that changes the call)"), joined);
+    assert.ok(!joined.includes("vs last week"), "the readings block claims a weekly move it cannot compute");
+    assert.ok(!/regime line|threshold|delta/i.test(joined), `the readings block speaks the engine's terms: ${joined}`);
   });
 });
