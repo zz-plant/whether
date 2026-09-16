@@ -125,7 +125,9 @@ export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
 ];
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
-  { href: "#executive-snapshot", label: "Leadership summary" },
+  /* Was `#executive-snapshot`, which no page renders. The guide had never been
+     rendered either, so nobody could click it and find that out. */
+  { href: "#weekly-call", label: "This week's call" },
   { href: "/operate#ops-playbook", label: "Planning" },
   { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
 ];
@@ -373,38 +375,15 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   },
 ];
 
-export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
-  {
-    href: "/operate",
-    label: "Planning",
-    description: "Use these diagnostics to set guardrails, prioritize work, and make trade-offs.",
-  },
-  {
-    href: "/trust",
-    label: "Trust",
-    description: "Inspect trust status, source coverage, and formula references for each signal.",
-  },
-  {
-    href: "/trust#beginner-glossary",
-    label: "Trust & glossary",
-    description: "Open trust details and plain-English definitions of U.S. market terms.",
-  },
-];
-
-export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
-  {
-    href: "/",
-    label: "Weekly Brief",
-    description: "Use the live weekly recommendation before opening deeper evidence or execution paths.",
-  },
-  {
-    href: "/operate",
-    label: "Planning",
-    description: "Turn the current market backdrop into concrete execution guidance.",
-  },
-  {
-    href: "/trust#beginner-glossary",
-    label: "Trust & glossary",
-    description: "Review trust status, confidence limits, and the plain-English U.S. market glossary in one place.",
-  },
-];
+/*
+ * `SIGNALS_RELATED_LINKS` and `ONBOARDING_RELATED_LINKS` stood here: two arrays
+ * of {href, label, description} for `/`, `/operate` and `/trust`, rendered by
+ * nothing and kept alive by a test asserting each entry had a description.
+ *
+ * They were a third copy of the information architecture. `navigationLayers` in
+ * lib/navigation/informationArchitecture.ts already carries a label, a
+ * description and a boundary for every one of those routes, and that module says
+ * in as many words to render the array rather than restate it — the footer's own
+ * hand-listed copy of the utility row is recorded there as having drifted. A
+ * page that wants a where-next row should read the IA.
+ */
