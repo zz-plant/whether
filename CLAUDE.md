@@ -13,7 +13,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run test` | ~14s | 1,180+ tests / 211 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
-| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
+| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
@@ -112,9 +112,22 @@ deploys every push, which is the only remote gate left.
   is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
   and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
   by design (`requireCompleteTree`): a two-file tree is what they measure.
-- **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
+- **`lint:types` is enforced (2026-09-16), on pre-push and `bun run check`.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
-  type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared
+  type-constituent rules.
+
+  Promoting it is what found the two findings it had drifted to, both in code written the day
+  before: `tests/analyticsQuery.test.ts` had `String(url)` on a `RequestInfo | URL`, the exact trap
+  the burn-down below cleared from eight test files, and `lib/contentMeasurement.ts` reached every
+  field of a public intake through `String()` on an `unknown`. That is the argument for the
+  promotion in one line — advisory means nobody runs it, and ten days of "reports zero" was ten
+  days of nobody running it. The content guard is a `z.strictObject` now, like the search intake
+  beside it, so extra keys on that endpoint are refused rather than ignored.
+
+  **Not in the deploy gate.** It reads the type graph, so it is the slowest task in the list, and
+  the reproducibility note below still stands. A check that might flake belongs where a person is
+  standing next to it, not in the one place whose log is hard to read — the lesson `run-checks.mjs`
+  paid for on 2026-09-15. The 28 pre-existing findings were burned down on 2026-09-06: a shared
   `tests/fixtures/requestTarget.ts` replaced `String(input)` on a `RequestInfo | URL` in eight test
   files (a `Request` there compares as "[object Object]"), deliberate fire-and-forget promises took
   `void`, `RegimeKey | string` unions collapsed to `string`, `premiumFunnel` rejects a non-string
@@ -165,6 +178,24 @@ deploys every push, which is the only remote gate left.
   ingest coordinator and the Workflow; both are set on `env.preview` only. Details:
   `docs/cloudflare-deployment-runbook.md` ("Secrets", "Trial infrastructure") and
   `docs/agents/data-and-platform.md`.
+
+- **A telemetry stream needs a producer, and the public intake validates what it accepts
+  (2026-09-16).** `regime-transition` and `degraded-state` were declared in `TelemetryStream` and
+  listed in the intake's accepted set, and nothing in `app/`, `lib/` or `worker/` had ever written
+  either one — so the only way a row reached them was a POST from outside, and no reader would have
+  looked. Both are gone, and `tests/telemetryStreamReachability.test.ts` fails if a stream is
+  declared without a producer.
+
+  The larger finding was next to them. The intake checked its ten accepted names against a chain of
+  `if`s, and **five of the ten had no validator in that chain**, so they were written through
+  unexamined. Two of those five are Worker-authored (`ingest-pipeline`, `cron-step`) and one of
+  those two is read back and rendered on `/trust` as "Scheduled runs" — anyone could have posted a
+  run that never happened onto the page whose job is to be trustworthy. A third, `premium-funnel`,
+  has its own route with a body cap and a validator, which shadows the dynamic one anyway, so its
+  entry there was a weaker door Next never opened. The accepted set is now the keys of
+  `STREAM_VALIDATORS`: a stream with no validator cannot be posted, and adding one without a
+  validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
+  derived from it and the census script reading it.
 
 ### Scheduled automation
 
@@ -384,14 +415,40 @@ of them, which is less obvious.
   slope also drives the inversion term in `tightness`, so an inversion moves both at once. Note
   `riskAppetiteRegime = 50` therefore means "slope above +0.25%", not "a flat curve" — a
   relationship the threshold's own doc comment asks callers not to encode.
-- **Confidence measures distance from a boundary, nothing else.** It is not calibrated against
-  outcomes. Two guards matter: an imputed input caps it (`CONFIDENCE_PERCENT_IMPUTED_CEILING`),
-  because the stand-ins sit far from the boundaries and used to score the *ceiling* on an empty
-  payload; and the risk gap is converted to its tightness equivalent before the two are compared,
-  because the raw scales differ 4.5x and the risk axis otherwise decided the answer in 164 of 175
-  historical months. Calibrating the percent against `data/summary_archive.json` — how often a
-  call at distance d was later revised — is the open work; the scale still tops out for most
-  months.
+- **Confidence measures distance from a boundary, nothing else — and the archive now says so out
+  loud (2026-09-16).** Two guards matter: an imputed input caps it
+  (`CONFIDENCE_PERCENT_IMPUTED_CEILING`), because the stand-ins sit far from the boundaries and used
+  to score the *ceiling* on an empty payload; and the risk gap is converted to its tightness
+  equivalent before the two are compared, because the raw scales differ 4.5x and the risk axis
+  otherwise decided the answer in 164 of 175 historical months.
+
+  Calibrating the percent against `data/summary_archive.json` was the open work here. It is done,
+  and the result is not that the number needs a different slope. Over the 176 month-end readings
+  (2012-01 to 2026-08) the published regime held into the next month 169 times in 175, and:
+
+  | Points from a boundary | Percent reported | Months held | Months |
+  | --- | --- | --- | --- |
+  | 0 to 5 | 55% | 100% | 11 |
+  | 5 to 10 | 60% | 78% | 9 |
+  | 10 to 20 | 65% | 100% | 12 |
+  | 20 to 37 | 75% | 94% | 54 |
+  | 37 or more | 92% | 99% | 89 |
+
+  Every band held more often than the percent those months reported, above its 95% interval, the
+  ceiling band included. Worse for the number's name, **distance does not order the outcome**: the
+  least-confident band held 11 of 11 while the band above it held 7 of 9. And the archive cannot
+  support re-fitting it — six flips in fourteen years is not a probability per band, and a curve
+  fitted to the base rate would report ~97% every week and discriminate nothing.
+
+  So the percent keeps measuring distance, which is honest, and the record is published beside it
+  rather than folded into it (`lib/report/confidenceCalibration.ts`, rendered at
+  `/trust#confidence-record`). It is derived from the bundled archive at module load, so the monthly
+  refresh improves it instead of dating it. `tests/confidenceCalibration.test.ts` asserts the two
+  findings as properties rather than pinning the counts, and fails if a later archive ever makes
+  distance order the outcome — which is exactly when the copy would need rewriting.
+
+  Still true: the scale tops out for most months. 51% of them report the 92% ceiling, and only 14
+  distinct values have ever been produced.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.

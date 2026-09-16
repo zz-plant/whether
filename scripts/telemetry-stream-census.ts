@@ -2,11 +2,12 @@
 /**
  * How many rows each telemetry stream wrote, over a window.
  *
- * Nine streams are declared in `lib/telemetry/analyticsEngine.ts`. Two of them
- * (`regime-transition`, `degraded-state`) have never had a writer, and until
- * 2026-09-15 only two had a reader: `cron-step` (the trust page's run history)
- * and `content-measurement` (the SEO refresh loop). The rest were written on
- * every page view and read by nothing, so "is this stream alive" and "did this
+ * The streams are declared in `lib/telemetry/analyticsEngine.ts` and read from
+ * there rather than listed again here. Two of them, `regime-transition` and
+ * `degraded-state`, had never had a writer and were removed on 2026-09-16; only
+ * two have a reader: `cron-step` (the trust page's run history) and
+ * `content-measurement` (the SEO refresh loop). The rest are written on every
+ * page view and read by nothing, so "is this stream alive" and "did this
  * emitter stop firing" were unanswerable without opening the Cloudflare
  * dashboard.
  *
@@ -25,23 +26,13 @@
  */
 import { z } from "zod";
 import { queryAnalyticsEngine, resolveAnalyticsReadConfig } from "../lib/telemetry/analyticsQuery";
+import { TELEMETRY_STREAMS } from "../lib/telemetry/analyticsEngine";
 
 const DEFAULT_WINDOW_DAYS = 30;
 const ROW_LIMIT = 100;
 
 /** Every stream the writer declares, so one at zero shows up as a row rather than an absence. */
-const DECLARED_STREAMS = [
-  "web-vitals",
-  "operator-workflow",
-  "activation",
-  "content-measurement",
-  "premium-funnel",
-  "ingest-pipeline",
-  "cron-step",
-  "regime-transition",
-  "degraded-state",
-  "search",
-] as const;
+const DECLARED_STREAMS = TELEMETRY_STREAMS;
 
 /** What reads each stream today, so a zero row can be judged against intent. */
 const READERS: Record<string, string> = {

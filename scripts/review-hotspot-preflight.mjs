@@ -248,8 +248,19 @@ function main() {
   }
 
   if (assertionOffenders.length > 0) {
+    /*
+     * Name them. `addedTypeAssertions` has collected `file: line` for each one
+     * since this check existed, and the report printed only the count — so the
+     * gate said "one unsafe assertion" and left you to find it by eye across the
+     * whole range. A count is a verdict; the offender is the thing you can act
+     * on, and withholding it is the same defect `run-checks.mjs` was fixed for
+     * on 2026-09-15.
+     */
     failures.push(
-      `Unsafe type assertions detected in added lines (${assertionOffenders.length}). Prefer runtime validation/narrowing.`,
+      [
+        `Unsafe type assertions detected in added lines (${assertionOffenders.length}). Prefer runtime validation/narrowing.`,
+        ...assertionOffenders.map((offender) => `    ${offender}`),
+      ].join("\n"),
     );
   }
 

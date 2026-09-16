@@ -9,6 +9,7 @@ import {
   resolveAnalyticsReadConfig,
   splitWindow,
 } from "../lib/telemetry/analyticsQuery";
+import { requestUrl } from "./fixtures/requestTarget";
 
 const originalEnv = { ...process.env };
 const rowSchema = z.object({ blob2: z.string().nullable().optional() });
@@ -91,7 +92,7 @@ describe("queryAnalyticsEngine", () => {
       rowLimit: 10,
       sql: "SELECT 1",
       fetcher: async (url, init) => {
-        seenUrl = String(url);
+        seenUrl = requestUrl(url);
         // `new Headers` narrows HeadersInit at runtime; an assertion would only move the risk.
         seenAuth = new Headers(init?.headers).get("authorization") ?? "";
         return jsonResponse({ data: [] });
