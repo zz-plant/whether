@@ -56,8 +56,28 @@ deploys every push, which is the only remote gate left.
   global `RequestInit` with `next`, so the whole expression collapses to `...init?.next` and the
   cast goes with the fallback.
 
-  **Only `react/set-state-in-effect` (26) and `react/no-danger` (12) are still off**, and both
-  want judgement per site rather than a codemod.
+  **`react/no-danger` is enforced from 2026-09-16.** All fourteen findings were
+  `<script>` tags holding JSON — structured data, and one JSON island the page reads back — which
+  is the case the rule cannot tell from an HTML injection and the one React offers no other API
+  for. They are now a single `app/components/jsonLdScript.tsx`, so a rule disabled across the whole
+  repo became a disable on one line someone has read. The suppression census records that trade
+  (lint suppressions 7 -> 8, disabled rules 2 -> 1) with the argument in the baseline. It also
+  tightened one thing: every payload goes through `serializeJsonLd`, and `briefArtifactScript` had
+  been escaping only `<`, so a line separator in any string it carried was a parse error in the
+  embedded JSON.
+
+  **Only `react/set-state-in-effect` is still off**, with 22 findings across 19 files, and they are
+  not one problem:
+
+  | Shape | Roughly | What it needs |
+  | --- | --- | --- |
+  | Reads a browser-only source on mount (localStorage, a cookie, a DOM island, a generated client id) | half | `useSyncExternalStore`, not deletion — the read genuinely cannot happen during SSR |
+  | Mirrors a prop into state | 3 | The real anti-pattern: compute during render, or key the component |
+  | Animation and reset-on-condition | the rest | Per-site judgement |
+
+  Enforcing it means changing the hydration behaviour of nineteen client components, and nothing in
+  this suite exercises a client effect, so it is scoped work rather than a codemod. The
+  classification is here so the next pass is bounded rather than rediscovered.
 
   Two rules are enforced everywhere except a named set of files, which the suppression census
   counts rather than treating as configuration:

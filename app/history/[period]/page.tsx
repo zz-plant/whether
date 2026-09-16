@@ -12,7 +12,6 @@ import {
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
-  serializeJsonLd,
 } from "../../../lib/seo";
 import {
   buildAuthorSchema,
@@ -29,6 +28,7 @@ import {
 } from "../../../lib/summary/postureArchive";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { JsonLdScript } from "../../components/jsonLdScript";
 
 type Params = { period: string };
 
@@ -112,8 +112,8 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
   return (
     <ContentPageShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleStructuredData) }} />
+      <JsonLdScript data={breadcrumbStructuredData} />
+      <JsonLdScript data={articleStructuredData} />
 
       <Breadcrumbs
         items={[

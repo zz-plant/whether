@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Route } from "../../../lib/navigation/routeType";
-import { buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
+import { buildPageMetadata } from "../../../lib/seo";
 import { buildToolkitHowTo } from "../../../lib/seo/pageStructuredData";
 import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { JsonLdScript } from "../../components/jsonLdScript";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -45,7 +46,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       {/* The run sequence is a HowTo: steps with prompts, and the prep checklist
           as what you bring. The page is noindex today, so this costs nothing and
           is ready the day that changes. */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildToolkitHowTo(toolkit)) }} />
+      <JsonLdScript data={buildToolkitHowTo(toolkit)} />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },

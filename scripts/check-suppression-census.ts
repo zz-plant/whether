@@ -240,12 +240,31 @@ export function takeCensus(files: string[] = collectFiles()): Census {
  * with the reason, not folded into the change that needed the suppression.
  */
 const BASELINE: Record<string, number> = {
-  lintSuppressions: 7,
+  /*
+   * 7 -> 8 on 2026-09-16, traded against `disabledLintRules` 2 -> 1. This is the
+   * one direction a rise is allowed: `react/no-danger` was off for the whole
+   * repo because fourteen surfaces embedded structured data by hand, and every
+   * one was a `<script>` holding JSON — the case the rule cannot tell from an
+   * HTML injection and the one React gives no other API for. Those uses are now
+   * a single `app/components/jsonLdScript.tsx`, so what was a rule disabled
+   * everywhere is a disable on one line someone has read. This file makes that
+   * argument itself two entries down, about scoped overrides; it applies here.
+   */
+  lintSuppressions: 8,
   typeSuppressions: 3,
   skippedTests: 0,
-  // react/set-state-in-effect (26 findings) and react/no-danger (12) are what is
-  // left; both want judgement per site rather than a codemod.
-  disabledLintRules: 2,
+  /*
+   * `react/set-state-in-effect` is the last one off, with 22 findings across 19
+   * files. They are not one problem: roughly half read a browser-only source on
+   * mount (localStorage, a cookie, a DOM island, a generated client id), which
+   * is legitimate and wants `useSyncExternalStore` rather than deletion; three
+   * mirror a prop into state, which is the real anti-pattern; the rest are an
+   * animation and a reset-on-condition. Enforcing it means changing the
+   * hydration behaviour of nineteen client components, and nothing in this suite
+   * exercises a client effect — so it is scoped work, not a codemod, and not
+   * something to flip blind.
+   */
+  disabledLintRules: 1,
   // Two rules are enforced everywhere but one small set of files:
   // nextjs/no-html-link-for-pages is off for app/layout.tsx, where /feed.xml is a
   // route handler serving a file that <Link> would client-navigate to; and
