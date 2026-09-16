@@ -6,8 +6,6 @@ import {
   FIRST_TIME_GUIDE_NEXT_LINKS,
   FIRST_TIME_GUIDE_STEPS,
   GLOSSARY_USAGE_NOTES,
-  ONBOARDING_RELATED_LINKS,
-  SIGNALS_RELATED_LINKS,
 } from "../lib/report/reportCopy";
 
 describe("reportCopy", () => {
@@ -45,17 +43,6 @@ describe("reportCopy", () => {
       note.bullets.forEach((bullet) => {
         assert.ok(bullet.emphasis.length > 0);
         assert.ok(bullet.detail.length > 0);
-      });
-    });
-  });
-
-  it("provides related links metadata for onboarding and signals pages", () => {
-    [SIGNALS_RELATED_LINKS, ONBOARDING_RELATED_LINKS].forEach((links) => {
-      assert.equal(links.length, 3);
-      links.forEach((link) => {
-        assert.ok(link.href.startsWith("/"));
-        assert.ok(link.label.length > 0);
-        assert.ok(link.description.length > 15);
       });
     });
   });

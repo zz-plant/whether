@@ -1,0 +1,75 @@
+import assert from "node:assert/strict";
+import { describe, it } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import { FirstVisitExplainer } from "../app/components/homeFirstRunOrientation";
+import {
+  FIRST_TIME_GUIDE_HIGHLIGHTS,
+  FIRST_TIME_GUIDE_NEXT_LINKS,
+  FIRST_TIME_GUIDE_STEPS,
+} from "../lib/report/reportCopy";
+
+/*
+ * The guide existed and no page rendered it.
+ *
+ * Three steps with worked examples, four highlights and three next links had
+ * been sitting in `reportCopy.ts` since before this component, tested by
+ * `tests/reportCopy.test.ts` — which asserted there were exactly three steps and
+ * that each carried an example, and never asked whether anyone could read them.
+ * That is the shape worth naming: a test is enough to keep an unshipped feature
+ * past every gate in this repo, because `check:dead-exports` counts a reference
+ * from anywhere and a test counts.
+ *
+ * So this file asserts the rendered markup, not the constants.
+ */
+
+/* React escapes an apostrophe to `&#x27;`, and one highlight has one. Decoded
+   here so the assertion compares the copy rather than the encoding. */
+const decode = (html: string) =>
+  html
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&amp;", "&");
+
+const markup = () => decode(renderToStaticMarkup(<FirstVisitExplainer />));
+
+describe("first-run orientation guide", () => {
+  it("renders every step, with the example that makes it concrete", () => {
+    const html = markup();
+
+    for (const step of FIRST_TIME_GUIDE_STEPS) {
+      assert.ok(html.includes(step.label), `step "${step.label}" is not on the page`);
+      assert.ok(html.includes(step.example), `step "${step.label}" lost its example`);
+    }
+  });
+
+  it("renders the highlights and the links out", () => {
+    const html = markup();
+
+    for (const highlight of FIRST_TIME_GUIDE_HIGHLIGHTS) {
+      assert.ok(html.includes(highlight.text), `highlight missing: ${highlight.text}`);
+    }
+    for (const link of FIRST_TIME_GUIDE_NEXT_LINKS) {
+      assert.ok(html.includes(`href="${link.href}"`), `link missing: ${link.href}`);
+    }
+  });
+
+  it("keeps the standfirst first and the guide collapsed behind it", () => {
+    const html = markup();
+    const standfirst = html.indexOf("scored into");
+    const guide = html.indexOf("How to read this page");
+
+    assert.ok(standfirst >= 0 && guide > standfirst, "the guide displaced the opening line");
+    assert.ok(html.includes("<details"), "the guide is not collapsed");
+  });
+
+  /*
+   * The one in-page target it has. `#executive-snapshot` was the original, and
+   * no page has ever rendered that id — the guide was never rendered either, so
+   * nobody could click it and find out.
+   */
+  it("points its in-page link at a section the homepage renders", () => {
+    const inPage = FIRST_TIME_GUIDE_NEXT_LINKS.filter((link) => link.href.startsWith("#"));
+
+    assert.deepEqual(inPage.map((link) => link.href), ["#weekly-call"]);
+  });
+});
