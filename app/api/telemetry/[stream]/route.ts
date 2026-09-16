@@ -9,20 +9,36 @@ import { checkRateLimit, clientKeyFor, rateLimitedResponse } from "../../../../l
 
 export const runtime = "edge";
 
-const VALID_STREAMS = new Set<string>([
-  "web-vitals",
-  "operator-workflow",
-  "activation",
-  "content-measurement",
-  "premium-funnel",
-  "ingest-pipeline",
-  "cron-step",
-  "regime-transition",
-  "degraded-state",
-  "search",
-]);
+/**
+ * What a browser may write here, and the validator each one is checked against.
+ *
+ * The accepted set is this map's keys, which is the point. It used to be a
+ * separate list of ten names checked against a chain of `if`s, and five of the
+ * ten had no validator in that chain — so they were accepted, unexamined, and
+ * written straight through. Two of those five (`ingest-pipeline`, `cron-step`)
+ * are authored by the Worker and by nothing else, and `cron-step` is read back
+ * and rendered on `/trust` as "Scheduled runs": anyone could have posted a run
+ * that never happened onto the page whose job is to be trustworthy. A third,
+ * `premium-funnel`, has its own route with a body cap and a validator, which
+ * shadows this one for that path anyway, so its entry here was a weaker door
+ * that Next never opened. The last two were written by nothing at all.
+ *
+ * Deriving the set from the validators makes the missing-validator case
+ * unreachable rather than merely noticed: a stream with no entry cannot be
+ * posted, and adding one without a validator does not typecheck.
+ */
+const STREAM_VALIDATORS = {
+  "web-vitals": isWebVitalMetric,
+  "operator-workflow": isOperatorWorkflowEvent,
+  activation: isActivationEvent,
+  "content-measurement": isContentMeasurementEvent,
+  search: isSearchTelemetryEvent,
+} satisfies Partial<Record<TelemetryStream, (input: unknown) => boolean>>;
 
-const isTelemetryStream = (value: string): value is TelemetryStream => VALID_STREAMS.has(value);
+type BrowserWritableStream = keyof typeof STREAM_VALIDATORS;
+
+const isBrowserWritableStream = (value: string): value is BrowserWritableStream =>
+  Object.hasOwn(STREAM_VALIDATORS, value);
 
 export async function POST(
   request: Request,
@@ -31,7 +47,7 @@ export async function POST(
   const params = await Promise.resolve(context.params);
   const stream = params?.stream;
 
-  if (!stream || !isTelemetryStream(stream)) {
+  if (!stream || !isBrowserWritableStream(stream)) {
     return NextResponse.json({ ok: false, error: "invalid_stream" }, { status: 400 });
   }
 
@@ -49,24 +65,11 @@ export async function POST(
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  // Optional validator checks per stream
-  if (stream === "web-vitals" && !isWebVitalMetric(payload)) {
-    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
-  }
-  if (stream === "operator-workflow" && !isOperatorWorkflowEvent(payload)) {
-    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
-  }
-  if (stream === "activation" && !isActivationEvent(payload)) {
-    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
-  }
-  if (stream === "content-measurement" && !isContentMeasurementEvent(payload)) {
-    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
-  }
-
-  /* Strict, and strict about extras: the search stream promises to hold no
-     query text, so a payload carrying an unexpected key is refused rather than
-     stored with the key ignored. */
-  if (stream === "search" && !isSearchTelemetryEvent(payload)) {
+  /* Every accepted stream has one, by construction. The search and content
+     validators are strict about extra keys as well as shape: those streams
+     promise to carry no query text and no referrer, so an unexpected key is
+     refused rather than stored with the key ignored. */
+  if (!STREAM_VALIDATORS[stream](payload)) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 

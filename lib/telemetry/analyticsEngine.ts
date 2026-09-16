@@ -47,16 +47,30 @@ const truncateBlob = (value: string) => {
   return `${value.slice(0, TELEMETRY_BLOB_BYTE_LIMIT)}…`;
 };
 
-export type TelemetryStream =
-  | "web-vitals"
-  | "operator-workflow"
-  | "activation"
-  | "content-measurement"
-  | "premium-funnel"
-  | "ingest-pipeline"
-  | "cron-step"
-  | "regime-transition"
-  | "degraded-state"
+/**
+ * Every stream something actually writes.
+ *
+ * One array, and the union derived from it, because the census script kept a
+ * second copy and the two could drift without anything failing.
+ *
+ * `regime-transition` and `degraded-state` were here too, and nothing in
+ * `lib/`, `app/` or `worker/` had ever written either one, nor read them. What
+ * they did have was an entry in the public intake's accepted set, so the only
+ * way a row reached them was a POST from outside. A stream nobody emits is not
+ * a feature waiting for a producer, it is an open write with no reader to
+ * notice — `tests/telemetryStreamReachability.test.ts` fails if one is declared
+ * again.
+ */
+export const TELEMETRY_STREAMS = [
+  "web-vitals",
+  "operator-workflow",
+  "activation",
+  "content-measurement",
+  "premium-funnel",
+  /** Worker-authored: the ingest pipeline's own success, failure and duration. */
+  "ingest-pipeline",
+  /** Worker-authored, and read back on `/trust` as "Scheduled runs". */
+  "cron-step",
   /**
    * The shape of a search: which job the query routed to, how many entities
    * matched, whether it matched nothing. Not the text typed, which this product
@@ -64,7 +78,10 @@ export type TelemetryStream =
    * carrying any key beyond those four, so the promise is enforced at the
    * intake rather than left as a convention.
    */
-  | "search";
+  "search",
+] as const;
+
+export type TelemetryStream = (typeof TELEMETRY_STREAMS)[number];
 
 type WriteAnalyticsOptions = {
   doubles?: number[];

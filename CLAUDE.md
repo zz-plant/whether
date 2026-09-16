@@ -179,6 +179,24 @@ deploys every push, which is the only remote gate left.
   `docs/cloudflare-deployment-runbook.md` ("Secrets", "Trial infrastructure") and
   `docs/agents/data-and-platform.md`.
 
+- **A telemetry stream needs a producer, and the public intake validates what it accepts
+  (2026-09-16).** `regime-transition` and `degraded-state` were declared in `TelemetryStream` and
+  listed in the intake's accepted set, and nothing in `app/`, `lib/` or `worker/` had ever written
+  either one — so the only way a row reached them was a POST from outside, and no reader would have
+  looked. Both are gone, and `tests/telemetryStreamReachability.test.ts` fails if a stream is
+  declared without a producer.
+
+  The larger finding was next to them. The intake checked its ten accepted names against a chain of
+  `if`s, and **five of the ten had no validator in that chain**, so they were written through
+  unexamined. Two of those five are Worker-authored (`ingest-pipeline`, `cron-step`) and one of
+  those two is read back and rendered on `/trust` as "Scheduled runs" — anyone could have posted a
+  run that never happened onto the page whose job is to be trustworthy. A third, `premium-funnel`,
+  has its own route with a body cap and a validator, which shadows the dynamic one anyway, so its
+  entry there was a weaker door Next never opened. The accepted set is now the keys of
+  `STREAM_VALIDATORS`: a stream with no validator cannot be posted, and adding one without a
+  validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
+  derived from it and the census script reading it.
+
 ### Scheduled automation
 
 The recurring data jobs run as scheduled Claude Code routines, not GitHub Actions. Each one runs
