@@ -103,6 +103,42 @@ html[data-theme="light"] .weather-hero-card {
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
+/* The regime's atmosphere. One wash for both shells: the brief's container
+   and the report backdrop paint this, from the token the data-regime map
+   resolves, so the two cannot be keyed to different weeks or different hues.
+   Top-anchored and gone by 60% of the page — the ground below it is
+   --bg-body itself, which is what the card ladder was measured against. */
+.weather-regime-ground {
+  background-image: linear-gradient(to bottom, var(--regime-atmosphere) 0%, transparent 60%);
+}
+
+/* Report-page intro. The hero card above is the brief's; this is every other
+   route's, and until 2026-09-16 it was plain slate under a status line that
+   named the week — a reader on /operate got no colour cue the hero gives on /.
+   Same treatment as the hero at lower weight: the wash sits top-left, behind
+   the title rather than a score, and the border and top edge take the hue at
+   about two thirds of the hero's mix. */
+.weather-page-intro {
+  background:
+    radial-gradient(ellipse 60% 70% at 0% 0%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008)),
+    color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
+  border-color: color-mix(in srgb, var(--regime-accent) 24%, var(--border-default));
+  box-shadow:
+    var(--elev-2),
+    inset 0 1px 0 color-mix(in srgb, var(--regime-accent) 16%, var(--edge-highlight-faint));
+}
+
+html[data-theme="light"] .weather-page-intro {
+  background:
+    radial-gradient(ellipse 60% 70% at 0% 0%, color-mix(in srgb, var(--regime-accent) 10%, transparent), transparent 70%),
+    var(--bg-raised);
+  border-color: color-mix(in srgb, var(--regime-accent) 22%, var(--border-default));
+  box-shadow:
+    var(--elev-2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 /* Mobile & desktop brief cards: high-contrast executive cards matching mockup */
 .weather-brief-card {
   position: relative;
@@ -230,12 +266,12 @@ html[data-theme="light"] .weather-brief-card {
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary)
+    .weather-surface-secondary, .weather-page-intro)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary) {
+    .weather-surface-secondary, .weather-page-intro) {
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -249,17 +285,17 @@ html[data-theme="light"] .weather-brief-card {
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary)
+    .weather-surface-secondary, .weather-page-intro)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary)
+    .weather-surface-secondary, .weather-page-intro)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
+    .weather-surface-secondary, .weather-page-intro):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
 }

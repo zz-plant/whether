@@ -291,10 +291,24 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
   the section eyebrows and rules to read the week, and until 2026-09-15 no report page fed it, so
   every shell rendered slate under a call its own intro line named. `/history/compare` is the one
   deliberate exception: two weeks on one page, and keying it to either would mislead.
-- SHOULD: keep the regime ink for section-level marks — the `ReportSection` eyebrow and rule. A
-  card's own eyebrow inside a section is neutral (`.type-eyebrow` alone); `/signals` carried sky
-  card eyebrows beside a rose section eyebrow, two accents for one hierarchy. Sky stays for
-  what it means elsewhere: links, and the cards whose border is already sky.
+- SHOULD: keep the regime ink for section-level marks — the `ReportSection` eyebrow and rule, and
+  `.type-eyebrow-section` on a hand-rolled section's own eyebrow (`/signals`, `/history`,
+  `/operate` carry these). A card's own eyebrow inside a section is neutral (`.type-eyebrow`
+  alone); `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
+  hierarchy. Sky stays for what it means elsewhere: links, and the cards whose border is already
+  sky.
+- MUST: keep the four regime hues off the action accent. Sky is what every link, button and focus
+  ring is drawn in, and until 2026-09-16 Stormy was sky-500 — under that call the regime and the
+  controls were one colour. Stormy is violet (`#8b5cf6`, ink `--color-semantic-stormy-fg`);
+  `tests/regimeColourContract.test.tsx` fails if a regime lands back on the sky ramp.
+- MUST: paint the page atmosphere from `--regime-atmosphere`, via `.weather-regime-ground`, on
+  both shells. The brief's container and the report backdrop each held a regime → tint table of
+  their own — the report one had Sunny in teal and never faded, so the ground under every card on
+  every report route was lifted to a grey and the depth ladder lost half its separation.
+- MUST: key the report intro (`CommandCenterNavBlock`, `.weather-page-intro`) to the regime like
+  the hero: wash, border and top edge from `--regime-accent`, the status word in `--regime-ink`.
+  It was plain slate under a status line that named the week, so `/` showed a colour and every
+  other route showed none.
 - NEVER: print text in `--regime-accent`. At 12–13px on the light ground it sits near 3:1; the
   section eyebrows did this until 2026-09-15.
 - MUST: key a surface's colour to the regime the copy on it states, from the same source. The

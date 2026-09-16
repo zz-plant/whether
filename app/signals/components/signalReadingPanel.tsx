@@ -28,7 +28,7 @@ export function SignalReadingPanel({
   return (
     <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="signal-reading-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="signal-reading-heading" className="type-eyebrow text-slate-400">
+        <h2 id="signal-reading-heading" className="type-eyebrow type-eyebrow-section">
           {reading.measure} · this week
         </h2>
         <p className="text-xs text-slate-500">As of {recordDateLabel}</p>

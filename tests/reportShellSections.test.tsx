@@ -45,7 +45,9 @@ describe("ReportShell extracted sections", () => {
     // on whichever routes forgot to ask for the compact variant.
     assert.match(html, /Weekly brief/);
     assert.doesNotMatch(html, /Weekly operating brief/);
-    assert.match(html, /DEFENSIVE • HIGH • As of Mar 5/);
+    // The status word is the route's stamp: it prints in the regime ink, and
+    // the rest of the line stays neutral after it.
+    assert.match(html, /text-\[color:var\(--regime-ink\)\][^>]*>DEFENSIVE<\/span> • HIGH • As of Mar 5/);
     assert.match(html, /Decision summary/);
     assert.match(html, /Updated Mar 6/);
     assert.match(html, /Start/);

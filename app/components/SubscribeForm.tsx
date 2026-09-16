@@ -53,7 +53,13 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
   }
 
   return (
-    <div className={compact ? "space-y-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-4 py-3" : "weather-section-border space-y-3"}>
+    <div className={compact
+      // Surface tier, not nested: the card sits beside .weather-surface
+      // siblings on the brief, and the input inside it is the nested well.
+      // With both on --bg-nested the input had no edge to sit in, and on the
+      // light theme the card was the one beige slab between white ones.
+      ? "space-y-2 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-4 py-3"
+      : "weather-section-border space-y-3"}>
       <div>
         <p className="text-fluid-sm font-medium text-white">Get the call every Monday, and a note the day it changes</p>
         {compact ? null : (

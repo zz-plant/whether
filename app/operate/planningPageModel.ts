@@ -396,7 +396,7 @@ export async function buildPlanningPageModel(
       }),
       h("section", { id: "ops-failure-patterns", className: "weather-panel space-y-4 px-5 py-5", "aria-labelledby": "ops-failure-patterns-title" },
         h("div", { className: "space-y-2" },
-          h("p", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-slate-400" }, "Risk checks"),
+          h("p", { className: "type-eyebrow type-eyebrow-section" }, "Risk checks"),
           h("h2", { id: "ops-failure-patterns-title", className: "text-lg font-semibold text-slate-100" }, "Pressure-test the plan before you approve it"),
           h("p", { className: "text-sm text-slate-300" }, "Use these warnings to catch weak assumptions before the plan goes out."),
         ),

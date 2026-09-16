@@ -130,7 +130,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
     <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="phase-map-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <h2 className="type-eyebrow" id="phase-map-heading">
+          <h2 className="type-eyebrow type-eyebrow-section" id="phase-map-heading">
             The plane the call is made on
           </h2>
           <p className="max-w-prose text-sm text-slate-300">

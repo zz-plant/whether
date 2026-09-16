@@ -114,7 +114,7 @@ export function TrackRecord({
   return (
     <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="track-record-heading">
       <div>
-        <h2 className="type-eyebrow" id="track-record-heading">Track record</h2>
+        <h2 className="type-eyebrow type-eyebrow-section" id="track-record-heading">Track record</h2>
         <p className="text-sm text-slate-300">
           Every call this engine has made, from the same published formula. Not a forecast — a record
           you can audit.

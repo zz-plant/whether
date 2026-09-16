@@ -93,12 +93,16 @@ export const REGIME_STYLE_TOKENS: Record<
     },
   },
   VOLATILE: {
-    marker: "bg-indigo-400",
-    badge: "border-sky-400/60 bg-sky-400/15 text-sky-100",
+    // Violet across the board, matching REGIME_HEX_COLORS. The marker was
+    // already indigo while the badge and panel were sky, so one regime drew
+    // in two hues — and sky is the action accent, so a Stormy badge read as
+    // a button.
+    marker: "bg-violet-400",
+    badge: "border-violet-400/60 bg-violet-400/15 text-violet-100",
     accent: {
-      panel: "from-sky-500/20 via-sky-400/10 to-transparent border-sky-400/40",
-      dot: "bg-sky-400",
-      text: "text-sky-200",
+      panel: "from-violet-500/20 via-violet-400/10 to-transparent border-violet-400/40",
+      dot: "bg-violet-400",
+      text: "text-violet-200",
     },
   },
   EXPANSION: {

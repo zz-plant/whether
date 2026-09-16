@@ -96,7 +96,7 @@ export function SignalInversionPreview({
   return (
     <section id="curve-context" className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signals-inversion-preview-title">
       <header className="space-y-2">
-        <p className="type-eyebrow">Curve context</p>
+        <p className="type-eyebrow type-eyebrow-section">Curve context</p>
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">
           Inversion timeline before you open the deeper evidence.
         </h2>

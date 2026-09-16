@@ -134,7 +134,7 @@ export default async function SignalsPage({
           its first link and the scenario pages hung off parents no crawler
           reached. */}
       <nav aria-labelledby="signal-watches-heading" className="weather-panel space-y-3 px-5 py-5">
-        <h2 id="signal-watches-heading" className="type-eyebrow">Signal watches</h2>
+        <h2 id="signal-watches-heading" className="type-eyebrow type-eyebrow-section">Signal watches</h2>
         <ul className="grid gap-3 sm:grid-cols-3">
           {indexableSignalsClusters.map((watch) => (
             <li key={watch.slug}>
@@ -152,7 +152,7 @@ export default async function SignalsPage({
       ) : null}
 
       <div id="trends" className="weather-panel space-y-4 px-5 py-5">
-        <h2 className="type-eyebrow">Funding pressure and risk appetite over time</h2>
+        <h2 className="type-eyebrow type-eyebrow-section">Funding pressure and risk appetite over time</h2>
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
         <SignalSparklineStrip
@@ -174,7 +174,7 @@ export default async function SignalsPage({
         return (
           <section id="analog-pattern" aria-labelledby="analog-pattern-title" className="weather-panel space-y-4 p-5">
             <div>
-              <p className="type-eyebrow">Nearest reference cycle</p>
+              <p className="type-eyebrow type-eyebrow-section">Nearest reference cycle</p>
               <h3 id="analog-pattern-title" className="text-base font-semibold text-slate-100">
                 {analog.analogPeriod} · {analog.regimeType}
               </h3>
