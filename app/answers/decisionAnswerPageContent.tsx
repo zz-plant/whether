@@ -17,7 +17,14 @@ import { ActionLink } from "../components/ui/actionLink";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
+import {
+  DATA_CURRENCY_ACTION,
+  DATA_CURRENCY_ACTION_HREF,
+  buildDataCurrencyNotice,
+} from "../../lib/report/dataCurrencyNotice";
 import { ContentMeasurementTracker } from "../components/contentMeasurementTracker";
+import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "../components/ui/plainLanguage";
+import { signalPlainEnglish, type CompositeSignalKey } from "../../lib/report/signalTranslations";
 import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
 
@@ -67,6 +74,11 @@ export async function DecisionAnswerPageContent({
    * and could point at pages the allowlist excludes.
    */
   const relatedPages = selectRelatedAnswers(page, answerPages, { isEligible: isIndexableAnswerSlug });
+  /* One notice, where a reader sees it first. There used to be two — one keyed on
+     `noindex` and one on `degraded` — and between them they said "noindex" twice
+     and printed the gate ids once. Whether this page is indexed is not something
+     the person reading it can act on; whether the reading is current is. */
+  const dataCurrency = buildDataCurrencyNotice(payload.noindexReasons, { recordDateLabel });
   const pagePath = `/answers/${page.slug}`;
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [
@@ -88,7 +100,11 @@ export async function DecisionAnswerPageContent({
   const faqData = buildAnswerFaqStructuredData({
     slug: page.slug,
     question: page.title,
-    answer: `${liveShortAnswer} Threshold context: risk appetite ${assessment.scores.riskAppetite.toFixed(0)} vs ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)} vs ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
+    /* A rich result is the first thing a stranger reads, and this sentence was
+       "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
+       comparisons, one of them under the engine's name for a score the rest of
+       the site calls funding pressure. */
+    answer: `${liveShortAnswer} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} line that would change this call; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
@@ -103,12 +119,20 @@ export async function DecisionAnswerPageContent({
    */
   const headings = buildAnswerSectionHeadings(page);
 
+  /* The third branch was the one written in the engine's terms — "risk appetite <
+     50 or tightness > 70" — with an operator the other two spell out and a name
+     no other surface uses for that score. */
   const thresholdTrigger =
     page.thresholdFocus === "tightness"
       ? `Trigger tighter mode if funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`
       : page.thresholdFocus === "risk"
         ? `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}.`
-        : `Trigger tighter mode if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+        : `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, or funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+
+  const compositeReadings: Array<{ key: CompositeSignalKey; score: number }> = [
+    { key: "tightness", score: Math.round(assessment.scores.tightness) },
+    { key: "riskAppetite", score: Math.round(assessment.scores.riskAppetite) },
+  ];
 
   return (
     <SecondaryPageShell width="narrow">
@@ -124,9 +148,10 @@ export async function DecisionAnswerPageContent({
             <div className="weather-surface space-y-2 px-4 py-4">
               <p className="type-eyebrow">Short answer</p>
               <p className="text-sm font-semibold text-sky-200">{liveShortAnswer}</p>
-              {payload.noindex ? (
+              {dataCurrency ? (
                 <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                  Degraded signal quality: fallback mode and noindex remain active until freshness, completeness, and provenance checks pass.
+                  {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
+                  <ActionLink href={DATA_CURRENCY_ACTION_HREF} variant="inline">Source dates</ActionLink>
                 </p>
               ) : null}
             </div>
@@ -184,13 +209,32 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title={headings.threshold}>
           <p className="text-sm text-slate-200">{thresholdTrigger}</p>
-          <p className="text-sm text-slate-200">Current risk appetite: {assessment.scores.riskAppetite.toFixed(0)} / 100 · current tightness: {assessment.scores.tightness.toFixed(0)} / 100.</p>
+          {/*
+            Both numbers were printed bare — "current tightness: 79 / 100" — on the
+            pages a first-time visitor reaches from a search result, while the scale
+            note and the plain-English band that make a bare score readable sat only
+            on the three pages a returning reader already knows their way around.
+            Same primitives, on the surface that needs them most.
+          */}
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {compositeReadings.map((reading) => (
+              <div key={reading.key} className="space-y-1">
+                <p className="text-sm tabular-nums text-slate-200">
+                  {signalPlainEnglish[reading.key].plainLabel}: {reading.score} / 100
+                </p>
+                <SignalScaleNote signalKey={reading.key} />
+                <PlainEnglishScoreNote signalKey={reading.key} score={reading.score} lead="On this signal alone" />
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-fluid-nano text-white/45">
+            <GlossaryLink>What these terms mean</GlossaryLink>
+          </p>
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
           <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
-          {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {(payload.noindexReasons ?? []).join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.next}>
