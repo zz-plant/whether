@@ -18,8 +18,8 @@ const mockAssessment: RegimeAssessment = {
     riskAppetiteRegime: 50,
   },
   diagnostics: {
-    tightnessDelta: 0,
-    riskAppetiteDelta: 0,
+    tightnessVsThreshold: 0,
+    riskAppetiteVsThreshold: 0,
     nearestThresholdDelta: 10,
     confidence: "HIGH",
     transitionWatch: false,

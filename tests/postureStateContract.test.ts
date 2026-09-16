@@ -26,8 +26,8 @@ const assessment: RegimeAssessment = {
   },
   scores: { tightness: 72, riskAppetite: 48, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.1 },
   diagnostics: {
-    tightnessDelta: 2,
-    riskAppetiteDelta: -2,
+    tightnessVsThreshold: 2,
+    riskAppetiteVsThreshold: -2,
     nearestThresholdDelta: 2,
     confidence: "LOW",
     transitionWatch: true,

@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { ClimateBackdrop } from "./climateBackdrop";
 import { WebVitalsTracker } from "./webVitalsTracker";
 import { AnchorFeedback } from "./anchorFeedback";
-import { serializeJsonLd } from "../../lib/seo";
 import type { RegimeKey } from "../../lib/types";
 import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
+import { JsonLdScript } from "./jsonLdScript";
 
 export type RegimeIconType = RegimeKey | "NEUTRAL";
 
@@ -37,7 +37,7 @@ export function PageShell({
       {backdropVariant === "hub" ? <div className="weather-hub-backdrop" aria-hidden="true" /> : null}
       {backdropVariant === "default" ? <ClimateBackdrop regime={regime || "NEUTRAL"} /> : null}
       <WebVitalsTracker />
-      {structuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} /> : null}
+      {structuredData ? <JsonLdScript data={structuredData} /> : null}
       {/* Renders nothing until the hash matches one of its target ids, and it is
           what opens a collapsed panel an anchor points into — the /trust glossary
           is linked from six places. It was once gated on TV ambient mode, which

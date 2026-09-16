@@ -20,7 +20,6 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
-import { serializeJsonLd } from "../lib/seo";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
@@ -47,6 +46,7 @@ import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachine
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
+import { JsonLdScript } from "./components/jsonLdScript";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -584,10 +584,7 @@ async function PageContent({
         * the headline and posture labels, and this was the only JSON-LD call site
         * in the repo that skipped the escaper written for exactly that.
         */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(homepage.reportShell.structuredData) }}
-      />
+      <JsonLdScript data={homepage.reportShell.structuredData} />
 
       <StickyCallStrip
         call={primaryCall}

@@ -56,8 +56,28 @@ deploys every push, which is the only remote gate left.
   global `RequestInit` with `next`, so the whole expression collapses to `...init?.next` and the
   cast goes with the fallback.
 
-  **Only `react/set-state-in-effect` (26) and `react/no-danger` (12) are still off**, and both
-  want judgement per site rather than a codemod.
+  **`react/no-danger` is enforced from 2026-09-16.** All fourteen findings were
+  `<script>` tags holding JSON — structured data, and one JSON island the page reads back — which
+  is the case the rule cannot tell from an HTML injection and the one React offers no other API
+  for. They are now a single `app/components/jsonLdScript.tsx`, so a rule disabled across the whole
+  repo became a disable on one line someone has read. The suppression census records that trade
+  (lint suppressions 7 -> 8, disabled rules 2 -> 1) with the argument in the baseline. It also
+  tightened one thing: every payload goes through `serializeJsonLd`, and `briefArtifactScript` had
+  been escaping only `<`, so a line separator in any string it carried was a parse error in the
+  embedded JSON.
+
+  **Only `react/set-state-in-effect` is still off**, with 22 findings across 19 files, and they are
+  not one problem:
+
+  | Shape | Roughly | What it needs |
+  | --- | --- | --- |
+  | Reads a browser-only source on mount (localStorage, a cookie, a DOM island, a generated client id) | half | `useSyncExternalStore`, not deletion — the read genuinely cannot happen during SSR |
+  | Mirrors a prop into state | 3 | The real anti-pattern: compute during render, or key the component |
+  | Animation and reset-on-condition | the rest | Per-site judgement |
+
+  Enforcing it means changing the hydration behaviour of nineteen client components, and nothing in
+  this suite exercises a client effect, so it is scoped work rather than a codemod. The
+  classification is here so the next pass is bounded rather than rediscovered.
 
   Two rules are enforced everywhere except a named set of files, which the suppression census
   counts rather than treating as configuration:
@@ -219,6 +239,22 @@ in progress to KV on every run (`lib/summary/refreshMonthlyRegimeHistory.ts`), a
 merges it over the bundled snapshot, so the month rail stays current between deploys. The regime
 history routine still regenerates the canonical month-end series and the archive the scripts own —
 it is the rebuild, not the critical path.
+
+**The freeze Workflow now reports its own outcome (2026-09-16).** The Monday cron logged a
+`cron-step` row the moment `create()` resolved — before the freeze had read anything — and the
+Workflow itself wrote nothing at all. So `/trust` showed a green Monday row whether the week was
+frozen, refused as stale, or retried for five hours and gave up, and the only signal that anything
+was wrong was `data/published_briefs.json` sitting at one week. There are two rows now:
+`brief-freeze-start` (the cron handed it over) and `brief-freeze` (what the Workflow did). A step
+that reports success for work it did not observe is worse than one that reports nothing, because it
+gets read as evidence.
+
+**Still gated to preview.** Promoting it needs `WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in
+`wrangler.toml`'s top-level `[vars]`, and `GITHUB_TOKEN` set on the production lane. The argument
+for not waiting on the preview trial: the archive is deliberately never backfilled, so every week
+spent proving this is a week the record can never honestly claim, and the failure modes are bounded
+— a bad run throws, opens no pull request, and now writes a failing row; `assembleCurrentWeekBrief`
+refuses degraded and fallback data outright; and nothing merges the pull request without a person.
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
@@ -400,17 +436,70 @@ recapture correctly.
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |
 
+## Tests that read source instead of behaviour
+
+22 of 276 test files match a regex against a file's source rather than asserting on what it does.
+That is not automatically wrong, and the split is sharp enough to state as a rule.
+
+**Legitimate, and most of them.** A `.husky` hook, a workflow YAML, `package.json`, `next.config.js`
+and a `scripts/*.mjs` are configuration: there is no behaviour to render, and the fact *is* the text.
+So is a module-level declaration a render cannot see — `"use client"`, `alternates.canonical`,
+`export const revalidate` — which `tests/crawlableRouteContract.test.ts` explains where it uses one.
+A third case is narrower and real: `tests/feedRoute.test.ts` reads its route to check no URL is
+hardcoded, which no rendered assertion can distinguish, because the hardcoded literal and the
+configured default are the same string.
+
+**The failure mode, when it is one.** A source regex breaks on a rename and passes on a regression.
+`tests/homePageHeading.test.tsx` carried the evidence in its own comment: one assertion "failed when
+the ternary became a `??`, with the rendered heading unchanged". A test that fails on a refactor and
+passes on a behaviour change is answering a different question from the one in its name.
+
+**The rule.** If the claim is about rendered output and the thing renders in this suite, render it.
+Pages and components do: `renderToStaticMarkup` works for a component, and for a page that reads no
+upstream (`tests/toolkitHowToAnchors.test.tsx` renders `/toolkits/[slug]` and checks the HowTo's
+`#step-N` fragments resolve to real anchors). A route handler is even easier — call it and parse the
+response, as the feed test does for everything except that one literal. What does **not** render here
+is a page behind the report read path: the suite serves no upstreams, so `app/page.tsx` suspends at
+its data boundary and streams a shell. Assertions about that route stay source-level and say so at
+the site.
+
+Two files were converted on 2026-09-16 under this rule; the remaining source reads were checked
+against it and left.
+
 ## Regime scoring: what the numbers do and do not claim
 
 The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
 of them, which is less obvious.
 
-- **`tightness` saturates, on purpose, and hides that it has.** The rate component spans 0-90
-  across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the cap, so
-  above ~4% the published score is a constant 100 and its week-over-week delta is zero. Read
-  `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
+- **`tightness` saturates, on purpose, and the hero now says when it has.** The rate component
+  spans 0-90 across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the
+  cap, so above ~4% the published score is a constant 100 and its week-over-week delta is zero.
+  Read `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
   `scores.tightnessSaturated` to tell a clipped score from a flat reading. Classification still
   uses the bounded score, so no published regime moved when pressure was added.
+
+  The delta row used to render only when the delta was non-zero, so at the ceiling it vanished:
+  100/100, no direction, and the reader left to infer from the ceiling tag that the silence meant
+  "off the top" rather than "flat". It now says so. Pressure is computed per read and never
+  persisted, so a *pressure* delta is not available without a stored-history change; what is
+  published is the fact that the score has stopped being able to report a move.
+
+- **A distance from a threshold is not a weekly move, and three artifacts published it as one
+  (2026-09-16).** `RegimeDiagnostics` carried `tightnessDelta` and `riskAppetiteDelta`, and both
+  were `score - threshold`, with no previous week in the calculation. The weekly email, the export
+  brief and the published brief archive each printed one as **"vs last week"** — so an unchanged
+  week still reported a move, of whatever size the score happened to sit above the line, and a
+  score pinned at 100 reported +30 every week forever. `getRegimeProjection` already warned, in a
+  comment, not to pass these where a velocity was wanted; three call sites did it anyway, which is
+  why the fields are now `tightnessVsThreshold` and `riskAppetiteVsThreshold`. A name has to carry
+  that, not a comment three files away.
+
+  Each surface was fixed for what it actually has: the published archive reads
+  `reportDynamics.changedSignals` and carries the real move (no record was contaminated — the field
+  predates every entry); the weekly email's snapshot has no previous week in it, so its label
+  changed to "vs the regime line"; the export brief dropped the segment, because the honest version
+  of that number duplicates the corridor rails printed beside it. `OperatingSnapshot.schemaVersion`
+  is 2, and a stored snapshot of the old shape reads as absent and is refilled by the next cron.
 - **The two axes are not independent.** `riskAppetite` is a pure function of curve slope, and
   slope also drives the inversion term in `tightness`, so an inversion moves both at once. Note
   `riskAppetiteRegime = 50` therefore means "slope above +0.25%", not "a flat curve" — a

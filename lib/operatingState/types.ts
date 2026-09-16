@@ -6,7 +6,14 @@ import type { PostureTransitionEvent } from "../storage/postureTransitionEventRe
 
 export type OperatingSnapshot = {
   id: string;
-  schemaVersion: 1;
+  /*
+   * 2 since 2026-09-16: `diagnostics` renamed its two threshold-distance fields
+   * from `tightnessDelta`/`riskAppetiteDelta`, which three artifacts had read as
+   * a week-over-week move and published as "vs last week". A stored snapshot of
+   * the old shape fails the guard and reads as absent, which the cron refills on
+   * its next run — this is derived data, so discarding it costs one refresh.
+   */
+  schemaVersion: 2;
   epoch: string;
   recordDate: string;
   inputHash: string;

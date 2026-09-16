@@ -18,7 +18,7 @@
     "react/set-state-in-effect": "off",
     "react/purity": "error",
     "react/refs": "error",
-    "react/no-danger": "off",
+    "react/no-danger": "error",
     "nextjs/no-html-link-for-pages": "error",
     "no-unused-vars": "error",
     "no-useless-escape": "error",

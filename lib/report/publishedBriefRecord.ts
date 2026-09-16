@@ -13,6 +13,15 @@
 import { formatIsoWeekSlug, getIsoWeekInfo, type IsoWeek } from "../isoWeek";
 import { assessPublishReadiness } from "./briefPublishGuard";
 import type { PublishedBrief } from "./publishedBriefs";
+
+/** The signal's change since the previous read, or null when there is no prior week. */
+const weeklyDelta = (
+  reportData: { reportDynamics: { changedSignals: ReadonlyArray<{ key: string; delta: number }>; anomalySignals: ReadonlyArray<{ key: string; delta: number }> } },
+  key: "tightness" | "riskAppetite",
+): number | null =>
+  reportData.reportDynamics.changedSignals.find((signal) => signal.key === key)?.delta
+  ?? reportData.reportDynamics.anomalySignals.find((signal) => signal.key === key)?.delta
+  ?? null;
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
 
 type PublishedBriefRecordInput = {
@@ -62,8 +71,17 @@ export const buildPublishedBriefRecord = ({
     scores: {
       tightness: reportData.assessment.scores.tightness,
       riskAppetite: reportData.assessment.scores.riskAppetite,
-      tightnessDelta: reportData.assessment.diagnostics.tightnessDelta ?? null,
-      riskAppetiteDelta: reportData.assessment.diagnostics.riskAppetiteDelta ?? null,
+      /*
+       * The week-over-week move, from `reportDynamics`, because `/brief/[week]`
+       * renders these as "vs last week" and this archive is append-only and
+       * citable. They used to read `diagnostics`, whose two fields carry a
+       * distance from the regime threshold — so a week that moved nothing at
+       * all would have been published, permanently, as having moved by however
+       * far the score happened to sit above the line. No record carries the
+       * wrong number: the field predates every entry in the archive.
+       */
+      tightnessDelta: weeklyDelta(reportData, "tightness"),
+      riskAppetiteDelta: weeklyDelta(reportData, "riskAppetite"),
     },
     evidence: reportData.reportEvidenceItems.map((item) => ({
       title: item.title,

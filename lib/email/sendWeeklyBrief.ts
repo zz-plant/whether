@@ -13,22 +13,43 @@ const formatDelta = formatSignedDeltaOrNull;
  * The numbers the call was scored on, as one row.
  *
  * This is the highest-fanout artifact the product sends and it used to carry
- * no number at all — four sentences and a link. The scores, their weekly
- * deltas and the confidence label are what a reader forwards.
+ * no number at all — four sentences and a link. The scores, where they sit
+ * against the regime line, and the confidence label are what a reader forwards.
+ *
+ * The second number is a distance from the threshold, and this said "vs last
+ * week" under it for as long as it has carried numbers. It never was a weekly
+ * move: two identical weeks reported the same non-zero figure, because the
+ * figure is how far the score sits above or below the line. The snapshot this
+ * reads has no previous week in it, so the honest fix is the label — the
+ * published archive, which does have one, now carries the real move instead.
  */
-export const buildWeeklyEmailReadings = (snapshot: OperatingSnapshot | undefined) => {
+/* Exactly the fields the readings row reads. A full `OperatingSnapshot` is
+   assignable, and a test can build these five without asserting its way past
+   the thirty it does not touch. */
+type WeeklyEmailReadingSource = {
+  assessment: {
+    scores: Pick<OperatingSnapshot["assessment"]["scores"], "tightness" | "riskAppetite">;
+    diagnostics: Pick<
+      OperatingSnapshot["assessment"]["diagnostics"],
+      "tightnessVsThreshold" | "riskAppetiteVsThreshold" | "confidence"
+    >;
+  };
+};
+
+export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | undefined) => {
   if (!snapshot) return [];
   const { scores, diagnostics } = snapshot.assessment;
   const confidence = diagnostics.confidence === "MEDIUM" ? "MED" : diagnostics.confidence;
   return [
-    { label: "Funding pressure", value: `${scores.tightness}/100`, delta: formatDelta(diagnostics.tightnessDelta), worseWhenUp: true },
-    { label: "Risk appetite", value: `${scores.riskAppetite}/100`, delta: formatDelta(diagnostics.riskAppetiteDelta), worseWhenUp: false },
+    { label: "Funding pressure", value: `${scores.tightness}/100`, delta: formatDelta(diagnostics.tightnessVsThreshold), worseWhenUp: true },
+    { label: "Risk appetite", value: `${scores.riskAppetite}/100`, delta: formatDelta(diagnostics.riskAppetiteVsThreshold), worseWhenUp: false },
     { label: "Confidence", value: confidence, delta: null, worseWhenUp: false },
   ];
 };
 
-const readingsText = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
-  readings.map((reading) => `${reading.label}: ${reading.value}${reading.delta ? ` (${reading.delta} vs last week)` : ""}`);
+/** One line per reading, as the plain-text email renders it. Exported so a test reads the line rather than the fields behind it. */
+export const readingsText = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
+  readings.map((reading) => `${reading.label}: ${reading.value}${reading.delta ? ` (${reading.delta} vs the regime line)` : ""}`);
 
 const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
   readings.length === 0
@@ -42,7 +63,7 @@ const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
             `<td style="padding:12px 16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;vertical-align:top;">`,
             `<p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 4px;">${reading.label}</p>`,
             `<p style="font-size:1.25rem;font-weight:600;margin:0;color:#f1f5f9;font-variant-numeric:tabular-nums;">${reading.value}</p>`,
-            reading.delta ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.delta} vs last week</p>` : "",
+            reading.delta ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.delta} vs the regime line</p>` : "",
             `</td>`,
           ].join("");
         }),

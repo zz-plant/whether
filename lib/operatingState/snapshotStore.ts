@@ -63,8 +63,8 @@ const isRegimeAssessment = (value: unknown): boolean => {
     && BASE_RATE_SOURCES.has(value.scores.baseRateUsed)
     && typeof value.scores.baseRate === "number"
     && isNumberOrNull(value.scores.curveSlope)
-    && typeof value.diagnostics.tightnessDelta === "number"
-    && typeof value.diagnostics.riskAppetiteDelta === "number"
+    && typeof value.diagnostics.tightnessVsThreshold === "number"
+    && typeof value.diagnostics.riskAppetiteVsThreshold === "number"
     && typeof value.diagnostics.nearestThresholdDelta === "number"
     && typeof value.diagnostics.confidence === "string"
     && CONFIDENCE_BANDS.has(value.diagnostics.confidence)
@@ -106,7 +106,7 @@ const isOperatingSnapshot = (value: unknown): value is OperatingSnapshot => {
   }
 
   return typeof value.id === "string"
-    && value.schemaVersion === 1
+    && value.schemaVersion === 2
     && typeof value.epoch === "string"
     && typeof value.recordDate === "string"
     && typeof value.inputHash === "string"

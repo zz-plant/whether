@@ -100,7 +100,7 @@ export const buildOperatingSnapshot = ({
 
   return {
     id,
-    schemaVersion: 1,
+    schemaVersion: 2,
     epoch,
     recordDate,
     inputHash,

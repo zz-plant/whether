@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { ActionLink } from "../components/ui/actionLink";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { JsonLdScript } from "../components/jsonLdScript";
 import {
   buildBreadcrumbList,
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
-  serializeJsonLd,
 } from "../../lib/seo";
 import {
   buildAuthorSchema,
@@ -44,7 +44,7 @@ export default function AboutPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
+      <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>

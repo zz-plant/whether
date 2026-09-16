@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { serializeJsonLd } from "../../lib/seo";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import { buildLiveDirectAnswer, buildLiveShortAnswer } from "./liveShortAnswers";
 import {
@@ -20,6 +19,7 @@ import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import { ContentMeasurementTracker } from "../components/contentMeasurementTracker";
 import { ReportCta } from "../components/reportCta";
+import { JsonLdScript } from "../components/jsonLdScript";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -113,7 +113,7 @@ export async function DecisionAnswerPageContent({
   return (
     <SecondaryPageShell width="narrow">
       <ContentMeasurementTracker pagePath={pagePath} cluster={measurement.cluster} intent={measurement.intent} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqData) }} />
+      <JsonLdScript data={faqData} />
 
       <div data-content-measurement-root={pagePath}>
         <SecondaryPageHeader
