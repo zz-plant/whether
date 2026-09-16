@@ -2,12 +2,18 @@ import { ReportSection } from "../components/reportSection";
 import type { CronRunHistory } from "../../lib/telemetry/runHistory";
 
 /**
- * What the Worker's scheduled jobs actually did, read back from the telemetry they write.
+ * Whether the jobs that keep this brief current have been running.
  *
- * The rest of /trust says how fresh the data is; this says whether the pipeline that
- * keeps it fresh has been running. Both are trust claims, and this is the one that used to
- * have no evidence on the page. Server-rendered, so timestamps are formatted once, in UTC,
- * and never re-derived on the client.
+ * The rest of /trust says how fresh the data is; this says whether the thing that keeps it
+ * fresh has been working. Both are trust claims, and this is the one that used to have no
+ * evidence on the page. Server-rendered, so timestamps are formatted once, in UTC, and never
+ * re-derived on the client.
+ *
+ * The copy here was written for whoever maintains the pipeline, on the page the IA points a
+ * reader to "when you want to sanity-check the brief before a big decision". It named the
+ * Worker and its crons, printed the read failure's internal reason, and put a raw error
+ * message under a column header promising a time. None of that is something the reader can
+ * act on; "the weekly email last succeeded on Sep 15" is.
  */
 
 const stampFormat = new Intl.DateTimeFormat("en-US", {
@@ -34,13 +40,17 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
     <ReportSection
       id="run-history"
       title={`Scheduled runs, last ${windowDays} days`}
-      description="Read back from the Worker's own telemetry, one row per scheduled step."
+      description="One row per job that keeps this brief current, from the record each run leaves behind."
     >
       {runHistory.status === "unavailable" ? (
-        <p className="text-sm text-slate-300">Run history could not be read right now ({runHistory.reason}).</p>
+        <p className="text-sm text-slate-300">
+          This panel could not be loaded right now. That is a fault in reading the record, not in
+          the brief above it — the freshness and source dates on this page are unaffected.
+        </p>
       ) : runHistory.steps.length === 0 ? (
         <p className="text-sm text-slate-300">
-          No scheduled runs recorded in this window. The daily and Monday crons write one row per step, so an empty window means the cron has not fired.
+          Nothing ran in this window. Every job records itself, so an empty table means they did
+          not run — treat the dates on this page as the last word on how current the brief is.
         </p>
       ) : (
         <>
@@ -75,13 +85,7 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
                       {countFormat.format(step.failures)}
                     </td>
                     <td className="px-3 py-2 font-mono text-slate-300">{formatStamp(step.lastOkAt)}</td>
-                    <td className="px-3 py-2 text-slate-400">
-                      {step.lastError ? (
-                        <span className="line-clamp-2" title={step.lastError}>{step.lastError}</span>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
+                    <td className="px-3 py-2 font-mono text-slate-400">{formatStamp(step.lastFailedAt)}</td>
                   </tr>
                 ))}
               </tbody>
