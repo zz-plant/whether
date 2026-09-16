@@ -415,14 +415,40 @@ of them, which is less obvious.
   slope also drives the inversion term in `tightness`, so an inversion moves both at once. Note
   `riskAppetiteRegime = 50` therefore means "slope above +0.25%", not "a flat curve" — a
   relationship the threshold's own doc comment asks callers not to encode.
-- **Confidence measures distance from a boundary, nothing else.** It is not calibrated against
-  outcomes. Two guards matter: an imputed input caps it (`CONFIDENCE_PERCENT_IMPUTED_CEILING`),
-  because the stand-ins sit far from the boundaries and used to score the *ceiling* on an empty
-  payload; and the risk gap is converted to its tightness equivalent before the two are compared,
-  because the raw scales differ 4.5x and the risk axis otherwise decided the answer in 164 of 175
-  historical months. Calibrating the percent against `data/summary_archive.json` — how often a
-  call at distance d was later revised — is the open work; the scale still tops out for most
-  months.
+- **Confidence measures distance from a boundary, nothing else — and the archive now says so out
+  loud (2026-09-16).** Two guards matter: an imputed input caps it
+  (`CONFIDENCE_PERCENT_IMPUTED_CEILING`), because the stand-ins sit far from the boundaries and used
+  to score the *ceiling* on an empty payload; and the risk gap is converted to its tightness
+  equivalent before the two are compared, because the raw scales differ 4.5x and the risk axis
+  otherwise decided the answer in 164 of 175 historical months.
+
+  Calibrating the percent against `data/summary_archive.json` was the open work here. It is done,
+  and the result is not that the number needs a different slope. Over the 176 month-end readings
+  (2012-01 to 2026-08) the published regime held into the next month 169 times in 175, and:
+
+  | Points from a boundary | Percent reported | Months held | Months |
+  | --- | --- | --- | --- |
+  | 0 to 5 | 55% | 100% | 11 |
+  | 5 to 10 | 60% | 78% | 9 |
+  | 10 to 20 | 65% | 100% | 12 |
+  | 20 to 37 | 75% | 94% | 54 |
+  | 37 or more | 92% | 99% | 89 |
+
+  Every band held more often than the percent those months reported, above its 95% interval, the
+  ceiling band included. Worse for the number's name, **distance does not order the outcome**: the
+  least-confident band held 11 of 11 while the band above it held 7 of 9. And the archive cannot
+  support re-fitting it — six flips in fourteen years is not a probability per band, and a curve
+  fitted to the base rate would report ~97% every week and discriminate nothing.
+
+  So the percent keeps measuring distance, which is honest, and the record is published beside it
+  rather than folded into it (`lib/report/confidenceCalibration.ts`, rendered at
+  `/trust#confidence-record`). It is derived from the bundled archive at module load, so the monthly
+  refresh improves it instead of dating it. `tests/confidenceCalibration.test.ts` asserts the two
+  findings as properties rather than pinning the counts, and fails if a later archive ever makes
+  distance order the outcome — which is exactly when the copy would need rewriting.
+
+  Still true: the scale tops out for most months. 51% of them report the 92% ceiling, and only 14
+  distinct values have ever been produced.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.

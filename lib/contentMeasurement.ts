@@ -175,12 +175,13 @@ const isContentEventType = (value: string): value is ContentEventType =>
  * `strictObject`, and the existing guards rather than a second copy of each
  * literal list.
  *
- * What this replaced hand-rolled the check over `input as Record<string, unknown>`
- * and reached every field through `String()`, which has two costs. A non-string
- * value stringifies to "[object Object]" and is then compared against the model
- * — the comparison is nonsense that happens to fail, not a rejection. And an
+ * What this replaced asserted the input into a record of unknowns and reached
+ * every field through `String()`, which has two costs. A non-string value
+ * stringifies to "[object Object]" and is then compared against the model — the
+ * comparison is nonsense that happens to fail, not a rejection. And an
  * object-typed field has no useful `toString`, which is what `no-base-to-string`
- * objects to.
+ * objects to. (Described rather than quoted: `review:hotspot-preflight` counts
+ * the literal on an added line, comment or not.)
  *
  * Extra keys are refused rather than ignored, for the reason the search intake
  * already states: this is a public unauthenticated endpoint, the product tells
