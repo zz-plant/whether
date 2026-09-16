@@ -156,6 +156,11 @@ function hasPathFilter(args) {
  *
  * So the gate excludes this directory and says so. Nothing is skipped or
  * quarantined — the suite still runs everywhere a contributor runs tests.
+ *
+ * The directory is empty as of 2026-09-16: its one suite drove an operator
+ * feedback script that nothing in the product read. The guard stays for the next
+ * one, and now prints only when it actually excluded something — "excluding 0
+ * test file(s)" in a deploy log reads like a suite was skipped.
  */
 const TOOL_TEST_DIRECTORY = path.join(TEST_ROOT, 'tools');
 
@@ -192,11 +197,13 @@ if (excludeToolTests) {
   const kept = allTests.filter((file) => !file.startsWith(`${TOOL_TEST_DIRECTORY}${path.sep}`));
   const excluded = allTests.length - kept.length;
 
-  console.log(
-    `[test-runner] deploy gate: excluding ${excluded} test file(s) under tests/tools/ ` +
-      `(they drive external interpreters the build image does not guarantee). ` +
-      `They still run on bun run test, bun run check, and pre-push.`,
-  );
+  if (excluded > 0) {
+    console.log(
+      `[test-runner] deploy gate: excluding ${excluded} test file(s) under tests/tools/ ` +
+        `(they drive external interpreters the build image does not guarantee). ` +
+        `They still run on bun run test, bun run check, and pre-push.`,
+    );
+  }
 
   defaultTargets = kept.map((file) => path.relative(process.cwd(), file));
 }
