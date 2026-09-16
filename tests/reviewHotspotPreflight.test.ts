@@ -51,11 +51,15 @@ describe("isUnsafeAssertion", () => {
     assert.equal(isUnsafeAssertion('  const modes = ["auto", "tv"] as const;'), false);
   });
 
-  it("allows import aliases", () => {
+  it("allows import aliases, renamed or namespaced", () => {
     assert.equal(
       isUnsafeAssertion('import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";'),
       false,
     );
+    /* The namespace form carries the same `as Name` tokens and overrides nothing.
+       It was refused until a test needed one to spread the real `next/navigation`
+       over a mock, and the gate then failed on an import. */
+    assert.equal(isUnsafeAssertion('import * as nextNavigation from "next/navigation";'), false);
   });
 
   it("ignores English prose, quoted or not", () => {

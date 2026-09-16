@@ -143,8 +143,13 @@ export function isUnsafeAssertion(code) {
     .replace(/"(?:[^"\\]|\\.)*"/g, '""');
 
   // Import renaming uses the same `as Name` tokens as a type assertion, but it does
-  // not override or narrow a runtime value.
-  if (/^\s*import\s+\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}\s+from\b/.test(withoutStrings)) {
+  // not override or narrow a runtime value. Both forms: the named rename, and the
+  // namespace import — `import * as nextNavigation from "next/navigation"`, which
+  // this refused until a test needed one to spread the real module over a mock.
+  if (
+    /^\s*import\s+\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}\s+from\b/.test(withoutStrings) ||
+    /^\s*import\s+\*\s+as\s+[A-Za-z_$][\w$]*\s+from\b/.test(withoutStrings)
+  ) {
     return false;
   }
 

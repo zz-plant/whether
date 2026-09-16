@@ -399,6 +399,26 @@ A test about writes has to serve its own upstreams (see `readWithStore` in
 each test must remember: the suite runs offline (see "The suite runs offline" above), so the
 container and a sandboxed session now see the same upstreams — none — unless a test serves its own.
 
+**A `mock.module` stub must be a superset of the module it replaces (2026-09-16).** Ten suites patch
+`next/navigation`, and every one of them listed the three or four exports it happened to need. The
+patch is process-wide, so what each of them actually installed was a `next/navigation` with *only*
+those exports, for every file in the run. Three suites reach `permanentRedirect` through a route and
+failed to link — `SyntaxError: Export named 'permanentRedirect' not found` — in whichever shuffled
+orders put a stub first. It reproduced in roughly one shuffled run in four and never once in file
+order, which is the shape of this hazard every time it appears here. Spread the real module and
+override only what the test needs:
+
+```ts
+import * as nextNavigation from "next/navigation";
+mockAny.module("next/navigation", () => ({ ...nextNavigation, useRouter: () => ({ … }) }));
+```
+
+The two files that render a *route* were fixed this way (`toolkitHowToAnchors`,
+`answerPageReaderCopy`) and eight shuffled runs went green; the eight component suites still list
+their three exports and have not been observed to trigger it, because they never dynamically import
+a route. Keeping the real `notFound` has a second benefit: `resourceArticleRoutes.test.ts` asserts
+against what Next actually throws instead of against a stub written in another file.
+
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
 
@@ -465,6 +485,49 @@ the site.
 
 Two files were converted on 2026-09-16 under this rule; the remaining source reads were checked
 against it and left.
+
+## Who the copy is written for (2026-09-16)
+
+Four surfaces were addressed to the wrong reader, all in the same way: they rendered a fact about
+*how the product works* to someone who can only act on facts about their own decision.
+
+- **The programmatic pages published the indexation decision.** Two of the three printed the word
+  "noindex" into the page, and all three joined `noindexReasons` — the quality gate's own
+  identifiers — into the sentence. Someone searching a hiring question could land on an amber box
+  reading "Degraded data mode: cluster-duplicate-no-distinct-datapoint-or-interpretation; this
+  answer is marked noindex." Whether a page is indexed is a fact about a crawler; the gate ids are a
+  fact about our own editorial bar. `lib/report/dataCurrencyNotice.ts` now splits the reasons: the
+  four that mean the reading is not current become one sentence in the reader's terms, and the rest
+  — thin section, duplicate cluster, missing copy button — render nothing at all, because a warning
+  about data that is fine is the one that teaches a reader to ignore the next one. It takes the
+  reasons rather than `degraded`, which is true whenever *any* gate fails.
+- **`/trust`'s "Scheduled runs" panel was written for whoever maintains the pipeline**, on the page
+  the IA points a reader to "when you want to sanity-check the brief before a big decision". It
+  named the Worker and its crons, printed the read failure's internal reason, and rendered a raw
+  error message under a column header promising a time. The column is a timestamp now
+  (`lastFailedAt`), and the message stays in the model for whoever reads logs.
+- **The cold-traffic corpus dropped the plain-language layer.** `GlossaryLink`, `SignalScaleNote`
+  and `PlainEnglishScoreNote` were used on the home hero, `/signals` and `/trust` — the three pages
+  a *returning* reader already knows their way around — and on none of the eleven answer pages or
+  the scenario pages, which printed "current tightness: 79 / 100" to first-time visitors under a
+  name no other surface uses for that score. The FAQ answer, which is the text a rich result shows,
+  carried the same bare comparison.
+- **The weekly email said "vs the regime line".** True, after the fix that replaced "vs last week",
+  and still the engine's name for a threshold. It reads "9 pts above the line that changes the call"
+  now, with the worse side folded into the model rather than re-derived in the renderer by checking
+  whether a formatted string starts with a plus — the two lines face opposite ways.
+
+The rule this leaves: **reader-facing copy carries no crawler, engine or infrastructure
+vocabulary**, and where a label means the same thing on more than one surface it belongs in
+`lib/report/` rather than being reworded per component (`lib/report/AGENTS.md` already says so).
+Three tests hold it, each rendering the thing it judges rather than reading its source:
+`tests/answerPageReaderCopy.test.tsx` renders all eleven answer pages and fails on
+`/tightness|noindex|riskAppetite/`, `tests/runHistoryPanelCopy.test.tsx` renders every state the
+panel has and fails on `/worker|cron|telemetry|binding|dataset/`, and
+`tests/dataCurrencyNotice.test.ts` drives the real gate and asserts no reason id it produces can
+reach a rendered sentence. The answer pages render offline because `loadWeeklyBriefSnapshot` falls
+back to the bundled snapshot — which is worth knowing generally: **a page that reads through a
+loader that degrades gracefully is testable here**, unlike one that suspends at a data boundary.
 
 ## Regime scoring: what the numbers do and do not claim
 

@@ -2,26 +2,28 @@ import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { z } from "zod";
+import * as nextNavigation from "next/navigation";
 
 import { buildToolkitHowTo } from "../lib/seo/pageStructuredData";
 import { findToolkitDefinition } from "../lib/decisionDomainCatalog";
 
 const mockAny: any = mock;
 
-/* The page reaches `notFound` and the router through next/navigation, and
-   renderToStaticMarkup mounts neither. Installed here so this file answers for
-   its own dependencies rather than passing on another suite's ordering luck —
-   the reason decisionHeroSignalBreakdown gives for doing the same. */
+/* The page reaches the router through next/navigation, and renderToStaticMarkup
+   mounts none. Installed here so this file answers for its own dependencies
+   rather than passing on another suite's ordering luck — the reason
+   decisionHeroSignalBreakdown gives for doing the same.
+
+   Spread rather than replaced. `mock.module` patches the registry process-wide,
+   and this listed four exports, so every other file in the run got a
+   `next/navigation` holding only those four: three suites that reach
+   `permanentRedirect` through a route then failed to link, in whichever shuffled
+   orders put this file first. A stub narrower than the module it stands in for
+   is a decision about every other file in the run. Keeping the real `notFound`
+   also means `resourceArticleRoutes.test.ts` asserts against what Next throws
+   rather than against a stub written here. */
 mockAny.module("next/navigation", () => ({
-  /* `mock.module` patches the registry process-wide, so this stub is the one
-     `resourceArticleRoutes.test.ts` gets too — and that file asserts on the
-     message Next throws. Matching it keeps this file from deciding another
-     file's result, which is the hazard, met for the third time today. */
-  notFound: () => {
-    throw new Error("NEXT_NOT_FOUND");
-  },
-  usePathname: () => "/",
-  useSearchParams: () => new URLSearchParams(),
+  ...nextNavigation,
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
 }));
 
