@@ -6,12 +6,18 @@ import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayload
 import { shouldNoindexPayload } from "../../../../lib/seo/freshnessIndexation";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
+import {
+  DATA_CURRENCY_ACTION,
+  DATA_CURRENCY_ACTION_HREF,
+  buildDataCurrencyNotice,
+} from "../../../../lib/report/dataCurrencyNotice";
 import { DECISION_CONTRACT_LABELS } from "../../../../lib/report/reportCopy";
 import { findSignalsCluster } from "../../clusterRoutes";
 import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClusters";
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { ReportCta } from "../../../components/reportCta";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
+import { GlossaryLink } from "../../../components/ui/plainLanguage";
 
 const signalScenarioIntentBySlug = {
   hiring: "cfo",
@@ -128,6 +134,8 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
     scenarioTitle: scenario.title,
     payload,
   });
+  /* The indexation decision is not the reader's to act on; the age of the reading is. */
+  const dataCurrency = buildDataCurrencyNotice(payload.noindexReasons);
 
   return (
     <ContentPageShell
@@ -145,9 +153,12 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
             Trust: {payload.trustSummary}
           </span>
         </div>
-        {payload.noindex ? (
+        {dataCurrency ? (
           <p className="rounded-md border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
-            This page is currently excluded from indexing until freshness and provenance recover. Reasons: {(payload.noindexReasons ?? []).join(", ")}.
+            {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
+            <Link href={DATA_CURRENCY_ACTION_HREF} className="underline decoration-amber-300/60 underline-offset-4">
+              Source dates
+            </Link>
           </p>
         ) : null}
       </section>
@@ -159,6 +170,12 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {payload.triggerThreshold}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {payload.reversalCondition}</li>
         </ul>
+        {/* These rails are stated in score points, on a page most readers reach cold
+            from a search result. The glossary is one click from every other surface
+            that prints a score, and was one click from none of these. */}
+        <p className="text-fluid-nano text-white/45">
+          <GlossaryLink>What these terms mean</GlossaryLink>
+        </p>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Trust and evidence</h2>
