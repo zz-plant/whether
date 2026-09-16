@@ -220,6 +220,22 @@ merges it over the bundled snapshot, so the month rail stays current between dep
 history routine still regenerates the canonical month-end series and the archive the scripts own —
 it is the rebuild, not the critical path.
 
+**The freeze Workflow now reports its own outcome (2026-09-16).** The Monday cron logged a
+`cron-step` row the moment `create()` resolved — before the freeze had read anything — and the
+Workflow itself wrote nothing at all. So `/trust` showed a green Monday row whether the week was
+frozen, refused as stale, or retried for five hours and gave up, and the only signal that anything
+was wrong was `data/published_briefs.json` sitting at one week. There are two rows now:
+`brief-freeze-start` (the cron handed it over) and `brief-freeze` (what the Workflow did). A step
+that reports success for work it did not observe is worse than one that reports nothing, because it
+gets read as evidence.
+
+**Still gated to preview.** Promoting it needs `WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in
+`wrangler.toml`'s top-level `[vars]`, and `GITHUB_TOKEN` set on the production lane. The argument
+for not waiting on the preview trial: the archive is deliberately never backfilled, so every week
+spent proving this is a week the record can never honestly claim, and the failure modes are bounded
+— a bad run throws, opens no pull request, and now writes a failing row; `assembleCurrentWeekBrief`
+refuses degraded and fallback data outright; and nothing merges the pull request without a person.
+
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
 same from the repo. Every one of these jobs previously failed at its PR step while reporting green,

@@ -39,7 +39,11 @@ const CRON_STEP_LABELS: Record<string, string> = {
   "check-regime-change": "Regime-change check",
   "alert-deliveries": "Alert deliveries",
   "regime-history-workflow": "Regime history pull request",
-  "brief-freeze-workflow": "Brief freeze pull request",
+  /* Two rows, because they answer different questions. The `-start` row is green
+     the moment the cron hands the workflow to Cloudflare; the other is written by
+     the workflow itself and is the one that knows whether the week was frozen. */
+  "brief-freeze-start": "Brief freeze started",
+  "brief-freeze": "Brief freeze outcome",
 };
 
 type CronStepSummary = {

@@ -177,7 +177,10 @@ export default {
        every one of its runs failed at the egress proxy before reaching FRED. */
     if (!isDailyIngestion && env.WHETHER_BRIEF_FREEZE_WORKFLOW === "1" && env.BRIEF_FREEZE_WORKFLOW) {
       const workflow = env.BRIEF_FREEZE_WORKFLOW;
-      await runCronStep("brief-freeze-workflow", async () => {
+      /* Named for what it measures: handing the workflow to Cloudflare. Whether the
+         week was actually frozen is a separate `brief-freeze` row the workflow
+         writes itself, because this one is green the moment `create()` resolves. */
+      await runCronStep("brief-freeze-start", async () => {
         await workflow.create({ id: `brief-freeze-${new Date().toISOString().slice(0, 10)}`, params: { base: "main" } });
         return { ok: true };
       });
