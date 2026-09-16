@@ -13,12 +13,6 @@ export const DIRECTION_LABEL: Record<SignalDirection, string> = {
 export const CONFIDENCE_COLOR = (label: string) =>
   label === "HIGH" ? "text-emerald-300" : label === "MED" ? "text-amber-300" : "text-rose-300";
 
-export const RELIABILITY_COLOR = (score: number) =>
-  score >= 80 ? "text-emerald-300" : score >= 60 ? "text-amber-300" : "text-rose-300";
-
-export const RELIABILITY_BAR = (score: number) =>
-  score >= 80 ? "bg-emerald-400" : score >= 60 ? "bg-amber-400" : "bg-rose-400";
-
 // Record<string, string> lets consumers index dictionary keys at call sites.
 // satisfies checks that all RegimeKey values have entries — remove a regime, get a compile error.
 export const REGIME_DESCRIPTOR: Record<string, string> = {
@@ -41,20 +35,19 @@ export const formatBoldnessDeltaLabel = (delta: number) => {
   return `${sign}${delta.toFixed(0)} vs last week`;
 };
 
-export const computeReliabilityScore = ({
-  confidenceLabel,
-  showOfflineBadge,
-  degradedCount,
-}: {
-  confidenceLabel: string;
-  showOfflineBadge?: boolean;
-  degradedCount: number;
-}) => {
-  const c = confidenceLabel === "HIGH" ? 90 : confidenceLabel === "MED" ? 60 : 30;
-  const f = showOfflineBadge ? 50 : 100;
-  const t = Math.max(degradedCount + 3, 4);
-  return Math.round((c + f + Math.round(((t - degradedCount) / t) * 100)) / 3);
-};
+/*
+ * `computeReliabilityScore` lived here, with a colour and a bar to render it in
+ * three bands. It averaged three invented numbers — confidence as 90/60/30, an
+ * offline flag as 100/50, and a degraded-source ratio over `max(degraded + 3, 4)`,
+ * where the 3 was justified nowhere — into a 0-100 "reliability" figure.
+ *
+ * Nothing ever rendered it, which was lucky: its own tests pinned MED at 87 and
+ * LOW at 77 with every source healthy, against bands calling 80 green and 60
+ * amber. So the entire confidence range landed between 77 and 97, LOW read amber
+ * and MED read green, and the number looked measured while discriminating almost
+ * nothing. Deleted rather than recalibrated — the site already publishes a
+ * confidence label and, since the archive study, the record behind it.
+ */
 
 type V2HeroSignalData = {
   baseRate?: number | null;

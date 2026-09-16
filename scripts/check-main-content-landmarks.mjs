@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Fails the build when a route does not own exactly one `<main id="main-content">`.
+ * Fails the build when a route does not own exactly one `<main id="main-content">`,
+ * or links to an `#anchor` that no audited route renders.
  *
  * The skip link is the only way a keyboard or screen-reader user gets past the
  * nav, and it is a single anchor pointed at a single id — so a duplicated,
@@ -24,6 +25,7 @@ import { availableParallelism } from "node:os";
 import {
   auditMainContentRoutes,
   collectMainContentRouteSamples,
+  collectUnresolvedAnchors,
 } from "./main-content-landmarks.mjs";
 import { withDevServer } from "./dev-server.lib.mjs";
 
@@ -63,9 +65,24 @@ const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", inDeployGate ? "1
  */
 const defaultConcurrency = Math.min(8, Math.max(4, availableParallelism() * 2));
 const concurrency = Number.parseInt(readArgValue("--concurrency", String(defaultConcurrency)), 10);
-// Separate from --timeout-ms, which bounds dev-server readiness rather than a
-// single route. Tunable so a slow container can be given room without editing code.
-const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", inDeployGate ? "60000" : "30000"), 10);
+/*
+ * Separate from --timeout-ms, which bounds dev-server readiness rather than a
+ * single route. Tunable so a slow container can be given room without editing code.
+ *
+ * The deploy-gate bound went 60s -> 120s on 2026-09-17, measured rather than
+ * guessed. The gate starts its own dev server, so every route compiles from
+ * cold, and the two heaviest — /share and /trust — do not answer inside 60s on
+ * a loaded box: a cold run against `origin/main`, with none of that day's
+ * changes in it, reported exactly those two as "never answered" and went green
+ * at 150s. So this was not a property of any one branch, it was a bound set
+ * below what a cold compile of the slowest routes costs, and it read as an
+ * unexplained red build because the audit's own log is not reachable from a
+ * sandbox.
+ *
+ * A hung route still fails the gate. This widens the bound, not the meaning:
+ * "never answered" has to mean the route is broken, not that it was compiling.
+ */
+const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", inDeployGate ? "120000" : "30000"), 10);
 
 if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
   console.error("`--timeout-ms` must be a positive integer.");
@@ -118,11 +135,29 @@ const reportResults = (results) => {
   const timedOut = results.filter((result) => result.timedOut);
   const violations = results.filter((result) => !result.ok && !result.unauditable && !result.timedOut);
   const audited = results.length - unauditable.length - timedOut.length;
+  /*
+   * Judged across every route that rendered, never per page. Whether a given
+   * section is on screen depends on the data a route got — figures entered, a
+   * degraded banner, a live upstream — so "this page links to an id it is not
+   * currently showing" is a claim about the data, and would go red in a
+   * container whose log cannot be read from here. "No page in the app renders
+   * this id" is a claim about the code, and is what the four found by hand had
+   * in common.
+   */
+  const auditedResults = results.filter((result) => !result.unauditable && !result.timedOut);
+  const unresolvedAnchors = collectUnresolvedAnchors(auditedResults);
 
   for (const violation of violations) {
     console.error(`\n✗ ${violation.route}  (${violation.finalUrl})`);
     for (const issue of violation.issues) {
       console.error(`    ${issue}`);
+    }
+  }
+
+  for (const entry of unresolvedAnchors) {
+    console.error(`\n✗ ${entry.route}`);
+    for (const anchor of entry.missing) {
+      console.error(`    Links to #${anchor}, which no audited route renders.`);
     }
   }
 
@@ -154,17 +189,17 @@ const reportResults = (results) => {
     return 1;
   }
 
-  if (violations.length > 0) {
+  if (violations.length > 0 || unresolvedAnchors.length > 0) {
     console.error(
-      `\n${violations.length} of ${audited} rendered routes have main-landmark problems.`,
+      `\n${violations.length} landmark problem(s) and ${unresolvedAnchors.length} route(s) linking to an id no page renders, across ${audited} rendered routes.`,
     );
     console.error(
-      'Each route needs exactly one <main id="main-content">, and exactly one link to it.',
+      'Each route needs exactly one <main id="main-content"> with exactly one link to it, and every #anchor it links to must exist on some page.',
     );
     return 1;
   }
 
-  console.log(`\n✅ ${audited} rendered routes each own one <main id="main-content">`);
+  console.log(`\n✅ ${audited} rendered routes own one <main id="main-content">, and every #anchor they link to exists`);
   return 0;
 };
 

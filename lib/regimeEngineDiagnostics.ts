@@ -254,9 +254,9 @@ export const computeDiagnostics = (
    */
   hasImputedInputs = false,
 ): RegimeDiagnostics => {
-  const tightnessDelta = Math.round(tightness - thresholds.tightnessRegime);
-  const riskAppetiteDelta = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
-  const nearestThresholdDelta = Math.min(Math.abs(tightnessDelta), Math.abs(riskAppetiteDelta));
+  const tightnessVsThreshold = Math.round(tightness - thresholds.tightnessRegime);
+  const riskAppetiteVsThreshold = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
+  const nearestThresholdDelta = Math.min(Math.abs(tightnessVsThreshold), Math.abs(riskAppetiteVsThreshold));
   const confidence: RegimeDiagnostics["confidence"] = hasImputedInputs
     ? "LOW"
     : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
@@ -273,8 +273,8 @@ export const computeDiagnostics = (
         : "MILD";
 
   return {
-    tightnessDelta,
-    riskAppetiteDelta,
+    tightnessVsThreshold,
+    riskAppetiteVsThreshold,
     nearestThresholdDelta,
     confidence,
     transitionWatch,

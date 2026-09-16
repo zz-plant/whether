@@ -64,8 +64,16 @@ export type RegimeSignalInfluence = {
 export type RegimeTrend = "IMPROVING" | "DETERIORATING" | "MIXED" | "STABLE";
 
 export type RegimeDiagnostics = {
-  tightnessDelta: number;
-  riskAppetiteDelta: number;
+  /*
+   * Distance from the regime threshold, in score points — NOT a change since
+   * last week. They were called `tightnessDelta` and `riskAppetiteDelta`, and
+   * `getRegimeProjection` already carried a comment warning callers not to pass
+   * them where a week-over-week velocity was wanted. Two later call sites did
+   * exactly that anyway and published the result as "vs last week", which is
+   * what a name has to prevent rather than a comment three files away.
+   */
+  tightnessVsThreshold: number;
+  riskAppetiteVsThreshold: number;
   nearestThresholdDelta: number;
   confidence: "LOW" | "MEDIUM" | "HIGH";
   transitionWatch: boolean;

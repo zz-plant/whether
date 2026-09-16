@@ -1,4 +1,3 @@
-import { formatSignedDeltaOrNull } from "../formatters";
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
 import { unsubscribeFooterHtml, unsubscribeFooterText } from "../alert/alertTemplates";
 import type { OperatingSnapshot } from "../operatingState/types";
@@ -7,28 +6,82 @@ import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel } from "../regimePresentation";
 
-const formatDelta = formatSignedDeltaOrNull;
+/**
+ * How far a reading sits from the line that would change the call, and which
+ * side of it.
+ *
+ * The label above this number said "vs last week", which it never was, and the
+ * fix for that made it "vs the regime line" — true, and still not the language
+ * of the person reading it in an inbox. "The regime line" is the engine's name
+ * for a threshold, and a bare "+9.0" leaves a reader to work out on their own
+ * which direction is the bad one. Same number, said the way a recipient would
+ * say it, with the side folded into the model rather than re-derived in the
+ * renderer by checking whether the string starts with a plus.
+ */
+const distanceFromLine = (
+  vsThreshold: number | null | undefined,
+  worseSide: "above" | "below",
+): { label: string; worse: boolean } | null => {
+  if (typeof vsThreshold !== "number" || !Number.isFinite(vsThreshold)) return null;
+
+  const points = Math.round(Math.abs(vsThreshold) * 10) / 10;
+  if (points === 0) return { label: "sitting on the line that changes the call", worse: true };
+
+  const side = vsThreshold > 0 ? "above" : "below";
+  return { label: `${points} pts ${side} the line that changes the call`, worse: side === worseSide };
+};
 
 /**
  * The numbers the call was scored on, as one row.
  *
  * This is the highest-fanout artifact the product sends and it used to carry
- * no number at all — four sentences and a link. The scores, their weekly
- * deltas and the confidence label are what a reader forwards.
+ * no number at all — four sentences and a link. The scores, where they sit
+ * against the regime line, and the confidence label are what a reader forwards.
+ *
+ * The second number is a distance from the threshold, and this said "vs last
+ * week" under it for as long as it has carried numbers. It never was a weekly
+ * move: two identical weeks reported the same non-zero figure, because the
+ * figure is how far the score sits above or below the line. The snapshot this
+ * reads has no previous week in it, so the honest fix is the label — the
+ * published archive, which does have one, now carries the real move instead.
  */
-export const buildWeeklyEmailReadings = (snapshot: OperatingSnapshot | undefined) => {
+/* Exactly the fields the readings row reads. A full `OperatingSnapshot` is
+   assignable, and a test can build these five without asserting its way past
+   the thirty it does not touch. */
+type WeeklyEmailReadingSource = {
+  assessment: {
+    scores: Pick<OperatingSnapshot["assessment"]["scores"], "tightness" | "riskAppetite">;
+    diagnostics: Pick<
+      OperatingSnapshot["assessment"]["diagnostics"],
+      "tightnessVsThreshold" | "riskAppetiteVsThreshold" | "confidence"
+    >;
+  };
+};
+
+export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | undefined) => {
   if (!snapshot) return [];
   const { scores, diagnostics } = snapshot.assessment;
   const confidence = diagnostics.confidence === "MEDIUM" ? "MED" : diagnostics.confidence;
   return [
-    { label: "Funding pressure", value: `${scores.tightness}/100`, delta: formatDelta(diagnostics.tightnessDelta), worseWhenUp: true },
-    { label: "Risk appetite", value: `${scores.riskAppetite}/100`, delta: formatDelta(diagnostics.riskAppetiteDelta), worseWhenUp: false },
-    { label: "Confidence", value: confidence, delta: null, worseWhenUp: false },
+    {
+      label: "Funding pressure",
+      value: `${scores.tightness}/100`,
+      /* Above the line is the tighter regime, so above is the worse side here. */
+      distance: distanceFromLine(diagnostics.tightnessVsThreshold, "above"),
+    },
+    {
+      label: "Risk appetite",
+      value: `${scores.riskAppetite}/100`,
+      /* The risk line is a floor: below it is risk-off. */
+      distance: distanceFromLine(diagnostics.riskAppetiteVsThreshold, "below"),
+    },
+    { label: "Confidence", value: confidence, distance: null },
   ];
 };
 
-const readingsText = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
-  readings.map((reading) => `${reading.label}: ${reading.value}${reading.delta ? ` (${reading.delta} vs last week)` : ""}`);
+/** One line per reading, as the plain-text email renders it. Exported so a test reads the line rather than the fields behind it. */
+export const readingsText = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
+  readings.map((reading) => `${reading.label}: ${reading.value}${reading.distance ? ` (${reading.distance.label})` : ""}`);
 
 const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
   readings.length === 0
@@ -36,13 +89,12 @@ const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
     : [
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         ...readings.map((reading) => {
-          const up = reading.delta?.startsWith("+");
-          const deltaColor = reading.delta ? (up === reading.worseWhenUp ? "#f59e0b" : "#10b981") : "#64748b";
+          const deltaColor = reading.distance ? (reading.distance.worse ? "#f59e0b" : "#10b981") : "#64748b";
           return [
             `<td style="padding:12px 16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;vertical-align:top;">`,
             `<p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 4px;">${reading.label}</p>`,
             `<p style="font-size:1.25rem;font-weight:600;margin:0;color:#f1f5f9;font-variant-numeric:tabular-nums;">${reading.value}</p>`,
-            reading.delta ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.delta} vs last week</p>` : "",
+            reading.distance ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.distance.label}</p>` : "",
             `</td>`,
           ].join("");
         }),

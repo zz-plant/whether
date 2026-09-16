@@ -13,7 +13,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run test` | ~14s | 1,180+ tests / 211 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
-| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
+| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
@@ -56,8 +56,28 @@ deploys every push, which is the only remote gate left.
   global `RequestInit` with `next`, so the whole expression collapses to `...init?.next` and the
   cast goes with the fallback.
 
-  **Only `react/set-state-in-effect` (26) and `react/no-danger` (12) are still off**, and both
-  want judgement per site rather than a codemod.
+  **`react/no-danger` is enforced from 2026-09-16.** All fourteen findings were
+  `<script>` tags holding JSON — structured data, and one JSON island the page reads back — which
+  is the case the rule cannot tell from an HTML injection and the one React offers no other API
+  for. They are now a single `app/components/jsonLdScript.tsx`, so a rule disabled across the whole
+  repo became a disable on one line someone has read. The suppression census records that trade
+  (lint suppressions 7 -> 8, disabled rules 2 -> 1) with the argument in the baseline. It also
+  tightened one thing: every payload goes through `serializeJsonLd`, and `briefArtifactScript` had
+  been escaping only `<`, so a line separator in any string it carried was a parse error in the
+  embedded JSON.
+
+  **Only `react/set-state-in-effect` is still off**, with 22 findings across 19 files, and they are
+  not one problem:
+
+  | Shape | Roughly | What it needs |
+  | --- | --- | --- |
+  | Reads a browser-only source on mount (localStorage, a cookie, a DOM island, a generated client id) | half | `useSyncExternalStore`, not deletion — the read genuinely cannot happen during SSR |
+  | Mirrors a prop into state | 3 | The real anti-pattern: compute during render, or key the component |
+  | Animation and reset-on-condition | the rest | Per-site judgement |
+
+  Enforcing it means changing the hydration behaviour of nineteen client components, and nothing in
+  this suite exercises a client effect, so it is scoped work rather than a codemod. The
+  classification is here so the next pass is bounded rather than rediscovered.
 
   Two rules are enforced everywhere except a named set of files, which the suppression census
   counts rather than treating as configuration:
@@ -112,9 +132,41 @@ deploys every push, which is the only remote gate left.
   is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
   and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
   by design (`requireCompleteTree`): a two-file tree is what they measure.
-- **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
+
+  **It now counts orphaned data files too, and a test does not count there (2026-09-16).** A JSON
+  file declares no exports, so the export census cannot see it: a dataset every consumer was
+  deleted from scores zero findings and goes on looking like part of the product.
+  `censusOrphanedDataFiles` walks `data/` and `content/` and matches each filename, with and without
+  its extension, against every reference root *except* `tests/` — plus `docs/`, because a dataset a
+  runbook names by filename has a consumer, it is just not a compiler. Excluding tests is the whole
+  reason it finds anything: `data/` is what the product ships and reads, so a file there whose only
+  reader is a suite is not product data. A genuine fixture belongs in `tests/fixtures/`, where this
+  scan never looks.
+
+  **And modules only a test imports (2026-09-17).** `censusTestOnlyModules` is the third scan, and
+  it closes the hole the export half leaves open on purpose. A helper used inside its own module and
+  exported for a test is a legitimate seam — this repo has around two hundred — so the symbol level
+  cannot tell a seam from a feature. The *module* level can: `driverDecisionViews.ts` has four
+  exports only its test names and is imported by the homepage, so it passes, while a module no
+  shipping file imports at all is a feature built, tested, and reachable by nobody. Import
+  specifiers are resolved to paths rather than matched by filename, `scripts/` counts as a consumer
+  (a CLI is one), and the files Next.js loads by convention are exempt.
+- **`lint:types` is enforced (2026-09-16), on pre-push and `bun run check`.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
-  type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared
+  type-constituent rules.
+
+  Promoting it is what found the two findings it had drifted to, both in code written the day
+  before: `tests/analyticsQuery.test.ts` had `String(url)` on a `RequestInfo | URL`, the exact trap
+  the burn-down below cleared from eight test files, and `lib/contentMeasurement.ts` reached every
+  field of a public intake through `String()` on an `unknown`. That is the argument for the
+  promotion in one line — advisory means nobody runs it, and ten days of "reports zero" was ten
+  days of nobody running it. The content guard is a `z.strictObject` now, like the search intake
+  beside it, so extra keys on that endpoint are refused rather than ignored.
+
+  **Not in the deploy gate.** It reads the type graph, so it is the slowest task in the list, and
+  the reproducibility note below still stands. A check that might flake belongs where a person is
+  standing next to it, not in the one place whose log is hard to read — the lesson `run-checks.mjs`
+  paid for on 2026-09-15. The 28 pre-existing findings were burned down on 2026-09-06: a shared
   `tests/fixtures/requestTarget.ts` replaced `String(input)` on a `RequestInfo | URL` in eight test
   files (a `Request` there compares as "[object Object]"), deliberate fire-and-forget promises took
   `void`, `RegimeKey | string` unions collapsed to `string`, `premiumFunnel` rejects a non-string
@@ -166,6 +218,24 @@ deploys every push, which is the only remote gate left.
   `docs/cloudflare-deployment-runbook.md` ("Secrets", "Trial infrastructure") and
   `docs/agents/data-and-platform.md`.
 
+- **A telemetry stream needs a producer, and the public intake validates what it accepts
+  (2026-09-16).** `regime-transition` and `degraded-state` were declared in `TelemetryStream` and
+  listed in the intake's accepted set, and nothing in `app/`, `lib/` or `worker/` had ever written
+  either one — so the only way a row reached them was a POST from outside, and no reader would have
+  looked. Both are gone, and `tests/telemetryStreamReachability.test.ts` fails if a stream is
+  declared without a producer.
+
+  The larger finding was next to them. The intake checked its ten accepted names against a chain of
+  `if`s, and **five of the ten had no validator in that chain**, so they were written through
+  unexamined. Two of those five are Worker-authored (`ingest-pipeline`, `cron-step`) and one of
+  those two is read back and rendered on `/trust` as "Scheduled runs" — anyone could have posted a
+  run that never happened onto the page whose job is to be trustworthy. A third, `premium-funnel`,
+  has its own route with a body cap and a validator, which shadows the dynamic one anyway, so its
+  entry there was a weaker door Next never opened. The accepted set is now the keys of
+  `STREAM_VALIDATORS`: a stream with no validator cannot be posted, and adding one without a
+  validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
+  derived from it and the census script reading it.
+
 ### Scheduled automation
 
 The recurring data jobs run as scheduled Claude Code routines, not GitHub Actions. Each one runs
@@ -188,6 +258,22 @@ in progress to KV on every run (`lib/summary/refreshMonthlyRegimeHistory.ts`), a
 merges it over the bundled snapshot, so the month rail stays current between deploys. The regime
 history routine still regenerates the canonical month-end series and the archive the scripts own —
 it is the rebuild, not the critical path.
+
+**The freeze Workflow now reports its own outcome (2026-09-16).** The Monday cron logged a
+`cron-step` row the moment `create()` resolved — before the freeze had read anything — and the
+Workflow itself wrote nothing at all. So `/trust` showed a green Monday row whether the week was
+frozen, refused as stale, or retried for five hours and gave up, and the only signal that anything
+was wrong was `data/published_briefs.json` sitting at one week. There are two rows now:
+`brief-freeze-start` (the cron handed it over) and `brief-freeze` (what the Workflow did). A step
+that reports success for work it did not observe is worse than one that reports nothing, because it
+gets read as evidence.
+
+**Still gated to preview.** Promoting it needs `WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in
+`wrangler.toml`'s top-level `[vars]`, and `GITHUB_TOKEN` set on the production lane. The argument
+for not waiting on the preview trial: the archive is deliberately never backfilled, so every week
+spent proving this is a week the record can never honestly claim, and the failure modes are bounded
+— a bad run throws, opens no pull request, and now writes a failing row; `assembleCurrentWeekBrief`
+refuses degraded and fallback data outright; and nothing merges the pull request without a person.
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
@@ -289,6 +375,18 @@ writing one. The record is refused for a dirty tree, for another commit, and aft
 every way it can go wrong costs a repeated run rather than a skipped gate. The build log says which
 way it went.
 
+**A bound set under the real cost manufactures the failure it claims to detect (2026-09-17).** The
+landmark audit's per-route bound was 60s in the deploy gate. The gate spawns its own dev server, so
+every route compiles from cold, and the two heaviest — `/share` and `/trust` — do not answer inside
+60s on a loaded box. Three builds failed with `2 route(s) never answered`, and the log saying so is
+only in the Cloudflare dashboard, so from a sandbox it read as an unexplained red build on whatever
+was pushed last. The bound is 120s now, measured rather than guessed: a cold run against
+`origin/main`, carrying none of that day's changes, reported exactly those two routes and went green
+at 150s. **When a check fails only where you cannot read it, reproduce the environment, not the
+diff** — here, `git archive` into a scratch directory with `node_modules` hardlinked, and
+`--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
+warm one. The bound is still a bound: a route that never answers fails the gate.
+
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
 - `run-checks.mjs` buffers each task's output until it exits, and had no per-task timeout, so one
@@ -332,6 +430,26 @@ A test about writes has to serve its own upstreams (see `readWithStore` in
 each test must remember: the suite runs offline (see "The suite runs offline" above), so the
 container and a sandboxed session now see the same upstreams — none — unless a test serves its own.
 
+**A `mock.module` stub must be a superset of the module it replaces (2026-09-16).** Ten suites patch
+`next/navigation`, and every one of them listed the three or four exports it happened to need. The
+patch is process-wide, so what each of them actually installed was a `next/navigation` with *only*
+those exports, for every file in the run. Three suites reach `permanentRedirect` through a route and
+failed to link — `SyntaxError: Export named 'permanentRedirect' not found` — in whichever shuffled
+orders put a stub first. It reproduced in roughly one shuffled run in four and never once in file
+order, which is the shape of this hazard every time it appears here. Spread the real module and
+override only what the test needs:
+
+```ts
+import * as nextNavigation from "next/navigation";
+mockAny.module("next/navigation", () => ({ ...nextNavigation, useRouter: () => ({ … }) }));
+```
+
+The two files that render a *route* were fixed this way (`toolkitHowToAnchors`,
+`answerPageReaderCopy`) and eight shuffled runs went green; the eight component suites still list
+their three exports and have not been observed to trigger it, because they never dynamically import
+a route. Keeping the real `notFound` has a second benefit: `resourceArticleRoutes.test.ts` asserts
+against what Next actually throws instead of against a stub written in another file.
+
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
 
@@ -369,29 +487,247 @@ recapture correctly.
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |
 
+## Tests that read source instead of behaviour
+
+22 of 276 test files match a regex against a file's source rather than asserting on what it does.
+That is not automatically wrong, and the split is sharp enough to state as a rule.
+
+**Legitimate, and most of them.** A `.husky` hook, a workflow YAML, `package.json`, `next.config.js`
+and a `scripts/*.mjs` are configuration: there is no behaviour to render, and the fact *is* the text.
+So is a module-level declaration a render cannot see — `"use client"`, `alternates.canonical`,
+`export const revalidate` — which `tests/crawlableRouteContract.test.ts` explains where it uses one.
+A third case is narrower and real: `tests/feedRoute.test.ts` reads its route to check no URL is
+hardcoded, which no rendered assertion can distinguish, because the hardcoded literal and the
+configured default are the same string.
+
+**The failure mode, when it is one.** A source regex breaks on a rename and passes on a regression.
+`tests/homePageHeading.test.tsx` carried the evidence in its own comment: one assertion "failed when
+the ternary became a `??`, with the rendered heading unchanged". A test that fails on a refactor and
+passes on a behaviour change is answering a different question from the one in its name.
+
+**The rule.** If the claim is about rendered output and the thing renders in this suite, render it.
+Pages and components do: `renderToStaticMarkup` works for a component, and for a page that reads no
+upstream (`tests/toolkitHowToAnchors.test.tsx` renders `/toolkits/[slug]` and checks the HowTo's
+`#step-N` fragments resolve to real anchors). A route handler is even easier — call it and parse the
+response, as the feed test does for everything except that one literal. What does **not** render here
+is a page behind the report read path: the suite serves no upstreams, so `app/page.tsx` suspends at
+its data boundary and streams a shell. Assertions about that route stay source-level and say so at
+the site.
+
+Two files were converted on 2026-09-16 under this rule; the remaining source reads were checked
+against it and left.
+
+## Who the copy is written for (2026-09-16)
+
+Four surfaces were addressed to the wrong reader, all in the same way: they rendered a fact about
+*how the product works* to someone who can only act on facts about their own decision.
+
+- **The programmatic pages published the indexation decision.** Two of the three printed the word
+  "noindex" into the page, and all three joined `noindexReasons` — the quality gate's own
+  identifiers — into the sentence. Someone searching a hiring question could land on an amber box
+  reading "Degraded data mode: cluster-duplicate-no-distinct-datapoint-or-interpretation; this
+  answer is marked noindex." Whether a page is indexed is a fact about a crawler; the gate ids are a
+  fact about our own editorial bar. `lib/report/dataCurrencyNotice.ts` now splits the reasons: the
+  four that mean the reading is not current become one sentence in the reader's terms, and the rest
+  — thin section, duplicate cluster, missing copy button — render nothing at all, because a warning
+  about data that is fine is the one that teaches a reader to ignore the next one. It takes the
+  reasons rather than `degraded`, which is true whenever *any* gate fails.
+- **`/trust`'s "Scheduled runs" panel was written for whoever maintains the pipeline**, on the page
+  the IA points a reader to "when you want to sanity-check the brief before a big decision". It
+  named the Worker and its crons, printed the read failure's internal reason, and rendered a raw
+  error message under a column header promising a time. The column is a timestamp now
+  (`lastFailedAt`), and the message stays in the model for whoever reads logs.
+- **The cold-traffic corpus dropped the plain-language layer.** `GlossaryLink`, `SignalScaleNote`
+  and `PlainEnglishScoreNote` were used on the home hero, `/signals` and `/trust` — the three pages
+  a *returning* reader already knows their way around — and on none of the eleven answer pages or
+  the scenario pages, which printed "current tightness: 79 / 100" to first-time visitors under a
+  name no other surface uses for that score. The FAQ answer, which is the text a rich result shows,
+  carried the same bare comparison.
+- **The weekly email said "vs the regime line".** True, after the fix that replaced "vs last week",
+  and still the engine's name for a threshold. It reads "9 pts above the line that changes the call"
+  now, with the worse side folded into the model rather than re-derived in the renderer by checking
+  whether a formatted string starts with a plus — the two lines face opposite ways.
+
+The rule this leaves: **reader-facing copy carries no crawler, engine or infrastructure
+vocabulary**, and where a label means the same thing on more than one surface it belongs in
+`lib/report/` rather than being reworded per component (`lib/report/AGENTS.md` already says so).
+Three tests hold it, each rendering the thing it judges rather than reading its source:
+`tests/answerPageReaderCopy.test.tsx` renders all eleven answer pages and fails on
+`/tightness|noindex|riskAppetite/`, `tests/runHistoryPanelCopy.test.tsx` renders every state the
+panel has and fails on `/worker|cron|telemetry|binding|dataset/`, and
+`tests/dataCurrencyNotice.test.ts` drives the real gate and asserts no reason id it produces can
+reach a rendered sentence. The answer pages render offline because `loadWeeklyBriefSnapshot` falls
+back to the bundled snapshot — which is worth knowing generally: **a page that reads through a
+loader that degrades gracefully is testable here**, unlike one that suspends at a data boundary.
+
+## Features that shipped without shipping (2026-09-16)
+
+Four things were built, tested, and reachable by nobody. They are worth naming together, because
+**one mechanism kept all four alive: every ratchet here counts a reference from anywhere, and a test
+counts.** An unshipped feature with a test is not a lint finding, not a type error, not a failing
+test and not a dead export. It is invisible to the whole gate.
+
+- **The first-time guide.** `FIRST_TIME_GUIDE_STEPS` (three steps, each with a worked example),
+  `FIRST_TIME_GUIDE_HIGHLIGHTS` and `FIRST_TIME_GUIDE_NEXT_LINKS` sat in `reportCopy.ts` with
+  `tests/reportCopy.test.ts` asserting there were exactly three steps and that each carried an
+  example — and asking nowhere whether a reader could see them. They render now, collapsed, inside
+  `FirstVisitExplainer`: that element is already the one thing on `/` addressed to someone who has
+  never seen the page, and its own comment records what it cost the last time that spot grew a
+  second block. Its first link pointed at `#executive-snapshot`, an id no page renders.
+- **`computeReliabilityScore`** averaged confidence as 90/60/30, an offline flag as 100/50, and a
+  degraded-source ratio over `max(degraded + 3, 4)` into a 0-100 figure with three colour bands.
+  Its own tests pinned MED at 87 and LOW at 77 with every source healthy, against bands calling 80
+  green and 60 amber — so the whole confidence range landed between 77 and 97, LOW read amber, MED
+  read green. Deleted, not recalibrated: the site publishes a confidence label and, since the
+  archive study, the record behind it.
+- **The operator feedback pipeline.** `scripts/ingest_operator_feedback.py` (545 lines, the only
+  Python here), `data/cohort_feedback.json` (31KB, eight named operators over six weeks), and a
+  suite in `tests/tools/` — the one directory the deploy gate drops. No npm script, no route, no
+  reader. It could not have been real: the published archive holds one week because the weekly
+  routine has never completed a good run, so a six-week feedback cadence never happened. A
+  committed file of named operators reads as evidence, which is why it went rather than stayed.
+- **`data/concept_conflicts.json`**, which principle wins under which regime — a good idea, wired to
+  nothing, referencing slugs no content carries and whose `/concepts` routes are in
+  `retiredSitemapPaths`.
+
+Also removed: the `ReturningVisitorDeltaStrip` fallback, whose default `impactLinks` and
+`openPanelHref` named four ids nothing renders. The one caller passes its own, so the defaults never
+shipped — dead anchors kept alive by never being reached. Both props are required now.
+
+`check:dead-exports` grew the data-file scan above as a result. The export half still counts tests,
+by design, so **this class can recur for code**: if you are adding a module whose only caller is its
+own test, you are adding one of these.
+
+### The rest of them (2026-09-17)
+
+The module census above found nine more, and the split it draws is the useful part: three modules
+`scripts/` imports (`answerLaunchReadiness`, `pageMetricsFromTelemetry`, `summaryArchive`) are alive
+— a CLI is a consumer — and nine had no consumer but their own test.
+
+- **`lib/export/issueTrackerBrief.ts` was wired up rather than deleted.** Its own doc comment says it
+  was extracted from `exportBriefPanel.tsx` so it could be tested; that panel was later deleted, and
+  the extraction survived it. It takes the same four arguments as the Slack brief, and `/share` is
+  the page that owns copy formats, so it is a fifth card there now.
+- **`lib/runtime/boundary.ts` was the instructive one.** Its `config` getter resolved `cronSecret`
+  and `siteUrl` its own way, and production resolves both elsewhere — `lib/api/cronAuth.ts` and
+  `lib/siteUrl.ts`, the latter reading `NEXT_PUBLIC_SITE_URL`, not the `SITE_URL` the boundary read.
+  So the only test of "how config resolves" tested a third, divergent copy against the wrong
+  variable. Its `ensureDurableStorage` promised to refuse a "silent in-memory fallback" that nothing
+  consulted, and **"Invariant 6: Production writes fail if durable storage is missing" proved it by
+  calling a fixture it had just defined** — an object literal, installed through
+  `setRuntimeBoundaryForTesting`, asserted to throw from its own method. No production code was
+  involved.
+
+  What the code does is the opposite: `getOperatingSnapshotStore()` falls back to
+  `InMemoryOperatingSnapshotStore` when no KV binding is present, in production as anywhere else, so
+  the write succeeds and goes nowhere durable. Invariant 6 pins *that* now, and says so. Whether it
+  should refuse instead is open — this repo has paid for silent fallbacks before — but that is a
+  change to a write path, not a cleanup.
+- **Deleted, each for its own reason**: a second Slack dispatcher (`lib/webhooks/`) beside the one
+  the cron runs; an "official TypeScript SDK" that is not published and duplicates `/api/mcp` and
+  `/api/agent`; `DecisionPlanStressTester.tsx`, 425 lines superseded by `PlanStressTestMode` in
+  `decisionShieldPanel`; `transitionProbability.ts`, whose own comment said it was "kept for model
+  analysis and tests; not rendered as a user product surface"; `reportNarrative.ts`, `sectorOverlays.ts`
+  and `whetherToShipChecklist.ts`, each of which needs a surface that does not exist, and inventing
+  one is what the first-time guide's history argues against.
+
+Five exported *types* fell out as orphans once those modules went, and were de-exported rather than
+deleted: each is still used inside its own file, and each had been kept "referenced" only by the
+deleted module naming the same identifier.
+
+**A dead `#anchor` is the link version of this, and the landmark audit now catches it.**
+`inspectInPageAnchors` reads every `href="#…"` and every id off the same served response for all 31
+routes, and `collectUnresolvedAnchors` judges them **across routes, never per page**: a link fails
+only when *no* audited route renders that id.
+
+Both halves of that were paid for. Reading only literal HTML called the skip link dead on five
+routes, because a streamed route's `<main id="main-content">` arrives escaped in the flight payload —
+the same reason `inspectMainContentHtml` already consults it. And the first version judged per page,
+which went green here and red in the container: plenty of targets render only under a condition —
+a section that needs figures entered, a banner that needs degraded data — so "this page links to an
+id it is not currently showing" is a claim about the data a route got, and the container's data is
+not this box's (it reaches Treasury and often FRED; a sandbox reaches neither). "No page renders this
+id" is a claim about the code. It is also the claim that catches the real cases: all four anchors
+found by hand rendered on no route at all.
+
+One real finding survived: `/operate/financial` offered nav chips for `#ops-runway-risk` and
+`#ops-board-memo`, neither of which exists until figures have been entered. The empty state carries
+the risk id now (exactly one branch is ever in the DOM, so the anchor always lands, on the message
+saying what is missing), and the board-memo chip is gone — it sits behind a second toggle, so it
+could never be a stable target.
+
 ## Regime scoring: what the numbers do and do not claim
 
 The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
 of them, which is less obvious.
 
-- **`tightness` saturates, on purpose, and hides that it has.** The rate component spans 0-90
-  across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the cap, so
-  above ~4% the published score is a constant 100 and its week-over-week delta is zero. Read
-  `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
+- **`tightness` saturates, on purpose, and the hero now says when it has.** The rate component
+  spans 0-90 across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the
+  cap, so above ~4% the published score is a constant 100 and its week-over-week delta is zero.
+  Read `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
   `scores.tightnessSaturated` to tell a clipped score from a flat reading. Classification still
   uses the bounded score, so no published regime moved when pressure was added.
+
+  The delta row used to render only when the delta was non-zero, so at the ceiling it vanished:
+  100/100, no direction, and the reader left to infer from the ceiling tag that the silence meant
+  "off the top" rather than "flat". It now says so. Pressure is computed per read and never
+  persisted, so a *pressure* delta is not available without a stored-history change; what is
+  published is the fact that the score has stopped being able to report a move.
+
+- **A distance from a threshold is not a weekly move, and three artifacts published it as one
+  (2026-09-16).** `RegimeDiagnostics` carried `tightnessDelta` and `riskAppetiteDelta`, and both
+  were `score - threshold`, with no previous week in the calculation. The weekly email, the export
+  brief and the published brief archive each printed one as **"vs last week"** — so an unchanged
+  week still reported a move, of whatever size the score happened to sit above the line, and a
+  score pinned at 100 reported +30 every week forever. `getRegimeProjection` already warned, in a
+  comment, not to pass these where a velocity was wanted; three call sites did it anyway, which is
+  why the fields are now `tightnessVsThreshold` and `riskAppetiteVsThreshold`. A name has to carry
+  that, not a comment three files away.
+
+  Each surface was fixed for what it actually has: the published archive reads
+  `reportDynamics.changedSignals` and carries the real move (no record was contaminated — the field
+  predates every entry); the weekly email's snapshot has no previous week in it, so its label
+  changed to "vs the regime line"; the export brief dropped the segment, because the honest version
+  of that number duplicates the corridor rails printed beside it. `OperatingSnapshot.schemaVersion`
+  is 2, and a stored snapshot of the old shape reads as absent and is refilled by the next cron.
 - **The two axes are not independent.** `riskAppetite` is a pure function of curve slope, and
   slope also drives the inversion term in `tightness`, so an inversion moves both at once. Note
   `riskAppetiteRegime = 50` therefore means "slope above +0.25%", not "a flat curve" — a
   relationship the threshold's own doc comment asks callers not to encode.
-- **Confidence measures distance from a boundary, nothing else.** It is not calibrated against
-  outcomes. Two guards matter: an imputed input caps it (`CONFIDENCE_PERCENT_IMPUTED_CEILING`),
-  because the stand-ins sit far from the boundaries and used to score the *ceiling* on an empty
-  payload; and the risk gap is converted to its tightness equivalent before the two are compared,
-  because the raw scales differ 4.5x and the risk axis otherwise decided the answer in 164 of 175
-  historical months. Calibrating the percent against `data/summary_archive.json` — how often a
-  call at distance d was later revised — is the open work; the scale still tops out for most
-  months.
+- **Confidence measures distance from a boundary, nothing else — and the archive now says so out
+  loud (2026-09-16).** Two guards matter: an imputed input caps it
+  (`CONFIDENCE_PERCENT_IMPUTED_CEILING`), because the stand-ins sit far from the boundaries and used
+  to score the *ceiling* on an empty payload; and the risk gap is converted to its tightness
+  equivalent before the two are compared, because the raw scales differ 4.5x and the risk axis
+  otherwise decided the answer in 164 of 175 historical months.
+
+  Calibrating the percent against `data/summary_archive.json` was the open work here. It is done,
+  and the result is not that the number needs a different slope. Over the 176 month-end readings
+  (2012-01 to 2026-08) the published regime held into the next month 169 times in 175, and:
+
+  | Points from a boundary | Percent reported | Months held | Months |
+  | --- | --- | --- | --- |
+  | 0 to 5 | 55% | 100% | 11 |
+  | 5 to 10 | 60% | 78% | 9 |
+  | 10 to 20 | 65% | 100% | 12 |
+  | 20 to 37 | 75% | 94% | 54 |
+  | 37 or more | 92% | 99% | 89 |
+
+  Every band held more often than the percent those months reported, above its 95% interval, the
+  ceiling band included. Worse for the number's name, **distance does not order the outcome**: the
+  least-confident band held 11 of 11 while the band above it held 7 of 9. And the archive cannot
+  support re-fitting it — six flips in fourteen years is not a probability per band, and a curve
+  fitted to the base rate would report ~97% every week and discriminate nothing.
+
+  So the percent keeps measuring distance, which is honest, and the record is published beside it
+  rather than folded into it (`lib/report/confidenceCalibration.ts`, rendered at
+  `/trust#confidence-record`). It is derived from the bundled archive at module load, so the monthly
+  refresh improves it instead of dating it. `tests/confidenceCalibration.test.ts` asserts the two
+  findings as properties rather than pinning the counts, and fails if a later archive ever makes
+  distance order the outcome — which is exactly when the copy would need rewriting.
+
+  Still true: the scale tops out for most months. 51% of them report the 92% ceiling, and only 14
+  distinct values have ever been produced.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.

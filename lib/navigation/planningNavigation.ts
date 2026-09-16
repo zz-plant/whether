@@ -47,7 +47,10 @@ export const operationsSectionLinks: {
   financial: [
     { href: "#ops-runway-inputs", label: "Financial inputs" },
     { href: "#ops-runway-risk", label: "Runway analysis" },
-    { href: "#ops-board-memo", label: "Board memo" },
+    /* No "Board memo" chip. That section is behind a toggle inside the results,
+       so the anchor exists only after two separate user actions — a nav target
+       that does nothing on most visits is worse than one fewer chip, and the
+       memo is reachable from the control that opens it. */
   ],
   scenarios: [
     { href: "#scenario-presets-heading", label: "Presets" },

@@ -5,7 +5,6 @@ import {
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
-  serializeJsonLd,
 } from "../../../lib/seo";
 import { buildAuthorSchema } from "../../../lib/publisher";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
@@ -15,6 +14,7 @@ import { CopyAnchorButton } from "./copyAnchorButton";
 import { isIndexableResourceArticleSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { JsonLdScript } from "../../components/jsonLdScript";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
 
@@ -158,8 +158,8 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
       data-content-measurement-root={pagePath}
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster={article.cluster} intent={article.intent} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }} />
+      <JsonLdScript data={articleSchema} />
+      <JsonLdScript data={faqSchema} />
 
       <div className="space-y-6 print:text-black">
         <Breadcrumbs

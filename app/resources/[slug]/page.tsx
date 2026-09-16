@@ -6,7 +6,6 @@ import {
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
-  serializeJsonLd,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import {
@@ -41,6 +40,7 @@ import {
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { JsonLdScript } from "../../components/jsonLdScript";
 
 type Params = { slug: string };
 const RESOURCES_RETURN_HREF = "/operate" as const;
@@ -212,8 +212,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         cluster={page.cluster}
         intent={page.intent}
       />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationSchema) }} />
+      <JsonLdScript data={articleSchema} />
+      <JsonLdScript data={organizationSchema} />
 
       <Breadcrumbs
         items={[

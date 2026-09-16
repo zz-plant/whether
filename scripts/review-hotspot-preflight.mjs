@@ -143,8 +143,13 @@ export function isUnsafeAssertion(code) {
     .replace(/"(?:[^"\\]|\\.)*"/g, '""');
 
   // Import renaming uses the same `as Name` tokens as a type assertion, but it does
-  // not override or narrow a runtime value.
-  if (/^\s*import\s+\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}\s+from\b/.test(withoutStrings)) {
+  // not override or narrow a runtime value. Both forms: the named rename, and the
+  // namespace import — `import * as nextNavigation from "next/navigation"`, which
+  // this refused until a test needed one to spread the real module over a mock.
+  if (
+    /^\s*import\s+\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}\s+from\b/.test(withoutStrings) ||
+    /^\s*import\s+\*\s+as\s+[A-Za-z_$][\w$]*\s+from\b/.test(withoutStrings)
+  ) {
     return false;
   }
 
@@ -248,8 +253,19 @@ function main() {
   }
 
   if (assertionOffenders.length > 0) {
+    /*
+     * Name them. `addedTypeAssertions` has collected `file: line` for each one
+     * since this check existed, and the report printed only the count — so the
+     * gate said "one unsafe assertion" and left you to find it by eye across the
+     * whole range. A count is a verdict; the offender is the thing you can act
+     * on, and withholding it is the same defect `run-checks.mjs` was fixed for
+     * on 2026-09-15.
+     */
     failures.push(
-      `Unsafe type assertions detected in added lines (${assertionOffenders.length}). Prefer runtime validation/narrowing.`,
+      [
+        `Unsafe type assertions detected in added lines (${assertionOffenders.length}). Prefer runtime validation/narrowing.`,
+        ...assertionOffenders.map((offender) => `    ${offender}`),
+      ].join("\n"),
     );
   }
 

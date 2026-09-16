@@ -70,11 +70,29 @@ describe("summarizeCronSteps", () => {
     assert.equal(email.failures, 1);
     assert.equal(email.lastRunAt, "2026-09-14T14:00:05.000Z");
     assert.equal(email.lastOkAt, "2026-09-07T14:00:05.000Z");
+    assert.equal(email.lastFailedAt, "2026-09-14T14:00:05.000Z");
     assert.equal(email.lastError, "2 delivery errors");
 
     const monthly = history.steps.find((step) => step.step === "summary-history");
     assert.equal(monthly?.lastOkAt, "2026-09-14T02:00:03.000Z");
     assert.equal(monthly?.lastError, "degraded read");
+  });
+
+  /*
+   * The query orders newest first and the failure branch used to take the first
+   * one it saw, while `lastOkAt` beside it compared timestamps. So the two halves
+   * of one row disagreed about what "last" meant, and any reordering upstream
+   * would have put the oldest failure on the page under a column saying "last".
+   */
+  it("reports the newest failure however the rows are ordered", () => {
+    const ascending = summarizeCronSteps([
+      row("2026-09-01 14:00:00", { step: "email/send-weekly", ok: false, error: "first failure" }),
+      row("2026-09-08 14:00:00", { step: "email/send-weekly", ok: false, error: "latest failure" }),
+    ]);
+
+    const email = ascending.steps.find((step) => step.step === "email/send-weekly");
+    assert.equal(email?.lastFailedAt, "2026-09-08T14:00:00.000Z");
+    assert.equal(email?.lastError, "latest failure");
   });
 
   it("shows an unknown step under its raw label rather than dropping it", () => {

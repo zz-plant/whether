@@ -18,8 +18,8 @@ export const assessment: RegimeAssessment = {
     curveSlope: 0.55,
   },
   diagnostics: {
-    tightnessDelta: 0,
-    riskAppetiteDelta: 0,
+    tightnessVsThreshold: 0,
+    riskAppetiteVsThreshold: 0,
     nearestThresholdDelta: 0,
     confidence: "MEDIUM",
     transitionWatch: false,

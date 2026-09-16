@@ -15,7 +15,6 @@ import {
   buildOgImageUrl,
   buildPageMetadata,
   organizationName,
-  serializeJsonLd,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
 import {
@@ -102,6 +101,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 import { SubscribeForm } from "../../components/SubscribeForm";
+import { JsonLdScript } from "../../components/jsonLdScript";
 
 export default async function PublishedBriefPage({ params }: { params: Promise<Params> }) {
   const { week } = await params;
@@ -160,7 +160,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
+      <JsonLdScript data={structuredData} />
 
       <Breadcrumbs
         items={[

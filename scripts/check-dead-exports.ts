@@ -246,7 +246,136 @@ export const censusDeadExports = (
   return dead.sort((left, right) => left.file.localeCompare(right.file) || left.name.localeCompare(right.name));
 };
 
+/** Committed data the product reads. Judged by filename, the way an import names it. */
+const DATA_ROOTS = ["data", "content"];
+const DATA_EXTENSIONS = new Set([".json", ".csv", ".md", ".txt", ".yaml", ".yml"]);
+
+/**
+ * Data files nothing reads.
+ *
+ * The export census cannot see these: a JSON file declares no exports, so a
+ * dataset that every consumer has been deleted from scores zero findings and
+ * sits there looking like part of the product. Two were found on 2026-09-16 —
+ * `data/concept_conflicts.json`, a which-principle-wins-per-regime mapping whose
+ * slugs matched no content that still exists, and `data/cohort_feedback.json`,
+ * 31KB of eight named operators over six weeks, feeding a Python analytics
+ * script wired to no command, no route and no reader.
+ *
+ * Matched on the filename with and without its extension, which is how an import
+ * names one, so this over-matches rather than under-matches: a file mentioned
+ * anywhere at all passes. A reported orphan is therefore close to certain.
+ */
+export const censusOrphanedDataFiles = (root = REPO_ROOT): string[] => {
+  const dataFiles = collect(root, DATA_ROOTS, DATA_EXTENSIONS, false);
+  if (dataFiles.size === 0) return [];
+
+  /* Prose counts here, unlike in the export census: a dataset a runbook or a
+     routine names by filename has a consumer, it is just not a compiler. */
+  const dataReferenceExtensions = new Set([...REFERENCE_EXTENSIONS, ".md", ".mdx", ".csv", ".txt"]);
+  /*
+   * And a test does not count, unlike in the export census, which is the whole
+   * reason this scan finds anything. `data/` is what the product ships and
+   * reads; a file there whose only consumer is a suite is not product data. The
+   * cohort dataset was exactly that — its one reader was the test for a script
+   * nothing ran — and with `tests/` counted it would have passed this check the
+   * same way it passed every other one. A genuine fixture belongs in
+   * `tests/fixtures/`, where this scan never looks.
+   */
+  const dataReferenceRoots = [...REFERENCE_ROOTS.filter((entry) => entry !== "tests"), "docs"];
+  const references = collect(root, dataReferenceRoots, dataReferenceExtensions, true);
+  const haystack = [...references.values()].join("\n");
+
+  const orphans: string[] = [];
+  for (const path of dataFiles.keys()) {
+    const fileName = path.slice(path.lastIndexOf("/") + 1);
+    const withoutExtension = fileName.slice(0, fileName.lastIndexOf("."));
+    if (haystack.includes(fileName) || haystack.includes(withoutExtension)) continue;
+    orphans.push(path);
+  }
+
+  return orphans.sort();
+};
+
+/** Files Next.js and the Workers runtime load by convention; nothing imports them. */
+const CONVENTION_MODULES =
+  /^(page|layout|route|loading|error|not-found|template|default|sitemap|robots|manifest|icon|apple-icon|opengraph-image|twitter-image|global-error|middleware|instrumentation)$/;
+
+const IMPORT_PATTERN = /(?:from|import)\s*\(?\s*["']((?:\.|\.\.)\/[^"']+)["']/g;
+
+/**
+ * Modules only a test imports.
+ *
+ * The export census cannot catch these, and deliberately: a helper used inside
+ * its own module and exported for a test is a legitimate seam, and this repo has
+ * two hundred of them. What is not a seam is a whole module that no shipping
+ * file imports — a feature built, tested, and reachable by nobody. Four were
+ * found that way on 2026-09-16 and nine more on 2026-09-17: an SDK client, a
+ * second Slack dispatcher, a sector-overlay model, a ship/wait/kill checklist,
+ * a runtime boundary whose config resolution had drifted from the resolvers
+ * production actually uses.
+ *
+ * Judged per module rather than per symbol, which is what makes it precise:
+ * `driverDecisionViews.ts` has four exports only its test names and is imported
+ * by the homepage, so it is a seam and passes. A `scripts/` importer counts —
+ * a CLI is a consumer.
+ */
+export const censusTestOnlyModules = (root = REPO_ROOT): string[] => {
+  const shipped = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false);
+  const consumers = collect(root, [...DECLARATION_ROOTS, "scripts"], REFERENCE_EXTENSIONS, true);
+  const tests = collect(root, ["tests"], REFERENCE_EXTENSIONS, false);
+
+  /** Every module path an importing file resolves to, relative to the repo root. */
+  const importedBy = (files: Map<string, string>): Set<string> => {
+    const imported = new Set<string>();
+    for (const [path, source] of files) {
+      const directory = path.slice(0, path.lastIndexOf("/"));
+      for (const match of source.matchAll(IMPORT_PATTERN)) {
+        const resolved = join(directory, match[1]).replaceAll("\\", "/");
+        const bare = resolved.replace(/\.(ts|tsx|js|jsx)$/, "");
+        for (const candidate of [bare, `${bare}/index`]) {
+          imported.add(`${candidate}.ts`);
+          imported.add(`${candidate}.tsx`);
+        }
+      }
+    }
+    return imported;
+  };
+
+  const shippedImports = importedBy(consumers);
+  const testImports = importedBy(tests);
+
+  const orphans: string[] = [];
+  for (const path of shipped.keys()) {
+    const base = path.slice(path.lastIndexOf("/") + 1).replace(/\.(ts|tsx)$/, "");
+    if (CONVENTION_MODULES.test(base)) continue;
+    if (shippedImports.has(path)) continue;
+    if (testImports.has(path)) orphans.push(path);
+  }
+
+  return orphans.sort();
+};
+
 const main = () => {
+  const testOnly = censusTestOnlyModules(REPO_ROOT);
+  process.stdout.write(`[dead-exports] ${testOnly.length} module(s) imported only by tests\n`);
+  if (testOnly.length > 0) {
+    for (const file of testOnly) process.stdout.write(`  ${file}\n`);
+    process.stdout.write(
+      "[dead-exports] FAIL: a module no shipping file imports. Wire it to a surface or delete it — a test is not a consumer.\n",
+    );
+    process.exit(1);
+  }
+
+  const orphanedData = censusOrphanedDataFiles(REPO_ROOT);
+  process.stdout.write(`[dead-exports] ${orphanedData.length} unreferenced data file(s) under ${DATA_ROOTS.join("/, ")}/\n`);
+  if (orphanedData.length > 0) {
+    for (const file of orphanedData) process.stdout.write(`  ${file}\n`);
+    process.stdout.write(
+      "[dead-exports] FAIL: committed data nothing reads. Wire it up or delete it — a dataset no code reads still reads as evidence.\n",
+    );
+    process.exit(1);
+  }
+
   const dead = censusDeadExports(REPO_ROOT, { requireCompleteTree: true });
   const runtime = dead.filter((entry) => entry.kind === "runtime").length;
   const types = dead.length - runtime;

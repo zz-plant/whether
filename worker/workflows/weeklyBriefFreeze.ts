@@ -15,6 +15,7 @@
  */
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
 import { installBindings } from "../bindings";
+import { writeAnalytics } from "../../lib/telemetry/analyticsEngine";
 import { GitHubRepoClient } from "../../lib/github/repoClient";
 import { assembleCurrentWeekBrief } from "../../lib/report/publishedBriefRecord";
 import {
@@ -46,8 +47,54 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
        the first thing to run in its isolate, so nothing has installed them yet. */
     installBindings(this.env);
 
+    const startedAt = Date.now();
+    try {
+      const result = await this.freeze(event, step);
+      /*
+       * The trial could not conclude without this. The cron records that it
+       * *started* a workflow and nothing recorded what the workflow did, so the
+       * trust page's "Scheduled runs" showed a green Monday row whether the week
+       * was frozen, refused as stale, or retried for five hours and gave up. A
+       * step that reports success for work it did not observe is worse than one
+       * that reports nothing, because it is read as evidence.
+       */
+      writeAnalytics(
+        "cron-step",
+        { step: "brief-freeze", ok: true, detail: result.opened ? "pull request opened" : result.reason, durationMs: Date.now() - startedAt },
+        { doubles: [1, Date.now() - startedAt] },
+      );
+      return result;
+    } catch (error) {
+      const durationMs = Date.now() - startedAt;
+      writeAnalytics(
+        "cron-step",
+        { step: "brief-freeze", ok: false, error: error instanceof Error ? error.message : "Unknown error", durationMs },
+        { doubles: [0, durationMs] },
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * The live read, as a seam.
+   *
+   * A test needs to drive the outcome reporting through both a refusal and a
+   * missing token, and the alternative was `mock.module` on
+   * `publishedBriefRecord` — which patches the registry process-wide and broke
+   * `publishedBriefPullRequest.test.ts` the moment both files ran together, in
+   * exactly the way CLAUDE.md records. One overridable method costs less than a
+   * suite that passes on ordering luck.
+   */
+  protected assembleWeek(): ReturnType<typeof assembleCurrentWeekBrief> {
+    return assembleCurrentWeekBrief({ route: "workflow:brief-freeze" });
+  }
+
+  private async freeze(
+    event: WorkflowEvent<WeeklyBriefFreezeWorkflowParams>,
+    step: WorkflowStep,
+  ): Promise<OpenPublishedBriefPullRequestResult> {
     const assembled = await step.do("assemble this week's brief from live data", { retries: ASSEMBLE_RETRIES }, async () => {
-      const result = await assembleCurrentWeekBrief({ route: "workflow:brief-freeze" });
+      const result = await this.assembleWeek();
       if (!result.ok) {
         throw new Error(`not ready to publish: ${result.reason}`);
       }

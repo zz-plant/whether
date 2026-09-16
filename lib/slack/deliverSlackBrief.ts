@@ -15,7 +15,7 @@ import { buildPostureState } from "../report/postureStateSource";
 
 type SlackDeliveryStatus = "posted" | "partial" | "skipped_unconfigured" | "failed";
 
-export type SlackDeliveryResult = {
+type SlackDeliveryResult = {
   /** True when every configured webhook accepted the post, or none are configured. */
   ok: boolean;
   status: SlackDeliveryStatus;

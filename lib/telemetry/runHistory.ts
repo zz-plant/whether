@@ -39,7 +39,11 @@ const CRON_STEP_LABELS: Record<string, string> = {
   "check-regime-change": "Regime-change check",
   "alert-deliveries": "Alert deliveries",
   "regime-history-workflow": "Regime history pull request",
-  "brief-freeze-workflow": "Brief freeze pull request",
+  /* Two rows, because they answer different questions. The `-start` row is green
+     the moment the cron hands the workflow to Cloudflare; the other is written by
+     the workflow itself and is the one that knows whether the week was frozen. */
+  "brief-freeze-start": "Brief freeze started",
+  "brief-freeze": "Brief freeze outcome",
 };
 
 type CronStepSummary = {
@@ -49,6 +53,12 @@ type CronStepSummary = {
   failures: number;
   lastRunAt: string;
   lastOkAt: string | null;
+  lastFailedAt: string | null;
+  /**
+   * The message the failing step reported. Kept out of the rendered panel: it is
+   * written for whoever reads the logs, and "Weekly email failed on Sep 8" is the
+   * whole of what a reader deciding whether to trust the brief can act on.
+   */
   lastError: string | null;
 };
 
@@ -111,6 +121,7 @@ export const summarizeCronSteps = (
       failures: 0,
       lastRunAt: at,
       lastOkAt: null,
+      lastFailedAt: null,
       lastError: null,
     };
     summary.runs += 1;
@@ -119,8 +130,14 @@ export const summarizeCronSteps = (
       if (!summary.lastOkAt || at > summary.lastOkAt) summary.lastOkAt = at;
     } else {
       summary.failures += 1;
-      // Rows arrive newest first, so the first failure seen is the latest one.
-      summary.lastError ??= event.error ?? "failed";
+      /* Compared rather than taken first-seen. The query orders newest first and
+         the old `??=` relied on that, so the panel would have shown the *oldest*
+         failure the day anything reordered the rows — while `lastOkAt` beside it
+         was already order-independent. */
+      if (!summary.lastFailedAt || at > summary.lastFailedAt) {
+        summary.lastFailedAt = at;
+        summary.lastError = event.error ?? "failed";
+      }
     }
     summaries.set(event.step, summary);
   }

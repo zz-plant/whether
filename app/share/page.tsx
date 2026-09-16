@@ -8,6 +8,7 @@ import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
+import { buildIssueTrackerMarkdownBrief } from "../../lib/export/issueTrackerBrief";
 import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
@@ -49,6 +50,19 @@ const buildCurrentShareArtifact = async () => {
     }),
   );
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportOptions);
+  /*
+   * The issue-tracker form was extracted from `exportBriefPanel.tsx` so it could
+   * be tested, and then that panel was deleted — leaving a finished, tested
+   * builder that nothing called and no reader could reach. It takes the same
+   * four inputs as the Slack brief, and this page is where the formats live.
+   */
+  const issueTrackerBrief = buildIssueTrackerMarkdownBrief(
+    assessment,
+    treasury,
+    sensors,
+    macroSeries,
+    exportOptions.modeledDecision,
+  );
   const citation = buildCallCitation(assessment, treasury, {
     postureWithStageLabel: snapshot.weeklyCall.regimeStage,
   });
@@ -93,6 +107,7 @@ const buildCurrentShareArtifact = async () => {
       buildBriefPermalinkLine(treasury.record_date),
     ].join("\n"),
     meetingPack,
+    issueTrackerBrief,
     calendarDetails: [
       "Review the current Whether weekly operating brief.",
       "",
@@ -135,6 +150,7 @@ export default async function SharePage() {
             slackBrief={artifact.slackBrief}
             emailBrief={artifact.emailBrief}
             meetingPack={artifact.meetingPack}
+            issueTrackerBrief={artifact.issueTrackerBrief}
             calendarDetails={artifact.calendarDetails}
           />
         </div>

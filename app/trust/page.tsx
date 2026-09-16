@@ -14,6 +14,7 @@ import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
+import { ConfidenceRecordSection } from "./confidenceRecord";
 import { RunHistorySection } from "./runHistorySection";
 import { buildTrustPageModel } from "./trustPageModel";
 
@@ -147,6 +148,8 @@ export default async function MethodPage({
           </article>
         </div>
       </ReportSection>
+
+      <ConfidenceRecordSection />
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">

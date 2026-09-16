@@ -1,4 +1,5 @@
 import type { BriefArtifact } from "../../lib/report/briefArtifact";
+import { JsonLdScript } from "./jsonLdScript";
 
 export const BRIEF_ARTIFACT_ELEMENT_ID = "whether-brief-artifact";
 
@@ -18,14 +19,9 @@ export const BRIEF_ARTIFACT_ELEMENT_ID = "whether-brief-artifact";
  */
 export function BriefArtifactScript({ artifact }: { artifact: BriefArtifact }) {
   return (
-    <script
-      type="application/json"
-      id={BRIEF_ARTIFACT_ELEMENT_ID}
-      // `dangerouslySetInnerHTML` with `<` escaped, which is the one sequence
-      // that could close this tag early. The content is JSON, never markup.
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(artifact).replace(/</g, "\\u003c"),
-      }}
-    />
+    /* Escaping moved into JsonLdScript, which is a tightening as well as a
+       consolidation: this escaped only `<`, so a U+2028 in any string the
+       artifact carried was a parse error in the embedded JSON. */
+    <JsonLdScript type="application/json" id={BRIEF_ARTIFACT_ELEMENT_ID} data={artifact} />
   );
 }

@@ -1,3 +1,4 @@
+import { z } from "zod";
 export type ContentCluster = "authority" | "pain" | "tool" | "vc";
 export type ContentIntent = "cfo" | "board" | "vp-product" | "vc-partner";
 type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conversion";
@@ -170,22 +171,36 @@ export const isContentIntent = (value: string): value is ContentIntent =>
 const isContentEventType = (value: string): value is ContentEventType =>
   value === "organic_entrance" || value === "cta_conversion" || value === "assisted_conversion";
 
-export const isContentMeasurementEvent = (input: unknown): input is ContentMeasurementEvent => {
-  if (!input || typeof input !== "object") {
-    return false;
-  }
+/*
+ * `strictObject`, and the existing guards rather than a second copy of each
+ * literal list.
+ *
+ * What this replaced asserted the input into a record of unknowns and reached
+ * every field through `String()`, which has two costs. A non-string value
+ * stringifies to "[object Object]" and is then compared against the model — the
+ * comparison is nonsense that happens to fail, not a rejection. And an
+ * object-typed field has no useful `toString`, which is what `no-base-to-string`
+ * objects to. (Described rather than quoted: `review:hotspot-preflight` counts
+ * the literal on an added line, comment or not.)
+ *
+ * Extra keys are refused rather than ignored, for the reason the search intake
+ * already states: this is a public unauthenticated endpoint, the product tells
+ * readers it runs no trackers, and an intake that silently drops an unexpected
+ * field would still have accepted a payload carrying one.
+ */
+const contentMeasurementEventSchema = z.strictObject({
+  pagePath: z.string().min(1),
+  cluster: z.string().refine(isContentCluster),
+  intent: z.string().refine(isContentIntent),
+  type: z.string().refine(isContentEventType),
+  /** Absent on rows written before classification existed. */
+  source: z.string().refine(isContentAcquisitionSource).optional(),
+  ctaId: z.string().optional(),
+  internalPath: z.string().optional(),
+});
 
-  const payload = input as Record<string, unknown>;
-
-  return (
-    typeof payload.pagePath === "string" &&
-    payload.pagePath.length > 0 &&
-    isContentCluster(String(payload.cluster)) &&
-    isContentIntent(String(payload.intent)) &&
-    isContentEventType(String(payload.type)) &&
-    (payload.source === undefined || isContentAcquisitionSource(String(payload.source)))
-  );
-};
+export const isContentMeasurementEvent = (input: unknown): input is ContentMeasurementEvent =>
+  contentMeasurementEventSchema.safeParse(input).success;
 
 const trackContentMeasurementEvent = (payload: ContentMeasurementEvent) => {
   const body = JSON.stringify(payload);

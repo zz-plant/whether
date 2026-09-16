@@ -50,17 +50,26 @@ const getDeltaValueForMetric = ({
   }
 };
 
+/*
+ * `impactLinks` and `openPanelHref` were optional, with defaults pointing at
+ * `#weekly-action-summary`, `#executive-snapshot`, `#signal-matrix` and
+ * `#change-since-last-read`. None of those four ids is rendered anywhere in the
+ * app. The one caller passes its own links, so the fallback never shipped — it
+ * was a set of dead anchors kept alive by never being reached, and the next
+ * caller to leave the prop off would have shipped three links to nowhere.
+ * Required now: a link target is the caller's to know.
+ */
 export const ReturningVisitorDeltaStrip = ({
   assessment,
   recordDate,
   impactLinks,
-  openPanelHref = "#change-since-last-read",
+  openPanelHref,
   openPanelLabel = "Open full delta panel",
 }: {
   assessment: RegimeAssessment;
   recordDate: string;
-  impactLinks?: Array<{ label: string; href: string; metric: DeltaMetricKey }>;
-  openPanelHref?: string;
+  impactLinks: Array<{ label: string; href: string; metric: DeltaMetricKey }>;
+  openPanelHref: string;
   openPanelLabel?: string;
 }) => {
   const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
@@ -82,14 +91,7 @@ export const ReturningVisitorDeltaStrip = ({
     return null;
   }
 
-  const defaultImpactLinks = [
-    { label: "Funding pressure", href: "#weekly-action-summary", metric: "tightness" as const },
-    { label: "Risk appetite", href: "#executive-snapshot", metric: "riskAppetite" as const },
-    { label: "Base rate", href: "#signal-matrix", metric: "baseRate" as const },
-  ];
-  const configuredImpactLinks = impactLinks && impactLinks.length > 0 ? impactLinks : defaultImpactLinks;
-
-  const impactItems = configuredImpactLinks
+  const impactItems = impactLinks
     .map((item) => ({
       ...item,
       delta: getDeltaValueForMetric({

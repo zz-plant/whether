@@ -24,6 +24,22 @@ import { recordPassedChecks } from "./check-gate-marker.mjs";
 
 const TASKS = [
   { name: "lint", script: "lint" },
+  /*
+   * Type-aware oxlint, advisory since 2026-09-06 and enforced from 2026-09-16.
+   * It catches what the syntactic pass structurally cannot — a floating promise,
+   * a value stringified through `Object.prototype.toString` — and it sat at zero
+   * for ten days. It was at zero, rather: the two findings that promoting it
+   * surfaced were both in code written the day before, one of them the exact
+   * `RequestInfo | URL` trap the burn-down had already cleared from eight test
+   * files. Advisory means nobody runs it, which is the whole argument.
+   *
+   * On pre-push and `bun run check`, not the deploy gate. It reads the type
+   * graph, so it is the slowest task here, and CLAUDE.md records one run that
+   * reported findings later runs could not reproduce. A check that might flake
+   * belongs where a human is standing next to it, not where the only log is one
+   * nobody can read.
+   */
+  { name: "lint:types", script: "lint:types" },
   { name: "typecheck", script: "typecheck" },
   { name: "test", script: "test" },
   { name: "assets", script: "assets:check" },
