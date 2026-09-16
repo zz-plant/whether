@@ -260,7 +260,19 @@ export function DecisionHero({
             </span>
           ) : null}
         </p>
-        {tightnessDelta !== 0 ? (
+        {tightnessDelta === 0 && tightnessSaturated ? (
+          /*
+           * A clipped score cannot move, so the delta row rendered nothing at
+           * exactly the moment conditions were most extreme — the reader saw
+           * 100/100 and no direction, and had to infer from the ceiling tag
+           * beside it that the silence meant "off the top" rather than "flat".
+           * Say it. The raw pressure is in the tag; what is missing is that the
+           * score has stopped being able to report a move.
+           */
+          <p className="mt-0.5 text-fluid-nano text-amber-300/70">
+            At the ceiling — a clipped score cannot show a weekly move.
+          </p>
+        ) : tightnessDelta !== 0 ? (
           // The glyph carries its own title/desc ("Rose from 61 to 64"), so it
           // stays exposed to assistive tech rather than sitting behind
           // aria-hidden with only "+3.0 pts" left to announce.

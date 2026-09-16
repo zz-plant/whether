@@ -224,8 +224,8 @@ const assessment = (
       curveSlope: 0.5,
     },
     diagnostics: {
-      tightnessDelta: 0,
-      riskAppetiteDelta: 0,
+      tightnessVsThreshold: 0,
+      riskAppetiteVsThreshold: 0,
       nearestThresholdDelta: 20,
       confidence: "HIGH" as const,
       transitionWatch: false,

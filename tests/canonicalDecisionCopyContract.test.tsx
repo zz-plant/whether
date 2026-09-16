@@ -10,8 +10,8 @@ const assessment: RegimeAssessment = {
   regime: "DEFENSIVE",
   scores: { tightness: 72, riskAppetite: 42, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.3 },
   diagnostics: {
-    tightnessDelta: 1,
-    riskAppetiteDelta: -1,
+    tightnessVsThreshold: 1,
+    riskAppetiteVsThreshold: -1,
     nearestThresholdDelta: 4,
     confidence: "MEDIUM",
     transitionWatch: true,

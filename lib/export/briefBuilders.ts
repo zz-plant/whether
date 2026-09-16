@@ -145,22 +145,22 @@ const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOp
   const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
   const rails = buildSharedCorridorRails(items, scores);
-  const deltas: Record<"tightness" | "riskAppetite", number | undefined> = {
-    tightness: assessment.diagnostics?.tightnessDelta,
-    riskAppetite: assessment.diagnostics?.riskAppetiteDelta,
-  };
   const readings: Array<{ metric: "tightness" | "riskAppetite"; label: string; value: number }> = [
     { metric: "tightness", label: "Funding pressure", value: scores.tightness },
     { metric: "riskAppetite", label: "Risk appetite", value: scores.riskAppetite },
   ];
   return readings.map((reading) => {
     const rail = rails.find((candidate) => candidate.metric === reading.metric);
-    const delta = deltas[reading.metric];
+    /*
+     * No delta segment. It read `diagnostics.tightnessDelta` and printed it as
+     * "vs last week", and that field is a distance from the regime threshold —
+     * so an unchanged week still claimed a move. The honest version of that
+     * number is "how far from a line", which the two rails after this already
+     * say, against the guardrail the reader is actually deciding on. Restating
+     * it against a second line is the restatement this repo declutters for.
+     */
     return [
       `${reading.label}: ${reading.value}/100`,
-      typeof delta === "number" && Number.isFinite(delta) && delta !== 0
-        ? `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`
-        : null,
       rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})` : null,
       rail && rail.clearsAt !== undefined
         ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`

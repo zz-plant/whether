@@ -8,8 +8,8 @@ const assessment = {
   regime: "DEFENSIVE",
   scores: { tightness: 72, riskAppetite: 48, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.1 },
   diagnostics: {
-    tightnessDelta: 2,
-    riskAppetiteDelta: -3,
+    tightnessVsThreshold: 2,
+    riskAppetiteVsThreshold: -3,
     nearestThresholdDelta: 2,
     confidence: "LOW",
     transitionWatch: true,
@@ -186,8 +186,8 @@ describe("flip watch under a held call", () => {
     },
     scores: { tightness: 77, riskAppetite: 42, baseRateUsed: "1M", baseRate: 3.93, curveSlope: 0.33 },
     diagnostics: {
-      tightnessDelta: 7,
-      riskAppetiteDelta: -8,
+      tightnessVsThreshold: 7,
+      riskAppetiteVsThreshold: -8,
       nearestThresholdDelta: 7,
       confidence: "MEDIUM",
       transitionWatch: false,

@@ -12,7 +12,7 @@ import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportF
 
 const assessment = buildAssessmentFixture({
   scores: { riskAppetite: 34, curveSlope: -0.3 },
-  diagnostics: { tightnessDelta: 1, riskAppetiteDelta: -1, confidence: "HIGH" },
+  diagnostics: { tightnessVsThreshold: 1, riskAppetiteVsThreshold: -1, confidence: "HIGH" },
   constraints: ["Freeze non-essential hiring", "Gate roadmap spend", "Preserve runway"],
   policyAssessment: {
     version: "v1",

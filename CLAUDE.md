@@ -405,12 +405,35 @@ recapture correctly.
 The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
 of them, which is less obvious.
 
-- **`tightness` saturates, on purpose, and hides that it has.** The rate component spans 0-90
-  across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the cap, so
-  above ~4% the published score is a constant 100 and its week-over-week delta is zero. Read
-  `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
+- **`tightness` saturates, on purpose, and the hero now says when it has.** The rate component
+  spans 0-90 across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the
+  cap, so above ~4% the published score is a constant 100 and its week-over-week delta is zero.
+  Read `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
   `scores.tightnessSaturated` to tell a clipped score from a flat reading. Classification still
   uses the bounded score, so no published regime moved when pressure was added.
+
+  The delta row used to render only when the delta was non-zero, so at the ceiling it vanished:
+  100/100, no direction, and the reader left to infer from the ceiling tag that the silence meant
+  "off the top" rather than "flat". It now says so. Pressure is computed per read and never
+  persisted, so a *pressure* delta is not available without a stored-history change; what is
+  published is the fact that the score has stopped being able to report a move.
+
+- **A distance from a threshold is not a weekly move, and three artifacts published it as one
+  (2026-09-16).** `RegimeDiagnostics` carried `tightnessDelta` and `riskAppetiteDelta`, and both
+  were `score - threshold`, with no previous week in the calculation. The weekly email, the export
+  brief and the published brief archive each printed one as **"vs last week"** — so an unchanged
+  week still reported a move, of whatever size the score happened to sit above the line, and a
+  score pinned at 100 reported +30 every week forever. `getRegimeProjection` already warned, in a
+  comment, not to pass these where a velocity was wanted; three call sites did it anyway, which is
+  why the fields are now `tightnessVsThreshold` and `riskAppetiteVsThreshold`. A name has to carry
+  that, not a comment three files away.
+
+  Each surface was fixed for what it actually has: the published archive reads
+  `reportDynamics.changedSignals` and carries the real move (no record was contaminated — the field
+  predates every entry); the weekly email's snapshot has no previous week in it, so its label
+  changed to "vs the regime line"; the export brief dropped the segment, because the honest version
+  of that number duplicates the corridor rails printed beside it. `OperatingSnapshot.schemaVersion`
+  is 2, and a stored snapshot of the old shape reads as absent and is refilled by the next cron.
 - **The two axes are not independent.** `riskAppetite` is a pure function of curve slope, and
   slope also drives the inversion term in `tightness`, so an inversion moves both at once. Note
   `riskAppetiteRegime = 50` therefore means "slope above +0.25%", not "a flat curve" — a
