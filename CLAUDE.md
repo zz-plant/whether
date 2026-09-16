@@ -13,7 +13,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run test` | ~14s | 1,180+ tests / 211 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
-| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). Advisory: run before a PR; not in the gate (see toolchain notes). |
+| `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
@@ -112,9 +112,22 @@ deploys every push, which is the only remote gate left.
   is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
   and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
   by design (`requireCompleteTree`): a two-file tree is what they measure.
-- **`lint:types` is advisory, not a gate — yet, and now reports zero.** Type-aware oxlint
+- **`lint:types` is enforced (2026-09-16), on pre-push and `bun run check`.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
-  type-constituent rules. The 28 pre-existing findings were burned down on 2026-09-06: a shared
+  type-constituent rules.
+
+  Promoting it is what found the two findings it had drifted to, both in code written the day
+  before: `tests/analyticsQuery.test.ts` had `String(url)` on a `RequestInfo | URL`, the exact trap
+  the burn-down below cleared from eight test files, and `lib/contentMeasurement.ts` reached every
+  field of a public intake through `String()` on an `unknown`. That is the argument for the
+  promotion in one line — advisory means nobody runs it, and ten days of "reports zero" was ten
+  days of nobody running it. The content guard is a `z.strictObject` now, like the search intake
+  beside it, so extra keys on that endpoint are refused rather than ignored.
+
+  **Not in the deploy gate.** It reads the type graph, so it is the slowest task in the list, and
+  the reproducibility note below still stands. A check that might flake belongs where a person is
+  standing next to it, not in the one place whose log is hard to read — the lesson `run-checks.mjs`
+  paid for on 2026-09-15. The 28 pre-existing findings were burned down on 2026-09-06: a shared
   `tests/fixtures/requestTarget.ts` replaced `String(input)` on a `RequestInfo | URL` in eight test
   files (a `Request` there compares as "[object Object]"), deliberate fire-and-forget promises took
   `void`, `RegimeKey | string` unions collapsed to `string`, `premiumFunnel` rejects a non-string

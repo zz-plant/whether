@@ -59,6 +59,23 @@ describe("buildContentMeasurementReport", () => {
     );
   });
 
+  /*
+   * A public unauthenticated intake, on a product that tells readers it runs no
+   * trackers. The guard hand-rolled its checks over a cast and reached each
+   * field through `String()`, so an object arrived as "[object Object]" and was
+   * compared against the model rather than refused, and any key beyond the
+   * seven it models rode along into the stream. The search intake was already
+   * strict for the same reason; this one now matches it.
+   */
+  it("refuses a field it does not model, and a value that is not a string", () => {
+    const valid = { pagePath: "/", cluster: "tool", intent: "board", type: "cta_conversion" } as const;
+
+    assert.ok(isContentMeasurementEvent(valid));
+    assert.ok(!isContentMeasurementEvent({ ...valid, referrer: "https://www.google.com/?q=secret" }));
+    assert.ok(!isContentMeasurementEvent({ ...valid, cluster: { toString: () => "tool" } }));
+    assert.ok(!isContentMeasurementEvent({ ...valid, ctaId: 42 }));
+  });
+
 });
 
 
