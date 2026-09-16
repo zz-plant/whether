@@ -375,6 +375,18 @@ writing one. The record is refused for a dirty tree, for another commit, and aft
 every way it can go wrong costs a repeated run rather than a skipped gate. The build log says which
 way it went.
 
+**A bound set under the real cost manufactures the failure it claims to detect (2026-09-17).** The
+landmark audit's per-route bound was 60s in the deploy gate. The gate spawns its own dev server, so
+every route compiles from cold, and the two heaviest — `/share` and `/trust` — do not answer inside
+60s on a loaded box. Three builds failed with `2 route(s) never answered`, and the log saying so is
+only in the Cloudflare dashboard, so from a sandbox it read as an unexplained red build on whatever
+was pushed last. The bound is 120s now, measured rather than guessed: a cold run against
+`origin/main`, carrying none of that day's changes, reported exactly those two routes and went green
+at 150s. **When a check fails only where you cannot read it, reproduce the environment, not the
+diff** — here, `git archive` into a scratch directory with `node_modules` hardlinked, and
+`--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
+warm one. The bound is still a bound: a route that never answers fails the gate.
+
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
 - `run-checks.mjs` buffers each task's output until it exits, and had no per-task timeout, so one

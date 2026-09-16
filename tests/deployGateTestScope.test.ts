@@ -182,12 +182,21 @@ describe("deploy gate resource defaults", () => {
   });
 
   it("gives the landmark audit's bounds room for a cold container start", async () => {
-    // The dev server is spawned cold in the build container while lint, tsc, and the
-    // suite share its cores. The bounds stay bounds — a route that never answers still
-    // fails the gate — but a slow box must read as slow, not as broken.
+    /*
+     * The dev server is spawned cold in the build container while lint, tsc, and the
+     * suite share its cores. The bounds stay bounds — a route that never answers still
+     * fails the gate — but a slow box must read as slow, not as broken.
+     *
+     * The per-route bound went 60s -> 120s on 2026-09-17 because 60s was below what a
+     * cold compile of the two heaviest routes costs: the container failed three builds
+     * with "/share and /trust never answered", and a cold run against `origin/main`,
+     * carrying none of that day's changes, reported the same two and went green at
+     * 150s. A bound set under the real cost does not measure breakage, it manufactures
+     * it — and it did so in the one log a sandbox cannot read.
+     */
     const audit = await readFile("scripts/check-main-content-landmarks.mjs", "utf8");
     assert.match(audit, /const inDeployGate = process\.env\.WHETHER_DEPLOY_GATE === "1"/);
     assert.match(audit, /inDeployGate \? "180000" : "90000"/);
-    assert.match(audit, /inDeployGate \? "60000" : "30000"/);
+    assert.match(audit, /inDeployGate \? "120000" : "30000"/);
   });
 });

@@ -65,9 +65,24 @@ const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", inDeployGate ? "1
  */
 const defaultConcurrency = Math.min(8, Math.max(4, availableParallelism() * 2));
 const concurrency = Number.parseInt(readArgValue("--concurrency", String(defaultConcurrency)), 10);
-// Separate from --timeout-ms, which bounds dev-server readiness rather than a
-// single route. Tunable so a slow container can be given room without editing code.
-const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", inDeployGate ? "60000" : "30000"), 10);
+/*
+ * Separate from --timeout-ms, which bounds dev-server readiness rather than a
+ * single route. Tunable so a slow container can be given room without editing code.
+ *
+ * The deploy-gate bound went 60s -> 120s on 2026-09-17, measured rather than
+ * guessed. The gate starts its own dev server, so every route compiles from
+ * cold, and the two heaviest — /share and /trust — do not answer inside 60s on
+ * a loaded box: a cold run against `origin/main`, with none of that day's
+ * changes in it, reported exactly those two as "never answered" and went green
+ * at 150s. So this was not a property of any one branch, it was a bound set
+ * below what a cold compile of the slowest routes costs, and it read as an
+ * unexplained red build because the audit's own log is not reachable from a
+ * sandbox.
+ *
+ * A hung route still fails the gate. This widens the bound, not the meaning:
+ * "never answered" has to mean the route is broken, not that it was compiling.
+ */
+const routeTimeoutMs = Number.parseInt(readArgValue("--route-timeout-ms", inDeployGate ? "120000" : "30000"), 10);
 
 if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
   console.error("`--timeout-ms` must be a positive integer.");
