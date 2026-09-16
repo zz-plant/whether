@@ -246,7 +246,67 @@ export const censusDeadExports = (
   return dead.sort((left, right) => left.file.localeCompare(right.file) || left.name.localeCompare(right.name));
 };
 
+/** Committed data the product reads. Judged by filename, the way an import names it. */
+const DATA_ROOTS = ["data", "content"];
+const DATA_EXTENSIONS = new Set([".json", ".csv", ".md", ".txt", ".yaml", ".yml"]);
+
+/**
+ * Data files nothing reads.
+ *
+ * The export census cannot see these: a JSON file declares no exports, so a
+ * dataset that every consumer has been deleted from scores zero findings and
+ * sits there looking like part of the product. Two were found on 2026-09-16 —
+ * `data/concept_conflicts.json`, a which-principle-wins-per-regime mapping whose
+ * slugs matched no content that still exists, and `data/cohort_feedback.json`,
+ * 31KB of eight named operators over six weeks, feeding a Python analytics
+ * script wired to no command, no route and no reader.
+ *
+ * Matched on the filename with and without its extension, which is how an import
+ * names one, so this over-matches rather than under-matches: a file mentioned
+ * anywhere at all passes. A reported orphan is therefore close to certain.
+ */
+export const censusOrphanedDataFiles = (root = REPO_ROOT): string[] => {
+  const dataFiles = collect(root, DATA_ROOTS, DATA_EXTENSIONS, false);
+  if (dataFiles.size === 0) return [];
+
+  /* Prose counts here, unlike in the export census: a dataset a runbook or a
+     routine names by filename has a consumer, it is just not a compiler. */
+  const dataReferenceExtensions = new Set([...REFERENCE_EXTENSIONS, ".md", ".mdx", ".csv", ".txt"]);
+  /*
+   * And a test does not count, unlike in the export census, which is the whole
+   * reason this scan finds anything. `data/` is what the product ships and
+   * reads; a file there whose only consumer is a suite is not product data. The
+   * cohort dataset was exactly that — its one reader was the test for a script
+   * nothing ran — and with `tests/` counted it would have passed this check the
+   * same way it passed every other one. A genuine fixture belongs in
+   * `tests/fixtures/`, where this scan never looks.
+   */
+  const dataReferenceRoots = [...REFERENCE_ROOTS.filter((entry) => entry !== "tests"), "docs"];
+  const references = collect(root, dataReferenceRoots, dataReferenceExtensions, true);
+  const haystack = [...references.values()].join("\n");
+
+  const orphans: string[] = [];
+  for (const path of dataFiles.keys()) {
+    const fileName = path.slice(path.lastIndexOf("/") + 1);
+    const withoutExtension = fileName.slice(0, fileName.lastIndexOf("."));
+    if (haystack.includes(fileName) || haystack.includes(withoutExtension)) continue;
+    orphans.push(path);
+  }
+
+  return orphans.sort();
+};
+
 const main = () => {
+  const orphanedData = censusOrphanedDataFiles(REPO_ROOT);
+  process.stdout.write(`[dead-exports] ${orphanedData.length} unreferenced data file(s) under ${DATA_ROOTS.join("/, ")}/\n`);
+  if (orphanedData.length > 0) {
+    for (const file of orphanedData) process.stdout.write(`  ${file}\n`);
+    process.stdout.write(
+      "[dead-exports] FAIL: committed data nothing reads. Wire it up or delete it — a dataset no code reads still reads as evidence.\n",
+    );
+    process.exit(1);
+  }
+
   const dead = censusDeadExports(REPO_ROOT, { requireCompleteTree: true });
   const runtime = dead.filter((entry) => entry.kind === "runtime").length;
   const types = dead.length - runtime;

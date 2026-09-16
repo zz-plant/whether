@@ -132,6 +132,16 @@ deploys every push, which is the only remote gate left.
   is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
   and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
   by design (`requireCompleteTree`): a two-file tree is what they measure.
+
+  **It now counts orphaned data files too, and a test does not count there (2026-09-16).** A JSON
+  file declares no exports, so the export census cannot see it: a dataset every consumer was
+  deleted from scores zero findings and goes on looking like part of the product.
+  `censusOrphanedDataFiles` walks `data/` and `content/` and matches each filename, with and without
+  its extension, against every reference root *except* `tests/` — plus `docs/`, because a dataset a
+  runbook names by filename has a consumer, it is just not a compiler. Excluding tests is the whole
+  reason it finds anything: `data/` is what the product ships and reads, so a file there whose only
+  reader is a suite is not product data. A genuine fixture belongs in `tests/fixtures/`, where this
+  scan never looks.
 - **`lint:types` is enforced (2026-09-16), on pre-push and `bun run check`.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
   type-constituent rules.
@@ -528,6 +538,44 @@ panel has and fails on `/worker|cron|telemetry|binding|dataset/`, and
 reach a rendered sentence. The answer pages render offline because `loadWeeklyBriefSnapshot` falls
 back to the bundled snapshot — which is worth knowing generally: **a page that reads through a
 loader that degrades gracefully is testable here**, unlike one that suspends at a data boundary.
+
+## Features that shipped without shipping (2026-09-16)
+
+Four things were built, tested, and reachable by nobody. They are worth naming together, because
+**one mechanism kept all four alive: every ratchet here counts a reference from anywhere, and a test
+counts.** An unshipped feature with a test is not a lint finding, not a type error, not a failing
+test and not a dead export. It is invisible to the whole gate.
+
+- **The first-time guide.** `FIRST_TIME_GUIDE_STEPS` (three steps, each with a worked example),
+  `FIRST_TIME_GUIDE_HIGHLIGHTS` and `FIRST_TIME_GUIDE_NEXT_LINKS` sat in `reportCopy.ts` with
+  `tests/reportCopy.test.ts` asserting there were exactly three steps and that each carried an
+  example — and asking nowhere whether a reader could see them. They render now, collapsed, inside
+  `FirstVisitExplainer`: that element is already the one thing on `/` addressed to someone who has
+  never seen the page, and its own comment records what it cost the last time that spot grew a
+  second block. Its first link pointed at `#executive-snapshot`, an id no page renders.
+- **`computeReliabilityScore`** averaged confidence as 90/60/30, an offline flag as 100/50, and a
+  degraded-source ratio over `max(degraded + 3, 4)` into a 0-100 figure with three colour bands.
+  Its own tests pinned MED at 87 and LOW at 77 with every source healthy, against bands calling 80
+  green and 60 amber — so the whole confidence range landed between 77 and 97, LOW read amber, MED
+  read green. Deleted, not recalibrated: the site publishes a confidence label and, since the
+  archive study, the record behind it.
+- **The operator feedback pipeline.** `scripts/ingest_operator_feedback.py` (545 lines, the only
+  Python here), `data/cohort_feedback.json` (31KB, eight named operators over six weeks), and a
+  suite in `tests/tools/` — the one directory the deploy gate drops. No npm script, no route, no
+  reader. It could not have been real: the published archive holds one week because the weekly
+  routine has never completed a good run, so a six-week feedback cadence never happened. A
+  committed file of named operators reads as evidence, which is why it went rather than stayed.
+- **`data/concept_conflicts.json`**, which principle wins under which regime — a good idea, wired to
+  nothing, referencing slugs no content carries and whose `/concepts` routes are in
+  `retiredSitemapPaths`.
+
+Also removed: the `ReturningVisitorDeltaStrip` fallback, whose default `impactLinks` and
+`openPanelHref` named four ids nothing renders. The one caller passes its own, so the defaults never
+shipped — dead anchors kept alive by never being reached. Both props are required now.
+
+`check:dead-exports` grew the data-file scan above as a result. The export half still counts tests,
+by design, so **this class can recur for code**: if you are adding a module whose only caller is its
+own test, you are adding one of these.
 
 ## Regime scoring: what the numbers do and do not claim
 

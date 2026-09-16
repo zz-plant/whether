@@ -3,7 +3,11 @@ import { afterEach, describe, it } from "bun:test";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { censusDeadExports, DEAD_EXPORT_BASELINE } from "../scripts/check-dead-exports";
+import {
+  censusDeadExports,
+  censusOrphanedDataFiles,
+  DEAD_EXPORT_BASELINE,
+} from "../scripts/check-dead-exports";
 
 const roots: string[] = [];
 
@@ -98,5 +102,58 @@ describe("dead export census", () => {
       dead.length <= DEAD_EXPORT_BASELINE,
       `${dead.length} unreferenced export(s):\n${dead.map((entry) => `  ${entry.file}: ${entry.name}`).join("\n")}`,
     );
+  });
+});
+
+/*
+ * A JSON file declares no exports, so the census above cannot see it: a dataset
+ * every consumer was deleted from scores zero findings and goes on looking like
+ * part of the product. Two were found that way on 2026-09-16, one of them 31KB
+ * of named operators that read as evidence of a pilot that never ran.
+ */
+describe("orphaned data census", () => {
+  it("reports a data file nothing mentions, and passes one an import names", () => {
+    const root = scaffold({
+      "data/read.json": "[]",
+      "data/orphan.json": "[]",
+      "lib/reader.ts": [
+        'import rows from "../data/read.json";',
+        "export const count = rows.length;",
+      ].join("\n"),
+    });
+
+    assert.deepEqual(censusOrphanedDataFiles(root), ["data/orphan.json"]);
+  });
+
+  it("counts a mention without the extension, which is how a loader often names one", () => {
+    const root = scaffold({
+      "data/by_stem.json": "[]",
+      "lib/reader.ts": 'export const file = "by_stem";',
+    });
+
+    assert.deepEqual(censusOrphanedDataFiles(root), []);
+  });
+
+  /*
+   * The rule that makes this scan find anything. With `tests/` counted, the
+   * cohort dataset would have passed here the way it passed every other gate:
+   * its one reader was the test for a script nothing ran.
+   */
+  it("does not count a test, unlike the export census beside it", () => {
+    const root = scaffold({
+      "data/fixture_only.json": "[]",
+      "tests/thing.test.ts": 'import rows from "../data/fixture_only.json";\nconsole.log(rows);\n',
+    });
+
+    assert.deepEqual(censusOrphanedDataFiles(root), ["data/fixture_only.json"]);
+  });
+
+  it("counts a mention from docs, where a data file is often only described", () => {
+    const root = scaffold({
+      "data/described.json": "[]",
+      "docs/notes.md": "The archive lives in data/described.json and fills forward.\n",
+    });
+
+    assert.deepEqual(censusOrphanedDataFiles(root), []);
   });
 });
