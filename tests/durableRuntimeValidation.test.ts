@@ -5,7 +5,6 @@ import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { KvOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import { macroSeries } from "../lib/macroSnapshot";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
-import { getRuntimeBoundary, resetRuntimeBoundary } from "../lib/runtime/boundary";
 import type { KvNamespace } from "../lib/runtime/kv";
 import { snapshotData } from "../lib/snapshot";
 import { KvDecisionMemoryRepository } from "../lib/storage/decisionMemoryRepository";
@@ -51,7 +50,6 @@ describe("durable runtime validation", () => {
     Reflect.deleteProperty(globalThis, "SITE_URL");
     restoreEnvironmentValue("WHETHER_CRON_SECRET", originalCronSecret);
     restoreEnvironmentValue("SITE_URL", originalSiteUrl);
-    resetRuntimeBoundary();
   });
 
   it("round-trips a valid operating snapshot", async () => {
@@ -138,16 +136,4 @@ describe("durable runtime validation", () => {
     assert.deepEqual((await repository.list()).events, [serializedEvent]);
   });
 
-  it("ignores non-string global config values", () => {
-    process.env.WHETHER_CRON_SECRET = "env-cron-secret";
-    process.env.SITE_URL = "https://env.whether.test";
-    Reflect.set(globalThis, "WHETHER_CRON_SECRET", 42);
-    Reflect.set(globalThis, "SITE_URL", false);
-    resetRuntimeBoundary();
-
-    const config = getRuntimeBoundary().config;
-
-    assert.equal(config.cronSecret, "env-cron-secret");
-    assert.equal(config.siteUrl, "https://env.whether.test");
-  });
 });

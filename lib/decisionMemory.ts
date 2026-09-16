@@ -359,7 +359,7 @@ import {
   type StalenessVerdict,
 } from "./report/decisionStaleness";
 
-export type DecisionAssumptionVerdict = StalenessVerdict;
+type DecisionAssumptionVerdict = StalenessVerdict;
 
 type DecisionAssumptionHealthResult = {
   verdict: DecisionAssumptionVerdict;

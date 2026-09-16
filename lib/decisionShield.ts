@@ -223,7 +223,7 @@ export const isBusinessModel = (
 ): value is NonNullable<CompanyFinancialProfile["businessModel"]> =>
   value === "VC_BACKED" || value === "BOOTSTRAPPED";
 
-export interface PlanStressTestRequest {
+interface PlanStressTestRequest {
   planText: string;
   lifecycle?: LifecycleStage;
   category?: DecisionCategory;
