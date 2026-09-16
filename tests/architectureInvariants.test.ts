@@ -5,6 +5,7 @@ import { assessDecisionStaleness, stalenessVerdictLabel } from "../lib/report/de
 import { evaluateDecisionAssumptionHealth, buildDecisionMemoryEntry } from "../lib/decisionMemory";
 import { buildOperatingSnapshot, hashOperatingInputs } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
+import { getWhetherKv } from "../lib/runtime/kv";
 import {
   InMemoryDecisionMemoryRepository,
   resetDecisionMemoryRepository,
@@ -13,7 +14,6 @@ import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBri
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 import { snapshotData } from "../lib/snapshot";
 import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";
-import { resetRuntimeBoundary, setRuntimeBoundaryForTesting } from "../lib/runtime/boundary";
 import type { KvNamespace } from "../lib/runtime/kv";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -151,7 +151,6 @@ describe("Architecture Invariants", () => {
   beforeEach(() => {
     resetDecisionMemoryRepository();
     resetOperatingSnapshotStore();
-    resetRuntimeBoundary();
   });
 
   /*
@@ -298,26 +297,32 @@ describe("Architecture Invariants", () => {
     assert.equal(snapshot.inputHash, hashOperatingInputs(snapshotData, snapshotMacroSeries));
   });
 
-  it("Invariant 6: Production writes fail if durable storage is missing", () => {
-    // Simulate production environment
-    const prodBoundary = {
-      storage: null,
-      backgroundWork: () => {},
-      clock: { now: () => new Date() },
-      config: { isProduction: true, siteUrl: "https://whether.work" },
-      ensureDurableStorage(name: string) {
-        if (!this.storage && this.config.isProduction) {
-          throw new Error(`[runtime] Durable storage unavailable for production write: ${name}`);
-        }
-        return this.storage!;
-      },
-    };
+  /*
+   * This was "Invariant 6: Production writes fail if durable storage is missing",
+   * and it proved nothing: it built a `prodBoundary` object literal, installed it
+   * through `setRuntimeBoundaryForTesting`, and then asserted that calling that
+   * same literal's own method threw. No production code was involved, and none
+   * ever called `lib/runtime/boundary.ts` — its `ensureDurableStorage` promised to
+   * refuse a "silent in-memory fallback" that nothing consulted.
+   *
+   * What the code actually does is the opposite, so that is what this pins.
+   * `getOperatingSnapshotStore` falls back to an in-memory store when no KV
+   * binding is present, in production as anywhere else: the write succeeds and
+   * goes nowhere durable. Whether it should refuse instead is a live question —
+   * this repo has paid for silent fallbacks before (see the brief freeze) — but
+   * it is a change to a write path, not a cleanup, and CLAUDE.md records it.
+   */
+  it("Invariant 6: the snapshot store falls back to memory when no KV is bound, and says so here", () => {
+    Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
+    resetOperatingSnapshotStore();
+    assert.equal(getWhetherKv(), null, "the test environment has no KV binding");
 
-    setRuntimeBoundaryForTesting(prodBoundary);
+    const store = resetOperatingSnapshotStore();
 
-    assert.throws(
-      () => prodBoundary.ensureDurableStorage("writeOperatingSnapshot"),
-      /Durable storage unavailable for production write/,
+    assert.equal(
+      store.constructor.name,
+      "InMemoryOperatingSnapshotStore",
+      "a missing binding selects the in-memory store; nothing refuses the write",
     );
   });
 

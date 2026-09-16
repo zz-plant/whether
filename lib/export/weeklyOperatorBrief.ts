@@ -9,7 +9,7 @@ import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCop
 import { publicDecisionLabels } from "../report/reportFormatting";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 
-export type WeeklyOperatorBriefPayload = {
+type WeeklyOperatorBriefPayload = {
   date: string;
   boldnessBudget?: {
     score: number;

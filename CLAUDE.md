@@ -142,6 +142,15 @@ deploys every push, which is the only remote gate left.
   reason it finds anything: `data/` is what the product ships and reads, so a file there whose only
   reader is a suite is not product data. A genuine fixture belongs in `tests/fixtures/`, where this
   scan never looks.
+
+  **And modules only a test imports (2026-09-17).** `censusTestOnlyModules` is the third scan, and
+  it closes the hole the export half leaves open on purpose. A helper used inside its own module and
+  exported for a test is a legitimate seam — this repo has around two hundred — so the symbol level
+  cannot tell a seam from a feature. The *module* level can: `driverDecisionViews.ts` has four
+  exports only its test names and is imported by the homepage, so it passes, while a module no
+  shipping file imports at all is a feature built, tested, and reachable by nobody. Import
+  specifiers are resolved to paths rather than matched by filename, `scripts/` counts as a consumer
+  (a CLI is one), and the files Next.js loads by convention are exempt.
 - **`lint:types` is enforced (2026-09-16), on pre-push and `bun run check`.** Type-aware oxlint
   (`oxlint-tsgolint` 7.0.2001) adds `no-floating-promises`, `no-base-to-string`, and the
   type-constituent rules.
@@ -366,6 +375,18 @@ writing one. The record is refused for a dirty tree, for another commit, and aft
 every way it can go wrong costs a repeated run rather than a skipped gate. The build log says which
 way it went.
 
+**A bound set under the real cost manufactures the failure it claims to detect (2026-09-17).** The
+landmark audit's per-route bound was 60s in the deploy gate. The gate spawns its own dev server, so
+every route compiles from cold, and the two heaviest — `/share` and `/trust` — do not answer inside
+60s on a loaded box. Three builds failed with `2 route(s) never answered`, and the log saying so is
+only in the Cloudflare dashboard, so from a sandbox it read as an unexplained red build on whatever
+was pushed last. The bound is 120s now, measured rather than guessed: a cold run against
+`origin/main`, carrying none of that day's changes, reported exactly those two routes and went green
+at 150s. **When a check fails only where you cannot read it, reproduce the environment, not the
+diff** — here, `git archive` into a scratch directory with `node_modules` hardlinked, and
+`--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
+warm one. The bound is still a bound: a route that never answers fails the gate.
+
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
 - `run-checks.mjs` buffers each task's output until it exits, and had no per-task timeout, so one
@@ -576,6 +597,64 @@ shipped — dead anchors kept alive by never being reached. Both props are requi
 `check:dead-exports` grew the data-file scan above as a result. The export half still counts tests,
 by design, so **this class can recur for code**: if you are adding a module whose only caller is its
 own test, you are adding one of these.
+
+### The rest of them (2026-09-17)
+
+The module census above found nine more, and the split it draws is the useful part: three modules
+`scripts/` imports (`answerLaunchReadiness`, `pageMetricsFromTelemetry`, `summaryArchive`) are alive
+— a CLI is a consumer — and nine had no consumer but their own test.
+
+- **`lib/export/issueTrackerBrief.ts` was wired up rather than deleted.** Its own doc comment says it
+  was extracted from `exportBriefPanel.tsx` so it could be tested; that panel was later deleted, and
+  the extraction survived it. It takes the same four arguments as the Slack brief, and `/share` is
+  the page that owns copy formats, so it is a fifth card there now.
+- **`lib/runtime/boundary.ts` was the instructive one.** Its `config` getter resolved `cronSecret`
+  and `siteUrl` its own way, and production resolves both elsewhere — `lib/api/cronAuth.ts` and
+  `lib/siteUrl.ts`, the latter reading `NEXT_PUBLIC_SITE_URL`, not the `SITE_URL` the boundary read.
+  So the only test of "how config resolves" tested a third, divergent copy against the wrong
+  variable. Its `ensureDurableStorage` promised to refuse a "silent in-memory fallback" that nothing
+  consulted, and **"Invariant 6: Production writes fail if durable storage is missing" proved it by
+  calling a fixture it had just defined** — an object literal, installed through
+  `setRuntimeBoundaryForTesting`, asserted to throw from its own method. No production code was
+  involved.
+
+  What the code does is the opposite: `getOperatingSnapshotStore()` falls back to
+  `InMemoryOperatingSnapshotStore` when no KV binding is present, in production as anywhere else, so
+  the write succeeds and goes nowhere durable. Invariant 6 pins *that* now, and says so. Whether it
+  should refuse instead is open — this repo has paid for silent fallbacks before — but that is a
+  change to a write path, not a cleanup.
+- **Deleted, each for its own reason**: a second Slack dispatcher (`lib/webhooks/`) beside the one
+  the cron runs; an "official TypeScript SDK" that is not published and duplicates `/api/mcp` and
+  `/api/agent`; `DecisionPlanStressTester.tsx`, 425 lines superseded by `PlanStressTestMode` in
+  `decisionShieldPanel`; `transitionProbability.ts`, whose own comment said it was "kept for model
+  analysis and tests; not rendered as a user product surface"; `reportNarrative.ts`, `sectorOverlays.ts`
+  and `whetherToShipChecklist.ts`, each of which needs a surface that does not exist, and inventing
+  one is what the first-time guide's history argues against.
+
+Five exported *types* fell out as orphans once those modules went, and were de-exported rather than
+deleted: each is still used inside its own file, and each had been kept "referenced" only by the
+deleted module naming the same identifier.
+
+**A dead `#anchor` is the link version of this, and the landmark audit now catches it.**
+`inspectInPageAnchors` reads every `href="#…"` and every id off the same served response for all 31
+routes, and `collectUnresolvedAnchors` judges them **across routes, never per page**: a link fails
+only when *no* audited route renders that id.
+
+Both halves of that were paid for. Reading only literal HTML called the skip link dead on five
+routes, because a streamed route's `<main id="main-content">` arrives escaped in the flight payload —
+the same reason `inspectMainContentHtml` already consults it. And the first version judged per page,
+which went green here and red in the container: plenty of targets render only under a condition —
+a section that needs figures entered, a banner that needs degraded data — so "this page links to an
+id it is not currently showing" is a claim about the data a route got, and the container's data is
+not this box's (it reaches Treasury and often FRED; a sandbox reaches neither). "No page renders this
+id" is a claim about the code. It is also the claim that catches the real cases: all four anchors
+found by hand rendered on no route at all.
+
+One real finding survived: `/operate/financial` offered nav chips for `#ops-runway-risk` and
+`#ops-board-memo`, neither of which exists until figures have been entered. The empty state carries
+the risk id now (exactly one branch is ever in the DOM, so the anchor always lands, on the message
+saying what is missing), and the board-memo chip is gone — it sits behind a second toggle, so it
+could never be a stable target.
 
 ## Regime scoring: what the numbers do and do not claim
 

@@ -317,8 +317,12 @@ This memo aligns our company budget and operating guardrails with the current cl
         </label>
       </div>
 
+      {/* The same id on both branches, because exactly one of them is ever in the
+          DOM and the nav chip that points here has to land somewhere either way.
+          Before this, "Runway analysis" did nothing until figures were entered —
+          which is the visit where a reader most needs to be told what is missing. */}
       {!resolution.ready || !output ? (
-        <div className="weather-surface border-dashed p-4" aria-live="polite">
+        <div id="ops-runway-risk" className="weather-surface border-dashed p-4" aria-live="polite">
           <p className="text-sm text-slate-100">
             {resolution.ready ? "Sizing the plan…" : describeMissingRunwayInputs(resolution.missing)}
           </p>

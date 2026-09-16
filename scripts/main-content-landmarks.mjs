@@ -60,6 +60,65 @@ const inspectFlightPayload = (html) => ({
   hasSkipLink: countMatches(html, FLIGHT_SKIP_LINK) > 0,
 });
 
+/**
+ * The in-page anchors a rendered page links to, and the ids it carries.
+ *
+ * A dead `#anchor` fails silently: the browser stays put, and nothing in a type
+ * check, a unit test or the landmark audit notices. Four of them were found by
+ * hand on 2026-09-16, all invisible for the same reason — they sat in code that
+ * never rendered, so no reader could click one and report it.
+ *
+ * Ids come from the literal markup *and* from the flight payload, for the same
+ * reason the landmark check consults it: a streamed route's real markup is
+ * escaped JSON in the served response, not elements. Reading only the HTML
+ * called the skip link dead on five routes.
+ *
+ * Both halves are returned rather than diffed here, because the useful question
+ * is not per-page. Plenty of targets render only under a condition — a section
+ * that needs figures entered, a banner that needs degraded data — so a page can
+ * honestly link to an id it is not currently showing, and which state a route
+ * renders in depends on what its upstreams returned. Pinning that per page
+ * makes the check a function of the data, and it would go red in a container
+ * whose log cannot be read from here. The caller asks the stable question
+ * instead: does this id exist anywhere in the app at all.
+ */
+export const inspectInPageAnchors = (html) => {
+  const ids = new Set();
+  for (const match of html.matchAll(/\sid="([^"]+)"/g)) ids.add(match[1]);
+  for (const match of html.matchAll(/\\"id\\":\\"([^"\\]+)\\"/g)) ids.add(match[1]);
+
+  const anchors = new Set();
+  for (const match of html.matchAll(/\shref="#([^"]+)"/g)) {
+    /* `#top` is the document itself, and needs no id to work. */
+    if (match[1] !== "top") anchors.add(match[1]);
+  }
+
+  const byName = (left, right) => left.localeCompare(right);
+  return { ids: [...ids].sort(byName), anchors: [...anchors].sort(byName) };
+};
+
+/**
+ * Anchors no audited route renders an id for, per route that links to one.
+ *
+ * Aggregated across every route before judging, so a target that exists on some
+ * page in some state is real and only a target that exists nowhere fails. That
+ * is the claim worth gating: the four found by hand rendered on no route at
+ * all, and so did the two `/operate/financial` chips.
+ */
+export const collectUnresolvedAnchors = (results) => {
+  const rendered = new Set();
+  for (const result of results) {
+    for (const id of result.anchorIds ?? []) rendered.add(id);
+  }
+
+  return results
+    .flatMap((result) => {
+      const missing = (result.inPageAnchors ?? []).filter((anchor) => !rendered.has(anchor));
+      return missing.length > 0 ? [{ route: result.route, missing }] : [];
+    })
+    .sort((left, right) => left.route.localeCompare(right.route));
+};
+
 export const inspectMainContentHtml = (html) => {
   const mainTags = [...html.matchAll(/<\/?main\b[^>]*>/gi)].map((match) => match[0]);
   const openingMainTags = mainTags.filter((tag) => !/^<\/main\b/i.test(tag));
@@ -219,6 +278,7 @@ const auditRoute = async ({ baseUrl, route, fetchImpl, timeoutMs = ROUTE_FETCH_T
     });
     const html = await response.text();
     const inspection = inspectMainContentHtml(html);
+    const anchors = inspectInPageAnchors(html);
     const issues = [...inspection.issues];
 
     if (!response.ok) {
@@ -241,6 +301,8 @@ const auditRoute = async ({ baseUrl, route, fetchImpl, timeoutMs = ROUTE_FETCH_T
       ok: issues.length === 0,
       unauditable,
       ...inspection,
+      anchorIds: anchors.ids,
+      inPageAnchors: anchors.anchors,
       issues,
     };
   } catch (error) {

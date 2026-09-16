@@ -6,6 +6,7 @@ import { join } from "node:path";
 import {
   censusDeadExports,
   censusOrphanedDataFiles,
+  censusTestOnlyModules,
   DEAD_EXPORT_BASELINE,
 } from "../scripts/check-dead-exports";
 
@@ -155,5 +156,51 @@ describe("orphaned data census", () => {
     });
 
     assert.deepEqual(censusOrphanedDataFiles(root), []);
+  });
+});
+
+/*
+ * The export census cannot catch these, and deliberately: a helper used inside
+ * its own module and exported for a test is a legitimate seam, and this repo has
+ * two hundred of them. A whole module no shipping file imports is not a seam —
+ * it is a feature built, tested, and reachable by nobody.
+ */
+describe("test-only module census", () => {
+  it("reports a module only a test imports", () => {
+    const root = scaffold({
+      "lib/orphan.ts": "export const unused = 1;",
+      "tests/orphan.test.ts": 'import { unused } from "../lib/orphan";\nconsole.log(unused);\n',
+    });
+
+    assert.deepEqual(censusTestOnlyModules(root), ["lib/orphan.ts"]);
+  });
+
+  it("passes a module a shipping file imports, however many exports only its test names", () => {
+    const root = scaffold({
+      "lib/seam.ts": "export const rendered = 1;\nexport const forTheTest = 2;",
+      "lib/consumer.ts": 'import { rendered } from "./seam";\nexport const use = rendered;\n',
+      "tests/seam.test.ts": 'import { forTheTest } from "../lib/seam";\nconsole.log(forTheTest);\n',
+    });
+
+    assert.deepEqual(censusTestOnlyModules(root), []);
+  });
+
+  it("counts a script as a consumer, because a CLI is one", () => {
+    const root = scaffold({
+      "lib/tool.ts": "export const run = 1;",
+      "scripts/do-it.ts": 'import { run } from "../lib/tool";\nconsole.log(run);\n',
+      "tests/tool.test.ts": 'import { run } from "../lib/tool";\nconsole.log(run);\n',
+    });
+
+    assert.deepEqual(censusTestOnlyModules(root), []);
+  });
+
+  it("ignores the files Next.js loads by convention, which nothing imports", () => {
+    const root = scaffold({
+      "app/thing/page.tsx": "export default function Page() { return null; }",
+      "tests/page.test.tsx": 'import Page from "../app/thing/page";\nconsole.log(Page);\n',
+    });
+
+    assert.deepEqual(censusTestOnlyModules(root), []);
   });
 });

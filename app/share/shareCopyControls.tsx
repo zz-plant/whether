@@ -9,15 +9,17 @@ type ShareCopyControlsProps = {
   slackBrief: string;
   emailBrief: string;
   meetingPack: string;
+  issueTrackerBrief: string;
   calendarDetails: string;
 };
 
-type CopyTarget = "slack" | "email" | "meeting";
+type CopyTarget = "slack" | "email" | "meeting" | "tracker";
 
 const copyLabels: Record<CopyTarget, string> = {
   slack: "Slack brief",
   email: "Email brief",
   meeting: "Meeting pack",
+  tracker: "Ticket brief",
 };
 
 const isCopyTarget = (value: string | null): value is CopyTarget => value !== null && value in copyLabels;
@@ -27,6 +29,10 @@ const copyCommitments: Record<CopyTarget, ActivationCommitment> = {
   slack: "copied_slack",
   email: "copied_email",
   meeting: "copied_meeting",
+  /* The generic one rather than a fifth value: the funnel's question is whether
+     a reader copied the call, and widening a telemetry union to split one
+     destination off buys a distinction nothing reads. */
+  tracker: "copied_brief",
 };
 
 const nextMondayIsoDate = () => {
@@ -41,6 +47,7 @@ export function ShareCopyControls({
   slackBrief,
   emailBrief,
   meetingPack,
+  issueTrackerBrief,
   calendarDetails,
 }: ShareCopyControlsProps) {
   const { status, error, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy();
@@ -73,14 +80,14 @@ export function ShareCopyControls({
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       {/* content-start: the preview column beside this one is tall, and without
-          it these four cards stretched to match, leaving a block of empty space
+          it these cards stretched to match, leaving a block of empty space
           under each button. */}
       <div className="grid gap-4 sm:grid-cols-2 content-start">
         <article className="weather-surface space-y-3 px-4 py-4">
-          {/* One colour for four peer formats. These were sky / emerald / amber /
+          {/* One colour for every peer format. These were sky / emerald / amber /
               violet, which reads as a status legend on a site where emerald and
               amber mean easing and tightening everywhere else — decoration
-              spending the semantic palette on four things that differ only by
+              spending the semantic palette on things that differ only by
               destination. */}
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Slack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the current weekly operator brief for channel handoff.</p>
@@ -114,6 +121,18 @@ export function ShareCopyControls({
             onClick={() => void copyText("meeting", meetingPack)}
           >
             {copiedTarget === "meeting" ? "Copied meeting pack" : "Copy meeting pack"}
+          </button>
+        </article>
+
+        <article className="weather-surface space-y-3 px-4 py-4">
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Issue tracker</h2>
+          <p className="text-xs leading-relaxed text-slate-300">Copy the call in Markdown for a Jira or Linear ticket, or a wiki page.</p>
+          <button
+            type="button"
+            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+            onClick={() => void copyText("tracker", issueTrackerBrief)}
+          >
+            {copiedTarget === "tracker" ? "Copied ticket brief" : "Copy ticket brief"}
           </button>
         </article>
 

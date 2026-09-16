@@ -8,6 +8,8 @@ import { ContentPageShell } from "../app/components/ui/contentPageShell";
 import {
   auditMainContentRoutes,
   collectMainContentRouteSamples,
+  collectUnresolvedAnchors,
+  inspectInPageAnchors,
   inspectMainContentHtml,
 } from "../scripts/main-content-landmarks.mjs";
 
@@ -148,5 +150,75 @@ describe("fetch-based main-content guard", () => {
 
     // Still overridable, so a box that disagrees needs no code change.
     assert.match(audit, /readArgValue\("--concurrency", String\(defaultConcurrency\)\)/);
+  });
+});
+
+/*
+ * A dead `#anchor` fails silently — the browser stays put — and nothing in a
+ * type check or a unit test sees it. The four found by hand on 2026-09-16 were
+ * all invisible for one reason: they sat in code that never rendered, so no
+ * reader could click one and report it. The audit reads links and ids off the
+ * same served response, which is the only place both are true at once.
+ */
+describe("in-page anchor targets", () => {
+  it("separates the ids a page carries from the anchors it links to", () => {
+    const html = '<a href="#present">go</a><a href="#absent">go</a><div id="present"></div>';
+
+    assert.deepEqual(inspectInPageAnchors(html), {
+      ids: ["present"],
+      anchors: ["absent", "present"],
+    });
+  });
+
+  it("reads an id out of the flight payload, as a streamed route's arrives", () => {
+    /* The shape a streamed <main id="main-content"> takes in the served HTML.
+       Reading only literal markup called the skip link on five routes dead. */
+    const html = '<a href="#main-content">skip</a>' + String.raw`\"id\":\"main-content\"`;
+
+    assert.deepEqual(inspectInPageAnchors(html).ids, ["main-content"]);
+  });
+
+  it("leaves #top alone, which needs no id", () => {
+    assert.deepEqual(inspectInPageAnchors('<a href="#top">top</a>').anchors, []);
+  });
+
+  it("says nothing about a link to another route's anchor", () => {
+    assert.deepEqual(inspectInPageAnchors('<a href="/trust#beginner-glossary">glossary</a>').anchors, []);
+  });
+});
+
+/*
+ * Aggregated across routes before judging, and that is the load-bearing part.
+ * Plenty of targets render only under a condition — a section that needs
+ * figures entered, a banner that needs degraded data — so "this page links to
+ * an id it is not currently showing" is a claim about the data a route got, and
+ * it would go red in a container whose log cannot be read from here. "No page in
+ * the app renders this id" is a claim about the code, and it is what the four
+ * dead anchors found by hand had in common.
+ */
+describe("unresolved anchors across routes", () => {
+  it("passes an anchor another route renders, and fails one no route does", () => {
+    const results = [
+      { route: "/", anchorIds: ["weekly-call"], inPageAnchors: ["weekly-call", "elsewhere", "nowhere"] },
+      { route: "/operate", anchorIds: ["elsewhere"], inPageAnchors: [] },
+    ];
+
+    assert.deepEqual(collectUnresolvedAnchors(results), [{ route: "/", missing: ["nowhere"] }]);
+  });
+
+  it("names every route that links to a missing id, in route order", () => {
+    const results = [
+      { route: "/b", anchorIds: [], inPageAnchors: ["gone"] },
+      { route: "/a", anchorIds: [], inPageAnchors: ["gone"] },
+    ];
+
+    assert.deepEqual(collectUnresolvedAnchors(results), [
+      { route: "/a", missing: ["gone"] },
+      { route: "/b", missing: ["gone"] },
+    ]);
+  });
+
+  it("says nothing when a route reported no anchors at all", () => {
+    assert.deepEqual(collectUnresolvedAnchors([{ route: "/" }]), []);
   });
 });

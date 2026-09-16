@@ -296,7 +296,76 @@ export const censusOrphanedDataFiles = (root = REPO_ROOT): string[] => {
   return orphans.sort();
 };
 
+/** Files Next.js and the Workers runtime load by convention; nothing imports them. */
+const CONVENTION_MODULES =
+  /^(page|layout|route|loading|error|not-found|template|default|sitemap|robots|manifest|icon|apple-icon|opengraph-image|twitter-image|global-error|middleware|instrumentation)$/;
+
+const IMPORT_PATTERN = /(?:from|import)\s*\(?\s*["']((?:\.|\.\.)\/[^"']+)["']/g;
+
+/**
+ * Modules only a test imports.
+ *
+ * The export census cannot catch these, and deliberately: a helper used inside
+ * its own module and exported for a test is a legitimate seam, and this repo has
+ * two hundred of them. What is not a seam is a whole module that no shipping
+ * file imports — a feature built, tested, and reachable by nobody. Four were
+ * found that way on 2026-09-16 and nine more on 2026-09-17: an SDK client, a
+ * second Slack dispatcher, a sector-overlay model, a ship/wait/kill checklist,
+ * a runtime boundary whose config resolution had drifted from the resolvers
+ * production actually uses.
+ *
+ * Judged per module rather than per symbol, which is what makes it precise:
+ * `driverDecisionViews.ts` has four exports only its test names and is imported
+ * by the homepage, so it is a seam and passes. A `scripts/` importer counts —
+ * a CLI is a consumer.
+ */
+export const censusTestOnlyModules = (root = REPO_ROOT): string[] => {
+  const shipped = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false);
+  const consumers = collect(root, [...DECLARATION_ROOTS, "scripts"], REFERENCE_EXTENSIONS, true);
+  const tests = collect(root, ["tests"], REFERENCE_EXTENSIONS, false);
+
+  /** Every module path an importing file resolves to, relative to the repo root. */
+  const importedBy = (files: Map<string, string>): Set<string> => {
+    const imported = new Set<string>();
+    for (const [path, source] of files) {
+      const directory = path.slice(0, path.lastIndexOf("/"));
+      for (const match of source.matchAll(IMPORT_PATTERN)) {
+        const resolved = join(directory, match[1]).replaceAll("\\", "/");
+        const bare = resolved.replace(/\.(ts|tsx|js|jsx)$/, "");
+        for (const candidate of [bare, `${bare}/index`]) {
+          imported.add(`${candidate}.ts`);
+          imported.add(`${candidate}.tsx`);
+        }
+      }
+    }
+    return imported;
+  };
+
+  const shippedImports = importedBy(consumers);
+  const testImports = importedBy(tests);
+
+  const orphans: string[] = [];
+  for (const path of shipped.keys()) {
+    const base = path.slice(path.lastIndexOf("/") + 1).replace(/\.(ts|tsx)$/, "");
+    if (CONVENTION_MODULES.test(base)) continue;
+    if (shippedImports.has(path)) continue;
+    if (testImports.has(path)) orphans.push(path);
+  }
+
+  return orphans.sort();
+};
+
 const main = () => {
+  const testOnly = censusTestOnlyModules(REPO_ROOT);
+  process.stdout.write(`[dead-exports] ${testOnly.length} module(s) imported only by tests\n`);
+  if (testOnly.length > 0) {
+    for (const file of testOnly) process.stdout.write(`  ${file}\n`);
+    process.stdout.write(
+      "[dead-exports] FAIL: a module no shipping file imports. Wire it to a surface or delete it — a test is not a consumer.\n",
+    );
+    process.exit(1);
+  }
+
   const orphanedData = censusOrphanedDataFiles(REPO_ROOT);
   process.stdout.write(`[dead-exports] ${orphanedData.length} unreferenced data file(s) under ${DATA_ROOTS.join("/, ")}/\n`);
   if (orphanedData.length > 0) {

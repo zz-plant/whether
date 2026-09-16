@@ -15,7 +15,7 @@ type AnalogCoordinate = {
   unit: "%" | "pts";
 };
 
-export interface AnalogPlaybookResult {
+interface AnalogPlaybookResult {
   analogPeriod: string;
   /**
    * Nearness of the closest reference cycle, 0–100, as `100 / (1 + d)` where `d`
