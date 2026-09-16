@@ -624,16 +624,25 @@ deleted: each is still used inside its own file, and each had been kept "referen
 deleted module naming the same identifier.
 
 **A dead `#anchor` is the link version of this, and the landmark audit now catches it.**
-`inspectInPageAnchors` reads every `href="#…"` and every id off the same served response, for all 31
-routes, and a link with no target on its page fails the check. Writing it surfaced the trap
-immediately: reading only literal HTML reported the skip link as dead on five routes, because a
-streamed route's `<main id="main-content">` arrives escaped in the flight payload — the same reason
-`inspectMainContentHtml` already consults it. With that fixed, one real finding remained:
-`/operate/financial` offered nav chips for `#ops-runway-risk` and `#ops-board-memo`, neither of which
-exists until the reader has entered figures. The empty state carries the risk id now (exactly one
-branch is ever in the DOM, so the anchor always lands, and it lands on the message saying what is
-missing), and the board-memo chip is gone — it sits behind a second toggle, so it could never be a
-stable target.
+`inspectInPageAnchors` reads every `href="#…"` and every id off the same served response for all 31
+routes, and `collectUnresolvedAnchors` judges them **across routes, never per page**: a link fails
+only when *no* audited route renders that id.
+
+Both halves of that were paid for. Reading only literal HTML called the skip link dead on five
+routes, because a streamed route's `<main id="main-content">` arrives escaped in the flight payload —
+the same reason `inspectMainContentHtml` already consults it. And the first version judged per page,
+which went green here and red in the container: plenty of targets render only under a condition —
+a section that needs figures entered, a banner that needs degraded data — so "this page links to an
+id it is not currently showing" is a claim about the data a route got, and the container's data is
+not this box's (it reaches Treasury and often FRED; a sandbox reaches neither). "No page renders this
+id" is a claim about the code. It is also the claim that catches the real cases: all four anchors
+found by hand rendered on no route at all.
+
+One real finding survived: `/operate/financial` offered nav chips for `#ops-runway-risk` and
+`#ops-board-memo`, neither of which exists until figures have been entered. The empty state carries
+the risk id now (exactly one branch is ever in the DOM, so the anchor always lands, on the message
+saying what is missing), and the board-memo chip is gone — it sits behind a second toggle, so it
+could never be a stable target.
 
 ## Regime scoring: what the numbers do and do not claim
 

@@ -27,11 +27,21 @@ export interface MainContentRouteResult extends MainContentInspection {
 export function inspectMainContentHtml(html: string): MainContentInspection;
 
 /**
- * Same-page `#anchor` targets the rendered page does not carry, sorted. Reads
- * the flight payload's ids as well as the literal markup's, because a streamed
- * route's landmark arrives escaped rather than as an element.
+ * The ids a rendered page carries and the same-page `#anchor` targets it links
+ * to, both sorted. Ids come from the flight payload as well as the literal
+ * markup, because a streamed route's landmark arrives escaped rather than as an
+ * element. `#top` is excluded: it needs no id.
  */
-export function inspectInPageAnchors(html: string): string[];
+export function inspectInPageAnchors(html: string): { ids: string[]; anchors: string[] };
+
+/**
+ * Per route, the anchors it links to that no audited route renders an id for.
+ * Aggregated before judging, because whether a given section is on screen
+ * depends on the data a route got; whether the id exists at all does not.
+ */
+export function collectUnresolvedAnchors(
+  results: Array<{ route: string; anchorIds?: string[]; inPageAnchors?: string[] }>,
+): Array<{ route: string; missing: string[] }>;
 
 /**
  * Every page route under `appDir`, with dynamic segments replaced by the

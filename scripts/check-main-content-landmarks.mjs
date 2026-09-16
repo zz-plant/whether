@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Fails the build when a route does not own exactly one `<main id="main-content">`,
- * or links to an `#anchor` it does not render.
+ * or links to an `#anchor` that no audited route renders.
  *
  * The skip link is the only way a keyboard or screen-reader user gets past the
  * nav, and it is a single anchor pointed at a single id — so a duplicated,
@@ -25,6 +25,7 @@ import { availableParallelism } from "node:os";
 import {
   auditMainContentRoutes,
   collectMainContentRouteSamples,
+  collectUnresolvedAnchors,
 } from "./main-content-landmarks.mjs";
 import { withDevServer } from "./dev-server.lib.mjs";
 
@@ -119,11 +120,29 @@ const reportResults = (results) => {
   const timedOut = results.filter((result) => result.timedOut);
   const violations = results.filter((result) => !result.ok && !result.unauditable && !result.timedOut);
   const audited = results.length - unauditable.length - timedOut.length;
+  /*
+   * Judged across every route that rendered, never per page. Whether a given
+   * section is on screen depends on the data a route got — figures entered, a
+   * degraded banner, a live upstream — so "this page links to an id it is not
+   * currently showing" is a claim about the data, and would go red in a
+   * container whose log cannot be read from here. "No page in the app renders
+   * this id" is a claim about the code, and is what the four found by hand had
+   * in common.
+   */
+  const auditedResults = results.filter((result) => !result.unauditable && !result.timedOut);
+  const unresolvedAnchors = collectUnresolvedAnchors(auditedResults);
 
   for (const violation of violations) {
     console.error(`\n✗ ${violation.route}  (${violation.finalUrl})`);
     for (const issue of violation.issues) {
       console.error(`    ${issue}`);
+    }
+  }
+
+  for (const entry of unresolvedAnchors) {
+    console.error(`\n✗ ${entry.route}`);
+    for (const anchor of entry.missing) {
+      console.error(`    Links to #${anchor}, which no audited route renders.`);
     }
   }
 
@@ -155,17 +174,17 @@ const reportResults = (results) => {
     return 1;
   }
 
-  if (violations.length > 0) {
+  if (violations.length > 0 || unresolvedAnchors.length > 0) {
     console.error(
-      `\n${violations.length} of ${audited} rendered routes have landmark or in-page link problems.`,
+      `\n${violations.length} landmark problem(s) and ${unresolvedAnchors.length} route(s) linking to an id no page renders, across ${audited} rendered routes.`,
     );
     console.error(
-      'Each route needs exactly one <main id="main-content"> with exactly one link to it, and every #anchor it renders must resolve on the page.',
+      'Each route needs exactly one <main id="main-content"> with exactly one link to it, and every #anchor it links to must exist on some page.',
     );
     return 1;
   }
 
-  console.log(`\n✅ ${audited} rendered routes own one <main id="main-content"> and render every #anchor they link to`);
+  console.log(`\n✅ ${audited} rendered routes own one <main id="main-content">, and every #anchor they link to exists`);
   return 0;
 };
 
