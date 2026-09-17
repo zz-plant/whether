@@ -45,11 +45,45 @@ describe("STD-07 export of decision memory", () => {
     assert.equal(regime.record_id, "whether:belief:dm-2:regime");
     assert.deepEqual(decision.depends_on, [regime.record_id]);
     assert.equal(decision.subject, "HIRING / HIRE (GROWTH)");
-    assert.equal(decision.actor.id, "kj");
+    /* The owner claim alone no longer buys a human actor — see below. */
+    assert.equal(decision.actor.id, "whether-decision-shield");
+    assert.equal(decision.actor.kind, "service");
     assert.equal(decision.actor.on_behalf_of, "client-a");
     assert.equal(decision.time.as_of, "2026-02-16T00:00:00.000Z");
     assert.equal(decision.time.recorded_at, "2026-02-16T12:00:00.000Z");
     assert.equal(decision.visibility, "private");
+  });
+
+  /*
+   * `POST /api/decision-memory` had no authentication: `requireClientOwner`
+   * compared a header against a body field the same caller wrote. Supplying
+   * `owner` set `actor.kind: "human"`, so anyone could append a record
+   * attributed to a named person into a ledger published as STD-07 conformance
+   * level 2, chained, with an external verifier named beside it.
+   *
+   * The ledger is the artifact that would evidence the human review the
+   * Acceptable Use Policy requires for decisions affecting individuals, so the
+   * unauthenticated path could manufacture proof of the review the policy
+   * demands. The chain and the server-set `recorded_at` stop tampering and
+   * backdating; neither says anything about who wrote a record.
+   */
+  it("does not record a human actor the server cannot vouch for", async () => {
+    const claimed = { ...decisionEntry, owner: "kj" };
+    const [, decision] = await toRevisableDelegationRecords([claimed], { baseUrl: "https://whether.work" });
+
+    assert.equal(decision.actor.kind, "service");
+    assert.notEqual(decision.actor.id, "kj");
+  });
+
+  it("records a human actor once the request is verified", async () => {
+    /* `verifiedOwner` is set by the route and only when a valid signed client
+       token accompanied the write, so it cannot be reached from a payload. */
+    const attested = { ...decisionEntry, owner: "kj", verifiedOwner: "kj" };
+    const [, decision] = await toRevisableDelegationRecords([attested], { baseUrl: "https://whether.work" });
+
+    assert.equal(decision.actor.kind, "human");
+    assert.equal(decision.actor.id, "kj");
+    assert.equal(decision.actor.on_behalf_of, "client-a");
   });
 
   it("never emits a belief that says nothing would end it", async () => {

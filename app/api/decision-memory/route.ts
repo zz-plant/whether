@@ -62,7 +62,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const format = url.searchParams.get("format");
   const clientId = url.searchParams.get("clientId") ?? undefined;
-  const owner = requireClientOwner(request, clientId);
+  const owner = await requireClientOwner(request, clientId);
   if (owner.error) return owner.error;
   const repository = getDecisionMemoryRepository();
   const listed = await repository.list({ limit: 64, clientId: owner.ownerId! });
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ entries: [], count: 0, error: "invalid-payload", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
   const claimedClientId = snapshot?.clientId ?? parsed?.clientId;
-  const owner = requireClientOwner(request, claimedClientId);
+  const owner = await requireClientOwner(request, claimedClientId);
   if (owner.error) return owner.error;
   if (snapshot) snapshot.clientId = owner.ownerId!;
   if (parsed) parsed.clientId = owner.ownerId!;
@@ -126,6 +126,13 @@ export async function POST(request: Request) {
   const entry = snapshot
     ? buildDecisionMemorySnapshotEntry(snapshot)
     : buildDecisionMemoryEntry(parsed as DecisionMemoryPayload);
+
+  /* The route is the only place that knows whether the request was vouched for,
+     so it is the only place that may promote an owner claim to a verified one.
+     Everything downstream reads `verifiedOwner` and cannot manufacture it. */
+  if (owner.verified && entry.owner) {
+    entry.verifiedOwner = entry.owner;
+  }
   await repository.append(entry);
   const listed = await repository.list({ limit: 64, clientId: entry.context.clientId });
 
