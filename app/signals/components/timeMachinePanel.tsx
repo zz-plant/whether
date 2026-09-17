@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -137,12 +137,18 @@ export const TimeMachinePanel = ({
     selectedSnapshotIndex >= 0 && selectedSnapshotIndex < orderedSnapshots.length - 1
       ? orderedSnapshots[selectedSnapshotIndex + 1]
       : null;
-  const [calendarYear, setCalendarYear] = useState(year);
+  /* Which year the calendar is browsing, which starts at the selected year and
+     follows it whenever the selection moves. Stamped with the year it was picked
+     against rather than re-assigned from an effect on every selection change:
+     the effect version rendered the calendar on the old year first and corrected
+     it on a second pass. */
+  const [browsedYear, setBrowsedYear] = useState<{ forYear: number; value: number } | null>(null);
+  const calendarYear = browsedYear?.forYear === year ? browsedYear.value : year;
   const calendarMonths = monthsByYear[calendarYear] ?? [];
-
-  useEffect(() => {
-    setCalendarYear(year);
-  }, [year]);
+  const setCalendarYear = useCallback(
+    (value: number) => setBrowsedYear({ forYear: year, value }),
+    [year],
+  );
 
   const handleSubmit = () => {
     if (isUnavailableSelection) {
