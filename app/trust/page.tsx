@@ -13,7 +13,6 @@ import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
-import { ConfidenceRecordSection } from "./confidenceRecord";
 import { RunHistorySection } from "./runHistorySection";
 import { buildTrustPageModel } from "./trustPageModel";
 import { GLOSSARY_HREF } from "../../lib/report/signalTranslations";
@@ -149,7 +148,18 @@ export default async function MethodPage({
         </div>
       </ReportSection>
 
-      <ConfidenceRecordSection />
+      {/* The study moved to /calibration — it is original research and deserved
+          an address, and two indexable URLs carrying it would compete. This
+          keeps the reader who is here to judge the call pointed at it. */}
+      <ReportSection
+        id="confidence-record"
+        title="What the confidence number has been worth"
+        description="The percent measures distance from a regime boundary. Whether calls at that distance actually held is measured separately, over the whole archive."
+      >
+        <ActionLink href="/calibration" variant="pill">
+          Read the calibration study
+        </ActionLink>
+      </ReportSection>
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">

@@ -26,8 +26,37 @@ export const defaultSiteDescription =
  * brand entity was anchored to nothing but its own homepage. Only the
  * organization's own presences belong here (the author's site is on the
  * Person node, in lib/publisher.ts).
+ *
+ * One entry is thin for a brand whose name is an ordinary English word, which
+ * is the hardest case for entity resolution: "whether" appears in every corpus
+ * a retrieval system holds, so the node needs corroborating identifiers rather
+ * than more prose. A LinkedIn company page, an X profile, a Crunchbase entry
+ * and a Wikidata item are the four that carry weight, and each belongs here the
+ * day it exists. None are listed because none have been confirmed to exist —
+ * an invented profile URL is a false claim about the organization, and a
+ * `sameAs` pointing at a 404 is worse for entity resolution than a short list.
  */
 export const organizationSameAs = ["https://github.com/zz-plant/whether"] as const;
+
+/**
+ * What the organization is about, as the site itself defines it.
+ *
+ * Derived from the two vocabularies that already exist — the signals the engine
+ * publishes and the decision areas its rules are scoped to — so a topic cannot
+ * be claimed here that no page covers. This is the other half of anchoring an
+ * ambiguous brand name: `sameAs` says *which* entity, `knowsAbout` says what it
+ * is competent in, and a retrieval system deciding whether to cite this site on
+ * a hiring-under-tight-credit question reads the second one.
+ */
+export const organizationKnowsAbout = [
+  "Macroeconomic conditions for startup operating decisions",
+  "US Treasury yield curve",
+  "Startup hiring decisions",
+  "Capital raising timing",
+  "Burn discipline",
+  "Product tempo",
+  "Expansion bets",
+] as const;
 
 /** The site-level entity ids every page's graph points at. */
 export const organizationId = `${siteUrl}#organization`;

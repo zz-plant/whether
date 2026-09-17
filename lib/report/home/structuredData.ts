@@ -1,5 +1,6 @@
 import {
   buildBreadcrumbList,
+  organizationKnowsAbout,
   buildOgImageUrl,
   defaultSiteDescription,
   organizationName,
@@ -10,6 +11,7 @@ import { siteUrl } from "../../siteUrl";
 import { createBreadcrumbTrail } from "../../navigation/breadcrumbs";
 import { buildAuthorSchema } from "../../publisher";
 import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
+import { formatConfidenceChipLabel } from "../reportFormatting";
 
 /** A JSON-LD document. Typed loosely on purpose — this is serialized to JSON, and
  *  a consumer (or a test) reads nodes by key rather than by a TS shape. Giving the
@@ -62,6 +64,11 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       logo: `${siteUrl}/icon.svg`,
       description: defaultSiteDescription,
       sameAs: [...organizationSameAs],
+      /* The named person behind the call, as the same Person node the article
+         bylines resolve to. A one-author publication whose author is anchored
+         nowhere is the shape of a content farm. */
+      founder: buildAuthorSchema(),
+      knowsAbout: [...organizationKnowsAbout],
     },
     {
       "@type": "WebSite",
@@ -116,13 +123,49 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         variableMeasured: [
           { "@type": "PropertyValue", name: "Operating posture", value: brief.postureLabel },
           { "@type": "PropertyValue", name: "Regime", value: brief.regimeLabel },
-          { "@type": "PropertyValue", name: "Confidence", value: brief.confidenceLabel },
+          /*
+           * The word, not the engine's code. This shipped `"MED"` — the value
+           * `RegimeConfidenceLabel` stores — into the one payload on the site
+           * written to be read by machines, so every consumer that quoted the
+           * confidence quoted an abbreviation with no key beside it. The
+           * reader-facing surfaces were moved to the word form; this one was
+           * missed because nothing renders it on screen.
+           */
+          { "@type": "PropertyValue", name: "Confidence", value: formatConfidenceChipLabel(brief.confidenceLabel) },
         ],
         isBasedOn: {
           "@type": "CreativeWork",
           name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
           url: "https://fred.stlouisfed.org/",
         },
+        /*
+         * Where the data actually is. `isBasedOn` names the upstream this is
+         * derived from; `distribution` is the part a dataset consumer needs —
+         * the machine-readable copies of *this* reading. The site has served
+         * all three for a long time, advertises them in `llms.txt`, the agent
+         * manifest and `<link rel="alternate">`, and the node that exists to
+         * describe the dataset named none of them.
+         */
+        distribution: [
+          {
+            "@type": "DataDownload",
+            encodingFormat: "application/json",
+            name: "Agent API — current brief",
+            contentUrl: `${siteUrl}/api/agent?cadence=weekly`,
+          },
+          {
+            "@type": "DataDownload",
+            encodingFormat: "application/json",
+            name: "Current posture",
+            contentUrl: `${siteUrl}/api/posture/current`,
+          },
+          {
+            "@type": "DataDownload",
+            encodingFormat: "text/markdown",
+            name: "Weekly brief (Markdown)",
+            contentUrl: `${siteUrl}/brief.md`,
+          },
+        ],
       },
     },
     {

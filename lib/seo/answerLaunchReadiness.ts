@@ -1,6 +1,10 @@
 import type { DecisionPageDefinition } from "../../app/answers/decisionPages";
 import { answerPages } from "../../app/answers/decisionPages";
-import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoDecisionPayload";
+import {
+  buildAnswerInterpretationLabel,
+  buildSeoDecisionPayload,
+  type SeoDecisionPayload,
+} from "../report/seoDecisionPayload";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "../report/weeklyBriefSnapshot";
 import { evaluateSeoQualityGates, type SeoQualityGateResult, type SeoQualitySiblingInput } from "../report/seoQualityGates";
 
@@ -20,8 +24,19 @@ type AnswerLaunchReadinessPayloadRecord = {
   siblingInput: SeoQualitySiblingInput;
 };
 
-const buildInterpretationLabel = (payload: Pick<SeoDecisionPayload, "currentCall" | "immediateAction">) =>
-  `${payload.currentCall}|${payload.immediateAction}`;
+/* One definition, in `seoDecisionPayload`. This was a second copy of the same
+   rule, so a page could be scored here against a label the payload builder no
+   longer produced. */
+const buildInterpretationLabel = (
+  payload: Pick<SeoDecisionPayload, "currentCall" | "immediateAction" | "interpretationLabel">,
+  editorialAngle?: string,
+) =>
+  payload.interpretationLabel
+  ?? buildAnswerInterpretationLabel({
+    editorialAngle,
+    currentCall: payload.currentCall,
+    immediateAction: payload.immediateAction,
+  });
 
 const estimateScanSeconds = (payload: Pick<SeoDecisionPayload, "currentCall" | "immediateAction" | "triggerThreshold" | "reversalCondition">): number => {
   const words = [payload.currentCall, payload.immediateAction, payload.triggerThreshold, payload.reversalCondition]
@@ -68,7 +83,7 @@ const buildPayloadRecords = (
       payload,
       siblingInput: {
         pageKey: `/answers/${page.slug}`,
-        interpretationLabel: buildInterpretationLabel(payload),
+        interpretationLabel: buildInterpretationLabel(payload, page.shortAnswer),
         evidenceTitles: payload.evidence.map((item) => item.title),
       },
     };
@@ -107,7 +122,7 @@ export const scoreAnswerLaunchReadiness = async (
       fallbackLabel: inputs.degraded ? "fallback" : "live",
       trustSummary: payload.trustSummary,
       citationMeta: payload.citationMeta,
-      interpretationLabel: buildInterpretationLabel(payload),
+      interpretationLabel: buildInterpretationLabel(payload, page.shortAnswer),
       siblingsInCluster: siblings,
       enforceLaunchChecklist: true,
       scanSecondsEstimate: estimateScanSeconds(payload),

@@ -180,6 +180,11 @@ export const utilityLinks = [
     description: "Plain-English definitions of every term the brief uses",
   },
   {
+    href: "/calibration",
+    label: "Calibration",
+    description: "What the confidence number has been worth, against the whole archive",
+  },
+  {
     href: "/search",
     label: "Search",
     description: "Find a decision, signal, or past call",

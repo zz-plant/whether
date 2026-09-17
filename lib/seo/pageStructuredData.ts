@@ -1,4 +1,4 @@
-import { buildBreadcrumbList, buildCanonicalUrl, organizationName, websiteId, websiteName } from "../seo";
+import { buildBreadcrumbList, buildCanonicalUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
 import { siteUrl } from "../siteUrl";
 import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
 import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
@@ -327,11 +327,23 @@ export const buildAnswerFaqStructuredData = ({
   payload,
   datePublishedIso,
   dateModifiedIso,
+  additionalQuestions = [],
 }: {
   slug: string;
   question: string;
   answer: string;
   payload: Pick<SeoDecisionPayload, "triggerThreshold" | "reversalCondition">;
+  /**
+   * The rest of what the page answers.
+   *
+   * The node carried two entries — the question and its flip condition — while
+   * the page itself answered what to do this week, who it is for, how current
+   * the reading is and what it rests on. Each of those is a passage an answer
+   * engine can lift and attribute, and none of them were in the payload a
+   * machine reads. Every entry is built from data the page already renders;
+   * an empty answer is dropped rather than published as a blank.
+   */
+  additionalQuestions?: ReadonlyArray<{ question: string; answer: string }>;
   /** ISO. The record date the call was struck on. */
   datePublishedIso: string;
   /** ISO. When the data behind the answer was last read. */
@@ -365,8 +377,80 @@ export const buildAnswerFaqStructuredData = ({
             text: `${payload.triggerThreshold} ${payload.reversalCondition}`,
           },
         },
+        ...additionalQuestions
+          .filter((entry) => entry.question.trim() && entry.answer.trim())
+          .map((entry) => ({
+            "@type": "Question",
+            name: entry.question,
+            acceptedAnswer: { "@type": "Answer", text: entry.answer },
+          })),
       ],
     },
     buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/resolve" }, { path: `/answers/${slug}`, label: question }])),
+  ]);
+};
+
+/**
+ * `/calibration`: the confidence calibration study.
+ *
+ * Both a `Dataset` and a `ScholarlyArticle`, because it is both — a measured
+ * result over a named sample, and a written finding about that result. The
+ * `citation` names the upstream the archive is built from, which is what lets a
+ * consumer check the claim rather than take it.
+ */
+export const buildCalibrationStudyStructuredData = ({
+  totals,
+}: {
+  totals: { months: number; held: number };
+}): JsonLdGraph => {
+  const url = buildCanonicalUrl("/calibration");
+  const name = "Does the confidence number predict anything?";
+  const description =
+    `A calibration study of Whether's published confidence percent against ${totals.months} month-end readings: `
+    + "every band understates, and distance from a regime boundary does not order the outcome.";
+
+  return graph([
+    {
+      "@type": "ScholarlyArticle",
+      "@id": `${url}#study`,
+      url,
+      headline: name,
+      name,
+      description,
+      inLanguage: "en",
+      isPartOf: isPartOfSite,
+      mainEntityOfPage: url,
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      about: {
+        "@type": "Thing",
+        name: "Calibration of a macro regime confidence score",
+      },
+      citation: {
+        "@type": "CreativeWork",
+        name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
+        url: "https://fred.stlouisfed.org/",
+      },
+    },
+    {
+      "@type": "Dataset",
+      "@id": `${url}#dataset`,
+      name: "Whether regime hold rates by distance to boundary",
+      description:
+        `Month-end regime readings and whether the published regime held the following month. `
+        + `${totals.held} of ${totals.months} held.`,
+      url,
+      creator: { "@id": organizationId },
+      isBasedOn: {
+        "@type": "CreativeWork",
+        name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
+        url: "https://fred.stlouisfed.org/",
+      },
+      variableMeasured: [
+        { "@type": "PropertyValue", name: "Month-end readings compared", value: totals.months },
+        { "@type": "PropertyValue", name: "Readings whose regime held one month later", value: totals.held },
+      ],
+    },
+    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }, { path: "/calibration", label: name }])),
   ]);
 };

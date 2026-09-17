@@ -14,7 +14,7 @@ import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ActionLink } from "../components/ui/actionLink";
-import { publicDecisionLabels } from "../../lib/report/reportFormatting";
+import { formatConfidenceChipLabel, publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import {
@@ -108,6 +108,29 @@ export async function DecisionAnswerPageContent({
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
+    /* The rest of what this page answers, from what it already renders. Each is
+       a passage an answer engine can quote and attribute; none of them were in
+       the payload a machine reads. */
+    additionalQuestions: [
+      {
+        question: "What should we do about it this week?",
+        answer: payload.immediateAction,
+      },
+      {
+        question: "Who is this answer for?",
+        answer: `${page.audience}. It covers ${page.mappedDecisionAreas.map(decisionAreaLabel).join(", ").toLowerCase()}.`,
+      },
+      {
+        question: "How current is this reading?",
+        answer: `Data date ${recordDateLabel}, refreshed ${fetchedAtLabel}, ${formatConfidenceChipLabel(homeBriefModel.confidenceLabel).toLowerCase()}.`,
+      },
+      {
+        question: "What is this based on?",
+        answer: payload.evidence.length > 0
+          ? `${payload.evidence.map((item) => item.title).join(", ")}. ${payload.citationMeta}`
+          : payload.citationMeta,
+      },
+    ],
   });
 
   /*
