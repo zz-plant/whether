@@ -87,7 +87,10 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
         heading(3, page.title),
         `URL: ${baseUrl}/resources/${page.slug}`,
         page.description,
-        page.boardSummary ? `Board summary: ${page.boardSummary}` : null,
+        /* `boardSummary` is `string[]`, and interpolating one publishes it
+           comma-joined — "a,b,c" — into the corpus agents read. `lint:types`
+           had been failing on exactly this line. */
+        page.boardSummary.length > 0 ? `Board summary: ${page.boardSummary.join(" ")}` : null,
         ...(page.sections ?? []).map((entry) =>
           section([heading(4, entry.heading), ...(entry.paragraphs ?? [])]),
         ),

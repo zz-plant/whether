@@ -12,6 +12,13 @@
  * date the page already rendered rather than reading one, which is what makes
  * the claim true by construction: whatever reading is on the screen is the one
  * named here.
+ *
+ * The rule, since 2026-09-17: a route that renders a reading mounts this; a
+ * route that does not — the glossary, privacy, the API docs — needs nothing,
+ * because a cached copy of those makes no claim that can go stale. It shipped
+ * on `/` alone while the worker cached every document, so /trust and /signals
+ * served a previous visit's readings unlabelled. It is mounted in
+ * `reportShell.tsx` now, which every reading route but `/` is built on.
  */
 "use client";
 

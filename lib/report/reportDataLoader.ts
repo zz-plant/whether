@@ -639,12 +639,15 @@ export const buildFallbackReportDataInternal = ({
   const ageLabel = deps.formatAgeHours(fallbackTreasury.fetched_at, now);
   const { playbook, startItems, stopItems, actionStripItems } = deps.buildGuidanceBundleFromAssessment(assessment);
 
+  /* The fallback report has no previous reading behind it at all, so it claims
+     no direction. It said "stable" until 2026-09-17, which is how a degraded
+     read published "Conditions held steady this week" to the homepage. */
   const fallbackReportDynamics: ReportDynamics = {
     changedSignals: [],
     anomalySignals: [],
     totalSignalChanges: 0,
     regimeChanged: false,
-    directionLabel: "stable",
+    directionLabel: "unavailable",
   };
   const actionNowShort = deps.buildActionNowShort({ ...fallbackReportDynamics, regime: assessment.regime });
   // A threshold, not a playbook "stop" item. This read stopItems[0], so the

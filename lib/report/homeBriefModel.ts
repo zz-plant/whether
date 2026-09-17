@@ -84,7 +84,7 @@ export type HomeReportData = {
   stopItems: string[];
   recordDateLabel?: string;
   reportDynamics?: {
-    directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+    directionLabel: ReportDynamics["directionLabel"];
     changedSignals: Array<{
       key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
       delta: number;
@@ -361,8 +361,9 @@ export type WeeklyDecisionCardViewModel = {
     decisionReadiness: DecisionReadinessState;
     weeklyLeadershipSummary: WeeklyLeadershipSummary;
     weeklyMovement: {
-      score: number;
-      direction: "tightening" | "easing" | "stable";
+      /** null when no previous reading was compared, which is not a score of 0. */
+      score: number | null;
+      direction: "tightening" | "easing" | "stable" | "unavailable";
       summary: string;
     };
   };

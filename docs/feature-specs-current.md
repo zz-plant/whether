@@ -339,10 +339,17 @@ assumptions optimistic in three ways, and this pass fixed each:
   growth live in one browser-held profile (`lib/operatorProfile.ts`, `whether.operatorProfile`)
   that the planner and both stress tests share through `OperatorProfileNumberField`, which
   validates on blur, commits on parse, and treats blank as "not given".
-- **Dead capture paths removed.** `useCrossDeviceSync` (no call sites; `/api/sync` stays,
-  tested, with no client), `useDecisionHistory` + the history page's "Decision archive" (nothing
-  ever wrote the key it read), `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts`
-  (no product callers), and the unused entries in `lib/storage/keys.ts`.
+- **Dead capture paths removed.** `useCrossDeviceSync` (no call sites), `useDecisionHistory` +
+  the history page's "Decision archive" (nothing ever wrote the key it read),
+  `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts` (no product callers), and the
+  unused entries in `lib/storage/keys.ts`.
+- **`/api/sync` went too (2026-09-17).** It was kept at the time — "stays, tested, with no client" —
+  and a tested endpoint with no client is not a dormant feature, it is a live one nobody reads. It
+  accepted an unauthenticated POST, scoped by a caller-chosen id and a caller-chosen secret, and
+  wrote 24KB of reader state into KV with no rate limit and no TTL. Its two permitted keys
+  (`whether-company-metrics`, `whether-decision-log`) named the module deleted in the line above and
+  a key nothing has ever written. `/privacy` 2.4 says everything other than recorded decisions
+  "stays in your browser and is never sent", which was true only because nothing called it.
 - **Subscribe no longer succeeds without mail.** Without an EMAIL binding the adapter stubbed
   `ok: true`, so production told subscribers to check their inbox for mail that never left. In
   production a missing binding is now a failed send with a named reason

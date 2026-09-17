@@ -3,7 +3,7 @@ import type { Regime } from "../homeBriefModel";
 
 export type StartupClimateIndex = {
   score: number;
-  status: "Improving" | "Stable" | "Deteriorating";
+  status: "Improving" | "Stable" | "Deteriorating" | "Not compared";
   breakdown: Array<{ label: string; score: number }>;
 };
 
@@ -23,7 +23,7 @@ export const buildStartupClimateIndex = ({
     scores: { tightness: number; riskAppetite: number };
   };
   macroSeries: MacroSeriesReading[] | undefined;
-  trendLabel: "Improving" | "Deteriorating" | "Mixed" | "Stable";
+  trendLabel: "Improving" | "Deteriorating" | "Mixed" | "Stable" | "Not compared";
 }): StartupClimateIndex => {
   const capitalAvailability = clampScore((100 - assessment.scores.tightness) * 0.6 + assessment.scores.riskAppetite * 0.4);
   const unemployment = findMacroValue(macroSeries, "UNEMPLOYMENT_RATE");

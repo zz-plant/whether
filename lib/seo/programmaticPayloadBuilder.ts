@@ -61,7 +61,7 @@ const payloadRecordSchema = z.object({
   }),
   delta: z.object({
     regimeChanged: z.boolean(),
-    directionLabel: z.enum(["improving", "deteriorating", "mixed", "stable"]),
+    directionLabel: z.enum(["improving", "deteriorating", "mixed", "stable", "unavailable"]),
     changedSignals: z.array(deltaSignalSchema),
   }),
   payload: seoPayloadSchema,

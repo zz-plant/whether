@@ -289,12 +289,15 @@ export const buildReportDynamics = ({
   previous: ReturnType<typeof evaluateRegime> | null;
 }): ReportDynamics => {
   if (!previous) {
+    /* No previous reading is not a quiet week. Reporting "stable" here made the
+       absence of a comparison indistinguishable from a comparison that found
+       nothing, and every renderer downstream reads the second meaning. */
     return {
       changedSignals: [],
       anomalySignals: [],
       totalSignalChanges: 0,
       regimeChanged: false,
-      directionLabel: "stable",
+      directionLabel: "unavailable",
       signalContributions: resolveSignalInfluence(current),
     };
   }

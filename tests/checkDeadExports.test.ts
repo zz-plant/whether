@@ -46,12 +46,18 @@ describe("dead export census", () => {
     ]);
   });
 
-  it("counts a test, a script, or the package boundary as a reference", () => {
+  /*
+   * `packages/` was a reference root too, for `@whether/decision-engine`. Both
+   * it and the `lib/report/index.ts` barrel it re-exported are gone: nothing
+   * imported either, and the pair is the shape this scan cannot see, since a
+   * namespace re-export always spells its own filename and so reads as
+   * referenced by every importer of the module it re-exports.
+   */
+  it("counts a test or a script as a reference", () => {
     const root = scaffold({
-      "lib/a.ts": "export const testedOnly = 1;\nexport const scriptedOnly = 2;\nexport const packaged = 3;\n",
+      "lib/a.ts": "export const testedOnly = 1;\nexport const scriptedOnly = 2;\n",
       "tests/a.test.ts": 'import { testedOnly } from "../lib/a";\n',
       "scripts/run.ts": 'import { scriptedOnly } from "../lib/a";\n',
-      "packages/engine/src/index.ts": 'export { packaged } from "../../../lib/a";\n',
     });
 
     assert.deepEqual(censusDeadExports(root), []);

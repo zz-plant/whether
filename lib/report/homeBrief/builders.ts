@@ -241,12 +241,18 @@ export const buildHomeBriefModelInternal = (
     ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
     : 0;
 
+  /* "No worse than last week" needs a last week. The severity delta is 0 both
+     when the regime held and when there is nothing to compare it to, and this
+     rendered the comparative sentence for both — including onto the OG share
+     card, which is the version of this line that travels furthest. */
   const postureDeltaLabel =
-    severityDelta > 0
-      ? "Worse than last week"
-      : severityDelta < 0
-        ? "Better than last week"
-        : "No worse than last week";
+    reportDynamics?.directionLabel === "unavailable"
+      ? "No previous week to compare"
+      : severityDelta > 0
+        ? "Worse than last week"
+        : severityDelta < 0
+          ? "Better than last week"
+          : "No worse than last week";
 
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
@@ -282,7 +288,9 @@ export const buildHomeBriefModelInternal = (
         ? "Deteriorating"
         : reportDynamics?.directionLabel === "mixed"
           ? "Mixed"
-          : "Stable";
+          : reportDynamics?.directionLabel === "unavailable"
+            ? "Not compared"
+            : "Stable";
   const weeklyDeltaBySignal = new Map(
     (reportDynamics?.changedSignals ?? []).map((item) => [item.key, item.delta]),
   );
@@ -506,6 +514,7 @@ export const buildHomeBriefModelInternal = (
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
+    directionLabel: reportDynamics?.directionLabel,
   });
   const revisitQueue = buildRevisitQueue({
     revisitDecisions,

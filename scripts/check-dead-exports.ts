@@ -40,10 +40,19 @@ const DECLARATION_EXTENSIONS = new Set([".ts", ".tsx"]);
 
 /**
  * Files whose identifiers count as references. Wider than the declaration
- * roots on purpose: a script, a test, the private decision-engine package or
- * `wrangler.toml` naming a Durable Object class is a real consumer.
+ * roots on purpose: a script, a test, or `wrangler.toml` naming a Durable
+ * Object class is a real consumer.
+ *
+ * `packages` was in this list for `@whether/decision-engine`, whose entire
+ * content was `export * from "../../../lib/report/index"` and which nothing
+ * imported. A star re-export names no identifiers, so it inflated nothing —
+ * but the pair it formed with `lib/report/index.ts` is the shape this scan
+ * structurally cannot see, and is why both are gone: a namespace re-export
+ * (`export * as decisionKnobs from "./decisionKnobs"`) always spells its own
+ * filename, so every other file that imports that module reads as a reference
+ * to the barrel's export. A barrel is referenced by construction.
  */
-const REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests", "packages", ".github"];
+const REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests", ".github"];
 /*
  * Wider than the declaration set on purpose. A symbol can be named from a
  * `.jsx` file, an ambient `.d.ts`, a nested `wrangler.toml` naming a Durable
