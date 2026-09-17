@@ -1,8 +1,33 @@
 "use client";
 
+import {
+  MONDAY_AGENDA_MINUTES,
+  MONDAY_AGENDA_STEPS,
+  MONDAY_AGENDA_TITLE,
+} from "../../lib/report/briefArtifact";
+import { siteUrl } from "../../lib/siteUrl";
+
+const MONDAY_HOLD_TITLE = "Whether Weekly Posture Sync";
+
+/**
+ * The invite body: the standing agenda, not this week's call. The hold repeats
+ * every Monday, so a description carrying one week's numbers would be wrong by
+ * the second occurrence; the structure is what stays true, and the link is
+ * where the week's numbers live. The same steps fill the "Agenda" copy format.
+ */
+export const buildMondayAgendaDescription = (briefUrl = `${siteUrl}/`) =>
+  [
+    `${MONDAY_AGENDA_TITLE} (${MONDAY_AGENDA_MINUTES} min)`,
+    ...MONDAY_AGENDA_STEPS.map(
+      (step, index) => `${index + 1}. ${step.label} (${step.minutes} min) — ${step.prompt}`,
+    ),
+    "",
+    `This week's call: ${briefUrl}`,
+  ].join("\n");
+
 export function buildMondayCalendarUrl(
-  title = "Whether Weekly Posture Sync",
-  description = "Review weekly macro regime & posture delta: https://whether.work",
+  title = MONDAY_HOLD_TITLE,
+  description = buildMondayAgendaDescription(),
 ) {
   // UTC on purpose: the times below carry a Z, and this renders on the server
   // (UTC) before it hydrates in the reader's zone. Local getters gave the two

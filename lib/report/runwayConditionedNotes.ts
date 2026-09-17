@@ -32,6 +32,43 @@ const CRITICAL_RUNWAY_MONTHS = 6;
 const TIGHT_RUNWAY_MONTHS = 12;
 const LONG_RUNWAY_MONTHS = 18;
 
+/**
+ * The one-click runway bands the homepage offers before a figure is stored.
+ *
+ * One band per branch below, so a pick lands on the note it names: the label
+ * is the band's range, and `months` is a representative figure inside it.
+ * The bands are derived from the thresholds rather than written beside them,
+ * so a moved threshold moves the pick with it. `/operate` still takes the
+ * exact number; this is the coarse dial for a reader who has not been there.
+ */
+type RunwayQuickPick = {
+  label: string;
+  months: number;
+  /** Inclusive lower bound of the band, in months. */
+  min: number;
+  /** Exclusive upper bound, or null for the open-ended top band. */
+  max: number | null;
+};
+
+export const RUNWAY_QUICK_PICKS: readonly RunwayQuickPick[] = [
+  { label: `Under ${CRITICAL_RUNWAY_MONTHS} mo`, months: 4, min: 0, max: CRITICAL_RUNWAY_MONTHS },
+  { label: `${CRITICAL_RUNWAY_MONTHS}–${TIGHT_RUNWAY_MONTHS} mo`, months: 9, min: CRITICAL_RUNWAY_MONTHS, max: TIGHT_RUNWAY_MONTHS },
+  { label: `${TIGHT_RUNWAY_MONTHS}–${LONG_RUNWAY_MONTHS} mo`, months: 15, min: TIGHT_RUNWAY_MONTHS, max: LONG_RUNWAY_MONTHS },
+  { label: `${LONG_RUNWAY_MONTHS}+ mo`, months: 24, min: LONG_RUNWAY_MONTHS, max: null },
+];
+
+/** The band a stored runway falls in, so the dial can show which pick is live. */
+export const findRunwayQuickPick = (runwayMonths: number | undefined): RunwayQuickPick | null => {
+  if (typeof runwayMonths !== "number" || !Number.isFinite(runwayMonths) || runwayMonths <= 0) {
+    return null;
+  }
+  return (
+    RUNWAY_QUICK_PICKS.find(
+      (pick) => runwayMonths >= pick.min && (pick.max === null || runwayMonths < pick.max),
+    ) ?? null
+  );
+};
+
 const compactUsd = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 0 });
 
 /**

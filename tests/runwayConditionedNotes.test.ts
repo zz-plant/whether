@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildRunwayConditionedNotes } from "../lib/report/runwayConditionedNotes";
+import {
+  RUNWAY_QUICK_PICKS,
+  buildRunwayConditionedNotes,
+  findRunwayQuickPick,
+} from "../lib/report/runwayConditionedNotes";
 
 describe("runway-conditioned notes", () => {
   it("renders nothing when no runway is given", () => {
@@ -91,5 +95,32 @@ describe("runway-conditioned notes", () => {
         }
       }
     }
+  });
+
+  it("offers one quick pick per note band, each landing inside the band it names", () => {
+    // The homepage dial is derived from the same thresholds the notes branch
+    // on, so a pick cannot name one band and produce another band's note. Four
+    // branches above, four picks, and each pick's figure resolves back to
+    // itself.
+    assert.equal(RUNWAY_QUICK_PICKS.length, 4);
+    for (const pick of RUNWAY_QUICK_PICKS) {
+      assert.equal(findRunwayQuickPick(pick.months)?.label, pick.label);
+      assert.ok(pick.months >= pick.min && (pick.max === null || pick.months < pick.max));
+      const notes = buildRunwayConditionedNotes({ regime: "DEFENSIVE", runwayMonths: pick.months });
+      assert.ok(notes.length > 0, `pick "${pick.label}" produces no note`);
+    }
+    // Contiguous and exhaustive: every positive runway lands in exactly one band.
+    for (let months = 1; months <= 60; months += 1) {
+      assert.equal(RUNWAY_QUICK_PICKS.filter((pick) => findRunwayQuickPick(months) === pick).length, 1);
+    }
+    assert.equal(findRunwayQuickPick(undefined), null);
+    assert.equal(findRunwayQuickPick(0), null);
+  });
+
+  it("names each band by the thresholds the notes use", () => {
+    assert.deepEqual(
+      RUNWAY_QUICK_PICKS.map((pick) => pick.label),
+      ["Under 6 mo", "6–12 mo", "12–18 mo", "18+ mo"],
+    );
   });
 });
