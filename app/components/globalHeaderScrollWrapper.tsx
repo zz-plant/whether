@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useScrollDirection } from "./useScrollDirection";
 
 type GlobalHeaderScrollWrapperProps = {
@@ -9,18 +9,12 @@ type GlobalHeaderScrollWrapperProps = {
 
 export function GlobalHeaderScrollWrapper({ children }: GlobalHeaderScrollWrapperProps) {
   const { direction, isPastThreshold } = useScrollDirection();
-  const [hidden, setHidden] = useState(false);
-  const [atTop, setAtTop] = useState(true);
-
-  useEffect(() => {
-    if (!isPastThreshold) {
-      setHidden(false);
-      setAtTop(true);
-      return;
-    }
-    setAtTop(false);
-    setHidden(direction === "down");
-  }, [direction, isPastThreshold]);
+  /* Both were state assigned from an effect on every scroll frame, which is a
+     render per frame to reach a value this render already has: the hook's own
+     state is the only input either one reads. Its initial state is `up` and not
+     past the threshold, so the first render still comes out shown and at top. */
+  const atTop = !isPastThreshold;
+  const hidden = isPastThreshold && direction === "down";
 
   return (
     <header
