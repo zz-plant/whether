@@ -87,7 +87,11 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
         heading(3, page.title),
         `URL: ${baseUrl}/resources/${page.slug}`,
         page.description,
-        page.boardSummary ? `Board summary: ${page.boardSummary}` : null,
+        /* `boardSummary` is `z.array(z.string())`, not a string: interpolated
+           directly it rendered the bullets comma-joined into one line, which is
+           what `restrict-template-expressions` was pointing at. Each bullet gets
+           its own paragraph, the way every other multi-value field here does. */
+        page.boardSummary?.length ? section([heading(4, "Board summary"), ...page.boardSummary]) : null,
         ...(page.sections ?? []).map((entry) =>
           section([heading(4, entry.heading), ...(entry.paragraphs ?? [])]),
         ),
