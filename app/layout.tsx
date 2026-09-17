@@ -313,6 +313,7 @@ export default function RootLayout({
                 aria-label="Legal and credits"
                 className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
               >
+                <Link href="/privacy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
                 <Link href="/acceptable-use-policy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
                 <Link href="/terms-of-service" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>
                 <a href="https://github.com/zz-plant/whether" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]" target="_blank" rel="noreferrer">GitHub</a>

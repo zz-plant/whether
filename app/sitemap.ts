@@ -143,6 +143,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       priority: 0.7,
     })),
     { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
+    { path: "/privacy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },

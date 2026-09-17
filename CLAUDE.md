@@ -684,6 +684,75 @@ the risk id now (exactly one branch is ever in the DOM, so the anchor always lan
 saying what is missing), and the board-memo chip is gone — it sits behind a second toggle, so it
 could never be a stable target.
 
+## What the site says about its reader (2026-09-17)
+
+`/privacy` did not exist. The footer carried Terms and an Acceptable Use Policy, and **every use of
+the word "data" in both means market data** — twelve sections of Terms including "Fees and Payment",
+and nothing about the person reading. Meanwhile the product holds subscriber addresses with
+verification tokens, the email Stripe reports for a paying customer, a per-browser identifier the
+server reads back (`x-whether-client-id`) to scope saved decisions, one cookie, nine browser storage
+keys and eight telemetry streams.
+
+The gap was worse than a missing document, because `/pricing` publishes **"No signup, no key, no
+trackers"** and the code is genuinely built to honour it: the search payload has no field that could
+hold the query text, the acquisition bucket drops the referring URL, the intake refuses an
+unexpected key, and the fonts are self-hosted. A claim a reader cannot check is worth less than the
+work behind making it true, and there is real work behind this one — so `/pricing` links to the page
+from the promise itself.
+
+**The page is an inventory, and `tests/privacyPolicy.test.tsx` keeps it one.** Every `STORAGE_KEYS`
+entry and every `TELEMETRY_STREAMS` entry is claimed there by the section that accounts for it, so
+adding a storage key or a stream without deciding what a reader is told fails the suite. The registry
+is hand-written on purpose: the point is that a person looked at the new key and said where it
+belongs. It also checks the absences the page asserts — "no third-party analytics" is the kind of
+sentence one added `<script>` makes false.
+
+## A published field with no reading behind it
+
+Three cases now, and they rhyme. `RegimeDiagnostics` published a distance from a threshold as a
+weekly move (below); the confidence percent published distance as a probability; and on 2026-09-17
+the embed API was found publishing `reversalCondition` as the literal **"Two consecutive weeks of
+confirming signals"** — the same sentence every week, in every regime.
+
+The embed case is the one worth remembering for where it hid. The field is returned only by
+`format=json` and rendered by neither the HTML nor the text format, so nothing on any page could
+have looked wrong; its only consumer was an integrator reading it as a fact about this week's call.
+The real value was in scope the whole time — `reversalCondition` and `triggerThreshold` are
+non-optional siblings of the `areaActionNow` the route already maps — and `flipTrigger` fell back to
+"Monitor economic indicators", advice no reading produced. Both fields are nullable now, so a
+consumer can tell "no condition published" from a condition.
+
+**A surface nothing renders is where invented data survives longest.** When a route returns more than
+it draws, the undrawn fields are the ones to check.
+
+## Written for third parties, resolved like it (2026-09-17)
+
+The embed is the one surface that renders inside somebody else's page, and it wrote the production
+origin in three times: the snippet a reader copies off `/share`, `buildWhetherBriefUrl` (which
+supplies the two links every embed carries), and `public/embed.js`. So the preview lane's embeds
+advertised production — **the one surface you would use preview to check was the one preview could
+not check.** The first two resolve through `lib/siteUrl` now, which `app/api-docs/page.tsx` already
+did for the identical snippet; the script cannot import anything, so it reads its own `<script src>`
+and keeps production as the fallback.
+
+This is `tests/feedRoute.test.ts`'s rule, which had never been carried past the feed: on production
+the hardcoded literal and the configured default are the same string, so no rendered assertion can
+tell them apart, and the lane where they differ is the one this suite never runs in. Those
+assertions are source reads and say so.
+
+## An artifact that names itself
+
+`public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —
+`- Posture this quarter:` with nothing after the colon, five times — while being titled "Example"
+and sold as "a memo example for board updates". A reader who already had the template downloaded the
+same blank document under a second name.
+
+The rule `tests/downloadableResourceArtifacts.test.ts` pins is asymmetric, and that is the point: a
+file calling itself an example has no unfilled fields and says in the file that its figures are
+illustrative, while the template and the checklist stay blank forms, because that is what those are.
+A memo full of real-looking figures without that label is a live claim, and this repo already keeps
+those out of static content.
+
 ## Regime scoring: what the numbers do and do not claim
 
 The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
