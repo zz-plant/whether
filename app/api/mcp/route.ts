@@ -7,6 +7,7 @@ import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/s
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
 import { RateLimitedError, rateLimitedResponse } from "../../../lib/runtime/rateLimit";
 import { siteUrl } from "../../../lib/siteUrl";
+import { buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
 
@@ -48,6 +49,9 @@ export async function GET(request: Request) {
           { name: "get_signals", params: "none", description: "Available historical data coverage by year/month" },
           { name: "subscribe", params: "email (POST body)", description: "Subscribe an email to the weekly brief" },
         ],
+        /* On the catalogue, so a caller wiring up the tools meets the
+           constraint before it calls one of them. */
+        use: buildUseConstraint(),
         _links: {
           full_brief: siteUrl,
           history: `${siteUrl}/history`,
@@ -121,6 +125,9 @@ export async function GET(request: Request) {
       recordDate: "recordDateLabel" in summary ? summary.recordDateLabel : null,
       confidence: "confidence" in summary ? summary.confidence : null,
       posture: "regimeLabel" in summary ? summary.regimeLabel : null,
+      /* This is the response that carries an action against a decision area
+         named `hiring`, returned to a caller with no person in the loop. */
+      use: buildUseConstraint(),
       links: {
         full_brief: siteUrl,
         history: `${siteUrl}/history`,

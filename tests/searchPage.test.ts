@@ -24,7 +24,10 @@ describe("/search", () => {
    */
   it("records the shape of a search from the client, not during the render", () => {
     assert.ok(!code.includes("writeAnalytics"), "the route writes no telemetry while rendering");
-    assert.match(code, /<SearchTelemetry/);
+    /* The emitter moved into the results component when search became instant,
+       because what it records has to be a query the reader stopped changing. */
+    const results = readFileSync(new URL("../app/search/searchResults.tsx", import.meta.url), "utf8");
+    assert.match(results, /<SearchTelemetry/);
 
     const emitter = readFileSync(new URL("../lib/searchTelemetry.ts", import.meta.url), "utf8");
     const emitterCode = emitter.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
@@ -47,9 +50,47 @@ describe("/search", () => {
     assert.ok(!isSearchTelemetryEvent({ ...valid, type: "other" }));
   });
 
+  /* The routing heuristic and the results list both moved when search became
+     instant: the page renders a client component, which Next still renders into
+     the initial HTML. Reading the files that hold them now, rather than the one
+     that used to. */
   it("keeps the redirect target as an offered action rather than a forced one", () => {
-    assert.match(code, /resolveSearchCommandHref/);
-    assert.match(code, /Go straight there/);
+    const results = readFileSync(new URL("../app/search/searchResults.tsx", import.meta.url), "utf8");
+    assert.match(results, /resolveSearchCommandHref/);
+    assert.match(results, /Go straight there/);
+  });
+
+  /*
+   * The form keeps its `action` and its submit button, so a browser with no
+   * JavaScript still gets the GET form the page always was — and the page still
+   * renders `?q=` on the server. Typing is the improvement, not the mechanism.
+   */
+  it("still works as a plain GET form", () => {
+    const results = readFileSync(new URL("../app/search/searchResults.tsx", import.meta.url), "utf8");
+    assert.match(results, /action="\/search"/);
+    assert.match(results, /type="submit"/);
+    assert.match(code, /initialQuery=\{query\}/, "the server still resolves the query it was given");
+  });
+
+  /*
+   * The trap instant search sets for this stream. It measures a zero-result
+   * *rate*, and every prefix of every word is a zero-result, so recording per
+   * keystroke would make "hirin" count as someone failing to find anything and
+   * the denominator meaningless.
+   */
+  it("records a settled query rather than a keystroke", () => {
+    const results = readFileSync(new URL("../app/search/searchResults.tsx", import.meta.url), "utf8");
+    assert.match(results, /<SearchTelemetry\s+query=\{settledQuery\}/);
+    assert.match(results, /setTimeout\(\(\) => setSettledQuery/);
+    assert.doesNotMatch(results, /<SearchTelemetry\s+query=\{query\}/);
+  });
+
+  /* A history entry per keystroke turns the back button into a rubout key, and
+     a search nobody can send anyone is not a result. */
+  it("keeps the URL as the result, without a history entry per keystroke", () => {
+    const results = readFileSync(new URL("../app/search/searchResults.tsx", import.meta.url), "utf8");
+    assert.match(results, /router\.replace\(/);
+    assert.doesNotMatch(results, /router\.push\(/);
   });
 
   it("stays out of the index", () => {

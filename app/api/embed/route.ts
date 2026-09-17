@@ -12,6 +12,7 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { siteUrl } from "../../../lib/siteUrl";
+import { USE_CONSTRAINT_SUMMARY, buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -93,6 +94,11 @@ export async function GET(request: Request) {
     if (format === "json") {
       return NextResponse.json({
         ...briefData,
+        /* Attribution was already here. What was missing is the constraint:
+           the embed is the one surface that renders inside somebody else's
+           page, where their framing replaces ours — which is exactly the
+           reading the Acceptable Use Policy forbids (§3.4). */
+        use: buildUseConstraint(),
         attribution: {
           text: "Macro brief by Whether",
           url: briefData.attributionUrl,
@@ -111,6 +117,7 @@ export async function GET(request: Request) {
         ...(flipTrigger ? [`Watch: ${flipTrigger}`] : []),
         ``,
         `Get your own weekly brief: ${briefData.attributionUrl}`,
+        USE_CONSTRAINT_SUMMARY,
       ].join("\n");
 
       return new NextResponse(text, {
@@ -225,6 +232,9 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
   ${flipTrigger ? `<div style="background:rgba(245,158,11,0.08);border-left:3px solid rgba(245,158,11,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:rgba(252,211,77,0.8);"><strong style="color:rgba(251,191,36,0.9);">Watch:</strong> ${escapeHtml(flipTrigger)}</div>` : ""}
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;">
+    <span>${escapeHtml(USE_CONSTRAINT_SUMMARY)}</span>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:rgba(255,255,255,0.45);">
     <span>Macro brief by <a href="${escapeAttribute(attributionUrl)}" style="color:rgba(56,189,248,0.8);text-decoration:underline;font-weight:600;">Whether</a></span>
     <a href="${escapeAttribute(data.briefUrl)}" style="color:rgba(56,189,248,0.6);text-decoration:underline;">Get your own →</a>
   </div>
