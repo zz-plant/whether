@@ -18,24 +18,38 @@ import { useEntitlement } from "./useEntitlement";
  * any verification has run — means a slow or failed check fails closed rather
  * than briefly exposing the panel.
  */
-export function PremiumGate({
-  source,
-  title,
-  description,
-  children,
-}: {
+type PremiumGateProps = {
   source: PremiumIntentSource;
   title: string;
   description: string;
   children: React.ReactNode;
-}) {
+};
+
+/*
+ * The gate cannot sell what /pricing says is not for sale, and while it cannot,
+ * it asks nothing.
+ *
+ * This branch used to sit below `useEntitlement()`, which hooks require — so
+ * every visitor to Planning with a stored token spent a round trip to
+ * /api/billing/status computing a value the next line discarded. Splitting the
+ * check off means the request is made only when its answer can change what is
+ * rendered. `PAID_PLANS_ON_SALE` is a module constant, so which component
+ * renders is fixed at build time and no hook order moves.
+ */
+export function PremiumGate(props: PremiumGateProps) {
+  if (!PAID_PLANS_ON_SALE) {
+    return <>{props.children}</>;
+  }
+
+  return <EntitlementGate {...props} />;
+}
+
+function EntitlementGate({ source, title, description, children }: PremiumGateProps) {
   const entitlement = useEntitlement();
   const [pending, setPending] = useState<"pro" | "team" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  /* The gate cannot sell what /pricing says is not for sale. Until the plans are
-     on sale the rail stays wired but the panel renders ungated. */
-  if (!PAID_PLANS_ON_SALE || entitlement.active) {
+  if (entitlement.active) {
     return <>{children}</>;
   }
 
