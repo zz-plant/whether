@@ -13,7 +13,7 @@ import {
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
-import { CalendarButton } from "./calendarButton";
+import { CalendarButton, buildMondayAgendaDescription } from "./calendarButton";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
@@ -199,7 +199,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             <div className="mb-3">
               <CalendarButton
                 title="Whether Weekly Brief"
-                description="Review the weekly operating brief from Whether."
+                description={buildMondayAgendaDescription()}
                 date={(() => {
                   const d = new Date();
                   d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
