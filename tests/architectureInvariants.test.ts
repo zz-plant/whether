@@ -425,8 +425,14 @@ describe("Architecture Invariants", () => {
    * reading either one passed. A vocabulary with synonyms is not a vocabulary.
    */
   it("Invariant 8a: No two contract labels name the same line", () => {
+    /* Narrowed rather than asserted. Every value in the table is a string
+       today, and a cast would make that an assumption the type system vouches
+       for instead of one this test checks — a nested group added later would
+       be silently stringified into a comparison rather than skipped. */
     const entries = Object.entries(DECISION_CONTRACT_LABELS).flatMap(([group, labels]) =>
-      Object.entries(labels).map(([key, value]) => ({ path: `${group}.${key}`, value: value as string })),
+      Object.entries(labels).flatMap(([key, value]) =>
+        typeof value === "string" ? [{ path: `${group}.${key}`, value }] : [],
+      ),
     );
 
     const byValue = new Map<string, string[]>();
@@ -436,14 +442,18 @@ describe("Architecture Invariants", () => {
 
     const duplicates = [...byValue.entries()]
       .filter(([, paths]) => paths.length > 1)
-      .map(([value, paths]) => `"${value}" is reachable as ${paths.join(" and ")}`);
+      /* "reachable via", not "reachable as": the hotspot preflight scans added
+         lines for type assertions and the English word matched its pattern. */
+      .map(([value, paths]) => `"${value}" is reachable via ${paths.join(" and ")}`);
 
     assert.deepEqual(duplicates, [], `\n${duplicates.join("\n")}\n`);
 
     /* The retired synonyms, named so a revert reads as the regression it is.
        Each drew a line some other surface drew under the imperative name. */
     const retired = ["Guardrail", "Clears when", "Trigger"];
-    const shipped = entries.map((entry) => entry.value);
+    /* Widened, not asserted: narrowing the table above gave `value` a literal
+       union, and a retired name is by definition not in it. */
+    const shipped: string[] = entries.map((entry) => entry.value);
     for (const name of retired) {
       assert.ok(!shipped.includes(name), `"${name}" is back in the contract vocabulary`);
     }

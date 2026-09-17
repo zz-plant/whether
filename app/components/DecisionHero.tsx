@@ -9,7 +9,7 @@ import { trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGl
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../../lib/report/homeBriefModel";
 import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
-import { buildBoundedConditionRails, formatPointsToLine } from "../../lib/report/operatingCalls";
+import { buildBoundedConditionRails, parenthesizePointsToLine } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
 import { Sparkline, interquartileRange, sparklineDomain } from "./ui/sparkline";
@@ -25,6 +25,7 @@ import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
+import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
@@ -596,6 +597,18 @@ export function DecisionHero({
                         hysteresisBand
                         invert={rail.invert}
                         signalLabel={rail.label}
+                        /* The pair reads as a small-multiple set, and the two
+                           rails run opposite axes: `invert` flips the falling
+                           signal so trouble sits right on both. That flip was
+                           announced only by the numeric end-labels — 0…100 on
+                           one rail, 100…0 on the other, at 8px — so a reader
+                           comparing marker positions got risk appetite
+                           backwards unless they read them. The scale words name
+                           each end in the reader's terms and follow the flip,
+                           which is what the ladder's `scaleDirection` was built
+                           to do; the bounded rails were the one pair of rails
+                           that never passed it. */
+                        scaleDirection={compositeSignalScales[rail.metric]?.directionLabel}
                         viewBoxWidth={300}
                       />
                       <dl className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums">
@@ -604,7 +617,7 @@ export function DecisionHero({
                           <dd className="text-slate-300">
                             {rail.guardrail}
                             <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-white/45"}`}>
-                              {formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
+                              {parenthesizePointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
                             </span>
                           </dd>
                         </div>
@@ -614,7 +627,7 @@ export function DecisionHero({
                             <dd className="text-slate-300">
                               {rail.clearsAt}
                               <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-white/45"}`}>
-                                {formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
+                                {parenthesizePointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
                               </span>
                             </dd>
                           </div>
@@ -696,7 +709,7 @@ export function DecisionHero({
                   and shared, and losing Confidence, a required field of the
                   screenshot contract. Only the longer trust-status sentence is
                   held back to keep the line from dominating a narrow column. */}
-              <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}</span>
+              <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · ${formatConfidenceChipLabel(confidenceLabel)}` : ""}</span>
               {trustStatusLabel ? <span className="hidden sm:inline">· {trustStatusLabel}</span> : null}
             </p>
           </div>
