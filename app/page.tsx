@@ -49,6 +49,8 @@ import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
+import { PublishedCallWatcher } from "./components/publishedCallWatcher";
+import { OfflineNotice } from "./components/offlineNotice";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -396,6 +398,18 @@ async function PageContent({
               always that of a top strip. Hiding once dismissed is a global CSS
               rule keyed on the data attribute (app/layout.tsx), so it stays
               pre-paint and CLS-free at either position. */}
+          {/* Above everything, because its whole subject is that what follows
+              may no longer be current. Renders nothing until a poll finds the
+              published call has moved, so on the overwhelming majority of
+              visits it is not on the page at all. */}
+          {/* Pairs with the service worker: it serves the last copy this
+              browser saw, and this names the reading that copy contains. A
+              cache without the label is the staleness this repo has already
+              paid for twice. */}
+          <OfflineNotice recordDateLabel={reportData.recordDateLabel} />
+          <PublishedCallWatcher
+            rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
+          />
           <FirstVisitExplainer arrival={arrivedFromShare ? "share" : undefined} />
           {/* Meta row: week switcher and the confidence popover. The "Data through …
               · refreshed …" line that sat under the switcher restated the hero's

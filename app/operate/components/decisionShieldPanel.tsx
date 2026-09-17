@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
@@ -40,6 +40,8 @@ import {
 import { createOpaqueId, usePersistentClientId } from "../../components/clientIdentity";
 import { createKeyedBrowserSource, useBrowserSource } from "../../components/browserSource";
 import { ComparePlansMode, PlanStressTestMode } from "./decisionShieldPlanModes";
+import { RecordDecisionButton } from "./recordDecisionButton";
+import type { DecisionMemoryPayload } from "../../../lib/decisionMemory";
 import { usePersistedQuerySelections } from "./usePersistedQuerySelections";
 import {
   actionOptions,
@@ -137,9 +139,12 @@ const presetsSourceFor = createKeyedBrowserSource<DecisionShieldPreset[]>({
 export const DecisionShieldPanel = ({
   assessment,
   provenance,
+  recordDate,
 }: {
   assessment: RegimeAssessment;
   provenance: DataProvenance;
+  /** The reading this verdict was computed against, stored with anything recorded. */
+  recordDate: string;
 }) => {
   const {
     state: { lifecycle, category, action },
@@ -221,6 +226,28 @@ export const DecisionShieldPanel = ({
     () => evaluateDecision(assessment, { lifecycle, category, action }),
     [assessment, lifecycle, category, action]
   );
+  /* The stored snapshot is the reading on screen, not a fresh read: a decision
+     is only judgeable later against the conditions its author actually saw. */
+  const buildLedgerPayload = useCallback(
+    (): DecisionMemoryPayload => ({
+      recordDate,
+      decision: { lifecycle, category, action },
+      outcome: {
+        verdict: output.verdict,
+        summary: output.summary,
+        guardrail: output.guardrail,
+        reversalTrigger: output.reversalTrigger,
+      },
+      assessment: {
+        regime: assessment.regime,
+        scores: assessment.scores,
+        thresholds: assessment.thresholds,
+        inputs: assessment.inputs,
+      },
+    }),
+    [recordDate, lifecycle, category, action, output, assessment],
+  );
+
   const shareText = useMemo(
     () => buildShareText(assessment, lifecycle, category, action, output),
     [assessment, lifecycle, category, action, output]
@@ -389,6 +416,7 @@ export const DecisionShieldPanel = ({
               buttonLabels={{ copied: "Link copied" }}
               onClick={handleCopyLink}
             />
+            <RecordDecisionButton buildPayload={buildLedgerPayload} />
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>

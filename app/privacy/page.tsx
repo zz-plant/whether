@@ -155,6 +155,17 @@ export default function PrivacyPage() {
           </div>
 
           <div className="space-y-2">
+            <h3 className={subheading}>2.6a Pages saved for offline reading</h3>
+            <p className={paragraph}>
+              Your browser keeps a copy of the pages you have opened, and of the fonts and scripts they
+              need, so the brief still opens without a connection. It is a copy of what this site already
+              sent you — no record of what you read is made here or anywhere else, and nothing about it is
+              sent back. When you are offline the page says which reading it is showing you rather than
+              letting an old one pass for the current one. Clearing site data removes it.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <h3 className={subheading}>2.7 Abuse limits and server logs</h3>
             <p className={paragraph}>
               Endpoints that send email or accept public writes are rate-limited against the network
