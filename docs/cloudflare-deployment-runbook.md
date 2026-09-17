@@ -78,7 +78,7 @@ the Slack signing secret gates one webhook route.
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
-| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts` | The regime-history Workflow fails at its PR step, loudly. Fine-grained token: contents and pull requests, write, on this repository only. |
+| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token: contents and pull requests, write, on this repository only. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 | `CLOUDFLARE_ACCOUNT_ID` | `lib/telemetry/runHistory.ts`, `lib/export/briefScreenshot.ts` | Both readers below report themselves unconfigured. The account id is not a secret, but it is set the same way so the two tokens cannot be present without it. |
 | `CLOUDFLARE_ANALYTICS_READ_TOKEN` | `lib/telemetry/runHistory.ts` (`loadCronRunHistory`), from `app/trust/trustPageModel.ts` | `/trust` renders no "Scheduled runs" section. With it, the page reads the `cron-step` stream back through the Analytics Engine SQL API and shows runs, failures, and last success per scheduled step for the trailing 30 days, cached 15 minutes per isolate under a 2.5s deadline. Token permission: Account Analytics: Read. |
@@ -115,7 +115,35 @@ only, so production keeps its current behavior until the trial is promoted:
   branch is `automation/weekly-brief-freeze-<slug>`, the same name the manual GitHub workflow uses,
   so the two never collide on a week.
 
-To promote any of them, copy its var into the production `[vars]` block; to retire one, remove
+### Promoting the brief freeze to production
+
+Two operator actions, and since 2026-09-17 they can be done in either order — the Workflow checks
+`GITHUB_TOKEN` at its first line, before the live read, so a lane that has the flag and not the
+secret refuses in seconds and names the secret in its `brief-freeze` row rather than reporting
+"gave up after five hours" for something that was true at hand-off:
+
+1. `wrangler secret put GITHUB_TOKEN` (no `--env`, so it lands on the production lane), with the
+   same fine-grained scope the preview lane's token has.
+2. Add to the top-level `[vars]` block in `wrangler.toml` — named environments do not inherit
+   `vars`, so the preview lane keeps its own copy:
+
+   ```toml
+   WHETHER_BRIEF_FREEZE_WORKFLOW = "1"
+   GITHUB_REPOSITORY = "zz-plant/whether"
+   ```
+
+   `GITHUB_REPOSITORY` only restates `DEFAULT_GITHUB_REPOSITORY`, but a lane that writes to a
+   repository should say which one rather than inherit it from a constant two modules away.
+
+Then watch `/trust` → Scheduled runs for a `Brief freeze outcome` row on the next Monday, and
+`automation/weekly-brief-freeze-<slug>` for the pull request. Nothing merges it without a person.
+
+Why not wait for a longer preview trial: `data/published_briefs.json` is deliberately never
+backfilled, so every week spent proving this is a week the record can never honestly claim. The
+failure modes are bounded — `assembleCurrentWeekBrief` refuses degraded and fallback data outright,
+a bad run throws and opens nothing, and it now writes its own failing row either way.
+
+To promote any of the others, copy its var into the production `[vars]` block; to retire one, remove
 the binding and, for the object, add a `deleted_sqlite_classes` migration. The DO migration list
 is top-level and applies to both lanes, which is why the class is declared on both. The
 coordinator's promotion criterion, so it is a decision and not a drift: two consecutive weeks on

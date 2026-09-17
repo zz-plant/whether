@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import {
   FIRST_TIME_GUIDE_HIGHLIGHTS,
@@ -11,6 +10,7 @@ import {
 import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { canonicalPositioningLine } from "../../lib/seo";
 import { buildMondayCalendarUrl } from "./calendarButton";
+import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
 
@@ -44,6 +44,17 @@ const getBootstrappedDismissedState = () => {
   }
 };
 
+/* The bootstrap runs before paint and the storage read is the fallback, so both
+   are one source. `false` through hydration, because that is what the server
+   rendered; the layout's injected style rule is what keeps a dismissed line from
+   flashing in the meantime. Dismissing writes and then re-reads through the same
+   source rather than setting a second copy in state. */
+const dismissedSource = createBrowserSource<boolean>({
+  read: getBootstrappedDismissedState,
+  serverValue: false,
+  refreshOnSubscribe: true,
+});
+
 /**
  * One-line plain-language explainer for visitors who land on the brief with no
  * context. Server-rendered, hidden pre-paint by the layout bootstrap once
@@ -56,11 +67,7 @@ const getBootstrappedDismissedState = () => {
  * buttons twice within one screen. The stage is asked once, in the hero.
  */
 export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
-  const [dismissed, setDismissed] = useState(false);
-
-  useEffect(() => {
-    setDismissed(getBootstrappedDismissedState());
-  }, []);
+  const dismissed = useBrowserSource(dismissedSource);
 
   if (dismissed) {
     return null;
@@ -68,7 +75,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
 
   const handleDismiss = () => {
     markOrientationDismissed();
-    setDismissed(true);
+    dismissedSource.refresh();
     // Dismissing is the cheapest available proof that someone read the line and
     // knew what they were looking at, which is the step between arriving and
     // doing anything deliberate.

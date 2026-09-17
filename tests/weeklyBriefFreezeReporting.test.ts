@@ -150,18 +150,26 @@ describe("weekly brief freeze reporting", () => {
     assert.match(outcome?.error ?? "", /not ready to publish/);
   });
 
-  it("records a failed outcome when the token needed to open the pull request is absent", async () => {
+  /*
+   * The token is checked before the live read, not between the read and the pull
+   * request, and that ordering is the assertion. It is what lets the flag and the
+   * secret be set in either order when the freeze is promoted out of the preview
+   * lane: below the assemble step, a run missing the token spends a live provider
+   * read and — when the week is not publishable yet — five hourly retries before
+   * reporting a fact that was already true at hand-off. `assembleWeek` never being
+   * called is what pins that.
+   */
+  it("refuses before reading anything when the token needed to open the pull request is absent", async () => {
     const rows = installAnalyticsCapture();
-    const workflow = await freezeWorkflow({}, async () => ({
-      ok: true,
-      slug: "2026-w38",
-      recordDate: "2026-09-14",
-      /* The record is never read on this path: the token check throws first. */
-      record: publishedBriefFixture,
-    }));
+    let assembleCalls = 0;
+    const workflow = await freezeWorkflow({}, async () => {
+      assembleCalls += 1;
+      return { ok: true, slug: "2026-w38", recordDate: "2026-09-14", record: publishedBriefFixture };
+    });
 
     await assert.rejects(() => runFreeze(workflow));
 
+    assert.equal(assembleCalls, 0, "the live read ran before the configuration it depends on was checked");
     const outcome = cronSteps(rows).find((step) => step.step === "brief-freeze");
     assert.equal(outcome?.ok, false);
     assert.match(outcome?.error ?? "", /GITHUB_TOKEN/);

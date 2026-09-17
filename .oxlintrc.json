@@ -15,7 +15,7 @@
   "rules": {
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "error",
-    "react/set-state-in-effect": "off",
+    "react/set-state-in-effect": "error",
     "react/purity": "error",
     "react/refs": "error",
     "react/no-danger": "error",

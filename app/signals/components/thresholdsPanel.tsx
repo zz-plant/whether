@@ -4,18 +4,19 @@
  */
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Popover } from "@base-ui/react/popover";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
+import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { createBrowserSource, useBrowserSource } from "../../components/browserSource";
 import { ThresholdNumberField } from "./ThresholdNumberField";
 
 type ThresholdDraft = {
@@ -65,6 +66,62 @@ const validateDraft = (draft: ThresholdDraft): ThresholdErrorMap => {
   return errors;
 };
 
+const STORAGE_KEY = "whether.thresholdDraft";
+const AUDIT_KEY = "whether.thresholdAudit";
+
+const isThresholdDraft = (value: unknown): value is ThresholdDraft => {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate: Record<string, unknown> = { ...value };
+  return (
+    typeof candidate.baseRateTightness === "string"
+    && typeof candidate.tightnessRegime === "string"
+    && typeof candidate.riskAppetiteRegime === "string"
+  );
+};
+
+const isAuditEntry = (value: unknown): value is ThresholdAuditEntry => {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate: Record<string, unknown> = { ...value };
+  return typeof candidate.timestamp === "string" && typeof candidate.source === "string";
+};
+
+/* Both slots read through a store rather than assigned into state from a mount
+   effect. Checked rather than cast on the way in: each is whatever an older
+   build of this panel wrote, and a draft with a missing field renders an
+   uncontrolled input while an audit entry without a timestamp renders "Invalid
+   Date" into the trail the panel exists to keep. */
+const storedDraftSource = createBrowserSource<ThresholdDraft | null>({
+  read: () => {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (!stored) return null;
+      const parsed: unknown = JSON.parse(stored);
+      return isThresholdDraft(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  },
+  serverValue: null,
+});
+
+const NO_AUDIT: ThresholdAuditEntry[] = [];
+
+const storedAuditSource = createBrowserSource<ThresholdAuditEntry[]>({
+  read: () => {
+    try {
+      const stored = window.localStorage.getItem(AUDIT_KEY);
+      if (!stored) return NO_AUDIT;
+      const parsed: unknown = JSON.parse(stored);
+      if (!Array.isArray(parsed)) return NO_AUDIT;
+      const entries = parsed.filter(isAuditEntry);
+      return entries.length > 0 ? entries : NO_AUDIT;
+    } catch {
+      return NO_AUDIT;
+    }
+  },
+  serverValue: NO_AUDIT,
+});
+
 const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
   const { baseRate, tightness, risk } = parseDraft(draft);
   return {
@@ -84,15 +141,16 @@ export const ThresholdsPanel = ({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [draft, setDraft] = useState<ThresholdDraft>(() => buildDraft(currentThresholds));
   const [errors, setErrors] = useState<ThresholdErrorMap>({});
-  const [auditLog, setAuditLog] = useState<ThresholdAuditEntry[]>([]);
+  // Null until the panel appends one; the stored trail is the default.
+  const [appendedAudit, setAppendedAudit] = useState<ThresholdAuditEntry[] | null>(null);
+  const storedAudit = useBrowserSource(storedAuditSource);
+  const auditLog = appendedAudit ?? storedAudit;
+  const storedDraft = useBrowserSource(storedDraftSource);
   const [isPending, startTransition] = useTransition();
   const baseRateRef = useRef<HTMLInputElement | null>(null);
   const tightnessRef = useRef<HTMLInputElement | null>(null);
   const riskRef = useRef<HTMLInputElement | null>(null);
-  const storageKey = "whether.thresholdDraft";
-  const auditKey = "whether.thresholdAudit";
   const errorIds = {
     baseRateTightness: "threshold-base-rate-error",
     tightnessRegime: "threshold-tightness-error",
@@ -128,52 +186,47 @@ export const ThresholdsPanel = ({
     },
   ] as const;
 
+  /*
+   * Where the form's values come from, in order: what the reader has typed
+   * since the URL last moved, then the draft this browser saved if the URL
+   * names no thresholds, then the thresholds themselves.
+   *
+   * All three used to arrive as `setDraft` from an effect — one watching the
+   * prop, one reading storage — so the panel rendered the old values first and
+   * corrected them on a second pass. Edits are stamped with the baseline they
+   * were made against instead, which is what makes "the URL moved, so the form
+   * follows it" a fact about this render rather than a later assignment.
+   */
+  const hasUrlThresholds =
+    searchParams.has(THRESHOLD_PARAM_KEYS.baseRate) ||
+    searchParams.has(THRESHOLD_PARAM_KEYS.tightness) ||
+    searchParams.has(THRESHOLD_PARAM_KEYS.risk);
+  const baselineDraft = !hasUrlThresholds && storedDraft ? storedDraft : buildDraft(currentThresholds);
+  const baselineKey = JSON.stringify(baselineDraft);
+  const [editedDraft, setEditedDraft] = useState<{ baseline: string; value: ThresholdDraft } | null>(null);
+  const draft = editedDraft?.baseline === baselineKey ? editedDraft.value : baselineDraft;
+  const setDraft = useCallback(
+    (value: ThresholdDraft) => setEditedDraft({ baseline: baselineKey, value }),
+    [baselineKey],
+  );
+
+  /* Restoring the saved draft is a navigation, not a state assignment: the URL
+     is where these thresholds live, so putting them back there is what makes the
+     rest of the page agree with the form. Once, and only while the URL names
+     none — a draft that fails validation is shown but not published. */
+  const restoredFromStorage = useRef(false);
   useEffect(() => {
-    setDraft(buildDraft(currentThresholds));
-  }, [currentThresholds]);
+    if (restoredFromStorage.current || hasUrlThresholds || !storedDraft) return;
+    if (Object.keys(validateDraft(storedDraft)).length > 0) return;
+    restoredFromStorage.current = true;
+    const nextParams = new URLSearchParams(searchParams.toString());
+    buildThresholdSearchParams(buildThresholds(storedDraft), appliedDefaults, nextParams);
+    router.replace(toRoute(`${pathname}?${nextParams.toString()}`), { scroll: false });
+  }, [appliedDefaults, hasUrlThresholds, pathname, router, searchParams, storedDraft]);
 
   useEffect(() => {
-    const hasUrlThresholds =
-      searchParams.has(THRESHOLD_PARAM_KEYS.baseRate) ||
-      searchParams.has(THRESHOLD_PARAM_KEYS.tightness) ||
-      searchParams.has(THRESHOLD_PARAM_KEYS.risk);
-    if (hasUrlThresholds) {
-      return;
-    }
-    const storedDraft = window.localStorage.getItem(storageKey);
-    if (!storedDraft) {
-      return;
-    }
-    try {
-      const parsed = JSON.parse(storedDraft) as ThresholdDraft;
-      setDraft(parsed);
-      const nextErrors = validateDraft(parsed);
-      if (Object.keys(nextErrors).length === 0) {
-        const nextParams = new URLSearchParams(searchParams.toString());
-        buildThresholdSearchParams(buildThresholds(parsed), appliedDefaults, nextParams);
-        router.replace(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
-      }
-    } catch {
-      // Ignore storage parse errors to keep console clean.
-    }
-  }, [appliedDefaults, pathname, router, searchParams]);
-
-  useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(draft));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }, [draft]);
-
-  useEffect(() => {
-    const storedAudit = window.localStorage.getItem(auditKey);
-    if (!storedAudit) {
-      return;
-    }
-    try {
-      const parsed = JSON.parse(storedAudit) as ThresholdAuditEntry[];
-      setAuditLog(parsed);
-    } catch {
-      // Ignore audit parse errors to keep console clean.
-    }
-  }, []);
 
   const formattedCurrent = useMemo(() => buildDraft(currentThresholds), [currentThresholds]);
 
@@ -188,8 +241,8 @@ export const ThresholdsPanel = ({
       source,
     };
     const nextAudit = [entry, ...auditLog].slice(0, 8);
-    setAuditLog(nextAudit);
-    window.localStorage.setItem(auditKey, JSON.stringify(nextAudit));
+    setAppendedAudit(nextAudit);
+    window.localStorage.setItem(AUDIT_KEY, JSON.stringify(nextAudit));
   };
 
   const focusFirstInvalid = (nextErrors: ThresholdErrorMap) => {
@@ -240,7 +293,7 @@ export const ThresholdsPanel = ({
   };
 
   const updateDraft = (key: keyof ThresholdDraft, value: string) => {
-    setDraft((prev) => ({ ...prev, [key]: value }));
+    setDraft({ ...draft, [key]: value });
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 

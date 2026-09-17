@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useClipboardCopy } from "../components/useClipboardCopy";
 import { OPERATOR_STAGE_OPTIONS } from "../../lib/report/operatorStage";
+import { siteUrl } from "../../lib/siteUrl";
 
 /**
  * The embed snippet builder, as a section of `/share`.
@@ -24,21 +25,24 @@ export function EmbedBuilder() {
   const [stage, setStage] = useState("");
   const { status, copyToClipboard } = useClipboardCopy();
   const copied = status === "copied";
-  const [previewKey, setPreviewKey] = useState(0);
-  const previewRef = useRef<HTMLDivElement>(null);
+  /* Remounts the preview whenever the snippet's attributes change, so embed.js
+     hydrates it again. This was a counter bumped from an effect on every change
+     to either field — a second render to reach a value both fields already
+     determine. The key is those fields. */
+  const previewKey = `${ticker}|${stage}`;
 
+  /* The origin is resolved, not written in: this snippet is the thing a reader
+     copies into somebody else's page, and on the preview lane a literal made it
+     advertise production — so the preview of the embed could never be a preview
+     of the embed. `app/api-docs/page.tsx` already builds this with `siteUrl`. */
   const embedCode = `<div data-whether-embed="brief"${
     ticker ? ` data-whether-ticker="${ticker}"` : ""
   }${stage ? ` data-whether-stage="${stage}"` : ""}></div>
-<script async src="https://whether.work/embed.js"></script>`;
+<script async src="${siteUrl}/embed.js"></script>`;
 
   const handleCopy = useCallback(() => {
     void copyToClipboard(embedCode, "embed");
   }, [copyToClipboard, embedCode]);
-
-  useEffect(() => {
-    setPreviewKey((k) => k + 1);
-  }, [ticker, stage]);
 
   return (
     <div className="space-y-8">
@@ -69,7 +73,6 @@ export function EmbedBuilder() {
               </p>
               <div
                 key={previewKey}
-                ref={previewRef}
                 data-whether-embed="brief"
                 {...(ticker ? { "data-whether-ticker": ticker } : {})}
                 {...(stage ? { "data-whether-stage": stage } : {})}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const PERSISTENT_CLIENT_ID_STORAGE_KEY = "whether-client-id";
 
@@ -44,12 +44,13 @@ const getOrCreatePersistentClientId = () => {
   return created;
 };
 
-export const usePersistentClientId = () => {
-  const [clientId, setClientId] = useState<string | null>(null);
+/* One id per browser, so one source per tab rather than one per component: the
+   first consumer to render creates the id and every later one reads the same
+   string back, which is also what makes the snapshot reference-stable. */
+const clientIdSource = createBrowserSource<string | null>({
+  read: getOrCreatePersistentClientId,
+  serverValue: null,
+});
 
-  useEffect(() => {
-    setClientId(getOrCreatePersistentClientId());
-  }, []);
-
-  return clientId;
-};
+/** Null until hydration finishes, which is also what a browser with storage blocked reports. */
+export const usePersistentClientId = () => useBrowserSource(clientIdSource);

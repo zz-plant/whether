@@ -95,6 +95,16 @@ export default function PricingPage() {
         <header className="space-y-3">
           <h1 className="text-fluid-lg font-semibold text-white">Pricing</h1>
           <p className="max-w-2xl text-fluid-sm text-slate-300">{FREE_FOREVER_PROMISE}</p>
+          {/* The promise above is the strongest data claim this site makes, and
+              until /privacy existed there was nowhere to check it. A claim a
+              reader cannot verify is worth less than the work behind making it
+              true, and there is real work behind this one. */}
+          <p className="max-w-2xl text-fluid-xs text-slate-400">
+            <Link href="/privacy" className="text-sky-300 underline-offset-2 hover:underline">
+              What that means in practice
+            </Link>{" "}
+            — every store, cookie, and measurement, itemised.
+          </p>
         </header>
 
         <div className="grid gap-4 md:grid-cols-3">

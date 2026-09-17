@@ -75,7 +75,10 @@ egress proxy denies FRED, so every run failed before it had a week to write. The
 `assessPublishReadiness` before anything is built; a week that is not publishable makes the first
 step throw, and the platform retries it hourly up to five times. The archive is append-only at the
 merge: a slug the base branch already carries is left exactly as it is. On for the preview lane
-only (`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`.
+only (`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`, which it checks before the live
+read rather than after it, so the flag and the secret can be set in either order when the lane is
+promoted. Checklist: `docs/cloudflare-deployment-runbook.md`, "Promoting the brief freeze to
+production".
 
 ## Reading telemetry back
 

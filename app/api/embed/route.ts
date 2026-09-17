@@ -11,6 +11,7 @@ import { assembleHomePage } from "../../../lib/report/homePageAssembler";
 import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { siteUrl } from "../../../lib/siteUrl";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -47,11 +48,25 @@ export async function GET(request: Request) {
     const operatingCall = canonicalDecision?.operatingCall ?? operatingStanceLine;
     const actionNow = homepage.weeklyDecisionCardModel.decision.actionNowShort || homepage.weeklyDecisionCardModel.decision.immediateDecision;
     const doNowItems = actionItems.map((item) => item.areaActionNow);
-    const flipTrigger = flipConditionLabels[0] || "Monitor economic indicators";
-    const reversalCondition = "Two consecutive weeks of confirming signals";
+    /*
+     * Both of these are read off the same action strip `doNowItems` comes from.
+     *
+     * `reversalCondition` used to be the literal "Two consecutive weeks of
+     * confirming signals" — the same sentence every week, for every regime, in a
+     * field nothing renders and only `format=json` returns. So the one consumer
+     * it had was an integrator reading it as a fact about this week's call. The
+     * value was already in scope: `reversalCondition` and `triggerThreshold` are
+     * non-optional siblings of the `areaActionNow` on the line above, and every
+     * other surface in this repo reads them.
+     *
+     * `flipTrigger` fell back to "Monitor economic indicators", which is advice
+     * no reading produced. An empty list means the call has no flip condition to
+     * publish; the field is omitted rather than filled.
+     */
+    const primaryAction = actionItems[0];
+    const flipTrigger = flipConditionLabels[0] ?? primaryAction?.triggerThreshold ?? null;
+    const reversalCondition = primaryAction?.reversalCondition ?? null;
     const dataFreshness = homepage.reportShell.fetchedAtLabel;
-
-
 
     const briefUrl = buildWhetherBriefUrl({ ticker: tickerParam, ref });
     const attributionUrl = buildWhetherBriefUrl({ ref });
@@ -135,8 +150,10 @@ type BriefEmbedData = {
   operatingCall: string;
   actionNow: string;
   doNowItems: string[];
-  flipTrigger: string;
-  reversalCondition: string;
+  /** Null when the call published no flip condition. Never filler. */
+  flipTrigger: string | null;
+  /** Null when the call published no reversal condition. Never filler. */
+  reversalCondition: string | null;
   dataFreshness: string;
   postureLabel: string;
   confidenceLabel: string;
@@ -149,8 +166,18 @@ type BriefEmbedData = {
   attributionUrl: string;
 };
 
+/*
+ * The origin comes from `resolveSiteUrl`, not a literal.
+ *
+ * Every embed carries these two links into somebody else's page, so a hardcoded
+ * origin means the preview lane's embeds advertise production — the one surface
+ * you would use preview to check is the one preview cannot check. This is the
+ * rule `tests/feedRoute.test.ts` already guards for the feed, where the literal
+ * and the configured default are the same string and only a source read tells
+ * them apart; `app/api-docs/page.tsx` already builds the same snippet correctly.
+ */
 export const buildWhetherBriefUrl = ({ ticker, ref }: { ticker?: string | null; ref?: string | null }): string => {
-  const url = new URL("https://whether.work/");
+  const url = new URL(`${siteUrl}/`);
   const normalizedTicker = ticker?.trim();
   const normalizedRef = ref?.trim();
 

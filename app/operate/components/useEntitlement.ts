@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
+import { createBrowserSource, useBrowserSource, useHydrated } from "../../components/browserSource";
 
 type EntitlementState = {
   /** True once the confirm/status round trip has resolved (success or not). */
@@ -35,6 +36,20 @@ const clearToken = () => {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/* Read through a store, so "this browser has no token" is an answer the render
+   already has rather than one an effect assigns. It is also the difference the
+   server cannot see: null before hydration means "not read yet", and `hydrated`
+   is what tells the two apart. */
+const storedTokenSource = createBrowserSource<string | null>({
+  read: readStoredToken,
+  serverValue: null,
+  refreshOnSubscribe: true,
+});
+
+/** Nothing outstanding: no token to verify and no checkout to confirm. */
+const NOT_ENTITLED: EntitlementState = { ready: true, active: false };
+const UNRESOLVED: EntitlementState = { ready: false, active: false };
+
 /**
  * Resolves whether this browser holds an active premium entitlement.
  *
@@ -49,12 +64,21 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 export function useEntitlement(): EntitlementState {
   const searchParams = useSearchParams();
-  const [state, setState] = useState<EntitlementState>({ ready: false, active: false });
+  const [resolved, setResolved] = useState<EntitlementState | null>(null);
+  const hydrated = useHydrated();
+  const storedToken = useBrowserSource(storedTokenSource);
 
   const checkoutStatus = searchParams?.get("checkout");
   const sessionId = searchParams?.get("session_id");
 
+  /* The only two states that need the network. Everything else — no token, no
+     checkout — is settled here, which is why the effect below has no branch
+     that assigns state without having waited for something. */
+  const returningFromCheckout = checkoutStatus === "success" && Boolean(sessionId);
+  const awaitingRoundTrip = returningFromCheckout || Boolean(storedToken);
+
   useEffect(() => {
+    if (!awaitingRoundTrip) return;
     let cancelled = false;
 
     const verify = async (token: string) => {
@@ -67,13 +91,13 @@ export function useEntitlement(): EntitlementState {
         const data = await res.json();
         if (cancelled) return;
         if (data.active) {
-          setState({ ready: true, active: true, plan: data.plan });
+          setResolved({ ready: true, active: true, plan: data.plan });
         } else {
           clearToken();
-          setState({ ready: true, active: false });
+          setResolved(NOT_ENTITLED);
         }
       } catch {
-        if (!cancelled) setState({ ready: true, active: false });
+        if (!cancelled) setResolved(NOT_ENTITLED);
       }
     };
 
@@ -92,7 +116,7 @@ export function useEntitlement(): EntitlementState {
           if (cancelled) return;
           if (data.ok && data.token) {
             storeToken(data.token);
-            setState({ ready: true, active: true, plan: data.plan });
+            setResolved({ ready: true, active: true, plan: data.plan });
             return;
           }
           break;
@@ -100,23 +124,20 @@ export function useEntitlement(): EntitlementState {
           break;
         }
       }
-      if (!cancelled) setState({ ready: true, active: false });
+      if (!cancelled) setResolved(NOT_ENTITLED);
     };
 
-    if (checkoutStatus === "success" && sessionId) {
+    if (returningFromCheckout && sessionId) {
       void confirm(sessionId);
-      return () => { cancelled = true; };
-    }
-
-    const stored = readStoredToken();
-    if (stored) {
-      void verify(stored);
-    } else {
-      setState({ ready: true, active: false });
+    } else if (storedToken) {
+      void verify(storedToken);
     }
 
     return () => { cancelled = true; };
-  }, [checkoutStatus, sessionId]);
+  }, [awaitingRoundTrip, returningFromCheckout, sessionId, storedToken]);
 
-  return state;
+  if (resolved) return resolved;
+  // Before hydration the browser has not been read, so "no token" is not yet a
+  // fact about this browser — only about the server's render.
+  return hydrated && !awaitingRoundTrip ? NOT_ENTITLED : UNRESOLVED;
 }

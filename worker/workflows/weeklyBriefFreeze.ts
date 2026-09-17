@@ -1,11 +1,17 @@
 /**
  * WeeklyBriefFreezeWorkflow — records this week's brief into the citable archive.
  *
- * Trial scope: the binding exists in every environment, but the Monday cron only starts an
- * instance where WHETHER_BRIEF_FREEZE_WORKFLOW=1 (the preview lane). It replaces the
- * scheduled routine that ran `scripts/freezeWeeklyBrief.ts` in a sandbox whose egress proxy
- * denies FRED: every one of those runs failed before it had a week to write, and the archive
- * that is meant to prove weekly cadence stayed at one entry.
+ * The binding exists in every environment; the Monday cron starts an instance wherever
+ * WHETHER_BRIEF_FREEZE_WORKFLOW=1, today the preview lane. It replaces the scheduled routine
+ * that ran `scripts/freezeWeeklyBrief.ts` in a sandbox whose egress proxy denies FRED: every
+ * one of those runs failed before it had a week to write, and the archive that is meant to
+ * prove weekly cadence stayed at one entry. Nothing here merges anything — the output is a
+ * pull request a person reads.
+ *
+ * Written to be promoted without a sequencing rule. Production reaches this code the moment
+ * the flag is set, and GITHUB_TOKEN is a secret set separately, so the two can arrive in
+ * either order: the missing one is refused at the first line of `freeze` and named in the
+ * `brief-freeze` row, rather than discovered after a live read and five hourly retries.
  *
  * The first step is the one that used to fail, so it is the one with the patient retry: if
  * the live read is not publishable yet — fallback data, a stale record date — the step
@@ -93,6 +99,23 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
     event: WorkflowEvent<WeeklyBriefFreezeWorkflowParams>,
     step: WorkflowStep,
   ): Promise<OpenPublishedBriefPullRequestResult> {
+    /*
+     * Checked before any work, not between the read and the pull request.
+     *
+     * Fail loudly either way: a workflow that cannot open its pull request has not done
+     * its job, and a silent skip is what left the archive at one week with nothing on
+     * /trust to say so. But the order matters once the flag is on in production, where
+     * the token is a secret an operator sets separately. Below the assemble step, a
+     * missing token costs a live provider read and — when the data is not publishable
+     * yet — five hourly retries, so the run reports "gave up after five hours" at 7pm
+     * for a fact that was true at 2pm. Above it, the failing `brief-freeze` row names
+     * the missing secret within seconds of the hand-off.
+     */
+    const token = this.env.GITHUB_TOKEN;
+    if (!token) {
+      throw new Error("GITHUB_TOKEN is not configured; the week cannot be recorded in the repository");
+    }
+
     const assembled = await step.do("assemble this week's brief from live data", { retries: ASSEMBLE_RETRIES }, async () => {
       const result = await this.assembleWeek();
       if (!result.ok) {
@@ -100,12 +123,6 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
       }
       return { record: result.record, slug: result.slug };
     });
-
-    const token = this.env.GITHUB_TOKEN;
-    if (!token) {
-      // Fail loudly: a workflow that cannot open its pull request has not done its job.
-      throw new Error("GITHUB_TOKEN is not configured; the week cannot be recorded in the repository");
-    }
 
     const client = new GitHubRepoClient({ token, repository: this.env.GITHUB_REPOSITORY ?? DEFAULT_GITHUB_REPOSITORY });
     const base = event.payload?.base ?? "main";

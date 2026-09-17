@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
+import { createBrowserSource, useBrowserSource } from "../browserSource";
 
 type SeenCall = {
   recordDate: string;
@@ -31,6 +32,30 @@ const readSeenCall = (): SeenCall | null => {
   }
 };
 
+/*
+ * The read and the write are the same slot, and the read has to win.
+ *
+ * This visit overwrites what the last one stored, so the previous call is gone
+ * the moment the write lands. The source caches on its first read and never
+ * re-reads, which is what makes "what this browser last saw" a fact about the
+ * page load rather than a race with the write beside it; `rememberSeenCall`
+ * takes that snapshot explicitly before writing rather than relying on the
+ * order React happens to run two effects in.
+ */
+const lastSeenCallSource = createBrowserSource<SeenCall | null>({
+  read: readSeenCall,
+  serverValue: null,
+});
+
+const rememberSeenCall = (current: SeenCall) => {
+  lastSeenCallSource.getSnapshot();
+  try {
+    window.localStorage.setItem(STORAGE_KEYS.lastSeenCall, JSON.stringify(current));
+  } catch {
+    // Storage blocked: the page still works, the comparison waits for a browser that keeps it.
+  }
+};
+
 /**
  * "Since you were last here", with nothing saved on purpose.
  *
@@ -41,23 +66,17 @@ const readSeenCall = (): SeenCall | null => {
  * next — and the comparison is computed against what the call is now.
  *
  * Renders nothing on a first visit and nothing when the call the reader last
- * saw is this week's. Reads storage in an effect so server and client agree.
+ * saw is this week's. Storage is read through a store rather than during
+ * render, so the server's markup — nothing — is what hydration renders too.
  */
 export function SinceLastVisit({ current }: { current: SeenCall }) {
-  const [previous, setPrevious] = useState<SeenCall | null>(null);
+  const seen = useBrowserSource(lastSeenCallSource);
 
   useEffect(() => {
-    const seen = readSeenCall();
-    if (seen && seen.recordDate !== current.recordDate) {
-      setPrevious(seen);
-    }
-    try {
-      window.localStorage.setItem(STORAGE_KEYS.lastSeenCall, JSON.stringify(current));
-    } catch {
-      // Storage blocked: the page still works, the comparison waits for a browser that keeps it.
-    }
+    rememberSeenCall(current);
   }, [current]);
 
+  const previous = seen && seen.recordDate !== current.recordDate ? seen : null;
   if (!previous) return null;
 
   const regimeChanged = previous.regimeLabel !== current.regimeLabel;
