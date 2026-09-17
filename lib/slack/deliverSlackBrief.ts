@@ -1,6 +1,8 @@
 import { buildSlackBrief } from "../export/briefBuilders";
+import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { loadReportDataSafe } from "../report/reportData";
 import { buildPostureState } from "../report/postureStateSource";
+import { siteUrl } from "../siteUrl";
 
 /**
  * Slack delivery for the weekly brief.
@@ -13,7 +15,12 @@ import { buildPostureState } from "../report/postureStateSource";
  * three outcomes actually happened.
  */
 
-type SlackDeliveryStatus = "posted" | "partial" | "skipped_unconfigured" | "failed";
+type SlackDeliveryStatus =
+  | "posted"
+  | "partial"
+  | "skipped_unconfigured"
+  | "refused_unpublishable"
+  | "failed";
 
 type SlackDeliveryResult = {
   /** True when every configured webhook accepted the post, or none are configured. */
@@ -55,7 +62,7 @@ export const buildSlackBriefBlocks = (
         {
           type: "button",
           text: { type: "plain_text", text: "Open the brief" },
-          url: "https://whether.work",
+          url: siteUrl,
           action_id: "open_brief",
         },
       ],
@@ -63,11 +70,26 @@ export const buildSlackBriefBlocks = (
   ];
 };
 
-/** Same data path as GET /api/brief/slack, so both surfaces say the same thing. */
-const buildSlackBriefPayload = async (): Promise<{
+/**
+ * Same data path as GET /api/brief/slack, so both surfaces say the same thing —
+ * and, since 2026-09-17, the same readiness judgement.
+ *
+ * This function already computed a `degraded` flag and the one caller
+ * destructured `{ text, recordDate }` and dropped it, so the Monday post went
+ * out identically whether the reading was live or a bundled snapshot. The read
+ * endpoint published the flag; the artifact people actually read did not.
+ *
+ * `degraded` was also the wrong flag to have carried: it is `!reportResult.ok`,
+ * which stays false through a total upstream outage, because falling back is a
+ * success for this loader. That is the exact reading `briefPublishGuard` exists
+ * to correct, so readiness is judged there, on the flags that move.
+ */
+const buildSlackBriefPayload = async (
+  now: Date,
+): Promise<{
   text: string;
   recordDate: string;
-  degraded: boolean;
+  readiness: ReturnType<typeof assessPublishReadiness>;
 }> => {
   const reportResult = await loadReportDataSafe(undefined, { route: "slack/deliver-brief" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
@@ -78,7 +100,18 @@ const buildSlackBriefPayload = async (): Promise<{
     reportDynamics: reportData.reportDynamics,
   });
   const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
-  return { text, recordDate: treasury.record_date, degraded: !reportResult.ok };
+  return {
+    text,
+    recordDate: treasury.record_date,
+    readiness: assessPublishReadiness({
+      degraded: !reportResult.ok,
+      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
+      isLive: treasury.isLive,
+      fallbackReason: treasury.fallback_reason,
+      recordDate: treasury.record_date ?? treasury.fetched_at,
+      now,
+    }),
+  };
 };
 
 export const resolveConfiguredSlackWebhooks = (): string[] => {
@@ -96,6 +129,7 @@ export const deliverSlackBrief = async (options?: {
   payload?: { text: string; recordDate: string };
   /** Public URL of this week's stored screenshot; omitted, the post is text blocks as before. */
   imageUrl?: string;
+  now?: Date;
 }): Promise<SlackDeliveryResult> => {
   const urls = options?.webhookUrls ?? resolveConfiguredSlackWebhooks();
   if (urls.length === 0) {
@@ -109,7 +143,21 @@ export const deliverSlackBrief = async (options?: {
   let payload = options?.payload;
   if (!payload) {
     try {
-      payload = await buildSlackBriefPayload();
+      const built = await buildSlackBriefPayload(options?.now ?? new Date());
+      if (!built.readiness.ok) {
+        /* Not a failure of this dispatcher, and not a post either. A channel
+           that is told nothing this Monday can ask; a channel handed a stale
+           reading under this week's heading cannot tell. */
+        return {
+          ok: false,
+          status: "refused_unpublishable",
+          attempted: 0,
+          delivered: 0,
+          recordDate: built.recordDate,
+          error: `refused_unpublishable: ${built.readiness.reason}`,
+        };
+      }
+      payload = { text: built.text, recordDate: built.recordDate };
     } catch (error) {
       return {
         ok: false,

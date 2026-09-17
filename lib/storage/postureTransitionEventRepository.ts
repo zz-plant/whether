@@ -380,10 +380,6 @@ export const buildPostureTransitionEvent = ({
   };
 };
 
-export const buildPostureDecisionEvent = (
-  payload: Parameters<typeof buildPostureTransitionEvent>[0],
-): PostureTransitionEvent => buildPostureTransitionEvent(payload);
-
 export const buildRegimeDecisionEvent = ({
   previousState,
   nextState,

@@ -4,6 +4,7 @@ import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { siteUrl } from "../siteUrl";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 
 type CheckRegimeChangeResult = {
@@ -80,7 +81,7 @@ export const checkRegimeChange = async (options?: {
           blocks: [
             { type: "header", text: { type: "plain_text", text: "⚠️ Reconsider Operating Posture" } },
             { type: "section", text: { type: "mrkdwn", text: `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.` } },
-            { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+            { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
           ],
         }),
       });
@@ -109,7 +110,7 @@ export const checkRegimeChange = async (options?: {
             blocks: [
               { type: "header", text: { type: "plain_text", text: "👀 Watch Decisions — Flip Window Narrowing" } },
               { type: "section", text: { type: "mrkdwn", text: `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.` } },
-              { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+              { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
             ],
           }),
         });

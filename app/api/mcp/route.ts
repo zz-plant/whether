@@ -6,6 +6,7 @@ import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachine
 import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
 import { RateLimitedError, rateLimitedResponse } from "../../../lib/runtime/rateLimit";
+import { siteUrl } from "../../../lib/siteUrl";
 import { buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
@@ -52,13 +53,13 @@ export async function GET(request: Request) {
            constraint before it calls one of them. */
         use: buildUseConstraint(),
         _links: {
-          full_brief: "https://whether.work",
-          history: "https://whether.work/history",
-          trust: "https://whether.work/trust",
+          full_brief: siteUrl,
+          history: `${siteUrl}/history`,
+          trust: `${siteUrl}/trust`,
         },
         mcp: {
           transport: "streamable-http",
-          endpoint: "https://whether.work/api/mcp",
+          endpoint: `${siteUrl}/api/mcp`,
           note: "POST JSON-RPC 2.0 (initialize / tools/list / tools/call) to this URL with no ?tool param.",
         },
       });
@@ -128,10 +129,10 @@ export async function GET(request: Request) {
          named `hiring`, returned to a caller with no person in the loop. */
       use: buildUseConstraint(),
       links: {
-        full_brief: "https://whether.work",
-        history: "https://whether.work/history",
-        trust: "https://whether.work/trust",
-        api_docs: "https://whether.work/api/agent",
+        full_brief: siteUrl,
+        history: `${siteUrl}/history`,
+        trust: `${siteUrl}/trust`,
+        api_docs: `${siteUrl}/api/agent`,
       },
     });
   } catch (error) {

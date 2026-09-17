@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ configured: false, subscribed: false, publicKey: null });
   }
 
-  const owner = requireClientOwner(request);
+  const owner = await requireClientOwner(request);
   /* Unauthenticated is not an error here: a page asking "can I offer this?"
      before it has an id is the normal first call. */
   if (owner.error || !owner.ownerId) {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "push_not_configured" }, { status: 503 });
   }
 
-  const owner = requireClientOwner(request);
+  const owner = await requireClientOwner(request);
   if (owner.error || !owner.ownerId) return owner.error ?? NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   let body: unknown;
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
  * achieve keeps a notification arriving at someone who asked it to stop.
  */
 export async function DELETE(request: Request) {
-  const owner = requireClientOwner(request);
+  const owner = await requireClientOwner(request);
   if (owner.error || !owner.ownerId) return owner.error ?? NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const removed = await deletePushSubscription(owner.ownerId);

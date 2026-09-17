@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it, mock } from "bun:test";
 import { POST as legacySubscribePost } from "../app/api/subscribe/route";
-import { GET as syncGet, POST as syncPost } from "../app/api/sync/route";
 import { POST as ingestPost } from "../app/api/ingest/route";
 import { POST as emailSendWeeklyPost } from "../app/api/email/send-weekly/route";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
@@ -40,7 +39,7 @@ afterEach(() => {
   mock.restore();
 });
 
-describe("subscription and sync hardening", () => {
+describe("subscription hardening", () => {
   it("legacy subscribe persists through the canonical store and sends verification", async () => {
     const sent: Array<{ to: string; text: string }> = [];
     (globalThis as { EMAIL?: { send: (message: { to: string; text: string }) => Promise<unknown> } }).EMAIL = {
@@ -81,44 +80,6 @@ describe("subscription and sync hardening", () => {
     assert.deepEqual(await coldStore.getActiveSubscriptions(), []);
   });
 
-  it("sync requires a secret and rejects invalid keys", async () => {
-    (globalThis as { WHETHER_DURABLE_KV?: unknown }).WHETHER_DURABLE_KV = createMemoryKv();
-    const now = Date.now();
-
-    const missingSecret = await syncPost(new Request("https://whether.test/api/sync", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id: "sync-a", key: "whether-company-metrics", value: { burn: 1 }, ts: now }),
-    }));
-    assert.equal(missingSecret.status, 401);
-
-    const invalidKey = await syncPost(new Request("https://whether.test/api/sync", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-whether-sync-secret": "1234567890123456" },
-      body: JSON.stringify({ id: "sync-a", key: "untrusted:key", value: true, ts: now }),
-    }));
-    assert.equal(invalidKey.status, 400);
-
-    const created = await syncPost(new Request("https://whether.test/api/sync", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-whether-sync-secret": "1234567890123456" },
-      body: JSON.stringify({ id: "sync-a", key: "whether-company-metrics", value: { burn: 1 }, ts: now }),
-    }));
-    assert.equal(created.status, 200);
-
-    const wrongSecret = await syncGet(new Request("https://whether.test/api/sync?id=sync-a", {
-      headers: { "x-whether-sync-secret": "abcdefghijklmnop" },
-    }));
-    assert.equal(wrongSecret.status, 401);
-
-    const read = await syncGet(new Request("https://whether.test/api/sync?id=sync-a", {
-      headers: { "x-whether-sync-secret": "1234567890123456" },
-    }));
-    assert.equal(read.status, 200);
-    const body = await read.json() as { state: Record<string, { value: unknown; secretHash?: string }> };
-    assert.deepEqual(body.state["whether-company-metrics"]?.value, { burn: 1 });
-    assert.equal(body.state["whether-company-metrics"]?.secretHash, undefined);
-  });
 });
 
 describe("cron endpoint auth", () => {

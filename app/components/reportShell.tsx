@@ -38,6 +38,7 @@ import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 import { NextStepCard } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
+import { OfflineNotice } from "./offlineNotice";
 
 type ReportShellInput = {
   statusLabel: string;
@@ -160,6 +161,15 @@ export const ReportShell = (props: ReportShellProps) => {
           {/* The outline, in chip form, where the rail is hidden. Renders
               nothing on a page with fewer than two sections. */}
           <MobileSectionChips sectionLinks={sectionLinks} />
+
+          {/* Every page built on this shell renders a reading, and the service
+              worker serves the last copy of any of them when the network is
+              gone. `/` carried this notice alone, so /trust — the page the IA
+              points a reader to when they want to check the brief before a
+              decision — showed a previous visit's readings with nothing saying
+              so. The shell already has the record date, which is what makes the
+              label true of whatever is on the screen. */}
+          <OfflineNotice recordDateLabel={recordDateLabel} />
 
           <CommandCenterNavBlock
             pageTitle={pageTitle}
