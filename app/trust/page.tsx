@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ActionLink } from "../components/ui/actionLink";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
-import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
@@ -17,6 +16,7 @@ import { FrameworkSection } from "./frameworkSection";
 import { ConfidenceRecordSection } from "./confidenceRecord";
 import { RunHistorySection } from "./runHistorySection";
 import { buildTrustPageModel } from "./trustPageModel";
+import { GLOSSARY_HREF } from "../../lib/report/signalTranslations";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -189,7 +189,21 @@ export default async function MethodPage({
         </pre>
       </ReportSection>
 
-      <BeginnerGlossaryPanel />
+      {/* The glossary itself moved to /glossary. A pointer stays because this
+          page is where a reader checking the brief before a decision ends up,
+          and "what does that word mean" is a question they arrive with — but
+          the definitions are not a trust artifact, and six links across the
+          site used to send someone who did not know a term to a page about
+          source freshness. */}
+      <ReportSection
+        id="beginner-glossary"
+        title="Unfamiliar with a term?"
+        description="Every term this site uses, in plain English, with what it changes for the company you run."
+      >
+        <ActionLink href={GLOSSARY_HREF} variant="pill">
+          Open the glossary
+        </ActionLink>
+      </ReportSection>
     </>
   );
 

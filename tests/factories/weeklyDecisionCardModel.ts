@@ -1,4 +1,5 @@
 import type { WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
+import { GLOSSARY_HREF } from "../../lib/report/signalTranslations";
 
 export type WeeklyDecisionCardModelOverrides = Partial<{
   status: Partial<WeeklyDecisionCardViewModel["status"]>;
@@ -268,7 +269,7 @@ export const buildWeeklyDecisionCardModel = (
       { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },
       { label: "What would reverse the call", detail: "If risk appetite rises above 55, reopen selective hiring." },
     ],
-    glossaryHref: "/trust#beginner-glossary",
+    glossaryHref: GLOSSARY_HREF,
     ...overrides.presentation,
   },
   diagnostics: {

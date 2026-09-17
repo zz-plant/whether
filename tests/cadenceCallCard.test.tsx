@@ -5,6 +5,7 @@ import { CadenceCallCard } from "../app/components/CadenceCallCard";
 import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { RegimeKey } from "../lib/regimeEngine";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 
 const rawAssessment = evaluateRegime({
   source: "https://example.com/treasury",
@@ -68,15 +69,15 @@ describe("CadenceCallCard", () => {
   it("states the horizon's bounded triad when the call stands", () => {
     const html = render("monthly");
 
-    assert.match(html, /Guardrail/);
-    assert.match(html, /Reversal/);
+    assert.ok(html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
+    assert.ok(html.includes(DECISION_CONTRACT_LABELS.reversal.changeCourseIf));
     assert.match(html, /Regime by month/);
   });
 
   it("drops the triad under a refusal, where the weekly hero below carries it", () => {
     const html = render("monthly", true);
 
-    assert.doesNotMatch(html, /Guardrail/);
+    assert.ok(!html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
     assert.match(html, /Posture change held:/);
     assert.match(html, /Signals disagree\./);
   });
@@ -123,24 +124,26 @@ describe("CadenceCallCard", () => {
     assert.match(html, /Funding pressure: 61/);
     assert.match(html, /Risk appetite: 56/);
     // Distance to each edge, in the same two words the chips above use.
-    assert.match(html, /5 to Reversal · 15 to Guardrail/);
-    assert.match(html, /2 to Reversal · 12 to Guardrail/);
+    assert.ok(html.includes(`5 to ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} · 15 to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`));
+    assert.ok(html.includes(`2 to ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} · 12 to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`));
   });
 
   it("states a tripped edge rather than measuring zero distance to it", () => {
     // The bare fixture reads 100 against a 76 guardrail: already past it, not near it.
     const html = render("monthly");
 
-    assert.match(html, /Guardrail tripped/);
-    assert.doesNotMatch(html, /0 to Guardrail/);
+    assert.ok(html.includes(`${DECISION_CONTRACT_LABELS.threshold.pauseIf} tripped`));
+    assert.ok(!html.includes(`0 to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`));
   });
 
   it("calls one threshold by one name across chip, rail, and readout", () => {
     const html = render("monthly");
 
-    // The rail used to label this "Trigger" while the chip beside it said "Guardrail",
-    // which reads as two rules rather than one drawn twice.
+    // The rail used to label this one thing while the chip beside it used
+    // another, which reads as two rules rather than one drawn twice. Both of
+    // those names are retired; neither may come back.
     assert.doesNotMatch(html, />Trigger</);
+    assert.doesNotMatch(html, />Guardrail</);
   });
 
   it("keeps the rails off the card under a refusal", () => {

@@ -10,6 +10,7 @@ import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRout
 import { SignalSparklineStrip } from "./components/signalSparklineStrip";
 import { formatMonthYearShortFromValue } from "../../lib/formatters";
 import { FossilRecordSection } from "./components/fossilRecordSection";
+import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import {
@@ -112,7 +113,7 @@ export default async function SignalsPage({
         impactLinks={[
           { label: "Funding pressure", href: model.regimeTimelineHref, metric: "tightness" },
           { label: "Risk appetite", href: "#current-scores", metric: "riskAppetite" },
-          { label: "Fed interest rate", href: "#current-scores", metric: "baseRate" },
+          { label: regimeSignalLabel.baseRate, href: "#current-scores", metric: "baseRate" },
         ]}
         openPanelHref={model.timeMachineHref}
       />
@@ -153,6 +154,15 @@ export default async function SignalsPage({
 
       <div id="trends" className="weather-panel space-y-4 px-5 py-5">
         <h2 className="type-eyebrow type-eyebrow-section">Funding pressure and risk appetite over time</h2>
+        {/* The scorecard above this section publishes *this week's* reading and
+            this series is the month-end archive, so the two disagree by design —
+            and for the same two named signals, several hundred pixels apart,
+            with nothing saying which was which. Each cell stamps its own period;
+            this line says what the section is, once. */}
+        <p className="text-fluid-xs text-slate-400">
+            Month-end readings from the archive, so the latest figure here is the last
+            completed month rather than this week&rsquo;s score above.
+        </p>
         {/* "Tightness" is the engine's internal name for this score; every reader-facing
             surface calls it funding pressure. */}
         <SignalSparklineStrip

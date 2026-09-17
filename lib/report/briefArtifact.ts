@@ -179,13 +179,13 @@ export const briefConditionEntries = (
   artifact: BriefArtifact,
 ): { label: string; value: string }[] => [
   ...(artifact.guardrail
-    ? [{ label: DECISION_CONTRACT_LABELS.threshold.guardrail, value: artifact.guardrail }]
+    ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: artifact.guardrail }]
     : []),
   ...(artifact.reversal
-    ? [{ label: DECISION_CONTRACT_LABELS.reversal.reversal, value: artifact.reversal }]
+    ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: artifact.reversal }]
     : []),
   ...(artifact.clearsWhen && artifact.clearsWhen.length > 0
-    ? [{ label: DECISION_CONTRACT_LABELS.reversal.clearsWhen, value: artifact.clearsWhen.join("; ") }]
+    ? [{ label: DECISION_CONTRACT_LABELS.reversal.changeCourseIf, value: artifact.clearsWhen.join("; ") }]
     : []),
 ];
 

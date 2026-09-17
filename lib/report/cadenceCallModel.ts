@@ -120,22 +120,22 @@ const formatSignedScore = (value: number) =>
  * The two distances a rail carries, named with the same two words the sentences above
  * it are chipped with. A rail that invented its own vocabulary for the edges would
  * leave the reader matching "5 to no rule" against "Reopen broader scope when …" on
- * their own; naming the edges Reversal and Guardrail makes the number and the sentence
+ * their own; naming the edges with the contract pair makes the number and the sentence
  * the same claim.
  *
- * A tripped edge is stated rather than measured — "0 to Guardrail" is a distance of
- * zero and a condition that already fires, and those are not the same thing to act on.
+ * A tripped edge is stated rather than measured — zero distance to a line is
+ * not the same thing to act on as a condition that already fires.
  */
 export const formatBandHeadroom = (band: HorizonSignalBand): string => {
   if (band.pauseTripped) {
-    return `${DECISION_CONTRACT_LABELS.threshold.guardrail} tripped`;
+    return `${DECISION_CONTRACT_LABELS.threshold.pauseIf} tripped`;
   }
 
-  const toPause = `${formatScore(band.toPause)} to ${DECISION_CONTRACT_LABELS.threshold.guardrail}`;
+  const toPause = `${formatScore(band.toPause)} to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`;
 
   return band.resumeHolds
-    ? `${formatScore(band.toResume)} to ${DECISION_CONTRACT_LABELS.slot.reversal} · ${toPause}`
-    : `${DECISION_CONTRACT_LABELS.slot.reversal} short by ${formatScore(band.toResume)} · ${toPause}`;
+    ? `${formatScore(band.toResume)} to ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} · ${toPause}`
+    : `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} short by ${formatScore(band.toResume)} · ${toPause}`;
 };
 
 /** The reading itself, and the move that produced it. Null movement stays null rather
@@ -344,8 +344,8 @@ export const buildCadenceCallModel = ({
     shareLabel: copy.shareLabel,
     shareCopiedLabel: "Call copied",
     shareLines: [
-      `${DECISION_CONTRACT_LABELS.threshold.guardrail}: ${boundedRule.threshold}`,
-      `${DECISION_CONTRACT_LABELS.reversal.reversal}: ${boundedRule.reversal}`,
+      `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${boundedRule.threshold}`,
+      `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${boundedRule.reversal}`,
     ],
   };
 };

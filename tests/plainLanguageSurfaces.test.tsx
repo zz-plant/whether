@@ -9,6 +9,7 @@ import { BEGINNER_GLOSSARY_ENTRIES } from "../lib/report/reportCopy";
 import {
   PLAIN_ENGLISH_SUBSTITUTIONS,
   applyPlainEnglishSubstitutions,
+  GLOSSARY_HREF,
   compositeSignalScales,
   scoreBandReference,
   signalPlainEnglish,
@@ -92,7 +93,10 @@ describe("DecisionHero plain-English layer", () => {
   it("anchors the risk-appetite scale and links out to the glossary", () => {
     const html = render();
     assert.ok(html.includes(compositeSignalScales.riskAppetite.directionLabel));
-    assert.match(html, /\/trust#beginner-glossary/);
+    /* Read from the constant: the destination moved off /trust, and a literal
+       here would have to be edited in lockstep with it — which is how six
+       links came to point at a page about source freshness. */
+    assert.ok(html.includes(GLOSSARY_HREF));
   });
 
   it("draws the tightness ladder label from the shared scale constant", () => {

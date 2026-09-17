@@ -99,6 +99,10 @@ describe("tablists support the keyboard", () => {
    *
    * Written as a sweep rather than a single-file assertion so the next tablist is held
    * to the same contract.
+   *
+   * Reads code only, like every other assertion in this file. Without that it matched
+   * the doc comments that record *why* these controls stopped being tablists, and
+   * reported the three files that had just been fixed.
    */
   it("gives every role=tablist arrow-key movement and a roving tabindex", async () => {
     const componentsDir = join(testDir, "..", "app", "components");
@@ -108,7 +112,7 @@ describe("tablists support the keyboard", () => {
     const violations: string[] = [];
     for (const entry of files) {
       const path = join(entry.parentPath ?? componentsDir, entry.name);
-      const source = await readFile(path, "utf8");
+      const source = codeOnly(await readFile(path, "utf8"));
       if (!source.includes('role="tablist"')) continue;
 
       if (!/ArrowLeft|ArrowRight/.test(source)) {
@@ -120,5 +124,40 @@ describe("tablists support the keyboard", () => {
     }
 
     assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
+  });
+
+  /*
+   * The cheapest way to satisfy the sweep above is to stop declaring the role and
+   * hand-roll the keyboard anyway, which is how three controls that look identical
+   * came to have three different keyboard behaviours — arrows, arrows plus Home/End,
+   * and nothing. They share one primitive now, and it is a native radio group, so the
+   * browser supplies the movement and there is no handler to get wrong.
+   */
+  it("routes every segmented control through the shared primitive", async () => {
+    const componentsDir = join(testDir, "..", "app", "components");
+    const consumers = ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayConditionedNotes.tsx"];
+
+    for (const name of consumers) {
+      const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
+      assert.match(source, /SegmentedControl/, `${name} draws its own segmented control`);
+      assert.doesNotMatch(source, /ArrowLeft|ArrowRight/, `${name} hand-rolls keyboard movement again`);
+      assert.doesNotMatch(source, /role="tablist"|aria-pressed|aria-current/, `${name} uses a third ARIA pattern`);
+    }
+  });
+
+  /*
+   * Choosing a horizon, a stage or a runway band is a view of the page you are on.
+   * `router.push` made Back mean "undo my last filter", so leaving the brief after
+   * trying four stages took five presses. `UrlDetails` records the same argument for
+   * the disclosure panels.
+   */
+  it("keeps a setting out of the history stack", async () => {
+    const componentsDir = join(testDir, "..", "app", "components");
+
+    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx"]) {
+      const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
+      assert.match(source, /router\.replace\(/, `${name} should replace rather than push`);
+      assert.doesNotMatch(source, /router\.push\(/, `${name} pushes a setting onto history`);
+    }
   });
 });

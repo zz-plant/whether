@@ -129,6 +129,10 @@ export const SignalsCurrentScoresSection = ({
       leftLabel: string;
       rightLabel: string;
       watchDistanceLabel: string;
+      /** Row heading for this card's line — not shared: two cards measure the
+       *  posture flip and one measures curve inversion. */
+      thresholdName: string;
+      thresholdLineNoun: string;
     }>
   >;
 }) => (
@@ -171,7 +175,7 @@ export const SignalsCurrentScoresSection = ({
               </dl>
               <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
                 <div className="flex items-center justify-between gap-3 type-eyebrow">
-                  <span>Current vs watch line</span>
+                  <span>Current vs {card.thresholdName.toLowerCase()}</span>
                   <span>{card.watchDistanceLabel}</span>
                 </div>
                 {meterState ? (
@@ -224,7 +228,7 @@ export const SignalsCurrentScoresSection = ({
                       </span>
                     </div>
                     <p className="mt-2 text-fluid-xs text-slate-400">
-                      Watch line:{" "}
+                      {card.thresholdName}:{" "}
                       <span className="text-slate-200">
                         {card.thresholdLabel}
                       </span>
@@ -232,7 +236,7 @@ export const SignalsCurrentScoresSection = ({
                   </>
                 ) : (
                   <p className="mt-2 text-xs text-slate-400">
-                    Watch line: {card.thresholdLabel}
+                    {card.thresholdName}: {card.thresholdLabel}
                   </p>
                 )}
               </div>

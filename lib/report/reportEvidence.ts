@@ -4,6 +4,7 @@ import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
 import { formatScoreValue } from "../formatters";
+import { regimeSignalLabel } from "./signalTranslations";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildActionStripItems } from "./operatingCalls";
 import type {
@@ -180,18 +181,13 @@ const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =
       }),
   );
 
-const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
-  tightness: "Funding pressure",
-  riskAppetite: "Risk appetite",
-  baseRate: "Fed interest rate",
-  curveSlope: "Recession warning gauge",
-};
+const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = regimeSignalLabel;
 
+/* Only `tightness` has an evidence-section title of its own; the rest are the
+   canonical signal names. */
 const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
+  ...regimeSignalLabel,
   tightness: "Capital conditions",
-  riskAppetite: "Risk appetite",
-  baseRate: "Fed interest rate",
-  curveSlope: "Recession warning gauge",
 };
 
 const EVIDENCE_SIGNAL_MAGNITUDE_HIGH = 3;

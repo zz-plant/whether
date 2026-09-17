@@ -3,10 +3,27 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 
 describe("home route render contract", () => {
-  it("keeps cadence access below the decision content, out of the home fold", () => {
+  it("keeps the horizon control beside the card it changes", () => {
+    /* It used to sit under `BelowTheFoldEvidence`, roughly 1,500px below the
+       card it swaps, and reached back up with a `scrollIntoView` — so the only
+       way to use it correctly was to be scrolled somewhere you had not asked to
+       go, and the only way to discover it was to have already scrolled past
+       everything it affects. It now sits in the meta row with the week
+       switcher, which is where this page keeps its other period controls.
+
+       A source read, and it has to be: the claim is about where in the document
+       the control sits relative to another element, and this page suspends at
+       its data boundary in this suite, so a render gives a shell. */
     const source = readFileSync("app/page.tsx", "utf8");
     assert.equal(source.split("<CadenceSelector").length - 1, 1);
-    assert.ok(source.indexOf("<CadenceSelector") > source.indexOf('<BelowTheFoldEvidence'), "read the call before choosing a longer horizon");
+    assert.ok(
+      source.indexOf("<CadenceSelector") < source.indexOf("<DecisionHero"),
+      "the horizon control must sit above the call it restates",
+    );
+    assert.ok(
+      source.indexOf("<CadenceSelector") < source.indexOf("<BelowTheFoldEvidence"),
+      "the horizon control must not be below the fold again",
+    );
     const header = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
     assert.ok(!header.includes("<CadenceSelector"));
   });
@@ -14,14 +31,15 @@ describe("home route render contract", () => {
   it("hands the client cadence selector data, never a function", () => {
     // `app/page.tsx` renders on the server. A function prop crossing into the
     // client control is not a warning: React refuses the whole render and the
-    // homepage shows "This brief isn't rendering right now". The reveal the
-    // selector performs is declared by id instead.
+    // homepage shows "This brief isn't rendering right now".
     const source = readFileSync("app/page.tsx", "utf8");
     const tag = source.slice(source.indexOf("<CadenceSelector"), source.indexOf("/>", source.indexOf("<CadenceSelector")) + 2);
-    assert.match(tag, /revealTargetId="weekly-call"/, "the selector reveals the cadence card by id");
     assert.doesNotMatch(tag, /=\{\s*(async\s*)?\(/, "no inline function crosses the server/client boundary");
     assert.doesNotMatch(tag, /onNavigate=/, "the callback form is for client callers only");
-    assert.ok(source.includes('id="weekly-call"'), "the reveal target exists on the page");
+    /* The reveal prop is gone with the distance that required it. A control
+       adjacent to its target has nothing to scroll to. */
+    assert.doesNotMatch(tag, /revealTargetId/, "a control beside its target needs no reveal");
+    assert.ok(source.includes('id="weekly-call"'), "the call region still anchors the page");
   });
 
   it("keeps the active / route carrying the homepage decision contract", () => {

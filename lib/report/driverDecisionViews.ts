@@ -28,6 +28,7 @@
 import { BASE_RATE_TIGHTNESS_THRESHOLD, TIGHTNESS_BASE_RATE_POINTS, BASE_RATE_TIGHTNESS_MULTIPLIER, BASE_RATE_SOURCE_LABELS } from "../regimeEngineCore";
 import type { RuleCondition } from "./boundedDecisionRules";
 import { distanceToRuleCondition, isRuleConditionMet } from "./boundedDecisionRules";
+import { regimeSignalLabel } from "./signalTranslations";
 
 /** One monthly regime-series entry: the brief's macro trendline. Absent inputs
  *  carry null — a gap in the history is not a flat reading. */
@@ -72,7 +73,7 @@ type FundingPressureLadderLine = {
 
 type FundingPressureDriverView = {
   key: "funding-pressure";
-  label: "Funding pressure";
+  label: typeof regimeSignalLabel.tightness;
   current: number;
   weeklyDelta: number | null;
   /** The model's action lines, ascending, with crossed state per line. */
@@ -128,7 +129,7 @@ export const buildFundingPressureDriverView = ({
 
   return {
     key: "funding-pressure",
-    label: "Funding pressure",
+    label: regimeSignalLabel.tightness,
     current: tightness,
     weeklyDelta,
     ladder,
@@ -144,7 +145,7 @@ export const buildFundingPressureDriverView = ({
 
 type RiskAppetiteDriverView = {
   key: "risk-appetite";
-  label: "Risk appetite";
+  label: typeof regimeSignalLabel.riskAppetite;
   current: number;
   /** The regime boundary value, e.g. 50. */
   boundaryValue: number;
@@ -213,7 +214,7 @@ export const buildRiskAppetiteDriverView = ({
 
   return {
     key: "risk-appetite",
-    label: "Risk appetite",
+    label: regimeSignalLabel.riskAppetite,
     current: riskAppetite,
     boundaryValue: riskAppetiteRegime,
     rulePauseValue,
@@ -228,7 +229,7 @@ export const buildRiskAppetiteDriverView = ({
 
 type FinancingDriverView = {
   key: "financing";
-  label: "Financing conditions";
+  label: typeof regimeSignalLabel.baseRate;
   /** What the engine actually read, e.g. "The 1-month Treasury bill". */
   rateSourceLabel: string;
   /** The published short-rate reading, in percent. Null when missing. */
@@ -308,7 +309,10 @@ export const buildFinancingDriverView = ({
 
   return {
     key: "financing",
-    label: "Financing conditions",
+    /* The same name the What-changed row prints. This card said "Financing
+       conditions" and that row said "Fed interest rate", ~600px apart on one
+       page, for one `baseRate` reading. */
+    label: regimeSignalLabel.baseRate,
     rateSourceLabel: resolvedRateLabel,
     currentRate: baseRate,
     change,

@@ -10,11 +10,15 @@ import {
   findRunwayQuickPick,
 } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
+import { SegmentedControl } from "./ui/segmentedControl";
 
 /**
- * The runway bands as a segmented control, the same shape as the cadence
- * selector two screens down. `aria-pressed` rather than `aria-current`: this
- * sets a stored figure, it does not navigate.
+ * The runway bands.
+ *
+ * It was the third hand-rolled version of one control: a `fieldset` with
+ * `aria-pressed` and no keyboard movement at all, beside a cadence selector
+ * using `aria-current` and a stage selector claiming `role="tablist"`. It reads
+ * the shared radio group now, so the arrows work here too.
  */
 const RunwayQuickPicks = ({
   activeMonths,
@@ -24,28 +28,18 @@ const RunwayQuickPicks = ({
   onPick: (months: number) => void;
 }) => {
   const active = findRunwayQuickPick(activeMonths);
+  const options = RUNWAY_QUICK_PICKS.map((pick) => ({ key: pick.label, label: pick.label }));
+
   return (
-    <fieldset
-      aria-label="Cash runway"
-      className="flex flex-wrap items-center gap-0.5 rounded-sm border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-0.5"
-    >
-      {RUNWAY_QUICK_PICKS.map((pick) => {
-        const isActive = active?.label === pick.label;
-        return (
-          <button
-            key={pick.label}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => onPick(pick.months)}
-            className={`min-h-[44px] sm:min-h-9 rounded-sm px-3 py-1.5 text-fluid-micro font-semibold tabular-nums transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-              isActive ? "bg-sky-500/15 text-sky-100" : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            {pick.label}
-          </button>
-        );
-      })}
-    </fieldset>
+    <SegmentedControl
+      options={options}
+      value={active?.label}
+      onSelect={(label) => {
+        const pick = RUNWAY_QUICK_PICKS.find((candidate) => candidate.label === label);
+        if (pick) onPick(pick.months);
+      }}
+      ariaLabel="Cash runway"
+    />
   );
 };
 

@@ -4,6 +4,10 @@ import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue } from "../formatters";
 import { REGIME_LABELS } from "../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+/* Value import against a type-only back-edge: `signalTranslations` imports
+   `RegimeSignalKey` from this module with `import type`, which erases, so this
+   is not a runtime cycle. */
+import { regimeSignalLabel } from "./signalTranslations";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
@@ -30,13 +34,8 @@ const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   reversal: "Reverse only after threshold recovery",
 };
 
-/** Same canonical names as `deltaLabelBySignal` and the glossary in `reportCopy.ts`. */
-export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
-  tightness: "Funding pressure",
-  riskAppetite: "Risk appetite",
-  baseRate: "Fed interest rate",
-  curveSlope: "Recession warning gauge",
-};
+/** The one table, re-exported under the name this module's callers already use. */
+export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = regimeSignalLabel;
 
 export const buildRegimeAlert = (
   current: RegimeAssessment,

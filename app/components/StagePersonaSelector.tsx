@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
@@ -10,6 +9,7 @@ import {
   type OperatorStage,
 } from "../../lib/report/operatorStage";
 import { persistOperatorStage } from "./useOperatorStage";
+import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 
 /** The four stages, from the one module every stage control reads. */
 export const STAGE_PERSONA_OPTIONS = OPERATOR_STAGE_OPTIONS;
@@ -19,6 +19,23 @@ interface StagePersonaSelectorProps {
   className?: string;
 }
 
+/**
+ * Which kind of company the operating rules are written for.
+ *
+ * It used to declare `role="tablist"` with `aria-selected`, which promises tab
+ * panels this control does not have, while the cadence selector beside it — the
+ * same control, drawn the same way — declared a `fieldset` with `aria-current`.
+ * Both are now the shared radio group, which is what picking one of four
+ * actually is.
+ *
+ * `replace`, not `push`, for the same reason the cadence selector uses it:
+ * naming your stage is a setting, and it used to take four Back presses to
+ * leave a page after trying the four options.
+ *
+ * The label is "Stage", not "Calibrate Stage". Nothing is being calibrated —
+ * the reader is saying which company they run — and the header pill that offers
+ * the same choice on a phone has always just said the stage's name.
+ */
 export function StagePersonaSelector({
   activeStage,
   className = "",
@@ -28,33 +45,12 @@ export function StagePersonaSelector({
   const searchParams = useSearchParams();
   const selected = operatorStageForVariantMode(activeStage);
 
-  const tabsRef = useRef<Array<HTMLButtonElement | null>>([]);
-
-  /*
-   * A `role="tablist"` promises arrow-key movement between its tabs, and this one had no
-   * keyboard handler at all — so a screen reader announced "tab, 1 of 4" and the arrows
-   * did nothing. `cadenceSelector` is the same control drawn the same way and has always
-   * implemented this; the two disagreed.
-   *
-   * Roving tabindex, per the pattern: only the selected tab is tabbable, and the arrows
-   * move between the rest. Home and End jump to the ends, which the pattern also expects.
-   */
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const lastIndex = OPERATOR_STAGE_OPTIONS.length - 1;
-    let nextIndex: number | null = null;
-
-    if (event.key === "ArrowLeft") nextIndex = (index - 1 + OPERATOR_STAGE_OPTIONS.length) % OPERATOR_STAGE_OPTIONS.length;
-    else if (event.key === "ArrowRight") nextIndex = (index + 1) % OPERATOR_STAGE_OPTIONS.length;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = lastIndex;
-
-    if (nextIndex === null) return;
-    event.preventDefault();
-    const nextStage = OPERATOR_STAGE_OPTIONS[nextIndex]?.key;
-    if (!nextStage) return;
-    tabsRef.current[nextIndex]?.focus();
-    handleSelectStage(nextStage);
-  };
+  const options: readonly SegmentedOption<OperatorStage>[] = OPERATOR_STAGE_OPTIONS.map((option) => ({
+    key: option.key,
+    label: option.label,
+    sublabel: option.sublabel,
+    title: `Tailor operating rules for ${option.label} (${option.sublabel})`,
+  }));
 
   const handleSelectStage = (stage: OperatorStage) => {
     // The cookie is what makes the choice survive this page: the settings panel,
@@ -68,48 +64,20 @@ export function StagePersonaSelector({
       params.set("stage", stage);
     }
     const query = params.toString();
-    router.push(`${pathname}${query ? `?${query}` : ""}`);
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   return (
     <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">
-        Calibrate Stage:
+      <span className="mr-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+        Stage
       </span>
-      <div
-        role="tablist"
-        id="calibrate-stage"
-        aria-label="Startup lifecycle stage selector"
-        className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 p-1 backdrop-blur-sm"
-      >
-        {OPERATOR_STAGE_OPTIONS.map((option, index) => {
-          const isSelected = selected === option.key;
-          return (
-            <button
-              key={option.key}
-              type="button"
-              role="tab"
-              ref={(el) => {
-                tabsRef.current[index] = el;
-              }}
-              aria-selected={isSelected}
-              // Roving: the tablist is one stop in the tab order, not four.
-              tabIndex={isSelected ? 0 : -1}
-              onKeyDown={(event) => handleKeyDown(event, index)}
-              onClick={() => handleSelectStage(option.key)}
-              title={`Tailor operating rules for ${option.label} (${option.sublabel})`}
-              className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs transition-all ${
-                isSelected
-                  ? "border border-sky-500/40 bg-sky-500/15 font-semibold text-sky-200 shadow-sm"
-                  : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"
-              }`}
-            >
-              <span>{option.label}</span>
-              <span className="text-[10px] opacity-60 hidden sm:inline">· {option.sublabel}</span>
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        options={options}
+        value={selected}
+        onSelect={handleSelectStage}
+        ariaLabel="Company stage"
+      />
     </div>
   );
 }
