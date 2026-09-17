@@ -21,7 +21,12 @@ describe("signal label contract", () => {
     assert.deepEqual(regimeSignalLabelByKey, regimeSignalLabel);
     assert.deepEqual(deltaLabelBySignal, regimeSignalLabel);
 
-    for (const key of Object.keys(regimeSignalLabel) as Array<keyof typeof regimeSignalLabel>) {
+    /* The four keys named, rather than `Object.keys(...)` cast back to them.
+       The cast was the reason this loop type-checked; naming them also makes a
+       key added to one table and not the other fail here. */
+    const keys = ["tightness", "riskAppetite", "baseRate", "curveSlope"] as const;
+    assert.deepEqual(Object.keys(regimeSignalLabel).sort(), [...keys].sort());
+    for (const key of keys) {
       assert.equal(regimeSignalLabel[key], signalPlainEnglish[key].plainLabel);
     }
   });
