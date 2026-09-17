@@ -1,45 +1,53 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import {
   buildOperatorStageCookie,
   readOperatorStageCookie,
   type OperatorStage,
 } from "../../lib/report/operatorStage";
+import { createBrowserSource, useBrowserSource, useHydrated } from "./browserSource";
 
 const STAGE_CHANGED_EVENT = "whether-operator-stage-changed";
 
-/**
- * The stage cookie, read on the client after mount. Every control that sets a
- * stage writes the same cookie and announces it, so two panels on one page
- * (the planner and the stress test on Planning) never disagree.
+/*
+ * The stage cookie, as one source the whole page shares.
  *
- * `stage` is null until the effect runs, which is also what a visitor who has
- * never chosen one sees. Read it during render and the server markup would
- * differ from the client's, so the cookie is only ever read in an effect.
+ * Every control that sets a stage writes the same cookie and announces it, so
+ * two panels on one page (the planner and the stress test on Planning) never
+ * disagree. That announcement is what the store watches; before this, each
+ * consumer kept its own copy of the cookie in state and re-read it from a mount
+ * effect, which is the same synchronisation done once per component.
+ *
+ * `serverValue` is null — what a visitor who has never chosen a stage sees —
+ * and React renders it through hydration, so the server's markup still matches.
  */
+const stageSource = createBrowserSource<OperatorStage | null>({
+  read: () => readOperatorStageCookie(document.cookie),
+  serverValue: null,
+  watch: (onChange) => {
+    window.addEventListener(STAGE_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(STAGE_CHANGED_EVENT, onChange);
+  },
+  // The cookie outlives any one tree and can be set by a control that is no
+  // longer mounted, so a new consumer re-reads rather than trusting the cache.
+  refreshOnSubscribe: true,
+});
+
 export const useOperatorStage = () => {
-  const [stage, setStageState] = useState<OperatorStage | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const stage = useBrowserSource(stageSource);
+  const hydrated = useHydrated();
 
-  useEffect(() => {
-    const sync = () => setStageState(readOperatorStageCookie(document.cookie));
-    sync();
-    setHydrated(true);
-    window.addEventListener(STAGE_CHANGED_EVENT, sync);
-    return () => window.removeEventListener(STAGE_CHANGED_EVENT, sync);
-  }, []);
-
-  const setStage = useCallback((next: OperatorStage | null) => {
-    document.cookie = buildOperatorStageCookie(next);
-    setStageState(next);
-    window.dispatchEvent(new CustomEvent(STAGE_CHANGED_EVENT));
-  }, []);
-
-  return { stage, setStage, hydrated };
+  return { stage, setStage: persistOperatorStage, hydrated };
 };
 
-/** For controls that write the cookie without holding the hook's state (the hero selector). */
+/**
+ * Writes the cookie and announces it. The announcement is the only update path:
+ * the writer does not also set local state, so a control that changes the stage
+ * and a panel that reads it cannot end up holding different answers.
+ *
+ * Exported for controls that write without holding the hook's state (the hero
+ * selector), and used by the hook itself.
+ */
 export const persistOperatorStage = (stage: OperatorStage | null) => {
   document.cookie = buildOperatorStageCookie(stage);
   window.dispatchEvent(new CustomEvent(STAGE_CHANGED_EVENT));

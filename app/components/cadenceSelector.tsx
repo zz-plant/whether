@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
+import { useHydrated } from "./browserSource";
 import { scrollBehaviorFor } from "./scrollRowToItem";
 
 const CADENCES = [
@@ -44,10 +45,9 @@ function SegmentControl({ options, paramName, defaultKey, ariaLabel, onNavigate,
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? "/";
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  const current = mounted ? (searchParams?.get(paramName) ?? defaultKey) : defaultKey;
+  /* The server rendered the default, so the first client render has to as well;
+     the query string is only safe to read once hydration is past. */
+  const current = useHydrated() ? (searchParams?.get(paramName) ?? defaultKey) : defaultKey;
   const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
 
   const activeIndex = Math.max(

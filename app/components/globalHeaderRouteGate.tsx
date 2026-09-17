@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import {
   hasVisibleActiveNavLink,
   normalizePathname,
   resolveGlobalHeaderRouteLabel,
 } from "../../lib/navigation/globalHeader";
+import { useHydrated } from "./browserSource";
 import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
@@ -39,11 +39,11 @@ type GlobalHeaderRouteGateProps = {
  */
 export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRouteGateProps) {
   const currentPathname = normalizePathname(usePathname() ?? initialPathname);
-  const [pathname, setPathname] = useState(() => normalizePathname(initialPathname));
-
-  useEffect(() => {
-    setPathname(currentPathname);
-  }, [currentPathname]);
+  /* The server is handed the route it rendered and the router knows the live one,
+     and through hydration the two have to agree or React discards the markup. This
+     was a `useState(initialPathname)` plus an effect that assigned the router's
+     answer on mount; `useHydrated` is the same two renders, stated once. */
+  const pathname = useHydrated() ? currentPathname : normalizePathname(initialPathname);
 
   const isHomeBrief = pathname === "/";
   // Only where the nav row will not mark the route itself. Below `md` the
