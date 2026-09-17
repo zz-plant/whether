@@ -6,6 +6,7 @@ import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachine
 import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
 import { RateLimitedError, rateLimitedResponse } from "../../../lib/runtime/rateLimit";
+import { buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
 
@@ -47,6 +48,9 @@ export async function GET(request: Request) {
           { name: "get_signals", params: "none", description: "Available historical data coverage by year/month" },
           { name: "subscribe", params: "email (POST body)", description: "Subscribe an email to the weekly brief" },
         ],
+        /* On the catalogue, so a caller wiring up the tools meets the
+           constraint before it calls one of them. */
+        use: buildUseConstraint(),
         _links: {
           full_brief: "https://whether.work",
           history: "https://whether.work/history",
@@ -120,6 +124,9 @@ export async function GET(request: Request) {
       recordDate: "recordDateLabel" in summary ? summary.recordDateLabel : null,
       confidence: "confidence" in summary ? summary.confidence : null,
       posture: "regimeLabel" in summary ? summary.regimeLabel : null,
+      /* This is the response that carries an action against a decision area
+         named `hiring`, returned to a caller with no person in the loop. */
+      use: buildUseConstraint(),
       links: {
         full_brief: "https://whether.work",
         history: "https://whether.work/history",

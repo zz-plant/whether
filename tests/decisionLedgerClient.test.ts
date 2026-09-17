@@ -65,9 +65,12 @@ describe("decision ledger client", () => {
     assert.equal(sent, "browser-1");
 
     // The guard is the other end: what the client sends must satisfy it.
-    const owner = requireClientOwner(new Request("https://whether.work/api/decision-memory", { headers: { [CLIENT_ID_HEADER]: sent ?? "" } }));
+    const owner = await requireClientOwner(new Request("https://whether.work/api/decision-memory", { headers: { [CLIENT_ID_HEADER]: sent ?? "" } }));
     assert.equal(owner.error, null);
     assert.equal(owner.ownerId, "browser-1");
+    /* Admitted, but not vouched for: the id round-trips, and without a signed
+       token nothing downstream may record it as an attested human act. */
+    assert.equal(owner.verified, false);
   });
 
   /*
