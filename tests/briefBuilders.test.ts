@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { regimeSignalLabel } from "../lib/report/signalTranslations";
 
 import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
 
@@ -65,9 +66,15 @@ describe("buildSlackBrief", () => {
 
   it("names the rate signals the way the rest of the product does", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
-    assert.match(brief, /Fed interest rate:/);
-    assert.match(brief, /Recession warning gauge/);
+    /* Read from the canonical table rather than a literal: the point of this
+       test is that the brief and the site agree, and a literal here would let
+       them disagree by only failing the rename in one direction. */
+    assert.ok(brief.includes(`${regimeSignalLabel.baseRate}:`));
+    assert.ok(brief.includes(regimeSignalLabel.curveSlope));
     assert.doesNotMatch(brief, /^Curve slope:/m);
+    /* The engine has never read a Fed policy rate, so this name must not come
+       back. */
+    assert.doesNotMatch(brief, /Fed interest rate/);
   });
 
   it("formats index values without the literal unit suffix", () => {

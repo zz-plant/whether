@@ -303,7 +303,7 @@ export function DecisionHero({
             current={tightness}
             previous={tightness - tightnessDelta}
             trigger={tightnessThreshold}
-            triggerLabel="Watch line"
+            triggerLabel={DECISION_CONTRACT_LABELS.watch.postureFlips}
             viewBoxWidth={220}
             signalLabel="Funding pressure"
             scaleDirection={compositeSignalScales.tightness.directionLabel}
@@ -358,7 +358,7 @@ export function DecisionHero({
                 typeof riskAppetiteDelta === "number" ? riskAppetite - riskAppetiteDelta : undefined
               }
               trigger={riskAppetiteThreshold}
-              triggerLabel="Watch line"
+              triggerLabel={DECISION_CONTRACT_LABELS.watch.postureFlips}
               viewBoxWidth={220}
               invert
               signalLabel="Risk appetite"
@@ -586,9 +586,9 @@ export function DecisionHero({
                         max={100}
                         current={rail.current}
                         trigger={rail.guardrail}
-                        triggerLabel={DECISION_CONTRACT_LABELS.threshold.guardrail}
+                        triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
                         reversal={rail.clearsAt}
-                        reversalLabel={DECISION_CONTRACT_LABELS.reversal.clearsWhen}
+                        reversalLabel={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
                         hysteresisBand
                         invert={rail.invert}
                         signalLabel={rail.label}
@@ -596,7 +596,7 @@ export function DecisionHero({
                       />
                       <dl className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums">
                         <div className="flex items-baseline gap-1.5">
-                          <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}</dt>
+                          <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
                           <dd className="text-slate-300">
                             {rail.guardrail}
                             <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-white/45"}`}>
@@ -606,7 +606,7 @@ export function DecisionHero({
                         </div>
                         {rail.clearsAt !== undefined ? (
                           <div className="flex items-baseline gap-1.5">
-                            <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}</dt>
+                            <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</dt>
                             <dd className="text-slate-300">
                               {rail.clearsAt}
                               <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-white/45"}`}>
@@ -623,7 +623,7 @@ export function DecisionHero({
 
               {boundedRails.length > 0 && (boundedConditions?.pauseQualifier || boundedConditions?.resumeQualifier) ? (
                 <p className="text-fluid-nano text-white/45">
-                  {boundedConditions?.pauseQualifier ? `${DECISION_CONTRACT_LABELS.threshold.guardrail} also trips if ${boundedConditions.pauseQualifier}.` : null}
+                  {boundedConditions?.pauseQualifier ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf} also trips if ${boundedConditions.pauseQualifier}.` : null}
                   {boundedConditions?.pauseQualifier && boundedConditions?.resumeQualifier ? " " : null}
                   {boundedConditions?.resumeQualifier ? `Clears only when ${boundedConditions.resumeQualifier}.` : null}
                 </p>
@@ -636,7 +636,7 @@ export function DecisionHero({
                     carry the numbers and the sentences would restate them. */}
                 {guardrail && boundedRails.length === 0 ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</dt>
+                    <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
                   </div>
                 ) : null}
@@ -652,7 +652,7 @@ export function DecisionHero({
                 ) : null}
                 {flipConditions && flipConditions.length > 0 && boundedRails.length === 0 ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</dt>
+                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
                   </div>
                 ) : null}

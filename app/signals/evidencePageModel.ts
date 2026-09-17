@@ -1,4 +1,4 @@
-import { FALLBACK_PAUSE_THRESHOLD } from "../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, FALLBACK_PAUSE_THRESHOLD } from "../../lib/report/reportCopy";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import {
@@ -23,6 +23,14 @@ import {
 } from "./evidenceQueryState";
 import { loadSignalsPagePanels } from "./evidencePagePanels";
 import type { ThresholdPressureDirection } from "../../lib/report/homeBriefModel";
+
+/* The prose forms of the two lines these cards measure against. The label is
+   the row heading ("Posture flips: 70/100"); the noun goes inside a sentence
+   ("7.0 pts above the posture-flip line"), where the heading's verb does not
+   fit. */
+const POSTURE_FLIP_LINE_NOUN = "the posture-flip line";
+const INVERSION_LINE_NAME = "Inversion line";
+const INVERSION_LINE_NOUN = "the inversion line";
 
 export type SignalsPageSearchParams = {
   month?: string;
@@ -55,21 +63,28 @@ export const buildSignalsPageModel = async (
     };
   };
 
+  /* The line has to be named, because the three cards do not share one. Two
+     are the regime boundary — where the posture itself flips — and the curve's
+     is the zero line where it inverts. All three used to read "watch line",
+     which put a fourth name on the page for lines the brief already draws
+     under the two contract labels. */
   const buildWatchDistanceLabel = ({
     current,
     threshold,
     unit,
+    lineNoun,
   }: {
     current: number;
     threshold: number;
     unit: "pts" | "%";
+    lineNoun: string;
   }) => {
     const delta = current - threshold;
     const magnitude = unit === "pts" ? `${Math.abs(delta).toFixed(1)} pts` : `${Math.abs(delta).toFixed(2)}%`;
     if (delta === 0) {
-      return `${magnitude} from watch line`;
+      return `${magnitude} from ${lineNoun}`;
     }
-    return `${magnitude} ${delta > 0 ? "above" : "below"} watch line`;
+    return `${magnitude} ${delta > 0 ? "above" : "below"} ${lineNoun}`;
   };
 
   const structuredData = {
@@ -319,6 +334,8 @@ export const buildSignalsPageModel = async (
       label: "Tightness" as const,
       valueLabel: `${assessment.scores.tightness}/100`,
       currentValue: assessment.scores.tightness,
+      thresholdName: DECISION_CONTRACT_LABELS.watch.postureFlips,
+      thresholdLineNoun: POSTURE_FLIP_LINE_NOUN,
       thresholdLabel: `${assessment.thresholds.tightnessRegime}/100`,
       thresholdValue: assessment.thresholds.tightnessRegime,
       description:
@@ -332,6 +349,7 @@ export const buildSignalsPageModel = async (
         current: assessment.scores.tightness,
         threshold: assessment.thresholds.tightnessRegime,
         unit: "pts",
+        lineNoun: POSTURE_FLIP_LINE_NOUN,
       }),
       href: "#current-scores",
     },
@@ -339,6 +357,8 @@ export const buildSignalsPageModel = async (
       label: "Risk appetite" as const,
       valueLabel: `${assessment.scores.riskAppetite}/100`,
       currentValue: assessment.scores.riskAppetite,
+      thresholdName: DECISION_CONTRACT_LABELS.watch.postureFlips,
+      thresholdLineNoun: POSTURE_FLIP_LINE_NOUN,
       thresholdLabel: `${assessment.thresholds.riskAppetiteRegime}/100`,
       thresholdValue: assessment.thresholds.riskAppetiteRegime,
       description: "Higher values mean markets are acting more willing to fund risk.",
@@ -351,6 +371,7 @@ export const buildSignalsPageModel = async (
         current: assessment.scores.riskAppetite,
         threshold: assessment.thresholds.riskAppetiteRegime,
         unit: "pts",
+        lineNoun: POSTURE_FLIP_LINE_NOUN,
       }),
       href: "#current-scores",
     },
@@ -361,6 +382,12 @@ export const buildSignalsPageModel = async (
           ? "N/A"
           : `${assessment.scores.curveSlope.toFixed(2)}%`,
       currentValue: assessment.scores.curveSlope,
+      /* Not a posture flip: the regime is classified off funding pressure and
+         risk appetite, and this line is where the curve inverts. It fed the
+         same "Watch line" wording as the two that are, which is how one page
+         came to show three thresholds under one name. */
+      thresholdName: INVERSION_LINE_NAME,
+      thresholdLineNoun: INVERSION_LINE_NOUN,
       thresholdLabel: "0.00%",
       thresholdValue: 0,
       description:
@@ -379,11 +406,12 @@ export const buildSignalsPageModel = async (
       rightLabel: "More room",
       watchDistanceLabel:
         assessment.scores.curveSlope === null
-          ? "Watch line unavailable"
+          ? `${INVERSION_LINE_NAME} unavailable`
           : buildWatchDistanceLabel({
             current: assessment.scores.curveSlope,
             threshold: 0,
             unit: "%",
+            lineNoun: INVERSION_LINE_NOUN,
           }),
       href: "#current-scores",
     },

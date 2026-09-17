@@ -30,6 +30,22 @@ type HighlightBullet = { text: string };
 // reversal). UI surfaces read the imperative forms (Do now, Pause if, Change
 // course if); exports and metadata use the noun slots (Action, Threshold,
 // Reversal). Consume these instead of hardcoding slot labels in components.
+//
+// One name per line, and that is the whole point of the table.
+//
+// It used to offer two: `threshold.guardrail` beside `threshold.pauseIf`, and
+// `reversal.clearsWhen` beside `reversal.changeCourseIf`. Invariant 8 stops a
+// component spelling a label itself but cannot see that two entries name one
+// thing, so the hero drew a rail labelled "Guardrail / Clears when" and
+// `/operate` drew the same rail, off the same numbers, labelled "Pause if /
+// Change course if". A reader crossing from the brief to the plan had to
+// discover that four words were two.
+//
+// The imperative pair won because the rest of the product already taught it:
+// `FIRST_TIME_GUIDE_HIGHLIGHTS` names "Action now + Pause if + Change course
+// if", `/trust`'s framework explainer works the example in those words, and
+// the glossary glosses the noun as "Guardrail (pause trigger)" — the synonym
+// was always the second name for the imperative, never the other way round.
 /** The threshold slot when no rule supplied one. Was retyped in five modules. */
 export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
 
@@ -55,18 +71,24 @@ export const DECISION_CONTRACT_LABELS = {
     actionNow: "Action now",
   },
   threshold: {
-    guardrail: "Guardrail",
-    trigger: "Trigger",
     pauseIf: "Pause if",
   },
   reversal: {
-    reversal: "Reversal",
     changeCourseIf: "Change course if",
-    clearsWhen: "Clears when",
   },
   watch: {
     flipWatch: "Flip watch",
-    /** The regime line, as distinct from a rule's guardrail: where the call itself changes. */
+    /**
+     * The regime line, as distinct from a rule's pause line: where the call
+     * itself changes.
+     *
+     * Three lines sit on one 0-100 axis — pause (76), change course (66) and
+     * this one (70) — and until now only two of them were drawn. This one was
+     * stated in prose under the rails as "Posture flips: funding pressure at or
+     * below 70", while the rails themselves labelled it, where they drew it at
+     * all, "Watch line". So the reader met a third threshold under a fourth
+     * name, between two it had just learned.
+     */
     postureFlips: "Posture flips",
     watchThisWeek: "Watch this week",
     watchNext: "Watch next",
@@ -161,9 +183,9 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "base-rate",
-    term: "Fed interest rate",
-    summary: "The baseline cost of money set by the Federal Reserve. Higher means borrowing costs more.",
-    why: "Why it matters: the base rate affects your cost of capital, burn planning, and debt decisions.",
+    term: "Short-term borrowing rate",
+    summary: "The baseline cost of short-term borrowing in U.S. markets, read from the 1-month Treasury bill. Higher means borrowing costs more.",
+    why: "Why it matters: it affects your cost of capital, burn planning, and debt decisions.",
     usedInLabel: "Signal diagnostics",
     usedInHref: "/signals",
   },
