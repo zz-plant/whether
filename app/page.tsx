@@ -466,7 +466,9 @@ async function PageContent({
                   using it meant never learning the card could change. */}
               <CadenceSelector />
               <CompactTrustPopover
-                confidenceLabel={confidenceLabel ?? "High confidence"}
+                /* The fallback is a code like the real value, not the phrase it
+                   used to be — the popover formats both the same way now. */
+                confidenceLabel={confidenceLabel ?? "HIGH"}
                 isHistorical={Boolean(historicalSelection)}
                 fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
                 recordDateLabel={homepage.reportShell.recordDateLabel}

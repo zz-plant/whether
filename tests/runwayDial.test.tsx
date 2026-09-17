@@ -15,7 +15,11 @@ describe("runway dial on the homepage", () => {
   it("offers the four bands when no runway is stored, and no note", () => {
     const html = renderToStaticMarkup(<RunwayConditionedNotes regime="DEFENSIVE" />);
 
-    assert.match(html, /Translate this call for your runway/);
+    assert.match(html, /What this call means at your runway/);
+    /* The invitation, not the caveat. The panel used to open with a sentence
+       about browser storage — the first thing a reader was told about a control
+       they had no reason to touch was where the value would be kept. */
+    assert.match(html, /Pick a band/);
     for (const pick of RUNWAY_QUICK_PICKS) {
       assert.ok(html.includes(`>${pick.label}</span>`), `band "${pick.label}" is not offered`);
     }

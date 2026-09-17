@@ -145,9 +145,19 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
         the last time this spot grew a second block of controls.
       */}
       <details className="weather-auto-chevron group mt-3">
+        {/* The label and its count are one flex item, not two.
+            `summary[data-chevron] / .list-none / .weather-auto-chevron > summary`
+            sets `justify-content: space-between`, which is right for a summary
+            holding a label and a badge at opposite ends (the What-changed row
+            does exactly that). Here the count qualifies the label, and as a
+            third flex item beside the text node and the `::after` chevron it was
+            pushed to the centre of the line — on a 1600px page "3 steps" sat
+            ~380px from the words it counts, reading as an unrelated control. */}
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center gap-2 rounded-md text-fluid-xs text-slate-400 hover:text-slate-200">
-          How to read this page
-          <span className="text-slate-500">{FIRST_TIME_GUIDE_STEPS.length} steps</span>
+          <span className="flex items-center gap-2">
+            How to read this page
+            <span className="text-slate-500">{FIRST_TIME_GUIDE_STEPS.length} steps</span>
+          </span>
         </summary>
 
         <ol className="mt-2 space-y-2">
