@@ -1,8 +1,9 @@
 "use client";
 
 import { createBrowserSource, useBrowserSource } from "./browserSource";
+import { STORAGE_KEYS } from "../../lib/storage/keys";
 
-const PERSISTENT_CLIENT_ID_STORAGE_KEY = "whether-client-id";
+const PERSISTENT_CLIENT_ID_STORAGE_KEY = STORAGE_KEYS.clientId;
 
 export const createOpaqueId = () => {
   const cryptoRef = typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
