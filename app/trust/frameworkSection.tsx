@@ -20,11 +20,9 @@ export function FrameworkSection() {
       description="A bounded decision has three parts: an action, a threshold that pauses it, and a condition that reverses it. It works because it separates what you will do from the conditions under which you will stop."
     >
       <div className="space-y-8">
-        <p className="text-sm text-slate-300 leading-relaxed">
-          A bounded decision has three parts: an action, a threshold that pauses it, and a condition that reverses it.
-          That is the complete structure. It works because it separates what you will do from the conditions under which you will stop.
-        </p>
-
+        {/* The section description above already says what a bounded decision
+            is. This paragraph restated it almost word for word, so the first
+            thing a reader met on this section was the same sentence twice. */}
         <section className="space-y-4">
           <h3 className="type-eyebrow">The three parts</h3>
           <div className="grid gap-4">

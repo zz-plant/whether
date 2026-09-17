@@ -642,6 +642,57 @@ reach a rendered sentence. The answer pages render offline because `loadWeeklyBr
 back to the bundled snapshot — which is worth knowing generally: **a page that reads through a
 loader that degrades gracefully is testable here**, unlike one that suspends at a data boundary.
 
+## What a page says against what the rest of the site says (2026-09-17)
+
+Found by rendering the routes and reading them — `bun run ui:shots` against a dev server, then
+looking at the PNGs — rather than by reading source. None of these is a lint finding, a type error,
+a failing test or a dead export, and the suite was green through all of them.
+`tests/pageReaderContradictions.test.tsx` pins each one.
+
+- **`/history` said "Reading now" over a month-end reading.** Every figure on that page comes from
+  the monthly series, so the last plotted point is the last *completed* month — up to five weeks
+  behind the weekly call and regularly a different regime. The panel beside the phase map was headed
+  "Reading now", and `TrackRecord` said "The call has been Sunny since Dec 31, 2025", so on a week
+  the brief was calling Freezing, the page a reader visits to check the record told them the call
+  was Sunny. Its own "Published weekly briefs" panel, two sections down, led with *Sep 15 — Freezing*.
+  The honest version already existed on `/signals`, over the same series: "Month-end readings from
+  the archive, so the latest figure here is the last completed month rather than this week's score
+  above." That sentence is on `/history` now, the panel is headed "Last completed month", and the
+  track-record line is bounded ("Through Aug 31, 2026, the month-end call had been…").
+- **`/resolve` rendered every answer row as two underlined lines**, so eleven links read as
+  twenty-two. `app/styles/decision-flow.css` already carries the fix and the argument for it, from
+  when the same thing happened on `/answer` — but it keys on `a:has(p)`, and this list was built with
+  `<span className="block">`. The anchor's own `no-underline` lost, exactly as the comment three
+  lines below predicts ("the anchor rules above are unlayered, so they beat Tailwind's
+  `no-underline`"). **A CSS rule that keys on an element name is a contract with the markup**; the
+  three lists there are `<p>` in a grid now, with the title as the anchor's own first child.
+- **`/trust` restated its section description as the first line of the section**, so the reader met
+  the same sentence twice before anything new. And its rail offered "Sources" and "Sources &
+  freshness" as neighbours, where the second opened a section headed **"Cite this call"** — a label
+  naming neither its destination nor anything distinguishable from the entry above it. Rail labels
+  are the section titles now. The test only pins distinguishability: a first version also required
+  each label to share a word with its heading and failed on "Revisit triggers" → "What would make
+  this recommendation wrong?", which is a good short name. A test that fails on a correct label is
+  answering a different question from the one in its name.
+- **`/pricing` told a reader their recorded decisions stay in their browser.** `/privacy` 2.4 says
+  they are held in Cloudflare KV against the browser identifier, which is the truth; the pricing
+  bullet bundled them with week close-outs, which *are* local, and called both "saved in this
+  browser". Understating where a reader's data goes is the direction that costs trust, and these two
+  pages are read by the same person for the same reason.
+- **The mockup's copy button handed over an unmarked sample.** `/mockups/*` is gated off production
+  by `app/mockups/layout.tsx` and only runs on the preview lane, which the audit initially missed —
+  the route is not the problem. What left it was: the copied text was branded "Whether" and carried
+  a posture, an action and a pause condition, so in a channel it read as the Monday brief. It leads
+  with a SAMPLE line now, the same rule `tests/downloadableResourceArtifacts.test.ts` holds for the
+  downloadable artifacts.
+
+**Two findings from that audit were wrong and are recorded here as such.** The mockup route being
+publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
+four of six sections collapsed: `resolveInitialOpenStepIds` opens the first step plus anything
+marked `defaultOpen`, and the comment above it records why the page moved *away* from opening
+everything. Rendering a page tells you what a reader sees; it does not tell you whether someone
+already decided that on purpose. Read the component before calling a default a defect.
+
 ## Features that shipped without shipping (2026-09-16)
 
 Four things were built, tested, and reachable by nobody. They are worth naming together, because

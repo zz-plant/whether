@@ -110,13 +110,18 @@ export async function buildTrustPageModel() {
           detail: decisionReadiness.detail,
           toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
         };
+  /* Each label is the section's own title. Two had drifted: "Snapshot" for a
+     section headed "System status", and "Sources & freshness" for one headed
+     "Cite this call" — so the rail offered "Sources" and "Sources & freshness"
+     next to each other, and the second went to a citation block. The id stays
+     as it is; an anchor someone has already linked to outlives its label. */
   const sectionLinks = [
-    { href: "#trust-snapshot", label: "Snapshot" },
+    { href: "#trust-snapshot", label: "System status" },
     // Only when the telemetry read is configured: an index entry for a section that
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
     { href: "#source-board", label: "Sources" },
-    { href: "#sources-freshness", label: "Sources & freshness" },
+    { href: "#sources-freshness", label: "Cite this call" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#framework", label: "Using the thresholds" },
