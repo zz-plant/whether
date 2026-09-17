@@ -93,13 +93,20 @@ export const downloadableResources = {
       imageAlt: "Quarterly capital posture memo example",
       imageParams: { template: "guides", title: "Quarterly Capital Posture Memo Example" },
     },
+    /* Worked, not blank. This was 310 bytes of empty headings — the same
+       skeleton as the template beside it — while the word "example" is the
+       whole of what it promises a reader who already has the template. It is a
+       filled quarter now, labelled illustrative at the top of the file and
+       here, because a memo with real-looking figures and no such label is a
+       live claim that goes stale the week after it ships. */
     heroDescription:
-      "A concise board document format you can copy for quarterly operating reviews.",
+      "A worked quarter — posture, decisions, triggers and board asks, filled in — so you can see the format carrying real content before you write your own.",
     heroItems: [
-      "One-sentence posture call",
-      "SAFE / RISKY / DANGEROUS decisions this quarter",
-      "Trigger outcomes and reversal plans",
-      "Requested board approvals",
+      "One-sentence posture call with the reading behind it",
+      "SAFE / RISKY / DANGEROUS decisions classified by reversibility, not size",
+      "Three reversal triggers, each with a number, a duration, an owner and a consequence",
+      "Board approvals and guardrails requested",
+      "Illustrative figures throughout — not a published reading. The live call is on the home page.",
     ],
     downloadCta: {
       href: "/downloads/quarterly-capital-posture-memo-example.md",
