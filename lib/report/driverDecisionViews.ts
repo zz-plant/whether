@@ -73,7 +73,7 @@ type FundingPressureLadderLine = {
 
 type FundingPressureDriverView = {
   key: "funding-pressure";
-  label: "Funding pressure";
+  label: typeof regimeSignalLabel.tightness;
   current: number;
   weeklyDelta: number | null;
   /** The model's action lines, ascending, with crossed state per line. */
@@ -129,7 +129,7 @@ export const buildFundingPressureDriverView = ({
 
   return {
     key: "funding-pressure",
-    label: "Funding pressure",
+    label: regimeSignalLabel.tightness,
     current: tightness,
     weeklyDelta,
     ladder,
@@ -145,7 +145,7 @@ export const buildFundingPressureDriverView = ({
 
 type RiskAppetiteDriverView = {
   key: "risk-appetite";
-  label: "Risk appetite";
+  label: typeof regimeSignalLabel.riskAppetite;
   current: number;
   /** The regime boundary value, e.g. 50. */
   boundaryValue: number;
@@ -214,7 +214,7 @@ export const buildRiskAppetiteDriverView = ({
 
   return {
     key: "risk-appetite",
-    label: "Risk appetite",
+    label: regimeSignalLabel.riskAppetite,
     current: riskAppetite,
     boundaryValue: riskAppetiteRegime,
     rulePauseValue,

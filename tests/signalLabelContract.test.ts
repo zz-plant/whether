@@ -40,6 +40,8 @@ describe("signal label contract", () => {
     });
 
     assert.equal(views.financing.label, regimeSignalLabel.baseRate);
+    assert.equal(views.fundingPressure.label, regimeSignalLabel.tightness);
+    assert.equal(views.riskAppetite.label, regimeSignalLabel.riskAppetite);
 
     const glossaryEntry = BEGINNER_GLOSSARY_ENTRIES.find((entry) => entry.value === "base-rate");
     assert.ok(glossaryEntry, "no base-rate glossary entry");

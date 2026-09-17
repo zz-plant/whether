@@ -159,6 +159,24 @@ export const SCORE_BAND_LABELS: Record<ScoreBand, string> = {
 };
 
 /**
+ * The same band word, said as a position on the scale.
+ *
+ * The bands answer "is 42 a normal number or an unusual one" and the decision
+ * lines answer "has anything tripped". They are different questions with
+ * different cut points — the bands split at 30 and 70, the risk-appetite
+ * posture line sits at 50 and its pause line at 44 — so a week can, and did,
+ * render "Risk appetite 42 moderate" directly above a rail reading
+ * "42 · pause line crossed". Both were true. The reassuring one was the word.
+ *
+ * Wherever a band word sits within sight of a line, it says "mid range" rather
+ * than "moderate", so the reader can tell a statement about the scale from a
+ * statement about the rule. `scoreBandReference` keeps the bare words: it is a
+ * table of the bands themselves, where nothing else is being claimed.
+ */
+export const scoreBandScaleLabel = (band: ScoreBand): string =>
+  `${band === "mid" ? "mid" : SCORE_BAND_LABELS[band].toLowerCase()} range`;
+
+/**
  * The reference a bare score needs to be readable: what the three bands are and
  * what a reading in each means. Without it, "64" is a number with no scale
  * attached, which is only interpretable if you already know the domain.

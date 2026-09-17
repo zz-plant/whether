@@ -17,8 +17,8 @@ import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
 import { BoundedValue } from "./ui/boundedValue";
 import {
-  SCORE_BAND_LABELS,
   classifyScoreBand,
+  scoreBandScaleLabel,
   compositeSignalScales,
 } from "../../lib/report/signalTranslations";
 import type { SparklinePoint } from "./ui/sparkline";
@@ -148,8 +148,12 @@ export function DecisionHero({
 
   // Band words and band sentences have to come from the same classification, or
   // the card says "low" above a sentence that says "balanced".
+  /* The scale-position wording, not the bare band word. Every place this
+     string renders has a pause line or a posture line within sight of it, and
+     "moderate" beside "pause line crossed" reads as a contradiction rather
+     than as two different questions being answered. */
   const tightnessBand = classifyScoreBand(tightness);
-  const tightnessLevel = SCORE_BAND_LABELS[tightnessBand];
+  const tightnessLevel = scoreBandScaleLabel(tightnessBand);
   const tightnessLevelColor =
     tightnessBand === "high"
       ? "text-rose-300/60"
@@ -163,7 +167,7 @@ export function DecisionHero({
 
   // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
   const riskAppetiteBand = riskAppetite !== undefined ? classifyScoreBand(riskAppetite) : undefined;
-  const riskAppetiteLevel = riskAppetiteBand ? SCORE_BAND_LABELS[riskAppetiteBand] : undefined;
+  const riskAppetiteLevel = riskAppetiteBand ? scoreBandScaleLabel(riskAppetiteBand) : undefined;
   const riskAppetiteLevelColor =
     riskAppetiteBand === "high"
       ? "text-emerald-300"
@@ -230,9 +234,9 @@ export function DecisionHero({
   // Mobile-collapsed signal readout (DD-004): the summary line keeps all three
   // values visible, so collapsing hides only deltas and descriptors.
   const signalReadoutSummary = [
-    `Funding pressure ${tightness} ${tightnessLevel.toLowerCase()}`,
+    `Funding pressure ${tightness} ${tightnessLevel}`,
     typeof riskAppetite === "number" && riskAppetiteLevel
-      ? `Risk appetite ${riskAppetite} ${riskAppetiteLevel.toLowerCase()}`
+      ? `Risk appetite ${riskAppetite} ${riskAppetiteLevel}`
       : null,
     regimeDisplay,
   ]
@@ -250,7 +254,7 @@ export function DecisionHero({
         <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
           {tightness}
           <span className="font-normal text-white/35">/100</span>{" "}
-          <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
+          <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel}</span>
           {tightnessSaturated && typeof tightnessPressure === "number" ? (
             <span
               className="ml-1.5 text-fluid-nano font-normal text-amber-300/80"
@@ -323,7 +327,7 @@ export function DecisionHero({
           <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
             {riskAppetite}
             <span className="font-normal text-white/35">/100</span>{" "}
-            <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel?.toLowerCase() ?? ""}</span>
+            <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel ?? ""}</span>
           </p>
           {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
             <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">

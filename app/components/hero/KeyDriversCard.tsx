@@ -25,6 +25,10 @@ const formatSignedBps = (bps: number) =>
 const rowLinkClass = "flex items-center gap-2.5 group no-underline min-w-0";
 const rowIconClass =
   "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-teal-400 group-hover:border-teal-500/40 transition-colors";
+/* The rows read their labels off the views rather than spelling them. All
+   three were literals here, which is how this card came to print "Financing
+   conditions" for the same reading the What-changed rows above it called
+   something else. */
 const rowLabelClass = "text-xs font-medium text-slate-200 group-hover:text-white transition-colors truncate";
 
 /**
@@ -62,7 +66,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
               <div className={rowIconClass}>
                 <BarChart2 size={15} />
               </div>
-              <span className={rowLabelClass}>Funding pressure</span>
+              <span className={rowLabelClass}>{fundingPressure.label}</span>
               <span className="ml-auto flex items-baseline gap-1.5 tabular-nums">
                 <strong className="text-sm font-semibold text-white">{fundingPressure.current}</strong>
                 {fundingPressure.weeklyDelta !== null && fundingPressure.weeklyDelta !== 0 ? (
@@ -86,7 +90,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
               <div className={rowIconClass}>
                 <Shield size={15} />
               </div>
-              <span className={rowLabelClass}>Risk appetite</span>
+              <span className={rowLabelClass}>{riskAppetite.label}</span>
               <span className="ml-auto tabular-nums">
                 <strong className="text-sm font-semibold text-white">{riskAppetite.current}</strong>
               </span>
@@ -114,7 +118,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
               <div className={rowIconClass}>
                 <Percent size={15} />
               </div>
-              <span className={rowLabelClass}>Financing conditions</span>
+              <span className={rowLabelClass}>{financing.label}</span>
               <span className="ml-auto flex items-baseline gap-1.5 tabular-nums">
                 <strong className="text-sm font-semibold text-white">
                   {financing.currentRate !== null ? `${financing.currentRate.toFixed(2)}%` : "—"}

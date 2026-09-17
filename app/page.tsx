@@ -444,6 +444,13 @@ async function PageContent({
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+              {/* The horizon sits with the other period controls, next to the
+                  week it qualifies. It used to live at the foot of the page
+                  while the card it swaps renders at the top, and reached back
+                  up with a `scrollIntoView` — so using it correctly meant
+                  being scrolled somewhere you had not asked to go, and not
+                  using it meant never learning the card could change. */}
+              <CadenceSelector />
               <CompactTrustPopover
                 confidenceLabel={confidenceLabel ?? "High confidence"}
                 isHistorical={Boolean(historicalSelection)}
@@ -563,17 +570,6 @@ async function PageContent({
           <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <h2 id="plan-and-evidence-heading" className="sr-only">Turn this week’s call into a plan</h2>
             <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
-              <span className="text-fluid-sm text-slate-400">Planning horizon</span>
-              {/*
-                * The selector sits below the fold but the cadence card it controls
-                * renders in `#weekly-call` — a change otherwise moved content only
-                * where the reader could not see it. The reveal is declared by id:
-                * this page renders on the server, and a function prop handed to the
-                * client control fails the whole render.
-                */}
-              <CadenceSelector revealTargetId="weekly-call" />
-            </div>
           </div>
         </div>
 
