@@ -11,8 +11,12 @@ import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPan
 
 export const SEARCH_JOB_ORDER: SearchEntityJob[] = ["check", "approve", "resolve", "risk", "trust"];
 
+/* `some` rather than `includes`, which needs the value asserted into the union
+   before it will accept it — the assertion `review:hotspot-preflight` flagged
+   when this moved out of the page, on a function whose whole job is to decide
+   whether an untrusted query parameter is one of five strings. */
 export const isSearchEntityJob = (value: string): value is SearchEntityJob =>
-  SEARCH_JOB_ORDER.includes(value as SearchEntityJob);
+  SEARCH_JOB_ORDER.some((job) => job === value);
 
 export const resolveSearchCommandHref = (query: string, results: ReturnType<typeof searchIndex>, activeJob?: SearchEntityJob) => {
   const normalizedQuery = query.trim().toLowerCase();

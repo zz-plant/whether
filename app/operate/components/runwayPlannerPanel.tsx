@@ -1,12 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 import { useOperatorProfile } from "../../components/useOperatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
 import { isPlannerSector } from "../../../lib/operatorProfile";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  buildSharedRunwayPlanQuery,
+  readSharedRunwayPlan,
+  resolveSharedRunwayProfile,
+} from "./runwayPlanLink";
+import { toRoute } from "../../../lib/navigation/routeType";
 import { isOperatorStage, OPERATOR_STAGE_OPTIONS, operatorStageLabel } from "../../../lib/report/operatorStage";
 import {
   buildRunwayPlan,
@@ -130,8 +137,39 @@ export function RunwayPlannerPanel({
   macroSeries?: any;
   recordDateLabel?: string;
 }) {
-  const { profile, setProfileField } = useOperatorProfile();
-  const { stage, setStage } = useOperatorStage();
+  const { profile: storedProfile, setProfileField } = useOperatorProfile();
+  const { stage: storedStage, setStage } = useOperatorStage();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  /*
+   * Precedence stated once, in render, rather than resolved by whichever effect
+   * runs last — the rule `thresholdsPanel` paid for. The link wins where it
+   * speaks and the stored profile fills the rest, so following someone's plan
+   * shows their figures without overwriting yours.
+   */
+  const shared = useMemo(() => readSharedRunwayPlan(searchParams), [searchParams]);
+  const profile = useMemo(() => resolveSharedRunwayProfile(storedProfile, shared.profile), [storedProfile, shared.profile]);
+  const stage = shared.stage ?? storedStage;
+
+  /* Every edit writes both, so the address bar is always the plan on screen and
+     "copy link" needs no separate button to keep in sync. */
+  const syncPlanLink = useCallback(
+    (nextProfile: typeof profile, nextStage: typeof stage) => {
+      const query = buildSharedRunwayPlanQuery(nextProfile, nextStage);
+      router.replace(toRoute(query ? `${pathname}?${query}` : pathname), { scroll: false });
+    },
+    [pathname, router],
+  );
+
+  const commitProfileField = useCallback(
+    <K extends keyof typeof profile>(key: K, value: (typeof profile)[K] | undefined) => {
+      setProfileField(key, value);
+      syncPlanLink({ ...profile, [key]: value }, stage);
+    },
+    [profile, setProfileField, stage, syncPlanLink],
+  );
   const [showMethodology, setShowMethodology] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
 
@@ -248,7 +286,7 @@ This memo aligns our company budget and operating guardrails with the current cl
           label="Runway (months)"
           placeholder="e.g. 14"
           value={profile.runwayMonths}
-          onCommit={(value) => setProfileField("runwayMonths", value)}
+          onCommit={(value) => commitProfileField("runwayMonths", value)}
           className="weather-surface p-3"
           labelClassName="block text-sm text-slate-200"
         />
@@ -257,7 +295,7 @@ This memo aligns our company budget and operating guardrails with the current cl
           label="Monthly burn ($)"
           placeholder="e.g. $450k"
           value={profile.monthlyBurnUsd}
-          onCommit={(value) => setProfileField("monthlyBurnUsd", value)}
+          onCommit={(value) => commitProfileField("monthlyBurnUsd", value)}
           className="weather-surface p-3"
           labelClassName="block text-sm text-slate-200"
         />
@@ -266,7 +304,7 @@ This memo aligns our company budget and operating guardrails with the current cl
           label="Monthly revenue ($)"
           placeholder="e.g. $300k, or 0"
           value={profile.monthlyRevenueUsd}
-          onCommit={(value) => setProfileField("monthlyRevenueUsd", value)}
+          onCommit={(value) => commitProfileField("monthlyRevenueUsd", value)}
           className="weather-surface p-3"
           labelClassName="block text-sm text-slate-200"
         />
@@ -276,7 +314,7 @@ This memo aligns our company budget and operating guardrails with the current cl
           hint="Month over month. Blank reads as flat."
           placeholder="e.g. 6"
           value={profile.monthlyGrowthPct}
-          onCommit={(value) => setProfileField("monthlyGrowthPct", value)}
+          onCommit={(value) => commitProfileField("monthlyGrowthPct", value)}
           optional
           className="weather-surface p-3"
           labelClassName="block text-sm text-slate-200"
@@ -288,7 +326,7 @@ This memo aligns our company budget and operating guardrails with the current cl
             style={{ colorScheme: "light dark" }}
             value={profile.sector ?? "b2b-saas"}
             onChange={(event) => {
-              if (isPlannerSector(event.target.value)) setProfileField("sector", event.target.value);
+              if (isPlannerSector(event.target.value)) commitProfileField("sector", event.target.value);
             }}
           >
             {sectorOptions.map((option) => (
@@ -304,7 +342,11 @@ This memo aligns our company budget and operating guardrails with the current cl
             className={selectClassName}
             style={{ colorScheme: "light dark" }}
             value={stage ?? ""}
-            onChange={(event) => setStage(isOperatorStage(event.target.value) ? event.target.value : null)}
+            onChange={(event) => {
+              const next = isOperatorStage(event.target.value) ? event.target.value : null;
+              setStage(next);
+              syncPlanLink(profile, next);
+            }}
           >
             <option value="">Not set · defaults to Series A</option>
             {OPERATOR_STAGE_OPTIONS.map((option) => (
