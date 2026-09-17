@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
-import { resolveSearchCommandHref } from "../app/search/page";
+import { resolveSearchCommandHref } from "../app/search/searchCommand";
 import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/resolve/components/toolkitLibraryPanels";
 import { searchIndex } from "../lib/search/searchIndex";
 import { buildGuidanceSearchHref } from "../app/components/commandPalette";
