@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import Link from "next/link";
@@ -16,27 +16,18 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
   const currentYear = Number(searchParams?.get("year")) || 0;
   const isActive = currentMonth > 0 && currentYear > 0;
 
-  const [coverage, setCoverage] = useState<CoverageMap | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number>(currentYear || 0);
+  /* The coverage map is bundled JSON read synchronously, so it is there on the
+     first render. Loading it into state from an effect bought nothing but a
+     "Loading historical data..." frame the reader saw on every open, and a
+     second effect to pick a default year once it had "arrived". */
+  const coverage: CoverageMap = getTimeMachineMonthsByYear();
+  const years = useMemo(() => Object.keys(coverage).map(Number).sort((a, b) => b - a), [coverage]);
 
-  useEffect(() => {
-    const data = getTimeMachineMonthsByYear();
-    setCoverage(data);
-  }, []);
-
-  useEffect(() => {
-    if (!coverage) return;
-    const yearsList = Object.keys(coverage).map(Number).sort((a, b) => b - a);
-    if (!selectedYear && yearsList.length > 0) {
-      setSelectedYear(yearsList[0]);
-    }
-  }, [coverage, selectedYear]);
-
-  const years = useMemo(
-    () => coverage ? Object.keys(coverage).map(Number).sort((a, b) => b - a) : [],
-    [coverage],
-  );
-  const months = selectedYear && coverage ? (coverage[selectedYear] ?? []) : [];
+  // Null until the reader picks one: the default is the year in the URL, or the
+  // newest on record, and both are already known here.
+  const [pickedYear, setPickedYear] = useState<number | null>(null);
+  const selectedYear = pickedYear ?? (currentYear || years[0] || 0);
+  const months = selectedYear ? (coverage[selectedYear] ?? []) : [];
 
   const navigateTo = useCallback((year: number, month: number) => {
     const params = new URLSearchParams();
@@ -53,8 +44,6 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
 
   const adjacentPrev = isActive ? getAdjacentTimeMachineEntry(currentYear, currentMonth, "previous") : null;
   const adjacentNext = isActive ? getAdjacentTimeMachineEntry(currentYear, currentMonth, "next") : null;
-  const loaded = coverage !== null;
-
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
@@ -92,9 +81,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
             </div>
           ) : null}
 
-          {!loaded ? (
-            <p className="mt-4 text-xs text-slate-400">Loading historical data...</p>
-          ) : years.length === 0 ? (
+          {years.length === 0 ? (
             <p className="mt-4 text-xs text-slate-400">No historical data available.</p>
           ) : (
             <div className="mt-4 space-y-3">
@@ -102,7 +89,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
                 <legend className="type-eyebrow">Year</legend>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {years.map((year) => (
-                    <button key={year} type="button" onClick={() => setSelectedYear(year)}
+                    <button key={year} type="button" onClick={() => setPickedYear(year)}
                       className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${selectedYear === year ? "bg-sky-500/12 text-sky-100 border border-sky-500/30" : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"}`}
                     >{year}</button>
                   ))}
