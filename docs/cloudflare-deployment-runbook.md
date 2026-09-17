@@ -47,6 +47,24 @@ that survives.
 If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
 in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
 
+### "the working tree is not the commit it claims to be"
+
+The gate prints `[run-checks] HEAD <sha>` before it runs anything, and stops with this message when
+a tracked file on disk differs from that commit. It is not a code failure: the container is holding
+content the commit does not have, so nothing the gate could report would be about the commit, and
+the assets the deploy uploads come from that same tree.
+
+It happened on 2026-09-17. `public/` held the previous successful build's files — the blank memo
+example and the pre-fix `embed.js` — over an otherwise fresh clone, which the log's
+`Restoring from build output cache` step explains. Two tests failed on content their own commit had
+replaced, everything else passed, and it read as a flaky suite for a day.
+
+**Fix it in the dashboard, not the repo:** clear the project's build cache in Workers Builds
+(Settings → Build → clear build cache) and re-run the build. Nothing pushed to this repository can
+refresh a stale cache, and deleting the assertions that noticed would leave the stale assets
+deploying silently. The message names every drifted path, so check them against the commit before
+assuming the cache.
+
 ## Tracing
 
 `wrangler.toml` enables Workers automatic tracing (open beta) on both lanes under
