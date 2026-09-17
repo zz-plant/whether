@@ -105,6 +105,41 @@ the Slack signing secret gates one webhook route.
 The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
 which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
 
+## Browser notifications (VAPID keys)
+
+Regime-change notifications to a browser need three values on the lane that should send them. Until
+all three are set, `resolveVapidConfig` returns null and **nothing is offered anywhere in the UI** —
+the toggle renders nothing rather than failing when pressed, and `/api/push` answers
+`{ configured: false }`. That is deliberate, and it is the same rule the brief freeze follows: check
+the configuration first and say so, rather than spend work discovering it later.
+
+```bash
+# Generate a P-256 pair. The public key is the uncompressed point, base64url;
+# the private key is the JWK's `d`.
+node -e '
+const { subtle } = crypto;
+subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]).then(async (pair) => {
+  const raw = new Uint8Array(await subtle.exportKey("raw", pair.publicKey));
+  const jwk = await subtle.exportKey("jwk", pair.privateKey);
+  const b64 = (b) => Buffer.from(b).toString("base64url");
+  console.log("VAPID_PUBLIC_KEY=" + b64(raw));
+  console.log("VAPID_PRIVATE_KEY=" + jwk.d);
+});'
+
+wrangler secret put VAPID_PRIVATE_KEY     # secret
+wrangler secret put VAPID_PUBLIC_KEY      # not secret, but kept beside its pair
+wrangler secret put VAPID_SUBJECT         # mailto: or https: identifying the sender (RFC 8292 §2.1)
+```
+
+The keypair is an identity, not a rotating credential: regenerating it invalidates every stored
+subscription, and each browser has to opt in again. Rotate only if the private key leaks.
+
+Sending happens in one place — the branch of `checkRegimeChange` that has established the published
+regime actually moved — so nothing fires on a week where nothing happened. The push carries no
+payload, so there is no RFC 8291 encryption in the codebase and no way for a queued notification to
+deliver a reading that has since changed; the service worker fetches `/api/posture/current` as it
+draws the notification. Subscriptions that answer 404 or 410 are deleted rather than retried.
+
 ## Trial infrastructure
 
 Two platform pieces are declared on both lanes and switched on by `[vars]` on the preview lane

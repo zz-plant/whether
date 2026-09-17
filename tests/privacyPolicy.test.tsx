@@ -96,6 +96,19 @@ describe("privacy policy", () => {
     assert.match(html, /copy of what this site already sent you/i);
   });
 
+  /*
+   * A push subscription is a record held about a reader on the server, and like
+   * the offline cache it holds no storage key and writes no telemetry stream,
+   * so neither census can see it. Claimed here, with the two properties that
+   * make it a routing slip rather than a profile.
+   */
+  it("accounts for a push subscription, if one is stored", () => {
+    const html = renderPrivacyPage();
+    assert.match(html, /notif/i, "the app can store a push subscription and the page must say so");
+    assert.match(html, /no email address/i);
+    assert.match(html, /carries no content/i, "the push carries no reading, which is why it cannot go stale");
+  });
+
   it("tells a reader how to leave and how to ask", () => {
     const html = renderPrivacyPage();
     assert.match(html, /mailto:/, "no address for a deletion request");

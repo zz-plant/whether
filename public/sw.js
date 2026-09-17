@@ -105,3 +105,71 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(documentStrategy(request));
   }
 });
+
+/*
+ * A regime-change push, drawn from the current call rather than from the push.
+ *
+ * The push carries no body on purpose (lib/push/sendRegimePush.ts): it sits in
+ * a queue, and a phone that was off all evening would otherwise light up with a
+ * reading that had already moved on. So the notification's text is fetched when
+ * it is drawn, and if that fetch fails the notification says only that the call
+ * changed — which is the part the push itself attests to — rather than
+ * inventing a regime to name.
+ */
+const NOTIFICATION_TAG = "whether-regime-change";
+
+const buildNotification = async () => {
+  const fallback = {
+    title: "The weekly call has changed",
+    body: "Open Whether to see this week's posture.",
+  };
+
+  try {
+    const response = await fetch("/api/posture/current", { headers: { accept: "application/json" } });
+    if (!response.ok) return fallback;
+
+    const posture = await response.json();
+    if (!posture || typeof posture.summary !== "string" || posture.summary === "") return fallback;
+    return { title: "The weekly call has changed", body: posture.summary };
+  } catch {
+    return fallback;
+  }
+};
+
+self.addEventListener("push", (event) => {
+  event.waitUntil(
+    (async () => {
+      const { title, body } = await buildNotification();
+      await self.registration.showNotification(title, {
+        body,
+        tag: NOTIFICATION_TAG,
+        /* Replaces rather than stacks: two notifications about the same weekly
+           call is one more than the reader needs. */
+        renotify: false,
+        icon: "/icon-192.png",
+        badge: "/icon-192.png",
+        data: { url: "/" },
+      });
+    })(),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = event.notification.data?.url ?? "/";
+
+  event.waitUntil(
+    (async () => {
+      /* Focus a tab that is already here instead of opening a third one. */
+      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const client of windows) {
+        if (new URL(client.url).origin === self.location.origin && "focus" in client) {
+          await client.focus();
+          if ("navigate" in client) await client.navigate(target);
+          return;
+        }
+      }
+      await self.clients.openWindow(target);
+    })(),
+  );
+});

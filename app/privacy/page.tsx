@@ -166,6 +166,23 @@ export default function PrivacyPage() {
           </div>
 
           <div className="space-y-2">
+            <h3 className={subheading}>2.6b Browser notifications, if you turn them on</h3>
+            <p className={paragraph}>
+              If you ask this browser to notify you when the call changes, your browser generates a
+              subscription — an address its own push service assigned, and two keys it made — and we store
+              those three things against the random identifier above. That is the whole record: no email
+              address, no reading, and no history of what was sent. It is used to wake this browser when the
+              published posture moves to a different one, which is a handful of times a year, and for
+              nothing else.
+            </p>
+            <p className={paragraph}>
+              The notification itself carries no content. What it says is fetched by your browser when it is
+              shown, so it cannot deliver a stale reading. Turning notifications off in the page removes the
+              stored subscription; blocking them in your browser stops them arriving either way.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <h3 className={subheading}>2.7 Abuse limits and server logs</h3>
             <p className={paragraph}>
               Endpoints that send email or accept public writes are rate-limited against the network
