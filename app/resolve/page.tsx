@@ -102,15 +102,21 @@ export default async function DecidePage({
         <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
           {featuredAnswerPages.map((page) => (
             <li key={page.slug}>
+              {/* The title is the anchor's own first child, not nested in a
+                  wrapper, because that is what the underline rule in
+                  decision-flow.css keys on: `a:has(p)` clears the inherited
+                  underline and `a:has(p) > :first-child` puts it back on the
+                  title alone. Written with wrapper spans, every row rendered as
+                  two underlined lines and read as two links — the exact defect
+                  that rule was added to fix on /answer. The grid keeps the
+                  chevron beside both lines without a wrapper. */}
               <Link
                 href={answerPageHref(page.slug)}
-                className="flex min-h-[44px] items-center justify-between gap-3 py-3 no-underline hover:bg-slate-900/40"
+                className="grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-3 hover:bg-slate-900/40"
               >
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-slate-100">{page.title}</span>
-                  <span className="block text-xs text-slate-400">{page.shortAnswer}</span>
-                </span>
-                <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                <p className="text-sm font-semibold text-slate-100">{page.title}</p>
+                <span aria-hidden="true" className="row-span-2 shrink-0 text-slate-500">›</span>
+                <p className="text-xs text-slate-400">{page.shortAnswer}</p>
               </Link>
             </li>
           ))}
@@ -129,13 +135,11 @@ export default async function DecidePage({
                   <li key={guide.slug}>
                     <Link
                       href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
-                      className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                      className="grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2.5 hover:bg-slate-900/40"
                     >
-                      <span className="min-w-0">
-                        <span className="block text-sm font-semibold text-slate-100">{guide.title}</span>
-                        <span className="block text-xs text-slate-400">{guide.tagline}</span>
-                      </span>
-                      <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                      <p className="text-sm font-semibold text-slate-100">{guide.title}</p>
+                      <span aria-hidden="true" className="row-span-2 shrink-0 text-slate-500">›</span>
+                      <p className="text-xs text-slate-400">{guide.tagline}</p>
                     </Link>
                   </li>
                 ))}
@@ -143,13 +147,11 @@ export default async function DecidePage({
                   <li key={stage.slug}>
                     <Link
                       href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
-                      className="flex min-h-[44px] items-center justify-between gap-3 py-2.5 no-underline hover:bg-slate-900/40"
+                      className="grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2.5 hover:bg-slate-900/40"
                     >
-                      <span className="min-w-0">
-                        <span className="block text-sm font-semibold text-slate-100">{stage.title}</span>
-                        <span className="block text-xs text-slate-400">{stage.primaryValue}</span>
-                      </span>
-                      <span aria-hidden="true" className="shrink-0 text-slate-500">›</span>
+                      <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
+                      <span aria-hidden="true" className="row-span-2 shrink-0 text-slate-500">›</span>
+                      <p className="text-xs text-slate-400">{stage.primaryValue}</p>
                     </Link>
                   </li>
                 ))}
