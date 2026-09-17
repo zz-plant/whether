@@ -22,7 +22,7 @@ import { useSyncExternalStore } from "react";
  * reason this is a module rather than a hook per call site — it is pure, so
  * `tests/browserSource.test.ts` can pin it in a suite that has no DOM.
  */
-export type BrowserSource<TValue> = {
+type BrowserSource<TValue> = {
   subscribe: (onStoreChange: () => void) => () => void;
   getSnapshot: () => TValue;
   getServerSnapshot: () => TValue;
