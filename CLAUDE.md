@@ -415,6 +415,35 @@ diff** — here, `git archive` into a scratch directory with `node_modules` hard
 `--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
 warm one. The bound is still a bound: a route that never answers fails the gate.
 
+**The build container's checkout is not necessarily the commit (2026-09-17), and the gate now
+refuses one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo
+example still reading as the blank form, and `public/embed.js` still holding the hardcoded origin —
+while `lint`, `typecheck` and every other test passed, and the same suite was green here through six
+consecutive `WHETHER_DEPLOY_GATE=1` runs. The tell was inside one file: in `tests/embedRoute.test.ts`
+the case that reads `public/embed.js` failed while the case beside it, reading `app/api/embed/route.ts`
+and `app/share/embedBuilder.tsx` from the same commit, passed. `app/`, `lib/` and `tests/` were fresh
+and `public/` was not — and the stale content was byte-for-byte what the last *successful* build
+(03:03, pre-merge) still serves in production. The log's `Restoring from build output cache` step is
+the mechanism: something wrote over `public/` after the clone. Two files from one commit cannot
+disagree in a checkout, so a split like that is never a test problem, and the repo's answers for a
+flaky suite — run it again, run it alone, replay the seed — cannot find it.
+
+`scripts/check-gate-marker.mjs` had the answer the entire time and threw it away: `headCommit()`
+returns `""` for a dirty tree, so the marker was silently not written, and its own doc comment
+asserted that "the build container checks out clean, so this only ever fires locally". Believing
+that sentence cost a day and three wrong public hypotheses. `worktreeDrift()` now reports the
+drifted paths instead of collapsing them into `""`, and under `WHETHER_DEPLOY_GATE=1`
+`run-checks.mjs` prints `HEAD <sha>` and **refuses before running any task** when a tracked file on
+disk differs from it. It is a refusal, not a note, for `check:dead-exports`'s reason and one worse
+than it: the results would be about something other than the commit, *and* the assets that deploy
+come from the same tree, so a green run would ship the drift. Untracked files are reported and
+allowed — a build container may leave something extra behind, which does not make the commit's own
+content wrong.
+
+Clearing the project's build cache in the Cloudflare dashboard is the remedy, and it is a dashboard
+action: no push from here can fix a stale cache, and deleting the two assertions would have made
+`main` green while hiding the fact that stale static assets were the thing about to deploy.
+
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
 - `run-checks.mjs` buffers each task's output until it exits, and had no per-task timeout, so one

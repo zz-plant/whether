@@ -20,7 +20,7 @@ import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 
-import { recordPassedChecks } from "./check-gate-marker.mjs";
+import { recordPassedChecks, worktreeDrift } from "./check-gate-marker.mjs";
 
 const TASKS = [
   { name: "lint", script: "lint" },
@@ -83,6 +83,62 @@ if (unknown.length > 0) {
 }
 
 const selected = requested.length > 0 ? TASKS.filter((t) => requested.includes(t.name)) : TASKS;
+
+/*
+ * Nothing below means anything until the tree is the commit.
+ *
+ * On 2026-09-17 the Workers Builds container ran this gate against a checkout
+ * whose `public/` still held the previous successful build's files. Two tests
+ * read a file their own commit had replaced and failed; every other check passed;
+ * and the only reachable log showed a red build with two assertions that could
+ * not be reproduced anywhere. It read as suite flakiness for a day, and the
+ * repo's answer for that — run it again, run it alone, shuffle it — cannot find
+ * it, because the code was never the problem.
+ *
+ * So this is a refusal rather than a note, for the same reason `check:dead-exports`
+ * refuses a tree it cannot fully read instead of scoring it. Two things are wrong
+ * with scoring a drifted tree, and the second is worse: the results are about
+ * something other than the commit, and the assets that deploy come from that same
+ * tree, so a green run would *ship* the drift. Better to stop and name the files.
+ *
+ * Gate-only. A dirty tree is the normal state of a local `bun run check`, and the
+ * claim being made here — "this container is testing the commit it will deploy" —
+ * is one only the gate makes. Untracked files are reported and not refused: a
+ * build container may legitimately leave something extra behind, and that does not
+ * make the commit's own content wrong.
+ */
+if (process.env.WHETHER_DEPLOY_GATE === "1") {
+  const drift = worktreeDrift();
+
+  if (!drift) {
+    process.stdout.write("[run-checks] no readable git checkout here; the checks below run against whatever is on disk.\n");
+  } else {
+    process.stdout.write(`[run-checks] HEAD ${drift.commit}\n`);
+
+    if (drift.untracked.length > 0) {
+      const shown = drift.untracked.slice(0, 5);
+      process.stdout.write(
+        `[run-checks] ${drift.untracked.length} untracked file(s) present, which is allowed: ${shown.join(", ")}` +
+          `${drift.untracked.length > shown.length ? ", …" : ""}\n`,
+      );
+    }
+
+    if (drift.tracked.length > 0) {
+      process.stdout.write(
+        `\n❌ the working tree is not the commit it claims to be\n\n` +
+          `HEAD is ${drift.commit}, but ${drift.tracked.length} tracked file(s) on disk differ from it:\n\n` +
+          `${drift.tracked.map(({ code, path }) => `  ${code.padEnd(2)} ${path}`).join("\n")}\n\n` +
+          `Every check in this gate judges what is on disk, and so does the build that follows it,\n` +
+          `so a run against this tree would score — and deploy — something other than ${drift.commit.slice(0, 8)}.\n` +
+          `Refusing rather than reporting a result about a tree nobody pushed.\n\n` +
+          `In a build container this means the checkout was written over after it was made. The build\n` +
+          `output cache restore is the usual candidate: clear this project's build cache and re-run.\n` +
+          `Locally, commit or stash the files above, or unset the deploy-gate signal and use \`bun run check\`.\n`,
+      );
+      process.exit(1);
+    }
+  }
+}
 
 /*
  * tsc and bun test are each CPU- and memory-hungry (oxlint finishes in seconds). Running more of them
