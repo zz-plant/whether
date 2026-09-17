@@ -1,6 +1,7 @@
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { createBrowserSource } from "../browserSource";
 
-export type LastReadSnapshot = {
+type LastReadSnapshot = {
   recordDate: string;
   assessment: RegimeAssessment;
   readAt: string;
@@ -56,7 +57,7 @@ export const hasAssessmentChanged = (
   previous.assessment.scores.baseRate !== current.scores.baseRate ||
   previous.assessment.scores.curveSlope !== current.scores.curveSlope;
 
-export const readStoredSnapshot = () => {
+const readStoredSnapshot = () => {
   try {
     const stored = window.localStorage.getItem(LAST_READ_SNAPSHOT_STORAGE_KEY);
     if (!stored) {
@@ -69,7 +70,7 @@ export const readStoredSnapshot = () => {
   }
 };
 
-export const writeStoredSnapshot = ({
+const writeStoredSnapshot = ({
   assessment,
   recordDate,
 }: {
@@ -88,4 +89,24 @@ export const writeStoredSnapshot = ({
   } catch {
     // Ignore storage errors to keep console clean.
   }
+};
+
+/*
+ * The read and the write are the same slot, and the read has to win.
+ *
+ * The strip's whole subject is what changed since the last visit, and this
+ * visit overwrites that record. Both sides live here rather than in the
+ * component so the ordering is a property of the module that owns the slot:
+ * `rememberReadSnapshot` takes the source's snapshot before writing, and the
+ * source caches it, so "what this browser last saw" cannot become "what it is
+ * seeing now" through some later re-read.
+ */
+export const lastReadSnapshotSource = createBrowserSource<LastReadSnapshot | null>({
+  read: readStoredSnapshot,
+  serverValue: null,
+});
+
+export const rememberReadSnapshot = (visit: { assessment: RegimeAssessment; recordDate: string }) => {
+  lastReadSnapshotSource.getSnapshot();
+  writeStoredSnapshot(visit);
 };

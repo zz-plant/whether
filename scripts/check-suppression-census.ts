@@ -254,17 +254,22 @@ const BASELINE: Record<string, number> = {
   typeSuppressions: 3,
   skippedTests: 0,
   /*
-   * `react/set-state-in-effect` is the last one off, with 22 findings across 19
-   * files. They are not one problem: roughly half read a browser-only source on
-   * mount (localStorage, a cookie, a DOM island, a generated client id), which
-   * is legitimate and wants `useSyncExternalStore` rather than deletion; three
-   * mirror a prop into state, which is the real anti-pattern; the rest are an
-   * animation and a reset-on-condition. Enforcing it means changing the
-   * hydration behaviour of nineteen client components, and nothing in this suite
-   * exercises a client effect — so it is scoped work, not a codemod, and not
-   * something to flip blind.
+   * 1 -> 0 on 2026-09-17. `react/set-state-in-effect` was the last rule off,
+   * with 22 findings across 19 files, and they were not one problem: about half
+   * read a browser-only source on mount, three mirrored a prop into state, the
+   * rest were an animation and a reset-on-condition.
+   *
+   * What made it "not something to flip blind" was that nothing in this suite
+   * exercises a client effect, and adding a DOM to get that is a far larger
+   * change than the fix. The browser reads went to `useSyncExternalStore`
+   * through `app/components/browserSource.ts`, which puts the one part that can
+   * fail catastrophically — a `getSnapshot` that allocates, and so never settles
+   * — in a pure module `tests/browserSource.test.ts` pins without a DOM. The
+   * rest needed no new machinery: a value mirrored back through an effect is a
+   * value the render already had, and an edit that has to survive until a prop
+   * moves is an edit stamped with the prop it was made against.
    */
-  disabledLintRules: 1,
+  disabledLintRules: 0,
   // Two rules are enforced everywhere but one small set of files:
   // nextjs/no-html-link-for-pages is off for app/layout.tsx, where /feed.xml is a
   // route handler serving a file that <Link> would client-navigate to; and

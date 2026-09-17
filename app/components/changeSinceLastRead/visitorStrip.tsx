@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatDateLabel } from "../../../lib/report/signalFormatting";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta } from "../illustrations/TrendGlyph";
+import { useBrowserSource } from "../browserSource";
 import {
   getImpactTone,
   hasAssessmentChanged,
-  readStoredSnapshot,
-  writeStoredSnapshot,
-  type LastReadSnapshot,
+  lastReadSnapshotSource,
+  rememberReadSnapshot,
 } from "./storage";
 
 type DeltaMetricKey = "tightness" | "riskAppetite" | "baseRate";
@@ -72,14 +72,10 @@ export const ReturningVisitorDeltaStrip = ({
   openPanelHref: string;
   openPanelLabel?: string;
 }) => {
-  const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
+  const previous = useBrowserSource(lastReadSnapshotSource);
 
   useEffect(() => {
-    const storedSnapshot = readStoredSnapshot();
-    if (storedSnapshot) {
-      setPrevious(storedSnapshot);
-    }
-    writeStoredSnapshot({ assessment, recordDate });
+    rememberReadSnapshot({ assessment, recordDate });
   }, [assessment, recordDate]);
 
   if (!previous) {

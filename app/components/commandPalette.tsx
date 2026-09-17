@@ -30,10 +30,16 @@ export const buildGuidanceSearchHref = (query: string) =>
 export function CommandPalette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  /* The selection belongs to the query that produced it, so a new query resets
+     it by not matching rather than by an effect assigning 0 after the list has
+     already rendered with the old index — a second render per keystroke, and a
+     frame in which the highlight sat on a row the new query does not have. */
+  const [selection, setSelection] = useState({ query: "", index: 0 });
+  const selectedIndex = selection.query === query ? selection.index : 0;
 
   const filteredRef = useRef<CommandItem[]>([]);
   const selectedIndexRef = useRef(0);
+  const queryRef = useRef("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const toggleFocusMode = useCallback(() => {
@@ -202,11 +208,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     filteredRef.current = filtered;
     selectedIndexRef.current = selectedIndex;
-  }, [filtered, selectedIndex]);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
+    queryRef.current = query;
+  }, [filtered, query, selectedIndex]);
 
   /*
    * Capture phase, not bubble.
@@ -226,14 +229,26 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
    * The `true` here and on `removeEventListener` must stay in sync, or the
    * listener is never removed.
    */
+  /* Reads the mirrors rather than closing over the values: the listener below is
+     attached once and must not re-subscribe on every keystroke. Stamping the
+     query onto the selection is what keeps an arrow press from resurrecting an
+     index the current query has already reset. */
+  const moveSelection = useCallback((delta: number) => {
+    const lastIndex = Math.max(filteredRef.current.length - 1, 0);
+    setSelection({
+      query: queryRef.current,
+      index: Math.min(Math.max(selectedIndexRef.current + delta, 0), lastIndex),
+    });
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 1, filteredRef.current.length - 1));
+        moveSelection(1);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.max(i - 1, 0));
+        moveSelection(-1);
       } else if (e.key === "Enter") {
         e.preventDefault();
         filteredRef.current[selectedIndexRef.current]?.action();
@@ -241,7 +256,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     };
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, []);
+    // `moveSelection` closes over nothing but the mirrors, so it is stable and
+    // listing it here does not re-subscribe on a keystroke.
+  }, [moveSelection]);
 
   // The palette opens in response to an explicit command, so moving focus to
   // the query field is what the user asked for. It rides in an effect rather

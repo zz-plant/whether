@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Route } from "../../../lib/navigation/routeType";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toRoute } from "../../../lib/navigation/routeType";
+import { createKeyedBrowserSource, useBrowserSource } from "../../components/browserSource";
 
 type QueryFieldConfig<TValue> = {
   queryParam: string;
@@ -14,6 +15,38 @@ type QueryFieldConfigMap<TState extends Record<string, unknown>> = {
   [K in keyof TState]: QueryFieldConfig<TState[K]>;
 };
 
+/** What a selection looks like in storage: one serialized string per field, or null. */
+type StoredSelections = Record<string, string | null>;
+
+/*
+ * The saved selections, per storage key, checked on the way in.
+ *
+ * Reading this in an effect and assigning it into state is what the
+ * react/set-state-in-effect finding here was: the panel rendered its defaults,
+ * then the saved selection, then whatever the URL said, in whichever order the
+ * effects happened to run. Precedence is stated in `baseline` below instead,
+ * and this is just the read.
+ */
+const storedSelectionsFor = createKeyedBrowserSource<StoredSelections | null>({
+  read: (key) => {
+    try {
+      const stored = window.localStorage.getItem(key);
+      if (!stored) return null;
+      const parsed: unknown = JSON.parse(stored);
+      if (typeof parsed !== "object" || parsed === null) return null;
+      const selections: StoredSelections = {};
+      for (const [field, value] of Object.entries({ ...parsed })) {
+        if (typeof value === "string" || value === null) selections[field] = value;
+      }
+      return Object.keys(selections).length > 0 ? selections : null;
+    } catch {
+      // A slot this browser cannot read is the same as one it has not filled.
+      return null;
+    }
+  },
+  serverValue: null,
+});
+
 export function usePersistedQuerySelections<TState extends Record<string, unknown>>({
   initialState,
   storageKey,
@@ -23,86 +56,71 @@ export function usePersistedQuerySelections<TState extends Record<string, unknow
   storageKey: string;
   fields: QueryFieldConfigMap<TState>;
 }) {
-  const [state, setState] = useState(initialState);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const restoredFromStorage = useRef(false);
-
-  const parsedUrlState = useMemo(() => {
-    const nextState = {} as Partial<TState>;
-    for (const [key, config] of Object.entries(fields) as Array<[keyof TState, QueryFieldConfig<TState[keyof TState]>]>) {
-      nextState[key] = config.parse(searchParams.get(config.queryParam)) as TState[keyof TState];
-    }
-    return nextState;
-  }, [fields, searchParams]);
+  /* Captured once, because it is the *initial* state and callers build it as an
+     inline literal: read every render, every value derived from it would be a
+     new object every render, and the effects below would re-run on each. */
+  const [defaults] = useState(initialState);
+  const stored = useBrowserSource(storedSelectionsFor(storageKey));
 
   const hasAnyUrlSelection = useMemo(
-    () =>
-      Object.values(fields).some((config) => searchParams.has(config.queryParam)),
+    () => Object.values(fields).some((config) => searchParams.has(config.queryParam)),
     [fields, searchParams],
   );
-  const hasValidUrlSelection = useMemo(
-    () => Object.values(parsedUrlState).some((value) => value !== null && typeof value !== "undefined"),
-    [parsedUrlState],
+
+  /**
+   * Where a selection comes from, in order: the URL when it names a value this
+   * field understands, then what this browser saved if the URL names nothing at
+   * all, then the caller's default. A URL that names only unreadable values
+   * still wins over storage — the reader followed a link, and quietly restoring
+   * a different selection under it is the behaviour this replaces.
+   */
+  const baseline = useMemo(() => {
+    const next = { ...defaults };
+
+    /* `for...in` over a mapped type rather than `Object.entries`, here and
+       below: entries widens the key to `string`, and narrowing it back is the
+       type assertion this file used to carry in four places. */
+    let fromUrl = false;
+    for (const key in fields) {
+      const parsed = fields[key].parse(searchParams.get(fields[key].queryParam));
+      if (parsed === null) continue;
+      next[key] = parsed;
+      fromUrl = true;
+    }
+    if (fromUrl || hasAnyUrlSelection || !stored) return next;
+
+    for (const key in fields) {
+      const parsed = fields[key].parse(stored[key] ?? null);
+      if (parsed !== null) next[key] = parsed;
+    }
+    return next;
+  }, [defaults, fields, hasAnyUrlSelection, searchParams, stored]);
+
+  /* Edits carry the baseline they were made against, so a URL change replaces
+     them by not matching rather than through an effect that assigns over them. */
+  const baselineKey = JSON.stringify(baseline);
+  const [edited, setEdited] = useState<{ baseline: string; value: TState } | null>(null);
+  const state = edited?.baseline === baselineKey ? edited.value : baseline;
+
+  const setField = useCallback(
+    <K extends keyof TState>(key: K, value: TState[K]) => {
+      setEdited((previous) => {
+        const base = previous?.baseline === baselineKey ? previous.value : baseline;
+        if (Object.is(base[key], value)) return previous;
+        return { baseline: baselineKey, value: { ...base, [key]: value } };
+      });
+    },
+    [baseline, baselineKey],
   );
 
   useEffect(() => {
-    if (hasValidUrlSelection) {
-      setState((previousState) => {
-        let didChange = false;
-        const nextState = { ...previousState };
-
-        for (const [key, value] of Object.entries(parsedUrlState) as Array<[keyof TState, TState[keyof TState] | null | undefined]>) {
-          if (value === null || typeof value === "undefined" || Object.is(previousState[key], value)) {
-            continue;
-          }
-          nextState[key] = value;
-          didChange = true;
-        }
-
-        return didChange ? nextState : previousState;
-      });
-      return;
-    }
-
-    if (hasAnyUrlSelection || restoredFromStorage.current) {
-      return;
-    }
-
-    restoredFromStorage.current = true;
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) {
-      return;
-    }
-
     try {
-      const parsed = JSON.parse(stored) as Partial<Record<keyof TState, string | null>>;
-      setState((previousState) => {
-        let didChange = false;
-        const nextState = { ...previousState };
-
-        for (const [key, config] of Object.entries(fields) as Array<[keyof TState, QueryFieldConfig<TState[keyof TState]>]>) {
-          const nextValue = config.parse((parsed[key] ?? null) as string | null);
-          if (nextValue === null || typeof nextValue === "undefined" || Object.is(previousState[key], nextValue)) {
-            continue;
-          }
-          nextState[key] = nextValue;
-          didChange = true;
-        }
-
-        return didChange ? nextState : previousState;
-      });
-    } catch {
-      // Intentionally ignore storage restore errors to keep console clean.
-    }
-  }, [fields, hasAnyUrlSelection, hasValidUrlSelection, parsedUrlState, storageKey]);
-
-  useEffect(() => {
-    try {
-      const serializableState = {} as Record<string, string | null>;
-      for (const [key, config] of Object.entries(fields) as Array<[keyof TState, QueryFieldConfig<TState[keyof TState]>]>) {
-        serializableState[String(key)] = config.serialize(state[key]);
+      const serializableState: StoredSelections = {};
+      for (const key in fields) {
+        serializableState[key] = fields[key].serialize(state[key]);
       }
       window.localStorage.setItem(storageKey, JSON.stringify(serializableState));
     } catch {
@@ -110,33 +128,26 @@ export function usePersistedQuerySelections<TState extends Record<string, unknow
     }
   }, [fields, state, storageKey]);
 
+  /* The URL is where a selection is shareable, so state is published to it —
+     which is also how a restored selection reaches the rest of the page. It
+     settles in one step: once the URL carries the selection, `baseline` reads
+     it back unchanged and this produces the same search string. */
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams.toString());
-    for (const [key, config] of Object.entries(fields) as Array<[keyof TState, QueryFieldConfig<TState[keyof TState]>]>) {
-      const serializedValue = config.serialize(state[key]);
+    for (const key in fields) {
+      const serializedValue = fields[key].serialize(state[key]);
       if (serializedValue) {
-        nextParams.set(config.queryParam, serializedValue);
+        nextParams.set(fields[key].queryParam, serializedValue);
       } else {
-        nextParams.delete(config.queryParam);
+        nextParams.delete(fields[key].queryParam);
       }
     }
 
     const nextSearch = nextParams.toString();
-    const currentSearch = searchParams.toString();
-    if (nextSearch === currentSearch) {
-      return;
-    }
+    if (nextSearch === searchParams.toString()) return;
 
-    router.push(`${pathname}?${nextSearch}` as Route, { scroll: false });
+    router.push(toRoute(`${pathname}?${nextSearch}`), { scroll: false });
   }, [fields, pathname, router, searchParams, state]);
 
-  const setField = <K extends keyof TState>(key: K, value: TState[K]) => {
-    setState((previousState) => (Object.is(previousState[key], value) ? previousState : { ...previousState, [key]: value }));
-  };
-
-  return {
-    state,
-    setField,
-    setState,
-  };
+  return { state, setField };
 }

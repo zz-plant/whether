@@ -38,6 +38,7 @@ import {
   type ClipboardCopyState,
 } from "../../components/useClipboardCopy";
 import { createOpaqueId, usePersistentClientId } from "../../components/clientIdentity";
+import { createKeyedBrowserSource, useBrowserSource } from "../../components/browserSource";
 import { ComparePlansMode, PlanStressTestMode } from "./decisionShieldPlanModes";
 import { usePersistedQuerySelections } from "./usePersistedQuerySelections";
 import {
@@ -83,6 +84,56 @@ const actionSelectOptions: LabeledSelectOption<DecisionAction>[] = actionOptions
   label: option.label,
 }));
 
+type DecisionShieldPreset = {
+  id: string;
+  name: string;
+  lifecycle: LifecycleStage;
+  category: DecisionCategory;
+  action: DecisionAction;
+  createdAt: string;
+};
+
+/* Presets are stored per browser, under the persistent client id, with the
+   pre-id key read once as a fallback so an existing reader keeps theirs. The
+   key is itself a browser value, so this is keyed and memoised rather than a
+   module constant: a source built during render would be a new subscription on
+   every render. */
+const LEGACY_PRESET_STORAGE_KEY = "whether.decisionShieldPresets";
+const NO_PRESETS: DecisionShieldPreset[] = [];
+
+/* Checked rather than asserted. The stored list is whatever a previous build of
+   this panel wrote, and a shape that no longer matches would otherwise reach the
+   apply handler and set fields to undefined. */
+const isPreset = (value: unknown): value is DecisionShieldPreset => {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate: Record<string, unknown> = { ...value };
+  return (
+    typeof candidate.id === "string"
+    && typeof candidate.name === "string"
+    && typeof candidate.lifecycle === "string"
+    && typeof candidate.category === "string"
+    && typeof candidate.action === "string"
+    && typeof candidate.createdAt === "string"
+  );
+};
+
+const presetsSourceFor = createKeyedBrowserSource<DecisionShieldPreset[]>({
+  read: (key) => {
+    try {
+      const stored = window.localStorage.getItem(key) ?? window.localStorage.getItem(LEGACY_PRESET_STORAGE_KEY);
+      if (!stored) return NO_PRESETS;
+      const parsed: unknown = JSON.parse(stored);
+      if (!Array.isArray(parsed)) return NO_PRESETS;
+      const presets = parsed.filter(isPreset);
+      return presets.length > 0 ? presets : NO_PRESETS;
+    } catch {
+      // A slot this browser cannot read is the same as one it has not filled.
+      return NO_PRESETS;
+    }
+  },
+  serverValue: NO_PRESETS,
+});
+
 export const DecisionShieldPanel = ({
   assessment,
   provenance,
@@ -102,20 +153,11 @@ export const DecisionShieldPanel = ({
     storageKey: "whether.decisionShield",
     fields: decisionShieldFieldConfigs,
   });
-  const [presets, setPresets] = useState<
-    Array<{
-      id: string;
-      name: string;
-      lifecycle: LifecycleStage;
-      category: DecisionCategory;
-      action: DecisionAction;
-      createdAt: string;
-    }>
-  >([]);
+  // Null until the reader adds or deletes one; the stored list is the default.
+  const [editedPresets, setEditedPresets] = useState<DecisionShieldPreset[] | null>(null);
   const [presetName, setPresetName] = useState("");
   const [presetError, setPresetError] = useState<string | null>(null);
   const [presetStatus, setPresetStatus] = useState<string | null>(null);
-  const legacyPresetStorageKey = "whether.decisionShieldPresets";
   const { add } = Toast.useToastManager();
   const presetInputRef = useRef<HTMLInputElement | null>(null);
   const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
@@ -126,6 +168,12 @@ export const DecisionShieldPanel = ({
 
   const clientId = usePersistentClientId();
   const presetStorageKey = clientId ? `whether.decisionShieldPresets:${clientId}` : null;
+  /* Read through a keyed store: the slot is named after the persistent client
+     id, which does not exist until hydration, so this is one of the few reads
+     that genuinely cannot be a module constant. It replaces an effect that
+     assigned the stored list — or `[]` — into state on every key change. */
+  const storedPresets = useBrowserSource(presetsSourceFor(presetStorageKey));
+  const presets = editedPresets ?? storedPresets;
 
   // No sample plan and no sample company: the panel used to open on a
   // fictional hiring plan with 14 months of runway and a 75% gross margin no
@@ -183,27 +231,6 @@ export const DecisionShieldPanel = ({
       return;
     }
     try {
-      const stored = window.localStorage.getItem(presetStorageKey)
-        ?? window.localStorage.getItem(legacyPresetStorageKey);
-      if (!stored) {
-        setPresets([]);
-        return;
-      }
-      const parsed = JSON.parse(stored) as typeof presets;
-      if (Array.isArray(parsed)) {
-        setPresets(parsed);
-      }
-    } catch {
-      setPresets([]);
-      // Intentionally ignore storage restore errors to keep console clean.
-    }
-  }, [legacyPresetStorageKey, presetStorageKey]);
-
-  useEffect(() => {
-    if (!presetStorageKey) {
-      return;
-    }
-    try {
       window.localStorage.setItem(presetStorageKey, JSON.stringify(presets));
     } catch {
       // Intentionally ignore storage persistence errors to keep console clean.
@@ -232,7 +259,7 @@ export const DecisionShieldPanel = ({
       action,
       createdAt: new Date().toISOString(),
     };
-    setPresets((prev) => [nextPreset, ...prev].slice(0, 8));
+    setEditedPresets([nextPreset, ...presets].slice(0, 8));
     setPresetName("");
     setPresetError(null);
     setPresetStatus("Preset saved.");
@@ -254,7 +281,7 @@ export const DecisionShieldPanel = ({
     if (!presetToDelete) return;
 
     if (confirm(`Delete preset "${presetToDelete.name}"? This cannot be undone.`)) {
-      setPresets((prev) => prev.filter((item) => item.id !== presetId));
+      setEditedPresets(presets.filter((item) => item.id !== presetId));
       setPresetStatus(`Preset "${presetToDelete.name}" deleted.`);
     }
   };

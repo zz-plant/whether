@@ -89,7 +89,16 @@ export function TimelineBar({
   const [isDragging, setIsDragging] = useState(false);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
+  /* The local echo of a committed month, stamped with the URL selection it was
+     committed against. The URL is the source of truth; this only keeps the
+     handle under the pointer while the server renders the new month, and it has
+     to stop the moment that month arrives or the handle snaps back on release.
+     It used to stop through an effect clearing it on every selection change. */
+  const [pending, setPending] = useState<{
+    forMonth: number | undefined;
+    forYear: number | undefined;
+    index: number;
+  } | null>(null);
   // null means "centre on the selection". A number holds the window where the
   // reader put it, so a commit or a pan does not slide the band sideways.
   const [windowStart, setWindowStart] = useState<number | null>(null);
@@ -119,13 +128,6 @@ export function TimelineBar({
     return requested >= 0 ? requested : Math.max(liveIndex, 0);
   }, [series, currentMonth, currentYear, liveIndex]);
 
-  // The URL is the source of truth; this local echo only keeps the handle under
-  // the pointer while the server renders the month. Clearing it when the new
-  // selection arrives is what stops the handle snapping back on release.
-  useEffect(() => {
-    setPendingIndex(null);
-  }, [currentMonth, currentYear]);
-
   useEffect(
     () => () => {
       if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
@@ -133,6 +135,8 @@ export function TimelineBar({
     []
   );
 
+  const pendingIndex =
+    pending && pending.forMonth === currentMonth && pending.forYear === currentYear ? pending.index : null;
   const handleIndex = dragIndex ?? pendingIndex ?? selectedIndex;
   // The window is anchored on what is committed or in flight, never on the live
   // drag, so content does not slide out from under the pointer mid-gesture.
@@ -163,7 +167,7 @@ export function TimelineBar({
       const target = series[index];
       if (!target) return;
 
-      setPendingIndex(index);
+      setPending({ forMonth: currentMonth, forYear: currentYear, index });
       // Hold the strip still when the new selection is already in view; recentre
       // only when it lands on an edge and there is nothing to see beyond it, or
       // when the caller is deliberately moving the view somewhere else.
@@ -195,7 +199,7 @@ export function TimelineBar({
         send();
       }, KEY_COMMIT_COALESCE_MS);
     },
-    [series, onSelect, viewWindow]
+    [series, onSelect, viewWindow, currentMonth, currentYear]
   );
 
   const indexFromPointer = useCallback(

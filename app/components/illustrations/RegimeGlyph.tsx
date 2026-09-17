@@ -2,7 +2,6 @@
 
 import type { RegimeKey } from "../../../lib/types";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
-import { useState, useEffect } from "react";
 
 type RegimeGlyphProps = {
   idPrefix: string;
@@ -57,14 +56,6 @@ const GLYPHS: Record<RegimeKey, GlyphSpec> = {
 
 export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
   const spec = GLYPHS[regime];
-  const [opacity, setOpacity] = useState(1);
-
-  // Fade the glyph in/out on regime change (350ms transition).
-  useEffect(() => {
-    setOpacity(0);
-    const timer = setTimeout(() => setOpacity(1), 150);
-    return () => clearTimeout(timer);
-  }, [regime]);
 
   if (!spec) return null;
 
@@ -72,7 +63,7 @@ export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
     <svg
       viewBox="0 0 32 32"
       width="100%"
-      style={{ height: "auto", transition: "opacity 350ms ease" }}
+      style={{ height: "auto" }}
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
     >
@@ -89,32 +80,37 @@ export function RegimeGlyph({ idPrefix, regime, className }: RegimeGlyphProps) {
         strokeLinecap="round"
       />
 
-      {spec.lines?.map(([x1, y1, x2, y2]) => (
-        <line
-          key={`${x1}-${y1}-${x2}-${y2}`}
-          x1={x1}
-          y1={y1}
-          x2={x2}
-          y2={y2}
-          stroke={spec.color}
-          strokeWidth={2}
-          strokeLinecap="round"
-          fill="none"
-          opacity={opacity}
-        />
-      ))}
+      {/* The strokes fade in when the regime changes, the horizon does not. This
+          was a 150ms timer setting opacity to 0 and back from an effect, which
+          also fired on mount — so the glyph blinked once on every page load
+          before showing the regime that had not changed. `key` restarts the
+          animation on a real change and nothing else does. */}
+      <g key={regime} className="animate-in fade-in duration-[350ms]">
+        {spec.lines?.map(([x1, y1, x2, y2]) => (
+          <line
+            key={`${x1}-${y1}-${x2}-${y2}`}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke={spec.color}
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+          />
+        ))}
 
-      {spec.points ? (
-        <polyline
-          points={spec.points}
-          stroke={spec.color}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity={opacity}
-        />
-      ) : null}
+        {spec.points ? (
+          <polyline
+            points={spec.points}
+            stroke={spec.color}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        ) : null}
+      </g>
     </svg>
   );
 }

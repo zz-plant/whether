@@ -66,18 +66,36 @@ deploys every push, which is the only remote gate left.
   been escaping only `<`, so a line separator in any string it carried was a parse error in the
   embedded JSON.
 
-  **Only `react/set-state-in-effect` is still off**, with 22 findings across 19 files, and they are
-  not one problem:
+  **`react/set-state-in-effect` is enforced from 2026-09-17, and no lint rule is off any more.**
+  It was the last one, with 22 findings across 19 files, and they were three different problems:
 
-  | Shape | Roughly | What it needs |
+  | Shape | Count | What it took |
   | --- | --- | --- |
-  | Reads a browser-only source on mount (localStorage, a cookie, a DOM island, a generated client id) | half | `useSyncExternalStore`, not deletion — the read genuinely cannot happen during SSR |
-  | Mirrors a prop into state | 3 | The real anti-pattern: compute during render, or key the component |
-  | Animation and reset-on-condition | the rest | Per-site judgement |
+  | Reads a browser-only source on mount (localStorage, a cookie, a DOM island, a generated client id) | 11 | `useSyncExternalStore` through `app/components/browserSource.ts` |
+  | A value the render already had, mirrored back through an effect | 7 | Derive it; the effect was a second render to reach it |
+  | An edit that has to survive until a prop moves | 4 | Stamp the edit with the baseline it was made against |
 
-  Enforcing it means changing the hydration behaviour of nineteen client components, and nothing in
-  this suite exercises a client effect, so it is scoped work rather than a codemod. The
-  classification is here so the next pass is bounded rather than rediscovered.
+  What made it "not something to flip blind" was the first row: nothing in this suite exercises a
+  client effect, and adding a DOM to get one is a far larger change than the fix. The way round it
+  is that a store's one catastrophic failure mode is pure. React calls `getSnapshot` on every
+  render and re-renders whenever the reference differs, so a snapshot that allocates — `JSON.parse`,
+  a spread — never settles; an effect's worst case was one extra render, a store's is an infinite
+  one. So the caching lives in one module and `tests/browserSource.test.ts` pins its properties
+  without a DOM: stable reference, lazy first read, the server snapshot rendered through hydration,
+  notify only on a real change, one `window` listener per source however many components read it.
+
+  Two details a module-singleton store gets wrong by default, both pinned there:
+  `refreshOnSubscribe` for a source the *page* owns rather than the tab (a DOM island the next route
+  renders differently — a cache that never re-reads serves the previous route's brief where the
+  mount effect read again), and refcounting the watch on the listener set (handing the teardown to
+  whoever subscribed first means the first consumer to unmount stops watching for everyone still
+  mounted).
+
+  Two conversions were worth more than the rule. Where a visit **overwrites the slot it reads** —
+  both "since you were last here" panels — read and write now sit in the module that owns the slot
+  and the read is taken explicitly first, instead of surviving on the order of two statements in one
+  effect. And `thresholdsPanel` had three effects racing for one form (the prop, the saved draft,
+  the audit trail), so which won depended on effect order; precedence is stated once, in render.
 
   Two rules are enforced everywhere except a named set of files, which the suppression census
   counts rather than treating as configuration:
@@ -268,12 +286,22 @@ was wrong was `data/published_briefs.json` sitting at one week. There are two ro
 that reports success for work it did not observe is worse than one that reports nothing, because it
 gets read as evidence.
 
-**Still gated to preview.** Promoting it needs `WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in
-`wrangler.toml`'s top-level `[vars]`, and `GITHUB_TOKEN` set on the production lane. The argument
-for not waiting on the preview trial: the archive is deliberately never backfilled, so every week
-spent proving this is a week the record can never honestly claim, and the failure modes are bounded
-— a bad run throws, opens no pull request, and now writes a failing row; `assembleCurrentWeekBrief`
-refuses degraded and fallback data outright; and nothing merges the pull request without a person.
+**Still gated to preview, and the promotion no longer has an order (2026-09-17).** It needs
+`WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in `wrangler.toml`'s top-level `[vars]` and `GITHUB_TOKEN`
+set on the production lane — two operator actions, one of them a secret, and until now the
+sequence mattered: the flag without the secret made the Workflow spend a live read and, on a week
+that was not publishable yet, up to five hourly retries before discovering at 7pm a configuration
+fact that was true at 2pm. The token is checked at the first line of `freeze()` now, before any
+work, so either action can land first and the missing one is named in the `brief-freeze` row within
+seconds. Skipping instead was the wrong repair: a silent skip is exactly what left the archive at
+one week with nothing on `/trust` to say so. The full checklist, with the secret's scope, is in
+`docs/cloudflare-deployment-runbook.md` ("Promoting the brief freeze to production").
+
+The argument for not waiting on a longer preview trial: the archive is deliberately never
+backfilled, so every week spent proving this is a week the record can never honestly claim, and the
+failure modes are bounded — a bad run throws, opens no pull request, and writes a failing row;
+`assembleCurrentWeekBrief` refuses degraded and fallback data outright; and nothing merges the pull
+request without a person.
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
