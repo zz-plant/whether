@@ -108,6 +108,36 @@ export const useBrowserSource = <TValue>(source: BrowserSource<TValue>): TValue 
   useSyncExternalStore(source.subscribe, source.getSnapshot, source.getServerSnapshot);
 
 /**
+ * One source per storage key, for slots whose key is itself a browser value.
+ *
+ * The decision-shield presets are stored under the persistent client id, which
+ * is null until hydration — so the source cannot be a module constant, and it
+ * cannot be built during render either, because a new object every render is a
+ * new subscription every render. Keyed and memoised, the component gets the
+ * same source back for the same key, and `null` (nothing to read yet) has a
+ * source of its own that reads nothing.
+ */
+export const createKeyedBrowserSource = <TValue>({
+  read,
+  serverValue,
+}: {
+  read: (key: string) => TValue;
+  serverValue: TValue;
+}): ((key: string | null) => BrowserSource<TValue>) => {
+  const sources = new Map<string, BrowserSource<TValue>>();
+  const empty = createBrowserSource<TValue>({ read: () => serverValue, serverValue });
+
+  return (key) => {
+    if (key === null) return empty;
+    const existing = sources.get(key);
+    if (existing) return existing;
+    const source = createBrowserSource<TValue>({ read: () => read(key), serverValue });
+    sources.set(key, source);
+    return source;
+  };
+};
+
+/**
  * "Has this tree hydrated yet" — false through the server render and the first
  * client render, true afterwards. Several controls need it to keep rendering
  * the server's answer until the browser's is safe to read; they used to spell
