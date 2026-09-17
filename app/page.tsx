@@ -10,6 +10,7 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { RunwayConditionedNotes } from "./components/RunwayConditionedNotes";
 import { SubscribeForm } from "./components/SubscribeForm";
+import { RegimeAlertToggle } from "./components/regimeAlertToggle";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { ActivationTracker } from "./components/activationTracker";
@@ -581,6 +582,14 @@ async function PageContent({
           <div id="subscribe" data-page-section="subscribe" tabIndex={-1} aria-labelledby="subscribe-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <h2 id="subscribe-heading" className="sr-only">Get the weekly call by email</h2>
             <SubscribeForm compact />
+            {/* Beside the email signup rather than somewhere of its own: it is
+                the same alert by another route, and a reader deciding how they
+                want to hear about a regime change should see both options in
+                one place. Renders nothing at all where push is unconfigured or
+                unsupported, which is every developer machine. */}
+            <div className="mt-4">
+              <RegimeAlertToggle />
+            </div>
           </div>
 
           <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
