@@ -197,19 +197,38 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
+  /*
+   * The three lines, defined once each and named the way the brief draws them.
+   *
+   * This used to be four entries under four names — "Clears-when condition",
+   * "Guardrail (pause trigger)", "Stop line (guardrail trigger)" and the
+   * bounded rule — for three lines, two of which were the same line. One of
+   * them then defined a guardrail as "less severe than a clears-when
+   * condition", which conflates the rule's re-open line with the point where
+   * the posture itself changes. They sit adjacent here so a reader meets all
+   * three at once and can see they are different heights on one scale.
+   */
   {
     value: "flip-condition",
-    term: "Clears-when condition",
-    summary: "The specific threshold that, if crossed, would change this week's forecast. Includes the recovery condition: what to do when conditions clear.",
-    why: "Why it matters: knowing what would shift the forecast prevents overreaction and grounds decisions in data.",
+    term: "Change course if",
+    summary: "The reading at which a paused decision re-opens. It sits below the pause line, so conditions have to improve past where they worsened rather than merely back to it.",
+    why: "Why it matters: without a stated re-open, a pause is a permanent stop and every week reopens the same argument.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
   {
     value: "guardrail",
-    term: "Guardrail (pause trigger)",
-    summary: "A boundary condition that tells you when to pause or slow down current plans. Less severe than a clears-when condition.",
-    why: "Why it matters: guardrails let you operate with confidence without constant re-litigation.",
+    term: "Pause if",
+    summary: "The reading at which a category of decisions — hiring, spending, long-term commitments — pauses until conditions improve. Stated as a number, not a judgement.",
+    why: "Why it matters: a line agreed in advance is what stops the same decision being re-argued every week.",
+    usedInLabel: "Weekly brief",
+    usedInHref: "/",
+  },
+  {
+    value: "posture-flip",
+    term: "Posture flips",
+    summary: "The reading at which the weekly call itself changes — a different set of conditions, not a paused decision inside the current one. It sits on the same 0-100 scale as the pause and re-open lines.",
+    why: "Why it matters: a pause is a move inside this week's posture; a flip means the posture you planned around is no longer the one you are in.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
@@ -268,14 +287,6 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
     why: "Why it matters: signal disagreement tells you which signal to trust more—usually the one supported by real-time company metrics.",
     usedInLabel: "Evidence view",
     usedInHref: "/signals",
-  },
-  {
-    value: "stop-line",
-    term: "Stop line (guardrail trigger)",
-    summary: "A specific threshold that, if crossed, pauses a category of decisions (hiring, spending, long-term commitments) until conditions improve.",
-    why: "Why it matters: stop lines let you operate without constant re-litigation—you know the exact boundary where you shift to caution.",
-    usedInLabel: "Planning page",
-    usedInHref: "/operate",
   },
   {
     value: "cached-snapshot",

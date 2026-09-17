@@ -78,6 +78,7 @@ import type {
 } from "../homeBriefModel";
 import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
+import { GLOSSARY_HREF } from "../signalTranslations";
 
 export { extractExecutiveOperationalStance, buildMemoryRail };
 
@@ -756,7 +757,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     presentation: {
       whyItMattersLine,
       readThisCardItems,
-      glossaryHref: "/trust#beginner-glossary",
+      glossaryHref: GLOSSARY_HREF,
     },
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,

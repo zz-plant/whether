@@ -175,6 +175,11 @@ export const utilityLinks = [
     description: "What is free forever, and what Pro and Team add",
   },
   {
+    href: "/glossary",
+    label: "Glossary",
+    description: "Plain-English definitions of every term the brief uses",
+  },
+  {
     href: "/search",
     label: "Search",
     description: "Find a decision, signal, or past call",

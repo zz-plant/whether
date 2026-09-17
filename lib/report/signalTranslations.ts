@@ -222,8 +222,14 @@ export const regimeSignalLabel: Record<RegimeSignalKey, string> = {
   curveSlope: signalPlainEnglish.curveSlope.plainLabel,
 };
 
-/** Canonical destination for "what does this word mean" links. */
-export const GLOSSARY_HREF = "/trust#beginner-glossary";
+/**
+ * Canonical destination for "what does this word mean" links.
+ *
+ * Was `/trust#beginner-glossary`. A reader who does not know what funding
+ * pressure means was sent to a page named Trust, about freshness and source
+ * coverage — the one reader least able to work out why they had landed there.
+ */
+export const GLOSSARY_HREF = "/glossary";
 
 export const plainEnglishScoreDescription = (
   key: RegimeSignalKey,

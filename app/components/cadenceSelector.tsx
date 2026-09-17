@@ -51,9 +51,12 @@ export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => 
   /* The server rendered the default, so the first client render has to as well;
      the query string is only safe to read once hydration is past. */
   const hydrated = useHydrated();
-  const current = hydrated
-    ? ((searchParams?.get("cadence") as CadenceKey | null) ?? DEFAULT_CADENCE)
-    : DEFAULT_CADENCE;
+  /* Narrowed against the options rather than asserted: `?cadence=` is whatever
+     the address bar happens to hold, so a cast would have the type system
+     vouch for a string nobody validated. An unknown value falls back to the
+     default, which is what the server rendered for it too. */
+  const requested = hydrated ? searchParams?.get("cadence") : null;
+  const current = CADENCES.find((option) => option.key === requested)?.key ?? DEFAULT_CADENCE;
 
   const navigate = useCallback(
     (key: CadenceKey) => {
@@ -73,7 +76,7 @@ export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => 
   return (
     <SegmentedControl
       options={CADENCES}
-      value={CADENCES.some((option) => option.key === current) ? current : DEFAULT_CADENCE}
+      value={current}
       onSelect={navigate}
       onPrefetch={prefetch}
       ariaLabel="Planning horizon"

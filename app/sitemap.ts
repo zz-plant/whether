@@ -133,6 +133,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     // deep link, and compare is a disclosure under history. Both stay indexable;
     // neither is ranked like a hub.
     { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+    { path: "/glossary", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/operate", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     // The two workstreams are indexable pages with their own metadata; they
     // were submitted nowhere because the page file kept its route map private.
