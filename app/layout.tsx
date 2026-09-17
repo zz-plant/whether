@@ -11,6 +11,7 @@ import { MobileTabBar } from "./components/MobileTabBar";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
+import { ServiceWorkerRegistrar } from "./components/serviceWorkerRegistrar";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -221,6 +222,7 @@ export default function RootLayout({
           </a>
           <GlobalHeader />
           <GlobalCommandPalette />
+          <ServiceWorkerRegistrar />
           <GlobalTimeMachine />
           <GlobalShareRail />
           <MobileTabBar />
