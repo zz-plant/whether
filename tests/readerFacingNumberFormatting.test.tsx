@@ -111,10 +111,15 @@ describe("mirrored rails", () => {
      that is drawn. Read the two end captions — the `y="9"` runs — instead. */
   const endCaptions = (svg: string) => {
     const matches = [...svg.matchAll(/<text x="[\d.]+" y="9"[^>]*text-anchor="(start|end)"[^>]*>([^<]*)<\/text>/g)];
-    return Object.fromEntries(matches.map((match) => [match[1], match[2]])) as {
-      start?: string;
-      end?: string;
-    };
+    /* Built rather than cast: `Object.fromEntries` widens to a string index and
+       the assertion put the anchor names back by hand, which is the type system
+       vouching for a shape the regex is not guaranteed to produce. */
+    const captions: { start?: string; end?: string } = {};
+    for (const match of matches) {
+      if (match[1] === "start") captions.start = match[2];
+      if (match[1] === "end") captions.end = match[2];
+    }
+    return captions;
   };
 
   it("names both ends of each rail in words", () => {
