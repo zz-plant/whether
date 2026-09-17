@@ -108,10 +108,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
       <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[color:var(--border-subtle)] text-fluid-nano text-slate-400">
         <span>{compact ? "One email a week, one more if the call flips. Unsubscribe in one click." : "Prefer calendar holds over email?"}</span>
         <a
-          href={buildMondayCalendarUrl(
-            "Whether Weekly Posture Sync",
-            "Review weekly macro regime & posture delta: https://whether.work",
-          )}
+          href={buildMondayCalendarUrl()}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 font-medium text-sky-400 hover:text-sky-300 transition-colors"

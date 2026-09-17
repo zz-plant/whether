@@ -5,6 +5,26 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, ChevronDown, Check, Sparkles } from "lucide-react";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
+/**
+ * Four months a reader already has a memory of, offered above the trailing
+ * three-year grid. The grid shows the record exists; these show it reaching
+ * back through weeks the reader can check against their own — which is the
+ * only answer to "this is a two-number model" that does not require reading
+ * the method. Each is described by what happened, not by how it felt, and the
+ * chip prints the call the record holds for that month rather than a verdict
+ * written here. Every one sits inside the snapshot store's coverage
+ * (`getTimeMachineCoverage`), so the selection resolves to an archived brief
+ * rather than falling back to the live one.
+ */
+export const KNOWN_PERIODS: readonly { year: number; month: number; label: string }[] = [
+  { year: 2020, month: 3, label: "Pandemic shutdown" },
+  { year: 2021, month: 11, label: "Zero-rate peak" },
+  { year: 2022, month: 6, label: "Rate hikes" },
+  { year: 2023, month: 3, label: "Bank failures" },
+];
+
+const MONTH_YEAR_LABEL = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+
 interface TimeMachineCalendarPickerProps {
   currentDateLabel: string;
   isHistorical: boolean;
@@ -105,6 +125,44 @@ export function TimeMachineCalendarPicker({
                 <span>Return to Live</span>
               </button>
             )}
+          </div>
+
+          <div className="pb-2.5 mb-2 border-b border-white/[0.08] space-y-1.5">
+            <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
+              Replay a known period
+            </span>
+            <div className="grid grid-cols-2 gap-1.5">
+              {KNOWN_PERIODS.map((period) => {
+                const isSelected =
+                  selectedMonth === String(period.month) && selectedYear === String(period.year);
+                const entry = history.find((candidate) => {
+                  const d = new Date(candidate.record_date);
+                  return d.getUTCFullYear() === period.year && d.getUTCMonth() + 1 === period.month;
+                });
+                const periodDate = new Date(Date.UTC(period.year, period.month - 1, 1));
+                return (
+                  <button
+                    key={`${period.year}-${period.month}`}
+                    type="button"
+                    onClick={() => handleSelect(periodDate.toISOString())}
+                    className={`flex min-h-[44px] flex-col items-start rounded-lg px-2.5 py-1.5 text-left text-xs transition-colors border ${
+                      isSelected
+                        ? "border-teal-500/50 bg-teal-500/15 text-white"
+                        : "border-white/[0.06] bg-slate-900/50 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
+                    }`}
+                  >
+                    <span className="flex w-full items-center justify-between gap-1">
+                      <span className="font-semibold tabular-nums">{MONTH_YEAR_LABEL.format(periodDate)}</span>
+                      {isSelected && <Check size={12} className="text-teal-400" />}
+                    </span>
+                    <span className="w-full truncate text-[10px] text-slate-400">
+                      {period.label}
+                      {entry ? ` · ${getRegimePublicLabel(entry.regime)}` : ""}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="space-y-3">

@@ -8,6 +8,8 @@ import {
   FIRST_TIME_GUIDE_STEPS,
 } from "../../lib/report/reportCopy";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
+import { canonicalPositioningLine } from "../../lib/seo";
+import { buildMondayCalendarUrl } from "./calendarButton";
 import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
@@ -64,7 +66,7 @@ const dismissedSource = createBrowserSource<boolean>({
  * already cover every width — so a first visit showed the same four stage
  * buttons twice within one screen. The stage is asked once, in the hero.
  */
-export function FirstVisitExplainer() {
+export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
   const dismissed = useBrowserSource(dismissedSource);
 
   if (dismissed) {
@@ -94,10 +96,32 @@ export function FirstVisitExplainer() {
       className="mb-3 border-b border-white/[0.08] pb-3 text-fluid-xs text-slate-300"
     >
       <div className="flex items-start justify-between gap-4">
-        <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-          How hard it is to raise money right now, and how much risk investors will fund, scored into
-          one operating call each Monday.
-        </p>
+        {/* Same slot, different opening line. A reader who followed a pasted
+            brief (`?ref=share`, set by the share formats) knows who sent them
+            and nothing else, so the line says what they are looking at and
+            offers the one thing that turns a forwarded link into a ritual —
+            the Monday hold. It replaces the standfirst rather than sitting
+            above it: the comment on the guide below records what this spot
+            cost the last time it grew a second block. */}
+        {arrival === "share" ? (
+          <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
+            A teammate sent you this week&rsquo;s operating call. {canonicalPositioningLine}{" "}
+            <a
+              href={buildMondayCalendarUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-200 underline decoration-sky-700 underline-offset-4 hover:text-sky-100"
+            >
+              Add the Monday hold to your calendar
+            </a>
+            .
+          </p>
+        ) : (
+          <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
+            How hard it is to raise money right now, and how much risk investors will fund, scored into
+            one operating call each Monday.
+          </p>
+        )}
         <button
           type="button"
           onClick={handleDismiss}

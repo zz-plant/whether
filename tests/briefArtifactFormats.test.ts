@@ -4,11 +4,13 @@ import { readFileSync } from "node:fs";
 import { formatMeetingSlideMarkdown } from "../lib/export/meetingSlideExport";
 import {
   BRIEF_FORMATS,
+  MONDAY_AGENDA_STEPS,
   briefArtifactToSlidePayload,
   briefConditionEntries,
   formatBriefArtifact,
   parseBriefArtifact,
   resolveBriefUrl,
+  resolveSharedBriefUrl,
   type BriefArtifact,
 } from "../lib/report/briefArtifact";
 
@@ -219,5 +221,46 @@ describe("brief artifact formats", () => {
       !hero.includes("changeCourseIf:"),
       "the hero must not assemble an export payload of its own",
     );
+  });
+
+  it("marks the link a channel paste carries as a share, and leaves the citation's alone", () => {
+    // A reader who follows the Slack or agenda link is a teammate's referral,
+    // and `/` greets them as one (`?ref=share`). A citation names the canonical
+    // address: a tracking query in a footnote is noise, and the frozen record
+    // it points at re-renders nothing.
+    assert.equal(resolveSharedBriefUrl(artifact, origin), `${origin}/?ref=share`);
+    assert.equal(
+      resolveSharedBriefUrl({ ...artifact, permalinkPath: "/brief/2026-w36" }, origin),
+      `${origin}/brief/2026-w36?ref=share`,
+    );
+    assert.match(formatBriefArtifact(artifact, "slack", origin), /Full brief: https:\/\/whether\.work\/\?ref=share/);
+    assert.match(formatBriefArtifact(artifact, "agenda", origin), /Full brief: https:\/\/whether\.work\/\?ref=share/);
+    assert.ok(!formatBriefArtifact(artifact, "citation", origin).includes("ref=share"));
+  });
+
+  it("lays the agenda out as the three timed steps, with the conditions under the one that checks them", () => {
+    const agenda = formatBriefArtifact(artifact, "agenda", origin);
+    const lines = agenda.split("\n");
+
+    assert.match(lines[0], /^### .* \(3 min\) — 2026-09-04$/);
+    assert.equal(lines[1], `**Operating call:** ${artifact.call} (${artifact.regimeLabel})`);
+
+    for (const [index, step] of MONDAY_AGENDA_STEPS.entries()) {
+      assert.ok(
+        agenda.includes(`${index + 1}. **${step.label}** (${step.minutes} min) — ${step.prompt}`),
+        `agenda lost step ${index + 1}: ${step.label}`,
+      );
+    }
+
+    // The bounded conditions are indented under "Check the thresholds", not
+    // floated above the steps, so a room reads them at the minute they apply.
+    const thresholdsLine = lines.findIndex((line) => line.includes("**Check the thresholds**"));
+    const revisitLine = lines.findIndex((line) => line.includes("**Decide what to revisit**"));
+    assert.ok(thresholdsLine > 0 && revisitLine > thresholdsLine);
+    const under = lines.slice(thresholdsLine + 1, revisitLine);
+    for (const entry of briefConditionEntries(artifact)) {
+      assert.ok(under.includes(`   - ${entry.label}: ${entry.value}`), `${entry.label} is not under the thresholds step`);
+    }
+    assert.ok(under.some((line) => line.startsWith("   - Scores: Funding pressure 64/100")));
   });
 });

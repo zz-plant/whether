@@ -130,7 +130,7 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
   };
 };
 
-export type BriefFormatId = "slack" | "slide" | "citation";
+export type BriefFormatId = "slack" | "slide" | "citation" | "agenda";
 
 export const BRIEF_FORMATS: readonly {
   id: BriefFormatId;
@@ -141,7 +141,32 @@ export const BRIEF_FORMATS: readonly {
   { id: "slack", label: "Slack", hint: "Bolded block for a channel or DM." },
   { id: "slide", label: "Slide", hint: "Markdown callout for Notion, Docs or a deck." },
   { id: "citation", label: "Citation", hint: "Dated reference with a link to the record." },
+  { id: "agenda", label: "Agenda", hint: "Three-minute Monday item for Notion, Docs or a meeting doc." },
 ];
+
+/**
+ * The standing shape of the Monday item, independent of any one week.
+ *
+ * Shared by the agenda format below, which fills it with the week's call, and
+ * the recurring calendar hold (`app/components/calendarButton.tsx`), which
+ * cannot carry a week's numbers because the same event repeats every Monday.
+ * One list, so the invite and the pasted agenda describe the same three
+ * minutes.
+ */
+export const MONDAY_AGENDA_STEPS: readonly {
+  id: "changed" | "thresholds" | "revisit";
+  label: string;
+  minutes: number;
+  prompt: string;
+}[] = [
+  { id: "changed", label: "What changed", minutes: 1, prompt: "Read the call and what moved since last Monday." },
+  { id: "thresholds", label: "Check the thresholds", minutes: 1, prompt: "Guardrail and reversal trigger, against this week's scores." },
+  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of a threshold?" },
+];
+
+export const MONDAY_AGENDA_TITLE = "Monday operating call review";
+
+export const MONDAY_AGENDA_MINUTES = MONDAY_AGENDA_STEPS.reduce((total, step) => total + step.minutes, 0);
 
 /**
  * The bounded conditions, as label/value pairs.
@@ -216,6 +241,26 @@ const signalLine = (artifact: BriefArtifact) =>
 export const resolveBriefUrl = (artifact: BriefArtifact, origin: string) =>
   artifact.permalinkPath ? `${origin}${artifact.permalinkPath}` : `${origin}/`;
 
+/**
+ * The `ref` value a pasted brief carries, and the query the homepage reads it
+ * back from. A reader who lands on `/` with it arrived from a teammate's
+ * paste, not a search or a bookmark, and is greeted as one
+ * (`app/components/homeFirstRunOrientation.tsx`).
+ */
+export const SHARE_REFERRAL_PARAM = "ref";
+export const SHARE_REFERRAL_VALUE = "share";
+
+/**
+ * The brief URL as it is pasted into a channel: the same address, marked as a
+ * share. The citation format keeps `resolveBriefUrl` — a citation names the
+ * canonical address, and a tracking query on it is noise in a footnote.
+ */
+export const resolveSharedBriefUrl = (artifact: BriefArtifact, origin: string) => {
+  const url = new URL(resolveBriefUrl(artifact, origin));
+  url.searchParams.set(SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE);
+  return url.toString();
+};
+
 const formatSlack = (artifact: BriefArtifact, origin: string) =>
   [
     `*${artifact.title} — ${artifact.recordDateLabel}*`,
@@ -224,7 +269,36 @@ const formatSlack = (artifact: BriefArtifact, origin: string) =>
     "",
     `${signalLine(artifact)} · ${artifact.regimeLabel}`,
     `${provenanceLine(artifact)}`,
-    `Full brief: ${resolveBriefUrl(artifact, origin)}`,
+    `Full brief: ${resolveSharedBriefUrl(artifact, origin)}`,
+  ].join("\n");
+
+/**
+ * The call as a meeting item, in the order a room takes it: the posture, the
+ * bounded conditions to check against, and the one question the meeting is
+ * for. Markdown, because the destinations are Notion, Docs and Coda, where a
+ * heading and bullets survive a paste and a Slack block does not.
+ */
+const formatAgenda = (artifact: BriefArtifact, origin: string) =>
+  [
+    `### ${MONDAY_AGENDA_TITLE} (${MONDAY_AGENDA_MINUTES} min) — ${artifact.recordDateLabel}`,
+    `**Operating call:** ${artifact.call} (${artifact.regimeLabel})`,
+    ...(actionRestatesCall(artifact)
+      ? []
+      : [`**${DECISION_CONTRACT_LABELS.action.doNow}:** ${artifact.actionNow}`]),
+    ...MONDAY_AGENDA_STEPS.flatMap((step, index) => [
+      `${index + 1}. **${step.label}** (${step.minutes} min) — ${step.prompt}`,
+      // The thresholds step carries the week's numbers under it, so the room
+      // checks against the printed conditions rather than remembered ones.
+      ...(step.id === "thresholds"
+        ? [
+            ...briefConditionEntries(artifact).map((entry) => `   - ${entry.label}: ${entry.value}`),
+            `   - Scores: ${signalLine(artifact)}`,
+          ]
+        : []),
+    ]),
+    "",
+    provenanceLine(artifact),
+    `Full brief: ${resolveSharedBriefUrl(artifact, origin)}`,
   ].join("\n");
 
 /**
@@ -290,6 +364,8 @@ export const formatBriefArtifact = (
       return formatSlide(artifact, origin);
     case "citation":
       return formatCitation(artifact, origin);
+    case "agenda":
+      return formatAgenda(artifact, origin);
     default:
       return formatSlack(artifact, origin);
   }

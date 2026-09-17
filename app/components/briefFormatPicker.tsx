@@ -28,7 +28,7 @@ export const BriefFormatPicker = ({
   <>
     <fieldset className="mt-2">
       <legend className="sr-only">Format</legend>
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5">
         {BRIEF_FORMATS.map((option) => (
           <button
             key={option.id}
