@@ -26,6 +26,7 @@ import { TELEMETRY_STREAMS } from "../lib/telemetry/analyticsEngine";
 /** Every `STORAGE_KEYS` entry, against the section of /privacy that covers it. */
 const STORAGE_KEY_SECTIONS: Record<keyof typeof STORAGE_KEYS, string> = {
   theme: "2.4 — stays in the browser, never sent",
+  clientId: "2.3 — the random identifier this browser is known by",
   homeOrientationDismissed: "2.4 — stays in the browser, never sent",
   reviewedRecordDates: "2.4 — stays in the browser, never sent",
   operatorProfile: "2.4 — stays in the browser, never sent",

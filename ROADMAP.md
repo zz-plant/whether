@@ -147,7 +147,7 @@ Track these items to present Whether as a Reforge-grade operating system.
 - [x] Executive brief CTA is primary in the Overview header. Shipped: `CopySlackBriefButton` is the primary hero action (2026-08-29).
 - [x] Weekly/monthly briefing APIs are stable and copy-ready with citations. Shipped: `/api/weekly`, `/api/monthly`, `/brief.md`, and `/api/integrations/weekly-mandate` (2026-08).
 - [ ] Insight Database includes precedent case studies per regime.
-- [x] Decision Memory logs are immutable and exportable. Shipped: `/api/decision-memory` and `/operate/memory` (2026-09).
+- [x] Decision Memory logs are immutable and exportable. Shipped: `/api/decision-memory` and `/decisions` (2026-09). `/operate/memory` was retired into a redirect to `/history` — which is the *published* archive, not the reader's own — and this line went on claiming it for weeks, during which no browser could read or write the ledger at all.
 - [x] Role-based presets ship for CFO/COO/CTO/CPO workflows. Shipped: stakeholder briefs on /operate and role-calibrated alert routing (2026-09-04).
 - [x] Source health panel surfaces stale or failed data feeds. Shipped: System status and Source board on `/trust`.
 - [x] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs. Shipped: live FRED fetchers in `lib/fred.ts` (2026-08).

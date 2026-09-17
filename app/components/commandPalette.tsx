@@ -141,6 +141,16 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         action: () => navigateTo("/history"),
         shortcut: "H",
       },
+      /* Deliberately here and in the footer rather than in the nav: the page is
+         noindex and per-browser, so it is something a reader goes looking for
+         rather than a section of the site. */
+      {
+        id: "decision-record",
+        label: "Open your decision record",
+        description: "Decisions recorded from this browser, checked against this week's reading",
+        icon: Archive,
+        action: () => navigateTo("/decisions"),
+      },
     ];
 
     const navCommands: CommandItem[] = loopNavigationLayers.map((layer) => ({
