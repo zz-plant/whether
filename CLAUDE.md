@@ -268,12 +268,22 @@ was wrong was `data/published_briefs.json` sitting at one week. There are two ro
 that reports success for work it did not observe is worse than one that reports nothing, because it
 gets read as evidence.
 
-**Still gated to preview.** Promoting it needs `WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in
-`wrangler.toml`'s top-level `[vars]`, and `GITHUB_TOKEN` set on the production lane. The argument
-for not waiting on the preview trial: the archive is deliberately never backfilled, so every week
-spent proving this is a week the record can never honestly claim, and the failure modes are bounded
-— a bad run throws, opens no pull request, and now writes a failing row; `assembleCurrentWeekBrief`
-refuses degraded and fallback data outright; and nothing merges the pull request without a person.
+**Still gated to preview, and the promotion no longer has an order (2026-09-17).** It needs
+`WHETHER_BRIEF_FREEZE_WORKFLOW = "1"` in `wrangler.toml`'s top-level `[vars]` and `GITHUB_TOKEN`
+set on the production lane — two operator actions, one of them a secret, and until now the
+sequence mattered: the flag without the secret made the Workflow spend a live read and, on a week
+that was not publishable yet, up to five hourly retries before discovering at 7pm a configuration
+fact that was true at 2pm. The token is checked at the first line of `freeze()` now, before any
+work, so either action can land first and the missing one is named in the `brief-freeze` row within
+seconds. Skipping instead was the wrong repair: a silent skip is exactly what left the archive at
+one week with nothing on `/trust` to say so. The full checklist, with the secret's scope, is in
+`docs/cloudflare-deployment-runbook.md` ("Promoting the brief freeze to production").
+
+The argument for not waiting on a longer preview trial: the archive is deliberately never
+backfilled, so every week spent proving this is a week the record can never honestly claim, and the
+failure modes are bounded — a bad run throws, opens no pull request, and writes a failing row;
+`assembleCurrentWeekBrief` refuses degraded and fallback data outright; and nothing merges the pull
+request without a person.
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
