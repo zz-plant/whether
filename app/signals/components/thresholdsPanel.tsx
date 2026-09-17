@@ -10,7 +10,7 @@ import { Form } from "@base-ui/react/form";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Popover } from "@base-ui/react/popover";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
+import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
@@ -221,7 +221,7 @@ export const ThresholdsPanel = ({
     restoredFromStorage.current = true;
     const nextParams = new URLSearchParams(searchParams.toString());
     buildThresholdSearchParams(buildThresholds(storedDraft), appliedDefaults, nextParams);
-    router.replace(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
+    router.replace(toRoute(`${pathname}?${nextParams.toString()}`), { scroll: false });
   }, [appliedDefaults, hasUrlThresholds, pathname, router, searchParams, storedDraft]);
 
   useEffect(() => {
