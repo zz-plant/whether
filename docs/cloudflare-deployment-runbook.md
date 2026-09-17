@@ -47,6 +47,19 @@ that survives.
 If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
 in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
 
+### Build output cache restore overlay
+
+Cloudflare Workers Builds restores the build output cache *after* cloning the repository.
+If the build output directory or cache overlaps tracked paths (such as `public/` or generated
+fixtures), the cache extraction stomps freshly cloned git-tracked files with whatever stale
+snapshots were saved in earlier runs.
+
+Under `WHETHER_DEPLOY_GATE=1` in remote CI, `scripts/run-checks.mjs` checks whether any tracked files
+differ from `HEAD` and resets them with `git checkout HEAD -- .` before running tasks. In Cloudflare
+Dashboard (Workers & Pages → `whether` → Settings → Builds), ensure "Build output directory" is not
+pointed at tracked source directories like `public/`. If stale cache issues arise, use "Clear build
+cache" in Settings → Builds.
+
 ## Tracing
 
 `wrangler.toml` enables Workers automatic tracing (open beta) on both lanes under

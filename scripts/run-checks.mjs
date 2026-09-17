@@ -16,7 +16,7 @@
  *   bun scripts/run-checks.mjs lint typecheck test # only these, still concurrent
  *   bun scripts/run-checks.mjs --serial            # fail-fast sequencing
  */
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 
@@ -83,6 +83,43 @@ if (unknown.length > 0) {
 }
 
 const selected = requested.length > 0 ? TASKS.filter((t) => requested.includes(t.name)) : TASKS;
+
+/*
+ * Cloudflare Workers Builds restores its build output cache directly over the
+ * git clone. When the build output directory or cache includes tracked files
+ * (such as public/ or generated artifacts), that restore stomps committed files
+ * with whatever stale state was saved in a prior run.
+ * Inside the deploy gate in remote CI, restore tracked files to HEAD before
+ * any checks run.
+ */
+const inRemoteBuild = Boolean(
+  process.env.WORKERS_CI === "1" ||
+    process.env.WORKERS_CI_BUILD_UUID ||
+    process.env.CF_PAGES === "1" ||
+    process.env.CI === "1" ||
+    process.env.CI === "true" ||
+    process.env.WHETHER_FORCE_HEAD_RESTORE === "1",
+);
+
+if (process.env.WHETHER_DEPLOY_GATE === "1" && inRemoteBuild) {
+  try {
+    const diff = spawnSync("git", ["diff", "--name-only", "HEAD"], { encoding: "utf8" });
+    const modified = (diff.stdout ?? "").trim();
+    if (diff.status === 0 && modified.length > 0) {
+      const checkout = spawnSync("git", ["checkout", "HEAD", "--", "."], { encoding: "utf8" });
+      if (checkout.status === 0) {
+        const fileList = modified
+          .split("\n")
+          .map((f) => f.trim())
+          .filter(Boolean)
+          .join(", ");
+        process.stdout.write(`[run-checks] restored tracked files stomped by build cache restore: ${fileList}\n`);
+      }
+    }
+  } catch {
+    // Best-effort if git is unavailable in the environment
+  }
+}
 
 /*
  * tsc and bun test are each CPU- and memory-hungry (oxlint finishes in seconds). Running more of them
