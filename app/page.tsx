@@ -4,6 +4,7 @@ import { ActionLink } from "./components/ui/actionLink";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
+import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -42,7 +43,8 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { KeyDriversCard } from "./components/hero/KeyDriversCard";
 import { buildDriverViews } from "../lib/report/driverDecisionViews";
-import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries, getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
+import { buildTrackRecord } from "../lib/report/trackRecord";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
@@ -179,6 +181,10 @@ async function PageContent({
    * archived view of a month that has no data.
    */
   const historicalSelection = resolveTimeMachineSelection(searchParams);
+  /* Set by the Slack and agenda copy formats on the link they print
+     (`resolveSharedBriefUrl`), so a reader who followed a teammate's paste is
+     greeted as one. Any other value of `ref` is somebody else's tag. */
+  const arrivedFromShare = searchParams?.[SHARE_REFERRAL_PARAM] === SHARE_REFERRAL_VALUE;
   const previousHistoricalRequest = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
@@ -337,6 +343,11 @@ async function PageContent({
     title: cadenceTitle ?? "Whether Weekly Brief",
   });
 
+  /* The whole record, as /history reads it, so the popover's "months on
+   * record" and the page it links to agree. The series walk is cached per
+   * window, so the second reader of the full window pays nothing. */
+  const trackRecord = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
+
   const cardActions = (homepage.weeklyDecisionCardModel.decision.actionStripItems?.length ?? 0) > 0
     ? homepage.weeklyDecisionCardModel.decision.actionStripItems!.map((item, idx) => ({
         id: idx + 1,
@@ -385,7 +396,7 @@ async function PageContent({
               always that of a top strip. Hiding once dismissed is a global CSS
               rule keyed on the data attribute (app/layout.tsx), so it stays
               pre-paint and CLS-free at either position. */}
-          <FirstVisitExplainer />
+          <FirstVisitExplainer arrival={arrivedFromShare ? "share" : undefined} />
           {/* Meta row: week switcher and the confidence popover. The "Data through …
               · refreshed …" line that sat under the switcher restated the hero's
               trust line and the popover's timestamp; the stage pill that sat beside
@@ -440,6 +451,8 @@ async function PageContent({
                 recordDateLabel={homepage.reportShell.recordDateLabel}
                 treasurySource={homepage.reportShell.treasurySource}
                 degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+                record={trackRecord}
+                regime={regime}
               />
             </div>
           </div>

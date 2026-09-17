@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FirstVisitExplainer } from "../app/components/homeFirstRunOrientation";
+import { canonicalPositioningLine } from "../lib/seo";
 import {
   FIRST_TIME_GUIDE_HIGHLIGHTS,
   FIRST_TIME_GUIDE_NEXT_LINKS,
@@ -71,5 +72,26 @@ describe("first-run orientation guide", () => {
     const inPage = FIRST_TIME_GUIDE_NEXT_LINKS.filter((link) => link.href.startsWith("#"));
 
     assert.deepEqual(inPage.map((link) => link.href), ["#weekly-call"]);
+  });
+
+  it("greets a reader who followed a teammate's paste, in the same slot", () => {
+    // `?ref=share` is set by the Slack and agenda formats. The opening line
+    // changes; nothing is added above or beside it, because this spot is the
+    // one thing on `/` addressed to a newcomer and it has grown a second block
+    // before. The line names the product once, in the canonical category line,
+    // and offers the Monday hold — the one step from a forwarded link to a ritual.
+    const shared = decode(renderToStaticMarkup(<FirstVisitExplainer arrival="share" />));
+    const plain = markup();
+
+    assert.match(shared, /A teammate sent you this week’s operating call\./);
+    assert.ok(shared.includes(canonicalPositioningLine));
+    assert.match(shared, /href="https:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE[^"]*"[^>]*>Add the Monday hold to your calendar/);
+    assert.ok(!shared.includes("scored into"), "the shared line replaces the standfirst rather than stacking on it");
+    assert.equal((shared.match(/<section /g) ?? []).length, 1, "one section, not a banner above one");
+
+    assert.ok(!plain.includes("A teammate sent you"));
+    assert.ok(!plain.includes("calendar.google.com"));
+    // The guide behind the line is the same either way.
+    assert.ok(shared.includes("How to read this page"));
   });
 });

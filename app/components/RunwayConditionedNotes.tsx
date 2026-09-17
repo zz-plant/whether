@@ -1,22 +1,70 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import { buildRunwayConditionedNotes } from "../../lib/report/runwayConditionedNotes";
+import {
+  RUNWAY_QUICK_PICKS,
+  buildRunwayConditionedNotes,
+  findRunwayQuickPick,
+} from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
+
+/**
+ * The runway bands as a segmented control, the same shape as the cadence
+ * selector two screens down. `aria-pressed` rather than `aria-current`: this
+ * sets a stored figure, it does not navigate.
+ */
+const RunwayQuickPicks = ({
+  activeMonths,
+  onPick,
+}: {
+  activeMonths: number | undefined;
+  onPick: (months: number) => void;
+}) => {
+  const active = findRunwayQuickPick(activeMonths);
+  return (
+    <fieldset
+      aria-label="Cash runway"
+      className="flex flex-wrap items-center gap-0.5 rounded-sm border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-0.5"
+    >
+      {RUNWAY_QUICK_PICKS.map((pick) => {
+        const isActive = active?.label === pick.label;
+        return (
+          <button
+            key={pick.label}
+            type="button"
+            aria-pressed={isActive}
+            onClick={() => onPick(pick.months)}
+            className={`min-h-[44px] sm:min-h-9 rounded-sm px-3 py-1.5 text-fluid-micro font-semibold tabular-nums transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+              isActive ? "bg-sky-500/15 text-sky-100" : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            {pick.label}
+          </button>
+        );
+      })}
+    </fieldset>
+  );
+};
 
 /**
  * The weekly call, conditioned on the operator's own runway.
  *
  * The canonical call is server-rendered and company-agnostic; this panel reads
  * the browser-local operator profile after mount and adds translation-only
- * notes beneath it. It renders nothing until the operator has given a runway
- * figure — a missing number never reads as zero, and the brief stays canonical
- * for every other reader of the same URL.
+ * notes beneath it. A missing number never reads as zero, and the brief stays
+ * canonical for every other reader of the same URL.
+ *
+ * Until a runway is stored it offers the four bands instead of nothing. The
+ * figure used to be settable only on `/operate`, so the one line on `/` that
+ * translates the call to a company was invisible to anyone who had not been
+ * there — which is every reader arriving from a shared link. A band is enough
+ * to pick the note; the exact figure and burn still live on `/operate`.
  */
 export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
-  const { profile } = useOperatorProfile();
+  const { profile, setProfileField } = useOperatorProfile();
   const notes = useMemo(
     () =>
       buildRunwayConditionedNotes({
@@ -27,14 +75,45 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
     [regime, profile.runwayMonths, profile.monthlyBurnUsd],
   );
 
-  if (notes.length === 0) return null;
+  const setRunway = (months: number | undefined) => setProfileField("runwayMonths", months);
+
+  if (notes.length === 0) {
+    return (
+      <aside
+        aria-label="Condition this call on your runway"
+        className="weather-panel mt-4 space-y-2 px-5 py-3.5"
+      >
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="type-eyebrow text-slate-300">Translate this call for your runway</p>
+          <RunwayQuickPicks activeMonths={undefined} onPick={setRunway} />
+        </div>
+        <p className="text-fluid-nano text-slate-500">
+          Stays in this browser. The call above does not change; the notes under it do.
+        </p>
+      </aside>
+    );
+  }
 
   return (
     <aside
       aria-label="Notes conditioned on your runway"
       className="weather-panel mt-4 space-y-2 px-5 py-4"
     >
-      <p className="type-eyebrow text-slate-300">Conditioned on your runway — {profile.runwayMonths} months</p>
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="type-eyebrow text-slate-300">
+          Conditioned on your runway — {profile.runwayMonths} months
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <RunwayQuickPicks activeMonths={profile.runwayMonths} onPick={setRunway} />
+          <button
+            type="button"
+            onClick={() => setRunway(undefined)}
+            className="inline-flex min-h-[44px] sm:min-h-9 items-center rounded-sm px-2 text-fluid-micro text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
       <ul className="space-y-1.5 text-fluid-xs text-slate-300">
         {notes.map((note) => (
           <li key={note.area}>
@@ -43,7 +122,12 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         ))}
       </ul>
       <p className="text-fluid-nano text-slate-500">
-        Your figures stay in this browser. These notes translate the call; the thresholds above are unchanged.
+        Your figures stay in this browser. These notes translate the call; the thresholds above are
+        unchanged.{" "}
+        <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+          Enter the exact runway and burn
+        </Link>
+        .
       </p>
     </aside>
   );

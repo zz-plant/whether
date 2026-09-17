@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import { buildMondayCalendarUrl } from "../app/components/calendarButton";
+import { buildMondayAgendaDescription, buildMondayCalendarUrl } from "../app/components/calendarButton";
+import { MONDAY_AGENDA_STEPS } from "../lib/report/briefArtifact";
 
 describe("buildMondayCalendarUrl", () => {
   /**
@@ -35,5 +36,19 @@ describe("buildMondayCalendarUrl", () => {
     assert.equal(url.searchParams.get("text"), "Sync");
     assert.equal(url.searchParams.get("details"), "Details");
     assert.equal(url.searchParams.get("recur"), "RRULE:FREQ=WEEKLY;BYDAY=MO");
+  });
+
+  it("fills the recurring hold with the standing agenda rather than a week's numbers", () => {
+    // The event repeats every Monday, so a body carrying one week's call is
+    // wrong by the second occurrence. It carries the three steps, timed, and
+    // the link where the week's numbers live.
+    const details = new URL(buildMondayCalendarUrl()).searchParams.get("details");
+    assert.equal(details, buildMondayAgendaDescription());
+    assert.ok(details);
+    for (const [index, step] of MONDAY_AGENDA_STEPS.entries()) {
+      assert.ok(details.includes(`${index + 1}. ${step.label} (${step.minutes} min)`), `hold lost step: ${step.label}`);
+    }
+    assert.match(details, /This week's call: https:\/\/[^\s]+\/$/);
+    assert.ok(!/\d+\/100/.test(details), "the standing hold must not carry a score");
   });
 });
