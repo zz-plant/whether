@@ -153,9 +153,7 @@ export default {
         briefImageUrl = result.imageUrl;
         return { ok: result.ok, error: result.error };
       });
-      await runCronStep("slack/deliver-brief", () =>
-        deliverSlackBrief({ snapshot, imageUrl: briefImageUrl }),
-      );
+      await runCronStep("slack/deliver-brief", () => deliverSlackBrief({ imageUrl: briefImageUrl }));
     }
 
     // Records the month in progress from the assessment the read path just computed, so the
