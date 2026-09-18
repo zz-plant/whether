@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildFlipProximity } from "../lib/report/flipProximity";
+import { buildFlipProximity, buildQuietDayRead } from "../lib/report/flipProximity";
 import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
@@ -69,5 +69,33 @@ describe("flip proximity", () => {
     // From below the line the only crossing is upward, which the veto forbids.
     assert.ok(base.scores.riskAppetite <= base.thresholds.riskAppetiteRegime);
     assert.equal(risk, undefined);
+  });
+});
+
+describe("quiet-day read", () => {
+  const sentences = [
+    "0.15% flatter on the 10Y−2Y curve would change the call to Cloudy.",
+    "0.4% lower on the 1-month Treasury bill would change the call to Stormy.",
+  ];
+
+  it("leads a steady week with the call-unchanged verdict and the nearest flip distance", () => {
+    const line = buildQuietDayRead({ steadyWeek: true, flipProximity: sentences });
+    assert.equal(line, "Call unchanged — 0.15% flatter on the 10Y−2Y curve would change the call to Cloudy.");
+  });
+
+  it("renders nothing when the call moved this week", () => {
+    assert.equal(buildQuietDayRead({ steadyWeek: false, flipProximity: sentences }), null);
+  });
+
+  it("renders nothing when no axis has a reachable crossing", () => {
+    assert.equal(buildQuietDayRead({ steadyWeek: true, flipProximity: [] }), null);
+  });
+
+  it("reuses the hero's flip sentence verbatim rather than re-minting it", () => {
+    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const heroSentences = buildFlipProximity(assessment).map((entry) => entry.sentence);
+    const line = buildQuietDayRead({ steadyWeek: true, flipProximity: heroSentences });
+    assert.ok(line);
+    assert.ok(heroSentences.some((sentence) => line!.includes(sentence)));
   });
 });

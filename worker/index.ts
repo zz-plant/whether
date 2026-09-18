@@ -9,6 +9,7 @@ import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { captureAndStoreBriefScreenshot } from "../lib/export/briefScreenshot";
 import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
+import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { WHETHER_AGENT_MANIFEST_PATH, agentManifestResponse } from "../lib/agentManifest";
 import { installBindings } from "./bindings";
@@ -152,7 +153,9 @@ export default {
         briefImageUrl = result.imageUrl;
         return { ok: result.ok, error: result.error };
       });
-      await runCronStep("slack/deliver-brief", () => deliverSlackBrief({ imageUrl: briefImageUrl }));
+      await runCronStep("slack/deliver-brief", () =>
+        deliverSlackBrief({ snapshot, imageUrl: briefImageUrl }),
+      );
     }
 
     // Records the month in progress from the assessment the read path just computed, so the
@@ -162,6 +165,18 @@ export default {
       const result = await refreshMonthlyRegimeHistory();
       return { ok: result.ok, error: result.error };
     });
+
+    /* Month-end pulse, judged after the month-in-progress record above so the
+       comparison has the current month to work with. Fires once per month, and
+       only when the reading differs from the prior month-end: a quiet month-end
+       records the pulse and sends nothing. Safe to run daily — the KV last-
+       pulsed gate makes a re-run within the month a no-op. */
+    if (snapshot && weeklyCall) {
+      await runCronStep("month-end-pulse", async () => {
+        const result = await runMonthEndPulse({ snapshot, weeklyCall });
+        return { ok: result.ok, error: result.error };
+      });
+    }
 
     /* Monday only, and only where the trial is on: start the Workflow that turns the KV month
        in progress into a pull request. It runs on its own (retried steps, its own log), so the

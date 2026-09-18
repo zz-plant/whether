@@ -13,6 +13,7 @@ import { SubscribeForm } from "./components/SubscribeForm";
 import { RegimeAlertToggle } from "./components/regimeAlertToggle";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
+import { QuietDayRead } from "./components/home/QuietDayRead";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
@@ -32,6 +33,7 @@ import {
 import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
 import { buildFlipProximity } from "../lib/report/flipProximity";
+import { buildQuietDayRead } from "../lib/report/flipProximity";
 import { guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
@@ -309,6 +311,15 @@ async function PageContent({
     flipProximity: buildFlipProximity(reportData.assessment).map((entry) => entry.sentence),
   };
 
+  /* The quiet-day read: the line a returning reader on a non-Monday needs to
+     know the call still stands and how far it is from flipping. Derived from
+     the same snapshot the hero draws, so the verdict and the flip watch cannot
+     disagree; absent on a week the call moved. */
+  const quietDayLine = buildQuietDayRead({
+    steadyWeek: weeklyLeadershipSummary.steadyWeek,
+    flipProximity: v2HeroSignalData.flipProximity,
+  });
+
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
   // the rails may draw — but only when that is in fact the sentence being
@@ -575,8 +586,14 @@ async function PageContent({
                     regimeLabel: publicRegimeLabel,
                     call: primaryCall,
                   }}
+                  flipProximitySentence={v2HeroSignalData.flipProximity[0]}
+                  boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
                 />
               ) : null}
+              {/* The quiet-day read, under the call it confirms. Live briefs only,
+                  and it renders nothing on a week the call moved — the delta path
+                  already leads there. */}
+              {!historicalSelection ? <QuietDayRead line={quietDayLine} /> : null}
             </div>
 
             <div id="key-drivers" data-page-section="key-drivers" tabIndex={-1} aria-labelledby="key-drivers-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">

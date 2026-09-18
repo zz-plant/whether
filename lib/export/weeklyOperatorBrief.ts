@@ -1,6 +1,6 @@
 import { resolveWeekEndingIsoDateUTC } from "../formatters";
 import { getRegimePublicLabel } from "../regimePresentation";
-import { OPERATING_LATITUDE_LABEL } from "../report/reportCopy";
+import { OPERATING_LATITUDE_LABEL, DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
@@ -8,6 +8,7 @@ import type { PostureStateContract } from "../report/postureStateContract";
 import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { buildFlipProximity } from "../report/flipProximity";
 
 type WeeklyOperatorBriefPayload = {
   date: string;
@@ -22,6 +23,14 @@ type WeeklyOperatorBriefPayload = {
   actionNow: string;
   pauseIf: string;
   changeCourseIf: string;
+  /**
+   * The nearest flip distance in the market's units — "0.15% flatter on the
+   * 10Y−2Y curve would change the call to X" — not in score points. The hero
+   * prints it as its flip watch; this export carries the same sentence so an
+   * artifact pasted into Slack states what has to happen in the market, which
+   * the score-point flip conditions below do not.
+   */
+  flipWatchLine?: string;
   doNowBullets: string[];
   whyCouldBeWrong: string;
   flipTrigger: string;
@@ -160,6 +169,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     currentCall,
     actionNow,
     pauseIf,
+    flipWatchLine: buildFlipProximity(assessment)[0]?.sentence,
     changeCourseIf: resolvedFlipTrigger,
     doNowBullets: canonicalDoNowLines.length > 0 ? canonicalDoNowLines : doNowBullets,
     whyCouldBeWrong:
@@ -195,6 +205,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     `${publicDecisionLabels.action}: ${payload.actionNow}`,
     `${publicDecisionLabels.threshold}: ${payload.pauseIf}`,
     `${publicDecisionLabels.reversal}: ${payload.changeCourseIf}`,
+    ...(payload.flipWatchLine ? [`${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${payload.flipWatchLine}`] : []),
     ...(supportingActionLines.length > 0
       ? ["", "More action-now lines:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
       : []),
@@ -255,7 +266,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           elements: [
             {
               type: "mrkdwn",
-              text: `*${publicDecisionLabels.threshold}:* ${payload.pauseIf}\n*${publicDecisionLabels.reversal}:* ${payload.changeCourseIf}`,
+              text: `*${publicDecisionLabels.threshold}:* ${payload.pauseIf}\n*${publicDecisionLabels.reversal}:* ${payload.changeCourseIf}${payload.flipWatchLine ? `\n*${DECISION_CONTRACT_LABELS.watch.flipWatch}:* ${payload.flipWatchLine}` : ""}`,
             },
           ],
         },

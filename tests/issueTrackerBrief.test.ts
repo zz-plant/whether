@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
   buildExportStamp,
+  buildGuardrailTagBlocks,
   buildIssueTrackerMarkdownBrief,
 } from "../lib/export/issueTrackerBrief";
 import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
+import type { ActionStripItem } from "../lib/report/operatingCalls";
 
 /**
  * These two builders lived inside `exportBriefPanel.tsx`, a 940-line client
@@ -78,5 +80,75 @@ describe("buildExportStamp", () => {
     assert.match(stamp, /https:\/\/fred\.stlouisfed\.org/);
     assert.match(stamp, /2026-03-04/);
     assert.match(stamp, /HIGH confidence/);
+  });
+});
+
+describe("buildGuardrailTagBlocks", () => {
+  const items: ActionStripItem[] = [
+    {
+      lever: "hiring-stance",
+      label: "Hiring posture",
+      ownerLabel: "VP Eng",
+      areaActionNow: "Hold speculative hiring.",
+      triggerThreshold: "Pause net-new hiring above 56.",
+      reversalCondition: "Resume below 46.",
+    },
+    {
+      lever: "investment-pace",
+      label: "Investment pace",
+      ownerLabel: "CEO",
+      areaActionNow: "Keep expansion bets reversible.",
+      triggerThreshold: "Pause expansion spend above 70.",
+      reversalCondition: "Resume below 60.",
+    },
+  ];
+
+  it("builds one block per business area, each carrying posture, pause trigger and flip condition", () => {
+    const blocks = buildGuardrailTagBlocks({
+      actionStripItems: items,
+      postureLabel: "Cloudy",
+      recordDate: "2026-03-04",
+      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change the call.",
+    });
+
+    assert.equal(blocks.length, 2);
+    for (const block of blocks) {
+      assert.match(block.markdown, /\*\*Posture:\*\* Cloudy/);
+      assert.match(block.markdown, /\*\*Action now:\*\* /);
+      assert.match(block.markdown, /\*\*Pause if:\*\* /);
+      assert.match(block.markdown, /\*\*Change course if:\*\* /);
+      assert.match(block.markdown, /Week of 2026-03-04/);
+    }
+    assert.match(blocks[0].markdown, /Hold speculative hiring\./);
+    assert.match(blocks[0].markdown, /Pause net-new hiring above 56\./);
+    assert.match(blocks[1].markdown, /Keep expansion bets reversible\./);
+  });
+
+  it("carries the flip watch sentence when one is given", () => {
+    const blocks = buildGuardrailTagBlocks({
+      actionStripItems: items,
+      postureLabel: "Cloudy",
+      recordDate: "2026-03-04",
+      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change the call.",
+    });
+
+    assert.ok(blocks.every((block) => block.markdown.includes("0.15% flatter on the 10Y−2Y curve would change the call.")));
+  });
+
+  it("omits the flip watch line when no axis is reachable", () => {
+    const blocks = buildGuardrailTagBlocks({
+      actionStripItems: items,
+      postureLabel: "Cloudy",
+      recordDate: "2026-03-04",
+    });
+
+    assert.ok(blocks.every((block) => !block.markdown.includes("Flip watch")));
+  });
+
+  it("returns no blocks for an empty action strip", () => {
+    assert.deepEqual(
+      buildGuardrailTagBlocks({ actionStripItems: [], postureLabel: "Cloudy", recordDate: "2026-03-04" }),
+      [],
+    );
   });
 });

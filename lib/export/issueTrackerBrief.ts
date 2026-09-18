@@ -16,6 +16,8 @@ import { formatNumberWithUnit } from "../formatters";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildBoundedDecisionLines, type ModeledExportDecisionPayload } from "./briefBuilders";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import type { ActionStripItem } from "../report/operatingCalls";
 
 type IssueTrackerFormat = "markdown" | "wiki";
 
@@ -89,3 +91,50 @@ export const buildIssueTrackerMarkdownBrief = (
     ),
   ].join("\n");
 };
+
+/**
+ * A per-business-area guardrail block an operator pastes into a work item.
+ *
+ * This is the credential-free slice of the Linear/Jira sync: no tokens are
+ * stored and nothing is written to the tracker — the operator copies one block
+ * per area into the card description, and the card now carries posture, the
+ * pause trigger, the flip condition, and the flip watch. The block uses the
+ * same bounded-rule fields the Slack brief and the hero print, so a card
+ * cannot state a threshold the weekly call does not.
+ */
+export type GuardrailTagBlock = {
+  /** Business-area lever, e.g. `hiring-stance`. */
+  area: string;
+  /** Reader-facing business-area label, e.g. "Hiring posture". */
+  label: string;
+  /** The role that owns this lever's line, when known. */
+  ownerLabel?: string;
+  /** The paste-ready markdown block. */
+  markdown: string;
+};
+
+export const buildGuardrailTagBlocks = ({
+  actionStripItems,
+  postureLabel,
+  recordDate,
+  flipWatchSentence,
+}: {
+  actionStripItems: readonly ActionStripItem[];
+  postureLabel: string;
+  recordDate: string;
+  /** The nearest flip distance in the market's units, as the hero prints it. */
+  flipWatchSentence?: string;
+}): GuardrailTagBlock[] =>
+  actionStripItems.map((item) => ({
+    area: item.lever,
+    label: item.label,
+    ownerLabel: item.ownerLabel,
+    markdown: [
+      `**Posture:** ${postureLabel}`,
+      `**${DECISION_CONTRACT_LABELS.action.actionNow}:** ${item.areaActionNow}`,
+      `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${item.triggerThreshold}`,
+      `**${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:** ${item.reversalCondition}`,
+      ...(flipWatchSentence ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${flipWatchSentence}`] : []),
+      `_Week of ${recordDate}_`,
+    ].join("\n"),
+  }));
