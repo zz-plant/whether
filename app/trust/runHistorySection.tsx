@@ -16,16 +16,27 @@ import type { CronRunHistory } from "../../lib/telemetry/runHistory";
  * act on; "the weekly email last succeeded on Sep 15" is.
  */
 
-const stampFormat = new Intl.DateTimeFormat("en-US", {
+// Date and time are formatted separately and joined here, because the joiner is the one part
+// of this stamp ICU owns: older builds render "Sep 14, 14:00" and ICU 72+ (bun 1.3.x) renders
+// "Sep 14 at 14:00". A stamp that changes with the runtime's ICU is not "formatted once".
+const stampDateFormat = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
   month: "short",
   day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
 });
 
-const formatStamp = (iso: string | null) => (iso ? `${stampFormat.format(new Date(iso))} UTC` : "—");
+const stampTimeFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "UTC",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+const formatStamp = (iso: string | null) => {
+  if (!iso) return "—";
+  const at = new Date(iso);
+  return `${stampDateFormat.format(at)}, ${stampTimeFormat.format(at)} UTC`;
+};
 
 const countFormat = new Intl.NumberFormat("en-US");
 
