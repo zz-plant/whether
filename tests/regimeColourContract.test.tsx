@@ -125,20 +125,36 @@ describe("regime colour contract", () => {
   it("hands every report shell the regime its intro line states", () => {
     // `regimeAccentStyle` existed for the section eyebrows and rules to read the
     // week, and no report page ever passed a regime, so every shell rendered
-    // slate under a call the intro line named. /history/compare is the one
-    // exception by design: it shows two weeks, and keying it to either would
-    // mislead.
+    // slate under a call the intro line named.
+    //
+    // Two pages are exceptions, for one reason: the accent is the page's
+    // weather, and a page about several weeks has none to state.
+    // /history/compare shows two, and keying it to either would mislead.
+    // /history shows 176 months and counts all four regimes in a panel of its
+    // own; keyed to the newest of them it rendered its whole chrome Sunny on a
+    // week the brief was calling Freezing, so a reader one click from `/` saw
+    // the site change its mind. Its intro line still names the archive's own
+    // regime — that line describes the numbers on the page, which the accent
+    // does not.
     const callers = [
       "app/signals/page.tsx",
       "app/resolve/page.tsx",
       "app/operate/planningPageModel.ts",
       "app/operate/[workstream]/page.tsx",
       "app/trust/trustPageModel.ts",
-      "app/history/page.tsx",
     ];
     for (const path of callers) {
       const source = readRepoFile(path);
       assert.match(source, /regime[:=]\s*\{?\s*(\w+\??\.)*(assessment\.regime|currentRegime)/, `${path} passes the week's regime into its shell`);
+    }
+
+    for (const path of ["app/history/page.tsx", "app/history/compare/page.tsx"]) {
+      const source = readRepoFile(path);
+      assert.doesNotMatch(
+        source,
+        /regime:\s*(\w+\??\.)*(assessment\.regime|currentRegime)/,
+        `${path} covers several weeks, so the chrome must not claim a single regime`,
+      );
     }
   });
 

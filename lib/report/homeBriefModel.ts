@@ -30,7 +30,6 @@ import {
 } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
-import type { StartupClimateIndex } from "./homeBrief/scoring";
 import type { RegimeKey } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { WeeklyCallContract } from "./weeklyCallContract";
@@ -385,7 +384,6 @@ export type WeeklyDecisionCardViewModel = {
       tightnessSaturated?: boolean;
       riskAppetite: number;
     };
-    startupClimateIndex: StartupClimateIndex;
     regimeDistance: {
       dimensionLabel: string;
       dimensionKey: "tightness" | "riskAppetite";

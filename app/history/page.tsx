@@ -103,7 +103,15 @@ export default async function HistoryPage({
         // numbers are.
         status: {
           statusLabel: trackRecord?.currentRegimeLabel ?? "Historical",
-          regime: trackRecord?.currentRegime,
+          /* Deliberately no regime. This field is only the page accent — the hue
+             the whole chrome, every section rule and the mobile outline draw in
+             — and it is the site saying "this is the weather". Fed the month-end
+             regime, /history rendered its entire chrome Sunny on a week the
+             brief was calling Freezing, so the site changed its mind one click
+             apart. The status line above still names the archive's own regime,
+             which is the part that describes the numbers on the page; the accent
+             is neutral, because this page is about every regime on record rather
+             than one. */
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },
