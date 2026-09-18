@@ -30,7 +30,9 @@ describe("Slack subscribe/unsubscribe API routes", () => {
     const originalFetch = globalThis.fetch;
     globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
       pingedUrl = String(input);
-      pingPayload = String(init?.body);
+      /* The body is a JSON string here; stringify rather than String() so a
+         non-string body can never read as "[object Object]". */
+      pingPayload = typeof init?.body === "string" ? init.body : JSON.stringify(init?.body ?? null);
       return new Response("ok", { status: 200 });
     }) as typeof fetch;
 
