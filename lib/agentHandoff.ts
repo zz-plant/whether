@@ -113,11 +113,16 @@ const buildDecisionDelta = (assessment: RegimeAssessment, support: AgentDecision
     };
   });
 
-  const summary = support.reportDynamics.regimeChanged
-    ? `Regime changed this week. ${support.actionNowShort}`
-    : changedSignals.length === 0
-      ? `No material weekly signal delta. ${support.actionNowShort}`
-      : `${titleCase(support.reportDynamics.directionLabel)} weekly signal move. ${support.actionNowShort}`;
+  /* "No material weekly signal delta" is a finding; an agent reading it will
+     report it as one. Without a previous reading there is no finding to pass
+     on, only the current call. */
+  const summary = support.reportDynamics.directionLabel === "unavailable"
+    ? `No previous reading to compare this week against. ${support.actionNowShort}`
+    : support.reportDynamics.regimeChanged
+      ? `Regime changed this week. ${support.actionNowShort}`
+      : changedSignals.length === 0
+        ? `No material weekly signal delta. ${support.actionNowShort}`
+        : `${titleCase(support.reportDynamics.directionLabel)} weekly signal move. ${support.actionNowShort}`;
 
   return {
     summary,

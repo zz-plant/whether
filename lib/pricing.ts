@@ -52,13 +52,19 @@ export const pricingPlans: PricingPlan[] = [
     audience: "Any operator who wants the Monday call",
     promise: FREE_FOREVER_PROMISE,
     features: [
-      "The weekly operating call and Operating latitude",
+      "The weekly operating call, scored and dated",
       "Published scoring, thresholds, and reversal conditions",
       "Copyable Slack, email, and meeting artifacts",
       "Agent API and MCP endpoint — no key, no rate card",
       "Embeds for a dashboard or wiki",
       "The full call history and archive",
-      "Decision memory and week close-outs, saved in this browser",
+      /* Split because the two are stored in different places, and saying
+         "saved in this browser" of both contradicted /privacy 2.4, which tells
+         a reader that recorded decisions are held in Cloudflare KV against the
+         browser identifier. Understating where a reader's data goes is the
+         direction that costs trust. */
+      "Decisions you record, kept against this browser's identifier",
+      "Week close-outs and what you have already reviewed, in this browser",
       "Email when the call changes between Mondays",
     ],
   },

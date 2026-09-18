@@ -31,7 +31,6 @@ import {
 } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
-import type { StartupClimateIndex } from "./homeBrief/scoring";
 import type { RegimeKey } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { WeeklyCallContract } from "./weeklyCallContract";
@@ -85,7 +84,7 @@ export type HomeReportData = {
   stopItems: string[];
   recordDateLabel?: string;
   reportDynamics?: {
-    directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+    directionLabel: ReportDynamics["directionLabel"];
     changedSignals: Array<{
       key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
       delta: number;
@@ -362,8 +361,9 @@ export type WeeklyDecisionCardViewModel = {
     decisionReadiness: DecisionReadinessState;
     weeklyLeadershipSummary: WeeklyLeadershipSummary;
     weeklyMovement: {
-      score: number;
-      direction: "tightening" | "easing" | "stable";
+      /** null when no previous reading was compared, which is not a score of 0. */
+      score: number | null;
+      direction: "tightening" | "easing" | "stable" | "unavailable";
       summary: string;
     };
   };
@@ -385,7 +385,6 @@ export type WeeklyDecisionCardViewModel = {
       tightnessSaturated?: boolean;
       riskAppetite: number;
     };
-    startupClimateIndex: StartupClimateIndex;
     regimeDistance: {
       dimensionLabel: string;
       dimensionKey: "tightness" | "riskAppetite";

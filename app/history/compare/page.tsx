@@ -6,6 +6,7 @@ import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../li
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { DateSelector, type DateOption } from "./DateSelector";
 
 export const runtime = "edge";
@@ -269,7 +270,7 @@ export default async function HistoryComparePage({
                     <td className="py-2.5 text-right text-slate-200 font-semibold">{(reportA.assessment.scores.riskAppetite).toFixed(1)}</td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Fed interest rate (1M/3M)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">{regimeSignalLabel.baseRate} (1M/3M)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {reportA.assessment.scores.baseRate !== undefined ? `${reportA.assessment.scores.baseRate.toFixed(2)}%` : "N/A"}
                     </td>
@@ -355,7 +356,7 @@ export default async function HistoryComparePage({
                     <td className="py-2.5 text-right text-slate-200 font-semibold">{(reportB.assessment.scores.riskAppetite).toFixed(1)}</td>
                   </tr>
                   <tr className="border-b border-slate-800/50">
-                    <td className="py-2.5 text-slate-400 font-medium">Fed interest rate (1M/3M)</td>
+                    <td className="py-2.5 text-slate-400 font-medium">{regimeSignalLabel.baseRate} (1M/3M)</td>
                     <td className="py-2.5 text-right text-slate-200 font-semibold">
                       {reportB.assessment.scores.baseRate !== undefined ? `${reportB.assessment.scores.baseRate.toFixed(2)}%` : "N/A"}
                     </td>

@@ -47,18 +47,23 @@ that survives.
 If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
 in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
 
-### Build output cache restore overlay
+### "the working tree is not the commit it claims to be"
 
-Cloudflare Workers Builds restores the build output cache *after* cloning the repository.
-If the build output directory or cache overlaps tracked paths (such as `public/` or generated
-fixtures), the cache extraction stomps freshly cloned git-tracked files with whatever stale
-snapshots were saved in earlier runs.
+The gate prints `[run-checks] HEAD <sha>` before it runs anything, and stops with this message when
+a tracked file on disk differs from that commit. It is not a code failure: the container is holding
+content the commit does not have, so nothing the gate could report would be about the commit, and
+the assets the deploy uploads come from that same tree.
 
-Under `WHETHER_DEPLOY_GATE=1` in remote CI, `scripts/run-checks.mjs` checks whether any tracked files
-differ from `HEAD` and resets them with `git checkout HEAD -- .` before running tasks. In Cloudflare
-Dashboard (Workers & Pages → `whether` → Settings → Builds), ensure "Build output directory" is not
-pointed at tracked source directories like `public/`. If stale cache issues arise, use "Clear build
-cache" in Settings → Builds.
+It happened on 2026-09-17. `public/` held the previous successful build's files — the blank memo
+example and the pre-fix `embed.js` — over an otherwise fresh clone, which the log's
+`Restoring from build output cache` step explains. Two tests failed on content their own commit had
+replaced, everything else passed, and it read as a flaky suite for a day.
+
+**Fix it in the dashboard, not the repo:** clear the project's build cache in Workers Builds
+(Settings → Build → clear build cache) and re-run the build. Nothing pushed to this repository can
+refresh a stale cache, and deleting the assertions that noticed would leave the stale assets
+deploying silently. The message names every drifted path, so check them against the commit before
+assuming the cache.
 
 ## Tracing
 
@@ -100,6 +105,41 @@ the Slack signing secret gates one webhook route.
 
 The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
 which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
+
+## Browser notifications (VAPID keys)
+
+Regime-change notifications to a browser need three values on the lane that should send them. Until
+all three are set, `resolveVapidConfig` returns null and **nothing is offered anywhere in the UI** —
+the toggle renders nothing rather than failing when pressed, and `/api/push` answers
+`{ configured: false }`. That is deliberate, and it is the same rule the brief freeze follows: check
+the configuration first and say so, rather than spend work discovering it later.
+
+```bash
+# Generate a P-256 pair. The public key is the uncompressed point, base64url;
+# the private key is the JWK's `d`.
+node -e '
+const { subtle } = crypto;
+subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]).then(async (pair) => {
+  const raw = new Uint8Array(await subtle.exportKey("raw", pair.publicKey));
+  const jwk = await subtle.exportKey("jwk", pair.privateKey);
+  const b64 = (b) => Buffer.from(b).toString("base64url");
+  console.log("VAPID_PUBLIC_KEY=" + b64(raw));
+  console.log("VAPID_PRIVATE_KEY=" + jwk.d);
+});'
+
+wrangler secret put VAPID_PRIVATE_KEY     # secret
+wrangler secret put VAPID_PUBLIC_KEY      # not secret, but kept beside its pair
+wrangler secret put VAPID_SUBJECT         # mailto: or https: identifying the sender (RFC 8292 §2.1)
+```
+
+The keypair is an identity, not a rotating credential: regenerating it invalidates every stored
+subscription, and each browser has to opt in again. Rotate only if the private key leaks.
+
+Sending happens in one place — the branch of `checkRegimeChange` that has established the published
+regime actually moved — so nothing fires on a week where nothing happened. The push carries no
+payload, so there is no RFC 8291 encryption in the codebase and no way for a queued notification to
+deliver a reading that has since changed; the service worker fetches `/api/posture/current` as it
+draws the notification. Subscriptions that answer 404 or 410 are deleted rather than retried.
 
 ## Trial infrastructure
 
@@ -241,7 +281,7 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 - `ASSETS` — Workers Static Assets binding for vinext output.
 - `IMAGES` — Workers Images binding used by the `/_vinext/image` worker route.
-- `WHETHER_SUBSCRIBE_RATE_LIMITER` and `WHETHER_PUBLIC_WRITE_RATE_LIMITER` — Workers [rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) bindings (`[[ratelimits]]`), read through `lib/runtime/rateLimit.ts`. The first fronts every path that sends a verification email (`/api/email/subscribe`, `/api/subscribe`, `/api/mcp?tool=subscribe`, all through `subscribeAndSendVerification`) at 5 a minute per connecting address; the second fronts the browser telemetry intake and `/api/company` at 60 a minute. A refused request answers 429 with `Retry-After`. Counters are per Cloudflare location and eventually consistent, so this is abuse control, not accounting. `namespace_id` is account-wide and shared counters follow it, which is why the preview lane declares its own ids. Absent (tests, `bun run dev`), every check allows.
+- `WHETHER_SUBSCRIBE_RATE_LIMITER` and `WHETHER_PUBLIC_WRITE_RATE_LIMITER` — Workers [rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) bindings (`[[ratelimits]]`), read through `lib/runtime/rateLimit.ts`. The first fronts every path that sends a verification email (`/api/email/subscribe`, `/api/subscribe`, `/api/mcp?tool=subscribe`, all through `subscribeAndSendVerification`) at 5 a minute per connecting address; the second fronts the browser telemetry intake at 60 a minute. A refused request answers 429 with `Retry-After`. Counters are per Cloudflare location and eventually consistent, so this is abuse control, not accounting. `namespace_id` is account-wide and shared counters follow it, which is why the preview lane declares its own ids. Absent (tests, `bun run dev`), every check allows.
 - `CF_VERSION_METADATA` — Workers [Version Metadata](https://developers.cloudflare.com/workers/runtime-apis/bindings/version-metadata/) binding. Surfaces `id`, `tag`, and `timestamp` for the live deploy. `app/api/health/route.ts` reads `globalThis.CF_VERSION_METADATA.id` to populate the `commitSha` field, replacing the previous Pages-only `CF_PAGES_COMMIT_SHA` lookup.
 - `ANALYTICS` — Workers [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) dataset (`whether_telemetry` on production, `whether_telemetry_preview` on the preview lane). All three first-party telemetry routes (`/api/telemetry/web-vitals`, `/api/telemetry/operator-workflow`, `/api/telemetry/content-measurement`) write through `lib/telemetry/analyticsEngine.ts`. Schema: `index1 = stream`, `blob1 = stream`, `blob2 = JSON event payload`, with optional typed `doubles` (e.g. web-vitals `value` and `delta`). Datasets auto-create on first write — no extra provisioning needed. When the binding is absent (local dev / tests) the helper falls back to a tagged `console.info` line so behavior matches the previous black-hole path without throwing. **Querying**: the Analytics Engine binding only supports `writeDataPoint` from Workers; to read the data, use the [Cloudflare GraphQL Analytics API](https://developers.cloudflare.com/analytics/graphql-api/) with an API token that has `Workers Analytics Engine` read permissions. Filter on `dataset = 'whether_telemetry'` and extract fields from the JSON blob in `blob2`. `lib/telemetry/runHistory.ts` does this from the Worker for the `cron-step` stream so `/trust` can show what the scheduled jobs did (see `CLOUDFLARE_ANALYTICS_READ_TOKEN` above); `WHETHER_TELEMETRY_DATASET` names the lane's dataset for that read, and is set on the preview lane only.
 

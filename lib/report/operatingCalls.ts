@@ -388,6 +388,12 @@ export const buildSharedCorridorRails = (
  * "44 pts away", "at the line", "crossed" or "already met" — a distance, not a
  * sentence. `met` is the operator's verdict; a strict line at zero distance is
  * "at the line", which is not the same claim as tripped.
+ *
+ * Every caller prints this immediately after the line's own value, so the two
+ * numbers end up adjacent: `66` followed by `11 pts away` reads as "66 11" on
+ * first glance, and the reader has to work out where one figure stops. The
+ * export formats had already solved it by parenthesising the distance;
+ * `parenthesizePointsToLine` is that, shared, so the screen and the paste agree.
  */
 export const formatPointsToLine = (
   points: number | undefined,
@@ -399,6 +405,17 @@ export const formatPointsToLine = (
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} pts away`;
 };
+
+/**
+ * The same distance, wrapped so it cannot be misread as part of the number it
+ * follows. Kept separate from `formatPointsToLine` because a few surfaces print
+ * the distance on its own, where brackets would be noise.
+ */
+export const parenthesizePointsToLine = (
+  points: number | undefined,
+  kind: "pause" | "resume",
+  met: boolean | undefined,
+): string => `(${formatPointsToLine(points, kind, met)})`;
 
 const formatDistanceLabel = (distance: RuleThresholdDistance | undefined, kind: "caution" | "reopen") => {
   if (!distance) {

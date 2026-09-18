@@ -1,7 +1,7 @@
 import { deriveRegimeStage } from "../regimePresentation";
 import type { RuleCondition } from "../report/boundedDecisionRules";
 import type { PostureStateContract } from "../report/postureStateContract";
-import type { ReportData } from "../report/reportData";
+import type { ReportData, ReportDynamics } from "../report/reportData";
 import { buildCompactFreshnessMeta } from "../report/reportFormatting";
 
 type CliFreshnessContract = {
@@ -99,6 +99,12 @@ const rawForKey = (reportData: ReportData, key: "tightness" | "riskAppetite" | "
         ? reportData.assessment.scores.baseRate
         : reportData.assessment.scores.curveSlope;
 
+/* `titleCase("unavailable")` reads as a trend named "Unavailable". The CLI is a
+   machine contract, so it says which of the two states this is in words a
+   consumer can branch on. */
+const describeTrend = (directionLabel: ReportDynamics["directionLabel"]) =>
+  directionLabel === "unavailable" ? "Not compared" : titleCase(directionLabel);
+
 const deriveCyclePhaseLabel = (reportData: ReportData) => {
   const stage = deriveRegimeStage({
     regime: reportData.assessment.regime,
@@ -163,7 +169,7 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
     label: postureState.currentState.confidenceLabel,
     score: postureState.currentState.confidencePercent,
   },
-  trend: titleCase(reportData.reportDynamics.directionLabel),
+  trend: describeTrend(reportData.reportDynamics.directionLabel),
   decisionStability: buildDecisionStability(postureState),
   call: {
     summary: reportData.actionNowShort,
@@ -229,7 +235,7 @@ export const buildCliRegimeContract = ({ reportData, postureState, degraded }: {
   regime: postureState.currentState.postureLabel,
   phase: deriveCyclePhaseLabel(reportData),
   confidence: postureState.currentState.confidenceLabel,
-  trend: titleCase(reportData.reportDynamics.directionLabel),
+  trend: describeTrend(reportData.reportDynamics.directionLabel),
   interpretation: reportData.playbook?.insight ?? reportData.assessment.description,
   degraded,
 });

@@ -11,6 +11,7 @@ import { MobileTabBar } from "./components/MobileTabBar";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
+import { ServiceWorkerRegistrar } from "./components/serviceWorkerRegistrar";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -221,6 +222,7 @@ export default function RootLayout({
           </a>
           <GlobalHeader />
           <GlobalCommandPalette />
+          <ServiceWorkerRegistrar />
           <GlobalTimeMachine />
           <GlobalShareRail />
           <MobileTabBar />
@@ -313,6 +315,7 @@ export default function RootLayout({
                 aria-label="Legal and credits"
                 className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
               >
+                <Link href="/decisions" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your record</Link>
                 <Link href="/privacy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
                 <Link href="/acceptable-use-policy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
                 <Link href="/terms-of-service" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>

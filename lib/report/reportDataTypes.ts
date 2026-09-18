@@ -47,7 +47,18 @@ export type ReportDynamics = {
   }>;
   totalSignalChanges: number;
   regimeChanged: boolean;
-  directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+  /**
+   * Which way the week moved — or `"unavailable"` when there was no previous
+   * reading to compare against, which is not the same fact as "nothing moved".
+   *
+   * Both no-previous constructions used to say `"stable"`: `buildReportDynamics`
+   * with `previous: null`, and the fallback dynamics the loader builds when the
+   * live read fails. Downstream that became "Conditions held steady this week.
+   * Last week's calls stand." on the homepage and "No worse than last week" on
+   * the social card — two affirmative claims about a comparison nobody made,
+   * published on exactly the path where the product knows least.
+   */
+  directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | "unavailable";
   signalContributions?: NormalizedSignalContribution[];
 };
 

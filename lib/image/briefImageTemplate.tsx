@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { OG_FONT_BODY, toImageSafeText } from "./ogFonts";
 import { OG_ACCENT, OG_BG, OG_BORDER, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
+import { formatConfidenceChipLabel } from "../report/reportFormatting";
 
 export type BriefImageProps = {
   decision: string;
@@ -70,7 +71,10 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
   const eyebrow = ["WHETHER", briefLabel, recordDate].filter(Boolean).join(" \u00b7 ");
   const postureLine = [displayRegime, postureLabel, contextLabel].filter(Boolean).join(" \u00b7 ");
   const watching = flipConditions?.length ? `Watching: ${flipConditions.join(" \u00b7 ")}` : "";
-  const confidenceBadge = `${confidenceLabel} CONFIDENCE`;
+  /* The card that lands in someone else's Slack channel said "MED CONFIDENCE".
+     The colour below still keys off the raw code, which is what the engine
+     stores; only the words a reader sees change. */
+  const confidenceBadge = formatConfidenceChipLabel(confidenceLabel).toUpperCase();
 
   return (
     <div style={{ display: "flex", flexDirection: "column", width: 1200, height: 800, padding: 56, background: `linear-gradient(160deg, ${OG_BG} 0%, ${OG_PANEL} 100%)`, color: OG_TEXT, fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`, justifyContent: "space-between" }}>

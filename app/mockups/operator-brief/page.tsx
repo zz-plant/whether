@@ -51,7 +51,18 @@ const proofItems = [
   },
 ] as const;
 
+/*
+ * Every value on this page is written above, by hand, and none of it came from
+ * a reading. The page itself says so — "VISUAL LAB", a concept route — and the
+ * layout keeps it off production entirely. What leaves the page did not: this
+ * text was branded "Whether", carried a posture, an action and a pause
+ * condition, and read exactly like the real Monday brief once it was in a
+ * channel. `tests/downloadableResourceArtifacts.test.ts` already holds the rule
+ * it broke: a thing that looks like the product says in itself that its figures
+ * are illustrative.
+ */
 const copyBriefText = [
+  "SAMPLE — design concept, not a real reading. The live call is at https://whether.work",
   `Whether · ${weeklyCall.readiness}`,
   weeklyCall.currentCall,
   `${publicDecisionLabels.action}: ${weeklyCall.actionNow}`,

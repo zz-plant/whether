@@ -7,6 +7,7 @@ import {
   REVISABLE_DELEGATION_STANDARD_URL,
   WHETHER_REVISABLE_DELEGATION_CONFORMANCE_LEVEL,
 } from "./export/revisableDelegationRecord";
+import { buildUseConstraint } from "./report/useConstraint";
 
 /**
  * The agent discovery manifest, and the one path that can actually serve it.
@@ -53,6 +54,10 @@ const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
   agent: {
     invalidCadenceStatus: 400,
   },
+  /* What a caller may and may not do with any of the above. The manifest is the
+     documented entry point for an agent, so it is the first place a constraint
+     has a chance of being read. */
+  use: buildUseConstraint(),
   // Where Whether sits in the loop an institution runs when it delegates
   // work to machines, and what it emits in the shared record shape. Whether
   // authorizes nothing and acts on nothing, so it emits belief records only.

@@ -53,7 +53,12 @@ export const buildPublishedBriefRecord = ({
     postureLabel: homeBriefModel.postureWithStageLabel,
     regime: reportData.assessment.regime,
     confidenceLabel: homeBriefModel.confidenceLabel,
-    whatChanged: homeBriefModel.weeklyMovement.summary ?? "No material change from the prior week.",
+    /* No `??` here. The summary is always a string, so the fallback that used
+       to sit on this line — "No material change from the prior week." — could
+       only ever have written a claim about a comparison into an append-only,
+       citable record without one having been made. The summary itself now says
+       when nothing was compared. */
+    whatChanged: homeBriefModel.weeklyMovement.summary,
     actionNow: reportData.actionNowShort,
     guardrailThreshold: reportData.guardrailThreshold,
     flipThreshold: reportData.flipThreshold,

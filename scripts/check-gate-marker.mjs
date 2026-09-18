@@ -36,28 +36,67 @@ const MARKER_DIRECTORY = join(".cache", "check-gate");
 const MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
 /**
+ * What the working tree holds that its commit does not.
+ *
+ * `null` when git cannot answer at all — no repository, no binary, a broken
+ * checkout. That is a different fact from "nothing has changed" and the two must
+ * not collapse into one value: a caller that cannot tell has to say so rather
+ * than report a clean tree.
+ *
+ * Tracked drift and untracked files are returned separately because they support
+ * different claims. A modified or deleted tracked file means the tree is not the
+ * commit. An untracked file means only that something extra is present, which a
+ * build container may legitimately do.
+ */
+export function worktreeDrift(cwd = process.cwd()) {
+  const git = (args) => spawnSync("git", args, { cwd, encoding: "utf8" });
+
+  try {
+    const head = git(["rev-parse", "HEAD"]);
+    const commit = (head.stdout ?? "").trim();
+    if (head.status !== 0 || !/^[0-9a-f]{40}$/.test(commit)) return null;
+
+    const status = git(["status", "--porcelain"]);
+    if (status.status !== 0) return null;
+
+    const tracked = [];
+    const untracked = [];
+    for (const line of (status.stdout ?? "").split("\n")) {
+      if (line.trim() === "") continue;
+      const code = line.slice(0, 2);
+      const path = line.slice(3);
+      if (code === "??") untracked.push(path);
+      else tracked.push({ code: code.trim(), path });
+    }
+
+    return { commit, tracked, untracked };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * The commit under test, or "" when there is no commit a record could honestly name.
  *
  * A dirty tree counts as no commit. The marker's whole claim is "these checks passed
  * for this commit", and that is false the moment the tree holds something the commit
  * does not — a marker written for HEAD against modified files would vouch for code
- * nobody checked. The build container checks out clean, so this only ever fires
- * locally, and firing costs a repeated run rather than a skipped gate.
+ * nobody checked.
+ *
+ * This used to add "the build container checks out clean, so this only ever fires
+ * locally". It is not true, and believing it cost a day: on 2026-09-17 the Workers
+ * Builds container ran the gate against a checkout whose `public/` held the previous
+ * successful build's files, so two tests read content their own commit had replaced
+ * and the failure read as suite flakiness. This function had the answer the whole
+ * time and threw it away — a drifted tree and a missing git binary both come back
+ * "", and neither says anything. `run-checks.mjs` refuses on the drift now; see
+ * there for why a refusal rather than a note.
  */
 export function headCommit(cwd = process.cwd()) {
-  const git = (args) => spawnSync("git", args, { cwd, encoding: "utf8" });
-
-  try {
-    const commit = (git(["rev-parse", "HEAD"]).stdout ?? "").trim();
-    if (!/^[0-9a-f]{40}$/.test(commit)) return "";
-
-    const status = git(["status", "--porcelain"]);
-    if (status.status !== 0 || (status.stdout ?? "").trim() !== "") return "";
-
-    return commit;
-  } catch {
-    return "";
-  }
+  const drift = worktreeDrift(cwd);
+  if (!drift) return "";
+  if (drift.tracked.length > 0 || drift.untracked.length > 0) return "";
+  return drift.commit;
 }
 
 const markerPath = (commit) => join(MARKER_DIRECTORY, `${commit}.json`);

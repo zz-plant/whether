@@ -10,6 +10,7 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { RunwayConditionedNotes } from "./components/RunwayConditionedNotes";
 import { SubscribeForm } from "./components/SubscribeForm";
+import { RegimeAlertToggle } from "./components/regimeAlertToggle";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { ActivationTracker } from "./components/activationTracker";
@@ -50,6 +51,8 @@ import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
+import { PublishedCallWatcher } from "./components/publishedCallWatcher";
+import { OfflineNotice } from "./components/offlineNotice";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -407,6 +410,18 @@ async function PageContent({
               always that of a top strip. Hiding once dismissed is a global CSS
               rule keyed on the data attribute (app/layout.tsx), so it stays
               pre-paint and CLS-free at either position. */}
+          {/* Above everything, because its whole subject is that what follows
+              may no longer be current. Renders nothing until a poll finds the
+              published call has moved, so on the overwhelming majority of
+              visits it is not on the page at all. */}
+          {/* Pairs with the service worker: it serves the last copy this
+              browser saw, and this names the reading that copy contains. A
+              cache without the label is the staleness this repo has already
+              paid for twice. */}
+          <OfflineNotice recordDateLabel={reportData.recordDateLabel} />
+          <PublishedCallWatcher
+            rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
+          />
           <FirstVisitExplainer arrival={arrivedFromShare ? "share" : undefined} />
           {/* Meta row: week switcher and the confidence popover. The "Data through …
               · refreshed …" line that sat under the switcher restated the hero's
@@ -454,9 +469,18 @@ async function PageContent({
                 )}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+              {/* The horizon sits with the other period controls, next to the
+                  week it qualifies. It used to live at the foot of the page
+                  while the card it swaps renders at the top, and reached back
+                  up with a `scrollIntoView` — so using it correctly meant
+                  being scrolled somewhere you had not asked to go, and not
+                  using it meant never learning the card could change. */}
+              <CadenceSelector />
               <CompactTrustPopover
-                confidenceLabel={confidenceLabel ?? "High confidence"}
+                /* The fallback is a code like the real value, not the phrase it
+                   used to be — the popover formats both the same way now. */
+                confidenceLabel={confidenceLabel ?? "HIGH"}
                 isHistorical={Boolean(historicalSelection)}
                 fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
                 recordDateLabel={homepage.reportShell.recordDateLabel}
@@ -571,22 +595,19 @@ async function PageContent({
           <div id="subscribe" data-page-section="subscribe" tabIndex={-1} aria-labelledby="subscribe-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <h2 id="subscribe-heading" className="sr-only">Get the weekly call by email</h2>
             <SubscribeForm compact />
+            {/* Beside the email signup rather than somewhere of its own: it is
+                the same alert by another route, and a reader deciding how they
+                want to hear about a regime change should see both options in
+                one place. Renders nothing at all where push is unconfigured or
+                unsupported, which is every developer machine. */}
+            <div className="mt-4">
+              <RegimeAlertToggle />
+            </div>
           </div>
 
           <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
             <h2 id="plan-and-evidence-heading" className="sr-only">Turn this week’s call into a plan</h2>
             <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/70 pt-4">
-              <span className="text-fluid-sm text-slate-400">Planning horizon</span>
-              {/*
-                * The selector sits below the fold but the cadence card it controls
-                * renders in `#weekly-call` — a change otherwise moved content only
-                * where the reader could not see it. The reveal is declared by id:
-                * this page renders on the server, and a function prop handed to the
-                * client control fails the whole render.
-                */}
-              <CadenceSelector revealTargetId="weekly-call" />
-            </div>
           </div>
         </div>
 

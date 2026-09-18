@@ -10,7 +10,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~14s | 1,180+ tests / 211 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run test` | ~14s | 1,900+ tests / 297 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
@@ -339,6 +339,10 @@ for every series). Two shared the defect; two were already correct:
 | `scripts/generateMonthlySummaries.ts` | throws on the first FRED failure, exit 1, no writes | already safe |
 | `scripts/refreshFallbackSnapshots.ts` | `fetchTreasuryData()` without `snapshotFallback` throws, exit 1, no writes | already safe |
 
+`refreshFallbackSnapshots` is safe and **unscheduled**: `bun run data:refresh-fallbacks` is hand-run,
+no routine and no workflow calls it, and what it writes is the floor every degraded read serves.
+`check:curated-freshness` (in `bun run check`) is the only thing that notices, at a 45-day SLA.
+
 The two safe ones fetch FRED directly, so a 403 is an error. The two broken ones went through
 `loadReportData`, where falling back to the bundled snapshot is a *success*. That is the tell: a
 script is at risk exactly when it reads through a loader that degrades gracefully.
@@ -347,11 +351,31 @@ script is at risk exactly when it reads through a loader that degrades gracefull
 which writes but stamps the output `NOT LIVE DATA` with the reason. The scheduled routine passes no
 flag, so it fails loudly.
 
-Why `data/published_briefs.json` holds a single week: the routine has not completed a good run since.
+**The audit covered the scripts and missed the sends (fixed 2026-09-17).** The same question — what
+does this do on fallback — had never been asked of the two artifacts that leave the building, and
+both answered it worse than any script did. `lib/email/sendWeeklyBrief.ts` read the snapshot through
+`?.` and filled every gap with a constant: no snapshot meant regime `"DEFENSIVE"`, "Hold bounded
+operating discipline.", and a record date reading "this week", mailed to every subscriber and
+returned as `ok: true`, so the Monday `cron-step` row on `/trust` went green for a call nobody
+computed. `lib/slack/deliverSlackBrief.ts` *computed* a `degraded` flag and the one caller
+destructured `{ text, recordDate }` and dropped it, so the post went out identically whether the
+reading was live or bundled — while `GET /api/brief/slack`, the same data path, published the flag
+to integrators. Both call `assessPublishReadiness` now and refuse, with the reason on the failed
+cron row (`refused_unpublishable: …`). The cron itself was never the hole: it guards on
+`refreshResult.ok && snapshot && weeklyCall`. `POST /api/email/send-weekly` was — it calls
+`sendWeeklyBrief()` with no snapshot, and reads whatever the store has, which is nothing when the
+Worker has no KV binding and falls back to the in-memory store.
+
+A refusal is the right outcome rather than a labelled send, for the archive's reason: an email
+cannot be corrected after it lands, and a channel told nothing on Monday can ask, where a channel
+handed a stale reading under this week's heading cannot tell.
+
+`data/published_briefs.json` held a single week for as long as the routine could not complete a good
+run; the Workflow froze `2026-w38` on 2026-09-17, so it holds two and fills forward from there.
 That archive is **not backfilled**, deliberately. Its value is that it is evidence the call was
 published every week; writing retroactive `publishedAt` stamps for weeks that were never published
 would fabricate exactly the cadence it exists to prove, and `/history` now shows those numbers to
-visitors. The archive fills forward, once the allowlist lets a real run through.
+visitors.
 
 Cloudflare's build is the remote gate, and it gates **production too**. The build command
 configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 that script *is* the
@@ -414,6 +438,35 @@ at 150s. **When a check fails only where you cannot read it, reproduce the envir
 diff** — here, `git archive` into a scratch directory with `node_modules` hardlinked, and
 `--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
 warm one. The bound is still a bound: a route that never answers fails the gate.
+
+**The build container's checkout is not necessarily the commit (2026-09-17), and the gate now
+refuses one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo
+example still reading as the blank form, and `public/embed.js` still holding the hardcoded origin —
+while `lint`, `typecheck` and every other test passed, and the same suite was green here through six
+consecutive `WHETHER_DEPLOY_GATE=1` runs. The tell was inside one file: in `tests/embedRoute.test.ts`
+the case that reads `public/embed.js` failed while the case beside it, reading `app/api/embed/route.ts`
+and `app/share/embedBuilder.tsx` from the same commit, passed. `app/`, `lib/` and `tests/` were fresh
+and `public/` was not — and the stale content was byte-for-byte what the last *successful* build
+(03:03, pre-merge) still serves in production. The log's `Restoring from build output cache` step is
+the mechanism: something wrote over `public/` after the clone. Two files from one commit cannot
+disagree in a checkout, so a split like that is never a test problem, and the repo's answers for a
+flaky suite — run it again, run it alone, replay the seed — cannot find it.
+
+`scripts/check-gate-marker.mjs` had the answer the entire time and threw it away: `headCommit()`
+returns `""` for a dirty tree, so the marker was silently not written, and its own doc comment
+asserted that "the build container checks out clean, so this only ever fires locally". Believing
+that sentence cost a day and three wrong public hypotheses. `worktreeDrift()` now reports the
+drifted paths instead of collapsing them into `""`, and under `WHETHER_DEPLOY_GATE=1`
+`run-checks.mjs` prints `HEAD <sha>` and **refuses before running any task** when a tracked file on
+disk differs from it. It is a refusal, not a note, for `check:dead-exports`'s reason and one worse
+than it: the results would be about something other than the commit, *and* the assets that deploy
+come from the same tree, so a green run would ship the drift. Untracked files are reported and
+allowed — a build container may leave something extra behind, which does not make the commit's own
+content wrong.
+
+Clearing the project's build cache in the Cloudflare dashboard is the remedy, and it is a dashboard
+action: no push from here can fix a stale cache, and deleting the two assertions would have made
+`main` green while hiding the fact that stale static assets were the thing about to deploy.
 
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
@@ -517,7 +570,8 @@ recapture correctly.
 
 ## Tests that read source instead of behaviour
 
-22 of 276 test files match a regex against a file's source rather than asserting on what it does.
+22 test files (counted 2026-09-16) match a regex against a file's source rather than asserting on
+what it does.
 That is not automatically wrong, and the split is sharp enough to state as a rule.
 
 **Legitimate, and most of them.** A `.husky` hook, a workflow YAML, `package.json`, `next.config.js`
@@ -587,6 +641,96 @@ panel has and fails on `/worker|cron|telemetry|binding|dataset/`, and
 reach a rendered sentence. The answer pages render offline because `loadWeeklyBriefSnapshot` falls
 back to the bundled snapshot — which is worth knowing generally: **a page that reads through a
 loader that degrades gracefully is testable here**, unlike one that suspends at a data boundary.
+
+## What a page says against what the rest of the site says (2026-09-17)
+
+Found by rendering the routes and reading them — `bun run ui:shots` against a dev server, then
+looking at the PNGs — rather than by reading source. None of these is a lint finding, a type error,
+a failing test or a dead export, and the suite was green through all of them.
+`tests/pageReaderContradictions.test.tsx` pins each one.
+
+- **`/history` said "Reading now" over a month-end reading.** Every figure on that page comes from
+  the monthly series, so the last plotted point is the last *completed* month — up to five weeks
+  behind the weekly call and regularly a different regime. The panel beside the phase map was headed
+  "Reading now", and `TrackRecord` said "The call has been Sunny since Dec 31, 2025", so on a week
+  the brief was calling Freezing, the page a reader visits to check the record told them the call
+  was Sunny. Its own "Published weekly briefs" panel, two sections down, led with *Sep 15 — Freezing*.
+  The honest version already existed on `/signals`, over the same series: "Month-end readings from
+  the archive, so the latest figure here is the last completed month rather than this week's score
+  above." That sentence is on `/history` now, the panel is headed "Last completed month", and the
+  track-record line is bounded ("Through Aug 31, 2026, the month-end call had been…").
+- **`/resolve` rendered every answer row as two underlined lines**, so eleven links read as
+  twenty-two. `app/styles/decision-flow.css` already carries the fix and the argument for it, from
+  when the same thing happened on `/answer` — but it keys on `a:has(p)`, and this list was built with
+  `<span className="block">`. The anchor's own `no-underline` lost, exactly as the comment three
+  lines below predicts ("the anchor rules above are unlayered, so they beat Tailwind's
+  `no-underline`"). **A CSS rule that keys on an element name is a contract with the markup**; the
+  three lists there are `<p>` in a grid now, with the title as the anchor's own first child.
+- **`/trust` restated its section description as the first line of the section**, so the reader met
+  the same sentence twice before anything new. And its rail offered "Sources" and "Sources &
+  freshness" as neighbours, where the second opened a section headed **"Cite this call"** — a label
+  naming neither its destination nor anything distinguishable from the entry above it. Rail labels
+  are the section titles now. The test only pins distinguishability: a first version also required
+  each label to share a word with its heading and failed on "Revisit triggers" → "What would make
+  this recommendation wrong?", which is a good short name. A test that fails on a correct label is
+  answering a different question from the one in its name.
+- **`/pricing` told a reader their recorded decisions stay in their browser.** `/privacy` 2.4 says
+  they are held in Cloudflare KV against the browser identifier, which is the truth; the pricing
+  bullet bundled them with week close-outs, which *are* local, and called both "saved in this
+  browser". Understating where a reader's data goes is the direction that costs trust, and these two
+  pages are read by the same person for the same reason.
+- **The mockup's copy button handed over an unmarked sample.** `/mockups/*` is gated off production
+  by `app/mockups/layout.tsx` and only runs on the preview lane, which the audit initially missed —
+  the route is not the problem. What left it was: the copied text was branded "Whether" and carried
+  a posture, an action and a pause condition, so in a channel it read as the Monday brief. It leads
+  with a SAMPLE line now, the same rule `tests/downloadableResourceArtifacts.test.ts` holds for the
+  downloadable artifacts.
+
+### The three left open, closed 2026-09-18
+
+- **`/history` painted its whole chrome in the archive's newest regime.** The accent
+  (`regimeAccentStyle`, on the page shell) is the hue every section rule, eyebrow and the mobile
+  outline draw in — the site saying what the weather is — and `/history` fed it
+  `trackRecord.currentRegime`. So the page rendered Sunny throughout on a week the brief was calling
+  Freezing, and a reader one click from `/` watched the site change its mind. The status line still
+  names the archive's regime, which describes the numbers on the page; the accent is neutral now.
+  `tests/regimeColourContract.test.tsx` already carried the principle and the exception — "/history/compare
+  is the one exception by design: it shows two weeks, and keying it to either would mislead" — so
+  `/history`, which shows 176 months and counts all four regimes in a panel of its own, is the
+  second exception rather than a new rule.
+- **`startupClimateIndex` is gone.** It was computed on every build, carried into the weekly
+  decision card's `diagnostics`, and rendered by nothing. A *field* rather than an export, so
+  `check:dead-exports` could not see it — and `tests/homeBriefModel.test.ts` asserted on its score
+  and its four breakdown rows without ever asking whether a reader could reach it, which is the
+  mechanism that kept the four features above alive. `docs/adoption-driven-change-plan.md` had
+  already put the choice as "surface it or remove the computation entirely"; surfacing it would have
+  meant inventing the surface.
+- **`review:hotspot-preflight` could not read a merge commit.** Its default range was `HEAD~1` — the
+  first parent, which on "merge the base branch into this PR" is the *pre-merge branch tip*, so
+  every line the base brought in read as newly added. Merging `main` on 2026-09-17 flagged an `as`
+  cast that had been on `main` for a day, and the merge that resolved that PR's conflict could only
+  be pushed with `SKIP_PREPUSH=1`. A merge now scans `HEAD^2...HEAD`: the second parent is the
+  branch merged *in*, so the range is this branch since it last agreed with the base. Checked
+  against the commit that misfired, the first parent surfaces seven lines of the base's own code and
+  the new range surfaces none.
+
+  **The first version of that fix was worse than the bug**, and the shape is worth keeping. A
+  three-dot range ignores the working tree, and every branch cut from this repo's `main` starts at a
+  merge commit — so scanning only the merge range made a fresh branch's uncommitted edits invisible
+  until its first commit. The default mode's whole value is that it sees uncommitted work. It scans
+  both ranges now, and the printed line names both.
+
+  Left alone, deliberately: `isUnsafeAssertion` does not strip template literals, so prose in a
+  backticked assertion message can still trip it (this session hit "…as one of them" and reworded
+  the message). The comment there states the reason — `${...}` can hold real code — and blanking the
+  literal text without blanking interpolations is a change to a matcher, not to a range.
+
+**Two findings from that audit were wrong and are recorded here as such.** The mockup route being
+publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
+four of six sections collapsed: `resolveInitialOpenStepIds` opens the first step plus anything
+marked `defaultOpen`, and the comment above it records why the page moved *away* from opening
+everything. Rendering a page tells you what a reader sees; it does not tell you whether someone
+already decided that on purpose. Read the component before calling a default a defect.
 
 ## Features that shipped without shipping (2026-09-16)
 
@@ -663,6 +807,37 @@ Five exported *types* fell out as orphans once those modules went, and were de-e
 deleted: each is still used inside its own file, and each had been kept "referenced" only by the
 deleted module naming the same identifier.
 
+### What the census still could not see (2026-09-17)
+
+Four more, each invisible to every ratchet for its own structural reason. The pattern worth carrying:
+**the census measures exported symbols in `app/`, `lib/` and `worker/`, so anything that is not one
+is unmeasured.**
+
+- **A route is not an export.** `GET`/`POST` are framework-exempt by name, so an API route nobody
+  links, fetches or documents scores zero findings forever. `/api/company` (a public, rate-limited
+  proxy to a keyed upstream, no consumer, absent from `/api-docs`) and `/api/posture-state` (an
+  unauthenticated GET of full posture state, plus a cron-authed POST that appended the same
+  committed transition `refreshOperatingState` already appends inline every run) are both gone.
+  `appendCommittedPostureEvent` went with the route it existed for.
+- **`/api/sync` was the same hole with a write on the end**, and had been *knowingly* kept:
+  `docs/feature-specs-current.md` recorded it as "stays, tested, with no client". Unauthenticated
+  POST, caller-chosen id and secret, 24KB into KV with no rate limit and no TTL, for two key names
+  (`whether-company-metrics`, `whether-decision-log`) naming a module deleted the same day and a key
+  nothing has ever written. `/privacy` 2.4 promises everything but recorded decisions "stays in your
+  browser and is never sent", which was true only because nothing called it — and
+  `tests/privacyPolicy.test.tsx` enumerates `STORAGE_KEYS` and `TELEMETRY_STREAMS`, neither of which
+  a server-side write path appears in. A tested endpoint with no client is not a dormant feature.
+- **A barrel is referenced by construction.** `lib/report/index.ts` was eleven
+  `export * as x from "./x"` lines, imported by nothing except `packages/decision-engine`, whose
+  entire content was `export * from "../../../lib/report/index"` and which nothing imported at all.
+  The scan could never have found it: a namespace re-export always spells its own filename, so every
+  file importing `./decisionKnobs` reads as a reference to the barrel's `decisionKnobs`. Both are
+  deleted and `packages` is no longer a reference root.
+- **`reports/` is not `data/`.** `reports/OPERATOR_COHORT_6_WEEKS.md` — eight named operators with
+  companies, stages and runway months, "100% cohort retention", a 22.9-second median read — survived
+  the purge of the operator-feedback pipeline, because `censusOrphanedDataFiles` walks `data/` and
+  `content/`. It was the most evidence-shaped of the three files and the one left behind.
+
 **A dead `#anchor` is the link version of this, and the landmark audit now catches it.**
 `inspectInPageAnchors` reads every `href="#…"` and every id off the same served response for all 31
 routes, and `collectUnresolvedAnchors` judges them **across routes, never per page**: a link fails
@@ -683,6 +858,20 @@ One real finding survived: `/operate/financial` offered nav chips for `#ops-runw
 the risk id now (exactly one branch is ever in the DOM, so the anchor always lands, on the message
 saying what is missing), and the board-memo chip is gone — it sits behind a second toggle, so it
 could never be a stable target.
+
+## A cache is only honest where the label is (2026-09-17)
+
+`public/sw.js` caches every same-origin document and serves the last copy when the network is gone;
+`OfflineNotice` names the record date of what is on the screen. The worker shipped caching every
+route and the notice shipped on `/` alone, so `/trust` — the page the IA points a reader to "when
+you want to sanity-check the brief before a big decision" — served a previous visit's readings with
+nothing saying so. The notice is mounted in `app/components/reportShell.tsx` now, which every
+reading route but `/` is built on, and it takes the record date the shell already has, so the claim
+stays true by construction.
+
+The rule: **a route that renders a reading carries the notice; a route that does not — the glossary,
+`/privacy`, the API docs — needs nothing**, because a cached copy of those makes no claim that can go
+stale.
 
 ## What the site says about its reader (2026-09-17)
 
@@ -725,6 +914,25 @@ consumer can tell "no condition published" from a condition.
 **A surface nothing renders is where invented data survives longest.** When a route returns more than
 it draws, the undrawn fields are the ones to check.
 
+**A fourth case, and the one with the widest reach (2026-09-17): "stable" was manufactured from
+absence.** `buildReportDynamics` returned `directionLabel: "stable"` when handed `previous: null`,
+and the loader's fallback dynamics said the same — so *no comparison happened* and *a comparison
+found nothing* arrived downstream as identical inputs, a zero severity delta and an empty
+changed-signal list. Every renderer read the second meaning. A degraded read published "Conditions
+held steady this week. Last week's calls stand." as the homepage's movement line, and
+`postureDeltaLabel` rendered "No worse than last week" — onto the OG share card, which is the copy
+that travels furthest. The snapshot path was worse: `lib/operatingState/snapshot.ts` passes
+`previous: null` unconditionally, so every `OperatingSnapshot` claimed a stable week.
+
+The fix is a fifth direction rather than better wording, because the distinction has to survive
+being passed around: `"unavailable"` on `ReportDynamics["directionLabel"]` and on `RegimeMomentum`.
+Widening the union is what enumerated the work — the compiler named the sites, and the ones it could
+not reach (a `Record<string, string>` copy map, a `titleCase` interpolation, a zod enum that would
+have *rejected* the degraded payload) were found by following the same field. `weeklyMovement.score`
+is `number | null` for the same reason a missing distance is not zero. `tests/noComparisonHonesty.test.ts`
+pins both halves: nothing claims a comparison when there was none, and a real comparison still says
+what it found.
+
 ## Written for third parties, resolved like it (2026-09-17)
 
 The embed is the one surface that renders inside somebody else's page, and it wrote the production
@@ -739,6 +947,14 @@ This is `tests/feedRoute.test.ts`'s rule, which had never been carried past the 
 the hardcoded literal and the configured default are the same string, so no rendered assertion can
 tell them apart, and the lane where they differ is the one this suite never runs in. Those
 assertions are source reads and say so.
+
+**The rule stopped at the embed, and the embed is not the only surface written for someone else
+(2026-09-17).** `/api/mcp` hardcoded the production origin in the `_links` block and in
+`mcp.endpoint` — the discovery payload, so preview told an agent which URL to call and named
+production. So did the "Open the brief" button on both the weekly Slack post and the regime-change
+alert, the weekly email's four links, and `app/brief.md`'s footer. All resolve through `lib/siteUrl`
+now. `lib/fred.ts` and `lib/github/repoClient.ts` keep the literal on purpose: a `user-agent` names
+who to contact, not where this deployment lives.
 
 ## An artifact that names itself
 

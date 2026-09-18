@@ -33,7 +33,7 @@ import { ThresholdLadder } from "../../components/illustrations/ThresholdLadder"
 import { RuleLines } from "../../components/boundedRuleLines";
 import {
   buildBoundedConditionRails,
-  formatPointsToLine,
+  parenthesizePointsToLine,
   toThresholdDistance,
   type RuleThresholdDistance,
 } from "../../../lib/report/operatingCalls";
@@ -102,6 +102,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 import { SubscribeForm } from "../../components/SubscribeForm";
 import { JsonLdScript } from "../../components/jsonLdScript";
+import { compositeSignalScales } from "../../../lib/report/signalTranslations";
 
 export default async function PublishedBriefPage({ params }: { params: Promise<Params> }) {
   const { week } = await params;
@@ -248,20 +249,24 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                           hysteresisBand
                           invert={rail.invert}
                           signalLabel={rail.label}
+                          /* Same argument as the hero's rails: the flip that
+                             puts trouble on the right for both signals was
+                             announced only by 8px numeric end-labels. */
+                          scaleDirection={compositeSignalScales[rail.metric]?.directionLabel}
                           viewBoxWidth={320}
                         />
                         <p className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums text-slate-400">
                           <span>
                             {DECISION_CONTRACT_LABELS.threshold.pauseIf} {rail.invert ? "<" : ">"} {rail.guardrail}
                             <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-slate-500"}`}>
-                              {formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
+                              {parenthesizePointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
                             </span>
                           </span>
                           {rail.clearsAt !== undefined ? (
                             <span>
                               {publicDecisionLabels.reversal} {rail.invert ? ">" : "<"} {rail.clearsAt}
                               <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-slate-500"}`}>
-                                {formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
+                                {parenthesizePointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
                               </span>
                             </span>
                           ) : null}
@@ -286,11 +291,11 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <section className="weather-panel space-y-3 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What would flip the call</h2>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</span>{" "}
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
             <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
           </p>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span>{" "}
             <BoundedValue>{brief.flipThreshold}</BoundedValue>
           </p>
         </section>
@@ -350,11 +355,11 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     <p className="text-sm text-slate-300">{decision.call}</p>
                     {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {decision.doNow}</p> : null}
                     <p className="text-sm text-slate-300">
-                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.slot.threshold}:</span>{" "}
+                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
                       <BoundedValue>{decision.pauseTrigger}</BoundedValue>
                     </p>
                     <p className="text-sm text-slate-300">
-                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.reversal}:</span>{" "}
+                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:</span>{" "}
                       <BoundedValue>{decision.resumeTrigger}</BoundedValue>
                     </p>
                   </li>

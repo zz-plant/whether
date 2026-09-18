@@ -9,6 +9,7 @@ import {
   type PhaseSpanKey,
 } from "../../../lib/regimePhaseSpace";
 import type { RegimeKey } from "../../../lib/types";
+import Link from "next/link";
 
 /**
  * The regime plane. Both scores on one pair of axes, with the classifier's two
@@ -400,8 +401,16 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
         </figure>
 
         <div className="space-y-4">
+          {/* Not "Reading now". `current` is the last plotted point, and every
+              point here is a month-end reading from the archive, so this is the
+              last completed month — up to five weeks behind the weekly call,
+              and regularly a different regime from it. Labelled "Reading now"
+              this panel told a reader the call was Sunny on a week the brief
+              was calling Freezing. /signals already states the same caveat over
+              the same series; this is that sentence, on the page a reader comes
+              to when they want to check the record. */}
           <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-            <p className="type-eyebrow text-fluid-nano">Reading now</p>
+            <p className="type-eyebrow text-fluid-nano">Last completed month</p>
             <p className="mt-1 flex items-baseline gap-2">
               <span
                 aria-hidden="true"
@@ -433,6 +442,14 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               {gaps.tightness.distance <= gaps.riskAppetite.distance
                 ? describePhaseGap(gaps.tightness)
                 : describePhaseGap(gaps.riskAppetite)}
+            </p>
+            <p className="mt-2 text-fluid-nano text-slate-500">
+              Every point here is a month-end reading, so this is the last completed
+              month rather than{" "}
+              <Link href="/" className="text-sky-300">
+                this week&rsquo;s call
+              </Link>
+              .
             </p>
           </div>
 

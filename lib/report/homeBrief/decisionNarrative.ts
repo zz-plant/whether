@@ -1,6 +1,7 @@
 import type { RegimeConfidenceLabel } from "../../regimePresentation";
 import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
+import type { ReportDynamics } from "../reportDataTypes";
 
 const regimeShiftTargets = {
   SCARCITY: { defensive: "DEFENSIVE" },
@@ -19,10 +20,16 @@ export const buildDecisionShiftSummary = ({
   reversalTrigger,
 }: {
   severityDelta: number;
-  directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
+  directionLabel: ReportDynamics["directionLabel"] | undefined;
   changeCount: number;
   reversalTrigger: string;
 }) => {
+  if (directionLabel === "unavailable") {
+    /* Nothing was compared, so "no significant change" is not available to say.
+       The call still stands on where the signals sit; what is missing is the
+       week-over-week half of the sentence. */
+    return `No previous reading to compare this week against. The call below comes from where the signals sit now. Re-open when: ${reversalTrigger}`;
+  }
   if (changeCount === 0 || directionLabel === "stable") {
     return `No significant change this week. Keep your current plan. Re-open when: ${reversalTrigger}`;
   }
@@ -38,10 +45,24 @@ export const buildDecisionShiftSummary = ({
 export const buildWeeklyMovementMetric = ({
   severityDelta,
   changedSignals,
+  directionLabel,
 }: {
   severityDelta: number;
   changedSignals: SignalChange[];
+  directionLabel: ReportDynamics["directionLabel"] | undefined;
 }) => {
+  /* Absence of a comparison scores nothing. Without this the inputs of "no
+     previous reading" and "a week that moved nothing" are identical — both are
+     a zero severity delta and an empty signal list — and this function reported
+     the second: "Conditions held steady this week. Last week's calls stand." */
+  if (directionLabel === "unavailable") {
+    return {
+      score: null,
+      direction: "unavailable" as const,
+      summary: "No previous reading to compare this week against.",
+    };
+  }
+
   const movementDomainBySignal: Record<SignalChange["key"], number> = {
     tightness: 6,
     riskAppetite: 6,
@@ -124,7 +145,7 @@ export const buildOperatingStanceLine = ({
   currentRegime,
 }: {
   severityDelta: number;
-  directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
+  directionLabel: ReportDynamics["directionLabel"] | undefined;
   currentRegime: Regime;
 }) => {
   if (severityDelta > 0 || directionLabel === "deteriorating") {
@@ -189,9 +210,13 @@ export const buildWhyItMattersLine = ({
   weeklyMovement,
 }: {
   weeklyMovement: {
-    direction: "tightening" | "easing" | "stable";
+    direction: "tightening" | "easing" | "stable" | "unavailable";
   };
 }) => {
+  if (weeklyMovement.direction === "unavailable") {
+    return "This week's move is not known — there is no previous reading to compare against — so the approval rules below stand on where the signals sit now, not on a change.";
+  }
+
   if (weeklyMovement.direction === "tightening") {
     return "Fixed-cost mistakes are getting more expensive, so long-payback bets now need harder proof and tighter approval discipline.";
   }

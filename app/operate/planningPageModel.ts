@@ -363,7 +363,7 @@ export async function buildPlanningPageModel(
               hideHeader: true,
               id: "ops-decision-shield-panel",
               title: "Test a decision",
-              children: h(DecisionShieldPanel, { assessment, provenance: treasuryProvenance }),
+              children: h(DecisionShieldPanel, { assessment, provenance: treasuryProvenance, recordDate: treasury.record_date }),
             }),
           },
           {

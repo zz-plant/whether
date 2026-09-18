@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, Info, ExternalLink } from "lucide-react";
+import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 
 /**
  * The published series behind each row, by FRED code. Written here rather than
@@ -107,7 +108,7 @@ export function CompactTrustPopover({
         className="inline-flex items-center gap-1.5 rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300 hover:bg-teal-500/20 transition-colors cursor-pointer"
       >
         <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
-        <span>{confidenceLabel}</span>
+        <span>{formatConfidenceChipLabel(confidenceLabel)}</span>
         <Info size={12} className="text-teal-400/70 ml-0.5" />
       </button>
 

@@ -42,7 +42,6 @@ import {
 } from "../boundedDecisionRules";
 import { resolveRunwayBand, type RunwayBand } from "../operatorRunway";
 import { buildDecisionMatrixPayload } from "./decisionMatrix";
-import { buildStartupClimateIndex } from "./scoring";
 import { buildPrimaryRiskLabel } from "./risk";
 import { extractExecutiveOperationalStance } from "./executiveOperationalStance";
 import {
@@ -79,6 +78,7 @@ import type {
 } from "../homeBriefModel";
 import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
+import { GLOSSARY_HREF } from "../signalTranslations";
 
 export { extractExecutiveOperationalStance, buildMemoryRail };
 
@@ -249,12 +249,18 @@ export const buildHomeBriefModelInternal = (
     ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
     : 0;
 
+  /* "No worse than last week" needs a last week. The severity delta is 0 both
+     when the regime held and when there is nothing to compare it to, and this
+     rendered the comparative sentence for both — including onto the OG share
+     card, which is the version of this line that travels furthest. */
   const postureDeltaLabel =
-    severityDelta > 0
-      ? "Worse than last week"
-      : severityDelta < 0
-        ? "Better than last week"
-        : "No worse than last week";
+    reportDynamics?.directionLabel === "unavailable"
+      ? "No previous week to compare"
+      : severityDelta > 0
+        ? "Worse than last week"
+        : severityDelta < 0
+          ? "Better than last week"
+          : "No worse than last week";
 
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
@@ -290,7 +296,9 @@ export const buildHomeBriefModelInternal = (
         ? "Deteriorating"
         : reportDynamics?.directionLabel === "mixed"
           ? "Mixed"
-          : "Stable";
+          : reportDynamics?.directionLabel === "unavailable"
+            ? "Not compared"
+            : "Stable";
   const weeklyDeltaBySignal = new Map(
     (reportDynamics?.changedSignals ?? []).map((item) => [item.key, item.delta]),
   );
@@ -329,7 +337,6 @@ export const buildHomeBriefModelInternal = (
       riskAppetite: riskThreshold,
     },
   };
-  const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
   const weeklyLeadershipSummary = buildWeeklyLeadershipBriefModel({
     assessment,
     previousAssessment,
@@ -514,6 +521,7 @@ export const buildHomeBriefModelInternal = (
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
+    directionLabel: reportDynamics?.directionLabel,
   });
   const revisitQueue = buildRevisitQueue({
     revisitDecisions,
@@ -584,7 +592,6 @@ export const buildHomeBriefModelInternal = (
       pauseIf: guardrail,
       changeCourseIf: conciseFlipThreshold,
     }),
-    startupClimateIndex,
     regimeDistance,
     regimeVelocity,
     decisionShiftSummary: buildDecisionShiftSummary({
@@ -765,14 +772,13 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     presentation: {
       whyItMattersLine,
       readThisCardItems,
-      glossaryHref: "/trust#beginner-glossary",
+      glossaryHref: GLOSSARY_HREF,
     },
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,
       inputInfluence: homeBriefModel.inputInfluence,
       postureTrajectory: homeBriefModel.postureTrajectory,
       currentScores: homeBriefModel.currentScores,
-      startupClimateIndex: homeBriefModel.startupClimateIndex,
       regimeDistance: homeBriefModel.regimeDistance,
       flipRiskMeter: buildFlipRiskMeterState(homeBriefModel.regimeDistance),
       regimeVelocity: homeBriefModel.regimeVelocity,

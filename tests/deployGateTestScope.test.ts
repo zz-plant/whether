@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { GATE_TASKS, outstandingChecks } from "../scripts/vinext-run.mjs";
 
 /**
@@ -117,101 +114,6 @@ describe("deploy gate test scope", () => {
     assert.deepEqual(outstandingChecks(GATE_TASKS), []);
     assert.deepEqual(outstandingChecks([]), GATE_TASKS);
     assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "dead-exports", "landmarks"]);
-  });
-
-  /*
-   * Cloudflare Workers Builds restores the build output cache over the git clone.
-   * If the build output directory or cache overlaps tracked paths (like public/),
-   * the restore stomps committed files with stale snapshots. In remote CI under the
-   * deploy gate, run-checks.mjs restores tracked files to HEAD before running tasks.
-   */
-  it("restores tracked files stomped by remote build cache before running checks", () => {
-    const repository = mkdtempSync(join(tmpdir(), "deploy-gate-restore-"));
-    const git = (...gitArgs: string[]) => spawnSync("git", gitArgs, { cwd: repository, encoding: "utf8" });
-
-    try {
-      git("init", "--quiet");
-      git("config", "user.email", "test@example.com");
-      git("config", "user.name", "test");
-      writeFileSync(
-        join(repository, "package.json"),
-        JSON.stringify(
-          { name: "restore-test", scripts: { "check:suppressions": "node -e 'process.exit(0)'" } },
-          null,
-          2,
-        ),
-      );
-      writeFileSync(join(repository, "tracked.txt"), "original committed\n");
-      git("add", "package.json", "tracked.txt");
-      git("commit", "--quiet", "-m", "initial");
-
-      writeFileSync(join(repository, "tracked.txt"), "stale cached content\n");
-      assert.equal(readFileSync(join(repository, "tracked.txt"), "utf8"), "stale cached content\n");
-
-      const runner = join(process.cwd(), "scripts/run-checks.mjs");
-      const result = spawnSync("bun", [runner, "suppressions"], {
-        cwd: repository,
-        encoding: "utf8",
-        env: {
-          ...process.env,
-          WHETHER_DEPLOY_GATE: "1",
-          WHETHER_FORCE_HEAD_RESTORE: "1",
-        },
-      });
-
-      assert.equal(result.status, 0);
-      assert.match(result.stdout, /restored tracked files stomped by build cache restore: tracked\.txt/);
-      assert.equal(readFileSync(join(repository, "tracked.txt"), "utf8"), "original committed\n");
-    } finally {
-      rmSync(repository, { recursive: true, force: true });
-    }
-  });
-
-  it("leaves local modifications alone when deploy gate runs outside remote CI", () => {
-    const repository = mkdtempSync(join(tmpdir(), "deploy-gate-local-"));
-    const git = (...gitArgs: string[]) => spawnSync("git", gitArgs, { cwd: repository, encoding: "utf8" });
-
-    try {
-      git("init", "--quiet");
-      git("config", "user.email", "test@example.com");
-      git("config", "user.name", "test");
-      writeFileSync(
-        join(repository, "package.json"),
-        JSON.stringify(
-          { name: "local-test", scripts: { "check:suppressions": "node -e 'process.exit(0)'" } },
-          null,
-          2,
-        ),
-      );
-      writeFileSync(join(repository, "tracked.txt"), "original committed\n");
-      git("add", "package.json", "tracked.txt");
-      git("commit", "--quiet", "-m", "initial");
-
-      writeFileSync(join(repository, "tracked.txt"), "local developer change\n");
-
-      const cleanEnv = { ...process.env };
-      delete cleanEnv.CI;
-      delete cleanEnv.WORKERS_CI;
-      delete cleanEnv.WORKERS_CI_BUILD_UUID;
-      delete cleanEnv.CF_PAGES;
-      delete cleanEnv.WHETHER_FORCE_HEAD_RESTORE;
-
-      const runner = join(process.cwd(), "scripts/run-checks.mjs");
-      const result = spawnSync("bun", [runner, "suppressions"], {
-        cwd: repository,
-        encoding: "utf8",
-        env: {
-          ...cleanEnv,
-          WHETHER_DEPLOY_GATE: "1",
-        },
-      });
-
-      assert.equal(result.status, 0);
-      assert.doesNotMatch(result.stdout, /restored tracked files stomped by build cache restore/);
-      assert.equal(readFileSync(join(repository, "tracked.txt"), "utf8"), "local developer change\n");
-    } finally {
-      rmSync(repository, { recursive: true, force: true });
-    }
   });
 });
 

@@ -10,11 +10,15 @@ import {
   findRunwayQuickPick,
 } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
+import { SegmentedControl } from "./ui/segmentedControl";
 
 /**
- * The runway bands as a segmented control, the same shape as the cadence
- * selector two screens down. `aria-pressed` rather than `aria-current`: this
- * sets a stored figure, it does not navigate.
+ * The runway bands.
+ *
+ * It was the third hand-rolled version of one control: a `fieldset` with
+ * `aria-pressed` and no keyboard movement at all, beside a cadence selector
+ * using `aria-current` and a stage selector claiming `role="tablist"`. It reads
+ * the shared radio group now, so the arrows work here too.
  */
 const RunwayQuickPicks = ({
   activeMonths,
@@ -24,28 +28,18 @@ const RunwayQuickPicks = ({
   onPick: (months: number) => void;
 }) => {
   const active = findRunwayQuickPick(activeMonths);
+  const options = RUNWAY_QUICK_PICKS.map((pick) => ({ key: pick.label, label: pick.label }));
+
   return (
-    <fieldset
-      aria-label="Cash runway"
-      className="flex flex-wrap items-center gap-0.5 rounded-sm border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-0.5"
-    >
-      {RUNWAY_QUICK_PICKS.map((pick) => {
-        const isActive = active?.label === pick.label;
-        return (
-          <button
-            key={pick.label}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => onPick(pick.months)}
-            className={`min-h-[44px] sm:min-h-9 rounded-sm px-3 py-1.5 text-fluid-micro font-semibold tabular-nums transition-colors active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-              isActive ? "bg-sky-500/15 text-sky-100" : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            {pick.label}
-          </button>
-        );
-      })}
-    </fieldset>
+    <SegmentedControl
+      options={options}
+      value={active?.label}
+      onSelect={(label) => {
+        const pick = RUNWAY_QUICK_PICKS.find((candidate) => candidate.label === label);
+        if (pick) onPick(pick.months);
+      }}
+      ariaLabel="Cash runway"
+    />
   );
 };
 
@@ -84,11 +78,23 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         className="weather-panel mt-4 space-y-2 px-5 py-3.5"
       >
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="type-eyebrow text-slate-300">Translate this call for your runway</p>
+          <p className="type-eyebrow text-slate-300">What this call means at your runway</p>
+          {/* Deliberately nothing selected. The operator has not said what their
+              runway is, and a default would be this panel inventing one — the
+              same rule the note builder keeps ("a missing runway never reads
+              like zero"). What was missing is not a default but the invitation
+              below: the panel used to offer four unexplained buttons over a
+              sentence about browser storage, so the first thing a reader was
+              told about a control they had no reason to touch was where the
+              value would be kept. */}
           <RunwayQuickPicks activeMonths={undefined} onPick={setRunway} />
         </div>
+        <p className="text-fluid-nano text-slate-400">
+          Pick a band and this week&rsquo;s call gains a line per decision it changes — which lane
+          protects runway fastest, and roughly how many months a 10% burn cut buys you.
+        </p>
         <p className="text-fluid-nano text-slate-500">
-          Stays in this browser. The call above does not change; the notes under it do.
+          Nothing leaves this browser, and the call above does not change; only the notes under it do.
         </p>
       </aside>
     );
@@ -101,7 +107,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
     >
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <p className="type-eyebrow text-slate-300">
-          Conditioned on your runway — {profile.runwayMonths} months
+          What this call means at {profile.runwayMonths} months of runway
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <RunwayQuickPicks activeMonths={profile.runwayMonths} onPick={setRunway} />

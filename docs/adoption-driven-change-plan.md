@@ -150,13 +150,23 @@ Reframe alerts from signal events to decision verdicts.
 
 ### 4. SCI → supporting metadata (P1)
 
-`buildStartupClimateIndex` is dormant. Either:
+**Done 2026-09-18: the computation was removed**, which was the second of the two options below.
 
-- Surface it as one supporting metadata line under the posture call — "Overall conditions:
-  deteriorating" — and delete the numeric object, or
-- Remove the computation entirely.
+It was computed into the home brief model on every build, carried into the weekly decision card's
+`diagnostics`, and rendered by nothing — a field rather than an export, so `check:dead-exports`
+could not see it, and `tests/homeBriefModel.test.ts` asserted on its score and its four breakdown
+rows without ever asking whether a reader could. Surfacing it instead would have meant inventing the
+surface, which is the move the first-time guide's history argues against.
 
-Do not ship it as `SCI 57.4 ▼ 6.2`. The adoption reason is the interpretation, not the number.
+The original note, kept for the reasoning:
+
+> `buildStartupClimateIndex` is dormant. Either:
+>
+> - Surface it as one supporting metadata line under the posture call — "Overall conditions:
+>   deteriorating" — and delete the numeric object, or
+> - Remove the computation entirely.
+>
+> Do not ship it as `SCI 57.4 ▼ 6.2`. The adoption reason is the interpretation, not the number.
 
 ### 5. Ritual simplification (P1)
 

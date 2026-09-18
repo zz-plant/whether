@@ -78,7 +78,26 @@ const isSignalScenarioIndexable = async (path: `/${string}`): Promise<boolean> =
  * upstreams are reachable and a read can trigger an ingest — meant doing that
  * work twice to answer one question about one snapshot.
  */
-const resolveSitemapReadiness = async (): Promise<{ programmaticEligible: boolean; watchHubsFresh: boolean }> => {
+/**
+ * The live read's own dates, for `lastmod`.
+ *
+ * `reportLastModified` used to come from `snapshotData` — the *bundled fallback*
+ * in `data/snapshot_fallback.json`, whose record date is whenever that file was
+ * last regenerated. On 2026-09-17 it said 2026-06-17, so `/` and `/signals`
+ * submitted `changefreq: weekly` beside a `lastmod` thirteen weeks old, on the
+ * two pages whose whole premise is that they are current. A crawler reconciling
+ * "claims weekly, unchanged for a quarter" concludes the claim is false.
+ *
+ * The homepage's JSON-LD already got this right and carries a comment saying so
+ * (`HomeBriefStructuredDataInput`); the sitemap never got the same fix, and this
+ * function was already loading the live snapshot for the readiness gates below.
+ * The bundled dates stay as the fallback, which is what they are.
+ */
+const resolveSitemapReadiness = async (): Promise<{
+  programmaticEligible: boolean;
+  watchHubsFresh: boolean;
+  reportLastModified: Date;
+}> => {
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/sitemap" });
   const homeBriefModel = snapshot.homeBriefModel;
   const primaryRule = homeBriefModel.decisionRules[0];
@@ -93,6 +112,13 @@ const resolveSitemapReadiness = async (): Promise<{ programmaticEligible: boolea
     fetchedAtIso: reportData.treasury.fetched_at,
     isFallbackSnapshot: degraded || !reportData.treasury.isLive,
   });
+
+  const liveReportLastModified = resolveLastModified(
+    reportData.treasury.record_date,
+    reportData.treasury.fetched_at,
+    snapshotData.record_date,
+    snapshotData.fetched_at,
+  );
 
   const programmaticEligible = evaluateSeoQualityGates({
     pageKey: "sitemap-programmatic",
@@ -113,16 +139,20 @@ const resolveSitemapReadiness = async (): Promise<{ programmaticEligible: boolea
     interpretationLabel: `${primaryRule?.recommendation ?? ""}|${primaryRule?.doNow[0] ?? ""}`,
   }).eligible;
 
-  return { programmaticEligible, watchHubsFresh };
+  return { programmaticEligible, watchHubsFresh, reportLastModified: liveReportLastModified };
 };
 
 export default async function sitemap(options?: { programmaticEligible?: boolean }): Promise<MetadataRoute.Sitemap> {
-  const reportLastModified = resolveLastModified(snapshotData.record_date, snapshotData.fetched_at);
-  /* One read for both questions; the override skips it, as it always has. */
+  /* One read for three questions now; the override skips it, as it always has,
+     and falls back to the bundled dates because it has no live read to offer. */
   const readiness = options?.programmaticEligible === undefined
     ? await resolveSitemapReadiness()
-    : { programmaticEligible: options.programmaticEligible, watchHubsFresh: options.programmaticEligible };
-  const { programmaticEligible } = readiness;
+    : {
+        programmaticEligible: options.programmaticEligible,
+        watchHubsFresh: options.programmaticEligible,
+        reportLastModified: resolveLastModified(snapshotData.record_date, snapshotData.fetched_at),
+      };
+  const { programmaticEligible, reportLastModified } = readiness;
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
@@ -133,6 +163,10 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     // deep link, and compare is a disclosure under history. Both stay indexable;
     // neither is ranked like a hub.
     { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+    { path: "/glossary", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+    /* Derived from the bundled archive at module load, so the monthly refresh
+       moves it — it takes the report's date, not the static one. */
+    { path: "/calibration", lastModified: reportLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/operate", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     // The two workstreams are indexable pages with their own metadata; they
     // were submitted nowhere because the page file kept its route map private.

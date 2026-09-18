@@ -54,7 +54,7 @@ function BoundedBandRail({ band, idSuffix }: { band: HorizonSignalBand; idSuffix
         current={band.current}
         previous={band.previous ?? undefined}
         trigger={band.pause}
-        triggerLabel={DECISION_CONTRACT_LABELS.threshold.guardrail}
+        triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
         reversal={band.resume}
         invert={band.pauseWhen === "below"}
         hysteresisBand
@@ -131,13 +131,13 @@ export function CadenceCallCard({
       <dl className="space-y-1.5 text-fluid-nano">
         <div className="flex flex-wrap items-baseline gap-x-2">
           <dt className="shrink-0 rounded border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 text-fluid-nano font-semibold text-semantic-caution-fg">
-            {DECISION_CONTRACT_LABELS.threshold.guardrail}
+            {DECISION_CONTRACT_LABELS.threshold.pauseIf}
           </dt>
           <dd className="min-w-0 text-slate-300">{model.boundedRule.threshold}</dd>
         </div>
         <div className="flex flex-wrap items-baseline gap-x-2">
           <dt className="shrink-0 rounded border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 text-fluid-nano font-semibold text-semantic-easing-fg">
-            {DECISION_CONTRACT_LABELS.reversal.reversal}
+            {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
           </dt>
           <dd className="min-w-0 text-slate-300">{model.boundedRule.reversal}</dd>
         </div>

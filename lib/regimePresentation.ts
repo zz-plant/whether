@@ -116,7 +116,12 @@ export const REGIME_STYLE_TOKENS: Record<
   },
 };
 
-export type RegimeMomentum = "improving" | "deteriorating" | "mixed" | "stable";
+/**
+ * Which way the week moved. `"unavailable"` is a fifth case rather than a
+ * synonym for `"stable"`: it means no previous reading was compared, which is
+ * what a degraded read and a freshly built snapshot both have.
+ */
+export type RegimeMomentum = "improving" | "deteriorating" | "mixed" | "stable" | "unavailable";
 type RegimeStageLabel = "Early" | "Mid" | "Late";
 export type RegimeConfidenceLabel = "LOW" | "MED" | "HIGH";
 
@@ -152,11 +157,15 @@ export const getRegimeDisplayLabel = ({
     };
   }
 
+  /* An unknown direction qualifies the expansion for the same reason a mixed one
+     does: the modifier says "do not read this as a clean run", and not having
+     looked is not evidence that it is one. */
   const guardedExpansion =
     transitionWatch ||
     confidence === "LOW" ||
     momentum === "deteriorating" ||
-    momentum === "mixed";
+    momentum === "mixed" ||
+    momentum === "unavailable";
 
   return {
     canonicalRegime: regime,
@@ -187,7 +196,9 @@ export const deriveRegimeStage = ({
     }
   } else if (momentum === "deteriorating") {
     label = regime === "EXPANSION" ? "Late" : "Mid";
-  } else if (momentum === "stable" || momentum === "mixed") {
+  } else if (momentum === "stable" || momentum === "mixed" || momentum === "unavailable") {
+    /* Distance to the boundary is known without a previous reading, so an
+       unknown direction still gets the proximity rung. */
     label = normalizedDistance <= 8 ? "Late" : "Mid";
   }
 

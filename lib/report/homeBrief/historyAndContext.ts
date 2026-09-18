@@ -204,6 +204,10 @@ const overallDirectionCopy: Record<string, string> = {
   deteriorating: "the rest of the week's readings weakened on balance",
   mixed: "the rest of the week's readings pulled both ways",
   stable: "nothing else moved much",
+  /* Unreachable while a signal is named beside it — a week with no comparison
+     has no changed signals — and present so the map cannot answer "nothing else
+     moved much" for a week nothing was compared. */
+  unavailable: "the rest of the week was not compared against a previous reading",
 };
 
 export const buildWhyThisCall = ({

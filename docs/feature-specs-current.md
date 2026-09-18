@@ -339,10 +339,17 @@ assumptions optimistic in three ways, and this pass fixed each:
   growth live in one browser-held profile (`lib/operatorProfile.ts`, `whether.operatorProfile`)
   that the planner and both stress tests share through `OperatorProfileNumberField`, which
   validates on blur, commits on parse, and treats blank as "not given".
-- **Dead capture paths removed.** `useCrossDeviceSync` (no call sites; `/api/sync` stays,
-  tested, with no client), `useDecisionHistory` + the history page's "Decision archive" (nothing
-  ever wrote the key it read), `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts`
-  (no product callers), and the unused entries in `lib/storage/keys.ts`.
+- **Dead capture paths removed.** `useCrossDeviceSync` (no call sites), `useDecisionHistory` +
+  the history page's "Decision archive" (nothing ever wrote the key it read),
+  `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts` (no product callers), and the
+  unused entries in `lib/storage/keys.ts`.
+- **`/api/sync` went too (2026-09-17).** It was kept at the time — "stays, tested, with no client" —
+  and a tested endpoint with no client is not a dormant feature, it is a live one nobody reads. It
+  accepted an unauthenticated POST, scoped by a caller-chosen id and a caller-chosen secret, and
+  wrote 24KB of reader state into KV with no rate limit and no TTL. Its two permitted keys
+  (`whether-company-metrics`, `whether-decision-log`) named the module deleted in the line above and
+  a key nothing has ever written. `/privacy` 2.4 says everything other than recorded decisions
+  "stays in your browser and is never sent", which was true only because nothing called it.
 - **Subscribe no longer succeeds without mail.** Without an EMAIL binding the adapter stubbed
   `ok: true`, so production told subscribers to check their inbox for mail that never left. In
   production a missing binding is now a failed send with a named reason
@@ -1032,11 +1039,14 @@ Shared report-shell routes now avoid stacking a separate trust summary panel ahe
 - **Weekly plan** (`/operate`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, scoped alert delivery controls, Decision Memory recall/export, and operator requests.
 
-### 1.5 Home and glossary support (`/`, `/trust#beginner-glossary`)
+### 1.5 Home and glossary support (`/`, `/glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English
-glossary support lives under the Trust hub so operators can pull term translation without leaving
-the weekly brief flow. The glossary now explicitly translates U.S. market and Treasury language for
-the product's primary user base instead of assuming macro fluency.
+glossary support has its own route. It used to be a collapsed disclosure under the Trust hub, which
+sent every "unfamiliar with a term?" link — the hero's, the answer pages', the signal cards' — to a
+page about freshness, source coverage and confidence; a reader who does not know what funding
+pressure means is the one least able to work out why they landed there. The glossary explicitly
+translates U.S. market and Treasury language for the product's primary user base instead of
+assuming macro fluency, and `/trust` keeps a pointer to it.
 
 ### 1.5.1 About and identity framing (`/about`)
 The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.

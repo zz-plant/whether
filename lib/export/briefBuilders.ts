@@ -9,6 +9,7 @@ import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } fr
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
+import { regimeSignalLabel } from "../report/signalTranslations";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -342,7 +343,7 @@ export const buildSlackBrief = (
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Posture: ${postureLabel}`,
     ...buildReadingLines(assessment, options),
-    `Fed interest rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `${regimeSignalLabel.baseRate}: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Recession warning gauge (10Y−2Y): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
     "Signal check:",

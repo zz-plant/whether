@@ -65,7 +65,6 @@ export const insightDatabase = {
     regimes: [
       {
         key: "SCARCITY",
-        title: "Scarcity",
         tone: "High rates + risk off",
         mandate: "Don't die.",
         insight:
@@ -96,7 +95,6 @@ export const insightDatabase = {
       },
       {
         key: "DEFENSIVE",
-        title: "Defensive",
         tone: "High rates + moderate risk",
         mandate: "Efficiency first.",
         insight:
@@ -127,7 +125,6 @@ export const insightDatabase = {
       },
       {
         key: "VOLATILE",
-        title: "Volatile",
         tone: "Low rates + risk off",
         mandate: "Safety first.",
         insight:
@@ -158,7 +155,6 @@ export const insightDatabase = {
       },
       {
         key: "EXPANSION",
-        title: "Expansion",
         tone: "Low rates + risk on",
         mandate: "Land grab.",
         insight:

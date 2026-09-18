@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { formatMeetingSlideMarkdown } from "../lib/export/meetingSlideExport";
@@ -91,7 +92,7 @@ describe("brief artifact formats", () => {
 
     for (const format of BRIEF_FORMATS) {
       const text = formatBriefArtifact(sparse, format.id, origin);
-      assert.ok(!text.includes("Guardrail:"), `${format.id} printed an empty guardrail`);
+      assert.ok(!text.includes(`${DECISION_CONTRACT_LABELS.threshold.pauseIf}:`), `${format.id} printed an empty pause line`);
       assert.ok(!text.includes("undefined"), `${format.id} leaked an undefined field`);
       assert.ok(!text.includes("risk appetite"), `${format.id} claimed a risk appetite it lacks`);
     }
@@ -102,9 +103,16 @@ describe("brief artifact formats", () => {
     // at and the block someone pastes afterwards cannot name different
     // thresholds.
     const entries = briefConditionEntries(artifact);
+    /* Three lines, three names, and the same three names the hero prints —
+       these used to read "Guardrail / Reversal / Clears when" against the
+       plan page's "Pause if / Change course if" for the same numbers. */
     assert.deepEqual(
       entries.map((entry) => entry.label),
-      ["Guardrail", "Reversal", "Clears when"],
+      [
+        DECISION_CONTRACT_LABELS.threshold.pauseIf,
+        DECISION_CONTRACT_LABELS.watch.postureFlips,
+        DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
+      ],
     );
 
     const slack = formatBriefArtifact(artifact, "slack", origin);
@@ -116,7 +124,7 @@ describe("brief artifact formats", () => {
   it("drops a condition rather than labelling an empty one", () => {
     assert.deepEqual(
       briefConditionEntries({ ...artifact, reversal: undefined, clearsWhen: [] }).map((e) => e.label),
-      ["Guardrail"],
+      [DECISION_CONTRACT_LABELS.threshold.pauseIf],
     );
   });
 

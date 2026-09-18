@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { headCommit, passedChecks, recordPassedChecks } from "../scripts/check-gate-marker.mjs";
+import { headCommit, passedChecks, recordPassedChecks, worktreeDrift } from "../scripts/check-gate-marker.mjs";
 
 /**
  * The record that stops the build gate running twice.
@@ -136,6 +136,116 @@ describe("check gate marker", () => {
       git("checkout", "--quiet", "--", "tracked.txt");
       writeFileSync(join(repository, "untracked.txt"), "new\n");
       assert.equal(headCommit(repository), "", "an untracked file is not the commit either");
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+});
+
+/*
+ * The same "is this tree its commit" question, asked where it has teeth.
+ *
+ * The marker answers it by going quiet: a drifted tree gets no record, the inner
+ * gate runs the checks again, and nothing says why. That is the right cost for a
+ * marker and the wrong one for the gate itself. On 2026-09-17 a Workers Builds
+ * container ran the gate against a checkout whose `public/` held the previous
+ * successful build's files; two tests read a file their own commit had replaced,
+ * and the failure was indistinguishable from a flaky suite for a day. The drift
+ * was visible to this module the whole time.
+ */
+const gitRepository = () => {
+  const repository = mkdtempSync(join(tmpdir(), "check-gate-tree-"));
+  const git = (...args: string[]) => spawnSync("git", args, { cwd: repository, encoding: "utf8" });
+  git("init", "--quiet");
+  git("config", "user.email", "test@example.com");
+  git("config", "user.name", "test");
+  writeFileSync(join(repository, "tracked.txt"), "committed\n");
+  git("add", "tracked.txt");
+  git("commit", "--quiet", "-m", "initial");
+  return { repository, git };
+};
+
+/* Git hands a hook GIT_DIR and friends, and every git below would inherit them and
+   run against the pushing repository instead of this scaffold. CLAUDE.md records the
+   same trap in the pre-push hook; this suite is one of the two files it names. */
+const gitFreeEnv = () => {
+  const env = { ...process.env };
+  for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];
+  return env;
+};
+
+const runGate = (cwd: string) =>
+  spawnSync("bun", [join(process.cwd(), "scripts", "run-checks.mjs"), "lint"], {
+    cwd,
+    encoding: "utf8",
+    env: { ...gitFreeEnv(), WHETHER_DEPLOY_GATE: "1" },
+  });
+
+describe("deploy gate worktree check", () => {
+  it("separates a tree that is not its commit from one that merely holds extra files", () => {
+    const { repository, git } = gitRepository();
+
+    try {
+      assert.deepEqual(worktreeDrift(repository)?.tracked, [], "a fresh checkout has no tracked drift");
+
+      writeFileSync(join(repository, "tracked.txt"), "overwritten after checkout\n");
+      assert.deepEqual(
+        worktreeDrift(repository)?.tracked,
+        [{ code: "M", path: "tracked.txt" }],
+        "a file replaced after checkout is drift, and the path is what a build log needs",
+      );
+
+      git("checkout", "--quiet", "--", "tracked.txt");
+      writeFileSync(join(repository, "extra.txt"), "new\n");
+      const clean = worktreeDrift(repository);
+      assert.deepEqual(clean?.tracked, [], "an untracked file does not make the commit's own content wrong");
+      assert.deepEqual(clean?.untracked, ["extra.txt"]);
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+
+  /*
+   * Distinct from "clean", and the distinction is the point: a caller that cannot
+   * read the checkout must not report one that matches. This is the shape
+   * `check:dead-exports` already refuses on — a tree it cannot fully read scores
+   * *better*, not worse, so silence there reads as a pass.
+   */
+  it("answers nothing, not clean, where there is no checkout to read", () => {
+    const directory = mkdtempSync(join(tmpdir(), "check-gate-nogit-"));
+    try {
+      assert.equal(worktreeDrift(directory), null);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("refuses to run the deploy gate against a tree that is not its commit, and names the files", () => {
+    const { repository } = gitRepository();
+
+    try {
+      writeFileSync(join(repository, "tracked.txt"), "what a stale cache restored\n");
+      const result = runGate(repository);
+      const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+
+      assert.equal(result.status, 1, `expected a refusal, got ${result.status}:\n${output}`);
+      assert.match(output, /working tree is not the commit/);
+      assert.match(output, /tracked\.txt/, "a refusal that does not name the file is the log we already had");
+      assert.match(output, /build cache/, "the build container is where this fires, so say what to do there");
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+
+  /* The negative control: a clean tree is reported, not refused. Without this the
+     test above passes for any gate that refuses everything. */
+  it("reports the commit and carries on when the tree is that commit", () => {
+    const { repository } = gitRepository();
+
+    try {
+      const output = `${runGate(repository).stdout ?? ""}`;
+      assert.match(output, /\[run-checks\] HEAD [0-9a-f]{40}/);
+      assert.doesNotMatch(output, /working tree is not the commit/);
     } finally {
       rmSync(repository, { recursive: true, force: true });
     }
