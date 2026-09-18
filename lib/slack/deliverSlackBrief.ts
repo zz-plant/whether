@@ -114,11 +114,29 @@ const buildSlackBriefPayload = async (
   };
 };
 
+import { getSlackWebhookStore } from "./slackWebhookStore";
+
 export const resolveConfiguredSlackWebhooks = (): string[] => {
   const urls = new Set<string>();
   const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
   if (envUrl && isSlackWebhookUrl(envUrl)) {
     urls.add(envUrl);
+  }
+  return [...urls];
+};
+
+const resolveAllTargetSlackWebhooks = async (): Promise<string[]> => {
+  const urls = new Set<string>(resolveConfiguredSlackWebhooks());
+  try {
+    const store = getSlackWebhookStore();
+    const stored = await store.listActiveWebhooks();
+    for (const url of stored) {
+      if (isSlackWebhookUrl(url)) {
+        urls.add(url);
+      }
+    }
+  } catch (error) {
+    console.warn("[slack] failed to load stored webhooks", error);
   }
   return [...urls];
 };
@@ -131,7 +149,7 @@ export const deliverSlackBrief = async (options?: {
   imageUrl?: string;
   now?: Date;
 }): Promise<SlackDeliveryResult> => {
-  const urls = options?.webhookUrls ?? resolveConfiguredSlackWebhooks();
+  const urls = options?.webhookUrls ?? (await resolveAllTargetSlackWebhooks());
   if (urls.length === 0) {
     /* Nothing configured is a real state, not a failure — but it must never be
        reported as "posted". */
@@ -180,6 +198,9 @@ export const deliverSlackBrief = async (options?: {
         body: JSON.stringify({ blocks, text: `Whether Weekly Brief — ${recordDate}` }),
       });
       if (!response.ok) {
+        if (response.status === 404 || response.status === 410) {
+          getSlackWebhookStore().deactivateByUrl(url).catch(() => undefined);
+        }
         throw new Error(`slack_webhook_${response.status}`);
       }
     }),
