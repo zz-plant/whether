@@ -402,7 +402,6 @@ describe("Architecture Invariants", () => {
     DECISION_CONTRACT_LABELS.action.doNow,
     DECISION_CONTRACT_LABELS.threshold.pauseIf,
     DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
-    DECISION_CONTRACT_LABELS.reversal.clearsWhen,
     DECISION_CONTRACT_LABELS.watch.flipWatch,
     DECISION_CONTRACT_LABELS.watch.watchThisWeek,
     DECISION_CONTRACT_LABELS.watch.watchNext,
@@ -415,6 +414,50 @@ describe("Architecture Invariants", () => {
       "names a capability in the agent skill catalog, peer to 'Constraint translation' and 'PM question log' — not a decision slot, and it must not follow a rename of one",
     ],
   ]);
+
+  /**
+   * The gap Invariant 8 left open.
+   *
+   * It proves no surface spells a label itself, so both the hero and `/operate`
+   * were compliant while drawing the same rail under different words: the table
+   * held `threshold.guardrail` beside `threshold.pauseIf` and
+   * `reversal.clearsWhen` beside `reversal.changeCourseIf`, and a component
+   * reading either one passed. A vocabulary with synonyms is not a vocabulary.
+   */
+  it("Invariant 8a: No two contract labels name the same line", () => {
+    /* Narrowed rather than asserted. Every value in the table is a string
+       today, and a cast would make that an assumption the type system vouches
+       for instead of one this test checks — a nested group added later would
+       be silently stringified into a comparison rather than skipped. */
+    const entries = Object.entries(DECISION_CONTRACT_LABELS).flatMap(([group, labels]) =>
+      Object.entries(labels).flatMap(([key, value]) =>
+        typeof value === "string" ? [{ path: `${group}.${key}`, value }] : [],
+      ),
+    );
+
+    const byValue = new Map<string, string[]>();
+    for (const { path, value } of entries) {
+      byValue.set(value, [...(byValue.get(value) ?? []), path]);
+    }
+
+    const duplicates = [...byValue.entries()]
+      .filter(([, paths]) => paths.length > 1)
+      /* "reachable via", not "reachable as": the hotspot preflight scans added
+         lines for type assertions and the English word matched its pattern. */
+      .map(([value, paths]) => `"${value}" is reachable via ${paths.join(" and ")}`);
+
+    assert.deepEqual(duplicates, [], `\n${duplicates.join("\n")}\n`);
+
+    /* The retired synonyms, named so a revert reads as the regression it is.
+       Each drew a line some other surface drew under the imperative name. */
+    const retired = ["Guardrail", "Clears when", "Trigger"];
+    /* Widened, not asserted: narrowing the table above gave `value` a literal
+       union, and a retired name is by definition not in it. */
+    const shipped: string[] = entries.map((entry) => entry.value);
+    for (const name of retired) {
+      assert.ok(!shipped.includes(name), `"${name}" is back in the contract vocabulary`);
+    }
+  });
 
   it("Invariant 8: Bounded-decision slot labels are never hardcoded outside reportCopy.ts", () => {
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");

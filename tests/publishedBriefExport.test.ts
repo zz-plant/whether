@@ -7,6 +7,7 @@ import {
   type PublishedBrief,
 } from "../lib/report/publishedBriefs";
 import { buildCanonicalUrl } from "../lib/seo";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 
 describe("published brief readings block", () => {
   it("prints a reading line per signal when the record carries scores and lines", async () => {
@@ -83,8 +84,8 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, /Executive summary: Keep expansion selective/);
     assert.match(email, /What changed this week:\nPressure increased by \+1\.2 this week\./);
     assert.match(email, /• Action now: Conditions tightening — freeze new commitments and keep spend flexible\./);
-    assert.match(email, /• Guardrail threshold: Over-engineering before demand proves out/);
-    assert.match(email, /• Reversal condition: No flip condition is tripped yet\./);
+    assert.ok(email.includes(`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: Over-engineering before demand proves out`));
+    assert.ok(email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: No flip condition is tripped yet.`));
 
     // Area decisions
     assert.match(email, /• Product tempo: Speed up product work tied to activation and retention goals\./);

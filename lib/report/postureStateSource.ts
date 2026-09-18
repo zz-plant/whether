@@ -1,77 +1,12 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeDisplayLabel } from "../regimePresentation";
 import {
-  buildPostureDecisionEvent,
   getPostureDecisionEventRepository,
   type PostureDecisionEvent,
   type PostureDecisionEventRepository,
 } from "../storage/postureDecisionEventRepository";
 import { buildPostureStateContract, type PostureStateContract } from "./postureStateContract";
 import type { ReportDynamics } from "./reportData";
-
-const resolveDeterministicRecordedAt = ({
-  recordDate,
-  sourceIngestedAt,
-}: {
-  recordDate: string;
-  sourceIngestedAt: string;
-}) => {
-  const parsed = Date.parse(sourceIngestedAt);
-  if (Number.isFinite(parsed)) {
-    return new Date(parsed).toISOString();
-  }
-
-  return `${recordDate}T00:00:00.000Z`;
-};
-
-const buildIdempotencyKey = ({
-  effectiveRecordDate,
-  toState,
-}: {
-  effectiveRecordDate: string;
-  toState: RegimeAssessment["regime"];
-}) => `${effectiveRecordDate}:${toState}`;
-
-export const appendCommittedPostureEvent = async ({
-  recordDate,
-  sourceIngestedAt,
-  assessment,
-  previousRegime,
-  repository = getPostureDecisionEventRepository(),
-}: {
-  recordDate: string;
-  sourceIngestedAt: string;
-  assessment: RegimeAssessment;
-  previousRegime: PostureDecisionEvent["fromState"];
-  repository?: PostureDecisionEventRepository;
-}) => {
-  const idempotencyKey = buildIdempotencyKey({
-    effectiveRecordDate: recordDate,
-    toState: assessment.regime,
-  });
-
-  const duplicate = await repository.findByIdempotencyKey(idempotencyKey);
-  const latest = await repository.latest();
-  if (duplicate || latest?.toState === assessment.regime) {
-    return { appended: false as const, backend: repository.backendStatus() };
-  }
-
-  const entry = buildPostureDecisionEvent({
-    recordedAt: resolveDeterministicRecordedAt({
-      recordDate,
-      sourceIngestedAt,
-    }),
-    effectiveRecordDate: recordDate,
-    idempotencyKey,
-    fromState: previousRegime,
-    toState: assessment.regime,
-    reason: assessment.regimeTransition?.transitionReason ?? "Transition committed without explicit reason.",
-  });
-
-  await repository.append(entry);
-
-  return { appended: true as const, event: entry, backend: repository.backendStatus() };
-};
 
 /**
  * The committed-transition log, or nothing if it cannot be read.
@@ -82,9 +17,11 @@ export const appendCommittedPostureEvent = async ({
  * outage took down every page that renders the weekly brief — nine routes at
  * once, none of which needed the log to say anything true about posture.
  *
- * Only reads degrade. `appendCommittedPostureEvent` still fails loudly, because
- * it decides whether to append by first reading; treating a failed read as "no
- * event found" there would write duplicate transitions into a durable log.
+ * Reads are all this module does now. The write path that lived here —
+ * `appendCommittedPostureEvent`, reachable only through the unconsumed
+ * `POST /api/posture-state` — appended the same committed transition that
+ * `refreshOperatingState` already appends inline on every cron run, guarded by
+ * the same "previous snapshot names a different regime" condition.
  */
 const readDecisionEvents = async (
   repository: PostureDecisionEventRepository,

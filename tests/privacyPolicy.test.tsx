@@ -26,6 +26,7 @@ import { TELEMETRY_STREAMS } from "../lib/telemetry/analyticsEngine";
 /** Every `STORAGE_KEYS` entry, against the section of /privacy that covers it. */
 const STORAGE_KEY_SECTIONS: Record<keyof typeof STORAGE_KEYS, string> = {
   theme: "2.4 — stays in the browser, never sent",
+  clientId: "2.3 — the random identifier this browser is known by",
   homeOrientationDismissed: "2.4 — stays in the browser, never sent",
   reviewedRecordDates: "2.4 — stays in the browser, never sent",
   operatorProfile: "2.4 — stays in the browser, never sent",
@@ -81,6 +82,31 @@ describe("privacy policy", () => {
     assert.match(html, /Cloudflare/);
     assert.match(html, /no IP address/i);
     assert.match(html, /never sent/i);
+  });
+
+  /*
+   * The service worker keeps copies of pages on the device. It holds no storage
+   * key and writes no telemetry stream, so neither census above can see it —
+   * which is precisely how a page that is meant to be an inventory stops being
+   * one. It is claimed here instead.
+   */
+  it("accounts for the pages the service worker keeps on the device", () => {
+    const html = renderPrivacyPage();
+    assert.match(html, /offline/i, "the app caches pages for offline reading and the page must say so");
+    assert.match(html, /copy of what this site already sent you/i);
+  });
+
+  /*
+   * A push subscription is a record held about a reader on the server, and like
+   * the offline cache it holds no storage key and writes no telemetry stream,
+   * so neither census can see it. Claimed here, with the two properties that
+   * make it a routing slip rather than a profile.
+   */
+  it("accounts for a push subscription, if one is stored", () => {
+    const html = renderPrivacyPage();
+    assert.match(html, /notif/i, "the app can store a push subscription and the page must say so");
+    assert.match(html, /no email address/i);
+    assert.match(html, /carries no content/i, "the push carries no reading, which is why it cannot go stale");
   });
 
   it("tells a reader how to leave and how to ask", () => {

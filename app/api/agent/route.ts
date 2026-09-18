@@ -5,6 +5,7 @@ import {
   supportedAgentCadences,
 } from "../../../lib/agentInterface";
 import { agentApiCorsHeaders } from "../../../lib/agentApiCors";
+import { buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
     route: "/api/agent",
   });
 
-  return NextResponse.json(payload, {
+  return NextResponse.json({ ...payload, use: buildUseConstraint() }, {
     headers: agentApiCorsHeaders,
   });
 }

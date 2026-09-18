@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ActionLink } from "../components/ui/actionLink";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
-import { BeginnerGlossaryPanel } from "../components/appendix/OnboardingPanels";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
@@ -14,9 +13,9 @@ import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
-import { ConfidenceRecordSection } from "./confidenceRecord";
 import { RunHistorySection } from "./runHistorySection";
 import { buildTrustPageModel } from "./trustPageModel";
+import { GLOSSARY_HREF } from "../../lib/report/signalTranslations";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -149,7 +148,18 @@ export default async function MethodPage({
         </div>
       </ReportSection>
 
-      <ConfidenceRecordSection />
+      {/* The study moved to /calibration — it is original research and deserved
+          an address, and two indexable URLs carrying it would compete. This
+          keeps the reader who is here to judge the call pointed at it. */}
+      <ReportSection
+        id="confidence-record"
+        title="What the confidence number has been worth"
+        description="The percent measures distance from a regime boundary. Whether calls at that distance actually held is measured separately, over the whole archive."
+      >
+        <ActionLink href="/calibration" variant="pill">
+          Read the calibration study
+        </ActionLink>
+      </ReportSection>
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
@@ -189,7 +199,21 @@ export default async function MethodPage({
         </pre>
       </ReportSection>
 
-      <BeginnerGlossaryPanel />
+      {/* The glossary itself moved to /glossary. A pointer stays because this
+          page is where a reader checking the brief before a decision ends up,
+          and "what does that word mean" is a question they arrive with — but
+          the definitions are not a trust artifact, and six links across the
+          site used to send someone who did not know a term to a page about
+          source freshness. */}
+      <ReportSection
+        id="beginner-glossary"
+        title="Unfamiliar with a term?"
+        description="Every term this site uses, in plain English, with what it changes for the company you run."
+      >
+        <ActionLink href={GLOSSARY_HREF} variant="pill">
+          Open the glossary
+        </ActionLink>
+      </ReportSection>
     </>
   );
 

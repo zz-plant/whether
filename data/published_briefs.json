@@ -78,5 +78,210 @@
     "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
     "freshnessLabel": "Aug 1, 2026 at 1:51 PM UTC",
     "correction": null
+  },
+  {
+    "slug": "2026-w38",
+    "year": 2026,
+    "week": 38,
+    "publishedAt": "2026-09-15T00:00:00.000Z",
+    "recordDate": "2026-09-15",
+    "recordDateLabel": "Sep 15, 2026",
+    "headline": "Freezing — Mid — week of Sep 15, 2026",
+    "summary": "Tighten to survival mode: approve only renewals, core delivery, and revenue-backed roles.",
+    "postureLabel": "Freezing — Mid",
+    "regime": "SCARCITY",
+    "confidenceLabel": "MED",
+    "whatChanged": "Pressure increased by +3.0 this week. Slow new commitments until conditions stabilize.",
+    "actionNow": "Conditions tightening — freeze new commitments and protect runway.",
+    "guardrailThreshold": "Funding pressure rises above 76 or risk appetite falls below 44",
+    "flipThreshold": "Funding pressure at or below 70 (77 today) or risk appetite above 50 (42 today).",
+    "decisions": [
+      {
+        "area": "hiring",
+        "call": "Backfills + mission-critical hiring only.",
+        "doNow": "Limit hiring to backfills and mission-critical roles tied to delivery risk.",
+        "pauseTrigger": "Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44.",
+        "resumeTrigger": "Resume staged approvals when funding pressure falls below 66 and risk appetite is above 54.",
+        "pause": [
+          {
+            "metric": "tightness",
+            "operator": ">",
+            "value": 76,
+            "label": "Funding pressure > 76"
+          },
+          {
+            "metric": "riskAppetite",
+            "operator": "<",
+            "value": 44,
+            "label": "Risk appetite < 44"
+          }
+        ],
+        "resume": [
+          {
+            "metric": "tightness",
+            "operator": "<",
+            "value": 66,
+            "label": "Funding pressure < 66"
+          },
+          {
+            "metric": "riskAppetite",
+            "operator": ">",
+            "value": 54,
+            "label": "Risk appetite > 54"
+          }
+        ]
+      },
+      {
+        "area": "product-tempo",
+        "call": "Protect your roadmap. Slow long-payback expansions.",
+        "doNow": "Protect core roadmap tempo and prioritize near-term customer value slices.",
+        "pauseTrigger": "Pause long-payback bets if risk appetite falls below 44 or two consecutive weaker weekly reads print.",
+        "resumeTrigger": "Resume tempo on deferred bets when risk appetite is above 54 and weekly direction stabilizes or improves.",
+        "pause": [
+          {
+            "metric": "riskAppetite",
+            "operator": "<",
+            "value": 44,
+            "label": "Risk appetite < 44"
+          }
+        ],
+        "resume": [
+          {
+            "metric": "riskAppetite",
+            "operator": ">",
+            "value": 54,
+            "label": "Risk appetite > 54"
+          }
+        ],
+        "pauseQualifier": "two consecutive weaker weekly reads print",
+        "resumeQualifier": "weekly direction stabilizes or improves"
+      },
+      {
+        "area": "capital-raising",
+        "call": "Begin raise planning early and optimize for durability over speed.",
+        "doNow": "Prepare raise materials and launch planning early to preserve process control.",
+        "pauseTrigger": "Pause acceleration if risk appetite falls below 44 or funding pressure rises above 76.",
+        "resumeTrigger": "Resume full process when risk appetite is above 54 and funding pressure falls below 66.",
+        "pause": [
+          {
+            "metric": "riskAppetite",
+            "operator": "<",
+            "value": 44,
+            "label": "Risk appetite < 44"
+          },
+          {
+            "metric": "tightness",
+            "operator": ">",
+            "value": 76,
+            "label": "Funding pressure > 76"
+          }
+        ],
+        "resume": [
+          {
+            "metric": "riskAppetite",
+            "operator": ">",
+            "value": 54,
+            "label": "Risk appetite > 54"
+          },
+          {
+            "metric": "tightness",
+            "operator": "<",
+            "value": 66,
+            "label": "Funding pressure < 66"
+          }
+        ]
+      },
+      {
+        "area": "burn-discipline",
+        "call": "Keep discretionary spend gated by measurable short-cycle payback.",
+        "doNow": "Gate discretionary spend by measurable short-cycle payback proof.",
+        "pauseTrigger": "Pause discretionary burn expansion if funding pressure rises above 76.",
+        "resumeTrigger": "Resume controlled burn expansion when funding pressure falls below 66 and budget payback proof is intact.",
+        "pause": [
+          {
+            "metric": "tightness",
+            "operator": ">",
+            "value": 76,
+            "label": "Funding pressure > 76"
+          }
+        ],
+        "resume": [
+          {
+            "metric": "tightness",
+            "operator": "<",
+            "value": 66,
+            "label": "Funding pressure < 66"
+          }
+        ],
+        "resumeQualifier": "budget payback proof is intact"
+      },
+      {
+        "area": "expansion-bets",
+        "call": "Hold irreversible expansion bets; keep only reversible experiments active.",
+        "doNow": "Keep only reversible expansion experiments active with clear checkpoints.",
+        "pauseTrigger": "Pause expansion bets if risk appetite falls below 44 or funding pressure rises above 76.",
+        "resumeTrigger": "Resume in tranches when risk appetite is above 54 and funding pressure falls below 66.",
+        "pause": [
+          {
+            "metric": "riskAppetite",
+            "operator": "<",
+            "value": 44,
+            "label": "Risk appetite < 44"
+          },
+          {
+            "metric": "tightness",
+            "operator": ">",
+            "value": 76,
+            "label": "Funding pressure > 76"
+          }
+        ],
+        "resume": [
+          {
+            "metric": "riskAppetite",
+            "operator": ">",
+            "value": 54,
+            "label": "Risk appetite > 54"
+          },
+          {
+            "metric": "tightness",
+            "operator": "<",
+            "value": 66,
+            "label": "Funding pressure < 66"
+          }
+        ]
+      }
+    ],
+    "scores": {
+      "tightness": 77,
+      "riskAppetite": 42,
+      "tightnessDelta": 14,
+      "riskAppetiteDelta": -14
+    },
+    "evidence": [
+      {
+        "title": "Capital conditions",
+        "detail": "Tighten approvals and protect runway for fixed-cost commitments.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "title": "Risk appetite",
+        "detail": "Bias toward proof-first launches and smaller bet sizes.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "title": "Fed interest rate",
+        "detail": "Shorten payback windows before approving net-new spend.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      },
+      {
+        "title": "Recession warning gauge",
+        "detail": "Cap new projects at 12-month payback; reopen longer-payback work after the curve returns above 0.0% and funding pressure stays below 70.",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
+      }
+    ],
+    "sourceLabel": "Canonical snapshot (high confidence)",
+    "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
+    "freshnessLabel": "Sep 17, 2026, 1:03 PM UTC",
+    "correction": null
   }
 ]

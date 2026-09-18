@@ -4,6 +4,7 @@ import { buildInterpretationLayer, type InterpretationLayer } from "../lib/repor
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { ForecastModel } from "../lib/report/forecastModel";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 
 const assessment = {
   regime: "DEFENSIVE",
@@ -156,7 +157,7 @@ describe("interpretation layer", () => {
     assert.match(company.bullets[0], /Rule 1 first\./);
     assert.match(company.bullets[1], /Rule 2 second\./);
     assert.match(company.bullets[2], /Rule 3 third\./);
-    assert.ok(company.bullets.every((bullet) => bullet.includes("Trigger:")));
+    assert.ok(company.bullets.every((bullet) => bullet.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}:`)));
     assert.ok(company.bullets.every((bullet) => bullet.includes("Reverse:")));
     assert.ok(company.bullets.every((bullet) => !bullet.includes("Rule 4 hidden.")));
   });
@@ -175,7 +176,7 @@ describe("interpretation layer", () => {
     assert.match(company.summary, /unavailable this week/i);
     assert.equal(company.bullets.length, 3);
     assert.match(company.bullets[0], /Action: Pressure rose compared to last week\./);
-    assert.match(company.bullets[1], /Trigger: Hold irreversible hiring\./);
+    assert.ok(company.bullets[1].includes(`${DECISION_CONTRACT_LABELS.slot.threshold}: Hold irreversible hiring.`));
     assert.match(company.bullets[2], /Reverse: Reopen if risk appetite rises above 55\./);
   });
 
@@ -205,11 +206,11 @@ describe("interpretation layer", () => {
 
     assert.match(sectorText, /Sector view/);
     assert.match(sectorText, /Action: Cloudy\+\. Run this sector a step ahead of the base call\./);
-    assert.match(sectorText, /Trigger: Hold irreversible hiring\./);
+    assert.ok(sectorText.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}: Hold irreversible hiring.`));
     assert.match(sectorText, /Reverse: Drop the sector tilt if funding pressure rises above 70\./);
     assert.match(financialText, /Financial view/);
     assert.match(financialText, /Runway risk/);
-    assert.match(financialText, /Trigger: Open the raise between month/);
+    assert.ok(financialText.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}: Open the raise between month`));
     assert.match(financialText, /Reverse: Move burn by/);
   });
 
@@ -238,7 +239,10 @@ describe("interpretation layer", () => {
       });
 
       assert.ok(layer.bullets.length >= 1 && layer.bullets.length <= 3);
-      assert.ok(layer.bullets.every((bullet) => bullet.includes("Action:") || bullet.includes("Trigger:") || bullet.includes("Reverse:")));
+      assert.ok(layer.bullets.every((bullet) =>
+        bullet.includes(`${DECISION_CONTRACT_LABELS.slot.action}:`)
+        || bullet.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}:`)
+        || bullet.includes("Reverse:")));
       assert.ok(layer.bullets.every((bullet) => bullet.length <= 340));
     }
   });

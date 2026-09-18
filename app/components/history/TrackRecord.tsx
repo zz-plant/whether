@@ -149,8 +149,14 @@ export function TrackRecord({
         </div>
       </dl>
 
+      {/* "The call has been X" read as a statement about the call on the site
+          today. Every figure in this panel comes from the month-end series, so
+          it is a statement about closed months, and the two disagree whenever
+          the month in progress has moved — which is how this page said "Sunny"
+          on a week the brief was calling Freezing. */}
       <p className="text-fluid-xs text-slate-400">
-        The call has been <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
+        Through {formatDateUTC(record.latestRecordDate)}, the month-end call had been{" "}
+        <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
         since {formatDateUTC(record.currentHoldStartDate)}.
         Hysteresis in the scoring means a single noisy month cannot flip it, so a held call is the
         expected state and a change is the event worth reading.

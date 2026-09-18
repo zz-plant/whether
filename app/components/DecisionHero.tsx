@@ -9,7 +9,7 @@ import { trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGl
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../../lib/report/homeBriefModel";
 import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
-import { buildBoundedConditionRails, formatPointsToLine } from "../../lib/report/operatingCalls";
+import { buildBoundedConditionRails, parenthesizePointsToLine } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
@@ -17,14 +17,15 @@ import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
 import { BoundedValue } from "./ui/boundedValue";
 import {
-  SCORE_BAND_LABELS,
   classifyScoreBand,
+  scoreBandScaleLabel,
   compositeSignalScales,
 } from "../../lib/report/signalTranslations";
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
 import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
+import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
 import { RunwayPersonaSelector } from "./RunwayPersonaSelector";
@@ -162,8 +163,12 @@ export function DecisionHero({
 
   // Band words and band sentences have to come from the same classification, or
   // the card says "low" above a sentence that says "balanced".
+  /* The scale-position wording, not the bare band word. Every place this
+     string renders has a pause line or a posture line within sight of it, and
+     "moderate" beside "pause line crossed" reads as a contradiction rather
+     than as two different questions being answered. */
   const tightnessBand = classifyScoreBand(tightness);
-  const tightnessLevel = SCORE_BAND_LABELS[tightnessBand];
+  const tightnessLevel = scoreBandScaleLabel(tightnessBand);
   const tightnessLevelColor =
     tightnessBand === "high"
       ? "text-rose-300/60"
@@ -177,7 +182,7 @@ export function DecisionHero({
 
   // High risk appetite = braver = room for bolder bets (see lib/report/regimeContext.ts).
   const riskAppetiteBand = riskAppetite !== undefined ? classifyScoreBand(riskAppetite) : undefined;
-  const riskAppetiteLevel = riskAppetiteBand ? SCORE_BAND_LABELS[riskAppetiteBand] : undefined;
+  const riskAppetiteLevel = riskAppetiteBand ? scoreBandScaleLabel(riskAppetiteBand) : undefined;
   const riskAppetiteLevelColor =
     riskAppetiteBand === "high"
       ? "text-emerald-300"
@@ -250,9 +255,9 @@ export function DecisionHero({
   // Mobile-collapsed signal readout (DD-004): the summary line keeps all three
   // values visible, so collapsing hides only deltas and descriptors.
   const signalReadoutSummary = [
-    `Funding pressure ${tightness} ${tightnessLevel.toLowerCase()}`,
+    `Funding pressure ${tightness} ${tightnessLevel}`,
     typeof riskAppetite === "number" && riskAppetiteLevel
-      ? `Risk appetite ${riskAppetite} ${riskAppetiteLevel.toLowerCase()}`
+      ? `Risk appetite ${riskAppetite} ${riskAppetiteLevel}`
       : null,
     regimeDisplay,
   ]
@@ -270,7 +275,7 @@ export function DecisionHero({
         <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
           {tightness}
           <span className="font-normal text-white/35">/100</span>{" "}
-          <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel.toLowerCase()}</span>
+          <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel}</span>
           {tightnessSaturated && typeof tightnessPressure === "number" ? (
             <span
               className="ml-1.5 text-fluid-nano font-normal text-amber-300/80"
@@ -323,7 +328,7 @@ export function DecisionHero({
             current={tightness}
             previous={tightness - tightnessDelta}
             trigger={tightnessThreshold}
-            triggerLabel="Watch line"
+            triggerLabel={DECISION_CONTRACT_LABELS.watch.postureFlips}
             viewBoxWidth={220}
             signalLabel="Funding pressure"
             scaleDirection={compositeSignalScales.tightness.directionLabel}
@@ -343,7 +348,7 @@ export function DecisionHero({
           <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
             {riskAppetite}
             <span className="font-normal text-white/35">/100</span>{" "}
-            <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel?.toLowerCase() ?? ""}</span>
+            <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel ?? ""}</span>
           </p>
           {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
             <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
@@ -378,7 +383,7 @@ export function DecisionHero({
                 typeof riskAppetiteDelta === "number" ? riskAppetite - riskAppetiteDelta : undefined
               }
               trigger={riskAppetiteThreshold}
-              triggerLabel="Watch line"
+              triggerLabel={DECISION_CONTRACT_LABELS.watch.postureFlips}
               viewBoxWidth={220}
               invert
               signalLabel="Risk appetite"
@@ -653,31 +658,43 @@ export function DecisionHero({
                         max={100}
                         current={rail.current}
                         trigger={rail.guardrail}
-                        triggerLabel={DECISION_CONTRACT_LABELS.threshold.guardrail}
+                        triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
                         reversal={rail.clearsAt}
-                        reversalLabel={DECISION_CONTRACT_LABELS.reversal.clearsWhen}
+                        reversalLabel={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
                         hysteresisBand
                         invert={rail.invert}
                         signalLabel={rail.label}
+                        /* The pair reads as a small-multiple set, and the two
+                           rails run opposite axes: `invert` flips the falling
+                           signal so trouble sits right on both. That flip was
+                           announced only by the numeric end-labels — 0…100 on
+                           one rail, 100…0 on the other, at 8px — so a reader
+                           comparing marker positions got risk appetite
+                           backwards unless they read them. The scale words name
+                           each end in the reader's terms and follow the flip,
+                           which is what the ladder's `scaleDirection` was built
+                           to do; the bounded rails were the one pair of rails
+                           that never passed it. */
+                        scaleDirection={compositeSignalScales[rail.metric]?.directionLabel}
                         viewBoxWidth={300}
                       />
                       <dl className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums">
                         <div className="flex items-baseline gap-1.5">
-                          <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}</dt>
+                          <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
                           <dd className="text-slate-300">
                             {rail.guardrail}
                             <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-white/45"}`}>
-                              {formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
+                              {parenthesizePointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
                             </span>
                           </dd>
                         </div>
                         {rail.clearsAt !== undefined ? (
                           <div className="flex items-baseline gap-1.5">
-                            <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}</dt>
+                            <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</dt>
                             <dd className="text-slate-300">
                               {rail.clearsAt}
                               <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-white/45"}`}>
-                                {formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
+                                {parenthesizePointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
                               </span>
                             </dd>
                           </div>
@@ -690,7 +707,7 @@ export function DecisionHero({
 
               {boundedRails.length > 0 && (boundedConditions?.pauseQualifier || boundedConditions?.resumeQualifier) ? (
                 <p className="text-fluid-nano text-white/45">
-                  {boundedConditions?.pauseQualifier ? `${DECISION_CONTRACT_LABELS.threshold.guardrail} also trips if ${boundedConditions.pauseQualifier}.` : null}
+                  {boundedConditions?.pauseQualifier ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf} also trips if ${boundedConditions.pauseQualifier}.` : null}
                   {boundedConditions?.pauseQualifier && boundedConditions?.resumeQualifier ? " " : null}
                   {boundedConditions?.resumeQualifier ? `Clears only when ${boundedConditions.resumeQualifier}.` : null}
                 </p>
@@ -703,7 +720,7 @@ export function DecisionHero({
                     carry the numbers and the sentences would restate them. */}
                 {guardrail && boundedRails.length === 0 ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.guardrail}:</dt>
+                    <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
                   </div>
                 ) : null}
@@ -719,7 +736,7 @@ export function DecisionHero({
                 ) : null}
                 {flipConditions && flipConditions.length > 0 && boundedRails.length === 0 ? (
                   <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.clearsWhen}:</dt>
+                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:</dt>
                     <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
                   </div>
                 ) : null}
@@ -759,7 +776,7 @@ export function DecisionHero({
                   and shared, and losing Confidence, a required field of the
                   screenshot contract. Only the longer trust-status sentence is
                   held back to keep the line from dominating a narrow column. */}
-              <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · Confidence ${confidenceLabel}` : ""}</span>
+              <span>{sourceNode} · {recordDate}{confidenceLabel ? ` · ${formatConfidenceChipLabel(confidenceLabel)}` : ""}</span>
               {trustStatusLabel ? <span className="hidden sm:inline">· {trustStatusLabel}</span> : null}
             </p>
           </div>

@@ -5,6 +5,8 @@ import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { assessPublishReadiness } from "../report/briefPublishGuard";
+import { siteUrl } from "../siteUrl";
 
 /**
  * How far a reading sits from the line that would change the call, and which
@@ -113,6 +115,33 @@ type SendWeeklyBriefResult = {
 };
 
 /**
+ * What this send is allowed to claim, given the reading behind it.
+ *
+ * `scripts/freezeWeeklyBrief.ts` and `scripts/generateWeeklySlackBrief.ts` have
+ * asked this since 2026-08-29, and this path — the one artifact that leaves the
+ * building and cannot be corrected afterwards — did not. It read the snapshot
+ * with `?.` throughout and filled every gap with a constant: no snapshot meant
+ * regime `"DEFENSIVE"`, "Hold bounded operating discipline.", and a record date
+ * reading "this week". That is a call nobody computed, mailed to every
+ * subscriber, returning `ok: true` so the Monday `cron-step` row on /trust went
+ * green for it.
+ *
+ * The flags to judge on were already in hand: `buildOperatingSnapshot` writes
+ * `provenance.isLive` and `freshness.status`, which are what `assessPublishReadiness`
+ * takes. The staleness limit is the archive's, deliberately — a brief mailed as
+ * this week's and a week frozen into the archive make the same claim about which
+ * week it is.
+ */
+const assessSendReadiness = (snapshot: OperatingSnapshot, now: Date) =>
+  assessPublishReadiness({
+    degraded: false,
+    isFallback: snapshot.freshness.status === "fallback",
+    isLive: snapshot.provenance.isLive,
+    recordDate: snapshot.recordDate,
+    now,
+  });
+
+/**
  * Send the weekly brief to all active subscribers. Shared by the cron trigger
  * (direct call from worker/index.ts) and the POST /api/email/send-weekly route,
  * projecting the authoritative OperatingSnapshot. Slack delivery is its own cron
@@ -121,6 +150,7 @@ type SendWeeklyBriefResult = {
 export const sendWeeklyBrief = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
+  now?: Date;
 }): Promise<SendWeeklyBriefResult> => {
   const subscriptions = await getActiveSubscriptions();
   const adapter = createCloudflareEmailAdapter();
@@ -141,20 +171,39 @@ export const sendWeeklyBrief = async (options?: {
     }
   }
 
-  const regime = snapshot?.assessment.regime ?? "DEFENSIVE";
+  const refuse = (reason: string): SendWeeklyBriefResult => ({
+    ok: false,
+    sent: 0,
+    errors: 0,
+    total: subscriptions.length,
+    deliveryMode,
+    error: `refused_unpublishable: ${reason}`,
+  });
+
+  if (!snapshot || !weeklyCall) {
+    return refuse("No operating snapshot is available; there is no call to send.");
+  }
+
+  const readiness = assessSendReadiness(snapshot, options?.now ?? new Date());
+  if (!readiness.ok) {
+    return refuse(readiness.reason);
+  }
+
+  /* Past the guard, every line below is a reading rather than a stand-in for one. */
+  const regime = snapshot.assessment.regime;
   const regimeLabel = getRegimePublicLabel(regime);
   const readings = buildWeeklyEmailReadings(snapshot);
-  const actionNow = weeklyCall?.actionNow ?? weeklyCall?.currentCall ?? "Hold bounded operating discipline.";
-  const pauseIf = weeklyCall?.pauseIf ?? "Pause irreversible commitments if funding tightness rises.";
-  const changeCourseIf = weeklyCall?.changeCourseIf ?? "Resume staged approvals when conditions stabilize.";
-  const recordDate = snapshot?.provenance.recordDateLabel ?? "this week";
+  const actionNow = weeklyCall.actionNow;
+  const pauseIf = weeklyCall.pauseIf;
+  const changeCourseIf = weeklyCall.changeCourseIf;
+  const recordDate = snapshot.provenance.recordDateLabel;
 
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regimeLabel}: ${actionNow}`
         : `Whether Brief — ${regimeLabel}`;
-      const briefUrl = "https://whether.work";
+      const briefUrl = siteUrl;
       const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
 
       const text = [
@@ -205,11 +254,11 @@ export const sendWeeklyBrief = async (options?: {
         `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.15);margin-top:24px;" />`,
         `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
         `<td style="font-size:0.7rem;color:#64748b;padding-top:12px;">`,
-        `<a href="https://whether.work/trust" style="color:#64748b;text-decoration:underline;">Methodology</a>`,
+        `<a href="${siteUrl}/trust" style="color:#64748b;text-decoration:underline;">Methodology</a>`,
         ` · `,
-        `<a href="https://whether.work/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
+        `<a href="${siteUrl}/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
         ` · `,
-        `<a href="https://whether.work" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
+        `<a href="${siteUrl}" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
         unsubscribeFooterHtml(recipient.token),
         `</td></tr></table>`,
         `</body></html>`,

@@ -58,8 +58,17 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     operatorPrompt: "Would a new product launch or expansion hire get funded or questioned?",
   },
   baseRate: {
-    plainLabel: "Fed interest rate",
-    whatItMeasures: "The baseline cost of money set by the Federal Reserve. Higher means borrowing costs more.",
+    /*
+     * Not "Fed interest rate". `getBaseRate`'s `FED` rung has never fired, so
+     * this number is the 1-month Treasury bill in every published reading —
+     * `BASE_RATE_SOURCE_LABELS` in `regimeEngineCore` already corrected the
+     * engine's own wording for exactly this reason, and the correction never
+     * reached the four label tables that render it. A name that says which
+     * institution set the rate is a claim; "short-term borrowing rate" is what
+     * the number is on any of the three rungs.
+     */
+    plainLabel: "Short-term borrowing rate",
+    whatItMeasures: "The baseline cost of short-term borrowing in U.S. markets. Higher means borrowing costs more.",
     highMeans:
       "Borrowing is expensive — prioritize cash-flow-positive work, extend runway, and avoid debt-heavy growth.",
     lowMeans:
@@ -150,6 +159,24 @@ export const SCORE_BAND_LABELS: Record<ScoreBand, string> = {
 };
 
 /**
+ * The same band word, said as a position on the scale.
+ *
+ * The bands answer "is 42 a normal number or an unusual one" and the decision
+ * lines answer "has anything tripped". They are different questions with
+ * different cut points — the bands split at 30 and 70, the risk-appetite
+ * posture line sits at 50 and its pause line at 44 — so a week can, and did,
+ * render "Risk appetite 42 moderate" directly above a rail reading
+ * "42 · pause line crossed". Both were true. The reassuring one was the word.
+ *
+ * Wherever a band word sits within sight of a line, it says "mid range" rather
+ * than "moderate", so the reader can tell a statement about the scale from a
+ * statement about the rule. `scoreBandReference` keeps the bare words: it is a
+ * table of the bands themselves, where nothing else is being claimed.
+ */
+export const scoreBandScaleLabel = (band: ScoreBand): string =>
+  `${band === "mid" ? "mid" : SCORE_BAND_LABELS[band].toLowerCase()} range`;
+
+/**
  * The reference a bare score needs to be readable: what the three bands are and
  * what a reading in each means. Without it, "64" is a number with no scale
  * attached, which is only interpretable if you already know the domain.
@@ -178,8 +205,31 @@ export const scoreBandReference = (key: RegimeSignalKey): readonly ScoreBandRow[
   ];
 };
 
-/** Canonical destination for "what does this word mean" links. */
-export const GLOSSARY_HREF = "/trust#beginner-glossary";
+/**
+ * The canonical reader-facing name for each signal.
+ *
+ * Four modules used to carry their own copy of this map — `reportFormatting`,
+ * `briefFormatting`, `reportEvidence` twice — and three of them carried a
+ * comment telling the next reader not to add a fourth spelling. The comments
+ * were the whole mechanism, so when `baseRate` needed renaming the rename had
+ * to land in six places and landed in none. Derived from `signalPlainEnglish`,
+ * which already had to hold the name for its own sentences.
+ */
+export const regimeSignalLabel: Record<RegimeSignalKey, string> = {
+  tightness: signalPlainEnglish.tightness.plainLabel,
+  riskAppetite: signalPlainEnglish.riskAppetite.plainLabel,
+  baseRate: signalPlainEnglish.baseRate.plainLabel,
+  curveSlope: signalPlainEnglish.curveSlope.plainLabel,
+};
+
+/**
+ * Canonical destination for "what does this word mean" links.
+ *
+ * Was `/trust#beginner-glossary`. A reader who does not know what funding
+ * pressure means was sent to a page named Trust, about freshness and source
+ * coverage — the one reader least able to work out why they had landed there.
+ */
+export const GLOSSARY_HREF = "/glossary";
 
 export const plainEnglishScoreDescription = (
   key: RegimeSignalKey,
@@ -214,7 +264,7 @@ export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
   { pattern: /\brisk appetite threshold\b/gi, replacement: "risk tolerance boundary" },
   { pattern: /\bVC funding slowdown\b/gi, replacement: "VC funding is slowing" },
   { pattern: /\bTech layoff pressure\b/gi, replacement: "tech layoffs are rising" },
-  { pattern: /\bBase rate\b/gi, replacement: "Fed interest rate" },
+  { pattern: /\bBase rate\b/gi, replacement: "Short-term borrowing rate" },
   // Regime keys.
   { pattern: /\bSCARCITY\b/g, replacement: "Freezing" },
   { pattern: /\bDEFENSIVE\b/g, replacement: "Cloudy" },

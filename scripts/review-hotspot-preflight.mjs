@@ -53,32 +53,76 @@ function sanitizeBaseRef(base) {
  * `describeDiffRange` names whichever applies in the printed output, so the
  * line in the gate log says what was actually compared.
  */
-function getDiffRange() {
+
+/**
+ * The default range, given what HEAD turns out to be.
+ *
+ * `HEAD~1` is the first parent, which is right for an ordinary commit and wrong
+ * for a merge: on "merge the base branch into this PR", the first parent is the
+ * pre-merge branch tip, so `git diff HEAD~1` reports every line the *base*
+ * brought in as newly added by this change. The pre-push hook failed that way
+ * on a routine base merge, flagging an `as` cast that had been on `main` for a
+ * day, and the gate's own fix for a merge conflict could not be pushed without
+ * `SKIP_PREPUSH=1`.
+ *
+ * For a merge, the second parent is the branch being merged *in* — the base —
+ * so `HEAD^2...HEAD` is "everything on this branch since it last agreed with
+ * the base", which is the change under review. It is a three-dot range, so it
+ * ignores the working tree, which is the honest reading on a merge commit
+ * anyway: what a merge commit contributes is committed by definition.
+ *
+ * Pure so the decision is testable without building a repository with two
+ * parents; the caller supplies what git said.
+ */
+export function resolveDefaultDiffRange({ hasHeadParent, parentCount }) {
+  if (!hasHeadParent) return ["HEAD"];
+  /* Two ranges, because one cannot say both things. `HEAD^2...HEAD` is
+     commit-to-commit and ignores the working tree, and the default mode's whole
+     value is that it sees uncommitted work — a branch cut from this repo's main
+     starts at a merge commit, so keying only off the merge would have made every
+     fresh branch's edits invisible until the first commit. That is a worse bug
+     than the one this fixes. */
+  if (parentCount >= 2) return ["HEAD^2...HEAD", "HEAD"];
+  return ["HEAD~1"];
+}
+
+function countHeadParents() {
+  const line = sh("git", ["rev-list", "--parents", "-n", "1", "HEAD"]);
+  if (!line) return 0;
+  /* "<commit> <parent>..." — every field after the commit itself is a parent. */
+  return line.trim().split(/\s+/).length - 1;
+}
+
+/** Every range the scan compares, in the order they are reported. */
+function getDiffRanges() {
   const base = sanitizeBaseRef(readArg("--base", process.env.REVIEW_HOTSPOT_BASE || ""));
   const head = readArg("--head", process.env.REVIEW_HOTSPOT_HEAD || "HEAD");
 
   if (hasFlag("--working-tree")) {
-    return "HEAD";
+    return ["HEAD"];
   }
 
   if (base) {
-    return `${base}...${head}`;
+    return [`${base}...${head}`];
   }
 
   try {
-    const hasHeadParent = sh("git", ["rev-parse", "--verify", "HEAD~1"]);
-    if (hasHeadParent) {
-      return "HEAD~1";
-    }
+    const hasHeadParent = Boolean(sh("git", ["rev-parse", "--verify", "HEAD~1"]));
+    return resolveDefaultDiffRange({ hasHeadParent, parentCount: countHeadParents() });
   } catch {
-    return "HEAD";
+    return ["HEAD"];
   }
-
-  return "HEAD";
 }
 
 /** Says, in words, which commits and which uncommitted edits a range covers. */
 export function describeDiffRange(diffRange) {
+  if (Array.isArray(diffRange)) {
+    if (diffRange.length === 1) return describeDiffRange(diffRange[0]);
+    return `${diffRange.join(" + ")} (a merge commit: this branch since it last agreed with the base, plus any uncommitted changes)`;
+  }
+  if (diffRange === "HEAD^2...HEAD") {
+    return `${diffRange} (this branch since it last agreed with the base)`;
+  }
   if (diffRange.includes("...")) {
     return `${diffRange} (commits only — uncommitted changes are NOT scanned)`;
   }
@@ -88,10 +132,17 @@ export function describeDiffRange(diffRange) {
   return `${diffRange} (the last commit plus any uncommitted changes)`;
 }
 
-function changedFiles(diffRange) {
-  const output = sh("git", ["diff", "--name-only", diffRange]);
-  if (!output) return [];
-  return output.split("\n").map((file) => file.trim()).filter(Boolean);
+function changedFiles(diffRanges) {
+  const files = new Set();
+  for (const range of diffRanges) {
+    const output = sh("git", ["diff", "--name-only", range]);
+    if (!output) continue;
+    for (const file of output.split("\n")) {
+      const trimmed = file.trim();
+      if (trimmed) files.add(trimmed);
+    }
+  }
+  return [...files];
 }
 
 /**
@@ -161,7 +212,11 @@ export function isUnsafeAssertion(code) {
   return /\sas\s+[A-Za-z_$<{(]/.test(withoutStrings) && !/\sas\s+const\b/.test(withoutStrings);
 }
 
-function addedTypeAssertions(diffRange) {
+function addedTypeAssertions(diffRanges) {
+  return [...new Set(diffRanges.flatMap((range) => addedTypeAssertionsForRange(range)))];
+}
+
+function addedTypeAssertionsForRange(diffRange) {
   const diff = sh("git", ["diff", "--unified=0", diffRange, "--", "*.ts", "*.tsx"]);
   if (!diff) return [];
 
@@ -232,7 +287,7 @@ function main() {
     process.exit(0);
   }
 
-  const diffRange = getDiffRange();
+  const diffRange = getDiffRanges();
   const files = changedFiles(diffRange);
 
   if (files.length === 0) {

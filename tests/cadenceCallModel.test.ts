@@ -5,7 +5,7 @@ import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { getMonthlyActionGuidance } from "../lib/summary/monthlySummary";
 import { getQuarterlyActionGuidance } from "../lib/summary/quarterlySummary";
-import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import type { RegimeKey } from "../lib/regimeEngine";
 
 const rawAssessment = evaluateRegime({
@@ -276,7 +276,7 @@ describe("buildCadenceCallModel", () => {
   it("names the artifact by horizon so a shared call is not labelled weekly", () => {
     assert.equal(build("monthly").shareTitle, "Whether Monthly Call");
     assert.equal(build("quarterly").shareTitle, "Whether Quarterly Call");
-    assert.ok(build("monthly").shareLines.some((line) => line.startsWith("Guardrail: ")));
-    assert.ok(build("monthly").shareLines.some((line) => line.startsWith("Reversal: ")));
+    assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.threshold.pauseIf}: `)));
+    assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: `)));
   });
 });

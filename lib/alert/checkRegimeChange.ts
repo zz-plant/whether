@@ -4,10 +4,18 @@ import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { siteUrl } from "../siteUrl";
+import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
 
 type CheckRegimeChangeResult = {
   ok: boolean;
+  /**
+   * What the browser notifications did, when the regime moved. Absent on a run
+   * where it did not — reporting "0 sent" for a week nothing happened is the
+   * cron step that claims success for work it never observed.
+   */
+  push?: { sent: number; pruned: number; failed: number; reason?: string };
   error?: string;
   previousRegime?: string | null;
   currentRegime?: string;
@@ -26,7 +34,7 @@ const postSlackAlert = async (webhook: string, header: string, body: string) => 
       blocks: [
         { type: "header", text: { type: "plain_text", text: header } },
         { type: "section", text: { type: "mrkdwn", text: body } },
-        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: "https://whether.work", action_id: "open_brief" }] },
+        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
       ],
     }),
   });
@@ -68,10 +76,22 @@ export const checkRegimeChange = async (options?: {
   const prevWeeksToFlip = await kv.get("regime:weeks-to-flip");
   const previousRegime = lastKnown ?? null;
   const alerts: string[] = [];
+  let pushOutcome: Awaited<ReturnType<typeof sendRegimeChangePush>> | null = null;
 
   /* 1. Regime change — highest priority alert */
   if (previousRegime && previousRegime !== currentRegime) {
     alerts.push(`RECONSIDER OPERATING POSTURE — regime shifted from ${previousRegime} to ${currentRegime}`);
+    /*
+     * Here and nowhere else. A notification that fires on every cron run,
+     * whether or not anything happened, is one people turn off — and then the
+     * one that mattered never arrives. This is the only branch that knows the
+     * published regime actually moved.
+     *
+     * Not awaited into the result and never allowed to throw: a push service
+     * being slow or down must not fail the regime check, which has KV state to
+     * write after this.
+     */
+    pushOutcome = await sendRegimeChangePush().catch(() => null);
     if (slackWebhook) {
       await postSlackAlert(
         slackWebhook,
@@ -146,5 +166,11 @@ export const checkRegimeChange = async (options?: {
     velocityLabel: projection.velocityLabel,
     alerts: alerts.length > 0 ? alerts : undefined,
     ...(flashMoves.length > 0 ? { flashMoves } : {}),
+    /* Absent on a run where the regime did not move, rather than a cheerful
+       "0 sent": a step that reports on work it did not do gets read as
+       evidence that it did it. */
+    push: pushOutcome
+      ? { sent: pushOutcome.sent, pruned: pushOutcome.pruned, failed: pushOutcome.failed, reason: pushOutcome.reason }
+      : undefined,
   };
 };

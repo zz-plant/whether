@@ -545,7 +545,7 @@ export function ScenarioStudioSimulator({
                 <tr className="border-b border-slate-800 text-slate-400 font-medium">
                   <th scope="col" className="py-2 pr-3 w-1/5">Business Area</th>
                   <th scope="col" className="py-2 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.action.actionNow}</th>
-                  <th scope="col" className="py-2 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.threshold.guardrail}</th>
+                  <th scope="col" className="py-2 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
                 </tr>
               </thead>
               <tbody>

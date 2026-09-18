@@ -156,8 +156,31 @@ const buildUnsealedRecords = (entry: DecisionMemoryEntry, baseUrl: string): Unse
   const checkUrl = `${baseUrl}/api/weekly`;
   const asOf = asOfFromRecordDate(entry.context.recordDate);
   const time = { as_of: asOf, recorded_at: entry.createdAt, valid_until: addDays(asOf, 7) };
-  const actor = entry.owner
-    ? { id: entry.owner, kind: "human" as const, on_behalf_of: entry.context.clientId }
+  /*
+   * A human actor is attested, never claimed.
+   *
+   * `owner` arrives in the POST body, and `POST /api/decision-memory` had no
+   * authentication — `requireClientOwner` compared a header against a body field
+   * that the same caller wrote. So anyone could append a record attributed to a
+   * named `human`, into a ledger this site publishes as STD-07 conformance
+   * level 2, chained, with an external verifier named beside it.
+   *
+   * That matters more than an ordinary spoof because of what the ledger is for.
+   * The Acceptable Use Policy (§3.2) requires human review for decisions
+   * affecting individuals, and this record is the artifact that would evidence
+   * it — so the unauthenticated path could manufacture proof of the review the
+   * policy demands. The chain and the server-set `recorded_at` defend against
+   * tampering and backdating; neither says anything about who wrote a record.
+   *
+   * `verifiedOwner` is set only when the request carried a valid signed client
+   * token. Without one the owner claim is not recorded at all, rather than
+   * recorded with a caveat: an unverifiable claim written into an audit record
+   * is worse than an absent one, because it reads as fact to everything
+   * downstream. The entry still appears, attributed to the service that
+   * actually produced it, which is the true statement available.
+   */
+  const actor = entry.verifiedOwner
+    ? { id: entry.verifiedOwner, kind: "human" as const, on_behalf_of: entry.context.clientId }
     : {
         id: kind === "decision" ? "whether-decision-shield" : "whether-weekly-brief",
         kind: "service" as const,

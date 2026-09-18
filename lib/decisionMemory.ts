@@ -41,6 +41,13 @@ export type DecisionMemoryEntry = {
   kind?: DecisionMemoryEntryKind;
   department?: DecisionDepartment;
   owner?: string;
+  /**
+   * The owner, when the server could verify the request was made by the client
+   * it claims. Only this field may become a `human` actor in an exported
+   * record; `owner` above is the caller's unverified claim and is kept for
+   * display only. See `lib/export/revisableDelegationRecord.ts`.
+   */
+  verifiedOwner?: string;
   context: {
     clientId: string;
     teamId?: string;
