@@ -81,7 +81,7 @@ export function RunwayDropdownPill({
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={`Current cash runway: ${selectedOption.label}. Tap to change runway`}
-        className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-900/80 px-3 py-1 text-xs font-semibold text-slate-200 shadow-sm backdrop-blur-md transition-colors hover:border-teal-500/40 hover:bg-slate-800/80 hover:text-white focus-visible:outline-2 focus-visible:outline-teal-400"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-900/80 px-3 py-1 text-xs font-semibold text-slate-200 shadow-sm backdrop-blur-md transition-colors hover:border-sky-500/40 hover:bg-slate-800/80 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
       >
         <span>{selectedOption.label}</span>
         <ChevronDown
@@ -110,7 +110,7 @@ export function RunwayDropdownPill({
                 onClick={() => handleSelectRunway(option.key)}
                 className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition-colors ${
                   isSelected
-                    ? "bg-teal-500/15 font-semibold text-teal-300"
+                    ? "bg-sky-500/15 font-semibold text-sky-300"
                     : "text-slate-300 hover:bg-slate-900 hover:text-white"
                 }`}
               >
@@ -118,7 +118,7 @@ export function RunwayDropdownPill({
                   <div>{option.label}</div>
                   <div className="text-[10px] text-slate-400">{option.sublabel}</div>
                 </div>
-                {isSelected ? <Check size={14} className="text-teal-400 shrink-0 ml-2" /> : null}
+                {isSelected ? <Check size={14} className="text-sky-400 shrink-0 ml-2" /> : null}
               </button>
             );
           })}
