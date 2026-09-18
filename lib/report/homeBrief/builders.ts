@@ -41,7 +41,6 @@ import {
   startupVariantModes,
 } from "../boundedDecisionRules";
 import { buildDecisionMatrixPayload } from "./decisionMatrix";
-import { buildStartupClimateIndex } from "./scoring";
 import { buildPrimaryRiskLabel } from "./risk";
 import { extractExecutiveOperationalStance } from "./executiveOperationalStance";
 import {
@@ -329,7 +328,6 @@ export const buildHomeBriefModelInternal = (
       riskAppetite: riskThreshold,
     },
   };
-  const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
   const weeklyLeadershipSummary = buildWeeklyLeadershipBriefModel({
     assessment,
     previousAssessment,
@@ -585,7 +583,6 @@ export const buildHomeBriefModelInternal = (
       pauseIf: guardrail,
       changeCourseIf: conciseFlipThreshold,
     }),
-    startupClimateIndex,
     regimeDistance,
     regimeVelocity,
     decisionShiftSummary: buildDecisionShiftSummary({
@@ -773,7 +770,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       inputInfluence: homeBriefModel.inputInfluence,
       postureTrajectory: homeBriefModel.postureTrajectory,
       currentScores: homeBriefModel.currentScores,
-      startupClimateIndex: homeBriefModel.startupClimateIndex,
       regimeDistance: homeBriefModel.regimeDistance,
       flipRiskMeter: buildFlipRiskMeterState(homeBriefModel.regimeDistance),
       regimeVelocity: homeBriefModel.regimeVelocity,

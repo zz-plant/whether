@@ -365,7 +365,6 @@ export const buildWeeklyDecisionCardModel = (
       tightness: 64,
       riskAppetite: 52,
     },
-    startupClimateIndex: { score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] },
     regimeDistance: { dimensionLabel: "Tightness", currentValue: 64, thresholdValue: 70, pointsToFlip: 6, dimensionKey: "tightness", thresholdDirection: "riseAbove" },
     flipRiskMeter: {
       progressPercent: 50,

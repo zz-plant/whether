@@ -686,6 +686,45 @@ a failing test or a dead export, and the suite was green through all of them.
   with a SAMPLE line now, the same rule `tests/downloadableResourceArtifacts.test.ts` holds for the
   downloadable artifacts.
 
+### The three left open, closed 2026-09-18
+
+- **`/history` painted its whole chrome in the archive's newest regime.** The accent
+  (`regimeAccentStyle`, on the page shell) is the hue every section rule, eyebrow and the mobile
+  outline draw in — the site saying what the weather is — and `/history` fed it
+  `trackRecord.currentRegime`. So the page rendered Sunny throughout on a week the brief was calling
+  Freezing, and a reader one click from `/` watched the site change its mind. The status line still
+  names the archive's regime, which describes the numbers on the page; the accent is neutral now.
+  `tests/regimeColourContract.test.tsx` already carried the principle and the exception — "/history/compare
+  is the one exception by design: it shows two weeks, and keying it to either would mislead" — so
+  `/history`, which shows 176 months and counts all four regimes in a panel of its own, is the
+  second exception rather than a new rule.
+- **`startupClimateIndex` is gone.** It was computed on every build, carried into the weekly
+  decision card's `diagnostics`, and rendered by nothing. A *field* rather than an export, so
+  `check:dead-exports` could not see it — and `tests/homeBriefModel.test.ts` asserted on its score
+  and its four breakdown rows without ever asking whether a reader could reach it, which is the
+  mechanism that kept the four features above alive. `docs/adoption-driven-change-plan.md` had
+  already put the choice as "surface it or remove the computation entirely"; surfacing it would have
+  meant inventing the surface.
+- **`review:hotspot-preflight` could not read a merge commit.** Its default range was `HEAD~1` — the
+  first parent, which on "merge the base branch into this PR" is the *pre-merge branch tip*, so
+  every line the base brought in read as newly added. Merging `main` on 2026-09-17 flagged an `as`
+  cast that had been on `main` for a day, and the merge that resolved that PR's conflict could only
+  be pushed with `SKIP_PREPUSH=1`. A merge now scans `HEAD^2...HEAD`: the second parent is the
+  branch merged *in*, so the range is this branch since it last agreed with the base. Checked
+  against the commit that misfired, the first parent surfaces seven lines of the base's own code and
+  the new range surfaces none.
+
+  **The first version of that fix was worse than the bug**, and the shape is worth keeping. A
+  three-dot range ignores the working tree, and every branch cut from this repo's `main` starts at a
+  merge commit — so scanning only the merge range made a fresh branch's uncommitted edits invisible
+  until its first commit. The default mode's whole value is that it sees uncommitted work. It scans
+  both ranges now, and the printed line names both.
+
+  Left alone, deliberately: `isUnsafeAssertion` does not strip template literals, so prose in a
+  backticked assertion message can still trip it (this session hit "…as one of them" and reworded
+  the message). The comment there states the reason — `${...}` can hold real code — and blanking the
+  literal text without blanking interpolations is a change to a matcher, not to a range.
+
 **Two findings from that audit were wrong and are recorded here as such.** The mockup route being
 publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
 four of six sections collapsed: `resolveInitialOpenStepIds` opens the first step plus anything
