@@ -144,7 +144,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
         someone who has never seen it, and the comment above records what it cost
         the last time this spot grew a second block of controls.
       */}
-      <details className="weather-auto-chevron group mt-3">
+      <details className="weather-auto-chevron group mt-1">
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center gap-2 rounded-md text-fluid-xs text-slate-400 hover:text-slate-200">
           How to read this page
           <span className="text-slate-500">{FIRST_TIME_GUIDE_STEPS.length} steps</span>

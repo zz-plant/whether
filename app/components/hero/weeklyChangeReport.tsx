@@ -1,6 +1,6 @@
 import type { RegimeSignalIndicator } from "../../../lib/report/homeBriefModel";
 import type { RevisitQueueItem } from "../../../lib/report/homeBriefModel";
-import { Sparkline } from "../ui/sparkline";
+import { MIN_SHAPE_POINTS, Sparkline } from "../ui/sparkline";
 import { TrendGlyph, trendDirectionFromArrow, trendToneClass } from "../illustrations/TrendGlyph";
 
 /**
@@ -16,9 +16,16 @@ const INCREASE_IS_POSITIVE: Record<string, boolean> = {
 
 /**
  * The move as a record, not a sentence: name, reading, signed delta with a
- * direction glyph, and the trailing window as a sparkline. The sentence the
- * model wrote survives for assistive tech and copy, where a row of chips
- * does not read aloud.
+ * direction glyph, and — where there is one — the trailing window as a
+ * sparkline. The sentence the model wrote survives for assistive tech and
+ * copy, where a row of chips does not read aloud.
+ *
+ * The composite signals carry a two-value series (`[threshold, reading]`,
+ * see `resolveSparkline`), which is a comparison, not a window: drawn, it was
+ * a straight segment whose slope repeated the delta beside it, and on a phone
+ * it wrapped onto a line of its own. The rails under "Watch this week" already
+ * draw that comparison on a stated scale, so the row prints nothing here
+ * unless the series has a shape.
  */
 const SignalMoveRow = ({ signal, headline }: { signal: RegimeSignalIndicator; headline: string }) => {
   const direction = trendDirectionFromArrow(signal.trendArrow);
@@ -33,7 +40,7 @@ const SignalMoveRow = ({ signal, headline }: { signal: RegimeSignalIndicator; he
         <TrendGlyph direction={direction} className="h-3 w-3" />
         {signal.trendDeltaLabel}
       </span>
-      {points.length >= 2 ? (
+      {points.length >= MIN_SHAPE_POINTS ? (
         <span aria-hidden="true" className="ml-auto text-white/50">
           <Sparkline points={points} label={signal.label} widthEm={5} tone={direction === "up" ? (INCREASE_IS_POSITIVE[signal.key] ? "easing" : "tightening") : direction === "down" ? (INCREASE_IS_POSITIVE[signal.key] ? "tightening" : "easing") : "unchanged"} />
         </span>

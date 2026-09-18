@@ -21,6 +21,8 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
+import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
+import { regimeDataAttribute } from "../lib/regimeAccent";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
@@ -47,7 +49,6 @@ import { buildDriverViews } from "../lib/report/driverDecisionViews";
 import { getTimeMachineRegimeSeries, getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
 import { buildTrackRecord } from "../lib/report/trackRecord";
 import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
-import { RecentPostureHistoryCard } from "./components/hero/RecentPostureHistoryCard";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
 
@@ -225,14 +226,20 @@ async function PageContent({
   // Same score the hero headlines, computed back across the window so the number
   // carries its own history. Months missing either input are dropped rather than
   // interpolated — a gap is honest, an invented point is not.
-  const boldnessTrend = macroTrendline.flatMap((entry) =>
-    entry.tightness != null && entry.riskAppetite != null
-      ? [{
-          label: formatMonthYearShortFromValue(entry.record_date),
-          value: buildBoldnessScore(entry.tightness, entry.riskAppetite),
-        }]
-      : [],
-  );
+  // Each month also carries the regime it was called in, drawn behind the
+  // line in the plane's hue. This is the stripe the memory rail used to draw
+  // at the foot of the page, moved to where the same 24 months were already
+  // being drawn — one graphic, one window, the score through its weather.
+  const boldnessTrend = macroTrendline.flatMap((entry) => {
+    if (entry.tightness == null || entry.riskAppetite == null) return [];
+    const regimeKey = regimeDataAttribute(entry.regime);
+    return [{
+      label: formatMonthYearShortFromValue(entry.record_date),
+      value: buildBoldnessScore(entry.tightness, entry.riskAppetite),
+      ground: regimeKey ? REGIME_HEX_COLORS[regimeKey] : null,
+      groundLabel: regimeKey ? getRegimePublicLabel(entry.regime) : undefined,
+    }];
+  });
 
   const signalDeltas = new Map(
     homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
@@ -412,8 +419,14 @@ async function PageContent({
               · refreshed …" line that sat under the switcher restated the hero's
               trust line and the popover's timestamp; the stage pill that sat beside
               the popover overlapped the hero's own stage control at every width
-              above `sm` (the header carries the phone-only pill). */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-1">
+              above `sm` (the header carries the phone-only pill).
+
+              The row wraps rather than stacking below `sm`: on a 430px phone the
+              week title and the confidence chip fit on one line, and stacking
+              them put a fifth row between the top of the page and the call on a
+              first visit. Where they do not fit, the chip wraps under the
+              title, which is the row the stack gave every phone. */}
+          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
             <div>
               <div className="flex items-center gap-2">
                 {prevWeekHref ? (
@@ -555,13 +568,11 @@ async function PageContent({
                 />
               </div>
 
-              {/* The memory rail: the stripe and a link to the record. Its prior-read
-                  chips and side-by-side comparison restated the hero's What-changed
-                  rows and were cut; the stress-test card that followed it recreated
-                  /operate's tester inline and was the second plan CTA on the page. */}
-              <div className="mt-5">
-                <RecentPostureHistoryCard history={macroTrendline} historyHref="/history" />
-              </div>
+              {/* The memory rail that sat here — 24 monthly calls as a stripe and
+                  a link to the record — is drawn behind the hero's score line now
+                  (`boldnessTrend` carries each month's regime as its ground), and
+                  the link sits in that figure's caption. Same window, same hues,
+                  one encoding for the trailing two years instead of two. */}
             </div>
 
           {/* Directly under the call, not 3,000px below it. The one conversion

@@ -91,6 +91,13 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
  * One sentence now, both boundaries, each with its live reading in parentheses.
  * A boundary already crossed says so in place of the status preamble, and sorts
  * first, because that is the half an operator has to act on.
+ *
+ * The distance leads. "Funding pressure at or below 70 (83 today)" handed the
+ * reader a subtraction; the number that changes a plan is how far away the
+ * line is, in the units the rail beside it draws, so the sentence opens with
+ * it — "Funding pressure falls 13 pts to 70 or below (83 today)" — the way a rain alert
+ * opens with the minutes, not the radar. The boundary and the live reading
+ * stay, because the archive and the embed cite them.
  */
 export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
@@ -118,13 +125,20 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     }
 
     const tripped = direction === "riseAbove" ? now > threshold : now <= threshold;
+    if (tripped) {
+      return { text: `${label} ${boundary} (already true at ${formatScoreValue(now)})`, tripped };
+    }
 
-    return {
-      text: tripped
-        ? `${label} ${boundary} (already true at ${formatScoreValue(now)})`
-        : `${label} ${boundary} (${formatScoreValue(now)} today)`,
-      tripped,
-    };
+    // Distance to the line, whole points: the scores are published as integers
+    // and a fraction here would be precision the reader cannot act on. The two
+    // directions keep their inequality — reaching 70 flips an "at or below"
+    // boundary, reaching 50 does not flip an "above" one, so that side says
+    // "clear".
+    const distance = Math.max(1, Math.round(Math.abs(threshold - now)));
+    const move = direction === "riseAbove"
+      ? `rises ${distance} pts to clear ${formatScoreValue(threshold)}`
+      : `falls ${distance} pts to ${formatScoreValue(threshold)} or below`;
+    return { text: `${label} ${move} (${formatScoreValue(now)} today)`, tripped };
   };
 
   const tightnessDirection: "riseAbove" | "fallToOrBelow" =
