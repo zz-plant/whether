@@ -69,6 +69,8 @@ Generic advice says *"be cautious."* Whether delivers **bounded decisions** — 
 | **Hiring & Headcount** | Backfill revenue-critical roles only | BBB spreads widen &gt; 220 bps | Cash availability index returns above 65 |
 | **Fundraising & Runway** | Maintain 18+ months forward runway | VIX stays &gt; 28 for &gt; 10 trading days | Volatility subsides and rate cuts materialize |
 
+The rules are calibrated on two axes of the reader's own company, chosen once and kept in the browser: **stage** (Seed, Series A, Series B+, Bootstrapped) and **cash runway** (under 6 months, 6–12, 12–24, 24+). Under a year of cash a cash gate leads every rule and the reversal is a cash milestone, not a macro read; past two years the corridor still binds but the brief offers the counter-cyclical move. The hero also states how far the market is from changing the call, in the market's own units — *"0.07% lower on the 1-month bill would change the call to Stormy"* — rather than in score points.
+
 ---
 
 ### 3. Meeting-Ready & Slack-Ready Artifacts
@@ -80,8 +82,11 @@ Decision clarity is incomplete without frictionless distribution. Every brief ge
 </p>
 
 - **Slack Brief**: Markdown-ready summary formatted for executive and team channels (`whether brief slack`).
-- **Leadership Pack**: Formatted slides and bulleted recaps for board and leadership syncs.
+- **Board slide**: The week's call as a one-slide native PPTX (every box editable) or a one-page 16:9 PDF, downloaded from `/share` or `GET /api/export/board-slide?format=pptx|pdf`; the same slide is also an SVG for Figma or Keynote.
+- **Investor update**: Two paragraphs for the market section of a monthly letter — the regime and its move since the prior month-end, then the call and what the company's runway band means for it.
+- **Leadership Pack**: Bulleted recaps and role memos for board and leadership syncs.
 - **Attributable Permalinks**: Every shared artifact links to a permanent, frozen citable record (`https://whether.work/brief/2026-w34`).
+- **Between Mondays**: Subscribers who opt in are alerted the day a regime flips, a score crosses its line, or the short rate or the 10Y−2Y curve moves an emergency-sized amount between two reads — a quarter point on the rate, twenty basis points on the curve.
 
 <p align="center">
   <img src="docs/assets/whether-email.png" alt="Whether email briefing view" width="600" style="border-radius: 8px; max-width: 100%;" />
@@ -205,7 +210,8 @@ whether/
 │   ├── report/           # Brief data assembly, Boldness Budget, and knobs
 │   ├── regimeEngine.ts   # Core macro scoring & regime classification
 │   ├── macroSnapshot.ts  # Live FRED / Treasury feed ingestion & fallback
-│   ├── briefBuilders.ts  # Slack, email, and meeting artifact formatting
+│   ├── export/           # Slack, email, slide (SVG/PPTX/PDF) and investor-update artifacts
+│   ├── alert/            # Regime-change, threshold and flash alerts; email and Slack delivery
 │   └── navigation/       # Information architecture & routing definitions
 └── docs/                 # Product specs, editorial guardrails & agent guides
 ```

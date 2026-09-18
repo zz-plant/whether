@@ -28,6 +28,7 @@ import {
 } from "./viewModel";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
 import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
+import { buildFlipProximity } from "../lib/report/flipProximity";
 import { guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
@@ -204,6 +205,13 @@ async function PageContent({
   const regime = homepage.reportShell.regime;
   const publicRegimeLabel = getRegimePublicLabel(regime);
   const activeStage = homepage.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode;
+  const activeRunway = homepage.weeklyCall.runwayBand ?? data.operatorContext.companyRunway ?? undefined;
+  // Only a band that reshaped the rule carries a label; the default band leaves
+  // the stage rule alone and this stays undefined.
+  const runwayScopedAdjustment = homepage.weeklyCall.stageScopedAdjustments?.[activeStage];
+  const runwayEmphasis = runwayScopedAdjustment?.runwayLabel
+    ? runwayScopedAdjustment.thresholdEmphasis
+    : undefined;
 
   const asOfDate = timeMachineRequest
     ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
@@ -286,7 +294,10 @@ async function PageContent({
     briefShareLines,
   } = deriveBriefCallFields(homepage.weeklyDecisionCardModel);
 
-  const v2HeroSignalData = buildV2HeroSignalData(reportData);
+  const v2HeroSignalData = {
+    ...buildV2HeroSignalData(reportData),
+    flipProximity: buildFlipProximity(reportData.assessment).map((entry) => entry.sentence),
+  };
 
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
@@ -443,7 +454,7 @@ async function PageContent({
                 )}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+            <div className="flex flex-wrap items-center gap-2">
               <CompactTrustPopover
                 confidenceLabel={confidenceLabel ?? "High confidence"}
                 isHistorical={Boolean(historicalSelection)}
@@ -504,6 +515,8 @@ async function PageContent({
                 thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
                 signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
                 activeStage={activeStage}
+                activeRunway={activeRunway}
+                runwayEmphasis={runwayEmphasis}
               />
               {/* Live briefs only. The profile holds the operator's runway as of
                   today; combining it with an archived regime would date the

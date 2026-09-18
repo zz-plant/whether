@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOperatingSnapshotStore } from "../../../../lib/operatingState/snapshotStore";
-import { loadCanonicalReportInputs } from "../../../../lib/ingestion/materialized";
-import { buildOperatingSnapshot } from "../../../../lib/operatingState/snapshot";
+import { loadExportSnapshot } from "../../../../lib/export/exportSnapshot";
 import {
   extractMeetingSlidePayload,
   formatMeetingSlideSvg,
@@ -19,19 +17,7 @@ export async function GET(request: NextRequest) {
   const rawStage = searchParams.get("stage") ?? "seed";
   const stage: StartupVariantMode = isStartupVariantMode(rawStage) ? rawStage : "seed";
 
-  const store = getOperatingSnapshotStore();
-  let snapshot = await store.readLatest();
-
-  if (!snapshot) {
-    const inputs = await loadCanonicalReportInputs({ refresh: "none" });
-    if (inputs) {
-      snapshot = buildOperatingSnapshot({
-        treasury: inputs.treasury,
-        macroSeries: inputs.macroSeries,
-      });
-    }
-  }
-
+  const snapshot = await loadExportSnapshot();
   if (!snapshot) {
     return new NextResponse("Operating snapshot unavailable", { status: 503 });
   }

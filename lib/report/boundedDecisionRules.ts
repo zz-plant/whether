@@ -9,6 +9,7 @@ import {
   formatDecisionThreshold,
   formatDecisionTriplet,
 } from "./reportFormatting";
+import { resolveRunwayBand, runwayBandLabel, type RunwayBand } from "./operatorRunway";
 
 export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "burn-discipline" | "expansion-bets";
 
@@ -186,6 +187,13 @@ export type ScopedVariantDecisionAdjustment = {
   mode: StartupVariantMode;
   label: string;
   description: string;
+  /**
+   * Present only when a runway band other than the default reshaped the stage
+   * rule. The balanced band is the corridor the stage rules already assume, so
+   * it leaves the adjustment untouched and these unset.
+   */
+  runwayBand?: RunwayBand;
+  runwayLabel?: string;
   doNowAdjustments: string[];
   avoidAdjustments: string[];
   watchAdjustments: string[];
@@ -443,151 +451,244 @@ export const buildScopedVariantDecisionAdjustment = ({
   mode,
   thresholds,
   scores,
-}: Pick<RuleContext, "thresholds" | "scores"> & { mode: StartupVariantMode }): ScopedVariantDecisionAdjustment => {
+  runwayMonths,
+  runwayBand,
+}: Pick<RuleContext, "thresholds" | "scores"> & {
+  mode: StartupVariantMode;
+  runwayMonths?: number;
+  runwayBand?: RunwayBand;
+}): ScopedVariantDecisionAdjustment => {
   const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime);
   const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime);
+  const resolvedBand = resolveRunwayBand(runwayBand, runwayMonths);
 
-  if (mode === "seed") {
+  const getBaseAdjustment = (): ScopedVariantDecisionAdjustment => {
+    if (mode === "seed") {
+      return {
+        mode,
+        label: "Seed",
+        description: "Protect runway while preserving rapid proof loops.",
+        doNowAdjustments: [
+          "Prioritize experiments that can prove customer pull inside one sprint.",
+          "Keep hiring decisions tied to milestone unlocks or direct revenue coverage.",
+        ],
+        avoidAdjustments: [
+          "Avoid bundling multiple irreversible hires before one milestone clears.",
+        ],
+        watchAdjustments: [
+          describeBoundaryGap({
+            dimension: "tightness",
+            gap: tightnessGap,
+            whenNearBoundary: () => "Runway trigger: tighten immediately because funding pressure is already at the regime boundary.",
+            whenAway: (formattedGap) => `Runway trigger: tighten immediately if funding pressure gap compresses below ${formattedGap} points for 2 reads.`,
+          }),
+        ],
+        thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
+        reversalTriggerDiscipline: "Reverse to faster hiring only after two consecutive improving reads and one shipped traction milestone.",
+      };
+    }
+
+    if (mode === "series-a") {
+      return {
+        mode,
+        label: "Series A",
+        description: "Balance growth tempo with repeatability proof.",
+        doNowAdjustments: [
+          "Scale GTM and product bets only where activation and retention targets are tracking.",
+        ],
+        avoidAdjustments: [
+          "Avoid parallel expansion programs that obscure payback accountability.",
+        ],
+        watchAdjustments: [
+          describeBoundaryGap({
+            dimension: "risk appetite",
+            gap: riskGap,
+            whenNearBoundary: () => "Payback trigger: revisit plan now because risk appetite is already at the regime boundary.",
+            whenAway: (formattedGap) => `Payback trigger: revisit plan if risk appetite gap moves inside ${formattedGap} points.`,
+          }),
+        ],
+        thresholdEmphasis: "Emphasize payback windows and repeatable pipeline conversion.",
+        reversalTriggerDiscipline: "Reverse to aggressive expansion only after trigger clears and conversion quality remains stable for two weekly reviews.",
+      };
+    }
+
+    if (mode === "series-b") {
+      return {
+        mode,
+        label: "Series B",
+        description: "Protect operating leverage while preserving selective scale lanes.",
+        doNowAdjustments: [
+          "Concentrate approvals on lanes with measurable margin or efficiency lift this quarter.",
+        ],
+        avoidAdjustments: [
+          "Avoid fixed-cost expansions that assume forward multiple recovery.",
+        ],
+        watchAdjustments: [
+          describeBoundaryGap({
+            dimension: "tightness",
+            gap: tightnessGap,
+            whenNearBoundary: () => "Leverage trigger: hold expansion now because funding pressure is already at the regime boundary.",
+            whenAway: (formattedGap) => `Leverage trigger: hold expansion if funding pressure rises within ${formattedGap} points of the boundary.`,
+          }),
+        ],
+        thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
+        reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and funding pressure clear their resume bands in the same week.",
+      };
+    }
+
+    if (mode === "growth") {
+      return {
+        mode,
+        label: "Growth",
+        description: "Scale durable GTM and platform leverage without losing unit discipline.",
+        doNowAdjustments: [
+          "Concentrate scale on channels with proven CAC payback inside the planning window.",
+        ],
+        avoidAdjustments: [
+          "Avoid top-line-first expansions that outrun support and margin readiness.",
+        ],
+        watchAdjustments: [
+          describeBoundaryGap({
+            dimension: "risk appetite",
+            gap: riskGap,
+            whenNearBoundary: () => "Growth trigger: rephase expansion now because risk appetite is already at the regime boundary.",
+            whenAway: (formattedGap) => `Growth trigger: rephase expansion if risk appetite moves inside ${formattedGap} points.`,
+          }),
+        ],
+        thresholdEmphasis: "Emphasize CAC payback, retention durability, and support capacity before adding fixed cost.",
+        reversalTriggerDiscipline: "Reverse to faster scaling only after risk appetite and conversion efficiency both improve for two weekly reads.",
+      };
+    }
+
+    if (mode === "public") {
+      return {
+        mode,
+        label: "Public",
+        description: "Prioritize earnings resilience and guided execution consistency.",
+        doNowAdjustments: [
+          "Bias capital allocation toward initiatives with near-term margin and cash-flow reliability.",
+        ],
+        avoidAdjustments: [
+          "Avoid guidance-risk programs that depend on optimistic macro re-rating.",
+        ],
+        watchAdjustments: [
+          describeBoundaryGap({
+            dimension: "tightness",
+            gap: tightnessGap,
+            whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now because funding pressure is already at the regime boundary.",
+            whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if funding pressure closes inside ${formattedGap} points.`,
+          }),
+        ],
+        thresholdEmphasis: "Emphasize earnings durability, cash conversion, and guidance credibility.",
+        reversalTriggerDiscipline: "Reverse to broader spend only when boundary pressure eases and guidance confidence improves in tandem.",
+      };
+    }
+
     return {
       mode,
-      label: "Seed",
-      description: "Protect runway while preserving rapid proof loops.",
+      label: "Bootstrapped",
+      description: "Maximize cash durability and compounding customer value.",
       doNowAdjustments: [
-        "Prioritize experiments that can prove customer pull inside one sprint.",
-        "Keep hiring decisions tied to milestone unlocks or direct revenue coverage.",
+        "Prioritize self-funded growth loops with near-term cash payback.",
+        "Sequence investments so each tranche can be paused without operational breakage.",
       ],
       avoidAdjustments: [
-        "Avoid bundling multiple irreversible hires before one milestone clears.",
+        "Avoid commitments that require external financing to finish.",
       ],
       watchAdjustments: [
         describeBoundaryGap({
-          dimension: "tightness",
-          gap: tightnessGap,
-          whenNearBoundary: () => "Runway trigger: tighten immediately because funding pressure is already at the regime boundary.",
-          whenAway: (formattedGap) => `Runway trigger: tighten immediately if funding pressure gap compresses below ${formattedGap} points for 2 reads.`,
+          dimension: "a boundary",
+          gap: Math.min(riskGap, tightnessGap),
+          whenNearBoundary: () => "Cash trigger: tighten spend now because at least one boundary is already at the regime threshold.",
+          whenAway: (formattedGap) => `Cash trigger: tighten spend if either boundary sits within ${formattedGap} points.`,
         }),
       ],
-      thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
-      reversalTriggerDiscipline: "Reverse to faster hiring only after two consecutive improving reads and one shipped traction milestone.",
+      thresholdEmphasis: "Emphasize cash conversion and reversible commitments over growth optics.",
+      reversalTriggerDiscipline: "Reverse to higher spend only after cash payback proof holds for two consecutive weekly reads.",
+    };
+  };
+
+  const base = getBaseAdjustment();
+  return scaleAdjustmentToRunway(base, resolvedBand);
+};
+
+/*
+ * Runway is the second axis. Stage says what kind of company is reading the
+ * rule; runway says how long it can be wrong. The bands below 12 months put a
+ * cash gate in front of every stage rule, because a company with four months
+ * of cash does not get to act on an expansion call however clear the macro
+ * read is. Above 24 months the corridor still binds, but the cushion buys a
+ * counter-cyclical move the stage rule alone would not offer.
+ *
+ * Each slot keeps its sentence type: a do-now is an action, a watch line is
+ * the condition that pauses it, and the reversal names the milestone that
+ * lifts it — a cash figure, not a macro read, because cash is what put the
+ * gate there.
+ */
+const scaleAdjustmentToRunway = (
+  base: ScopedVariantDecisionAdjustment,
+  band: RunwayBand | null,
+): ScopedVariantDecisionAdjustment => {
+  if (!band || band === "balanced") {
+    return base;
+  }
+  const runwayLabel = `${runwayBandLabel(band)} runway`;
+
+  if (band === "critical") {
+    return {
+      ...base,
+      runwayBand: band,
+      runwayLabel,
+      description: `${base.description} Under six months of cash, preservation overrides the macro call.`,
+      doNowAdjustments: [
+        "Freeze non-revenue hires and put every discretionary commitment behind a second signoff.",
+        "Pull cash forward: chase receivables and offer annual-upfront terms over deferred billing.",
+        ...base.doNowAdjustments,
+      ],
+      avoidAdjustments: [
+        "Avoid any commitment or hire that needs follow-on financing to finish.",
+        ...base.avoidAdjustments,
+      ],
+      watchAdjustments: [
+        "Cash gate: under six months of runway, hold every new commitment whatever the macro corridor says.",
+        ...base.watchAdjustments,
+      ],
+      thresholdEmphasis: "Runway is the binding constraint this week, not the regime line; the corridor sets tempo again once cash clears nine months.",
+      reversalTriggerDiscipline: "Reverse the freeze only after runway extends past nine months or bridge financing is banked.",
     };
   }
 
-  if (mode === "series-a") {
+  if (band === "tight") {
     return {
-      mode,
-      label: "Series A",
-      description: "Balance growth tempo with repeatability proof.",
+      ...base,
+      runwayBand: band,
+      runwayLabel,
       doNowAdjustments: [
-        "Scale GTM and product bets only where activation and retention targets are tracking.",
-      ],
-      avoidAdjustments: [
-        "Avoid parallel expansion programs that obscure payback accountability.",
+        "Require a six-to-nine month cash payback case on every new hire and growth campaign.",
+        "Start raise-window planning now; a year of cash leaves room for one process, not two.",
+        ...base.doNowAdjustments,
       ],
       watchAdjustments: [
-        describeBoundaryGap({
-          dimension: "risk appetite",
-          gap: riskGap,
-          whenNearBoundary: () => "Payback trigger: revisit plan now because risk appetite is already at the regime boundary.",
-          whenAway: (formattedGap) => `Payback trigger: revisit plan if risk appetite gap moves inside ${formattedGap} points.`,
-        }),
+        "Cash gate: pause unbudgeted initiatives if net burn grows faster than gross margin.",
+        ...base.watchAdjustments,
       ],
-      thresholdEmphasis: "Emphasize payback windows and repeatable pipeline conversion.",
-      reversalTriggerDiscipline: "Reverse to aggressive expansion only after trigger clears and conversion quality remains stable for two weekly reviews.",
-    };
-  }
-
-  if (mode === "series-b") {
-    return {
-      mode,
-      label: "Series B",
-      description: "Protect operating leverage while preserving selective scale lanes.",
-      doNowAdjustments: [
-        "Concentrate approvals on lanes with measurable margin or efficiency lift this quarter.",
-      ],
-      avoidAdjustments: [
-        "Avoid fixed-cost expansions that assume forward multiple recovery.",
-      ],
-      watchAdjustments: [
-        describeBoundaryGap({
-          dimension: "tightness",
-          gap: tightnessGap,
-          whenNearBoundary: () => "Leverage trigger: hold expansion now because funding pressure is already at the regime boundary.",
-          whenAway: (formattedGap) => `Leverage trigger: hold expansion if funding pressure rises within ${formattedGap} points of the boundary.`,
-        }),
-      ],
-      thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
-      reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and funding pressure clear their resume bands in the same week.",
-    };
-  }
-
-  if (mode === "growth") {
-    return {
-      mode,
-      label: "Growth",
-      description: "Scale durable GTM and platform leverage without losing unit discipline.",
-      doNowAdjustments: [
-        "Concentrate scale on channels with proven CAC payback inside the planning window.",
-      ],
-      avoidAdjustments: [
-        "Avoid top-line-first expansions that outrun support and margin readiness.",
-      ],
-      watchAdjustments: [
-        describeBoundaryGap({
-          dimension: "risk appetite",
-          gap: riskGap,
-          whenNearBoundary: () => "Growth trigger: rephase expansion now because risk appetite is already at the regime boundary.",
-          whenAway: (formattedGap) => `Growth trigger: rephase expansion if risk appetite moves inside ${formattedGap} points.`,
-        }),
-      ],
-      thresholdEmphasis: "Emphasize CAC payback, retention durability, and support capacity before adding fixed cost.",
-      reversalTriggerDiscipline: "Reverse to faster scaling only after risk appetite and conversion efficiency both improve for two weekly reads.",
-    };
-  }
-
-  if (mode === "public") {
-    return {
-      mode,
-      label: "Public",
-      description: "Prioritize earnings resilience and guided execution consistency.",
-      doNowAdjustments: [
-        "Bias capital allocation toward initiatives with near-term margin and cash-flow reliability.",
-      ],
-      avoidAdjustments: [
-        "Avoid guidance-risk programs that depend on optimistic macro re-rating.",
-      ],
-      watchAdjustments: [
-        describeBoundaryGap({
-          dimension: "tightness",
-          gap: tightnessGap,
-          whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now because funding pressure is already at the regime boundary.",
-          whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if funding pressure closes inside ${formattedGap} points.`,
-        }),
-      ],
-      thresholdEmphasis: "Emphasize earnings durability, cash conversion, and guidance credibility.",
-      reversalTriggerDiscipline: "Reverse to broader spend only when boundary pressure eases and guidance confidence improves in tandem.",
+      thresholdEmphasis: `Tight runway: a nine-month payback gate sits in front of every stage rule. ${base.thresholdEmphasis}`,
+      reversalTriggerDiscipline: "Lift the payback gate once runway clears twelve months or the round is signed; until then the stage rule's own reversal still applies.",
     };
   }
 
   return {
-    mode,
-    label: "Bootstrapped",
-    description: "Maximize cash durability and compounding customer value.",
+    ...base,
+    runwayBand: band,
+    runwayLabel,
     doNowAdjustments: [
-      "Prioritize self-funded growth loops with near-term cash payback.",
-      "Sequence investments so each tranche can be paused without operational breakage.",
+      "Use the cushion: recruit senior talent and renegotiate vendor terms while peers hold.",
+      ...base.doNowAdjustments,
     ],
     avoidAdjustments: [
-      "Avoid commitments that require external financing to finish.",
+      "Avoid letting the cushion loosen the payback bar; a counter-cyclical bet is still priced like any other.",
+      ...base.avoidAdjustments,
     ],
-    watchAdjustments: [
-      describeBoundaryGap({
-        dimension: "a boundary",
-        gap: Math.min(riskGap, tightnessGap),
-        whenNearBoundary: () => "Cash trigger: tighten spend now because at least one boundary is already at the regime threshold.",
-        whenAway: (formattedGap) => `Cash trigger: tighten spend if either boundary sits within ${formattedGap} points.`,
-      }),
-    ],
-    thresholdEmphasis: "Emphasize cash conversion and reversible commitments over growth optics.",
-    reversalTriggerDiscipline: "Reverse to higher spend only after cash payback proof holds for two consecutive weekly reads.",
+    thresholdEmphasis: `Abundant runway: counter-cyclical moves are on the table at the same payback bar. ${base.thresholdEmphasis}`,
   };
 };

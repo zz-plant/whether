@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../../lib/report/homePageAssembler";
 import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
+import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { siteUrl } from "../../../lib/siteUrl";
 
@@ -29,6 +30,7 @@ export async function GET(request: Request) {
 
   const operatorContext: OperatorContext = {
     companyStage,
+    companyRunway: parseOperatorRunwayParam(url.searchParams.get("runway")),
     ticker: tickerParam || null,
   };
 

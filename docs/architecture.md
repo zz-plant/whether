@@ -296,6 +296,8 @@ The API layer exposes the same core reasoning in machine-readable form.
 | `/api/agent` | GET | Plain JSON weekly posture for LLM context |
 | `/api/integrations/weekly-mandate` | GET | Destination-specific weekly mandate payload |
 | `/brief.md` | GET | Markdown-formatted operator brief |
+| `/api/image/slide` | GET | The call as a 16:9 SVG meeting slide (`lib/export/meetingSlideExport.ts`) |
+| `/api/export/board-slide` | GET | The same slide as a one-slide PPTX or one-page PDF (`lib/export/boardSlideDeck.ts`); both read `lib/export/exportSnapshot.ts` |
 | `/api/billing/checkout` | POST | Create Stripe Checkout sessions |
 | `/api/billing/webhook` | POST | Stripe webhook receiver |
 

@@ -1,8 +1,9 @@
 import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
 import { loadReportData } from "../report/reportData";
-import { evaluateAlert } from "./alertEvaluator";
-import { decisionVerdictEmail, thresholdCrossingEmail } from "./alertTemplates";
+import { alertDeliveryKey, evaluateAlert } from "./alertEvaluator";
+import { decisionVerdictEmail, flashMoveEmail, thresholdCrossingEmail } from "./alertTemplates";
+import { evaluateFlashMoves, flashInputsFrom } from "./flashMoves";
 import {
   createCloudflareEmailAdapter,
   type EmailDeliveryAdapter,
@@ -118,7 +119,9 @@ export const deliverAlertToSubscriber = async (
 ): Promise<boolean> => {
   try {
     let template: ReturnType<typeof decisionVerdictEmail>;
-    if (alert.type === "regime_change") {
+    if (alert.type === "flash" && alert.flash) {
+      template = flashMoveEmail(alert.flash, unsubscribeToken);
+    } else if (alert.type === "regime_change") {
       template = decisionVerdictEmail({
         headline: "RECONSIDER OPERATING POSTURE",
         why: `The operating regime shifted to ${conditions.regime}. The assumptions behind the current posture have moved.`,
@@ -170,14 +173,21 @@ const trackAlertDelivery = async (
 export const runScheduledAlertDelivery = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
+  /** The read before `snapshot`, so a flash can be judged on consecutive reads. */
+  previousSnapshot?: OperatingSnapshot | null;
 }): Promise<DeliveryResult> => {
   let assessment;
 
   let recordDate = new Date().toISOString();
+  let flashMoves: AlertConditions["flashMoves"];
 
   if (options?.snapshot) {
     assessment = options.snapshot.assessment;
     recordDate = options.snapshot.provenance.recordDateLabel;
+    flashMoves = evaluateFlashMoves(
+      flashInputsFrom(options.snapshot),
+      options.previousSnapshot ? flashInputsFrom(options.previousSnapshot) : null,
+    );
   } else {
     const stored = await getOperatingSnapshotStore().readLatest();
     if (stored) {
@@ -196,6 +206,7 @@ export const runScheduledAlertDelivery = async (options?: {
     riskAppetite: assessment.scores.riskAppetite,
     posture: assessment.description,
     recordDate,
+    ...(flashMoves && flashMoves.length > 0 ? { flashMoves } : {}),
   };
 
   return deliverAlerts(conditions);
@@ -232,7 +243,7 @@ export const deliverAlerts = async (
       // Keyed on the address rather than on the record, because two records could once
       // resolve to one inbox and each got its own "already delivered" marker — the
       // reader received two copies of the same alert.
-      const already = await wasAlreadyDelivered(sub.email, alert.type);
+      const already = await wasAlreadyDelivered(sub.email, alertDeliveryKey(alert));
       if (already) {
         skipped++;
         continue;
@@ -246,7 +257,7 @@ export const deliverAlerts = async (
       );
       if (ok) {
         sent++;
-        await trackAlertDelivery(sub.email, alert.type);
+        await trackAlertDelivery(sub.email, alertDeliveryKey(alert));
       } else {
         errors++;
       }

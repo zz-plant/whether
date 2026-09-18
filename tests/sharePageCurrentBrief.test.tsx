@@ -50,4 +50,15 @@ describe("/share current weekly artifact", () => {
     assert.doesNotMatch(html, /Macro signals.*operating posture/);
     assert.doesNotMatch(html, /Current regime and operating posture for the period/);
   });
+
+  it("offers the board slide as a file beside the images, and the investor update beside the copy formats", async () => {
+    const html = renderToStaticMarkup(await SharePage());
+
+    assert.match(html, /href="\/api\/export\/board-slide\?format=pptx&amp;stage=seed"/);
+    assert.match(html, /href="\/api\/export\/board-slide\?format=pdf&amp;stage=seed"/);
+    assert.match(html, /Download PPTX/);
+    assert.match(html, /Download PDF/);
+    assert.match(html, /Investor update/);
+    assert.match(html, /Copy investor update/);
+  });
 });

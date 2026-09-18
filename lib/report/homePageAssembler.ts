@@ -18,6 +18,7 @@ import type { HomePageSearchParams } from "./homeMetadata";
 import { loadHomePageReportData } from "./homePageData";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 import { resolveStartupVariantMode } from "./boundedDecisionRules";
+import { parseOperatorRunwayParam } from "./operatorRunway";
 import { buildDiagnosticsLanePayload } from "./home/diagnosticsLane";
 import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
@@ -146,6 +147,9 @@ export const assembleHomePage = async ({
   const startupVariantMode = searchParams?.stage
     ? resolveStartupVariantMode(searchParams.stage)
     : operatorContext?.companyStage ?? undefined;
+  const runwayBand = (searchParams?.runway
+    ? parseOperatorRunwayParam(searchParams.runway)
+    : operatorContext?.companyRunway) ?? undefined;
   const interpretationView: InterpretationView = isInterpretationView(searchParams?.view)
     ? searchParams.view
     : "default";
@@ -180,6 +184,7 @@ export const assembleHomePage = async ({
     degraded: !reportResult.ok,
     overlaySector: homepageOverlaySector,
     startupVariantMode,
+    runwayBand,
   });
   const { isFallback, trustStatus, freshnessMeta, homeBriefModel, weeklyDecisionCardModel, weeklyCall } = baseSnapshot;
   const {

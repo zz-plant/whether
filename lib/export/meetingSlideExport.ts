@@ -8,7 +8,10 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 
 export interface MeetingSlidePayload {
+  /** The record date as displayed ("Sep 16, 2026"). */
   recordDate: string;
+  /** The same date as ISO, for a filename or a timestamp; absent when the caller only has the label. */
+  recordDateIso?: string;
   regime: string;
   stageLabel: string;
   actionNow: string;
@@ -55,6 +58,7 @@ export function extractMeetingSlidePayload(
 
   return {
     recordDate: snapshot.provenance.recordDateLabel,
+    recordDateIso: snapshot.recordDate,
     regime: snapshot.assessment.regime,
     stageLabel,
     actionNow,

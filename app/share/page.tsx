@@ -14,7 +14,9 @@ import {
   buildWeeklyOperatorBriefPlainText,
 } from "../../lib/export/weeklyOperatorBrief";
 import { buildBriefPermalinkLine } from "../../lib/export/briefPermalink";
+import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdateSnippet";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 
 export const runtime = "edge";
 export const revalidate = 300;
@@ -69,6 +71,18 @@ const buildCurrentShareArtifact = async () => {
   // The slide bullets rather than the board brief, which is the Slack brief
   // with the bullets appended: this pack used to paste the same block twice.
   const boardSlideBullets = buildBoardSlideBullets(assessment, treasury, macroSeries, exportOptions);
+  // Monthly, against the prior month-end in the regime history, because that
+  // is the cadence an investor letter compares itself on. The runway sentence
+  // is composed in the browser: this page is cached and cannot read the cookie.
+  const investorUpdate = buildInvestorUpdateSnippetParts({
+    assessment,
+    recordDate: treasury.record_date,
+    weeklyCall: snapshot.weeklyCall,
+    monthlyHistory: getMonthlyRegimeHistory(),
+    // The provenance label, not `treasury.source`, which is a FRED series URL on a live read.
+    sourceLabel: reportData.treasuryProvenance.sourceLabel,
+    isFallback: snapshot.isFallback,
+  });
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
@@ -108,6 +122,7 @@ const buildCurrentShareArtifact = async () => {
     ].join("\n"),
     meetingPack,
     issueTrackerBrief,
+    investorUpdate,
     calendarDetails: [
       "Review the current Whether weekly operating brief.",
       "",
@@ -151,6 +166,7 @@ export default async function SharePage() {
             emailBrief={artifact.emailBrief}
             meetingPack={artifact.meetingPack}
             issueTrackerBrief={artifact.issueTrackerBrief}
+            investorUpdate={artifact.investorUpdate}
             calendarDetails={artifact.calendarDetails}
           />
         </div>

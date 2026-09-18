@@ -12,6 +12,7 @@ import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 import { StageDropdownPill } from "./StageDropdownPill";
+import { RunwayDropdownPill } from "./RunwayDropdownPill";
 
 type GlobalHeaderRouteGateProps = {
   initialPathname?: string;
@@ -74,7 +75,12 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </Link>
           <GlobalHeaderNavClient pathname={pathname} />
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-teal-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-teal-400">
-            {isHomeBrief ? <StageDropdownPill className="sm:hidden" /> : null}
+            {isHomeBrief ? (
+              <div className="flex items-center gap-1 sm:hidden">
+                <StageDropdownPill />
+                <RunwayDropdownPill />
+              </div>
+            ) : null}
             <div className={isHomeBrief ? "hidden sm:block" : undefined}>
               <GlobalHeaderActionsClient showPresentMode={isHomeBrief} />
             </div>

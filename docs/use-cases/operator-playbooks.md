@@ -83,6 +83,16 @@ Finance needs objective, non-emotional criteria to determine when runway buffers
    curl -s "https://whether.work/api/cli/status?view=expanded" | jq '.boundedDecision'
    ```
 2. Compares the **Cash Availability / Tightness Index** and **BBB Credit Spreads** against internal burn targets.
+3. Calibrates the brief to the company's cash position: pick a runway band on `/` (the hero's
+   "Calibrate Runway" row, or `?runway=critical|tight|balanced|abundant`, or a month count such
+   as `?runway=9`). Below twelve months the weekly call leads with a cash gate and its reversal
+   is a cash milestone, not a macro read; above twenty-four it offers a counter-cyclical move at
+   the same payback bar. The band is a cookie, never a cash figure, and stays in the browser.
+4. For the monthly letter, copies **Investor update** on `/share`: two paragraphs — the regime
+   and its move since the prior month-end, then the call and what the runway band means for it —
+   with the source stamped underneath.
+5. For the board pack, downloads the **Board slide** from `/share` as a native PPTX (editable) or
+   a one-page PDF (`/api/export/board-slide?format=pptx|pdf&stage=series-a`).
 
 ### Exemplary FP&A Rule
 - **Baseline Rule:** If **BBB Spreads $\ge 2.20\%$** or **Cash Availability Index $\le 45$**, capital markets are pricing significant credit distress.
@@ -163,6 +173,6 @@ During quarterly Board meetings, investors and directors may question past hirin
 | :--- | :--- | :--- | :--- |
 | **Founder / CEO** | Monday Standup | `whether brief slack` | 60-second Slack Posture Call |
 | **VP Engineering** | Sprint Planning & Debt Review | `whether scenario` / Decision Shield | Payback-Bounded Tech Debt Rules |
-| **CFO / VP Finance** | Monthly FP&A Review | `GET /api/cli/status?view=expanded` | Dynamic Runway & Hiring Triggers |
+| **CFO / VP Finance** | Monthly FP&A Review | `GET /api/cli/status?view=expanded`, `/share` (investor update, board slide) | Runway-calibrated call; letter and board-pack artifacts |
 | **AI Agents** | Automated Ticket Triage | MCP (`/api/mcp`) / `GET /api/agent` | Policy-Constrained Ticket Tagging |
 | **Board / Directors** | Quarterly Governance | `GET /api/decision-memory` / `/history` | Auditable Capital Discipline Log |

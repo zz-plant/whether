@@ -21,6 +21,8 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/agent?cadence=<weekly|monthly|quarterly|yearly>` | GET | Agent-focused summary + handoff payload/prompt. |
 | `/api/weekly` | GET | Weekly summary copy + structured fields + summary hash. |
 | `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
+| `/api/image/slide?stage=<seed|series-a|series-b|growth>` | GET | The call as a 16:9 meeting slide, hand-written SVG. |
+| `/api/export/board-slide?format=<pptx|pdf>&stage=<mode>` | GET | The same slide as a file: a one-slide native PPTX (default) or a one-page 16:9 PDF, served as an attachment named by ISO week. |
 
 ### B) Validate drift and consistency
 

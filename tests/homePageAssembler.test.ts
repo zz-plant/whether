@@ -171,13 +171,13 @@ describe("assembleHomePage streaming contract", () => {
     // The settings panel and the hero selector both write this cookie; before
     // this it was parsed on every request and read by nothing.
     const fromCookie = await assembleHomePage(
-      { searchParams: undefined, operatorContext: { companyStage: "bootstrapped", ticker: null } },
+      { searchParams: undefined, operatorContext: { companyStage: "bootstrapped", companyRunway: null, ticker: null } },
       dependencies,
     );
     assert.equal(fromCookie.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode, "bootstrapped");
 
     const fromUrl = await assembleHomePage(
-      { searchParams: { stage: "seed" }, operatorContext: { companyStage: "bootstrapped", ticker: null } },
+      { searchParams: { stage: "seed" }, operatorContext: { companyStage: "bootstrapped", companyRunway: null, ticker: null } },
       dependencies,
     );
     assert.equal(fromUrl.weeklyDecisionCardModel.decision.startupVariantPolicy.selectedMode, "seed");

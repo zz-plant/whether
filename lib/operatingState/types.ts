@@ -50,6 +50,8 @@ export type RefreshOperatingStateResult =
       ok: true;
       snapshot: OperatingSnapshot;
       weeklyCall: WeeklyCallContract;
+      /** The read this one replaced, for anything judged on consecutive reads. Null on a cold store. */
+      previousSnapshot: OperatingSnapshot | null;
       transition: PostureTransitionEvent | null;
       durationMs: number;
     }

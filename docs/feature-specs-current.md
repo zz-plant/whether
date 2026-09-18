@@ -908,6 +908,76 @@ rails, the drivers and actions, the posture stripe, subscribe, the handoff, the 
 data-dependent (a wide week prints more What-changed rows), so the guards above are the acceptance
 check and these numbers are the record.
 
+### 1.1.18 Runway as a second axis, the slide as a file, and the day a move lands (2026-09-17)
+
+Three roadmap items from the community backlog, each built on a surface that already existed
+rather than on a new one.
+
+**Runway calibrates the rule, beside stage.** `lib/report/operatorRunway.ts` is the one answer
+set for cash runway — `critical` (<6 months), `tight` (6–12), `balanced` (12–24), `abundant`
+(24+) — with the same three carriers stage has: `?runway=` on the URL (a band key or a month
+count), the `whether-company-runway` cookie, and `whether.operatorProfile.runwayMonths` in the
+browser, kept in step by `app/components/useOperatorRunway.ts`. `scaleAdjustmentToRunway` in
+`boundedDecisionRules.ts` reshapes every stage rule: below twelve months a cash gate leads the
+do-now and pause lines and the reversal becomes a cash milestone (past nine months, or bridge
+financing banked) rather than a macro read; above twenty-four the corridor still binds but a
+counter-cyclical move is offered at the same payback bar. The balanced band is the corridor the
+stage rules already assume, so it leaves them untouched — an operator who picks the default sees
+the same brief as one who never picked. The hero carries a second tablist from `sm` up and the
+header a second pill on phones (`RunwayPersonaSelector`, `RunwayDropdownPill`; the phone pill
+reads the cookie itself, since the header has no page model in reach), and when a band has
+reshaped the rule the hero prints the binding constraint under the calibration row ("Runway is
+the binding constraint this week, not the regime line; the corridor sets tempo again once cash
+clears nine months"). `WeeklyCallContract` carries `runwayBand` and `runwayLabel`, both absent
+rather than `undefined` so a stored snapshot round-trips unchanged. `/privacy` §2.5 counts two
+cookies now. `tests/runwayScaledDecisionRules.test.ts` pins the band semantics; the balanced
+no-op is asserted for every stage.
+
+**The board slide is a file.** `GET /api/export/board-slide?format=pptx|pdf&stage=<mode>`
+(`lib/export/boardSlideDeck.ts`) writes the meeting slide as a native one-slide PPTX or a
+one-page 16:9 PDF, from the same `MeetingSlidePayload` and at the same geometry as the SVG at
+`/api/image/slide`, so the three formats cannot disagree about the week. The PPTX is hand-written
+OOXML in a stored ZIP — no dependency; under 22 KB — and was validated by opening it through
+LibreOffice; the PDF uses `@cantoo/pdf-lib` (already in the tree for the CLI) with the standard
+fonts, mapping the few characters WinAnsi lacks rather than failing the export. Served as an
+attachment named by ISO week (`whether-board-slide-2026-09-16.pptx`; the payload now carries
+`recordDateIso` beside the display label). Both routes share `lib/export/exportSnapshot.ts`.
+Linked as two cards under "Files and images for a deck or a thread" on `/share`, and listed on
+`/api-docs`.
+
+**The investor update.** "Investor update" on `/share` (`lib/export/investorUpdateSnippet.ts`)
+copies two paragraphs for the market section of a monthly letter: the regime and the two scores'
+move since the prior *month-end* in the regime history (the cadence a letter compares on, not
+last Monday), then the call, guardrail and reversal, each terminated as a sentence — the
+contract's clauses are written for labelled slots and carry no full stop. The runway sentence
+closes the second paragraph and is composed in the browser from the cookie, because `/share` is
+cached (`revalidate = 300`) and cannot read it server-side; without a band the paragraph stops at
+the reversal rather than saying "band not set", and the card tells the reader where to pick one.
+The stamp uses the provenance label, not `treasury.source`, which is a FRED series URL on a live
+read.
+
+**Flash alerts.** `lib/alert/flashMoves.ts` judges two raw inputs between *consecutive* reads: a
+move of 0.25 points or more in the short rate (a cut between meetings, a bill-market
+dislocation) or 0.20 points or more in 10Y−2Y (a spread blowout) fires the day it lands, whether
+or not a score crossed anything. Consecutive means the previous snapshot, which
+`refreshOperatingState` now returns — never the last alert state, which is written only when
+something fires and would turn weeks of drift into a flash — and at most seven days apart,
+because the size assumes a short window. It is a critical CFO alert that bypasses the weekly
+cooldown like a regime change, deduplicated per input (`flash:baseRate`, `flash:curveSlope`),
+mailed through `flashMoveEmail` and posted to `SLACK_WEBHOOK_URL` through the one
+`postSlackAlert` helper in `checkRegimeChange`, on both crons. `/privacy` §2.1 says what the
+between-Monday alerts now include.
+
+**The flip watch.** The hero's Conditions cell states the market move that would change the
+call, in the input's units: "0.07% lower on the 1-month Treasury bill would change the call to
+Stormy." `lib/report/flipProximity.ts` derives it by scanning the real score functions (both are
+piecewise-linear in one input each, but clipped and rounded, so a closed form would carry every
+edge), carrying the published-minus-baseline macro offset across the scan so it agrees with the
+published scores — the bare curve formula was eleven points off on the bundled reading — and
+refusing to offer a rise in risk appetite while the volatility veto caps it. An axis it cannot
+measure honestly (an imputed input, no crossing within three points) is left out rather than
+reported at the scan's edge. Nearest move first; the label is `DECISION_CONTRACT_LABELS.watch.flipWatch`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -1229,7 +1299,9 @@ $$
 
 ### 5.3 Briefing exports
 Planning briefings support copy-ready briefs and executive narratives with sensor data and
-macro context embedded for leadership consumption.
+macro context embedded for leadership consumption. `/share` owns the copy formats (Slack, email,
+meeting pack, issue tracker, investor update) and the file and image artifacts (board slide as
+PPTX and PDF, meeting slide as SVG, brief card as PNG); see §1.1.18.
 
 Interpretation-context transmission contract (homepage-selected `?view=` only):
 - Slack/board/call-citation builders include an optional interpretation context block when the selected layer is non-default.
@@ -1319,13 +1391,16 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 - `GET/POST /api/mcp?tool=…` — legacy REST tool API, kept for existing integrations.
 - `bun run mcp:whether` — local stdio MCP server (separate tool set, official SDK).
 
-### 6.8 Alert cadence (2026-08-11)
+### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
 Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
 `/api/check-regime-change` and `/api/alert-deliveries` in addition to the Monday run, so a
 regime flip or threshold crossing pushes the day it lands instead of waiting up to six days.
 Both endpoints are transition-based (KV last-known state: `regime:*`, `alert:state`), so
-daily runs stay silent unless something actually crossed. The brief email remains
-weekly-only — the cadence promise is weekly; only rule firings break cadence.
+daily runs stay silent unless something actually crossed. Since 2026-09-17 the same two steps
+also judge a flash (§1.1.18): an outsized move in the short rate or the curve between the
+previous snapshot and this one, which is measured against the previous read rather than the
+alert state. The brief email remains weekly-only — the cadence promise is weekly; only rule
+firings break cadence.
 
 ## 7) Non-goals (as enforced in UI copy)
 - The UI is framed as operational guidance, not financial advice.

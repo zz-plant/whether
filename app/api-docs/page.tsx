@@ -223,6 +223,17 @@ export default function ApiDocsPage() {
               series-a, series-b, or growth.
             </Endpoint>
             <Endpoint
+              signature="GET /api/export/board-slide?format=pptx|pdf&stage=seed"
+              tryHref="/api/export/board-slide?format=pptx&stage=seed"
+              tryLabel="Download PPTX"
+              tryCta="try_export_board_slide"
+              tryAriaLabel="Download the board slide as a PowerPoint file"
+            >
+              The same slide as a file: a one-slide native PPTX with every box editable, or a
+              one-page 16:9 PDF for a pre-read. Served as an attachment. Takes the same stage
+              values as the SVG.
+            </Endpoint>
+            <Endpoint
               signature="GET /api/embed?format=text|json|html"
               tryHref="/api/embed?format=text"
               tryLabel="Try it"

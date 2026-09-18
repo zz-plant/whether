@@ -8,6 +8,8 @@ import {
 } from "./boundedDecisionRules";
 import { POLICY_OVERRIDE_CALL } from "./reportCopy";
 
+import { resolveRunwayBand, type RunwayBand } from "./operatorRunway";
+
 type StageScopedAdjustment = {
   mode: StartupVariantMode;
   label: string;
@@ -16,6 +18,8 @@ type StageScopedAdjustment = {
   changeCourseIf: string;
   doNowBullets: string[];
   thresholdEmphasis: string;
+  /** Set only when the adjustment was scaled by a runway band; the hero badge reads it. */
+  runwayLabel?: string;
 };
 
 export type WeeklyCallContract = {
@@ -29,6 +33,8 @@ export type WeeklyCallContract = {
   whyCouldBeWrong: string;
   policyOverrideActive: boolean;
   policyOverrideReason: string | null;
+  runwayBand?: RunwayBand;
+  runwayLabel?: string;
   stageScopedAdjustments?: Record<StartupVariantMode, StageScopedAdjustment>;
 };
 
@@ -72,11 +78,15 @@ export const buildWeeklyCallContract = ({
   homeBriefModel,
   canonicalDecisionCopy,
   startupVariantMode,
+  runwayMonths,
+  runwayBand,
 }: {
   assessment: RegimeAssessment;
   homeBriefModel: HomeBriefModel;
   canonicalDecisionCopy?: CanonicalDecisionCopy | null;
   startupVariantMode?: StartupVariantMode;
+  runwayMonths?: number;
+  runwayBand?: RunwayBand;
 }): WeeklyCallContract => {
   const actionStripItems = homeBriefModel.actionStripItems ?? [];
   const policyOverrideActive = assessment.policyAssessment.refusal.refused;
@@ -106,14 +116,16 @@ export const buildWeeklyCallContract = ({
     ?? homeBriefModel.compactFlipConditionLabels[0]
     ?? FALLBACK_CHANGE_COURSE_IF;
 
-  // Build stage-scoped adjustment copy for every stage up front. These swap the
-  // brief's decision bullets per selected stage; the macro regime call stays
-  // stage-agnostic. Only the selected stage's copy feeds the primary contract.
+  // Build stage-scoped adjustment copy for every stage up front, scaled by runway if given.
+  // These swap the brief's decision bullets per selected stage and runway; the macro
+  // regime call stays company-agnostic.
   const buildStageAdjustment = (mode: StartupVariantMode, label: string): StageScopedAdjustment => {
     const adj = buildScopedVariantDecisionAdjustment({
       mode,
       thresholds: assessment.thresholds,
       scores: assessment.scores,
+      runwayMonths,
+      runwayBand,
     });
     return {
       mode,
@@ -123,6 +135,10 @@ export const buildWeeklyCallContract = ({
       changeCourseIf: adj.reversalTriggerDiscipline ?? FALLBACK_CHANGE_COURSE_IF,
       doNowBullets: dedupeLines([...adj.doNowAdjustments, ...adj.avoidAdjustments], 3),
       thresholdEmphasis: adj.thresholdEmphasis,
+      // Conditional so an uncalibrated contract survives a JSON round-trip
+      // unchanged: the snapshot store compares what it reads back by deep
+      // equality, and a key holding `undefined` does not.
+      ...(adj.runwayLabel ? { runwayLabel: adj.runwayLabel } : {}),
     };
   };
   const stageScopedAdjustments: Record<StartupVariantMode, StageScopedAdjustment> = {
@@ -134,12 +150,13 @@ export const buildWeeklyCallContract = ({
     bootstrapped: buildStageAdjustment("bootstrapped", "Bootstrapped"),
   };
 
-  // Stage-scoped scaling: when an operator has picked a startup stage, swap the
-  // brief's decision bullets for that stage's calibrated language while keeping
-  // the macro regime call itself stage-agnostic. The adjustment lives on the
-  // same contract and only changes what an operator can act on, not the signals.
-  const stageAdj = startupVariantMode
-    ? stageScopedAdjustments[startupVariantMode] ?? stageScopedAdjustments["series-a"]
+  // Stage- and runway-scoped scaling: when an operator has calibrated stage or runway,
+  // swap the brief's decision bullets for that calibrated language while keeping the
+  // macro regime call itself unchanged.
+  const resolvedRunwayBand = resolveRunwayBand(runwayBand, runwayMonths) ?? undefined;
+  const activeMode = startupVariantMode ?? (resolvedRunwayBand ? "series-a" : undefined);
+  const stageAdj = activeMode
+    ? stageScopedAdjustments[activeMode] ?? stageScopedAdjustments["series-a"]
     : undefined;
 
   const currentCall = policyOverrideActive
@@ -201,6 +218,8 @@ export const buildWeeklyCallContract = ({
     whyCouldBeWrong,
     policyOverrideActive,
     policyOverrideReason,
+    ...(resolvedRunwayBand ? { runwayBand: resolvedRunwayBand } : {}),
+    ...(stageAdj?.runwayLabel ? { runwayLabel: stageAdj.runwayLabel } : {}),
     stageScopedAdjustments,
   };
 };

@@ -191,6 +191,7 @@ export const parseImageBriefRequestContext = (source: SearchParamReader): ImageB
   // narrower predicate, so a legacy value survived serialization and was then dropped.
   const operatorContext: OperatorContext = {
     companyStage: parseOperatorStageParam(supportedParams.get("stage")),
+    companyRunway: null,
     ticker: supportedParams.get("ticker"),
   };
 

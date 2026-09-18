@@ -103,6 +103,7 @@ export const refreshOperatingState = async (
       ok: true,
       snapshot,
       weeklyCall: snapshot.weeklyCall,
+      previousSnapshot,
       transition: transitionEvent,
       durationMs,
     };

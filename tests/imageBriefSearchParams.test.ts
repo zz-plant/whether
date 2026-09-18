@@ -57,7 +57,7 @@ describe("image brief search params", () => {
 
     assert.deepEqual(context, {
       searchParams: { month: "2", year: "2026" },
-      operatorContext: { companyStage: "seed", ticker: "GOOGL" },
+      operatorContext: { companyStage: "seed", companyRunway: null, ticker: "GOOGL" },
     });
   });
 
