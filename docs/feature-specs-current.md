@@ -985,6 +985,46 @@ refusing to offer a rise in risk appetite while the volatility veto caps it. An 
 measure honestly (an imputed input, no crossing within three points) is left out rather than
 reported at the scan's edge. Nearest move first; the label is `DECISION_CONTRACT_LABELS.watch.flipWatch`.
 
+### 1.1.19 The score through its weather (2026-09-17)
+
+A moodboard of the weather apps people keep — Weather Strip, Apple's 10-day bars, Hello Weather,
+Mercury, Dark Sky — checked against the brief, and what it changed. The pattern they share is not
+a look: each decides what a reader needs first, draws it rather than lists it, and puts nothing in
+front of it. Six things followed.
+
+- **The months are behind the score line.** Weather Strip draws the temperature through the sky
+  it ran under; the hero's 24-month sparkline now draws the score through each month's regime,
+  in the plane's hue (`SparklinePoint.ground`, built in `app/page.tsx` from `REGIME_HEX_COLORS`
+  via `regimeDataAttribute`, each band titled with its month and regime). That was the
+  `RecentPostureHistoryCard` stripe at the foot of the page — the same 24 months, 3,000px below
+  the graphic already drawing them — so the card is gone (§XV, one encoding per concept per
+  screen) and its link to the record sits in the figure's caption. The colour contract in
+  `tests/regimeColourContract.test.tsx` moved with it.
+- **The line states its window and range, and where the week sits in it.** The sparkline was
+  autoscaled with no domain shown, which its own doc forbids; the caption carries
+  `Sep 2024–Aug 2026 · 31–67`, and above it `describeWindowPosition` (`lib/report/windowPosition.ts`)
+  prints the rank — "Bottom quarter since Sep 2024" — which is the answer to "is 33 low?" that a
+  first-time reader cannot get from the label. Rank, not a band the product would have to invent.
+- **Two points is not a trend.** The change report drew one `Sparkline` per composite signal from
+  `[threshold, reading]` — a segment whose slope repeated the delta beside it, wrapping onto its
+  own line on phones. `Sparkline` renders nothing below `MIN_SHAPE_POINTS` (3) and the row shares
+  the constant; `tests/chartIntegrityContract.test.tsx` pins it.
+- **The flip sentence leads with the distance.** "Funding pressure at or below 70 (83 today)" is
+  a subtraction handed to the reader; Dark Sky's sentence was "Rain starting in 12 minutes". It
+  reads "Funding pressure falls 13 pts to 70 or below (83 today) or risk appetite rises 10 pts to
+  clear 50 (40 today)" — the inequality survives on each side (reaching 50 does not clear an
+  "above 50" line), the boundary and the live reading stay for the archive and the embed.
+- **One fewer row above the call on a phone.** The meta row wraps instead of stacking, and the
+  week title is `text-lg` below `sm`, so the title and the confidence chip share a line at 430px
+  (they ran 4px over at `text-xl`); the guide's disclosure sits closer under the standfirst. The
+  first-visit page is 3,683px on a phone, from 3,875.
+- **The boldness delta chip reads the tightening / easing tokens** rather than a rose and an
+  emerald picked at the call site.
+
+Left as decisions: making the three horizons (weekly, monthly, quarterly) headings rather than a
+control, which is Hello Weather's reading order and would change the page outline; and taking
+the remaining rows above the call on a first visit, which the standfirst's own comment warns about.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

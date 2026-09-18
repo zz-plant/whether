@@ -94,7 +94,10 @@ export function TimeMachineCalendarPicker({
         onClick={() => setOpen((prev) => !prev)}
         className="group flex items-center gap-2 text-left cursor-pointer rounded-lg px-2 py-1 -ml-2 hover:bg-slate-900/60 transition-colors focus-visible:outline-2 focus-visible:outline-teal-400"
       >
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white group-hover:text-teal-300 transition-colors">
+        {/* `text-lg` below `sm`: at `text-xl` the week title and the confidence
+            chip beside it ran 4px past a 430px phone's content width, and the
+            chip dropped to a row of its own above the call. */}
+        <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-white group-hover:text-teal-300 transition-colors">
           {currentDateLabel}
         </h2>
         <ChevronDown

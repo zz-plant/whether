@@ -10,15 +10,21 @@ import {
   operatorStageForVariantMode,
   type OperatorStage,
 } from "../../lib/report/operatorStage";
-import { persistOperatorStage } from "./useOperatorStage";
+import { persistOperatorStage, useOperatorStage } from "./useOperatorStage";
 
 interface StageDropdownPillProps {
+  /**
+   * The stage the server calibrated the page against. Left unset (the global
+   * header mounts the pill with no page model in reach), the pill reads the
+   * cookie itself, so an operator who chose Seed sees "Seed" here rather than
+   * the default the brief below is no longer calibrated to.
+   */
   activeStage?: StartupVariantMode;
   className?: string;
 }
 
 export function StageDropdownPill({
-  activeStage = "series-a",
+  activeStage,
   className = "",
 }: StageDropdownPillProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +33,13 @@ export function StageDropdownPill({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const selectedStageKey = operatorStageForVariantMode(activeStage);
+  const { stage: storedStage } = useOperatorStage();
+
+  // The hook's server value is null, so the first render matches the server's
+  // markup (the default) and the cookie's answer arrives through hydration.
+  const selectedStageKey = activeStage
+    ? operatorStageForVariantMode(activeStage)
+    : storedStage ?? DEFAULT_OPERATOR_STAGE;
   const selectedOption = OPERATOR_STAGE_OPTIONS.find((opt) => opt.key === selectedStageKey) ?? OPERATOR_STAGE_OPTIONS[1];
 
   // Close on outside click or Escape

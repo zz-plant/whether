@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { RecentPostureHistoryCard } from "../app/components/hero/RecentPostureHistoryCard";
 import { DecisionHero } from "../app/components/DecisionHero";
+import { Sparkline } from "../app/components/ui/sparkline";
 import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
 import { regimeDataAttribute } from "../lib/regimeAccent";
 
@@ -28,26 +28,31 @@ const readRepoFile = (path: string) => readFileSync(new URL(`../${path}`, import
  * regime than the hero it framed.
  */
 describe("regime colour contract", () => {
-  it("draws the posture stripe in the canonical regime hues and lists only what it shows", () => {
+  it("draws the months behind the score line in the canonical regime hues, each named on hover", () => {
+    // The posture stripe used to be a card of its own at the foot of `/`; the
+    // same 24 months are the ground of the hero's sparkline now, so the colour
+    // contract moves with them. `/` builds these points from `REGIME_HEX_COLORS`
+    // via `regimeDataAttribute`, the same table the plane on /history reads.
     const html = renderToStaticMarkup(
-      <RecentPostureHistoryCard
-        history={[
-          { record_date: "2026-05-31", regime: "SCARCITY" },
-          { record_date: "2026-06-30", regime: "VOLATILE" },
-          { record_date: "2026-07-31", regime: "EXPANSION" },
+      <Sparkline
+        label="Operating latitude"
+        points={[
+          { label: "May 2026", value: 40, ground: REGIME_HEX_COLORS.SCARCITY, groundLabel: "Freezing" },
+          { label: "Jun 2026", value: 44, ground: REGIME_HEX_COLORS.VOLATILE, groundLabel: "Stormy" },
+          { label: "Jul 2026", value: 52, ground: REGIME_HEX_COLORS.EXPANSION, groundLabel: "Sunny" },
         ]}
       />,
     );
 
     for (const regime of ["SCARCITY", "VOLATILE", "EXPANSION"] as const) {
-      assert.ok(html.includes(REGIME_HEX_COLORS[regime]), `${regime} months are drawn in the plane's hue`);
+      assert.ok(html.includes(`fill="${REGIME_HEX_COLORS[regime]}"`), `${regime} months are drawn in the plane's hue`);
     }
     assert.ok(!html.includes(REGIME_HEX_COLORS.DEFENSIVE), "a regime with no months is not drawn");
-    for (const label of ["Freezing", "Stormy", "Sunny"]) {
-      assert.ok(html.includes(`>${label}<`), `legend names ${label}`);
+    for (const title of ["May 2026: Freezing", "Jun 2026: Stormy", "Jul 2026: Sunny"]) {
+      assert.ok(html.includes(`<title>${title}</title>`), `each month names its regime: ${title}`);
     }
-    assert.ok(!html.includes(">Cloudy<"), "legend omits a regime with no months");
-    assert.ok(!/bg-teal-4\d\d/.test(html), "Sunny months are emerald as on the plane, not the brand teal");
+    assert.match(html, /aria-label="[^"]*Shaded by regime; Sunny at Jul 2026/, "the latest regime reaches the accessible label");
+    assert.ok(!/teal/.test(html), "Sunny months are emerald as on the plane, not the brand teal");
   });
 
   it("stamps the hero with the regime its copy states", () => {

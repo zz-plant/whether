@@ -144,7 +144,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
         someone who has never seen it, and the comment above records what it cost
         the last time this spot grew a second block of controls.
       */}
-      <details className="weather-auto-chevron group mt-3">
+      <details className="weather-auto-chevron group mt-1">
         {/* The label and its count are one flex item, not two.
             `summary[data-chevron] / .list-none / .weather-auto-chevron > summary`
             sets `justify-content: space-between`, which is right for a summary

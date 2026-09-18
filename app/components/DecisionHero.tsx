@@ -12,7 +12,7 @@ import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
 import { buildBoundedConditionRails, parenthesizePointsToLine } from "../../lib/report/operatingCalls";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
 import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
-import { Sparkline, interquartileRange, sparklineDomain } from "./ui/sparkline";
+import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
 import { BoundedValue } from "./ui/boundedValue";
@@ -33,6 +33,8 @@ import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { RunwayBand } from "../../lib/report/operatorRunway";
 import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
 import { describeInputMovement } from "../../lib/report/inputMovement";
+import { describeWindowPosition } from "../../lib/report/windowPosition";
+import Link from "next/link";
 import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
 
 type Props = {
@@ -219,6 +221,12 @@ export function DecisionHero({
   const trendDomain = trendValues ? sparklineDomain(trendValues) : undefined;
   const trendBand = trendValues ? interquartileRange(trendValues) : undefined;
   const trendTone = boldnessDelta > 0 ? "easing" : boldnessDelta < 0 ? "tightening" : "unchanged";
+  // The score against its own window, as a rank. "Operating latitude" names
+  // the number; this says whether 33 is low, which is what a reader who has
+  // not seen the page before is asking.
+  const trendPosition = trendValues && trendPoints
+    ? describeWindowPosition(boldnessScore, trendValues, `since ${trendPoints[0].label}`)
+    : null;
 
   const isDegradedData = isFallback || (degradedCount && degradedCount > 0);
   const dataStatus = resolveDataStatusLabel({ isFallbackSnapshot: isFallback, degradedSourceCount: degradedCount ?? 0 });
@@ -508,10 +516,13 @@ export function DecisionHero({
               </span>
               <span className="text-xs sm:text-sm font-medium text-slate-400">/100</span>
               {boldnessDelta !== 0 ? (
-                <span className={`ml-1 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium tabular-nums ${
+                /* The tightening / easing tokens, not a rose and an emerald
+                   picked here: every other delta on the page reads them, and
+                   the light theme's 700-level inks live on the tokens. */
+                <span className={`ml-1 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium tabular-nums ${
                   boldnessDelta < 0
-                    ? "bg-rose-500/15 border border-rose-500/30 text-rose-300"
-                    : "bg-emerald-500/15 border border-emerald-500/30 text-emerald-300"
+                    ? "border-semantic-tightening-border/30 bg-semantic-tightening-border/15 text-semantic-tightening-fg"
+                    : "border-semantic-easing-border/30 bg-semantic-easing-border/15 text-semantic-easing-fg"
                 }`}>
                   {boldnessDelta < 0 ? <ArrowDownRight size={13} /> : <ArrowUpRight size={13} />}
                   <span>{boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} this week</span>
@@ -533,9 +544,25 @@ export function DecisionHero({
                   domain={trendDomain}
                   band={trendBand}
                   tone={trendTone}
-                  widthEm={12}
+                  widthEm={16}
                   className="text-[color:var(--regime-ink)]"
                 />
+                {/* The line is autoscaled, so a 4-point wobble and a 40-point
+                    swing draw the same height. The window and range beside it
+                    are what let a reader decode the shape — the rule the
+                    sparkline documents and this caller had not been keeping. */}
+                <figcaption className="mt-0.5 flex flex-col items-start sm:items-end sm:text-right tabular-nums text-slate-500">
+                  {trendPosition ? <span className="text-slate-400">{trendPosition}</span> : null}
+                  <span>
+                    {`${trendPoints[0].label}–${trendPoints[trendPoints.length - 1].label} · ${rangeLabel(trendDomain)} · `}
+                    {/* The record this window is cut from. The memory rail that
+                        carried this link drew the same months at the foot of the
+                        page; the months are behind the line now, so the link is here. */}
+                    <Link href="/history" className="text-slate-400 underline decoration-white/20 underline-offset-2 hover:text-white/80">
+                      History
+                    </Link>
+                  </span>
+                </figcaption>
               </figure>
             ) : null}
           </div>

@@ -92,6 +92,15 @@ describe("sparkline", () => {
       renderToStaticMarkup(<Sparkline points={[{ label: "Jan", value: 1 }]} label="One" />),
       "",
     );
+    // Two points is a segment whose slope is the delta printed beside it. The
+    // change report drew one per composite signal, threshold-to-reading, and
+    // it read as a trend next to a rail that already drew the comparison.
+    assert.equal(
+      renderToStaticMarkup(
+        <Sparkline points={[{ label: "threshold", value: 70 }, { label: "now", value: 83 }]} label="Two" />,
+      ),
+      "",
+    );
   });
 
   it("uses tokens for color so both themes resolve", () => {

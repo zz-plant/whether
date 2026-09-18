@@ -18,11 +18,26 @@
  *    always stated in the accessible label.
  */
 
-export type SparklinePoint = { label: string; value: number };
+export type SparklinePoint = {
+  label: string;
+  value: number;
+  /**
+   * A categorical ground behind this reading — the regime the month was in —
+   * as a fill. Weather Strip draws the temperature line through the sky it
+   * ran under (sun, cloud, rain), and a reader gets the condition and the
+   * number from one graphic. Here the score runs through the month's regime.
+   * Omit it and the line draws on the surface as before.
+   */
+  ground?: string | null;
+  /** What the ground is, for the hover title and the accessible label. */
+  groundLabel?: string;
+};
 
 const VIEW_W = 120;
 const VIEW_H = 24;
 const PAD_Y = 2.5;
+/** The fewest readings that make a shape rather than a segment. */
+export const MIN_SHAPE_POINTS = 3;
 
 /** Semantic tones resolve to tokens, so light and dark themes both hold. */
 const TONE_COLOR = {
@@ -111,9 +126,13 @@ export function Sparkline({
   widthEm = 5,
   className,
 }: SparklineProps) {
-  // Below two points there is no shape to show. Render nothing rather than a
-  // decorative stub — the adjacent number is still the honest reading.
-  if (points.length < 2) return null;
+  // Below three points there is no shape to show. Two points is a segment, and
+  // a segment's slope is the delta the number beside it already prints — the
+  // change report drew one per signal, from the threshold to the reading, and
+  // it read as "the trend went up" beside a rail that said "above the line".
+  // A line earns its place by carrying more readings than the sentence can;
+  // render nothing rather than a decorative stub.
+  if (points.length < MIN_SHAPE_POINTS) return null;
 
   const values = points.map((p) => p.value);
   const resolvedDomain = domain ?? sparklineDomain(values);
@@ -130,9 +149,16 @@ export function Sparkline({
   const bandTop = band ? toY(Math.max(band[1], min)) : 0;
   const bandBottom = band ? toY(Math.min(band[0], max)) : 0;
 
+  const groundLabels = points.filter((p) => p.ground && p.groundLabel);
   const accessibleLabel =
     `${label}: ${points.length} readings from ${first.label} to ${last.label}, ` +
-    `ranging ${rangeLabel(resolvedDomain)}. Latest ${Math.round(last.value)} at ${last.label}.`;
+    `ranging ${rangeLabel(resolvedDomain)}. Latest ${Math.round(last.value)} at ${last.label}.` +
+    (last.ground && last.groundLabel ? ` Shaded by regime; ${last.groundLabel} at ${last.label}.` : "");
+
+  // Each reading owns the column around it: half a step either side, the
+  // ends clipped to the frame. Bands rather than stripes, so a run of one
+  // regime reads as one block the way it does on the /history plane.
+  const step = VIEW_W / Math.max(points.length - 1, 1);
 
   return (
     <svg
@@ -143,6 +169,23 @@ export function Sparkline({
       className={`inline-block shrink-0 align-[-0.15em] overflow-visible ${className ?? ""}`}
       aria-label={accessibleLabel}
     >
+      {groundLabels.length > 0
+        ? points.map((point, i) =>
+            point.ground ? (
+              <rect
+                key={`${point.label}-${i}`}
+                x={Math.max(0, i * step - step / 2)}
+                y="0"
+                width={Math.min(VIEW_W, i * step + step / 2) - Math.max(0, i * step - step / 2)}
+                height={VIEW_H}
+                fill={point.ground}
+                opacity="0.28"
+              >
+                {point.groundLabel ? <title>{`${point.label}: ${point.groundLabel}`}</title> : null}
+              </rect>
+            ) : null,
+          )
+        : null}
       {band ? (
         <rect
           x="0"

@@ -468,6 +468,16 @@ describe("buildFlipThreshold", () => {
     assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
   });
 
+  it("leads each boundary with the distance to it, in the direction it trips", () => {
+    // Scarcity flips on funding pressure falling to 70 or below, or risk
+    // appetite rising above 50. From 76 / 45 that is 6 pts down and 5 pts up.
+    // The reader gets the subtraction done, and the inequality survives: a
+    // score *at* 50 does not clear an "above 50" line, so that side says so.
+    const flip = buildFlipThreshold(makeAssessment("SCARCITY"));
+    assert.match(flip, /Funding pressure falls 6 pts to 70 or below \(76 today\)/);
+    assert.match(flip, /risk appetite rises 5 pts to clear 50 \(45 today\)/);
+  });
+
   it("returns a future crossing for defensive regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("DEFENSIVE"));
     // One sentence, both boundaries, each carrying its live reading.
