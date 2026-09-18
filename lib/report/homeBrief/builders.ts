@@ -40,6 +40,7 @@ import {
   buildScopedVariantDecisionAdjustment,
   startupVariantModes,
 } from "../boundedDecisionRules";
+import { resolveRunwayBand, type RunwayBand } from "../operatorRunway";
 import { buildDecisionMatrixPayload } from "./decisionMatrix";
 import { buildPrimaryRiskLabel } from "./risk";
 import { extractExecutiveOperationalStance } from "./executiveOperationalStance";
@@ -208,7 +209,12 @@ const buildLeadershipShorthandLine = (boldnessDelta: number) => {
 
 export const buildHomeBriefModelInternal = (
   data: HomeReportData,
-  options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantPolicy["selectedMode"] },
+  options?: {
+    overlaySector?: SectorKey;
+    startupVariantMode?: StartupVariantPolicy["selectedMode"];
+    runwayBand?: RunwayBand;
+    runwayMonths?: number;
+  },
 ) => {
   const {
     assessment,
@@ -235,6 +241,9 @@ export const buildHomeBriefModelInternal = (
   // picked a stage, so an untouched brief keeps its canonical action line.
   const startupVariantMode = options?.startupVariantMode ?? "series-a";
   const explicitStartupVariantMode = options?.startupVariantMode;
+  const runwayBand = options?.runwayBand;
+  const runwayMonths = options?.runwayMonths;
+  const runwayCalibrated = resolveRunwayBand(runwayBand, runwayMonths) !== null;
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
@@ -462,12 +471,12 @@ export const buildHomeBriefModelInternal = (
     selectedMode: startupVariantMode,
     options: startupVariantModes,
     adjustmentsByMode: {
-      seed: buildScopedVariantDecisionAdjustment({ mode: "seed", thresholds: assessment.thresholds, scores: assessment.scores }),
-      "series-a": buildScopedVariantDecisionAdjustment({ mode: "series-a", thresholds: assessment.thresholds, scores: assessment.scores }),
-      "series-b": buildScopedVariantDecisionAdjustment({ mode: "series-b", thresholds: assessment.thresholds, scores: assessment.scores }),
-      growth: buildScopedVariantDecisionAdjustment({ mode: "growth", thresholds: assessment.thresholds, scores: assessment.scores }),
-      public: buildScopedVariantDecisionAdjustment({ mode: "public", thresholds: assessment.thresholds, scores: assessment.scores }),
-      bootstrapped: buildScopedVariantDecisionAdjustment({ mode: "bootstrapped", thresholds: assessment.thresholds, scores: assessment.scores }),
+      seed: buildScopedVariantDecisionAdjustment({ mode: "seed", thresholds: assessment.thresholds, scores: assessment.scores, runwayBand, runwayMonths }),
+      "series-a": buildScopedVariantDecisionAdjustment({ mode: "series-a", thresholds: assessment.thresholds, scores: assessment.scores, runwayBand, runwayMonths }),
+      "series-b": buildScopedVariantDecisionAdjustment({ mode: "series-b", thresholds: assessment.thresholds, scores: assessment.scores, runwayBand, runwayMonths }),
+      growth: buildScopedVariantDecisionAdjustment({ mode: "growth", thresholds: assessment.thresholds, scores: assessment.scores, runwayBand, runwayMonths }),
+      public: buildScopedVariantDecisionAdjustment({ mode: "public", thresholds: assessment.thresholds, scores: assessment.scores, runwayBand, runwayMonths }),
+      bootstrapped: buildScopedVariantDecisionAdjustment({ mode: "bootstrapped", thresholds: assessment.thresholds, scores: assessment.scores, runwayBand, runwayMonths }),
     },
   };
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
@@ -483,7 +492,7 @@ export const buildHomeBriefModelInternal = (
 
   const conciseActionNow = policyOverrideActive
     ? "Slow approvals, require reversible bets, and cap new experiments until disagreement clears."
-    : explicitStartupVariantMode
+    : (explicitStartupVariantMode || runwayCalibrated)
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()
       : actionNowShort?.trim();

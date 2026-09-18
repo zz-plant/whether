@@ -4,6 +4,7 @@
  */
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import type { FlashMove } from "./flashMoves";
 
 type EmailContent = {
   subject: string;
@@ -165,6 +166,46 @@ export const thresholdCrossingEmail = (
       ),
       `<div style="margin-top:12px;">`,
       sectionBlock(metricLabel, `${value.toFixed(1)} / ${threshold}`, "#fbbf24", "#fde68a"),
+      `</div>`,
+    ].join("\n"),
+    unsubscribeToken,
+  );
+  return { subject, html, text };
+};
+
+/**
+ * Flash alert — an emergency-sized move in a raw input between two reads,
+ * pushed the day it lands. Names the input and the size in the input's own
+ * units; the scores may not have crossed anything yet, and the mail says so.
+ */
+export const flashMoveEmail = (
+  move: FlashMove,
+  unsubscribeToken?: string | null,
+): EmailContent => {
+  const size = `${move.delta > 0 ? "+" : ""}${move.delta.toFixed(2)}%`;
+  const subject = `Whether Flash — ${move.label.toLowerCase()} moved ${size} since the last read`;
+  const text = [
+    `Whether Flash Alert`,
+    move.headline,
+    `A move this size between two reads is outside a normal session. The weekly call stands until the next read confirms where the scores settle; hold irreversible commitments until then.`,
+    ``,
+    `View full brief: https://whether.work`,
+    `---`,
+    `Whether · weekly operating brief`,
+    ...unsubscribeFooterText(unsubscribeToken),
+  ].join("\n");
+  const html = baseHtml(
+    "Whether Flash Alert",
+    [
+      alertBanner("critical", `<strong>${move.headline}</strong>`),
+      `<div style="margin-top:12px;">`,
+      sectionBlock(move.label, `${move.from.toFixed(2)}% → ${move.to.toFixed(2)}% (${size})`, "#fbbf24", "#fde68a"),
+      `</div>`,
+      `<div style="margin-top:12px;">`,
+      sectionBlock(
+        "What to do",
+        "A move this size between two reads is outside a normal session. The weekly call stands until the next read confirms where the scores settle; hold irreversible commitments until then.",
+      ),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,

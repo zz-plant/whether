@@ -28,10 +28,12 @@ import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { StagePersonaSelector } from "./StagePersonaSelector";
+import { RunwayPersonaSelector } from "./RunwayPersonaSelector";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import type { RunwayBand } from "../../lib/report/operatorRunway";
 import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
 import { describeInputMovement } from "../../lib/report/inputMovement";
-import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { Sun, Cloud, Zap, Snowflake, ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
 
 type Props = {
   tightness: number;
@@ -84,6 +86,13 @@ type Props = {
   /** Server-resolved from `?why=1`, so a shared link opens on the same panel. */
   signalBreakdownOpen?: boolean;
   activeStage?: StartupVariantMode;
+  activeRunway?: RunwayBand;
+  /**
+   * Which constraint binds this week — cash or the corridor — once a runway band
+   * has reshaped the stage rule. Unset when the band is the default, so an
+   * uncalibrated brief prints nothing here.
+   */
+  runwayEmphasis?: string;
   /**
    * The heading level for the call. `h1` by default — it is the page's subject.
    * `h2` on the one state where a cadence card above it carries the call the
@@ -98,6 +107,7 @@ type Props = {
     macroContributors?: string[];
     tightnessThreshold?: number;
     riskAppetiteThreshold?: number;
+    flipProximity?: string[];
   };
 };
 
@@ -141,6 +151,8 @@ export function DecisionHero({
   titleLevel = "h1",
   signalData,
   activeStage = "series-a",
+  activeRunway,
+  runwayEmphasis,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const tightnessDeltaSign = tightnessDelta > 0 ? "+" : tightnessDelta < 0 ? "" : "";
@@ -392,6 +404,24 @@ export function DecisionHero({
         {REGIME_DESCRIPTOR[regime] ? (
           <p className="mt-0.5 text-fluid-nano text-white/45">{REGIME_DESCRIPTOR[regime]}</p>
         ) : null}
+        {/* The flip watch: the distance to the boundary in the market's units
+            rather than in score points, nearest move first. The rails above
+            show how far each score sits from its line; this says what has to
+            happen on the curve or the bill for that line to be crossed. */}
+        {signalData?.flipProximity && signalData.flipProximity.length > 0 ? (
+          <div className="mt-1.5 border-t border-slate-800/60 pt-1.5">
+            <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/40">
+              {DECISION_CONTRACT_LABELS.watch.flipWatch}
+            </p>
+            <ul className="mt-0.5 space-y-0.5">
+              {signalData.flipProximity.map((sentence) => (
+                <li key={sentence} className="text-fluid-nano leading-snug text-white/60">
+                  {sentence}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
     </>
   );
@@ -520,10 +550,20 @@ export function DecisionHero({
             sourceLabel={sourceLabel}
           />
 
-          {/* Calibrate stage: displayed on sm+ desktop; mobile has dropdown in header */}
-          <div className="hidden sm:block">
+          {/* Calibrate stage and runway: displayed on sm+ desktop; mobile has dropdowns in header */}
+          <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-3">
             <StagePersonaSelector activeStage={activeStage} />
+            <RunwayPersonaSelector activeRunway={activeRunway} />
           </div>
+          {runwayEmphasis ? (
+            <p
+              data-testid="runway-emphasis"
+              className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90"
+            >
+              <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
+              <span>{runwayEmphasis}</span>
+            </p>
+          ) : null}
 
           {/* The chevron comes from the shared contract rather than a hand-rolled
               `after:content` pair, and the open state rides in `?why=1` so the

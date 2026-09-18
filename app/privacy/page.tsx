@@ -84,7 +84,8 @@ export default function PrivacyPage() {
             <h3 className={subheading}>2.1 Your email address, if you subscribe</h3>
             <p className={paragraph}>
               Subscribing stores your address, the time you subscribed, whether you have confirmed
-              it, whether you opted in to regime-change alerts as well as the Monday brief, and a
+              it, whether you opted in to alerts between Mondays (a regime change, a score crossing
+              its line, or an outsized move in a market input) as well as the Monday brief, and a
               random token that makes the confirmation and unsubscribe links work. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
               you click the confirmation link. Every email carries an unsubscribe link, and using it
@@ -131,11 +132,12 @@ export default function PrivacyPage() {
           </div>
 
           <div className="space-y-2">
-            <h3 className={subheading}>2.5 One cookie, set only if you choose a stage</h3>
+            <h3 className={subheading}>2.5 Two cookies, set only if you calibrate the call</h3>
             <p className={paragraph}>
               Picking a company stage writes a cookie so the panels on a page agree with each other
-              and the call is calibrated the same way everywhere. It holds the stage you picked, is
-              read only by this site, and is set by no other action.
+              and the call is calibrated the same way everywhere. Picking a cash runway band writes a
+              second one for the same reason. Each holds only the band you picked &mdash; never a
+              cash figure &mdash; is read only by this site, and is set by no other action.
             </p>
           </div>
 
@@ -232,8 +234,8 @@ export default function PrivacyPage() {
         <ul className={`list-disc space-y-2 pl-5 ${paragraph}`}>
           <li>Stop the emails with the unsubscribe link in any of them. No reply or account needed.</li>
           <li>
-            Remove everything held in your browser — the identifier, presets, drafts, the stage
-            cookie — by clearing site data for this site.
+            Remove everything held in your browser — the identifier, presets, drafts, the stage and
+            runway cookies — by clearing site data for this site.
           </li>
           <li>
             Ask for a copy of what is held against your address, or for it to be deleted, by emailing{" "}

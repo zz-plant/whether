@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
 import { useClipboardCopy } from "../components/useClipboardCopy";
+import { useOperatorRunway } from "../components/useOperatorRunway";
+import {
+  formatInvestorUpdateSnippet,
+  type InvestorUpdateSnippetParts,
+} from "../../lib/export/investorUpdateSnippet";
 
 type ShareCopyControlsProps = {
   recordDate: string;
@@ -10,16 +15,18 @@ type ShareCopyControlsProps = {
   emailBrief: string;
   meetingPack: string;
   issueTrackerBrief: string;
+  investorUpdate: InvestorUpdateSnippetParts;
   calendarDetails: string;
 };
 
-type CopyTarget = "slack" | "email" | "meeting" | "tracker";
+type CopyTarget = "slack" | "email" | "meeting" | "tracker" | "investor";
 
 const copyLabels: Record<CopyTarget, string> = {
   slack: "Slack brief",
   email: "Email brief",
   meeting: "Meeting pack",
   tracker: "Ticket brief",
+  investor: "Investor update",
 };
 
 const isCopyTarget = (value: string | null): value is CopyTarget => value !== null && value in copyLabels;
@@ -33,6 +40,7 @@ const copyCommitments: Record<CopyTarget, ActivationCommitment> = {
      a reader copied the call, and widening a telemetry union to split one
      destination off buys a distinction nothing reads. */
   tracker: "copied_brief",
+  investor: "copied_brief",
 };
 
 const nextMondayIsoDate = () => {
@@ -48,9 +56,17 @@ export function ShareCopyControls({
   emailBrief,
   meetingPack,
   issueTrackerBrief,
+  investorUpdate,
   calendarDetails,
 }: ShareCopyControlsProps) {
   const { status, error, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy();
+  // The one paragraph that depends on the reader's company comes from the
+  // browser: the page is cached, so the server built the reading without it.
+  const { runwayBand } = useOperatorRunway();
+  const investorUpdateText = useMemo(
+    () => formatInvestorUpdateSnippet(investorUpdate, runwayBand),
+    [investorUpdate, runwayBand],
+  );
   const copiedTarget = isCopyTarget(copiedKey) ? copiedKey : null;
   const copyError = error ? "Clipboard access failed. Select the preview text and copy it manually." : null;
   const trackedRef = useRef<string | null>(null);
@@ -133,6 +149,22 @@ export function ShareCopyControls({
             onClick={() => void copyText("tracker", issueTrackerBrief)}
           >
             {copiedTarget === "tracker" ? "Copied ticket brief" : "Copy ticket brief"}
+          </button>
+        </article>
+
+        <article className="weather-surface space-y-3 px-4 py-4">
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Investor update</h2>
+          <p className="text-xs leading-relaxed text-slate-300">
+            {runwayBand
+              ? "Copy two paragraphs for the market section of a monthly letter: the regime and its move since last month-end, then the call and what your runway band means for it."
+              : "Copy two paragraphs for the market section of a monthly letter: the regime and its move since last month-end, then the call. Pick a runway band on the brief to add what it means for your cash."}
+          </p>
+          <button
+            type="button"
+            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+            onClick={() => void copyText("investor", investorUpdateText)}
+          >
+            {copiedTarget === "investor" ? "Copied investor update" : "Copy investor update"}
           </button>
         </article>
 

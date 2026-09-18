@@ -9,11 +9,13 @@
  * promise the settings panel cannot keep.
  */
 import { readOperatorStageCookie, type OperatorStage } from "./operatorStage";
+import { readOperatorRunwayCookie, type RunwayBand } from "./operatorRunway";
 
 export type CompanyStage = OperatorStage;
 
 export interface OperatorContext {
   companyStage: CompanyStage | null;
+  companyRunway: RunwayBand | null;
   ticker: string | null;
 }
 
@@ -24,7 +26,7 @@ const parseCookieValue = (cookieHeader: string, name: string): string | null => 
   return match ? decodeURIComponent(match[1]) : null;
 };
 
-const EMPTY_OPERATOR_CONTEXT: OperatorContext = { companyStage: null, ticker: null };
+const EMPTY_OPERATOR_CONTEXT: OperatorContext = { companyStage: null, companyRunway: null, ticker: null };
 
 /**
  * Parse operator context from a cookie header string (from request.headers.get("cookie")).
@@ -40,5 +42,9 @@ export const parseOperatorContextFromCookies = (
   const tickerRaw = parseCookieValue(cookieHeader, COOKIE_TICKER);
   const ticker: string | null = tickerRaw && tickerRaw.trim().length > 0 ? tickerRaw.trim().toUpperCase() : null;
 
-  return { companyStage: readOperatorStageCookie(cookieHeader), ticker };
+  return {
+    companyStage: readOperatorStageCookie(cookieHeader),
+    companyRunway: readOperatorRunwayCookie(cookieHeader),
+    ticker,
+  };
 };

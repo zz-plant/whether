@@ -22,6 +22,7 @@ import type {
   ScopedVariantDecisionAdjustment,
   StartupVariantMode,
 } from "./boundedDecisionRules";
+import type { RunwayBand } from "./operatorRunway";
 import {
   buildDecisionTransmissionBoundedRules,
   type ActionStripItem,
@@ -416,7 +417,12 @@ export type WeeklyDecisionCardViewModel = {
 
 export const buildHomeBriefModel = (
   data: HomeReportData,
-  options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
+  options?: {
+    overlaySector?: SectorKey;
+    startupVariantMode?: StartupVariantMode;
+    runwayBand?: RunwayBand;
+    runwayMonths?: number;
+  },
 ) => buildHomeBriefModelInternal(data, options);
 
 const normalizeDecisionTransmissionConfidence = (label: string | undefined): DecisionTransmission["confidence"] => {
@@ -446,6 +452,8 @@ export const buildDecisionTransmission = (
   options?: {
     overlaySector?: SectorKey;
     startupVariantMode?: StartupVariantMode;
+    runwayBand?: RunwayBand;
+    runwayMonths?: number;
     now?: Date;
     staleAfterHours?: number;
   },

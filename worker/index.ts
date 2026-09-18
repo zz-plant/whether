@@ -131,13 +131,16 @@ export default {
 
     const snapshot = refreshResult.ok ? refreshResult.snapshot : null;
     const weeklyCall = refreshResult.ok ? refreshResult.weeklyCall : null;
+    const previousSnapshot = refreshResult.ok ? refreshResult.previousSnapshot : null;
 
     /* Both crons evaluate bounded-rule tripwires against the fresh signals, so a
        regime flip or threshold crossing pushes the day it lands instead of waiting
        for Monday. Both checks are transition-based (KV last-known state), so
-       daily runs stay silent unless something actually crossed. The brief email
-       remains weekly-only — the cadence promise is weekly; only rule firings
-       break cadence. */
+       daily runs stay silent unless something actually crossed. A flash — an
+       emergency-sized move in the short rate or the curve between two reads — is
+       judged against the previous snapshot for the same reason (lib/alert/flashMoves.ts).
+       The brief email remains weekly-only — the cadence promise is weekly; only
+       rule firings break cadence. */
     if (!isDailyIngestion && snapshot && weeklyCall) {
       await runCronStep("email/send-weekly", () => sendWeeklyBrief({ snapshot, weeklyCall }));
 
@@ -187,9 +190,9 @@ export default {
     }
 
     if (snapshot && weeklyCall) {
-      await runCronStep("check-regime-change", () => checkRegimeChange({ snapshot, weeklyCall }));
+      await runCronStep("check-regime-change", () => checkRegimeChange({ snapshot, weeklyCall, previousSnapshot }));
       await runCronStep("alert-deliveries", async () => {
-        const result = await runScheduledAlertDelivery({ snapshot, weeklyCall });
+        const result = await runScheduledAlertDelivery({ snapshot, weeklyCall, previousSnapshot });
         return { ok: result.errors === 0, error: result.errors > 0 ? `${result.errors} delivery errors` : undefined };
       });
     }
@@ -232,7 +235,7 @@ export default {
     const response = await handler.fetch(request, env, ctx);
 
     const cookieHeader = request.headers.get("cookie");
-    if (cookieHeader && /whether-(company-stage|rate-sensitivity|ticker)=/.test(cookieHeader)) {
+    if (cookieHeader && /whether-(company-stage|company-runway|rate-sensitivity|ticker)=/.test(cookieHeader)) {
       const headers = new Headers(response.headers);
       headers.set("Cache-Control", "private, no-store");
       return new Response(response.body, {

@@ -6,13 +6,20 @@ plain‑English operational constraints with traceable sources.
 Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 
 ## Immediate priority backlog (live-gap focused)
-All five items shipped as of 2026-08-29.
 
+### Shipped baseline (2026-08-29)
 1. ~~**Promote export/share to the Overview header**~~ — Shipped: `CopySlackBriefButton` and `PresentModeButton` in `DecisionHero` header (2026-08-29).
 2. ~~**Ship source health panel (stale/failed feed visibility)**~~ — Shipped: System status and Source board on `/trust` with per-source freshness, fallback reasons, and fetch metadata.
 3. ~~**Harden API contracts for summary and Signal Ops payloads**~~ — Shipped: `tests/apiSummaryContracts.test.ts` and `tests/cliContracts.test.ts` provide contract coverage for `/api/weekly`, `/api/monthly`, alerts, and digest.
 4. ~~**Finish historical structured archive materialization**~~ — Shipped: `lib/summary/summaryArchive.ts` with deterministic regression coverage.
 5. ~~**Consolidate operations IA around live routes**~~ — Shipped: `lib/navigation/informationArchitecture.ts` consolidates live routes (`/`, `/operate`, `/signals`, `/answer`, `/trust`, `/history`).
+
+### Active focus (community & operator demand)
+1. ~~**Scheduled Monday Slack & Email delivery**~~ (Top request #1 & #3) — Shipped: KV-backed multi-team webhook registry (`lib/slack/slackWebhookStore.ts`), connection & test API (`/api/slack/subscribe`), UI destination toggle, and automated Monday delivery fan-out with auto-pruning (2026-09-17).
+2. ~~**Runway & stage decision calibration**~~ (Top request #11 & #12) — Shipped: runway bands (`lib/report/operatorRunway.ts`: <6, 6–12, 12–24, 24+ months) scale every stage rule's do-now, pause and reversal lines (`scaleAdjustmentToRunway`), selectable from the hero and the phone header, carried by `?runway=` and the `whether-company-runway` cookie (2026-09-17).
+3. ~~**1-slide board deck & investor memo exports**~~ (Top request #31 & #32) — Shipped: `/api/export/board-slide?format=pptx|pdf` writes the meeting slide as a native one-slide PPTX (hand-written OOXML, `lib/export/boardSlideDeck.ts`) or a 16:9 PDF, downloadable from `/share`; the monthly investor update block (`lib/export/investorUpdateSnippet.ts`) copies from `/share` with the regime, its move since the prior month-end, the call, and the runway sentence for the browser's band (2026-09-17).
+4. **Linear / Jira epic guardrail tagging** (Top request #4) — Sync macro posture to engineering planning tools to warn on high-risk, speculative bets. *Open decision (2026-09-17): the sync needs each team's Linear API key or Jira token stored server-side, which is a new class of stored secret and a new `/privacy` entry; deferred behind items 3 and 5. A credential-free slice — a per-epic guardrail label and description block an operator pastes themselves, extending the issue-tracker brief on `/share` — is the fallback if tokens are not to be held.*
+5. ~~**Mid-week flash alerts & proximity-to-flip watch**~~ (Top request #21 & #22) — Shipped: the daily cron judges the short rate and the 10Y−2Y curve against the previous read (`lib/alert/flashMoves.ts`: a quarter point on the rate or twenty points on the curve between consecutive reads) and pushes a critical alert by email and Slack the day it lands, outside the weekly cooldown; the hero's Conditions cell carries a flip watch (`lib/report/flipProximity.ts`) stating the market move that would change the call, in the input's units (2026-09-17).
 
 
 ## Milestone 0 — Repo scaffolding (Week 0)
@@ -122,23 +129,68 @@ All five items shipped as of 2026-08-29.
 - [x] Data freshness health checks with explicit fallback reasons. Shipped: freshness timestamps and fallback status on `/trust` Source board.
 - [x] Add a "source health" panel that surfaces stale/failed data feeds. Shipped: System status and Source board on `/trust`.
 
+## Milestone 12 — Automated Transmission & Ritual Embedding (Week 12)
+- [x] Multi-team Slack delivery with scheduled Monday digest into `#leadership` with welcome test ping. Shipped: `SlackWebhookStore`, `/api/slack/subscribe`, UI channel toggle, and `deliverSlackBrief` fan-out with auto-pruning (2026-09-17).
+- [x] Zero-login automated executive email brief delivery with copy-ready decision bullets. Shipped: `sendWeeklyBrief` and `subscriberStore` with Cloudflare Email adapter.
+- [ ] Live Notion and Coda embed / sync block for PRDs and quarterly planning documents.
+- [ ] Linear and Jira initiative / epic macro-guardrail sync (flag speculative bets during Scarcity/Defensive).
+- [x] Mid-week emergency flash alerts for unexpected regime changes (intraday spread blowouts, emergency rate cuts). Shipped: `lib/alert/flashMoves.ts`, wired through `checkRegimeChange` (Slack) and `runScheduledAlertDelivery` (email) on both crons (2026-09-17).
+- [x] Proximity-to-flip watch indicator ("0.08% on 10Y-2Y curve away from shifting regime"). Shipped: `lib/report/flipProximity.ts`, rendered in the hero's Conditions cell (2026-09-17).
+
+## Milestone 13 — Company-Calibrated Decisions (Week 13)
+- [x] Dynamic runway-scaled guardrails (<6m, 12m, 24m+ cash bands) scaling stop/start/fence rules. Shipped: `lib/report/operatorRunway.ts` and `scaleAdjustmentToRunway` in `boundedDecisionRules.ts` (2026-09-17).
+- [x] Stage profile presets (Seed vs. Series A vs. Growth) adjusting hiring speed and burn tolerance. Shipped: `lib/report/operatorStage.ts` and the per-stage adjustments in `boundedDecisionRules.ts` (see `docs/feature-specs-current.md` §1.1.7, 2026-09-06).
+- [ ] Sector overlays (B2B SaaS vs. Consumer vs. DeepTech / AI Infrastructure).
+- [ ] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin).
+- [ ] ARR-per-employee and burn multiple efficiency benchmark thresholds.
+- [ ] Tech talent heat index integration (WARN notices and layoffs tracking) to calibrate hiring pacing.
+
+## Milestone 14 — Governance & Executive Artifacts (Week 14)
+- [x] 1-slide board deck export (native PPTX and presentation-ready PDF). Shipped: `/api/export/board-slide`, linked from `/share` and `/api-docs` (2026-09-17).
+- [x] Monthly investor update snippet generator (2-paragraph copyable block with regime, delta, and runway implications). Shipped: "Investor update" on `/share` (2026-09-17).
+- [ ] White-label / unbranded PDF and slide exports for PE/advisors and board directors.
+- [ ] Board pre-read memo template (structured 2-page Markdown/PDF for leadership syncs).
+- [ ] Audit-proof Decision Memory export for compliance, board scrutiny, and compensation reviews.
+
+## Milestone 15 — Platform Ecosystem & Portfolio Intelligence (Week 15)
+- [ ] Model Context Protocol (MCP) server expansion and typed client SDK (`@whether/sdk`).
+- [ ] Native Zapier and Make.com connectors for custom operator workflows.
+- [ ] GitHub Action for macro-aware PR & architecture reviews (flagging high-variable-cost cloud spend in tight regimes).
+- [ ] VC / Multi-Company Health Matrix (portfolio-wide runway vs. macro sensitivity view).
+- [ ] Bulk portfolio broadcast tools for VC platform and accelerator leads.
+
 ---
 
 ### Development stories (planned)
 - As a product leader, I can see a curated Insight Database so I understand how macro regimes translate into concrete product and engineering constraints.
 - As an operator, I can copy Decision Shield guidance tied to current sensors so I can validate hires, rewrites, and launches with traceable reasoning.
-- As a team lead, I can compare fossil-record signals against today’s regime so I can spot legacy architecture and support patterns that no longer fit the climate.
-- As an executive, I can read a one-sentence meta-insight that explains why posture must change with macro physics.
-- As a strategy lead, I can subscribe to regime-change alerts and distribute summaries automatically.
-- As a finance partner, I can export a slide-ready snapshot of the current regime with citations for planning reviews.
-- As an operations lead, I can generate a briefing pack with citations in under a minute.
-- As a planning reviewer, I can audit decisions against the exact regime and threshold settings at the time.
-- As a staff leader, I can run a counterfactual and share the deltas as a link.
+- As a team lead, I can receive the Monday brief directly in our `#leadership` Slack channel without logging in.
+- As a founder, I can export a 1-slide PPTX board summary that aligns investors on macro posture in under a minute.
+- As a CFO, I can enter our cash runway and see stop/fence/start rules scaled specifically to our remaining months.
+- As an engineering executive, I can tag epics in Linear that violate current capital efficiency bounds.
+- As a strategy lead, I can subscribe to mid-week flash alerts when a rate shock or credit blowout threatens our posture.
+- As a VC operating partner, I can inspect a health matrix of 40 portfolio companies against current macro tightness.
 
 ### Success criteria
 - Every output is traceable to a public source and includes timestamps.
-- Operators can copy/paste a defensible, plain‑English decision rationale.
+- Operators can copy/paste a defensible, plain‑English decision rationale in under 60 seconds.
+- Ritual transmission works without requiring the user to open a browser tab every Monday.
 - Offline mode is explicit and safe.
+
+---
+
+## Explicit Non-Goals & Rejected Feature Traps (What We Will Not Build)
+
+To protect the core product loop (**signals → posture → decision delta → bounded action → shareable artifact**) and prevent product sprawl, the following high-demand community requests are explicitly rejected:
+
+1. **No Bloomberg / TradingView Terminal Replication:**
+   - *Why rejected:* Operators repeatedly upvote requests for crypto liquidity, oil/energy commodity prices, and intraday stock tick charts. Whether's mission is not to explain or display the market; it is to deliver an operational verdict.
+2. **No Speculative Fed Forecasting / Prediction Crystal Ball:**
+   - *Why rejected:* Users ask "Predict what the Fed will do next month." Whether is a pacing instrument with explicit numeric thresholds, not a macroeconomic opinion blog or speculative forecasting tool.
+3. **No Black-Box Monte Carlo Financial Models:**
+   - *Why rejected:* Complex probabilistic multi-variable simulations obscure the derivation. Decisions must remain traceable to public formulas with visible constants on `/trust`.
+4. **No Generic Uncurated BI Dashboards:**
+   - *Why rejected:* Adding custom SQL queries or arbitrary chart widgets creates new-system overhead and destroys the 60-second decision transmission speed.
 
 ---
 

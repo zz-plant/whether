@@ -159,12 +159,21 @@ describe("home route render contract", () => {
       assert.ok(!routeSource.includes(tag), `${tag} has no render site on /`);
     }
 
-    // One stage control at every width: the header's phone-only pill and the
-    // hero's tablist above `sm` are complementary, and nothing else asks.
+    // One control per axis at every width: the header's phone-only pills and
+    // the hero's tablists above `sm` are complementary, and nothing else asks.
     const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
-    assert.match(headerSource, /<StageDropdownPill className="sm:hidden"/, "the header keeps the phone pill");
-    assert.match(heroSource, /<div className="hidden sm:block">\s*<StagePersonaSelector/, "the hero keeps the sm+ tablist");
+    assert.match(
+      headerSource,
+      /<div className="[^"]*\bsm:hidden\b[^"]*">\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
+      "the header keeps the phone pills, and only there",
+    );
+    assert.match(
+      heroSource,
+      /<div className="hidden sm:flex[^"]*">\s*<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      "the hero keeps the sm+ tablists",
+    );
+    assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");
     const explainerSource = readFileSync("app/components/homeFirstRunOrientation.tsx", "utf8");
     assert.ok(!explainerSource.includes("OPERATOR_STAGE_OPTIONS"), "the first-run line no longer asks the stage a third time");
 

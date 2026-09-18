@@ -1,4 +1,5 @@
 import type { DecisionDepartment } from "../decisionMemory";
+import type { FlashMove } from "./flashMoves";
 
 type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
 
@@ -8,6 +9,8 @@ export type AlertConditions = {
   riskAppetite: number;
   posture: string;
   recordDate: string;
+  /** Raw-input moves since the previous read that clear a flash threshold (`flashMoves.ts`). */
+  flashMoves?: FlashMove[];
 };
 
 export type LastAlertState = {
@@ -23,11 +26,13 @@ export type LastAlertState = {
 type AlertMetric = "credit" | "sentiment";
 
 export type AlertDecision = {
-  type: "regime_change" | "threshold";
+  type: "regime_change" | "threshold" | "flash";
   severity: "info" | "warning" | "critical";
   headline: string;
   /** Set on threshold alerts; absent on regime changes. */
   metric?: AlertMetric;
+  /** Set on flash alerts: the move that fired. */
+  flash?: FlashMove;
   /** Department and executive role preset most impacted by this alert. */
   department?: DecisionDepartment;
   rolePreset?: RolePreset;
@@ -79,6 +84,27 @@ const buildThresholdDecision = (
   rolePreset: metric === "credit" ? "CFO" : "COO",
 });
 
+/*
+ * A flash is an emergency-sized move in a raw input, so it goes to the CFO like
+ * a regime change and, like one, is not held back by the weekly cooldown: the
+ * cooldown exists so a score oscillating on a boundary does not mail every day,
+ * and a quarter-point overnight move is the opposite of that.
+ */
+const buildFlashDecision = (move: FlashMove): AlertDecision => ({
+  type: "flash",
+  severity: "critical",
+  headline: move.headline,
+  flash: move,
+  department: "Executive",
+  rolePreset: "CFO",
+});
+
+/** The key a delivery is deduplicated on. Two different inputs flashing in one week are two alerts. */
+export const alertDeliveryKey = (alert: AlertDecision): string =>
+  alert.type === "flash" && alert.flash ? `flash:${alert.flash.metric}` : alert.type;
+
+const bypassesCooldown = (alert: AlertDecision) => alert.type === "regime_change" || alert.type === "flash";
+
 const isWithinCooldown = (lastSentAt: string): boolean => {
   const lastMs = Date.parse(lastSentAt);
   if (Number.isNaN(lastMs)) {
@@ -99,6 +125,10 @@ export const evaluateAlert = (
 
   if (regimeChanged) {
     decisions.push(buildRegimeDecision(readiness.regime));
+  }
+
+  for (const move of readiness.flashMoves ?? []) {
+    decisions.push(buildFlashDecision(move));
   }
 
   for (const boundary of THRESHOLD_BOUNDARIES) {
@@ -134,12 +164,8 @@ export const evaluateAlert = (
     }
   }
 
-  if (lastKnown && isWithinCooldown(lastKnown.lastSentAt) && regimeChanged) {
-    return decisions.filter((d) => d.type === "regime_change");
-  }
-
   if (lastKnown && isWithinCooldown(lastKnown.lastSentAt)) {
-    return [];
+    return decisions.filter(bypassesCooldown);
   }
 
   return decisions;

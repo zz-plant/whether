@@ -1053,6 +1053,16 @@ Canonical modules — extend these before creating new ones:
   `lib/report/homeBriefModel.ts`, `lib/report/reportData.ts`, `lib/report/decisionKnobs.ts`
 - **Bounded rules / playbooks** — `lib/playbook.ts`, `lib/report/operatingCalls.ts`,
   `lib/thresholds.ts`, `lib/regimeEngine.ts`
+- **Company calibration (stage, runway)** — `lib/report/operatorStage.ts`,
+  `lib/report/operatorRunway.ts`, `buildScopedVariantDecisionAdjustment` and
+  `scaleAdjustmentToRunway` in `lib/report/boundedDecisionRules.ts`; one cookie each, read by
+  `lib/report/operatorContext.ts`
+- **Share artifacts** — `/share` owns every copy, file and image format; builders in
+  `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `meetingSlideExport`,
+  `boardSlideDeck`), all reading one `exportSnapshot`
+- **Alerts between Mondays** — `lib/alert/*`: `alertEvaluator` decides, `flashMoves` judges
+  raw-input moves against the previous snapshot, `checkRegimeChange` posts Slack,
+  `alertDelivery` mails subscribers
 - **Trust / continuity** — `lib/report/trustStatus.ts`, `lib/report/reportFormatting.ts`,
   `lib/timeMachine/*`
 - **Operator-domain catalog** — `lib/decisionDomainCatalog.ts`

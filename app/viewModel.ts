@@ -56,6 +56,8 @@ type V2HeroSignalData = {
   macroContributors?: string[];
   tightnessThreshold?: number;
   riskAppetiteThreshold?: number;
+  /** The nearest market moves that would change the call, nearest first (`lib/report/flipProximity`). */
+  flipProximity?: string[];
 };
 
 type V2HeroReportData = {

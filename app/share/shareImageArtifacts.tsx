@@ -1,7 +1,7 @@
 import { ActionLink } from "../components/ui/actionLink";
 
 /**
- * The two image artifacts, on the page whose job is getting the brief out.
+ * The image and file artifacts, on the page whose job is getting the brief out.
  *
  * `/api/image/brief` (PNG) was listed on `/api-docs` under developer endpoints and
  * `/api/image/slide` was listed nowhere at all — so the two formats most useful to the
@@ -12,18 +12,39 @@ import { ActionLink } from "../components/ui/actionLink";
  * the SVG by hand rather than rasterizing a component, so it drops into Figma or
  * Keynote as editable vector instead of a screenshot that goes soft on a projector.
  *
- * Deliberately links rather than thumbnails. Both endpoints render at request time —
- * the PNG through `ImageResponse` — so inlining previews would put two edge renders on
+ * The board slide files draw the same payload as the SVG at the same geometry
+ * (`lib/export/boardSlideDeck.ts`): the PPTX is the slide as PowerPoint or Keynote
+ * opens it, every box editable; the PDF is the page a director reads on a phone.
+ *
+ * Deliberately links rather than thumbnails. Every endpoint renders at request time —
+ * the PNG through `ImageResponse` — so inlining previews would put four edge renders on
  * every view of this page to decorate a choice the labels already make.
  */
 
 const IMAGE_ARTIFACTS = [
   {
+    href: "/api/export/board-slide?format=pptx&stage=seed",
+    title: "Board slide",
+    meta: "PPTX · one slide · 16:9",
+    description:
+      "Drops into the board pack as a native slide with every box still editable. Swap ?stage= for seed, series-a, series-b, or growth.",
+    download: true,
+  },
+  {
+    href: "/api/export/board-slide?format=pdf&stage=seed",
+    title: "Board slide, as PDF",
+    meta: "PDF · one page · 16:9",
+    description:
+      "The same slide as a page, for a pre-read that goes out by email or gets opened on a phone. Takes the same ?stage= values.",
+    download: true,
+  },
+  {
     href: "/api/image/slide?stage=seed",
     title: "Meeting slide",
     meta: "SVG · 1200×675 · 16:9",
     description:
-      "Vector, so it stays sharp at projector size and every label is still editable text. Swap ?stage= for seed, series-a, series-b, or growth.",
+      "Vector, so it stays sharp at projector size and every label is still editable text in Figma or Keynote. Same ?stage= values.",
+    download: false,
   },
   {
     href: "/api/image/brief",
@@ -31,13 +52,14 @@ const IMAGE_ARTIFACTS = [
     meta: "PNG · 1200×800",
     description:
       "Raster card for a thread, a Slack post, or anywhere an SVG will not render. Takes the same cadence and company-context params as the brief.",
+    download: false,
   },
 ] as const;
 
 export function ShareImageArtifacts() {
   return (
     <div className="space-y-3">
-      <h2 className="type-eyebrow">Images for a deck or a thread</h2>
+      <h2 className="type-eyebrow">Files and images for a deck or a thread</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {IMAGE_ARTIFACTS.map((artifact) => (
           <div key={artifact.href} className="weather-card flex flex-col gap-2">
@@ -48,14 +70,15 @@ export function ShareImageArtifacts() {
               </p>
             </div>
             <p className="text-xs leading-relaxed text-white/60">{artifact.description}</p>
+            {/* A file is served as an attachment, so it lands in the download
+                tray from this tab; an image opens in a new one. */}
             <ActionLink
               href={artifact.href}
               variant="ghost"
               className="mt-auto self-start"
-              target="_blank"
-              rel="noreferrer"
+              {...(artifact.download ? {} : { target: "_blank", rel: "noreferrer" })}
             >
-              Open {artifact.title.toLowerCase()}
+              {artifact.download ? `Download ${artifact.meta.split(" · ")[0]}` : `Open ${artifact.title.toLowerCase()}`}
             </ActionLink>
           </div>
         ))}

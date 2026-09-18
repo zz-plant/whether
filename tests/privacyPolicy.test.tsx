@@ -13,7 +13,7 @@ import { TELEMETRY_STREAMS } from "../lib/telemetry/analyticsEngine";
  * Use Policy, and every use of the word "data" in both means *market* data —
  * while the product stores subscriber addresses with verification tokens, the
  * email Stripe reports for a paying customer, a per-browser identifier the
- * server reads back, one cookie, nine browser storage keys, and eight telemetry
+ * server reads back, two cookies, nine browser storage keys, and eight telemetry
  * streams. A reader had nowhere to check any of it.
  *
  * Prose goes stale silently, which is the failure this guards. Each storage key

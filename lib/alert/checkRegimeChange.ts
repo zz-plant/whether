@@ -6,6 +6,7 @@ import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { siteUrl } from "../siteUrl";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
+import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
 
 type CheckRegimeChangeResult = {
   ok: boolean;
@@ -22,6 +23,21 @@ type CheckRegimeChangeResult = {
   weeksToFlip?: number | null;
   velocityLabel?: string;
   alerts?: string[];
+  flashMoves?: FlashMove[];
+};
+
+/** One Slack post, in the block shape every alert here uses. */
+const postSlackAlert = async (webhook: string, header: string, body: string) => {
+  await fetch(webhook, {
+    method: "POST",
+    body: JSON.stringify({
+      blocks: [
+        { type: "header", text: { type: "plain_text", text: header } },
+        { type: "section", text: { type: "mrkdwn", text: body } },
+        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
+      ],
+    }),
+  });
 };
 
 /**
@@ -32,6 +48,8 @@ type CheckRegimeChangeResult = {
 export const checkRegimeChange = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
+  /** The read before `snapshot`; a flash is judged on consecutive reads only. */
+  previousSnapshot?: OperatingSnapshot | null;
 }): Promise<CheckRegimeChangeResult> => {
   const kv = getWhetherKv();
   if (!kv) return { ok: false, error: "KV not available" };
@@ -75,16 +93,30 @@ export const checkRegimeChange = async (options?: {
      */
     pushOutcome = await sendRegimeChangePush().catch(() => null);
     if (slackWebhook) {
-      await fetch(slackWebhook, {
-        method: "POST",
-        body: JSON.stringify({
-          blocks: [
-            { type: "header", text: { type: "plain_text", text: "⚠️ Reconsider Operating Posture" } },
-            { type: "section", text: { type: "mrkdwn", text: `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.` } },
-            { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
-          ],
-        }),
-      });
+      await postSlackAlert(
+        slackWebhook,
+        "⚠️ Reconsider Operating Posture",
+        `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.`,
+      );
+    }
+  }
+
+  /* 1b. Flash — an emergency-sized move in a raw input since the previous read.
+     Pushed whether or not a score crossed anything: the point is the day it lands. */
+  const flashMoves = options?.snapshot
+    ? evaluateFlashMoves(
+        flashInputsFrom(options.snapshot),
+        options.previousSnapshot ? flashInputsFrom(options.previousSnapshot) : null,
+      )
+    : [];
+  for (const move of flashMoves) {
+    alerts.push(`FLASH — ${move.headline}`);
+    if (slackWebhook) {
+      await postSlackAlert(
+        slackWebhook,
+        "⚡ Flash — outsized move since the last read",
+        `${move.headline}\nThe weekly call stands until the next read confirms where the scores settle. Hold irreversible commitments until then.`,
+      );
     }
   }
 
@@ -104,16 +136,11 @@ export const checkRegimeChange = async (options?: {
     if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
       alerts.push(`WATCH DECISIONS — flip window narrowing: ${projection.velocityLabel}`);
       if (slackWebhook) {
-        await fetch(slackWebhook, {
-          method: "POST",
-          body: JSON.stringify({
-            blocks: [
-              { type: "header", text: { type: "plain_text", text: "👀 Watch Decisions — Flip Window Narrowing" } },
-              { type: "section", text: { type: "mrkdwn", text: `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.` } },
-              { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
-            ],
-          }),
-        });
+        await postSlackAlert(
+          slackWebhook,
+          "👀 Watch Decisions — Flip Window Narrowing",
+          `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.`,
+        );
       }
     }
   }
@@ -138,6 +165,7 @@ export const checkRegimeChange = async (options?: {
     weeksToFlip: projection.weeksToFlip,
     velocityLabel: projection.velocityLabel,
     alerts: alerts.length > 0 ? alerts : undefined,
+    ...(flashMoves.length > 0 ? { flashMoves } : {}),
     /* Absent on a run where the regime did not move, rather than a cheerful
        "0 sent": a step that reports on work it did not do gets read as
        evidence that it did it. */
