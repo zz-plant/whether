@@ -80,7 +80,7 @@ export function RunwayPersonaSelector({
               onKeyDown={(event) => handleKeyDown(event, index)}
               onClick={() => handleSelectRunway(option.key)}
               title={`Tailor operating rules for ${option.label} cash runway (${option.sublabel})`}
-              className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs transition-all ${
+              className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
                 isSelected
                   ? "border border-amber-500/40 bg-amber-500/15 font-semibold text-amber-200 shadow-sm"
                   : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"

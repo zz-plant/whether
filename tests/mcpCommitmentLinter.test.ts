@@ -9,6 +9,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
 
     assert.ok(names.includes("stress_test_plan"));
     assert.ok(names.includes("lint_commitment"));
+    assert.ok(names.includes("lint_sprint_goal"));
     assert.ok(names.includes("get_analog_playbook"));
   });
 
@@ -92,5 +93,34 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     assert.ok(data.analogPeriod);
     assert.ok(data.consensusTrap);
     assert.ok(data.winningMove);
+  });
+
+  it("lints a sprint goal to holds/pauses/needs_reversal_guardrail with the bounded rule's trigger", async () => {
+    const request = new Request("http://localhost/api/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 104,
+        method: "tools/call",
+        params: {
+          name: "lint_sprint_goal",
+          arguments: {
+            goalText: "Ship the v2 migration across three long-running refactor tracks this sprint.",
+          },
+        },
+      }),
+    });
+
+    const response = await handleMcpRequest(request);
+    const body = (await response.json()) as any;
+
+    assert.equal(body.id, 104);
+    assert.ok(body.result);
+    const data = body.result.structuredContent;
+    assert.ok(["holds", "pauses", "needs_reversal_guardrail"].includes(data.verdict));
+    assert.ok(typeof data.pauseTrigger === "string" && data.pauseTrigger.length > 0);
+    assert.ok(typeof data.reversalTrigger === "string" && data.reversalTrigger.length > 0);
+    assert.ok(Array.isArray(data.fragileAssumptions));
   });
 });

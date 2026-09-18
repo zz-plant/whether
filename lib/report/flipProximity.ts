@@ -142,3 +142,32 @@ export const buildFlipProximity = (assessment: ProximityInputs): FlipProximity[]
   [riskAppetiteProximity(assessment), tightnessProximity(assessment)]
     .filter((entry): entry is FlipProximity => entry !== null)
     .sort((left, right) => Math.abs(left.inputMove) - Math.abs(right.inputMove));
+
+/**
+ * The quiet-day read: the line a non-Monday visitor needs to know the call
+ * still stands and how far it is from flipping.
+ *
+ * The daily cron keeps the snapshot fresh, but between Mondays the hero has no
+ * reason for a returning reader to open `/`. This is that reason — one compact
+ * line that leads with the call-unchanged verdict and then the nearest flip
+ * distance, so "is the call still standing?" is answered without opening any
+ * disclosure. It renders nothing when the call moved (the delta path already
+ * leads) or when no axis has a reachable crossing.
+ *
+ * The flip sentence is reused verbatim from `buildFlipProximity`, never
+ * re-minted, so the quiet-day line and the hero's flip watch cannot disagree.
+ */
+export const buildQuietDayRead = ({
+  steadyWeek,
+  flipProximity,
+}: {
+  /** True when the week did not move the posture enough to shift a notch. */
+  steadyWeek: boolean;
+  /** The hero's flip-proximity sentences, nearest first. */
+  flipProximity: readonly string[];
+}): string | null => {
+  if (!steadyWeek) return null;
+  const nearest = flipProximity[0];
+  if (!nearest) return null;
+  return `Call unchanged — ${nearest}`;
+};

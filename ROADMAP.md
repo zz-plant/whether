@@ -4,6 +4,7 @@ This roadmap focuses on shipping a defensible, operator-facing “product strate
 Each milestone is tied to the core loop: ingest Treasury data → compute regime → translate into
 plain‑English operational constraints with traceable sources.
 Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
+Prioritized specs for the open items below live in `docs/roadmap-prioritized-spec.md`.
 
 ## Immediate priority backlog (live-gap focused)
 
@@ -21,6 +22,44 @@ Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 4. **Linear / Jira epic guardrail tagging** (Top request #4) — Sync macro posture to engineering planning tools to warn on high-risk, speculative bets. *Open decision (2026-09-17): the sync needs each team's Linear API key or Jira token stored server-side, which is a new class of stored secret and a new `/privacy` entry; deferred behind items 3 and 5. A credential-free slice — a per-epic guardrail label and description block an operator pastes themselves, extending the issue-tracker brief on `/share` — is the fallback if tokens are not to be held.*
 5. ~~**Mid-week flash alerts & proximity-to-flip watch**~~ (Top request #21 & #22) — Shipped: the daily cron judges the short rate and the 10Y−2Y curve against the previous read (`lib/alert/flashMoves.ts`: a quarter point on the rate or twenty points on the curve between consecutive reads) and pushes a critical alert by email and Slack the day it lands, outside the weekly cooldown; the hero's Conditions cell carries a flip watch (`lib/report/flipProximity.ts`) stating the market move that would change the call, in the input's units (2026-09-17).
 
+## Engagement by cadence (WAU / DAU / QAU / engineering cadences)
+
+The product's own activation model (`lib/activationFunnel.ts`) declares weekly return the north star, so WAU is the natural metric and DAU is the structural stretch. Treating the cadences as one problem breaks the weekly ritual. Each cadence gets its own loop, and no cadence uses cadence-synced notifications — `lib/push/sendRegimePush.ts` only wakes subscribers on real moves because a notification that fires whether or not anything happened is one people turn off, and then the one that mattered never arrives.
+
+### WAU — breadth of the weekly ritual
+- [x] **Deliver to a room, not a person** — Monday fan-out into `#leadership` ships; growth is channel presence (multi-channel, bot invite) so one adopter carries a roomful of weekly readers. Reuses `lib/slack/slackWebhookStore.ts`.
+- [x] **Meeting artifact for the Monday slot** — board slide, investor memo, and `/share` formats ship; the return payoff is keeping the artifact calendar-timed so the brief is pulled into recurring staff syncs.
+- [x] **Sharpen the delta so the return pays** — Shipped: the weekly operator brief (Slack/email/export) now carries the flip watch in the market's units (`lib/export/weeklyOperatorBrief.ts`, `DECISION_CONTRACT_LABELS.watch.flipWatch`), the same sentence the hero prints, so a pasted artifact states what has to happen on the curve or the bill (2026-09-18).
+- [ ] **Fix the funnel leak before adding surface** — `visited → oriented → committed → returned` is measured; the biggest WAU win is whichever step is leaking, not a new feature.
+
+### DAU — event and state only, never cadence
+- [x] **Flash days are the honest DAU spikes** — `lib/alert/flashMoves.ts` fires on real market moves, irregularly; DAU rises on those days and cannot be scheduled.
+- [x] **Productize the quiet day** — Shipped: `buildQuietDayRead` (`lib/report/flipProximity.ts`) + `QuietDayRead` render a call-unchanged verdict with the nearest flip distance under the live call on `/`, from the same snapshot the hero draws; nothing on a week the call moved (2026-09-18).
+- [x] **Push only on real moves** — already the design (`sendRegimePush.ts`); preserve it, it is the guardrail that keeps push an accelerator instead of a churn driver.
+
+### QAU — monthly/quarterly stakes as return reasons
+- [x] **Month-end pulse** — Shipped: `lib/alert/monthEndPulse.ts` fires once per month rollover, only when the reading differs from the prior month-end (same 0.5-point cut the investor update's own wording uses), delivering the investor-update block by email and Slack; wired into the daily cron after `summary-history` and `/api/month-end-pulse` for manual runs (2026-09-18).
+- [x] **Regenerate the investor update at month-end** — Shipped with the pulse: the block is regenerated from `buildInvestorUpdateSnippetParts` against the prior month-end and delivered on the operator's letter deadline, not the app's (2026-09-18).
+- [x] **Board-deck return** — Shipped: `SinceLastVisit` classifies the return gap off the stored last-seen week and, for `within_month`/`lapsed`, leads with a delta panel (regime, call, flip proximity) plus a one-click board deck at the browser's stage; no identity joins (2026-09-18).
+- [x] **Planning-window returns** — Shipped: the lapsed-return panel links back to the runway bands (`#runway-notes`), whose notes rescale client-side without a reload (2026-09-18).
+- [ ] **History/compare as the lapsed-user magnet** — `/history/[period]` and Time Machine are pure QAU surfaces: regime at last visit vs today, score deltas, flip proximity.
+
+### Sprint ceremonies — weekly execution commitments
+- [x] **Grooming guardrail tags** — Shipped: `buildGuardrailTagBlocks` (`lib/export/issueTrackerBrief.ts`) builds one paste-ready block per business area (posture, `Action now` / `Pause if` / `Change course if`, flip watch, week stamp), copyable from `/share` (`GuardrailTagControls`); no tokens, no tracker integration (2026-09-18).
+- [x] **Commitment lint in planning** — Shipped: MCP `lint_sprint_goal` (`lib/mcp/httpMcpServer.ts`) takes a sprint goal or story plan and returns `holds | pauses | needs_reversal_guardrail` with the bounded rule's pause trigger and reversal, reusing `stressTestDecisionPlan` (2026-09-18).
+- [ ] **Standup flip line** — a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change") reusing the daily cron + `flipProximity.ts`.
+- [ ] **Sprint-posture recap + retro violation report** — compare the sprint's logged decisions (`lib/events/decisionEventStore.ts`) against the regime's bounded rules and surface the mismatches ("committed to a speculative build in a DEFENSIVE regime").
+
+**Non-goal for sprint presence**: do not become a sprint tool (scrum dashboards, burndown, velocity). Presence stays decision-shaped — the macro guardrail attached to commitments, not a project manager.
+
+### Kanban — posture on the flow, not on a calendar
+- [x] **WIP caps derived from the regime** — Shipped: `buildWipGuidance` (`lib/report/wipPolicy.ts`) turns the regime into a numeric cap on parallel bets (SCARCITY/DEFENSIVE 1, VOLATILE 2, EXPANSION 3), scaled by the runway bands and floored at one, copyable from `/share` (2026-09-18).
+- [x] **Card-level guardrail tags** — Shipped with the sprint grooming tags above: one block per business area from `/share`, carrying posture, pause trigger, flip condition, and flip watch (2026-09-18).
+- [ ] **Persistent board embed** — `embedBuilder.tsx` already ships a widget; a compact always-on strip (regime + call + flip distance) above the board, updating daily from the cron, is the continuous analog of the standup line.
+- [x] **Pull-policy pause/resume language** — Shipped: `buildPullPolicyBlocks` (`lib/report/operatingCalls.ts`) re-verbs the pause/resume conditions as pull rules ("Pull: … / Stop pulling when: … / Resume when: …"), copyable from `/share` (`PullPolicyControls`); the stop/resume lines are the bounded rules' own conditions verbatim (2026-09-18).
+- [ ] **Flash alerts as an expedite signal** — kanban's expedite lane is what `flashMoves.ts` produces: "a policy-sized move just landed — expedite the response." Frame the existing alert as an expedite trigger.
+
+**Non-goal for kanban presence**: do not become a board tool (WIP tracking, cycle-time analytics, flow dashboards). Presence stays decision-shaped — the regime sets the pull policy, cards carry the guardrail, the board carries the live call.
 
 ## Milestone 0 — Repo scaffolding (Week 0)
 - [x] Establish Next.js 14 + TypeScript strict + Tailwind baseline.
@@ -170,12 +209,17 @@ Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 - As an engineering executive, I can tag epics in Linear that violate current capital efficiency bounds.
 - As a strategy lead, I can subscribe to mid-week flash alerts when a rate shock or credit blowout threatens our posture.
 - As a VC operating partner, I can inspect a health matrix of 40 portfolio companies against current macro tightness.
+- As an operator returning after a long gap, I see what changed since my last read and a fresh board deck, not a blank page. (QAU)
+- As a sprint lead, I paste this sprint's goal and see whether it holds, pauses, or needs a reversal guardrail under the current regime. (Sprint ceremonies)
+- As an engineering manager, I paste a per-epic guardrail label into Linear without storing any token. (Sprint ceremonies)
+- As a kanban team, I see the current call and flip distance on a persistent board embed, and the regime sets our WIP cap and pull-policy pauses. (Kanban)
 
 ### Success criteria
 - Every output is traceable to a public source and includes timestamps.
 - Operators can copy/paste a defensible, plain‑English decision rationale in under 60 seconds.
 - Ritual transmission works without requiring the user to open a browser tab every Monday.
 - Offline mode is explicit and safe.
+- WAU and QAU each have a working return loop; DAU spikes are event-driven only, never cadence-synced.
 
 ---
 

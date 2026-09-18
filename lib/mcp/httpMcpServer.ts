@@ -216,6 +216,49 @@ const TOOLS: ToolDefinition[] = [
     },
   },
   {
+    name: "lint_sprint_goal",
+    title: "Lint a sprint goal or story plan against live macro posture",
+    description:
+      "Takes a sprint goal or story-level plan and returns whether it holds, pauses, or needs a reversal guardrail under the current regime, with the specific bounded-rule trigger that would fire. Reuses the stress-test engine; a sprint goal is a planned decision at smaller granularity.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        goalText: { type: "string", description: "The sprint goal or story-level plan in plain English." },
+        lifecycle: {
+          type: "string",
+          enum: ["DISCOVERY", "GROWTH", "SCALE", "MATURE"],
+          description: "Company lifecycle stage; defaults to GROWTH.",
+        },
+      },
+      required: ["goalText"],
+    },
+    execute: async (args) => {
+      const goalText = typeof args.goalText === "string" ? args.goalText : "";
+      if (!goalText.trim()) throw new Error("Missing required argument: goalText");
+      const lifecycle = (args.lifecycle as any) ?? "GROWTH";
+      const { snapshot } = await loadWeeklyBriefSnapshot();
+      const plan = stressTestDecisionPlan(snapshot.reportData.assessment, { planText: goalText, lifecycle });
+      /* The stress-test engine grades on SAFE/RISKY/DANGEROUS; a sprint goal
+         needs a verdict an engineer can act on, mapped 1:1 so the source of the
+         call stays visible: SAFE holds, RISKY pauses, DANGEROUS needs a reversal
+         guardrail before it is pulled. */
+      const verdict = plan.verdict === "SAFE" ? "holds" : plan.verdict === "RISKY" ? "pauses" : "needs_reversal_guardrail";
+      return {
+        verdict,
+        headline: plan.headline,
+        detectedCategory: plan.detectedCategory,
+        detectedAction: plan.detectedAction,
+        detectionConfidence: plan.detectionConfidence,
+        /* The pause line and reversal trigger are the bounded rule's own, so the
+           caller can paste them into the sprint goal without re-deriving them. */
+        pauseTrigger: plan.boundedGuardrail,
+        reversalTrigger: plan.reversalTrigger,
+        fragileAssumptions: plan.fragileAssumptions,
+        sizingNote: plan.sizingNote,
+      };
+    },
+  },
+  {
     name: "get_analog_playbook",
     title: "Get historical analog playbook and consensus trap",
     description:

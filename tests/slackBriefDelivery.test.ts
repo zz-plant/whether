@@ -92,4 +92,47 @@ describe("Slack brief delivery", () => {
     assert.ok(section.text.text.length <= 3000);
     assert.match(section.text.text, /truncated/);
   });
+
+  it("delivers to webhooks registered in SlackWebhookStore", async () => {
+    const { getSlackWebhookStore, resetSlackWebhookStore } = await import("../lib/slack/slackWebhookStore");
+    resetSlackWebhookStore();
+    const store = getSlackWebhookStore();
+    await store.subscribe("https://hooks.slack.com/services/T0/B0/store-test");
+
+    const deliveredUrls: string[] = [];
+    const capture: typeof fetch = (async (input: unknown) => {
+      deliveredUrls.push(String(input));
+      return new Response("ok", { status: 200 });
+    }) as typeof fetch;
+
+    const result = await deliverSlackBrief({
+      payload,
+      fetchImpl: capture,
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.status, "posted");
+    assert.equal(deliveredUrls.includes("https://hooks.slack.com/services/T0/B0/store-test"), true);
+  });
+
+  it("auto-deactivates revoked (410) webhooks on delivery failure", async () => {
+    const { getSlackWebhookStore, resetSlackWebhookStore } = await import("../lib/slack/slackWebhookStore");
+    resetSlackWebhookStore();
+    const store = getSlackWebhookStore();
+    await store.subscribe("https://hooks.slack.com/services/T0/B0/revoked-hook");
+
+    const goneFetch: typeof fetch = (async () => new Response("gone", { status: 410 })) as typeof fetch;
+
+    const result = await deliverSlackBrief({
+      payload,
+      fetchImpl: goneFetch,
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.status, "failed");
+
+    // Webhook should be deactivated
+    const active = await store.listActiveWebhooks();
+    assert.equal(active.includes("https://hooks.slack.com/services/T0/B0/revoked-hook"), false);
+  });
 });

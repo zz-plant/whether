@@ -89,6 +89,30 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(cardText, text);
   });
 
+  it("states the flip distance in the market's units, not score points", () => {
+    // The hero's flip watch says what has to happen on the curve or the bill;
+    // the pasted artifact carries the same sentence so a reader in Slack can
+    // state the flip condition without the score vocabulary.
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      confidenceLabel: "MED",
+    });
+
+    assert.ok(payload.flipWatchLine, "the assessment fixture has a reachable crossing");
+    assert.match(
+      payload.flipWatchLine!,
+      /^\d+\.\d{2}% (steeper|flatter|higher|lower) on (the 10Y−2Y curve|the 1-month Treasury bill) would change the call to (Sunny|Cloudy|Stormy|Freezing)\.$/,
+    );
+    assert.doesNotMatch(payload.flipWatchLine!, /tightness|riskAppetite|score/i);
+
+    const text = buildWeeklyOperatorBriefPlainText(payload);
+    assert.match(text, /Flip watch: \d+\.\d{2}% /);
+
+    const blocks = buildWeeklyOperatorBriefSlackBlocks(payload);
+    assert.ok(blocks.includes("Flip watch"));
+  });
+
   it("renders Slack blocks adapter with required sections", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,

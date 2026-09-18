@@ -51,3 +51,47 @@ export async function requestSubscription(
     return { ok: false, message: NETWORK_MESSAGE };
   }
 }
+
+const SLACK_SUBSCRIBE_ENDPOINT = "/api/slack/subscribe";
+
+type SlackSubscribeResult = { ok: boolean; message: string; channelName?: string; token?: string };
+
+export async function requestSlackSubscription(
+  webhookUrl: string,
+  options?: { channelName?: string },
+): Promise<SlackSubscribeResult> {
+  const trimmed = webhookUrl.trim();
+  if (!trimmed || !trimmed.startsWith("https://hooks.slack.com/")) {
+    return { ok: false, message: "Please enter a valid Slack webhook URL (must begin with https://hooks.slack.com/)." };
+  }
+
+  try {
+    const res = await fetch(SLACK_SUBSCRIBE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        webhookUrl: trimmed,
+        channelName: options?.channelName?.trim() || undefined,
+      }),
+    });
+    const data = (await res.json().catch(() => null)) as {
+      ok?: boolean;
+      error?: string;
+      message?: string;
+      channelName?: string;
+      token?: string;
+    } | null;
+
+    if (res.ok && data?.ok) {
+      return {
+        ok: true,
+        message: data.message || "Connected to Slack! Check your channel for the confirmation ping.",
+        channelName: data.channelName,
+        token: data.token,
+      };
+    }
+    return { ok: false, message: data?.error || "Failed to connect Slack webhook. Please try again." };
+  } catch {
+    return { ok: false, message: "A network error occurred. Please try again." };
+  }
+}

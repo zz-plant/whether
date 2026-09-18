@@ -9,7 +9,9 @@ import {
   formatSharedFlipCorridor,
 } from "../lib/report/boundedDecisionRules";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
-import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
+import type { ActionStripItem } from "../lib/report/operatingCalls";
+import { buildWipGuidance } from "../lib/report/wipPolicy";
+import { buildActionStripItems, buildPullPolicyBlocks, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
 
 describe("bounded decision rule formatting", () => {
   it("preserves decimals for low-magnitude score displays", () => {
@@ -201,5 +203,87 @@ describe("shared flip corridor", () => {
 
   it("returns null when there are too few rules to share anything", () => {
     assert.equal(formatSharedFlipCorridor(rules.slice(0, 1)), null);
+  });
+});
+
+describe("kanban pull-policy blocks", () => {
+  const rules = buildCanonicalBoundedDecisionRules({
+    regime: "DEFENSIVE",
+    thresholds: { tightnessRegime: 42, riskAppetiteRegime: 58 },
+    scores: { tightness: 52, riskAppetite: 46 },
+  });
+  const items = buildActionStripItems(rules, { tightness: 52, riskAppetite: 46 });
+
+  it("states stop/resume lines from the same conditions the pause/resume lines carry", () => {
+    const blocks = buildPullPolicyBlocks(items);
+
+    assert.equal(blocks.length, items.length);
+    for (const [index, block] of blocks.entries()) {
+      const item = items[index];
+      for (const condition of item.pauseConditions ?? []) {
+        assert.ok(
+          block.stopPullingWhen.includes(condition.label),
+          `${block.label} stop line must carry the pause condition "${condition.label}"`,
+        );
+      }
+      for (const condition of item.resumeConditions ?? []) {
+        assert.ok(
+          block.resumeWhen.includes(condition.label),
+          `${block.label} resume line must carry the resume condition "${condition.label}"`,
+        );
+      }
+      assert.ok(block.stopPullingWhen.length > 0, "a pull policy without a stop line is not a policy");
+      assert.ok(block.resumeWhen.length > 0, "a pull policy without a resume line is not a policy");
+    }
+  });
+
+  it("falls back to the item's printed threshold and reversal when no numeric lines exist", () => {
+    const fallback: ActionStripItem[] = [{
+      lever: "product-priorities",
+      label: "Product priorities",
+      areaActionNow: "Keep the roadmap reversible.",
+      triggerThreshold: "Pause speculative builds above 60.",
+      reversalCondition: "Resume when funding pressure drops below 50.",
+    }];
+
+    const [block] = buildPullPolicyBlocks(fallback);
+
+    assert.ok(block);
+    assert.equal(block.stopPullingWhen, "Pause speculative builds above 60.");
+    assert.equal(block.resumeWhen, "Resume when funding pressure drops below 50.");
+    assert.match(block.markdown, /Pull policy — Product priorities/);
+    assert.match(block.markdown, /Pull: Keep the roadmap reversible\./);
+  });
+});
+
+describe("regime-derived WIP caps", () => {
+  it("caps tighter regimes lower and expansion higher", () => {
+    const defensive = buildWipGuidance({ regime: "DEFENSIVE" });
+    const expansion = buildWipGuidance({ regime: "EXPANSION" });
+
+    assert.equal(defensive.cap, 1);
+    assert.equal(expansion.cap, 3);
+    assert.ok(defensive.cap < expansion.cap);
+    assert.match(defensive.sentence, /Cap parallel bets at 1/);
+    assert.match(expansion.sentence, /Cap parallel bets at 3/);
+  });
+
+  it("scales the cap by the runway band, floored at one", () => {
+    const critical = buildWipGuidance({ regime: "EXPANSION", runwayBand: "critical" });
+    const abundant = buildWipGuidance({ regime: "DEFENSIVE", runwayBand: "abundant" });
+    const scarcest = buildWipGuidance({ regime: "SCARCITY", runwayBand: "critical" });
+
+    assert.equal(critical.cap, 2, "expansion with critical runway is one lower");
+    assert.equal(abundant.cap, 2, "defensive with abundant runway is one higher");
+    assert.equal(scarcest.cap, 1, "the cap never reads as a freeze");
+    assert.match(critical.sentence, /given .* runway/);
+  });
+
+  it("carries the cap as a copyable block", () => {
+    const guidance = buildWipGuidance({ regime: "VOLATILE", runwayBand: "tight" });
+
+    assert.match(guidance.markdown, /WIP policy — VOLATILE/);
+    assert.match(guidance.markdown, /Parallel bets: 2/);
+    assert.match(guidance.markdown, /finish one before pulling the next/);
   });
 });

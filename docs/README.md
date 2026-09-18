@@ -86,6 +86,7 @@ Use these when shaping follow-on work, not as sole implementation truth:
 - `design-improvements-priority.md` — prioritized UI improvements
 - `design-debt-prioritized.md` — UI/UX and IA design debt tracker (DD-001–DD-009)
 - `implementation-status.md` — implementation status and milestone tracker
+- `roadmap-prioritized-spec.md` — prioritized, detailed specs for open roadmap items
 - `premium-launch-readiness.md` — launch readiness for pricing/billing
 - `product-marketing-review-2026-08-29.md` — PMM review and launch checks
 - `seo/roadmap.md` — SEO content roadmap

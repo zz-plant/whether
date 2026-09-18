@@ -74,6 +74,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
   if (notes.length === 0) {
     return (
       <aside
+        id="runway-notes"
         aria-label="Condition this call on your runway"
         className="weather-panel mt-4 space-y-2 px-5 py-3.5"
       >
@@ -102,6 +103,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
 
   return (
     <aside
+      id="runway-notes"
       aria-label="Notes conditioned on your runway"
       className="weather-panel mt-4 space-y-2 px-5 py-4"
     >

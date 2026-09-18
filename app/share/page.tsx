@@ -2,13 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../components/pageShell";
 import { ShareCopyControls } from "./shareCopyControls";
+import { GuardrailTagControls } from "./guardrailTagControls";
+import { PullPolicyControls } from "./pullPolicyControls";
 import { SharePageFormats } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
-import { buildIssueTrackerMarkdownBrief } from "../../lib/export/issueTrackerBrief";
+import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
+import { buildFlipProximity } from "../../lib/report/flipProximity";
+import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
+import { buildWipGuidance } from "../../lib/report/wipPolicy";
 import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
@@ -65,6 +70,24 @@ const buildCurrentShareArtifact = async () => {
     macroSeries,
     exportOptions.modeledDecision,
   );
+  /* The credential-free slice of the Linear/Jira sync: one paste-ready
+     guardrail block per business area, built from the same bounded-rule fields
+     the hero and Slack brief print. No tokens, no tracker integration — the
+     operator pastes the block into the work item description and the card
+     carries posture + pause trigger + flip condition. */
+  const guardrailTagBlocks = buildGuardrailTagBlocks({
+    actionStripItems: snapshot.homeBriefModel.actionStripItems ?? [],
+    postureLabel: snapshot.weeklyCall.regimeStage,
+    recordDate: treasury.record_date,
+    flipWatchSentence: buildFlipProximity(assessment).map((entry) => entry.sentence)[0],
+  });
+  /* Kanban pull policies: the same pause/resume conditions re-verbed for a
+     pull system, copyable for a board header or wiki. */
+  const pullPolicyBlocks = buildPullPolicyBlocks(snapshot.homeBriefModel.actionStripItems ?? []);
+  /* The regime as a numeric WIP cap. The runway band is browser-held (cookie),
+     so the server copy states the regime cap; the pull-policy section above
+     carries the thresholds that gate it. */
+  const wipGuidance = buildWipGuidance({ regime: assessment.regime });
   const citation = buildCallCitation(assessment, treasury, {
     postureWithStageLabel: snapshot.weeklyCall.regimeStage,
   });
@@ -123,6 +146,9 @@ const buildCurrentShareArtifact = async () => {
     meetingPack,
     issueTrackerBrief,
     investorUpdate,
+    guardrailTagBlocks,
+    pullPolicyBlocks,
+    wipGuidance,
     calendarDetails: [
       "Review the current Whether weekly operating brief.",
       "",
@@ -169,6 +195,13 @@ export default async function SharePage() {
             investorUpdate={artifact.investorUpdate}
             calendarDetails={artifact.calendarDetails}
           />
+        </div>
+
+        {/* The credential-free slice of the Linear/Jira sync, beside the ticket
+            brief it extends. One paste-ready block per business area. */}
+        <div className="space-y-3">
+          <GuardrailTagControls blocks={artifact.guardrailTagBlocks} />
+          <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
         </div>
 
         {/* Role memos are share formats. They sat under the sixth collapsed
