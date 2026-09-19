@@ -58,6 +58,11 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
           {channel === "slack" ? "Slack Channel Connected!" : "Subscribed!"}
         </p>
         <p className="text-fluid-micro text-white/60">{message}</p>
+        {channel === "slack" ? (
+          <p className="text-fluid-nano text-white/40">
+            To stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.
+          </p>
+        ) : null}
         <button
           type="button"
           onClick={() => {
@@ -101,8 +106,8 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
               setStatus("idle");
               setMessage("");
             }}
-            className={`rounded-md px-2.5 py-1 transition-colors ${
-              channel === "email" ? "bg-white/15 text-white font-semibold" : "text-slate-400 hover:text-white"
+            className={`rounded-md px-2.5 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+              channel === "email" ? "bg-sky-500/15 text-sky-200 border border-sky-500/30 font-semibold" : "text-slate-400 hover:text-white border border-transparent"
             }`}
           >
             Email
@@ -114,8 +119,8 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
               setStatus("idle");
               setMessage("");
             }}
-            className={`rounded-md px-2.5 py-1 transition-colors ${
-              channel === "slack" ? "bg-white/15 text-white font-semibold" : "text-slate-400 hover:text-white"
+            className={`rounded-md px-2.5 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+              channel === "slack" ? "bg-sky-500/15 text-sky-200 border border-sky-500/30 font-semibold" : "text-slate-400 hover:text-white border border-transparent"
             }`}
           >
             Slack
@@ -202,7 +207,15 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[color:var(--border-subtle)] text-fluid-nano text-slate-400">
-        <span>{compact ? "One email a week, one more if the call flips. Unsubscribe in one click." : "Prefer calendar holds over email?"}</span>
+        <span>
+          {compact
+            ? channel === "slack"
+              ? "Monday mornings, plus a flash if the call flips. To stop, delete the webhook in Slack."
+              : "One email a week, one more if the call flips. Unsubscribe in one click."
+            : channel === "slack"
+              ? "Set a recurring Monday hold for the team"
+              : "Prefer calendar holds over email?"}
+        </span>
         <a
           href={buildMondayCalendarUrl()}
           target="_blank"

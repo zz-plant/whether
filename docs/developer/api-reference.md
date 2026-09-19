@@ -47,6 +47,8 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/decision-memory` | GET, POST | List/create Decision Memory entries (`{ entries, count }`), with CSV export via `?format=csv`. |
 | `/api/alert-preferences` | GET, POST | Read/upsert delivery preferences by `clientId` (`{ preferences }`). |
 | `/api/alert-deliveries` | GET, POST | List delivery history and create delivery attempts (`{ deliveries }`). |
+| `/api/slack/subscribe` | POST | Register a Slack Incoming Webhook (`webhookUrl`) plus optional `channelName` for weekly brief delivery; pings the channel to verify, stores the subscription in KV, returns a `token` for unsubscribe. |
+| `/api/slack/unsubscribe` | POST | Remove a Slack delivery subscription by its `token`. |
 | `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
 

@@ -18,7 +18,7 @@ describe("Slack subscribe/unsubscribe API routes", () => {
 
     const response = await subscribeHandler(request);
     assert.equal(response.status, 400);
-    const body = (await response.json()) as { ok: boolean; error: string };
+    const body: { ok: boolean; error: string } = await response.json();
     assert.equal(body.ok, false);
     assert.match(body.error, /Valid Slack webhook URL required/);
   });
@@ -28,13 +28,13 @@ describe("Slack subscribe/unsubscribe API routes", () => {
     let pingPayload: string | undefined;
 
     const originalFetch = globalThis.fetch;
-    globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
-      pingedUrl = String(input);
+    globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      pingedUrl = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
       /* The body is a JSON string here; stringify rather than String() so a
          non-string body can never read as "[object Object]". */
       pingPayload = typeof init?.body === "string" ? init.body : JSON.stringify(init?.body ?? null);
       return new Response("ok", { status: 200 });
-    }) as typeof fetch;
+    };
 
     try {
       const request = new Request("http://localhost/api/slack/subscribe", {
@@ -48,7 +48,7 @@ describe("Slack subscribe/unsubscribe API routes", () => {
 
       const response = await subscribeHandler(request);
       assert.equal(response.status, 200);
-      const body = (await response.json()) as { ok: boolean; token: string; channelName: string };
+      const body: { ok: boolean; token: string; channelName: string } = await response.json();
       assert.equal(body.ok, true);
       assert.equal(body.channelName, "#exec");
       assert.ok(body.token);
@@ -76,7 +76,7 @@ describe("Slack subscribe/unsubscribe API routes", () => {
 
     const response = await unsubscribeHandler(request);
     assert.equal(response.status, 200);
-    const body = (await response.json()) as { ok: boolean };
+    const body: { ok: boolean } = await response.json();
     assert.equal(body.ok, true);
 
     const active = await store.listActiveWebhooks();

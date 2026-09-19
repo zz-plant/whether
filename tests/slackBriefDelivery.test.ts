@@ -7,6 +7,9 @@ import {
   isSlackWebhookUrl,
   resolveConfiguredSlackWebhooks,
 } from "../lib/slack/deliverSlackBrief";
+import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { macroSeries } from "../lib/macroSnapshot";
+import { snapshotData } from "../lib/snapshot";
 
 const payload = { text: "Posture: Guarded\nAction: hold hiring", recordDate: "2026-08-17" };
 
@@ -121,7 +124,7 @@ describe("Slack brief delivery", () => {
     const store = getSlackWebhookStore();
     await store.subscribe("https://hooks.slack.com/services/T0/B0/revoked-hook");
 
-    const goneFetch: typeof fetch = (async () => new Response("gone", { status: 410 })) as typeof fetch;
+    const goneFetch: typeof fetch = async () => new Response("gone", { status: 410 });
 
     const result = await deliverSlackBrief({
       payload,
@@ -134,5 +137,52 @@ describe("Slack brief delivery", () => {
     // Webhook should be deactivated
     const active = await store.listActiveWebhooks();
     assert.equal(active.includes("https://hooks.slack.com/services/T0/B0/revoked-hook"), false);
+  });
+
+  it("builds the brief from the given operating snapshot instead of a second report read", async () => {
+    const snapshot = buildOperatingSnapshot({
+      /* `snapshotData` is the bundled fallback (isLive: false), which the
+         publish guard rightly refuses. Flip it to a live reading so the test
+         is about the read path, not about fallback policy. */
+      treasury: {
+        ...snapshotData,
+        isLive: true,
+        fallback_at: undefined,
+        fallback_reason: undefined,
+        record_date: "2099-12-31",
+        fetched_at: "2099-12-31T12:00:00.000Z",
+      },
+      macroSeries,
+      now: new Date("2099-12-31T13:00:00.000Z"),
+    });
+
+    /* Any outbound read would blow up the test, which is the point: with a
+       snapshot in hand the deliverer must not reassemble the report. */
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => {
+      throw new Error("snapshot path must not read the report");
+    };
+
+    try {
+      let sentBody = "";
+      const capture: typeof fetch = async (_url: RequestInfo | URL, init?: RequestInit) => {
+        sentBody = typeof init?.body === "string" ? init.body : "";
+        return new Response("ok", { status: 200 });
+      };
+
+      const result = await deliverSlackBrief({
+        webhookUrls: ["https://hooks.slack.com/services/T0/B0/x"],
+        snapshot,
+        now: new Date("2099-12-31T13:00:00.000Z"),
+        fetchImpl: capture,
+      });
+
+      assert.equal(result.status, "posted");
+      assert.equal(result.delivered, 1);
+      assert.match(sentBody, /Whether Weekly Brief — 2099-12-31/);
+      assert.match(sentBody, /Posture:/);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });

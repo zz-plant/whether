@@ -61,7 +61,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
       <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
         <div className="flex items-center justify-between gap-2 px-3 py-2 sm:gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-2.5 no-underline">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-teal-400 shrink-0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0">
               <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
               <circle cx="5" cy="11" r="1.5" fill="currentColor" />
               <circle cx="19" cy="11" r="1.5" fill="currentColor" />
@@ -74,7 +74,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             </div>
           </Link>
           <GlobalHeaderNavClient pathname={pathname} />
-          <div className="flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-teal-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-teal-400">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
             {isHomeBrief ? (
               <div className="flex items-center gap-1 sm:hidden">
                 <StageDropdownPill />

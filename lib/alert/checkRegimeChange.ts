@@ -4,6 +4,8 @@ import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { getSlackWebhookStore } from "../slack/slackWebhookStore";
+import { isSlackWebhookUrl } from "../slack/deliverSlackBrief";
 import { siteUrl } from "../siteUrl";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
@@ -28,7 +30,7 @@ type CheckRegimeChangeResult = {
 
 /** One Slack post, in the block shape every alert here uses. */
 const postSlackAlert = async (webhook: string, header: string, body: string) => {
-  await fetch(webhook, {
+  const response = await fetch(webhook, {
     method: "POST",
     body: JSON.stringify({
       blocks: [
@@ -38,6 +40,50 @@ const postSlackAlert = async (webhook: string, header: string, body: string) => 
       ],
     }),
   });
+  /* A webhook Slack has revoked reads 404/410; drop it so the weekly step stops
+     counting it as a target. Same rule the weekly deliverer applies. */
+  if (response.status === 404 || response.status === 410) {
+    getSlackWebhookStore().deactivateByUrl(webhook).catch(() => undefined);
+  }
+  return response;
+};
+
+/**
+ * Every Slack target for an alert: the env-configured webhook plus every
+ * webhook a channel subscribed through the form (KV store). A regime change or
+ * flash reaches the channels that signed up for the weekly brief, not just the
+ * operator's own webhook — the flip is the one mid-week event the channel
+ * needs, and it is exactly what the form's "a note if the call flips" promises.
+ */
+const resolveAlertSlackWebhooks = async (): Promise<string[]> => {
+  const urls = new Set<string>(resolveConfiguredAlertWebhook());
+  try {
+    const store = getSlackWebhookStore();
+    const stored = await store.listActiveWebhooks();
+    for (const url of stored) {
+      if (isSlackWebhookUrl(url)) urls.add(url);
+    }
+  } catch (error) {
+    console.warn("[slack-alert] failed to load subscribed webhooks", error);
+  }
+  return [...urls];
+};
+
+const resolveConfiguredAlertWebhook = (): string[] => {
+  const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
+  return envUrl && isSlackWebhookUrl(envUrl) ? [envUrl] : [];
+};
+
+/** Post an alert to every target, never throwing: a slow Slack post must not
+ *  fail the regime check, which has KV state to write after this. */
+const postSlackAlerts = async (header: string, body: string) => {
+  try {
+    const webhooks = await resolveAlertSlackWebhooks();
+    if (webhooks.length === 0) return;
+    await Promise.allSettled(webhooks.map((webhook) => postSlackAlert(webhook, header, body)));
+  } catch (error) {
+    console.warn("[slack-alert] delivery failed", error);
+  }
 };
 
 /**
@@ -70,7 +116,6 @@ export const checkRegimeChange = async (options?: {
     }
   }
   const currentRegime = assessment.regime;
-  const slackWebhook = process.env.SLACK_WEBHOOK_URL;
 
   const lastKnown = await kv.get("regime:last-known");
   const prevWeeksToFlip = await kv.get("regime:weeks-to-flip");
@@ -92,13 +137,10 @@ export const checkRegimeChange = async (options?: {
      * write after this.
      */
     pushOutcome = await sendRegimeChangePush().catch(() => null);
-    if (slackWebhook) {
-      await postSlackAlert(
-        slackWebhook,
-        "⚠️ Reconsider Operating Posture",
-        `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.`,
-      );
-    }
+    await postSlackAlerts(
+      "⚠️ Reconsider Operating Posture",
+      `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.`,
+    );
   }
 
   /* 1b. Flash — an emergency-sized move in a raw input since the previous read.
@@ -111,13 +153,10 @@ export const checkRegimeChange = async (options?: {
     : [];
   for (const move of flashMoves) {
     alerts.push(`FLASH — ${move.headline}`);
-    if (slackWebhook) {
-      await postSlackAlert(
-        slackWebhook,
-        "⚡ Flash — outsized move since the last read",
-        `${move.headline}\nThe weekly call stands until the next read confirms where the scores settle. Hold irreversible commitments until then.`,
-      );
-    }
+    await postSlackAlerts(
+      "⚡ Flash — outsized move since the last read",
+      `${move.headline}\nThe weekly call stands until the next read confirms where the scores settle. Hold irreversible commitments until then.`,
+    );
   }
 
   /* 2. Distance-to-flip velocity — alert when narrowing rapidly */
@@ -135,13 +174,10 @@ export const checkRegimeChange = async (options?: {
     const prevWeeks = prevWeeksToFlip ? parseInt(prevWeeksToFlip, 10) : null;
     if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
       alerts.push(`WATCH DECISIONS — flip window narrowing: ${projection.velocityLabel}`);
-      if (slackWebhook) {
-        await postSlackAlert(
-          slackWebhook,
-          "👀 Watch Decisions — Flip Window Narrowing",
-          `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.`,
-        );
-      }
+      await postSlackAlerts(
+        "👀 Watch Decisions — Flip Window Narrowing",
+        `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.`,
+      );
     }
   }
 

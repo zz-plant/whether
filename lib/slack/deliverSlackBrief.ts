@@ -2,6 +2,9 @@ import { buildSlackBrief } from "../export/briefBuilders";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { loadReportDataSafe } from "../report/reportData";
 import { buildPostureState } from "../report/postureStateSource";
+import { buildReportDynamics } from "../report/reportEvidence";
+import type { OperatingSnapshot } from "../operatingState/types";
+import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
 
 /**
@@ -125,6 +128,49 @@ export const resolveConfiguredSlackWebhooks = (): string[] => {
   return [...urls];
 };
 
+/**
+ * The weekly brief from the operating snapshot the cron just materialized,
+ * with no second report read.
+ *
+ * The cron's `refreshOperatingState` already assembled the snapshot from this
+ * run's fresh ingest; the email brief is built from it, and until now the Slack
+ * brief re-assembled the whole report (`loadReportDataSafe`) on a second read.
+ * Two reads mean two chances to disagree about the same Monday, and a second
+ * assembly under the cron step deadline. The snapshot carries assessment,
+ * treasury and macro series; the sensors and report dynamics it lacks are
+ * derived from the same treasury the snapshot already holds, so the post below
+ * is the email's call in Slack's blocks.
+ */
+const buildSlackBriefPayloadFromSnapshot = async (
+  snapshot: OperatingSnapshot,
+  now: Date,
+): Promise<{
+  text: string;
+  recordDate: string;
+  readiness: ReturnType<typeof assessPublishReadiness>;
+}> => {
+  const { assessment, treasury, macroSeries } = snapshot;
+  const sensors = buildSensorReadings(treasury);
+  const postureState = await buildPostureState({
+    recordDate: treasury.record_date,
+    assessment,
+    reportDynamics: buildReportDynamics({ current: assessment, previous: null }),
+  });
+  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
+  return {
+    text,
+    recordDate: treasury.record_date,
+    readiness: assessPublishReadiness({
+      degraded: false,
+      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
+      isLive: treasury.isLive,
+      fallbackReason: treasury.fallback_reason,
+      recordDate: treasury.record_date ?? treasury.fetched_at,
+      now,
+    }),
+  };
+};
+
 const resolveAllTargetSlackWebhooks = async (): Promise<string[]> => {
   const urls = new Set<string>(resolveConfiguredSlackWebhooks());
   try {
@@ -145,8 +191,11 @@ export const deliverSlackBrief = async (options?: {
   webhookUrls?: string[];
   fetchImpl?: typeof fetch;
   payload?: { text: string; recordDate: string };
-  /** Public URL of this week's stored screenshot; omitted, the post is text blocks as before. */
+  /** Public URL of this week's stored screenshot, omitted, the post is text blocks as before. */
   imageUrl?: string;
+  /** The operating snapshot the caller just materialized; when present the brief
+   *  is built from it instead of a second report read. */
+  snapshot?: OperatingSnapshot;
   now?: Date;
 }): Promise<SlackDeliveryResult> => {
   const urls = options?.webhookUrls ?? (await resolveAllTargetSlackWebhooks());
@@ -161,7 +210,9 @@ export const deliverSlackBrief = async (options?: {
   let payload = options?.payload;
   if (!payload) {
     try {
-      const built = await buildSlackBriefPayload(options?.now ?? new Date());
+      const built = options?.snapshot
+        ? await buildSlackBriefPayloadFromSnapshot(options.snapshot, options?.now ?? new Date())
+        : await buildSlackBriefPayload(options?.now ?? new Date());
       if (!built.readiness.ok) {
         /* Not a failure of this dispatcher, and not a post either. A channel
            that is told nothing this Monday can ask; a channel handed a stale

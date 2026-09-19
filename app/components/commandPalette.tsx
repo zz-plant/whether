@@ -290,7 +290,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search or jump to… e Evidence · p Plan · h History"
-              className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 outline-none font-medium"
+              className="flex-1 bg-transparent text-base sm:text-sm text-slate-100 placeholder-slate-500 outline-none font-medium"
               aria-label="Search commands"
             />
             <kbd className="text-[10px] text-slate-400 font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-2 py-0.5 shadow-inner">ESC</kbd>
@@ -308,7 +308,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                       <button
                         type="button"
                         onClick={cmd.action}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all duration-150 ${
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-left transition-all duration-150 ${
                           isSelected
                             ? "bg-sky-500/15 text-sky-100 border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.12)] font-semibold"
                             : "text-slate-300 border border-transparent hover:bg-slate-800/50 hover:text-white"

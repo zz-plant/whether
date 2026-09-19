@@ -1025,6 +1025,39 @@ Left as decisions: making the three horizons (weekly, monthly, quarterly) headin
 control, which is Hello Weather's reading order and would change the page outline; and taking
 the remaining rows above the call on a first visit, which the standfirst's own comment warns about.
 
+### 1.1.20 Slack weekly delivery, subscribed channels, and the flip (2026-09-18)
+
+The Slack weekly brief used to post a two-line message to `SLACK_WEBHOOK_URL` and report success
+for a post that never left the building; the full `buildSlackBrief` text — posture, readings,
+signal check, bounded decisions, citations — sat unused in `lib/export/briefBuilders.ts`. The
+cron's Slack step now posts the real brief to every delivery target and reports which of five
+outcomes actually happened (`posted` / `partial` / `skipped_unconfigured` /
+`refused_unpublishable` / `failed`).
+
+- **Channels can subscribe.** The subscribe form gained a Slack channel; `POST /api/slack/subscribe`
+  pings the webhook to verify it and introduce the cadence, then stores
+  `webhookUrl` + `channelName` + a `token` in KV (`lib/slack/slackWebhookStore.ts`, durable
+  backend with a local-fallback like the alert store). `POST /api/slack/unsubscribe` removes by
+  token. Delivery targets are the env webhook plus every active stored webhook; Slack revoking a
+  webhook answers 404/410 on the next Monday post, which auto-deactivates the subscription.
+- **The off-ramp is the webhook.** A Slack channel has no address the site can reach, so the
+  honest stop is deleting the webhook in Slack admin; the next post 404s and the subscription
+  drops. The ping message and the success screen say this instead of implying a perpetual
+  channel. The compact form's footer is now channel-aware: Slack promises "Monday mornings, plus
+  a flash if the call flips."
+- **Same call as the email, from the same read.** The Monday email builds from the operating
+  snapshot the cron just materialized; the Slack step re-assembled the whole report on a second
+  read, which is a second chance to disagree about the same Monday and a second assembly under
+  the step deadline. `deliverSlackBrief` now takes that snapshot — its treasury already carries
+  the sensor and report-dynamics derivations — so the Slack post is the email's call in Slack's
+  blocks. `GET /api/brief/slack` keeps the report-read path for on-demand automation.
+- **The flip reaches subscribed channels.** `checkRegimeChange` posted regime-change, flash, and
+  flip-window alerts to `SLACK_WEBHOOK_URL` alone. Those now go to every subscribed webhook as
+  well (never throwing, so a slow Slack post cannot fail the KV state write after it), which is
+  what "a note if the call flips" promises a channel. The daily threshold-crossing mail
+  (sentiment/credit lines) deliberately stays email-only, and Slack subscriptions carry no
+  per-channel delivery preferences.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
