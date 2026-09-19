@@ -144,7 +144,7 @@ export const SearchResults = ({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="What do you need to decide?"
-            className="weather-surface min-h-[44px] min-w-0 flex-1 px-4 py-2 text-sm text-slate-100 placeholder:text-slate-500"
+            className="weather-surface min-h-[44px] min-w-0 flex-1 px-4 py-2 text-base sm:text-sm text-slate-100 placeholder:text-slate-500"
           />
           <button type="submit" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
             Search

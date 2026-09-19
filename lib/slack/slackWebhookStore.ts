@@ -301,11 +301,15 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
   }
 }
 
-const getKvBinding = (): KvNamespaceLike | null => {
-  const binding =
-    (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV;
+const isKvNamespaceLike = (value: unknown): value is KvNamespaceLike =>
+  typeof value === "object" &&
+  value !== null &&
+  typeof Reflect.get(value, "get") === "function" &&
+  typeof Reflect.get(value, "put") === "function";
 
-  if (!binding || typeof binding.get !== "function" || typeof binding.put !== "function") {
+const getKvBinding = (): KvNamespaceLike | null => {
+  const binding: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
+  if (!isKvNamespaceLike(binding)) {
     return null;
   }
   return binding;

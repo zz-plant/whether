@@ -41,7 +41,7 @@ export async function requestSubscription(
           : { email: trimmed },
       ),
     });
-    const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+    const data: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);
 
     if (res.ok && data?.ok) {
       return { ok: true, message: VERIFY_MESSAGE };
@@ -74,13 +74,13 @@ export async function requestSlackSubscription(
         channelName: options?.channelName?.trim() || undefined,
       }),
     });
-    const data = (await res.json().catch(() => null)) as {
+    const data: {
       ok?: boolean;
       error?: string;
       message?: string;
       channelName?: string;
       token?: string;
-    } | null;
+    } | null = await res.json().catch(() => null);
 
     if (res.ok && data?.ok) {
       return {

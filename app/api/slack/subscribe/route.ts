@@ -29,13 +29,13 @@ export async function POST(request: Request) {
             type: "header",
             text: { type: "plain_text", text: "Whether Weekly Brief Connected" },
           },
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `This channel${channelName ? ` (${channelName})` : ""} is now connected to Whether. Your team will receive the weekly operating brief every Monday morning.\n\n*What to expect:*\n• Current macro posture & decision delta\n• Bounded start, stop, and fence rules\n• Reversal thresholds that flip the call`,
+{
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `This channel${channelName ? ` (${channelName})` : ""} is now connected to Whether. Expect the weekly operating brief every Monday, plus a flash alert if the call flips mid-week.\n\n*What to expect:*\n• Current macro posture & decision delta\n• Bounded start, stop, and fence rules\n• Reversal thresholds that flip the call\n\nTo stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.`,
+              },
             },
-          },
           {
             type: "context",
             elements: [

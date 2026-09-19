@@ -24,7 +24,7 @@ const formatSignedBps = (bps: number) =>
 
 const rowLinkClass = "flex items-center gap-2.5 group no-underline min-w-0";
 const rowIconClass =
-  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-teal-400 group-hover:border-teal-500/40 transition-colors";
+  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-sky-400 group-hover:border-sky-500/40 transition-colors";
 /* The rows read their labels off the views rather than spelling them. All
    three were literals here, which is how this card came to print "Financing
    conditions" for the same reading the What-changed rows above it called
@@ -70,7 +70,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
               <span className="ml-auto flex items-baseline gap-1.5 tabular-nums">
                 <strong className="text-sm font-semibold text-white">{fundingPressure.current}</strong>
                 {fundingPressure.weeklyDelta !== null && fundingPressure.weeklyDelta !== 0 ? (
-                  <span className={`text-[11px] font-semibold ${fundingPressure.weeklyDelta > 0 ? "text-rose-300" : "text-teal-300"}`}>
+                  <span className={`text-[11px] font-semibold ${fundingPressure.weeklyDelta > 0 ? "text-rose-300" : "text-semantic-easing-fg"}`}>
                     {formatSignedPoints(fundingPressure.weeklyDelta)} WoW
                   </span>
                 ) : null}
@@ -99,7 +99,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
             {riskAppetite.trend && riskAppetite.trend.points !== 0 ? (
               <p className="flex items-baseline justify-between gap-2 text-[11px] tabular-nums">
                 <span className="text-slate-400">Trend</span>
-                <span className={riskAppetite.trend.points < 0 ? "text-amber-300" : "text-teal-300"}>
+                <span className={riskAppetite.trend.points < 0 ? "text-amber-300" : "text-semantic-easing-fg"}>
                   {formatSignedPoints(riskAppetite.trend.points)} over {riskAppetite.trend.windowMonths} months
                 </span>
               </p>
@@ -124,7 +124,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
                   {financing.currentRate !== null ? `${financing.currentRate.toFixed(2)}%` : "—"}
                 </strong>
                 {financing.change ? (
-                  <span className={`text-[11px] font-semibold ${financing.change.bps > 0 ? "text-rose-300" : financing.change.bps < 0 ? "text-teal-300" : "text-slate-400"}`}>
+                  <span className={`text-[11px] font-semibold ${financing.change.bps > 0 ? "text-rose-300" : financing.change.bps < 0 ? "text-semantic-easing-fg" : "text-slate-400"}`}>
                     {formatSignedBps(financing.change.bps)} / {financing.change.windowMonths}mo
                   </span>
                 ) : null}

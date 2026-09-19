@@ -76,8 +76,8 @@ export function ActionsThisWeekCard({
             >
               {didCopy ? (
                 <>
-                  <Check size={12} className="text-teal-400" />
-                  <span className="text-teal-300">Copied!</span>
+                  <Check size={12} className="text-sky-400" />
+                  <span className="text-sky-300">Copied!</span>
                 </>
               ) : didFail ? (
                 <>
@@ -104,10 +104,10 @@ export function ActionsThisWeekCard({
               <li key={item.id ?? index}>
                 <Link
                   href={href}
-                  className="group flex min-h-[52px] items-center justify-between gap-3 rounded-xl border border-white/[0.04] bg-slate-950/40 p-3 transition-colors hover:border-teal-500/30 hover:bg-slate-900/60 focus-visible:outline-2 focus-visible:outline-teal-400 no-underline"
+                  className="group flex min-h-[52px] items-center justify-between gap-3 rounded-xl border border-white/[0.04] bg-slate-950/40 p-3 transition-colors hover:border-sky-500/30 hover:bg-slate-900/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 no-underline"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-xs font-semibold text-slate-200 group-hover:border-teal-500/30 group-hover:text-teal-300 transition-colors">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-xs font-semibold text-slate-200 group-hover:border-sky-500/30 group-hover:text-sky-300 transition-colors">
                       {index + 1}
                     </span>
                     <span className="text-xs font-medium text-slate-200 group-hover:text-white line-clamp-2 leading-snug">
@@ -116,7 +116,7 @@ export function ActionsThisWeekCard({
                   </div>
                   <ChevronRight
                     size={16}
-                    className="shrink-0 text-slate-500 transition-all group-hover:text-teal-400 group-hover:translate-x-0.5"
+                    className="shrink-0 text-slate-500 transition-all group-hover:text-sky-400 group-hover:translate-x-0.5"
                     aria-hidden="true"
                   />
                 </Link>

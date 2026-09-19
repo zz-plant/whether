@@ -127,12 +127,12 @@ export function MobileTabBar() {
                 <Link
                   href={tab.href}
                   aria-current={tab.isActive ? "page" : undefined}
-                  className={`relative ${TAB_CLASS} ${tab.isActive ? "text-teal-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
+                  className={`relative ${TAB_CLASS} ${tab.isActive ? "text-sky-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
                 >
                   <Icon aria-hidden="true" size={20} strokeWidth={tab.isActive ? 2.2 : 1.8} />
                   <span>{tab.navLabel ?? tab.label}</span>
                   {tab.isActive ? (
-                    <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-teal-400" aria-hidden="true" />
+                    <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-sky-400" aria-hidden="true" />
                   ) : null}
                 </Link>
               </li>
@@ -154,12 +154,12 @@ export function MobileTabBar() {
               type="button"
               onClick={() => setShowMore(true)}
               aria-expanded={showMore}
-              className={`relative ${TAB_CLASS} ${moreIsActive ? "text-teal-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
+              className={`relative ${TAB_CLASS} ${moreIsActive ? "text-sky-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
             >
               <MoreHorizontal aria-hidden="true" size={20} strokeWidth={moreIsActive ? 2.2 : 1.8} />
               <span>{moreIsActive && activeLoopLayer ? (activeLoopLayer.navLabel ?? activeLoopLayer.label) : "More"}</span>
               {moreIsActive ? (
-                <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-teal-400" aria-hidden="true" />
+                <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-sky-400" aria-hidden="true" />
               ) : null}
             </button>
           </li>

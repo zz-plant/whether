@@ -31,7 +31,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     });
 
     const response = await handleMcpRequest(request);
-    const body = (await response.json()) as any;
+    const body: any = await response.json();
 
     assert.equal(body.id, 101);
     assert.ok(body.result);
@@ -60,7 +60,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     });
 
     const response = await handleMcpRequest(request);
-    const body = (await response.json()) as any;
+    const body: any = await response.json();
 
     assert.equal(body.id, 102);
     assert.ok(body.result);
@@ -85,7 +85,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     });
 
     const response = await handleMcpRequest(request);
-    const body = (await response.json()) as any;
+    const body: any = await response.json();
 
     assert.equal(body.id, 103);
     assert.ok(body.result);
@@ -113,7 +113,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     });
 
     const response = await handleMcpRequest(request);
-    const body = (await response.json()) as any;
+    const body: any = await response.json();
 
     assert.equal(body.id, 104);
     assert.ok(body.result);

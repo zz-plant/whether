@@ -235,7 +235,13 @@ const TOOLS: ToolDefinition[] = [
     execute: async (args) => {
       const goalText = typeof args.goalText === "string" ? args.goalText : "";
       if (!goalText.trim()) throw new Error("Missing required argument: goalText");
-      const lifecycle = (args.lifecycle as any) ?? "GROWTH";
+      const lifecycle =
+        args.lifecycle === "DISCOVERY" ||
+        args.lifecycle === "GROWTH" ||
+        args.lifecycle === "SCALE" ||
+        args.lifecycle === "MATURE"
+          ? args.lifecycle
+          : "GROWTH";
       const { snapshot } = await loadWeeklyBriefSnapshot();
       const plan = stressTestDecisionPlan(snapshot.reportData.assessment, { planText: goalText, lifecycle });
       /* The stress-test engine grades on SAFE/RISKY/DANGEROUS; a sprint goal
