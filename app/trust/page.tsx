@@ -28,6 +28,8 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether trust hub",
 });
 
+import { TrustRadarGlyph } from "../components/illustrations/TrustRadarGlyph";
+
 export default async function MethodPage({
   searchParams,
 }: {
@@ -220,6 +222,18 @@ export default async function MethodPage({
   return (
     <ReportShell {...reportShellProps}>
       <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and the trust to act.">
+        <div className={`mb-3 flex items-center justify-between gap-4 rounded-lg border p-3.5 sm:p-4 ${trustVerdict.toneClasses}`}>
+          <div className="flex items-center gap-3">
+            <TrustRadarGlyph tone={reportShellProps.trustStatusTone} size={40} />
+            <div>
+              <p className="text-sm font-bold tracking-tight text-white">{trustVerdict.label}</p>
+              <p className="text-xs text-slate-300">{trustVerdict.detail}</p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-block text-fluid-nano font-mono text-slate-400">
+            {reportData.recordDateLabel}
+          </span>
+        </div>
         {/* One strip, five cells. This was five stacked cards each opening with
             a coloured dot and a sentence that said "cached" a different way;
             the state is five facts, and a row of five labelled values says them

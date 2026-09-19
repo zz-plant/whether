@@ -1,6 +1,7 @@
 import { ReportCta } from "../reportCta";
 import { ShareRailButton } from "./ShareRailButton";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
+import { OperatingLoopGlyph } from "../illustrations/OperatingLoopGlyph";
 
 /**
  * The one page intro block a report route gets (ui-ux-standards §XI): kicker,
@@ -38,6 +39,15 @@ export function CommandCenterNavBlock({
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
 }) {
+  const activeStep =
+    pageTitle.toLowerCase() === "plan"
+      ? "plan"
+      : pageTitle.toLowerCase().includes("changed") || pageTitle.toLowerCase().includes("signal")
+        ? "signals"
+        : pageTitle.toLowerCase().includes("trust")
+          ? "posture"
+          : undefined;
+
   // The status word leads and prints in the regime ink — it is this page's
   // equivalent of the hero's stamp, and the only word on the route that
   // names the week. The rest of the line stays neutral.
@@ -58,7 +68,7 @@ export function CommandCenterNavBlock({
 
   return (
     <section
-      className="weather-surface-secondary weather-page-intro relative min-w-0 px-4 py-4 sm:px-5 sm:py-5"
+      className="weather-surface-secondary weather-page-intro relative min-w-0 px-4 py-3.5 sm:px-5 sm:py-4"
       aria-label="Page introduction"
     >
       {/* Two columns from lg up: the reading block keeps its measure on the
@@ -82,8 +92,14 @@ export function CommandCenterNavBlock({
           </p>
         </div>
 
-        {showStamp || showActions ? (
+        {activeStep || showStamp || showActions ? (
           <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
+            {activeStep ? (
+              <div className="flex lg:justify-end">
+                <OperatingLoopGlyph activeStep={activeStep} />
+              </div>
+            ) : null}
+
             {showStamp ? (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right">
                 {fetchedAtLabel ? <span>Updated {fetchedAtLabel}</span> : null}

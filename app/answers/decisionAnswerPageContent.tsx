@@ -27,6 +27,7 @@ import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "../compone
 import { signalPlainEnglish, type CompositeSignalKey } from "../../lib/report/signalTranslations";
 import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
+import { ResolutionCompassGlyph } from "../components/illustrations/ResolutionCompassGlyph";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -169,7 +170,10 @@ export async function DecisionAnswerPageContent({
           description={liveDirectAnswer}
           aside={(
             <div className="weather-surface space-y-2 px-4 py-4">
-              <p className="type-eyebrow">Short answer</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="type-eyebrow">Short answer</p>
+                <ResolutionCompassGlyph size={26} />
+              </div>
               <p className="text-sm font-semibold text-sky-200">{liveShortAnswer}</p>
               {dataCurrency ? (
                 <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">

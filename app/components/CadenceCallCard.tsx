@@ -89,7 +89,7 @@ export function CadenceCallCard({
   const headingId = `${model.horizon}-call-title`;
 
   return (
-    <section className="weather-card space-y-4 p-5 sm:p-7" aria-labelledby={headingId}>
+    <section className="weather-card space-y-4 p-4 sm:p-6 lg:p-7" aria-labelledby={headingId}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-fluid-xs font-medium text-slate-400">
           {model.cadenceLabel}

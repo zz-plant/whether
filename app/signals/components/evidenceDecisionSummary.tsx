@@ -2,6 +2,11 @@
 
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { displaySignalLabel } from "./evidenceSectionShared";
+import {
+  MarketVectorBarometer,
+  PressureDriverGauge,
+  ThresholdGateGlyph,
+} from "../../components/illustrations/SignalTelemetryGlyphs";
 
 /**
  * The first task block on /signals: what the evidence means now, and what else
@@ -26,7 +31,15 @@ export const SignalsDecisionSummarySection = ({
   showMicroDecisionRows: boolean;
   actionNowShort?: string;
   topDiagnosticCallouts: Array<{ label: string; why: string }>;
-}) => (
+}) => {
+  const normalizedAction = (actionNowShort ?? "").toLowerCase();
+  const vectorDirection: "tighten" | "ease" | "hold" = normalizedAction.includes("tighten")
+    ? "tighten"
+    : normalizedAction.includes("ease")
+      ? "ease"
+      : "hold";
+
+  return (
   <section
     id="decision-summary"
     className="weather-panel space-y-6 px-6 py-5"
@@ -36,18 +49,24 @@ export const SignalsDecisionSummarySection = ({
       <p className="type-eyebrow">What this means now</p>
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-xs font-semibold text-slate-400">
-            Current outlook
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-slate-400">
+              Current outlook
+            </p>
+            <MarketVectorBarometer direction={vectorDirection} size={24} />
+          </div>
           <p className="mt-2 text-sm font-semibold text-slate-100">
             {actionNowShort ??
               "Hold the current operating posture while thresholds hold."}
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-xs font-semibold text-slate-400">
-            Main pressure
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-slate-400">
+              Main pressure
+            </p>
+            <PressureDriverGauge intensity={topDiagnosticCallouts.length > 0 ? "high" : "mid"} size={24} />
+          </div>
           {topDiagnosticCallouts[0] ? (
             <>
               {/* Names the driver as well as describing it — this cell is now the
@@ -67,9 +86,12 @@ export const SignalsDecisionSummarySection = ({
           )}
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <p className="text-xs font-semibold text-slate-400">
-            What would change this
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-slate-400">
+              What would change this
+            </p>
+            <ThresholdGateGlyph size={24} />
+          </div>
           {showMicroDecisionRows ? (
             /* Was two tinted cards nested inside this card, inside the section
              card — three containment levels for two sentences. Labelled rows
@@ -145,4 +167,5 @@ export const SignalsDecisionSummarySection = ({
       </article>
     ) : null}
   </section>
-);
+  );
+};
