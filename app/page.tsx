@@ -419,8 +419,8 @@ async function PageContent({
           />
         </div>
       ) : null}
-      <div className="mx-auto max-w-[64rem] space-y-8">
-        <div className="space-y-8 min-w-0">
+      <div className="mx-auto max-w-[64rem] space-y-4 sm:space-y-8">
+        <div className="space-y-4 sm:space-y-8 min-w-0">
           {/* Above the brief, not after it. This is the orientation line for a
               first-time visitor, and it sat below the hero, all three operating
               levers, and the compare strip — roughly 2,800px down on mobile,

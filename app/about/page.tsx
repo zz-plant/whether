@@ -15,6 +15,8 @@ import {
   publisherProfilePath,
 } from "../../lib/publisher";
 
+import { OperatingLoopGlyph } from "../components/illustrations/OperatingLoopGlyph";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
   description:
@@ -43,10 +45,10 @@ export default function AboutPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6 sm:py-10">
       <JsonLdScript data={structuredData} />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
         <p className="text-sm text-slate-300">
           Whether turns public macro signals into a weekly operating posture for startup and product leaders. Each
@@ -57,6 +59,9 @@ export default function AboutPage() {
           triggers it, and the condition that reverses it — so a team can act on it and revisit it later without
           re-litigating the reasoning.
         </p>
+        <div className="pt-2">
+          <OperatingLoopGlyph variant="detailed" />
+        </div>
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">

@@ -13,6 +13,12 @@ import {
   type PricingPlan,
 } from "../../lib/pricing";
 
+import {
+  FreeTierGlyph,
+  ProTierGlyph,
+  TeamTierGlyph,
+} from "../components/illustrations/PricingTierGlyphs";
+
 export const runtime = "edge";
 
 export const metadata: Metadata = {
@@ -47,9 +53,18 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
         isFree ? "border-sky-500/30" : ""
       }`}
     >
-      <div className="space-y-1">
-        <h2 className="text-fluid-sm font-semibold text-white">{plan.name}</h2>
-        <p className="text-fluid-xs text-slate-400">{plan.audience}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <h2 className="text-fluid-sm font-semibold text-white">{plan.name}</h2>
+          <p className="text-fluid-xs text-slate-400">{plan.audience}</p>
+        </div>
+        {plan.id === "free" ? (
+          <FreeTierGlyph size={32} />
+        ) : plan.id === "pro" ? (
+          <ProTierGlyph size={32} />
+        ) : (
+          <TeamTierGlyph size={32} />
+        )}
       </div>
 
       <p className="text-2xl font-bold text-white">{formatMonthlyPrice(plan)}</p>
@@ -91,8 +106,8 @@ export default function PricingPage() {
       backdropVariant="hub"
       structuredData={buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: PAID_PLANS_ON_SALE })}
     >
-      <div className="mx-auto max-w-[64rem] space-y-8 px-4 py-8">
-        <header className="space-y-3">
+      <div className="mx-auto max-w-[64rem] space-y-5 sm:space-y-8 px-4 py-4 sm:py-8">
+        <header className="space-y-2.5 sm:space-y-3">
           <h1 className="text-fluid-lg font-semibold text-white">Pricing</h1>
           <p className="max-w-2xl text-fluid-sm text-slate-300">{FREE_FOREVER_PROMISE}</p>
           {/* The promise above is the strongest data claim this site makes, and

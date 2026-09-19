@@ -7,6 +7,7 @@ import {
   SecondaryPageShell,
 } from "../components/secondaryPageShell";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { DecisionShieldGlyph } from "../components/illustrations/DecisionShieldGlyph";
 import { DecisionRecordPanel } from "./decisionRecordPanel";
 import { DecisionRecordDownloads } from "./decisionRecordDownloads";
 export const runtime = "edge";
@@ -52,6 +53,15 @@ export default async function DecisionsPage() {
         eyebrow="Your record"
         title="Your decision record"
         description="Every call you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed, so this page tells you which of those have moved."
+        aside={(
+          <div className="weather-surface flex items-center gap-3.5 px-4 py-3.5">
+            <DecisionShieldGlyph size={44} />
+            <div className="space-y-0.5 text-xs text-slate-300">
+              <p className="font-semibold text-slate-100">STD-07 Ledger</p>
+              <p className="text-fluid-nano text-slate-400">Local-only · Tamper-evident · Zero tracking</p>
+            </div>
+          </div>
+        )}
       />
       <SecondaryPageSection
         title="Recorded from this browser"

@@ -459,13 +459,13 @@ export function DecisionHero({
      */
     <section
       id="share-ready-artifact"
-      className="weather-card weather-hero-card relative overflow-hidden p-5 sm:p-7"
+      className="weather-card weather-hero-card relative overflow-hidden p-4 sm:p-6 lg:p-7"
       aria-labelledby="weekly-call-title"
       data-regime={regimeKey ?? undefined}
     >
-      <div className="relative z-10 flex flex-col gap-6 sm:grid sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start sm:gap-y-3">
+      <div className="relative z-10 flex flex-col gap-4 sm:gap-6 sm:grid sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start sm:gap-y-3">
           <div className="order-1 min-w-0 space-y-2 sm:col-start-1 sm:row-start-1">
-            {/* The regime stamp: sharp (§XIV), in the regime's own ink. */}
+            {/* The regime stamp: sharp (§XIV), in the regime's own ink with visual weather glyph. */}
             <div className="flex items-center gap-2">
               <span
                 className="inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
@@ -475,7 +475,13 @@ export function DecisionHero({
                   backgroundColor: "color-mix(in srgb, var(--regime-accent) 14%, transparent)",
                 }}
               >
-                <WeatherIcon size={14} aria-hidden="true" />
+                {regimeKey ? (
+                  <span className="inline-block w-4 shrink-0" aria-hidden="true">
+                    <RegimeGlyph idPrefix="hero-stamp" regime={regimeKey} />
+                  </span>
+                ) : (
+                  <WeatherIcon size={14} aria-hidden="true" />
+                )}
                 <span>{regimeWeatherLabel}</span>
               </span>
             </div>
