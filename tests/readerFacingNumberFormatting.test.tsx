@@ -108,9 +108,9 @@ describe("mirrored rails", () => {
 
   /* The rail's `<desc>` repeats the whole scale-direction string for assistive
      tech, so a bare `indexOf` finds the word there rather than in the caption
-     that is drawn. Read the two end captions — the `y="9"` runs — instead. */
+     that is drawn. Read the two end captions — the `y="11"` runs — instead. */
   const endCaptions = (svg: string) => {
-    const matches = [...svg.matchAll(/<text x="[\d.]+" y="9"[^>]*text-anchor="(start|end)"[^>]*>([^<]*)<\/text>/g)];
+    const matches = [...svg.matchAll(/<text x="[\d.]+" y="11"[^>]*text-anchor="(start|end)"[^>]*>([^<]*)<\/text>/g)];
     /* Built rather than cast: `Object.fromEntries` widens to a string index and
        the assertion put the anchor names back by hand, which is the type system
        vouching for a shape the regex is not guaranteed to produce. */

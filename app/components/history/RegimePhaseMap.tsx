@@ -10,6 +10,7 @@ import {
 } from "../../../lib/regimePhaseSpace";
 import type { RegimeKey } from "../../../lib/types";
 import Link from "next/link";
+import { regimeDataAttribute } from "../../../lib/regimeAccent";
 
 /**
  * The regime plane. Both scores on one pair of axes, with the classifier's two
@@ -222,11 +223,11 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
                 x={quadrant.tx}
                 y={quadrant.ty}
                 textAnchor={quadrant.anchor}
-                fontSize="11"
+                fontSize="13"
                 fontWeight="600"
-                letterSpacing="0.09em"
-                fill={REGIME_HEX_COLORS[quadrant.regime]}
-                opacity="0.85"
+                letterSpacing="0.04em"
+                data-regime={regimeDataAttribute(quadrant.regime)}
+                fill="var(--regime-ink)"
               >
                 {model.occupancy.find((row) => row.regime === quadrant.regime)?.regimeLabel.toUpperCase()}
               </text>
@@ -297,7 +298,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
                 the midpoints, which for a reading near both rules — the usual
                 case, since a call is made near its lines — put the two labels
                 on the same few units of plot and on the marker's halo. */}
-            <g fontSize="9" fontWeight="600" fill="var(--app-text-secondary)" stroke="var(--bg-panel)" strokeWidth="3.5" paintOrder="stroke">
+            <g fontSize="12" fontWeight="600" fill="var(--app-text-secondary)" stroke="var(--bg-panel)" strokeWidth="3.5" paintOrder="stroke">
               <text
                 x={boundaryX + (boundaryX < currentX ? -5 : 5)}
                 y={currentY + 3.2}
@@ -330,7 +331,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               x={currentX + (current.riskAppetite > 70 ? -13 : 13)}
               y={currentY + 3.5}
               textAnchor={current.riskAppetite > 70 ? "end" : "start"}
-              fontSize="10"
+              fontSize="12"
               fontWeight="700"
               fill="var(--app-text)"
               stroke="var(--bg-panel)"
@@ -356,24 +357,24 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
             />
 
             {TICKS.map((tick) => (
-              <text key={`x-tick-${tick}`} x={xFor(tick)} y={PLOT_BOTTOM + 15} textAnchor="middle" fontSize="10" fill="var(--app-text-muted)">
+              <text key={`x-tick-${tick}`} x={xFor(tick)} y={PLOT_BOTTOM + 15} textAnchor="middle" fontSize="12" fill="var(--app-text-muted)">
                 {tick}
               </text>
             ))}
             {TICKS.map((tick) => (
-              <text key={`y-tick-${tick}`} x={PLOT_X - 8} y={yFor(tick) + 3.4} textAnchor="end" fontSize="10" fill="var(--app-text-muted)">
+              <text key={`y-tick-${tick}`} x={PLOT_X - 8} y={yFor(tick) + 3.4} textAnchor="end" fontSize="12" fill="var(--app-text-muted)">
                 {tick}
               </text>
             ))}
 
-            <text x={PLOT_X + PLOT_SIZE / 2} y={VIEW_H - 8} textAnchor="middle" fontSize="10.5" fontWeight="600" fill="var(--app-text-secondary)">
+            <text x={PLOT_X + PLOT_SIZE / 2} y={VIEW_H - 8} textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--app-text-secondary)">
               Risk appetite →
             </text>
             <text
               x={13}
               y={PLOT_Y + PLOT_SIZE / 2}
               textAnchor="middle"
-              fontSize="10.5"
+              fontSize="13"
               fontWeight="600"
               fill="var(--app-text-secondary)"
               transform={`rotate(-90 13 ${PLOT_Y + PLOT_SIZE / 2})`}

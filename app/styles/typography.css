@@ -132,6 +132,11 @@ svg :where(.type-eyebrow, .type-badge) {
     display: block;
     max-width: 100%;
   }
+  /* Intrinsic SVG dimensions reserve space; preserve the aspect when a narrow
+     parent constrains the width. Explicit h-* utilities still win. */
+  svg[viewBox][width][height] {
+    height: auto;
+  }
 }
 
 a:focus-visible {
