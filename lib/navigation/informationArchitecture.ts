@@ -182,7 +182,7 @@ export const utilityLinks = [
   {
     href: "/calibration",
     label: "Calibration",
-    description: "What the confidence number has been worth, against the whole archive",
+    description: "15-year empirical validation of published confidence metrics against market outcomes",
   },
   {
     href: "/search",

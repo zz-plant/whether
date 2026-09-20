@@ -4,6 +4,7 @@ import { buildPageMetadata } from "../../lib/seo";
 import { buildResourceHubEntries } from "../../lib/resourceHub";
 import { PageShell } from "../components/pageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
+import { GovernancePillarsGlyph } from "../components/illustrations/GovernancePillarsGlyph";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Governance Resources",
@@ -28,12 +29,15 @@ export default function ResourcesHubPage() {
     <PageShell backdropVariant="hub">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
       <article className="weather-panel space-y-6 px-5 py-5">
-        <header className="space-y-2">
-          <h1 className="text-fluid-2xl font-semibold text-slate-100">Governance resources</h1>
-          <p className="text-sm text-slate-300">
-            The long-form guides behind the weekly operating call, and the decision guides operators ask for most.
-            Evergreen by design: what changes week to week is on the brief, not here.
-          </p>
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-fluid-2xl font-semibold text-slate-100">Governance resources</h1>
+            <p className="text-sm text-slate-300">
+              The long-form guides behind the weekly operating call, and the decision guides operators ask for most.
+              Evergreen by design: what changes week to week is on the brief, not here.
+            </p>
+          </div>
+          <GovernancePillarsGlyph size={56} className="self-start sm:self-center" />
         </header>
 
         <section aria-labelledby="resources-pillars-heading" className="space-y-3">

@@ -30,6 +30,7 @@ import {
 } from "../../../lib/report/publishedBriefs";
 import { PublishedBriefCopyControls } from "./publishedBriefCopyControls";
 import { ThresholdLadder } from "../../components/illustrations/ThresholdLadder";
+import { RegimeGlyph } from "../../components/illustrations/RegimeGlyph";
 import { RuleLines } from "../../components/boundedRuleLines";
 import {
   buildBoundedConditionRails,
@@ -173,9 +174,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
       <article className="flex flex-col gap-6">
         <header className="weather-panel space-y-4 px-6 py-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <Tag tone="sky">{brief.postureLabel}</Tag>
-            <Tag tone="slate">Confidence: {brief.confidenceLabel}</Tag>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Tag tone="sky">{brief.postureLabel}</Tag>
+              <Tag tone="slate">Confidence: {brief.confidenceLabel}</Tag>
+              <span className="text-fluid-micro font-mono text-slate-400">Permanent Record</span>
+            </div>
+            <RegimeGlyph idPrefix={`brief-${brief.slug}`} regime={brief.regime} className="h-6 w-auto shrink-0" />
           </div>
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{briefTitle(brief)}</h1>
           <p className="text-sm text-slate-300">{brief.summary}</p>

@@ -404,7 +404,7 @@ export const buildCalibrationStudyStructuredData = ({
   totals: { months: number; held: number };
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/calibration");
-  const name = "Does the confidence number predict anything?";
+  const name = "Confidence score calibration study";
   const description =
     `A calibration study of Whether's published confidence percent against ${totals.months} month-end readings: `
     + "every band understates, and distance from a regime boundary does not order the outcome.";

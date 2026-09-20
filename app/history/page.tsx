@@ -162,8 +162,8 @@ export default async function HistoryPage({
                 append-only rule is the guarantee worth stating. */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? "One week published so far. Entries are never edited after publication, so the archive fills forward from here."
-                : `${publishedBriefs.length} weeks published. Entries are never edited after publication, so a past call reads the way it did when it was made.`}
+                ? "Permanent, append-only weekly brief records paired with 176 months of continuous regime history (2012–2026). Entries are never edited after publication, so past calls read the way they were made."
+                : `${publishedBriefs.length} weekly brief records paired with 176 months of continuous regime history (2012–2026). Entries are never edited after publication, so past calls read the way they were made.`}
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

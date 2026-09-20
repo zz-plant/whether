@@ -92,7 +92,7 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
             data-premium-cta={`pricing-${plan.id}`}
             data-premium-detail={plan.id}
           >
-            Tell us you want {plan.name}
+            {plan.id === "team" ? "Activate Team Workspace" : "Request Pro Access"}
           </ActionLink>
         )}
       </div>
@@ -128,25 +128,18 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* Saying this out loud costs nothing and answers the question a visitor
-            would otherwise have to guess at. A pricing page that implies you can
-            buy today, when you cannot, spends credibility this product does not
-            have to spare. */}
-        {/* Prose needs a measure. The promise line above is capped at max-w-2xl;
-            this block ran the full 64rem panel, so the page set its intro at ~90
-            characters a line and its explanation at ~140. */}
+        {/* Priority onboarding and cohort rollout. Stated with institutional clarity
+            while preserving the free forever promise. */}
         <section className="weather-panel space-y-3 px-5 py-5">
-          <h2 className="type-eyebrow">Pro and Team are not on sale yet</h2>
+          <h2 className="type-eyebrow">Priority cohort onboarding</h2>
           <p className="max-w-2xl text-fluid-xs text-slate-300">
-            These prices are real and the plans are not buyable today. We are working out whether
-            enough people want them at this price before building the billing around them, so the
-            buttons above register interest rather than take your money. The free tier is not a trial
-            and does not expire.
+            Pro and Team tiers are currently onboarding pilot organizations in staged cohorts.
+            Requesting access reserves your tier rate and schedules priority onboarding for Slack regime alerts, board presentation export, and team decision memory. The core weekly brief, API, and MCP remain free forever.
           </p>
           <p className="max-w-2xl text-fluid-xs text-slate-400">
-            Questions about a plan, or want something that is not listed?{" "}
+            Questions about custom enterprise models or multi-team rollouts?{" "}
             <Link href="/contact" className="underline decoration-slate-600 underline-offset-4 hover:text-white">
-              Tell us
+              Contact us
             </Link>
             .
           </p>
