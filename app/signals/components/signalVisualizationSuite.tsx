@@ -148,7 +148,7 @@ const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) =>
 );
 
 const FlatPanel = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <article className={`space-y-2 border border-slate-800/70 bg-slate-950/40 p-3 ${className}`}>{children}</article>
+  <article className={`min-w-0 space-y-2 border border-slate-800/70 bg-slate-950/40 p-2 sm:p-3 ${className}`}>{children}</article>
 );
 
 export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalVisualizationSuiteProps) => {
@@ -235,14 +235,14 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     .slice(0, 10);
 
   return (
-    <section id="visual-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-labelledby="visual-diagnostics-title">
+    <section id="visual-diagnostics" className="min-w-0 space-y-4" aria-labelledby="visual-diagnostics-title">
       <header className="space-y-2">
         <p className="text-xs font-semibold tracking-[0.22em] text-slate-300">Visual diagnostics</p>
         <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">Yield-curve terminal</h2>
         <p className="text-sm text-slate-300">Cleaner one-screen view: 5 panels, minimal framing.</p>
       </header>
 
-      <Collapsible.Root open={terminalOpen} onOpenChange={setTerminalOpen} className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-4">
+      <Collapsible.Root open={terminalOpen} onOpenChange={setTerminalOpen} className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
         <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
           <span>One-screen terminal · 5 chart panels</span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
@@ -261,7 +261,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           className="mt-3 border-b border-slate-800/80 pb-3"
         />
 
-        <div className="mt-3 grid gap-2 lg:grid-cols-12">
+        <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-12">
           <FlatPanel className="lg:col-span-12">
             <PanelTitle title="1) Curve signal ribbon" subtitle="One block per period. Green = normal, Amber = flattening, Red = inverted (recession warning)." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
@@ -273,7 +273,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           <FlatPanel className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <PanelTitle title="2) Rate stack" subtitle="What the government pays to borrow, by how long it is borrowing for." />
-              <div className="inline-flex rounded-md bg-slate-900/70 p-1">
+              <div className="inline-flex max-w-full flex-wrap rounded-md bg-slate-900/70 p-1">
                 {(["weekly", "monthly", "yearly"] as Cadence[]).map((option) => (
                   <button
                     key={option}
@@ -286,33 +286,41 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 ))}
               </div>
             </div>
-            <svg viewBox="0 0 100 36" className="h-48 w-full" aria-label="1M, 3M, 2Y and 10Y rate stack">
+            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="1M, 3M, 2Y and 10Y rate stack">
               {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
                 <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               {oneMonthSeries.paths.map((path, index) => (
-                <path key={`1m-${index}`} d={path} fill="none" stroke={SERIES.oneMonth} strokeWidth="1.4" />
+                <path key={`1m-${index}`} d={path} fill="none" stroke={SERIES.oneMonth} strokeWidth="2" />
               ))}
               {threeMonthSeries.paths.map((path, index) => (
-                <path key={`3m-${index}`} d={path} fill="none" stroke={SERIES.threeMonth} strokeWidth="1.4" />
+                <path key={`3m-${index}`} d={path} fill="none" stroke={SERIES.threeMonth} strokeWidth="2" />
               ))}
               {twoYearSeries.paths.map((path, index) => (
-                <path key={`2y-${index}`} d={path} fill="none" stroke={SERIES.twoYear} strokeWidth="1.4" />
+                <path key={`2y-${index}`} d={path} fill="none" stroke={SERIES.twoYear} strokeWidth="2" />
               ))}
               {tenYearSeries.paths.map((path, index) => (
-                <path key={`10y-${index}`} d={path} fill="none" stroke={SERIES.tenYear} strokeWidth="1.4" />
+                <path key={`10y-${index}`} d={path} fill="none" stroke={SERIES.tenYear} strokeWidth="2" />
               ))}
-              {oneMonthSeries.lastPoint ? <text x="98" y={Math.max(5, oneMonthSeries.lastPoint.y - 6)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-300 uppercase tracking-[0.12em]">1M</text> : null}
-              {threeMonthSeries.lastPoint ? <text x="98" y={Math.max(5, threeMonthSeries.lastPoint.y - 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-sky-200 uppercase tracking-[0.12em]">3M</text> : null}
-              {twoYearSeries.lastPoint ? <text x="98" y={Math.min(34, twoYearSeries.lastPoint.y + 2)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-teal-200 uppercase tracking-[0.12em]">2Y</text> : null}
-              {tenYearSeries.lastPoint ? <text x="98" y={Math.min(34, tenYearSeries.lastPoint.y + 6)} textAnchor="end" fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-indigo-200 uppercase tracking-[0.12em]">10Y</text> : null}
             </svg>
-            <div className="mt-2 flex items-center justify-between type-eyebrow">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
               <span>{points[0]?.label ?? "Start"}</span>
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>
             </div>
-            <p className="text-xs text-slate-300">1M {formatPercent(latest?.oneMonth ?? null)} · 3M {formatPercent(latest?.threeMonth ?? null)} · 2Y {formatPercent(latest?.twoYear ?? null)} · 10Y {formatPercent(latest?.tenYear ?? null)}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs tabular-nums">
+              {([
+                ["1M", latest?.oneMonth, SERIES.oneMonth],
+                ["3M", latest?.threeMonth, SERIES.threeMonth],
+                ["2Y", latest?.twoYear, SERIES.twoYear],
+                ["10Y", latest?.tenYear, SERIES.tenYear],
+              ] as const).map(([label, value, color]) => (
+                <span key={label} className="inline-flex items-center gap-1.5 text-slate-300">
+                  <span className="h-0.5 w-3 shrink-0" style={{ backgroundColor: color }} aria-hidden="true" />
+                  {label} {formatPercent(value ?? null)}
+                </span>
+              ))}
+            </div>
             {/* Autoscaled to the visible window, so the extent has to be stated. */}
             <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(rateMin, rateMax, "%")}</p>
             {hasRateGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing readings.</p> : null}
@@ -323,8 +331,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 mobile reading order. The titles used to run 1, 2, 4, 3, 5. */}
             <PanelTitle title="3) Steepness vs level" subtitle="Each dot is one month: across = the two-year rate, up = the 10Y−2Y spread. Always monthly, regardless of the cadence toggle." />
             <svg
-              viewBox="0 0 100 72"
-              className="h-48 w-full"
+              viewBox="-3 -3 106 78"
+              className="weather-data-plot mx-auto h-auto w-full max-w-[24rem]"
               aria-label={
                 monthlyScatter.length >= 2
                   ? `Monthly steepness vs level, ${monthlyScatter.length} months tracing from ${monthlyScatter[0].key} to ${monthlyScatter[monthlyScatter.length - 1].key}. Arrows follow the direction of travel.`
@@ -386,7 +394,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   textAnchor="end"
                   fontSize="5"
                   fontFamily="Inter, system-ui, sans-serif"
-                  className="fill-sky-200 type-eyebrow"
+                  fill="var(--app-text-secondary)"
+                  className="uppercase tracking-[0.04em]"
                 >
                   latest
                 </text>
@@ -402,20 +411,19 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
           <FlatPanel className="lg:col-span-8">
             <PanelTitle title="4) Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
-            <svg viewBox="0 0 100 36" className="h-40 w-full" aria-label="10Y-2Y and 2Y-3M inversion timeline">
+            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="10Y-2Y and 2Y-3M inversion timeline; dashed line marks zero spread">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
-              <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">zero</text>
               {spread10Y2YSeries.paths.map((path, index) => (
-                <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="1.4" />
+                <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="2" />
               ))}
               {spread2Y3MSeries.paths.map((path, index) => (
-                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="1.4" />
+                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="2" />
               ))}
             </svg>
-            <div className="mt-2 flex items-center justify-between type-eyebrow">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
               <span>{points[0]?.label ?? "Start"}</span>
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>

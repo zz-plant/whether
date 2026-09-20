@@ -608,7 +608,7 @@ export function DecisionHero({
             summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-white/75"
             summary={<span>Why this call · {signalReadoutSummary}</span>}
           >
-            <fieldset className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Signal readout">
+            <fieldset className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3" aria-label="Signal readout">
               {renderSignalCells("details")}
             </fieldset>
             {/* The gloss for the headline score sits with the signal glosses rather

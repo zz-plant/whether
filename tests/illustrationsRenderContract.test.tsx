@@ -203,10 +203,10 @@ describe("ThresholdLadder", () => {
 
     // A hysteresis gap is small by design, so the two captions overlap exactly
     // when the rule is tight. The stacked one buys its room from the box height.
-    assert.match(tight, /viewBox="0 0 300 66"/);
-    assert.match(tight, /transform="translate\(0, 10\)"/);
-    assert.match(roomy, /viewBox="0 0 300 56"/);
-    assert.doesNotMatch(roomy, /translate\(0, 10\)/);
+    assert.match(tight, /viewBox="0 0 300 88"/);
+    assert.match(tight, /transform="translate\(0, 14\)"/);
+    assert.match(roomy, /viewBox="0 0 300 74"/);
+    assert.doesNotMatch(roomy, /translate\(0, 14\)/);
   });
 
   it("splits a two-ended scale direction across the ends it names, and follows invert", () => {
@@ -246,7 +246,7 @@ describe("ThresholdLadder", () => {
     assert.match(upright, /Scale direction: 0 = easier funding · 100 = harder funding/);
   });
 
-  it("shrinks rather than clips a scale direction that will not split", () => {
+  it("wraps rather than shrinks a scale direction that will not split", () => {
     const html = renderToStaticMarkup(
       <ThresholdLadder
         idPrefix="l7g"
@@ -260,10 +260,8 @@ describe("ThresholdLadder", () => {
       />,
     );
 
-    // SVG text does not wrap; left at font-size 8 this run would be cut off
-    // mid-word with no indication anything was lost.
-    const fontSize = Number(html.match(/font-size="([\d.]+)"[^>]*>a single unsplittable/)?.[1]);
-    assert.ok(fontSize > 0 && fontSize < 8, `expected a shrunk caption, got ${fontSize}`);
+    assert.match(html, /<p[^>]*text-xs[^>]*>a single unsplittable run of scale direction copy that overflows<\/p>/);
+    assert.doesNotMatch(html, /<text[^>]*>a single unsplittable/);
   });
 
   it("does not read a signal that blew through the trigger as improving", () => {
@@ -323,7 +321,7 @@ describe("ThresholdLadder", () => {
     assert.match(html, /Rose from 70, moving away from the trigger\./);
   });
 
-  it("keeps label size fixed against a widened coordinate space", () => {
+  it("caps wide coordinate spaces so phone layouts retain readable labels", () => {
     const wide = renderToStaticMarkup(
       <ThresholdLadder
         idPrefix="l8"
@@ -337,10 +335,10 @@ describe("ThresholdLadder", () => {
     );
 
     assertNoNaN(wide);
-    assert.match(wide, /viewBox="0 0 660 56"/);
-    // Same inset, so a wider space is more rail rather than bigger type.
-    assert.ok(wide.includes('x2="648"'));
-    assert.ok(wide.includes('fontSize="9"') || wide.includes('font-size="9"'));
+    assert.match(wide, /viewBox="0 0 300 74"/);
+    // Keep the drawing compact even when a desktop caller requests a very wide rail.
+    assert.ok(wide.includes('x2="288"'));
+    assert.ok(wide.includes('fontSize="12"') || wide.includes('font-size="12"'));
   });
 });
 

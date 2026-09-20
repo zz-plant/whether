@@ -50,13 +50,7 @@ type ThresholdLadderProps = {
    * Ignored when there is no `reversal` to bound it.
    */
   hysteresisBand?: boolean;
-  /**
-   * Width of the coordinate space, in user units. The rail renders at `width: 100%`, so
-   * this is really a type-scale control: label sizes are fixed in user units, and a
-   * viewBox narrower than the rendered element scales them up with everything else. Set
-   * it to roughly the pixel width the rail will occupy — the default suits the narrow
-   * column it was first drawn for, and a full-width row wants a much larger value.
-   */
+  /** Preferred coordinate width, capped at 300 to keep labels readable on phones. */
   viewBoxWidth?: number;
   className?: string;
 };
@@ -66,7 +60,7 @@ const formatNumber = (v: number) =>
 
 const RAIL_INSET = 12;
 const DEFAULT_VIEWBOX_WIDTH = 240;
-const RAIL_Y = 30;
+
 
 export function ThresholdLadder({
   idPrefix,
@@ -83,11 +77,13 @@ export function ThresholdLadder({
   scaleDirection,
   invert = false,
   hysteresisBand = false,
-  viewBoxWidth = DEFAULT_VIEWBOX_WIDTH,
+  viewBoxWidth: requestedWidth = DEFAULT_VIEWBOX_WIDTH,
   className,
 }: ThresholdLadderProps) {
   if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return null;
 
+  const viewBoxWidth = Math.min(300, Math.max(200, Number.isFinite(requestedWidth) ? requestedWidth : DEFAULT_VIEWBOX_WIDTH));
+  const RAIL_Y = scaleDirection ? 42 : 30;
   const RAIL_START = RAIL_INSET;
   const RAIL_END = viewBoxWidth - RAIL_INSET;
 
@@ -180,7 +176,10 @@ export function ThresholdLadder({
   const desc = `${thresholdDesc}${directionDesc}${movementDesc}`;
 
   // Keep end-of-rail captions from spilling out of the viewBox.
-  const clampLabelX = (x: number) => Math.min(Math.max(x, RAIL_START + 14), RAIL_END - 14);
+  const clampLabelX = (x: number, label: string, size = 12) => {
+    const halfWidth = label.length * size * 0.3;
+    return Math.min(Math.max(x, RAIL_START + halfWidth), RAIL_END - halfWidth);
+  };
 
   /* A tight hysteresis gap is the normal case, not the edge one — a rule that
      trips at 76 and clears at 66 puts its two captions 10 units apart on a
@@ -188,12 +187,12 @@ export function ThresholdLadder({
      reading. Approximating the glyph width from the character count is enough to
      tell whether they do; when they would, the reversal caption goes on a second
      line and the rail drops to make room for it. */
-  const captionWidth = (text: string, fontSize = 9) => text.length * fontSize * 0.52;
+  const captionWidth = (text: string, fontSize = 12) => text.length * fontSize * 0.52;
   const captionsCollide =
     reversalValue !== undefined
-    && Math.abs(xTrigger - xFor(reversalValue))
+    && Math.abs(clampLabelX(xTrigger, triggerLabel) - clampLabelX(xFor(reversalValue), reversalLabel))
       < (captionWidth(triggerLabel) + captionWidth(reversalLabel)) / 2;
-  const stackedCaptionRise = captionsCollide ? 10 : 0;
+  const stackedCaptionRise = captionsCollide ? 14 : 0;
 
   /* A scale direction names both ends of the rail ("0 = easier funding · 100 =
      harder funding"), so a single left-anchored run both overflows a narrow rail
@@ -201,7 +200,7 @@ export function ThresholdLadder({
      nowhere near it. Split on the separator the copy already uses and anchor each
      half to the end it describes. `invert` swaps which end that is, so the halves
      follow the flip rather than contradicting it. Anything that will not split
-     into two halves that fit stays one run, shrunk to the rail width. */
+     into two halves that fit wraps in an HTML caption below the graphic. */
   const directionHalves = (() => {
     if (!scaleDirection) return undefined;
     const parts = scaleDirection.split(" · ");
@@ -211,21 +210,17 @@ export function ThresholdLadder({
     // number is redundant, and dropping it is most of what makes the halves fit.
     const stripValue = (part: string) => part.replace(/^-?\d+(?:\.\d+)?\s*=\s*/, "");
     const [low, high] = [stripValue(parts[0]), stripValue(parts[1])];
-    const fits = captionWidth(low, 8) + captionWidth(high, 8) + 8 <= RAIL_END - RAIL_START;
+    const fits = captionWidth(low, 12) + captionWidth(high, 12) + 8 <= RAIL_END - RAIL_START;
     if (!fits) return undefined;
     return invert ? ([high, low] as const) : ([low, high] as const);
   })();
 
-  const directionFontSize =
-    scaleDirection && !directionHalves
-      ? Math.min(8, ((RAIL_END - RAIL_START) / (scaleDirection.length * 0.52)))
-      : 8;
-
   return (
+    <>
     <svg
-      viewBox={`0 0 ${viewBoxWidth} ${(scaleDirection ? 68 : 56) + stackedCaptionRise}`}
+      viewBox={`0 0 ${viewBoxWidth} ${(scaleDirection ? 86 : 74) + stackedCaptionRise}`}
       width="100%"
-      style={{ height: "auto" }}
+      style={{ height: "auto", maxWidth: viewBoxWidth * 1.4 }}
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
       className={className}
     >
@@ -234,22 +229,13 @@ export function ThresholdLadder({
 
       {directionHalves ? (
         <>
-          <text x={RAIL_START} y={9} textAnchor="start" fill="var(--app-text-muted)" fontSize={8}>
+          <text x={RAIL_START} y={11} textAnchor="start" fill="var(--app-text-muted)" fontSize={12}>
             {directionHalves[0]}
           </text>
-          <text x={RAIL_END} y={9} textAnchor="end" fill="var(--app-text-muted)" fontSize={8}>
+          <text x={RAIL_END} y={11} textAnchor="end" fill="var(--app-text-muted)" fontSize={12}>
             {directionHalves[1]}
           </text>
         </>
-      ) : scaleDirection ? (
-        <text
-          x={RAIL_START}
-          y={9}
-          fill="var(--app-text-muted)"
-          fontSize={directionFontSize}
-        >
-          {scaleDirection}
-        </text>
       ) : null}
 
       <g transform={stackedCaptionRise ? `translate(0, ${stackedCaptionRise})` : undefined}>
@@ -323,11 +309,11 @@ export function ThresholdLadder({
         strokeWidth={2}
       />
       <text
-        x={clampLabelX(xTrigger)}
+        x={clampLabelX(xTrigger, triggerLabel)}
         y={RAIL_Y - 14}
         textAnchor="middle"
         fill="var(--app-text-muted)"
-        fontSize={9}
+        fontSize={12}
       >
         {triggerLabel}
       </text>
@@ -344,11 +330,11 @@ export function ThresholdLadder({
             strokeDasharray="3 2"
           />
           <text
-            x={clampLabelX(xFor(reversalValue))}
-            y={RAIL_Y - 14 - (stackedCaptionRise ? 10 : 0)}
+            x={clampLabelX(xFor(reversalValue), reversalLabel)}
+            y={RAIL_Y - 14 - (stackedCaptionRise ? 14 : 0)}
             textAnchor="middle"
             fill="var(--app-text-muted)"
-            fontSize={9}
+            fontSize={12}
           >
             {reversalLabel}
           </text>
@@ -399,11 +385,11 @@ export function ThresholdLadder({
       />
       {/* Readout sits under the dot; domain bounds sit at the rail ends. */}
       <text
-        x={clampLabelX(xCurrent)}
+        x={clampLabelX(xCurrent, readout, 12)}
         y={RAIL_Y + 20}
         textAnchor="middle"
         fill="var(--app-text)"
-        fontSize={10}
+        fontSize={12}
         fontWeight={600}
       >
         {readout}
@@ -411,13 +397,17 @@ export function ThresholdLadder({
 
       {/* Follow the flip. An inverted rail whose ends still read 0 then 100 is a rail
           that lies about every position on it. */}
-      <text x={RAIL_START} y={RAIL_Y + 20} textAnchor="start" fill="var(--app-text-muted)" fontSize={8}>
+      <text x={RAIL_START} y={RAIL_Y + 38} textAnchor="start" fill="var(--app-text-muted)" fontSize={12}>
         {formatNumber(invert ? max : min)}
       </text>
-      <text x={RAIL_END} y={RAIL_Y + 20} textAnchor="end" fill="var(--app-text-muted)" fontSize={8}>
+      <text x={RAIL_END} y={RAIL_Y + 38} textAnchor="end" fill="var(--app-text-muted)" fontSize={12}>
         {formatNumber(invert ? min : max)}
       </text>
       </g>
     </svg>
+    {scaleDirection && !directionHalves ? (
+      <p className="mt-1 text-xs text-slate-400" style={{ maxWidth: viewBoxWidth * 1.4 }}>{scaleDirection}</p>
+    ) : null}
+    </>
   );
 }

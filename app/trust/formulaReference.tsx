@@ -21,6 +21,7 @@ import {
   TIGHTNESS_REGIME_THRESHOLD,
 } from "../../lib/regimeEngine";
 import type { RegimeKey } from "../../lib/regimeEngine";
+import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
@@ -43,8 +44,8 @@ function RegimeQuadrant() {
   const t = TIGHTNESS_REGIME_THRESHOLD;
   const r = RISK_APPETITE_REGIME_THRESHOLD;
   const W = 260;
-  const H = 180;
-  const pad = { l: 34, r: 8, t: 8, b: 30 };
+  const H = 194;
+  const pad = { l: 34, r: 8, t: 8, b: 44 };
   const x = (v: number) => pad.l + (v / 100) * (W - pad.l - pad.r);
   const y = (v: number) => H - pad.b - (v / 100) * (H - pad.t - pad.b);
   const cells: Array<{ key: RegimeKey; x0: number; x1: number; y0: number; y1: number }> = [
@@ -53,20 +54,14 @@ function RegimeQuadrant() {
     { key: "DEFENSIVE", x0: 0, x1: t, y0: 0, y1: r },
     { key: "SCARCITY", x0: t, x1: 100, y0: 0, y1: r },
   ];
-  const fill: Record<RegimeKey, string> = {
-    EXPANSION: "rgba(52,211,153,0.18)",
-    VOLATILE: "rgba(251,191,36,0.18)",
-    DEFENSIVE: "rgba(56,189,248,0.14)",
-    SCARCITY: "rgba(248,113,113,0.18)",
-  };
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
+    <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
       <title id="regime-quadrant-title">
         {`Regime quadrants: funding pressure above ${t} and risk appetite below ${r} pick the environment.`}
       </title>
       {cells.map((cell) => (
         <g key={cell.key}>
-          <rect x={x(cell.x0)} y={y(cell.y1)} width={x(cell.x1) - x(cell.x0)} height={y(cell.y0) - y(cell.y1)} fill={fill[cell.key]} />
+          <rect x={x(cell.x0)} y={y(cell.y1)} width={x(cell.x1) - x(cell.x0)} height={y(cell.y0) - y(cell.y1)} fill={REGIME_HEX_COLORS[cell.key]} fillOpacity="0.16" />
           <text
             x={(x(cell.x0) + x(cell.x1)) / 2}
             y={(y(cell.y0) + y(cell.y1)) / 2}
@@ -82,10 +77,10 @@ function RegimeQuadrant() {
       ))}
       <line x1={x(t)} x2={x(t)} y1={y(0)} y2={y(100)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
       <line x1={x(0)} x2={x(100)} y1={y(r)} y2={y(r)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
-      <text x={x(t)} y={H - 6} textAnchor="middle" fontSize="10" fill="currentColor">{t}</text>
-      <text x={x(0)} y={H - 6} textAnchor="start" fontSize="9" fill="currentColor" opacity="0.7">Funding pressure →</text>
-      <text x={pad.l - 6} y={y(r)} textAnchor="end" dominantBaseline="middle" fontSize="10" fill="currentColor">{r}</text>
-      <text transform={`translate(10 ${y(100)}) rotate(90)`} fontSize="9" fill="currentColor" opacity="0.7">Risk appetite →</text>
+      <text x={x(t)} y={H - 26} textAnchor="middle" fontSize="12" fill="currentColor">{t}</text>
+      <text x={x(0)} y={H - 6} textAnchor="start" fontSize="11" fill="currentColor" opacity="0.7">Funding pressure →</text>
+      <text x={pad.l - 6} y={y(r)} textAnchor="end" dominantBaseline="middle" fontSize="12" fill="currentColor">{r}</text>
+      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Risk appetite →</text>
     </svg>
   );
 }
@@ -127,7 +122,7 @@ function RampPlot({ id, from, to, points, unit, label }: { id: string; from: num
   const y = (v: number) => H - pad.b - (v / points) * (H - pad.t - pad.b);
   const fmt = (v: number) => `${Number.isInteger(v) ? v : v.toFixed(2)}${unit}`;
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full max-w-[16rem] text-slate-300" aria-labelledby={`${id}-title`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot mt-2 h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby={`${id}-title`}>
       <title id={`${id}-title`}>{label}</title>
       <line x1={x(x0)} x2={x(x1)} y1={y(0)} y2={y(0)} stroke="currentColor" opacity="0.3" />
       <line x1={x(x0)} x2={x(x0)} y1={y(0)} y2={y(points)} stroke="currentColor" opacity="0.3" />
@@ -137,10 +132,10 @@ function RampPlot({ id, from, to, points, unit, label }: { id: string; from: num
         stroke="var(--accent-action)"
         strokeWidth="2"
       />
-      <text x={x(from)} y={H - 6} textAnchor="middle" fontSize="9" fill="currentColor">{fmt(from)}</text>
-      <text x={x(to)} y={H - 6} textAnchor="middle" fontSize="9" fill="currentColor">{fmt(to)}</text>
-      <text x={pad.l - 4} y={y(points)} textAnchor="end" dominantBaseline="middle" fontSize="9" fill="currentColor">{points}</text>
-      <text x={pad.l - 4} y={y(0)} textAnchor="end" dominantBaseline="middle" fontSize="9" fill="currentColor">0</text>
+      <text x={x(from)} y={H - 6} textAnchor="middle" fontSize="11" fill="currentColor">{fmt(from)}</text>
+      <text x={x(to)} y={H - 6} textAnchor="middle" fontSize="11" fill="currentColor">{fmt(to)}</text>
+      <text x={pad.l - 4} y={y(points)} textAnchor="end" dominantBaseline="middle" fontSize="11" fill="currentColor">{points}</text>
+      <text x={pad.l - 4} y={y(0)} textAnchor="end" dominantBaseline="middle" fontSize="11" fill="currentColor">0</text>
     </svg>
   );
 }

@@ -334,3 +334,18 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
   the light set beside the dark one; until 2026-09-15 the harness could not, and the light theme
   carried a hard-edged artwork rectangle, invisible tags, and a grey slab behind `/pricing` that
   no capture had shown.
+
+## XVII. Responsive diagrams
+
+- Keep prose labels in HTML for flow diagrams (`OperatingLoopGlyph`), so labels wrap at
+  mobile widths and text zoom. SVG is for the artwork, not a fixed-width page of text.
+- Bound the coordinate and rendered widths of text-bearing charts. `ThresholdLadder`
+  caps its coordinate width at 300 and rendered width at 1.4 times that; wider parent
+  rows must not reduce its labels to miniature type on phones or inflate them on desktop.
+- Keep threshold captions inside the frame using their text width, stack nearby captions,
+  and give the current reading a separate row from the domain endpoints.
+- Give plot frames padding for endpoint strokes and markers. Use `weather-data-plot`
+  for non-scaling line strokes; do not apply that rule to decorative icons.
+- Put multi-series legends outside the plot where they can wrap. Labels tied to nearby
+  endpoint values overlap as the series converge. Preserve domain and freshness captions.
+- Check mobile and desktop in both themes; use the canonical regime colors in diagrams.

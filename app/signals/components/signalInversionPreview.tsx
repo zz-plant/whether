@@ -110,7 +110,7 @@ export function SignalInversionPreview({
         </p>
       </header>
       <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
-        <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} className="h-40 w-full" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
+        <svg viewBox={`-2 -2 ${CHART_WIDTH + 4} ${CHART_HEIGHT + 4}`} className="weather-data-plot mx-auto h-auto w-full max-w-[40rem]" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
           {/* Zone fills and strokes were hardcoded rgba() tuned to the dark
               ground; on the light theme they rendered as dark-toned washes. */}
           <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="var(--color-semantic-tightening-border)" fillOpacity="0.12" />
@@ -126,14 +126,12 @@ export function SignalInversionPreview({
             />
           ))}
           <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
-          <text x="2" y={Math.max(6, zeroLineY - 2)} fontSize="5" fontFamily="Inter, system-ui, sans-serif" className="fill-slate-400 uppercase tracking-[0.12em]">
-            zero line
-          </text>
+
           {spread10Y2YSeries.paths.map((path, index) => (
-            <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="1.6" />
+            <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="2" />
           ))}
           {spread2Y3MSeries.paths.map((path, index) => (
-            <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--color-semantic-caution-border)" strokeWidth="1.6" />
+            <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--color-semantic-caution-border)" strokeWidth="2" />
           ))}
           {/* Endpoint dots, no in-plot text. The series labels that sat here were
               anchored to each line's last point at the right edge — exactly where
@@ -149,6 +147,7 @@ export function SignalInversionPreview({
             <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
           ) : null}
         </svg>
+        <p className="mt-1 text-xs text-slate-400">Dashed zero line: boundary for inversion</p>
         <div className="mt-2 flex items-center justify-between type-eyebrow">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
