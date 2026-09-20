@@ -763,6 +763,13 @@ export function DecisionHero({
                 panel and the presentation frames read. The literal that used to
                 sit here made the hero a second definition of the week's call. */}
             <CopyMeetingSlideButton />
+            <Link
+              href="/operate#ops-decision-shield"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 hover:border-slate-600 text-xs font-medium text-slate-200 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              <span>Stress-test your plan</span>
+              <span aria-hidden="true" className="text-slate-400">→</span>
+            </Link>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">

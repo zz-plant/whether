@@ -15,6 +15,8 @@ import {
   type SaaSValuationSnapshot,
 } from "../../lib/saasMultiples";
 
+import { ValuationMultiplesGlyph } from "../components/illustrations/ValuationMultiplesGlyph";
+
 export const runtime = "edge";
 export const revalidate = 900;
 
@@ -91,13 +93,18 @@ export default async function CompsPage() {
       structuredData={buildCompsStructuredData({ data: comps.status === "ok" ? comps.data : null, tickers: SAAS_BASKET })}
     >
       <article className="weather-panel space-y-6 px-5 py-5">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">
-          Public SaaS valuation multiples
-        </h1>
-        <p className="text-sm text-slate-300">
-          Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public
-          SaaS companies, read from Yahoo Finance.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-fluid-2xl font-semibold text-slate-100">
+              Public SaaS valuation multiples
+            </h1>
+            <p className="text-sm text-slate-300">
+              Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public
+              SaaS companies, read from Yahoo Finance.
+            </p>
+          </div>
+          <ValuationMultiplesGlyph size={64} className="self-start sm:self-center" />
+        </div>
 
         {comps.status === "ok" ? (
           <div className="grid gap-4 sm:grid-cols-3">

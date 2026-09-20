@@ -12,6 +12,7 @@ import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/brief
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
 import { buildFlipProximity } from "../../lib/report/flipProximity";
+import { TransmissionPipelineGlyph } from "../components/illustrations/TransmissionPipelineGlyph";
 import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
 import { buildWipGuidance } from "../../lib/report/wipPolicy";
 import {
@@ -169,17 +170,20 @@ export default async function SharePage() {
     <PageShell backdropVariant="default">
       <BriefArtifactScript artifact={artifact.briefArtifact} />
       <section className="weather-panel space-y-5 px-5 py-5">
-        <div className="max-w-3xl space-y-3">
-          <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
-            Current weekly artifact
-          </p>
-          <h1 className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s operating brief</h1>
-          <p className="text-sm leading-relaxed text-white/60">
-            Copy the live weekly call with its bounded conditions and source into Slack, a slide, or a
-            citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
-            embed for a newsletter or wiki is at the end.
-          </p>
-          <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-2xl space-y-2">
+            <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
+              Current weekly artifact
+            </p>
+            <h1 className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s operating brief</h1>
+            <p className="text-sm leading-relaxed text-white/60">
+              Copy the live weekly call with its bounded conditions and source into Slack, a slide, or a
+              citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
+              embed for a newsletter or wiki is at the end.
+            </p>
+            <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
+          </div>
+          <TransmissionPipelineGlyph size={64} className="self-start sm:self-center" />
         </div>
 
         <SharePageFormats />

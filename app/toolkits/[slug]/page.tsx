@@ -10,6 +10,7 @@ import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
+import { ToolkitPlaybookGlyph } from "../../components/illustrations/ToolkitPlaybookGlyph";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -58,13 +59,37 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       <Link href="/resolve#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         ← Back to Decision Tools toolkit library
       </Link>
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
-        <p className="text-base text-slate-200"><span className="font-semibold">Decide now:</span> {toolkit.decisionThisSession}</p>
-        <p className="text-base text-slate-200"><span className="font-semibold">When to use:</span> {toolkit.whenToUse}</p>
-        <p className="text-base text-slate-200"><span className="font-semibold">Operating outcome:</span> {toolkit.operatingOutcome}</p>
-        <p className="text-base text-slate-200"><span className="font-semibold">Typical runtime:</span> {toolkit.timeToRun}</p>
-        <p className="text-base text-slate-200"><span className="font-semibold">Artifact you leave with:</span> {toolkit.decisionArtifact}</p>
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="type-badge text-fluid-micro rounded px-2 py-0.5 bg-slate-800 text-sky-300 font-mono">
+                {toolkit.timeToRun}
+              </span>
+              <span className="type-badge text-fluid-micro rounded px-2 py-0.5 bg-slate-800 text-slate-300">
+                {toolkit.recommendedParticipants}
+              </span>
+            </div>
+            <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
+            <p className="text-sm text-slate-300">{toolkit.whenToUse}</p>
+          </div>
+          <ToolkitPlaybookGlyph size={60} className="self-start sm:self-center" />
+        </div>
+
+        <dl className="grid gap-3 pt-2 sm:grid-cols-2 text-sm border-t border-slate-800/80">
+          <div className="weather-surface p-3.5 space-y-1">
+            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">Decide now</dt>
+            <dd className="text-slate-100 font-medium">{toolkit.decisionThisSession}</dd>
+          </div>
+          <div className="weather-surface p-3.5 space-y-1">
+            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">Operating outcome</dt>
+            <dd className="text-slate-100 font-medium">{toolkit.operatingOutcome}</dd>
+          </div>
+          <div className="weather-surface p-3.5 space-y-1 sm:col-span-2">
+            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">Artifact you leave with</dt>
+            <dd className="text-slate-100 font-medium">{toolkit.decisionArtifact}</dd>
+          </div>
+        </dl>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Bounded operating rules</h2>

@@ -5,6 +5,7 @@ import { isSearchEntityJob } from "./searchCommand";
 import { noindexRobots } from "../../lib/seo/indexationPolicy";
 import { PageShell } from "../components/pageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
+import { SearchRadarGlyph } from "../components/illustrations/SearchRadarGlyph";
 
 export const runtime = "edge";
 
@@ -42,11 +43,14 @@ export default async function SearchPage({
     <PageShell backdropVariant="hub">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Search" }]} />
       <article className="weather-panel space-y-6 px-5 py-5">
-        <header className="space-y-3">
-          <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>
-          <p className="text-sm text-slate-300">
-            Route a question to the surface that answers it: evidence, guardrails, toolkits, or the method behind the call.
-          </p>
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>
+            <p className="text-sm text-slate-300">
+              Route a question to the surface that answers it: evidence, guardrails, toolkits, or the method behind the call.
+            </p>
+          </div>
+          <SearchRadarGlyph size={56} className="self-start sm:self-center" />
         </header>
 
         {/* A client component, and still server-rendered: Next renders these

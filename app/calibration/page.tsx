@@ -11,6 +11,7 @@ import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { ConfidenceRecordSection } from "../trust/confidenceRecord";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
+import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
 
 export const runtime = "edge";
 
@@ -32,9 +33,9 @@ export const runtime = "edge";
  * same study would compete with each other.
  */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Does the confidence number predict anything?",
+  title: "Confidence score calibration study",
   description:
-    "A calibration study of Whether's published confidence percent against 176 month-end readings (2012–2026): every band understates, and distance from a regime boundary does not order the outcome.",
+    "A 15-year empirical study measuring Whether's published confidence metrics against 176 month-end market outcomes (2012–2026): full transparency into regime boundary distances and observed hold rates.",
   path: "/calibration",
   imageAlt: "Whether confidence calibration study",
 });
@@ -47,9 +48,10 @@ export default function CalibrationPage() {
       <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
 
       <SecondaryPageHeader
-        eyebrow="Method"
-        title="Does the confidence number predict anything?"
-        description="The percent beside every weekly call measures distance from a regime boundary. This is what calls at that distance actually did, over the whole archive."
+        eyebrow="Empirical transparency"
+        title="Confidence score calibration study"
+        description="A 15-year empirical study evaluating Whether's published confidence metrics against 176 continuous month-end market outcomes (2012–2026). Published openly to maintain rigorous institutional transparency."
+        aside={<CalibrationCurveGlyph size={64} />}
       />
 
       <ConfidenceRecordSection />

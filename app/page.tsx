@@ -130,11 +130,14 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
       <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
         {props.planLabel ?? "Build this week’s plan →"}
       </ActionLink>
-      {/* A text link, not a second button: the five direct answers used to render
-          here as their own band, restating a list /resolve owns. The plan CTA
-          stays the one button in the handoff (home AGENTS.md). */}
+      <ActionLink href="/operate#ops-decision-shield" variant="inline">
+        Stress-test a plan →
+      </ActionLink>
       <ActionLink href="/resolve#direct-answers" variant="inline">
         Direct answers →
+      </ActionLink>
+      <ActionLink href="/api-docs" variant="inline">
+        Connect Claude & Cursor (MCP) →
       </ActionLink>
     </div>
   );

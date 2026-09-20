@@ -9,6 +9,7 @@ import {
   SecondaryPageShell,
 } from "../components/secondaryPageShell";
 import { BEGINNER_GLOSSARY_ENTRIES, GLOSSARY_USAGE_NOTES } from "../../lib/report/reportCopy";
+import { GlossaryCompassGlyph } from "../components/illustrations/GlossaryCompassGlyph";
 
 export const runtime = "edge";
 
@@ -42,6 +43,7 @@ export default function GlossaryPage() {
         eyebrow="Reference"
         title="Glossary"
         description="Every term this site uses, in plain English, with what it changes for the company you run."
+        aside={<GlossaryCompassGlyph size={64} />}
       />
 
       <SecondaryPageSection

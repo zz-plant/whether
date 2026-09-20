@@ -57,28 +57,35 @@ export default function ApiDocsPage() {
       <article className="weather-panel space-y-6 px-5 py-5 max-w-3xl">
         <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
-          Whether exposes the weekly brief through an MCP server, REST endpoints, a command-line
-          client, and an embeddable widget. No API key required.
+          Equip AI agents, executive workflows, and engineering tools with live macro operating posture.
+          Whether exposes real-time regime signals and bounded decision rules through a native Model Context Protocol (MCP) server, REST endpoints, CLI, and embeddable widgets. Free forever, no API key required.
         </p>
 
         <section className="space-y-4">
-          <h2 className="type-eyebrow">Connect an MCP client</h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="type-eyebrow">Connect Claude, Cursor & AI Agents (MCP)</h2>
+            <span className="text-fluid-micro font-mono text-emerald-400">Streamable HTTP • No auth required</span>
+          </div>
           <p className="text-xs text-slate-300">
-            <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a
-            streamable-HTTP MCP server. Point Claude, or any MCP client, at it and the weekly call
-            becomes a tool the model can query mid-conversation.
+            <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
+            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or autonomous agents to give your models real-time macro operating posture, threshold distance calculations, and scenario projections mid-reasoning loop.
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
-            {mcpClientConfig}
-          </pre>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-fluid-micro text-slate-400">
+              <span>Claude Desktop (<code className="font-mono text-slate-300">claude_desktop_config.json</code>) or Cursor Settings → MCP:</span>
+            </div>
+            <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+              {mcpClientConfig}
+            </pre>
+          </div>
           <p className="text-xs text-slate-300">
-            Five tools are exposed: <span className="text-sky-200">get_brief</span>,{" "}
-            <span className="text-sky-200">get_context</span>,{" "}
-            <span className="text-sky-200">get_projection</span>,{" "}
-            <span className="text-sky-200">get_comps</span>, and{" "}
-            <span className="text-sky-200">get_signals</span>. Running the repo locally,{" "}
-            <span className="text-sky-200">bun run mcp:whether</span> starts the same interface over
-            stdio, with two extra tools for bounded decision rules and trailing signal history.
+            Five production tools are exposed over HTTP: <span className="text-sky-200 font-mono">get_brief</span>,{" "}
+            <span className="text-sky-200 font-mono">get_context</span>,{" "}
+            <span className="text-sky-200 font-mono">get_projection</span>,{" "}
+            <span className="text-sky-200 font-mono">get_comps</span>, and{" "}
+            <span className="text-sky-200 font-mono">get_signals</span>. For local agents or CI pipelines,{" "}
+            <span className="text-sky-200 font-mono">bun run mcp:whether</span> starts the same interface over
+            stdio, with additional tools for bounded decision rules and 15-year trailing history.
           </p>
         </section>
 

@@ -7,6 +7,7 @@ import { Tag } from "../../components/ui/tag";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { RegimeGlyph } from "../../components/illustrations/RegimeGlyph";
 import {
   buildBreadcrumbList,
   buildCanonicalUrl,
@@ -139,9 +140,13 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       </nav>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
-          <Tag tone="slate">{period.statusLabel}</Tag>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
+            <Tag tone="slate">{period.statusLabel}</Tag>
+            <span className="text-fluid-micro font-mono text-slate-400">Archived Period</span>
+          </div>
+          <RegimeGlyph idPrefix={`period-${period.slug}`} regime={period.regime} className="h-6 w-auto shrink-0" />
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           What the operating posture was in {period.title}
