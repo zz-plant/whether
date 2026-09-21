@@ -3,6 +3,7 @@ import { websiteName } from "../seo";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeSharePath, type HomeShareSearchParams as HomePageSearchParams } from "./homeSharePreview";
 import { decisionTransmissionSearchDescription } from "./decisionTransmissionCopy";
+import { type HomeReportData } from "./homeBriefModel";
 
 export type { HomePageSearchParams };
 
@@ -12,7 +13,7 @@ export type { HomePageSearchParams };
 const HOME_TITLE = "Weekly Operating Call for Startup Leaders";
 const HOME_DESCRIPTION = decisionTransmissionSearchDescription;
 
-const buildImageParams = (searchParams: HomePageSearchParams | undefined) => {
+const buildImageParams = (searchParams: HomePageSearchParams | undefined, reportData?: HomeReportData) => {
   const params: Record<string, string> = { template: "report" };
 
   if (searchParams?.month) {
@@ -23,16 +24,26 @@ const buildImageParams = (searchParams: HomePageSearchParams | undefined) => {
     params.year = searchParams.year;
   }
 
+  if (reportData) {
+    if (reportData.assessment.regime) {
+      params.regime = reportData.assessment.regime;
+    }
+    if (reportData.postureState?.currentState?.postureLabel) {
+      params.posture = reportData.postureState.currentState.postureLabel;
+    }
+  }
+
   return params;
 };
 
 export const buildHomeMetadata = async (
   searchParams?: Promise<HomePageSearchParams>,
+  reportData?: HomeReportData,
 ): Promise<Metadata> => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const hasTimeMachineParams = Boolean(resolvedSearchParams?.month || resolvedSearchParams?.year);
   const sharePath = buildHomeSharePath(resolvedSearchParams);
-  const imageUrl = buildOgImageUrl(buildImageParams(resolvedSearchParams));
+  const imageUrl = buildOgImageUrl(buildImageParams(resolvedSearchParams, reportData));
 
   return {
     title: HOME_TITLE,

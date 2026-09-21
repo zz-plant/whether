@@ -64,7 +64,11 @@ export const generateMetadata = async ({
   searchParams,
 }: {
   searchParams?: Promise<HomePageSearchParams>;
-}): Promise<Metadata> => buildHomeMetadata(searchParams);
+}): Promise<Metadata> => {
+  const resolved = searchParams ? await searchParams : undefined;
+  const data = await loadHomePageAssembly(resolved);
+  return buildHomeMetadata(searchParams, data.reportData);
+};
 
 export default async function Page({
   searchParams,
