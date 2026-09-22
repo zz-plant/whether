@@ -3,8 +3,9 @@
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ActionLink } from "../components/ui/actionLink";
+import { MonthGrid } from "../components/history/monthGrid";
 import { TimelineBar } from "../components/TimelineBar";
-import { formatMonthShortUtc, formatMonthLongYearUtc } from "../../lib/formatters";
+import { formatMonthLongYearUtc } from "../../lib/formatters";
 import type { TimeMachineRegimeEntry } from "../../lib/timeMachine/timeMachineCache";
 
 export function HistoryExplorer({
@@ -86,14 +87,10 @@ export function HistoryExplorer({
         <ActionLink href="/history/compare" variant="pill">Compare two periods &rarr;</ActionLink>
       </div>
 
-      {/* Continuous Zoomable Timeline Bar */}
-      <div className="space-y-2 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-        <div className="flex items-center justify-between pb-1">
-          <p className="type-eyebrow">Timeline</p>
-          <span className="text-fluid-micro text-slate-400">
-            Drag to scrub · shift-drag for single months · pinch or &#8984;-scroll to zoom
-          </span>
-        </div>
+      {/* The bar carries its own gesture hints as `title`s; a sentence about how
+          to drag it is not page content. */}
+      <div className="weather-surface space-y-2 p-4">
+        <p className="type-eyebrow pb-1">Timeline</p>
         <TimelineBar
           currentMonth={selectedMonth || undefined}
           currentYear={selectedYear || undefined}
@@ -125,29 +122,17 @@ export function HistoryExplorer({
           <select
             value={selectedYear}
             onChange={(event) => { setSelectedYear(Number(event.target.value)); setSelectedMonth(0); }}
-            className="min-h-[44px] rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--app-text)] focus:border-sky-400/60 focus:outline-none"
+            className="min-h-[44px] rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--app-text)]"
             style={{ colorScheme: "light dark" }}
             aria-label="Select year"
           >
             {years.map((year) => <option key={year} value={year}>{year}</option>)}
           </select>
-          <div className="flex flex-wrap gap-1.5">
-            {months.map((month) => (
-              <button
-                key={month}
-                type="button"
-                onClick={() => navigateTo(selectedYear, month)}
-                aria-pressed={month === selectedMonth}
-                className={`min-h-[44px] rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                  month === selectedMonth
-                    ? "bg-sky-500/20 text-sky-100 border border-sky-400/50 shadow-sm"
-                    : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"
-                }`}
-              >
-                {formatMonthShortUtc(month)}
-              </button>
-            ))}
-          </div>
+          <MonthGrid
+            months={months}
+            selectedMonth={selectedMonth || undefined}
+            onSelect={(month) => navigateTo(selectedYear, month)}
+          />
         </div>
       </div>
 

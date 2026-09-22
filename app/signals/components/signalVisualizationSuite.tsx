@@ -1,14 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
-import { ChevronDownIcon } from "../../components/uiIcons";
+import { SegmentedControl } from "../../components/ui/segmentedControl";
 import { formatMonthLabel, formatMonthShortLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 import { CurveTermsKey } from "./curveTermsKey";
 
 type Cadence = "weekly" | "monthly" | "yearly";
+
+const CADENCE_OPTIONS = [
+  { key: "weekly", label: "Weekly" },
+  { key: "monthly", label: "Monthly" },
+  { key: "yearly", label: "Yearly" },
+] as const satisfies ReadonlyArray<{ key: Cadence; label: string }>;
 
 type YieldCurvePoint = {
   year: number;
@@ -142,7 +147,7 @@ const ribbonTone = (value: number | null) => {
 
 const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) => (
   <header className="space-y-1">
-    <p className="text-xs font-semibold tracking-[0.14em] text-slate-300">{title}</p>
+    <p className="type-eyebrow text-slate-300">{title}</p>
     <p className="text-fluid-xs text-slate-400">{subtitle}</p>
   </header>
 );
@@ -153,7 +158,6 @@ const FlatPanel = ({ children, className = "" }: { children: React.ReactNode; cl
 
 export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalVisualizationSuiteProps) => {
   const [cadence, setCadence] = useState<Cadence>("monthly");
-  const [terminalOpen, setTerminalOpen] = useState(true);
   const points = useMemo(() => byCadence(yieldCurveSeries, cadence), [yieldCurveSeries, cadence]);
   const latest = points.at(-1) ?? null;
   const midPoint = points[Math.floor((points.length - 1) / 2)] ?? latest;
@@ -234,20 +238,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     .sort((a, b) => b.rank - a.rank)
     .slice(0, 10);
 
+  /* No header of its own. This renders inside the "Full diagnostics"
+     ReportSection, which already carries the eyebrow and title; a second
+     eyebrow-plus-h2 pair here read as two sections for one block. The
+     disclosure is a native `<details>`, open by default — the charts are the
+     section's content, and the summary is there for a reader who wants the
+     shocks list below without the plots. */
   return (
-    <section id="visual-diagnostics" className="min-w-0 space-y-4" aria-labelledby="visual-diagnostics-title">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold tracking-[0.22em] text-slate-300">Visual diagnostics</p>
-        <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">Yield curve</h2>
-      </header>
-
-      <Collapsible.Root open={terminalOpen} onOpenChange={setTerminalOpen} className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
-        <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
-          <span>Five charts</span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
-        </Collapsible.Trigger>
-
-        <Collapsible.Panel>
+    <div id="visual-diagnostics" className="min-w-0 space-y-4">
+      <details open className="weather-auto-chevron rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
+        <summary className="text-xs font-semibold text-slate-100">Five charts</summary>
 
         <div className="mt-3 border-b border-slate-800/80 pb-3 text-xs text-slate-300">
           Latest: {treasury.record_date} · {treasury.isLive ? "Live reading" : "Last saved reading"}
@@ -272,18 +272,12 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           <FlatPanel className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <PanelTitle title="2) Rates by term" subtitle="What the government pays to borrow, by how long it is borrowing for." />
-              <div className="inline-flex max-w-full flex-wrap rounded-md bg-slate-900/70 p-1">
-                {(["weekly", "monthly", "yearly"] as Cadence[]).map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setCadence(option)}
-                    className={`min-h-[44px] rounded px-3 type-badge ${cadence === option ? "bg-sky-500/30 text-sky-100" : "text-slate-300"}`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={CADENCE_OPTIONS}
+                value={cadence}
+                onSelect={setCadence}
+                ariaLabel="Chart cadence"
+              />
             </div>
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="1-month, 3-month, 2-year and 10-year rates">
               {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
@@ -447,8 +441,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </ul>
           </FlatPanel>
         </div>
-        </Collapsible.Panel>
-      </Collapsible.Root>
-    </section>
+      </details>
+    </div>
   );
 };

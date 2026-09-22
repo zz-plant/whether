@@ -14,7 +14,6 @@ import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 import { buildSignalsPageModel, type SignalsPageSearchParams } from "./evidencePageModel";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import {
-  SignalsAdvancedControlsSection,
   SignalsCurrentScoresSection,
   SignalsDiagnosticsSection,
   SignalsEvidencePrioritiesSection,
@@ -72,6 +71,7 @@ export default async function SignalsPage({
       pageTitle="Why the weekly brief changed"
       pageSummary="What moved, why it matters, and what would change the call."
       sectionLinks={model.sectionLinks}
+      activeStep="signals"
       nextStep={{
         href: "/operate",
         description: "Set guardrails for this week's plan",
@@ -281,8 +281,10 @@ export default async function SignalsPage({
         />
       ) : null}
 
-      {model.activeSignalsView === "detail" ? (
-        <SignalsAdvancedControlsSection
+      {model.activeSignalsView === "detail" && model.AdvancedThresholdsSection ? (
+        <model.AdvancedThresholdsSection
+          currentThresholds={model.assessment.thresholds}
+          provenance={model.treasuryProvenance}
           showAdvanced={model.showAdvanced}
           searchParams={resolvedSearchParams}
         />
@@ -290,15 +292,9 @@ export default async function SignalsPage({
 
       {model.activeSignalsView === "detail"
       && model.showAdvanced
-      && model.AdvancedThresholdsSection
       && model.TimeMachinePanel
       && model.RegimeTimelinePanel ? (
         <>
-          <model.AdvancedThresholdsSection
-            currentThresholds={model.assessment.thresholds}
-            provenance={model.treasuryProvenance}
-          />
-
           <model.TimeMachinePanel
             selectedYear={model.selectedYear}
             selectedMonth={model.selectedMonth}

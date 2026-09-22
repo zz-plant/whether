@@ -12,12 +12,10 @@ function OutlineItem({
   href,
   label,
   isActive,
-  stepNumber,
 }: {
   href: string;
   label: string;
   isActive: boolean;
-  stepNumber?: string;
 }) {
   const isHash = href.startsWith("#");
   const linkClass = `rounded-lg px-2.5 py-1.5 text-fluid-xs no-underline transition-colors min-h-[38px] flex items-center justify-between group weather-focus-ring ${
@@ -26,22 +24,7 @@ function OutlineItem({
       : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 border-l-2 border-transparent pl-2"
   }`;
 
-  const content = (
-    <>
-      <span className="flex items-center gap-2 truncate">
-        {stepNumber ? (
-          <span
-            className={`font-mono text-[10px] tabular-nums ${
-              isActive ? "font-bold text-sky-300" : "text-slate-500"
-            }`}
-          >
-            {stepNumber}
-          </span>
-        ) : null}
-        <span className="truncate">{label}</span>
-      </span>
-    </>
-  );
+  const content = <span className="truncate">{label}</span>;
 
   if (isHash) {
     return (
@@ -132,7 +115,7 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
         On this page
       </p>
       <nav aria-label="Page sections" className="space-y-0.5">
-        {sectionLinks.map((section, index) => {
+        {sectionLinks.map((section) => {
           const isActive = section.href === `#${activeSectionId}`;
           return (
             <OutlineItem
@@ -140,7 +123,6 @@ function SidebarContent({ sectionLinks }: { sectionLinks: ReportSectionLink[] })
               href={section.href}
               label={section.label}
               isActive={isActive}
-              stepNumber={`0${index + 1}`}
             />
           );
         })}

@@ -1,5 +1,4 @@
 import { insightDatabase } from "../../../data/recommendations";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { UrlDetails } from "../../components/ui/urlDetails";
 
 export function FossilRecordSection({ regime, open = false }: { regime?: string; open?: boolean }) {
@@ -12,7 +11,11 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
       aria-labelledby="fossil-record-title"
       className="weather-panel space-y-5 p-5"
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      {/* The header used to carry a mono chip reading "Now: {regime}", which
+          restated the page's status line one screen up, and the table ended
+          on a "Source: Whether Insight Database" footer — the product citing
+          itself. Both are gone; the regime still shapes the sentence below. */}
+      <div>
         <div>
           <p className="type-eyebrow">
             {fossilRecord.title} · {fossilRecord.subtitle}
@@ -27,9 +30,6 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
               : " A way to check how your company is set up against habits from low-rate and high-rate years."}
           </p>
         </div>
-        <span className="rounded border border-slate-700/70 bg-slate-900/60 px-2.5 py-1 text-fluid-nano font-mono text-slate-300">
-          Now: {regime ? getRegimePublicLabel(regime) : "unknown"}
-        </span>
       </div>
 
       {/* Collapsed by default. This is architecture reference on the evidence
@@ -98,10 +98,6 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
           </tbody>
         </table>
       </div>
-
-      <p className="mt-3 text-fluid-nano text-slate-500">
-        Source: Whether Insight Database · Precedents from 2001, 2008, and 2022 regime shifts.
-      </p>
       </UrlDetails>
     </section>
   );

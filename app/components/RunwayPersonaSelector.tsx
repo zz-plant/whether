@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   DEFAULT_RUNWAY_BAND,
@@ -8,12 +7,27 @@ import {
   type RunwayBand,
 } from "../../lib/report/operatorRunway";
 import { persistOperatorRunway } from "./useOperatorRunway";
+import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 
 interface RunwayPersonaSelectorProps {
   activeRunway?: RunwayBand;
   className?: string;
 }
 
+/**
+ * Which cash-runway band the operating rules are scaled to.
+ *
+ * It was the last hand-rolled copy of the segmented control: a `role="tablist"`
+ * with its own roving tabindex and arrow-key handler, in an amber fill no other
+ * control on the page uses, mounted beside a stage selector that had already
+ * moved to the shared radio group (`ui/segmentedControl.tsx` records the three
+ * versions and why one survives). Same primitive now, so the two controls a
+ * reader meets side by side agree about focus, arrows and what Back means.
+ *
+ * `replace`, not `push`, for the reason `StagePersonaSelector` gives: a band is
+ * a setting, and it used to take four Back presses to leave the page after
+ * trying the four options.
+ */
 export function RunwayPersonaSelector({
   activeRunway,
   className = "",
@@ -23,24 +37,12 @@ export function RunwayPersonaSelector({
   const searchParams = useSearchParams();
   const selected = activeRunway ?? DEFAULT_RUNWAY_BAND;
 
-  const tabsRef = useRef<Array<HTMLButtonElement | null>>([]);
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const lastIndex = RUNWAY_BAND_OPTIONS.length - 1;
-    let nextIndex: number | null = null;
-
-    if (event.key === "ArrowLeft") nextIndex = (index - 1 + RUNWAY_BAND_OPTIONS.length) % RUNWAY_BAND_OPTIONS.length;
-    else if (event.key === "ArrowRight") nextIndex = (index + 1) % RUNWAY_BAND_OPTIONS.length;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = lastIndex;
-
-    if (nextIndex === null) return;
-    event.preventDefault();
-    const nextBand = RUNWAY_BAND_OPTIONS[nextIndex]?.key;
-    if (!nextBand) return;
-    tabsRef.current[nextIndex]?.focus();
-    handleSelectRunway(nextBand);
-  };
+  const options: readonly SegmentedOption<RunwayBand>[] = RUNWAY_BAND_OPTIONS.map((option) => ({
+    key: option.key,
+    label: option.label,
+    sublabel: option.sublabel,
+    title: `Tailor operating rules for ${option.label} cash runway (${option.sublabel})`,
+  }));
 
   const handleSelectRunway = (band: RunwayBand) => {
     persistOperatorRunway(band);
@@ -51,47 +53,18 @@ export function RunwayPersonaSelector({
       params.set("runway", band);
     }
     const query = params.toString();
-    router.push(`${pathname}${query ? `?${query}` : ""}`);
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   return (
     <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">
-        Cash runway:
-      </span>
-      <div
-        role="tablist"
-        id="calibrate-runway"
-        aria-label="Cash runway band selector"
-        className="inline-flex flex-wrap items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/80 p-1 backdrop-blur-sm"
-      >
-        {RUNWAY_BAND_OPTIONS.map((option, index) => {
-          const isSelected = selected === option.key;
-          return (
-            <button
-              key={option.key}
-              type="button"
-              role="tab"
-              ref={(el) => {
-                tabsRef.current[index] = el;
-              }}
-              aria-selected={isSelected}
-              tabIndex={isSelected ? 0 : -1}
-              onKeyDown={(event) => handleKeyDown(event, index)}
-              onClick={() => handleSelectRunway(option.key)}
-              title={`Tailor operating rules for ${option.label} cash runway (${option.sublabel})`}
-              className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-                isSelected
-                  ? "border border-amber-500/40 bg-amber-500/15 font-semibold text-amber-200 shadow-sm"
-                  : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"
-              }`}
-            >
-              <span>{option.label}</span>
-              <span className="text-[10px] opacity-60 hidden sm:inline">· {option.sublabel}</span>
-            </button>
-          );
-        })}
-      </div>
+      <span className="type-eyebrow mr-1">Cash runway</span>
+      <SegmentedControl
+        options={options}
+        value={selected}
+        onSelect={handleSelectRunway}
+        ariaLabel="Cash runway band"
+      />
     </div>
   );
 }

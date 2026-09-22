@@ -96,11 +96,6 @@
   }
 }
 
-@keyframes weather-section-reveal {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 /* WCAG 2.3.3: Animation from interactions */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -38,7 +38,6 @@ const renderHero = (thresholdBusinessConsequence: ThresholdBusinessConsequence) 
     boldnessDelta={-1}
     weeklyCall="Keep approvals staged."
     regime="DEFENSIVE"
-    signalDirection="tighten"
     recordDate="Aug 15, 2026"
     fetchedAt="Aug 15, 2026"
     guardrail="Pause at the bounded threshold."

@@ -47,9 +47,9 @@ export const shortcutTargetIsNeutral = (active: Element | null): boolean => {
  *
  * Sections are the intended stops, but only some routes declare them: `/` and `/trust`
  * carry six and eight, while `/signals` and `/resolve` render most of theirs inside
- * disclosures and expose one apiece. The shortcut bar sits in the footer of *every* page
- * and says "J K Navigate sections" regardless, so on those routes the app advertised a
- * key that did nothing — the same defect this shortcut was fixed for in the first place.
+ * disclosures and expose one apiece. The help dialog lists J and K on *every* page
+ * regardless, so on those routes the app advertised a key that did nothing — the same
+ * defect this shortcut was fixed for in the first place.
  *
  * Falling back to the page's own headings keeps the advertisement true everywhere, and is
  * the better stop anyway for a screen reader: focusing a heading announces it.
@@ -140,25 +140,24 @@ export function KeyboardShortcuts() {
     return () => window.removeEventListener("keydown", handle);
   }, [router]);
 
-  const openHelp = () => {
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
-  };
+  /* The setter, not a synthetic "?" keydown dispatched at the window for the
+     handler above to catch — a click that impersonates a keypress toggles
+     rather than opens, and depends on nothing else having claimed the key. */
+  const openHelp = () => setHelpOpen(true);
 
+  /* One button. The strip used to announce "J K Navigate sections" on every
+     route beside it; the palette footer and the help dialog both list the
+     keys, so the footer's job is to open the list, not to be a third copy. */
   return (
     <>
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
-      <p className="flex flex-wrap items-center justify-center gap-2 text-center text-fluid-micro text-[var(--app-text-muted)] py-2">
-        <span className="hidden sm:inline-flex items-center gap-1">
-          <kbd className="rounded border border-[var(--app-border-strong)] px-1.5 py-0.5 text-[var(--app-text-muted)] font-mono">J</kbd>
-          <kbd className="rounded border border-[var(--app-border-strong)] px-1.5 py-0.5 text-[var(--app-text-muted)] font-mono">K</kbd>
-          <span className="ml-1">Navigate sections</span>
-        </span>
+      <p className="flex items-center justify-center py-2 text-center text-fluid-micro text-[var(--app-text-muted)]">
         <button
           type="button"
           onClick={openHelp}
-          className="inline-flex items-center gap-1 rounded border border-[var(--app-border-strong)] px-2 py-0.5 font-medium text-[var(--app-text-muted)] hover:bg-[var(--app-border-strong)] hover:text-[var(--app-text)] transition-colors focus-visible:outline-2 focus-visible:outline-sky-400"
+          className="weather-focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 font-medium text-[var(--app-text-muted)] transition-colors hover:text-[var(--app-text)]"
         >
-          <kbd className="font-mono">?</kbd>
+          <kbd className="weather-kbd">?</kbd>
           <span>Shortcuts</span>
         </button>
       </p>

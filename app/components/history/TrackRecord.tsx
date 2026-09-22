@@ -5,13 +5,14 @@ import type {
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
+import { StatTile } from "../ui/statTile";
 import { UrlDetails } from "../ui/urlDetails";
 
 /**
  * The record of what this product has called, framed as evidence rather than as
- * mechanism. `RegimeStats` below already derives similar numbers, but it is
- * titled "Regime velocity" and sits inside a collapsed disclosure — it reads as
- * a fact about the macro cycle, not as a fact about the product's consistency.
+ * mechanism. A `RegimeStats` panel used to derive the same numbers a second time
+ * inside the raw-conditions disclosure, under "Current streak" and "Longest run";
+ * it was one record on three layers of the page, and it is gone.
  *
  * This panel makes no accuracy claim. The engine does not forecast, so it cannot
  * be scored on being right; what it can be scored on is holding a call and
@@ -123,33 +124,16 @@ export function TrackRecord({
         </p>
       </div>
 
-      <dl className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-        <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-          <dt className="text-slate-400">Months on record</dt>
-          <dd className="mt-1 text-lg font-bold text-slate-100">
-            {record.monthsCovered.toLocaleString("en-US")}
-          </dd>
-        </div>
-        <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-          <dt className="text-slate-400">Current call held</dt>
-          <dd className="mt-1 text-lg font-bold text-slate-100">
-            {record.currentHoldMonths.toLocaleString("en-US")}
-            <span className="text-sm font-normal text-slate-400">
-              {record.currentHoldMonths === 1 ? " mo" : " mos"}
-            </span>
-          </dd>
-        </div>
-        <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-          <dt className="text-slate-400">Call changes</dt>
-          <dd className="mt-1 text-lg font-bold text-slate-100">{changeRate}</dd>
-        </div>
-        <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-          <dt className="text-slate-400">Record starts</dt>
-          <dd className="mt-1 text-lg font-bold text-slate-100">
-            {formatDateUTC(record.firstRecordDate)}
-          </dd>
-        </div>
-      </dl>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} />
+        <StatTile
+          label="Current call held"
+          value={record.currentHoldMonths.toLocaleString("en-US")}
+          unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
+        />
+        <StatTile label="Call changes" value={changeRate} />
+        <StatTile label="Record starts" value={formatDateUTC(record.firstRecordDate)} />
+      </div>
 
       {/* "The call has been X" read as a statement about the call on the site
           today. Every figure in this panel comes from the month-end series, so

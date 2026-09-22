@@ -38,7 +38,7 @@ export function PlanStressTestMode({
   stressTestResult,
 }: PlanStressTestModeProps) {
   return (
-          <div className="weather-surface p-5 border border-sky-500/30 bg-slate-900/50 space-y-4">
+          <div className="weather-surface p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h4 className="text-sm font-bold text-slate-100">Plan stress test</h4>
@@ -87,7 +87,7 @@ export function PlanStressTestMode({
               value={planText}
               onChange={(e) => setPlanText(e.target.value)}
               rows={3}
-              className="weather-input w-full p-3 font-mono text-xs text-slate-100 placeholder-slate-500 border border-slate-700 bg-slate-950/80 focus:border-sky-500 focus:outline-none"
+              className="weather-input w-full p-3 text-xs text-slate-100 placeholder-slate-500 border border-slate-700 bg-slate-950/80"
               placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
             />
 
@@ -117,7 +117,7 @@ export function PlanStressTestMode({
                   </span>
                 </div>
                 {stressTestResult.financialImpactSummary && (
-                  <span className="text-fluid-nano text-slate-400 font-mono">
+                  <span className="text-fluid-nano text-slate-400 tabular-nums">
                     {stressTestResult.financialImpactSummary}
                   </span>
                 )}
@@ -171,7 +171,7 @@ export function ComparePlansMode({
   comparisonResult,
 }: ComparePlansModeProps) {
   return (
-          <div className="weather-surface p-5 border border-sky-500/30 bg-slate-900/50 space-y-4">
+          <div className="weather-surface p-5 space-y-4">
             <div>
               <h4 className="text-sm font-bold text-slate-100">Compare two plans</h4>
               <p className="text-fluid-xs text-slate-400">
@@ -188,7 +188,7 @@ export function ComparePlansMode({
                   onChange={(e) => setPlanText(e.target.value)}
                   rows={3}
                   placeholder="e.g. Hire 3 senior engineers @ $180k and sign a 2-year cloud reservation"
-                  className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
+                  className="weather-input w-full p-2.5 text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
                 />
                 {planReady ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
@@ -210,7 +210,7 @@ export function ComparePlansMode({
                   onChange={(e) => setPlanBText(e.target.value)}
                   rows={3}
                   placeholder="e.g. Hire 2 contractors for 6 months on milestones and use monthly rolling compute"
-                  className="weather-input w-full p-2.5 font-mono text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
+                  className="weather-input w-full p-2.5 text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
                 />
                 {planBText.trim() ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">

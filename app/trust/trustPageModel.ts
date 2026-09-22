@@ -99,23 +99,15 @@ export async function buildTrustPageModel() {
     : decisionReadiness.tone === "warning"
       ? "warning"
       : "stable";
-  const trustVerdict = trustStatusTone === "stable"
-    ? {
-        label: "Ready to use",
-        detail: decisionReadiness.detail,
-        toneClasses: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
-      }
+  /* The verdict is a colour on the System status strip, not a banner: emerald
+     for ready, violet for a past week, amber for caution. A labelled banner
+     above the strip used to say the same thing in words the five cells then
+     repeated. */
+  const trustVerdictToneClasses = trustStatusTone === "stable"
+    ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-100"
     : trustStatusTone === "historical"
-      ? {
-          label: "Historical only",
-          detail: "A past week. Compare it with the current one; do not act on it.",
-          toneClasses: "border-violet-400/35 bg-violet-500/10 text-violet-100",
-        }
-      : {
-          label: "Use with caution",
-          detail: decisionReadiness.detail,
-          toneClasses: "border-amber-400/35 bg-amber-500/10 text-amber-100",
-        };
+      ? "border-violet-400/35 bg-violet-500/10 text-violet-100"
+      : "border-amber-400/35 bg-amber-500/10 text-amber-100";
   /* Each label is the section's own title. Two had drifted: "Snapshot" for a
      section headed "System status", and "Sources & freshness" for one headed
      "Cite this call" — so the rail offered "Sources" and "Sources & freshness"
@@ -146,6 +138,7 @@ export async function buildTrustPageModel() {
     pageTitle: "How much to trust this week's call",
     pageSummary: "Check whether this week's call is current enough to act on.",
     sectionLinks,
+    activeStep: "posture",
     sidebarVariant: "full",
     nextStep: {
       href: "/signals",
@@ -169,7 +162,7 @@ export async function buildTrustPageModel() {
     warnings,
     meetingSnippet,
     revisitBullets,
-    trustVerdict,
+    trustVerdictToneClasses,
     runHistory,
     reportShellProps,
   };

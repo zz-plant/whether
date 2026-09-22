@@ -1,5 +1,3 @@
-"use client";
-
 import {
   MONDAY_AGENDA_MINUTES,
   MONDAY_AGENDA_STEPS,

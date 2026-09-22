@@ -65,53 +65,6 @@ body::-webkit-scrollbar-thumb:hover {
   100% { transform: scale(1); }
 }
 
-.onboarding-step-card {
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
-}
-
-.onboarding-step-card[data-completed="true"] {
-  border-color: rgba(52, 211, 153, 0.45);
-  box-shadow:
-    inset 0 1px 0 rgba(110, 231, 183, 0.18),
-    inset 0 0 0 1px rgba(5, 46, 22, 0.42),
-    var(--elev-2);
-  transform: translateY(-2px);
-}
-
-.onboarding-step-state {
-  transition:
-    color 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
-  animation: onboardingStatePulse 220ms ease-out;
-}
-
-@keyframes onboardingStatePulse {
-  from {
-    opacity: 0;
-    transform: translateY(3px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes fadeInPanel {
-  from {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.995);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes weather-panel-enter {
   from {
     opacity: 0;
@@ -129,19 +82,12 @@ body::-webkit-scrollbar-thumb:hover {
   .anchor-feedback-active > h2,
   .anchor-feedback-active [data-anchor-title='true'],
   .weather-section-stage,
-  .weather-list-stagger > *,
-  .weather-step-panel,
-  .onboarding-step-state {
+  .weather-step-panel {
     animation: none;
   }
 
-  .onboarding-step-card,
   .weather-delta-card {
     transition: none;
-  }
-
-  .onboarding-step-card[data-completed="true"] {
-    transform: none;
   }
 }
 

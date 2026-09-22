@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import { CheckIcon, CopyIcon } from "./uiIcons";
+import { ClipboardActionRow } from "./clipboardActionRow";
 import { useBriefArtifact } from "./useBriefArtifact";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { briefConditionEntries, formatBriefArtifact } from "../../lib/report/briefArtifact";
@@ -180,15 +181,16 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                   and someone has to paste the decision somewhere. It is the same
                   Slack block the share panel produces. */}
               {isLast ? (
-                <button
-                  type="button"
+                <ClipboardActionRow
+                  label="Copy summary"
+                  state={status}
                   onClick={() => { void copyToClipboard(summary, "presentation"); }}
-                  data-testid="presentation-copy-summary"
-                  className="weather-button inline-flex min-h-11 items-center gap-1.5 px-4 py-2 text-fluid-xs font-semibold"
-                >
-                  {status === "copied" ? <CheckIcon /> : <CopyIcon />}
-                  {status === "copied" ? "Summary copied" : "Copy summary"}
-                </button>
+                  leadingIcon={<CopyIcon />}
+                  stateIcons={{ copied: <CheckIcon /> }}
+                  buttonLabels={{ copied: "Summary copied" }}
+                  buttonClassName="text-fluid-xs"
+                  buttonProps={{ "data-testid": "presentation-copy-summary" }}
+                />
               ) : null}
               <button
                 type="button"

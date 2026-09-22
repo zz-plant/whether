@@ -146,7 +146,11 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.match(html, /Copy weekly brief/);
-    assert.match(html, /href="#share-ready-artifact"/);
+    // A copy action is a button (ui-ux-standards §IV): it used to be an anchor
+    // to the share section whose click was intercepted, so the markup promised
+    // a destination the click never followed.
+    assert.match(html, /<button type="button"[^>]*>Copy weekly brief<\/button>/);
+    assert.doesNotMatch(html, /href="#share-ready-artifact"/);
     assert.match(html, /share-ready path\./);
     assert.doesNotMatch(html, /Review order/);
   });

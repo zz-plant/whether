@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import Link from "next/link";
 import { CloseIcon, ChevronLeftIcon, ChevronRightIcon } from "./uiIcons";
+import { MonthGrid } from "./history/monthGrid";
 import { getTimeMachineMonthsByYear, getAdjacentTimeMachineEntry } from "../../lib/timeMachine/timeMachineCache";
 
 type CoverageMap = Record<number, number[]>;
@@ -96,16 +97,16 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
                 </div>
               </fieldset>
               {months.length > 0 ? (
-                <fieldset>
-                  <legend className="type-eyebrow">Month</legend>
-                  <div className="mt-1.5 grid grid-cols-4 gap-1.5">
-                    {months.map((month) => (
-                      <button key={month} type="button" onClick={() => navigateTo(selectedYear, month)}
-                        className={`rounded-md px-2 py-1.5 text-center text-xs font-medium transition-colors ${selectedYear === currentYear && month === currentMonth ? "bg-sky-500/18 text-sky-100 border border-sky-400/40" : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"}`}
-                      >{new Date(selectedYear, month - 1).toLocaleString("en", { month: "short" })}</button>
-                    ))}
+                <div>
+                  <p className="type-eyebrow">Month</p>
+                  <div className="mt-1.5">
+                    <MonthGrid
+                      months={months}
+                      selectedMonth={selectedYear === currentYear ? currentMonth : undefined}
+                      onSelect={(month) => navigateTo(selectedYear, month)}
+                    />
                   </div>
-                </fieldset>
+                </div>
               ) : <p className="mt-2 text-xs text-slate-400">No data for {selectedYear}.</p>}
             </div>
           )}

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
-import { useClipboardCopy } from "../components/useClipboardCopy";
+import { ClipboardActionRow } from "../components/clipboardActionRow";
+import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import { useOperatorRunway } from "../components/useOperatorRunway";
 import {
   formatInvestorUpdateSnippet,
@@ -59,7 +60,9 @@ export function ShareCopyControls({
   investorUpdate,
   calendarDetails,
 }: ShareCopyControlsProps) {
-  const { status, error, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy();
+  const clipboardState = (target: CopyTarget) =>
+    getClipboardUiState(target, { status, error, activeTarget, copiedTarget: copiedKey });
   // The one paragraph that depends on the reader's company comes from the
   // browser: the page is cached, so the server built the reading without it.
   const { runwayBand } = useOperatorRunway();
@@ -107,49 +110,45 @@ export function ShareCopyControls({
               destination. */}
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Slack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the current weekly operator brief for channel handoff.</p>
-          <button
-            type="button"
-            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+          <ClipboardActionRow
+            label="Copy Slack brief"
+            state={clipboardState("slack")}
             onClick={() => void copyText("slack", slackBrief)}
-          >
-            {copiedTarget === "slack" ? "Copied Slack brief" : "Copy Slack brief"}
-          </button>
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Email</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the same call with citation context for leadership notes.</p>
-          <button
-            type="button"
-            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+          <ClipboardActionRow
+            label="Copy email brief"
+            state={clipboardState("email")}
             onClick={() => void copyText("email", emailBrief)}
-          >
-            {copiedTarget === "email" ? "Copied email brief" : "Copy email brief"}
-          </button>
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Meeting pack</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the board note, call snapshot, weekly brief, board summary, and citation.</p>
-          <button
-            type="button"
-            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+          <ClipboardActionRow
+            label="Copy meeting pack"
+            state={clipboardState("meeting")}
             onClick={() => void copyText("meeting", meetingPack)}
-          >
-            {copiedTarget === "meeting" ? "Copied meeting pack" : "Copy meeting pack"}
-          </button>
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Issue tracker</h2>
           <p className="text-xs leading-relaxed text-slate-300">Copy the call in Markdown for a Jira or Linear ticket, or a wiki page.</p>
-          <button
-            type="button"
-            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+          <ClipboardActionRow
+            label="Copy ticket brief"
+            state={clipboardState("tracker")}
             onClick={() => void copyText("tracker", issueTrackerBrief)}
-          >
-            {copiedTarget === "tracker" ? "Copied ticket brief" : "Copy ticket brief"}
-          </button>
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
@@ -159,13 +158,12 @@ export function ShareCopyControls({
               ? "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the call and what your runway band means for it."
               : "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the call. Pick a runway band on the brief to add what it means for your cash."}
           </p>
-          <button
-            type="button"
-            className="weather-button min-h-[44px] px-4 py-2 text-xs font-semibold"
+          <ClipboardActionRow
+            label="Copy investor update"
+            state={clipboardState("investor")}
             onClick={() => void copyText("investor", investorUpdateText)}
-          >
-            {copiedTarget === "investor" ? "Copied investor update" : "Copy investor update"}
-          </button>
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">

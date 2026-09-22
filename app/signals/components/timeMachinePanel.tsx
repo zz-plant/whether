@@ -9,10 +9,11 @@ import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
+import { isRoute, type Route } from "../../../lib/navigation/routeType";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { ActionLink } from "../../components/ui/actionLink";
+import { SpinnerIcon } from "../../components/uiIcons";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_LABELS } from "../../../lib/regimePresentation";
 import {
@@ -203,11 +204,7 @@ export const TimeMachinePanel = ({
     nextSnapshot,
   );
   const nowDecisionHref = `${nowHref}#decision-summary`;
-  const replayPreviousHref = !isHistorical ? previousSnapshotHref : null;
   const centeredPillLinkClass = "justify-center";
-  const fullWidthPillLinkClass = "w-full justify-center";
-  const disabledPillClass =
-    "weather-pill inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-400/90 opacity-70";
 
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
@@ -237,83 +234,49 @@ export const TimeMachinePanel = ({
           }
         />
 
-        <div className="weather-list-stagger mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-          <div className="weather-surface weather-delta-card p-4" data-emphasis="true">
-            <p className="type-label text-slate-400">Month showing</p>
-            <p className="mt-3 type-data text-slate-300">
-              {isHistorical ? (
-                <>
-                  This page is showing{" "}
-                  <span className="font-semibold text-slate-100">{selectedLabel}</span>. This week&apos;s
-                  reading is dated {latestRecordLabel}.
-                </>
-              ) : (
-                <>
-                  This page is showing this week ({latestRecordLabel}). Pick a month below to see what
-                  the call was then.
-                </>
-              )}
-            </p>
-            {showHistoricalCallout ? (
-              <div className="weather-surface mt-4 p-3">
-                <p className="type-label text-slate-400">
-                  What it meant · {historicalRegime ? REGIME_LABELS[historicalRegime] : "—"}
-                </p>
-                <p className="mt-2 text-sm text-slate-200">{historicalSummary}</p>
-              </div>
-            ) : null}
-          </div>
-          <div className="weather-surface weather-delta-card p-4">
-            <p className="type-label text-slate-400">Month loaded</p>
-            <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
-            {!isHistorical && replayPreviousHref ? (
-              <ActionLink
-                href={replayPreviousHref as Route}
-                className={`mt-3 ${centeredPillLinkClass}`}
-              >
-                View last month
-              </ActionLink>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-4 weather-surface weather-delta-card p-4" aria-label="Time navigation controls">
-          <p className="type-label text-slate-400">Step through months</p>
-          <p className="mt-2 text-sm text-slate-300">
-            One month at a time, or straight back to this week.
+        {/* One line and the step links. This was three cards — "Month showing",
+            "Month loaded" and "Step through months" — that named the selected
+            month three times, one of them under a staggered entry animation
+            on a settings form. A previous or next month that does not exist
+            renders no link, rather than a disabled pill that looks like one. */}
+        <div className="mt-6 space-y-3">
+          <p className="type-data text-slate-300">
+            {isHistorical ? (
+              <>
+                This page is showing{" "}
+                <span className="font-semibold text-slate-100">{selectedLabel}</span>. This week&apos;s
+                reading is dated {latestRecordLabel}.
+              </>
+            ) : (
+              <>
+                This page is showing this week ({latestRecordLabel}). Pick a month below to see what
+                the call was then.
+              </>
+            )}
           </p>
-          <div className="weather-list-stagger mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {previousSnapshotHref ? (
-              <ActionLink
-                href={previousSnapshotHref as Route}
-                className={fullWidthPillLinkClass}
-              >
+          {showHistoricalCallout ? (
+            <div className="weather-surface p-3">
+              <p className="type-label text-slate-400">
+                What it meant · {historicalRegime ? REGIME_LABELS[historicalRegime] : "—"}
+              </p>
+              <p className="mt-2 text-sm text-slate-200">{historicalSummary}</p>
+            </div>
+          ) : null}
+          <nav aria-label="Step through months" className="flex flex-wrap gap-2">
+            {previousSnapshotHref && isRoute(previousSnapshotHref) ? (
+              <ActionLink href={previousSnapshotHref} className={centeredPillLinkClass}>
                 ← Previous month
               </ActionLink>
-            ) : (
-              <span aria-disabled="true" className={disabledPillClass}>
-                ← Previous month
-              </span>
-            )}
-            {nextSnapshotHref ? (
-              <ActionLink
-                href={nextSnapshotHref as Route}
-                className={fullWidthPillLinkClass}
-              >
+            ) : null}
+            {nextSnapshotHref && isRoute(nextSnapshotHref) ? (
+              <ActionLink href={nextSnapshotHref} className={centeredPillLinkClass}>
                 Next month →
               </ActionLink>
-            ) : (
-              <span aria-disabled="true" className={disabledPillClass}>
-                Next month →
-              </span>
-            )}
-            <ActionLink
-              href={nowHref as Route}
-              className={fullWidthPillLinkClass}
-            >
+            ) : null}
+            <ActionLink href={isRoute(nowHref) ? nowHref : "/signals"} className={centeredPillLinkClass}>
               This week
             </ActionLink>
-          </div>
+          </nav>
         </div>
 
         <Form onFormSubmit={handleSubmit} className="mt-6">
@@ -345,9 +308,7 @@ export const TimeMachinePanel = ({
               aria-busy={isPending}
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
             >
-              {isPending ? (
-                <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-              ) : null}
+              {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
               {isPending ? "Loading" : "Load month"}
             </button>
           </Fieldset.Root>

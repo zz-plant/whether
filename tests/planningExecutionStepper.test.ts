@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import {
+  OperationsExecutionStepper,
   buildOperationsExecutionStepHref,
   resolveOperationsExecutionStepActionLabel,
   resolveOperationsExecutionStepId,
@@ -127,5 +130,45 @@ describe("resolveInitialOpenStepIds", () => {
 
   it("never lists a step twice when the hash targets a default", () => {
     assert.deepEqual(resolveInitialOpenStepIds({ steps, hash: "#rules" }), ["first", "rules"]);
+  });
+});
+
+/*
+ * The current step is a fact assistive tech reads off `aria-current`, and the
+ * owner, status and change signal are facts about the step. Neither is a
+ * control, so neither is drawn as one: no "Active" stamp restating the state,
+ * no pills around the facts, and no ring or gradient hairline on the card.
+ */
+describe("OperationsExecutionStepper markup", () => {
+  const steps = [
+    {
+      id: "first",
+      label: "A",
+      title: "Weekly plan",
+      description: "Plan",
+      owner: "Finance",
+      approvalStatus: "Ready for weekly review",
+      changeSignal: "Cash posture shifts",
+      children: null,
+    },
+    { id: "second", label: "B", title: "Share", description: "Share", children: null },
+  ];
+
+  it("carries the current step on aria-current and nowhere else", () => {
+    const html = renderToStaticMarkup(createElement(OperationsExecutionStepper, { steps }));
+
+    assert.equal((html.match(/aria-current="step"/g) ?? []).length, 1);
+    assert.match(html, /id="first"[^>]*aria-current="step"|aria-current="step"[^>]*id="first"/);
+    assert.doesNotMatch(html, />Active</);
+    assert.doesNotMatch(html, /ring-1|bg-gradient-to-r/);
+  });
+
+  it("prints owner, status and change signal as facts, not pills", () => {
+    const html = renderToStaticMarkup(createElement(OperationsExecutionStepper, { steps }));
+
+    assert.doesNotMatch(html, /weather-pill/);
+    assert.match(html, /<dt[^>]*>Owner: <\/dt><dd[^>]*>Finance<\/dd>/);
+    assert.match(html, /<dd[^>]*>Ready for weekly review<\/dd>/);
+    assert.match(html, /<dt[^>]*>Check again if: <\/dt><dd[^>]*>Cash posture shifts<\/dd>/);
   });
 });

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Calendar, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Popover } from "@base-ui/react/popover";
+import { CheckIcon, ChevronDownIcon } from "./uiIcons";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
 /**
@@ -34,6 +35,16 @@ interface TimeMachineCalendarPickerProps {
   }>;
 }
 
+/**
+ * The week title, and behind it the archive of past briefs.
+ *
+ * The popover is Base UI's (`thresholdsPanel` and `dataProvenanceStrip` use the
+ * same one); this file used to carry its own outside-click and Escape
+ * listeners, the fourth copy of that pair on the site. Open state is held here
+ * only so that picking a week closes the panel before the route changes. The
+ * title is an `h2` wrapping the trigger rather than a button wrapping a
+ * heading, which is the order HTML allows.
+ */
 export function TimeMachineCalendarPicker({
   currentDateLabel,
   isHistorical,
@@ -42,32 +53,9 @@ export function TimeMachineCalendarPicker({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedMonth = searchParams?.get("month");
   const selectedYear = searchParams?.get("year");
-
-  // Close when clicking outside or pressing Escape
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (e.target instanceof Node && containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    }
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
-    }
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKeyDown);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open]);
 
   // Group history entries by year
   const entriesByYear = history.slice(-36).reduce<Record<string, typeof history>>((acc, entry) => {
@@ -93,132 +81,121 @@ export function TimeMachineCalendarPicker({
   };
 
   return (
-    <div ref={containerRef} className="relative inline-block">
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        onClick={() => setOpen((prev) => !prev)}
-        className="group flex items-center gap-2 text-left cursor-pointer rounded-lg px-2 py-1 -ml-2 hover:bg-slate-900/60 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-      >
-        {/* `text-lg` below `sm`: at `text-xl` the week title and the confidence
-            chip beside it ran 4px past a 430px phone's content width, and the
-            chip dropped to a row of its own above the call. */}
-        <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-white group-hover:text-sky-300 transition-colors">
+    <Popover.Root open={open} onOpenChange={(next) => setOpen(next)}>
+      {/* `text-lg` below `sm`: at `text-xl` the week title and the confidence
+          chip beside it ran 4px past a 430px phone's content width, and the
+          chip dropped to a row of its own above the call. */}
+      <h2 className="text-lg font-bold tracking-tight text-white sm:text-2xl">
+        <Popover.Trigger className="group -ml-2 inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors hover:bg-slate-900/60 hover:text-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400">
           {currentDateLabel}
-        </h2>
-        <ChevronDown
-          size={18}
-          className={`text-slate-400 group-hover:text-sky-300 transition-transform duration-200 ${
-            open ? "rotate-180 text-sky-400" : ""
-          }`}
-        />
-      </button>
+          <ChevronDownIcon
+            className={`h-[18px] w-[18px] text-slate-400 transition-transform duration-200 group-hover:text-sky-300 ${
+              open ? "rotate-180 text-sky-400" : ""
+            }`}
+          />
+        </Popover.Trigger>
+      </h2>
 
-      {open && (
-        <div
-          aria-label="Select brief period"
-          className="absolute left-0 top-full mt-2 z-50 w-80 max-h-96 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
-        >
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08]">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
-              <Calendar size={14} className="text-sky-400" />
-              <span>Past weeks</span>
+      <Popover.Portal>
+        <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-50">
+          <Popover.Popup
+            aria-label="Select brief period"
+            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950/95 p-3 shadow-2xl"
+          >
+            <div className="mb-2 flex items-center justify-between border-b border-white/[0.08] pb-2">
+              <span className="text-xs font-semibold text-white">Past weeks</span>
+              {isHistorical && (
+                <button
+                  type="button"
+                  onClick={handleReturnLive}
+                  className="weather-chip inline-flex min-h-[44px] items-center text-sky-300 hover:text-sky-200"
+                >
+                  Back to this week
+                </button>
+              )}
             </div>
-            {isHistorical && (
-              <button
-                type="button"
-                onClick={handleReturnLive}
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-sky-300 hover:text-sky-200 transition-colors bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20"
-              >
-                <Sparkles size={11} />
-                <span>Back to this week</span>
-              </button>
-            )}
-          </div>
 
-          <div className="pb-2.5 mb-2 border-b border-white/[0.08] space-y-1.5">
-            <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
-              Replay a known period
-            </span>
-            <div className="grid grid-cols-2 gap-1.5">
-              {KNOWN_PERIODS.map((period) => {
-                const isSelected =
-                  selectedMonth === String(period.month) && selectedYear === String(period.year);
-                const entry = history.find((candidate) => {
-                  const d = new Date(candidate.record_date);
-                  return d.getUTCFullYear() === period.year && d.getUTCMonth() + 1 === period.month;
-                });
-                const periodDate = new Date(Date.UTC(period.year, period.month - 1, 1));
+            <div className="mb-2 space-y-1.5 border-b border-white/[0.08] pb-2.5">
+              <span className="type-eyebrow block px-1">Replay a known period</span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {KNOWN_PERIODS.map((period) => {
+                  const isSelected =
+                    selectedMonth === String(period.month) && selectedYear === String(period.year);
+                  const entry = history.find((candidate) => {
+                    const d = new Date(candidate.record_date);
+                    return d.getUTCFullYear() === period.year && d.getUTCMonth() + 1 === period.month;
+                  });
+                  const periodDate = new Date(Date.UTC(period.year, period.month - 1, 1));
+                  return (
+                    <button
+                      key={`${period.year}-${period.month}`}
+                      type="button"
+                      aria-pressed={isSelected}
+                      onClick={() => handleSelect(periodDate.toISOString())}
+                      className={`flex min-h-[44px] flex-col items-start rounded-lg border px-2.5 py-1.5 text-left text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+                        isSelected
+                          ? "border-sky-500/50 bg-sky-500/15 text-white"
+                          : "border-white/[0.06] bg-slate-900/50 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
+                      }`}
+                    >
+                      <span className="flex w-full items-center justify-between gap-1">
+                        <span className="font-semibold tabular-nums">{MONTH_YEAR_LABEL.format(periodDate)}</span>
+                        {isSelected && <CheckIcon className="h-3 w-3 text-sky-400" />}
+                      </span>
+                      <span className="w-full truncate text-[10px] text-slate-400">
+                        {period.label}
+                        {entry ? ` · ${getRegimePublicLabel(entry.regime)}` : ""}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {sortedYears.map((year) => {
+                const yearEntries = entriesByYear[year] ?? [];
                 return (
-                  <button
-                    key={`${period.year}-${period.month}`}
-                    type="button"
-                    onClick={() => handleSelect(periodDate.toISOString())}
-                    className={`flex min-h-[44px] flex-col items-start rounded-lg px-2.5 py-1.5 text-left text-xs transition-colors border ${
-                      isSelected
-                        ? "border-sky-500/50 bg-sky-500/15 text-white"
-                        : "border-white/[0.06] bg-slate-900/50 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
-                    }`}
-                  >
-                    <span className="flex w-full items-center justify-between gap-1">
-                      <span className="font-semibold tabular-nums">{MONTH_YEAR_LABEL.format(periodDate)}</span>
-                      {isSelected && <Check size={12} className="text-sky-400" />}
-                    </span>
-                    <span className="w-full truncate text-[10px] text-slate-400">
-                      {period.label}
-                      {entry ? ` · ${getRegimePublicLabel(entry.regime)}` : ""}
-                    </span>
-                  </button>
+                  <div key={year} className="space-y-1">
+                    <span className="type-eyebrow px-1">{year}</span>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {yearEntries.map((entry) => {
+                        const d = new Date(entry.record_date);
+                        const monthNum = d.getUTCMonth() + 1;
+                        const monthName = d.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+                        const isSelected = selectedMonth === monthNum.toString() && selectedYear === year;
+                        const publicLabel = getRegimePublicLabel(entry.regime);
+
+                        return (
+                          <button
+                            key={entry.record_date}
+                            type="button"
+                            aria-pressed={isSelected}
+                            onClick={() => handleSelect(entry.record_date)}
+                            className={`flex min-h-[44px] flex-col items-start rounded-lg border p-2 text-left text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+                              isSelected
+                                ? "border-sky-500/50 bg-sky-500/15 text-white"
+                                : "border-white/[0.04] bg-slate-900/40 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
+                            }`}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              <span className="font-semibold">{monthName}</span>
+                              {isSelected && <CheckIcon className="h-3 w-3 text-sky-400" />}
+                            </span>
+                            <span className="w-full truncate text-[10px] text-slate-400">
+                              {publicLabel}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
             </div>
-          </div>
-
-          <div className="space-y-3">
-            {sortedYears.map((year) => {
-              const yearEntries = entriesByYear[year] ?? [];
-              return (
-                <div key={year} className="space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
-                    {year}
-                  </span>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {yearEntries.map((entry) => {
-                      const d = new Date(entry.record_date);
-                      const monthNum = d.getUTCMonth() + 1;
-                      const monthName = d.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
-                      const isSelected = selectedMonth === monthNum.toString() && selectedYear === year;
-                      const publicLabel = getRegimePublicLabel(entry.regime);
-
-                      return (
-                        <button
-                          key={entry.record_date}
-                          type="button"
-                          onClick={() => handleSelect(entry.record_date)}
-                          className={`flex flex-col items-start rounded-lg p-2 text-left text-xs transition-colors border ${
-                            isSelected
-                              ? "border-sky-500/50 bg-sky-500/15 text-white"
-                              : "border-white/[0.04] bg-slate-900/40 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <span className="font-semibold">{monthName}</span>
-                            {isSelected && <Check size={12} className="text-sky-400" />}
-                          </div>
-                          <span className="text-[10px] text-slate-400 truncate w-full">
-                            {publicLabel}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

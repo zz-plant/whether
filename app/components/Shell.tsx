@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { FocusModeController } from "./focusModeController";
+import { Skeleton } from "./skeleton";
 import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
 
 const shellMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 transition-all weather-page-enter";
@@ -14,39 +15,47 @@ export function Shell({
   regime?: string;
 }) {
   if (loading) {
+    /* `Skeleton`, not `animate-pulse`: only the primitive's shimmer is switched
+       off under prefers-reduced-motion (live-state.css), so a Tailwind pulse
+       animated for exactly the people who asked it not to. The shapes mirror
+       the hero — eyebrow, headline, summary, action row, the stamp column —
+       and the two cards under it, so the resolved page lands where the
+       placeholder was (suspenseFallbacks.tsx has the argument). */
     return (
       <div className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)]">
         <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-4 sm:py-5">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
-            <div className="space-y-6 min-w-0">
-              <div className="weather-card">
-                <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
-                  <div className="min-w-0 space-y-4">
-                    <div className="space-y-2">
-                      <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
-                      <div className="h-9 w-full max-w-xl rounded bg-white/15 animate-pulse" />
+          <output aria-busy="true" aria-label="Loading the weekly brief" className="block">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
+              <div className="space-y-6 min-w-0">
+                <div className="weather-card">
+                  <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="min-w-0 space-y-4">
+                      <div className="space-y-2">
+                        <Skeleton className="h-3 w-24 rounded-sm bg-slate-500/28" />
+                        <Skeleton className="h-9 w-full max-w-xl rounded-md bg-slate-500/40" />
+                      </div>
+                      <Skeleton className="h-4 w-full max-w-md rounded-sm bg-slate-500/24" />
+                      <Skeleton className="h-8 w-full max-w-sm rounded-lg bg-slate-500/22" />
                     </div>
-                    <div className="h-4 w-full max-w-md rounded bg-white/10 animate-pulse" />
-                    <div className="h-8 w-full max-w-sm rounded bg-white/10 animate-pulse" />
-                  </div>
-                  <div className="space-y-2 sm:text-right">
-                    <div className="h-20 w-20 rounded-full bg-white/15 animate-pulse mx-auto sm:mr-0" />
-                    <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
+                    <div className="space-y-2 sm:text-right">
+                      <Skeleton className="mx-auto h-20 w-20 rounded-full bg-slate-500/36 sm:mr-0" />
+                      <Skeleton className="h-3 w-24 rounded-sm bg-slate-500/24" />
+                    </div>
                   </div>
                 </div>
+                <Skeleton className="h-40 w-full rounded-xl bg-slate-500/18" />
+                <Skeleton className="h-56 w-full rounded-xl bg-slate-500/18" />
               </div>
-              <div className="weather-card h-40 animate-pulse" />
-              <div className="weather-card h-56 animate-pulse" />
+              <div className="space-y-4 lg:col-start-2">
+                <Skeleton className="h-32 w-full rounded-xl bg-slate-500/18" />
+                <Skeleton className="h-48 w-full rounded-xl bg-slate-500/18" />
+              </div>
+              <div className="space-y-6 min-w-0">
+                <Skeleton className="h-64 w-full rounded-xl bg-slate-500/18" />
+                <Skeleton className="h-32 w-full rounded-xl bg-slate-500/18" />
+              </div>
             </div>
-            <div className="space-y-4 lg:col-start-2">
-              <div className="weather-card h-32 animate-pulse" />
-              <div className="weather-card h-48 animate-pulse" />
-            </div>
-            <div className="space-y-6 min-w-0">
-              <div className="weather-card h-64 animate-pulse" />
-              <div className="weather-card h-32 animate-pulse" />
-            </div>
-          </div>
+          </output>
         </main>
       </div>
     );

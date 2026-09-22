@@ -147,7 +147,15 @@ export function SignalInversionPreview({
             <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
           ) : null}
         </svg>
-        <p className="mt-1 text-xs text-slate-400">Dashed zero line. Below it, the curve is inverted.</p>
+        {/* One caption carries the legend. It was four uppercase chips under
+            the values row — two restating the series names the row above had
+            just printed with their colours, one restating this sentence, and
+            one for gaps — which read as a second control strip. */}
+        <p className="mt-1 text-xs tabular-nums text-slate-400">
+          Dashed zero line; below it, the curve is inverted. 10Y−2Y has been inverted{" "}
+          {monthsInverted10Y2Y} of {monthlyPoints.length} months, 2Y−3M {monthsInverted2Y3M} of{" "}
+          {monthlyPoints.length}.{hasGaps ? " Breaks are missing monthly reads." : ""}
+        </p>
         <div className="mt-2 flex items-center justify-between type-eyebrow">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
@@ -167,22 +175,6 @@ export function SignalInversionPreview({
           <span className="tabular-nums text-slate-400">
             Vertical scale {spreadMin.toFixed(2)} to {spreadMax.toFixed(2)} pts
           </span>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2 type-eyebrow">
-          <span className="rounded-sm border border-emerald-300/30 bg-emerald-500/10 px-2 py-1 text-emerald-100">
-            10Y-2Y inverted {monthsInverted10Y2Y} mo
-          </span>
-          <span className="rounded-sm border border-amber-300/30 bg-amber-500/10 px-2 py-1 text-amber-100">
-            2Y-3M inverted {monthsInverted2Y3M} mo
-          </span>
-          <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
-            Below zero = inverted
-          </span>
-          {hasGaps ? (
-            <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
-              Breaks = missing monthly reads
-            </span>
-          ) : null}
         </div>
         {/* Expands the axis shorthand. Without it, "10Y-2Y +14.2 bp" is
             unreadable to anyone who has not traded bonds. */}

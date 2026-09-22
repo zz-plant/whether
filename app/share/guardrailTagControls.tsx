@@ -1,6 +1,7 @@
 "use client";
 
-import { useClipboardCopy } from "../components/useClipboardCopy";
+import { ClipboardActionRow } from "../components/clipboardActionRow";
+import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import type { GuardrailTagBlock } from "../../lib/export/issueTrackerBrief";
 
 /**
@@ -13,14 +14,16 @@ import type { GuardrailTagBlock } from "../../lib/export/issueTrackerBrief";
  * area into the work item description.
  */
 export function GuardrailTagControls({ blocks }: { blocks: GuardrailTagBlock[] }) {
-  const { copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const clipboardState = (target: string) =>
+    getClipboardUiState(target, { status, error, activeTarget, copiedTarget });
 
   if (blocks.length === 0) return null;
 
   return (
-    <div className="space-y-3">
+    <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="guardrail-tags-heading">
       <div className="space-y-1">
-        <h2 className="type-eyebrow">Guardrail tags for work items</h2>
+        <h2 id="guardrail-tags-heading" className="type-eyebrow">Guardrail tags for work items</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           Copy one block per business area into a Linear or Jira card description. No integration,
           no tokens — the card carries this week&apos;s call, its pause line, and what would change it.
@@ -36,13 +39,13 @@ export function GuardrailTagControls({ blocks }: { blocks: GuardrailTagBlock[] }
                   <span className="ml-2 text-fluid-micro font-normal text-slate-400">{block.ownerLabel}</span>
                 ) : null}
               </h3>
-              <button
-                type="button"
-                className="weather-button min-h-[36px] px-3 py-1.5 text-xs font-semibold"
+              <ClipboardActionRow
+                compact
+                label="Copy tag"
+                state={clipboardState(`guardrail-${block.area}`)}
                 onClick={() => void copyToClipboard(block.markdown, `guardrail-${block.area}`)}
-              >
-                {copiedTarget === `guardrail-${block.area}` ? "Copied" : "Copy tag"}
-              </button>
+                buttonLabels={{ error: "Copy failed" }}
+              />
             </div>
             <pre className="max-h-48 overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-2.5 text-fluid-micro leading-relaxed text-slate-200">
               {block.markdown}
@@ -50,6 +53,6 @@ export function GuardrailTagControls({ blocks }: { blocks: GuardrailTagBlock[] }
           </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

@@ -293,7 +293,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               className="flex-1 bg-transparent text-base sm:text-sm text-slate-100 placeholder-slate-500 outline-none font-medium"
               aria-label="Search commands"
             />
-            <kbd className="text-[10px] text-slate-400 font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-2 py-0.5 shadow-inner">ESC</kbd>
+            <kbd className="weather-kbd shrink-0">ESC</kbd>
           </div>
           <nav aria-label="Command results" className="max-h-80 overflow-y-auto overscroll-contain py-2">
             {filtered.length === 0 ? (
@@ -308,10 +308,10 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                       <button
                         type="button"
                         onClick={cmd.action}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-left transition-all duration-150 ${
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-left transition-colors duration-150 ${
                           isSelected
-                            ? "bg-sky-500/15 text-sky-100 border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.12)] font-semibold"
-                            : "text-slate-300 border border-transparent hover:bg-slate-800/50 hover:text-white"
+                            ? "bg-sky-500/15 text-sky-100 font-semibold"
+                            : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
                         }`}
                         aria-current={isSelected ? "true" : undefined}
                       >
@@ -323,9 +323,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                           ) : null}
                         </span>
                         {cmd.shortcut ? (
-                          <kbd className="text-[10px] text-slate-400 font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-2 py-0.5 shrink-0 shadow-inner">
-                            {cmd.shortcut}
-                          </kbd>
+                          <kbd className="weather-kbd shrink-0">{cmd.shortcut}</kbd>
                         ) : null}
                       </button>
                     </li>
@@ -335,9 +333,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             )}
           </nav>
           <div className="border-t border-[color:var(--border-default)] px-4 py-2.5 bg-[color:var(--bg-raised)]/40 flex items-center gap-4 text-[10px] text-slate-400 font-medium">
-            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-1.5 py-0.5 text-slate-300">↑↓</kbd> navigate</span>
-            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-1.5 py-0.5 text-slate-300">↵</kbd> select</span>
-            <span className="flex items-center gap-1.5"><kbd className="font-mono border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] rounded px-1.5 py-0.5 text-slate-300">esc</kbd> close</span>
+            <span className="flex items-center gap-1.5"><kbd className="weather-kbd">↑↓</kbd> navigate</span>
+            <span className="flex items-center gap-1.5"><kbd className="weather-kbd">↵</kbd> select</span>
+            <span className="flex items-center gap-1.5"><kbd className="weather-kbd">esc</kbd> close</span>
           </div>
         </Dialog.Popup>
       </Dialog.Portal>

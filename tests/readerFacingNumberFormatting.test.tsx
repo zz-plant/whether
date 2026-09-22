@@ -28,7 +28,6 @@ const heroProps = {
   boldnessDelta: -14,
   regime: "SCARCITY",
   postureLabel: "Contraction",
-  signalDirection: "tighten" as const,
   recordDate: "Sep 15, 2026",
   fetchedAt: "Sep 15, 2026",
   signalData: { tightnessThreshold: 70, riskAppetiteThreshold: 50 },

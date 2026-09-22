@@ -33,8 +33,8 @@ export function SharePageFormats() {
   if (!artifact) return null;
 
   return (
-    <div className="weather-surface px-4 py-4">
-      <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Copy this week&apos;s call</h2>
+    <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="copy-call-heading">
+      <h2 id="copy-call-heading" className="type-eyebrow">Copy this week&apos;s call</h2>
       <BriefFormatPicker
         format={format}
         activeFormat={activeFormat}
@@ -43,6 +43,6 @@ export function SharePageFormats() {
         onSelect={setFormat}
         onCopy={copyBrief}
       />
-    </div>
+    </section>
   );
 }

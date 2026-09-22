@@ -548,7 +548,6 @@ async function PageContent({
                 weeklyCall={primaryCall}
                 actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
                 regime={regime}
-                signalDirection={signalDirection}
                 recordDate={homepage.reportShell.recordDateLabel}
                 fetchedAt={homepage.reportShell.fetchedAtLabel}
                 confidenceLabel={confidenceLabel}

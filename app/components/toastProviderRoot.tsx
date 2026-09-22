@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Toast } from "@base-ui/react/toast";
+import { AlertTriangleIcon, CheckIcon, CloseIcon } from "./uiIcons";
 
 const toneClassByType: Record<string, string> = {
   success: "border-emerald-400/60 bg-emerald-500/10",
@@ -9,10 +10,10 @@ const toneClassByType: Record<string, string> = {
   warning: "border-amber-300/70 bg-amber-300/10",
 };
 
-const iconByType: Record<string, string> = {
-  success: "✓",
-  error: "!",
-  warning: "⚠",
+const iconByType: Record<string, ReactNode> = {
+  success: <CheckIcon />,
+  error: <AlertTriangleIcon />,
+  warning: <AlertTriangleIcon />,
 };
 
 const ToastList = () => {
@@ -34,7 +35,7 @@ const ToastList = () => {
               <div className="space-y-1">
                 {toast.title ? (
                   <Toast.Title className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                    {icon ? <span className="mr-1 inline-block">{icon}</span> : null}
+                    {icon ? <span className="mr-1.5 inline-flex align-[-2px]">{icon}</span> : null}
                     {toast.title}
                   </Toast.Title>
                 ) : null}
@@ -48,7 +49,7 @@ const ToastList = () => {
                 className="inline-flex min-h-11 min-w-11 items-center justify-center -mr-2 -mt-1 rounded-lg text-xs text-slate-400 transition-colors hover:text-slate-200 weather-focus-ring"
                 aria-label="Dismiss notification"
               >
-                ✕
+                <CloseIcon />
               </Toast.Close>
             </div>
             {toast.actionProps ? (
@@ -70,7 +71,9 @@ export const ToastProviderRoot = ({ children }: { children: ReactNode }) => (
   <Toast.Provider timeout={5000} limit={3}>
     {children}
     <Toast.Portal>
-      <Toast.Viewport className="fixed bottom-6 right-6 z-50 flex w-[min(360px,calc(100vw-2rem))] flex-col gap-3">
+      {/* Clears the bottom tab bar and the home indicator on phones; from md
+          the bar is gone and the viewport sits in the corner. */}
+      <Toast.Viewport className="fixed bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] right-6 z-50 flex w-[min(360px,calc(100vw-2rem))] flex-col gap-3 md:bottom-6">
         <ToastList />
       </Toast.Viewport>
     </Toast.Portal>

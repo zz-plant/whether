@@ -21,48 +21,42 @@ export function RouteLoadingShell({
           aria-busy="true"
           className="mx-auto w-full max-w-[72rem] space-y-4"
         >
-        <div className="flex flex-wrap items-center gap-2 type-eyebrow">
-          <span className="rounded-sm border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">{label}</span>
-          <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">In progress</span>
-        </div>
-
-        <div className="text-center space-y-4 py-5">
-          <Skeleton className="h-20 w-24 mx-auto rounded-lg bg-slate-500/48" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-48 mx-auto rounded-sm bg-slate-500/36" />
-            <Skeleton className="h-3 w-64 mx-auto rounded-sm bg-slate-500/28" />
-          </div>
-        </div>
-
-        <div className="relative flex items-center justify-center gap-2 py-2">
-          <span className="h-px flex-1 bg-slate-500/18" />
-          <Skeleton className="h-3 w-48 rounded-sm bg-slate-500/24" />
-          <span className="h-px flex-1 bg-slate-500/18" />
-        </div>
-
-        <div className="rounded-xl border border-slate-700/60 px-5 py-5 space-y-3">
-          <Skeleton className="h-10 w-full rounded-lg bg-slate-500/48" />
-          <Skeleton className="h-8 w-11/12 rounded-lg bg-slate-500/30" />
-          <Skeleton className="h-2 w-full rounded-sm bg-slate-500/28" />
-          <div className="flex justify-between">
-            <Skeleton className="h-3 w-12 rounded-sm bg-slate-500/24" />
-            <Skeleton className="h-3 w-8 rounded-sm bg-slate-500/24" />
-          </div>
-          <Skeleton className="h-3 w-2/3 rounded-sm bg-slate-500/22" />
-          <div className="flex gap-3 pt-3 border-t border-slate-700/30">
-            <Skeleton className="h-4 w-20 rounded-sm bg-slate-500/20" />
-            <Skeleton className="h-4 w-16 rounded-sm bg-slate-500/20" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          {["Why this call?", "Can I trust this?", "What else can I explore?", "How does this affect me?"].map((q) => (
-            <div key={q} className="border-b border-slate-800/60 py-3">
-              <span className="type-eyebrow">{q} ▸</span>
+        {/* Shaped like what replaces it — the report intro (kicker, status line,
+            title, summary; the stamp and action column banking right from lg)
+            and the first section's rule, heading and card — so the resolved
+            route lands where the placeholder was. This used to print two
+            badges and a four-question list no resolved page renders. */}
+        <div className="weather-surface-secondary weather-page-intro px-4 py-3.5 sm:px-5 sm:py-4">
+          <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:space-y-0">
+            <div className="min-w-0 space-y-2">
+              <Skeleton className="h-3 w-20 rounded-sm bg-slate-500/28" />
+              <Skeleton className="h-3 w-56 rounded-sm bg-slate-500/24" />
+              <Skeleton className="h-8 w-full max-w-xl rounded-md bg-slate-500/40" />
+              <Skeleton className="h-4 w-full max-w-2xl rounded-sm bg-slate-500/24" />
             </div>
-          ))}
+            <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
+              <Skeleton className="h-3 w-40 rounded-sm bg-slate-500/22 lg:ml-auto" />
+              <Skeleton className="h-11 w-36 rounded-lg bg-slate-500/28 lg:ml-auto" />
+            </div>
+          </div>
         </div>
-        <p className="sr-only">{description}</p>
+
+        <div className="space-y-4 border-t border-[color:var(--border-default)] pt-6">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-24 rounded-sm bg-slate-500/28" />
+            <Skeleton className="h-6 w-72 max-w-full rounded-md bg-slate-500/36" />
+          </div>
+          <div className="weather-card space-y-3">
+            <Skeleton className="h-4 w-11/12 rounded-sm bg-slate-500/26" />
+            <Skeleton className="h-4 w-3/4 rounded-sm bg-slate-500/22" />
+            <Skeleton className="h-2 w-full rounded-sm bg-slate-500/24" />
+            <div className="flex justify-between">
+              <Skeleton className="h-3 w-12 rounded-sm bg-slate-500/22" />
+              <Skeleton className="h-3 w-8 rounded-sm bg-slate-500/22" />
+            </div>
+          </div>
+        </div>
+        <p className="sr-only">{label}: {description}</p>
         </section>
       </div>
     </div>

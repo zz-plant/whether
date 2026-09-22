@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BarChart2, Shield, Percent } from "lucide-react";
 import type { DriverViews } from "../../../lib/report/driverDecisionViews";
 
 interface KeyDriversCardProps {
@@ -25,8 +24,6 @@ const formatSignedRateMove = (bps: number) =>
   `${bps > 0 ? "+" : bps < 0 ? "−" : ""}${(Math.abs(bps) / 100).toFixed(2)}%`;
 
 const rowLinkClass = "flex items-center gap-2.5 group no-underline min-w-0";
-const rowIconClass =
-  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-sky-400 group-hover:border-sky-500/40 transition-colors";
 /* The rows read their labels off the views rather than spelling them. All
    three were literals here, which is how this card came to print "Financing
    conditions" for the same reading the What-changed rows above it called
@@ -54,7 +51,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
   return (
     <section
       aria-labelledby="key-drivers-card-heading"
-      className={`weather-brief-card flex flex-col justify-between p-5 sm:p-6 ${className}`}
+      className={`weather-card flex flex-col justify-between ${className}`}
     >
       <div>
         <h3 id="key-drivers-card-heading" className="mb-4 text-sm font-semibold tracking-tight text-white">
@@ -65,9 +62,6 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
           {/* Funding pressure: a control variable — how long it has sat past its line. */}
           <div className="space-y-1.5">
             <Link href={DRIVER_LINKS["funding-pressure"]} className={rowLinkClass}>
-              <div className={rowIconClass}>
-                <BarChart2 size={15} />
-              </div>
               <span className={rowLabelClass}>{fundingPressure.label}</span>
               <span className="ml-auto flex items-baseline gap-1.5 tabular-nums">
                 <strong className="text-sm font-semibold text-white">{fundingPressure.current}</strong>
@@ -89,9 +83,6 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
           {/* Risk appetite: a buffer — the pace it is being consumed at. */}
           <div className="space-y-1.5 border-t border-white/[0.04] pt-3">
             <Link href={DRIVER_LINKS["risk-appetite"]} className={rowLinkClass}>
-              <div className={rowIconClass}>
-                <Shield size={15} />
-              </div>
               <span className={rowLabelClass}>{riskAppetite.label}</span>
               <span className="ml-auto tabular-nums">
                 <strong className="text-sm font-semibold text-white">{riskAppetite.current}</strong>
@@ -117,9 +108,6 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
               breakpoint of their own, so there is no line to be near. */}
           <div className="border-t border-white/[0.04] pt-3">
             <Link href={DRIVER_LINKS.financing} className={rowLinkClass}>
-              <div className={rowIconClass}>
-                <Percent size={15} />
-              </div>
               <span className={rowLabelClass}>{financing.label}</span>
               <span className="ml-auto flex items-baseline gap-1.5 tabular-nums">
                 <strong className="text-sm font-semibold text-white">

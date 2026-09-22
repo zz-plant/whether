@@ -80,7 +80,7 @@
 - JS interaction rule: avoid JavaScript layout read/write loops (`getBoundingClientRect`, `offset*`, forced sync reflow) for reveal/chip transitions; use CSS transitions and IntersectionObserver-only visibility toggles.
 - Accessibility floor for interactive controls in dark cards:
   - keep minimum hit area at least 44x44 CSS px,
-  - preserve high-contrast focus indicators (outline + halo) on `.weather-button`, `.weather-button-primary`, `.weather-pill`, and `.weather-tab`,
+  - preserve high-contrast focus indicators (outline + halo) on `.weather-button`, `.weather-button-primary`, `.weather-pill`,
   - ensure keyboard users can visibly track focus on citation/copy actions.
 
 ## X. Shared action-link primitives
@@ -206,7 +206,7 @@ take the other's job.
   | --- | --- | --- | --- |
   | Stamp | `--radius-sm` (2px) | `rounded-sm`, `.weather-tag`, `.weather-chip`, `.weather-hub-chip` | status, verdict, regime, confidence and analog badges; chips; tags |
   | Data | `--radius-md` (4px) | `rounded-md`, `rounded` | stat tiles, rule segments, trust lanes, loading stages |
-  | Control | `--radius-lg` (6px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-tab`, `.weather-cta`, `.weather-input`, `.weather-control`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, select, disclosure trigger, toast action |
+  | Control | `--radius-lg` (6px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-cta`, `.weather-input`, `.weather-control`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, select, disclosure trigger, toast action |
   | Card | `--radius-xl` (10px) | `rounded-xl`, `.weather-card`, the hub hero/section/card shells, page section shells | a self-contained item or section |
   | Surface | `--radius-2xl` (16px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
   | Round | `--radius-full` | `rounded-full` | dots, markers, spinners, switches, progress bars, icon wells, seals |

@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, FileText, AlertCircle } from "lucide-react";
 import type { TrackRecord } from "../../../lib/report/trackRecord";
-import { useClipboardCopy } from "../useClipboardCopy";
+import { ClipboardActionRow } from "../clipboardActionRow";
+import { CheckIcon, CopyIcon } from "../uiIcons";
+import { getClipboardUiState, useClipboardCopy } from "../useClipboardCopy";
 
 type Props = {
   record: TrackRecord | null;
@@ -18,8 +19,8 @@ type Props = {
  * only, enforced a six-month payback bar on refactors and held an 18-month cash
  * buffer — statements about the reader's company that no reading produced, in a
  * document labelled for their board. With no record it still wrote "4 consecutive
- * months". Every line here now names something the archive holds, and the button
- * is disabled rather than inventing a record when there is none.
+ * months". Every line here now names something the archive holds, and with no
+ * record there is no button rather than an invented one.
  */
 export const buildRecordSummary = (record: TrackRecord, origin: string) =>
   [
@@ -47,40 +48,25 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
    * Annex Copied!" for a memo that never reached the clipboard. The shared hook
    * awaits the write and separates "clipboard unavailable" from "write failed".
    */
-  const { status, copyToClipboard } = useClipboardCopy({ resetDelay: 2500 });
-  const copied = status === "copied";
-  const failed = status === "error";
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({
+    resetDelay: 2500,
+  });
 
-  const handleExport = () => {
-    if (!record) return;
-    void copyToClipboard(buildRecordSummary(record, window.location.origin), "board-annex");
-  };
+  if (!record) return null;
 
   return (
-    <button
-      type="button"
-      onClick={handleExport}
-      disabled={!record}
-      className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-900/60 px-3.5 py-1.5 text-fluid-xs font-semibold text-slate-200 hover:bg-slate-800/80 hover:text-white hover:border-sky-500/40 transition-all weather-press-scale weather-focus-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-      title="Copy a short memo of what the month-end record shows"
-      aria-label="Copy the record summary"
-    >
-      {copied ? (
-        <>
-          <Check className="size-3.5 text-emerald-300" />
-          <span className="text-emerald-300">Copied</span>
-        </>
-      ) : failed ? (
-        <>
-          <AlertCircle className="size-3.5 text-amber-300" />
-          <span className="text-amber-300">Copy failed — select the page text</span>
-        </>
-      ) : (
-        <>
-          <FileText className="size-3.5 text-sky-400" />
-          <span>Copy the record summary</span>
-        </>
-      )}
-    </button>
+    <ClipboardActionRow
+      label="Copy the record summary"
+      state={getClipboardUiState("board-annex", { status, error, activeTarget, copiedTarget })}
+      onClick={() => void copyToClipboard(buildRecordSummary(record, window.location.origin), "board-annex")}
+      leadingIcon={<CopyIcon />}
+      stateIcons={{ copied: <CheckIcon /> }}
+      buttonLabels={{ error: "Copy failed — select the page text" }}
+      className={className}
+      buttonProps={{
+        title: "Copy a short memo of what the month-end record shows",
+        "aria-label": "Copy the record summary",
+      }}
+    />
   );
 }

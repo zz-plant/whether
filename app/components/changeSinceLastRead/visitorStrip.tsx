@@ -121,15 +121,12 @@ export const ReturningVisitorDeltaStrip = ({
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Since your last review</p>
+          <p className="type-eyebrow">Since your last review</p>
           <h2 id="returning-visitor-delta-title" className="text-base font-semibold text-slate-100 sm:text-lg">
             What changed for your current call.
           </h2>
           <p className="text-xs text-slate-300">
             Previous snapshot {formatDateLabel(previous.recordDate)} · now {formatDateLabel(recordDate)}
-          </p>
-          <p className="text-xs text-slate-400">
-            Use these tags to decide whether this week’s plan should change.
           </p>
         </div>
         <a

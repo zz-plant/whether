@@ -58,8 +58,8 @@ const IMAGE_ARTIFACTS = [
 
 export function ShareImageArtifacts() {
   return (
-    <div className="space-y-3">
-      <h2 className="type-eyebrow">Files and images for a deck or a thread</h2>
+    <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="share-files-heading">
+      <h2 id="share-files-heading" className="type-eyebrow">Files and images for a deck or a thread</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {IMAGE_ARTIFACTS.map((artifact) => (
           <div key={artifact.href} className="weather-card flex flex-col gap-2">
@@ -83,6 +83,6 @@ export function ShareImageArtifacts() {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

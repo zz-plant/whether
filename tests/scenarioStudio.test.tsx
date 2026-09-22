@@ -33,7 +33,9 @@ describe("FossilRecordSection", () => {
     assert.match(html, /Self-serve help centers/);
     assert.match(html, /Pricing/);
     assert.match(html, /Reverse trials/);
-    assert.match(html, /Now: Freezing/);
+    // The "Now: Freezing" chip restated the shell's status line and the
+    // footer cited the product to itself; neither renders any more.
+    assert.doesNotMatch(html, /Now: |Whether Insight Database/);
     assert.doesNotMatch(html, /SCARCITY|CLIMATE/);
   });
 });
@@ -48,10 +50,21 @@ describe("ScenarioStudioSimulator", () => {
       />,
     );
 
-    // Banner
-    assert.match(html, /Simulated Scenario/);
-    assert.match(html, /What if the numbers were different/);
-    assert.match(html, /Not this week&#x27;s data/);
+    // One tag beside the sliders says the data is not this week's; the page
+    // intro already says what the studio is, so there is no banner repeating it.
+    assert.doesNotMatch(html, /Simulated Scenario|role="alert"/);
+    assert.equal((html.match(/Not this week&#x27;s data/g) ?? []).length, 1);
+    assert.match(html, /weather-tag-amber[^>]*>Not this week&#x27;s data/);
+
+    // At this week's values there is nothing to reset to, so no reset control.
+    assert.doesNotMatch(html, /Reset to this week/);
+    // Presets carry their state on the button, not as a badge inside it.
+    assert.equal((html.match(/aria-pressed="false"/g) ?? []).length, 4);
+    assert.doesNotMatch(html, />Active<|shadow-\[0_0_/);
+    // Copy actions are the shared clipboard control at the 44px floor.
+    assert.match(html, /Copy link/);
+    assert.match(html, /Copy this scenario/);
+    assert.doesNotMatch(html, /font-mono/);
 
     // Presets say what they set, not a scenario name
     assert.match(html, /Four preset scenarios/);

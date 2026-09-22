@@ -56,7 +56,6 @@ describe("score band vocabulary", () => {
         boldnessScore={36}
         boldnessDelta={-14}
         regime="SCARCITY"
-        signalDirection="tighten"
         recordDate="2026-09-15"
         fetchedAt="2026-09-15"
         signalData={{ tightnessThreshold: 70, riskAppetiteThreshold: 50 }}

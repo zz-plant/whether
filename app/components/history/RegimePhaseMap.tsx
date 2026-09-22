@@ -1,4 +1,5 @@
 import { ActionLink } from "../ui/actionLink";
+import { StatTile } from "../ui/statTile";
 import {
   PHASE_SPANS,
   REGIME_HEX_COLORS,
@@ -409,49 +410,55 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               was calling Freezing. /signals already states the same caveat over
               the same series; this is that sentence, on the page a reader comes
               to when they want to check the record. */}
-          <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-            <p className="type-eyebrow text-fluid-nano">Last completed month</p>
-            <p className="mt-1 flex items-baseline gap-2">
-              <span
-                aria-hidden="true"
-                className="size-2.5 shrink-0 rounded-full"
-                style={{ background: REGIME_HEX_COLORS[current.regime] }}
-              />
-              <span className="text-lg font-bold text-slate-100">{current.regimeLabel}</span>
-              <span className="text-fluid-nano text-slate-400">{current.monthLabel}</span>
-            </p>
-            <dl className="mt-2 space-y-1 text-fluid-xs">
-              {[gaps.tightness, gaps.riskAppetite].map((gap) => (
-                <div key={gap.axis} className="flex items-baseline justify-between gap-2">
-                  <dt className="text-slate-400">{gap.label}</dt>
-                  {/* The reading and its distance are one phrase; letting it wrap
-                      broke "from 70" across lines while the label beside it had
-                      room to spare. The label takes the wrap instead. */}
-                  <dd className="whitespace-nowrap tabular-nums text-slate-200">
-                    {gap.axis === "tightness" ? current.tightness : current.riskAppetite}
-                    <span className="text-slate-500">
-                      {" "}
-                      / {gap.side === "above" ? "+" : gap.side === "below" ? "−" : "±"}
-                      {gap.distance} from {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
-                    </span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <p className="mt-2 border-t border-white/[0.06] pt-2 text-fluid-nano text-slate-400">
-              {gaps.tightness.distance <= gaps.riskAppetite.distance
-                ? describePhaseGap(gaps.tightness)
-                : describePhaseGap(gaps.riskAppetite)}
-            </p>
-            <p className="mt-2 text-fluid-nano text-slate-500">
-              Every point here is a month-end reading, so this is the last completed
-              month rather than{" "}
-              <Link href="/" className="text-sky-300">
-                this week&rsquo;s call
-              </Link>
-              .
-            </p>
-          </div>
+          <StatTile
+            label="Last completed month"
+            value={
+              <span className="inline-flex items-baseline gap-2">
+                <span
+                  aria-hidden="true"
+                  className="size-2.5 shrink-0 self-center rounded-full"
+                  style={{ background: REGIME_HEX_COLORS[current.regime] }}
+                />
+                {current.regimeLabel}
+              </span>
+            }
+            unit={current.monthLabel}
+            detail={
+              <>
+                <dl className="mt-1 space-y-1 text-fluid-xs">
+                  {[gaps.tightness, gaps.riskAppetite].map((gap) => (
+                    <div key={gap.axis} className="flex items-baseline justify-between gap-2">
+                      <dt className="text-slate-400">{gap.label}</dt>
+                      {/* The reading and its distance are one phrase; letting it wrap
+                          broke "from 70" across lines while the label beside it had
+                          room to spare. The label takes the wrap instead. */}
+                      <dd className="whitespace-nowrap tabular-nums text-slate-200">
+                        {gap.axis === "tightness" ? current.tightness : current.riskAppetite}
+                        <span className="text-slate-500">
+                          {" "}
+                          / {gap.side === "above" ? "+" : gap.side === "below" ? "−" : "±"}
+                          {gap.distance} from {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
+                        </span>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-2 border-t border-[color:var(--border-subtle)] pt-2 text-fluid-nano text-slate-400">
+                  {gaps.tightness.distance <= gaps.riskAppetite.distance
+                    ? describePhaseGap(gaps.tightness)
+                    : describePhaseGap(gaps.riskAppetite)}
+                </p>
+                <p className="mt-2 text-fluid-nano text-slate-500">
+                  Every point here is a month-end reading, so this is the last completed
+                  month rather than{" "}
+                  <Link href="/" className="text-sky-300">
+                    this week&rsquo;s call
+                  </Link>
+                  .
+                </p>
+              </>
+            }
+          />
 
           <div>
             <p className="type-eyebrow text-fluid-nano">Months in each quadrant</p>
@@ -482,8 +489,8 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
       {/* The chart's data, not a summary of it. A `<desc>` tells a screen reader
           what the picture shows; this is what a sighted reader can get by
           looking at a point, and there is no other route to it. */}
-      <details className="group">
-        <summary className="cursor-pointer select-none text-fluid-nano text-white/55 hover:text-white/80">
+      <details className="weather-auto-chevron">
+        <summary className="text-fluid-nano text-slate-400">
           Plotted months, as a table
         </summary>
         <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-white/[0.06]">
