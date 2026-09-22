@@ -213,7 +213,11 @@ type RuleContext = {
   };
 };
 
-const areaOrder: DecisionArea[] = ["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"];
+/* The one order. Every surface that lists the five areas — the homepage table, the plan page's
+   playbook, the guardrail tags on /share, the scenario routes — reads it, so a reader who checks
+   Fundraising every Monday finds it in the same row on every page and in every paste. */
+export const decisionAreaOrder: readonly DecisionArea[] = ["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"];
+const areaOrder: DecisionArea[] = [...decisionAreaOrder];
 
 const areaLabels: Record<DecisionArea, string> = {
   hiring: "Hiring",
