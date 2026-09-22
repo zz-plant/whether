@@ -55,8 +55,8 @@ const stringLiterals = (source: string): Literal[] => {
 };
 
 /* The lookahead stops `weather-pill` from matching `weather-pill-muted` and `weather-surface`
-   from matching `weather-surface-sky`: modifiers ride alongside the base class and are not
-   radius owners on their own. */
+   from matching `weather-surface-secondary`: modifiers ride alongside the base class and are
+   not radius owners on their own. */
 const CONTROL_CLASS = /\bweather-(?:button-primary|button|pill|tab|cta|input|control)(?![\w-])/;
 /* Container classes whose stylesheet rule owns a card or surface radius (§XIV, Card and Surface tiers). */
 const CONTAINER_CLASS = /\bweather-(?:card|surface|lever-card|hub-hero|hub-section|hub-card|hub-link-card)(?![\w-])/;

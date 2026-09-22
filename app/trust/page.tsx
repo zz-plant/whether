@@ -28,8 +28,6 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether trust hub",
 });
 
-import { TrustRadarGlyph } from "../components/illustrations/TrustRadarGlyph";
-
 export default async function MethodPage({
   searchParams,
 }: {
@@ -47,7 +45,7 @@ export default async function MethodPage({
     warnings,
     meetingSnippet,
     revisitBullets,
-    trustVerdict,
+    trustVerdictToneClasses,
     runHistory,
     reportShellProps,
   } = await buildTrustPageModel();
@@ -65,44 +63,34 @@ export default async function MethodPage({
         title="Sources and last update"
         description="Where each feed comes from and when it last refreshed."
       >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            {/* Split from the Sources card in System status rather than
-                repeating it: that card owns each source's *status*, so this one
-                owns when each last updated and where it came from. It used to
-                print the status labels too, which put "Canonical snapshot (high
-                confidence)" on the page four times. Decision date and Trust
-                summary rows dropped for the same reason — both are stated in the
-                System status block above. */}
-            <p className="text-xs font-semibold tracking-[0.06em] text-white/60">Source freshness</p>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li><span className="text-white/60">Treasury:</span> {reportData.treasuryProvenance.timestampLabel}</li>
-              <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.timestampLabel}</li>
-            </ul>
-            <div className="flex flex-wrap gap-2 text-xs">
-              {/* Both source URLs are optional. As bare <a href={undefined}> these
-                  rendered a pill that looked clickable but was neither a link nor
-                  keyboard-focusable; the typed href on the shared primitive is what
-                  surfaced it. Render the affordance only when there is somewhere to go. */}
-              {reportData.treasuryProvenance.sourceUrl ? (
-                <ActionLink href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Treasury source</ActionLink>
-              ) : null}
-              {reportData.macroProvenance.sourceUrl ? (
-                <ActionLink href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Macro source</ActionLink>
-              ) : null}
-            </div>
-          </article>
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Before you share or approve</p>
-            <p className="text-sm text-slate-200">
-              Paste one of these when someone asks where the call came from.
-            </p>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#sources-freshness" variant="pill">Citation line</ActionLink>
-              <ActionLink href="#meeting-snippet" variant="pill">Meeting snippet</ActionLink>
-            </div>
-          </article>
-        </div>
+        {/* One card. A second, "Before you share or approve", held two pills to
+            sections the rail already lists. */}
+        <article className="weather-hub-card space-y-3 px-4 py-4">
+          {/* Split from the Sources card in System status rather than
+              repeating it: that card owns each source's *status*, so this one
+              owns when each last updated and where it came from. It used to
+              print the status labels too, which put "Canonical snapshot (high
+              confidence)" on the page four times. Decision date and Trust
+              summary rows dropped for the same reason — both are stated in the
+              System status block above. */}
+          <p className="type-eyebrow">Source freshness</p>
+          <ul className="space-y-2 text-sm text-slate-300">
+            <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.timestampLabel}</li>
+            <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.timestampLabel}</li>
+          </ul>
+          <div className="flex flex-wrap gap-2 text-xs">
+            {/* Both source URLs are optional. As bare <a href={undefined}> these
+                rendered a pill that looked clickable but was neither a link nor
+                keyboard-focusable; the typed href on the shared primitive is what
+                surfaced it. Render the affordance only when there is somewhere to go. */}
+            {reportData.treasuryProvenance.sourceUrl ? (
+              <ActionLink href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Treasury source</ActionLink>
+            ) : null}
+            {reportData.macroProvenance.sourceUrl ? (
+              <ActionLink href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Macro source</ActionLink>
+            ) : null}
+          </div>
+        </article>
       </ReportSection>
 
       <ReportSection
@@ -196,7 +184,7 @@ export default async function MethodPage({
       </ReportSection>
 
       <ReportSection id="meeting-snippet" title="Meeting snippet" description="Paste into notes or a meeting agenda.">
-        <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200 shadow-[0_10px_26px_-24px_rgba(0,0,0,0.55)]">
+        <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200">
           <code>{meetingSnippet}</code>
         </pre>
       </ReportSection>
@@ -222,23 +210,13 @@ export default async function MethodPage({
   return (
     <ReportShell {...reportShellProps}>
       <ReportSection id="trust-snapshot" title="System status" description="Five facts behind this week's call: data, freshness, sources, confidence, warnings.">
-        <div className={`mb-3 flex items-center justify-between gap-4 rounded-lg border p-3.5 sm:p-4 ${trustVerdict.toneClasses}`}>
-          <div className="flex items-center gap-3">
-            <TrustRadarGlyph tone={reportShellProps.trustStatusTone} size={40} />
-            <div>
-              <p className="text-sm font-bold tracking-tight text-white">{trustVerdict.label}</p>
-              <p className="text-xs text-slate-300">{trustVerdict.detail}</p>
-            </div>
-          </div>
-          <span className="hidden sm:inline-block text-fluid-nano font-mono text-slate-400">
-            {reportData.recordDateLabel}
-          </span>
-        </div>
         {/* One strip, five cells. This was five stacked cards each opening with
             a coloured dot and a sentence that said "cached" a different way;
             the state is five facts, and a row of five labelled values says them
-            in one line. The detail behind each sits in the sections below. */}
-        <dl className={`weather-hub-card grid grid-cols-2 gap-px overflow-hidden border sm:grid-cols-5 ${trustVerdict.toneClasses}`}>
+            in one line. The detail behind each sits in the sections below. A
+            verdict banner used to sit above it — a glyph, a bold label and the
+            date — restating the strip; the strip's tone border is the verdict. */}
+        <dl className={`weather-hub-card grid grid-cols-2 gap-px overflow-hidden border sm:grid-cols-5 ${trustVerdictToneClasses}`}>
           {[
             {
               key: "data",
@@ -307,8 +285,8 @@ export default async function MethodPage({
         <UrlDetails
           queryKey="sources"
           initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "sources")}
-          className="group mt-6 rounded-xl border border-white/[0.10] bg-slate-950/20 px-5 py-4"
-          summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow text-white/60 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-sky-400 select-none"
+          className="group mt-6 rounded-xl border border-[color:var(--border-default)] bg-slate-950/20 px-5 py-4"
+          summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
           summary={
             <>
               <span>Detailed verification &amp; sources</span>

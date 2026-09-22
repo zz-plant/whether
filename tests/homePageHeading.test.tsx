@@ -41,7 +41,6 @@ const heroProps = {
   boldnessDelta: -2,
   regime: "DEFENSIVE" as const,
   postureLabel: "Contraction",
-  signalDirection: "tighten" as const,
   recordDate: "2026-08-14",
   fetchedAt: "2026-08-15",
   signalData: { tightnessThreshold: 68 },

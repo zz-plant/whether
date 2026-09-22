@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageShell } from "../components/pageShell";
+import { ActionLink } from "../components/ui/actionLink";
 import { ShareCopyControls } from "./shareCopyControls";
 import { GuardrailTagControls } from "./guardrailTagControls";
 import { PullPolicyControls } from "./pullPolicyControls";
@@ -126,7 +126,6 @@ const buildCurrentShareArtifact = async () => {
     recordDate: treasury.record_date,
     recordDateLabel: reportData.recordDateLabel,
     assessment,
-    treasuryProvenance: reportData.treasuryProvenance,
     trustLine: `Source: ${treasury.source}`,
     // The picker's object, from the same snapshot the long-form builders read.
     briefArtifact: buildBriefArtifactFromSnapshot({
@@ -170,27 +169,32 @@ export default async function SharePage() {
   return (
     <PageShell backdropVariant="default">
       <BriefArtifactScript artifact={artifact.briefArtifact} />
-      <section className="weather-panel space-y-5 px-5 py-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-2xl space-y-2">
-            <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
-              Current weekly artifact
-            </p>
-            <h1 className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s call</h1>
-            <p className="text-sm leading-relaxed text-white/60">
-              Copy this week&apos;s call, its pause and resume lines, and its source into Slack, a slide, or a
-              citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
-              embed for a newsletter or wiki is at the end.
-            </p>
-            <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
+      {/* One panel per group, not six h2s inside one. `.weather-panel` is the
+          padding tier, so each group's surfaces are the outermost boxes that
+          draw anything and own their own elevation. */}
+      <div className="space-y-5 sm:space-y-8">
+        <section className="weather-panel space-y-5 px-5 py-5" aria-labelledby="share-page-title">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl space-y-2">
+              <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
+                Current weekly artifact
+              </p>
+              <h1 id="share-page-title" className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s call</h1>
+              <p className="text-sm leading-relaxed text-white/60">
+                Copy this week&apos;s call, its pause and resume lines, and its source into Slack, a slide, or a
+                citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
+                embed for a newsletter or wiki is at the end.
+              </p>
+              <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
+            </div>
+            <TransmissionPipelineGlyph size={64} className="self-start sm:self-center" />
           </div>
-          <TransmissionPipelineGlyph size={64} className="self-start sm:self-center" />
-        </div>
+        </section>
 
         <SharePageFormats />
 
-        <div className="space-y-3">
-          <h2 className="type-eyebrow">Longer formats</h2>
+        <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="longer-formats-heading">
+          <h2 id="longer-formats-heading" className="type-eyebrow">Longer formats</h2>
           <ShareCopyControls
             recordDate={artifact.recordDate}
             slackBrief={artifact.slackBrief}
@@ -200,42 +204,39 @@ export default async function SharePage() {
             investorUpdate={artifact.investorUpdate}
             calendarDetails={artifact.calendarDetails}
           />
-        </div>
+        </section>
 
         {/* The credential-free slice of the Linear/Jira sync, beside the ticket
-            brief it extends. One paste-ready block per business area. */}
-        <div className="space-y-3">
-          <GuardrailTagControls blocks={artifact.guardrailTagBlocks} />
-          <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
-        </div>
+            brief it extends. One paste-ready block per business area. Each
+            renders its own panel, or nothing when it has no blocks. */}
+        <GuardrailTagControls blocks={artifact.guardrailTagBlocks} />
+        <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
 
         {/* Role memos are share formats. They sat under the sixth collapsed
             section of /operate, where nobody planning a week went looking for
             a CFO memo; they belong beside Slack, email and the meeting pack. */}
-        <div id="role-memos" className="space-y-3">
-          <h2 className="type-eyebrow">Brief your team by role</h2>
+        <section id="role-memos" className="weather-panel space-y-3 px-5 py-5" aria-labelledby="role-memos-heading">
+          <h2 id="role-memos-heading" className="type-eyebrow">Brief your team by role</h2>
           <ExecutiveBriefingPanel
             assessment={artifact.assessment}
             recordDateLabel={artifact.recordDateLabel}
-            provenance={artifact.treasuryProvenance}
-            showProvenance={false}
           />
-        </div>
+        </section>
 
         {/* Text formats first, then the same call as a picture. */}
         <ShareImageArtifacts />
 
-        <div>
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100 no-underline">
+        <div className="px-5">
+          <ActionLink href="/" variant="pill">
             Return to weekly brief
-          </Link>
+          </ActionLink>
         </div>
-      </section>
 
-      {/* Anchored so the retired /embed route lands on it. */}
-      <section id="embed" className="weather-panel px-5 py-5">
-        <EmbedBuilder />
-      </section>
+        {/* Anchored so the retired /embed route lands on it. */}
+        <section id="embed" className="weather-panel px-5 py-5">
+          <EmbedBuilder />
+        </section>
+      </div>
 
       <SubscribeForm />
     </PageShell>

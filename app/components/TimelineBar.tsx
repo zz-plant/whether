@@ -595,7 +595,7 @@ export function TimelineBar({
         {/* Hover / Preview Indicator Ghost */}
         {previewIndex !== null ? (
           <div
-            className="absolute top-0 bottom-0 pointer-events-none w-0.5 bg-white/70 shadow-[0_0_8px_rgba(255,255,255,0.8)] z-10 transition-transform duration-75"
+            className="absolute top-0 bottom-0 pointer-events-none w-0.5 bg-white/70 z-10 transition-transform duration-75"
             style={{
               left: `${previewPercent}%`,
               transform: "translateX(-50%)",
@@ -614,8 +614,8 @@ export function TimelineBar({
           }}
         >
           <div
-            className={`h-8 w-3 rounded-[3px] border-2 bg-slate-950 shadow-[0_0_10px_rgba(0,0,0,0.8)] flex items-center justify-center ${
-              isPending ? "border-sky-300 animate-pulse" : "border-white"
+            className={`h-8 w-3 rounded-[3px] border-2 bg-slate-950 shadow-[var(--elev-2)] flex items-center justify-center ${
+              isPending ? "border-sky-300 motion-safe:animate-pulse" : "border-white"
             }`}
           >
             <div className="h-3 w-0.5 bg-white/80 rounded-full" />

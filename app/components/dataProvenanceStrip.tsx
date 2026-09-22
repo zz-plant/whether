@@ -9,11 +9,22 @@
  * scoped to its own panel, each reloading the document and discarding unsaved
  * plan text and planner inputs elsewhere on the page. The page-level retry lives
  * on `LiveDataFallbackAlert`, where the whole brief is the unit being retried.
+ *
+ * What it stopped carrying on 2026-09-22, and why:
+ * - "Confidence 92%": a status → percent table (100/92/64/52/28) with no
+ *   measurement behind it, stamped on eight panels beside the real confidence
+ *   label. A figure that is a lookup of the label next to it is the label
+ *   printed twice, once as a number nobody computed.
+ * - "Streaming feeds updated within the last 24 hours" / "updated every 15
+ *   minutes": claims about the pipeline, on a reader surface. The four rows
+ *   below say when the reading was taken and how old it is, which is what a
+ *   reader can act on.
+ * - Two near-copies of one layout (`compact` and `full`), which differed in
+ *   padding, in which two of the four rows the popover restated, and in the
+ *   number of columns. One render; the variant is the column count.
  */
-"use client";
-
-import { Popover } from "@base-ui/react/popover";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
+import { Tag } from "./ui/tag";
 
 export type DataProvenance = {
   sourceLabel: string;
@@ -24,34 +35,18 @@ export type DataProvenance = {
   statusLabel: string;
 };
 
-// Chip color tracks the confidence tier the label states (high = emerald,
+// Tag tone tracks the confidence tier the label states (high = emerald,
 // medium = amber, low = rose) so the hue is monotonic in trust. Live-vs-static
 // is carried separately by the data-mode chip's circle/square icon.
-const statusStyles = {
-  "Live (high confidence)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
-  "Archived snapshot (high)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
-  "Previously cached (medium)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
-  "Fallback active (low)": "border-rose-400/50 bg-rose-500/10 text-rose-200",
-  "Modeled estimate (low)": "border-rose-400/50 bg-rose-500/10 text-rose-200",
-} as const;
+const statusTones: Record<string, "emerald" | "amber" | "rose"> = {
+  "Live (high confidence)": "emerald",
+  "Archived snapshot (high)": "emerald",
+  "Previously cached (medium)": "amber",
+  "Fallback active (low)": "rose",
+  "Modeled estimate (low)": "rose",
+};
 
-const statusDescriptions = {
-  "Live (high confidence)": "Streaming feeds updated within the last 24 hours.",
-  "Archived snapshot (high)": "Historical archive generated from curated Treasury and macro inputs.",
-  "Previously cached (medium)": "Latest available data cached from our last refresh.",
-  "Fallback active (low)": "Fallback snapshot is active while live feeds recover.",
-  "Modeled estimate (low)": "Modeled inputs or backfilled estimates where live data is absent.",
-} as const;
-
-const statusConfidence = {
-  "Live (high confidence)": 100,
-  "Archived snapshot (high)": 92,
-  "Previously cached (medium)": 64,
-  "Fallback active (low)": 52,
-  "Modeled estimate (low)": 28,
-} as const;
-
-const statusDataMode = {
+const statusDataMode: Record<string, { label: string; icon: string; className: string }> = {
   "Live (high confidence)": {
     label: "Dynamic · live feed",
     icon: "live",
@@ -77,6 +72,11 @@ const statusDataMode = {
     icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
+};
+
+const ROW_COLUMNS = {
+  full: "sm:grid-cols-2 xl:grid-cols-4",
+  compact: "sm:grid-cols-2",
 } as const;
 
 export const DataProvenanceStrip = ({
@@ -88,13 +88,9 @@ export const DataProvenanceStrip = ({
   label?: string;
   variant?: "full" | "compact";
 }) => {
-  const statusStyle = statusStyles[provenance.statusLabel as keyof typeof statusStyles];
-  const statusDescription =
-    statusDescriptions[provenance.statusLabel as keyof typeof statusDescriptions] ??
-    "Signal status defined by source availability.";
-  const confidencePct = statusConfidence[provenance.statusLabel as keyof typeof statusConfidence] ?? 50;
+  const statusTone = statusTones[provenance.statusLabel] ?? "slate";
   const dataMode =
-    statusDataMode[provenance.statusLabel as keyof typeof statusDataMode] ?? {
+    statusDataMode[provenance.statusLabel] ?? {
       label: "Static · snapshot",
       icon: "static",
       className: "weather-data-mode weather-data-mode-static",
@@ -103,11 +99,6 @@ export const DataProvenanceStrip = ({
   const dataModeIcon = dataMode.icon === "live"
     ? <StatusLiveIcon className="h-2.5 w-2.5" />
     : <StatusStaticIcon className="h-2.5 w-2.5" />;
-  const derivationLine = provenance.statusLabel === "Live (high confidence)"
-    ? "Derived from U.S. Treasury, inflation, labor, credit, and funding indicators updated every 15 minutes."
-    : provenance.statusLabel === "Modeled estimate (low)"
-      ? "Derived from modeled U.S. Treasury and macro inputs while live coverage is unavailable."
-      : "Derived from the latest U.S. Treasury and macro snapshots available this refresh.";
 
   const provenanceRows = [
     {
@@ -127,100 +118,32 @@ export const DataProvenanceStrip = ({
     },
     {
       label: "Decision as-of",
-      value: <span className="mono text-slate-100">{provenance.recordDateLabel}</span>,
+      value: <span className="tabular-nums text-slate-100">{provenance.recordDateLabel}</span>,
     },
     {
       label: "Data refreshed",
-      value: <span className="mono text-slate-100">{provenance.timestampLabel}</span>,
+      value: <span className="tabular-nums text-slate-100">{provenance.timestampLabel}</span>,
     },
     {
       label: "Data age",
-      value: <span className="mono text-slate-100">{provenance.ageLabel}</span>,
+      value: <span className="tabular-nums text-slate-100">{provenance.ageLabel}</span>,
     },
   ] as const;
 
-  if (variant === "compact") {
-    return (
-      <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.08em] text-slate-200 shadow-none">
-        <p className="text-xs text-slate-300">{derivationLine}</p>
-        <div className="flex flex-wrap items-center gap-2 text-fluid-xs">
-          <span className={`${dataMode.className} type-badge`}>
-            <span aria-hidden="true">{dataModeIcon}</span>
-            <span>{dataMode.label}</span>
-          </span>
-          <span className="inline-flex items-center rounded-sm border border-slate-700/75 bg-slate-900/70 px-2 py-0.5 type-eyebrow text-slate-100">
-            Confidence {confidencePct}%
-          </span>
-          <Popover.Root>
-            <Popover.Trigger
-              className={`weather-chip min-h-[44px] border px-3 py-2 type-badge transition-colors hover:border-slate-500/80 ${
-                statusStyle ?? "border-slate-700 text-slate-200"
-              }`}
-            >
-              {provenance.statusLabel}
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Positioner side="top" align="center" sideOffset={10}>
-                <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
-                  <p className="text-fluid-micro font-medium tracking-[0.06em] text-slate-300">Trust snapshot</p>
-                  <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
-                <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
-                  <p><span className="text-slate-400">Confidence:</span> {confidencePct}%</p>
-                    <p><span className="text-slate-400">Decision as-of:</span> {provenance.recordDateLabel}</p>
-                    <p><span className="text-slate-400">Data refreshed:</span> {provenance.timestampLabel}</p>
-                </div>
-              </Popover.Popup>
-            </Popover.Positioner>
-            </Popover.Portal>
-          </Popover.Root>
-        </div>
-        <div className="grid gap-2 rounded-md border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
-          {provenanceRows.map((row) => (
-            <p key={row.label} className="space-y-1">
-              <span className="block type-eyebrow">{row.label}</span>
-              <span className="block tracking-normal normal-case">{row.value}</span>
-            </p>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+  /* A bordered row inside a panel, not a `weather-surface`: the panel it sits
+     in owns the elevation (ui-ux-standards §XIII), so this draws a rule and
+     nothing that lifts. */
   return (
-    <div className="weather-surface space-y-2 border-slate-800/80 bg-slate-950/50 px-4 py-3 text-xs font-semibold text-slate-300 shadow-none">
-      <p className="text-xs font-medium normal-case tracking-normal text-slate-300">{derivationLine}</p>
+    <div className="space-y-2 rounded-md border border-[color:var(--border-subtle)] px-4 py-3 text-xs text-slate-300">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-400 type-eyebrow">{label}</span>
         <span className={`${dataMode.className} type-badge`}>
           <span aria-hidden="true">{dataModeIcon}</span>
           <span>{dataMode.label}</span>
         </span>
-        <span className="rounded-sm border border-slate-700/70 bg-slate-900/70 px-2 py-1 type-eyebrow text-slate-200">
-          Confidence {confidencePct}%
-        </span>
-        <Popover.Root>
-          <Popover.Trigger
-            className={`weather-chip inline-flex min-h-[44px] items-center border px-2 py-1 type-badge transition-colors hover:border-slate-500/80 ${
-              statusStyle ?? "border-slate-700 text-slate-200"
-            }`}
-          >
-            {provenance.statusLabel}
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Positioner side="top" align="center" sideOffset={8}>
-              <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-md border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
-                <p className="type-eyebrow">Trust snapshot</p>
-                <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
-                <div className="mt-2 space-y-1 text-fluid-xs text-slate-300">
-                  <p><span className="text-slate-400">Confidence:</span> {confidencePct}%</p>
-                  <p><span className="text-slate-400">Data age:</span> {provenance.ageLabel}</p>
-                </div>
-              </Popover.Popup>
-            </Popover.Positioner>
-          </Popover.Portal>
-        </Popover.Root>
+        <Tag tone={statusTone}>{provenance.statusLabel}</Tag>
       </div>
-      <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
+      <div className={`grid gap-2 text-xs text-slate-200 ${ROW_COLUMNS[variant]}`}>
         {provenanceRows.map((row) => (
           <p key={row.label} className="space-y-1">
             <span className="block type-eyebrow">{row.label}</span>

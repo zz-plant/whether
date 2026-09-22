@@ -2,6 +2,7 @@ import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachin
 import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
+import { StatTile } from "../ui/statTile";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -37,35 +38,16 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
         </p>
       </div>
 
-      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <dt className="text-fluid-nano text-slate-400">Call changes</dt>
-          <dd className="text-fluid-lg font-semibold tabular-nums text-slate-100">
-            {record.transitions.length}
-            <span className="ml-1 text-fluid-nano font-normal text-slate-400">in {record.observations} mo</span>
-          </dd>
-        </div>
-        <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <dt className="text-fluid-nano text-slate-400">Signaled in advance</dt>
-          <dd className="text-fluid-lg font-semibold tabular-nums text-slate-100">
-            {record.signaledCount}
-            <span className="ml-1 text-fluid-nano font-normal text-slate-400">of {record.transitions.length}</span>
-          </dd>
-        </div>
-        <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <dt className="text-fluid-nano text-slate-400">Median hold</dt>
-          <dd className="text-fluid-lg font-semibold tabular-nums text-slate-100">
-            {record.medianHoldMonths ?? "—"}
-            {record.medianHoldMonths != null ? (
-              <span className="ml-1 text-fluid-nano font-normal text-slate-400">mo</span>
-            ) : null}
-          </dd>
-        </div>
-        <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <dt className="text-fluid-nano text-slate-400">Reversed after one month</dt>
-          <dd className="text-fluid-lg font-semibold tabular-nums text-slate-100">{record.whipsawCount}</dd>
-        </div>
-      </dl>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <StatTile label="Call changes" value={record.transitions.length} unit={`in ${record.observations} mo`} />
+        <StatTile label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        <StatTile
+          label="Median hold"
+          value={record.medianHoldMonths ?? "—"}
+          unit={record.medianHoldMonths != null ? "mo" : undefined}
+        />
+        <StatTile label="Reversed after one month" value={record.whipsawCount} />
+      </div>
 
       {recentTransitions.length > 0 ? (
         <div className="overflow-x-auto">

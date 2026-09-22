@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { paceLabel } from "../../../lib/report/paceLabels";
@@ -28,6 +28,7 @@ import {
   resolveRunwayPlannerRequest,
 } from "../../../lib/report/runwayPlannerInputs";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import type { ReportData } from "../../../lib/report/reportData";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
   { value: "b2b-saas", label: "B2B SaaS" },
@@ -120,6 +121,12 @@ const postureForPolicyPosture = (posture: RegimeAssessment["policyAssessment"]["
 const selectClassName =
   "mt-1 min-h-[44px] w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-base text-[var(--app-text)]";
 
+/* Both series arrive as arrays keyed by id. The memo used to reach for
+   `sensors.baseRate` through `any`, which is never a property of an array, so
+   every source line it printed read "N/A". */
+const readingValue = (reading: { value: number | null } | undefined) =>
+  typeof reading?.value === "number" ? reading.value.toFixed(2) : "N/A";
+
 /**
  * Runway, burn, revenue, and growth come from the operator profile shared with
  * the plan stress tests, and the stage from the same cookie the brief reads.
@@ -135,8 +142,8 @@ export function RunwayPlannerPanel({
   recordDateLabel = "weekly",
 }: {
   assessment: RegimeAssessment;
-  sensors?: any;
-  macroSeries?: any;
+  sensors?: ReportData["sensors"];
+  macroSeries?: ReportData["macroSeries"];
   recordDateLabel?: string;
 }) {
   const { profile: storedProfile, setProfileField } = useOperatorProfile();
@@ -172,8 +179,6 @@ export function RunwayPlannerPanel({
     },
     [profile, setProfileField, stage, syncPlanLink],
   );
-  const [showMethodology, setShowMethodology] = useState(false);
-  const [showMemo, setShowMemo] = useState(false);
 
   const resolution = useMemo(() => resolveRunwayPlannerRequest(profile, stage), [profile, stage]);
 
@@ -200,11 +205,11 @@ export function RunwayPlannerPanel({
 
   const memoMarkdown = useMemo(() => {
     if (!output || !resolution.ready) return "";
-    const baseRateVal = sensors?.baseRate?.valueLabel ?? sensors?.baseRate?.value ?? "N/A";
-    const slopeVal = sensors?.curveSlope?.valueLabel ?? sensors?.curveSlope?.value ?? "N/A";
-    const cpiVal = macroSeries?.cpi?.valueLabel ?? macroSeries?.cpi?.value ?? "N/A";
-    const unempVal = macroSeries?.unemployment?.valueLabel ?? macroSeries?.unemployment?.value ?? "N/A";
-    const bbbVal = macroSeries?.bbbSpread?.valueLabel ?? macroSeries?.bbbSpread?.value ?? "N/A";
+    const baseRateVal = readingValue(sensors?.find((reading) => reading.id === "BASE_RATE"));
+    const slopeVal = readingValue(sensors?.find((reading) => reading.id === "CURVE_SLOPE"));
+    const cpiVal = readingValue(macroSeries?.find((reading) => reading.id === "CPI_YOY"));
+    const unempVal = readingValue(macroSeries?.find((reading) => reading.id === "UNEMPLOYMENT_RATE"));
+    const bbbVal = readingValue(macroSeries?.find((reading) => reading.id === "BBB_CREDIT_SPREAD"));
     const conditions = getRegimePublicLabel(assessment.regime);
     const pace = paceLabel(assessment.policyAssessment.posture).toLowerCase();
     const { request, growthAssumedFlat } = resolution;
@@ -254,33 +259,16 @@ This memo lines the budget and spending limits up with those conditions:
         <p className="mt-2 text-sm text-slate-300">
           Check your runway plan against this week&apos;s market call so burn, fundraising timing, and reopen triggers stay aligned.
         </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setShowMethodology((current) => !current)}
-            className="inline-flex min-h-[44px] items-center rounded-sm border border-slate-600/70 px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 focus:outline-none"
-          >
+        {/* Native disclosure: the method is evidence for the figures below,
+            and its open state is nobody else's business, so no query key. */}
+        <details className="weather-auto-chevron mt-3">
+          <summary className="text-xs font-semibold tracking-[0.12em] text-slate-200">
             How is this calculated?
-          </button>
-          {output ? (
-            <button
-              type="button"
-              onClick={() => setShowMemo((current) => !current)}
-              className={`inline-flex min-h-[44px] items-center rounded-sm border px-3 py-1.5 text-xs font-semibold tracking-[0.12em] focus:outline-none ${
-                showMemo
-                  ? "border-sky-400/80 bg-sky-500/10 text-sky-100"
-                  : "border-slate-600/70 text-slate-200 hover:border-sky-400/70"
-              }`}
-            >
-              {showMemo ? "Hide budget memo" : "Show budget memo"}
-            </button>
-          ) : null}
-        </div>
-        {showMethodology ? (
-          <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
+          </summary>
+          <p className="rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
             Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions; growth compounds monthly, and with no revenue the burn multiple is read as 4x.
-          </div>
-        ) : null}
+          </p>
+        </details>
       </div>
 
       <div id="ops-runway-inputs" className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -479,13 +467,13 @@ This memo lines the budget and spending limits up with those conditions:
             ) : null}
           </div>
 
-          {showMemo ? (
-            <div id="ops-board-memo" className="weather-surface border-sky-500/25 bg-slate-950/60 p-5 space-y-4">
+          <details id="ops-board-memo" className="weather-surface weather-auto-chevron p-5">
+            <summary className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+              Budget memo
+            </summary>
+            <div className="space-y-4">
               <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                <div>
-                  <p className="type-eyebrow text-sky-200">Budget memo</p>
-                  <p className="text-fluid-xs text-slate-400">Built from the figures above. Check them before you send it.</p>
-                </div>
+                <p className="text-fluid-xs text-slate-400">Built from the figures above. Check them before you send it.</p>
                 <ClipboardActionRow
                   label="Copy memo"
                   state={memoClipboardState}
@@ -499,7 +487,7 @@ This memo lines the budget and spending limits up with those conditions:
                 {memoMarkdown}
               </pre>
             </div>
-          ) : null}
+          </details>
 
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-slate-400">Copy this block into Slack or a note.</p>

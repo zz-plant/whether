@@ -170,6 +170,7 @@ export const buildSignalsPageModel = async (
     TimeMachinePanel,
     RegimeTimelinePanel,
   } = await loadSignalsPagePanels({
+    showDetail: resolveSignalsView(resolvedSearchParams) === "detail",
     showAdvanced,
     showFullDiagnostics,
   });

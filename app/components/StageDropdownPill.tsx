@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, Check } from "lucide-react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
   DEFAULT_OPERATOR_STAGE,
@@ -11,6 +9,7 @@ import {
   type OperatorStage,
 } from "../../lib/report/operatorStage";
 import { persistOperatorStage, useOperatorStage } from "./useOperatorStage";
+import { HeaderChoicePill } from "./HeaderChoicePill";
 
 interface StageDropdownPillProps {
   /**
@@ -23,12 +22,11 @@ interface StageDropdownPillProps {
   className?: string;
 }
 
+/** The stage choice at phone width. The control itself is `HeaderChoicePill`. */
 export function StageDropdownPill({
   activeStage,
   className = "",
 }: StageDropdownPillProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -40,31 +38,6 @@ export function StageDropdownPill({
   const selectedStageKey = activeStage
     ? operatorStageForVariantMode(activeStage)
     : storedStage ?? DEFAULT_OPERATOR_STAGE;
-  const selectedOption = OPERATOR_STAGE_OPTIONS.find((opt) => opt.key === selectedStageKey) ?? OPERATOR_STAGE_OPTIONS[1];
-
-  // Close on outside click or Escape
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && event.target instanceof Node && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen]);
 
   const handleSelectStage = (stage: OperatorStage) => {
     persistOperatorStage(stage);
@@ -75,61 +48,18 @@ export function StageDropdownPill({
       params.set("stage", stage);
     }
     const query = params.toString();
-    router.push(`${pathname}${query ? `?${query}` : ""}`);
-    setIsOpen(false);
+    // `replace`, like the sm+ selector for the same setting: this is the same
+    // choice at a different width, and the two must not disagree about Back.
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   return (
-    <div ref={dropdownRef} className={`relative inline-block text-left ${className}`}>
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-        aria-label={`Current stage: ${selectedOption.label}. Tap to change stage`}
-        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-900/80 px-3 py-1 text-xs font-semibold text-slate-200 shadow-sm backdrop-blur-md transition-colors hover:border-sky-500/40 hover:bg-slate-800/80 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-      >
-        <span>{selectedOption.label}</span>
-        <ChevronDown
-          size={14}
-          className={`text-slate-400 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`}
-          aria-hidden="true"
-        />
-      </button>
-
-      {isOpen ? (
-        <div
-          role="menu"
-          aria-label="Select startup lifecycle stage"
-          className="absolute right-0 z-50 mt-1.5 w-48 origin-top-right rounded-xl border border-slate-800/90 bg-slate-950/95 p-1.5 shadow-2xl backdrop-blur-xl ring-1 ring-white/5 focus:outline-none"
-        >
-          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-            Startup Stage
-          </div>
-          {OPERATOR_STAGE_OPTIONS.map((option) => {
-            const isSelected = selectedStageKey === option.key;
-            return (
-              <button
-                key={option.key}
-                type="button"
-                role="menuitem"
-                onClick={() => handleSelectStage(option.key)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition-colors ${
-                  isSelected
-                    ? "bg-sky-500/15 font-semibold text-sky-300"
-                    : "text-slate-300 hover:bg-slate-900 hover:text-white"
-                }`}
-              >
-                <div>
-                  <div>{option.label}</div>
-                  <div className="text-[10px] text-slate-400">{option.sublabel}</div>
-                </div>
-                {isSelected ? <Check size={14} className="text-sky-400 shrink-0 ml-2" /> : null}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
-    </div>
+    <HeaderChoicePill
+      label="Stage"
+      options={OPERATOR_STAGE_OPTIONS}
+      value={selectedStageKey}
+      onSelect={handleSelectStage}
+      className={className}
+    />
   );
 }

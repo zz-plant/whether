@@ -36,6 +36,7 @@ import { MobileSectionChips } from "./mobileSectionChips";
 import type { RegimeIconType } from "./pageShell";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
+import type { OperatingLoopStep } from "./illustrations/OperatingLoopGlyph";
 import { NextStepCard } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
@@ -48,6 +49,8 @@ type ReportShellInput = {
   pageTitle: string;
   pageSummary: string;
   sectionLinks: ReportSectionLink[];
+  /** The route's step in the operating loop, drawn beside the intro. */
+  activeStep?: OperatingLoopStep;
   trustStatusTone: "stable" | "warning" | "historical";
   degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
   showOfflineBadge?: boolean;
@@ -66,7 +69,7 @@ type ReportShellInput = {
 
 type ReportShellModel = {
   status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel">;
-  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "sectionLinks">;
+  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "sectionLinks" | "activeStep">;
   trust: Pick<ReportShellInput, "trustStatusTone" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel">;
   chrome?: Pick<ReportShellInput, "sidebarVariant">;
   actions?: Pick<ReportShellInput, "primaryCta" | "exportCta" | "showShare" | "nextStep" | "nextRefreshLabel">;
@@ -106,6 +109,7 @@ export const ReportShell = (props: ReportShellProps) => {
     pageTitle,
     pageSummary,
     sectionLinks,
+    activeStep,
     trustStatusTone,
     degradedSourceRows,
     showOfflineBadge = false,
@@ -184,6 +188,7 @@ export const ReportShell = (props: ReportShellProps) => {
             resolvedNextRefreshLabel={resolvedNextRefreshLabel}
             showOfflineBadge={showOfflineBadge}
             offlineBadgeLabel={offlineBadgeLabel}
+            activeStep={activeStep}
           />
 
           {/* The section rule was white/[0.04] — below the visible threshold

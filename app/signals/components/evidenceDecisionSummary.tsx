@@ -1,12 +1,5 @@
-"use client";
-
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { displaySignalLabel } from "./evidenceSectionShared";
-import {
-  MarketVectorBarometer,
-  PressureDriverGauge,
-  ThresholdGateGlyph,
-} from "../../components/illustrations/SignalTelemetryGlyphs";
 
 /**
  * The first task block on /signals: what the evidence means now, and what else
@@ -18,6 +11,10 @@ import {
  * - a "What founders should do this week" playbook with live start and stop
  *   rules — the operating call, which app/signals/AGENTS.md says this directory
  *   must not own and which /operate prints by area.
+ *
+ * Three instrument glyphs went on 2026-09-22: a barometer whose needle came
+ * from whether the action sentence contained "tighten", a pressure gauge whose
+ * fill was a fixed path, and a static trip-wire. None had a reading behind it.
  */
 export const SignalsDecisionSummarySection = ({
   triggerCondition,
@@ -32,12 +29,11 @@ export const SignalsDecisionSummarySection = ({
   actionNowShort?: string;
   topDiagnosticCallouts: Array<{ label: string; why: string }>;
 }) => {
-  const normalizedAction = (actionNowShort ?? "").toLowerCase();
-  const vectorDirection: "tighten" | "ease" | "hold" = normalizedAction.includes("tighten")
-    ? "tighten"
-    : normalizedAction.includes("ease")
-      ? "ease"
-      : "hold";
+  /* One `<dl>` for both cases. The split rows and the plain rows were the same
+     markup written twice, differing only in whether the sentence went through
+     `BoundedValue`. */
+  const renderCondition = (value: string) =>
+    showMicroDecisionRows ? <BoundedValue>{value}</BoundedValue> : value;
 
   return (
   <section
@@ -49,24 +45,18 @@ export const SignalsDecisionSummarySection = ({
       <p className="type-eyebrow">What this means now</p>
       <div className="grid gap-3 lg:grid-cols-3">
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-slate-400">
-              Current outlook
-            </p>
-            <MarketVectorBarometer direction={vectorDirection} size={24} />
-          </div>
+          <p className="text-xs font-semibold text-slate-400">
+            Current outlook
+          </p>
           <p className="mt-2 text-sm font-semibold text-slate-100">
             {actionNowShort ??
               "Keep this week's call while the scores stay inside their lines."}
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-slate-400">
-              Main pressure
-            </p>
-            <PressureDriverGauge intensity={topDiagnosticCallouts.length > 0 ? "high" : "mid"} size={24} />
-          </div>
+          <p className="text-xs font-semibold text-slate-400">
+            Main pressure
+          </p>
           {topDiagnosticCallouts[0] ? (
             <>
               {/* Names the driver as well as describing it — this cell is now the
@@ -86,51 +76,27 @@ export const SignalsDecisionSummarySection = ({
           )}
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-slate-400">
-              What would change this
-            </p>
-            <ThresholdGateGlyph size={24} />
-          </div>
-          {showMicroDecisionRows ? (
-            /* Was two tinted cards nested inside this card, inside the section
+          <p className="text-xs font-semibold text-slate-400">
+            What would change this
+          </p>
+          {/* Was two tinted cards nested inside this card, inside the section
              card — three containment levels for two sentences. Labelled rows
              carry the same distinction with one level, and the hue now sits on
-             the label rather than on a box around it. */
-            <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
-              <div className="flex flex-wrap gap-x-2">
-                <dt className="shrink-0 font-semibold text-semantic-caution-fg">
-                  Wrong if:
-                </dt>
-                <dd className="min-w-0">
-                  <BoundedValue>{triggerCondition}</BoundedValue>
-                </dd>
-              </div>
-              <div className="flex flex-wrap gap-x-2">
-                <dt className="shrink-0 font-semibold text-semantic-easing-fg">
-                  Safe again when:
-                </dt>
-                <dd className="min-w-0">
-                  <BoundedValue>{reversalCondition}</BoundedValue>
-                </dd>
-              </div>
-            </dl>
-          ) : (
-            <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
-              <div className="flex flex-wrap gap-x-2">
-                <dt className="shrink-0 font-semibold text-semantic-caution-fg">
-                  Wrong if:
-                </dt>
-                <dd className="min-w-0">{triggerCondition}</dd>
-              </div>
-              <div className="flex flex-wrap gap-x-2">
-                <dt className="shrink-0 font-semibold text-semantic-easing-fg">
-                  Safe again when:
-                </dt>
-                <dd className="min-w-0">{reversalCondition}</dd>
-              </div>
-            </dl>
-          )}
+             the label rather than on a box around it. */}
+          <dl className="mt-2 space-y-1.5 text-sm text-slate-200">
+            <div className="flex flex-wrap gap-x-2">
+              <dt className="shrink-0 font-semibold text-semantic-caution-fg">
+                Wrong if:
+              </dt>
+              <dd className="min-w-0">{renderCondition(triggerCondition)}</dd>
+            </div>
+            <div className="flex flex-wrap gap-x-2">
+              <dt className="shrink-0 font-semibold text-semantic-easing-fg">
+                Safe again when:
+              </dt>
+              <dd className="min-w-0">{renderCondition(reversalCondition)}</dd>
+            </div>
+          </dl>
         </div>
       </div>
     </article>

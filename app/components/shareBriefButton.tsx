@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import { CheckIcon, ShareIcon } from "./uiIcons";
+import { ClipboardActionRow } from "./clipboardActionRow";
+import { CheckIcon, ShareIcon, SpinnerIcon } from "./uiIcons";
 import { useClipboardCopy } from "./useClipboardCopy";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
   lines?: string[];
   url?: string;
   className?: string;
+  /** Icon-only when false; the name still reaches assistive tech through `aria-label`. */
   showLabel?: boolean;
   /** Names the artifact this button copies. Two copy controls can share a screen only
    *  when they say what they each copy — DD-005 settled one canonical `Copy Brief` on
@@ -37,7 +39,6 @@ export function ShareBriefButton({
    * into Slack reported "Brief Copied" whether or not anything was copied.
    */
   const { status, copyToClipboard } = useClipboardCopy();
-  const didCopy = status === "copied";
   const didFail = status === "error";
 
   const handleClick = useCallback(() => {
@@ -55,35 +56,41 @@ export function ShareBriefButton({
     void copyToClipboard(formattedSlackBrief, "share-brief");
   }, [title, text, lines, url, copyToClipboard]);
 
+  /* The shared row, so this button and the slide button beside it are one
+     control drawn twice. It used to carry its own sky-tinted class chain, and
+     the hero's action row showed three button styles for three actions. */
   return (
-    <button
-      type="button"
+    <ClipboardActionRow
+      compact
+      className={className}
+      label={showLabel ? label : <span className="sr-only">{label}</span>}
+      state={status}
       onClick={handleClick}
-      title={`${label} — copies to the clipboard, or shares if the browser offers it`}
-      data-premium-intent="export_brief"
-      data-premium-cta="share_brief_button"
-      // The `C` shortcut and the command palette target this id. It moved here
-      // when the separate Slack copy button was retired; this button produces
-      // the same Slack block.
-      data-testid="copy-slack-brief-button"
-      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-fluid-xs font-semibold tabular-nums text-sky-200 hover:bg-sky-500/20 hover:border-sky-500/50 transition-colors weather-press-scale weather-focus-ring ${className}`}
-      aria-label={label}
-    >
-      {didCopy ? (
-        <CheckIcon className="size-4 text-emerald-300" />
-      ) : (
-        <ShareIcon className={didFail ? "size-4 text-amber-300" : "size-4"} />
-      )}
-      {showLabel ? (
-        <span className={didFail ? "text-amber-300" : undefined}>
-          {didCopy ? copiedLabel : didFail ? "Copy failed" : label}
-        </span>
-      ) : null}
-      {/* The label is optional on this button, so the failure has to reach a
-          screen reader either way. */}
-      <output className="sr-only" aria-live="polite">
-        {didCopy ? `${copiedLabel}.` : didFail ? "Copy failed. Select the brief text to copy it manually." : ""}
-      </output>
-    </button>
+      leadingIcon={<ShareIcon className={didFail ? "size-4 text-amber-300" : "size-4"} />}
+      stateIcons={{
+        copying: <SpinnerIcon className="size-4" />,
+        copied: <CheckIcon className="size-4 text-emerald-300" />,
+      }}
+      buttonLabels={{
+        copied: showLabel ? copiedLabel : <span className="sr-only">{copiedLabel}</span>,
+        error: showLabel ? <span className="text-amber-300">Copy failed</span> : <span className="sr-only">Copy failed</span>,
+      }}
+      buttonProps={{
+        title: `${label} — copies to the clipboard, or shares if the browser offers it`,
+        "aria-label": label,
+        "data-premium-intent": "export_brief",
+        "data-premium-cta": "share_brief_button",
+        // The `C` shortcut and the command palette target this id. It moved here
+        // when the separate Slack copy button was retired; this button produces
+        // the same Slack block.
+        "data-testid": "copy-slack-brief-button",
+      }}
+      showStatus
+      statusClassName="sr-only"
+      statusMessages={{
+        copied: `${copiedLabel}.`,
+        error: "Copy failed. Select the brief text to copy it manually.",
+      }}
+    />
   );
 }

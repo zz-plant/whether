@@ -33,7 +33,7 @@ export function MobileNavContent({ loopLinks: propLoopLinks, currentPathname, on
             Operator loop
           </p>
           <nav className="space-y-0.5" aria-label="Primary operator routes">
-            {items.map((link, idx) => {
+            {items.map((link) => {
               const isActive = link.isActive;
 
               return (
@@ -48,16 +48,9 @@ export function MobileNavContent({ loopLinks: propLoopLinks, currentPathname, on
                         : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
                     }`}
                   >
-                    <span className="flex items-center gap-2.5">
-                      <span className="font-mono text-[11px] text-slate-500">
-                        {String(idx + 1).padStart(2, "0")}
-                      </span>
-                      <span>{link.label}</span>
-                    </span>
+                    <span>{link.label}</span>
                     {link.shortcut ? (
-                      <kbd className="rounded border border-slate-800 bg-slate-900/80 px-1.5 font-mono text-[10px] text-slate-500 uppercase">
-                        {link.shortcut}
-                      </kbd>
+                      <kbd className="weather-kbd uppercase">{link.shortcut}</kbd>
                     ) : null}
                   </Link>
                 </div>
@@ -130,14 +123,19 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
         >
           <span>{link.navLabel ?? link.label}</span>
           {/* The one-key jump, shown on hover the way Linear teaches its
-              shortcuts: no help page needed to learn "p" opens Plan. */}
+              shortcuts: no help page needed to learn "p" opens Plan. The
+              breakpoint hide sits on a wrapper: `.weather-kbd` sets display
+              from unlayered CSS, which would beat a `hidden` utility on the
+              keycap itself. */}
           {link.shortcut ? (
-            <kbd
-              aria-hidden="true"
-              className="hidden lg:inline rounded border border-slate-800 bg-slate-900/80 px-1 font-mono text-[10px] leading-4 text-slate-500 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-            >
-              {link.shortcut}
-            </kbd>
+            <span className="hidden lg:inline">
+              <kbd
+                aria-hidden="true"
+                className="weather-kbd opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+              >
+                {link.shortcut}
+              </kbd>
+            </span>
           ) : null}
           <span
             aria-hidden="true"

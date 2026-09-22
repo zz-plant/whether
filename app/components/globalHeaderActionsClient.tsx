@@ -51,7 +51,7 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
       >
         <Search aria-hidden="true" size={16} strokeWidth={1.8} />
         <span className="hidden md:inline flex-1 text-left">Search or jump to…</span>
-        <kbd aria-hidden="true" className="hidden md:inline rounded border border-slate-800 bg-slate-900/80 px-1.5 font-mono text-[10px] leading-4 text-slate-500">⌘K</kbd>
+        <span className="hidden md:inline"><kbd aria-hidden="true" className="weather-kbd">⌘K</kbd></span>
       </button>
       {/* The light theme has a full token set in tokens.css and layout.tsx
           restores the saved choice pre-paint, but nothing rendered the control,

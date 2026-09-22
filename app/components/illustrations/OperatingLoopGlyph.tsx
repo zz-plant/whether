@@ -1,7 +1,9 @@
 import type { HTMLAttributes } from "react";
 
+export type OperatingLoopStep = "signals" | "posture" | "plan" | "share";
+
 type OperatingLoopGlyphProps = HTMLAttributes<HTMLOListElement> & {
-  activeStep?: "signals" | "posture" | "plan" | "share";
+  activeStep?: OperatingLoopStep;
   variant?: "compact" | "detailed";
 };
 

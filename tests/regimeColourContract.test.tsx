@@ -63,7 +63,6 @@ describe("regime colour contract", () => {
         boldnessScore={36}
         boldnessDelta={-14}
         regime="SCARCITY"
-        signalDirection="tighten"
         recordDate="2026-09-11"
         fetchedAt="2026-09-15"
       />,

@@ -7,7 +7,6 @@ import { Tag } from "../../components/ui/tag";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import { RegimeGlyph } from "../../components/illustrations/RegimeGlyph";
 import {
   buildBreadcrumbList,
   buildCanonicalUrl,
@@ -125,28 +124,15 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         ]}
       />
 
-      <nav aria-label="Archive navigation" className="flex flex-wrap gap-2">
-        <ActionLink href="/history" variant="pill">
-          Back to history
-        </ActionLink>
-        {parent ? (
-          <ActionLink href={buildPostureArchivePath(parent.slug)} variant="pill">
-            {parent.title} overview
-          </ActionLink>
-        ) : null}
-        <ActionLink href="/" variant="pill">
-          This week&apos;s brief
-        </ActionLink>
-      </nav>
-
+      {/* The breadcrumbs above already reach the brief, /history and the parent
+          year, so the pill row that repeated them is gone; the closing section
+          carries the one call to the current brief. One regime tag over the
+          title: the status tag, an "Archived Period" mark, the glyph and a
+          "this record does not change" line were four more statements that the
+          period is closed. */}
       <section className="weather-panel space-y-4 px-6 py-6">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
-            <Tag tone="slate">{period.statusLabel}</Tag>
-            <span className="text-fluid-micro font-mono text-slate-400">Archived Period</span>
-          </div>
-          <RegimeGlyph idPrefix={`period-${period.slug}`} regime={period.regime} className="h-6 w-auto shrink-0" />
+        <div>
+          <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           What the call was in {period.title}
@@ -165,9 +151,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
             {publisherAuthor.name}
           </a>{" "}
           · <time dateTime={period.asOf}>{period.recordDateLabel}</time>
-        </p>
-        <p className="text-xs text-slate-400">
-          Closed period ending {period.recordDateLabel}. This record does not change.
         </p>
       </section>
 

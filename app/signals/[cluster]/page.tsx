@@ -9,10 +9,6 @@ import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { SignalReadingPanel } from "../components/signalReadingPanel";
 import { buildSignalClusterReading, isSignalClusterSlug } from "../../../lib/report/signalClusterReading";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
-import {
-  ThresholdGateGlyph,
-  MarketVectorBarometer,
-} from "../../components/illustrations/SignalTelemetryGlyphs";
 
 type Params = { cluster: string };
 
@@ -91,31 +87,15 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
           { label: clusterDefinition.title },
         ]}
       />
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2 max-w-2xl">
-            <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{clusterDefinition.title}</h1>
-            <p className="text-sm text-slate-300">{clusterDefinition.summary}</p>
-          </div>
-          {/* The glyph mirrors the week's actual direction from the reading;
-              a hardcoded state would contradict the panel below it. `hold`
-              covers no-reading weeks and flat reads, so the decoration never
-              asserts a direction the data does not. */}
-          {cluster === "yield-curve-flip-watch" ? (
-            <ThresholdGateGlyph size={48} className="self-start sm:self-center" />
-          ) : (
-            <MarketVectorBarometer
-              direction={
-                reading?.directionTone === "tightening"
-                  ? "tighten"
-                  : reading?.directionTone === "easing"
-                    ? "ease"
-                    : "hold"
-              }
-              size={48}
-              className="self-start sm:self-center"
-            />
-          )}
+      {/* The header used to carry an instrument glyph beside the title: a
+          barometer needle keyed to the reading's direction, or a static
+          trip-wire on the curve watch. The reading panel directly below states
+          the direction in words and figures, so the glyph restated it at best
+          and, on the curve watch, encoded nothing. */}
+      <section className="weather-panel space-y-2 px-6 py-6">
+        <div className="max-w-2xl space-y-2">
+          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{clusterDefinition.title}</h1>
+          <p className="text-sm text-slate-300">{clusterDefinition.summary}</p>
         </div>
       </section>
       {reading ? <SignalReadingPanel reading={reading} recordDateLabel={reportData.recordDateLabel} /> : null}

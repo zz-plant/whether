@@ -127,17 +127,20 @@ export function CadenceCallCard({
           and the weekly hero below already carries them, so rendering them here put the
           same two sentences on screen twice. The bridge line hands the reader down to the
           one place the page states that contract. */}
+      {/* The labels are set the way the hero sets the same two — a coloured
+          term, then the sentence — rather than as bordered chips: one label,
+          one shape, on both surfaces. */}
       {model.overrideReason ? null : (
       <dl className="space-y-1.5 text-fluid-nano">
         <div className="flex flex-wrap items-baseline gap-x-2">
-          <dt className="shrink-0 rounded border border-amber-500/25 bg-amber-500/10 px-1.5 py-0.5 text-fluid-nano font-semibold text-semantic-caution-fg">
-            {DECISION_CONTRACT_LABELS.threshold.pauseIf}
+          <dt className="shrink-0 font-medium text-semantic-caution-fg">
+            {DECISION_CONTRACT_LABELS.threshold.pauseIf}:
           </dt>
           <dd className="min-w-0 text-slate-300">{model.boundedRule.threshold}</dd>
         </div>
         <div className="flex flex-wrap items-baseline gap-x-2">
-          <dt className="shrink-0 rounded border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 text-fluid-nano font-semibold text-semantic-easing-fg">
-            {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
+          <dt className="shrink-0 font-medium text-slate-400">
+            {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:
           </dt>
           <dd className="min-w-0 text-slate-300">{model.boundedRule.reversal}</dd>
         </div>

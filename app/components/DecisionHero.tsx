@@ -1,26 +1,18 @@
-import { REGIME_DESCRIPTOR, formatBoldnessDeltaLabel } from "../viewModel";
+import { formatBoldnessDeltaLabel } from "../viewModel";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import type { SignalDirection } from "../viewModel";
-import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
+import { NO_LIVE_READING_CALL, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
-import { ThresholdLadder } from "./illustrations/ThresholdLadder";
-import { DeltaGlyph } from "./illustrations/DeltaGlyph";
-import { trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 import type { RegimeKey } from "../../lib/types";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../../lib/report/homeBriefModel";
 import { WeeklyChangeReport } from "./hero/weeklyChangeReport";
-import { buildBoundedConditionRails, parenthesizePointsToLine } from "../../lib/report/operatingCalls";
+import { SignalReadoutCells } from "./hero/SignalReadoutCells";
+import { BoundedConditionsPanel, type BoundedConditions } from "./hero/BoundedConditionsPanel";
 import type { ThresholdBusinessConsequence } from "../../lib/report/operatingCalls";
-import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
 import { Sparkline, interquartileRange, rangeLabel, sparklineDomain } from "./ui/sparkline";
-import { GlossaryLink, PlainEnglishScoreNote } from "./ui/plainLanguage";
+import { GlossaryLink } from "./ui/plainLanguage";
 import { UrlDetails } from "./ui/urlDetails";
-import { BoundedValue } from "./ui/boundedValue";
-import {
-  classifyScoreBand,
-  scoreBandScaleLabel,
-  compositeSignalScales,
-} from "../../lib/report/signalTranslations";
+import { ActionLink } from "./ui/actionLink";
+import { classifyScoreBand, scoreBandScaleLabel } from "../../lib/report/signalTranslations";
 import type { SparklinePoint } from "./ui/sparkline";
 import { ShareBriefButton } from "./shareBriefButton";
 import { CopyMeetingSlideButton } from "./CopyMeetingSlideButton";
@@ -59,7 +51,6 @@ type Props = {
   actionNow?: string;
   regime: string;
   previousRegime?: string;
-  signalDirection: SignalDirection;
   recordDate: string;
   fetchedAt: string;
   confidenceLabel?: string;
@@ -70,18 +61,7 @@ type Props = {
   flipConditions?: string[];
   guardrail?: string;
   reversalTrigger?: string;
-  /**
-   * The bounded rule's lines as data — the same clause the `guardrail` and
-   * `flipConditions` sentences are derived from — so the rails draw what the
-   * rows say without parsing them.
-   */
-  boundedConditions?: {
-    pause: readonly RuleCondition[];
-    resume: readonly RuleCondition[];
-    /** Non-numeric conditions the rule states beside its lines; printed under the rails so the readout is the whole rule. */
-    pauseQualifier?: string;
-    resumeQualifier?: string;
-  };
+  boundedConditions?: BoundedConditions;
   shareLines?: string[];
   /** Per-signal weekly movement, rendered in the signal-breakdown popover. */
   signalIndicators?: readonly RegimeSignalIndicator[];
@@ -155,7 +135,6 @@ export function DecisionHero({
   weeklyCall,
   actionNow,
   regime,
-  signalDirection: _signalDirection,
   recordDate,
   confidenceLabel,
   trustStatusLabel,
@@ -219,24 +198,6 @@ export function DecisionHero({
   const tightnessThreshold = signalData?.tightnessThreshold ?? 50;
   const riskAppetiteThreshold = signalData?.riskAppetiteThreshold ?? 50;
 
-  // The bounded rule, as rail coordinates. Rails and rows come off the same
-  // clause data, so the rails cannot state a threshold the rows do not.
-  const boundedRails = buildBoundedConditionRails({
-    pause: boundedConditions?.pause,
-    resume: boundedConditions?.resume,
-    scores:
-      typeof riskAppetite === "number"
-        ? { tightness, riskAppetite }
-        : undefined,
-  });
-
-  const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
-  const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10
-    ? "text-rose-300"
-    : typeof pointsToPause === "number" && pointsToPause <= 20
-      ? "text-amber-300"
-      : "text-emerald-300";
-
   // The score column states a level and a one-week delta; neither says whether 68
   // is a normal reading or an outlier. The sparkline answers that in the space of
   // a word, and the shaded band is the middle 50% of the same window.
@@ -289,176 +250,6 @@ export function DecisionHero({
   ]
     .filter(Boolean)
     .join(" · ");
-
-  // Rendered twice (static desktop grid + mobile disclosure) so the collapse is
-  // pure CSS — no client effect, no hydration pop-in, works without JS. The
-  // idSuffix keeps the glyphs' SVG ids unique across the two renders; only one
-  // copy is ever displayed.
-  const renderSignalCells = (idSuffix: string) => (
-    <>
-      <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-        <p className="text-fluid-nano text-white/40">Funding pressure</p>
-        <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
-          {tightness}
-          <span className="font-normal text-white/35">/100</span>{" "}
-          <span className={`text-fluid-nano font-normal ${tightnessLevelColor}`}>{tightnessLevel}</span>
-          {tightnessSaturated && typeof tightnessPressure === "number" ? (
-            <span
-              className="ml-1.5 text-fluid-nano font-normal text-amber-300/80"
-              title={`The scale stops at 100. The pressure behind it would read ${tightnessPressure.toFixed(0)}.`}
-            >
-              · would read {tightnessPressure.toFixed(0)}
-            </span>
-          ) : null}
-        </p>
-        {tightnessDelta === 0 && tightnessSaturated ? (
-          /*
-           * A clipped score cannot move, so the delta row rendered nothing at
-           * exactly the moment conditions were most extreme — the reader saw
-           * 100/100 and no direction, and had to infer from the ceiling tag
-           * beside it that the silence meant "off the top" rather than "flat".
-           * Say it. The raw pressure is in the tag; what is missing is that the
-           * score has stopped being able to report a move.
-           */
-          <p className="mt-0.5 text-fluid-nano text-amber-300/70">
-            Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
-          </p>
-        ) : tightnessDelta !== 0 ? (
-          // The glyph carries its own title/desc ("Rose from 61 to 64"), so it
-          // stays exposed to assistive tech rather than sitting behind
-          // aria-hidden with only "+3.0 pts" left to announce.
-          <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
-            <span className="inline-block w-10 shrink-0">
-              <DeltaGlyph
-                idPrefix={`hero-tightness-delta-${idSuffix}`}
-                previous={tightness - tightnessDelta}
-                current={tightness}
-                min={0}
-                max={100}
-                label="Funding pressure"
-              />
-            </span>
-            {/* Coloured by this signal's own move. Using the week's overall
-                direction here painted a rising tightness emerald whenever the
-                headline call happened to be "easing". */}
-            <span className={trendToneClass(trendDirectionFromDelta(tightnessDelta), false)}>
-              {tightnessDeltaMetadataLabel}
-            </span>
-          </p>
-        ) : null}
-        <div className="mt-1.5 w-full">
-          <ThresholdLadder
-            idPrefix={`hero-tightness-${idSuffix}`}
-            min={0}
-            max={100}
-            current={tightness}
-            previous={tightness - tightnessDelta}
-            trigger={tightnessThreshold}
-            triggerLabel={DECISION_CONTRACT_LABELS.watch.postureFlips}
-            viewBoxWidth={220}
-            signalLabel="Funding pressure"
-            scaleDirection={compositeSignalScales.tightness.directionLabel}
-          />
-        </div>
-        <PlainEnglishScoreNote
-          signalKey="tightness"
-          score={tightness}
-          lead="This signal alone"
-          className="mt-1.5"
-        />
-      </div>
-
-      {typeof riskAppetite === "number" ? (
-        <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <p className="text-fluid-nano text-white/40">Risk appetite</p>
-          <p className="text-fluid-sm font-semibold tabular-nums text-white/85">
-            {riskAppetite}
-            <span className="font-normal text-white/35">/100</span>{" "}
-            <span className={`text-fluid-nano font-normal ${riskAppetiteLevelColor ?? ""}`}>{riskAppetiteLevel ?? ""}</span>
-          </p>
-          {typeof riskAppetiteDelta === "number" && riskAppetiteDelta !== 0 ? (
-            <p className="mt-0.5 flex items-center gap-1.5 text-fluid-nano">
-              <span className="inline-block w-10 shrink-0">
-                <DeltaGlyph
-                  idPrefix={`hero-risk-appetite-delta-${idSuffix}`}
-                  previous={riskAppetite - riskAppetiteDelta}
-                  current={riskAppetite}
-                  min={0}
-                  max={100}
-                  label="Risk appetite"
-                  increaseIsPositive
-                />
-              </span>
-              <span className={trendToneClass(trendDirectionFromDelta(riskAppetiteDelta), true)}>
-                {riskAppetiteDeltaLabel}
-              </span>
-            </p>
-          ) : null}
-          {/* The pair is meant to be read together, so it gets a single
-              encoding. Funding pressure had a rail and risk appetite had a
-              sentence, which left two panels claiming to be a pair while showing
-              the reader nothing he could compare. Risk appetite trips low, so the
-              rail is inverted and both put trouble on the right. */}
-          <div className="mt-1.5 w-full">
-            <ThresholdLadder
-              idPrefix={`hero-risk-appetite-${idSuffix}`}
-              min={0}
-              max={100}
-              current={riskAppetite}
-              previous={
-                typeof riskAppetiteDelta === "number" ? riskAppetite - riskAppetiteDelta : undefined
-              }
-              trigger={riskAppetiteThreshold}
-              triggerLabel={DECISION_CONTRACT_LABELS.watch.postureFlips}
-              viewBoxWidth={220}
-              invert
-              signalLabel="Risk appetite"
-              scaleDirection={compositeSignalScales.riskAppetite.directionLabel}
-            />
-          </div>
-          <PlainEnglishScoreNote
-            signalKey="riskAppetite"
-            score={riskAppetite}
-            lead="This signal alone"
-            className="mt-1"
-          />
-        </div>
-      ) : null}
-
-      <div className="col-span-2 rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 sm:col-span-1">
-        <p className="text-fluid-nano text-white/40">Conditions</p>
-        <p className="flex items-center gap-1.5 text-fluid-sm font-semibold text-white/85">
-          {regimeKey ? (
-            <span className="inline-block w-4 shrink-0" aria-hidden="true">
-              <RegimeGlyph idPrefix={`hero-regime-${idSuffix}`} regime={regimeKey} />
-            </span>
-          ) : null}
-          {regimeDisplay}
-        </p>
-        {REGIME_DESCRIPTOR[regime] ? (
-          <p className="mt-0.5 text-fluid-nano text-white/45">{REGIME_DESCRIPTOR[regime]}</p>
-        ) : null}
-        {/* The flip watch: the distance to the boundary in the market's units
-            rather than in score points, nearest move first. The rails above
-            show how far each score sits from its line; this says what has to
-            happen on the curve or the bill for that line to be crossed. */}
-        {signalData?.flipProximity && signalData.flipProximity.length > 0 ? (
-          <div className="mt-1.5 border-t border-slate-800/60 pt-1.5">
-            <p className="text-fluid-nano font-semibold uppercase tracking-[0.08em] text-white/40">
-              {DECISION_CONTRACT_LABELS.watch.flipWatch}
-            </p>
-            <ul className="mt-0.5 space-y-0.5">
-              {signalData.flipProximity.map((sentence) => (
-                <li key={sentence} className="text-fluid-nano leading-snug text-white/60">
-                  {sentence}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </div>
-    </>
-  );
 
   const weatherIconMap: Record<string, typeof Sun> = {
     EXPANSION: Sun,
@@ -656,7 +447,27 @@ export function DecisionHero({
             summary={<span>Why this call · {signalReadoutSummary}</span>}
           >
             <fieldset className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3" aria-label="Signal readout">
-              {renderSignalCells("details")}
+              <SignalReadoutCells
+                idSuffix="details"
+                tightness={tightness}
+                tightnessDelta={tightnessDelta}
+                tightnessPressure={tightnessPressure}
+                tightnessSaturated={tightnessSaturated}
+                tightnessLevel={tightnessLevel}
+                tightnessLevelColor={tightnessLevelColor}
+                tightnessDeltaMetadataLabel={tightnessDeltaMetadataLabel}
+                tightnessThreshold={tightnessThreshold}
+                riskAppetite={riskAppetite}
+                riskAppetiteDelta={riskAppetiteDelta}
+                riskAppetiteLevel={riskAppetiteLevel}
+                riskAppetiteLevelColor={riskAppetiteLevelColor}
+                riskAppetiteDeltaLabel={riskAppetiteDeltaLabel}
+                riskAppetiteThreshold={riskAppetiteThreshold}
+                regime={regime}
+                regimeKey={regimeKey}
+                regimeDisplay={regimeDisplay}
+                flipProximity={signalData?.flipProximity}
+              />
             </fieldset>
             {/* The gloss for the headline score sits with the signal glosses rather
                 than in a hover-only `title` on the label, which never showed on touch. */}
@@ -669,133 +480,15 @@ export function DecisionHero({
             </p>
           </UrlDetails>
 
-          {/* Bounded conditions: one box owning the trip line, guardrail, reversal, and flip watch */}
-          {(flipConditions && flipConditions.length > 0) || guardrail || reversalTrigger ? (
-            <div className="space-y-2.5 rounded-lg border border-slate-800/60 bg-slate-950/30 p-3">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-fluid-nano type-eyebrow">
-                  {DECISION_CONTRACT_LABELS.watch.watchThisWeek}
-                </p>
-                {thresholdBusinessConsequence ? (
-                  <span className={`whitespace-nowrap text-fluid-nano font-medium tabular-nums ${counterColor}`}>
-                    {thresholdBusinessConsequence.status === "crossed"
-                      ? `${pointsToPause} points — ${thresholdBusinessConsequence.consequenceLabel} crossed`
-                      : `${pointsToPause} points until ${thresholdBusinessConsequence.consequenceLabel}`}
-                  </span>
-                ) : null}
-              </div>
-
-              {/* The rule, drawn. Three prose rows used to state six numbers
-                  across two scales and leave the reader to subtract; a rail per
-                  signal puts the reading, the guardrail and the line that clears
-                  it on one axis, with the span where neither fires shaded, and
-                  the readout under each rail states the distance as a number.
-                  The sentences survive only as the copied share lines and as
-                  the fallback when a rule carries no numeric line. Both rails
-                  run trouble-to-the-right (`invert` flips the falling one),
-                  which is what lets the pair read as a small-multiple set. */}
-              {boundedRails.length > 0 ? (
-                <div
-                  className="grid gap-x-4 gap-y-2 sm:grid-cols-2"
-                  aria-label="Distance to this week's pause and resume lines"
-                >
-                  {boundedRails.map((rail) => (
-                    <div key={rail.metric} className="min-w-0">
-                      <p className="flex items-baseline justify-between gap-2 text-fluid-nano text-white/45">
-                        <span>{rail.label}</span>
-                        <span className="tabular-nums text-white/70">{rail.current}<span className="text-white/35">/100</span></span>
-                      </p>
-                      <ThresholdLadder
-                        idPrefix={`hero-bounded-${rail.metric}`}
-                        min={0}
-                        max={100}
-                        current={rail.current}
-                        trigger={rail.guardrail}
-                        triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
-                        reversal={rail.clearsAt}
-                        reversalLabel={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
-                        hysteresisBand
-                        invert={rail.invert}
-                        signalLabel={rail.label}
-                        /* The pair reads as a small-multiple set, and the two
-                           rails run opposite axes: `invert` flips the falling
-                           signal so trouble sits right on both. That flip was
-                           announced only by the numeric end-labels — 0…100 on
-                           one rail, 100…0 on the other, at 8px — so a reader
-                           comparing marker positions got risk appetite
-                           backwards unless they read them. The scale words name
-                           each end in the reader's terms and follow the flip,
-                           which is what the ladder's `scaleDirection` was built
-                           to do; the bounded rails were the one pair of rails
-                           that never passed it. */
-                        scaleDirection={compositeSignalScales[rail.metric]?.directionLabel}
-                        viewBoxWidth={300}
-                      />
-                      <dl className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums">
-                        <div className="flex items-baseline gap-1.5">
-                          <dt className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
-                          <dd className="text-slate-300">
-                            {rail.guardrail}
-                            <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-white/45"}`}>
-                              {parenthesizePointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
-                            </span>
-                          </dd>
-                        </div>
-                        {rail.clearsAt !== undefined ? (
-                          <div className="flex items-baseline gap-1.5">
-                            <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</dt>
-                            <dd className="text-slate-300">
-                              {rail.clearsAt}
-                              <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-white/45"}`}>
-                                {parenthesizePointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
-                              </span>
-                            </dd>
-                          </div>
-                        ) : null}
-                      </dl>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {boundedRails.length > 0 && (boundedConditions?.pauseQualifier || boundedConditions?.resumeQualifier) ? (
-                <p className="text-fluid-nano text-white/45">
-                  {boundedConditions?.pauseQualifier ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf} also trips if ${boundedConditions.pauseQualifier}.` : null}
-                  {boundedConditions?.pauseQualifier && boundedConditions?.resumeQualifier ? " " : null}
-                  {boundedConditions?.resumeQualifier ? `Clears only when ${boundedConditions.resumeQualifier}.` : null}
-                </p>
-              ) : null}
-
-              <dl className="space-y-1.5 text-fluid-xs">
-                {/* Hue tracks posture: guardrail and reversal are the tighten
-                    side. The guardrail and clears-when sentences print only when
-                    no rail could be drawn for them; otherwise the readouts above
-                    carry the numbers and the sentences would restate them. */}
-                {guardrail && boundedRails.length === 0 ? (
-                  <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
-                    <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
-                  </div>
-                ) : null}
-                {reversalTrigger ? (
-                  <div className="flex gap-2">
-                    {/* The regime line, not the rule line: this is where the
-                        posture itself flips, and it sits at a different number
-                        from the rule's guardrail. Named so the reader is not
-                        left with two unexplained pairs of thresholds. */}
-                    <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</dt>
-                    <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
-                  </div>
-                ) : null}
-                {flipConditions && flipConditions.length > 0 && boundedRails.length === 0 ? (
-                  <div className="flex gap-2">
-                    <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:</dt>
-                    <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
-                  </div>
-                ) : null}
-              </dl>
-            </div>
-          ) : null}
+          <BoundedConditionsPanel
+            flipConditions={flipConditions}
+            guardrail={guardrail}
+            reversalTrigger={reversalTrigger}
+            boundedConditions={boundedConditions}
+            thresholdBusinessConsequence={thresholdBusinessConsequence}
+            tightness={tightness}
+            riskAppetite={riskAppetite}
+          />
 
           {/* One copy control per artifact. "Copy Brief" already produces the
               Slack-formatted block (and hands off to the native share sheet where
@@ -810,13 +503,13 @@ export function DecisionHero({
                 panel and the presentation frames read. The literal that used to
                 sit here made the hero a second definition of the week's call. */}
             <CopyMeetingSlideButton />
-            <Link
-              href="/operate#ops-decision-shield"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 hover:border-slate-600 text-xs font-medium text-slate-200 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-            >
-              <span>Test a plan against this week</span>
-              <span aria-hidden="true" className="text-slate-400">→</span>
-            </Link>
+            {/* Three actions, one button register: the two copy controls are the
+                shared clipboard row and the link is the ghost action link. This
+                row used to show a sky tint, a slate shadow and a bare text link
+                with an arrow glyph for three things of equal weight. */}
+            <ActionLink href="/operate#ops-decision-shield" variant="ghost">
+              Test a plan against this week
+            </ActionLink>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-micro text-white/50">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">

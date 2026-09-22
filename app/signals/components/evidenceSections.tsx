@@ -2,15 +2,15 @@
 
 import type { ComponentType } from "react";
 import { useRouter } from "next/navigation";
-import { Collapsible } from "@base-ui/react/collapsible";
 import type { TreasuryData } from "../../../lib/types";
 import { ReportSection } from "../../components/reportSection";
+import { ActionLink } from "../../components/ui/actionLink";
+import { toRoute } from "../../../lib/navigation/routeType";
 import { indicatorTypeLabel } from "../../../lib/indicatorClassification";
 import type { ThresholdPressureDirection } from "../../../lib/report/homeBriefModel";
 import { buildThresholdMeterState, displaySignalLabel } from "./evidenceSectionShared";
 import {
   buildDiagnosticsExpansionHref,
-  buildSignalsAdvancedHref,
   buildSignalsFocusHref,
   buildSignalsViewHref,
   focusTabs,
@@ -268,9 +268,7 @@ export const SignalsEvidencePrioritiesSection = ({
     aria-label="Signal diagnostics queue"
   >
     <header className="space-y-2">
-      <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">
-        Start with these checks
-      </p>
+      <p className="type-eyebrow type-eyebrow-section">Start with these checks</p>
       <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
         The most useful places to check the read.
       </h2>
@@ -279,18 +277,15 @@ export const SignalsEvidencePrioritiesSection = ({
       {focusTabs.map((focus) => {
         const isActive = focus === activeFocus;
         return (
-          <a
+          <ActionLink
             key={focus}
-            href={buildSignalsFocusHref(searchParams, focus)}
+            variant="pill"
+            href={toRoute(buildSignalsFocusHref(searchParams, focus))}
             aria-current={isActive ? "page" : undefined}
-            className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
-              isActive
-                ? "border-sky-300/80 text-slate-100"
-                : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-            }`}
+            className={`justify-center ${isActive ? "border-sky-300/80" : "text-slate-300"}`}
           >
             {focusLabelByTab[focus]}
-          </a>
+          </ActionLink>
         );
       })}
     </div>
@@ -300,52 +295,39 @@ export const SignalsEvidencePrioritiesSection = ({
     >
       {essentialPriorityQueue.map((item, index) => (
         <li key={item.label} className="weather-surface space-y-2 p-4">
-          <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-            First check {index + 1}
-          </p>
+          <p className="type-eyebrow">First check {index + 1}</p>
           <p className="text-sm font-semibold text-slate-100">
             {displaySignalLabel(item.label)}
           </p>
           <p className="text-sm text-slate-200">{item.why}</p>
-          <p className="text-xs text-slate-300">
-            Use the sections below to check this next.
-          </p>
         </li>
       ))}
     </ol>
     {additionalPriorityQueue.length ? (
-      <Collapsible.Root className="weather-surface group p-4">
-        <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
-          <span>Show the rest</span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180">
-            ⌄
-          </span>
-        </Collapsible.Trigger>
-        <Collapsible.Panel>
-          <ol
-            className="mt-3 grid gap-3"
-            aria-label="Additional prioritized signal queue"
-          >
-            {additionalPriorityQueue.map((item, index) => (
-              <li
-                key={item.label}
-                className="rounded-md border border-slate-800/80 bg-slate-950/50 p-4"
-              >
-                <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-                  Next check {index + essentialPriorityQueue.length + 1}
-                </p>
-                <p className="mt-2 text-sm font-semibold text-slate-100">
-                  {displaySignalLabel(item.label)}
-                </p>
-                <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-                <p className="mt-2 text-xs text-slate-300">
-                  Check this in the matching section below.
-                </p>
-              </li>
-            ))}
-          </ol>
-        </Collapsible.Panel>
-      </Collapsible.Root>
+      /* Native disclosure. Which checks are open is incidental to a shared
+         link, so no query key (ui-ux-standards §XII). */
+      <details className="weather-auto-chevron weather-surface p-4">
+        <summary className="type-eyebrow text-slate-200">Show the rest</summary>
+        <ol
+          className="mt-3 grid gap-3"
+          aria-label="Additional prioritized signal queue"
+        >
+          {additionalPriorityQueue.map((item, index) => (
+            <li
+              key={item.label}
+              className="rounded-md border border-slate-800/80 bg-slate-950/50 p-4"
+            >
+              <p className="type-eyebrow">
+                Next check {index + essentialPriorityQueue.length + 1}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-100">
+                {displaySignalLabel(item.label)}
+              </p>
+              <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+            </li>
+          ))}
+        </ol>
+      </details>
     ) : null}
   </section>
 );
@@ -391,12 +373,12 @@ export const SignalsDiagnosticsSection = ({
         : "Start with the top 3 reasons. Expand only when you need the full evidence set."
     }
     action={
-      <a
-        href={buildDiagnosticsExpansionHref(searchParams, !showFullDiagnostics)}
-        className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+      <ActionLink
+        variant="ghost"
+        href={toRoute(buildDiagnosticsExpansionHref(searchParams, !showFullDiagnostics))}
       >
         {showFullDiagnostics ? "Show top 3 only" : "Show full evidence"}
-      </a>
+      </ActionLink>
     }
   >
     {!showFullDiagnostics ? (
@@ -406,14 +388,11 @@ export const SignalsDiagnosticsSection = ({
       >
         {topDiagnosticCallouts.map((item, index) => (
           <li key={item.label} className="weather-surface space-y-2 p-4">
-            <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">
-              Top driver {index + 1}
-            </p>
+            <p className="type-eyebrow">Top driver {index + 1}</p>
             <p className="text-sm font-semibold text-slate-100">
               {displaySignalLabel(item.label)}
             </p>
             <p className="text-sm text-slate-200">{item.why}</p>
-            <p className="text-xs text-slate-300">More detail is below.</p>
           </li>
         ))}
       </ol>
@@ -423,46 +402,5 @@ export const SignalsDiagnosticsSection = ({
         yieldCurveSeries={yieldCurveSeries}
       />
     ) : null}
-  </ReportSection>
-);
-
-export const SignalsAdvancedControlsSection = ({
-  showAdvanced,
-  searchParams,
-}: {
-  showAdvanced: boolean;
-  searchParams?: Record<string, string | undefined>;
-}) => (
-  // The hand-rolled version wrapped a bordered box inside the section panel,
-  // so the header sat in a box inside a box with nothing else in the outer one.
-  // ReportSection is that outer box, so the inner one goes away.
-  <ReportSection
-    id="advanced-controls"
-    title="Past months and line settings"
-    action={
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
-          {showAdvanced ? "Open" : "Closed"}
-        </span>
-        {!showAdvanced ? (
-          <a
-            href={
-              buildSignalsAdvancedHref(searchParams, true) + "#time-machine"
-            }
-            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-          >
-            Open the month picker
-          </a>
-        ) : null}
-        <a
-          href={buildSignalsAdvancedHref(searchParams, !showAdvanced)}
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-        >
-          {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
-        </a>
-      </div>
-    }
-  >
-    {null}
   </ReportSection>
 );

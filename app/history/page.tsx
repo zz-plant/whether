@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { ActionLink } from "../components/ui/actionLink";
+import { Tag } from "../components/ui/tag";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
-import { RegimeStats } from "../components/history/RegimeStats";
 import { TrackRecord } from "../components/history/TrackRecord";
 import { TrackRecordSection } from "../components/history/TrackRecordSection";
 import { ReportShell } from "../components/reportShell";
@@ -59,7 +60,7 @@ export default async function HistoryPage({
   const statsSeries = getTimeMachineRegimeSeries(60);
   // The whole record, not a trailing window. "Months on record: 60" next to
   // "Record starts Aug 2021" beside a year strip that reached 2010 was three
-  // answers to one question. The stats disclosure below still reads 60 months.
+  // answers to one question. The grading section below still reads 60 months.
   const fullSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   const tightnessTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.tightness }));
   const riskAppetiteTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
@@ -123,9 +124,11 @@ export default async function HistoryPage({
     >
       {/* The shell's h1 already says History and TrackRecord names itself directly below, so a
           second h1 here restated both; only the export action keeps this row. */}
-      <div className="flex justify-end mb-4">
-        <ExportBoardAnnexButton record={trackRecord} />
-      </div>
+      {trackRecord ? (
+        <div className="flex justify-end mb-4">
+          <ExportBoardAnnexButton record={trackRecord} />
+        </div>
+      ) : null}
 
       {/* The plane first. It is the one graphic on the page that shows where the
           call sits and how near the next one is; the record below says how often
@@ -166,23 +169,21 @@ export default async function HistoryPage({
                 : `${publishedBriefs.length} weekly brief records paired with 176 months of monthly calls (2012–2026). Entries are never edited after publication, so past calls read the way they were made.`}
             </p>
           </div>
+          {/* A link card, not a pill coerced into one: the `pill` variant is a
+              control, and it was carrying a border, a fill and a column layout
+              it does not own. The title is the anchor's first paragraph, which
+              is where decision-flow.css puts the one underline. */}
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {publishedBriefs.map((brief) => (
               <li key={brief.slug}>
-                <ActionLink
-                  href={buildPublishedBriefPath(brief.slug)}
-                  variant="pill"
-                  className="flex w-full flex-col items-start justify-start gap-1.5 p-3.5 text-left rounded-lg border border-slate-800/80 bg-slate-900/40 hover:border-sky-500/50 hover:bg-slate-900/70"
-                >
-                  <div className="flex w-full items-center justify-between gap-2">
-                    <span className="text-fluid-micro font-mono text-slate-400">{brief.recordDateLabel}</span>
-                    <span className="type-badge text-fluid-micro rounded-sm px-1.5 py-0.5 bg-slate-800 text-slate-200">
-                      {getRegimePublicLabel(brief.regime)}
-                    </span>
-                  </div>
-                  <span className="text-sm font-semibold text-slate-100 line-clamp-1">{brief.headline}</span>
-                  <span className="text-fluid-xs text-slate-400 line-clamp-2">{brief.summary}</span>
-                </ActionLink>
+                <Link href={buildPublishedBriefPath(brief.slug)} className="weather-hub-link-card text-slate-100">
+                  <p className="text-sm font-semibold text-slate-100 line-clamp-1">{brief.headline}</p>
+                  <p className="flex items-center justify-between gap-2">
+                    <span className="text-fluid-micro tabular-nums text-slate-400">{brief.recordDateLabel}</span>
+                    <Tag tone="slate">{getRegimePublicLabel(brief.regime)}</Tag>
+                  </p>
+                  <p className="text-fluid-xs text-slate-400 line-clamp-2">{brief.summary}</p>
+                </Link>
               </li>
             ))}
           </ul>
@@ -232,7 +233,6 @@ export default async function HistoryPage({
             initialYear={Number(resolvedSearchParams?.year) || 0}
             regimeSeries={fullSeries}
           />
-          <RegimeStats series={statsSeries} />
           <div className="grid gap-6 sm:grid-cols-2">
             <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
             <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />

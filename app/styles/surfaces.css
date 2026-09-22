@@ -32,14 +32,17 @@
   box-shadow:
     var(--elev-3),
     inset 0 1px 0 var(--edge-highlight);
-  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 250ms ease, box-shadow 250ms ease;
+  transition: border-color 250ms ease, box-shadow 250ms ease;
   container-type: inline-size;
 }
 
+/* The two homepage brief cards used to carry their own class, a literal
+   rgba(10,22,26,0.85) fill with a teal hover glow — the same slab on both
+   themes. They are the card tier now. */
 .weather-card {
   @apply rounded-xl border px-4 py-3.5 sm:px-5 sm:py-4;
   border-color: var(--border-default);
-  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 250ms ease, box-shadow 250ms ease;
+  transition: border-color 250ms ease, box-shadow 250ms ease;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
     color-mix(in srgb, var(--bg-body) 38%, transparent);
@@ -50,25 +53,9 @@
     inset 0 1px 0 var(--edge-highlight-faint);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .weather-card:hover {
-    transform: translateY(-1.5px);
-    border-color: rgba(125, 211, 252, 0.32);
-    box-shadow:
-      var(--elev-3),
-      0 0 20px rgba(56, 189, 248, 0.08),
-      inset 0 1px 0 var(--edge-highlight);
-  }
-
-  .weather-surface:hover {
-    transform: translateY(-1.5px);
-    border-color: rgba(125, 211, 252, 0.35);
-    box-shadow:
-      var(--elev-4),
-      0 0 24px rgba(56, 189, 248, 0.10),
-      inset 0 1px 0 var(--edge-highlight);
-  }
-}
+/* No hover on a container. A stat card that lifts and glows under the pointer
+   promises an action it does not have; only links and buttons move on hover
+   (controls.css, layout-shells.css). */
 
 /* Hero card. The one surface whose colour is allowed to say something: its
    wash, border and top-edge light all come from --regime-accent, which the
@@ -139,43 +126,6 @@ html[data-theme="light"] .weather-page-intro {
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* Mobile & desktop brief cards: high-contrast executive cards matching mockup */
-.weather-brief-card {
-  position: relative;
-  border-radius: var(--radius-2xl);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%),
-    rgba(10, 22, 26, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 1.125rem 1.25rem;
-  box-shadow:
-    0 4px 20px -2px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: border-color 200ms ease, box-shadow 200ms ease;
-}
-
-html[data-theme="light"] .weather-brief-card {
-  border-color: var(--border-default);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%),
-    var(--bg-panel, #ffffff);
-  box-shadow:
-    var(--elev-2),
-    0 0 0 1px rgba(0, 0, 0, 0.04);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .weather-brief-card:hover {
-    border-color: rgba(45, 212, 191, 0.25);
-    box-shadow:
-      0 6px 24px -2px rgba(0, 0, 0, 0.6),
-      0 0 16px rgba(45, 212, 191, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  }
-}
-
 /* Lever decision micro-card for visual rhythm */
 
 /* Glow aura for key scores and metric accents */
@@ -210,11 +160,6 @@ html[data-theme="light"] .weather-brief-card {
     var(--elev-2),
     inset 0 1px 0 var(--edge-highlight-faint),
     inset 0 0 0 1px var(--bg-nested-light);
-}
-
-.weather-surface-sky {
-  border-color: var(--accent-border-soft);
-  background: color-mix(in srgb, var(--accent-action) 6%, transparent);
 }
 
 .weather-data-mode {
@@ -265,12 +210,12 @@ html[data-theme="light"] .weather-brief-card {
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary, .weather-page-intro)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary, .weather-page-intro) {
   box-shadow: none;
   backdrop-filter: none;
@@ -284,17 +229,17 @@ html[data-theme="light"] .weather-brief-card {
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary, .weather-page-intro)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary, .weather-page-intro)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-brief-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary, .weather-page-intro):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;

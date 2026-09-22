@@ -31,8 +31,6 @@ import { SharePageFormats } from "../share/sharePageFormats";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
-import { PremiumGate } from "./components/PremiumGate";
-import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { ReportSection } from "../components/reportSection";
 
 export type PlanningSearchParams = {
@@ -114,10 +112,8 @@ export async function buildPlanningPageModel(
     fetchedAtLabel,
     historicalSelection,
     internalProvenance,
-    macroSeries,
     playbook,
     recordDateLabel,
-    sensors,
     startItems,
     statusLabel,
     stopItems,
@@ -162,6 +158,7 @@ export async function buildPlanningPageModel(
         pageTitle: "Plan",
         pageSummary: "Set the rules, check runway, and share the brief for this week's conditions.",
         sectionLinks: operationsSectionLinks.plan,
+        activeStep: "plan",
       },
       trust: {
         trustStatusTone,
@@ -383,12 +380,14 @@ export async function buildPlanningPageModel(
                 provenance: treasuryProvenance,
                 showProvenance: false,
               }),
-              h(PremiumGate, {
-                source: "runway_planner",
-                title: "Runway planner",
-                description: "Enter burn, revenue, and growth to see how far your runway goes in this week's conditions.",
-                children: h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
-              }),
+              // The planner has one owner, /operate/financial. The same 520-line
+              // panel was mounted here as well, so two routes carried one form
+              // and the URL a reader shared depended on which they had open.
+              h("p", { className: "text-xs leading-5 text-slate-400" },
+                "Enter your runway, burn and revenue in ",
+                h("a", { href: "/operate/financial", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the runway planner"),
+                " to size this week's plan against your figures.",
+              ),
               ),
             }),
           },

@@ -1,7 +1,7 @@
 import { ReportCta } from "../reportCta";
 import { ShareRailButton } from "./ShareRailButton";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
-import { OperatingLoopGlyph } from "../illustrations/OperatingLoopGlyph";
+import { OperatingLoopGlyph, type OperatingLoopStep } from "../illustrations/OperatingLoopGlyph";
 
 /**
  * The one page intro block a report route gets (ui-ux-standards §XI): kicker,
@@ -24,10 +24,16 @@ export function CommandCenterNavBlock({
   resolvedNextRefreshLabel,
   showOfflineBadge,
   offlineBadgeLabel,
+  activeStep,
 }: {
   pageTitle: string;
   pageSummary: string;
   recordDateLabel: string;
+  /** Which step of the operating loop this route is, for the glyph beside the
+   *  intro. Declared by the route: it used to be guessed from whether the
+   *  title contained "changed" or "trust", which is a string match standing in
+   *  for a fact the route already knows. Omitted, no glyph renders. */
+  activeStep?: OperatingLoopStep;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
   /** Opens the one global share rail — the same formats, the same island, as / and /share. */
@@ -39,15 +45,6 @@ export function CommandCenterNavBlock({
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
 }) {
-  const activeStep =
-    pageTitle.toLowerCase() === "plan"
-      ? "plan"
-      : pageTitle.toLowerCase().includes("changed") || pageTitle.toLowerCase().includes("signal")
-        ? "signals"
-        : pageTitle.toLowerCase().includes("trust")
-          ? "posture"
-          : undefined;
-
   // The status word leads and prints in the regime ink — it is this page's
   // equivalent of the hero's stamp, and the only word on the route that
   // names the week. The rest of the line stays neutral.

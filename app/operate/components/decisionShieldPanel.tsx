@@ -29,6 +29,8 @@ import {
 } from "../../../lib/report/operatorStage";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
+import { SegmentedControl, type SegmentedOption } from "../../components/ui/segmentedControl";
+import { SpinnerIcon } from "../../components/uiIcons";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useOperatorProfile } from "../../components/useOperatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
@@ -86,6 +88,14 @@ const actionSelectOptions: LabeledSelectOption<DecisionAction>[] = actionOptions
   value: option.value,
   label: option.label,
 }));
+
+type PlanMode = "dropdown" | "natural_language" | "compare";
+
+const planModeOptions: readonly SegmentedOption<PlanMode>[] = [
+  { key: "natural_language", label: "Describe a plan" },
+  { key: "compare", label: "Compare two plans" },
+  { key: "dropdown", label: "Pick from a list" },
+];
 
 type DecisionShieldPreset = {
   id: string;
@@ -184,7 +194,7 @@ export const DecisionShieldPanel = ({
   // No sample plan and no sample company: the panel used to open on a
   // fictional hiring plan with 14 months of runway and a 75% gross margin no
   // control ever exposed, and the margin alone could turn RISKY into SAFE.
-  const [planMode, setPlanMode] = useState<"dropdown" | "natural_language" | "compare">("natural_language");
+  const [planMode, setPlanMode] = useState<PlanMode>("natural_language");
   const [planText, setPlanText] = useState("");
   const [planBText, setPlanBText] = useState("");
   const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">("VC_BACKED");
@@ -399,15 +409,7 @@ export const DecisionShieldPanel = ({
               label="Copy verdict"
               state={getClipboardUiState("verdict", { status, error, activeTarget, copiedTarget })}
               buttonVariant="pill"
-              buttonLabels={{
-                copying: (
-                  <>
-                    <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-                    <span>Copying</span>
-                  </>
-                ),
-              }}
-              buttonClassName="gap-2"
+              stateIcons={{ copying: <SpinnerIcon className="h-3 w-3" /> }}
               onClick={handleCopy}
             />
             <ClipboardActionRow
@@ -421,18 +423,8 @@ export const DecisionShieldPanel = ({
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
-        <output className="sr-only" aria-live="polite">
-          {copiedTarget === "verdict"
-            ? "Verdict copied to clipboard."
-            : copiedTarget === "link"
-              ? "Decision Shield link copied to clipboard."
-              : error
-                ? "Clipboard unavailable."
-                : ""}
-        </output>
-        <output className="mt-2 block min-h-[20px] text-xs text-amber-200" aria-live="polite">
-          {error && lastAttemptedTarget === "link" ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
-        </output>
+        {/* The toast above is the one announcement of a copy result; two
+            live regions restating it read every outcome three times. */}
         <div className="mt-4 min-h-[260px]">
           {error && lastAttemptedTarget === "verdict" ? (
             <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
@@ -455,40 +447,13 @@ export const DecisionShieldPanel = ({
 
         <div className="mt-6 space-y-5">
           {/* Mode Switcher */}
-          <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-            <button
-              type="button"
-              onClick={() => setPlanMode("natural_language")}
-              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
-                planMode === "natural_language"
-                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-              }`}
-            >
-              Describe a plan
-            </button>
-            <button
-              type="button"
-              onClick={() => setPlanMode("compare")}
-              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
-                planMode === "compare"
-                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-              }`}
-            >
-              Compare two plans
-            </button>
-            <button
-              type="button"
-              onClick={() => setPlanMode("dropdown")}
-              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
-                planMode === "dropdown"
-                  ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-              }`}
-            >
-              Pick from a list
-            </button>
+          <div className="border-b border-slate-800 pb-3">
+            <SegmentedControl
+              options={planModeOptions}
+              value={planMode}
+              onSelect={setPlanMode}
+              ariaLabel="How to describe the decision"
+            />
           </div>
 
           {planMode === "natural_language" && (
@@ -666,13 +631,14 @@ export const DecisionShieldPanel = ({
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="weather-surface p-4">
-              <div className="flex items-center gap-2">
-                <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
-                {hiringPauseApplies(action) ? (
-                  <span title="Pause new hiring, long-term commitments, and major spend increases if this line is crossed." className="text-slate-400 cursor-help text-sm">ⓘ</span>
-                ) : null}
-              </div>
+              <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
+              {/* Printed, not tucked behind a hover glyph a touch screen never shows. */}
+              {hiringPauseApplies(action) ? (
+                <p className="mt-2 text-xs text-slate-400">
+                  Pause new hiring, long-term commitments, and major spend increases if this line is crossed.
+                </p>
+              ) : null}
             </div>
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">{publicDecisionLabels.reversal}</p>

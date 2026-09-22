@@ -30,6 +30,17 @@
   padding-block: clamp(1rem, 1rem + 2vw, 3rem);
 }
 
+/* Presentation focus mode narrows the brief's measure, and only that. The
+   attribute is set on <html> by FocusModeController; the rule reads it here
+   rather than the controller rewriting the class list on Shell's <main>. The
+   shadow, border and rounded frame the old class list added drew the page as
+   a card floating over itself. */
+html[data-focus-mode] [data-home-shell-main] {
+  max-width: 64rem;
+  padding-inline: 1.5rem;
+  padding-block: 3rem;
+}
+
 .weather-secondary-shell {
   position: relative;
   isolation: isolate;
@@ -172,20 +183,13 @@ html[data-theme="light"] .weather-secondary-shell-backdrop {
     box-shadow var(--transition-base) var(--ease-out);
 }
 
-.weather-hub-link-card:hover {
+/* A link, so it lifts; a card, so it does not glow. Its focus ring is the
+   element rule in decision-flow.css — this used to carry a yellow one of its
+   own, the only control on the site not drawn in --accent-action. */
+a.weather-hub-link-card:hover {
   transform: translateY(-3px);
   border-color: rgba(56, 189, 248, 0.42);
-  box-shadow:
-    var(--elev-4),
-    var(--glow-soft);
-}
-
-.weather-hub-link-card:focus-visible {
-  outline: 2px solid rgba(253, 224, 71, 0.85);
-  outline-offset: 3px;
-  box-shadow:
-    0 0 0 calc(4 * var(--sh)) rgba(250, 204, 21, 0.2),
-    inset 0 1px 0 var(--edge-highlight);
+  box-shadow: var(--elev-4);
 }
 
 .weather-hub-chip {

@@ -69,7 +69,7 @@ export function StagePersonaSelector({
 
   return (
     <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
-      <span className="mr-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+      <span className="type-eyebrow mr-1">
         Stage
       </span>
       <SegmentedControl

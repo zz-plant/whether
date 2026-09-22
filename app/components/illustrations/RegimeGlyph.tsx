@@ -1,5 +1,3 @@
-"use client";
-
 import type { RegimeKey } from "../../../lib/types";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 

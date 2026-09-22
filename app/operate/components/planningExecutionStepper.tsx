@@ -149,27 +149,26 @@ export function OperationsExecutionStepper({
         {steps.map((step) => {
           const isOpen = openStepIds.has(step.id);
           const isActive = step.id === currentStepId;
-          const activeClass = isOpen
-            ? "ring-1 ring-sky-500/30 border-sky-500/20 bg-slate-900/10"
-            : "border-white/[0.04] bg-slate-950/[0.05]";
 
           return (
             <section
               key={step.id}
               id={step.id}
-              className={`weather-step-panel space-y-4 rounded-xl border p-4 sm:p-5 transition-all ${activeClass}`}
+              // The current step is stated once, here, where assistive tech
+              // reads it; an "Active" stamp beside the title was the same fact
+              // drawn a second time for sighted readers only.
+              aria-current={isActive ? "step" : undefined}
+              className={`weather-step-panel space-y-4 rounded-xl border p-4 sm:p-5 ${
+                isOpen ? "border-sky-500/20 bg-slate-900/10" : "border-white/[0.04] bg-slate-950/[0.05]"
+              }`}
             >
               {/* The rule divides the header from the step body, so a closed step
                   drew a divider with nothing under it. */}
               <div
-                className={`relative overflow-hidden flex flex-wrap items-start justify-between gap-3 ${
+                className={`flex flex-wrap items-start justify-between gap-3 ${
                   isOpen ? "pb-4 border-b border-white/[0.04]" : ""
                 }`}
               >
-                <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/35 to-transparent"
-                  aria-hidden="true"
-                />
                 <div className="space-y-1">
                   {/* No `step.label` eyebrow here. All six read as a word already
                       in the title underneath — PLAN over "Weekly plan", RULES
@@ -200,33 +199,35 @@ export function OperationsExecutionStepper({
                   <p className="max-w-2xl text-sm leading-6 text-slate-300">
                     {step.description}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {step.owner ? (
-                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                        Owner: {step.owner}
-                      </span>
-                    ) : null}
-                    {step.approvalStatus ? (
-                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                        {step.approvalStatus}
-                      </span>
-                    ) : null}
-                    {step.changeSignal ? (
-                      <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold text-slate-100">
-                        Check again if: {step.changeSignal}
-                      </span>
-                    ) : null}
-                    {/* A "Back to steps" pill used to sit here, in all six steps,
-                        anchoring to the checklist a couple of hundred pixels
-                        above and still on screen. Six identical controls
-                        pointing at visible content is navigation noise. */}
-                  </div>
+                  {/* Facts about the step, not controls: a pill is a button
+                      shape, and three of them in a row read as three actions. */}
+                  {step.owner || step.approvalStatus || step.changeSignal ? (
+                    <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-fluid-xs text-slate-300">
+                      {step.owner ? (
+                        <div>
+                          <dt className="inline text-slate-400">Owner: </dt>
+                          <dd className="inline font-semibold text-slate-100">{step.owner}</dd>
+                        </div>
+                      ) : null}
+                      {step.approvalStatus ? (
+                        <div>
+                          <dt className="sr-only">Status</dt>
+                          <dd className="inline font-semibold text-slate-100">{step.approvalStatus}</dd>
+                        </div>
+                      ) : null}
+                      {step.changeSignal ? (
+                        <div>
+                          <dt className="inline text-slate-400">Check again if: </dt>
+                          <dd className="inline font-semibold text-slate-100">{step.changeSignal}</dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                  ) : null}
+                  {/* A "Back to steps" pill used to sit here, in all six steps,
+                      anchoring to the checklist a couple of hundred pixels
+                      above and still on screen. Six identical controls
+                      pointing at visible content is navigation noise. */}
                 </div>
-                {isActive && (
-                  <span className="rounded-sm border border-sky-300/80 bg-sky-500/15 px-3 py-1 type-eyebrow text-sky-100">
-                    Active
-                  </span>
-                )}
               </div>
               {isOpen && (
                 <div id={`${step.id}-body`} className="mt-4">

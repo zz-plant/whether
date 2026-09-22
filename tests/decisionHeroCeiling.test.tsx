@@ -29,7 +29,6 @@ describe("DecisionHero at the tightness ceiling", () => {
     boldnessScore: 58,
     boldnessDelta: -2,
     regime: "DEFENSIVE" as const,
-    signalDirection: "tighten" as const,
     recordDate: "2026-08-14",
     fetchedAt: "2026-08-15",
     signalData: { tightnessThreshold: 68 },

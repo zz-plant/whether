@@ -1,6 +1,7 @@
 "use client";
 
-import { useClipboardCopy } from "../components/useClipboardCopy";
+import { ClipboardActionRow } from "../components/clipboardActionRow";
+import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import type { PullPolicyBlock } from "../../lib/report/operatingCalls";
 import type { WipGuidance } from "../../lib/report/wipPolicy";
 
@@ -19,14 +20,16 @@ export function PullPolicyControls({
   blocks: PullPolicyBlock[];
   wipGuidance?: WipGuidance;
 }) {
-  const { copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const clipboardState = (target: string) =>
+    getClipboardUiState(target, { status, error, activeTarget, copiedTarget });
 
   if (blocks.length === 0 && !wipGuidance) return null;
 
   return (
-    <div className="space-y-3">
+    <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="wip-limits-heading">
       <div className="space-y-1">
-        <h2 className="type-eyebrow">Work-in-progress limits</h2>
+        <h2 id="wip-limits-heading" className="type-eyebrow">Work-in-progress limits</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           A work-in-progress limit is how many things a team runs at once. This week&apos;s call as
           one: what to keep starting, when to stop, when to resume, and how many bets can run in
@@ -38,13 +41,13 @@ export function PullPolicyControls({
         <article className="weather-surface space-y-2 px-4 py-3">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-fluid-xs font-semibold text-slate-100">WIP cap</h3>
-            <button
-              type="button"
-              className="weather-button min-h-[36px] px-3 py-1.5 text-xs font-semibold"
+            <ClipboardActionRow
+              compact
+              label="Copy policy"
+              state={clipboardState("wip-policy")}
               onClick={() => void copyToClipboard(wipGuidance.markdown, "wip-policy")}
-            >
-              {copiedTarget === "wip-policy" ? "Copied" : "Copy policy"}
-            </button>
+              buttonLabels={{ error: "Copy failed" }}
+            />
           </div>
           <pre className="overflow-auto whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-2.5 text-fluid-micro leading-relaxed text-slate-200">
             {wipGuidance.markdown}
@@ -56,13 +59,13 @@ export function PullPolicyControls({
           <article key={block.area} className="weather-surface space-y-2 px-4 py-3">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-fluid-xs font-semibold text-slate-100">{block.label}</h3>
-              <button
-                type="button"
-                className="weather-button min-h-[36px] px-3 py-1.5 text-xs font-semibold"
+              <ClipboardActionRow
+                compact
+                label="Copy policy"
+                state={clipboardState(`pull-policy-${block.area}`)}
                 onClick={() => void copyToClipboard(block.markdown, `pull-policy-${block.area}`)}
-              >
-                {copiedTarget === `pull-policy-${block.area}` ? "Copied" : "Copy policy"}
-              </button>
+                buttonLabels={{ error: "Copy failed" }}
+              />
             </div>
             <pre className="max-h-48 overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-2.5 text-fluid-micro leading-relaxed text-slate-200">
               {block.markdown}
@@ -70,6 +73,6 @@ export function PullPolicyControls({
           </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

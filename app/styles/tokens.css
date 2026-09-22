@@ -785,8 +785,7 @@ html[data-theme="light"] .weather-button-primary { color: #ffffff; }
    so the /evidence header chip rendered dark-on-dark. background-image must be
    cleared explicitly -- the shorthand alone loses to the later stylesheet. */
 html[data-theme="light"] .weather-pill,
-html[data-theme="light"] .weather-pill-muted,
-html[data-theme="light"] .weather-tab {
+html[data-theme="light"] .weather-pill-muted {
   color: var(--text-primary);
   border-color: var(--border-strong);
   background-color: var(--bg-panel);

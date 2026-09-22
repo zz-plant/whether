@@ -128,9 +128,12 @@ export const RegimeTimelinePanel = ({
           titleId="regime-timeline-title"
           description="Pick a month to load it."
           aside={
-            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-100">
-              Current: {currentLabel}
-            </span>
+            /* A labelled value, not a control: it was set in `weather-pill`,
+               which is the class every pill-shaped link on the page presses. */
+            <dl className="flex items-baseline gap-1.5 text-fluid-xs">
+              <dt className="text-slate-400">Current:</dt>
+              <dd className="font-semibold tabular-nums text-slate-100">{currentLabel}</dd>
+            </dl>
           }
         />
 

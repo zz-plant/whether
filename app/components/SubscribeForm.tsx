@@ -6,6 +6,14 @@ import { Check, Calendar } from "lucide-react";
 import { requestSubscription, requestSlackSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { buildMondayCalendarUrl } from "./calendarButton";
+import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
+
+type SubscribeChannel = "email" | "slack";
+
+const CHANNEL_OPTIONS: readonly SegmentedOption<SubscribeChannel>[] = [
+  { key: "email", label: "Email" },
+  { key: "slack", label: "Slack" },
+];
 
 /**
  * One subscription, one promise: Monday's call, and a note the day it changes.
@@ -17,7 +25,7 @@ import { buildMondayCalendarUrl } from "./calendarButton";
  */
 export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
   const pathname = usePathname() ?? "/";
-  const [channel, setChannel] = useState<"email" | "slack">("email");
+  const [channel, setChannel] = useState<SubscribeChannel>("email");
   const [email, setEmail] = useState("");
   const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
   const [channelName, setChannelName] = useState("");
@@ -97,35 +105,20 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
           )}
         </div>
 
-        {/* Channel toggle */}
-        <div className="inline-flex rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-nested)] p-0.5 text-xs font-medium self-start sm:self-auto">
-          <button
-            type="button"
-            onClick={() => {
-              setChannel("email");
-              setStatus("idle");
-              setMessage("");
-            }}
-            className={`rounded-md px-2.5 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-              channel === "email" ? "bg-sky-500/15 text-sky-200 border border-sky-500/30 font-semibold" : "text-slate-400 hover:text-white border border-transparent"
-            }`}
-          >
-            Email
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setChannel("slack");
-              setStatus("idle");
-              setMessage("");
-            }}
-            className={`rounded-md px-2.5 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-              channel === "slack" ? "bg-sky-500/15 text-sky-200 border border-sky-500/30 font-semibold" : "text-slate-400 hover:text-white border border-transparent"
-            }`}
-          >
-            Slack
-          </button>
-        </div>
+        {/* The one segmented control (segmentedControl.tsx): a radio group,
+            so arrows move between the two channels and the pair is one tab
+            stop, rather than two buttons with a hand-drawn selected state. */}
+        <SegmentedControl
+          ariaLabel="Delivery channel"
+          options={CHANNEL_OPTIONS}
+          value={channel}
+          onSelect={(next) => {
+            setChannel(next);
+            setStatus("idle");
+            setMessage("");
+          }}
+          className="self-start sm:self-auto"
+        />
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">

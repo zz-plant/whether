@@ -7,8 +7,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
-import { Collapsible } from "@base-ui/react/collapsible";
-import { Popover } from "@base-ui/react/popover";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { RegimeThresholds } from "../../../lib/regimeEngine";
@@ -16,6 +14,7 @@ import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { SpinnerIcon } from "../../components/uiIcons";
 import { createBrowserSource, useBrowserSource } from "../../components/browserSource";
 import { ThresholdNumberField } from "./ThresholdNumberField";
 
@@ -121,6 +120,13 @@ const storedAuditSource = createBrowserSource<ThresholdAuditEntry[]>({
   },
   serverValue: NO_AUDIT,
 });
+
+/* The panel's disclosure look, once. The summary is a control, so it takes the
+   control radius (ui-ux-standards §XIV); the chevron, target and focus ring
+   come from `weather-auto-chevron`. */
+const DISCLOSURE_CLASS = "weather-auto-chevron";
+const DISCLOSURE_SUMMARY_CLASS =
+  "rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-semibold text-slate-300";
 
 const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
   const { baseRate, tightness, risk } = parseDraft(draft);
@@ -314,16 +320,21 @@ export const ThresholdsPanel = ({
           titleId="thresholds-title"
           description="These values decide when the call changes. They stay in the URL so shared links match."
           aside={
-            <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-200">
-              Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
-              {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
-            </span>
+            /* A labelled value, not a control: it was set in `weather-pill`,
+               which is the class the page's pill-shaped links press. */
+            <dl className="flex items-baseline gap-1.5 text-fluid-xs">
+              <dt className="text-slate-400">Defaults:</dt>
+              <dd className="font-semibold tabular-nums text-slate-200">
+                {appliedDefaults.baseRateTightness}% · {appliedDefaults.tightnessRegime}/
+                {appliedDefaults.riskAppetiteRegime}
+              </dd>
+            </dl>
           }
         />
 
         <div className="mt-6 space-y-4">
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick presets</p>
+            <p className="type-eyebrow">Quick presets</p>
             <p className="mt-2 text-sm text-slate-300">
               Start with one preset, then expand the detailed controls only if you need custom watch lines.
             </p>
@@ -346,15 +357,13 @@ export const ThresholdsPanel = ({
             </div>
           </div>
 
-          <Collapsible.Root>
-            <Collapsible.Trigger
-              type="button"
-              className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100"
-            >
-              Edit exact numbers
-              <span className="text-fluid-micro text-slate-400">Show / hide</span>
-            </Collapsible.Trigger>
-            <Collapsible.Panel className="pt-4">
+          {/* Three disclosures on this panel, one contract: native `<details>`
+              under `weather-auto-chevron`. They were three Base UI collapsibles
+              styled three different ways, two with a focus ring in a colour
+              nothing else on the page uses. */}
+          <details className={DISCLOSURE_CLASS}>
+            <summary className={DISCLOSURE_SUMMARY_CLASS}>Edit exact numbers</summary>
+            <div className="pt-4">
               <Form onFormSubmit={handleSubmit} className="grid gap-4">
                 <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-[1fr,1fr,1fr,auto]">
                   <Fieldset.Legend className="sr-only">Set threshold guardrails</Fieldset.Legend>
@@ -410,9 +419,7 @@ export const ThresholdsPanel = ({
                       aria-busy={isPending}
                       className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
-                      {isPending ? (
-                        <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-                      ) : null}
+                      {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
                       {isPending ? "Applying" : "Apply watch lines"}
                     </button>
                     <button
@@ -422,21 +429,19 @@ export const ThresholdsPanel = ({
                       aria-busy={isPending}
                       className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
-                      {isPending ? (
-                        <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-                      ) : null}
+                      {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
                       {isPending ? "Resetting" : "Reset"}
                     </button>
                   </div>
                 </Fieldset.Root>
               </Form>
-            </Collapsible.Panel>
-          </Collapsible.Root>
+            </div>
+          </details>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Applied thresholds</p>
+            <p className="type-eyebrow">Applied thresholds</p>
             <div className="mt-3 space-y-2 text-sm text-slate-300">
               <p>
                 Base rate threshold:{" "}
@@ -453,65 +458,29 @@ export const ThresholdsPanel = ({
             </div>
           </div>
           <div className="weather-surface p-4">
-            <Collapsible.Root>
-              <Collapsible.Trigger
-                type="button"
-                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-              >
-                How this works
-              </Collapsible.Trigger>
-              <Collapsible.Panel className="mt-3 space-y-4">
-                <Popover.Root>
-                  <Popover.Trigger
-                    type="button"
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-slate-800/70 px-4 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                  >
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-[9px] text-slate-400">
-                      ?
-                    </span>
-                    How the watch lines work
-                  </Popover.Trigger>
-                  <Popover.Portal>
-                    <Popover.Positioner side="bottom" align="start" sideOffset={12}>
-                      <Popover.Popup className="w-72 rounded-lg border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
-                        <Popover.Title className="text-xs font-semibold tracking-[0.14em] text-slate-100">
-                          How these thresholds work
-                        </Popover.Title>
-                        <Popover.Description className="mt-2 text-xs text-slate-400">
-                          These lines decide when a score changes the call. Move them to match your
-                          own risk tolerance, then share this link.
-                        </Popover.Description>
-                        <ul className="mt-3 space-y-2 text-xs text-slate-300">
-                          <li className="flex gap-2">
-                            <span className="text-slate-400">•</span>
-                            <span>Lower numbers change the call sooner.</span>
-                          </li>
-                          <li className="flex gap-2">
-                            <span className="text-slate-400">•</span>
-                            <span>Higher numbers wait for a bigger move.</span>
-                          </li>
-                        </ul>
-                        <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100">
-                          Close
-                        </Popover.Close>
-                        <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
+            {/* The explanation used to sit behind two clicks: a collapsible
+                "How this works" whose body was a popover trigger, "How the
+                watch lines work", whose popup held two bullet points. The two
+                lines print here. */}
+            <details className={DISCLOSURE_CLASS}>
+              <summary className={DISCLOSURE_SUMMARY_CLASS}>How this works</summary>
+              <div className="mt-3 space-y-3 text-xs text-slate-300">
+                <p className="text-slate-400">
+                  These lines decide when a score changes the call. Move them to match your own
+                  risk tolerance, then share this link.
+                </p>
+                <ul className="list-disc space-y-1 pl-4">
+                  <li>Lower numbers change the call sooner.</li>
+                  <li>Higher numbers wait for a bigger move.</li>
+                </ul>
                 <DataProvenanceStrip provenance={provenance} />
-              </Collapsible.Panel>
-            </Collapsible.Root>
+              </div>
+            </details>
           </div>
           <div className="weather-surface p-4">
-            <Collapsible.Root defaultOpen>
-              <Collapsible.Trigger
-                type="button"
-                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-              >
-                Recent changes
-              </Collapsible.Trigger>
-              <Collapsible.Panel className="mt-3">
+            <details open className={DISCLOSURE_CLASS}>
+              <summary className={DISCLOSURE_SUMMARY_CLASS}>Recent changes</summary>
+              <div className="mt-3">
                 {auditLog.length ? (
                   <ul className="space-y-3 text-xs text-slate-400">
                     {auditLog.map((entry) => (
@@ -536,8 +505,8 @@ export const ThresholdsPanel = ({
                     Using the defaults.
                   </p>
                 )}
-              </Collapsible.Panel>
-            </Collapsible.Root>
+              </div>
+            </details>
           </div>
         </div>
       </div>

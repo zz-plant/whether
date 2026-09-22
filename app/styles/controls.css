@@ -133,9 +133,7 @@ input:not([type="range"]) {
   padding-inline: 1.05rem;
 }
 
-.weather-pill,
-.weather-icon-chip,
-.weather-surface {
+.weather-pill {
   transition:
     transform var(--transition-base) var(--ease-out),
     border-color var(--transition-base) var(--ease-out),
@@ -143,24 +141,16 @@ input:not([type="range"]) {
     color var(--transition-base) var(--ease-out);
 }
 
-.weather-tab:focus-visible,
-.weather-pill:focus-visible,
-.weather-button:focus-visible,
-.weather-button-primary:focus-visible,
-.weather-cta:focus-visible,
-.weather-icon-chip:focus-visible,
-.weather-hub-link-card:focus-visible,
-summary[data-chevron]:focus-visible,
-summary.list-none:focus-visible {
-  outline: 2px solid var(--accent-action);
-  outline-offset: 2px;
-  box-shadow: var(--focus-halo);
-}
+/* The focus ring is declared once, on the elements that can take focus
+   (decision-flow.css), plus `.weather-focus-ring` below for a control with no
+   class. This block used to repeat it per control class.
 
+   Hover lifts only on a link or a button: a `.weather-pill` on a <span> is a
+   label, and a label that rises under the pointer promises a click it cannot
+   honour. */
 @media (hover: hover) and (pointer: fine) {
-
-  .weather-tab:hover,
-  .weather-pill:hover {
+  a.weather-pill:hover,
+  button.weather-pill:hover {
     transform: translateY(-1px);
     border-color: rgba(125, 211, 252, 0.34);
     box-shadow:
@@ -169,7 +159,8 @@ summary.list-none:focus-visible {
       var(--glow-soft);
   }
 
-  .weather-button:hover {
+  a.weather-button:hover,
+  button.weather-button:hover {
     transform: translateY(-1px);
     border-color: rgba(103, 232, 249, 0.36);
     box-shadow:
@@ -178,34 +169,25 @@ summary.list-none:focus-visible {
       var(--glow-soft);
   }
 
-  .weather-button-primary:hover {
+  a.weather-button-primary:hover,
+  button.weather-button-primary:hover {
     transform: translateY(-2px);
     border-color: rgba(125, 211, 252, 0.9);
     box-shadow: var(--cta-shadow-hover);
   }
 
-  .weather-cta-primary:hover {
+  a.weather-cta-primary:hover,
+  button.weather-cta-primary:hover {
     transform: translateY(-1px);
     border-color: rgba(125, 211, 252, 0.9);
     box-shadow: var(--cta-shadow-hover);
   }
-
-  .weather-icon-chip:hover {
-    transform: translateY(-1px);
-    border-color: rgba(125, 211, 252, 0.5);
-    box-shadow:
-      inset 0 0 0 1px rgba(15, 23, 42, 0.45),
-      var(--elev-2),
-      var(--glow-soft);
-  }
 }
 
-.weather-tab:active,
 .weather-pill:active,
 .weather-button:active,
 .weather-button-primary:active,
-.weather-cta:active,
-.weather-icon-chip:active {
+.weather-cta:active {
   transform: translateY(1px);
 }
 
@@ -235,7 +217,6 @@ summary.list-none:focus-visible {
    the shared control classes instead of per call site. Mobile keeps 44px. */
 @media (min-width: 640px) {
   .weather-pill,
-  .weather-tab,
   .weather-cta,
   .weather-button,
   .weather-button-primary {
@@ -297,4 +278,22 @@ details[open] > summary[data-chevron]::after,
 
 .weather-press-scale:active {
   transform: translateY(1px);
+}
+
+/* One keycap. The palette, the shortcut strip, the help modal and the header
+   each styled `<kbd>` inline, seven ways. */
+.weather-kbd {
+  display: inline-flex;
+  align-items: center;
+  min-width: 1.4em;
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-nested);
+  color: var(--color-app-text-secondary);
+  font-family: inherit;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1.4;
+  justify-content: center;
 }
