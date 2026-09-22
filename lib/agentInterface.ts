@@ -1,5 +1,6 @@
 import { buildAgentPayload, buildAgentPrompt } from "./agentHandoff";
 import { loadReportRouteContext } from "./api/reportRoute";
+import { assessPublishReadiness } from "./report/briefPublishGuard";
 import { buildPostureState } from "./report/postureStateSource";
 import { buildSummaryHash } from "./summary/summaryHash";
 import { buildMonthlySummary } from "./summary/monthlySummary";
@@ -42,7 +43,11 @@ type SummaryByCadence = {
    read through a gracefully degrading loader and froze a ten-week-old brief while exiting 0.
    `lib/report/briefPublishGuard.ts` is what judges publish readiness, on the fallback and
    record-age flags that do move under an outage. Anything that writes from this payload
-   gates there, not on this flag. Every caller today only reads. */
+   gates there, not on this flag. Every caller today only reads.
+
+   `publishReadiness` is that judgment, returned so a consumer that automates on the call
+   (the Jev handoff, `?format=jev`) can refuse a fallback or stale week the same way the
+   Slack and email sends do, instead of reading `degraded` as a freshness signal. */
 export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
   cadence: Cadence,
   { route = "agent-interface" }: { route?: string } = {},
@@ -122,6 +127,14 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
     degraded,
+    publishReadiness: assessPublishReadiness({
+      degraded,
+      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
+      isLive: treasury.isLive,
+      fallbackReason: treasury.fallback_reason,
+      recordDate: treasury.record_date ?? treasury.fetched_at,
+      now: new Date(),
+    }),
     agentHandoff: {
       payload: agentPayload,
       prompt: agentPrompt,
