@@ -1,5 +1,6 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeProfile } from "../regimeEngine";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 import type { ReportEvidenceItem } from "./reportData";
 import { buildCompactTrustSummary, buildTrustWarnings, buildWeeklyCitationMetaLine } from "./trustStatus";
@@ -112,10 +113,10 @@ export const buildSeoDecisionPayload = ({
   const immediateAction = primaryRule?.doNow[0] ?? fallbackImmediateAction;
   const triggerThreshold =
     primaryRule?.pauseTrigger ??
-    `Trigger tighter mode if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+    `Risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
   const reversalCondition =
     primaryRule?.resumeTrigger ??
-    "Reverse only after two consecutive supportive reads and improved threshold distance.";
+    "Both scores move back past their lines and stay there for two weekly readings.";
 
   const trustSummary = buildCompactTrustSummary({
     confidenceLabel,
@@ -124,7 +125,7 @@ export const buildSeoDecisionPayload = ({
   });
 
   const citationMeta = buildWeeklyCitationMetaLine({
-    statusLabel: assessment.regime,
+    statusLabel: getRegimePublicLabel(assessment.regime),
     confidenceLabel,
     recordDateLabel,
     freshnessLabel,

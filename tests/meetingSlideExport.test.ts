@@ -60,7 +60,9 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(markdown.includes("> **Whether: this week's call**"));
     assert.ok(markdown.includes("ACTION NOW"));
     assert.ok(markdown.includes("PAUSE IF"));
-    assert.ok(markdown.includes("CHANGE COURSE IF"));
+    assert.ok(markdown.includes("CALL CHANGES IF"));
+    assert.ok(!markdown.includes("CHANGE COURSE IF"), "the slide uses the page's name for the call-change line");
+    assert.ok(/Medium confidence|High confidence|Low confidence/.test(markdown), "confidence reads as a word, not the engine's code");
     assert.ok(markdown.includes("Freezing"));
     assert.ok(!markdown.includes("SCARCITY"), "the engine key must not reach a pasted slide");
   });
@@ -75,9 +77,9 @@ describe("Meeting Slide & Notion Exporter", () => {
     const html = formatMeetingSlideHtml(payload);
 
     assert.ok(html.includes("Whether · Weekly Operating Brief"));
-    assert.ok(html.includes("1. Action Now"));
-    assert.ok(html.includes("2. Pause If"));
-    assert.ok(html.includes("3. Change Course If"));
+    assert.ok(html.includes("1. Action now"));
+    assert.ok(html.includes("2. Pause if"));
+    assert.ok(html.includes("3. Call changes if"));
     assert.ok(html.includes("Freezing"));
     assert.ok(!html.includes("SCARCITY"));
   });

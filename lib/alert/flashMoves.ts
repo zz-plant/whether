@@ -5,7 +5,7 @@
  * The daily cron already pushes on a regime flip and on a score crossing a
  * boundary. What neither catches is the shape of an emergency: the short rate
  * dropping a quarter point overnight (a cut between meetings, a bill-market
- * dislocation), or the 10Y−2Y curve moving twenty basis points in a session (a
+ * dislocation), or the 10Y−2Y curve moving 0.20 percentage points in a session (a
  * spread blowout, a flight to quality). Either can leave every score inside its
  * quadrant for a day or two and still be the fact an operator most needs before
  * the next board conversation.
@@ -17,9 +17,11 @@
  * month is a trend, and the brief already reports trends.
  */
 
+import { regimeSignalLabel } from "../report/signalTranslations";
+
 /** A policy-sized move of the short rate between two consecutive reads, in percentage points. */
 export const FLASH_BASE_RATE_MOVE = 0.25;
-/** Twenty basis points on 10Y−2Y in one read: outside a normal session's range. */
+/** 0.20 percentage points on 10Y−2Y in one read: outside a normal session's range. */
 export const FLASH_CURVE_MOVE = 0.2;
 /** Two reads more than this far apart are not consecutive in the sense the thresholds assume. */
 const FLASH_MAX_GAP_DAYS = 7;
@@ -44,9 +46,15 @@ export type FlashMove = {
   headline: string;
 };
 
+/*
+ * The page's names for the two inputs. An alert lands in an inbox with no page
+ * beside it, so the curve carries its plain meaning on first use, and every size
+ * is in percentage points: "the 10Y−2Y curve moved +0.30%" read as a 0.3% change
+ * in a bond-desk quantity to anyone not on a bond desk.
+ */
 const METRIC_LABELS: Record<FlashMetric, string> = {
-  baseRate: "The short rate",
-  curveSlope: "The 10Y−2Y curve",
+  baseRate: `The ${regimeSignalLabel.baseRate.toLowerCase()}`,
+  curveSlope: `The ${regimeSignalLabel.curveSlope.toLowerCase()} (10-year minus 2-year rate)`,
 };
 
 const THRESHOLDS: Record<FlashMetric, number> = {
@@ -63,18 +71,19 @@ const daysBetween = (from: string, to: string): number | null => {
   return Math.abs(toMs - fromMs) / DAY_MS;
 };
 
-const formatSigned = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
+/** "0.30 percentage points": a spread's move is a difference of rates, never a percent of one. */
+export const formatPointsMove = (value: number) => `${Math.abs(value).toFixed(2)} percentage points`;
 
 const describe = (metric: FlashMetric, from: number, to: number, current: FlashInputs, previous: FlashInputs): FlashMove => {
   const delta = to - from;
-  const verb = metric === "baseRate" ? (delta < 0 ? "fell" : "rose") : delta < 0 ? "flattened" : "steepened";
+  const verb = delta < 0 ? "fell" : "rose";
   return {
     metric,
     from,
     to,
     delta,
     label: METRIC_LABELS[metric],
-    headline: `${METRIC_LABELS[metric]} ${verb} ${formatSigned(delta)} between ${previous.recordDate} and ${current.recordDate} (${from.toFixed(2)}% to ${to.toFixed(2)}%).`,
+    headline: `${METRIC_LABELS[metric]} ${verb} ${formatPointsMove(delta)} between ${previous.recordDate} and ${current.recordDate} (${from.toFixed(2)}% to ${to.toFixed(2)}%).`,
   };
 };
 

@@ -1,6 +1,10 @@
 import type { RegimeAssessment } from "./regimeEngine";
 import type { TreasuryData } from "./types";
 import type { PostureStateContract } from "./report/postureStateContract";
+import { getRegimePublicLabel } from "./regimePresentation";
+import { formatSignalReading } from "./report/signalTranslations";
+import { DECISION_CONTRACT_LABELS } from "./report/reportCopy";
+import { describeConditions } from "./export/exportTerms";
 
 type IntegrationTarget = "slack" | "notion" | "linear";
 
@@ -30,7 +34,7 @@ const buildFallbackPostureState = (
 ): PostureStateContract => ({
   currentState: {
     regime: assessment.regime,
-    postureLabel: assessment.regime,
+    postureLabel: getRegimePublicLabel(assessment.regime),
     confidenceLabel: "MED",
     confidencePercent: 55,
     transitionWatch: "OFF",
@@ -40,12 +44,12 @@ const buildFallbackPostureState = (
     timestamp: null,
     fromState: null,
     toState: assessment.regime,
-    reason: "Posture event unavailable; using current regime snapshot.",
+    reason: "No record of the last change to the call; this is the current reading.",
     source: "state-machine",
   },
   whatFlipsNext: {
-    flipTrigger: "Recheck thresholds on next refresh.",
-    thresholds: ["Recheck thresholds on next refresh."],
+    flipTrigger: "Check again after the next update.",
+    thresholds: ["Check again after the next update."],
     reversalConditions: [],
   },
 });
@@ -65,7 +69,13 @@ export const buildWeeklyMandateEnvelope = (
 ): WeeklyMandateEnvelope => {
   const resolvedPostureState = resolvePostureState(postureState, assessment, treasury);
   const title = `Whether weekly mandate — ${treasury.record_date}`;
-  const summary = `${resolvedPostureState.currentState.postureLabel}: Funding pressure ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
+  /* Pasted into a channel, card or database row that has no page beside it, so
+     the conditions and both scores carry their meaning in the line. */
+  const summary = [
+    `Conditions: ${describeConditions(assessment.regime, resolvedPostureState.currentState.postureLabel)}.`,
+    `${formatSignalReading("tightness", assessment.scores.tightness)}.`,
+    `${formatSignalReading("riskAppetite", assessment.scores.riskAppetite)}.`,
+  ].join(" ");
   const constraints = assessment.constraints.slice(0, 3);
 
   return {
@@ -80,12 +90,14 @@ export const buildWeeklyMandateEnvelope = (
       `## ${title}`,
       summary,
       "",
-      "### Constraints",
+      "### What to hold",
       ...constraints.map((item) => `- ${item}`),
       "",
-      `Last committed change: ${resolvedPostureState.lastCommittedChangeEvent.timestamp ?? "Unavailable"} · ${resolvedPostureState.lastCommittedChangeEvent.reason}`,
-      `Next flip trigger: ${resolvedPostureState.whatFlipsNext.flipTrigger}`,
-      ...resolvedPostureState.whatFlipsNext.reversalConditions.map((condition) => `- Reversal: ${condition}`),
+      `Last change to the call: ${resolvedPostureState.lastCommittedChangeEvent.timestamp ?? "not recorded"} · ${resolvedPostureState.lastCommittedChangeEvent.reason}`,
+      `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${resolvedPostureState.whatFlipsNext.flipTrigger}`,
+      ...resolvedPostureState.whatFlipsNext.reversalConditions.map(
+        (condition) => `- ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${condition}`,
+      ),
       "",
       `Source: ${treasury.source}`,
     ].join("\n"),
@@ -121,7 +133,7 @@ export const buildWeeklyMandatePayload = (
       parent: { type: "database_id", database_id: "weekly-mandates" },
       properties: {
         Name: { title: [{ text: { content: envelope.title } }] },
-        Regime: { select: { name: assessment.regime } },
+        Conditions: { select: { name: getRegimePublicLabel(assessment.regime) } },
         Summary: { rich_text: [{ text: { content: envelope.summary } }] },
         RecordDate: { rich_text: [{ text: { content: envelope.recordDate } }] },
       },
@@ -137,7 +149,7 @@ export const buildWeeklyMandatePayload = (
   return {
     title: envelope.title,
     description: envelope.markdown,
-    labels: ["whether", assessment.regime.toLowerCase()],
+    labels: ["whether", getRegimePublicLabel(assessment.regime).toLowerCase()],
     metadata: envelope,
   };
 };

@@ -110,7 +110,7 @@ export function SignalInversionPreview({
         </p>
       </header>
       <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
-        <svg viewBox={`-2 -2 ${CHART_WIDTH + 4} ${CHART_HEIGHT + 4}`} className="weather-data-plot mx-auto h-auto w-full max-w-[40rem]" aria-label="10Y-2Y and 2Y-3M inversion timeline preview">
+        <svg viewBox={`-2 -2 ${CHART_WIDTH + 4} ${CHART_HEIGHT + 4}`} className="weather-data-plot mx-auto h-auto w-full max-w-[40rem]" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread">
           {/* Zone fills and strokes were hardcoded rgba() tuned to the dark
               ground; on the light theme they rendered as dark-toned washes. */}
           <rect x="0" y={zeroLineY} width={CHART_WIDTH} height={CHART_HEIGHT - zeroLineY} fill="var(--color-semantic-tightening-border)" fillOpacity="0.12" />
@@ -173,7 +173,7 @@ export function SignalInversionPreview({
           <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
           {/* Autoscaled to the visible window, so the extent has to be stated. */}
           <span className="tabular-nums text-slate-400">
-            Vertical scale {spreadMin.toFixed(2)} to {spreadMax.toFixed(2)} pts
+            Vertical scale {spreadMin.toFixed(2)}% to {spreadMax.toFixed(2)}%
           </span>
         </div>
         {/* Expands the axis shorthand. Without it, "10Y-2Y +14.2 bp" is

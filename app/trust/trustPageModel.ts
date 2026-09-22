@@ -103,8 +103,8 @@ export async function buildTrustPageModel() {
   const revisitBullets: Array<{ label: string; detail?: string; href: string; linkLabel: string }> = [
     {
       // No detail: this row's own link points at #confidence-limits, and that
-      // section already prints reportData.flipThreshold under "This
-      // recommendation breaks if". Carrying the sentence here too put the same
+      // section already prints reportData.flipThreshold under "Call changes
+      // if". Carrying the sentence here too put the same
       // long condition on screen twice within one section.
       label: "What would go wrong",
       href: "#confidence-limits",

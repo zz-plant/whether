@@ -55,27 +55,29 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 - **Regime names render as weather everywhere visible**: Freezing / Cloudy / Stormy / Sunny.
   Source is `lib/regimePresentation.ts` (`REGIME_WEATHER_LABELS`, aliased by
   `REGIME_PUBLIC_LABELS`). Concept keys (SCARCITY/DEFENSIVE/VOLATILE/EXPANSION) stay
-  internal — they are engine terms, not display copy. Compass quadrant axes and the
-  forecast "possible paths" strip are the two defined exceptions (axis labels and
-  forecast-outcome labels, below).
-- **Operating-posture descriptions are a distinct layer, not regime names**:
-  Contraction, Transitional Mixed, Guarded Expansion, Expansion (`getRegimeDisplayLabel`).
-  They describe the current stance; the regime name above stays separate.
-- **Forecast-outcome labels are a distinct typed layer**, not regime names:
-  Expansion / Mixed / Scarcity / Defensive (`lib/report/forecastModel.ts`
-  `ForecastRegimeLabel`). Used for the forward estimate and the diagnostics
-  "Possible paths" strip. Do not reuse them as current-regime names.
+  internal — they are engine terms, not display copy. Compass quadrant axes are the one
+  defined exception (axis labels).
+- **There is no separate posture-description layer.** `getRegimeDisplayLabel` used to return
+  Contraction / Transitional Mixed / Guarded Expansion / Expansion; it returns the weather name
+  now (`lib/regimePresentation.ts`).
+- **Forecast outcomes render as weather names too** (2026-09-22). `ForecastRegimeLabel`
+  (Expansion / Mixed / Scarcity / Defensive, `lib/report/forecastModel.ts`) stays a typed
+  internal layer; `forecastWeatherLabel` is what reaches a reader. Four names for four states
+  was the second vocabulary a reader had to look up.
 - **The stance object is the call**: "the call", with "weekly operating call" on first
-  mention in cold surfaces (shares, metadata, answer pages). "Posture" stays the label for
-  the operating stance; do not mint recommendation/verdict as user-facing stance synonyms
-  ("verdict" is internal; answers use "Bounded calls").
+  mention in cold surfaces (shares, metadata, answer pages). "Posture" is retired from reader
+  copy and ratcheted down by `tests/readerVocabulary.test.tsx`; do not mint
+  recommendation/verdict as user-facing stance synonyms ("verdict" is internal).
 - **The forward-look noun is forecast** ("why the forecast shifted", the forecast cone).
   Do not add synonyms (outlook/conditions) for the forward estimate. The command bar's
   "{regime} outlook" chip is a pass-through descriptor of current conditions, not a
   forecast synonym.
 - **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
   (`lib/report/reportCopy.ts`): general imperative forms on screens are Do now / Pause if /
-  Change course if. Noun slots in exports remain Action / Threshold / Reversal. Consume these
+  Resume when, and the line where the call itself changes is Call changes if. "Change course
+  if" and "Re-open when" are retired (2026-09-22): the first read as the call changing, which
+  it named only on some surfaces, and the second was a third name for the resume line. Other
+  conditions that would change the call print under "Watch this week". Noun slots in exports remain Action / Threshold / Reversal. Consume these
   exports instead of hardcoding slot words in components. Per-area bounded rules now render on
   `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
   (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not

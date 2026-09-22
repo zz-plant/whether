@@ -1,6 +1,7 @@
 import { resolveWeekEndingIsoDateUTC } from "../formatters";
+import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL, DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { describeConditions, formatExportConfidence, pauseConditionOnly } from "./exportTerms";
 import { getRegimePublicLabel } from "../regimePresentation";
-import { OPERATING_LATITUDE_LABEL, DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
@@ -22,6 +23,8 @@ type WeeklyOperatorBriefPayload = {
     line: string;
   };
   regimeStage: string;
+  /** `regimeStage` with what the weather means for money, as the paste prints it. */
+  conditions: string;
   confidence: string;
   currentCall: string;
   actionNow: string;
@@ -53,12 +56,16 @@ type WeeklyCallSnapshotPayload = {
   flipConditions: string[];
 };
 
+/* One line per slot, in the order the note prints them. The resume line is
+   optional because only a week with a per-area rule carries one. */
 type WeeklyBoardSnippetPayload = {
-  trustLine: string;
-  postureLine: string;
+  dataLine: string;
+  latitudeLine: string;
+  conditionsLine: string;
   changedLine: string;
-  guardrailLine: string;
-  flipLine: string;
+  pauseLine: string;
+  resumeLine?: string;
+  callChangeLine: string;
   stabilityLine: string;
 };
 
@@ -106,7 +113,8 @@ export const buildWeeklyOperatorBriefPayload = ({
       date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
       boldnessBudget,
       regimeStage: weeklyCall.regimeStage,
-      confidence: confidenceLabel ? `${confidenceLabel} confidence` : CONFIDENCE_FROM_DISTANCE,
+      conditions: describeConditions(assessment.regime, weeklyCall.regimeStage),
+      confidence: confidenceLabel ? formatExportConfidence(confidenceLabel) : CONFIDENCE_FROM_DISTANCE,
       currentCall: weeklyCall.currentCall,
       actionNow: weeklyCall.actionNow,
       pauseIf: weeklyCall.pauseIf,
@@ -138,7 +146,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     canonicalDecisionCopy?.flipTrigger
     ?? postureFlipTrigger
     ?? normalizedFlipConditionLabels[0]
-    ?? "The call changes when live data crosses the pause line.";
+    ?? NO_LIVE_READING_CALL.changeCourseIf;
 
   const resolvedFlipConditionLabels = canonicalFlipConditions.length > 0
     ? buildFlipConditionsWithoutTriggerDuplication({
@@ -169,7 +177,8 @@ export const buildWeeklyOperatorBriefPayload = ({
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
     boldnessBudget,
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? getRegimePublicLabel(assessment.regime),
-    confidence: confidenceLabel ? `${confidenceLabel} confidence` : CONFIDENCE_FROM_DISTANCE,
+    conditions: describeConditions(assessment.regime, canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel),
+    confidence: confidenceLabel ? formatExportConfidence(confidenceLabel) : CONFIDENCE_FROM_DISTANCE,
     currentCall,
     actionNow,
     pauseIf,
@@ -193,22 +202,26 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
 
   const boldnessDeltaLabel = payload.boldnessBudget
     ? payload.boldnessBudget.delta === 0
-      ? "no change vs last week"
-      : `${payload.boldnessBudget.delta > 0 ? "+" : ""}${payload.boldnessBudget.delta.toFixed(0)} vs last week`
+      ? "no change"
+      : `${payload.boldnessBudget.delta > 0 ? "+" : ""}${payload.boldnessBudget.delta.toFixed(0)} ${Math.abs(payload.boldnessBudget.delta) === 1 ? "point" : "points"}`
     : null;
 
   return [
     `Weekly Operator Brief — ${payload.date}`,
-    payload.boldnessBudget ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${boldnessDeltaLabel})` : null,
+    /* The number never travels without what it measures: a paste is read by
+       people who have not seen the hero that explains it. */
+    payload.boldnessBudget
+      ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${OPERATING_LATITUDE_GLOSS}) · vs last week: ${boldnessDeltaLabel}`
+      : null,
     payload.boldnessBudget?.line ?? null,
-    `Conditions: ${payload.regimeStage}`,
-    `Confidence: ${payload.confidence}`,
+    `Conditions: ${payload.conditions}`,
+    payload.confidence,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
     "",
     `${publicDecisionLabels.call}: ${payload.currentCall}`,
     `${publicDecisionLabels.action}: ${payload.actionNow}`,
-    `${publicDecisionLabels.threshold}: ${payload.pauseIf}`,
-    `${publicDecisionLabels.reversal}: ${payload.changeCourseIf}`,
+    `${publicDecisionLabels.threshold}: ${pauseConditionOnly(payload.pauseIf)}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${payload.changeCourseIf}`,
     ...(supportingActionLines.length > 0
       ? ["", "Also this week:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
       : []),
@@ -237,8 +250,10 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
         {
           type: "section",
           fields: [
-            ...(payload.boldnessBudget ? [{ type: "mrkdwn" as const, text: `*${OPERATING_LATITUDE_LABEL}*\n${payload.boldnessBudget.score}/100` }] : []),
-            { type: "mrkdwn", text: `*Conditions*\n${payload.regimeStage}` },
+            ...(payload.boldnessBudget
+              ? [{ type: "mrkdwn" as const, text: `*${OPERATING_LATITUDE_LABEL}*\n${payload.boldnessBudget.score}/100: ${OPERATING_LATITUDE_GLOSS}` }]
+              : []),
+            { type: "mrkdwn", text: `*Conditions*\n${payload.conditions}` },
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],
         },
@@ -272,7 +287,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           elements: [
             {
               type: "mrkdwn",
-              text: `*${publicDecisionLabels.threshold}:* ${payload.pauseIf}\n*${publicDecisionLabels.reversal}:* ${payload.changeCourseIf}`,
+              text: `*${publicDecisionLabels.threshold}:* ${pauseConditionOnly(payload.pauseIf)}\n*${DECISION_CONTRACT_LABELS.watch.postureFlips}:* ${payload.changeCourseIf}`,
             },
           ],
         },
@@ -305,19 +320,21 @@ export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayl
   `CONDITIONS: ${payload.regime}`,
   `CALL: ${payload.call}`,
   `${publicDecisionLabels.action.toUpperCase()}: ${payload.doNow}`,
-  `AVOID: ${payload.avoid}`,
-  `WATCH: ${payload.watch}`,
-  `${DECISION_CONTRACT_LABELS.watch.flipWatch.toUpperCase()}:`,
+  `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}: ${pauseConditionOnly(payload.avoid)}`,
+  `${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}: ${payload.watch}`,
+  "OTHER THINGS THAT WOULD CHANGE THE CALL:",
   ...(payload.flipConditions.length > 0
     ? payload.flipConditions.map((condition) => `• ${condition}`)
     : ["• No live line this week; check again after the next refresh."]),
 ].join("\n");
 
 export const buildWeeklyBoardSnippetPlainText = (payload: WeeklyBoardSnippetPayload) => [
-  payload.trustLine,
-  payload.postureLine,
+  payload.dataLine,
+  payload.latitudeLine,
+  payload.conditionsLine,
   payload.changedLine,
-  payload.guardrailLine,
-  payload.flipLine,
+  payload.pauseLine,
+  payload.resumeLine,
+  payload.callChangeLine,
   payload.stabilityLine,
-].join("\n");
+].filter((line): line is string => line != null).join("\n");

@@ -7,12 +7,8 @@ import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
 
 import { CurveTermsKey } from "../app/signals/components/curveTermsKey";
-import { ScoreBandReference, SignalScaleNote } from "../app/components/ui/plainLanguage";
-import { BEGINNER_GLOSSARY_ENTRIES } from "../lib/report/reportCopy";
+import { SignalScaleNote } from "../app/components/ui/plainLanguage";
 import {
-  PLAIN_ENGLISH_SUBSTITUTIONS,
-  applyPlainEnglishSubstitutions,
-  GLOSSARY_HREF,
   compositeSignalScales,
   scoreBandReference,
   signalPlainEnglish,
@@ -54,13 +50,6 @@ describe("score scale anchoring", () => {
     const rows = scoreBandReference("riskAppetite");
     assert.equal(rows[0].meaning, signalPlainEnglish.riskAppetite.lowMeans);
     assert.equal(rows[2].meaning, signalPlainEnglish.riskAppetite.highMeans);
-  });
-
-  it("marks the band this week's reading falls in", () => {
-    const html = renderToStaticMarkup(<ScoreBandReference signalKey="tightness" score={64} />);
-    assert.match(html, /31-69/);
-    // The active row is the only one that carries the assistive-tech marker.
-    assert.equal(html.match(/this week&#x27;s reading|this week’s reading/g)?.length, 1);
   });
 
   it("states which end of each composite scale is which", () => {
@@ -119,14 +108,11 @@ describe("the plain-English layer beside the week's readings", () => {
     assert.ok(html.includes(signalPlainEnglish.riskAppetite.midMeans));
   });
 
-  it("anchors both composite scales and links out to the glossary", () => {
+  it("anchors both composite scales in place, with no glossary link", () => {
     const html = render();
     assert.ok(html.includes(compositeSignalScales.riskAppetite.directionLabel));
     assert.ok(html.includes(compositeSignalScales.tightness.directionLabel));
-    /* Read from the constant: the destination moved off /trust, and a literal
-       here would have to be edited in lockstep with it — which is how six
-       links came to point at a page about source freshness. */
-    assert.ok(html.includes(GLOSSARY_HREF));
+    assert.ok(!html.includes('href="/glossary"'));
   });
 
   it("renders the unclipped pressure beside a saturated score", () => {
@@ -144,69 +130,5 @@ describe("curve chart shorthand", () => {
     assert.match(html, /Two-year rate minus three-month rate/);
     assert.match(html, /one hundredth of a percentage point/);
     assert.match(html, /How long the government is borrowing for/);
-  });
-});
-
-describe("beginner glossary", () => {
-  const values = new Set(BEGINNER_GLOSSARY_ENTRIES.map((entry) => entry.value));
-
-  it("defines the market-mechanics terms the charts and formulas use", () => {
-    for (const term of [
-      "yield-curve",
-      "treasury-maturities",
-      "spread",
-      "inversion",
-      "basis-point",
-      "credit-spread",
-      "vix",
-      "financial-conditions-index",
-      "fred-series",
-    ]) {
-      assert.ok(values.has(term), `glossary is missing "${term}"`);
-    }
-  });
-
-  it("keeps entry values unique so the accordion can key on them", () => {
-    assert.equal(values.size, BEGINNER_GLOSSARY_ENTRIES.length);
-  });
-});
-
-describe("plain-English substitutions", () => {
-  it("rewrites multi-word phrases before the bare term they contain", () => {
-    // Ordered the other way, the bare /tightness/ rule fired first and left
-    // "Cash funding pressure" behind.
-    assert.equal(
-      applyPlainEnglishSubstitutions("Cash tightness is elevated."),
-      "Funding pressure is elevated.",
-    );
-    assert.equal(
-      applyPlainEnglishSubstitutions("Capital tightness eased."),
-      "Funding pressure eased.",
-    );
-  });
-
-  it("keeps every multi-word rule ahead of any bare term it contains", () => {
-    const sources = PLAIN_ENGLISH_SUBSTITUTIONS.map((sub) =>
-      sub.pattern.source.replace(/\\b/g, "").toLowerCase(),
-    );
-    sources.forEach((source, index) => {
-      if (source.includes(" ")) return;
-      const laterContaining = sources
-        .slice(index + 1)
-        .filter((other) => other.includes(" ") && other.split(" ").includes(source));
-      assert.deepEqual(
-        laterContaining,
-        [],
-        `"${source}" runs before multi-word rules that contain it: ${laterContaining.join(", ")}`,
-      );
-    });
-  });
-
-  it("carries no rule whose replacement only changes case", () => {
-    const noOps = PLAIN_ENGLISH_SUBSTITUTIONS.filter(
-      (sub) =>
-        sub.pattern.source.replace(/\\b/g, "").toLowerCase() === sub.replacement.toLowerCase(),
-    );
-    assert.deepEqual(noOps.map((sub) => sub.replacement), []);
   });
 });

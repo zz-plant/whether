@@ -45,7 +45,7 @@ export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlo
   return (
     <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="guardrail-tags-heading">
       <div className="space-y-1">
-        <h2 id="guardrail-tags-heading" className="type-eyebrow">Guardrail tags for work items</h2>
+        <h2 id="guardrail-tags-heading" className="type-eyebrow">Pause and resume lines for work items</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           Copy one block per business area into a Linear or Jira card description. No integration,
           no tokens — the card carries this week&apos;s call, its pause line, and what would change it.

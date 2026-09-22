@@ -24,16 +24,18 @@ describe("flash moves", () => {
     assert.equal(rest.length, 0);
     assert.equal(move?.metric, "baseRate");
     assert.equal(move?.delta.toFixed(2), "-0.25");
-    assert.match(move?.headline ?? "", /^The short rate fell -0\.25% between 2026-09-15 and 2026-09-16 \(4\.55% to 4\.30%\)\.$/);
+    // A move in a rate is a difference of rates: percentage points, never a percent.
+    assert.match(move?.headline ?? "", /^The short-term borrowing rate fell 0\.25 percentage points between 2026-09-15 and 2026-09-16 \(4\.55% to 4\.30%\)\.$/);
   });
 
   it("fires on a twenty-point move of the curve, and names the direction", () => {
     const previous = read({ recordDate: "2026-09-15", curveSlope: 0.15 });
     const [move] = evaluateFlashMoves(read(), previous);
     assert.equal(move?.metric, "curveSlope");
-    assert.match(move?.headline ?? "", /steepened \+0\.25%/);
+    assert.match(move?.headline ?? "", /^The recession warning gauge \(10-year minus 2-year rate\) rose 0\.25 percentage points/);
+    assert.doesNotMatch(move?.headline ?? "", /10Y|steepen|flatten/);
     const [flatter] = evaluateFlashMoves(read({ curveSlope: -0.1 }), read({ recordDate: "2026-09-15", curveSlope: 0.15 }));
-    assert.match(flatter?.headline ?? "", /flattened -0\.25%/);
+    assert.match(flatter?.headline ?? "", /fell 0\.25 percentage points/);
   });
 
   it("holds exactly at the threshold and ignores float noise beneath it", () => {
@@ -98,9 +100,9 @@ describe("flash alerts in the evaluator and the mail", () => {
 
   it("mails the move in the input's units and says the call stands until the next read", () => {
     const mail = flashMoveEmail(move!, "token-1");
-    assert.match(mail.subject, /^Whether Flash — the short rate moved -0\.30% since the last read$/);
+    assert.match(mail.subject, /^Whether Flash — the short-term borrowing rate fell 0\.30 percentage points since the last reading$/);
     assert.match(mail.text, /4\.60% to 4\.30%/);
-    assert.match(mail.text, /The weekly call stands until the next read/);
+    assert.match(mail.text, /This week's call stands until the next reading/);
     assert.match(mail.html, /4\.60% → 4\.30%/);
     assert.match(mail.text, /unsubscribe/i);
     assert.doesNotMatch(mail.text, /tightness|riskAppetite/);

@@ -91,6 +91,11 @@ describe("integration briefs", () => {
     const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
     assert.match(envelope.title, /weekly mandate/i);
     assert.match(envelope.markdown, /## Whether weekly mandate/);
+    // Pasted with no page beside it: the scores carry their scale and the lines use the page's names.
+    assert.match(envelope.summary, /Funding pressure 72\/100: money is hard to raise\./);
+    assert.match(envelope.markdown, /Call changes if: /);
+    assert.match(envelope.markdown, /- Resume when: Risk appetite/);
+    assert.doesNotMatch(envelope.markdown, /flip|Reversal:|regime|DEFENSIVE/i);
   });
 
   it("builds slack payload", () => {
@@ -100,12 +105,14 @@ describe("integration briefs", () => {
   });
 
   it("builds notion payload", () => {
-    const payload = buildWeeklyMandatePayload("notion", assessment, treasury, postureState) as { properties: { Regime: { select: { name: string } } } };
-    assert.equal(payload.properties.Regime.select.name, "DEFENSIVE");
+    const payload = buildWeeklyMandatePayload("notion", assessment, treasury, postureState);
+    // A database row a team reads: the weather word, not the engine key.
+    assert.match(JSON.stringify(payload), /"Conditions":\{"select":\{"name":"Cloudy"\}\}/);
   });
 
   it("builds linear payload", () => {
     const payload = buildWeeklyMandatePayload("linear", assessment, treasury, postureState) as { labels: string[] };
-    assert.ok(payload.labels.includes("defensive"));
+    assert.ok(payload.labels.includes("cloudy"));
+    assert.ok(!payload.labels.includes("defensive"));
   });
 });

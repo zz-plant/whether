@@ -8,6 +8,7 @@ import { useBriefArtifact } from "./useBriefArtifact";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { briefConditionEntries, formatBriefArtifact } from "../../lib/report/briefArtifact";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { SignalReading } from "./ui/plainLanguage";
 
 /**
  * The brief as three frames, for the meeting it gets read in.
@@ -115,9 +116,16 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                     {artifact.actionNow}
                   </p>
                 ) : null}
+                {/* Each score with its meaning: a room reading "64/100" off a
+                    shared screen cannot tell which end is bad. */}
                 <p className="text-fluid-sm text-white/50">
-                  {artifact.regimeLabel} · Funding pressure {artifact.tightness}/100
-                  {typeof artifact.riskAppetite === "number" ? ` · Risk appetite ${artifact.riskAppetite}/100` : ""}
+                  {artifact.regimeLabel} · <SignalReading signalKey="tightness" score={artifact.tightness} />
+                  {typeof artifact.riskAppetite === "number" ? (
+                    <>
+                      {" · "}
+                      <SignalReading signalKey="riskAppetite" score={artifact.riskAppetite} />
+                    </>
+                  ) : null}
                 </p>
               </div>
             ) : null}

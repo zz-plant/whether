@@ -22,27 +22,27 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
   operations: {
     label: "OPERATIONS LENS",
     title: "Execution rhythm",
-    body: "Translate macro posture into planning cadence and staffing pacing.",
+    body: "Turn market conditions into a planning pace and a hiring plan.",
   },
   signals: {
     label: "SIGNALS LENS",
     title: "Evidence first",
-    body: "Track leading indicators, threshold crossings, and direction changes.",
+    body: "See which readings moved, which lines they crossed, and which way they point.",
   },
   method: {
     label: "METHOD LENS",
     title: "How it works",
-    body: "Make every call traceable to formulas, sources, and update cadence.",
+    body: "Trace every call to its formula, its sources and when they last updated.",
   },
   solutions: {
     label: "SOLUTIONS LENS",
     title: "Decision support",
-    body: "Turn climate calls into role-based operating guardrails for teams.",
+    body: "Turn the weekly call into pause and resume lines for each team.",
   },
   guides: {
     label: "GUIDES LENS",
     title: "Team enablement",
-    body: "Help leaders align product, finance, and strategy on one posture.",
+    body: "Give product, finance and strategy one call to plan against.",
   },
 };
 

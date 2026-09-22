@@ -16,7 +16,7 @@ type Props = {
   direction: SignalDirection;
   /** The weather word, so the strip states the call the way the hero does. */
   weatherWord: string;
-  /** The confidence word ("High", "Medium", "Low"), as the trust strip prints it. */
+  /** The confidence word ("High", "Medium", "Low"); the strip adds "confidence", since a bare "High" beside the call does not say what is high. */
   confidenceWord: string;
   shareLines?: string[];
 };
@@ -146,7 +146,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
               {weatherWord}
             </span>
             <span className="min-w-0 flex-1 truncate font-medium text-white">{call}</span>
-            <span className="shrink-0 text-slate-400">{confidenceWord}</span>
+            <span className="shrink-0 text-slate-400">{confidenceWord} confidence</span>
             <a
               href={`#${HOME_SECTIONS.consequences.id}`}
               className="weather-focus-ring inline-flex min-h-[44px] shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
@@ -180,7 +180,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
               </span>
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
             </span>
-            <span className="flex-shrink-0 text-fluid-xs text-slate-400">{confidenceWord}</span>
+            <span className="flex-shrink-0 text-fluid-xs text-slate-400">{confidenceWord} confidence</span>
             {/* Both actions are the shared ghost button; a plain `<a>` with its own
                 class chain drops the control radius, the press and the focus ring
                 the class carries. The download is an API path, so it stays an

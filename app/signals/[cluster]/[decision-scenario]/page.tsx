@@ -17,7 +17,8 @@ import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClu
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { ReportCta } from "../../../components/reportCta";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
-import { GlossaryLink } from "../../../components/ui/plainLanguage";
+import { compositeSignalScales } from "../../../../lib/report/signalTranslations";
+import { ruleMetricLabel } from "../../../../lib/report/boundedDecisionRules";
 
 const signalScenarioIntentBySlug = {
   hiring: "cfo",
@@ -170,12 +171,18 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {payload.triggerThreshold}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {payload.reversalCondition}</li>
         </ul>
-        {/* These rails are stated in score points, on a page most readers reach cold
-            from a search result. The glossary is one click from every other surface
-            that prints a score, and was one click from none of these. */}
-        <p className="text-fluid-nano text-white/45">
-          <GlossaryLink>What these terms mean</GlossaryLink>
-        </p>
+        {/* These lines are stated in score points, on a page most readers reach cold
+            from a search result. The scale is printed here rather than behind a link,
+            because a reader who has to leave to decode "above 76" never comes back to
+            the call. Both scales, since a pause line can name either score. */}
+        <dl className="space-y-0.5 text-fluid-nano text-white/55">
+          {(["tightness", "riskAppetite"] as const).map((key) => (
+            <div key={key} className="flex flex-wrap gap-x-1.5">
+              <dt>{ruleMetricLabel[key]}, out of 100:</dt>
+              <dd>{compositeSignalScales[key].directionLabel}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Trust and evidence</h2>

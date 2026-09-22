@@ -35,7 +35,7 @@ export function FrameworkSection() {
     <ReportSection
       id="framework"
       title="How to use the thresholds"
-      description="A bounded decision has three parts: an action, a threshold that pauses it, and a condition that reverses it. It works because it separates what you will do from the conditions under which you will stop."
+      description="Each decision here has three parts: an action, a threshold that pauses it, and a condition that reverses it. It works because it separates what you will do from the conditions under which you will stop."
     >
       <div className="space-y-8">
         {/* The section description above already says what a bounded decision
@@ -65,10 +65,10 @@ export function FrameworkSection() {
             Most strategic decisions fail not because the action was wrong, but because there was no condition for stopping. The action continues past the point where it should have paused, and by the time the error is visible, the cost has already been incurred.
           </p>
           <p className="text-sm text-slate-300 leading-relaxed">
-            A bounded decision makes the stopping condition explicit before the action begins. This does not guarantee the action is right. It guarantees the action will not continue past the point where it becomes wrong without a visible signal.
+            Writing the stopping condition down before the action begins is the whole method. This does not guarantee the action is right. It guarantees the action will not continue past the point where it becomes wrong without a visible signal.
           </p>
           <p className="text-sm text-slate-300 leading-relaxed">
-            This structure was developed across clinical workflows, physician financial guidance, and contested healthcare claims — environments where an unbounded decision can mean patient harm, regulatory action, or fiduciary breach. It is applied here to macro uncertainty because the same logic applies: the cost of continuing past the stopping point is higher than the cost of pausing too early.
+            This structure was developed across clinical workflows, physician financial guidance, and contested healthcare claims — environments where a decision with no stopping condition can mean patient harm, regulatory action, or fiduciary breach. It is applied here to macro uncertainty because the same logic applies: the cost of continuing past the stopping point is higher than the cost of pausing too early.
           </p>
         </section>
 

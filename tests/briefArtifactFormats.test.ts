@@ -74,7 +74,8 @@ describe("brief artifact formats", () => {
     for (const format of BRIEF_FORMATS) {
       assert.match(
         formatBriefArtifact(cached, format.id, origin),
-        /cached snapshot, not a live read/,
+        // The export layer says "saved copy"; lib/report/briefArtifact.ts still says "cached snapshot".
+        /cached snapshot, not a live read|saved copy, not a live reading/,
         `${format.id} format hides that the reading was cached`,
       );
     }
@@ -103,15 +104,16 @@ describe("brief artifact formats", () => {
     // at and the block someone pastes afterwards cannot name different
     // thresholds.
     const entries = briefConditionEntries(artifact);
-    /* Three lines, three names, and the same three names the hero prints —
-       these used to read "Guardrail / Reversal / Clears when" against the
-       plan page's "Pause if / Resume when" for the same numbers. */
+    /* The same names the hero prints. The third row is the other conditions
+       that would change the call (`flipConditionLabels`), not the resume line,
+       so it is not labelled as one: it read "Change course if" here, and then
+       briefly "Resume when", over conditions that tighten the call. */
     assert.deepEqual(
       entries.map((entry) => entry.label),
       [
         DECISION_CONTRACT_LABELS.threshold.pauseIf,
         DECISION_CONTRACT_LABELS.watch.postureFlips,
-        DECISION_CONTRACT_LABELS.reversal.resumeWhen,
+        DECISION_CONTRACT_LABELS.watch.watchThisWeek,
       ],
     );
 
@@ -269,6 +271,6 @@ describe("brief artifact formats", () => {
     for (const entry of briefConditionEntries(artifact)) {
       assert.ok(under.includes(`   - ${entry.label}: ${entry.value}`), `${entry.label} is not under the thresholds step`);
     }
-    assert.ok(under.some((line) => line.startsWith("   - Scores: Funding pressure 64/100")));
+    assert.ok(under.some((line) => line.startsWith("   - Scores: Funding pressure 64/100: ")));
   });
 });

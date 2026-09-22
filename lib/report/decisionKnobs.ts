@@ -23,9 +23,9 @@ export const businessAreaOrder = [
 export type BusinessAreaKey = (typeof businessAreaOrder)[number];
 
 export const businessAreaLabel: Record<BusinessAreaKey, string> = {
-  "hiring-stance": "Hiring posture",
+  "hiring-stance": "Hiring",
   "investment-pace": "Investment pace",
-  "sales-posture": "Fundraising posture",
+  "sales-posture": "Fundraising",
   "product-priorities": "Product priorities",
   "risk-tolerance": "Risk tolerance",
 };

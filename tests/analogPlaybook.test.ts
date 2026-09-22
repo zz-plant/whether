@@ -54,7 +54,34 @@ describe("analogPlaybook", () => {
     );
     assert.equal(playbook.matchBasis[0]?.live, 5.25);
     assert.doesNotMatch(playbook.consensusTrap, /^What peer startups got wrong/);
-    assert.match(playbook.consensusTrap, /Expanded enterprise direct sales headcount/);
-    assert.ok(playbook.reversalMarker.includes("Yield curve"));
+    assert.match(playbook.consensusTrap, /Hired more enterprise salespeople/);
+    assert.ok(playbook.reversalMarker.includes("recession warning gauge"));
+  });
+
+  /* Rendered on /signals beside the reader's own numbers, so the cycles are
+     told in plain words: no desk shorthand, no acronyms, no engine names. */
+  it("tells every reference cycle without desk shorthand", () => {
+    // One reading placed on each of the four reference cycles, so every cycle's copy is read.
+    const readings = [
+      { baseRate: 5.25, curveSlope: -0.25, tightness: 70, riskAppetite: 40 },
+      { baseRate: 2.5, curveSlope: 0.15, tightness: 62, riskAppetite: 35 },
+      { baseRate: 3.5, curveSlope: -0.4, tightness: 78, riskAppetite: 28 },
+      { baseRate: 0.25, curveSlope: 1.2, tightness: 25, riskAppetite: 85 },
+    ];
+    const periods = new Set<string>();
+    for (const reading of readings) {
+      const base = createMockAssessment();
+      const playbook = getHistoricalAnalogPlaybook({ ...base, scores: { ...base.scores, ...reading } });
+      periods.add(playbook.analogPeriod);
+      const text = [
+        playbook.regimeType,
+        playbook.consensusTrap,
+        playbook.winningMove,
+        playbook.reversalMarker,
+        ...playbook.matchBasis.map((item) => item.label),
+      ].join(" ");
+      assert.doesNotMatch(text, /\bGTM\b|\bZIRP\b|\bFed\b|10Y|2Y|tightness|down-round|reqs|closed-won|Late-Cycle/);
+    }
+    assert.equal(periods.size, 4, "each reading lands on a different cycle");
   });
 });

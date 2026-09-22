@@ -86,6 +86,6 @@ describe("buildRegimeFlipState", () => {
       },
     });
 
-    assert.match(state.text, /If risk appetite falls to or below 50, the flip target becomes Freezing\./);
+    assert.match(state.text, /If risk appetite falls to or below 50, the call would change to Freezing\./);
   });
 });

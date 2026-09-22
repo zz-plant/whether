@@ -4,7 +4,7 @@
   "series": [
     {
       "id": "CPI_YOY",
-      "label": "CPI inflation (YoY)",
+      "label": "Consumer price inflation, past 12 months",
       "value": 4.166614684049648,
       "unit": "%",
       "explanation": "Year-over-year change in CPI-U, tracking consumer inflation momentum.",
@@ -35,7 +35,7 @@
     },
     {
       "id": "UNEMPLOYMENT_RATE",
-      "label": "Unemployment rate (U-3)",
+      "label": "Unemployment rate",
       "value": 4.3,
       "unit": "%",
       "explanation": "Headline unemployment rate for civilian workers.",
@@ -66,7 +66,7 @@
     },
     {
       "id": "BBB_CREDIT_SPREAD",
-      "label": "BBB credit spread (OAS)",
+      "label": "Extra interest on mid-grade company bonds",
       "value": 1.5,
       "unit": "%",
       "explanation": "Option-adjusted spread for BBB corporates, proxying credit risk appetite.",
@@ -349,7 +349,7 @@
     },
     {
       "id": "HY_CREDIT_SPREAD",
-      "label": "High yield credit spread (OAS)",
+      "label": "Extra interest on riskier company bonds",
       "value": 2.66,
       "unit": "%",
       "explanation": "ICE BofA US High Yield OAS, used as a faster speculative-risk stress signal.",
@@ -707,7 +707,7 @@
     },
     {
       "id": "VIX_INDEX",
-      "label": "CBOE volatility index (VIX)",
+      "label": "Expected stock market volatility",
       "value": 16.78,
       "unit": "index",
       "explanation": "Implied equity volatility used as a short-cycle shock and regime-boundary warning signal.",
@@ -990,7 +990,7 @@
     },
     {
       "id": "VC_FUNDING_VELOCITY",
-      "label": "VC funding velocity (quarterly trend)",
+      "label": "Venture funding, change on the quarter",
       "value": -32.8,
       "unit": "%",
       "explanation": "Quarter-over-quarter change in startup funding flow to reflect private capital availability.",
@@ -1064,7 +1064,7 @@
     },
     {
       "id": "SAAS_VALUATION_MULTIPLE",
-      "label": "Public SaaS EV/Revenue median",
+      "label": "Public software valuations, median multiple of revenue",
       "value": 4.1,
       "unit": "x",
       "explanation": "Public SaaS median EV/revenue multiple as a proxy for growth capital pricing discipline.",
@@ -1103,7 +1103,7 @@
     },
     {
       "id": "EARNINGS_REVISION_INDEX",
-      "label": "Tech earnings revision index",
+      "label": "Tech earnings forecast revisions",
       "value": 86,
       "unit": "index",
       "explanation": "Forward EPS revision breadth index for tech-heavy baskets (share of IT-sector companies with positive EPS revisions).",
@@ -1181,7 +1181,7 @@
     },
     {
       "id": "REGULATORY_RISK_TRACKER",
-      "label": "AI/platform regulatory risk tracker",
+      "label": "AI and platform regulatory risk",
       "value": 52,
       "unit": "index",
       "explanation": "Composite policy volatility index built from major enforcement and milestone events.",

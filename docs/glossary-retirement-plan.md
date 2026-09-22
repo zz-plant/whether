@@ -1,4 +1,4 @@
-# Retiring the glossary (plan, 2026-09-22)
+# Retiring the glossary (plan and record, 2026-09-22)
 
 The goal is a site where no reader ever needs `/glossary`. Moving the 26 definitions somewhere
 else, or turning them into tooltips, does not count. Deleting the route is the last step and the
@@ -255,3 +255,28 @@ Removal checklist, from the dependency sweep:
 - `dataProvenanceStrip.tsx` keys its labels on status strings the loader never produces, so most
   statuses show "Confidence 50%" and a generic line.
 - The runway memo reads array props as objects, so every macro value prints "N/A".
+
+## Status (2026-09-22)
+
+All five phases shipped on `feat/retire-glossary`. `/glossary` returns a 308 to
+`/trust#formula-reference`. `tests/readerVocabulary.test.tsx` bans the retired line names, the
+retired score names and every pointer to the old page. `TERM_DEFINITIONS` keeps a Terms block in
+`llms-full.txt` for machine readers.
+
+One finding changed the plan. `weeklyCall.changeCourseIf` holds the line where the call changes,
+not the resume line, so every surface that printed it now labels it "Call changes if". The other
+conditions that would change the call print under "Watch this week". Before this, both carried
+"Change course if", which was ambiguous enough to fit either meaning.
+
+Left open, deliberately:
+
+- **`changeCourseIf` has two meanings.** With a company stage set, the field holds a resume
+  condition ("Reverse the hold only after…"). Splitting it is a contract change, filed as its own
+  task.
+- **"Capital posture" in `/resources`.** It is the target keyword of a whole content cluster,
+  including slugs, titles and downloads. Renaming it is an SEO decision, not a copy fix.
+- **Score distances are written "pts"** (`formatPointsToLine`, `scoreCell`). The abbreviation
+  is common enough that no reader needs it defined.
+- **Archive records are not rewritten.** `publishedBriefDisplay` translates their stored labels
+  at render, so the append-only record keeps the words it was frozen with.
+

@@ -1,4 +1,4 @@
-import type { CompactFreshnessMeta } from "./reportFormatting";
+import { formatConfidenceChipLabel, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
@@ -298,7 +298,7 @@ export const buildWeeklyTrustCueLine = ({
   transitionWatch: "ON" | "OFF";
 }) => {
   const changeWatch = transitionWatch === "ON" ? "The call could change next week" : "The call is not close to changing";
-  return `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
+  return `${formatConfidenceChipLabel(confidenceLabel)} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
 };
 export const buildCompactTrustSummary = ({
   confidenceLabel,
@@ -322,10 +322,10 @@ export const buildCompactTrustSummary = ({
   }
 
   if (confidenceLabel !== "HIGH") {
-    return `Confidence ${confidenceLabel} (${normalizedFreshness}). Hold anything you can't undo until confidence is back to high.`;
+    return `${formatConfidenceChipLabel(confidenceLabel)} (${normalizedFreshness}). Hold anything you can't undo until confidence is back to high.`;
   }
 
-  return `Confidence ${confidenceLabel} (${normalizedFreshness}). Fine to act on this week.`;
+  return `${formatConfidenceChipLabel(confidenceLabel)} (${normalizedFreshness}). Fine to act on this week.`;
 };
 
 /**
@@ -498,7 +498,7 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Call ${statusLabel} · Confidence ${confidenceLabel} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Call ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
 
 export const buildTrustStatus = ({
   historicalSelection,
@@ -556,12 +556,12 @@ export const buildTrustStatus = ({
       : "Every source answered and nothing here argues for holding back this week.";
 
   const action = historicalSelection
-    ? `${historicalAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: switch to current live data before changing spending pace.`
+    ? `${historicalAction} Switch to current live data before changing spending pace.`
     : isFallback
       ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
       : policyRefusalActive
         ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again.`
-      : `${stableAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: confidence drops to low or the call moves within reach of a line.`;
+      : `${stableAction} Hold back if confidence drops to low or the call moves within reach of a line.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

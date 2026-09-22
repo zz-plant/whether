@@ -63,7 +63,8 @@ export function ScenarioPresets({
               }`}
             >
               <span className="text-xs font-semibold text-slate-100">
-                Rate {preset.rate.toFixed(2)}%, curve {formatScenarioDelta(preset.slope, "%")}
+                {/* Named as the two sliders are named, so a preset reads as a setting of them. */}
+                Short-term borrowing rate {preset.rate.toFixed(2)}%, recession warning gauge {formatScenarioDelta(preset.slope, "%")}
               </span>
               <p className="mt-2 text-[11px] leading-snug text-slate-400">
                 {preset.description}

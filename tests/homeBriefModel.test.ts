@@ -97,9 +97,7 @@ describe("buildHomeBriefModel", () => {
     }, { overlaySector: "consumer" });
 
     assert.match(model.confidenceLabel, /LOW|MED|HIGH/);
-    assert.match(model.stageLabel, /Early|Mid|Late/);
-    assert.equal(typeof model.stageFragile, "boolean");
-    assert.match(model.postureWithStageLabel, /—/);
+    assert.equal(model.postureWithStageLabel, "Cloudy");
     assert.equal(model.postureLabel, "Cloudy");
     assert.equal(typeof model.confidencePercent, "number");
     assert.equal(typeof model.regimeHeader.regime, "string");
@@ -163,8 +161,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.regimeSignalIndicators.length, 4);
     assert.equal(model.inputInfluence.length, 4);
     assert.equal(model.inputInfluence[0]?.key, "tightness");
-    assert.match(model.inputInfluence[0]?.effectDetail ?? "", /regime line|approvals/i);
-    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /watch line/i);
+    assert.match(model.inputInfluence[0]?.effectDetail ?? "", /line that changes the call|approvals/i);
+    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /line that changes the call/i);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
     assert.equal(model.regimeSignalIndicators[0]?.label, "Funding pressure");
@@ -367,74 +365,38 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.historicalTimeline[0]?.label ?? "", /2026/);
   });
 
-  it("derives stage labels for regime edge cases", () => {
-    const strongExpansion = buildHomeBriefModel({
-      assessment: {
-        regime: "EXPANSION",
-        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-        scores: { tightness: 30, riskAppetite: 80 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "improving",
-        changedSignals: [{ key: "riskAppetite", delta: 4 }],
-        anomalySignals: [],
-      },
-    });
-    assert.equal(strongExpansion.stageLabel, "Late");
-    assert.equal(strongExpansion.stageFragile, false);
+  it("names how long the conditions have held instead of a stage word", () => {
+    const series = (regimes: Array<"EXPANSION" | "SCARCITY">) =>
+      regimes.map((regime, index) => ({
+        year: 2026,
+        month: index + 1,
+        recordDate: `2026-0${index + 1}-28`,
+        regime,
+        summary: "",
+        tightness: 50,
+        riskAppetite: 50,
+      }));
+    const build = (regimeSeries: ReturnType<typeof series>) =>
+      buildHomeBriefModel({
+        assessment: {
+          regime: "SCARCITY",
+          thresholds: { tightnessRegime: 55, riskAppetiteRegime: 45 },
+          scores: { tightness: 75, riskAppetite: 30 },
+        },
+        regimeAlert: null,
+        stopItems: ["Guardrail"],
+        regimeSeries,
+        reportDynamics: { directionLabel: "improving", changedSignals: [], anomalySignals: [] },
+      });
 
-    const weakExpansionNearFlip = buildHomeBriefModel({
-      assessment: {
-        regime: "EXPANSION",
-        thresholds: { tightnessRegime: 40, riskAppetiteRegime: 50 },
-        scores: { tightness: 39, riskAppetite: 52 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
-    });
-    assert.equal(weakExpansionNearFlip.stageLabel, "Late");
-    assert.equal(weakExpansionNearFlip.stageFragile, true);
-    assert.match(weakExpansionNearFlip.postureWithStageLabel, /Late \(Fragile\)/);
-
-    const mixedStabilization = buildHomeBriefModel({
-      assessment: {
-        regime: "VOLATILE",
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 66, riskAppetite: 68 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "mixed",
-        changedSignals: [{ key: "tightness", delta: -1.5 }, { key: "riskAppetite", delta: 1 }],
-        anomalySignals: [],
-      },
-    });
-    assert.equal(mixedStabilization.stageLabel, "Mid");
-    assert.equal(mixedStabilization.postureLabel, "Stormy");
-
-    const scarcityRecovery = buildHomeBriefModel({
-      assessment: {
-        regime: "SCARCITY",
-        thresholds: { tightnessRegime: 55, riskAppetiteRegime: 45 },
-        scores: { tightness: 75, riskAppetite: 30 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "improving",
-        changedSignals: [{ key: "tightness", delta: -4 }],
-        anomalySignals: [],
-      },
-    });
-    assert.equal(scarcityRecovery.stageLabel, "Early");
+    assert.equal(build(series(["EXPANSION", "SCARCITY", "SCARCITY", "SCARCITY"])).postureWithStageLabel, "Freezing for 3 months");
+    // One month-end says nothing a reader can use, and a month-end that disagrees
+    // with this week's call must not lend it a run it does not have.
+    assert.equal(build(series(["EXPANSION", "SCARCITY"])).postureWithStageLabel, "Freezing");
+    assert.equal(build(series(["SCARCITY", "SCARCITY", "EXPANSION"])).postureWithStageLabel, "Freezing");
+    for (const regimeSeries of [series(["SCARCITY", "SCARCITY"]), series([])]) {
+      assert.doesNotMatch(build(regimeSeries).postureWithStageLabel ?? "", /Early|Mid|Late|Fragile/);
+    }
   });
 
 

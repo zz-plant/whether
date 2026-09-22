@@ -24,7 +24,7 @@ describe("the base rate is named as the series that was read", () => {
 
     // The line said "The Fed rate is 5.20%" for a DGS1MO reading.
     assert.ok(!/Fed rate/i.test(evidence), `evidence still claims a Fed rate: ${evidence}`);
-    assert.match(evidence, /The 1-month Treasury bill is 5\.20%/);
+    assert.match(evidence, /The short-term borrowing rate \(the 1-month Treasury bill\) is 5\.20%/);
   });
 
   it("carries the corrected name into the block operators paste", () => {
@@ -40,7 +40,7 @@ describe("the base rate is named as the series that was read", () => {
     const assessment = evaluateRegime(treasury({ threeMonth: 5.0 }));
     assert.equal(assessment.scores.baseRateUsed, "3M");
     const output = evaluateDecision(assessment, { lifecycle: "GROWTH", category: "HIRING", action: "HIRE" });
-    assert.match(output.bullets.join("\n"), /The 3-month Treasury bill is 5\.00%/);
+    assert.match(output.bullets.join("\n"), /The short-term borrowing rate \(the 3-month Treasury bill\) is 5\.00%/);
   });
 
   it("would name the policy rate only if a policy rate were ever read", () => {

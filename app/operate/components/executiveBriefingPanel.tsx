@@ -33,7 +33,7 @@ export const buildExecutiveMemo = (
     "Decision templates:",
     ...template.decisionTemplates.map((item) => `• ${item}`),
     "",
-    "Change-course signals:",
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}:`,
     ...template.reversalTriggers.map((item) => `• ${item}`),
   ].join("\n");
 };
@@ -70,8 +70,9 @@ const visualSections = [
   },
   {
     key: "reversalTriggers",
-    title: "Change-course signals",
-    subtitle: DECISION_CONTRACT_LABELS.watch.flipWatch,
+    title: DECISION_CONTRACT_LABELS.watch.postureFlips,
+    // Not `watch.flipWatch` ("What would change the call"): under this title it restated it.
+    subtitle: "Watch for either one",
   },
 ] as const;
 

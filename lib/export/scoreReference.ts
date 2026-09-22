@@ -4,6 +4,7 @@ import { ruleMetricLabel, type RuleConditionMetric } from "../report/boundedDeci
 import { buildSharedCorridorRails, formatPointsToLine } from "../report/operatingCalls";
 import type { ReportDynamics } from "../report/reportDataTypes";
 import { findSignalDelta } from "../report/evidenceReaderModel";
+import { signalReadingMeaning } from "../report/signalTranslations";
 
 /**
  * The two scores as every export prints them: value, the line each is judged
@@ -60,7 +61,7 @@ export const previousScoresFromDynamics = (
 /**
  * One line per score.
  *
- * `Funding pressure 12 of 100 · pause line 76 · 64 pts below · last week 15 · resume line 66 (already met)`
+ * `Funding pressure 12 of 100 (money is easy to raise) · pause line 76 · 64 pts below · last week 15 · resume line 66 (already met)`
  *
  * With a rail the reference line is the pause line and the resume line follows
  * with its own distance, because "how close to re-opening" is the second thing
@@ -83,12 +84,15 @@ export const buildScoreReferenceLines = ({
     const line = rail
       ? { value: rail.guardrail, label: SCORE_LINE_LABELS.pause }
       : { value: callChangeLine(thresholds, metric), label: SCORE_LINE_LABELS.callChange };
-    const reference = formatScoreReference({
+    /* The meaning rides beside the number, so a paste read by someone who has
+       never seen the page still says which end of the scale is bad. */
+    const [head, ...rest] = formatScoreReference({
       label: ruleMetricLabel[metric],
       value: scores[metric],
       line,
       previous: previous?.[metric] ?? null,
-    });
+    }).split(" · ");
+    const reference = [`${head} (${signalReadingMeaning(metric, scores[metric])})`, ...rest].join(" · ");
     const resume =
       rail && rail.clearsAt !== undefined
         ? ` · ${SCORE_LINE_LABELS.resume} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`

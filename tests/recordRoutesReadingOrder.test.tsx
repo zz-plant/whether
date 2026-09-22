@@ -92,7 +92,7 @@ describe("/trust carries one trust strip", () => {
 });
 
 describe("/history/compare draws each score against its lines", () => {
-  it("renders two ladders, period A filled and period B hollow, plus the credit-spread tile", async () => {
+  it("renders two ladders, period A filled and period B hollow, plus the borrowing-premium tile", async () => {
     const page = await import("../app/history/compare/page");
     const html = renderToStaticMarkup(
       await page.default({ searchParams: Promise.resolve({ yearA: "2024", monthA: "3", yearB: "2020", monthB: "3" }) }),
@@ -100,7 +100,25 @@ describe("/history/compare draws each score against its lines", () => {
     assert.equal((html.match(/data-score-ladder/g) ?? []).length, 2);
     assert.match(html, /Period B \d+(\.\d+)?/, "the hollow dot is named for period B, not last week");
     assert.doesNotMatch(html, /Last week/);
-    assert.match(html, /Credit spread change/);
+    assert.match(html, /Corporate borrowing premium, A minus B/);
     assert.doesNotMatch(html, /Operating latitude change|Yield curve slope change/, "the delta tiles are the ladders now");
+  });
+
+  /*
+   * The reader layer names the implication, never the instrument
+   * (docs/glossary-retirement-plan.md). The period picker carried the engine key
+   * ("Mar 2023 · SCARCITY"), and the signal rows carried desk shorthand in
+   * parentheses — (1M/3M), (10Y−2Y), (BBB) — with nothing on the page to expand it.
+   */
+  it("names every row and option in plain words, with each score on its scale", async () => {
+    const page = await import("../app/history/compare/page");
+    const html = renderToStaticMarkup(
+      await page.default({ searchParams: Promise.resolve({ yearA: "2024", monthA: "3", yearB: "2020", monthB: "3" }) }),
+    );
+    const text = html.replace(/<[^>]+>/g, " ");
+    assert.doesNotMatch(text, /\b(SCARCITY|DEFENSIVE|VOLATILE|EXPANSION)\b/);
+    assert.doesNotMatch(text, /\(1M\/3M\)|10Y|\(BBB\)|\bCPI\b|Macro deltas/);
+    assert.match(text, /Funding pressure\s+[A-Z][^<]*?\.\s+\d+\/100/, "funding pressure carries its meaning and scale");
+    assert.match(text, /Risk appetite\s+[A-Z][^<]*?\.\s+\d+\/100/, "risk appetite carries its meaning and scale");
   });
 });

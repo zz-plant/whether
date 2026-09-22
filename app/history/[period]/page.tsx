@@ -58,6 +58,20 @@ const describePeriod = (period: PostureArchivePeriod) =>
 const cadenceNoun = (period: PostureArchivePeriod) =>
   period.sampleCadence === "weekly" ? "weekly readings" : "monthly readings";
 
+/*
+ * The archive stores each rate under the label the data pipeline wrote ("US Treasury
+ * 10Y", "Yield curve slope (10Y - 2Y)"), and the archive is append-only, so the plain
+ * name is applied where it renders. A label this map does not know passes through.
+ */
+const READER_RATE_LABELS: Record<string, string> = {
+  "The 1-month Treasury bill (1M)": "Short-term borrowing rate (one-month Treasury bill)",
+  "US Treasury 2Y": "2-year Treasury rate",
+  "US Treasury 10Y": "10-year Treasury rate",
+  "Yield curve slope (10Y - 2Y)": "Recession warning gauge (10-year minus 2-year rate)",
+};
+
+const readerRateLabel = (label: string) => READER_RATE_LABELS[label] ?? label;
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { period: slug } = await params;
   const period = findPostureArchivePeriod(slug);
@@ -218,7 +232,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <ul className="space-y-2 text-sm text-slate-300">
             {period.rates.map((rate) => (
               <li key={rate.label} className="flex flex-wrap items-baseline justify-between gap-2">
-                <span>{rate.label}</span>
+                <span>{readerRateLabel(rate.label)}</span>
                 <span className="font-semibold text-slate-100">
                   {formatNumberWithUnit(rate.value, rate.unit)}
                 </span>

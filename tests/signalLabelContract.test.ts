@@ -4,7 +4,7 @@ import { describe, it } from "bun:test";
 import { deltaLabelBySignal } from "../lib/report/briefFormatting";
 import { regimeSignalLabelByKey } from "../lib/report/reportFormatting";
 import { regimeSignalLabel, signalPlainEnglish } from "../lib/report/signalTranslations";
-import { BEGINNER_GLOSSARY_ENTRIES } from "../lib/report/reportCopy";
+import { TERM_DEFINITIONS } from "../lib/report/reportCopy";
 
 /**
  * One signal, one reader-facing name.
@@ -34,10 +34,10 @@ describe("signal label contract", () => {
     /* The driver card this used to render left the homepage on 2026-09-22 — the
        changed-signals table took its place and reads its labels from the same
        `regimeSignalLabel` map. What the case is for is unchanged: the name a
-       reader meets beside the number is the name the glossary defines. */
-    const glossaryEntry = BEGINNER_GLOSSARY_ENTRIES.find((entry) => entry.value === "base-rate");
-    assert.ok(glossaryEntry, "no base-rate glossary entry");
-    assert.equal(glossaryEntry.term, regimeSignalLabel.baseRate);
+       reader meets beside the number is the name the term definitions give it. */
+    const definition = TERM_DEFINITIONS.find((entry) => entry.value === "base-rate");
+    assert.ok(definition, "no base-rate definition");
+    assert.equal(definition.term, regimeSignalLabel.baseRate);
   });
 
   it("does not attribute the short rate to the Fed", () => {
@@ -48,7 +48,7 @@ describe("signal label contract", () => {
     const copy = [
       regimeSignalLabel.baseRate,
       signalPlainEnglish.baseRate.whatItMeasures,
-      BEGINNER_GLOSSARY_ENTRIES.find((entry) => entry.value === "base-rate")?.summary ?? "",
+      TERM_DEFINITIONS.find((entry) => entry.value === "base-rate")?.summary ?? "",
     ].join(" ");
 
     assert.doesNotMatch(copy, /Fed interest rate|Federal Reserve/);

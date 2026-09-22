@@ -71,7 +71,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
       tightness: "When money is tight, higher costs are harder to pass on",
     },
     instruments: [
-      { label: "Watch lines", why: "Where the lines sit, if inflation is the main worry", href: "#advanced-controls" },
+      { label: "Lines that change the call", why: "Where the lines sit, if inflation is the main worry", href: "#advanced-controls" },
     ],
   },
   labor: {
@@ -220,12 +220,12 @@ const deriveSignalsPageModel = (
     : `${FALLBACK_PAUSE_THRESHOLD}.`;
   // The resume trigger, symmetric with the pause trigger in "Wrong if" above.
   // This rendered `flipThreshold` — the condition that BREAKS the call, which
-  // /trust correctly labels "This recommendation breaks if". Printing it under
+  // /trust labels "Call changes if". Printing it under
   // "Safe again when" told an operator the opposite of what it means.
   const resumeTrigger = actionStripItems?.[0]?.reversalCondition;
   const reversalCondition = resumeTrigger?.trim().length
     ? resumeTrigger
-    : "Resume once reversal thresholds recover.";
+    : "Resume once both scores are back across their resume lines.";
   const showMicroDecisionRows = shouldSplitDecisionConditionRows({
     trigger: triggerCondition,
     reversal: reversalCondition,

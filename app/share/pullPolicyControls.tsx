@@ -40,7 +40,7 @@ export function PullPolicyControls({
       {wipGuidance ? (
         <article className="weather-surface space-y-2 px-4 py-3">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-fluid-xs font-semibold text-slate-100">WIP cap</h3>
+            <h3 className="text-fluid-xs font-semibold text-slate-100">Work-in-progress cap</h3>
             <ClipboardActionRow
               compact
               label="Copy policy"

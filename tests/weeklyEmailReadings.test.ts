@@ -17,7 +17,10 @@ describe("weekly email readings", () => {
     assert.deepEqual(readings.map((reading) => reading.label), ["Funding pressure", "Risk appetite", "Confidence"]);
     assert.match(readings[0].value, /^\d+\/100$/);
     assert.match(readings[1].value, /^\d+\/100$/);
-    assert.match(readings[2].value, /^(HIGH|MED|LOW)$/);
+    // The band as a word; the engine's code is not for an inbox.
+    assert.match(readings[2].value, /^(High|Medium|Low)$/);
+    assert.match(readings[0].meaning ?? "", /^money is /);
+    assert.match(readings[1].meaning ?? "", /^investors are /);
   });
 
   it("sends nothing numeric without a snapshot rather than inventing a reading", () => {

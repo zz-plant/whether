@@ -24,6 +24,7 @@ import {
   findAdjacentPublishedBriefs,
   findPublishedBrief,
   labelForArea,
+  publishedBriefDisplay,
   publishedBriefStaticParams,
   type PublishedBrief,
   type PublishedRuleLine,
@@ -68,7 +69,7 @@ export function generateStaticParams() {
 }
 
 const briefTitle = (brief: PublishedBrief) =>
-  `${brief.postureLabel}: the call for the week of ${brief.recordDateLabel}`;
+  `${publishedBriefDisplay(brief).conditions}: the call for the week of ${brief.recordDateLabel}`;
 
 const briefDescription = (brief: PublishedBrief) => `${brief.summary} What changed: ${brief.whatChanged}`;
 
@@ -103,7 +104,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 import { SubscribeForm } from "../../components/SubscribeForm";
 import { JsonLdScript } from "../../components/jsonLdScript";
-import { compositeSignalScales } from "../../../lib/report/signalTranslations";
+import { compositeSignalScales, signalReadingMeaning } from "../../../lib/report/signalTranslations";
 
 export default async function PublishedBriefPage({ params }: { params: Promise<Params> }) {
   const { week } = await params;
@@ -111,6 +112,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
   if (!brief) notFound();
 
+  const display = publishedBriefDisplay(brief);
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
@@ -128,8 +130,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
     : [];
   const readings = brief.scores
     ? [
-        { key: "tightness", label: "Funding pressure", value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta), worseWhenUp: true },
-        { key: "riskAppetite", label: "Risk appetite", value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta), worseWhenUp: false },
+        { key: "tightness" as const, label: "Funding pressure", value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta), worseWhenUp: true },
+        { key: "riskAppetite" as const, label: "Risk appetite", value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta), worseWhenUp: false },
       ]
     : [];
   const frozenScores = brief.scores;
@@ -176,8 +178,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <header className="weather-panel space-y-4 px-6 py-6 max-sm:px-0">
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              <Tag tone="sky">{brief.postureLabel}</Tag>
-              <Tag tone="slate">Confidence: {brief.confidenceLabel}</Tag>
+              <Tag tone="sky">{display.conditions}</Tag>
+              <Tag tone="slate">{display.confidence}</Tag>
               <span className="text-fluid-micro font-mono text-slate-400">Permanent Record</span>
             </div>
             <RegimeGlyph idPrefix={`brief-${brief.slug}`} regime={brief.regime} className="w-6 shrink-0" />
@@ -240,6 +242,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                       <span className="text-sm text-slate-500">/100</span>
                       {reading.delta ? <span className={`text-sm ${deltaTone}`}>{reading.delta} vs prior week</span> : null}
                     </dd>
+                    {/* What the number meant that week, so a cited record does not
+                        need the reader to know which end of the scale is bad. */}
+                    <dd className="mt-0.5 text-fluid-nano text-slate-300">{signalReadingMeaning(reading.key, reading.value)}</dd>
                     {rail ? (
                       <dd className="mt-2">
                         <ThresholdLadder
@@ -380,7 +385,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             <ul className="space-y-3 text-sm text-slate-300">
               {brief.evidence.map((item) => (
                 <li key={item.title}>
-                  <span className="font-semibold text-slate-100">{item.title}</span> — {item.detail}
+                  <span className="font-semibold text-slate-100">{display.evidenceTitle(item.title)}</span> — {item.detail}
                 </li>
               ))}
             </ul>
@@ -390,7 +395,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <footer className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Provenance</h2>
           <p className="text-sm text-slate-300">
-            Record date {brief.recordDateLabel} · {brief.sourceLabel} · captured {brief.freshnessLabel}
+            Record date {brief.recordDateLabel} · {display.source} · captured {brief.freshnessLabel}
           </p>
           {brief.sourceUrl ? (
             <p className="text-sm">

@@ -22,7 +22,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Live · all sources answered/);
     assert.equal(result.trustStatusDetail, "Every source answered and nothing here argues for holding back this week.");
     assert.match(result.trustStatusAction, /Proceed with normal approvals\./);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: confidence drops to low or the call moves within reach of a line`));
+    assert.ok(result.trustStatusAction.includes("Hold back if confidence drops to low or the call moves within reach of a line"));
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);
@@ -67,7 +67,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Historical snapshot/);
     assert.match(result.trustStatusDetail, /A past week, not this one/);
     assert.match(result.trustStatusAction, /Use this view for retrospective review/);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: switch to current live data`));
+    assert.ok(result.trustStatusAction.includes("Switch to current live data"));
     assert.equal(result.outageType, "historical-snapshot");
   });
 

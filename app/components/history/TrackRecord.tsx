@@ -4,7 +4,7 @@ import type {
   TrackRecordRow,
 } from "../../../lib/report/trackRecord";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
 import { StatTile } from "../ui/statTile";
 import { UrlDetails } from "../ui/urlDetails";
@@ -58,7 +58,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
       <tr className="border-b border-slate-800/80 text-slate-400">
         <th scope="col" className="py-2 pr-3 font-medium">Month</th>
         <th scope="col" className="py-2 pr-3 font-medium">Call</th>
-        <th scope="col" className="py-2 pr-3 text-right font-medium">{OPERATING_LATITUDE_LABEL}</th>
+        <th scope="col" className="py-2 pr-3 text-right font-medium">{OPERATING_LATITUDE_LABEL} (0–100)</th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
     </thead>
@@ -129,7 +129,7 @@ export function TrackRecordTiles({
       <div>
         <h2 className="type-eyebrow type-eyebrow-section" id="track-record-heading">Track record</h2>
         <p className="text-sm text-slate-300">
-          Every call this engine has made, from the same published formula. Not a forecast — a record
+          Every call Whether has made, from the same published formula. Not a forecast — a record
           you can audit.
         </p>
       </div>
@@ -191,7 +191,8 @@ export function TrackRecordTable({
       <div>
         <h2 className="type-eyebrow type-eyebrow-section" id="monthly-calls-heading">Monthly calls</h2>
         <p className="text-sm text-slate-300">
-          The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each call, newest first.
+          The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each call, newest first. It runs
+          0 to 100: {OPERATING_LATITUDE_GLOSS}.
         </p>
       </div>
 

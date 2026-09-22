@@ -121,10 +121,10 @@ export const buildSignalConfidenceReason = ({
 }) => {
   const boundaryClause =
     nearestThresholdGap <= 5
-      ? "This call is sitting on a regime boundary"
+      ? "This call is sitting on the line that changes it"
       : nearestThresholdGap <= 12
-        ? "This call has modest room before the nearest boundary"
-        : "This call is well clear of the nearest boundary";
+        ? "This call has modest room before the line that changes it"
+        : "This call is well clear of the line that changes it";
 
   const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
   const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);

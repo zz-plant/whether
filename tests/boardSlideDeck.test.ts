@@ -88,13 +88,13 @@ describe("board slide PPTX", () => {
     const slide = readStoredZip(buildBoardSlidePptx(payload)).get("ppt/slides/slide1.xml")?.content ?? "";
     assert.match(slide, /1\. ACTION NOW/);
     assert.match(slide, /2\. PAUSE IF/);
-    assert.match(slide, /3\. CHANGE COURSE IF/);
+    assert.match(slide, /3\. CALL CHANGES IF/);
     assert.match(slide, /This week's call \(Series A\)/);
     assert.match(slide, /<a:t>Freezing<\/a:t>/);
     assert.doesNotMatch(slide, /SCARCITY/);
     assert.match(slide, /Freeze non-revenue hires &amp; put every commitment/);
     assert.match(slide, /hold every new commitment &lt;whatever&gt; the macro corridor/);
-    assert.match(slide, /cached snapshot, not a live read/);
+    assert.match(slide, /saved copy, not a live reading/);
     assert.doesNotMatch(slide, /<whatever>/);
     // A defensive regime wears the rose badge; an easing one the emerald.
     assert.match(slide, /F43F5E/);
