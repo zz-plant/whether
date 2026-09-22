@@ -57,11 +57,12 @@ describe("Meeting Slide & Notion Exporter", () => {
     const payload = extractMeetingSlidePayload(snapshot, "seed");
     const markdown = formatMeetingSlideMarkdown(payload);
 
-    assert.ok(markdown.includes("> **Whether Weekly Operating Stance**"));
+    assert.ok(markdown.includes("> **Whether: this week's call**"));
     assert.ok(markdown.includes("ACTION NOW"));
     assert.ok(markdown.includes("PAUSE IF"));
     assert.ok(markdown.includes("CHANGE COURSE IF"));
-    assert.ok(markdown.includes("SCARCITY"));
+    assert.ok(markdown.includes("Freezing"));
+    assert.ok(!markdown.includes("SCARCITY"), "the engine key must not reach a pasted slide");
   });
 
   it("generates rich HTML with executive styling for slide copy", () => {
@@ -77,7 +78,8 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(html.includes("1. Action Now"));
     assert.ok(html.includes("2. Pause If"));
     assert.ok(html.includes("3. Change Course If"));
-    assert.ok(html.includes("SCARCITY"));
+    assert.ok(html.includes("Freezing"));
+    assert.ok(!html.includes("SCARCITY"));
   });
 
   it("generates valid 16:9 standalone SVG slide", () => {
@@ -93,6 +95,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(svg.includes('viewBox="0 0 1200 675"'));
     assert.ok(svg.includes("WHETHER · WEEKLY OPERATING CALL"));
     assert.ok(svg.includes("ACTION NOW"));
-    assert.ok(svg.includes("SCARCITY"));
+    assert.ok(svg.includes("Freezing"));
+    assert.ok(!svg.includes("SCARCITY"));
   });
 });

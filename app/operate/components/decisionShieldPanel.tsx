@@ -48,6 +48,7 @@ import {
   buildShareText,
   categoryOptions,
   formatOptionLabel,
+  hiringPauseApplies,
   lifecycleOptions,
   parseParam,
   verdictStyles,
@@ -355,7 +356,7 @@ export const DecisionShieldPanel = ({
       if (copiedTarget === "link") {
         add({
           title: "Link copied",
-          description: "Share this Decision Shield URL with your team.",
+          description: "The link opens this decision with these settings.",
           type: "success",
         });
       }
@@ -390,7 +391,7 @@ export const DecisionShieldPanel = ({
               Is this move safe right now?
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Apply this week&apos;s call to a specific decision, then share the readout with your team.
+              Apply this week&apos;s call to a specific decision, then copy the verdict.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
@@ -464,7 +465,7 @@ export const DecisionShieldPanel = ({
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
               }`}
             >
-              ⚡ Stress-Test Freeform Plan
+              Describe a plan
             </button>
             <button
               type="button"
@@ -475,7 +476,7 @@ export const DecisionShieldPanel = ({
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
               }`}
             >
-              ⚖️ Compare Plan A vs Plan B
+              Compare two plans
             </button>
             <button
               type="button"
@@ -486,7 +487,7 @@ export const DecisionShieldPanel = ({
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
               }`}
             >
-              🎛️ Standard Selectors
+              Pick from a list
             </button>
           </div>
 
@@ -519,7 +520,7 @@ export const DecisionShieldPanel = ({
             <>
               <div className="weather-surface p-4">
                 <p className="type-label text-slate-400">
-                  Weekly call context → Decision verdict → Why now → {publicDecisionLabels.threshold} → {publicDecisionLabels.reversal}
+                  Pick a stage, an area, and an action. The verdict below says whether the move is safe this week, what would pause it, and what would reopen it.
                 </p>
               </div>
               <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
@@ -557,7 +558,7 @@ export const DecisionShieldPanel = ({
               <div>
                 <p className="type-label text-slate-400">Saved scenarios</p>
                 <p className="mt-2 text-sm text-slate-300">
-                  Store common Decision Shield inputs as presets for faster reviews.
+                  Save these settings to come back to them.
                 </p>
               </div>
               <p id={presetHintId} className="text-xs text-slate-400">
@@ -603,7 +604,7 @@ export const DecisionShieldPanel = ({
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {presets.length === 0 ? (
                 <p className="text-sm text-slate-400">
-                  No presets yet. Save one to reuse this scenario in future reviews.
+                  No presets yet. Save one to come back to this decision.
                 </p>
               ) : (
                 presets.map((preset) => (
@@ -648,11 +649,11 @@ export const DecisionShieldPanel = ({
               </div>
               <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
               <p className="mt-3 text-xs text-slate-400">
-                Copy-ready board update based on current signals; outcomes remain uncertain.
+                A summary you can paste. It says what the reading was, not what will happen.
               </p>
             </div>
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Why (signals)</p>
+              <p className="type-label text-slate-400">Why</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {output.bullets.slice(0, 4).map((bullet) => (
                   <li key={bullet} className="flex gap-2">
@@ -667,7 +668,9 @@ export const DecisionShieldPanel = ({
             <div className="weather-surface p-4">
               <div className="flex items-center gap-2">
                 <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
-                <span title="Pause new hiring, long-term commitments, and major spend increases if this threshold is crossed." className="text-slate-400 cursor-help text-sm">ⓘ</span>
+                {hiringPauseApplies(action) ? (
+                  <span title="Pause new hiring, long-term commitments, and major spend increases if this line is crossed." className="text-slate-400 cursor-help text-sm">ⓘ</span>
+                ) : null}
               </div>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>

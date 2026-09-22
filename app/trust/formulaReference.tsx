@@ -23,6 +23,7 @@ import {
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
+import { OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
 
@@ -57,7 +58,7 @@ function RegimeQuadrant() {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
       <title id="regime-quadrant-title">
-        {`Regime quadrants: funding pressure above ${t} and risk appetite below ${r} pick the environment.`}
+        {`Four conditions: funding pressure above ${t} and risk appetite below ${r} pick the weather.`}
       </title>
       {cells.map((cell) => (
         <g key={cell.key}>
@@ -208,10 +209,10 @@ export function FormulaReference() {
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Rates:</span> FRED daily series — DGS1MO (the base
+              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series — DGS1MO (the base
               rate; falls back to DGS3MO), DGS2, DGS10.
               <span className="mt-1 block text-xs text-slate-400">
-                FRED is the Federal Reserve&rsquo;s free public data service; each code names one
+                FRED is the St. Louis Fed&rsquo;s free public data service; each code names one
                 published series. DGS1MO is the one-month Treasury bill rate, DGS2 the two-year,
                 DGS10 the ten-year.
               </span>
@@ -250,7 +251,7 @@ export function FormulaReference() {
                 + min({TIGHTNESS_INVERSION_POINTS}, inversion depth ×{" "}
                 {CURVE_INVERSION_TIGHTNESS_MULTIPLIER})
               </code>{" "}
-              when the 10Y−2Y curve is inverted.
+              when the recession warning gauge (10-year minus 2-year rate) is inverted.
               <RampPlot
                 id="ramp-inversion"
                 from={0}
@@ -269,8 +270,8 @@ export function FormulaReference() {
               cycle counts before the level alone crosses the ramp.
             </li>
             <li>
-              <span className="text-slate-400">Stress add-ons:</span> HY spread ≥{" "}
-              {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; Chicago FCI ≥{" "}
+              <span className="text-slate-400">Stress add-ons:</span> high-yield spread ≥{" "}
+              {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; Chicago Fed index ≥{" "}
               {adj.chicagoFciTighteningThreshold} adds up to +{adj.chicagoFciTightnessCap}.
             </li>
           </ul>
@@ -279,7 +280,7 @@ export function FormulaReference() {
         <FormulaCard title="Risk appetite · 0–100 · willingness to fund risk">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              10Y−2Y slope mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
+              Recession warning gauge (10-year minus 2-year rate), mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
               +{RISK_APPETITE_MAX_SLOPE}% → 100.
             </li>
             <li>
@@ -291,26 +292,25 @@ export function FormulaReference() {
             <li>
               <span className="text-slate-400">Market-stress veto:</span> when the trailing{" "}
               {adj.vixVetoMeanWindow}-observation VIX mean is {adj.vixMarketStressVetoMean}+, the
-              score is capped at the regime line ({RISK_APPETITE_REGIME_THRESHOLD}); between{" "}
+              score is capped at the line that changes the call ({RISK_APPETITE_REGIME_THRESHOLD}); between{" "}
               {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
-              {adj.vixVetoSoftCap}. Extreme realized stress, not the curve, sets the ceiling — the
-              posture cannot read better than transitional while it holds.
+              {adj.vixVetoSoftCap}. Extreme market stress, not the curve, sets the ceiling — the
+              score cannot read above the line while it holds.
             </li>
           </ul>
         </FormulaCard>
 
-        <FormulaCard title="Regime, headline number, confidence">
+        <FormulaCard title="Conditions, headline number, confidence">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Regime:</span>
+              <span className="text-slate-400">Conditions:</span>
               <RegimeQuadrant />
               <span className="mt-1 block text-xs text-slate-400">
-                Near a line or at MED confidence a change must repeat on two consecutive reads; LOW
-                blocks the switch.
+                At low confidence the call does not change at all.
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Boldness (homepage headline):</span>{" "}
+              <span className="text-slate-400">{OPERATING_LATITUDE_LABEL} (homepage headline):</span>{" "}
               <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
             </li>
             <li>

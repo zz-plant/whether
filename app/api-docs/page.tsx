@@ -6,7 +6,7 @@ import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
 
 export const metadata: Metadata = {
   title: "API & Agent Tools",
-  description: "Programmatic access to the weekly brief, regime data, SaaS multiples, and decision framework. MCP server, REST endpoints, CLI, and embeddable widget.",
+  description: "Programmatic access to the weekly brief, the month-by-month record, SaaS multiples, and the decision rules. MCP server, REST endpoints, CLI, and embeddable widget.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/api-docs" },
 };
@@ -23,7 +23,7 @@ type EndpointProps = {
 function Endpoint({ signature, children, tryHref, tryLabel, tryCta, tryAriaLabel }: EndpointProps) {
   return (
     <div className="weather-surface px-4 py-3 space-y-1">
-      <p className="text-fluid-xs font-semibold text-sky-200">{signature}</p>
+      <code className="block text-fluid-xs font-semibold text-sky-200">{signature}</code>
       <p className="text-xs text-slate-300">{children}</p>
       {tryHref ? (
         <a
@@ -57,8 +57,8 @@ export default function ApiDocsPage() {
       <article className="weather-panel space-y-6 px-5 py-5 max-w-3xl">
         <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
-          Equip AI agents, executive workflows, and engineering tools with live macro operating posture.
-          Whether exposes real-time regime signals and bounded decision rules through a native Model Context Protocol (MCP) server, REST endpoints, CLI, and embeddable widgets. Free forever, no API key required.
+          Read this week's call from an AI agent, a script, or a dashboard. Whether serves the call, the two
+          scores behind it, and the pause and resume lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Free forever, no API key required.
         </p>
 
         <section className="space-y-4">
@@ -68,7 +68,7 @@ export default function ApiDocsPage() {
           </div>
           <p className="text-xs text-slate-300">
             <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
-            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or autonomous agents to give your models real-time macro operating posture, threshold distance calculations, and scenario projections mid-reasoning loop.
+            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's call, how far each score sits from its line, and what a scenario would produce, while it reasons.
           </p>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
@@ -85,7 +85,7 @@ export default function ApiDocsPage() {
             <span className="text-sky-200 font-mono">get_comps</span>, and{" "}
             <span className="text-sky-200 font-mono">get_signals</span>. For local agents or CI pipelines,{" "}
             <span className="text-sky-200 font-mono">bun run mcp:whether</span> starts the same interface over
-            stdio, with additional tools for bounded decision rules and 15-year trailing history.
+            stdio, with additional tools for the decision rules and 15-year trailing history.
           </p>
         </section>
 
@@ -104,10 +104,10 @@ export default function ApiDocsPage() {
               Discovery. Lists every available tool with its parameters.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_brief">
-              Current regime, action, confidence, record date. Optional cadence param.
+              Current conditions, action, confidence, record date. Optional weekly, monthly or quarterly view.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_context&amp;regime=DEFENSIVE">
-              Regime duration, historical average, common next regime.
+              How long these conditions have held, the historical average, and what usually comes next.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_projection&amp;regime=DEFENSIVE&amp;tightness=74&amp;riskAppetite=32">
               Weeks until threshold crossing at current velocity. Scenario modeling for agents.
@@ -140,7 +140,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_posture_current"
             >
-              Stable JSON endpoint for the current posture. Returns regime, tightness, direction,
+              Stable JSON endpoint for the current call. Returns the conditions, funding pressure, direction,
               confidence, week, summary, url, and version. Type contract at lib/types.ts.
             </Endpoint>
             <Endpoint
@@ -149,7 +149,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_agent_brief"
             >
-              Full structured brief data with handoff payload. Supports weekly, monthly, quarterly,
+              The full structured brief, with the block an agent hands on. Supports weekly, monthly, quarterly,
               yearly.
             </Endpoint>
             <Endpoint
@@ -158,8 +158,8 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_scores"
             >
-              The two headline numbers on their own — tightness, risk appetite, both deltas, plus
-              distance to the next regime flip and which dimension would cross first.
+              The two headline numbers on their own — funding pressure, risk appetite, both deltas, plus
+              distance to the line that changes the call and which score would cross first.
             </Endpoint>
             <Endpoint
               signature="GET /api/cadence"
@@ -185,11 +185,11 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_regime_alerts"
             >
-              Paginated history of regime-change alerts. Read access is open; writes are cron-owned.
+              Paginated history of alerts sent when the call changed. Read access is open; only the Monday run writes.
             </Endpoint>
             <Endpoint signature="GET /api/decision-memory?format=records">
               The call history in NDJSON, shaped by the Revisable Delegation record schema — one
-              belief record per published posture. Scoped to the caller: it reads your own decision
+              belief record per published call. Scoped to the caller: it reads your own decision
               memory, so it needs an <span className="text-sky-200">x-whether-client-id</span> header
               and answers 401 without one. No &quot;Try it&quot; link for that reason.
             </Endpoint>
@@ -215,7 +215,7 @@ export default function ApiDocsPage() {
               tryCta="try_image_brief"
               tryAriaLabel="View the brief as an image"
             >
-              The brief as a 1200×800 PNG for decks and threads. Accepts cadence and company-context
+              The brief as a 1200×800 PNG for decks and threads. Accepts view and company-context
               params.
             </Endpoint>
             <Endpoint
@@ -225,7 +225,7 @@ export default function ApiDocsPage() {
               tryCta="try_image_slide"
               tryAriaLabel="View the brief as a meeting slide"
             >
-              The call as a 16:9 meeting slide — hand-written SVG, so it stays sharp at projector
+              The call as a widescreen meeting slide — hand-written SVG, so it stays sharp at projector
               size and the labels are still editable text in Figma or Keynote. Accepts seed,
               series-a, series-b, or growth.
             </Endpoint>
@@ -237,7 +237,7 @@ export default function ApiDocsPage() {
               tryAriaLabel="Download the board slide as a PowerPoint file"
             >
               The same slide as a file: a one-slide native PPTX with every box editable, or a
-              one-page 16:9 PDF for a pre-read. Served as an attachment. Takes the same stage
+              one-page widescreen PDF for a pre-read. Served as an attachment. Takes the same stage
               values as the SVG.
             </Endpoint>
             <Endpoint
@@ -303,7 +303,7 @@ export default function ApiDocsPage() {
           <h2 className="type-eyebrow">Command line</h2>
           <p className="text-xs text-slate-300">
             The <span className="text-sky-200">whether</span> CLI is an operator terminal for the
-            same data: environment, call, changes, flips.
+            same data: conditions, the call, what changed, what would change it.
           </p>
           <div className="space-y-3">
             <Endpoint signature="whether status">
@@ -317,7 +317,7 @@ export default function ApiDocsPage() {
               Export the brief to json, csv, markdown, pdf, or a full briefing pack.
             </Endpoint>
             <Endpoint signature="whether watch --interval 60 --changes-only">
-              Poll for regime movement and print only what changed.
+              Poll for a change in the call and print only what changed.
             </Endpoint>
             <Endpoint signature="whether scenario --tightness 74 --risk-appetite 32">
               Model a hypothetical and see which call it produces.

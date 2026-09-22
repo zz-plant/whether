@@ -17,7 +17,10 @@ describe("flip proximity", () => {
     assert.ok(nearest && next, "both axes are reachable from this reading");
     assert.ok(Math.abs(nearest.inputMove) <= Math.abs(next.inputMove));
     for (const entry of [nearest, next]) {
-      assert.match(entry.sentence, /^\d+\.\d{2}% (steeper|flatter|higher|lower) on (the 10Y−2Y curve|the 1-month Treasury bill) would change the call to (Sunny|Cloudy|Stormy|Freezing)\.$/);
+      // In the market's own terms, with no abbreviation: "10Y−2Y" was the one
+      // bond-desk token in the one line saying how close the call is to changing.
+      assert.match(entry.sentence, /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), the call changes to (Sunny|Cloudy|Stormy|Freezing)\.$/);
+      assert.doesNotMatch(entry.sentence, /10Y|2Y|1M\b/);
       assert.notEqual(entry.crossesTo, assessment.regime);
       assert.doesNotMatch(entry.sentence, /tightness|riskAppetite|threshold|score/i, "reader copy carries no engine vocabulary");
     }
@@ -74,13 +77,13 @@ describe("flip proximity", () => {
 
 describe("quiet-day read", () => {
   const sentences = [
-    "0.15% flatter on the 10Y−2Y curve would change the call to Cloudy.",
-    "0.4% lower on the 1-month Treasury bill would change the call to Stormy.",
+    "If long rates fall 0.15% closer to short rates, the call changes to Cloudy.",
+    "If the 1-month Treasury bill rate falls 0.40%, the call changes to Stormy.",
   ];
 
   it("leads a steady week with the call-unchanged verdict and the nearest flip distance", () => {
     const line = buildQuietDayRead({ steadyWeek: true, flipProximity: sentences });
-    assert.equal(line, "Call unchanged — 0.15% flatter on the 10Y−2Y curve would change the call to Cloudy.");
+    assert.equal(line, "Call unchanged — If long rates fall 0.15% closer to short rates, the call changes to Cloudy.");
   });
 
   it("renders nothing when the call moved this week", () => {

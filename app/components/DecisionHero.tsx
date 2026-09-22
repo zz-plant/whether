@@ -1,7 +1,7 @@
 import { REGIME_DESCRIPTOR, formatBoldnessDeltaLabel } from "../viewModel";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { SignalDirection } from "../viewModel";
-import { DECISION_CONTRACT_LABELS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import { ThresholdLadder } from "./illustrations/ThresholdLadder";
 import { DeltaGlyph } from "./illustrations/DeltaGlyph";
@@ -44,6 +44,12 @@ type Props = {
   tightnessSaturated?: boolean;
   riskAppetite?: number;
   riskAppetiteDelta?: number;
+  /**
+   * True when no previous reading was compared. A zero delta then means
+   * "nothing was measured", not "nothing moved", and the sentences that read
+   * the deltas say so instead of reporting a steady week.
+   */
+  comparisonUnavailable?: boolean;
   boldnessScore: number;
   boldnessDelta: number;
   /** Trailing monthly boldness readings, oldest first. Omit to hide the sparkline. */
@@ -53,7 +59,6 @@ type Props = {
   actionNow?: string;
   regime: string;
   previousRegime?: string;
-  postureLabel: string;
   signalDirection: SignalDirection;
   recordDate: string;
   fetchedAt: string;
@@ -117,6 +122,25 @@ const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as 
 const isRegimeKey = (value: string): value is RegimeKey =>
   REGIME_GLYPH_KEYS.some((key) => key === value);
 
+/** The acronym expanded, since this line is its first use on the page. */
+const FRED_SOURCE_LABEL = "St. Louis Fed (FRED)";
+
+/**
+ * The sentence under the h1, keyed by how the two scores moved this week. One
+ * plain noun and a direction; "tightening inputs" was the engine's word for it.
+ */
+const INPUT_MOVEMENT_SENTENCE: Record<ReturnType<typeof describeInputMovement>, string> = {
+  "steady inputs": "Neither score moved much this week.",
+  "tightening inputs": "The scores moved toward tighter money this week.",
+  "easing inputs": "The scores moved toward easier money this week.",
+  "mixed inputs": "The two scores moved in opposite directions this week.",
+};
+
+/* A degraded read hands the hero zero deltas. Saying "neither score moved" on
+   one would be the manufactured-stable claim tests/noComparisonHonesty.test.ts
+   exists to keep off the page. */
+const NO_COMPARISON_SENTENCE = "No previous week to compare the scores against.";
+
 export function DecisionHero({
   tightness,
   tightnessDelta,
@@ -131,7 +155,6 @@ export function DecisionHero({
   weeklyCall,
   actionNow,
   regime,
-  postureLabel,
   signalDirection: _signalDirection,
   recordDate,
   confidenceLabel,
@@ -145,6 +168,7 @@ export function DecisionHero({
   boundedConditions,
   shareLines,
   signalIndicators,
+  comparisonUnavailable = false,
   revisitDecisions = false,
   revisitQueue = [],
   noChangeAreas = [],
@@ -234,8 +258,10 @@ export function DecisionHero({
   const isTreasuryUrl = treasurySource?.startsWith("http");
   /* The same attribution as `sourceNode`, as plain text. The evidence rows in
    * the change report are a definition list, not prose, so a URL would print
-   * there in full where the trust line renders it as the word "FRED". */
-  const sourceLabel = isTreasuryUrl ? "FRED" : treasurySource ?? "FRED";
+   * there in full where the trust line renders it by name. "FRED" is expanded
+   * on this, its first use on the page: it is an acronym for a Federal Reserve
+   * bank's data service, and nothing else on `/` says so. */
+  const sourceLabel = isTreasuryUrl ? FRED_SOURCE_LABEL : treasurySource ?? FRED_SOURCE_LABEL;
   const sourceNode = isTreasuryUrl ? (
     <a
       href={treasurySource}
@@ -243,10 +269,10 @@ export function DecisionHero({
       rel="noopener noreferrer"
       className="underline decoration-white/20 underline-offset-2 hover:text-white/80 hover:decoration-white/40"
     >
-      FRED
+      {FRED_SOURCE_LABEL}
     </a>
   ) : (
-    <span>{treasurySource ?? "FRED"}</span>
+    <span>{treasurySource ?? FRED_SOURCE_LABEL}</span>
   );
 
   const normalizedCall = (weeklyCall ?? "").trim();
@@ -279,9 +305,9 @@ export function DecisionHero({
           {tightnessSaturated && typeof tightnessPressure === "number" ? (
             <span
               className="ml-1.5 text-fluid-nano font-normal text-amber-300/80"
-              title={`Raw pressure is ${tightnessPressure.toFixed(0)} before the 100-point clip`}
+              title={`The scale stops at 100. The pressure behind it would read ${tightnessPressure.toFixed(0)}.`}
             >
-              · ceiling ({tightnessPressure.toFixed(0)})
+              · would read {tightnessPressure.toFixed(0)}
             </span>
           ) : null}
         </p>
@@ -295,7 +321,7 @@ export function DecisionHero({
            * score has stopped being able to report a move.
            */
           <p className="mt-0.5 text-fluid-nano text-amber-300/70">
-            At the ceiling — a clipped score cannot show a weekly move.
+            Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
           </p>
         ) : tightnessDelta !== 0 ? (
           // The glyph carries its own title/desc ("Rose from 61 to 64"), so it
@@ -486,6 +512,16 @@ export function DecisionHero({
               </span>
             </div>
 
+            {/* What the weather word means for money, in one sentence, under
+                the word itself. It used to render only when the action line
+                happened to equal the call — so on a normal week the loudest
+                element on the page had no gloss anywhere in the hero. */}
+            {regimeKey ? (
+              <p className="max-w-xl text-xs leading-relaxed text-slate-400">
+                {REGIME_WEATHER_RATIONALES[regimeKey]}
+              </p>
+            ) : null}
+
             {/* The homepage's `h1`. It was an `h2` under a visually hidden
                 `h1` reading "Weekly Brief", so the one heading a crawler and a
                 screen-reader user meet first said nothing this week that it did
@@ -502,15 +538,26 @@ export function DecisionHero({
               style={{ viewTransitionName: "page-title" }}
               className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.2] tracking-[-0.012em] text-white"
             >
-              {weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`}
+              {weeklyCall ?? boldnessShorthand ?? NO_LIVE_READING_CALL.currentCall}
             </TitleTag>
 
-            <p className="text-xs sm:text-sm font-normal text-slate-300 max-w-xl leading-relaxed">
-              {(_showActionNow ? actionNow : (regimeKey ? REGIME_WEATHER_RATIONALES[regimeKey] : REGIME_DESCRIPTOR[regime])) ?? "Expand GTM and product bets only where activation and retention are tracking."}
-            </p>
+            {/* The action line, only when it says something the call above
+                does not. The rationale that used to stand in for it sits
+                under the weather word now. */}
+            {_showActionNow ? (
+              <p className="text-xs sm:text-sm font-normal text-slate-300 max-w-xl leading-relaxed">
+                {actionNow}
+              </p>
+            ) : null}
 
+            {/* How the two scores moved this week, from the same deltas the
+                cells below print. "Cloudy — Mid (Fragile) posture with steady
+                inputs" was three undefined engine words in the one sentence
+                under the h1; the stage label still travels with the exports. */}
             <p className="text-xs font-medium text-slate-400">
-              {`${postureLabel || "Steady"} posture with ${describeInputMovement(tightnessDelta, riskAppetiteDelta ?? 0)}.`}
+              {comparisonUnavailable
+                ? NO_COMPARISON_SENTENCE
+                : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta ?? 0)]}
             </p>
           </div>
 
@@ -535,12 +582,12 @@ export function DecisionHero({
                 </span>
               ) : (
                 <span className="ml-1 inline-flex items-center gap-1 rounded-md bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 text-xs font-medium text-slate-300">
-                  <span>Steady vs last week</span>
+                  <span>{comparisonUnavailable ? "No previous week to compare" : "Steady vs last week"}</span>
                 </span>
               )}
             </div>
 
-            <div className="text-xs text-slate-400">{OPERATING_LATITUDE_LABEL}</div>
+            <div className="text-xs text-slate-400">{OPERATING_LATITUDE_LABEL} · room to hire, spend and commit</div>
 
             {trendPoints && trendDomain ? (
               <figure className="mt-1 flex flex-col items-start sm:items-end text-fluid-nano">
@@ -650,7 +697,7 @@ export function DecisionHero({
               {boundedRails.length > 0 ? (
                 <div
                   className="grid gap-x-4 gap-y-2 sm:grid-cols-2"
-                  aria-label="Distance to this week's bounded conditions"
+                  aria-label="Distance to this week's pause and resume lines"
                 >
                   {boundedRails.map((rail) => (
                     <div key={rail.metric} className="min-w-0">
@@ -758,7 +805,7 @@ export function DecisionHero({
               the end of it and changes the page's display mode instead, so it
               moved to the header beside theme and settings. */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? `${regimeDisplay} posture`} lines={shareLines} showLabel />
+            <ShareBriefButton text={weeklyCall ?? boldnessShorthand ?? NO_LIVE_READING_CALL.currentCall} lines={shareLines} showLabel />
             {/* Takes no payload: it reads the same published artifact the share
                 panel and the presentation frames read. The literal that used to
                 sit here made the hero a second definition of the week's call. */}
@@ -767,7 +814,7 @@ export function DecisionHero({
               href="/operate#ops-decision-shield"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 hover:border-slate-600 text-xs font-medium text-slate-200 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             >
-              <span>Stress-test your plan</span>
+              <span>Test a plan against this week</span>
               <span aria-hidden="true" className="text-slate-400">→</span>
             </Link>
           </div>

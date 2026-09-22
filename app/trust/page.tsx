@@ -21,9 +21,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Trust — freshness, confidence, and what would flip the call",
+  title: "Trust — freshness, confidence, and what would change the call",
   description:
-    "Check source freshness, confidence, and methodology before acting on irreversible decisions.",
+    "Check how fresh the sources are, how sure the call is, and how the score is built, before acting on anything you can't undo.",
   path: "/trust",
   imageAlt: "Whether trust hub",
 });
@@ -93,9 +93,9 @@ export default async function MethodPage({
             </div>
           </article>
           <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Use in the room</p>
+            <p className="type-eyebrow">Before you share or approve</p>
             <p className="text-sm text-slate-200">
-              Check whether the weekly call is current enough to share or approve against.
+              Paste one of these when someone asks where the call came from.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <ActionLink href="#sources-freshness" variant="pill">Citation line</ActionLink>
@@ -116,7 +116,7 @@ export default async function MethodPage({
             <p className="text-sm text-slate-200">{citationLine}</p>
             <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#trust-snapshot" variant="pill">Snapshot</ActionLink>
+              <ActionLink href="#trust-snapshot" variant="pill">System status</ActionLink>
               <ActionLink href="#formula-reference" variant="pill">Formula notes</ActionLink>
             </div>
           </article>
@@ -134,13 +134,13 @@ export default async function MethodPage({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">This recommendation breaks if:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              <li><span className="text-slate-400">Recovery condition:</span> Confidence returns to HIGH and the transition warning clears before you reopen fixed-cost approvals.</li>
+              <li><span className="text-slate-400">Reopen fixed-cost approvals when:</span> confidence is back to high and the call has held for a second reading.</li>
             </ul>
           </article>
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Escalation rule</p>
             <p className="text-sm text-slate-200">
-              If a warning or revisit trigger fires, confirm freshness before moving ahead.
+              If a warning below is active, check the source dates before going ahead.
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               <ActionLink href="#source-board" variant="pill">Recheck freshness</ActionLink>
@@ -156,7 +156,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title="What the confidence number has been worth"
-        description="The percent measures distance from a regime boundary. Whether calls at that distance actually held is measured separately, over the whole archive."
+        description="The percent measures how far the scores sit from the line that changes the call. Whether calls at that distance actually held is measured separately, over the whole archive."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -166,9 +166,9 @@ export default async function MethodPage({
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Active warning patterns</p>
+            <p className="type-eyebrow">Active warnings</p>
             {warnings.length === 0 ? (
-              <p className="text-sm text-slate-300">No active warning pattern right now. Keep decisions staged and keep the normal change trigger in view.</p>
+              <p className="text-sm text-slate-300">No warning is active. Act on the call; the pause line still applies.</p>
             ) : (
               <ul className="space-y-3 text-sm text-slate-200">
                 {warnings.map((warning) => (
@@ -187,7 +187,7 @@ export default async function MethodPage({
                 <li key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
                   <p className="type-eyebrow">{item.label}</p>
                   {item.detail ? <p className="mt-1">{item.detail}</p> : null}
-                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">Check {item.label === "Trigger" ? "confidence limits" : item.label === "Impact" ? "snapshot" : "sources"} →</Link>
+                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">{item.linkLabel} →</Link>
                 </li>
               ))}
             </ul>
@@ -195,7 +195,7 @@ export default async function MethodPage({
         </div>
       </ReportSection>
 
-      <ReportSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Ready for Slack, notes, or agendas.">
+      <ReportSection id="meeting-snippet" title="Meeting snippet" description="Paste into notes or a meeting agenda.">
         <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200 shadow-[0_10px_26px_-24px_rgba(0,0,0,0.55)]">
           <code>{meetingSnippet}</code>
         </pre>
@@ -210,7 +210,7 @@ export default async function MethodPage({
       <ReportSection
         id="beginner-glossary"
         title="Unfamiliar with a term?"
-        description="Every term this site uses, in plain English, with what it changes for the company you run."
+        description="Every term this site uses, in plain English, and what each one changes for a decision."
       >
         <ActionLink href={GLOSSARY_HREF} variant="pill">
           Open the glossary
@@ -221,7 +221,7 @@ export default async function MethodPage({
 
   return (
     <ReportShell {...reportShellProps}>
-      <ReportSection id="trust-snapshot" title="System status" description="Current operating state of the data pipeline, signal reliability, and the trust to act.">
+      <ReportSection id="trust-snapshot" title="System status" description="Five facts behind this week's call: data, freshness, sources, confidence, warnings.">
         <div className={`mb-3 flex items-center justify-between gap-4 rounded-lg border p-3.5 sm:p-4 ${trustVerdict.toneClasses}`}>
           <div className="flex items-center gap-3">
             <TrustRadarGlyph tone={reportShellProps.trustStatusTone} size={40} />
@@ -277,7 +277,7 @@ export default async function MethodPage({
               label: "Warnings",
               value: warnings.length === 0 ? "None" : `${warnings.length} active`,
               dot: warnings.length === 0 ? "bg-emerald-400" : "bg-amber-400",
-              detail: warnings[0]?.warning ?? "Normal operating conditions.",
+              detail: warnings[0]?.warning ?? "None active.",
             },
           ].map((cell) => (
             <div key={cell.key} className="min-w-0 bg-[var(--bg-surface)] px-3 py-3">
@@ -293,7 +293,7 @@ export default async function MethodPage({
 
         <p className="mt-3 text-xs leading-5 text-slate-400 px-1">
           {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
-          {PRIMARY_AUDIENCE_SUMMARY} Verify source data and combine it with company-specific metrics before acting on irreversible decisions.
+          {PRIMARY_AUDIENCE_SUMMARY} Check the sources and add your own numbers before acting on anything you can't undo.
         </p>
       </ReportSection>
 

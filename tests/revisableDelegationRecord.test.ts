@@ -119,8 +119,8 @@ describe("STD-07 export of decision memory", () => {
     const [regime, decision] = await toRevisableDelegationRecords([decisionEntry], { baseUrl: "https://whether.work" });
     const conditions = decision.invalidated_by.map((entry) => entry.condition);
     assert.equal(conditions.length, 3);
-    assert.match(conditions[0], /tightness moves below the 70 regime boundary \(recorded 72\)/);
-    assert.match(conditions[1], /risk appetite moves below the 50 regime boundary \(recorded 52\)/);
+    assert.match(conditions[0], /funding pressure moves below the 70 line that changes the call \(recorded 72\)/);
+    assert.match(conditions[1], /risk appetite moves below the 50 line that changes the call \(recorded 52\)/);
     assert.equal(conditions[2], "tightness drops below 70");
     assert.ok(decision.invalidated_by.every((entry) => entry.check === "https://whether.work/api/weekly"));
     assert.equal(regime.invalidated_by.length, 2);

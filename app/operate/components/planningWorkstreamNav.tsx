@@ -20,8 +20,8 @@ import {
 
 const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode> = {
   "Weekly plan": <CircleTargetIcon className="h-3.5 w-3.5" />,
-  "Financial strategy": <TrendUpIcon className="h-3.5 w-3.5" />,
-  "Scenario studio": <SlidersIcon className="h-3.5 w-3.5" />,
+  "Runway planner": <TrendUpIcon className="h-3.5 w-3.5" />,
+  Scenarios: <SlidersIcon className="h-3.5 w-3.5" />,
 };
 
 export const CompactWorkstreamSwitcher = ({ currentPath }: { currentPath: Route }) => {

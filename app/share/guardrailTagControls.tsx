@@ -23,7 +23,7 @@ export function GuardrailTagControls({ blocks }: { blocks: GuardrailTagBlock[] }
         <h2 className="type-eyebrow">Guardrail tags for work items</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           Copy one block per business area into a Linear or Jira card description. No integration,
-          no tokens — the card carries this week&apos;s posture, pause trigger, and flip condition.
+          no tokens — the card carries this week&apos;s call, its pause line, and what would change it.
         </p>
       </div>
       <div className="grid gap-3 md:grid-cols-2">

@@ -1,6 +1,7 @@
 import { resolveWeekEndingIsoDateUTC } from "../formatters";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { OPERATING_LATITUDE_LABEL, DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
@@ -9,6 +10,9 @@ import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCop
 import { publicDecisionLabels } from "../report/reportFormatting";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { buildFlipProximity } from "../report/flipProximity";
+
+/** The confidence line when no label was modeled: what the number measures rather than a grade. */
+const CONFIDENCE_FROM_DISTANCE = "Confidence from how far the scores sit from the line that changes the call";
 
 type WeeklyOperatorBriefPayload = {
   date: string;
@@ -102,7 +106,7 @@ export const buildWeeklyOperatorBriefPayload = ({
       date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
       boldnessBudget,
       regimeStage: weeklyCall.regimeStage,
-      confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
+      confidence: confidenceLabel ? `${confidenceLabel} confidence` : CONFIDENCE_FROM_DISTANCE,
       currentCall: weeklyCall.currentCall,
       actionNow: weeklyCall.actionNow,
       pauseIf: weeklyCall.pauseIf,
@@ -134,7 +138,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     canonicalDecisionCopy?.flipTrigger
     ?? postureFlipTrigger
     ?? normalizedFlipConditionLabels[0]
-    ?? "Flip when live indicators cross the weekly guardrail threshold.";
+    ?? "The call changes when live data crosses the pause line.";
 
   const resolvedFlipConditionLabels = canonicalFlipConditions.length > 0
     ? buildFlipConditionsWithoutTriggerDuplication({
@@ -151,7 +155,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     canonicalDecisionCopy?.operatingCall
     ?? actionStripItems[0]?.areaActionNow
     ?? assessment.constraints[0]
-    ?? "Hold bounded operating discipline.";
+    ?? NO_LIVE_READING_CALL.currentCall;
   const actionNow =
     canonicalDoNowLines[0]
     ?? doNowBullets[0]
@@ -159,13 +163,13 @@ export const buildWeeklyOperatorBriefPayload = ({
   const pauseIf =
     actionStripItems[0]?.triggerThreshold
     ?? assessment.constraints[1]
-    ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
+    ?? NO_LIVE_READING_CALL.pauseIf;
 
   return {
     date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
     boldnessBudget,
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? getRegimePublicLabel(assessment.regime),
-    confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
+    confidence: confidenceLabel ? `${confidenceLabel} confidence` : CONFIDENCE_FROM_DISTANCE,
     currentCall,
     actionNow,
     pauseIf,
@@ -174,8 +178,8 @@ export const buildWeeklyOperatorBriefPayload = ({
     doNowBullets: canonicalDoNowLines.length > 0 ? canonicalDoNowLines : doNowBullets,
     whyCouldBeWrong:
       postureConfidenceLabel === "HIGH"
-        ? "Cross-signal confirmation could still fade; keep irreversible approvals gated until next weekly checkpoint."
-        : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.",
+        ? "The sources agree this week and can stop agreeing before next Monday. Hold anything you can't undo until then."
+        : "Confidence is not high: a score sits near a line, and a small move changes the call.",
     flipTrigger: resolvedFlipTrigger,
     flipConditionLabels: resolvedFlipConditionLabels,
     customTeamNote,
@@ -196,8 +200,8 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
   return [
     `Weekly Operator Brief — ${payload.date}`,
     payload.boldnessBudget ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${boldnessDeltaLabel})` : null,
-    payload.boldnessBudget?.line ? `Latitude signal: ${payload.boldnessBudget.line}` : null,
-    `Posture: ${payload.regimeStage}`,
+    payload.boldnessBudget?.line ?? null,
+    `Conditions: ${payload.regimeStage}`,
     `Confidence: ${payload.confidence}`,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
     "",
@@ -207,12 +211,12 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     `${publicDecisionLabels.reversal}: ${payload.changeCourseIf}`,
     ...(payload.flipWatchLine ? [`${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${payload.flipWatchLine}`] : []),
     ...(supportingActionLines.length > 0
-      ? ["", "More action-now lines:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
+      ? ["", "Also this week:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
       : []),
     "",
     `Why this could be wrong: ${payload.whyCouldBeWrong}`,
     ...(payload.flipConditionLabels.length > 0
-      ? ["", "Other change-course signals:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
+      ? ["", "Other things that would change the call:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
       : []),
   ].filter((line): line is string => line != null).join("\n");
 };
@@ -232,7 +236,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           type: "section",
           fields: [
             ...(payload.boldnessBudget ? [{ type: "mrkdwn" as const, text: `*${OPERATING_LATITUDE_LABEL}*\n${payload.boldnessBudget.score}/100` }] : []),
-            { type: "mrkdwn", text: `*Posture*\n${payload.regimeStage}` },
+            { type: "mrkdwn", text: `*Conditions*\n${payload.regimeStage}` },
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],
         },
@@ -276,7 +280,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
             {
               type: "mrkdwn",
               text: payload.flipConditionLabels.length > 0
-                ? `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*Other change-course signals:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
+                ? `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*Other things that would change the call:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
                 : `*Why this could be wrong:* ${payload.whyCouldBeWrong}`,
             },
           ],
@@ -292,15 +296,15 @@ export const buildWeeklyOperatorBriefCardText = (payload: WeeklyOperatorBriefPay
 
 export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayload) => [
   "Weekly call snapshot",
-  `REGIME: ${payload.regime}`,
+  `CONDITIONS: ${payload.regime}`,
   `CALL: ${payload.call}`,
   `${publicDecisionLabels.action.toUpperCase()}: ${payload.doNow}`,
   `AVOID: ${payload.avoid}`,
   `WATCH: ${payload.watch}`,
-  "FLIP CONDITIONS:",
+  `${DECISION_CONTRACT_LABELS.watch.flipWatch.toUpperCase()}:`,
   ...(payload.flipConditions.length > 0
     ? payload.flipConditions.map((condition) => `• ${condition}`)
-    : ["• Recheck thresholds on next refresh."]),
+    : ["• No live line this week; check again after the next refresh."]),
 ].join("\n");
 
 export const buildWeeklyBoardSnippetPlainText = (payload: WeeklyBoardSnippetPayload) => [

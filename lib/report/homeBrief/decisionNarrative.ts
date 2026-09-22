@@ -202,8 +202,8 @@ export const buildWeeklyMemoLines = ({
   // The stance line is already line 2, so this line adds the watch state and its
   // condition instead of restating it.
   transitionWatch === "ON"
-    ? `Flip watch is on, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `Flip watch is off, so this week's calls hold. Change course when: ${changeCourseIf}`,
+    ? `The call could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
+    : `The call is not close to changing, so this week's calls hold. Change course when: ${changeCourseIf}`,
 ];
 
 export const buildWhyItMattersLine = ({

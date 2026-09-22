@@ -71,14 +71,14 @@ describe("CadenceCallCard", () => {
 
     assert.ok(html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
     assert.ok(html.includes(DECISION_CONTRACT_LABELS.reversal.changeCourseIf));
-    assert.match(html, /Regime by month/);
+    assert.match(html, /Conditions by month/);
   });
 
   it("drops the triad under a refusal, where the weekly hero below carries it", () => {
     const html = render("monthly", true);
 
     assert.ok(!html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
-    assert.match(html, /Posture change held:/);
+    assert.match(html, /Call held:/);
     assert.match(html, /Signals disagree\./);
   });
 
@@ -111,8 +111,8 @@ describe("CadenceCallCard", () => {
 
   it("renders the two horizons differently", () => {
     assert.notEqual(render("monthly"), render("quarterly"));
-    assert.match(render("quarterly"), /Regime by quarter/);
-    assert.doesNotMatch(render("quarterly"), /Regime by month/);
+    assert.match(render("quarterly"), /Conditions by quarter/);
+    assert.doesNotMatch(render("quarterly"), /Conditions by month/);
   });
 
   it("puts the reading on the scale the sentences only describe", () => {
@@ -123,17 +123,18 @@ describe("CadenceCallCard", () => {
     assert.match(html, /id="cadence-band-riskAppetite-monthly-title"/);
     assert.match(html, /Funding pressure: 61/);
     assert.match(html, /Risk appetite: 56/);
-    // Distance to each edge, in the same two words the chips above use.
-    assert.ok(html.includes(`5 to ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} · 15 to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`));
-    assert.ok(html.includes(`2 to ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} · 12 to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`));
+    // Distance to each edge, named as the pause line and the resume line — the
+    // two names the rest of the page uses for the pair.
+    assert.ok(html.includes("15 points from the pause line · 5 from the resume line"));
+    assert.ok(html.includes("12 points from the pause line · 2 from the resume line"));
   });
 
   it("states a tripped edge rather than measuring zero distance to it", () => {
     // The bare fixture reads 100 against a 76 guardrail: already past it, not near it.
     const html = render("monthly");
 
-    assert.ok(html.includes(`${DECISION_CONTRACT_LABELS.threshold.pauseIf} tripped`));
-    assert.ok(!html.includes(`0 to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`));
+    assert.ok(html.includes("Past the pause line"));
+    assert.ok(!html.includes("0 points from the pause line"));
   });
 
   it("calls one threshold by one name across chip, rail, and readout", () => {

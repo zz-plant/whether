@@ -1567,7 +1567,7 @@ surfaces do not reintroduce the old words.
   masthead headline is derived from state via `resolveTrustReadinessCopy`; it no longer sniffs
   the detail string for words like "low".
 - **Regime-aware weekly headline.** `buildActionNowShort` takes the regime, so a softening Sunny
-  week reads "keep proven bets moving, but stage anything new" rather than "freeze new
+  week reads "keep what is working. Don't start anything new this week" rather than "freeze new
   commitments", which contradicted every downstream page.
 - **Guardrail slot is a threshold.** `reportDataLoader` fills `guardrailThreshold` from the first
   action-strip trigger instead of the playbook's first "stop" item.

@@ -1,6 +1,7 @@
 /**
- * Time Machine panel for replaying historical capital postures with client-side validation.
- * Keeps URL-driven state consistent while providing immediate feedback on availability.
+ * Month picker: shows what the brief said in an earlier month, with client-side
+ * validation. Keeps URL-driven state consistent while giving immediate feedback
+ * on which months are available.
  */
 "use client";
 
@@ -101,7 +102,7 @@ export const TimeMachinePanel = ({
     invalidSelection
       ? {
           key: "invalid",
-          message: "That month is not available in the cache. Showing the latest data instead.",
+          message: "That month is not available. Showing the latest instead.",
           includeId: false,
         }
       : null,
@@ -212,13 +213,13 @@ export const TimeMachinePanel = ({
     <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
-          label="Past snapshots"
-          title="Replay an earlier month"
+          label="Past months"
+          title="See what the brief said in an earlier month"
           titleId="time-machine-title"
           description={
             <>
-              Pull the latest available Treasury record on or before a chosen month to see what the
-              report would have said then.
+              Pick a month. The page loads the last Treasury reading on or before it and shows the
+              call from that month.
             </>
           }
           aside={
@@ -228,7 +229,7 @@ export const TimeMachinePanel = ({
                   href={nowDecisionHref as Route}
                   className={centeredPillLinkClass}
                 >
-                  Exit historical view
+                  Back to this week
                 </ActionLink>
               ) : null}
               <DataProvenanceStrip provenance={provenance} />
@@ -238,34 +239,33 @@ export const TimeMachinePanel = ({
 
         <div className="weather-list-stagger mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
           <div className="weather-surface weather-delta-card p-4" data-emphasis="true">
-            <p className="type-label text-slate-400">Historical mode</p>
+            <p className="type-label text-slate-400">Month showing</p>
             <p className="mt-3 type-data text-slate-300">
               {isHistorical ? (
                 <>
-                  You are viewing the weekly snapshot from{" "}
-                  <span className="font-semibold text-slate-100">{selectedLabel}</span>. Compare
-                  against now ({latestRecordLabel}) before changing current plans.
+                  This page is showing{" "}
+                  <span className="font-semibold text-slate-100">{selectedLabel}</span>. This week&apos;s
+                  reading is dated {latestRecordLabel}.
                 </>
               ) : (
                 <>
-                  You are in the current live view ({latestRecordLabel}). Use past snapshots to review
-                  the prior month before approving irreversible decisions.
+                  This page is showing this week ({latestRecordLabel}). Pick a month below to see what
+                  the call was then.
                 </>
               )}
             </p>
             {showHistoricalCallout ? (
               <div className="weather-surface mt-4 p-3">
                 <p className="type-label text-slate-400">
-                  Operational implication · {historicalRegime ? REGIME_LABELS[historicalRegime] : "—"}
+                  What it meant · {historicalRegime ? REGIME_LABELS[historicalRegime] : "—"}
                 </p>
                 <p className="mt-2 text-sm text-slate-200">{historicalSummary}</p>
               </div>
             ) : null}
           </div>
           <div className="weather-surface weather-delta-card p-4">
-            <p className="type-label text-slate-400">Snapshot</p>
+            <p className="type-label text-slate-400">Month loaded</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
-            <p className="mt-2 text-xs text-slate-400">Highlights the month loaded into the report.</p>
             {!isHistorical && replayPreviousHref ? (
               <ActionLink
                 href={replayPreviousHref as Route}
@@ -278,9 +278,9 @@ export const TimeMachinePanel = ({
         </div>
 
         <div className="mt-4 weather-surface weather-delta-card p-4" aria-label="Time navigation controls">
-          <p className="type-label text-slate-400">Move through past snapshots</p>
+          <p className="type-label text-slate-400">Step through months</p>
           <p className="mt-2 text-sm text-slate-300">
-            Move backward and forward month-by-month, then jump back to live data when you are done.
+            One month at a time, or straight back to this week.
           </p>
           <div className="weather-list-stagger mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {previousSnapshotHref ? (
@@ -311,14 +311,14 @@ export const TimeMachinePanel = ({
               href={nowHref as Route}
               className={fullWidthPillLinkClass}
             >
-              Jump to now
+              This week
             </ActionLink>
           </div>
         </div>
 
         <Form onFormSubmit={handleSubmit} className="mt-6">
           <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 md:grid-cols-[1fr,auto]">
-            <Fieldset.Legend className="sr-only">Choose a historical month and load the snapshot</Fieldset.Legend>
+            <Fieldset.Legend className="sr-only">Choose a month and load it</Fieldset.Legend>
             <TimeMachineMonthPicker
               monthRef={monthRef}
               selectedLabel={selectedLabel}
@@ -348,7 +348,7 @@ export const TimeMachinePanel = ({
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
               ) : null}
-              {isPending ? "Loading" : "Load snapshot"}
+              {isPending ? "Loading" : "Load month"}
             </button>
           </Fieldset.Root>
         </Form>
@@ -357,19 +357,19 @@ export const TimeMachinePanel = ({
             href={clearDraftHref}
             className="justify-center text-slate-300 hover:border-slate-500/70"
           >
-            Clear draft
+            Clear the pick
           </ActionLink>
           <ActionLink
             href={jumpToLatestHref}
             className={centeredPillLinkClass}
           >
-            Jump to latest
+            Latest month
           </ActionLink>
         </div>
         <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)]">
           <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2">
             <div>
-              <p className="type-label text-slate-400">Latest available record</p>
+              <p className="type-label text-slate-400">Latest reading</p>
               <p className="mt-2 text-sm text-slate-200">
                 <span className="mono text-slate-100">
                   <time dateTime={latestRecordDate}>{latestRecordLabel}</time>
@@ -377,7 +377,7 @@ export const TimeMachinePanel = ({
               </p>
             </div>
             <div>
-              <p className="type-label text-slate-400">Cache coverage</p>
+              <p className="type-label text-slate-400">Months available</p>
               <p className="mt-2 text-sm text-slate-200">
                 <span className="mono text-slate-100">
                   {coverageLabel && cacheCoverage.earliest && cacheCoverage.latest ? (
@@ -386,16 +386,16 @@ export const TimeMachinePanel = ({
                       <time dateTime={cacheCoverage.latest}>{coverageLabel.latest}</time>
                     </>
                   ) : (
-                    "No cache loaded"
+                    "None available"
                   )}
                 </span>
               </p>
             </div>
             {isDraft ? (
               <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-3 py-3 sm:col-span-2">
-                <p className="type-label text-sky-200">Draft staged</p>
+                <p className="type-label text-sky-200">Month picked</p>
                 <p className="mt-2 text-sm text-slate-200">
-                  The URL now points to {selectedLabel}. Load snapshot to apply the replay.
+                  {selectedLabel} is picked. Load it to see that month&apos;s call.
                 </p>
               </div>
             ) : null}

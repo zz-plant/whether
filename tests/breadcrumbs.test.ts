@@ -19,16 +19,16 @@ describe("navigation breadcrumbs", () => {
   });
 
   it("prefers explicit fallback labels when provided", () => {
-    assert.equal(getBreadcrumbLabel("/operate/financial", "Financial strategy"), "Financial strategy");
+    assert.equal(getBreadcrumbLabel("/operate/financial", "Runway planner"), "Runway planner");
     const trail = createBreadcrumbTrail([
       { path: "/" },
       { path: "/operate" },
-      { path: "/operate/financial", label: "Financial strategy" },
+      { path: "/operate/financial", label: "Runway planner" },
     ]);
     assert.deepEqual(trail, [
       { name: "Home", path: "/" },
       { name: "Plan", path: "/operate" },
-      { name: "Financial strategy", path: "/operate/financial" },
+      { name: "Runway planner", path: "/operate/financial" },
     ]);
   });
 

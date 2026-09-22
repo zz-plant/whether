@@ -75,7 +75,6 @@ describe("DecisionHero plain-English layer", () => {
         boldnessScore={58}
         boldnessDelta={-2}
         regime="DEFENSIVE"
-        postureLabel="Contraction"
         signalDirection="tighten"
         recordDate="2026-08-14"
         fetchedAt="2026-08-15"
@@ -116,7 +115,7 @@ describe("DecisionHero plain-English layer", () => {
     );
   });
 
-  it("renders a ceiling pressure badge when tightness is saturated", () => {
+  it("renders the unclipped pressure beside a saturated score", () => {
     const html = renderToStaticMarkup(
       <DecisionHero
         tightness={100}
@@ -128,14 +127,13 @@ describe("DecisionHero plain-English layer", () => {
         boldnessScore={58}
         boldnessDelta={-2}
         regime="DEFENSIVE"
-        postureLabel="Contraction"
         signalDirection="tighten"
         recordDate="2026-08-14"
         fetchedAt="2026-08-15"
         signalData={{ tightnessThreshold: 68 }}
       />,
     );
-    assert.match(html, /ceiling \(114\)/);
+    assert.match(html, /would read 114/);
   });
 });
 

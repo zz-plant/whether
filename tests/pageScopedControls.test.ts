@@ -110,7 +110,7 @@ describe("overlays open from the layer that owns them", () => {
     // Call, then what reopens, then what would flip it. The order is the point:
     // a meeting that sees the thresholds before the decisions re-litigates the
     // call instead of acting on it.
-    assert.match(frames, /"The call", "Decisions to revisit", "What would change the call"/);
+    assert.match(frames, /"The call", "Decisions to revisit", DECISION_CONTRACT_LABELS\.watch\.flipWatch/);
     // One artifact behind the frames and the copy formats, so the summary a
     // presenter pastes is the brief the room just saw.
     assert.match(frames, /useBriefArtifact/);

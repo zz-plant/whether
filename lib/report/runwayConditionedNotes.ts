@@ -96,8 +96,8 @@ export const buildRunwayConditionedNotes = ({
       {
         area: "burn-discipline",
         note: monthlyBurnUsd
-          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months — burn is the lane where the printed call moves runway fastest.`
-          : `At ${runwayMonths} months of runway, cash durability is this week's binding constraint, and burn is the lane where the printed call moves it fastest.`,
+          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months. Burn is where this week's call moves runway fastest.`
+          : `At ${runwayMonths} months of runway, cash is what limits you this week, and burn is where the call moves it fastest.`,
       },
       {
         area: "capital-raising",
@@ -105,7 +105,7 @@ export const buildRunwayConditionedNotes = ({
       },
       {
         area: "hiring",
-        note: `At ${runwayMonths} months, the runway every other lane assumes is protected most by the hiring lane — reversing that pause is what spends it.`,
+        note: `At ${runwayMonths} months, the hiring pause is what protects the runway every other rule assumes. Reversing it is what spends that runway.`,
       },
     ];
     return notes;
@@ -115,7 +115,7 @@ export const buildRunwayConditionedNotes = ({
     const notes: RunwayConditionedNote[] = [
       {
         area: "capital-raising",
-        note: `At ${runwayMonths} months, raise planning is the lane with the least slack — the corridor's window has to fit inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
+        note: `At ${runwayMonths} months, raise planning has the least slack: if you plan to raise, the process has to finish inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
       },
       {
         area: "hiring",
@@ -150,13 +150,13 @@ export const buildRunwayConditionedNotes = ({
   const notes: RunwayConditionedNote[] = [
     {
       area: "burn-discipline",
-      note: `At ${runwayMonths} months, runway is not this week's binding constraint — the corridor is.`,
+      note: `At ${runwayMonths} months, runway is not what limits you this week. The pause and resume lines are.`,
     },
   ];
   if (isTightening) {
     notes.push({
       area: "capital-raising",
-      note: "The exception: in a tightening window, raise discipline is where long runway earns its keep.",
+      note: "The exception: with money this expensive, the question is when to raise, not whether. Long runway lets you choose.",
     });
   }
   return notes;

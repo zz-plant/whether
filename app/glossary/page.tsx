@@ -42,7 +42,7 @@ export default function GlossaryPage() {
       <SecondaryPageHeader
         eyebrow="Reference"
         title="Glossary"
-        description="Every term this site uses, in plain English, with what it changes for the company you run."
+        description="Every term this site uses, in plain English, with what it changes for a hiring, spend or raise decision."
         aside={<GlossaryCompassGlyph size={64} />}
       />
 

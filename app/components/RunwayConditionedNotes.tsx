@@ -91,8 +91,8 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
           <RunwayQuickPicks activeMonths={undefined} onPick={setRunway} />
         </div>
         <p className="text-fluid-nano text-slate-400">
-          Pick a band and this week&rsquo;s call gains a line per decision it changes — which lane
-          protects runway fastest, and roughly how many months a 10% burn cut buys you.
+          Pick a band and this week&rsquo;s call gains a line per decision it changes: which area
+          protects runway fastest, and roughly how many months a 10% burn cut buys.
         </p>
         <p className="text-fluid-nano text-slate-500">
           Nothing leaves this browser, and the call above does not change; only the notes under it do.

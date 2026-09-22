@@ -131,7 +131,7 @@ it("avoids zero-distance watch copy at regime boundaries", () => {
     scores: { tightness: 62.01, riskAppetite: 55 },
   });
 
-  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the regime boundary/i);
+  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the line that changes the call/i);
   assert.doesNotMatch(seedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
 
   const bootstrappedAdjustment = buildScopedVariantDecisionAdjustment({
@@ -153,7 +153,7 @@ it("builds growth and public stage adjustments", () => {
   });
 
   assert.equal(growthAdjustment.mode, "growth");
-  assert.match(growthAdjustment.thresholdEmphasis, /CAC payback/i);
+  assert.match(growthAdjustment.thresholdEmphasis, /acquisition cost payback/i);
 
   const publicAdjustment = buildScopedVariantDecisionAdjustment({
     mode: "public",

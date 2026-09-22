@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { Route } from "../../../lib/navigation/routeType";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   buildCanonicalUrl,
@@ -89,7 +88,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {
       ...buildPageMetadata({
         title: "Governance resource moved",
-        description: "This resource has been retired from the active library. Use the remaining governance artifacts from the canonical Resources flow.",
+        description: "This resource has been retired. The remaining guides are on the Resources page.",
         path: "/resources",
         imageAlt: "Whether resources",
       }),
@@ -168,7 +167,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           article={article}
           decisionArtifact={{
             decisionShiftSummary: homeBriefModel.decisionShiftSummary,
-            postureSummary: `Posture: ${displayRegime.label} (${displayRegime.canonicalRegime}) · Weekly momentum: ${reportData.reportDynamics.directionLabel === "unavailable" ? "not compared" : reportData.reportDynamics.directionLabel} · Revisit decisions: ${homeBriefModel.revisitDecisions ? "YES" : "NO"}`,
+            postureSummary: `Conditions are ${displayRegime.label}${reportData.reportDynamics.directionLabel === "unavailable" ? ", with no comparison to last week available" : ` and ${reportData.reportDynamics.directionLabel} this week`}; ${homeBriefModel.revisitDecisions ? "recheck last week's approvals" : "last week's approvals stand"}.`,
             mappedRules,
             freshnessLabel: reportData.fetchedAtLabel,
             citation: callCitation,
@@ -258,12 +257,12 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Strategic links</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Related pages</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li><Link href={canonicalCapitalDisciplinePath} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Discipline pillar (canonical)</Link></li>
-          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Board Framework page{page.slug === "board-level-capital-posture-framework" ? " (current page)" : ""}</Link></li>
-          <li><Link href={resourceSupportingPages.decisionShieldOverview.path as Route} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Decision Shield overview page</Link></li>
-          <li><Link href={resourceSupportingPages.capitalPostureTemplate.path as Route} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Posture Template page</Link></li>
+          <li><Link href={canonicalCapitalDisciplinePath} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital discipline for venture-backed companies</Link></li>
+          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Board-level capital posture framework{page.slug === "board-level-capital-posture-framework" ? " (this page)" : ""}</Link></li>
+          <li><Link href={resourceSupportingPages.decisionShieldOverview.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Decision Shield overview</Link></li>
+          <li><Link href={resourceSupportingPages.capitalPostureTemplate.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Posture Template</Link></li>
         </ul>
       </section>
 
@@ -300,7 +299,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
             {index === midpointIndex ? (
               <PillarCtaBlock
                 title="Use the board-ready template in your next operating review"
-                body="Translate these governance standards into one working artifact your leadership team can review weekly and your board can trust monthly."
+                body="Turn these standards into one document: reviewed weekly by the team, read monthly by the board."
                 keyword={page.keyword}
                 sourceSlug={page.slug}
                 downloadLabel={page.midpointCtaLabel}
@@ -317,8 +316,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       })}
 
       <PillarCtaBlock
-        title="Need an executive-ready board pack?"
-        body="Request a board pack walkthrough with conversion hooks included for download, request, and contact/demo events."
+        title="Need the board pack itself?"
+        body="Ask for a walkthrough of the board pack."
         keyword={page.keyword}
         sourceSlug={page.slug}
         downloadLabel="Download Capital Posture Template"

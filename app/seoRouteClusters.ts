@@ -1,4 +1,5 @@
 import type { DecisionArea } from "../lib/report/boundedDecisionRules";
+import { decisionAreaLabel } from "../lib/report/boundedDecisionRules";
 import { indexableSignalsClusters } from "./signals/clusterRoutes";
 
 type DecisionScenarioDefinition = {
@@ -7,11 +8,11 @@ type DecisionScenarioDefinition = {
 };
 
 export const decisionScenarioDefinitions: DecisionScenarioDefinition[] = [
-  { slug: "hiring", title: "Hiring" },
-  { slug: "product-tempo", title: "Product tempo" },
-  { slug: "capital-raising", title: "Capital raising" },
-  { slug: "burn-discipline", title: "Burn discipline" },
-  { slug: "expansion-bets", title: "Expansion bets" },
+  { slug: "hiring", title: decisionAreaLabel("hiring") },
+  { slug: "product-tempo", title: decisionAreaLabel("product-tempo") },
+  { slug: "capital-raising", title: decisionAreaLabel("capital-raising") },
+  { slug: "burn-discipline", title: decisionAreaLabel("burn-discipline") },
+  { slug: "expansion-bets", title: decisionAreaLabel("expansion-bets") },
 ];
 
 export const signalScenarioRoutes = indexableSignalsClusters.flatMap((signal) =>

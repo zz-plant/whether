@@ -123,10 +123,10 @@ export const RegimeTimelinePanel = ({
     <section id="regime-timeline" aria-labelledby="regime-timeline-title" className="mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
-          label="Regime timeline"
-          title="24-month regime sequence"
+          label="Past calls"
+          title="The call, month by month, over 24 months"
           titleId="regime-timeline-title"
-          description="Timeline emphasizes continuity while keeping month-level navigation."
+          description="Pick a month to load it."
           aside={
             <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-100">
               Current: {currentLabel}
@@ -195,13 +195,13 @@ export const RegimeTimelinePanel = ({
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Regime changes</p>
+              <p className="type-label text-slate-400">Call changes</p>
               <p className="mt-2 text-sm text-slate-200">
                 {changeCount} changes across the last {series.length} months.
               </p>
             </div>
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Longest continuous run</p>
+              <p className="type-label text-slate-400">Longest held</p>
               <p className="mt-2 text-sm text-slate-200">
                 {longestRun ? `${REGIME_LABELS[longestRun.regime]} (${longestRun.count} months)` : "n/a"}.
               </p>

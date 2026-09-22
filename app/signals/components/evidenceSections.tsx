@@ -37,7 +37,7 @@ export const SignalsModeSwitcherSection = ({
         {/* The paragraph that sat here restated both radio options, which carry
             their own descriptions a few lines below. */}
         <h2 className="text-base font-semibold text-slate-100">
-          Open the deeper view when you need to defend the call.
+          Open the deeper view when you need to check the call.
         </h2>
       </div>
       <div
@@ -57,7 +57,7 @@ export const SignalsModeSwitcherSection = ({
               id: "detail",
               label: "Deeper evidence",
               detail:
-                "Diagnostics, replay, and the checks that would overturn the assessment.",
+                "Charts, past months, and the checks that would overturn the call.",
             },
           ] as const
         ).map((item) => (
@@ -175,7 +175,7 @@ export const SignalsCurrentScoresSection = ({
               </dl>
               <div className="rounded-md border border-slate-800/80 bg-slate-950/55 px-3 py-3">
                 <div className="flex items-center justify-between gap-3 type-eyebrow">
-                  <span>Current vs {card.thresholdName.toLowerCase()}</span>
+                  <span>Current vs {card.thresholdLineNoun}</span>
                   <span>{card.watchDistanceLabel}</span>
                 </div>
                 {meterState ? (
@@ -272,7 +272,7 @@ export const SignalsEvidencePrioritiesSection = ({
         Start with these checks
       </p>
       <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-        The most useful places to pressure-test the read.
+        The most useful places to check the read.
       </h2>
     </header>
     <div className="grid gap-2 sm:grid-cols-5">
@@ -387,7 +387,7 @@ export const SignalsDiagnosticsSection = ({
     title={showFullDiagnostics ? "Full diagnostics" : "Top drivers"}
     description={
       showFullDiagnostics
-        ? "Showing the full evidence set for a deeper validation pass."
+        ? "Every chart behind the call."
         : "Start with the top 3 reasons. Expand only when you need the full evidence set."
     }
     action={
@@ -438,8 +438,7 @@ export const SignalsAdvancedControlsSection = ({
   // ReportSection is that outer box, so the inner one goes away.
   <ReportSection
     id="advanced-controls"
-    title="Replay and threshold tools"
-    description="Use these only when the evidence still needs a replay, historical comparison, or threshold check."
+    title="Past months and line settings"
     action={
       <div className="flex flex-wrap items-center justify-end gap-2">
         <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
@@ -452,7 +451,7 @@ export const SignalsAdvancedControlsSection = ({
             }
             className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
           >
-            Open Time Machine
+            Open the month picker
           </a>
         ) : null}
         <a

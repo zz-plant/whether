@@ -58,28 +58,34 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Posture: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
+  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nAs of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
 
-  const revisitBullets: Array<{ label: string; detail?: string; href: string }> = [
+  /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
+     from the incident-review register, on a page addressed to someone deciding
+     whether to act this week. Each is now the question the row answers. */
+  const revisitBullets: Array<{ label: string; detail?: string; href: string; linkLabel: string }> = [
     {
       // No detail: this row's own link points at #confidence-limits, and that
       // section already prints reportData.flipThreshold under "This
       // recommendation breaks if". Carrying the sentence here too put the same
       // long condition on screen twice within one section.
-      label: "Trigger",
+      label: "What would go wrong",
       href: "#confidence-limits",
+      linkLabel: "Check the limits",
     },
     {
-      label: "Impact",
+      label: "What it would change",
       detail: reportData.actionNowShort,
       href: "#trust-snapshot",
+      linkLabel: "Check system status",
     },
     {
-      label: "Recovery",
+      label: "How you'd know it cleared",
       detail: isFallback
-        ? "Recovery condition: wait for one clean live refresh before approving hard-to-reverse moves."
-        : "Recovery condition: wait for HIGH confidence and no transition warning before expanding fixed-cost commitments.",
-      href: "#sources-freshness",
+        ? "One live refresh has landed from every source."
+        : "Confidence is back to high and the call has held for a second reading.",
+      href: "#source-board",
+      linkLabel: "Check source dates",
     },
   ];
   const decisionReadiness = buildDecisionReadinessState({
@@ -102,7 +108,7 @@ export async function buildTrustPageModel() {
     : trustStatusTone === "historical"
       ? {
           label: "Historical only",
-          detail: "Comparison only. Not for live approvals.",
+          detail: "A past week. Compare it with the current one; do not act on it.",
           toneClasses: "border-violet-400/35 bg-violet-500/10 text-violet-100",
         }
       : {
@@ -138,7 +144,7 @@ export async function buildTrustPageModel() {
     degradedSourceRows,
     showOfflineBadge: isFallback,
     pageTitle: "How much to trust this week's call",
-    pageSummary: "Check whether this week's forecast is current enough to act on.",
+    pageSummary: "Check whether this week's call is current enough to act on.",
     sectionLinks,
     sidebarVariant: "full",
     nextStep: {

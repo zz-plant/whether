@@ -15,8 +15,8 @@
  * The free tier is the load-bearing half. The weekly call, the API, MCP, and
  * embeds are free permanently, and saying so in writing is what makes the paid
  * tiers legible rather than threatening — this product's credibility with the
- * audience it launches to rests on not being a bait-and-switch. Paid packages
- * continuity and team ritual, never access to the call itself.
+ * audience it launches to rests on not being a bait-and-switch. Paid plans add
+ * delivery and memory, never access to the call itself.
  */
 type PricingPlanId = "free" | "pro" | "team";
 
@@ -41,7 +41,7 @@ export type PricingPlan = {
 export const PAID_PLANS_ON_SALE = false;
 
 export const FREE_FOREVER_PROMISE =
-  "The weekly operating call, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans buy continuity and team ritual — never access to the call itself.";
+  "The weekly operating call, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans add Monday delivery to email and Slack — never access to the call itself.";
 
 export const pricingPlans: PricingPlan[] = [
   {
@@ -72,13 +72,12 @@ export const pricingPlans: PricingPlan[] = [
     id: "pro",
     name: "Pro",
     monthlyPriceUsd: 49,
-    tagline: "The ritual runs itself",
-    audience: "One operator running the Monday meeting",
+    tagline: "Monday delivery to your inbox",
+    audience: "One person who reads the call every Monday",
     features: [
-      "Monday delivery to your inbox before the meeting",
-      "Threshold alerts — when a score crosses a pause or reopen line, not only when the call flips",
+      "The call in your inbox every Monday morning",
+      "Threshold alerts — when a score crosses a pause or resume line, not only when the call changes",
       "Decision memory that follows you across devices and survives a cleared browser",
-      "Exports in your own framing rather than the default",
     ],
   },
   {
@@ -86,12 +85,12 @@ export const pricingPlans: PricingPlan[] = [
     name: "Team",
     monthlyPriceUsd: 199,
     tagline: "One call the whole team is reading",
-    audience: "A leadership team aligning weekly",
+    audience: "A team that reads the same call each week",
     features: [
-      "Everything in Pro, for the whole leadership team",
+      "Everything in Pro, for the whole team",
       "Slack delivery into the channel where the decision happens",
       "Shared decision log across the team",
-      "Board- and investor-ready brief packaging",
+      "Briefs formatted for boards and investors",
     ],
   },
 ];

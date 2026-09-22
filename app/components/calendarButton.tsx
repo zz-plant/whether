@@ -7,7 +7,7 @@ import {
 } from "../../lib/report/briefArtifact";
 import { siteUrl } from "../../lib/siteUrl";
 
-const MONDAY_HOLD_TITLE = "Whether Weekly Posture Sync";
+const MONDAY_HOLD_TITLE = "Whether: Monday call (3 min)";
 
 /**
  * The invite body: the standing agenda, not this week's call. The hold repeats

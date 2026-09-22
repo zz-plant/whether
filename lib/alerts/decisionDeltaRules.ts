@@ -1,4 +1,5 @@
 import type { RegimeAssessment } from "../regimeEngine";
+import { getRegimePublicLabel } from "../regimePresentation";
 
 export type DecisionArea = "posture" | "hiring" | "spend" | "risk";
 type ConfidenceLevel = RegimeAssessment["diagnostics"]["confidence"];
@@ -92,10 +93,10 @@ export const buildDecisionDeltaRules = (
     rules.push({
       code: "regime-change",
       decisionArea: "posture",
-      action: `Reset weekly operating posture from ${previous.regime} to ${current.regime}.`,
-      thresholdLabel: "Composite regime boundary",
+      action: `The call moved from ${getRegimePublicLabel(previous.regime)} to ${getRegimePublicLabel(current.regime)}; reread last week's plan.`,
+      thresholdLabel: "The line that changes the call",
       thresholdValue: 0,
-      reversal: "Revert posture only if the prior regime state holds across two consecutive updates.",
+      reversal: "Go back only if the previous conditions hold across two readings in a row.",
       metricValue: 0,
       crossed: true,
       direction: "up",

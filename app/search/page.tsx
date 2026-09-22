@@ -12,7 +12,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Search Whether Guidance",
   description:
-    "Route a question to Evidence, Planning, Resolve, or Trust instead of browsing the full site.",
+    "Find the page that answers a question: the evidence, the plan, a toolkit, or the method behind the call.",
   path: "/search",
   imageAlt: "Whether search",
 });
@@ -47,7 +47,7 @@ export default async function SearchPage({
           <div className="space-y-2 max-w-2xl">
             <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>
             <p className="text-sm text-slate-300">
-              Route a question to the surface that answers it: evidence, guardrails, toolkits, or the method behind the call.
+              Find the page that answers it: the evidence, the pause lines, a toolkit, or the method behind the call.
             </p>
           </div>
           <SearchRadarGlyph size={56} className="self-start sm:self-center" />

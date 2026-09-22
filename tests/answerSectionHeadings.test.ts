@@ -12,9 +12,9 @@ describe("answer section headings", () => {
     });
 
     assert.equal(headings.posture, "What this means for CEO/CFO");
-    assert.equal(headings.rules, "Rules in force: capital raising and burn discipline");
-    assert.equal(headings.threshold, "What would flip this answer: funding pressure");
-    assert.equal(headings.next, "Next for capital raising and burn discipline");
+    assert.equal(headings.rules, "Rules in force: fundraising and spending");
+    assert.equal(headings.threshold, "What would change this answer: funding pressure");
+    assert.equal(headings.next, "Next for fundraising and spending");
   });
 
   it("reads one area without a conjunction and three with one", () => {
@@ -28,7 +28,7 @@ describe("answer section headings", () => {
         mappedDecisionAreas: ["hiring", "product-tempo", "burn-discipline"],
         thresholdFocus: "both",
       }).rules,
-      "Rules in force: hiring, product tempo and burn discipline",
+      "Rules in force: hiring, roadmap and spending",
     );
   });
 

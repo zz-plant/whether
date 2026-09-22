@@ -118,7 +118,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
      with a comment the way it does elsewhere: the server writes one text node,
      the client expects two, and hydration fails on the whole page. Every title
      below is therefore assembled here and passed as a single string. */
-  const chartTitle = `Regime plane: funding pressure against risk appetite, ${spanDescription}`;
+  const chartTitle = `Funding pressure against risk appetite, ${spanDescription}`;
   const currentTitle = `${current.monthLabel}: ${current.regimeLabel} — funding pressure ${current.tightness}, risk appetite ${current.riskAppetite}`;
   const description = [
     `${current.monthLabel} reads ${current.regimeLabel}: funding pressure ${current.tightness}, risk appetite ${current.riskAppetite}.`,
@@ -133,13 +133,12 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
           <h2 className="type-eyebrow type-eyebrow-section" id="phase-map-heading">
-            The plane the call is made on
+            Where this month sits on the two scores
           </h2>
           <p className="max-w-prose text-sm text-slate-300">
-            Funding pressure and risk appetite are not two readings that happen to sit side by
-            side — together they are one coordinate, and the call is whichever quadrant it lands
-            in. Boundaries at {thresholds.tightness} and {thresholds.riskAppetite} are the same two
-            numbers the weekly brief cites.
+            Funding pressure and risk appetite together are one point on this chart, and the call
+            is whichever quarter of it the point lands in. The lines at {thresholds.tightness} and{" "}
+            {thresholds.riskAppetite} are the same two numbers the weekly brief cites.
           </p>
         </div>
 

@@ -62,7 +62,7 @@ export const buildHomeMetadata = async (
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: "Whether weekly operating posture preview",
+          alt: "Whether: this week's call",
         },
       ],
     },

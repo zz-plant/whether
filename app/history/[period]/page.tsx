@@ -54,7 +54,7 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
 };
 
 const describePeriod = (period: PostureArchivePeriod) =>
-  `Whether's operating posture for ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
+  `Whether's call for ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
 
 const cadenceNoun = (period: PostureArchivePeriod) =>
   period.sampleCadence === "weekly" ? "weekly readings" : "monthly readings";
@@ -66,10 +66,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!period) return {};
 
   return buildPageMetadata({
-    title: `${period.title} operating posture — ${toWeatherLabel(period.operatorLabel)}`,
+    title: `${period.title} call — ${toWeatherLabel(period.operatorLabel)}`,
     description: describePeriod(period),
     path: buildPostureArchivePath(period.slug),
-    imageAlt: `Whether operating posture for ${period.title}`,
+    imageAlt: `Whether's call for ${period.title}`,
   });
 }
 
@@ -99,7 +99,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const articleStructuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: `${period.title} operating posture — ${toWeatherLabel(period.operatorLabel)}`,
+    headline: `${period.title} call — ${toWeatherLabel(period.operatorLabel)}`,
     description: describePeriod(period),
     datePublished: period.asOf,
     dateModified: period.asOf,
@@ -149,7 +149,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <RegimeGlyph idPrefix={`period-${period.slug}`} regime={period.regime} className="h-6 w-auto shrink-0" />
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          What the operating posture was in {period.title}
+          What the call was in {period.title}
         </h1>
         <p className="text-sm text-slate-300">{period.headline}</p>
         <p className="text-sm text-slate-300">
@@ -208,7 +208,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
       {period.transitions.length ? (
         <section className="weather-panel space-y-3 px-6 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Posture changes inside {period.title}</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Call changes inside {period.title}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.transitions.map((transition) => (
               <li key={transition.asOf} className="flex flex-wrap items-baseline gap-2">
@@ -222,9 +222,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         </section>
       ) : (
         <section className="weather-panel space-y-2 px-6 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Posture changes inside {period.title}</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Call changes inside {period.title}</h2>
           <p className="text-sm text-slate-300">
-            The posture held at {toWeatherLabel(period.operatorLabel)} for the whole period. No mid-period reversal was recorded.
+            The call held at {toWeatherLabel(period.operatorLabel)} for the whole period.
           </p>
         </section>
       )}
@@ -313,9 +313,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What is the posture now?</h2>
+        <h2 className="text-lg font-semibold text-slate-100">What is the call now?</h2>
         <p className="text-sm text-slate-300">
-          {period.title} is a closed record. The current call, what to do this week, and what would flip it live on
+          {period.title} is a closed record. The current call, what to do this week, and what would change it live on
           the weekly brief.
         </p>
         <ActionLink href="/" variant="primary">

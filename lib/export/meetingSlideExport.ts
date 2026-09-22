@@ -5,6 +5,7 @@
  */
 
 import type { OperatingSnapshot } from "../operatingState/types";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 
 export interface MeetingSlidePayload {
@@ -81,8 +82,8 @@ export function extractMeetingSlidePayload(
  */
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
-    `> **Whether Weekly Operating Stance** — *${payload.recordDate}*`,
-    `> **Regime**: \`${payload.regime}\`${payload.stageLabel ? ` · **Stage**: \`${payload.stageLabel}\`` : ""}`,
+    `> **Whether: this week's call** — *${payload.recordDate}*`,
+    `> **Conditions**: ${getRegimePublicLabel(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
     // when the two are the same sentence, which is what the model returns on a
@@ -120,7 +121,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
       <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's call${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
     </div>
     <div style="text-align: right;">
-      <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${payload.regime}</span>
+      <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
       <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">${payload.recordDate}</p>
     </div>
   </div>
@@ -195,7 +196,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <!-- Regime Badge -->
     <g transform="translate(880, 10)">
       <rect x="0" y="0" width="160" height="42" rx="21" fill="${badgeColor}" fill-opacity="0.15" stroke="${badgeColor}" stroke-width="1.5"/>
-      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeColor}" text-anchor="middle" letter-spacing="1">${esc(payload.regime)}</text>
+      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeColor}" text-anchor="middle" letter-spacing="1">${esc(getRegimePublicLabel(payload.regime))}</text>
     </g>
   </g>
 
@@ -212,7 +213,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 320)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#f59e0b"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. PAUSE IF (GUARDRAIL)</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. PAUSE IF</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.pauseIf)}</text>
   </g>
 
@@ -220,7 +221,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 450)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#10b981"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. CHANGE COURSE IF (REVERSAL TRIGGER)</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. CHANGE COURSE IF</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.changeCourseIf)}</text>
   </g>
 

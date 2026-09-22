@@ -28,7 +28,7 @@ const keyDocs: SearchEntity[] = [
     recommendedHubLabel: "Evidence",
     title: "Check what changed and why",
     href: "/signals",
-    summary: "Review macro evidence, thresholds, and the context behind current posture.",
+    summary: "Review the evidence, the pause lines, and what is behind this week's call.",
     intentLabel: "Check what changed",
     keywords: ["signals", "evidence", "thresholds", "regime", "macro"],
   },
@@ -41,7 +41,7 @@ const keyDocs: SearchEntity[] = [
     recommendedHubLabel: "Trust",
     title: "Run a trust check",
     href: "/trust",
-    summary: "See scoring, data cadence, source quality, and transparency notes.",
+    summary: "See how the scores are built, how often the data refreshes, and where it comes from.",
     intentLabel: "Validate trust",
     keywords: ["method", "methodology", "sources", "formulas", "confidence"],
   },
@@ -82,7 +82,7 @@ const keyDocs: SearchEntity[] = [
     href: "/resolve#direct-answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
     intentLabel: "Get one-question answer",
-    keywords: ["answers", "direct answer", "bounded decisions", "weekly posture", "shareable"],
+    keywords: ["answers", "direct answer", "bounded decisions", "weekly posture", "weekly call", "shareable"],
   },
   {
     id: "doc-resources",
@@ -170,7 +170,9 @@ export const buildSearchIndex = (): SearchEntity[] => {
     href: `/trust#revisit-call`,
     summary: failureMode.summary,
     intentLabel: "Diagnose risk pattern",
-    keywords: [failureMode.trigger, ...failureMode.symptoms, ...failureMode.firstMoves],
+    /* The type's own name, so "failure mode" finds these. It used to match by
+       accident, through the "Safety Mode" the toolkit copy no longer says. */
+    keywords: ["failure mode", failureMode.trigger, ...failureMode.symptoms, ...failureMode.firstMoves],
   }));
 
   return [...toolkitEntities, ...failureModeEntities, ...keyDocs];
@@ -234,7 +236,7 @@ export const searchJobLabels: Record<SearchEntityJob, string> = {
   approve: "Approve or hold this week",
   resolve: "Resolve one remaining edge case",
   risk: "Diagnose what could break",
-  trust: "Defend the call",
+  trust: "Check the sources",
 };
 
 export const groupSearchResultsByJob = (results: SearchEntity[]) => {

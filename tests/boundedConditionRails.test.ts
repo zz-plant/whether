@@ -65,7 +65,7 @@ describe("buildBoundedConditionRails", () => {
     });
 
     assert.equal(hiring.pauseTrigger, "Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44.");
-    assert.equal(hiring.resumeTrigger, "Resume staged approvals when funding pressure falls below 66 and risk appetite is above 54.");
+    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure falls below 66 and risk appetite is above 54.");
     assert.deepEqual(rails.map((rail) => [rail.guardrail, rail.clearsAt]), [[76, 66], [44, 54]]);
   });
 
@@ -173,8 +173,8 @@ describe("buildSharedCorridorRails", () => {
     });
     const items = buildActionStripItems(rules, scores);
     const product = items.find((item) => item.lever === "product-priorities");
-    assert.equal(product?.pauseQualifier, "two consecutive weaker weekly reads print");
-    assert.equal(product?.resumeQualifier, "weekly direction stabilizes or improves");
+    assert.equal(product?.pauseQualifier, "two weekly readings in a row come in weaker");
+    assert.equal(product?.resumeQualifier, "the weekly reading holds or improves");
     const hiring = items.find((item) => item.lever === "hiring-stance");
     assert.equal(hiring?.pauseQualifier, undefined);
   });

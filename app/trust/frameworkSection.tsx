@@ -57,9 +57,9 @@ export function FrameworkSection() {
         <section className="space-y-4">
           <h3 className="type-eyebrow">In practice</h3>
           <div className="weather-surface px-4 py-4 space-y-2">
-            <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Gate net-new hiring to short-payback roles only.</p>
-            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if credit conditions tighten above 76.</p>
-            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume staged approvals when credit conditions ease below 64.</p>
+            <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses 76.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below 64.</p>
           </div>
           <p className="text-sm text-slate-300 leading-relaxed">
             The threshold makes the decision concrete. The reversal makes it temporary. Together they make the decision safe to start.
@@ -103,8 +103,8 @@ export function FrameworkSection() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-slate-400 uppercase">Review cadence</p>
-              <p className="text-xs text-slate-400">How often will you check whether the threshold or reversal has been triggered?</p>
+              <p className="text-fluid-xs font-semibold tracking-[0.08em] text-slate-400 uppercase">When you will check</p>
+              <p className="text-xs text-slate-400">How often will you check whether the threshold or reversal has been reached?</p>
               <div className="h-8 border-b border-slate-700/50" />
             </div>
           </div>

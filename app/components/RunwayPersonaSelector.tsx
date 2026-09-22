@@ -57,7 +57,7 @@ export function RunwayPersonaSelector({
   return (
     <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
       <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">
-        Calibrate Runway:
+        Cash runway:
       </span>
       <div
         role="tablist"

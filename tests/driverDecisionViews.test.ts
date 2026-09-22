@@ -34,7 +34,7 @@ describe("funding pressure driver view", () => {
     });
 
     assert.deepEqual(view.ladder.map((line) => [line.value, line.action, line.crossed]), [
-      [70, "posture boundary", true],
+      [70, "the line that changes the call", true],
       [76, "pause net-new hiring", false],
     ]);
     assert.equal(view.ladder[0].points, 4);

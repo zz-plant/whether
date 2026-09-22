@@ -39,7 +39,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <dt className="text-fluid-nano text-slate-400">Regime changes</dt>
+          <dt className="text-fluid-nano text-slate-400">Call changes</dt>
           <dd className="text-fluid-lg font-semibold tabular-nums text-slate-100">
             {record.transitions.length}
             <span className="ml-1 text-fluid-nano font-normal text-slate-400">in {record.observations} mo</span>
@@ -62,7 +62,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
           </dd>
         </div>
         <div className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2">
-          <dt className="text-fluid-nano text-slate-400">One-month whipsaws</dt>
+          <dt className="text-fluid-nano text-slate-400">Reversed after one month</dt>
           <dd className="text-fluid-lg font-semibold tabular-nums text-slate-100">{record.whipsawCount}</dd>
         </div>
       </dl>
@@ -90,7 +90,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
                     {transition.signaled
                       ? `in the near band ${transition.leadMonths} mo before`
                       : shockByDate.get(transition.atDate)
-                        ? "no advance signal — shock crossing, no reversal condition could fire"
+                        ? "no advance signal — the score jumped its line from well outside the near band"
                         : "no advance signal"}
                   </td>
                 </tr>
@@ -100,15 +100,14 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
         </div>
       ) : currentSpell ? (
         <p className="text-fluid-xs text-slate-300">
-          No regime changes in this window — {label(currentSpell.regime)} has held all{" "}
+          No call changes in this window — {label(currentSpell.regime)} has held all{" "}
           {currentSpell.months} months.
         </p>
       ) : null}
 
       <p className="text-fluid-nano leading-relaxed text-slate-400">
-        Signaled = the score that crossed had spent at least a month within {record.nearBandPts}{" "}
-        pts of its classification line before the flip published — on either side, since the
-        confirmation gate publishes a dwelt crossing one read after it crosses. Unsignaled
+        Signaled = the score that crossed had spent at least a month within{" "}
+        {record.nearBandPts} pts of its line, on either side, before the call changed. Unsignaled
         changes are listed just the same — that is the point of this table.
       </p>
     </section>

@@ -68,7 +68,7 @@ export default async function DecideDetailPage({
         />
         <section className="weather-panel space-y-4 px-6 py-6">
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {role.title}</h1>
-          <p className="text-sm text-slate-300">Current decisions</p>
+          <p className="text-sm text-slate-300">Decisions this role usually owns</p>
           <ul className="space-y-2 text-sm text-slate-200">{role.decisions.map((item) => <li key={item}>• {item}</li>)}</ul>
         </section>
         <section className="weather-panel space-y-3 px-6 py-6">

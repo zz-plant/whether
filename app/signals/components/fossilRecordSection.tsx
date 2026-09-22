@@ -1,4 +1,5 @@
 import { insightDatabase } from "../../../data/recommendations";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { UrlDetails } from "../../components/ui/urlDetails";
 
 export function FossilRecordSection({ regime, open = false }: { regime?: string; open?: boolean }) {
@@ -17,17 +18,17 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
             {fossilRecord.title} · {fossilRecord.subtitle}
           </p>
           <h3 id="fossil-record-title" className="mt-1 text-base font-semibold text-slate-100">
-            Spotting ZIRP-Era Legacy Artifacts in Today&apos;s Climate
+            Habits from the zero-rate years
           </h3>
           <p className="mt-1 max-w-3xl text-fluid-xs leading-relaxed text-slate-400">
             {fossilRecord.description}
             {isTightClimate
-              ? " Under current tight macro conditions, lingering ZIRP-era artifacts create unbudgeted coordination drag and drain cash."
-              : " Compare your current operating architecture against historical low-rate and high-rate artifacts."}
+              ? " With money this expensive, worth checking whether any of these still shape your budget."
+              : " A way to check how your company is set up against habits from low-rate and high-rate years."}
           </p>
         </div>
         <span className="rounded border border-slate-700/70 bg-slate-900/60 px-2.5 py-1 text-fluid-nano font-mono text-slate-300">
-          Current: {regime ?? "TIGHT"} CLIMATE
+          Now: {regime ? getRegimePublicLabel(regime) : "unknown"}
         </span>
       </div>
 

@@ -24,7 +24,7 @@ import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
  * formats use, so the summary at the end cannot drift from what is on screen.
  */
 
-const FRAME_TITLES = ["The call", "Decisions to revisit", "What would change the call"] as const;
+const FRAME_TITLES = ["The call", "Decisions to revisit", DECISION_CONTRACT_LABELS.watch.flipWatch] as const;
 
 export function PresentationFrames({ onExit }: { onExit: () => void }) {
   const artifact = useBriefArtifact();

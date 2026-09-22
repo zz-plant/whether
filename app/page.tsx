@@ -138,10 +138,10 @@ function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
         Stress-test a plan →
       </ActionLink>
       <ActionLink href="/resolve#direct-answers" variant="inline">
-        Direct answers →
+        Answers to common questions →
       </ActionLink>
       <ActionLink href="/api-docs" variant="inline">
-        Connect Claude & Cursor (MCP) →
+        Connect an AI assistant →
       </ActionLink>
     </div>
   );
@@ -213,7 +213,6 @@ async function PageContent({
     ? (nextHistoricalRequest ? buildTimeMachineHref("/", nextHistoricalRequest) : "/")
     : null;
 
-  const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "";
   const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
   const regime = homepage.reportShell.regime;
   const publicRegimeLabel = getRegimePublicLabel(regime);
@@ -541,6 +540,7 @@ async function PageContent({
                 tightnessSaturated={tightnessSaturated}
                 riskAppetite={riskAppetite}
                 riskAppetiteDelta={riskAppetiteDelta}
+                comparisonUnavailable={homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel === "unavailable"}
                 boldnessScore={weeklyLeadershipSummary.boldnessScore}
                 boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
                 boldnessTrend={boldnessTrend}
@@ -548,7 +548,6 @@ async function PageContent({
                 weeklyCall={primaryCall}
                 actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
                 regime={regime}
-                postureLabel={postureLabel}
                 signalDirection={signalDirection}
                 recordDate={homepage.reportShell.recordDateLabel}
                 fetchedAt={homepage.reportShell.fetchedAtLabel}

@@ -36,7 +36,7 @@ const monthlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
   SCARCITY:
     "lock discretionary spend, protect runway, and require short payback windows for new bets",
   DEFENSIVE:
-    "double down on retention, reduce fixed costs, and sequence delivery around revenue durability",
+    "double down on retention, reduce fixed costs, and ship the work that protects revenue first",
   VOLATILE:
     "cap concurrent experiments, stage fixed-cost approvals, and assign a named checkpoint owner",
   EXPANSION:
@@ -131,8 +131,8 @@ export const buildMonthlyStructured = ({
   ];
   const reversalConditions = [
     transitionWatch
-      ? "Re-open broader scope once the next read confirms the regime is still stable."
-      : "Re-open broader bets if the posture or the confidence behind it weakens.",
+      ? "Restart paused work once the next reading confirms conditions held."
+      : "Re-check the plan if conditions or the confidence behind them weaken.",
     "Re-check the plan as soon as any execution constraint starts to bind.",
   ];
   const source = formatSourceLine(provenance);
@@ -172,7 +172,7 @@ export const buildMonthlySummary = ({
   const guidance = getMonthlyActionGuidance(assessment.regime, { financingSaturated });
   const operatingRules = getMonthlyOperatingRules(assessment);
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? "Evidence is sitting near a regime boundary, so hold major scope changes until the next read."
+    ? "A score is sitting near the line that changes the call, so hold major scope changes until the next reading."
     : "";
   const shockCue = assessment.diagnostics.shockCrossing
     ? "This flip crossed its line in one jump, so no published reversal condition fired — hold the call as unconfirmed until the next read."

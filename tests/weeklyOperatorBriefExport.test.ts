@@ -79,9 +79,9 @@ describe("weekly operator brief export adapters", () => {
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     assert.match(text, /Operating latitude: 58\/100 \(\+4 vs last week\)/);
-    assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Posture:"));
-    assert.match(text, /Posture:/);
-    assert.match(text, /Posture:/); // replaces Forecast
+    assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
+    assert.match(text, /Conditions:/);
+    assert.match(text, /Call:/);
     assert.match(text, /Do now:/);
     assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
@@ -102,15 +102,15 @@ describe("weekly operator brief export adapters", () => {
     assert.ok(payload.flipWatchLine, "the assessment fixture has a reachable crossing");
     assert.match(
       payload.flipWatchLine!,
-      /^\d+\.\d{2}% (steeper|flatter|higher|lower) on (the 10Y−2Y curve|the 1-month Treasury bill) would change the call to (Sunny|Cloudy|Stormy|Freezing)\.$/,
+      /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), the call changes to (Sunny|Cloudy|Stormy|Freezing)\.$/,
     );
     assert.doesNotMatch(payload.flipWatchLine!, /tightness|riskAppetite|score/i);
 
     const text = buildWeeklyOperatorBriefPlainText(payload);
-    assert.match(text, /Flip watch: \d+\.\d{2}% /);
+    assert.match(text, /What would change the call: If /);
 
     const blocks = buildWeeklyOperatorBriefSlackBlocks(payload);
-    assert.ok(blocks.includes("Flip watch"));
+    assert.ok(blocks.includes("What would change the call"));
   });
 
   it("renders Slack blocks adapter with required sections", () => {
@@ -199,12 +199,12 @@ describe("weekly call snapshot export", () => {
       ],
     });
 
-    assert.match(text, /REGIME: Defensive — Late Cycle/);
+    assert.match(text, /CONDITIONS: Defensive — Late Cycle/);
     assert.match(text, /CALL: Hold approval velocity and protect runway\./);
     assert.match(text, /DO NOW: Ship only reversible roadmap items\./);
     assert.match(text, /AVOID: Pause net-new fixed burn commitments\./);
     assert.match(text, /WATCH: Track threshold pressure near regime boundary\./);
-    assert.match(text, /FLIP CONDITIONS:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
+    assert.match(text, /WHAT WOULD CHANGE THE CALL:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
   });
 });
 

@@ -137,13 +137,13 @@ export default async function CompsPage() {
           </div>
           <dl className="space-y-1.5 text-sm text-slate-200">
             <div className="flex flex-wrap gap-x-2">
-              <dt className="shrink-0 font-semibold text-slate-400">Posture</dt>
+              <dt className="shrink-0 font-semibold text-slate-400">{publicDecisionLabels.call}</dt>
               <dd className="min-w-0">{reportData.statusLabel}</dd>
             </div>
             {capitalRule ? (
               <>
                 <div className="flex flex-wrap gap-x-2">
-                  <dt className="shrink-0 font-semibold text-slate-400">Capital-raising call</dt>
+                  <dt className="shrink-0 font-semibold text-slate-400">Fundraising</dt>
                   <dd className="min-w-0">{capitalRule.doNow[0] ?? capitalRule.recommendation}</dd>
                 </div>
                 <div className="flex flex-wrap gap-x-2">
@@ -165,7 +165,7 @@ export default async function CompsPage() {
           <p className="text-sm text-slate-300">
             {comps.status === "ok" && comps.data.medianEvToRevenue !== null
               ? `Read the ${formatMultiple(comps.data.medianEvToRevenue)} median as the price the public market is paying for a dollar of recurring revenue this week. It sets the comparable a late-stage round is argued against, so it moves the burden of proof on a raise rather than the decision itself.`
-              : "With no median to read this week, the capital-raising call above stands on the rate stack alone — the comparable is missing, not zero."}
+              : "With no median this week, the fundraising rule above rests on interest rates alone — the comparable is missing, not zero."}
           </p>
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
             Open the weekly brief
@@ -190,7 +190,9 @@ export default async function CompsPage() {
             The same public-market investors often lead or influence late-stage rounds, so a compression in public multiples reaches private valuations with a lag rather than not at all. That lag is why this page is worth reading before a raise is priced, not after.
           </p>
           <p className="text-sm text-slate-300 leading-relaxed">
-            An AI agent can query this data via <code className="text-sky-200">GET /api/mcp?tool=get_comps</code>.
+            <Link href="/api-docs" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+              Fetch this by API
+            </Link>
           </p>
         </section>
       </article>

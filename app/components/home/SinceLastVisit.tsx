@@ -128,7 +128,7 @@ export function SinceLastVisit({
     >
       <span className="font-semibold text-white">Since you were here on {previous.recordDateLabel}:</span>{" "}
       {regimeChanged
-        ? `the regime changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
+        ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
         : callChanged
           ? `still ${current.regimeLabel}, but the call moved.`
           : `the call held, ${current.regimeLabel} and the same do-now line.`}
@@ -140,14 +140,14 @@ export function SinceLastVisit({
 
   if (!isLapsedReturn) return compact;
 
-  /* A lapsed return is at a board or planning cadence, so lead with the delta
-     and put the deck one click away — the QAU conversion surface. */
+  /* A lapsed return is at a planning cadence, so lead with the delta and put
+     the one-slide summary one click away — the QAU conversion surface. */
   return (
     <div data-testid="lapsed-return" className="rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-3 space-y-2">
       <p className="text-fluid-xs leading-5 text-slate-200">
         <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}:</span>{" "}
         {regimeChanged
-          ? `the regime changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
+          ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
           : `still ${current.regimeLabel}${callChanged ? ", but the call moved" : ""}.`}
       </p>
       <p className="text-fluid-xs leading-5 text-white/60">
@@ -161,7 +161,7 @@ export function SinceLastVisit({
           rel="noreferrer"
           className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
         >
-          Download this week&apos;s board deck
+          Download this week&apos;s call as a slide
         </a>
       ) : null}
       <p className="text-fluid-nano text-slate-400">
@@ -172,7 +172,7 @@ export function SinceLastVisit({
         >
           Re-check your runway band
         </a>
-        {" "}— the notes under the call rescale without a reload.
+        .
       </p>
     </div>
   );

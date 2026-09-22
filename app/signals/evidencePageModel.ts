@@ -25,10 +25,10 @@ import { loadSignalsPagePanels } from "./evidencePagePanels";
 import type { ThresholdPressureDirection } from "../../lib/report/homeBriefModel";
 
 /* The prose forms of the two lines these cards measure against. The label is
-   the row heading ("Posture flips: 70/100"); the noun goes inside a sentence
-   ("7.0 pts above the posture-flip line"), where the heading's verb does not
+   the row heading ("Call changes if: 70/100"); the noun goes inside a sentence
+   ("7.0 pts above the line that changes the call"), where the heading's verb does not
    fit. */
-const POSTURE_FLIP_LINE_NOUN = "the posture-flip line";
+const POSTURE_FLIP_LINE_NOUN = "the line that changes the call";
 const INVERSION_LINE_NAME = "Inversion line";
 const INVERSION_LINE_NOUN = "the inversion line";
 
@@ -96,7 +96,7 @@ export const buildSignalsPageModel = async (
         name: "Whether Weekly Brief — Evidence",
         url: `${siteUrl}/signals`,
         description:
-          "Evidence for the weekly brief: drivers, thresholds, timestamps, and historical replay.",
+          "Evidence for the weekly brief: drivers, thresholds, timestamps, and past months.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
@@ -110,7 +110,7 @@ export const buildSignalsPageModel = async (
           "@type": "Dataset",
           name: "Macro signal evidence feed",
           description:
-            "Macro signal dataset for Whether, including thresholds, sensor readings, and regime evidence used for decision support.",
+            "Macro signal dataset for Whether, including thresholds, sensor readings, and the evidence behind the call.",
           creator: {
             "@id": `${siteUrl}#organization`,
           },
@@ -179,14 +179,14 @@ export const buildSignalsPageModel = async (
     historicalSelection: Boolean(historicalSelection),
     isFallback,
     fallbackReason: treasury.fallback_reason ?? undefined,
-    historicalAction: "Use historical data to understand trends, not to approve live bets.",
+    historicalAction: "Use a past month to understand trends, not to act on this week.",
     fallbackAction:
-      "Hold major decisions until live signals return or you validate the cache.",
+      "Hold anything you cannot undo until live data is back.",
     stableAction: "Evidence is live with current thresholds and timestamps.",
   });
-  const nextRefreshLabel = historicalSelection ? "Fixed historical snapshot" : undefined;
+  const nextRefreshLabel = historicalSelection ? "Past month, fixed" : undefined;
   const freshnessSummaryLabel = historicalSelection
-    ? `Historical snapshot fixed at ${recordDateLabel}.`
+    ? `Past month, fixed at ${recordDateLabel}.`
     : `Decision as-of ${recordDateLabel}; live data refreshed ${fetchedAtLabel}.`;
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
@@ -245,75 +245,75 @@ export const buildSignalsPageModel = async (
       },
       {
         label: "Curve slope",
-        why: "Early growth signal for whether this posture is likely to hold",
+        why: "The earliest sign of whether this week's call will hold",
         href: "#current-scores",
       },
     ],
     growth: [
       {
         label: "Curve slope",
-        why: "Best early growth stress read in current framework",
+        why: "The earliest read on whether growth is slowing",
         href: "#current-scores",
       },
       {
         label: "Regime timeline",
-        why: "Compare current growth posture against prior transitions",
+        why: "How the last few call changes played out",
         href: regimeTimelineHref,
       },
       {
         label: "Macro source series",
-        why: "Validate growth-sensitive inputs directly from sources",
+        why: "Check the growth inputs at their source",
         href: "#current-scores",
       },
     ],
     inflation: [
       {
         label: "Base rate",
-        why: "Rate level is the strongest inflation pressure proxy in this report",
+        why: "Rates are the biggest single input to funding pressure",
         href: "#current-scores",
       },
       {
         label: "Tightness",
-        why: "Liquidity stress compounds inflation pass-through risk",
+        why: "When money is tight, higher costs are harder to pass on",
         href: "#current-scores",
       },
       {
         label: "Threshold logic",
-        why: "Check if inflation-sensitive trigger bands need adjustment",
+        why: "Where the lines sit, if inflation is the main worry",
         href: "#advanced-controls",
       },
     ],
     labor: [
       {
         label: "Risk appetite",
-        why: "Hiring pace risk sits downstream of confidence and market risk",
+        why: "How willing investors are to fund hiring ahead of revenue",
         href: "#current-scores",
       },
       {
         label: "Regime timeline",
-        why: "Labor plans should align with regime persistence, not one data print",
+        why: "How long the call has held; a hiring plan outlasts one week's number",
         href: regimeTimelineHref,
       },
       {
         label: "Time machine",
-        why: "Test labor-related planning against prior regime windows",
+        why: "What the call said in past months, to test a hiring plan against",
         href: timeMachineHref,
       },
     ],
     financial: [
       {
         label: "Tightness",
-        why: "Funding conditions drive immediate financial operating constraints",
+        why: "How hard money is to raise or borrow right now",
         href: "#current-scores",
       },
       {
         label: "Risk appetite",
-        why: "Credit and valuation tolerance shift with capital-posture shifts",
+        why: "How willing investors are to fund risk, which moves with the call",
         href: "#current-scores",
       },
       {
         label: "Macro source series",
-        why: "Trace inputs before finalizing treasury-sensitive moves",
+        why: "Check the inputs at their source before a move that depends on rates",
         href: "#current-scores",
       },
     ],
@@ -391,7 +391,7 @@ export const buildSignalsPageModel = async (
       thresholdLabel: "0.00%",
       thresholdValue: 0,
       description:
-        "10Y minus 2Y Treasury yield spread, used here as a forward-looking growth read.",
+        "The 10-year minus 2-year Treasury rate, used here as an early read on growth.",
       pressureDirection: "lower-is-worse" as ThresholdPressureDirection,
       watchBuffer: 0.1,
       chartDomain:

@@ -14,7 +14,7 @@ import { downloadDecisionLedger, type LedgerDownloadFormat } from "../components
 
 const FORMATS: Array<{ format: LedgerDownloadFormat; label: string }> = [
   { format: "csv", label: "Download as CSV" },
-  { format: "records", label: "Download as delegation records" },
+  { format: "records", label: "Download JSON (one line per decision)" },
 ];
 
 export const DecisionRecordDownloads = () => {

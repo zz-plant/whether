@@ -81,7 +81,7 @@ export function HistoryExplorer({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h2>
-          <p className="text-sm text-slate-300">Continuous macro regime and funding-pressure trajectory since 2012.</p>
+          <p className="text-sm text-slate-300">The call and funding pressure, month by month, since 2012.</p>
         </div>
         <ActionLink href="/history/compare" variant="pill">Compare two periods &rarr;</ActionLink>
       </div>
@@ -89,7 +89,7 @@ export function HistoryExplorer({
       {/* Continuous Zoomable Timeline Bar */}
       <div className="space-y-2 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
         <div className="flex items-center justify-between pb-1">
-          <p className="type-eyebrow">Interactive macro timeline</p>
+          <p className="type-eyebrow">Timeline</p>
           <span className="text-fluid-micro text-slate-400">
             Drag to scrub · shift-drag for single months · pinch or &#8984;-scroll to zoom
           </span>
@@ -157,7 +157,7 @@ export function HistoryExplorer({
           variant="primary"
           className="w-full sm:w-auto"
         >
-          View the {formatMonthLongYearUtc(selectedYear, selectedMonth)} operating brief &rarr;
+          View the {formatMonthLongYearUtc(selectedYear, selectedMonth)} brief &rarr;
         </ActionLink>
       ) : null}
     </div>

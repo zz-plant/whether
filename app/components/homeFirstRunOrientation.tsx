@@ -9,7 +9,6 @@ import {
 } from "../../lib/report/reportCopy";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { canonicalPositioningLine } from "../../lib/seo";
-import { buildMondayCalendarUrl } from "./calendarButton";
 import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
@@ -98,23 +97,17 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
       <div className="flex items-start justify-between gap-4">
         {/* Same slot, different opening line. A reader who followed a pasted
             brief (`?ref=share`, set by the share formats) knows who sent them
-            and nothing else, so the line says what they are looking at and
-            offers the one thing that turns a forwarded link into a ritual —
-            the Monday hold. It replaces the standfirst rather than sitting
-            above it: the comment on the guide below records what this spot
-            cost the last time it grew a second block. */}
+            and nothing else, so the line says what they are looking at. It
+            replaces the standfirst rather than sitting above it: the comment
+            on the guide below records what this spot cost the last time it
+            grew a second block. It used to open "A teammate sent you this
+            week's operating call" and offer a Monday calendar hold — a team
+            and a meeting the page cannot know about. The calendar button still
+            sits beside the subscribe form for whoever wants it. */}
         {arrival === "share" ? (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-            A teammate sent you this week&rsquo;s operating call. {canonicalPositioningLine}{" "}
-            <a
-              href={buildMondayCalendarUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sky-200 underline decoration-sky-700 underline-offset-4 hover:text-sky-100"
-            >
-              Add the Monday hold to your calendar
-            </a>
-            .
+            This is the weekly call: what interest rates and credit mean for hiring, spend and
+            raising. {canonicalPositioningLine}
           </p>
         ) : (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">

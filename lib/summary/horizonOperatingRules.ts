@@ -157,7 +157,7 @@ export const buildHorizonOperatingRule = ({
 
   return {
     action: `Apply this ${horizon}'s priority: ${guidance}.`,
-    threshold: `Pause broader commitments if funding pressure rises above ${formatThresholdNumber(tightnessPause)} or risk appetite falls below ${formatThresholdNumber(riskPause)}.`,
-    reversal: `Reopen broader scope when funding pressure is below ${formatThresholdNumber(tightnessResume)} and risk appetite is above ${formatThresholdNumber(riskResume)}.`,
+    threshold: `Pause new hires and multi-year contracts if funding pressure rises above ${formatThresholdNumber(tightnessPause)} or risk appetite falls below ${formatThresholdNumber(riskPause)}.`,
+    reversal: `Restart them when funding pressure is below ${formatThresholdNumber(tightnessResume)} and risk appetite is above ${formatThresholdNumber(riskResume)}.`,
   };
 };

@@ -5,14 +5,14 @@
 export const insightDatabase = {
   fossilRecord: {
     title: "The Fossil Record",
-    subtitle: "Architecture & UX as economic indicators",
+    subtitle: "What a product's shape says about the money it was built with",
     description:
-      "Signals embedded in your product and org structure that reveal which capital climate you were built for.",
+      "Habits a product and an org pick up from the money climate they were built in.",
     columns: {
-      domain: "Domain",
-      lowRateArtifact: "Low-Rate Artifact (ZIRP Era)",
-      highRateArtifact: "High-Rate Artifact (Tight Era)",
-      insight: "Economic insight",
+      domain: "Area",
+      lowRateArtifact: "Built when money was cheap",
+      highRateArtifact: "Built when money was expensive",
+      insight: "Why",
     },
     rows: [
       {

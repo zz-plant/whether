@@ -1,0 +1,263 @@
+import assert from "node:assert/strict";
+import { describe, it, mock } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import * as nextNavigation from "next/navigation";
+
+import { answerPages } from "../app/answers/decisionPages";
+import { toolkitDefinitions } from "../lib/decisionDomainCatalog";
+import { buildBoardBrief, buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
+import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
+import {
+  extractMeetingSlidePayload,
+  formatMeetingSlideHtml,
+  formatMeetingSlideMarkdown,
+  formatMeetingSlideSvg,
+} from "../lib/export/meetingSlideExport";
+import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
+import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
+import { decisionVerdictEmail, flashMoveEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
+import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
+import type { TrackRecord } from "../lib/report/trackRecord";
+import type { RunwayBand } from "../lib/report/operatorRunway";
+import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
+
+const mockAny: any = mock;
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+/*
+ * A copy audit on 2026-09-22 read every route and every artifact that leaves the site and
+ * found the same problem on nearly all of them: the engine's names for things reached a reader.
+ * Four vocabularies for the four market states, "posture" as the load-bearing noun with a
+ * definition one click away, infrastructure words on the trust and signals pages, mechanism
+ * names offered as explanation on the method pages, and an approvals-committee register that
+ * assumed a board, a CEO and a finance lead.
+ *
+ * Every ratchet this repo already has — lint, types, the suite, dead exports, the suppression
+ * census — was green through all of it, because a word is not a finding to any of them. This
+ * file is the one that counts words. It renders what it judges, the way
+ * tests/answerPageReaderCopy.test.tsx does, and applies two kinds of rule:
+ *
+ * - Banned outright: a word that is never the reader's. An engine key, an infrastructure noun,
+ *   a mechanism name, a fixture company's figures, a UI implementation detail.
+ * - Ratcheted: a word that has a place on some surface (the glossary defines "posture") but
+ *   was doing a plain sentence's work on all of them. The count may fall and may not rise,
+ *   the way scripts/check-suppression-census.ts holds its numbers. Lower the baseline when
+ *   work earns it; raising one is a decision and belongs in its own PR with the reason.
+ *
+ * Routes behind the report read path stay out (they suspend at their data boundary offline;
+ * CLAUDE.md records why). Everything here renders from the bundled snapshot or from a fixture.
+ */
+
+const BANNED: { name: string; pattern: RegExp }[] = [
+  { name: "engine key", pattern: /\b(SCARCITY|DEFENSIVE|VOLATILE|EXPANSION)\b/ },
+  { name: "engine score name", pattern: /\b(tightness|riskAppetite|noindex)\b/ },
+  {
+    name: "infrastructure",
+    pattern: /\b(pipeline|payload|replay|audit trail|outage mode|policy override|ingestion|telemetry|worker|cron|isolate)\b/i,
+  },
+  { name: "mechanism name", pattern: /\b(hysteresis|confirmation gate|dwelt|whipsaw|classification line)\b/i },
+  {
+    name: "fixture company",
+    pattern: /Financial implications|Runway risk:|Raise window:|Burn adjustment:|CEO \+ Finance|Mon\/Thu|Executive Stance|Seed Stage|Board of Directors/,
+  },
+  /* "Risk-On or Risk-Off" is the market idiom a searcher types, and the title of the page that
+     answers it; "Risk-On" alone is the engine's old name for a pace. */
+  { name: "policy-engine vocabulary", pattern: /\b(policy signals|policy override|Safety Mode|Risk-On(?!\s+or\s+Risk-Off)|Capital-Tight|Capital-Loose)\b/ },
+  { name: "UI implementation detail", pattern: /\bYCURVE\b|1\.91:1|16:9|without a reload|hidden by default/ },
+];
+
+/*
+ * Counted, not banned. Baselines are the counts on the day the rule landed; each may only
+ * fall. Matching is case-insensitive and on whole words, over the rendered text with tags and
+ * script islands removed, so a JSON-LD block or an id does not count as a sentence.
+ */
+const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
+  { name: "posture", pattern: /\bposture\b/gi, baseline: 7 },
+  { name: "regime", pattern: /\bregime\b/gi, baseline: 1 },
+  { name: "corridor", pattern: /\bcorridor\b/gi, baseline: 0 },
+  { name: "cadence", pattern: /\bcadence\b/gi, baseline: 0 },
+  { name: "discipline", pattern: /\bdiscipline\b/gi, baseline: 5 },
+  { name: "bounded", pattern: /\bbounded\b/gi, baseline: 3 },
+  { name: "stance", pattern: /\bstance\b/gi, baseline: 1 },
+  { name: "flip", pattern: /\bflips?\b/gi, baseline: 0 },
+  { name: "board", pattern: /\bboard\b/gi, baseline: 11 },
+];
+
+/*
+ * Abbreviations may appear only after their expansion on the same surface. The expansion
+ * strings are what the site uses when it does expand them.
+ */
+const ABBREVIATIONS: { short: RegExp; long: RegExp }[] = [
+  { short: /\bFRED\b/, long: /St\. Louis Fed|Federal Reserve Economic Data/ },
+  { short: /\bWoW\b/, long: /week over week/i },
+  { short: /\bbps\b/, long: /basis points?/i },
+  { short: /\bGTM\b/, long: /go-to-market|sales and marketing/i },
+  { short: /\bZIRP\b/, long: /zero[- ]rate/i },
+  { short: /\bDRI\b/, long: /directly responsible/i },
+  { short: /\bSLA\b/, long: /service[- ]level|response time/i },
+];
+
+/**
+ * Rendered HTML to the words a reader sees: scripts, styles and tags out, entities decoded.
+ * `<code>` and `<pre>` go too: an API signature on /api-docs names the parameter the API actually
+ * takes, and rewording it would misdocument the contract.
+ */
+const visibleText = (html: string) =>
+  html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<(code|pre)\b[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#x27;|&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&rsquo;/g, "’")
+    .replace(/\s+/g, " ");
+
+type Surface = { name: string; text: () => Promise<string> | string };
+
+const routeSurfaces: Surface[] = [
+  ...answerPages.map((page) => ({
+    name: `/answers/${page.slug}`,
+    text: async () => {
+      const { DecisionAnswerPageContent } = await import("../app/answers/decisionAnswerPageContent");
+      return visibleText(renderToStaticMarkup(await DecisionAnswerPageContent({ slug: page.slug, route: `/answers/${page.slug}` })));
+    },
+  })),
+  ...toolkitDefinitions.map((toolkit) => ({
+    name: `/toolkits/${toolkit.slug}`,
+    text: async () => {
+      const page = await import("../app/toolkits/[slug]/page");
+      return visibleText(renderToStaticMarkup(await page.default({ params: Promise.resolve({ slug: toolkit.slug }) })));
+    },
+  })),
+  { name: "/glossary", text: async () => visibleText(renderToStaticMarkup((await import("../app/glossary/page")).default())) },
+  { name: "/pricing", text: async () => visibleText(renderToStaticMarkup((await import("../app/pricing/page")).default())) },
+  { name: "/about", text: async () => visibleText(renderToStaticMarkup((await import("../app/about/page")).default())) },
+  { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },
+  { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },
+  { name: "/resources", text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/page")).default())) },
+  { name: "/calibration", text: async () => visibleText(renderToStaticMarkup((await import("../app/calibration/page")).default())) },
+  { name: "/api-docs", text: async () => visibleText(renderToStaticMarkup((await import("../app/api-docs/page")).default())) },
+];
+
+const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });
+const record: TrackRecord = {
+  monthsCovered: 176,
+  firstRecordDate: "2012-01-31",
+  latestRecordDate: "2026-08-31",
+  currentHoldMonths: 8,
+  currentHoldStartDate: "2026-01-31",
+  regimeChanges: 6,
+  currentRegime: "EXPANSION",
+  currentRegimeLabel: "Sunny",
+  rows: [],
+  allRows: [],
+};
+
+const artifactSurfaces: Surface[] = [
+  { name: "Slack brief", text: () => buildSlackBrief(assessment, treasury, sensors, macros) },
+  { name: "board brief", text: () => buildBoardBrief(assessment, treasury, sensors, macros) },
+  { name: "call citation", text: () => buildCallCitation(assessment, treasury) },
+  { name: "board slide bullets", text: () => buildBoardSlideBullets(assessment, treasury, macros) },
+  { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros) },
+  {
+    name: "weekly operator brief",
+    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, confidenceLabel: "MED" })),
+  },
+  { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(extractMeetingSlidePayload(snapshot)) },
+  { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(extractMeetingSlidePayload(snapshot))) },
+  { name: "meeting slide (svg)", text: () => visibleText(formatMeetingSlideSvg(extractMeetingSlidePayload(snapshot))) },
+  {
+    name: "investor update",
+    text: () => {
+      const parts = buildInvestorUpdateSnippetParts({
+        assessment,
+        recordDate: treasury.record_date,
+        weeklyCall: snapshot.weeklyCall,
+        monthlyHistory: [],
+        sourceLabel: treasury.source,
+      });
+      const bands: RunwayBand[] = ["critical", "tight", "balanced", "abundant"];
+      return bands.map((band) => formatInvestorUpdateSnippet(parts, band)).join("\n");
+    },
+  },
+  { name: "published brief (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },
+  { name: "published brief (email)", text: () => (latestPublishedBrief ? buildPublishedBriefEmailUpdate(latestPublishedBrief) : "") },
+  {
+    name: "alert emails",
+    text: () =>
+      [
+        decisionVerdictEmail({ headline: "h", why: "w", actionNow: "a", reversal: "r", unsubscribeToken: null }).text,
+        thresholdCrossingEmail("credit", 76.2, 75).text,
+        flashMoveEmail({ metric: "baseRate", from: 4, to: 4.3, delta: 0.3, label: "Short-term borrowing rate", headline: "moved" }).text,
+      ].join("\n"),
+  },
+  { name: "record summary", text: () => buildRecordSummary(record, "https://example.test") },
+];
+
+const cache = new Map<string, Promise<string>>();
+const allSurfaces: Surface[] = [...routeSurfaces, ...artifactSurfaces].map((surface) => ({
+  name: surface.name,
+  text: () => {
+    const hit = cache.get(surface.name);
+    if (hit) return hit;
+    const pending = Promise.resolve(surface.text());
+    cache.set(surface.name, pending);
+    return pending;
+  },
+}));
+
+describe("reader vocabulary", () => {
+  it("bans the words that are never the reader's, on every route and artifact", async () => {
+    const violations: string[] = [];
+    for (const surface of allSurfaces) {
+      const text = await surface.text();
+      for (const rule of BANNED) {
+        const found = rule.pattern.exec(text);
+        if (found) violations.push(`${surface.name}: ${rule.name} — "${found[0]}"`);
+      }
+    }
+    assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
+  });
+
+  it("holds each ratcheted word at or below its baseline", async () => {
+    const totals = new Map<string, number>();
+    const perSurface: string[] = [];
+    for (const surface of allSurfaces) {
+      const text = await surface.text();
+      for (const rule of RATCHET) {
+        const count = (text.match(rule.pattern) ?? []).length;
+        if (count > 0) perSurface.push(`${surface.name}: ${rule.name} ×${count}`);
+        totals.set(rule.name, (totals.get(rule.name) ?? 0) + count);
+      }
+    }
+    const rose = RATCHET.filter((rule) => (totals.get(rule.name) ?? 0) > rule.baseline).map(
+      (rule) => `${rule.name}: ${totals.get(rule.name)} (baseline ${rule.baseline})`,
+    );
+    const summary = RATCHET.map((rule) => `${rule.name} ${totals.get(rule.name) ?? 0}/${rule.baseline}`).join(", ");
+    if (process.env.WHETHER_VOCABULARY_REPORT) console.log(`[reader-vocabulary] ${summary}\n${perSurface.join("\n")}`);
+    assert.deepEqual(rose, [], `\nratcheted words rose:\n${rose.join("\n")}\n(${summary})\n`);
+  });
+
+  it("expands an abbreviation before using it, or does not use it", async () => {
+    const violations: string[] = [];
+    for (const surface of allSurfaces) {
+      const text = await surface.text();
+      for (const rule of ABBREVIATIONS) {
+        const short = rule.short.exec(text);
+        if (!short) continue;
+        const long = rule.long.exec(text);
+        if (!long || long.index > short.index) violations.push(`${surface.name}: "${short[0]}" before any expansion`);
+      }
+    }
+    assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
+  });
+});

@@ -87,7 +87,7 @@ export const buildSignalDecisionScenarioMetadata = ({
      * The live action used to trail it; that belongs on the page, where it is
      * dated, not in a snippet a crawler caches.
      */
-    description: `${signalSummary} What it means for ${scenarioTitle.toLowerCase()} decisions, and the threshold that flips the call.`,
+    description: `${signalSummary} What it means for ${scenarioTitle.toLowerCase()} decisions, and the line that would change the call.`,
     path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
   });
@@ -163,7 +163,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         ) : null}
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">This week&apos;s bounded call</h2>
+        <h2 className="text-lg font-semibold text-slate-100">This week&apos;s call</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</li>
@@ -193,7 +193,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Copy this decision brief</h2>
         <p className="text-sm text-slate-300">
-          Use this as the evidence-side handoff when someone asks why this scenario should tighten or loosen now.
+          What to say when someone asks why.
         </p>
         <ReportCta
           href={pagePath}
@@ -213,9 +213,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
-          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Evidence cluster</Link>
+          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">The evidence</Link>
           <Link href={`/resolve/ceo/${decisionScenario}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
-          <Link href="/operate#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Planning handoff</Link>
+          <Link href="/operate#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">What to do</Link>
         </div>
       </section>
     </ContentPageShell>

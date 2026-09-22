@@ -5,7 +5,7 @@ import type { PullPolicyBlock } from "../../lib/report/operatingCalls";
 import type { WipGuidance } from "../../lib/report/wipPolicy";
 
 /**
- * Kanban pull policies, as copyable blocks for a board header or wiki.
+ * Kanban pull policies, as copyable blocks for a wiki or a project board.
  *
  * The same pause/resume conditions the weekly call prints, re-verbed for a
  * pull system: what to keep pulling, when to stop, when to resume — plus the
@@ -26,11 +26,12 @@ export function PullPolicyControls({
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <h2 className="type-eyebrow">Pull policies for kanban teams</h2>
+        <h2 className="type-eyebrow">Work-in-progress limits</h2>
         <p className="text-xs leading-relaxed text-slate-300">
-          Copy one policy per business area into a board header or wiki. The regime as a pull
-          policy: what to keep pulling, when to stop, when to resume, and how many parallel bets
-          the cap allows. Pick a runway band on the brief to scale the cap to your cash.
+          A work-in-progress limit is how many things a team runs at once. This week&apos;s call as
+          one: what to keep starting, when to stop, when to resume, and how many bets can run in
+          parallel. Copy one block per area into a wiki or a project board; pick a runway band on
+          the brief to scale the cap to your cash.
         </p>
       </div>
       {wipGuidance ? (

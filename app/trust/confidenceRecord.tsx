@@ -4,6 +4,7 @@ import {
   confidenceCalibrationTotals,
 } from "../../lib/report/confidenceCalibration";
 import { resolveConfidencePercentFromDistance } from "../../lib/report/confidence";
+import { CALL_CHANGE_RULE } from "../../lib/report/trackRecordCopy";
 
 /**
  * What the confidence percent has been worth, against the record.
@@ -32,24 +33,24 @@ export function ConfidenceRecordSection() {
     <ReportSection
       id="confidence-record"
       title="What the confidence number has been worth"
-      description="The percent measures distance from a regime boundary. This is what calls at that distance actually did."
+      description="The percent measures how far the scores sit from the line that changes the call. This is what calls at that distance actually did."
     >
       <div className="space-y-3">
         <p className="text-sm text-slate-200">
-          Across {totals.months} month-end readings, the published regime was the same the following
-          month {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often
-          than the percent those months reported, and the two least-confident bands run in the wrong
-          order — so the number is a distance, not a probability. It says how much room the call has
-          before a boundary; the count beside it says how often that room mattered.
+          Across {totals.months} month-end readings, the call was the same the following month{" "}
+          {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often than the
+          percent those months reported, and the two least-confident bands run in the wrong order —
+          so the number is a distance, not a probability. It says how much room the call has before
+          the line that changes it; the count beside it says how often that room mattered.
         </p>
 
         <table className="w-full text-sm text-slate-200">
           <caption className="sr-only">
-            Historical hold rate by distance from the nearest regime boundary
+            How often the call held, by distance from the nearest line that changes it
           </caption>
           <thead>
             <tr className="type-eyebrow text-slate-400">
-              <th scope="col" className="py-1 text-left font-normal">Points from a boundary</th>
+              <th scope="col" className="py-1 text-left font-normal">Points from the line</th>
               <th scope="col" className="py-1 text-right font-normal">Reported</th>
               <th scope="col" className="py-1 text-right font-normal">Held</th>
               <th scope="col" className="py-1 text-right font-normal">Months</th>
@@ -73,8 +74,7 @@ export function ConfidenceRecordSection() {
 
         <p className="text-fluid-xs text-slate-400">
           Derived from the month-end archive each time this page is built, so it improves as the
-          record grows. A held month means the published regime did not change; the confirmation
-          gate means a crossed threshold does not flip the call on its own.
+          record grows. A held month means the call did not change. {CALL_CHANGE_RULE}
         </p>
       </div>
     </ReportSection>

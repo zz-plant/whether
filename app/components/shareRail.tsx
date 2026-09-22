@@ -79,19 +79,19 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
 
   const buildShareText = useCallback(() => {
     const context = includeContext
-      ? "Whether tracks US macro signals and translates them into a weekly operating posture for startup and product leaders.\n\n"
+      ? "Whether is a weekly call on what interest rates and credit mean for a startup's hiring, spend and raise.\n\n"
       : "";
     const briefUrl = `${window.location.origin}/`;
 
     switch (preset) {
       case "ceo":
-        return `${context}This week's operating call: review the posture and decide if any thresholds have shifted.\n${briefUrl}`;
+        return `${context}This week's call, in case it changes anything on your side.\n${briefUrl}`;
       case "finance":
-        return `${context}Weekly brief with trust markers and freshness details.\n${briefUrl}/trust`;
+        return `${context}This week's call, with its sources and how fresh the data is.\n${briefUrl}/trust`;
       case "team":
-        return `${context}This week's macro brief — posture, decisions, and evidence.\n${briefUrl}`;
+        return `${context}This week's call, what to do now, and the evidence behind it.\n${briefUrl}`;
       default:
-        return `${context}Weekly operating brief from Whether.\n${briefUrl}`;
+        return `${context}This week's call from Whether.\n${briefUrl}`;
     }
   }, [preset, includeContext]);
 
@@ -177,7 +177,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               >
                 <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
               </Switch.Root>
-              <span id={includeContextLabelId}>Include context for non-users</span>
+              <span id={includeContextLabelId}>Add a one-line explanation of the site</span>
             </label>
             </>
           )}
@@ -192,7 +192,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             >
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
             </Switch.Root>
-            <span id={slackOverlayLabelId}>Slack preview overlay (1.91:1)</span>
+            <span id={slackOverlayLabelId}>Slack preview overlay</span>
           </label>
 
           <div className="border-t border-slate-800/60 pt-3">

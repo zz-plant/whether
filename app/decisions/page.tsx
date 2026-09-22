@@ -57,8 +57,8 @@ export default async function DecisionsPage() {
           <div className="weather-surface flex items-center gap-3.5 px-4 py-3.5">
             <DecisionShieldGlyph size={44} />
             <div className="space-y-0.5 text-xs text-slate-300">
-              <p className="font-semibold text-slate-100">STD-07 Ledger</p>
-              <p className="text-fluid-nano text-slate-400">Local-only · Tamper-evident · Zero tracking</p>
+              <p className="font-semibold text-slate-100">Your decision log</p>
+              <p className="text-fluid-nano text-slate-400">Stored in this browser only. Not linked to you.</p>
             </div>
           </div>
         )}
@@ -75,10 +75,9 @@ export default async function DecisionsPage() {
       >
         <DecisionRecordDownloads />
         <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
-          The CSV is one row per decision, for a board pack or a spreadsheet. The delegation records are
-          newline-delimited JSON in the STD-07 Revisable Delegation Record shape, hash-chained and oldest
-          first, so the order cannot be rewritten after the fact. Reading the same record from a script is
-          covered on the{" "}
+          The CSV is one row per decision, for a spreadsheet. The JSON file is one line per decision, oldest
+          first, and each line carries a hash of the one before it, so the order cannot be rewritten after
+          the fact. Reading the same record from a script is covered on the{" "}
           <Link href="/api-docs" className="text-sky-300 underline-offset-2 hover:underline">
             API page
           </Link>

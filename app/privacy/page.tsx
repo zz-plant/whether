@@ -69,7 +69,7 @@ export default function PrivacyPage() {
           <li>
             Text you type into the search box is never sent. The search measurement carries which
             kind of result the query routed to, how many things matched, and whether it matched
-            nothing — the payload has no field that could hold the words, so it cannot carry them by
+            nothing. The record has no field that could hold the words, so it cannot carry them by
             mistake.
           </li>
           <li>Nothing here is sold, rented, or shared for advertising, and no profile is built across sites.</li>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             <h3 className={subheading}>2.1 Your email address, if you subscribe</h3>
             <p className={paragraph}>
               Subscribing stores your address, the time you subscribed, whether you have confirmed
-              it, whether you opted in to alerts between Mondays (a regime change, a score crossing
+              it, whether you opted in to alerts between Mondays (the call changing, a score crossing
               its line, or an outsized move in a market input) as well as the Monday brief, and a
               random token that makes the confirmation and unsubscribe links work. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
             <h3 className={subheading}>2.4 Things you deliberately save</h3>
             <p className={paragraph}>
               Decisions you record are stored in Cloudflare KV against the identifier above, with the
-              regime reading at the time so a later week can be compared against the decision&apos;s
+              reading at the time so a later week can be compared against the decision&apos;s
               own assumptions. Everything else you set stays in your browser and is never sent: your
               operator profile, Decision Shield presets, threshold drafts, the last call this browser
               saw, the theme, and which one-time explainers you have dismissed.
@@ -151,7 +151,7 @@ export default function PrivacyPage() {
             </p>
             <p className={paragraph}>
               What is written is the event and nothing around it: no IP address, no user-agent
-              string, and none of the identifiers above. The intake refuses any payload carrying a
+              string, and none of the identifiers above. The intake refuses any record carrying a
               field it does not expect, so a stream cannot quietly start carrying more than it says.
             </p>
           </div>
@@ -174,7 +174,7 @@ export default function PrivacyPage() {
               subscription — an address its own push service assigned, and two keys it made — and we store
               those three things against the random identifier above. That is the whole record: no email
               address, no reading, and no history of what was sent. It is used to wake this browser when the
-              published posture moves to a different one, which is a handful of times a year, and for
+              published call changes, which is a handful of times a year, and for
               nothing else.
             </p>
             <p className={paragraph}>
@@ -208,7 +208,7 @@ export default function PrivacyPage() {
           anything about a reader.
         </p>
         <p className={paragraph}>
-          The data the product is built on — Treasury, FRED, and market quote providers — is fetched
+          The data the product is built on — Treasury, the St. Louis Fed (FRED), and market quote providers — is fetched
           by our servers on a schedule. Those requests carry nothing about you, and are made whether
           or not anyone is reading.
         </p>

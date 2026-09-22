@@ -124,7 +124,7 @@ export const TimeMachineMonthPicker = ({
             <div className="weather-surface mt-3 px-3 py-2">
               <p className="type-label text-slate-400">Available range</p>
               <p className="mt-1 text-fluid-xs text-slate-300">
-                {coverageMin && coverageMax ? `${coverageMin} → ${coverageMax}` : "No cache loaded yet."}
+                {coverageMin && coverageMax ? `${coverageMin} → ${coverageMax}` : "No months available yet."}
               </p>
             </div>
             <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />

@@ -120,12 +120,12 @@ const conditionsFromAssumptions = (
     const tightnessSide = assumptions.tightness >= assumptions.tightnessThreshold ? "below" : "at or above";
     const riskSide = assumptions.riskAppetite >= assumptions.riskAppetiteThreshold ? "below" : "at or above";
     conditions.push({
-      condition: `tightness moves ${tightnessSide} the ${assumptions.tightnessThreshold} regime boundary (recorded ${assumptions.tightness})`,
+      condition: `funding pressure moves ${tightnessSide} the ${assumptions.tightnessThreshold} line that changes the call (recorded ${assumptions.tightness})`,
       check: checkUrl,
       clock: "P7D",
     });
     conditions.push({
-      condition: `risk appetite moves ${riskSide} the ${assumptions.riskAppetiteThreshold} regime boundary (recorded ${assumptions.riskAppetite})`,
+      condition: `risk appetite moves ${riskSide} the ${assumptions.riskAppetiteThreshold} line that changes the call (recorded ${assumptions.riskAppetite})`,
       check: checkUrl,
       clock: "P7D",
     });

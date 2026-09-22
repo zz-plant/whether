@@ -21,12 +21,25 @@ describe("P2 beginner copy semantics", () => {
 
     assert.equal(
       summary.summaryLine,
-      "Operating posture: Guarded Expansion · Weekly momentum: deteriorating · Revisit decisions: YES",
+      "Conditions are Guarded Expansion and worsening; revisit last week's decisions.",
     );
-    assert.equal(summary.classificationLine, "Underlying regime classification: Sunny.");
+    assert.equal(summary.classificationLine, "Underneath, the call is Sunny.");
+    assert.doesNotMatch(summary.summaryLine, /posture|momentum|YES|NO\b/);
+
+    const noComparison = buildDecisionAnswerContextSummary({
+      displayLabel: "Cloudy",
+      canonicalRegime: "DEFENSIVE",
+      momentumLabel: "unavailable",
+      revisitDecisions: false,
+    });
+    assert.equal(
+      noComparison.summaryLine,
+      "Conditions are Cloudy; no comparison with last week is available, so last week's decisions stand.",
+    );
+    assert.equal(noComparison.classificationLine, null);
   });
 
-  it("uses posture-context language in Decision Shield shares", () => {
+  it("names this week's call in Decision Shield shares", () => {
     const assessment = buildAssessmentFixture({ regime: "DEFENSIVE" });
     const output = evaluateDecision(assessment, {
       lifecycle: "GROWTH",
@@ -35,8 +48,8 @@ describe("P2 beginner copy semantics", () => {
     });
     const shareText = buildShareText(assessment, "GROWTH", "HIRING", "HIRE", output);
 
-    assert.match(shareText, /Posture context: Cloudy/);
-    assert.doesNotMatch(shareText, /^Regime:/m);
+    assert.match(shareText, /This week's call: Cloudy/);
+    assert.doesNotMatch(shareText, /^Regime:|Posture/m);
   });
 
   it("keeps strategy and executive briefs framed as weekly-call context, not raw regime jargon", () => {
@@ -45,8 +58,8 @@ describe("P2 beginner copy semantics", () => {
     const executiveMemo = buildExecutiveMemo(assessment, "Mar 1, 2026", executiveTemplate);
     const checklist = buildGuardrailChecklist(assessment, executiveTemplate);
 
-    assert.match(executiveMemo, /Posture context: Cloudy/);
-    assert.doesNotMatch(executiveMemo, /^Regime:/m);
+    assert.match(executiveMemo, /This week's call: Cloudy/);
+    assert.doesNotMatch(executiveMemo, /^Regime:|Posture|Executive/m);
     assert.match(checklist, /Pause-if Checklist — Cloudy/);
   });
 });

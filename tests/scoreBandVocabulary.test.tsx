@@ -56,7 +56,6 @@ describe("score band vocabulary", () => {
         boldnessScore={36}
         boldnessDelta={-14}
         regime="SCARCITY"
-        postureLabel="Contraction"
         signalDirection="tighten"
         recordDate="2026-09-15"
         fetchedAt="2026-09-15"

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
@@ -48,7 +49,7 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     title: "Compare periods — two months side by side",
-    description: "Side-by-side comparison of two past months: regime, Operating latitude, and operating rules.",
+    description: "Two past months side by side: the conditions, the operating latitude, and the rules in force.",
     path: "/history/compare",
     imageAlt: "Whether comparison of two past periods",
     imageParams,
@@ -126,7 +127,7 @@ export default async function HistoryComparePage({
       return {
         year: s.year,
         month: s.month,
-        label: `${formatMonthLabel(s.year, s.month)} (${regime})`,
+        label: `${formatMonthLabel(s.year, s.month)} · ${getRegimePublicLabel(regime)}`,
       };
     })
     .reverse();
@@ -190,7 +191,7 @@ export default async function HistoryComparePage({
                 {boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta} pts
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                {boldnessDelta > 0 ? "Period A is more aggressive" : boldnessDelta < 0 ? "Period A is more defensive" : "Equivalent risk postures"}
+                {boldnessDelta > 0 ? "Period A had more room to move" : boldnessDelta < 0 ? "Period A had less room to move" : "No difference"}
               </p>
             </div>
 
@@ -200,7 +201,7 @@ export default async function HistoryComparePage({
                 {spreadA !== null && spreadB !== null ? `${(spreadA - spreadB).toFixed(2)}%` : "N/A"}
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                Spread diff: {(spreadA ?? 0).toFixed(2)}% vs {(spreadB ?? 0).toFixed(2)}%
+                10-year minus 2-year: {(spreadA ?? 0).toFixed(2)}% vs {(spreadB ?? 0).toFixed(2)}%
               </p>
             </div>
 
@@ -210,7 +211,7 @@ export default async function HistoryComparePage({
                 {bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                Risk premium: {(bbbA ?? 0).toFixed(2)}% vs {(bbbB ?? 0).toFixed(2)}%
+                Credit spread: {(bbbA ?? 0).toFixed(2)}% vs {(bbbB ?? 0).toFixed(2)}%
               </p>
             </div>
           </div>

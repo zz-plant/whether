@@ -38,7 +38,9 @@ describe("/share current weekly artifact", () => {
     const html = renderToStaticMarkup(await SharePage());
 
     assert.match(html, /Current weekly artifact/);
-    assert.match(html, /Posture/);
+    // The exports lead with the conditions label; "Posture" was the export header before the
+    // 2026-09-22 copy pass renamed it, and is no longer a word the page prints.
+    assert.match(html, /Conditions:/);
     assert.match(html, /Do now/);
     assert.match(html, /Pause if/);
     assert.match(html, /Re-open when/);

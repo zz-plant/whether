@@ -25,7 +25,7 @@ describe("FossilRecordSection", () => {
     const html = renderToStaticMarkup(<FossilRecordSection regime="SCARCITY" />);
 
     assert.match(html, /The Fossil Record/);
-    assert.match(html, /Architecture &amp; UX a[s] economic indicators/);
+    assert.match(html, /What a product&#x27;s shape says about the money it was built with/);
     assert.match(html, /Infrastructure/);
     assert.match(html, /Microservices sprawl/);
     assert.match(html, /Consolidated monoliths/);
@@ -33,12 +33,13 @@ describe("FossilRecordSection", () => {
     assert.match(html, /Self-serve help centers/);
     assert.match(html, /Pricing/);
     assert.match(html, /Reverse trials/);
-    assert.match(html, /SCARCITY CLIMATE/);
+    assert.match(html, /Now: Freezing/);
+    assert.doesNotMatch(html, /SCARCITY|CLIMATE/);
   });
 });
 
 describe("ScenarioStudioSimulator", () => {
-  it("renders the interactive counterfactual simulation controls and guardrails", () => {
+  it("renders the scenario controls in the reader's words", () => {
     const assessment = evaluateRegime(mockTreasury);
     const html = renderToStaticMarkup(
       <ScenarioStudioSimulator
@@ -47,31 +48,36 @@ describe("ScenarioStudioSimulator", () => {
       />,
     );
 
-    // Guardrail banner
+    // Banner
     assert.match(html, /Simulated Scenario/);
-    assert.match(html, /Interactive Counterfactual Model/);
-    assert.match(html, /Assumptions active/);
+    assert.match(html, /What if the numbers were different/);
+    assert.match(html, /Not this week&#x27;s data/);
 
-    // Presets
-    assert.match(html, /Scenario Presets Library/);
-    assert.match(html, /Aggressive Easing/);
-    assert.match(html, /Stagflation Trap/);
-    assert.match(html, /Deep Inversion/);
-    assert.match(html, /Soft Landing/);
+    // Presets say what they set, not a scenario name
+    assert.match(html, /Four preset scenarios/);
+    assert.match(html, /Rate 2\.00%, curve \+1\.2%/);
+    assert.match(html, /Rate 6\.25%, curve -0\.6%/);
+    assert.match(html, /Rate 5\.25%, curve -1\.25%/);
+    assert.match(html, /Rate 3\.25%, curve \+0\.85%/);
+    assert.doesNotMatch(html, /Stagflation|Liquidity freeze|archetype/);
 
-    // Sliders
-    assert.match(html, /Counterfactual Parameter Sliders/);
-    assert.match(html, /Policy Base Rate/);
-    assert.match(html, /10Y − 2Y Yield Curve Slope/);
+    // Sliders carry the reader's names and expand the abbreviation
+    assert.match(html, /Short-term borrowing rate/);
+    assert.match(html, /Recession warning gauge \(10-year minus 2-year rate\)/);
+    assert.match(html, /zero rates/);
+    assert.doesNotMatch(html, /ZIRP|Fed Funds|1M Yield|10Y|Counterfactual|counterfactual/);
 
-    // Then-vs-now comparisons
-    assert.match(html, /Then vs\. Now/);
-    assert.match(html, /Macro Regime/);
-    assert.match(html, /Funding Pressure/);
-    assert.match(html, /Risk Appetite/);
+    // This week against the scenario
+    assert.match(html, /This week vs\. this scenario/);
+    assert.match(html, /Conditions/);
+    assert.match(html, /Funding pressure/);
+    assert.match(html, /Risk appetite/);
+    // "posture" is not asserted here: the per-area lever labels ("Hiring posture") come from
+    // lib/playbook.ts, which this component renders as given.
+    assert.doesNotMatch(html, /SCARCITY|DEFENSIVE|VOLATILE|EXPANSION|regime|Live baseline/);
 
     // Playbook
-    assert.match(html, /Counterfactual Operating Posture &amp; Playbook/);
+    assert.match(html, /What you&#x27;d stop and start in this scenario/);
     assert.match(html, /What to STOP in this scenario/);
     assert.match(html, /What to START in this scenario/);
   });

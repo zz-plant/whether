@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { insightDatabase } from "../../../data/recommendations";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
@@ -18,12 +19,12 @@ export const buildExecutiveMemo = (
 ) => {
 
   if (!template) {
-    return "Executive memo unavailable for current regime.";
+    return "No memo for this week's call.";
   }
 
   return [
-    `Executive Brief — ${recordDateLabel}`,
-    `Posture context: ${getRegimePublicLabel(assessment.regime)}`,
+    `Brief — ${recordDateLabel}`,
+    `This week's call: ${getRegimePublicLabel(assessment.regime)}`,
     "",
     `Summary: ${template.executiveSummary}`,
     "",
@@ -65,7 +66,7 @@ const visualSections = [
   {
     key: "decisionTemplates",
     title: "Decision calls",
-    subtitle: "Use these ready-made stances",
+    subtitle: "Ready-made calls",
     badge: "Translate",
     icon: "🧭",
     surfaceClass: "border-emerald-400/35 bg-emerald-500/10",
@@ -73,7 +74,7 @@ const visualSections = [
   {
     key: "reversalTriggers",
     title: "Change-course signals",
-    subtitle: "Evidence to pivot quickly",
+    subtitle: DECISION_CONTRACT_LABELS.watch.flipWatch,
     badge: "Watch",
     icon: "↩",
     surfaceClass: "border-violet-400/35 bg-violet-500/10",
@@ -121,7 +122,7 @@ export const ExecutiveBriefingPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Executive brief</p>
+            <p className="type-label text-slate-400">Brief</p>
             <h3 id="executive-briefing-title" className="type-section text-slate-100">
               {insightDatabase.executiveBriefingSuite.title}
             </h3>
@@ -129,7 +130,7 @@ export const ExecutiveBriefingPanel = ({
               {insightDatabase.executiveBriefingSuite.subtitle}
             </p>
             <p className="mt-2 text-sm text-slate-300">
-              Turn this week&apos;s call into board-ready guardrails, decision templates, and change-course signals.
+              Turn this week&apos;s call into rules you can share.
             </p>
           </div>
           {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
@@ -141,7 +142,7 @@ export const ExecutiveBriefingPanel = ({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                      Board summary
+                      Summary
                     </p>
                     <p className="mt-2 text-xl font-semibold text-slate-50">
                       {template.executiveSummary}
@@ -203,13 +204,13 @@ export const ExecutiveBriefingPanel = ({
                     ? "Clipboard unavailable in this environment."
                     : copiedTarget
                       ? `${copiedTarget} copied.`
-                      : "Ready to share in executive reviews."}
+                      : "Ready to share."}
                 </p>
               </div>
 
               <details className="weather-surface weather-auto-chevron p-4">
                 <summary className="cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300">
-                  Full copy-ready executive memo
+                  Full memo
                 </summary>
                 <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
                   {executiveMemo}
@@ -219,7 +220,7 @@ export const ExecutiveBriefingPanel = ({
           ) : (
             <div className="weather-surface p-4">
               <p className="text-sm text-slate-300">
-                Executive memo unavailable for the current weekly call.
+                No memo for this week&apos;s call.
               </p>
             </div>
           )}

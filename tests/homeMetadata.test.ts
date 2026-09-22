@@ -44,7 +44,7 @@ describe("buildHomeMetadata", () => {
       ? firstOpenGraphImage.alt
       : undefined;
     assert.equal(firstOpenGraphImageUrl, "https://whether.work/api/og?template=report&month=3&year=2026");
-    assert.equal(firstOpenGraphImageAlt, "Whether weekly operating posture preview");
+    assert.equal(firstOpenGraphImageAlt, "Whether: this week's call");
     assert.equal(twitterImages[0], "https://whether.work/api/og?template=report&month=3&year=2026");
     assert.deepEqual(metadata.robots, { index: false, follow: true });
   });

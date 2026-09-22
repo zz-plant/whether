@@ -66,7 +66,7 @@ describe("signal cluster reading", () => {
     assert.equal(tightness.value, 32);
     assert.equal(risk.measure, "Risk appetite");
     assert.equal(risk.value, 52);
-    assert.equal(curve.measure, "Curve slope");
+    assert.equal(curve.measure, "Recession warning gauge");
     assert.equal(curve.value, 0.3);
 
     // The whole point: three pages, three readings.
@@ -84,19 +84,19 @@ describe("signal cluster reading", () => {
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 52 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(above.distanceLabel, /2 points above the 50 regime threshold/);
+    assert.match(above.distanceLabel, /2 points above the line at 50 that changes the call/);
 
     const below = buildSignalClusterReading(
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 41 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(below.distanceLabel, /9 points below the 50 regime threshold/);
+    assert.match(below.distanceLabel, /9 points below the line at 50 that changes the call/);
 
     const exact = buildSignalClusterReading(
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 50 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(exact.distanceLabel, /Exactly at the 50 regime threshold/);
+    assert.match(exact.distanceLabel, /Exactly at the line at 50 that changes the call/);
   });
 
   /*
@@ -228,7 +228,7 @@ describe("signal cluster reading", () => {
 
     assert.equal(reading.value, null);
     assert.match(reading.unavailableReason ?? "", /did not resolve/);
-    assert.match(reading.unavailableReason ?? "", /bounded call below still stands/);
+    assert.match(reading.unavailableReason ?? "", /call below still stands/);
   });
 
   it("builds the reading from the inputs each signal actually uses", () => {

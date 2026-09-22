@@ -98,14 +98,14 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       },
       about: {
         "@type": "Thing",
-        name: "Weekly operating posture and decision triggers for leadership teams",
+        name: "The weekly call: what rates and credit mean for hiring, spend and raising",
       },
       mainEntity: {
         "@type": "Dataset",
         "@id": `${siteUrl}/#dataset`,
         name: "US Treasury yield curve snapshot",
         description:
-          "Weekly US Treasury yield-curve regime snapshot used by Whether to guide what leaders should change now, with confidence and flip conditions.",
+          "The weekly US Treasury reading Whether makes the call from, with its confidence and what would change it.",
         creator: {
           "@id": `${siteUrl}#organization`,
         },
@@ -156,7 +156,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
           {
             "@type": "DataDownload",
             encodingFormat: "application/json",
-            name: "Current posture",
+            name: "Current call (JSON)",
             contentUrl: `${siteUrl}/api/posture/current`,
           },
           {
@@ -177,7 +177,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       abstract: brief.description,
       about: {
         "@type": "Thing",
-        name: "US macro operating posture for startup leaders",
+        name: "This week's call for startup leaders",
       },
       datePublished: brief.datePublishedIso,
       dateModified: brief.dateModifiedIso,

@@ -9,7 +9,7 @@ export const revalidate = 3600;
 const FEED_PATH = "/feed.xml";
 const CHANNEL_TITLE = "Whether Weekly Brief";
 const CHANNEL_DESCRIPTION =
-  "Macro signals → operating posture for startup and product leaders. Updated weekly.";
+  "Each Monday: what interest rates and credit mean for a startup's hiring, spend and raise.";
 
 /** RSS text nodes are XML; a `&` in a call or a headline broke the document. */
 const escapeXml = (value: string) =>
@@ -77,7 +77,7 @@ const publishedItems = (): FeedItem[] =>
       pubDate: toRfc822(brief.publishedAt),
       description: brief.summary,
       html: [
-        `        <p><strong>Posture:</strong> ${escapeXml(brief.postureLabel)}</p>`,
+        `        <p><strong>Conditions:</strong> ${escapeXml(brief.postureLabel)}</p>`,
         `        <p>${escapeXml(brief.summary)}</p>`,
         `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
         `        <p><strong>What changed:</strong> ${escapeXml(brief.whatChanged)}</p>`,
@@ -113,9 +113,9 @@ export async function GET() {
           guid: `whether-brief-live-${recordDateIso}`,
           isPermaLink: false,
           pubDate: toRfc822(recordDateIso),
-          description: `Regime: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.`,
+          description: `Conditions: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.`,
           html: [
-            `        <p><strong>Regime:</strong> ${escapeXml(regime)}</p>`,
+            `        <p><strong>Conditions:</strong> ${escapeXml(regime)}</p>`,
             `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(action)}</p>`,
             `        <p><strong>Confidence:</strong> ${escapeXml(confidence)}</p>`,
             `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)}</p>`,

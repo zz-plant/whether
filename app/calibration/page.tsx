@@ -35,7 +35,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Confidence score calibration study",
   description:
-    "A 15-year empirical study measuring Whether's published confidence metrics against 176 month-end market outcomes (2012–2026): full transparency into regime boundary distances and observed hold rates.",
+    "Whether's published confidence percent, checked against every month-end reading since 2012: how often the call held at each distance from the line that changes it.",
   path: "/calibration",
   imageAlt: "Whether confidence calibration study",
 });
@@ -48,9 +48,9 @@ export default function CalibrationPage() {
       <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
 
       <SecondaryPageHeader
-        eyebrow="Empirical transparency"
+        eyebrow="The record"
         title="Confidence score calibration study"
-        description="A 15-year empirical study evaluating Whether's published confidence metrics against 176 continuous month-end market outcomes (2012–2026). Published openly to maintain rigorous institutional transparency."
+        description={`The published confidence percent, checked against ${totals.months} month-end readings from 2012 to 2026: how often the call held at each distance from the line that changes it.`}
         aside={<CalibrationCurveGlyph size={64} />}
       />
 
@@ -58,22 +58,21 @@ export default function CalibrationPage() {
 
       <SecondaryPageSection
         title="How it was measured"
-        description="Run over the bundled archive at module load, so the monthly refresh improves it instead of dating it."
+        description="What was counted, and what counted as a hold."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            <span className="text-slate-100">Sample.</span> Every month-end reading in{" "}
-            <code className="text-xs text-slate-400">data/summary_archive.json</code> that has a
-            following month to compare against — {totals.months} of them.
+            <span className="text-slate-100">Sample.</span> Every month-end reading in the archive
+            that has a following month to compare against — {totals.months} of them.
           </li>
           <li>
-            <span className="text-slate-100">Outcome.</span> Whether the published regime was the
-            same one month later. No other outcome is scored, and none is weighted.
+            <span className="text-slate-100">Outcome.</span> Whether the call was the same one month
+            later. No other outcome is scored, and none is weighted.
           </li>
           <li>
-            <span className="text-slate-100">Bands.</span> Distance to the nearest regime boundary,
-            in tightness-equivalent points. The cut points were chosen before the outcomes were
-            looked at — they are the distances at which the published label changes.
+            <span className="text-slate-100">Bands.</span> Distance to the nearest line that changes
+            the call, in points of funding pressure. The cut points were chosen before the outcomes
+            were looked at — they are the distances at which the published label changes.
           </li>
         </ul>
       </SecondaryPageSection>
@@ -84,7 +83,7 @@ export default function CalibrationPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            Six regime flips in fourteen years is not enough to estimate a probability per band. A
+            Six changes of call in fourteen years is not enough to estimate a probability per band. A
             curve fitted to that base rate would report about 97% every week and discriminate
             nothing, which is worse than a number that at least measures something real.
           </li>
@@ -93,7 +92,7 @@ export default function CalibrationPage() {
             quarter.
           </li>
           <li>
-            The archive is a single regime model over a single country&rsquo;s rates. It is evidence
+            The archive is one model over one country&rsquo;s rates. It is evidence
             about this number, not about confidence scores generally.
           </li>
         </ul>
@@ -111,7 +110,7 @@ export default function CalibrationPage() {
               href="https://fred.stlouisfed.org/"
               className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
             >
-              FRED Treasury series
+              St. Louis Fed (FRED) Treasury series
             </a>{" "}
             (DGS1MO, DGS3MO, DGS2, DGS10).
           </li>

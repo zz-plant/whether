@@ -45,6 +45,21 @@ export const verdictStyles: Record<DecisionOutput["verdict"], string> = {
   DANGEROUS: "border-rose-400/40 bg-rose-500/10 text-rose-200",
 };
 
+/* The note beside the pause line explains a hiring pause, which only makes
+   sense for a move that adds headcount or fixed cost. It used to render for
+   every action, Divest and Restructure included. */
+const HIRING_PAUSE_ACTIONS: ReadonlySet<DecisionAction> = new Set<DecisionAction>([
+  "HIRE",
+  "REWRITE",
+  "LAUNCH",
+  "EXPAND",
+  "ACQUIRE",
+  "INFRA_SPEND",
+  "REGIONAL_EXPANSION",
+]);
+
+export const hiringPauseApplies = (action: DecisionAction): boolean => HIRING_PAUSE_ACTIONS.has(action);
+
 export const formatOptionLabel = <T extends string>(
   value: T,
   options: { value: T; label: string }[]
@@ -59,7 +74,7 @@ export const buildShareText = (
 ) => {
   const lines = [
     "Decision Shield — Whether Weekly Brief",
-    `Posture context: ${getRegimePublicLabel(assessment.regime)}`,
+    `This week's call: ${getRegimePublicLabel(assessment.regime)}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,

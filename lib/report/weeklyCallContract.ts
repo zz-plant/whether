@@ -6,7 +6,7 @@ import {
   buildScopedVariantDecisionAdjustment,
   type StartupVariantMode,
 } from "./boundedDecisionRules";
-import { POLICY_OVERRIDE_CALL } from "./reportCopy";
+import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "./reportCopy";
 
 import { resolveRunwayBand, type RunwayBand } from "./operatorRunway";
 
@@ -40,9 +40,9 @@ export type WeeklyCallContract = {
 
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
 
-const FALLBACK_CURRENT_CALL = "Hold bounded operating discipline.";
-const FALLBACK_PAUSE_IF = "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
-const FALLBACK_CHANGE_COURSE_IF = "Re-open approvals when confidence and trend stabilize.";
+const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
+const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
+const FALLBACK_CHANGE_COURSE_IF = NO_LIVE_READING_CALL.changeCourseIf;
 
 const dedupeLines = (lines: Array<string | undefined>, maxItems = 4) =>
   lines
@@ -194,15 +194,15 @@ export const buildWeeklyCallContract = ({
   const flipConditionLabels = policyOverrideActive
     ? dedupeLines(
         [
-          policyOverrideReason ? `Override reason: ${policyOverrideReason}` : undefined,
-          "Keep approvals staged until policy disagreement clears.",
+          policyOverrideReason ? `Why the call is held: ${policyOverrideReason}` : undefined,
+          "Hold anything you can't undo until the two scores agree.",
           ...defaultFlipConditionLabels,
         ],
         4,
       )
     : defaultFlipConditionLabels;
   const whyCouldBeWrong = policyOverrideActive
-    ? "Policy composites disagree or signal coverage is incomplete; this week’s directional call may overstate conviction."
+    ? "The two scores disagree, or too many inputs are missing, so this week’s direction may be overstated."
     : homeBriefModel.confidenceLabel === "HIGH"
       ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the call."
       : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.";

@@ -33,7 +33,6 @@ describe("DecisionHero signal breakdown", () => {
         boldnessScore={58}
         boldnessDelta={-2}
         regime="DEFENSIVE"
-        postureLabel="Contraction"
         signalDirection="tighten"
         recordDate="2026-08-14"
         fetchedAt="2026-08-15"

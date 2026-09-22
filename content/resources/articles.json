@@ -10,12 +10,12 @@
     "boardSummary": [
       "Base case: do not run a blanket freeze. Classify open and planned roles by reversibility and by direct cash impact within two quarters.",
       "Escalate to freeze mode when cash conversion worsens for 30 days, sales cycle friction rises, and confidence in near-term financing drops.",
-      "Keep three protected role bands active: reliability, revenue continuity, and decision-system instrumentation.",
+      "Keep three role bands protected: reliability, revenue continuity, and the people who can tell you whether your rules are being followed.",
       "Reversal trigger: reopen hiring in tranches only after two consecutive monthly reads show stabilization in burn multiple and demand quality."
     ],
     "sections": [
       {
-        "heading": "The real problem is not headcount. It is commitment quality under expensive capital.",
+        "heading": "The real problem is not headcount. It is which commitments you make while money is expensive.",
         "paragraphs": [
           "When leaders ask whether to freeze hiring, they are usually asking a deeper question: do we trust our assumptions enough to turn cash into fixed obligations? In a high-interest-rate environment, uncertainty is expensive because the cost of being wrong compounds through payroll commitments, onboarding drag, and slower correction cycles.",
           "A blanket hiring freeze feels decisive because it creates immediate control. But blanket decisions often collapse very different risks into one call. A reliability engineer replacing a known bottleneck is not the same risk as adding a speculative growth pod. Treating both as identical reduces optionality when optionality matters most.",
@@ -86,8 +86,8 @@
     "format": "guide",
     "boardSummary": [
       "Target runway should be tied to volatility and reversal latency, not a generic month count.",
-      "Base recommendation: maintain 18–24 months in tightening regimes, with upper bound required if commitments are slow to reverse.",
-      "Use a two-layer target: minimum survivability floor plus strategic optionality buffer.",
+      "Base recommendation: hold 18–24 months in a tightening market, at the upper end if your commitments are slow to reverse.",
+      "Use a two-layer target: the minimum you need to survive, plus a buffer that keeps your choices open.",
       "Reversal trigger: move from defense to selective offense only when demand persistence and financing access improve for 30 days."
     ],
     "sections": [

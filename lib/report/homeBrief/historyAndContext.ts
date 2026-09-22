@@ -372,8 +372,8 @@ export const buildStartRouteDeltaBlock = ({
   if (regimeAlert) {
     items.push({
       id: "posture-shift" as const,
-      label: "Posture shift",
-      detail: `Posture moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check decision posture before committing irreversible work.`,
+      label: "Conditions changed",
+      detail: `Conditions moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check this week's call before committing anything you can't undo.`,
       href: "/resolve" as const,
     });
   }

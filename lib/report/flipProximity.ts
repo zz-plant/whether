@@ -92,14 +92,18 @@ const riskAppetiteProximity = (inputs: ProximityInputs): FlipProximity | null =>
     regime,
   );
   if (!crossing) return null;
-  const direction = crossing.move > 0 ? "steeper" : "flatter";
+  /* The curve is the 10-year rate minus the 2-year, so "flatter" is long
+     rates falling toward short ones. Said that way rather than as "10Y−2Y". */
+  const move = crossing.move > 0
+    ? `long rates rise ${formatMove(crossing.move)} further above short rates`
+    : `long rates fall ${formatMove(crossing.move)} closer to short rates`;
   return {
     axis: "riskAppetite",
     input: "curveSlope",
     inputMove: crossing.move,
     pointsToBoundary: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime),
     crossesTo: crossing.regime,
-    sentence: `${formatMove(crossing.move)} ${direction} on the 10Y−2Y curve would change the call to ${getRegimePublicLabel(crossing.regime)}.`,
+    sentence: `If ${move}, the call changes to ${getRegimePublicLabel(crossing.regime)}.`,
   };
 };
 
@@ -120,7 +124,7 @@ const tightnessProximity = ({ regime, scores, thresholds }: ProximityInputs): Fl
     regime,
   );
   if (!crossing) return null;
-  const direction = crossing.move > 0 ? "higher" : "lower";
+  const direction = crossing.move > 0 ? "rises" : "falls";
   const label = BASE_RATE_SOURCE_LABELS[scores.baseRateUsed];
   return {
     axis: "tightness",
@@ -128,7 +132,7 @@ const tightnessProximity = ({ regime, scores, thresholds }: ProximityInputs): Fl
     inputMove: crossing.move,
     pointsToBoundary: Math.abs(scores.tightness - thresholds.tightnessRegime),
     crossesTo: crossing.regime,
-    sentence: `${formatMove(crossing.move)} ${direction} on ${label.charAt(0).toLowerCase()}${label.slice(1)} would change the call to ${getRegimePublicLabel(crossing.regime)}.`,
+    sentence: `If ${label.charAt(0).toLowerCase()}${label.slice(1)} rate ${direction} ${formatMove(crossing.move)}, the call changes to ${getRegimePublicLabel(crossing.regime)}.`,
   };
 };
 

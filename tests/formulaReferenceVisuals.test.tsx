@@ -13,7 +13,7 @@ describe("formula reference visuals", () => {
   const html = renderToStaticMarkup(<FormulaReference />);
 
   it("draws the regime rule as a quadrant carrying both thresholds", () => {
-    assert.match(html, /Regime quadrants: funding pressure above/);
+    assert.match(html, /Four conditions: funding pressure above/);
     assert.ok(html.includes(`>${TIGHTNESS_REGIME_THRESHOLD}<`), "tightness threshold labelled on the axis");
     assert.ok(html.includes(`>${RISK_APPETITE_REGIME_THRESHOLD}<`), "risk appetite threshold labelled on the axis");
     assert.doesNotMatch(html, /quadrant of funding pressure vs/, "the prose form is gone");

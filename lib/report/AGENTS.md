@@ -45,6 +45,22 @@ Typical downstream renderers:
 ## Working rules
 
 - If a label should mean the same thing across more than one surface, define or update it here.
+- One name per concept, and these are the names (set 2026-09-22 after a site-wide copy audit found
+  three vocabularies for the four market states and "posture" doing a plain sentence's work on
+  every surface). `tests/readerVocabulary.test.tsx` bans the old ones outright or ratchets them:
+
+  | Concept | The name | Defined in | Never |
+  | --- | --- | --- | --- |
+  | The four market states | the weather label (Sunny, Cloudy, Stormy, Freezing); "conditions" as the noun | `regimePresentation.ts` `REGIME_LABELS` / `getRegimePublicLabel` | an engine key in reader text; "regime" |
+  | The weekly recommendation | "the call" | `reportFormatting.ts` `publicDecisionLabels.call` | posture, stance, operating call |
+  | `PolicyPosture` (RISK_ON / SAFETY_MODE / TRANSITION) | "pace": Speed up / Hold / Slow down | `paceLabels.ts` | Risk-On, Safety Mode, Transition |
+  | The pause/resume threshold pair | "the pause line", "the resume line"; a decision category is an "area" | `reportCopy.ts` `DECISION_CONTRACT_LABELS`, `boundedDecisionRules.ts` `decisionAreaLabel` | corridor, lane, rail, watch line |
+  | The 0–100 room-to-act score | "Operating latitude", glossed "room to hire, spend and commit" | `reportCopy.ts` `OPERATING_LATITUDE_LABEL` | Boldness, latitude signal |
+  | The pressure score | "Funding pressure" | `boundedDecisionRules.ts` `ruleMetricLabel`, `signalTranslations.ts` | tightness, credit conditions |
+  | The curve number | "Recession warning gauge (10-year minus 2-year rate)" on first use | `signalTranslations.ts` `regimeSignalLabel` | 10Y−2Y alone, curve slope, curve signal |
+  | The call changing | "what would change the call", "the call changes if" | `DECISION_CONTRACT_LABELS.watch` | flip, flip watch |
+  | How the call changes | `trackRecordCopy.ts` `CALL_CHANGE_RULE`, once per page | `trackRecordCopy.ts` | hysteresis, confirmation gate, dwelt crossing |
+  | No live reading | `reportCopy.ts` `NO_LIVE_READING_CALL`: what is missing and what to hold | `reportCopy.ts` | "bounded operating discipline", "policy override" |
 - If a component needs to display `Action`, `Threshold`, `Reversal`, `Pause if`, or `Change course if`, route that phrasing through shared report/export formatting instead of custom string assembly.
 - Keep translation-only layers translation-only. Interpretation layers may change explanatory bullets, but they must not mutate canonical posture, confidence, readiness, or threshold semantics.
 - Keep fallback behavior explicit and non-fatal. Historical or degraded modes must remain renderable with a compact operating implication.

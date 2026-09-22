@@ -145,11 +145,16 @@ export const thresholdCrossingEmail = (
 ): EmailContent => {
   const metricLabel = metric === "credit" ? "Funding pressure" : "Risk appetite";
   const direction = value > threshold ? "above" : "below";
-  const subject = `Whether Alert — ${metricLabel} crossed ${threshold} threshold`;
+  /* 75 on funding pressure is the line the rules pause at; the rest are the
+     50 and 75 marks on a 0-100 score, and are named as marks, not as rules. */
+  const lineName = metric === "credit" && threshold === 75 ? "the pause line" : `the ${threshold} line`;
+  const reading = `${metricLabel} is ${value.toFixed(1)}; ${lineName} is ${threshold}.`;
+  const whatToDo = `It crossed ${direction} that line since the last reading. Read this week's call before acting on last week's plan.`;
+  const subject = `Whether Alert — ${metricLabel} crossed ${threshold}`;
   const text = [
     `Whether Threshold Alert`,
-    `${metricLabel} score: ${value.toFixed(1)} (threshold: ${threshold})`,
-    `Direction: crossed ${direction} the ${threshold} boundary.`,
+    reading,
+    whatToDo,
     ``,
     `View full brief: https://whether.work`,
     `---`,
@@ -162,7 +167,7 @@ export const thresholdCrossingEmail = (
     [
       alertBanner(
         severity,
-        `<strong>${metricLabel}</strong> crossed the <strong>${threshold}</strong> threshold at <strong>${value.toFixed(1)}</strong>. Review your operating posture.`,
+        `<strong>${metricLabel}</strong> is <strong>${value.toFixed(1)}</strong>; ${lineName} is <strong>${threshold}</strong>. ${whatToDo}`,
       ),
       `<div style="margin-top:12px;">`,
       sectionBlock(metricLabel, `${value.toFixed(1)} / ${threshold}`, "#fbbf24", "#fde68a"),
