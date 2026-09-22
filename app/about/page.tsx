@@ -48,7 +48,7 @@ export default function AboutPage() {
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6 sm:py-10">
       <JsonLdScript data={structuredData} />
 
-      <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+      <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
         <p className="text-sm text-slate-300">
           Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
@@ -64,7 +64,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Who writes it</h2>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">{publisherAuthor.name}</span> — {publisherAuthor.role}
@@ -72,7 +72,7 @@ export default function AboutPage() {
         <p className="text-sm text-slate-300">{publisherAuthor.bio}</p>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
         <p className="text-sm text-slate-300">
           Whether reads public data from the St. Louis Fed (FRED) across six signal families — Treasury yields, credit
@@ -95,7 +95,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Corrections and questions</h2>
         <p className="text-sm text-slate-300">
           Whether publishes dated records that do not change after the fact. If a published brief is wrong, say so

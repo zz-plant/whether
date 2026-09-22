@@ -54,7 +54,7 @@ const embedSnippet = `<div data-whether-embed="brief"></div>
 export default function ApiDocsPage() {
   return (
     <PageShell backdropVariant="default" structuredData={buildApiDocsStructuredData()}>
-      <article className="weather-panel space-y-6 px-5 py-5 max-w-3xl">
+      <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
         <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
           Read this week's call from an AI agent, a script, or a dashboard. Whether serves the call, the two

@@ -43,14 +43,37 @@ type AreaTableProps = {
 
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
 
+/* The column names, repeated inside each cell for the stacked phone layout,
+   where the header row is not drawn. Hidden from sm up, where the header is. */
+const CellLabel = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
+  <span className={`mb-0.5 block text-[11px] font-medium sm:hidden ${className}`.trim()}>{children}</span>
+);
+
+const LineCell = ({ value }: { value?: { line: ReactNode; distance?: ReactNode } }) =>
+  value ? (
+    <>
+      {value.line}
+      {value.distance ? <span className="block text-xs text-slate-400">{value.distance}</span> : null}
+    </>
+  ) : (
+    <span className="text-slate-500">—</span>
+  );
+
+/**
+ * A table from sm up. Below it the four columns do not fit a phone — the
+ * resume line sat off the right edge behind a sideways scroll — so each row
+ * restacks as a block: the area, the rule across the full width, then the
+ * pause and resume lines side by side, each labelled in its cell. One DOM for
+ * both, so the row order and content cannot drift between layouts.
+ */
 export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
   const ordered = [...rows].sort((a, b) => orderIndex(a.area) - orderIndex(b.area));
   const showChanged = ordered.some((row) => row.changed);
   return (
-    <div className={`overflow-x-auto ${className}`.trim()}>
-      <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
+    <div className={`sm:overflow-x-auto ${className}`.trim()}>
+      <table className="w-full border-collapse text-left text-sm max-sm:block sm:min-w-[36rem]">
         <caption className="sr-only">{caption}</caption>
-        <thead>
+        <thead className="max-sm:hidden">
           <tr className="border-b border-slate-800/80 text-xs text-slate-400">
             <th scope="col" className="py-2 pr-3 font-medium">Area</th>
             <th scope="col" className="py-2 pr-3 font-medium">This week</th>
@@ -59,10 +82,14 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
             {showChanged ? <th scope="col" className="py-2 pr-3 font-medium">Changed</th> : null}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="max-sm:block">
           {ordered.map((row) => (
-            <tr key={row.area} className="border-b border-slate-800/50 align-top" data-area={row.area}>
-              <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100">
+            <tr
+              key={row.area}
+              className="border-b border-slate-800/50 align-top max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-4 max-sm:gap-y-2 max-sm:py-3"
+              data-area={row.area}
+            >
+              <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-sm:col-span-2 max-sm:p-0">
                 {row.href ? (
                   <Link href={row.href} className="underline decoration-slate-600 underline-offset-4 hover:text-white">
                     {row.hrefLabel ?? decisionAreaLabel(row.area)}
@@ -71,31 +98,24 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                   decisionAreaLabel(row.area)
                 )}
               </th>
-              <td className="py-2.5 pr-3 text-slate-200">
+              <td className="py-2.5 pr-3 text-slate-200 max-sm:col-span-2 max-sm:p-0">
                 {row.rule}
                 {row.note}
               </td>
-              <td className="py-2.5 pr-3 tabular-nums text-slate-300">
-                {row.pause ? (
-                  <>
-                    {row.pause.line}
-                    {row.pause.distance ? <span className="block text-xs text-slate-400">{row.pause.distance}</span> : null}
-                  </>
-                ) : (
-                  <span className="text-slate-500">—</span>
-                )}
+              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-sm:p-0">
+                <CellLabel className="text-semantic-caution-fg">Pause line</CellLabel>
+                <LineCell value={row.pause} />
               </td>
-              <td className="py-2.5 pr-3 tabular-nums text-slate-300">
-                {row.resume ? (
-                  <>
-                    {row.resume.line}
-                    {row.resume.distance ? <span className="block text-xs text-slate-400">{row.resume.distance}</span> : null}
-                  </>
-                ) : (
-                  <span className="text-slate-500">—</span>
-                )}
+              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-sm:p-0">
+                <CellLabel className="text-semantic-easing-fg">Resume line</CellLabel>
+                <LineCell value={row.resume} />
               </td>
-              {showChanged ? <td className="py-2.5 pr-3 text-slate-300">{row.changed ?? <span className="text-slate-500">—</span>}</td> : null}
+              {showChanged ? (
+                <td className={`py-2.5 pr-3 text-slate-300 max-sm:col-span-2 max-sm:p-0 ${row.changed ? "" : "max-sm:hidden"}`.trim()}>
+                  <CellLabel className="text-slate-400">Changed</CellLabel>
+                  {row.changed ?? <span className="text-slate-500">—</span>}
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>

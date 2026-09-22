@@ -142,7 +142,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       data-content-measurement-root={pagePath}
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="authority" intent={contentIntent} />
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{signal.title}: {scenario.title}</h1>
         <p className="text-sm text-slate-300">{signal.summary}</p>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
@@ -162,7 +162,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           </p>
         ) : null}
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">This week&apos;s call</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
@@ -177,7 +177,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           <GlossaryLink>What these terms mean</GlossaryLink>
         </p>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Trust and evidence</h2>
         <p className="text-sm text-slate-300">{payload.citationMeta}</p>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -190,7 +190,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           ))}
         </div>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Copy this decision brief</h2>
         <p className="text-sm text-slate-300">
           What to say when someone asks why.
@@ -209,7 +209,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
         />
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>

@@ -28,7 +28,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
     <section
       data-page-section="track-record-grading"
       tabIndex={-1}
-      className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       aria-labelledby="track-record-grading-heading"
     >
       <div>

@@ -133,7 +133,7 @@ export function ReportSection({
       data-page-section={id}
       tabIndex={-1}
       aria-labelledby={headingId}
-      className="weather-panel space-y-5 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      className="weather-panel space-y-5 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">

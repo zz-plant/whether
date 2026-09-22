@@ -26,7 +26,7 @@ export default function Page() {
       data-page-intent="vc-partner"
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="vc" intent="vc-partner" />
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <p className="type-eyebrow">For VC firms</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           How VC firms can enforce capital discipline across portfolios
@@ -37,7 +37,7 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Portfolio-wide framework</h2>
         <ol className="space-y-2 text-sm text-slate-200">
           <li>1. Standardize SAFE / RISKY / DANGEROUS commitment classes across every company.</li>
@@ -47,7 +47,7 @@ export default function Page() {
         </ol>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Implementation model (first 90 days)</h2>
         <div className="space-y-3 text-sm text-slate-200">
           <p><span className="font-semibold text-slate-100">Days 1–30:</span> score every company against one rubric and find where they use different words for the same commitment class.</p>
@@ -56,7 +56,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Board-forwardable artifact block</h2>
         <div className="rounded-lg border border-sky-400/35 bg-sky-500/10 p-4 text-sm text-slate-100">
           <p>Portfolio recommendation: keep one governance vocabulary for two quarters before changing any threshold.</p>
@@ -66,7 +66,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Supporting links</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li><Link href="/resources/capital-discipline-venture-backed-companies" className="text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link></li>

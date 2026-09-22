@@ -159,17 +159,26 @@ export function ScoreLadder({
         aria-hidden="true"
       >
         <div className="absolute inset-x-0 top-3 h-1.5 rounded-full bg-slate-800" />
+        {/* Ticks first, then every label as a second layer. Each line used to
+            be one translated wrapper holding its tick and its label; a
+            transform makes a stacking context, so a later line's tick painted
+            over an earlier line's label whatever the label's z-index, and on a
+            phone it ran through the text ("Call changes|70"). */}
         {laidOut.map(({ line, row }) => (
-          <div
-            key={`${line.kind}-${line.value}`}
-            className="absolute top-1.5 flex -translate-x-1/2 flex-col items-center"
-            style={{ left: `${clampPercent(line.value, max)}%` }}
+          <span
+            key={`tick-${line.kind}-${line.value}`}
+            className={`absolute top-1.5 w-0.5 -translate-x-1/2 ${LINE_CLASS[line.kind].split(" ")[0]}`}
+            style={{ left: `${clampPercent(line.value, max)}%`, height: `${18 + row * 11}px` }}
+          />
+        ))}
+        {laidOut.map(({ line, row }) => (
+          <span
+            key={`label-${line.kind}-${line.value}`}
+            className={`absolute -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-[var(--bg-body)] px-0.5 text-[10px] leading-none ${LINE_CLASS[line.kind].split(" ")[1]}`}
+            style={{ left: `${clampPercent(line.value, max)}%`, top: `${26 + row * 11}px` }}
           >
-            <span className={`w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} style={{ height: `${18 + row * 11}px` }} />
-            <span className={`mt-0.5 whitespace-nowrap text-[10px] leading-none ${LINE_CLASS[line.kind].split(" ")[1]}`}>
-              {labelText(line)}
-            </span>
-          </div>
+            {labelText(line)}
+          </span>
         ))}
         {hasPrevious ? (
           <span

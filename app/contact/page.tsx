@@ -41,7 +41,7 @@ export default function ContactPage() {
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <JsonLdScript data={structuredData} />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2 max-w-xl">
             <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Contact</h1>
@@ -62,7 +62,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What to send</h2>
         <ul className="space-y-2 text-sm text-slate-300">
           <li className="flex gap-2">

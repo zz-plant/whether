@@ -43,7 +43,7 @@ export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlo
     .sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area));
 
   return (
-    <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="guardrail-tags-heading">
+    <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="guardrail-tags-heading">
       <div className="space-y-1">
         <h2 id="guardrail-tags-heading" className="type-eyebrow">Guardrail tags for work items</h2>
         <p className="text-xs leading-relaxed text-slate-300">

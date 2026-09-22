@@ -41,7 +41,7 @@ export function PublishedBriefCopyControls({
   };
 
   return (
-    <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="share-brief-title">
+    <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="share-brief-title">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="share-brief-title" className="text-lg font-semibold text-slate-100">

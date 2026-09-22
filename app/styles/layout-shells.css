@@ -287,6 +287,17 @@ a.weather-hub-link-card:hover {
   padding: clamp(1rem, 0.86rem + 0.7vw, 1.55rem);
 }
 
+/* Unboxed on every width, so on a phone their inline padding only narrowed the
+   column inside the page gutter, and pushed the header and sections out of
+   line with anything between them that carries no padding (the trust strip on
+   the answer pages sat 16px to their left). */
+@media (width < 40rem) {
+  .weather-secondary-header,
+  .weather-secondary-section {
+    padding-inline: 0;
+  }
+}
+
 .weather-secondary-section-header {
   display: flex;
   flex-direction: column;
@@ -415,8 +426,14 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
   min-width: 0;
 }
 
-.weather-panel {
-  padding: var(--space-lg) var(--space-lg);
+/* Layered, so it is a default rather than a verdict. Unlayered, this beat every
+   utility on the element: 27 sections wrote `px-5` and rendered 24px, and the
+   22 that ask for no inset on a phone (`max-sm:px-0`) — unboxed sections whose
+   padding only narrowed the column inside the page gutter — could not get it. */
+@layer components {
+  .weather-panel {
+    padding: var(--space-lg) var(--space-lg);
+  }
 }
 
 @media (min-width: 1024px) {

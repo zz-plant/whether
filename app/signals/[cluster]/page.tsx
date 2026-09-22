@@ -92,7 +92,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
           trip-wire on the curve watch. The reading panel directly below states
           the direction in words and figures, so the glyph restated it at best
           and, on the curve watch, encoded nothing. */}
-      <section className="weather-panel space-y-2 px-6 py-6">
+      <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <div className="max-w-2xl space-y-2">
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{clusterDefinition.title}</h1>
           <p className="text-sm text-slate-300">{clusterDefinition.summary}</p>
