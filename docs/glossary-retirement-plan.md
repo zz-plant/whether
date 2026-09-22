@@ -270,9 +270,9 @@ conditions that would change the call print under "Watch this week". Before this
 
 Left open, deliberately:
 
-- **`changeCourseIf` has two meanings.** With a company stage set, the field holds a resume
-  condition ("Reverse the hold only after…"). Splitting it is a contract change, filed as its own
-  task.
+- ~~**`changeCourseIf` has two meanings.**~~ Resolved: the field is split into `callChangesIf`
+  (always the flip trigger) and an optional `resumeWhen` (the stage's discipline, printed under
+  "Resume when" beside it). See `lib/report/weeklyCallContract.ts`.
 - **"Capital posture" in `/resources`.** It is the target keyword of a whole content cluster,
   including slugs, titles and downloads. Renaming it is an SEO decision, not a copy fix.
 - **Score distances are written "pts"** (`formatPointsToLine`, `scoreCell`). The abbreviation

@@ -81,6 +81,12 @@ export const DECISION_CONTRACT_LABELS = {
     pauseIf: "Pause if",
   },
   reversal: {
+    /**
+     * Where a hold lifts: an area's resume line, and — when a stage is set —
+     * that stage's discipline for lifting its hold (`WeeklyCallContract.resumeWhen`).
+     * Never where the call itself changes; that is `watch.postureFlips`, and the
+     * two print side by side, never one in place of the other.
+     */
     resumeWhen: "Resume when",
   },
   watch: {
@@ -121,7 +127,7 @@ export const POLICY_OVERRIDE_CALL = {
   currentCall: "The two scores point in different directions, so the call is not changing this week.",
   actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
   pauseIf: "Hold anything you can't undo while the two scores disagree.",
-  changeCourseIf:
+  callChangesIf:
     "The two scores point the same way for a second reading; until then the call is not changing.",
 } as const;
 
@@ -137,7 +143,7 @@ export const POLICY_OVERRIDE_CALL = {
 export const NO_LIVE_READING_CALL = {
   currentCall: "No live reading this week. Keep last week's plan.",
   pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
-  changeCourseIf: "A live reading lands; until then the call is not changing.",
+  callChangesIf: "A live reading lands; until then the call is not changing.",
 } as const;
 
 export const PRIMARY_AUDIENCE_SUMMARY =

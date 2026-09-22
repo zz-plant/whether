@@ -311,7 +311,7 @@ export const buildCadenceCallModel = ({
     ? {
         action: POLICY_OVERRIDE_CALL.actionNow,
         threshold: POLICY_OVERRIDE_CALL.pauseIf,
-        reversal: POLICY_OVERRIDE_CALL.changeCourseIf,
+        reversal: POLICY_OVERRIDE_CALL.callChangesIf,
       }
     : buildHorizonOperatingRule({
         assessment,

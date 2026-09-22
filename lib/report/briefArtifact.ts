@@ -30,7 +30,10 @@ export type BriefArtifact = {
   call: string;
   actionNow?: string;
   guardrail?: string;
+  /** Where the call itself changes. */
   reversal?: string;
+  /** A stage's discipline for lifting its hold; absent without a stage. */
+  resumeWhen?: string;
   clearsWhen?: readonly string[];
   regimeLabel: string;
   postureLabel?: string;
@@ -121,6 +124,7 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
     actionNow: readText(value, "actionNow"),
     guardrail: readText(value, "guardrail"),
     reversal: readText(value, "reversal"),
+    resumeWhen: readText(value, "resumeWhen"),
     clearsWhen: readTextList(value, "clearsWhen"),
     postureLabel: readText(value, "postureLabel"),
     riskAppetite: readNumber(value, "riskAppetite"),
@@ -185,6 +189,9 @@ export const briefConditionEntries = (
     : []),
   ...(artifact.reversal
     ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: artifact.reversal }]
+    : []),
+  ...(artifact.resumeWhen
+    ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: artifact.resumeWhen }]
     : []),
   ...(artifact.clearsWhen && artifact.clearsWhen.length > 0
     ? [{ label: DECISION_CONTRACT_LABELS.watch.watchThisWeek, value: artifact.clearsWhen.join("; ") }]
@@ -322,7 +329,10 @@ export const briefArtifactToSlidePayload = (
   stageLabel: artifact.postureLabel ?? "",
   actionNow: artifact.actionNow ?? artifact.call,
   pauseIf: artifact.guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
-  changeCourseIf: artifact.reversal ?? "Resume staged approvals when conditions ease.",
+  // Not a resume sentence: this slot is where the call changes, and an artifact
+  // without one says so rather than borrowing a condition from another line.
+  callChangesIf: artifact.reversal ?? "No call-change line was published with this brief.",
+  ...(artifact.resumeWhen ? { resumeWhen: artifact.resumeWhen } : {}),
   tightness: artifact.tightness,
   riskAppetite: artifact.riskAppetite ?? 50,
   confidence: artifact.confidenceLabel ?? "MED",

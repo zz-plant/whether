@@ -195,6 +195,7 @@ Canonical top-fold order on homepage must remain:
 
 Implementation guardrails:
 - Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Operating latitude`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
+- The weekly call's reversal side is two fields, printed under two labels (2026-09-22). `weeklyCall.callChangesIf` is where the call itself changes — the regime flip trigger — under `Call changes if`; a stage never replaces it. `weeklyCall.resumeWhen` is set only when a stage or runway is calibrated and carries that stage's `reversalTriggerDiscipline` under `Resume when`, beside the call-change line. They used to share one field (`changeCourseIf`), so choosing a stage swapped the flip trigger out for a resume condition while every surface still labelled it `Call changes if`. Surfaces print both through `weeklyCallChangeLines`. A read that projects the stored `OperatingSnapshot` lays the reader's stage over the stored (stage-agnostic) call with `applyStageToWeeklyCall`; before that, a chosen stage reached the brief only when the store was empty.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
 - The homepage action strip translates structured lane states into explicit action phrases (`Keep this closed`, `Proceed with guardrails`, `Stage the next move`, `Move ahead now`). The underlying `Closed` / `Guarded` / `Staged` / `Open` values remain stable for model consumers.
 - Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
@@ -363,7 +364,7 @@ Drift guardrails:
 
 - Each mode must provide explicit bounded language for both:
   - action emphasis (`doNowAdjustments` / `avoidAdjustments` / `watchAdjustments`), and
-  - reversal condition discipline (`reversalTriggerDiscipline`).
+  - reversal condition discipline (`reversalTriggerDiscipline`), which reaches readers as `weeklyCall.resumeWhen` under `Resume when` — never as the call-change line.
 - Reversal language should remain trigger-based (clear condition + resume rule), not narrative advice.
 - If mode copy changes, update both the bounded rules source and this contract in the same PR.
 

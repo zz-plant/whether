@@ -7,6 +7,7 @@ import type { InterpretationLayer } from "../report/interpretationLayer";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { NO_LIVE_READING_CALL } from "../report/reportCopy";
+import { buildFlipThreshold } from "../report/reportEvidence";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
@@ -93,7 +94,7 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
 const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
 const FALLBACK_ACTION_NOW = "Keep last week's approvals as they are; start nothing new.";
 const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
-const FALLBACK_CHANGE_COURSE_IF = "Live data is back and the call has held for a week.";
+const FALLBACK_RESUME_WHEN = "Live data is back and the call has held for a week.";
 /** The curve reading's name on first use, per the vocabulary table in `lib/report/AGENTS.md`. */
 export const RECESSION_GAUGE_LABEL = `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`;
 /** The stamp's confidence note when no label was modeled: what the number measures. */
@@ -124,15 +125,22 @@ export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLay
   // and under a slot label that already carries that verb it read twice. Only
   // the rule's condition goes under the label; the fallbacks are written for it.
   const leadPause = firstMeaningful(leadItem?.triggerThreshold, modeled.guardrailThreshold);
-  const leadResume = firstMeaningful(leadItem?.reversalCondition, modeled.reversalTrigger);
+  // Only an area's own resume line: `modeled.reversalTrigger` is where the call
+  // changes, and falling back to it printed the flip trigger as a resume line.
+  const leadResume = firstMeaningful(leadItem?.reversalCondition);
   const pauseIf = leadPause ? formatDecisionThreshold(leadPause) : FALLBACK_PAUSE_IF;
-  const changeCourseIf = leadResume ? formatDecisionReversal(leadResume) : FALLBACK_CHANGE_COURSE_IF;
+  const resumeWhen = leadResume ? formatDecisionReversal(leadResume) : FALLBACK_RESUME_WHEN;
+  // Where the call itself changes, in a slot of its own beside the resume line.
+  const callChangesIf =
+    firstMeaningful(modeled.reversalTrigger, options?.postureState?.whatFlipsNext.flipTrigger)
+    ?? buildFlipThreshold(assessment);
 
   return [
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
-    `• ${publicDecisionLabels.reversal}: ${changeCourseIf}`,
+    `• ${publicDecisionLabels.reversal}: ${resumeWhen}`,
+    `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${callChangesIf}`,
   ];
 };
 
@@ -297,7 +305,7 @@ const buildWhyThisCouldBeWrongBlock = (assessment: RegimeAssessment, options?: E
     `• ${confidenceLine}`,
     `• ${whyCouldBeWrong}`,
     ...(mode?.mitigationCheck ? [`• Check: ${mode.mitigationCheck}`] : []),
-    `• If it is: see "${publicDecisionLabels.reversal}" above, plus the readings.`,
+    `• If it is: see "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, plus the readings.`,
   ];
 };
 
@@ -364,7 +372,7 @@ export const buildSlackBrief = (
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Conditions: ${conditionsLabel}`,
     "",
-    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
     ...buildCallLines(assessment, options),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,

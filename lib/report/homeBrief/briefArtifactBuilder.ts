@@ -43,6 +43,7 @@ export const deriveBriefCallFields = (card: WeeklyCard) => {
     ?? decision.guardrail
     ?? (typeof guardrailThresholdRaw === "string" ? guardrailThresholdRaw : undefined);
   const reversalTriggerLabel = decision.reversalTrigger;
+  const resumeWhenLabel = decision.resumeWhen;
 
   const briefShareLines = [
     decision.actionNowShort
@@ -50,6 +51,7 @@ export const deriveBriefCallFields = (card: WeeklyCard) => {
       : null,
     guardrailLabel ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${guardrailLabel}` : null,
     reversalTriggerLabel ? `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reversalTriggerLabel}` : null,
+    resumeWhenLabel ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeWhenLabel}` : null,
     flipConditionLabels.length > 0
       ? `${DECISION_CONTRACT_LABELS.watch.watchThisWeek}: ${flipConditionLabels.join("; ")}`
       : null,
@@ -67,6 +69,7 @@ export const deriveBriefCallFields = (card: WeeklyCard) => {
      * that sentence. Deriving it twice is how the two would drift. */
     parsedGuardrailThreshold,
     reversalTriggerLabel,
+    resumeWhenLabel,
     briefShareLines,
   };
 };
@@ -100,6 +103,7 @@ export const buildBriefArtifact = ({
     actionNow: card.decision.actionNowShort,
     guardrail: fields.guardrailLabel,
     reversal: fields.reversalTriggerLabel,
+    resumeWhen: fields.resumeWhenLabel,
     clearsWhen: fields.flipConditionLabels,
     regimeLabel: getRegimePublicLabel(homepage.reportShell.regime),
     postureLabel: card.status.postureWithStageLabel ?? "",
@@ -158,7 +162,8 @@ export const buildBriefArtifactFromSnapshot = ({
     call: weeklyCall.actionNow,
     actionNow: weeklyCall.actionNow,
     guardrail: weeklyCall.pauseIf,
-    reversal: weeklyCall.changeCourseIf,
+    reversal: weeklyCall.callChangesIf,
+    resumeWhen: weeklyCall.resumeWhen,
     clearsWhen: weeklyCall.flipConditionLabels,
     regimeLabel: getRegimePublicLabel(reportData.assessment.regime),
     postureLabel: weeklyCall.regimeStage,

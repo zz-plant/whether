@@ -133,7 +133,7 @@ describe("a degraded state says what is missing", () => {
       ["currentCall", contract.currentCall],
       ["actionNow", contract.actionNow],
       ["pauseIf", contract.pauseIf],
-      ["changeCourseIf", contract.changeCourseIf],
+      ["callChangesIf", contract.callChangesIf],
       ["whyCouldBeWrong", contract.whyCouldBeWrong],
       ...contract.flipConditionLabels.map((line, index) => [`flipConditionLabels[${index}]`, line] as const),
       ...contract.doNowBullets.map((line, index) => [`doNowBullets[${index}]`, line] as const),

@@ -90,7 +90,7 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Do now:/);
     assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
-    // `changeCourseIf` is where the call itself changes, so it prints under that name.
+    // The call-change line sits under the label every other surface gives it.
     assert.match(text, /Call changes if:/);
     assert.equal(cardText, text);
   });

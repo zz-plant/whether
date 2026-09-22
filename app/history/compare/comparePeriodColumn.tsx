@@ -1,4 +1,5 @@
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import {
   classifyScoreBand,
   compositeSignalScales,
@@ -111,12 +112,12 @@ export function ComparePeriodColumn({
             </dt>
             <dd className="mt-1 text-sm text-slate-200">{snapshot.weeklyCall.pauseIf}</dd>
           </div>
-          <div>
-            <dt className={`text-fluid-xs font-semibold ${DECISION_SLOT_TONE.reversal}`}>
-              {DECISION_CONTRACT_LABELS.watch.postureFlips}
-            </dt>
-            <dd className="mt-1 text-sm text-slate-200">{snapshot.weeklyCall.changeCourseIf}</dd>
-          </div>
+          {weeklyCallChangeLines(snapshot.weeklyCall).map(({ label, value }) => (
+            <div key={label}>
+              <dt className={`text-fluid-xs font-semibold ${DECISION_SLOT_TONE.reversal}`}>{label}</dt>
+              <dd className="mt-1 text-sm text-slate-200">{value}</dd>
+            </div>
+          ))}
         </dl>
       </div>
 

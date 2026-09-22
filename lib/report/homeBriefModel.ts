@@ -330,8 +330,10 @@ export type WeeklyDecisionCardViewModel = {
     netConstraintSummary: string;
     /** Prose description of the pause-if condition. e.g. "Pause net-new hiring if funding pressure rises above 76." */
     guardrail: string;
-    /** Prose description of the condition that reverses the pause. Same concept as guardrail but for what re-opens approvals. */
+    /** Where the call itself changes (the regime flip trigger). A stage never replaces it. */
     reversalTrigger: string;
+    /** The selected stage's discipline for lifting its hold — `WeeklyCallContract.resumeWhen`. Absent without a stage. */
+    resumeWhen?: string;
     /** Compact action imperative extracted from the bounded decision rules. */
     actionNowShort?: string;
     immediateDecision: string;

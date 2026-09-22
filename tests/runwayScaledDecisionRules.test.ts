@@ -140,7 +140,10 @@ describe("runway-scaled decision rules", () => {
     // With no stage chosen the default stage's rule is what the band reshapes.
     assert.match(critical.actionNow, /freeze non-revenue hires/i);
     assert.match(critical.pauseIf, /under six months of runway/i);
-    assert.match(critical.changeCourseIf, /bridge financing/i);
+    assert.match(critical.resumeWhen ?? "", /bridge financing/i);
+    // The band reshapes when a hold lifts, not where the call changes.
+    assert.equal(critical.callChangesIf, uncalibrated.callChangesIf);
+    assert.equal(uncalibrated.resumeWhen, undefined);
     assert.ok(critical.doNowBullets.includes(critical.actionNow));
     // The regime call itself is company-agnostic.
     assert.equal(critical.currentCall, uncalibrated.currentCall);

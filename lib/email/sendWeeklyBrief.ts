@@ -1,7 +1,7 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
 import { unsubscribeFooterHtml, unsubscribeFooterText } from "../alert/alertTemplates";
 import type { OperatingSnapshot } from "../operatingState/types";
-import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
@@ -204,7 +204,7 @@ export const sendWeeklyBrief = async (options?: {
   const readings = buildWeeklyEmailReadings(snapshot);
   const actionNow = weeklyCall.actionNow;
   const pauseIf = pauseConditionOnly(weeklyCall.pauseIf);
-  const changeCourseIf = weeklyCall.changeCourseIf;
+  const changeLines = weeklyCallChangeLines(weeklyCall);
   const recordDate = snapshot.provenance.recordDateLabel;
 
   const results = await Promise.allSettled(
@@ -221,7 +221,7 @@ export const sendWeeklyBrief = async (options?: {
         ...readingsText(readings),
         `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
-        `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${changeCourseIf}`,
+        ...changeLines.map(({ label, value }) => `${label}: ${value}`),
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         `---`,
@@ -247,8 +247,10 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:#f1f5f9;">${actionNow}</p>`,
         `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>`,
         `<p style="font-size:0.9rem;margin:0 0 12px;color:#cbd5e1;">${pauseIf}</p>`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.watch.postureFlips}</p>`,
-        `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${changeCourseIf}</p>`,
+        ...changeLines.flatMap(({ label, value }, index) => [
+          `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:${index === 0 ? "0" : "12px"} 0 6px;">${label}</p>`,
+          `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${value}</p>`,
+        ]),
         `</td></tr></table>`
       );
 

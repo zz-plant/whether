@@ -5,6 +5,7 @@ import { buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { formatDecisionReversal, formatDecisionThreshold } from "../../lib/report/reportFormatting";
 import { describeConditions, pauseConditionOnly } from "../../lib/export/exportTerms";
@@ -74,8 +75,9 @@ export function buildBriefMarkdown(homepage: HomePage): string {
    * the Slack paste, and /api/embed all read, so the Markdown brief now agrees with them.
    */
   const weeklyCall = homepage.weeklyCall;
-  /* `changeCourseIf` is where the call itself changes; the lead rule's resume
-     line is a separate, nearer one, and prints under its own name. */
+  /* `callChangesIf` is where the call itself changes; the lead rule's resume
+     line is a separate, nearer one, and prints under its own name, as does a
+     stage's `resumeWhen`. */
   const leadResume = actionItems[0]?.reversalCondition;
 
   const operatorCopy = buildWeeklyOperatorBriefCopyText({
@@ -108,7 +110,7 @@ ${weeklyCall.currentCall}
 
 **${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${pauseConditionOnly(weeklyCall.pauseIf)}
 
-${leadResume ? `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(leadResume)}\n\n` : ""}**${DECISION_CONTRACT_LABELS.watch.postureFlips}:** ${weeklyCall.changeCourseIf}
+${leadResume ? `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(leadResume)}\n\n` : ""}${weeklyCallChangeLines(weeklyCall).map(({ label, value }) => `**${label}:** ${value}`).join("\n\n")}
 
 ---
 

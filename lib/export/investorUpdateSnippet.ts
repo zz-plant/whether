@@ -96,7 +96,7 @@ export const buildInvestorUpdateSnippetParts = ({
 }: {
   assessment: RegimeAssessment;
   recordDate: string;
-  weeklyCall: Pick<WeeklyCallContract, "actionNow" | "pauseIf" | "changeCourseIf">;
+  weeklyCall: Pick<WeeklyCallContract, "actionNow" | "pauseIf" | "callChangesIf" | "resumeWhen">;
   monthlyHistory: readonly MonthlyRegimeHistoryEntry[];
   sourceLabel: string;
   isFallback?: boolean;
@@ -129,7 +129,10 @@ export const buildInvestorUpdateSnippetParts = ({
   const response = [
     `Our operating response this month: ${asSentence(weeklyCall.actionNow)}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${asSentence(pauseConditionOnly(weeklyCall.pauseIf))}`,
-    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${asSentence(weeklyCall.changeCourseIf)}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${asSentence(weeklyCall.callChangesIf)}`,
+    ...(weeklyCall.resumeWhen
+      ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${asSentence(weeklyCall.resumeWhen)}`]
+      : []),
   ].join(" ");
 
   const source = `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}.`;

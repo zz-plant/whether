@@ -196,13 +196,13 @@ export const buildWeeklyMemoLines = ({
   trendLabel,
   transitionWatch,
   pauseIf,
-  changeCourseIf,
+  callChangesIf,
 }: {
   operatingStanceLine: string;
   trendLabel: string;
   transitionWatch: "ON" | "OFF";
   pauseIf: string;
-  changeCourseIf: string;
+  callChangesIf: string;
 }) => [
   trendMemoLines[trendLabel] ?? trendMemoLines.Stable,
   operatingStanceLine,
@@ -210,7 +210,7 @@ export const buildWeeklyMemoLines = ({
   // condition instead of restating it.
   transitionWatch === "ON"
     ? `The call could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `The call is not close to changing, so this week's calls hold. ${CALL_CHANGES_IF}: ${changeCourseIf}`,
+    : `The call is not close to changing, so this week's calls hold. ${CALL_CHANGES_IF}: ${callChangesIf}`,
 ];
 
 export const buildWhyItMattersLine = ({

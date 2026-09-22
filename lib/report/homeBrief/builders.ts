@@ -585,7 +585,7 @@ export const buildHomeBriefModelInternal = (
       trendLabel,
       transitionWatch,
       pauseIf: guardrail,
-      changeCourseIf: conciseFlipThreshold,
+      callChangesIf: conciseFlipThreshold,
     }),
     regimeDistance,
     regimeVelocity,
@@ -713,7 +713,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
   const readThisCardItems = buildReadThisCardItems({
     decisionShiftSummary: homeBriefModel.decisionShiftSummary,
     immediateDecision,
-    reversalTrigger: weeklyCall?.changeCourseIf ?? homeBriefModel.reversalTrigger,
+    reversalTrigger: weeklyCall?.callChangesIf ?? homeBriefModel.reversalTrigger,
   });
 
   return {
@@ -738,11 +738,12 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       weeklyMemoLines: homeBriefModel.weeklyMemoLines,
       netConstraintSummary: homeBriefModel.netConstraintSummary,
       guardrail: weeklyCall?.pauseIf ?? homeBriefModel.guardrail,
-      reversalTrigger: weeklyCall?.changeCourseIf ?? homeBriefModel.reversalTrigger,
+      reversalTrigger: weeklyCall?.callChangesIf ?? homeBriefModel.reversalTrigger,
+      ...(weeklyCall?.resumeWhen ? { resumeWhen: weeklyCall.resumeWhen } : {}),
       actionNowShort: homeBriefModel.actionNowShort,
       immediateDecision,
       guardrailThreshold: weeklyCall?.pauseIf ?? homeBriefModel.guardrailThreshold,
-      flipThreshold: weeklyCall?.changeCourseIf ?? homeBriefModel.flipThreshold,
+      flipThreshold: weeklyCall?.callChangesIf ?? homeBriefModel.flipThreshold,
       compactFlipConditionLabels: weeklyCall?.flipConditionLabels ?? homeBriefModel.compactFlipConditionLabels,
       canonicalDecisionCopy,
       canonicalFlipConditions: homeBriefModel.canonicalFlipConditions,

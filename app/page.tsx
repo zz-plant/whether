@@ -239,6 +239,7 @@ async function PageContent({
     guardrailLabel,
     parsedGuardrailThreshold,
     reversalTriggerLabel,
+    resumeWhenLabel,
     briefShareLines,
   } = deriveBriefCallFields(homepage.weeklyDecisionCardModel);
 
@@ -571,6 +572,7 @@ async function PageContent({
               ladders={scoreLadders}
               flipProximity={buildFlipProximity(reportData.assessment)}
               reversalTrigger={reversalTriggerLabel}
+              resumeWhen={resumeWhenLabel}
               guardrail={guardrailLabel}
               flipConditions={flipConditionLabels}
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}

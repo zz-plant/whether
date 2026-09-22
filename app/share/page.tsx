@@ -58,7 +58,7 @@ const buildCurrentShareArtifact = async () => {
       currentCall: snapshot.weeklyCall.currentCall,
       actionNow: snapshot.weeklyCall.actionNow,
       guardrailThreshold: snapshot.weeklyCall.pauseIf,
-      reversalTrigger: snapshot.weeklyCall.changeCourseIf,
+      reversalTrigger: snapshot.weeklyCall.callChangesIf,
       actionStripItems,
     },
   };

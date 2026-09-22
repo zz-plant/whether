@@ -64,6 +64,7 @@ describe("/brief.md", () => {
     // The three parts of a bounded decision, which is what this section promises.
     assert.match(call.body, /\*\*Do now:\*\*\s*\S/);
     assert.match(call.body, /\*\*Pause if:\*\*\s*\S/);
+    assert.match(call.body, /\*\*Call changes if:\*\*\s*\S/);
     assert.match(call.body, /\*\*Resume when:\*\*\s*\S/);
 
     // The other half of the original defect: a non-null object would have been

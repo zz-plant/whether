@@ -22,7 +22,7 @@ const treasury: TreasuryData = {
 const weeklyCall = {
   actionNow: "Hold net-new hiring and require reversible commitments.",
   pauseIf: "Pause if funding pressure crosses 66",
-  changeCourseIf: "Resume when risk appetite clears 50 for two reads",
+  callChangesIf: "Risk appetite rises above 50 for two reads",
 };
 
 const history: MonthlyRegimeHistoryEntry[] = [
@@ -58,7 +58,7 @@ describe("investor update snippet", () => {
     assert.match(parts.response, /^Our operating response this month: Hold net-new hiring/);
     // The page's slot names, and the rule's own verb dropped under a label that already says it.
     assert.match(parts.response, /Pause if: Funding pressure crosses 66\./);
-    assert.match(parts.response, /Call changes if: Resume when risk appetite clears 50 for two reads\.$/);
+    assert.match(parts.response, /Call changes if: Risk appetite rises above 50 for two reads\.$/);
     assert.doesNotMatch(parts.response, /guardrail|change our course/i);
     assert.doesNotMatch(parts.response, /commitments\.\./, "an existing full stop is not doubled");
     assert.equal(parts.source, "Source: U.S. Treasury, 2026-09-16, via whether.work.");

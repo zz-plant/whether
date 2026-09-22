@@ -110,7 +110,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.transitionWatch, /ON|OFF/);
     assert.equal(typeof model.guardrail, "string");
     assert.doesNotMatch(model.weeklyMemoLines.join(" "), /current track|next release/i);
-    assert.match(model.weeklyMemoLines.join(" "), /Change course when:|next live weekly refresh/i);
+    assert.match(model.weeklyMemoLines.join(" "), /The call changes when:|next live weekly refresh/i);
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.startupVariantPolicy.options.length, 6);

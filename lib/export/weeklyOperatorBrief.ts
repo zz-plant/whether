@@ -9,7 +9,7 @@ import type { ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { publicDecisionLabels } from "../report/reportFormatting";
-import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { buildFlipProximity } from "../report/flipProximity";
 
 /** The confidence line when no label was modeled: what the number measures rather than a grade. */
@@ -29,7 +29,10 @@ type WeeklyOperatorBriefPayload = {
   currentCall: string;
   actionNow: string;
   pauseIf: string;
-  changeCourseIf: string;
+  /** Where the call itself changes. */
+  callChangesIf: string;
+  /** A stage's discipline for lifting its hold; absent without a stage. */
+  resumeWhen?: string;
   /**
    * The nearest flip distance in the market's units — "0.15% flatter on the
    * 10Y−2Y curve would change the call to X" — not in score points. The hero
@@ -53,6 +56,8 @@ type WeeklyCallSnapshotPayload = {
   doNow: string;
   avoid: string;
   watch: string;
+  /** A stage's discipline for lifting its hold; printed beside `watch`, never as it. */
+  resume?: string;
   flipConditions: string[];
 };
 
@@ -118,10 +123,11 @@ export const buildWeeklyOperatorBriefPayload = ({
       currentCall: weeklyCall.currentCall,
       actionNow: weeklyCall.actionNow,
       pauseIf: weeklyCall.pauseIf,
-      changeCourseIf: weeklyCall.changeCourseIf,
+      callChangesIf: weeklyCall.callChangesIf,
+      ...(weeklyCall.resumeWhen ? { resumeWhen: weeklyCall.resumeWhen } : {}),
       doNowBullets: weeklyCall.doNowBullets,
       whyCouldBeWrong: weeklyCall.whyCouldBeWrong,
-      flipTrigger: weeklyCall.changeCourseIf,
+      flipTrigger: weeklyCall.callChangesIf,
       flipConditionLabels: weeklyCall.flipConditionLabels,
       customTeamNote,
     };
@@ -146,7 +152,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     canonicalDecisionCopy?.flipTrigger
     ?? postureFlipTrigger
     ?? normalizedFlipConditionLabels[0]
-    ?? NO_LIVE_READING_CALL.changeCourseIf;
+    ?? NO_LIVE_READING_CALL.callChangesIf;
 
   const resolvedFlipConditionLabels = canonicalFlipConditions.length > 0
     ? buildFlipConditionsWithoutTriggerDuplication({
@@ -183,7 +189,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     actionNow,
     pauseIf,
     flipWatchLine: buildFlipProximity(assessment)[0]?.sentence,
-    changeCourseIf: resolvedFlipTrigger,
+    callChangesIf: resolvedFlipTrigger,
     doNowBullets: canonicalDoNowLines.length > 0 ? canonicalDoNowLines : doNowBullets,
     whyCouldBeWrong:
       postureConfidenceLabel === "HIGH"
@@ -221,7 +227,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     `${publicDecisionLabels.call}: ${payload.currentCall}`,
     `${publicDecisionLabels.action}: ${payload.actionNow}`,
     `${publicDecisionLabels.threshold}: ${pauseConditionOnly(payload.pauseIf)}`,
-    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${payload.changeCourseIf}`,
+    ...weeklyCallChangeLines(payload).map(({ label, value }) => `${label}: ${value}`),
     ...(supportingActionLines.length > 0
       ? ["", "Also this week:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
       : []),
@@ -287,7 +293,10 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           elements: [
             {
               type: "mrkdwn",
-              text: `*${publicDecisionLabels.threshold}:* ${pauseConditionOnly(payload.pauseIf)}\n*${DECISION_CONTRACT_LABELS.watch.postureFlips}:* ${payload.changeCourseIf}`,
+              text: [
+                `*${publicDecisionLabels.threshold}:* ${pauseConditionOnly(payload.pauseIf)}`,
+                ...weeklyCallChangeLines(payload).map(({ label, value }) => `*${label}:* ${value}`),
+              ].join("\n"),
             },
           ],
         },
@@ -322,6 +331,7 @@ export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayl
   `${publicDecisionLabels.action.toUpperCase()}: ${payload.doNow}`,
   `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}: ${pauseConditionOnly(payload.avoid)}`,
   `${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}: ${payload.watch}`,
+  ...(payload.resume ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}: ${payload.resume}`] : []),
   "OTHER THINGS THAT WOULD CHANGE THE CALL:",
   ...(payload.flipConditions.length > 0
     ? payload.flipConditions.map((condition) => `• ${condition}`)
