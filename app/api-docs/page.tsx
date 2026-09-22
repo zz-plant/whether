@@ -153,6 +153,20 @@ export default function ApiDocsPage() {
               yearly.
             </Endpoint>
             <Endpoint
+              signature="GET /api/agent?format=jev"
+              tryHref="/api/agent?format=jev"
+              tryLabel="Try it"
+              tryCta="try_agent_jev"
+            >
+              This week&apos;s call as a ready-to-send request for TypeSafe&apos;s Jev decision model
+              (<code className="font-mono">typesafe/jev</code> on Cloudflare Workers AI). Put a short
+              description of your plan in <code className="font-mono">request.state.plan</code> and send
+              the request yourself; Jev answers whether the plan goes against the call, which decision it
+              touches, how hard it is to undo, and whether it is safer after the call changes. Whether
+              never sees the plan. Check <code className="font-mono">automationReady</code> before you
+              act on an answer: it is false when this week&apos;s reading is not live or not current.
+            </Endpoint>
+            <Endpoint
               signature="GET /api/scores"
               tryHref="/api/scores"
               tryLabel="Try it"

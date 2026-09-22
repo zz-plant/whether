@@ -50,6 +50,8 @@ const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
   },
   examples: {
     weekly: `${baseUrl}/api/agent?cadence=weekly`,
+    // This week's call as a typesafe/jev request, with a slot for the caller's plan.
+    jev: `${baseUrl}/api/agent?format=jev`,
   },
   agent: {
     invalidCadenceStatus: 400,
