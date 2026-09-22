@@ -89,7 +89,7 @@ describe("board slide PPTX", () => {
     assert.match(slide, /1\. ACTION NOW/);
     assert.match(slide, /2\. PAUSE IF \(GUARDRAIL\)/);
     assert.match(slide, /3\. CHANGE COURSE IF \(REVERSAL TRIGGER\)/);
-    assert.match(slide, /Monday Executive Stance \(Series A\)/);
+    assert.match(slide, /This week's call \(Series A\)/);
     assert.match(slide, /<a:t>SCARCITY<\/a:t>/);
     assert.match(slide, /Freeze non-revenue hires &amp; put every commitment/);
     assert.match(slide, /hold every new commitment &lt;whatever&gt; the macro corridor/);

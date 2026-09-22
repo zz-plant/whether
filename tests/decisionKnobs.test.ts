@@ -71,7 +71,7 @@ describe("buildWeeklyLockCommitment", () => {
     assert.equal(commitment.flipConditions.length, 3);
     assert.match(commitment.flipConditions[0], /Funding pressure ≤ 66/);
     assert.match(commitment.flipConditions[1], /Risk appetite ≥ 49/);
-    assert.match(commitment.ownerCadence, /Mon\/Thu operating review/);
+    assert.match(commitment.ownerCadence, /next weekly review/);
     assert.equal(commitment.trustMarkers.length, 0);
   });
 
@@ -85,6 +85,6 @@ describe("buildWeeklyLockCommitment", () => {
     });
 
     assert.deepEqual(commitment.trustMarkers, ["Confidence: Guarded", "Freshness: Stale"]);
-    assert.match(commitment.ownerCadence, /daily 10:00 review/);
+    assert.match(commitment.ownerCadence, /daily until live data/);
   });
 });

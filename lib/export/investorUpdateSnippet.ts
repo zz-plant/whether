@@ -32,18 +32,22 @@ export type InvestorUpdateSnippetParts = {
 
 /*
  * One sentence per band, in the first person an investor letter is written in.
- * These say what the company is doing about its cash, not what the band is
- * called; the band names are a control label, not letter copy.
+ * The runway clause is the one fact the site knows, because the reader chose
+ * the band. What the company is doing about it is not: an earlier version
+ * asserted a second-signoff rule, a raise process under way and senior hires
+ * in progress, in the founder's own voice, chosen by band rather than by them.
+ * Those are bracketed prompts now, the way the downloadable templates leave a
+ * field blank rather than filling it with a plausible figure.
  */
 const RUNWAY_IMPLICATIONS: Record<RunwayBand, string> = {
   critical:
-    "With under six months of runway, cash preservation overrides the macro read: no new commitment clears without a second signoff until runway extends past nine months or bridge financing is banked.",
+    "With under six months of runway, cash comes before the macro read: [our rule for new commitments until runway passes nine months].",
   tight:
-    "With six to twelve months of runway, every new commitment carries a nine-month cash payback case, and raise-window planning is under way.",
+    "With six to twelve months of runway, every new commitment has to pay back inside [n] months, and [where we are on raise planning].",
   balanced:
-    "With twelve to twenty-four months of runway we are running the standard corridor, so the macro call sets our tempo.",
+    "With twelve to twenty-four months of runway, the weekly call sets our pace.",
   abundant:
-    "With more than two years of runway we are using the cushion where peers are holding — senior hires and vendor terms — without loosening the payback bar.",
+    "With more than two years of runway we are [what the cushion is going on], without loosening the payback bar.",
 };
 
 const CONFIDENCE_PHRASES: Record<RegimeAssessment["diagnostics"]["confidence"], string> = {

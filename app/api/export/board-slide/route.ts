@@ -23,8 +23,8 @@ export const revalidate = 3600;
  */
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const rawStage = searchParams.get("stage") ?? "seed";
-  const stage: StartupVariantMode = isStartupVariantMode(rawStage) ? rawStage : "seed";
+  const rawStage = searchParams.get("stage");
+  const stage: StartupVariantMode | null = rawStage && isStartupVariantMode(rawStage) ? rawStage : null;
   const rawFormat = searchParams.get("format") ?? "pptx";
   const format = isBoardSlideFormat(rawFormat) ? rawFormat : "pptx";
 

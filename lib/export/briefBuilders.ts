@@ -10,12 +10,6 @@ import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
-import {
-  buildRunwayPlan,
-  formatRunwayPlanCompactBlock,
-  getRunwayPlannerBaselineInput,
-  type PlannerPosture,
-} from "../report/runwayPlanner";
 
 export type ModeledExportDecisionPayload = {
   postureWithStageLabel?: string;
@@ -211,7 +205,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${publicDecisionLabels.reversal}: ${condition}`),
-    "• Re-check owner/cadence: Owner: CEO + Finance lead at the Mon/Thu operating review.",
+    "• Re-check: whoever owns the plan, at the next weekly review.",
     ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
     ...actionStrip,
   ];
@@ -286,21 +280,6 @@ const buildHistoricalAnalogsBlock = (options?: ExportLayerOptions) => {
   ];
 };
 
-const mapPolicyPostureToPlannerPosture = (posture: RegimeAssessment["policyAssessment"]["posture"]): PlannerPosture => {
-  if (posture === "RISK_ON") return "RISK_ON";
-  if (posture === "TRANSITION") return "TRANSITION";
-  return "SAFETY_MODE";
-};
-
-const buildFinancialImplicationsBlock = (assessment: RegimeAssessment) => {
-  const baseline = getRunwayPlannerBaselineInput(
-    assessment.regime,
-    mapPolicyPostureToPlannerPosture(assessment.policyAssessment.posture),
-  );
-  const plan = buildRunwayPlan(baseline);
-  return formatRunwayPlanCompactBlock(plan);
-};
-
 const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]) => [
   `Treasury source: ${treasury.source} (${treasury.record_date})`,
   ...macros.map((macro) => `${macro.label}: ${macro.sourceUrl} (${macro.record_date})`),
@@ -336,7 +315,6 @@ export const buildSlackBrief = (
   const decisionHighlights = buildBoundedDecisionLines(assessment, options);
   const modeled = resolveModeledDecisionPayload(options);
   const citations = buildCitationLines(treasury, macros);
-  const financialImplications = buildFinancialImplicationsBlock(assessment);
   const postureLabel = modeled.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime);
 
   return [
@@ -355,8 +333,6 @@ export const buildSlackBrief = (
     "",
     "Operating limits:",
     ...assessment.constraints.map((item) => `• ${item}`),
-    "",
-    financialImplications,
     ...buildViralArtifactBlock(assessment, options),
     ...buildFailureModeBlock(options),
     ...buildHistoricalAnalogsBlock(options),

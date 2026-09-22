@@ -79,7 +79,7 @@ const footerLine = (payload: MeetingSlidePayload) =>
     payload.isFallback ? "  ·  cached snapshot, not a live read" : ""
   }`;
 
-const titleLine = (payload: MeetingSlidePayload) => `Monday Executive Stance (${payload.stageLabel})`;
+const titleLine = (payload: MeetingSlidePayload) => `This week's call${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;
 const subtitleLine = (payload: MeetingSlidePayload) => `${payload.recordDate} · Source: ${payload.provenance}`;
 const EYEBROW = "WHETHER · WEEKLY OPERATING CALL";
 

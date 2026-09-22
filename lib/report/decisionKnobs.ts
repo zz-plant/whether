@@ -300,8 +300,8 @@ export const buildWeeklyLockCommitment = ({
       [buildRuleCondition("tightness", ">", tightnessTighten), buildRuleCondition("riskAppetite", "<", riskTighten)],
     ],
     ownerCadence: confidenceDegraded || freshnessDegraded
-      ? "Owner: CEO + Finance lead · Checkpoint: daily 10:00 review until trust markers clear."
-      : "Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.",
+      ? "Re-check daily until live data is back."
+      : "Re-check at the next weekly review.",
     trustMarkers,
   };
 };

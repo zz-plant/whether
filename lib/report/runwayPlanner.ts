@@ -240,20 +240,6 @@ const deriveDownsidePosture = (posture: PlannerPosture): PlannerPosture => {
   return "SAFETY_MODE";
 };
 
-export const getRunwayPlannerBaselineInput = (
-  regime: RegimeKey,
-  posture: PlannerPosture,
-): RunwayPlannerInput => ({
-  runway: regime === "SCARCITY" ? 11 : regime === "DEFENSIVE" ? 13 : regime === "VOLATILE" ? 14 : 16,
-  burn: regime === "EXPANSION" ? 900_000 : 700_000,
-  revenue: regime === "SCARCITY" ? 420_000 : 500_000,
-  growthRate: regime === "EXPANSION" ? 18 : regime === "VOLATILE" ? 10 : 7,
-  sector: "b2b-saas",
-  stage: "growth",
-  regime,
-  posture,
-});
-
 export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutput => {
   const input = sanitize(rawInput);
   const safeBand = buildSafeBand(input);
