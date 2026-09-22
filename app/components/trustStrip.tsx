@@ -24,7 +24,9 @@ export type TrustStripProps = {
   className?: string;
 };
 
-const CONFIDENCE_WORD: Record<TrustStripProps["confidenceLabel"], string> = {
+/** The reader's word for the engine's confidence key. Exported so the sticky
+ * call strip states it the same way the strip under the call does. */
+export const CONFIDENCE_WORD: Record<TrustStripProps["confidenceLabel"], string> = {
   HIGH: "High",
   MED: "Medium",
   LOW: "Low",

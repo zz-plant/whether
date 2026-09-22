@@ -1,12 +1,26 @@
+import type { RegimeSignalKey } from "./report/reportFormatting";
+
 type IndicatorType = "leading" | "lagging";
 
-export const indicatorTypeByScoreLabel = {
-  Tightness: "lagging",
-  "Risk appetite": "leading",
-  "Curve slope": "leading",
-} as const satisfies Record<string, IndicatorType>;
+/**
+ * Whether a signal tends to move before the call or confirm it after. Keyed by
+ * the signal's engine key rather than its display label, so the evidence
+ * page's changed-signals table can look a row up without matching prose. The
+ * base rate carries no classification: it is an input, not a driver.
+ */
+export const indicatorTypeBySignal = {
+  tightness: "lagging",
+  riskAppetite: "leading",
+  curveSlope: "leading",
+  baseRate: null,
+} as const satisfies Record<RegimeSignalKey, IndicatorType | null>;
 
-export const indicatorTypeLabel = {
+const indicatorTypeLabel = {
   leading: "Leading (predictive)",
   lagging: "Lagging (confirming)",
 } as const;
+
+export const indicatorKindLabel = (key: RegimeSignalKey): string | null => {
+  const kind = indicatorTypeBySignal[key];
+  return kind ? indicatorTypeLabel[kind] : null;
+};

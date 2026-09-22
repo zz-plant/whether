@@ -11,6 +11,19 @@ import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
+import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
+import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
+import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
+
+/*
+ * Every paste reads in the page's order: the call, what changed, what it
+ * changes for you (one row per area, in the page's row order), what would
+ * change the call, then sources. The headings are the page's own.
+ */
+export const EXPORT_SECTION_HEADINGS = {
+  changed: "What changed this week",
+  areas: "What that changes for you",
+} as const;
 
 export type ModeledExportDecisionPayload = {
   postureWithStageLabel?: string;
@@ -43,6 +56,12 @@ type ExportLayerOptions = {
   freshnessLabel?: string;
   postureState?: PostureStateContract;
   modeledDecision?: ModeledExportDecisionPayload;
+  /**
+   * Last week's two scores, when the caller's read carries a previous week
+   * (`previousScoresFromDynamics` off `reportDynamics`). Null or absent prints
+   * no "last week" part rather than a stand-in for one.
+   */
+  previousScores?: ScorePair | null;
 };
 
 const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExportDecisionPayload => {
@@ -84,9 +103,10 @@ const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line that changes
 const firstMeaningful = (...values: Array<string | undefined | null>) =>
   values.find((value) => typeof value === "string" && value.trim().length > 0);
 
-export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+/** The call itself: the four slots every surface prints first. */
+export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
   const modeled = resolveModeledDecisionPayload(options);
-  const topActionStripItems = (modeled.actionStripItems ?? []).slice(0, 3);
+  const leadItem = modeled.actionStripItems?.[0];
   const currentCall =
     firstMeaningful(modeled.currentCall, assessment.description)
     ?? FALLBACK_CURRENT_CALL;
@@ -96,13 +116,13 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
   const actionNow =
     firstMeaningful(
       modeled.actionNow,
-      topActionStripItems[0]?.areaActionNow,
+      leadItem?.areaActionNow,
     ) ?? FALLBACK_ACTION_NOW;
   const pauseIf =
-    firstMeaningful(topActionStripItems[0]?.triggerThreshold, modeled.guardrailThreshold)
+    firstMeaningful(leadItem?.triggerThreshold, modeled.guardrailThreshold)
     ?? FALLBACK_PAUSE_IF;
   const changeCourseIf =
-    firstMeaningful(topActionStripItems[0]?.reversalCondition, modeled.reversalTrigger)
+    firstMeaningful(leadItem?.reversalCondition, modeled.reversalTrigger)
     ?? FALLBACK_CHANGE_COURSE_IF;
 
   return [
@@ -110,13 +130,28 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
     `• ${publicDecisionLabels.reversal}: ${changeCourseIf}`,
-    ...topActionStripItems.slice(1).flatMap((item) => [
-      `• ${item.label}: ${item.areaActionNow}`,
+  ];
+};
+
+const areaOrderIndex = (item: ActionStripItem) => decisionAreaOrder.indexOf(operatingLeverToDecisionArea[item.lever]);
+
+/**
+ * One row per decision area, in the page's row order (`decisionAreaOrder`),
+ * each with its rule, its pause and resume lines with a distance, and its
+ * timing. The rows used to follow the model's priority order and skip the
+ * lead item, so a reader who checks Fundraising every Monday found it in a
+ * different place in every paste — and never in the same place as on the page.
+ */
+export const buildAreaRowLines = (options?: ExportLayerOptions) => {
+  const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
+  return [...items]
+    .sort((left, right) => areaOrderIndex(left) - areaOrderIndex(right))
+    .flatMap((item) => [
+      `• ${decisionAreaLabel(operatingLeverToDecisionArea[item.lever])}: ${item.areaActionNow}`,
       `  ${publicDecisionLabels.threshold}: ${formatItemLines(item, "pause")}`,
       `  ${publicDecisionLabels.reversal}: ${formatItemLines(item, "resume")}`,
       ...(item.latencyLine ? [`  ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
-    ]),
-  ];
+    ]);
 };
 
 /**
@@ -143,39 +178,23 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
 };
 
 /**
- * The readings against the corridor, one line per signal.
- *
- * `Funding pressure: 32/100 · pause > 76 (44 pts away) · re-open < 66 (holds)`.
+ * The readings against their lines, one line per score, in the shape every
+ * export and the page's `ScoreCell` share (`lib/export/scoreReference.ts`).
  * The sentences elsewhere in the brief say the rule; this says where the
  * reading sits against it, so nobody pastes a paragraph to answer "how close".
+ *
+ * "Last week" prints only from `options.previousScores`. An earlier version
+ * read `diagnostics.tightnessDelta` as a weekly move, and that field was a
+ * distance from the regime threshold — so an unchanged week still claimed one.
  */
 const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
   const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
-  const rails = buildSharedCorridorRails(items, scores);
-  const readings: Array<{ metric: "tightness" | "riskAppetite"; label: string; value: number }> = [
-    { metric: "tightness", label: "Funding pressure", value: scores.tightness },
-    { metric: "riskAppetite", label: "Risk appetite", value: scores.riskAppetite },
-  ];
-  return readings.map((reading) => {
-    const rail = rails.find((candidate) => candidate.metric === reading.metric);
-    /*
-     * No delta segment. It read `diagnostics.tightnessDelta` and printed it as
-     * "vs last week", and that field is a distance from the regime threshold —
-     * so an unchanged week still claimed a move. The honest version of that
-     * number is "how far from a line", which the two rails after this already
-     * say, against the guardrail the reader is actually deciding on. Restating
-     * it against a second line is the restatement this repo declutters for.
-     */
-    return [
-      `${reading.label}: ${reading.value}/100`,
-      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})` : null,
-      rail && rail.clearsAt !== undefined
-        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
-        : null,
-    ]
-      .filter((part): part is string => Boolean(part))
-      .join(" · ");
+  return buildScoreReferenceLines({
+    scores,
+    thresholds: assessment.thresholds,
+    rails: buildSharedCorridorRails(items, scores),
+    previous: options?.previousScores ?? null,
   });
 };
 
@@ -298,15 +317,21 @@ export const buildBoardSlideBullets = (
   treasury: TreasuryData,
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
-) => [
-  `Conditions: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
-  `Funding pressure ${assessment.scores.tightness} / Risk appetite ${assessment.scores.riskAppetite}`,
-  ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
-  ...buildBoundedDecisionLines(assessment, options),
-  ...buildInterpretationLayerBlock(options),
-  "",
-  ...buildExportStamp(treasury, CONFIDENCE_STAMP_NOTE),
-].join("\n");
+) => {
+  const areaRows = buildAreaRowLines(options);
+  return [
+    `Conditions: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
+    ...buildCallLines(assessment, options),
+    "",
+    `${EXPORT_SECTION_HEADINGS.changed}:`,
+    ...buildReadingLines(assessment, options),
+    ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
+    ...(areaRows.length > 0 ? ["", `${EXPORT_SECTION_HEADINGS.areas}:`, ...areaRows] : []),
+    ...buildInterpretationLayerBlock(options),
+    "",
+    ...buildExportStamp(treasury, CONFIDENCE_STAMP_NOTE),
+  ].join("\n");
+};
 
 export const buildSlackBrief = (
   assessment: RegimeAssessment,
@@ -320,27 +345,33 @@ export const buildSlackBrief = (
   const macroLines = macros.map(
     (macro) => `• ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)} · refreshed ${macro.record_date}`,
   );
-  const decisionHighlights = buildBoundedDecisionLines(assessment, options);
   const modeled = resolveModeledDecisionPayload(options);
   const citations = buildCitationLines(treasury, macros);
   const postureLabel = modeled.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime);
+  const areaRows = buildAreaRowLines(options);
 
+  /*
+   * The page's order: the call, what changed, what that changes for you, what
+   * would change the call, then sources. The readings and the rate inputs used
+   * to lead, above the call they explain.
+   */
   return [
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Conditions: ${postureLabel}`,
+    "",
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    ...buildCallLines(assessment, options),
+    "",
+    `${EXPORT_SECTION_HEADINGS.changed}:`,
     ...buildReadingLines(assessment, options),
     `${regimeSignalLabel.baseRate}: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Recession warning gauge (10-year minus 2-year rate): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
-    "",
-    "The readings:",
     ...macroLines,
-    "",
-    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
-    ...decisionHighlights,
-    ...buildWhyThisCouldBeWrongBlock(assessment, options),
+    ...(areaRows.length > 0 ? ["", `${EXPORT_SECTION_HEADINGS.areas}:`, ...areaRows] : []),
     "",
     "What to hold:",
     ...assessment.constraints.map((item) => `• ${item}`),
+    ...buildWhyThisCouldBeWrongBlock(assessment, options),
     ...buildViralArtifactBlock(assessment, options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),

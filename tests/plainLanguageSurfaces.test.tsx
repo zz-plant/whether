@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
+import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
 
-import { DecisionHero } from "../app/components/DecisionHero";
 import { CurveTermsKey } from "../app/signals/components/curveTermsKey";
 import { ScoreBandReference, SignalScaleNote } from "../app/components/ui/plainLanguage";
 import { BEGINNER_GLOSSARY_ENTRIES } from "../lib/report/reportCopy";
@@ -64,21 +66,46 @@ describe("score scale anchoring", () => {
   });
 });
 
-describe("DecisionHero plain-English layer", () => {
-  const render = () =>
+describe("the plain-English layer beside the week's readings", () => {
+  /* The layer moved with the readings: the four signals left the hero for their
+     own section on 2026-09-22. What it has to carry is unchanged — which end of
+     a composite scale is which, what the score means at the level it is at, the
+     way to the glossary, and the unclipped pressure behind a score that has
+     stopped being able to move. The split-rail drawing went with the hero's
+     copy of ThresholdLadder; the direction it stated survives as the scale note,
+     and the rail itself is still covered where it still renders
+     (tests/illustrationsRenderContract.test.tsx). */
+  const render = (overrides: Partial<SignalChangeRow> = {}) =>
     renderToStaticMarkup(
-      <DecisionHero
-        tightness={64}
-        tightnessDelta={3}
-        riskAppetite={38}
-        riskAppetiteDelta={-2}
-        boldnessScore={58}
-        boldnessDelta={-2}
-        regime="DEFENSIVE"
-        recordDate="2026-08-14"
-        fetchedAt="2026-08-15"
-        signalData={{ tightnessThreshold: 68 }}
-      />,
+      createElement(WhatChangedSection, {
+        rows: [
+          {
+            key: "tightness",
+            label: "Funding pressure",
+            value: 64,
+            valueLabel: "64",
+            previous: 61,
+            previousLabel: "61",
+            delta: 3,
+            increaseIsPositive: false,
+            lines: [{ kind: "callChange", value: 70 }],
+            ...overrides,
+          },
+          {
+            key: "riskAppetite",
+            label: "Risk appetite",
+            value: 38,
+            valueLabel: "38",
+            previous: 40,
+            previousLabel: "40",
+            delta: -2,
+            increaseIsPositive: true,
+            lines: [{ kind: "callChange", value: 50 }],
+          },
+        ],
+        lead: "The scores moved toward tighter money this week.",
+        comparisonUnavailable: false,
+      }),
     );
 
   it("explains what each score means at its current level", () => {
@@ -88,49 +115,18 @@ describe("DecisionHero plain-English layer", () => {
     assert.ok(html.includes(signalPlainEnglish.riskAppetite.midMeans));
   });
 
-  it("anchors the risk-appetite scale and links out to the glossary", () => {
+  it("anchors both composite scales and links out to the glossary", () => {
     const html = render();
     assert.ok(html.includes(compositeSignalScales.riskAppetite.directionLabel));
+    assert.ok(html.includes(compositeSignalScales.tightness.directionLabel));
     /* Read from the constant: the destination moved off /trust, and a literal
        here would have to be edited in lockstep with it — which is how six
        links came to point at a page about source freshness. */
     assert.ok(html.includes(GLOSSARY_HREF));
   });
 
-  it("draws the tightness ladder label from the shared scale constant", () => {
-    const html = render();
-    // The rail splits the direction across the two ends it names and drops the
-    // number each half carries, because the rail end under it already prints it.
-    // The unsplit sentence survives in the accessible description.
-    const [low, high] = compositeSignalScales.tightness.directionLabel
-      .split(" · ")
-      .map((half) => half.replace(/^-?\d+(?:\.\d+)?\s*=\s*/, ""));
-    assert.match(html, new RegExp(`>${low}<`));
-    assert.match(html, new RegExp(`>${high}<`));
-    assert.match(
-      html,
-      new RegExp(`Scale direction: ${compositeSignalScales.tightness.directionLabel}`),
-      "the ladder states the same direction in its visible label and its accessible description",
-    );
-  });
-
   it("renders the unclipped pressure beside a saturated score", () => {
-    const html = renderToStaticMarkup(
-      <DecisionHero
-        tightness={100}
-        tightnessDelta={0}
-        tightnessPressure={114}
-        tightnessSaturated={true}
-        riskAppetite={38}
-        riskAppetiteDelta={-2}
-        boldnessScore={58}
-        boldnessDelta={-2}
-        regime="DEFENSIVE"
-        recordDate="2026-08-14"
-        fetchedAt="2026-08-15"
-        signalData={{ tightnessThreshold: 68 }}
-      />,
-    );
+    const html = render({ value: 100, valueLabel: "100", delta: 0, saturatedPressure: 114 });
     assert.match(html, /would read 114/);
   });
 });

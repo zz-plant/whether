@@ -3,7 +3,6 @@ import { parseMonthInput } from "./components/timeMachineUtils";
 export const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
 
 export type FocusTab = (typeof focusTabs)[number];
-export type SignalsView = "implication" | "detail";
 type SignalsSearchParamRecord = Record<string, string | undefined>;
 
 type SearchParamsLike = {
@@ -80,21 +79,6 @@ const buildSignalsHref = ({
   return buildHrefFromParams(pathname, params, anchor);
 };
 
-export const buildDiagnosticsExpansionHref = (
-  searchParams: SignalsSearchParamRecord | undefined,
-  showAll: boolean,
-) =>
-  buildSignalsHref({
-    searchParams,
-    remove: ["diagnostics"],
-    set: showAll ? { diagnostics: "all" } : {},
-    anchor: "signal-diagnostics",
-  });
-
-export const resolveSignalsView = (
-  searchParams: SignalsSearchParamRecord | undefined,
-): SignalsView => (searchParams?.signalsView === "detail" ? "detail" : "implication");
-
 export const resolveSignalsFocus = (
   searchParams: SignalsSearchParamRecord | undefined,
 ): FocusTab => {
@@ -104,16 +88,6 @@ export const resolveSignalsFocus = (
     : "all";
 };
 
-export const buildSignalsAdvancedHref = (
-  searchParams: SignalsSearchParamRecord | undefined,
-  advanced: boolean,
-) =>
-  buildSignalsHref({
-    searchParams,
-    remove: ["advanced"],
-    set: advanced ? { advanced: "1" } : {},
-  });
-
 export const buildSignalsFocusHref = (
   searchParams: SignalsSearchParamRecord | undefined,
   focus: FocusTab,
@@ -122,16 +96,6 @@ export const buildSignalsFocusHref = (
     searchParams,
     remove: ["focus"],
     set: focus === "all" ? {} : { focus },
-  });
-
-export const buildSignalsViewHref = (
-  searchParams: SignalsSearchParamRecord | undefined,
-  view: SignalsView,
-) =>
-  buildSignalsHref({
-    searchParams,
-    remove: ["signalsView"],
-    set: view === "detail" ? { signalsView: "detail" } : {},
   });
 
 export const buildTimeMachineSubmitHref = (

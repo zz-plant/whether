@@ -27,11 +27,14 @@ describe("published brief readings block", () => {
       ],
     };
 
+    /* Value, the line it is judged against, the distance, last week — the four
+       parts `formatScoreReference` prints wherever a score appears, so the
+       archive reads the way the page does. */
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure: 32/100 · -8.0 vs last week · pause > 76 (44 pts away) · re-open < 66 (already met)",
-      "Risk appetite: 52/100 · -7.0 vs last week · pause < 44 (8 pts away) · re-open > 54 (2 pts away)",
+      "Funding pressure 32 of 100 · pause line 76 · 44 pts below · last week 40 · resume line 66 (already met)",
+      "Risk appetite 52 of 100 · pause line 44 · 8 pts above · last week 59 · resume line 54 (2 pts away)",
     ]);
-    assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure: 32\/100/);
+    assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
   });
 });

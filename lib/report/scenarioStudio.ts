@@ -3,7 +3,8 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { getPlaybookGuidance } from "../playbook";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
-import { ruleMetricLabel } from "./boundedDecisionRules";
+import { buildCanonicalBoundedDecisionRules, ruleMetricLabel, type RuleConditionMetric } from "./boundedDecisionRules";
+import { buildSharedCorridorRails } from "./operatingCalls";
 
 /**
  * The scenario studio's text and numbers, lifted out of
@@ -76,6 +77,38 @@ export const buildScenarioSearch = (
     next.set("slope", values.slope.toFixed(2));
   }
   return next.toString();
+};
+
+type ScenarioLadderLines = { pause?: number; resume?: number; callChange: number };
+
+/**
+ * The three lines each score is judged against in a scenario: where the call
+ * changes, and the pause and resume lines the scenario's own rules state.
+ * Read off the same rule data the rules table prints (`buildSharedCorridorRails`
+ * over the canonical rules), never re-derived from the thresholds by hand, so
+ * the ladder cannot draw a line the scenario's rules do not state. A rule that
+ * states no line for a signal leaves that line out.
+ */
+export const buildScenarioLadderLines = (
+  assessment: RegimeAssessment,
+): Record<RuleConditionMetric, ScenarioLadderLines> => {
+  const rules = buildCanonicalBoundedDecisionRules({
+    regime: assessment.regime,
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
+  const rails = buildSharedCorridorRails(
+    rules.map((rule) => ({ pauseConditions: rule.pause.conditions, resumeConditions: rule.resume.conditions })),
+    assessment.scores,
+  );
+  const linesFor = (metric: RuleConditionMetric, callChange: number): ScenarioLadderLines => {
+    const rail = rails.find((entry) => entry.metric === metric);
+    return { pause: rail?.guardrail, resume: rail?.clearsAt, callChange };
+  };
+  return {
+    tightness: linesFor("tightness", assessment.thresholds.tightnessRegime),
+    riskAppetite: linesFor("riskAppetite", assessment.thresholds.riskAppetiteRegime),
+  };
 };
 
 export const formatScenarioDelta = (value: number, unit = "") => {

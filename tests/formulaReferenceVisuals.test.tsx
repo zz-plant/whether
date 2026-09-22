@@ -27,6 +27,27 @@ describe("formula reference visuals", () => {
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_MEDIUM_THRESHOLD}<`));
   });
 
+  it("opens with the two scores on their ladders when the page hands it positions", () => {
+    /* The quadrant draws the rule; where this week's scores sit is the
+       ladder, the one drawing every route uses for a score. Without positions
+       — the static render above — no ladder and no bare score. */
+    assert.doesNotMatch(html, /data-score-ladder/);
+    const withPositions = renderToStaticMarkup(
+      <FormulaReference
+        positions={{
+          tightness: { value: 72, previous: 68, lines: [{ kind: "callChange", value: TIGHTNESS_REGIME_THRESHOLD }] },
+          riskAppetite: { value: 41, previous: null, lines: [{ kind: "callChange", value: RISK_APPETITE_REGIME_THRESHOLD }] },
+        }}
+      />,
+    );
+    assert.equal((withPositions.match(/data-score-ladder/g) ?? []).length, 2);
+    assert.match(withPositions, /Last week 68\./);
+    assert.ok(
+      withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions: funding pressure above"),
+      "the ladders draw the reading before the quadrant explains the rule",
+    );
+  });
+
   it("draws both score ramps", () => {
     assert.match(html, /Rate component: 0 points at/);
     assert.match(html, /Inversion component: 0 points at no inversion/);

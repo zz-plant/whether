@@ -9,8 +9,9 @@ import {
   DECISION_CONTRACT_LABELS,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
-import { resolveConfidenceTone } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
+import { TrustStrip } from "../components/trustStrip";
+import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord";
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
@@ -37,24 +38,15 @@ export default async function MethodPage({
   const {
     reportData,
     isFallback,
-    degradedSourceRows,
-    confidenceLabel,
-    confidenceCode,
-    trustSummary,
     citationLine,
     warnings,
     meetingSnippet,
     revisitBullets,
-    trustVerdictToneClasses,
+    trustStrip,
+    scorePositions,
     runHistory,
     reportShellProps,
   } = await buildTrustPageModel();
-
-  const confidenceDotClass = {
-    positive: "bg-emerald-400",
-    caution: "bg-amber-400",
-    alert: "bg-rose-400",
-  }[resolveConfidenceTone(confidenceCode)];
 
   const secondaryContent = (
     <>
@@ -143,7 +135,7 @@ export default async function MethodPage({
           keeps the reader who is here to judge the call pointed at it. */}
       <ReportSection
         id="confidence-record"
-        title="What the confidence number has been worth"
+        title={CONFIDENCE_RECORD_TITLE}
         description="The percent measures how far the scores sit from the line that changes the call. Whether calls at that distance actually held is measured separately, over the whole archive."
       >
         <ActionLink href="/calibration" variant="pill">
@@ -209,75 +201,35 @@ export default async function MethodPage({
 
   return (
     <ReportShell {...reportShellProps}>
-      <ReportSection id="trust-snapshot" title="System status" description="Five facts behind this week's call: data, freshness, sources, confidence, warnings.">
-        {/* One strip, five cells. This was five stacked cards each opening with
-            a coloured dot and a sentence that said "cached" a different way;
-            the state is five facts, and a row of five labelled values says them
-            in one line. The detail behind each sits in the sections below. A
-            verdict banner used to sit above it — a glyph, a bold label and the
-            date — restating the strip; the strip's tone border is the verdict. */}
-        <dl className={`weather-hub-card grid grid-cols-2 gap-px overflow-hidden border sm:grid-cols-5 ${trustVerdictToneClasses}`}>
-          {[
-            {
-              key: "data",
-              label: "Data",
-              value: isFallback
-                ? "Cached snapshot"
-                : degradedSourceRows.length > 0
-                  ? `Partly cached · ${degradedSourceRows.length}`
-                  : "All sources live",
-              dot: isFallback || degradedSourceRows.length > 0 ? "bg-amber-400" : "bg-emerald-400",
-              detail: `Decision date ${reportData.recordDateLabel}`,
-            },
-            {
-              key: "freshness",
-              label: "Freshness",
-              value: reportData.fetchedAtLabel,
-              dot: isFallback ? "bg-amber-400" : "bg-emerald-400",
-              detail: trustSummary,
-            },
-            {
-              key: "sources",
-              label: "Sources",
-              value: `Treasury · ${reportData.treasuryProvenance.statusLabel}`,
-              dot: isFallback ? "bg-amber-400" : "bg-emerald-400",
-              detail: `Macro · ${reportData.macroProvenance.statusLabel}`,
-            },
-            {
-              key: "confidence",
-              label: "Confidence",
-              value: confidenceLabel,
-              dot: confidenceDotClass,
-              detail: reportData.flipThreshold,
-            },
-            {
-              key: "warnings",
-              label: "Warnings",
-              value: warnings.length === 0 ? "None" : `${warnings.length} active`,
-              dot: warnings.length === 0 ? "bg-emerald-400" : "bg-amber-400",
-              detail: warnings[0]?.warning ?? "None active.",
-            },
-          ].map((cell) => (
-            <div key={cell.key} className="min-w-0 bg-[var(--bg-surface)] px-3 py-3">
-              <dt className="flex items-center gap-1.5 text-fluid-nano type-eyebrow">
-                <span className={`flex h-2 w-2 shrink-0 rounded-full ${cell.dot}`} aria-hidden="true" />
-                {cell.label}
-              </dt>
-              <dd className="mt-1 truncate text-sm font-semibold text-slate-100" title={cell.value}>{cell.value}</dd>
-              <dd className="mt-0.5 line-clamp-2 text-fluid-nano text-slate-400">{cell.detail}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <p className="mt-3 text-xs leading-5 text-slate-400 px-1">
+      {/* The strip, directly under the h1, in the slot every reading route
+          gives it: record date, sources, confidence, could the call change.
+          This was a five-cell "System status" card — data, freshness, sources,
+          confidence, warnings — each cell with a coloured dot and a detail
+          line, and before that five stacked cards. The facts the cells carried
+          beyond the strip are all below: the refresh stamp is in the intro
+          block, the warnings under "What would make this recommendation
+          wrong?", the flip condition under "Confidence and reliability
+          limits". No link on this page's copy — the explanation is the page.
+          The id stays: the rail, the search command and three in-page links
+          point at #trust-snapshot as "System status", and the strip is that. */}
+      <section
+        id="trust-snapshot"
+        data-page-section="trust-snapshot"
+        tabIndex={-1}
+        aria-labelledby="section-trust-snapshot-heading"
+        className="space-y-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      >
+        <h2 id="section-trust-snapshot-heading" className="sr-only">System status</h2>
+        <TrustStrip {...trustStrip} />
+        <p className="text-xs leading-5 text-slate-400">
           {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
           {PRIMARY_AUDIENCE_SUMMARY} Check the sources and add your own numbers before acting on anything you can't undo.
         </p>
-      </ReportSection>
+      </section>
 
       <RunHistorySection runHistory={runHistory} />
 
-      <FormulaReference />
+      <FormulaReference positions={scorePositions} />
 
       <FrameworkSection />
 

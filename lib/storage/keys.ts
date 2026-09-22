@@ -25,6 +25,8 @@ export const STORAGE_KEYS = {
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
   /** The call this browser last saw — written on every visit, read on the next. */
   lastSeenCall: "whether.lastSeenCall",
+  /** Which steps of the weekly plan this browser has ticked off, keyed by the record date so a new week starts clean. */
+  weekChecklist: "whether.operate.weekChecklist",
   decisionMemory: (clientId: string) => `whether.decisionMemory:${clientId}`,
   decisionShieldPresets: (clientId?: string | null) =>
     clientId ? `whether.decisionShieldPresets:${clientId}` : "whether.decisionShieldPresets",

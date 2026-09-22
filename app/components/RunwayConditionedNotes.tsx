@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import type { RegimeKey } from "../../lib/regimeEngine";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
 import {
   RUNWAY_QUICK_PICKS,
   buildRunwayConditionedNotes,
@@ -43,21 +43,7 @@ const RunwayQuickPicks = ({
   );
 };
 
-/**
- * The weekly call, conditioned on the operator's own runway.
- *
- * The canonical call is server-rendered and company-agnostic; this panel reads
- * the browser-local operator profile after mount and adds translation-only
- * notes beneath it. A missing number never reads as zero, and the brief stays
- * canonical for every other reader of the same URL.
- *
- * Until a runway is stored it offers the four bands instead of nothing. The
- * figure used to be settable only on `/operate`, so the one line on `/` that
- * translates the call to a company was invisible to anyone who had not been
- * there — which is every reader arriving from a shared link. A band is enough
- * to pick the note; the exact figure and burn still live on `/operate`.
- */
-export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
+const useRunwayNotes = (regime: RegimeKey) => {
   const { profile, setProfileField } = useOperatorProfile();
   const notes = useMemo(
     () =>
@@ -68,16 +54,33 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
       }),
     [regime, profile.runwayMonths, profile.monthlyBurnUsd],
   );
+  return { profile, notes, setRunway: (months: number | undefined) => setProfileField("runwayMonths", months) };
+};
 
-  const setRunway = (months: number | undefined) => setProfileField("runwayMonths", months);
+/**
+ * The weekly call, conditioned on the operator's own runway: the control.
+ *
+ * The canonical call is server-rendered and company-agnostic; this reads the
+ * browser-local operator profile after mount. A missing number never reads as
+ * zero, and the brief stays canonical for every other reader of the same URL.
+ *
+ * Until a runway is stored it offers the four bands instead of nothing. The
+ * figure used to be settable only on `/operate`, so the one line on `/` that
+ * translates the call to a company was invisible to anyone who had not been
+ * there — which is every reader arriving from a shared link. A band is enough
+ * to pick the note; the exact figure and burn still live on `/operate`.
+ *
+ * The notes themselves no longer print here as a list of their own: each one
+ * sits under the rule for the area it concerns, in the table this control
+ * heads (`RunwayAreaNote`), so a reader finds the runway caveat on the row it
+ * qualifies rather than in a second list of the same five areas.
+ */
+export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
+  const { profile, notes, setRunway } = useRunwayNotes(regime);
 
   if (notes.length === 0) {
     return (
-      <aside
-        id="runway-notes"
-        aria-label="Condition this call on your runway"
-        className="weather-panel mt-4 space-y-2 px-5 py-3.5"
-      >
+      <div id="runway-notes" className="space-y-1.5">
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
           <p className="type-eyebrow text-slate-300">What this call means at your runway</p>
           {/* Deliberately nothing selected. The operator has not said what their
@@ -97,16 +100,12 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         <p className="text-fluid-nano text-slate-500">
           Nothing leaves this browser, and the call above does not change; only the notes under it do.
         </p>
-      </aside>
+      </div>
     );
   }
 
   return (
-    <aside
-      id="runway-notes"
-      aria-label="Notes conditioned on your runway"
-      className="weather-panel mt-4 space-y-2 px-5 py-4"
-    >
+    <div id="runway-notes" className="space-y-1.5">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <p className="type-eyebrow text-slate-300">
           What this call means at {profile.runwayMonths} months of runway
@@ -122,13 +121,6 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
           </button>
         </div>
       </div>
-      <ul className="space-y-1.5 text-fluid-xs text-slate-300">
-        {notes.map((note) => (
-          <li key={note.area}>
-            <span className="font-semibold text-slate-200">{decisionAreaLabel(note.area)}:</span> {note.note}
-          </li>
-        ))}
-      </ul>
       <p className="text-fluid-nano text-slate-500">
         Your figures stay in this browser. These notes translate the call; the thresholds above are
         unchanged.{" "}
@@ -137,6 +129,21 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         </Link>
         .
       </p>
-    </aside>
+    </div>
+  );
+}
+
+/**
+ * The runway note for one area, under that area's rule. Renders nothing until
+ * a band is stored, and nothing for an area the band leaves alone.
+ */
+export function RunwayAreaNote({ regime, area }: { regime: RegimeKey; area: DecisionArea }) {
+  const { notes } = useRunwayNotes(regime);
+  const note = notes.find((entry) => entry.area === area);
+  if (!note) return null;
+  return (
+    <p data-testid="runway-area-note" className="mt-1 text-xs leading-5 text-amber-200/90">
+      {note.note}
+    </p>
   );
 }

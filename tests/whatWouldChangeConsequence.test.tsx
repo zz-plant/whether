@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { DecisionHero } from "../app/components/DecisionHero";
+import { WhatWouldChangeSection } from "../app/components/home/WhatWouldChangeSection";
 import type { ThresholdBusinessConsequence } from "../lib/report/operatingCalls";
 
 const mockAny: any = mock;
@@ -29,23 +29,19 @@ mockAny.module("next/navigation", () => ({
 }));
 
 const renderHero = (thresholdBusinessConsequence: ThresholdBusinessConsequence) => renderToStaticMarkup(
-  <DecisionHero
-    tightness={52}
-    tightnessDelta={1}
-    riskAppetite={60}
-    riskAppetiteDelta={0}
-    boldnessScore={48}
-    boldnessDelta={-1}
-    weeklyCall="Keep approvals staged."
-    regime="DEFENSIVE"
-    recordDate="Aug 15, 2026"
-    fetchedAt="Aug 15, 2026"
+  <WhatWouldChangeSection
+    ladders={[
+      { metric: "tightness", label: "Funding pressure", value: 52, previous: 51, lines: [{ kind: "callChange", value: 70 }] },
+    ]}
+    flipProximity={[]}
     guardrail="Pause at the bounded threshold."
     thresholdBusinessConsequence={thresholdBusinessConsequence}
+    lastTime={null}
+    callChangeLines={{ tightness: 70, riskAppetite: 50 }}
   />,
 );
 
-describe("DecisionHero threshold consequence", () => {
+describe("the threshold consequence beside what would change the call", () => {
   it("renders one affected decision as a one-line numeric consequence", () => {
     const html = renderHero({ pointsToThreshold: 3, consequenceLabel: "the hiring pause line", status: "approaching" });
     assert.match(html, />3 points until the hiring pause line</);

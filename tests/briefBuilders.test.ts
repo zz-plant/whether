@@ -45,8 +45,8 @@ describe("buildSlackBrief", () => {
       modeledDecision: { actionStripItems: buildActionStripItems(rules, scores) },
     });
 
-    assert.match(brief, /^Funding pressure: 12\/100 · pause > 76 \(64 pts away\) · re-open < 66 \(already met\)$/m);
-    assert.match(brief, /^Risk appetite: 68\/100 · pause < 44 \(24 pts away\) · re-open > 54 \(already met\)$/m);
+    assert.match(brief, /^Funding pressure 12 of 100 · pause line 76 · 64 pts below · resume line 66 \(already met\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 · pause line 44 · 24 pts above · resume line 54 \(already met\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
@@ -138,8 +138,13 @@ describe("buildSlackBrief", () => {
     // First per-lever row is investment-pace, whose canonical area is burn
     // discipline — the lever label and the latency clock are different nouns.
     const timingLines = brief.match(/^  Timing: .+$/gm) ?? [];
-    assert.equal(timingLines.length, 2, `expected two Timing lines, got ${timingLines.length}`);
-    assert.match(timingLines[0], /Burn changes this month/);
+    /* One row per decision area, in `decisionAreaOrder`, the way every surface
+       tabulates them since 2026-09-22 — the brief used to print the first two. */
+    assert.equal(timingLines.length, 5, `expected five Timing lines, got ${timingLines.length}`);
+    // Hiring leads the order, and its clock is headcount's, not spending's —
+    // the lever label and the latency clock are different nouns.
+    assert.match(timingLines[0], /Headcount from a decision this week/);
+    assert.ok(timingLines.some((line) => /Burn changes this month/.test(line)), "spending keeps its own clock");
   });
 
   it("omits the Timing line when a hand-built item carries none", () => {

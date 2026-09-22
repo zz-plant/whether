@@ -19,10 +19,12 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /^## Whether Weekly Brief — 2026-03-04$/m);
     assert.match(brief, /^\*\*Conditions:\*\* /m);
-    assert.match(brief, /^### The readings$/m);
     assert.match(brief, /^### This week's call$/m);
+    assert.match(brief, /^### What changed this week$/m);
+    // The page's order: the call, then what moved. The brief reads the same way.
+    assert.ok(brief.indexOf("This week's call") < brief.indexOf("What changed this week"));
     assert.match(brief, /^- Chicago Fed National Financial Conditions Index: /m);
-    assert.match(brief, /^Source: https:\/\/fred\.stlouisfed\.org$/m);
+    assert.match(brief, /^Source: https:\/\/fred\.stlouisfed\.org · 2026-03-04 · Confidence: /m);
     // Markdown must not carry wiki markup.
     assert.doesNotMatch(brief, /^h2\. /m);
     assert.doesNotMatch(brief, /\[https:[^\]]*\|/);
@@ -33,7 +35,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /^h2\. Whether Weekly Brief — 2026-03-04$/m);
     assert.match(brief, /^\*Conditions:\* /m);
-    assert.match(brief, /^h3\. The readings$/m);
+    assert.match(brief, /^h3\. This week's call$/m);
     assert.match(brief, /^\* Chicago Fed National Financial Conditions Index: /m);
     assert.match(brief, /^Source: \[https:\/\/fred\.stlouisfed\.org\|https:\/\/fred\.stlouisfed\.org\]$/m);
     assert.doesNotMatch(brief, /^## /m);
@@ -42,8 +44,9 @@ describe("buildIssueTrackerMarkdownBrief", () => {
   it("carries both composite scores and the rate inputs behind them", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /Funding pressure:\*\* 12/);
-    assert.match(brief, /Risk appetite:\*\* 68/);
+    // Each score with the line it is judged against and the distance to it.
+    assert.match(brief, /Funding pressure 12 of 100 · call changes at 70 · 58 pts below/);
+    assert.match(brief, /Risk appetite 68 of 100 · call changes at 50 · 18 pts above/);
     assert.match(brief, /Short-term borrowing rate:\*\* 3\.75% \(1M\)/);
     assert.match(brief, /Recession warning gauge \(10-year minus 2-year rate\):\*\* 0\.55%/);
   });
@@ -57,13 +60,14 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     assert.match(brief, /\*\*Conditions:\*\* Sunny — Late/);
     // A ticket is read by a whole team; the engine key is for the JSON routes.
     assert.doesNotMatch(brief, /Regime:|EXPANSION/);
-    assert.match(brief, /HIGH confidence/);
+    assert.match(brief, /Confidence: HIGH \(how far the scores sit/);
   });
 
   it("stamps what confidence measures when no confidence label is modeled", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /Confidence: how far the scores sit from the line that changes the call/);
+    // With no modeled label the stamp still prints a value, from the reading itself.
+    assert.match(brief, /Confidence: MEDIUM \(how far the scores sit from the line that changes the call\)/);
   });
 
   it("produces identical bytes for Jira and Linear, which both consume markdown", () => {

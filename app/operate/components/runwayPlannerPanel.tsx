@@ -29,6 +29,7 @@ import {
 } from "../../../lib/report/runwayPlannerInputs";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { ReportData } from "../../../lib/report/reportData";
+import { ScoreCell } from "../../components/ui/scoreCell";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
   { value: "b2b-saas", label: "B2B SaaS" },
@@ -367,15 +368,18 @@ This memo lines the budget and spending limits up with those conditions:
         <>
           <div id="ops-runway-risk" className="grid gap-3 md:grid-cols-2">
             <article className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway risk</p>
-              <p className="mt-2 flex items-baseline gap-2 tabular-nums">
-                <span className="text-2xl font-semibold text-slate-100">{output.runwayRisk.score}</span>
-                <span className="text-sm text-slate-500">/100</span>
-                <span className="text-sm text-slate-300">{output.runwayRisk.level}</span>
-                <span className="ml-auto text-fluid-nano text-slate-400">
-                  if conditions worsen <span className="text-slate-200">{output.runwayRisk.macroRiskDownsideFlip}</span>
-                </span>
-              </p>
+              {/* The score with its reference: the line it is judged against here
+                  is where it would sit if conditions worsened, which is the one
+                  the planner computes. No last week — the planner has none. */}
+              <ScoreCell
+                label="Runway risk"
+                value={output.runwayRisk.score}
+                line={{ value: output.runwayRisk.macroRiskDownsideFlip, label: "If conditions worsen" }}
+                previous={null}
+              >
+                <dt className="text-slate-400">Level</dt>
+                <dd className="text-slate-300">{output.runwayRisk.level}</dd>
+              </ScoreCell>
               <RangeBar
                 min={0}
                 max={100}

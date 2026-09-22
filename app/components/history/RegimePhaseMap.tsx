@@ -133,8 +133,13 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
     <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="phase-map-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
+          {/* Headed as the mechanism, not the reading. The month strip and the
+              track record above already give the record's answer; this chart
+              is the second read — how the two scores decide the call — and a
+              heading that said "where this month sits" made it compete with
+              them for the first question. */}
           <h2 className="type-eyebrow type-eyebrow-section" id="phase-map-heading">
-            Where this month sits on the two scores
+            How the two scores decide the call
           </h2>
           <p className="max-w-prose text-sm text-slate-300">
             Funding pressure and risk appetite together are one point on this chart, and the call

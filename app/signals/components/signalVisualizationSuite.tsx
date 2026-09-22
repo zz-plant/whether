@@ -238,16 +238,13 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     .sort((a, b) => b.rank - a.rank)
     .slice(0, 10);
 
-  /* No header of its own. This renders inside the "Full diagnostics"
-     ReportSection, which already carries the eyebrow and title; a second
-     eyebrow-plus-h2 pair here read as two sections for one block. The
-     disclosure is a native `<details>`, open by default — the charts are the
-     section's content, and the summary is there for a reader who wants the
-     shocks list below without the plots. */
+  /* No header and no disclosure of its own. This renders inside the charts
+     disclosure of the evidence page's "Deeper evidence" section, which carries
+     the summary; a second `<details>` here was a disclosure inside a
+     disclosure. */
   return (
     <div id="visual-diagnostics" className="min-w-0 space-y-4">
-      <details open className="weather-auto-chevron rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
-        <summary className="text-xs font-semibold text-slate-100">Five charts</summary>
+      <div className="rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
 
         <div className="mt-3 border-b border-slate-800/80 pb-3 text-xs text-slate-300">
           Latest: {treasury.record_date} · {treasury.isLive ? "Live reading" : "Last saved reading"}
@@ -441,7 +438,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </ul>
           </FlatPanel>
         </div>
-      </details>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ScoreLadder, describeLadderPosition, nearestLadderLine } from "../app/components/ui/scoreLadder";
+import { ScoreLadder, buildLadderLines, describeLadderPosition, nearestLadderLine } from "../app/components/ui/scoreLadder";
 import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell";
 import { AreaTable } from "../app/components/ui/areaTable";
 import { TrustStrip } from "../app/components/trustStrip";
@@ -36,6 +36,25 @@ describe("ScoreLadder", () => {
     assert.doesNotMatch(without, /Last week/);
     assert.doesNotMatch(without, /role="img"/);
   });
+
+  it("names the hollow dot for what it is when it is not last week", () => {
+    /* /history/compare draws period B against period A; a hollow dot captioned
+       "last week" there would claim a comparison nobody made. */
+    const html = renderToStaticMarkup(
+      <ScoreLadder label="Funding pressure" value={72} previous={61} previousLabel="Period B" lines={lines} />,
+    );
+    assert.match(html, /Period B 61\./);
+    assert.doesNotMatch(html, /Last week/);
+  });
+
+  it("builds the three lines from the numbers a surface has, drawing only the ones it states", () => {
+    assert.deepEqual(buildLadderLines({ pause: 76, resume: 66, callChange: 70 }), [
+      { kind: "pause", value: 76 },
+      { kind: "resume", value: 66 },
+      { kind: "callChange", value: 70 },
+    ]);
+    assert.deepEqual(buildLadderLines({ callChange: 70 }), [{ kind: "callChange", value: 70 }]);
+  });
 });
 
 describe("ScoreCell", () => {
@@ -47,6 +66,26 @@ describe("ScoreCell", () => {
     const html = renderToStaticMarkup(<ScoreCell label="Risk appetite" value={68} line={{ value: 44, label: "Pause line" }} previous={64} />);
     assert.ok(html.indexOf("68") < html.indexOf("Pause line"));
     assert.ok(html.indexOf("Pause line") < html.indexOf("Last week"));
+  });
+
+  it("carries a reading that is not a score in its own units", () => {
+    /* The base rate is a percent and the curve a spread; both are judged
+       against a line the same way, and neither is "of 100". */
+    assert.equal(
+      formatScoreReference({
+        label: "Short-term borrowing rate",
+        value: 4.2,
+        line: { value: 3.5, label: "Pressure line" },
+        previous: 4.1,
+        units: { suffix: "%", scale: "", distance: "" },
+      }),
+      "Short-term borrowing rate 4.2% · Pressure line 3.5% · 0.7% above · last week 4.1%",
+    );
+    const html = renderToStaticMarkup(
+      <ScoreCell label="Curve" value={0.3} line={{ value: 0, label: "Inversion line" }} units={{ suffix: "pp", scale: "", distance: "" }} />,
+    );
+    assert.doesNotMatch(html, /of 100/);
+    assert.match(html, /0\.3pp/);
   });
 });
 

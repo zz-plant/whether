@@ -23,7 +23,7 @@ import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
-import { PlaybookPanel } from "../components/appendix/playbookPanel";
+import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import { ReportShell } from "../components/reportShell";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
@@ -207,6 +207,7 @@ export async function buildPlanningPageModel(
         })
         : null,
       h(OperationsExecutionStepper, {
+        recordDate: treasury.record_date,
         steps: [
           {
             id: "ops-monthly-action-summary",
@@ -335,15 +336,15 @@ export async function buildPlanningPageModel(
                   className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100",
                 }, showAllActionLanes ? "Show top 3 only" : "Show all rules"),
               ),
-              h(PlaybookPanel, {
+              /* The per-area rows are the weekly plan step's AreaTable now — the
+                 consequence tier, in the one order every surface uses. What is
+                 left here is what to read before committing. */
+              h(RulesBeforeCommit, {
                 playbook,
                 stopItems,
                 startItems,
                 fenceItems,
-                provenance: treasuryProvenance,
-                showProvenance: false,
-                actionStripItems,
-                showAllActionLanes,
+                showAll: showAllActionLanes,
               }),
               ),
             }),

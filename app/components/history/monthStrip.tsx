@@ -10,7 +10,7 @@ import { regimeDataAttribute } from "../../../lib/regimeAccent";
  * Each segment carries `data-regime`, so its colour comes from the same
  * token the page shells use (`--regime-accent`), never a per-component table.
  */
-export type MonthStripEntry = { recordDate: string; regime: string };
+type MonthStripEntry = { recordDate: string; regime: string };
 
 type MonthStripProps = {
   entries: readonly MonthStripEntry[];
@@ -36,7 +36,7 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
   if (!run) return null;
   const changes = sorted.filter((entry, index) => index > 0 && entry.regime !== sorted[index - 1].regime).length;
   return (
-    <figure className={`space-y-2 ${className}`.trim()}>
+    <figure className={`space-y-2 ${className}`.trim()} data-month-strip>
       <p className="sr-only">
         The call by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes} changes; {run.label} held {run.held} months.
       </p>

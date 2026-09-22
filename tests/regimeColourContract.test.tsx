@@ -57,15 +57,7 @@ describe("regime colour contract", () => {
 
   it("stamps the hero with the regime its copy states", () => {
     const html = renderToStaticMarkup(
-      <DecisionHero
-        tightness={77}
-        tightnessDelta={14}
-        boldnessScore={36}
-        boldnessDelta={-14}
-        regime="SCARCITY"
-        recordDate="2026-09-11"
-        fetchedAt="2026-09-15"
-      />,
+      <DecisionHero regime="SCARCITY" weeklyCall="Freeze new commitments." />,
     );
 
     assert.match(html, /data-regime="SCARCITY"/, "the card names its regime for the token layer");

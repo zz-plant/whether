@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { AreaTable } from "../app/components/ui/areaTable";
 
 import * as nextNavigation from "next/navigation";
 import { DecisionHero } from "../app/components/DecisionHero";
@@ -19,41 +20,22 @@ mockAny.module("next/navigation", () => ({
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
 }));
 
-const heroProps = {
-  tightness: 77,
-  tightnessDelta: 14,
-  riskAppetite: 42,
-  riskAppetiteDelta: -14,
-  boldnessScore: 36,
-  boldnessDelta: -14,
-  regime: "SCARCITY",
-  postureLabel: "Contraction",
-  recordDate: "Sep 15, 2026",
-  fetchedAt: "Sep 15, 2026",
-  signalData: { tightnessThreshold: 70, riskAppetiteThreshold: 50 },
-  boundedConditions: {
-    pause: [
-      { metric: "tightness" as const, operator: ">" as const, value: 76, label: "Funding pressure > 76" },
-      { metric: "riskAppetite" as const, operator: "<" as const, value: 44, label: "Risk appetite < 44" },
-    ],
-    resume: [
-      { metric: "tightness" as const, operator: "<" as const, value: 66, label: "Funding pressure < 66" },
-      { metric: "riskAppetite" as const, operator: ">" as const, value: 54, label: "Risk appetite > 54" },
-    ],
-  },
-  guardrail: "Funding pressure > 76",
-};
 
 describe("reader-facing number formatting", () => {
   it("does not run a threshold into the distance that follows it", () => {
     /* The readout prints the line's own value and then how far the reading sits
        from it, so the two numbers land adjacent: `66` followed by `11 pts away`
-       reads as "66 11" on first glance. The export formats had already solved
-       this by bracketing the distance. */
-    const html = renderToStaticMarkup(<DecisionHero {...heroProps} />);
+       reads as "66 11" on first glance. The area table draws them as separate
+       blocks for the same reason the export formats bracket the distance. */
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[{ area: "hiring", rule: "Backfills only.", pause: { line: "Funding pressure > 76", distance: "11 pts away" } }]}
+      />,
+    );
 
-    assert.doesNotMatch(html, /66\s*<[^>]*>\s*11 pts away/, "two numbers still collide");
-    assert.ok(html.includes("(11 pts away)"), "the distance is not bracketed");
+    assert.doesNotMatch(html, /76\s*11 pts away/, "two numbers still collide");
+    assert.match(html, /Funding pressure &gt; 76<span class="block[^"]*">11 pts away<\/span>/, "the distance is not on its own line");
   });
 
   it("brackets every distance, including the ones that read as words", () => {
@@ -64,10 +46,24 @@ describe("reader-facing number formatting", () => {
   });
 
   it("states confidence as a word, not an engine code", () => {
-    const html = renderToStaticMarkup(<DecisionHero {...heroProps} confidenceLabel="MED" />);
+    // Confidence is a cell of the trust strip under the call now, rather than a
+    // chip inside the hero card. The rule is the same: the reader gets the word.
+    const html = renderToStaticMarkup(
+      <DecisionHero
+        regime="DEFENSIVE"
+        weeklyCall="Keep approvals staged."
+        trust={{
+          recordDateLabel: "Sep 18, 2026",
+          sourcesLive: true,
+          sourcesLabel: "All sources live",
+          confidenceLabel: "MED",
+          couldChangeNextWeek: false,
+        }}
+      />,
+    );
 
-    assert.ok(html.includes("Medium confidence"), "the hero still prints the raw code");
-    assert.doesNotMatch(html, /Confidence MED\b/);
+    assert.ok(html.includes("Medium"), "the strip still prints the raw code");
+    assert.doesNotMatch(html, /\bMED\b/);
   });
 
   it("passes an unknown confidence value through rather than reshaping it", () => {

@@ -26,6 +26,12 @@ export type AreaRowData = {
   /** Where to read more: the area's toolkit, scenario or answer. */
   href?: Route;
   hrefLabel?: string;
+  /**
+   * A line under the rule that qualifies it for this reader — the runway
+   * note the homepage adds once a band is set. Rendered inside the rule cell,
+   * so a slot that resolves to nothing adds no row.
+   */
+  note?: ReactNode;
 };
 
 type AreaTableProps = {
@@ -65,7 +71,10 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                   decisionAreaLabel(row.area)
                 )}
               </th>
-              <td className="py-2.5 pr-3 text-slate-200">{row.rule}</td>
+              <td className="py-2.5 pr-3 text-slate-200">
+                {row.rule}
+                {row.note}
+              </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300">
                 {row.pause ? (
                   <>

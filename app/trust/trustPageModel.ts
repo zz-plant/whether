@@ -10,7 +10,11 @@ import {
   buildWeeklyCitationMetaLine,
 } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
+import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
+import { buildLadderLines } from "../components/ui/scoreLadder";
+import type { TrustStripProps } from "../components/trustStrip";
+import type { ScorePositions } from "./formulaReference";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { loadCronRunHistory } from "../../lib/telemetry/runHistory";
 
@@ -42,7 +46,46 @@ export async function buildTrustPageModel() {
     isHistoricalSelection: Boolean(reportData.historicalSelection),
   });
   const confidenceLabel = formatConfidencePlainLabel(homeBriefModel.confidenceLabel);
-  const sourceCoverage = `${reportData.treasuryProvenance.statusLabel} · ${reportData.macroProvenance.statusLabel}`;
+  /* The strip under the h1: the four facts a reader checks before acting, in
+     the slot every reading route gives them. The sources cell keeps the words
+     the five-cell System status strip used for the same three states. */
+  const trustStrip: Omit<TrustStripProps, "href"> = {
+    recordDateLabel: reportData.recordDateLabel,
+    sourcesLive: !isFallback && degradedSourceRows.length === 0,
+    sourcesLabel: isFallback
+      ? "Cached snapshot"
+      : degradedSourceRows.length > 0
+        ? `Partly cached · ${degradedSourceRows.length}`
+        : "All sources live",
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    couldChangeNextWeek: homeBriefModel.transitionWatch === "ON",
+  };
+  /* Where the two scores sit against their lines, for the ladders that open
+     "How the score is built". Last week is read off the same dynamics the
+     homepage's movement line uses: a signal missing from `changedSignals`
+     moved under 0.01, and no previous reading at all is `"unavailable"`, which
+     draws no hollow dot rather than a dot claiming a comparison nobody made. */
+  const scores = reportData.assessment.scores;
+  const thresholds = reportData.assessment.thresholds;
+  const rails = buildSharedCorridorRails(reportData.actionStripItems ?? [], scores);
+  const previousScore = (key: "tightness" | "riskAppetite") => {
+    const dynamics = reportData.reportDynamics;
+    if (dynamics.directionLabel === "unavailable") return null;
+    const delta = dynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? 0;
+    return scores[key] - delta;
+  };
+  const positionFor = (key: "tightness" | "riskAppetite", callChange: number) => {
+    const rail = rails.find((candidate) => candidate.metric === key);
+    return {
+      value: scores[key],
+      previous: previousScore(key),
+      lines: buildLadderLines({ pause: rail?.guardrail, resume: rail?.clearsAt, callChange }),
+    };
+  };
+  const scorePositions: ScorePositions = {
+    tightness: positionFor("tightness", thresholds.tightnessRegime),
+    riskAppetite: positionFor("riskAppetite", thresholds.riskAppetiteRegime),
+  };
   const citationLine = buildWeeklyCitationMetaLine({
     statusLabel: reportData.statusLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
@@ -99,15 +142,6 @@ export async function buildTrustPageModel() {
     : decisionReadiness.tone === "warning"
       ? "warning"
       : "stable";
-  /* The verdict is a colour on the System status strip, not a banner: emerald
-     for ready, violet for a past week, amber for caution. A labelled banner
-     above the strip used to say the same thing in words the five cells then
-     repeated. */
-  const trustVerdictToneClasses = trustStatusTone === "stable"
-    ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-100"
-    : trustStatusTone === "historical"
-      ? "border-violet-400/35 bg-violet-500/10 text-violet-100"
-      : "border-amber-400/35 bg-amber-500/10 text-amber-100";
   /* Each label is the section's own title. Two had drifted: "Snapshot" for a
      section headed "System status", and "Sources & freshness" for one headed
      "Cite this call" — so the rail offered "Sources" and "Sources & freshness"
@@ -152,17 +186,13 @@ export async function buildTrustPageModel() {
     isFallback,
     degradedSourceRows,
     confidenceLabel,
-    // The plain label ("Medium (mixed signal reliability)") is prose. The status
-    // dot needs the code, and comparing the prose against "MED" never matched —
-    // so every confidence level, HIGH included, painted the dot rose.
-    confidenceCode: homeBriefModel.confidenceLabel,
     trustSummary,
-    sourceCoverage,
     citationLine,
     warnings,
     meetingSnippet,
     revisitBullets,
-    trustVerdictToneClasses,
+    trustStrip,
+    scorePositions,
     runHistory,
     reportShellProps,
   };

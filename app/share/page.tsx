@@ -10,6 +10,7 @@ import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
+import { buildAreaRows } from "../operate/areaRows";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
 import { buildFlipProximity } from "../../lib/report/flipProximity";
 import { TransmissionPipelineGlyph } from "../components/illustrations/TransmissionPipelineGlyph";
@@ -86,6 +87,9 @@ const buildCurrentShareArtifact = async () => {
   /* Kanban pull policies: the same pause/resume conditions re-verbed for a
      pull system, copyable for a board header or wiki. */
   const pullPolicyBlocks = buildPullPolicyBlocks(snapshot.homeBriefModel.actionStripItems ?? []);
+  /* The same five rows the plan page tabulates, so an area's rule and its two
+     lines read identically on both surfaces. */
+  const areaRows = buildAreaRows(snapshot.homeBriefModel.actionStripItems ?? []);
   /* The regime as a numeric WIP cap. The runway band is browser-held (cookie),
      so the server copy states the regime cap; the pull-policy section above
      carries the thresholds that gate it. */
@@ -148,6 +152,7 @@ const buildCurrentShareArtifact = async () => {
     issueTrackerBrief,
     investorUpdate,
     guardrailTagBlocks,
+    areaRows,
     pullPolicyBlocks,
     wipGuidance,
     calendarDetails: [
@@ -209,7 +214,7 @@ export default async function SharePage() {
         {/* The credential-free slice of the Linear/Jira sync, beside the ticket
             brief it extends. One paste-ready block per business area. Each
             renders its own panel, or nothing when it has no blocks. */}
-        <GuardrailTagControls blocks={artifact.guardrailTagBlocks} />
+        <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />
         <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
 
         {/* Role memos are share formats. They sat under the sixth collapsed

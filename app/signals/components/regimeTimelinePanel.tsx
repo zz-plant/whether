@@ -120,8 +120,8 @@ export const RegimeTimelinePanel = ({
   };
 
   return (
-    <section id="regime-timeline" aria-labelledby="regime-timeline-title" className="mt-10">
-      <div className="weather-panel p-6">
+    <section id="regime-timeline" aria-labelledby="regime-timeline-title" className="mt-6 border-t border-slate-800/60 pt-6">
+      <div>
         <SectionPanelHeader
           label="Past calls"
           title="The call, month by month, over 24 months"

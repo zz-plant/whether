@@ -7,48 +7,72 @@ import type { ReactNode } from "react";
  * into a decision. The four parts always print in this order, on the page and
  * in every paste (`formatScoreReference` is the text form the exports use).
  */
-export type ScoreReference = {
+type ScoreReference = {
   label: string;
   value: number;
   line: { value: number; label: string };
   previous?: number | null;
+  /**
+   * Units for a reading that is not a 0–100 score. The base rate is a percent
+   * and the curve is a spread in points, and both are judged against a line
+   * the same way; the defaults print a score ("12 of 100 · … · 64 pts below").
+   */
+  units?: ScoreUnits;
 };
+
+export type ScoreUnits = {
+  /** Printed after the value and after the line, e.g. "%" or "pp". */
+  suffix?: string;
+  /** Printed after the value alone; "" for a reading with no fixed scale. */
+  scale?: string;
+  /** The word for a distance, e.g. "pts". "" prints the suffix instead. */
+  distance?: string;
+};
+
+const DEFAULT_UNITS: Required<ScoreUnits> = { suffix: "", scale: "of 100", distance: "pts" };
+
+const resolveUnits = (units?: ScoreUnits): Required<ScoreUnits> => ({ ...DEFAULT_UNITS, ...units });
+
+const formatDistance = (distance: number, units: Required<ScoreUnits>) =>
+  units.distance ? `${formatPoints(distance)} ${units.distance}` : `${formatPoints(distance)}${units.suffix}`;
 
 const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
 
-export const formatScoreReference = ({ label, value, line, previous }: ScoreReference) => {
+export const formatScoreReference = ({ label, value, line, previous, units }: ScoreReference) => {
+  const resolved = resolveUnits(units);
   const distance = Math.abs(value - line.value);
   const side = distance === 0 ? "at" : value > line.value ? "above" : "below";
   const parts = [
-    `${label} ${formatPoints(value)} of 100`,
-    `${line.label} ${formatPoints(line.value)}`,
-    distance === 0 ? "at the line" : `${formatPoints(distance)} pts ${side}`,
+    `${label} ${formatPoints(value)}${resolved.suffix}${resolved.scale ? ` ${resolved.scale}` : ""}`,
+    `${line.label} ${formatPoints(line.value)}${resolved.suffix}`,
+    distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${side}`,
   ];
-  if (typeof previous === "number" && Number.isFinite(previous)) parts.push(`last week ${formatPoints(previous)}`);
+  if (typeof previous === "number" && Number.isFinite(previous)) parts.push(`last week ${formatPoints(previous)}${resolved.suffix}`);
   return parts.join(" · ");
 };
 
 type ScoreCellProps = ScoreReference & { className?: string; children?: ReactNode };
 
-export function ScoreCell({ label, value, line, previous = null, className = "", children }: ScoreCellProps) {
+export function ScoreCell({ label, value, line, previous = null, units, className = "", children }: ScoreCellProps) {
+  const resolved = resolveUnits(units);
   const distance = Math.abs(value - line.value);
-  const side = distance === 0 ? "at the line" : `${formatPoints(distance)} pts ${value > line.value ? "above" : "below"}`;
+  const side = distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${value > line.value ? "above" : "below"}`;
   const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
   return (
     <dl className={`grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs ${className}`.trim()}>
       <dt className="text-slate-400">{label}</dt>
       <dd className="tabular-nums text-slate-100">
-        <span className="text-base font-semibold">{formatPoints(value)}</span>
-        <span className="text-slate-400"> of 100</span>
+        <span className="text-base font-semibold">{formatPoints(value)}{resolved.suffix}</span>
+        {resolved.scale ? <span className="text-slate-400"> {resolved.scale}</span> : null}
       </dd>
       <dt className="text-slate-400">{line.label}</dt>
       <dd className="tabular-nums text-slate-300">
-        {formatPoints(line.value)} · {side}
+        {formatPoints(line.value)}{resolved.suffix} · {side}
       </dd>
       {hasPrevious ? (
         <>
           <dt className="text-slate-400">Last week</dt>
-          <dd className="tabular-nums text-slate-300">{formatPoints(previous)}</dd>
+          <dd className="tabular-nums text-slate-300">{formatPoints(previous)}{resolved.suffix}</dd>
         </>
       ) : null}
       {children}

@@ -4,27 +4,38 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Copy, CopyCheck, ImageIcon } from "lucide-react";
 import { useClipboardCopy } from "./useClipboardCopy";
+import { useScrollDirection } from "./useScrollDirection";
 import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
-import { TrendGlyph, trendDirectionFromDelta, trendToneClass, type TrendDirection } from "./illustrations/TrendGlyph";
+import { TrendGlyph, type TrendDirection } from "./illustrations/TrendGlyph";
 import { DIRECTION_ARROW, DIRECTION_LABEL, type SignalDirection } from "../viewModel";
-import { OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
+import { HOME_SECTIONS } from "../../lib/report/home/homeSectionModel";
 
 type Props = {
   call: string;
   /** Weekly posture direction. Names the movement; the glyph is drawn from it. */
   direction: SignalDirection;
-  boldnessScore: number;
-  boldnessDelta: number;
+  /** The weather word, so the strip states the call the way the hero does. */
+  weatherWord: string;
+  /** The confidence word ("High", "Medium", "Low"), as the trust strip prints it. */
+  confidenceWord: string;
   shareLines?: string[];
 };
 
 /**
- * Rendered from `md` up only. Below `md` the bottom tab bar owns the thumb zone,
- * and this strip used to sit on top of it — two fixed bars, roughly 128px of a
- * 932px viewport, plus a spacer the strip reserved for itself even while hidden.
- * With the brief at about three phone screens the hero's Copy Brief is one flick
- * away, which is what the strip existed to shortcut. (Reverses the 2026-08
- * thumb-zone strip in docs/design-improvements-priority.md, P0 #1.)
+ * Two strips, one per width, and neither in the thumb zone.
+ *
+ * From `md` up the strip is the floating pill at the foot of the page, shown
+ * once the reader has scrolled past the hero. Below `md` the bottom tab bar
+ * owns the thumb zone, and this strip used to sit on top of it — two fixed
+ * bars, roughly 128px of a 932px viewport, plus a spacer the strip reserved for
+ * itself even while hidden. (Reverses the 2026-08 thumb-zone strip in
+ * docs/design-improvements-priority.md, P0 #1.)
+ *
+ * The phone variant is one line at the *top*, under the header, shown once
+ * the hero has left the viewport: weather word, the call, confidence, and a
+ * jump to what the call changes. The top is what keeps it out of the thumb
+ * zone. It follows the header's own hide-on-scroll: when the header slides
+ * away the strip moves up into its place, by transform, on the same curve.
  *
  * The badge is the only place the weekly direction appears once scrolled, so it
  * states the direction in words rather than leaving a bare arrow character for
@@ -36,22 +47,21 @@ const DIRECTION_BADGE: Record<SignalDirection, { glyph: TrendDirection; tone: st
   hold: { glyph: "flat", tone: "bg-sky-500/20 text-sky-300 border border-sky-500/30" },
 };
 
-export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta, shareLines }: Props) {
+/** The hero, which both variants watch: the strip has a job only once it is gone. */
+const HERO_ID = "share-ready-artifact";
+
+export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, shareLines }: Props) {
   const { status, copyToClipboard } = useClipboardCopy();
   const isCopied = status === "copied";
   const currentSearchParams = useSearchParams();
   const [showStrip, setShowStrip] = useState(false);
+  const [heroLeft, setHeroLeft] = useState(false);
+  const { direction: scrollDirection, isPastThreshold } = useScrollDirection();
+  const headerHidden = isPastThreshold && scrollDirection === "down";
   const imageBriefHref = useMemo(
     () => buildImageBriefApiPath(currentSearchParams),
     [currentSearchParams],
   );
-
-  const deltaLabel = boldnessDelta !== 0
-    ? `${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)} vs last week`
-    : "unchanged";
-  // Boldness rising is the favourable direction, so it resolves through the
-  // shared delta palette rather than a local emerald/rose pair.
-  const deltaColor = trendToneClass(trendDirectionFromDelta(boldnessDelta), true);
 
   useEffect(() => {
     let blockingControlInView = false;
@@ -92,9 +102,27 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
     };
   }, []);
 
+  /* The phone line watches the hero itself rather than a scroll offset: it
+     appears exactly when the call has scrolled off the top, whatever sits
+     above the hero on this visit (a banner, a since-last-visit line, nothing). */
+  useEffect(() => {
+    const hero = document.getElementById(HERO_ID);
+    if (!hero || !("IntersectionObserver" in window)) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        setHeroLeft(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { threshold: 0 },
+    );
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
+
   const handleCopy = async () => {
     const text = [
-      `Whether · ${OPERATING_LATITUDE_LABEL} ${boldnessScore}/100 (${deltaLabel})`,
+      `Whether · ${weatherWord} · ${confidenceWord} confidence`,
       // Plain-text artifact, so the compact glyph is right here — sourced from
       // the shared map rather than re-derived.
       `${DIRECTION_ARROW[direction]} ${call}`,
@@ -106,6 +134,28 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
 
   return (
     <>
+      {heroLeft ? (
+        <div
+          data-testid="phone-call-strip"
+          className={`fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.25rem)] z-40 px-3 pt-1.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
+            headerHidden ? "-translate-y-[3.25rem]" : "translate-y-0"
+          }`}
+        >
+          <p className="flex items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 text-fluid-xs leading-tight text-slate-100 shadow-[var(--elev-4)] backdrop-blur-xl">
+            <span className="shrink-0 font-bold uppercase tracking-wider" style={{ color: "var(--regime-ink)" }}>
+              {weatherWord}
+            </span>
+            <span className="min-w-0 flex-1 truncate font-medium text-white">{call}</span>
+            <span className="shrink-0 text-slate-400">{confidenceWord}</span>
+            <a
+              href={`#${HOME_SECTIONS.consequences.id}`}
+              className="weather-focus-ring inline-flex min-h-[44px] shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
+            >
+              What it changes
+            </a>
+          </p>
+        </div>
+      ) : null}
       {showStrip ? (
         <div
           data-testid="sticky-call-strip"
@@ -121,13 +171,16 @@ export function StickyCallStrip({ call, direction, boldnessScore, boldnessDelta,
                 <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
                 <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
               </span>
-              {/* The hero sets this same score in the sans; mono here made one
-                  number look like two quantities. Columns get mono, readouts
-                  beside a label get tabular figures — see tokens.css. */}
-              <span className="text-slate-400 tabular-nums text-xs">{boldnessScore}/100</span>
+              {/* The weather word, not the operating-latitude score it used to
+                  print: the page no longer shows that number anywhere, and a
+                  strip that restates the call should restate it in the words
+                  the hero uses. */}
+              <span className="shrink-0 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--regime-ink)" }}>
+                {weatherWord}
+              </span>
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
             </span>
-            <span className={`flex-shrink-0 text-fluid-xs tabular-nums font-medium ${deltaColor}`}>{deltaLabel}</span>
+            <span className="flex-shrink-0 text-fluid-xs text-slate-400">{confidenceWord}</span>
             {/* Both actions are the shared ghost button; a plain `<a>` with its own
                 class chain drops the control radius, the press and the focus ring
                 the class carries. The download is an API path, so it stays an

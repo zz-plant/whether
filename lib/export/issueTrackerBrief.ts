@@ -15,10 +15,11 @@ import type { CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { formatNumberWithUnit } from "../formatters";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildComplianceStamp } from "../exportNotices";
-import { buildBoundedDecisionLines, type ModeledExportDecisionPayload } from "./briefBuilders";
+import { EXPORT_SECTION_HEADINGS, buildAreaRowLines, buildCallLines, type ModeledExportDecisionPayload } from "./briefBuilders";
+import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { regimeSignalLabel } from "../report/signalTranslations";
-import type { ActionStripItem } from "../report/operatingCalls";
+import { buildSharedCorridorRails, type ActionStripItem } from "../report/operatingCalls";
 
 type IssueTrackerFormat = "markdown" | "wiki";
 
@@ -29,6 +30,8 @@ type ExportDecisionModel = ModeledExportDecisionPayload & {
   canonicalDecisionCopy?: CanonicalDecisionCopy;
   decisionShiftSummary?: string;
   trendLabel?: string;
+  /** Last week's scores, when the caller's read carries a previous week; never invented. */
+  previousScores?: ScorePair | null;
 };
 
 export const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
@@ -58,35 +61,48 @@ export const buildIssueTrackerMarkdownBrief = (
   const macroLines = macros.map(
     (macro) => `${bullet} ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`,
   );
-  const boundedDecisionLines = buildBoundedDecisionLines(assessment, { modeledDecision: decisionModel })
-    .map((line) => `${bullet} ${line.replace(/^•\s*/, "")}`);
-  const sourceLine = isWiki
-    ? `Source: [${treasury.source}|${treasury.source}]`
-    : `Source: ${treasury.source}`;
+  const exportOptions = { modeledDecision: decisionModel, previousScores: decisionModel?.previousScores ?? null };
+  /* A top-level bullet for the row, its lines and timing indented under it. */
+  const asBullets = (lines: string[]) =>
+    lines.map((line) => (line.startsWith("•") ? `${bullet} ${line.replace(/^•\s*/, "")}` : `  ${bullet} ${line.trim()}`));
+  const callLines = asBullets(buildCallLines(assessment, exportOptions));
+  const areaRows = asBullets(buildAreaRowLines(exportOptions));
+  const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+  const readingLines = buildScoreReferenceLines({
+    scores,
+    thresholds: assessment.thresholds,
+    rails: buildSharedCorridorRails(decisionModel?.actionStripItems ?? [], scores),
+    previous: decisionModel?.previousScores ?? null,
+  }).map((line) => `${bullet} ${line}`);
+  /* The stamp below carries the source in plain text for every format; the
+     wiki form adds a linked one because its stamp URL is not clickable. */
+  const sourceLine = isWiki ? `Source: [${treasury.source}|${treasury.source}]` : null;
 
+  /*
+   * The page's order: the call first, then what changed (the two scores against
+   * their lines, the rate inputs, the readings), then one row per area. No
+   * engine key beside the label: it used to print `**Regime:** EXPANSION` under
+   * "Conditions: Sunny", a second vocabulary for one state on a card a whole
+   * team reads; the JSON routes are where a machine looks it up.
+   */
   return [
     `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
     `${strong("Conditions")} ${postureLabel}`,
-    // No engine key beside the label. It used to print `**Regime:** EXPANSION`
-    // under "Conditions: Sunny", a second vocabulary for one state on a card
-    // a whole team reads; the JSON routes are where a machine looks it up.
-    `${strong("Funding pressure")} ${assessment.scores.tightness} / ${strong("Risk appetite")} ${assessment.scores.riskAppetite}`,
-    `${strong(regimeSignalLabel.baseRate)} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `${strong("Recession warning gauge (10-year minus 2-year rate)")} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
-    "",
-    `${heading3}The readings`,
-    ...macroLines,
     "",
     `${heading3}This week's call`,
-    ...boundedDecisionLines,
+    ...callLines,
     "",
-    sourceLine,
+    `${heading3}${EXPORT_SECTION_HEADINGS.changed}`,
+    ...readingLines,
+    `${bullet} ${strong(regimeSignalLabel.baseRate)} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `${bullet} ${strong("Recession warning gauge (10-year minus 2-year rate)")} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    ...macroLines,
+    ...(areaRows.length > 0 ? ["", `${heading3}${EXPORT_SECTION_HEADINGS.areas}`, ...areaRows] : []),
+    ...(sourceLine ? ["", sourceLine] : []),
     "",
     ...buildExportStamp(
       treasury,
-      decisionModel?.confidenceLabel
-        ? `${decisionModel.confidenceLabel} confidence`
-        : "how far the scores sit from the line that changes the call",
+      `${decisionModel?.confidenceLabel ?? assessment.diagnostics.confidence} (how far the scores sit from the line that changes the call)`,
     ),
   ].join("\n");
 };

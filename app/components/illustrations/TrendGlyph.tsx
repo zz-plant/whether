@@ -36,9 +36,6 @@ export const trendDirectionFromDelta = (delta: number | null | undefined): Trend
  * emits as a literal character. Callers should render the glyph rather than the
  * character so the direction has a shape and an accessible name.
  */
-export const trendDirectionFromArrow = (arrow: "↑" | "↓" | "→"): TrendDirection =>
-  arrow === "↑" ? "up" : arrow === "↓" ? "down" : "flat";
-
 /**
  * Tone for a movement. `increaseIsPositive` defaults to false because
  * tightness-style scores — the majority here — rise when conditions worsen.

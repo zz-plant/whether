@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FrameworkSection } from "../app/trust/frameworkSection";
-import { TrackRecord } from "../app/components/history/TrackRecord";
+import { TrackRecordTiles } from "../app/components/history/TrackRecord";
 import { TRACK_RECORD_MIN_MONTHS, buildTrackRecord } from "../lib/report/trackRecord";
 import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
 import { pricingPlans } from "../lib/pricing";
@@ -86,7 +86,7 @@ describe("/history dates what it is showing", () => {
   assert.ok(record, "expected the fixture window to be long enough for a record");
 
   it("does not present a month-end reading as the current call", () => {
-    const html = renderToStaticMarkup(<TrackRecord record={record} />);
+    const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
     assert.doesNotMatch(html, /Reading now/i);
     assert.doesNotMatch(
@@ -97,7 +97,7 @@ describe("/history dates what it is showing", () => {
   });
 
   it("stamps the period the record runs through", () => {
-    const html = renderToStaticMarkup(<TrackRecord record={record} />);
+    const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
     assert.match(html, /month-end call/i);
     assert.match(html, /Through /);

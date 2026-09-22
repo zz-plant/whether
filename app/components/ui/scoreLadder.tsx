@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
  *
  * Presentational: it takes numbers and knows nothing about the engine.
  */
-export type LadderLineKind = "pause" | "resume" | "callChange";
+type LadderLineKind = "pause" | "resume" | "callChange";
 
 export type LadderLine = {
   kind: LadderLineKind;
@@ -26,8 +26,15 @@ export type LadderLine = {
 type ScoreLadderProps = {
   label: ReactNode;
   value: number;
-  /** Last week's reading; drawn hollow. Null when there is nothing to compare against. */
+  /** The comparison reading; drawn hollow. Null when there is nothing to compare against. */
   previous?: number | null;
+  /**
+   * What the hollow dot is. "Last week" on every reading route; /history/compare
+   * draws period B against period A and /history draws the month before the
+   * last completed one, and a hollow dot captioned "last week" there would be
+   * a claim about a comparison nobody made.
+   */
+  previousLabel?: string;
   lines: readonly LadderLine[];
   max?: number;
   className?: string;
@@ -59,6 +66,26 @@ export const nearestLadderLine = (value: number, lines: readonly LadderLine[]) =
   return best;
 };
 
+/**
+ * The three lines as a ladder takes them, from the numbers a surface has. The
+ * pause and resume lines come from a rule's rails (`buildSharedCorridorRails`)
+ * and are absent when the rule states none; the call-change line is the
+ * threshold in force and is always drawn.
+ */
+export const buildLadderLines = ({
+  pause,
+  resume,
+  callChange,
+}: {
+  pause?: number;
+  resume?: number;
+  callChange: number;
+}): LadderLine[] => [
+  ...(typeof pause === "number" ? [{ kind: "pause" as const, value: pause }] : []),
+  ...(typeof resume === "number" ? [{ kind: "resume" as const, value: resume }] : []),
+  { kind: "callChange" as const, value: callChange },
+];
+
 export const describeLadderPosition = (value: number, lines: readonly LadderLine[]) => {
   const nearest = nearestLadderLine(value, lines);
   if (!nearest) return `${formatPoints(value)} of 100`;
@@ -68,16 +95,24 @@ export const describeLadderPosition = (value: number, lines: readonly LadderLine
   return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} pts ${side} the ${label} line`;
 };
 
-export function ScoreLadder({ label, value, previous = null, lines, max = 100, className = "" }: ScoreLadderProps) {
+export function ScoreLadder({
+  label,
+  value,
+  previous = null,
+  previousLabel = "Last week",
+  lines,
+  max = 100,
+  className = "",
+}: ScoreLadderProps) {
   const caption = describeLadderPosition(value, lines);
   const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
   return (
-    <figure className={`space-y-1.5 ${className}`.trim()}>
+    <figure className={`space-y-1.5 ${className}`.trim()} data-score-ladder>
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs">
         <span className="font-medium text-slate-200">{label}</span>
         <span className="tabular-nums text-slate-400">{caption}</span>
       </figcaption>
-      {hasPrevious ? <span className="sr-only">Last week {formatPoints(previous)}.</span> : null}
+      {hasPrevious ? <span className="sr-only">{previousLabel} {formatPoints(previous)}.</span> : null}
       <div className="relative h-8" aria-hidden="true">
         <div className="absolute inset-x-0 top-3 h-1.5 rounded-full bg-slate-800" />
         {lines.map((line) => (
@@ -96,7 +131,7 @@ export function ScoreLadder({ label, value, previous = null, lines, max = 100, c
           <span
             className="absolute top-2.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-slate-300 bg-transparent"
             style={{ left: `${clampPercent(previous, max)}%` }}
-            title={`Last week: ${formatPoints(previous)}`}
+            title={`${previousLabel}: ${formatPoints(previous)}`}
           />
         ) : null}
         <span

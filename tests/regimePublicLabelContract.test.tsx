@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { PlaybookPanel } from "../app/components/appendix/playbookPanel";
+import { RulesBeforeCommit } from "../app/operate/components/rulesBeforeCommit";
 import { getPlaybookForRegime } from "../lib/playbook";
 import { REGIME_LABELS, REGIME_ORDER, getRegimePublicLabel } from "../lib/regimePresentation";
 import { insightDatabase } from "../data/recommendations";
@@ -22,26 +22,18 @@ import { insightDatabase } from "../data/recommendations";
  * check and fail this.
  */
 describe("regime public labels", () => {
-  it("renders the public label as the playbook heading for every regime", () => {
+  it("renders the public label as the rules heading for every regime", () => {
     for (const regime of REGIME_ORDER) {
       const playbook = getPlaybookForRegime(regime);
       assert.ok(playbook, `no playbook for ${regime}`);
 
       const html = renderToStaticMarkup(
-        <PlaybookPanel
+        <RulesBeforeCommit
           playbook={playbook}
           stopItems={[]}
           startItems={[]}
           fenceItems={[]}
-          actionStripItems={[]}
-          provenance={{
-            sourceLabel: "FRED",
-            recordDateLabel: "Sep 15, 2026",
-            timestampLabel: "Sep 15, 2026",
-            ageLabel: "today",
-            statusLabel: "High",
-          }}
-          showProvenance={false}
+          showAll={false}
         />,
       );
 
