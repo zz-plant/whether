@@ -5,6 +5,7 @@ import { buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 
 type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
 
@@ -102,7 +103,7 @@ ${weeklyCall.currentCall}
 
 **Pause if:** ${weeklyCall.pauseIf}
 
-**Change course if:** ${weeklyCall.changeCourseIf}
+${weeklyCallChangeLines(weeklyCall).map(({ label, value }) => `**${label}:** ${value}`).join("\n\n")}
 
 ---
 

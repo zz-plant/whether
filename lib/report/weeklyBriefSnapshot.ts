@@ -8,7 +8,7 @@ import { buildCompactFreshnessMeta, type CompactFreshnessMeta } from "./reportFo
 import { resolveSectorKey, type SectorKey } from "./sectorSensitivity";
 import { buildTrustStatus } from "./trustStatus";
 import type { PostureStateContract } from "./postureStateContract";
-import { buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
+import { applyStageToWeeklyCall, buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
 import type { StartupVariantMode } from "./boundedDecisionRules";
 import type { RunwayBand } from "./operatorRunway";
 
@@ -125,7 +125,12 @@ export const buildWeeklyBriefSnapshot = ({
       })
     : null;
   const weeklyCall = reportData.projectsOperatingSnapshot && reportData.operatingSnapshot
-    ? reportData.operatingSnapshot.weeklyCall
+    ? applyStageToWeeklyCall(reportData.operatingSnapshot.weeklyCall, {
+        assessment: reportData.operatingSnapshot.assessment,
+        startupVariantMode,
+        runwayBand,
+        runwayMonths,
+      })
     : buildWeeklyCallContract({
         assessment: reportData.assessment,
         homeBriefModel,

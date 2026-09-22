@@ -49,7 +49,7 @@ const buildPersistedSnapshot = () => {
     currentCall: "Project the persisted operating call.",
     actionNow: "Use one committed snapshot across every current surface.",
     pauseIf: "Pause if a reader cannot resolve the committed snapshot.",
-    changeCourseIf: "Recompute only for an explicit historical selection.",
+    callChangesIf: "Recompute only for an explicit historical selection.",
   };
   snapshot.assessment = {
     ...snapshot.assessment,
@@ -93,7 +93,7 @@ describe("OperatingSnapshot read consistency", () => {
     assert.equal(exported.currentCall, persisted.weeklyCall.currentCall);
     assert.equal(exported.actionNow, persisted.weeklyCall.actionNow);
     assert.equal(exported.pauseIf, persisted.weeklyCall.pauseIf);
-    assert.equal(exported.changeCourseIf, persisted.weeklyCall.changeCourseIf);
+    assert.equal(exported.callChangesIf, persisted.weeklyCall.callChangesIf);
   });
 
   it("keeps explicit historical reads on the as-of reconstruction path", async () => {

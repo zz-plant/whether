@@ -13,7 +13,8 @@
  * than the writer. The ZIP stores its entries uncompressed, which the format
  * allows and every reader accepts; the whole file is under 20 KB.
  */
-import { slideReadingLines, type MeetingSlidePayload } from "./meetingSlideExport";
+import { slideReadingLines, slideResumeLine, type MeetingSlidePayload } from "./meetingSlideExport";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel } from "../regimePresentation";
 
 // ---------------------------------------------------------------------------
@@ -68,8 +69,8 @@ const buildCards = (payload: MeetingSlidePayload): SlideCard[] => [
   { label: "1. ACTION NOW", body: payload.actionNow, accent: COLORS.accents[0], top: CARD_TOPS[0] },
   { label: "2. PAUSE IF", body: payload.pauseIf, accent: COLORS.accents[1], top: CARD_TOPS[1] },
   {
-    label: "3. CHANGE COURSE IF",
-    body: payload.changeCourseIf,
+    label: `3. ${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}`,
+    body: payload.callChangesIf,
     accent: COLORS.accents[2],
     top: CARD_TOPS[2],
   },
@@ -214,6 +215,14 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
       }),
     );
   });
+  const resumeLine = slideResumeLine(payload);
+  if (resumeLine) {
+    // Below confidence rather than above it, so "whether.work" stays level with
+    // the confidence line and a long resume sentence has the slide's foot to wrap into.
+    shapes.push(
+      textBox({ name: "Footer resume", x: 80, y: FOOTER_TOP + footerLines(payload).length * FOOTER_LINE_HEIGHT, width: 1040, height: FOOTER_LINE_HEIGHT * 2, text: resumeLine, style: { sizePx: 13, bold: true, color: COLORS.inkMuted } }),
+    );
+  }
   shapes.push(
     textBox({ name: "Footer site", x: 940, y: FOOTER_TOP + 2 * FOOTER_LINE_HEIGHT, width: 180, height: FOOTER_LINE_HEIGHT, text: "whether.work", style: { sizePx: 13, bold: true, color: "475569" }, align: "r" }),
   );
@@ -603,6 +612,10 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
       maxWidthPx: 860,
     });
   });
+  const resumeLine = slideResumeLine(payload);
+  if (resumeLine) {
+    drawText(resumeLine, { x: 80, y: FOOTER_TOP + 2 + footer.length * FOOTER_LINE_HEIGHT, sizePx: 13, font: bold, fill: COLORS.inkMuted, maxWidthPx: 1040 });
+  }
   drawText("whether.work", { x: 940, y: FOOTER_TOP + 2 + 2 * FOOTER_LINE_HEIGHT, sizePx: 13, font: bold, fill: "475569", maxWidthPx: 180, align: "right" });
 
   return doc.save();

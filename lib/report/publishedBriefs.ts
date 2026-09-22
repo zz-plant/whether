@@ -243,11 +243,13 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
     `Conditions: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
     "",
-    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
     `• ${publicDecisionLabels.call}: ${brief.summary}`,
     `• ${publicDecisionLabels.action}: ${brief.actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${brief.guardrailThreshold}`,
-    `• ${publicDecisionLabels.reversal}: ${brief.flipThreshold}`,
+    // The regime line, labelled as the email below labels it; the areas' own
+    // resume lines follow under "Re-open when".
+    `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${brief.flipThreshold}`,
     ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
     "Summary:",

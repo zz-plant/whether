@@ -8,6 +8,7 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { buildScoreReferenceLines } from "./scoreReference";
 
 export interface MeetingSlidePayload {
@@ -19,7 +20,10 @@ export interface MeetingSlidePayload {
   stageLabel: string;
   actionNow: string;
   pauseIf: string;
-  changeCourseIf: string;
+  /** Where the call itself changes — the regime flip trigger. A stage never replaces it. */
+  callChangesIf: string;
+  /** A stage's discipline for lifting its hold. Present only when a stage is chosen. */
+  resumeWhen?: string;
   tightness: number;
   riskAppetite: number;
   /**
@@ -68,7 +72,7 @@ export function extractMeetingSlidePayload(
 
   const actionNow = stageAdj?.actionNow ?? weeklyCall.actionNow;
   const pauseIf = stageAdj?.pauseIf ?? weeklyCall.pauseIf;
-  const changeCourseIf = stageAdj?.changeCourseIf ?? weeklyCall.changeCourseIf;
+  const resumeWhen = stageAdj?.resumeWhen ?? weeklyCall.resumeWhen;
   const stageLabel = stageAdj?.label ?? (stage === "seed" ? "Seed" : stage ? "Startup" : "");
 
   return {
@@ -78,7 +82,8 @@ export function extractMeetingSlidePayload(
     stageLabel,
     actionNow,
     pauseIf,
-    changeCourseIf,
+    callChangesIf: weeklyCall.callChangesIf,
+    ...(resumeWhen ? { resumeWhen } : {}),
     tightness: snapshot.assessment.scores.tightness,
     riskAppetite: snapshot.assessment.scores.riskAppetite,
     lines: {
@@ -103,6 +108,10 @@ export const slideReadingLines = (payload: MeetingSlidePayload): string[] =>
       : DEFAULT_THRESHOLDS,
   });
 
+/** The stage's resume line as every slide format prints it, or null without a stage. */
+export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
+  payload.resumeWhen ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.resumeWhen}` : null;
+
 /**
  * Generates formatted Markdown / Notion Callout Block
  */
@@ -119,7 +128,10 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
       : []),
     `> 🎯 **ACTION NOW**: ${payload.actionNow}`,
     `> ⚠️ **PAUSE IF**: ${payload.pauseIf}`,
-    `> 🔄 **CHANGE COURSE IF**: ${payload.changeCourseIf}`,
+    `> 🔄 **${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}**: ${payload.callChangesIf}`,
+    ...(payload.resumeWhen
+      ? [`> ↩️ **${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}**: ${payload.resumeWhen}`]
+      : []),
     ...(payload.clearsWhen && payload.clearsWhen.length > 0
       ? [`> ✅ **CLEARS WHEN**: ${payload.clearsWhen.join("; ")}`]
       : []),
@@ -170,8 +182,14 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
     <tr><td style="height: 8px;"></td></tr>
     <tr>
       <td style="padding: 12px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 4px 8px 8px 4px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">3. Change Course If</span>
-        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.changeCourseIf}</div>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">3. ${DECISION_CONTRACT_LABELS.watch.postureFlips}</span>
+        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.callChangesIf}</div>${
+          payload.resumeWhen
+            ? `
+        <span style="display: block; margin-top: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">${DECISION_CONTRACT_LABELS.reversal.resumeWhen}</span>
+        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.resumeWhen}</div>`
+            : ""
+        }
       </td>
     </tr>
   </table>
@@ -244,12 +262,12 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.pauseIf)}</text>
   </g>
 
-  <!-- Card 3: Change Course If -->
+  <!-- Card 3: Call changes if -->
   <g transform="translate(80, 450)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#10b981"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. CHANGE COURSE IF</text>
-    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.changeCourseIf)}</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. ${esc(DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase())}</text>
+    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.callChangesIf)}</text>
   </g>
 
   <!-- Footer: each score against its line, then confidence -->
@@ -265,7 +283,12 @@ ${slideReadingLines(payload)
     </text>
     <text x="1040" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
       whether.work
-    </text>
+    </text>${
+      slideResumeLine(payload)
+        ? `
+    <text x="0" y="54" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">${esc(slideResumeLine(payload) ?? "")}</text>`
+        : ""
+    }
   </g>
 </svg>`;
 }

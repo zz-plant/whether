@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import type { Route } from "../../lib/navigation/routeType";
 import { buildBreadcrumbList, websiteName } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -271,9 +272,13 @@ export async function buildPlanningPageModel(
                     h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-amber-200" }, DECISION_CONTRACT_LABELS.threshold.pauseIf),
                     h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.pauseIf),
                   ),
-                  h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200" }, DECISION_CONTRACT_LABELS.reversal.changeCourseIf),
-                    h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.changeCourseIf),
+                  h("article", { className: "space-y-3 rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
+                    ...weeklyCallChangeLines(weeklyCall).map(({ label, value }) =>
+                      h("div", { key: label },
+                        h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200" }, label),
+                        h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, value),
+                      ),
+                    ),
                   ),
                 ),
                 /* One row per area, in the order every surface uses, with the rule and

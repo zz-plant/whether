@@ -10,7 +10,7 @@ describe("buildSlackBrief", () => {
   it("gives each bounded-decision slot content of its own shape", () => {
     // With no modeled payload — the /share page and the CLI artifact both call it
     // this way — the slots used to fall back to `assessment.constraints`, which is
-    // a list of actions. That put an action in "Pause if" and "Re-open when", and
+    // a list of actions. That put an action in "Pause if" and the reversal slot, and
     // printed constraints[0] under both "Posture" and "Do now".
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
     const slot = (label: string) =>
@@ -19,9 +19,9 @@ describe("buildSlackBrief", () => {
     const posture = slot("Call");
     const doNow = slot("Do now");
     const pauseIf = slot("Pause if");
-    const reopenWhen = slot("Re-open when");
+    const callChangesIf = slot("Call changes if");
 
-    for (const [label, value] of Object.entries({ posture, doNow, pauseIf, reopenWhen })) {
+    for (const [label, value] of Object.entries({ posture, doNow, pauseIf, callChangesIf })) {
       assert.ok(value.length > 0, `${label} slot is empty`);
     }
 
@@ -31,8 +31,8 @@ describe("buildSlackBrief", () => {
       "Pause if is being filled from the operating-constraints list",
     );
     assert.ok(
-      !assessment.constraints.includes(reopenWhen),
-      "Re-open when is being filled from the operating-constraints list",
+      !assessment.constraints.includes(callChangesIf),
+      "Call changes if is being filled from the operating-constraints list",
     );
   });
 
@@ -110,18 +110,23 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Re-open when\):/);
+    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Call changes if\):/);
     assert.match(brief, /• Call: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
-    assert.match(brief, /• Re-open when: Resume when tightness < 64\./);
+    // The fourth slot is where the call changes; the area's resume line is in
+    // its row, under its own label, rather than standing in for it.
+    const callChangesIf = brief.match(/• Call changes if: (.+)/)?.[1] ?? "";
+    assert.match(callChangesIf, /Funding pressure|Risk appetite/);
+    assert.doesNotMatch(callChangesIf, /Resume when tightness/);
+    assert.match(brief, /  Re-open when: Resume when tightness < 64\./);
     assert.ok(brief.indexOf("• Call: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
-    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
+    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Call changes if: "));
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Confidence: MEDIUM confidence/);
     assert.match(brief, /• The scores sit near a line; a small move changes the call\./);
-    assert.match(brief, /• If it is: see "Re-open when" above/);
+    assert.match(brief, /• If it is: see "Call changes if" above/);
   });
 
   it("carries each lever's timing line into the per-lever bullets", async () => {

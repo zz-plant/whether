@@ -92,7 +92,8 @@ const isWeeklyCall = (value: unknown): boolean => {
     && typeof value.currentCall === "string"
     && typeof value.actionNow === "string"
     && typeof value.pauseIf === "string"
-    && typeof value.changeCourseIf === "string"
+    && typeof value.callChangesIf === "string"
+    && (value.resumeWhen === undefined || typeof value.resumeWhen === "string")
     && isStringArray(value.doNowBullets)
     && isStringArray(value.flipConditionLabels)
     && typeof value.whyCouldBeWrong === "string"
@@ -130,9 +131,23 @@ const isOperatingSnapshot = (value: unknown): value is OperatingSnapshot => {
     && FRESHNESS_STATES.has(value.freshness.status);
 };
 
+/**
+ * A snapshot written before the contract split carries the call-change line as
+ * `changeCourseIf`. That is already the right value: snapshots are built with
+ * no stage, and the stage's resume line was the only thing that ever replaced
+ * the flip trigger there. So the old field is read as the new one rather than
+ * discarding every stored snapshot over a rename.
+ */
+const upgradeLegacyWeeklyCall = (value: unknown): unknown => {
+  if (!isRecord(value) || !isRecord(value.weeklyCall)) return value;
+  const { changeCourseIf, ...weeklyCall } = value.weeklyCall;
+  if (typeof weeklyCall.callChangesIf === "string" || typeof changeCourseIf !== "string") return value;
+  return { ...value, weeklyCall: { ...weeklyCall, callChangesIf: changeCourseIf } };
+};
+
 const parseOperatingSnapshot = (raw: string): OperatingSnapshot | null => {
   try {
-    const value: unknown = JSON.parse(raw);
+    const value: unknown = upgradeLegacyWeeklyCall(JSON.parse(raw));
     return isOperatingSnapshot(value) ? value : null;
   } catch {
     return null;

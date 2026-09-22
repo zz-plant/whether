@@ -60,7 +60,7 @@ const buildDeltaOnlyBriefText = ({
     ...revisitLines,
     "",
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${homeBriefModel.guardrail}`,
-    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${canonicalDecisionCopy.flipTrigger}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${canonicalDecisionCopy.flipTrigger}`,
     `Trust: ${homeBriefModel.decisionReadiness.detail}`,
     `Data refreshed: ${freshnessLabel}`,
     "",
@@ -142,7 +142,10 @@ export const buildLeadershipArtifactPayload = async ({
       postureLine: `BOLDNESS BUDGET: ${homeBriefModel.weeklyLeadershipSummary.boldnessScore}/100 (${homeBriefModel.weeklyLeadershipSummary.boldnessDelta === 0 ? "no change vs last week" : `${homeBriefModel.weeklyLeadershipSummary.boldnessDelta > 0 ? "+" : ""}${homeBriefModel.weeklyLeadershipSummary.boldnessDelta} vs last week`}) · POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
       changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
       guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
-      flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,
+      flipLine: `FLIP: ${weeklyCall.callChangesIf}`,
+      ...(weeklyCall.resumeWhen
+        ? { resumeLine: `${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}: ${weeklyCall.resumeWhen}` }
+        : {}),
       stabilityLine: "STABILITY: Act on a change in the call only after two weekly readings agree, unless it fires at HIGH confidence.",
     });
     const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
@@ -153,7 +156,8 @@ export const buildLeadershipArtifactPayload = async ({
       confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
       doNow: weeklyCall.actionNow,
       avoid: weeklyCall.pauseIf,
-      watch: weeklyCall.changeCourseIf,
+      watch: weeklyCall.callChangesIf,
+      ...(weeklyCall.resumeWhen ? { resume: weeklyCall.resumeWhen } : {}),
       flipConditions: weeklyCall.flipConditionLabels,
     });
 

@@ -262,7 +262,7 @@ describe("Architecture Invariants", () => {
     assert.equal(briefPayload.actionNow, weeklyCall.actionNow);
     assert.equal(briefPayload.regimeStage, weeklyCall.regimeStage);
     assert.equal(briefPayload.pauseIf, weeklyCall.pauseIf);
-    assert.equal(briefPayload.changeCourseIf, weeklyCall.changeCourseIf);
+    assert.equal(briefPayload.callChangesIf, weeklyCall.callChangesIf);
   });
 
   it("Invariant 4: A historical snapshot always deterministically regenerates the same call", () => {

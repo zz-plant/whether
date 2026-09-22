@@ -75,6 +75,12 @@ export const DECISION_CONTRACT_LABELS = {
   },
   reversal: {
     changeCourseIf: "Change course if",
+    /**
+     * A stage's discipline for lifting a hold it took ("Reverse the hold only
+     * after two improving readings in a row…"). Not where the call changes —
+     * that is `watch.postureFlips` — and it sits beside that line, never in it.
+     */
+    resumeWhen: "Resume when",
   },
   watch: {
     flipWatch: "What would change the call",
@@ -114,7 +120,7 @@ export const POLICY_OVERRIDE_CALL = {
   currentCall: "The two scores point in different directions, so the call is not changing this week.",
   actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
   pauseIf: "Hold anything you can't undo while the two scores disagree.",
-  changeCourseIf:
+  callChangesIf:
     "The two scores point the same way for a second reading; until then the call is not changing.",
 } as const;
 
@@ -130,7 +136,7 @@ export const POLICY_OVERRIDE_CALL = {
 export const NO_LIVE_READING_CALL = {
   currentCall: "No live reading this week. Keep last week's plan.",
   pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
-  changeCourseIf: "A live reading lands; until then the call is not changing.",
+  callChangesIf: "A live reading lands; until then the call is not changing.",
 } as const;
 
 export const PRIMARY_AUDIENCE_SUMMARY =

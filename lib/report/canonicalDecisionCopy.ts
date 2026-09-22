@@ -68,7 +68,7 @@ export const buildCanonicalDecisionCopy = ({
     .filter((line, index, lines) => lines.indexOf(line) === index)
     .slice(0, 4);
   const resolvedFlipTrigger =
-    (weeklyCall?.changeCourseIf ?? postureState.whatFlipsNext.flipTrigger.trim())
+    (weeklyCall?.callChangesIf ?? postureState.whatFlipsNext.flipTrigger.trim())
     || flipConditions[0]
     || FALLBACK_FLIP_TRIGGER;
 

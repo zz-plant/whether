@@ -250,6 +250,7 @@ export const assembleHomePage = async ({
         overlaySector: homepageOverlaySector,
         postureState,
         startupVariantMode,
+        runwayBand,
       });
 
       return {

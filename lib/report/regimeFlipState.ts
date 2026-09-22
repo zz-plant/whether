@@ -60,7 +60,7 @@ type RegimeFlipState = {
 
 /**
  * The future-conditional form. Phrased as a condition, not a statement, because
- * callers prefix it with "Re-open when:" / "The call flips when:" as well as
+ * callers prefix it with "The call changes when:" / "The call flips when:" as well as
  * showing it standalone.
  */
 const buildBoundaryTriggerText = ({

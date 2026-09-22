@@ -34,7 +34,8 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.equal(seedPayload.regime, "SCARCITY");
     assert.ok(seedPayload.actionNow.length > 0);
     assert.ok(seedPayload.pauseIf.length > 0);
-    assert.ok(seedPayload.changeCourseIf.length > 0);
+    assert.equal(seedPayload.callChangesIf, snapshot.weeklyCall.callChangesIf, "a stage never replaces the call-change line");
+    assert.equal(seedPayload.resumeWhen, snapshot.weeklyCall.stageScopedAdjustments?.seed.resumeWhen);
 
     const seriesAPayload = extractMeetingSlidePayload(snapshot, "series-a");
     assert.equal(seriesAPayload.stageLabel, "Series A");
@@ -60,7 +61,8 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(markdown.includes("> **Whether: this week's call**"));
     assert.ok(markdown.includes("ACTION NOW"));
     assert.ok(markdown.includes("PAUSE IF"));
-    assert.ok(markdown.includes("CHANGE COURSE IF"));
+    assert.ok(markdown.includes(`CALL CHANGES IF**: ${payload.callChangesIf}`));
+    assert.ok(markdown.includes(`RESUME WHEN**: ${payload.resumeWhen}`));
     assert.ok(markdown.includes("Freezing"));
     assert.ok(!markdown.includes("SCARCITY"), "the engine key must not reach a pasted slide");
   });
@@ -77,7 +79,8 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(html.includes("Whether · Weekly Operating Brief"));
     assert.ok(html.includes("1. Action Now"));
     assert.ok(html.includes("2. Pause If"));
-    assert.ok(html.includes("3. Change Course If"));
+    assert.ok(html.includes("3. Call changes if"));
+    assert.ok(html.includes("Resume when"));
     assert.ok(html.includes("Freezing"));
     assert.ok(!html.includes("SCARCITY"));
   });

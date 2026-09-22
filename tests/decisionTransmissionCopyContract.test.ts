@@ -87,8 +87,8 @@ describe("decision transmission copy contract", () => {
     assert.match(brief, /• Do now:/);
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Confidence:/);
-    assert.match(brief, /• If it is: see "Re-open when" above/);
-    assert.match(brief, /• Re-open when:/);
+    assert.match(brief, /• If it is: see "Call changes if" above/);
+    assert.match(brief, /• Call changes if:/);
   });
 
   it("keeps FAQ structured data aligned with the rendered weekly decision FAQ prompts", () => {

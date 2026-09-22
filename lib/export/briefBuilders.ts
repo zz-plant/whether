@@ -8,6 +8,7 @@ import type { InterpretationLayer } from "../report/interpretationLayer";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { NO_LIVE_READING_CALL } from "../report/reportCopy";
+import { buildFlipThreshold } from "../report/reportEvidence";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
@@ -93,7 +94,6 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
 const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
 const FALLBACK_ACTION_NOW = "Keep last week's approvals as they are; start nothing new.";
 const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
-const FALLBACK_CHANGE_COURSE_IF = "Re-open when live data is back and the call has held for a week.";
 /** The stamp's confidence note when no label was modeled: what the number measures. */
 const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line that changes the call";
 
@@ -121,15 +121,19 @@ export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLay
   const pauseIf =
     firstMeaningful(leadItem?.triggerThreshold, modeled.guardrailThreshold)
     ?? FALLBACK_PAUSE_IF;
-  const changeCourseIf =
-    firstMeaningful(leadItem?.reversalCondition, modeled.reversalTrigger)
-    ?? FALLBACK_CHANGE_COURSE_IF;
+  // Where the call itself changes — never the lead area's resume line, which
+  // printed here under "Re-open when" whenever the model had areas and left the
+  // call-change line out of the four slots entirely. Each area's resume line is
+  // in the area rows below, under its own label.
+  const callChangesIf =
+    firstMeaningful(modeled.reversalTrigger, options?.postureState?.whatFlipsNext.flipTrigger)
+    ?? buildFlipThreshold(assessment);
 
   return [
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
-    `• ${publicDecisionLabels.reversal}: ${changeCourseIf}`,
+    `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${callChangesIf}`,
   ];
 };
 
@@ -236,7 +240,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `• Could the call change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
-    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${publicDecisionLabels.reversal}: ${condition}`),
+    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${condition}`),
     "• Re-check: whoever owns the plan, at the next weekly review.",
     ...(trustMarkers.length > 0 ? [`• Data: ${trustMarkers.join(" · ")}`] : []),
     ...actionStrip,
@@ -290,7 +294,7 @@ const buildWhyThisCouldBeWrongBlock = (assessment: RegimeAssessment, options?: E
     `• Confidence: ${confidenceLine}`,
     `• ${whyCouldBeWrong}`,
     ...(mode?.mitigationCheck ? [`• Check: ${mode.mitigationCheck}`] : []),
-    `• If it is: see "${publicDecisionLabels.reversal}" above, plus the readings.`,
+    `• If it is: see "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, plus the readings.`,
   ];
 };
 
@@ -359,7 +363,7 @@ export const buildSlackBrief = (
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Conditions: ${postureLabel}`,
     "",
-    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
     ...buildCallLines(assessment, options),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,

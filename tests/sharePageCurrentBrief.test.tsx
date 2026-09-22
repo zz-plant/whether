@@ -23,7 +23,7 @@ beforeEach(async () => {
     currentCall: "Share the persisted call exactly.",
     actionNow: "Transmit the committed action.",
     pauseIf: "Pause if the snapshot cannot be read.",
-    changeCourseIf: "Re-open only from the next committed snapshot.",
+    callChangesIf: "Re-open only from the next committed snapshot.",
   };
   await resetOperatingSnapshotStore().write(snapshot);
 });
@@ -43,7 +43,8 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Conditions:/);
     assert.match(html, /Do now/);
     assert.match(html, /Pause if/);
-    assert.match(html, /Re-open when/);
+    // The call-change line under its own label, not the resume vocabulary.
+    assert.match(html, /Call changes if: Re-open only from the next committed snapshot\./);
     assert.match(html, /Meeting pack/);
     assert.match(html, /Share the persisted call exactly\./);
     assert.match(html, /Transmit the committed action\./);

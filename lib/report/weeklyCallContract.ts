@@ -6,7 +6,7 @@ import {
   buildScopedVariantDecisionAdjustment,
   type StartupVariantMode,
 } from "./boundedDecisionRules";
-import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "./reportCopy";
+import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "./reportCopy";
 
 import { resolveRunwayBand, type RunwayBand } from "./operatorRunway";
 
@@ -15,7 +15,8 @@ type StageScopedAdjustment = {
   label: string;
   actionNow: string;
   pauseIf: string;
-  changeCourseIf: string;
+  /** The stage's resume discipline: when a hold this stage took may lift. Not a call change. */
+  resumeWhen: string;
   doNowBullets: string[];
   thresholdEmphasis: string;
   /** Set only when the adjustment was scaled by a runway band; the hero badge reads it. */
@@ -27,7 +28,20 @@ export type WeeklyCallContract = {
   currentCall: string;
   actionNow: string;
   pauseIf: string;
-  changeCourseIf: string;
+  /**
+   * Where the call itself changes: the regime flip trigger. Printed under
+   * `DECISION_CONTRACT_LABELS.watch.postureFlips`. A stage never replaces it —
+   * the macro call is company-agnostic.
+   */
+  callChangesIf: string;
+  /**
+   * Set only when a stage (or runway) is calibrated: that stage's discipline
+   * for lifting a hold. Printed under `DECISION_CONTRACT_LABELS.reversal.resumeWhen`,
+   * beside `callChangesIf`, never in its place. They used to share one field, so
+   * setting a stage swapped the flip trigger out for a resume condition while
+   * every surface kept labelling it "Call changes if".
+   */
+  resumeWhen?: string;
   doNowBullets: string[];
   flipConditionLabels: string[];
   whyCouldBeWrong: string;
@@ -40,9 +54,23 @@ export type WeeklyCallContract = {
 
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
 
+/**
+ * The call-change line and, when a stage set one, the resume line — each under
+ * its own label. Every surface that prints the contract's reversal side reads
+ * this, so the two cannot be merged back under one name by a renderer.
+ */
+export const weeklyCallChangeLines = (
+  weeklyCall: Pick<WeeklyCallContract, "callChangesIf" | "resumeWhen">,
+): Array<{ label: string; value: string }> => [
+  { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: weeklyCall.callChangesIf },
+  ...(weeklyCall.resumeWhen
+    ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: weeklyCall.resumeWhen }]
+    : []),
+];
+
 const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
 const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
-const FALLBACK_CHANGE_COURSE_IF = NO_LIVE_READING_CALL.changeCourseIf;
+const FALLBACK_CALL_CHANGES_IF = NO_LIVE_READING_CALL.callChangesIf;
 
 const dedupeLines = (lines: Array<string | undefined>, maxItems = 4) =>
   lines
@@ -109,71 +137,27 @@ export const buildWeeklyCallContract = ({
     ?? homeBriefModel.guardrailThreshold
     ?? homeBriefModel.guardrail
     ?? FALLBACK_PAUSE_IF;
-  const defaultChangeCourseIf =
+  const defaultCallChangesIf =
     canonicalDecisionCopy?.flipTrigger
     ?? homeBriefModel.reversalTrigger
     ?? homeBriefModel.flipThreshold
     ?? homeBriefModel.compactFlipConditionLabels[0]
-    ?? FALLBACK_CHANGE_COURSE_IF;
-
-  // Build stage-scoped adjustment copy for every stage up front, scaled by runway if given.
-  // These swap the brief's decision bullets per selected stage and runway; the macro
-  // regime call stays company-agnostic.
-  const buildStageAdjustment = (mode: StartupVariantMode, label: string): StageScopedAdjustment => {
-    const adj = buildScopedVariantDecisionAdjustment({
-      mode,
-      thresholds: assessment.thresholds,
-      scores: assessment.scores,
-      runwayMonths,
-      runwayBand,
-    });
-    return {
-      mode,
-      label,
-      actionNow: adj.doNowAdjustments[0] ?? FALLBACK_CURRENT_CALL,
-      pauseIf: adj.watchAdjustments[0] ?? FALLBACK_PAUSE_IF,
-      changeCourseIf: adj.reversalTriggerDiscipline ?? FALLBACK_CHANGE_COURSE_IF,
-      doNowBullets: dedupeLines([...adj.doNowAdjustments, ...adj.avoidAdjustments], 3),
-      thresholdEmphasis: adj.thresholdEmphasis,
-      // Conditional so an uncalibrated contract survives a JSON round-trip
-      // unchanged: the snapshot store compares what it reads back by deep
-      // equality, and a key holding `undefined` does not.
-      ...(adj.runwayLabel ? { runwayLabel: adj.runwayLabel } : {}),
-    };
-  };
-  const stageScopedAdjustments: Record<StartupVariantMode, StageScopedAdjustment> = {
-    seed: buildStageAdjustment("seed", "Seed"),
-    "series-a": buildStageAdjustment("series-a", "Series A"),
-    "series-b": buildStageAdjustment("series-b", "Series B"),
-    growth: buildStageAdjustment("growth", "Growth"),
-    public: buildStageAdjustment("public", "Public"),
-    bootstrapped: buildStageAdjustment("bootstrapped", "Bootstrapped"),
-  };
-
-  // Stage- and runway-scoped scaling: when an operator has calibrated stage or runway,
-  // swap the brief's decision bullets for that calibrated language while keeping the
-  // macro regime call itself unchanged.
-  const resolvedRunwayBand = resolveRunwayBand(runwayBand, runwayMonths) ?? undefined;
-  const activeMode = startupVariantMode ?? (resolvedRunwayBand ? "series-a" : undefined);
-  const stageAdj = activeMode
-    ? stageScopedAdjustments[activeMode] ?? stageScopedAdjustments["series-a"]
-    : undefined;
+    ?? FALLBACK_CALL_CHANGES_IF;
 
   const currentCall = policyOverrideActive
     ? POLICY_OVERRIDE_CALL.currentCall
     : defaultCurrentCall;
   const actionNow = policyOverrideActive
     ? POLICY_OVERRIDE_CALL.actionNow
-    : stageAdj?.actionNow ?? defaultActionNow;
+    : defaultActionNow;
   const pauseIf = policyOverrideActive
     ? POLICY_OVERRIDE_CALL.pauseIf
-    : stageAdj?.pauseIf ?? defaultPauseIf;
-  const changeCourseIf = policyOverrideActive
-    ? POLICY_OVERRIDE_CALL.changeCourseIf
-    : stageAdj?.changeCourseIf ?? defaultChangeCourseIf;
+    : defaultPauseIf;
+  const callChangesIf = policyOverrideActive
+    ? POLICY_OVERRIDE_CALL.callChangesIf
+    : defaultCallChangesIf;
   const doNowBullets = policyOverrideActive
     ? dedupeLines([actionNow, ...buildPolicyOverrideActionLines(assessment)], 3)
-    : stageAdj?.doNowBullets ? dedupeLines(stageAdj.doNowBullets, 3)
     : dedupeLines(
         canonicalDecisionCopy?.doNowLines.length
           ? canonicalDecisionCopy.doNowLines
@@ -182,7 +166,7 @@ export const buildWeeklyCallContract = ({
       );
   const defaultFlipConditionLabels = canonicalDecisionCopy
     ? buildFlipConditionsWithoutTriggerDuplication({
-        flipTrigger: changeCourseIf,
+        flipTrigger: callChangesIf,
         flipConditions: canonicalDecisionCopy.flipConditions,
       })
     : dedupeLines(
@@ -207,17 +191,117 @@ export const buildWeeklyCallContract = ({
       ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the call."
       : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.";
 
+  return applyStageToWeeklyCall(
+    {
+      regimeStage,
+      currentCall,
+      actionNow,
+      pauseIf,
+      callChangesIf,
+      doNowBullets,
+      flipConditionLabels,
+      whyCouldBeWrong,
+      policyOverrideActive,
+      policyOverrideReason,
+    },
+    { assessment, startupVariantMode, runwayMonths, runwayBand },
+  );
+};
+
+// Stage-scoped adjustment copy for every stage, scaled by runway if given. These
+// swap the brief's decision bullets per selected stage and runway; the macro
+// regime call stays company-agnostic.
+const buildStageScopedAdjustments = ({
+  assessment,
+  runwayMonths,
+  runwayBand,
+}: {
+  assessment: Pick<RegimeAssessment, "thresholds" | "scores">;
+  runwayMonths?: number;
+  runwayBand?: RunwayBand;
+}): Record<StartupVariantMode, StageScopedAdjustment> => {
+  const buildStageAdjustment = (mode: StartupVariantMode, label: string): StageScopedAdjustment => {
+    const adj = buildScopedVariantDecisionAdjustment({
+      mode,
+      thresholds: assessment.thresholds,
+      scores: assessment.scores,
+      runwayMonths,
+      runwayBand,
+    });
+    return {
+      mode,
+      label,
+      actionNow: adj.doNowAdjustments[0] ?? FALLBACK_CURRENT_CALL,
+      pauseIf: adj.watchAdjustments[0] ?? FALLBACK_PAUSE_IF,
+      resumeWhen: adj.reversalTriggerDiscipline,
+      doNowBullets: dedupeLines([...adj.doNowAdjustments, ...adj.avoidAdjustments], 3),
+      thresholdEmphasis: adj.thresholdEmphasis,
+      // Conditional so an uncalibrated contract survives a JSON round-trip
+      // unchanged: the snapshot store compares what it reads back by deep
+      // equality, and a key holding `undefined` does not.
+      ...(adj.runwayLabel ? { runwayLabel: adj.runwayLabel } : {}),
+    };
+  };
   return {
-    regimeStage,
-    currentCall,
-    actionNow,
-    pauseIf,
-    changeCourseIf,
-    doNowBullets,
-    flipConditionLabels,
-    whyCouldBeWrong,
-    policyOverrideActive,
-    policyOverrideReason,
+    seed: buildStageAdjustment("seed", "Seed"),
+    "series-a": buildStageAdjustment("series-a", "Series A"),
+    "series-b": buildStageAdjustment("series-b", "Series B"),
+    growth: buildStageAdjustment("growth", "Growth"),
+    public: buildStageAdjustment("public", "Public"),
+    bootstrapped: buildStageAdjustment("bootstrapped", "Bootstrapped"),
+  };
+};
+
+/**
+ * The reader's stage and runway, laid over a stage-agnostic call.
+ *
+ * Separate from `buildWeeklyCallContract` because the read path usually does
+ * not build the call: it projects the stored `OperatingSnapshot`, whose call is
+ * stage-agnostic by construction (the cron has no reader). Projecting it as-is
+ * meant a reader who had chosen a stage got the stored action, pause and no
+ * resume line whenever the store had a snapshot — every live read — and the
+ * calibrated copy only when it did not. The stage adjustments depend on nothing
+ * but the scores and thresholds, which the stored assessment carries, so they
+ * are recomputed here and the stored call-change line is kept untouched.
+ */
+export const applyStageToWeeklyCall = (
+  weeklyCall: WeeklyCallContract,
+  {
+    assessment,
+    startupVariantMode,
+    runwayMonths,
+    runwayBand,
+  }: {
+    assessment: Pick<RegimeAssessment, "thresholds" | "scores">;
+    startupVariantMode?: StartupVariantMode;
+    runwayMonths?: number;
+    runwayBand?: RunwayBand;
+  },
+): WeeklyCallContract => {
+  const resolvedRunwayBand = resolveRunwayBand(runwayBand, runwayMonths) ?? undefined;
+  const activeMode = startupVariantMode ?? (resolvedRunwayBand ? "series-a" : undefined);
+  // Nothing calibrated: a stored call is returned exactly as stored, so the
+  // projection stays deep-equal to what was persisted.
+  if (!activeMode && weeklyCall.stageScopedAdjustments) return weeklyCall;
+
+  const stageScopedAdjustments = buildStageScopedAdjustments({ assessment, runwayMonths, runwayBand });
+  const stageAdj = activeMode
+    ? stageScopedAdjustments[activeMode] ?? stageScopedAdjustments["series-a"]
+    : undefined;
+  const calibrated = stageAdj && !weeklyCall.policyOverrideActive
+    ? {
+        actionNow: stageAdj.actionNow,
+        pauseIf: stageAdj.pauseIf,
+        // A held call has one resume line, the override's own; a stage's
+        // discipline would be a second, competing one.
+        resumeWhen: stageAdj.resumeWhen,
+        doNowBullets: dedupeLines(stageAdj.doNowBullets, 3),
+      }
+    : {};
+
+  return {
+    ...weeklyCall,
+    ...calibrated,
     ...(resolvedRunwayBand ? { runwayBand: resolvedRunwayBand } : {}),
     ...(stageAdj?.runwayLabel ? { runwayLabel: stageAdj.runwayLabel } : {}),
     stageScopedAdjustments,

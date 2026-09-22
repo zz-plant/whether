@@ -31,6 +31,7 @@ export function WhatWouldChangeSection({
   ladders,
   flipProximity,
   reversalTrigger,
+  resumeWhen,
   guardrail,
   flipConditions,
   thresholdBusinessConsequence,
@@ -40,6 +41,8 @@ export function WhatWouldChangeSection({
   ladders: readonly HomeScoreLadder[];
   flipProximity: readonly FlipProximityLine[];
   reversalTrigger?: string;
+  /** The selected stage's discipline for lifting its hold. Beside the call-change line, never in it. */
+  resumeWhen?: string;
   guardrail?: string;
   flipConditions?: readonly string[];
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
@@ -100,6 +103,12 @@ export function WhatWouldChangeSection({
           <div className="flex gap-2">
             <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</dt>
             <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
+          </div>
+        ) : null}
+        {resumeWhen ? (
+          <div className="flex gap-2">
+            <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</dt>
+            <dd className="text-slate-300"><BoundedValue>{resumeWhen}</BoundedValue></dd>
           </div>
         ) : null}
         {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (

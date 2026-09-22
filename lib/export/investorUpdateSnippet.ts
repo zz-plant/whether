@@ -93,7 +93,7 @@ export const buildInvestorUpdateSnippetParts = ({
 }: {
   assessment: RegimeAssessment;
   recordDate: string;
-  weeklyCall: Pick<WeeklyCallContract, "actionNow" | "pauseIf" | "changeCourseIf">;
+  weeklyCall: Pick<WeeklyCallContract, "actionNow" | "pauseIf" | "callChangesIf" | "resumeWhen">;
   monthlyHistory: readonly MonthlyRegimeHistoryEntry[];
   sourceLabel: string;
   isFallback?: boolean;
@@ -120,7 +120,8 @@ export const buildInvestorUpdateSnippetParts = ({
   const response = [
     `Our operating response this month: ${asSentence(weeklyCall.actionNow)}`,
     `The guardrail we are watching: ${asSentence(weeklyCall.pauseIf)}`,
-    `What would change our course: ${asSentence(weeklyCall.changeCourseIf)}`,
+    `What would change our course: ${asSentence(weeklyCall.callChangesIf)}`,
+    ...(weeklyCall.resumeWhen ? [`When we would resume: ${asSentence(weeklyCall.resumeWhen)}`] : []),
   ].join(" ");
 
   const source = `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? " (cached snapshot, not a live read)" : ""}.`;

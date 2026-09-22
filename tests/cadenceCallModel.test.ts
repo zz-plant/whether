@@ -243,7 +243,7 @@ describe("buildCadenceCallModel", () => {
     assert.equal(model.headline, POLICY_OVERRIDE_CALL.currentCall);
     assert.notEqual(model.headline, POLICY_OVERRIDE_CALL.actionNow);
     assert.equal(model.boundedRule.threshold, POLICY_OVERRIDE_CALL.pauseIf);
-    assert.equal(model.boundedRule.reversal, POLICY_OVERRIDE_CALL.changeCourseIf);
+    assert.equal(model.boundedRule.reversal, POLICY_OVERRIDE_CALL.callChangesIf);
     assert.ok(!model.headline.includes(getMonthlyActionGuidance(assessment.regime)));
     // The regime itself is unchanged by a refusal — only the instruction is.
     assert.equal(model.regime, assessment.regime);
