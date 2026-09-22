@@ -68,22 +68,22 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
         <thead>
           <tr className="type-eyebrow text-slate-400">
             <th scope="col" className="py-1 text-left font-normal">Points from the line</th>
-            <th scope="col" className="py-1 text-right font-normal">Reported</th>
-            <th scope="col" className="py-1 text-right font-normal">Held</th>
-            <th scope="col" className="py-1 text-right font-normal">Months</th>
+            <th scope="col" className="py-1 pl-3 text-right font-normal">Reported</th>
+            <th scope="col" className="py-1 pl-3 text-right font-normal">Held</th>
+            <th scope="col" className="py-1 pl-3 text-right font-normal">Months</th>
           </tr>
         </thead>
         <tbody>
           {bands.map((band) => (
             <tr key={band.from} className="border-t border-slate-800/80">
               <th scope="row" className="py-1.5 text-left font-normal">{bandLabel(band.from, band.to)}</th>
-              <td className="py-1.5 text-right tabular-nums text-slate-400">
+              <td className="py-1.5 pl-3 text-right tabular-nums text-slate-400">
                 {percentFormat(resolveConfidencePercentFromDistance(band.from, false))}
               </td>
-              <td className="py-1.5 text-right tabular-nums">
+              <td className="py-1.5 pl-3 text-right tabular-nums">
                 {percentFormat((band.held / band.months) * 100)}
               </td>
-              <td className="py-1.5 text-right tabular-nums text-slate-400">{band.months}</td>
+              <td className="py-1.5 pl-3 text-right tabular-nums text-slate-400">{band.months}</td>
             </tr>
           ))}
         </tbody>

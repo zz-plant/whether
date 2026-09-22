@@ -59,7 +59,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       <Link href="/resolve#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
         ← Back to Decision Tools toolkit library
       </Link>
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -91,7 +91,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           </div>
         </dl>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What to do at each pace</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action} in tighter conditions:</span> {toolkit.tightenNow}</li>
@@ -103,13 +103,13 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         <p className="text-sm text-slate-300"><span className="font-semibold">By pace:</span> {toolkit.byPosture}</p>
         <p className="text-sm text-slate-300"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>
       </section>
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Prep checklist</h2>
         <ul className="space-y-1 text-sm text-slate-200">
           {toolkit.prepChecklist.map((item) => <li key={item}>• {item}</li>)}
         </ul>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Run sequence</h2>
         <ol className="space-y-3 text-sm text-slate-200">
           {/*
@@ -132,13 +132,13 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           ))}
         </ol>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Signs it worked</h2>
         <ul className="space-y-1 text-sm text-slate-200">
           {toolkit.successSignals.map((item) => <li key={item}>• {item}</li>)}
         </ul>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What&apos;s in this toolkit</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           {toolkit.instruments.map((item, index) => {
@@ -155,13 +155,13 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           })}
         </ul>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Common mistakes to avoid</h2>
         <ul className="space-y-2 text-sm text-slate-200">{toolkit.misuseCases.map((item) => <li key={item}>• {item}</li>)}</ul>
         <h2 className="pt-2 text-lg font-semibold text-slate-100">Related guidance</h2>
         <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <Link key={link.href} href={link.href as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">{link.label}</Link>)}</div>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start from your role or situation</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {decisionPaths.roles.map((path) => (

@@ -27,7 +27,7 @@ export function PullPolicyControls({
   if (blocks.length === 0 && !wipGuidance) return null;
 
   return (
-    <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="wip-limits-heading">
+    <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="wip-limits-heading">
       <div className="space-y-1">
         <h2 id="wip-limits-heading" className="type-eyebrow">Work-in-progress limits</h2>
         <p className="text-xs leading-relaxed text-slate-300">

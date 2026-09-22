@@ -67,7 +67,7 @@ const CONTAINER =
    The focus ring is drawn on the painted span from the input's own
    `:focus-visible`, so keyboard focus stays visible with the input clipped. */
 const OPTION =
-  "flex min-h-[44px] sm:min-h-9 min-w-[2.75rem] cursor-pointer items-center justify-center rounded-sm px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] text-slate-400 hover:text-slate-200 peer-checked:bg-sky-500/15 peer-checked:text-sky-100 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
+  "flex min-h-[44px] sm:min-h-9 min-w-[2.75rem] cursor-pointer items-center justify-center rounded-sm px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] text-slate-400 hover:text-slate-200 peer-checked:bg-sky-500/15 peer-checked:text-[color:var(--app-text)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
 
 export function SegmentedControl<Key extends string>({
   options,

@@ -173,14 +173,14 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       />
 
       <article className="flex flex-col gap-6">
-        <header className="weather-panel space-y-4 px-6 py-6">
+        <header className="weather-panel space-y-4 px-6 py-6 max-sm:px-0">
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <Tag tone="sky">{brief.postureLabel}</Tag>
               <Tag tone="slate">Confidence: {brief.confidenceLabel}</Tag>
               <span className="text-fluid-micro font-mono text-slate-400">Permanent Record</span>
             </div>
-            <RegimeGlyph idPrefix={`brief-${brief.slug}`} regime={brief.regime} className="h-6 w-auto shrink-0" />
+            <RegimeGlyph idPrefix={`brief-${brief.slug}`} regime={brief.regime} className="w-6 shrink-0" />
           </div>
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{briefTitle(brief)}</h1>
           <p className="text-sm text-slate-300">{brief.summary}</p>
@@ -221,7 +221,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         />
 
         {readings.length > 0 ? (
-          <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="published-readings">
+          <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="published-readings">
             <h2 id="published-readings" className="text-lg font-semibold text-slate-100">The numbers the call was scored on</h2>
             <dl className="grid gap-4 sm:grid-cols-2">
               {readings.map((reading) => {
@@ -285,7 +285,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           </section>
         ) : null}
 
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
           <p className="text-sm text-slate-300">{brief.whatChanged}</p>
           <p className="text-sm text-slate-300">
@@ -293,7 +293,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           </p>
         </section>
 
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.flipWatch}</h2>
           <p className="text-sm text-slate-300">
             <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
@@ -306,7 +306,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         </section>
 
         {brief.decisions.length ? (
-          <section className="weather-panel space-y-4 px-6 py-6">
+          <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
             <h2 className="text-lg font-semibold text-slate-100">The call by area</h2>
             {tabulateDecisions && frozenScores ? (
               /* Every area's rule is a pair of the same four lines, drawn once
@@ -375,7 +375,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         ) : null}
 
         {brief.evidence.length ? (
-          <section className="weather-panel space-y-3 px-6 py-6">
+          <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
             <h2 className="text-lg font-semibold text-slate-100">Evidence behind the call</h2>
             <ul className="space-y-3 text-sm text-slate-300">
               {brief.evidence.map((item) => (
@@ -387,7 +387,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           </section>
         ) : null}
 
-        <footer className="weather-panel space-y-3 px-6 py-6">
+        <footer className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Provenance</h2>
           <p className="text-sm text-slate-300">
             Record date {brief.recordDateLabel} · {brief.sourceLabel} · captured {brief.freshnessLabel}

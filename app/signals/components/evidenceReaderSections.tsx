@@ -109,10 +109,13 @@ export const SignalsWhatChangedSection = ({
           );
         })}
       </nav>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
+      {/* A table from sm up; below it each row restacks — the signal and its
+          move on one line, the reading against its line under them — because
+          three columns clipped the score cells off a phone's right edge. */}
+      <div className="sm:overflow-x-auto">
+        <table className="w-full border-collapse text-left text-sm max-sm:block sm:min-w-[36rem]">
           <caption className="sr-only">Every signal this week, against its line and last week</caption>
-          <thead>
+          <thead className="max-sm:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">Since last week</th>
@@ -120,10 +123,15 @@ export const SignalsWhatChangedSection = ({
               {showNotes ? <th scope="col" className="py-2 pr-3 font-medium">Why it matters</th> : null}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="max-sm:block">
             {rows.map((row) => (
-              <tr key={row.key} id={row.key} className="border-b border-slate-800/50 align-top" data-signal={row.key}>
-                <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100">
+              <tr
+                key={row.key}
+                id={row.key}
+                className="border-b border-slate-800/50 align-top max-sm:grid max-sm:grid-cols-[1fr_auto] max-sm:gap-x-3 max-sm:gap-y-2 max-sm:py-3"
+                data-signal={row.key}
+              >
+                <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-sm:p-0">
                   {row.watchHref ? (
                     <Link href={toRoute(row.watchHref)} className="underline decoration-slate-600 underline-offset-4 hover:text-white">
                       {row.label}
@@ -133,17 +141,21 @@ export const SignalsWhatChangedSection = ({
                   )}
                   {row.kindLabel ? <span className="block text-xs font-normal text-slate-500">{row.kindLabel}</span> : null}
                 </th>
-                <td className="py-2.5 pr-3">
+                <td className="py-2.5 pr-3 max-sm:p-0">
                   <DeltaChip row={row} />
                 </td>
-                <td className="py-2.5 pr-3">
+                <td className="py-2.5 pr-3 max-sm:col-span-2 max-sm:p-0">
                   {row.value === null ? (
                     <span className="text-slate-500">—</span>
                   ) : (
                     <ScoreCell label={row.label} value={row.value} line={row.line} previous={row.previous} units={row.units} />
                   )}
                 </td>
-                {showNotes ? <td className="py-2.5 pr-3 text-slate-300">{row.note ?? <span className="text-slate-500">—</span>}</td> : null}
+                {showNotes ? (
+                  <td className={`py-2.5 pr-3 text-slate-300 max-sm:col-span-2 max-sm:p-0 max-sm:text-xs ${row.note ? "" : "max-sm:hidden"}`.trim()}>
+                    {row.note ?? <span className="text-slate-500">—</span>}
+                  </td>
+                ) : null}
               </tr>
             ))}
           </tbody>

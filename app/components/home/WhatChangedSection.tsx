@@ -54,28 +54,39 @@ export function WhatChangedSection({
          whether to act, not why. From `md` up the evidence reads first again. */
       className="order-3 md:order-2"
     >
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[42rem] table-fixed border-collapse text-left text-sm" data-testid="what-changed-table">
+      {/* A table from sm up. Below it each row restacks — the signal and its
+          move on one line, its ladder across the full width under them —
+          because at 42rem the ladder column sat off a phone's right edge,
+          behind a sideways scroll nobody knew was there. */}
+      <div className="sm:overflow-x-auto">
+        <table
+          className="w-full border-collapse text-left text-sm max-sm:block sm:min-w-[42rem] sm:table-fixed"
+          data-testid="what-changed-table"
+        >
           {/* The signal column carries the scale note and what the score means at
               its level, so it needs room: left to itself the browser gave it the
               width of its longest word and wrapped the notes one word per line. */}
-          <colgroup>
+          <colgroup className="max-sm:hidden">
             <col className="w-[15rem]" />
             <col className="w-[11rem]" />
             <col />
           </colgroup>
           <caption className="sr-only">Each signal this week against last week and against its lines</caption>
-          <thead>
+          <thead className="max-sm:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">Last week → this week</th>
               <th scope="col" className="py-2 font-medium">Against its lines</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="max-sm:block">
             {rows.map((row) => (
-              <tr key={row.key} className="border-b border-slate-800/50 align-top" data-signal={row.key}>
-                <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100">
+              <tr
+                key={row.key}
+                className="border-b border-slate-800/50 align-top max-sm:grid max-sm:grid-cols-[1fr_auto] max-sm:gap-x-3 max-sm:gap-y-2 max-sm:py-3"
+                data-signal={row.key}
+              >
+                <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-sm:p-0">
                   {row.label}
                   {row.scaleLabel ? <span className="block text-xs font-normal text-slate-500">{row.scaleLabel}</span> : null}
                   {/* Which end of the scale is which. A composite score is the one
@@ -93,7 +104,7 @@ export function WhatChangedSection({
                     />
                   ) : null}
                 </th>
-                <td className="whitespace-nowrap py-2.5 pr-3 text-xs">
+                <td className="whitespace-nowrap py-2.5 pr-3 text-xs max-sm:p-0">
                   {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} />}
                   {row.saturatedPressure !== undefined ? (
                     /* A clipped score cannot move, so the chip reads flat at the
@@ -106,7 +117,7 @@ export function WhatChangedSection({
                     </span>
                   ) : null}
                 </td>
-                <td className="min-w-[14rem] py-2.5">
+                <td className="py-2.5 max-sm:col-span-2 max-sm:p-0 sm:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
                     <ScoreLadder
                       label={<span className="sr-only">{row.label}</span>}

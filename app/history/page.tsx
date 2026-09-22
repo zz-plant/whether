@@ -147,7 +147,7 @@ export default async function HistoryPage({
           data-page-section="call-by-month"
           tabIndex={-1}
           aria-labelledby="call-by-month-heading"
-          className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+          className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">The call by month</h2>
           <MonthStrip entries={fullSeries} />
@@ -196,7 +196,7 @@ export default async function HistoryPage({
           data-page-section="published-briefs"
           tabIndex={-1}
           aria-labelledby="published-briefs-heading"
-          className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+          className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <div>
             <h2 id="published-briefs-heading" className="type-eyebrow type-eyebrow-section">Published weekly briefs</h2>
@@ -239,7 +239,7 @@ export default async function HistoryPage({
         data-page-section="posture-by-year"
         tabIndex={-1}
         aria-labelledby="posture-by-year-heading"
-        className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+        className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       >
         <h2 id="posture-by-year-heading" className="type-eyebrow type-eyebrow-section">The call by year</h2>
         <p className="text-sm text-slate-300">

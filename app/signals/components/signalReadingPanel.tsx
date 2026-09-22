@@ -26,7 +26,7 @@ export function SignalReadingPanel({
   const hasValue = reading.displayValue !== null && reading.unavailableReason === null;
 
   return (
-    <section className="weather-panel space-y-4 px-6 py-6" aria-labelledby="signal-reading-heading">
+    <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="signal-reading-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 id="signal-reading-heading" className="type-eyebrow type-eyebrow-section">
           {reading.measure} · this week

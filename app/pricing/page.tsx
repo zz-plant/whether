@@ -132,7 +132,7 @@ export default function PricingPage() {
             it records interest and nothing else; the cohort paragraph below claims a
             reserved rate and an onboarding schedule, which only exist once checkout is
             wired, so it renders only when the plans are on sale. */}
-        <section className="weather-panel space-y-3 px-5 py-5">
+        <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5">
           <h2 className="type-eyebrow">{PAID_PLANS_ON_SALE ? "Priority onboarding" : "Not on sale yet"}</h2>
           {PAID_PLANS_ON_SALE ? (
             <p className="max-w-2xl text-fluid-xs text-slate-300">

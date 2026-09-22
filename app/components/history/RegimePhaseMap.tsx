@@ -130,7 +130,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
   ].join(" ");
 
   return (
-    <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="phase-map-heading">
+    <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="phase-map-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
           {/* Headed as the mechanism, not the reading. The month strip and the

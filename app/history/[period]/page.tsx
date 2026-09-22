@@ -130,7 +130,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           title: the status tag, an "Archived Period" mark, the glyph and a
           "this record does not change" line were four more statements that the
           period is closed. */}
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div>
           <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
         </div>
@@ -155,7 +155,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       </section>
 
       {period.constraints.length ? (
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Operating constraints that applied</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.constraints.map((constraint) => (
@@ -171,7 +171,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       ) : null}
 
       {period.regimeMix.length ? (
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">How the period actually split</h2>
           <p className="text-sm text-slate-300">
             Derived from {period.sampleCount} {cadenceNoun(period)} inside {period.title}.
@@ -190,7 +190,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       ) : null}
 
       {period.transitions.length ? (
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Call changes inside {period.title}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.transitions.map((transition) => (
@@ -204,7 +204,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           </ul>
         </section>
       ) : (
-        <section className="weather-panel space-y-2 px-6 py-6">
+        <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Call changes inside {period.title}</h2>
           <p className="text-sm text-slate-300">
             The call held at {toWeatherLabel(period.operatorLabel)} for the whole period.
@@ -213,7 +213,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       )}
 
       {period.rates.length ? (
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Signals of record</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.rates.map((rate) => (
@@ -245,7 +245,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       ) : null}
 
       {period.children.length ? (
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Quarter by quarter</h2>
           <ul className="space-y-3">
             {period.children.map((child) => (
@@ -278,7 +278,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         ) : null}
       </nav>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Browse another year</h2>
         <ul className="flex flex-wrap gap-2">
           {postureArchiveYears.map((year) => (
@@ -295,7 +295,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         </ul>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What is the call now?</h2>
         <p className="text-sm text-slate-300">
           {period.title} is a closed record. The current call, what to do this week, and what would change it live on

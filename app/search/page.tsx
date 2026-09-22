@@ -42,7 +42,7 @@ export default async function SearchPage({
   return (
     <PageShell backdropVariant="hub">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Search" }]} />
-      <article className="weather-panel space-y-6 px-5 py-5">
+      <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2 max-w-2xl">
             <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>

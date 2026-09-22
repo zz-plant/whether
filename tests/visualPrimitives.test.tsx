@@ -37,6 +37,17 @@ describe("ScoreLadder", () => {
     assert.doesNotMatch(without, /role="img"/);
   });
 
+  it("paints every tick before any label, so no tick crosses a label", () => {
+    /* Each line used to be one translated wrapper holding its tick and label.
+       A transform makes a stacking context, so a later line's tick painted
+       over an earlier line's label ("Call changes|70" on a phone). */
+    const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={85} lines={lines} />);
+    const lastTick = html.lastIndexOf("w-0.5");
+    const firstLabel = Math.min(...["Resume 66", "Call changes 70", "Pause 76"].map((label) => html.indexOf(label)));
+    assert.ok(lastTick > 0 && firstLabel > 0);
+    assert.ok(lastTick < firstLabel, "all ticks come before the first label in paint order");
+  });
+
   it("names the hollow dot for what it is when it is not last week", () => {
     /* /history/compare draws period B against period A; a hollow dot captioned
        "last week" there would claim a comparison nobody made. */
@@ -117,6 +128,27 @@ describe("AreaTable", () => {
     assert.deepEqual([...positions].sort((a, b) => a - b), positions);
     assert.equal(decisionAreaOrder[0], "hiring");
     assert.match(html, /—/, "an empty slot renders a dash, not a reflow");
+  });
+
+  it("labels the pause and resume cells in every row, for the stacked phone layout", () => {
+    /* Below sm the header row is not drawn and each row restacks, so a cell
+       that did not name itself would leave two bare conditions side by side. */
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[
+          { area: "hiring", rule: "Backfills only.", pause: { line: "Funding pressure > 76" }, resume: { line: "Risk appetite > 54" } },
+          { area: "product-tempo", rule: "Keep the roadmap." },
+        ]}
+      />,
+    );
+    const rows = html.split("data-area=").slice(1);
+    assert.equal(rows.length, 2);
+    for (const row of rows) {
+      assert.match(row, />Pause line</);
+      assert.match(row, />Resume line</);
+    }
+    assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
   });
 });
 

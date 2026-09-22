@@ -190,7 +190,7 @@ export default async function SharePage() {
           padding tier, so each group's surfaces are the outermost boxes that
           draw anything and own their own elevation. */}
       <div className="space-y-5 sm:space-y-8">
-        <section className="weather-panel space-y-5 px-5 py-5" aria-labelledby="share-page-title">
+        <section className="weather-panel space-y-5 px-5 max-sm:px-0 py-5" aria-labelledby="share-page-title">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-2xl space-y-2">
               <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
@@ -210,7 +210,7 @@ export default async function SharePage() {
 
         <SharePageFormats scoreReferences={artifact.scoreReferences} />
 
-        <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="longer-formats-heading">
+        <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="longer-formats-heading">
           <h2 id="longer-formats-heading" className="type-eyebrow">Longer formats</h2>
           <ShareCopyControls
             recordDate={artifact.recordDate}
@@ -232,7 +232,7 @@ export default async function SharePage() {
         {/* Role memos are share formats. They sat under the sixth collapsed
             section of /operate, where nobody planning a week went looking for
             a CFO memo; they belong beside Slack, email and the meeting pack. */}
-        <section id="role-memos" className="weather-panel space-y-3 px-5 py-5" aria-labelledby="role-memos-heading">
+        <section id="role-memos" className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="role-memos-heading">
           <h2 id="role-memos-heading" className="type-eyebrow">Brief your team by role</h2>
           <ExecutiveBriefingPanel
             assessment={artifact.assessment}
@@ -250,7 +250,7 @@ export default async function SharePage() {
         </div>
 
         {/* Anchored so the retired /embed route lands on it. */}
-        <section id="embed" className="weather-panel px-5 py-5">
+        <section id="embed" className="weather-panel px-5 max-sm:px-0 py-5">
           <EmbedBuilder />
         </section>
       </div>

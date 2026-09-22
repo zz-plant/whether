@@ -125,7 +125,7 @@ export function TrackRecordTiles({
     : `${record.regimeChanges.toLocaleString("en-US")} total`;
 
   return (
-    <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="track-record-heading">
+    <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
       <div>
         <h2 className="type-eyebrow type-eyebrow-section" id="track-record-heading">Track record</h2>
         <p className="text-sm text-slate-300">
@@ -187,7 +187,7 @@ export function TrackRecordTable({
   const oldestShownDate = record.rows[record.rows.length - 1]?.recordDate ?? record.firstRecordDate;
 
   return (
-    <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="monthly-calls-heading">
+    <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
         <h2 className="type-eyebrow type-eyebrow-section" id="monthly-calls-heading">Monthly calls</h2>
         <p className="text-sm text-slate-300">

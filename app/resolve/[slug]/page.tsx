@@ -66,18 +66,18 @@ export default async function DecideDetailPage({
             { label: `For ${role.title}` },
           ]}
         />
-        <section className="weather-panel space-y-4 px-6 py-6">
+        <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {role.title}</h1>
           <p className="text-sm text-slate-300">Decisions this role usually owns</p>
           <ul className="space-y-2 text-sm text-slate-200">{role.decisions.map((item) => <li key={item}>• {item}</li>)}</ul>
         </section>
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Common mistakes</h2>
           <ul className="space-y-2 text-sm text-slate-300">{role.failureModes.map((item) => <li key={item}>• {item}</li>)}</ul>
           <h2 className="pt-2 text-lg font-semibold text-slate-100">When the call changes</h2>
           <ul className="space-y-2 text-sm text-slate-300">{role.postureShifts.map((item) => <li key={item}>• {item}</li>)}</ul>
         </section>
-        <section className="weather-panel space-y-3 px-6 py-6">
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Recommended tools</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {recommendedToolkitSlugs.map((slugItem) => {
@@ -106,11 +106,11 @@ export default async function DecideDetailPage({
           { label: situationUseCase?.title || titleCase(slug) },
         ]}
       />
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>
         <p className="text-sm text-slate-300">The strongest paths for this decision.</p>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Recommended tools</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {recommendedToolkitSlugs.map((toolkitSlug) => {
@@ -127,7 +127,7 @@ export default async function DecideDetailPage({
           })}
         </div>
       </section>
-      <section className="weather-panel space-y-3 px-6 py-6">
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Still unsure?</h2>
         <div className="flex gap-3">
           <ActionLink href="/trust#revisit-call" variant="pill">Revisit triggers</ActionLink>
