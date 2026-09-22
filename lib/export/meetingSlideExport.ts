@@ -44,17 +44,22 @@ export interface MeetingSlidePayload {
  * straight from an `OperatingSnapshot`, with no presentation model involved.
  */
 
+/*
+ * `stage` is null when the reader chose none. It used to default to "seed", so every slide,
+ * PPTX and PDF reached without a `?stage=` was titled as a seed-stage company's — a fact about
+ * the reader the site never asked for. No stage means no stage on the slide.
+ */
 export function extractMeetingSlidePayload(
   snapshot: OperatingSnapshot,
-  stage: StartupVariantMode = "seed"
+  stage: StartupVariantMode | null = null
 ): MeetingSlidePayload {
   const weeklyCall = snapshot.weeklyCall;
-  const stageAdj = weeklyCall.stageScopedAdjustments?.[stage];
+  const stageAdj = stage ? weeklyCall.stageScopedAdjustments?.[stage] : undefined;
 
   const actionNow = stageAdj?.actionNow ?? weeklyCall.actionNow;
   const pauseIf = stageAdj?.pauseIf ?? weeklyCall.pauseIf;
   const changeCourseIf = stageAdj?.changeCourseIf ?? weeklyCall.changeCourseIf;
-  const stageLabel = stageAdj?.label ?? (stage === "seed" ? "Seed" : "Startup");
+  const stageLabel = stageAdj?.label ?? (stage === "seed" ? "Seed" : stage ? "Startup" : "");
 
   return {
     recordDate: snapshot.provenance.recordDateLabel,
@@ -77,7 +82,7 @@ export function extractMeetingSlidePayload(
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
     `> **Whether Weekly Operating Stance** — *${payload.recordDate}*`,
-    `> **Regime**: \`${payload.regime}\` · **Stage**: \`${payload.stageLabel}\``,
+    `> **Regime**: \`${payload.regime}\`${payload.stageLabel ? ` · **Stage**: \`${payload.stageLabel}\`` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
     // when the two are the same sentence, which is what the model returns on a
@@ -112,7 +117,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
     <div>
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; font-weight: 700;">Whether · Weekly Operating Brief</span>
-      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">Executive Stance — ${payload.stageLabel} Stage</h2>
+      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's call${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
     </div>
     <div style="text-align: right;">
       <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${payload.regime}</span>
@@ -184,7 +189,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <!-- Header Container -->
   <g transform="translate(80, 70)">
     <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING CALL</text>
-    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">Monday Executive Stance (${esc(payload.stageLabel)})</text>
+    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's call${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
     <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · Source: ${esc(payload.provenance)}</text>
     
     <!-- Regime Badge -->

@@ -38,6 +38,14 @@ describe("Meeting Slide & Notion Exporter", () => {
 
     const seriesAPayload = extractMeetingSlidePayload(snapshot, "series-a");
     assert.equal(seriesAPayload.stageLabel, "Series A");
+
+    // No stage chosen means no stage on the slide. This used to default to "Seed", which titled
+    // every slide reached without a `?stage=` as a seed-stage company's.
+    const unstaged = extractMeetingSlidePayload(snapshot);
+    assert.equal(unstaged.stageLabel, "");
+    assert.doesNotMatch(formatMeetingSlideMarkdown(unstaged), /Stage\*\*/);
+    assert.doesNotMatch(formatMeetingSlideHtml(unstaged), /Seed|Startup/);
+    assert.doesNotMatch(formatMeetingSlideSvg(unstaged), /Seed|Startup/);
   });
 
   it("generates structured markdown callout for Notion", () => {

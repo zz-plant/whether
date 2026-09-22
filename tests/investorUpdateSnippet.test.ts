@@ -103,10 +103,17 @@ describe("investor update snippet", () => {
   it("adds the runway sentence for a known band and leaves the paragraph alone otherwise", () => {
     const parts = { conditions: "C.", response: "R.", source: "S." };
     assert.equal(formatInvestorUpdateSnippet(parts, undefined), "C.\n\nR.\n\nS.");
-    assert.match(formatInvestorUpdateSnippet(parts, "critical"), /^C\.\n\nR\. With under six months of runway, cash preservation overrides/);
-    assert.match(formatInvestorUpdateSnippet(parts, "tight"), /nine-month cash payback case/);
-    assert.match(formatInvestorUpdateSnippet(parts, "balanced"), /standard corridor/);
+    assert.match(formatInvestorUpdateSnippet(parts, "critical"), /^C\.\n\nR\. With under six months of runway, cash comes before/);
+    assert.match(formatInvestorUpdateSnippet(parts, "tight"), /pay back inside \[n\] months/);
+    assert.match(formatInvestorUpdateSnippet(parts, "balanced"), /the weekly call sets our pace/);
     assert.match(formatInvestorUpdateSnippet(parts, "abundant"), /without loosening the payback bar/);
+    // The runway clause is the reader's own choice; what the company is doing about it is not,
+    // so every band but the neutral one leaves that as a bracketed prompt rather than asserting
+    // a signoff rule, a raise in progress or hires under way in the founder's voice.
+    for (const band of ["critical", "tight", "abundant"] as const) {
+      assert.match(formatInvestorUpdateSnippet(parts, band), /\[[^\]]+\]/, `${band} asserts a policy the reader did not choose`);
+    }
+    assert.doesNotMatch(formatInvestorUpdateSnippet(parts, "balanced"), /corridor|tempo|second signoff|peers/);
     // Letter copy, not control labels.
     for (const band of ["critical", "tight", "balanced", "abundant"] as const) {
       assert.doesNotMatch(formatInvestorUpdateSnippet(parts, band), /critical|tight runway|balanced|abundant|band/i);

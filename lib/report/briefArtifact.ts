@@ -315,7 +315,7 @@ export const briefArtifactToSlidePayload = (
 ): MeetingSlidePayload => ({
   recordDate: artifact.recordDateLabel,
   regime: artifact.regimeLabel,
-  stageLabel: artifact.postureLabel ?? "Startup",
+  stageLabel: artifact.postureLabel ?? "",
   actionNow: artifact.actionNow ?? artifact.call,
   pauseIf: artifact.guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
   changeCourseIf: artifact.reversal ?? "Resume staged approvals when conditions ease.",

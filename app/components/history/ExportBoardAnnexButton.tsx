@@ -9,6 +9,35 @@ type Props = {
   className?: string;
 };
 
+/*
+ * The copied memo is built from the record and nothing else.
+ *
+ * It used to be headed "Prepared for the Board of Directors" and carry a section
+ * asserting, unconditionally, that "management paced organizational investment
+ * according to objective capital cost physics", backfilled revenue-critical roles
+ * only, enforced a six-month payback bar on refactors and held an 18-month cash
+ * buffer — statements about the reader's company that no reading produced, in a
+ * document labelled for their board. With no record it still wrote "4 consecutive
+ * months". Every line here now names something the archive holds, and the button
+ * is disabled rather than inventing a record when there is none.
+ */
+export const buildRecordSummary = (record: TrackRecord, origin: string) =>
+  [
+    "# Whether: what the record shows",
+    `Prepared from Whether's public record · As of ${record.latestRecordDate}`,
+    `Source: Whether (${origin})`,
+    "",
+    "## The reading",
+    `- **Conditions:** ${record.currentRegimeLabel}`,
+    `- **Held for:** ${record.currentHoldMonths} consecutive month-end readings`,
+    `- **Record length:** ${record.monthsCovered} months of public market data`,
+    "",
+    "## Sources",
+    "- Federal Reserve Economic Data (FRED): Treasury yields, credit spreads, VIX, and the Chicago Fed financial conditions index.",
+    "- US Department of the Treasury: constant-maturity daily rates.",
+    `- The full record: ${origin}/history`,
+  ].join("\n");
+
 export function ExportBoardAnnexButton({ record, className = "" }: Props) {
   /*
    * This used to be `void navigator.clipboard.writeText(...)` inside a
@@ -23,49 +52,23 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
   const failed = status === "error";
 
   const handleExport = () => {
-    const latestDate = record ? record.latestRecordDate : new Date().toISOString().slice(0, 10);
-    const holdMonths = record ? record.currentHoldMonths : 4;
-    const monthsOnRecord = record ? record.monthsCovered : 24;
-
-    const boardAnnex = [
-      "# Macroeconomic Operating Stance & Capital Allocation Annex",
-      `**Prepared for the Board of Directors** · As of ${latestDate}`,
-      "Source: Whether Macro & Treasury Ingestion Engine (https://whether.work)",
-      "",
-      "---",
-      "",
-      "## 1. Operating Climate Summary",
-      `- **Current Posture:** ${record ? record.currentRegimeLabel : "Unavailable"}`,
-      `- **Stance Stability:** ${holdMonths} consecutive months with consistent posture guidance`,
-      `- **Audited History:** ${monthsOnRecord} months of continuous public market data`,
-      "",
-      "## 2. Capital Discipline & Runway Guardrails",
-      "During this operating period, management paced organizational investment according to objective capital cost physics:",
-      "1. **Headcount & Hiring:** Backfilled revenue-critical roles only; held speculative expansions pending spread contraction.",
-      "2. **Engineering Payback:** Enforced strict <6-month payback criteria on platform refactors.",
-      "3. **Runway Management:** Preserved forward cash buffer above 18 months, mitigating dilutive bridge-round risk.",
-      "",
-      "## 3. Data Provenance & Verification",
-      "- Federal Reserve Economic Data (FRED): 10Y-2Y Treasury Slope, CPI YoY, Unemployment Rate, BBB Spreads, VIX.",
-      "- US Department of the Treasury Fiscal Data: Constant-Maturity Daily Rates.",
-      `- Citable Record Archive: https://whether.work/history`,
-    ].join("\n");
-
-    void copyToClipboard(boardAnnex, "board-annex");
+    if (!record) return;
+    void copyToClipboard(buildRecordSummary(record, window.location.origin), "board-annex");
   };
 
   return (
     <button
       type="button"
       onClick={handleExport}
-      className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-900/60 px-3.5 py-1.5 text-fluid-xs font-semibold text-slate-200 hover:bg-slate-800/80 hover:text-white hover:border-sky-500/40 transition-all weather-press-scale weather-focus-ring ${className}`}
-      title="Copy 1-page Board Governance Annex Markdown to clipboard"
-      aria-label="Export Board Annex memo"
+      disabled={!record}
+      className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-900/60 px-3.5 py-1.5 text-fluid-xs font-semibold text-slate-200 hover:bg-slate-800/80 hover:text-white hover:border-sky-500/40 transition-all weather-press-scale weather-focus-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      title="Copy a short memo of what the month-end record shows"
+      aria-label="Copy the record summary"
     >
       {copied ? (
         <>
           <Check className="size-3.5 text-emerald-300" />
-          <span className="text-emerald-300">Board Annex Copied!</span>
+          <span className="text-emerald-300">Copied</span>
         </>
       ) : failed ? (
         <>
@@ -75,7 +78,7 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
       ) : (
         <>
           <FileText className="size-3.5 text-sky-400" />
-          <span>Export Board Annex</span>
+          <span>Copy the record summary</span>
         </>
       )}
     </button>

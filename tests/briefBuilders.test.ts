@@ -84,12 +84,15 @@ describe("buildSlackBrief", () => {
     assert.doesNotMatch(brief, /-0\.52index/);
   });
 
-  it("includes compact financial implications aligned to posture", () => {
+  /* This block used to be computed from a hardcoded company (13 months of runway, $700k burn,
+     $500k revenue, growth-stage B2B SaaS) and printed with nothing marking it as a sample, so a
+     Slack channel read "Raise window: month 3 to 9" as a statement about its own company. The
+     runway planner on /operate prints the same block from figures the reader entered. */
+  it("carries no runway figures, because the brief has no company to compute them for", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /Financial implications:/);
-    assert.match(brief, /Runway risk:/);
-    assert.match(brief, /Burn adjustment:/);
+    assert.doesNotMatch(brief, /Financial implications:/);
+    assert.doesNotMatch(brief, /Runway risk:|Raise window:|Burn adjustment:|Safe runway band:/);
   });
 
   it("uses bounded decision triplets in stable action-trigger-reversal order", () => {
@@ -248,7 +251,7 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Distance to regime change: 2\.0 points/);
     assert.match(brief, /• Regime shift watch: ON/);
     assert.match(brief, /• Posture: Stage decisions/);
-    assert.match(brief, /• Re-check owner\/cadence: Owner: CEO \+ Finance lead/);
+    assert.match(brief, /• Re-check: whoever owns the plan/);
     assert.match(brief, /• Trust markers: Confidence: Guarded/);
     assert.match(brief, /• Posture:/);
     assert.match(brief, /Do now: Backfills only/);

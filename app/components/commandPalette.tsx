@@ -110,8 +110,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
       {
         id: "board-annex",
-        label: "Export Board Governance Annex",
-        description: "Copy multi-quarter stance audit memo for Directors",
+        label: "Copy the record summary",
+        description: "What the month-end record shows, as a short memo",
         icon: FileText,
         action: () => navigateTo("/history"),
       },

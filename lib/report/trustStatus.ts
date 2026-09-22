@@ -183,24 +183,24 @@ const buildRecoveryPlan = ({
 }): TrustRecoveryPlan => {
   if (tone === "warning") {
     return {
-      owner: "CEO + Finance lead",
-      nextCheckpoint: "Daily 10:00 UTC until outage gate clears",
-      exitCondition: "Resume normal approval cadence after one verified live refresh across core sources.",
+      owner: "Whoever owns the plan",
+      nextCheckpoint: "Daily, until live data is back",
+      exitCondition: "Every source has answered once with live data.",
     };
   }
 
   if (tone === "historical") {
     return {
-      owner: "CEO + Finance lead",
-      nextCheckpoint: "Before the next approval window",
-      exitCondition: "Switch to current live snapshot before changing pace.",
+      owner: "Whoever owns the plan",
+      nextCheckpoint: "Before acting on it",
+      exitCondition: "You are reading the current week, not a past one.",
     };
   }
 
   return {
-    owner: "CEO + Finance lead",
-    nextCheckpoint: "Weekly planning cadence",
-    exitCondition: "Keep standard approvals while confidence remains above LOW.",
+    owner: "Whoever owns the plan",
+    nextCheckpoint: "The next weekly review",
+    exitCondition: "Confidence is above low.",
   };
 };
 
