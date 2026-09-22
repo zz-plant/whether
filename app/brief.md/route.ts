@@ -5,6 +5,7 @@ import { buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
 type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
 
@@ -98,11 +99,11 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 
 ${weeklyCall.currentCall}
 
-**Do now:** ${weeklyCall.actionNow}
+**${DECISION_CONTRACT_LABELS.action.doNow}:** ${weeklyCall.actionNow}
 
-**Pause if:** ${weeklyCall.pauseIf}
+**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${weeklyCall.pauseIf}
 
-**Change course if:** ${weeklyCall.changeCourseIf}
+**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${weeklyCall.changeCourseIf}
 
 ---
 

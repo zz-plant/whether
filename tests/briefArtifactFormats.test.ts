@@ -105,13 +105,13 @@ describe("brief artifact formats", () => {
     const entries = briefConditionEntries(artifact);
     /* Three lines, three names, and the same three names the hero prints —
        these used to read "Guardrail / Reversal / Clears when" against the
-       plan page's "Pause if / Change course if" for the same numbers. */
+       plan page's "Pause if / Resume when" for the same numbers. */
     assert.deepEqual(
       entries.map((entry) => entry.label),
       [
         DECISION_CONTRACT_LABELS.threshold.pauseIf,
         DECISION_CONTRACT_LABELS.watch.postureFlips,
-        DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
+        DECISION_CONTRACT_LABELS.reversal.resumeWhen,
       ],
     );
 

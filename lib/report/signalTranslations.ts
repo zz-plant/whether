@@ -118,6 +118,8 @@ type SignalScale = {
   rangeLabel: string;
   /** Plain-words meaning of the bottom of the range. */
   lowAnchor: string;
+  /** Plain-words meaning of the middle band. */
+  midAnchor: string;
   /** Plain-words meaning of the top of the range. */
   highAnchor: string;
   /** One line combining both ends, for use under a score. */
@@ -128,15 +130,31 @@ export const compositeSignalScales: Record<CompositeSignalKey, SignalScale> = {
   tightness: {
     rangeLabel: "0-100",
     lowAnchor: "money is easy to raise",
+    midAnchor: "money is neither easy nor hard to raise",
     highAnchor: "money is hard to raise",
     directionLabel: "0 = easier funding \u00b7 100 = harder funding",
   },
   riskAppetite: {
     rangeLabel: "0-100",
     lowAnchor: "investors are avoiding risk",
+    midAnchor: "investors are selective about risk",
     highAnchor: "investors are funding risk",
     directionLabel: "0 = risk-averse investors \u00b7 100 = risk-hungry investors",
   },
+};
+
+/**
+ * A 0-100 score as a reader should meet it: name, number, and what that number
+ * means, in one string. A bare "74/100" is only readable to someone who already
+ * knows which end is bad, and the page that used to say so was the glossary.
+ * Every surface that prints one of the two composites prints it through this
+ * (or `SignalReading`, its rendered twin), so the meaning cannot be left behind.
+ */
+export const formatSignalReading = (key: CompositeSignalKey, score: number): string => {
+  const scale = compositeSignalScales[key];
+  const band = classifyScoreBand(score);
+  const anchor = band === "high" ? scale.highAnchor : band === "low" ? scale.lowAnchor : scale.midAnchor;
+  return `${regimeSignalLabel[key]} ${Math.round(score)}/100: ${anchor}`;
 };
 
 type ScoreBandRow = {

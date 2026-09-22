@@ -556,12 +556,12 @@ export const buildTrustStatus = ({
       : "Every source answered and nothing here argues for holding back this week.";
 
   const action = historicalSelection
-    ? `${historicalAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: switch to current live data before changing spending pace.`
+    ? `${historicalAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: switch to current live data before changing spending pace.`
     : isFallback
-      ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: live data returns from every source.`
+      ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
       : policyRefusalActive
-        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: the two scores point the same way again.`
-      : `${stableAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: confidence drops to low or the call moves within reach of a line.`;
+        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again.`
+      : `${stableAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: confidence drops to low or the call moves within reach of a line.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

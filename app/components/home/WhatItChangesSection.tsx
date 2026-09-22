@@ -79,7 +79,7 @@ export function WhatItChangesSection({
       {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
       <AreaTable
         rows={tableRows}
-        caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}, by area`}
+        caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}, by area`}
       />
     </HomeSection>
   );

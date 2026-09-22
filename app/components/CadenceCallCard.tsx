@@ -140,7 +140,7 @@ export function CadenceCallCard({
         </div>
         <div className="flex flex-wrap items-baseline gap-x-2">
           <dt className="shrink-0 font-medium text-slate-400">
-            {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:
+            {DECISION_CONTRACT_LABELS.reversal.resumeWhen}:
           </dt>
           <dd className="min-w-0 text-slate-300">{model.boundedRule.reversal}</dd>
         </div>

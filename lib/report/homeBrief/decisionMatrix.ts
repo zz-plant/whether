@@ -99,7 +99,7 @@ export const buildDecisionMatrixPayload = ({
     columns: [
       { key: "approve", label: "Approve" },
       { key: "delay", label: "Delay" },
-      { key: "flip", label: DECISION_CONTRACT_LABELS.reversal.changeCourseIf },
+      { key: "flip", label: DECISION_CONTRACT_LABELS.reversal.resumeWhen },
     ],
     rows,
   };

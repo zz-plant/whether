@@ -22,7 +22,7 @@ const treasury: TreasuryData = {
 const weeklyCall = {
   actionNow: "Hold net-new hiring and require reversible commitments.",
   pauseIf: "Pause if funding pressure crosses 66",
-  changeCourseIf: "Re-open when risk appetite clears 50 for two reads",
+  changeCourseIf: "Resume when risk appetite clears 50 for two reads",
 };
 
 const history: MonthlyRegimeHistoryEntry[] = [
@@ -55,7 +55,7 @@ describe("investor update snippet", () => {
     assert.match(parts.conditions, /The call is (well clear of|within reach of|close to) the line that would change it\./);
     assert.match(parts.response, /^Our operating response this month: Hold net-new hiring/);
     assert.match(parts.response, /The guardrail we are watching: Pause if funding pressure crosses 66\./);
-    assert.match(parts.response, /What would change our course: Re-open when risk appetite clears 50 for two reads\.$/);
+    assert.match(parts.response, /What would change our course: Resume when risk appetite clears 50 for two reads\.$/);
     assert.doesNotMatch(parts.response, /commitments\.\./, "an existing full stop is not doubled");
     assert.equal(parts.source, "Source: U.S. Treasury, 2026-09-16, via whether.work.");
 

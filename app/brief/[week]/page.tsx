@@ -364,7 +364,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                       <BoundedValue>{decision.pauseTrigger}</BoundedValue>
                     </p>
                     <p className="text-sm text-slate-300">
-                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:</span>{" "}
+                      <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span>{" "}
                       <BoundedValue>{decision.resumeTrigger}</BoundedValue>
                     </p>
                   </li>

@@ -39,7 +39,7 @@ export function BoundedCorridorRails({
             trigger={rail.guardrail}
             triggerLabel={DECISION_CONTRACT_LABELS.threshold.pauseIf}
             reversal={rail.clearsAt}
-            reversalLabel={DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
+            reversalLabel={DECISION_CONTRACT_LABELS.reversal.resumeWhen}
             hysteresisBand
             invert={rail.invert}
             signalLabel={rail.label}

@@ -345,7 +345,7 @@ export const buildCadenceCallModel = ({
     shareCopiedLabel: "Call copied",
     shareLines: [
       `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${boundedRule.threshold}`,
-      `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${boundedRule.reversal}`,
+      `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${boundedRule.reversal}`,
     ],
   };
 };

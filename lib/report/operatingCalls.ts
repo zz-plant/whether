@@ -13,6 +13,7 @@ import {
 import { formatDecisionLatencyLine } from "./decisionLatency";
 import { businessAreaLabel, businessAreaOrder, businessAreaOwner, type BusinessAreaKey } from "./decisionKnobs";
 import { joinSentences } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 
 /**
  * `avoidNow` renders under an "Avoid now" heading, so its entries stay bare
@@ -605,7 +606,7 @@ export const buildPullPolicyBlocks = (
         `**Pull policy — ${item.label}**`,
         `Pull: ${item.areaActionNow}`,
         `Stop pulling when: ${stopPullingWhen}`,
-        `Resume when: ${resumeWhen}`,
+        `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeWhen}`,
       ].join("\n"),
     };
   });

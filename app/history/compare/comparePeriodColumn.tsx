@@ -92,7 +92,7 @@ export function ComparePeriodColumn({
           </div>
           <div>
             <dt className={`text-fluid-xs font-semibold ${DECISION_SLOT_TONE.reversal}`}>
-              {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}
+              {DECISION_CONTRACT_LABELS.reversal.resumeWhen}
             </dt>
             <dd className="mt-1 text-sm text-slate-200">{snapshot.weeklyCall.changeCourseIf}</dd>
           </div>

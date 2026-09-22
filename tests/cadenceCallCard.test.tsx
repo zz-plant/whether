@@ -70,7 +70,7 @@ describe("CadenceCallCard", () => {
     const html = render("monthly");
 
     assert.ok(html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
-    assert.ok(html.includes(DECISION_CONTRACT_LABELS.reversal.changeCourseIf));
+    assert.ok(html.includes(DECISION_CONTRACT_LABELS.reversal.resumeWhen));
     assert.match(html, /Conditions by month/);
   });
 

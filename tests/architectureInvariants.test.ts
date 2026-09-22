@@ -401,7 +401,7 @@ describe("Architecture Invariants", () => {
     DECISION_CONTRACT_LABELS.action.actionNow,
     DECISION_CONTRACT_LABELS.action.doNow,
     DECISION_CONTRACT_LABELS.threshold.pauseIf,
-    DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
+    DECISION_CONTRACT_LABELS.reversal.resumeWhen,
     DECISION_CONTRACT_LABELS.watch.flipWatch,
     DECISION_CONTRACT_LABELS.watch.watchThisWeek,
     DECISION_CONTRACT_LABELS.watch.watchNext,
@@ -421,7 +421,7 @@ describe("Architecture Invariants", () => {
    * It proves no surface spells a label itself, so both the hero and `/operate`
    * were compliant while drawing the same rail under different words: the table
    * held `threshold.guardrail` beside `threshold.pauseIf` and
-   * `reversal.clearsWhen` beside `reversal.changeCourseIf`, and a component
+   * `reversal.clearsWhen` beside `reversal.resumeWhen`, and a component
    * reading either one passed. A vocabulary with synonyms is not a vocabulary.
    */
   it("Invariant 8a: No two contract labels name the same line", () => {

@@ -43,7 +43,7 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Conditions:/);
     assert.match(html, /Do now/);
     assert.match(html, /Pause if/);
-    assert.match(html, /Re-open when/);
+    assert.match(html, /Resume when/);
     assert.match(html, /Meeting pack/);
     assert.match(html, /Share the persisted call exactly\./);
     assert.match(html, /Transmit the committed action\./);

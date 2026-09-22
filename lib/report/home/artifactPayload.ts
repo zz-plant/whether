@@ -60,7 +60,7 @@ const buildDeltaOnlyBriefText = ({
     ...revisitLines,
     "",
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${homeBriefModel.guardrail}`,
-    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${canonicalDecisionCopy.flipTrigger}`,
+    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${canonicalDecisionCopy.flipTrigger}`,
     `Trust: ${homeBriefModel.decisionReadiness.detail}`,
     `Data refreshed: ${freshnessLabel}`,
     "",

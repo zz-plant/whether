@@ -85,7 +85,7 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Do now:/);
     assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
-    assert.match(text, /Re-open when:/); // replaces Clears when
+    assert.match(text, /Resume when:/); // replaces Clears when
     assert.equal(cardText, text);
   });
 

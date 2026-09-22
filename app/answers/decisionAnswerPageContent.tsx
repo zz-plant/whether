@@ -93,7 +93,7 @@ export async function DecisionAnswerPageContent({
     `Current call: ${payload.currentCall}`,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
-    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${payload.reversalCondition}`,
+    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
   ].join("\n");

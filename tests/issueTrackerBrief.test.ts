@@ -121,7 +121,7 @@ describe("buildGuardrailTagBlocks", () => {
       assert.match(block.markdown, /\*\*Conditions:\*\* Cloudy/);
       assert.match(block.markdown, /\*\*Action now:\*\* /);
       assert.match(block.markdown, /\*\*Pause if:\*\* /);
-      assert.match(block.markdown, /\*\*Change course if:\*\* /);
+      assert.match(block.markdown, /\*\*Resume when:\*\* /);
       assert.match(block.markdown, /Week of 2026-03-04/);
     }
     assert.match(blocks[0].markdown, /Hold speculative hiring\./);

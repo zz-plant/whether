@@ -27,8 +27,8 @@ type GlossaryUsageNote = {
 type HighlightBullet = { text: string };
 
 // Single vocabulary for the bounded-decision contract (action / threshold /
-// reversal). UI surfaces read the imperative forms (Do now, Pause if, Change
-// course if); exports and metadata use the noun slots (Action, Threshold,
+// reversal). UI surfaces read the imperative forms (Do now, Pause if, Resume
+// when); exports and metadata use the noun slots (Action, Threshold,
 // Reversal). Consume these instead of hardcoding slot labels in components.
 //
 // One name per line, and that is the whole point of the table.
@@ -46,6 +46,14 @@ type HighlightBullet = { text: string };
 // if", `/trust`'s framework explainer works the example in those words, and
 // the glossary glosses the noun as "Guardrail (pause trigger)" — the synonym
 // was always the second name for the imperative, never the other way round.
+//
+// "Change course if" then became "Resume when" (2026-09-22). The glossary had
+// to spend three adjacent entries telling it apart from "Call changes if",
+// because both read as "the call changes" — and the line it names does
+// something narrower: it re-opens the decisions the pause line held. A name
+// that says what happens needs no entry. `publicDecisionLabels.reversal`,
+// which still said "Re-open when" on /brief, /decisions and every answer page,
+// reads it now instead of spelling a third name.
 /** The threshold slot when no rule supplied one. Was retyped in five modules. */
 export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
 
@@ -59,6 +67,13 @@ export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
  * drift into describing different verdicts.
  */
 export const OPERATING_LATITUDE_LABEL = "Operating latitude";
+
+/**
+ * What the latitude number means, said wherever the number is. It was defined
+ * only inside the hero's collapsed "Why this call" panel and on /glossary, so
+ * the largest figure on the homepage arrived with no scale above the fold.
+ */
+export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit; higher means more room";
 
 export const DECISION_CONTRACT_LABELS = {
   slot: {
@@ -74,7 +89,7 @@ export const DECISION_CONTRACT_LABELS = {
     pauseIf: "Pause if",
   },
   reversal: {
-    changeCourseIf: "Change course if",
+    resumeWhen: "Resume when",
   },
   watch: {
     flipWatch: "What would change the call",
@@ -162,7 +177,7 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
   {
-    text: `The call is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}.`,
+    text: `The call is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}.`,
   },
   { text: "Your stage and runway, if you set them, change the notes under the call and nothing else." },
   { text: "Confidence says how far the scores sit from the line that changes the call." },

@@ -93,7 +93,7 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
 const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
 const FALLBACK_ACTION_NOW = "Keep last week's approvals as they are; start nothing new.";
 const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
-const FALLBACK_CHANGE_COURSE_IF = "Re-open when live data is back and the call has held for a week.";
+const FALLBACK_CHANGE_COURSE_IF = "Live data is back and the call has held for a week.";
 /** The stamp's confidence note when no label was modeled: what the number measures. */
 const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line that changes the call";
 

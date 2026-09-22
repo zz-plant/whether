@@ -209,7 +209,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.match(model.decisionShiftSummary, /No significant change/);
-    assert.match(model.decisionShiftSummary, /Re-open when:/);
+    assert.match(model.decisionShiftSummary, /Call changes if:/);
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.roleAwareTemplates.length, 2);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
@@ -555,7 +555,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.equal(model.decisionMatrix.columns.length, 3);
-    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Change course if"]);
+    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Resume when"]);
     assert.equal(model.decisionMatrix.rows.length, 4);
 
     for (const row of model.decisionMatrix.rows) {

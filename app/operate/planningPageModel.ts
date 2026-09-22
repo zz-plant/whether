@@ -272,7 +272,7 @@ export async function buildPlanningPageModel(
                     h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.pauseIf),
                   ),
                   h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200" }, DECISION_CONTRACT_LABELS.reversal.changeCourseIf),
+                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200" }, DECISION_CONTRACT_LABELS.reversal.resumeWhen),
                     h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.changeCourseIf),
                   ),
                 ),

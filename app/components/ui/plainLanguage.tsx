@@ -3,6 +3,7 @@ import {
   GLOSSARY_HREF,
   classifyScoreBand,
   compositeSignalScales,
+  formatSignalReading,
   plainEnglishScoreDescription,
   scoreBandReference,
   type CompositeSignalKey,
@@ -50,6 +51,23 @@ export function PlainEnglishScoreNote({
       {plainEnglishScoreDescription(signalKey, score)}
     </p>
   );
+}
+
+/**
+ * A composite score with its meaning attached: "Funding pressure 74/100: money
+ * is hard to raise". The rendered twin of `formatSignalReading`, for any surface
+ * that would otherwise print a bare number out of 100.
+ */
+export function SignalReading({
+  signalKey,
+  score,
+  className,
+}: {
+  signalKey: CompositeSignalKey;
+  score: number;
+  className?: string;
+}) {
+  return <span className={className}>{formatSignalReading(signalKey, score)}</span>;
 }
 
 /**

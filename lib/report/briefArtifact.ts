@@ -185,7 +185,7 @@ export const briefConditionEntries = (
     ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: artifact.reversal }]
     : []),
   ...(artifact.clearsWhen && artifact.clearsWhen.length > 0
-    ? [{ label: DECISION_CONTRACT_LABELS.reversal.changeCourseIf, value: artifact.clearsWhen.join("; ") }]
+    ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: artifact.clearsWhen.join("; ") }]
     : []),
 ];
 

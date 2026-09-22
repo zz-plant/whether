@@ -22,7 +22,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Live · all sources answered/);
     assert.equal(result.trustStatusDetail, "Every source answered and nothing here argues for holding back this week.");
     assert.match(result.trustStatusAction, /Proceed with normal approvals\./);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: confidence drops to low or the call moves within reach of a line`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: confidence drops to low or the call moves within reach of a line`));
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);
@@ -48,7 +48,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /Live data is late; this is a cached reading/);
     assert.match(result.trustStatusDetail, /Treasury API timeout/);
     assert.match(result.trustStatusAction, /Use cached read for pacing/);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: live data returns from every source`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source`));
     assert.equal(result.outageType, "feed-unavailable");
     assert.equal(result.outageSeverity, "critical");
     assert.equal(result.outageExitGate.metCount, 1);
@@ -67,7 +67,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Historical snapshot/);
     assert.match(result.trustStatusDetail, /A past week, not this one/);
     assert.match(result.trustStatusAction, /Use this view for retrospective review/);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: switch to current live data`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: switch to current live data`));
     assert.equal(result.outageType, "historical-snapshot");
   });
 
@@ -87,7 +87,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /the two scores point in different directions, so the call is not changing this week/);
     assert.match(result.trustStatusDetail, /Reason: Composite disagreement exceeded threshold\./);
     assert.match(result.trustStatusAction, /Keep approvals reversible\./);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: the two scores point the same way again`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again`));
   });
 
   it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {

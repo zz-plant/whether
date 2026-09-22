@@ -39,7 +39,7 @@ describe("/glossary", () => {
        two of them naming the same line twice. */
     for (const label of [
       DECISION_CONTRACT_LABELS.threshold.pauseIf,
-      DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
+      DECISION_CONTRACT_LABELS.reversal.resumeWhen,
       DECISION_CONTRACT_LABELS.watch.postureFlips,
     ]) {
       assert.ok(html.includes(label), `no entry defines "${label}"`);

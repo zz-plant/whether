@@ -59,13 +59,13 @@ describe("published brief date-pinned exports", () => {
     assert.match(slack, /• Call: Keep expansion selective/);
     assert.match(slack, /• Do now: Conditions tightening — freeze new commitments and keep spend flexible\./);
     assert.match(slack, /• Pause if: Over-engineering before demand proves out/);
-    assert.match(slack, /• Re-open when: No flip condition is tripped yet\./);
+    assert.match(slack, /• Resume when: No flip condition is tripped yet\./);
 
     // Area-level bounded decisions
     assert.match(slack, /• Hiring: Selective hiring for revenue-linked and reliability roles\./);
     assert.match(slack, /Do now: Prioritize revenue-linked and reliability roles/);
     assert.match(slack, /Pause if: Pause net-new hiring/);
-    assert.match(slack, /Re-open when: Resume staged approvals/);
+    assert.match(slack, /Resume when: Resume staged approvals/);
 
     // Provenance
     assert.match(slack, /Provenance:/);

@@ -148,7 +148,7 @@ export const buildGuardrailTagBlocks = ({
       `**Conditions:** ${postureLabel}`,
       `**${DECISION_CONTRACT_LABELS.action.actionNow}:** ${item.areaActionNow}`,
       `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${item.triggerThreshold}`,
-      `**${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:** ${item.reversalCondition}`,
+      `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${item.reversalCondition}`,
       ...(flipWatchSentence ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${flipWatchSentence}`] : []),
       `_Week of ${recordDate}_`,
     ].join("\n"),

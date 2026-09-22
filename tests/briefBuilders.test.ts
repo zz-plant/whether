@@ -10,7 +10,7 @@ describe("buildSlackBrief", () => {
   it("gives each bounded-decision slot content of its own shape", () => {
     // With no modeled payload — the /share page and the CLI artifact both call it
     // this way — the slots used to fall back to `assessment.constraints`, which is
-    // a list of actions. That put an action in "Pause if" and "Re-open when", and
+    // a list of actions. That put an action in "Pause if" and "Resume when", and
     // printed constraints[0] under both "Posture" and "Do now".
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
     const slot = (label: string) =>
@@ -19,7 +19,7 @@ describe("buildSlackBrief", () => {
     const posture = slot("Call");
     const doNow = slot("Do now");
     const pauseIf = slot("Pause if");
-    const reopenWhen = slot("Re-open when");
+    const reopenWhen = slot("Resume when");
 
     for (const [label, value] of Object.entries({ posture, doNow, pauseIf, reopenWhen })) {
       assert.ok(value.length > 0, `${label} slot is empty`);
@@ -32,7 +32,7 @@ describe("buildSlackBrief", () => {
     );
     assert.ok(
       !assessment.constraints.includes(reopenWhen),
-      "Re-open when is being filled from the operating-constraints list",
+      "Resume when is being filled from the operating-constraints list",
     );
   });
 
@@ -50,7 +50,7 @@ describe("buildSlackBrief", () => {
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
-    assert.match(brief, /Re-open when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
+    assert.match(brief, /Resume when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
     assert.doesNotMatch(brief, /Do now: Constraint one/, "Do now must not fall through to the operating-limits list");
   });
 
@@ -110,18 +110,18 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Re-open when\):/);
+    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Resume when\):/);
     assert.match(brief, /• Call: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
-    assert.match(brief, /• Re-open when: Resume when tightness < 64\./);
+    assert.match(brief, /• Resume when: Resume when tightness < 64\./);
     assert.ok(brief.indexOf("• Call: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
-    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
+    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Resume when: Resume when tightness < 64."));
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Confidence: MEDIUM confidence/);
     assert.match(brief, /• The scores sit near a line; a small move changes the call\./);
-    assert.match(brief, /• If it is: see "Re-open when" above/);
+    assert.match(brief, /• If it is: see "Resume when" above/);
   });
 
   it("carries each lever's timing line into the per-lever bullets", async () => {
@@ -261,7 +261,7 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Conditions:/);
     assert.match(brief, /Do now: Backfills only/);
     assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
-    assert.match(brief, /Re-open when: Resume staged approvals when tightness < 66/);
+    assert.match(brief, /Resume when: Resume staged approvals when tightness < 66/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {
