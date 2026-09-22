@@ -133,7 +133,7 @@ const buildReversalCondition = (
   actionBias: SectorAdjustedPosture["actionBias"],
 ) => {
   if (actionBias === "hold") {
-    return "Hold the base cadence unless either score clears its regime threshold by 3 points or more.";
+    return "Hold the base cadence unless either score moves 3 points or more past the line that changes the call.";
   }
 
   const nearestTightnessGap = Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime);

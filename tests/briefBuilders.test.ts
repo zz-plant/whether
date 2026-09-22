@@ -10,7 +10,7 @@ describe("buildSlackBrief", () => {
   it("gives each bounded-decision slot content of its own shape", () => {
     // With no modeled payload — the /share page and the CLI artifact both call it
     // this way — the slots used to fall back to `assessment.constraints`, which is
-    // a list of actions. That put an action in "Pause if" and the reversal slot, and
+    // a list of actions. That put an action in "Pause if" and "Resume when", and
     // printed constraints[0] under both "Posture" and "Do now".
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
     const slot = (label: string) =>
@@ -19,6 +19,7 @@ describe("buildSlackBrief", () => {
     const posture = slot("Call");
     const doNow = slot("Do now");
     const pauseIf = slot("Pause if");
+    const reopenWhen = slot("Resume when");
     const callChangesIf = slot("Call changes if");
 
     for (const [label, value] of Object.entries({ posture, doNow, pauseIf, callChangesIf })) {
@@ -29,6 +30,10 @@ describe("buildSlackBrief", () => {
     assert.ok(
       !assessment.constraints.includes(pauseIf),
       "Pause if is being filled from the operating-constraints list",
+    );
+    assert.ok(
+      !assessment.constraints.includes(reopenWhen),
+      "Resume when is being filled from the operating-constraints list",
     );
     assert.ok(
       !assessment.constraints.includes(callChangesIf),
@@ -45,12 +50,13 @@ describe("buildSlackBrief", () => {
       modeledDecision: { actionStripItems: buildActionStripItems(rules, scores) },
     });
 
-    assert.match(brief, /^Funding pressure 12 of 100 · pause line 76 · 64 pts below · resume line 66 \(already met\)$/m);
-    assert.match(brief, /^Risk appetite 68 of 100 · pause line 44 · 24 pts above · resume line 54 \(already met\)$/m);
+    // Each score carries what it means beside the number: a paste has no page to explain the scale.
+    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts below · resume line 66 \(already met\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts above · resume line 54 \(already met\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
-    assert.match(brief, /Re-open when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
+    assert.match(brief, /Resume when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
     assert.doesNotMatch(brief, /Do now: Constraint one/, "Do now must not fall through to the operating-limits list");
   });
 
@@ -110,21 +116,26 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Call changes if\):/);
+    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Resume when \/ Call changes if\):/);
     assert.match(brief, /• Call: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
-    assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
-    // The fourth slot is where the call changes; the area's resume line is in
-    // its row, under its own label, rather than standing in for it.
+    // The slot label carries the verb, so only the rule's condition prints under it.
+    assert.match(brief, /• Pause if: Tightness > 70$/m);
+    assert.match(brief, /• Resume when: Tightness < 64$/m);
+    assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
+    // Where the call itself changes has a slot of its own; the area's resume
+    // line never stands in for it.
     const callChangesIf = brief.match(/• Call changes if: (.+)/)?.[1] ?? "";
     assert.match(callChangesIf, /Funding pressure|Risk appetite/);
-    assert.doesNotMatch(callChangesIf, /Resume when tightness/);
-    assert.match(brief, /  Re-open when: Resume when tightness < 64\./);
+    assert.doesNotMatch(callChangesIf, /Tightness < 64/);
     assert.ok(brief.indexOf("• Call: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
-    assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
-    assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Call changes if: "));
+    assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Tightness > 70"));
+    assert.ok(brief.indexOf("• Pause if: Tightness > 70") < brief.indexOf("• Resume when: Tightness < 64"));
+    assert.ok(brief.indexOf("• Resume when: Tightness < 64") < brief.indexOf("• Call changes if: "));
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /• Confidence: MEDIUM confidence/);
+    // The engine's code ("MEDIUM") never reaches a paste; the band reads as a word.
+    assert.match(brief, /^• Medium confidence$/m);
+    assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
     assert.match(brief, /• The scores sit near a line; a small move changes the call\./);
     assert.match(brief, /• If it is: see "Call changes if" above/);
   });
@@ -194,8 +205,9 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Interpretation context: Financial view \(financial\)/);
-    assert.match(brief, /Interpretation summary: Runway translation for near-term operating cadence\./);
+    // The view's label heads its summary; the internal view id never prints.
+    assert.match(brief, /^Financial view: Runway translation for near-term operating cadence\.$/m);
+    assert.doesNotMatch(brief, /Interpretation context|\(financial\)/);
     assert.match(brief, /• Action: Tighten non-core spend\./);
   });
 
@@ -220,9 +232,8 @@ describe("buildSlackBrief", () => {
     const board = buildBoardBrief(assessment, treasury, sensors, macros, { interpretationLayer });
     const citation = buildCallCitation(assessment, treasury, { interpretationLayer });
 
-    assert.match(board, /Interpretation context: Forecast view \(forecast\)/);
-    assert.match(board, /Interpretation summary: Boundary pressure translation for planning windows\./);
-    assert.match(citation, /Interpretation context: Forecast view \(forecast\)/);
+    assert.match(board, /^Forecast view: Boundary pressure translation for planning windows\.$/m);
+    assert.match(citation, /^Forecast view: /m);
   });
 
   it("includes posture stage label in export surfaces when provided", () => {
@@ -257,16 +268,17 @@ describe("buildSlackBrief", () => {
 
     assert.match(brief, /This week's call:/);
     assert.match(brief, /• Conditions: Guarded Expansion — Late/);
-    assert.match(brief, /• Trend: DETERIORATING/);
+    assert.match(brief, /• vs last week: worse/);
     assert.match(brief, /• Points from the line that changes the call: 2\.0/);
     assert.match(brief, /• Could the call change next week: yes/);
     assert.match(brief, /• Call: Stage decisions/);
     assert.match(brief, /• Re-check: whoever owns the plan/);
-    assert.match(brief, /• Data: Confidence: Guarded/);
+    assert.match(brief, /• Read with care: confidence is not high; no live reading this week/);
     assert.match(brief, /• Conditions:/);
     assert.match(brief, /Do now: Backfills only/);
-    assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
-    assert.match(brief, /Re-open when: Resume staged approvals when tightness < 66/);
+    assert.match(brief, /Pause if: Tightness > 76/);
+    assert.match(brief, /Resume when: Tightness < 66/);
+    assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {
@@ -301,8 +313,10 @@ describe("buildSlackBrief", () => {
       ],
     });
 
-    assert.match(brief, /Historical analogs:/);
-    assert.match(brief, /2024-10-31 · 91% match/);
+    // A similarity percent reads as a probability; the date and what it implied are what a reader uses.
+    assert.match(brief, /Past weeks that looked like this one:/);
+    assert.match(brief, /• 2024-10-31: Keep approvals reversible/);
+    assert.doesNotMatch(brief, /% match|analog/i);
   });
   it("omits interpretation context when default layer is selected", () => {
     const citation = buildCallCitation(assessment, treasury, {
@@ -314,6 +328,6 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.doesNotMatch(citation, /Interpretation context:/);
+    assert.doesNotMatch(citation, /Default view/);
   });
 });

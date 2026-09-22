@@ -118,6 +118,8 @@ type SignalScale = {
   rangeLabel: string;
   /** Plain-words meaning of the bottom of the range. */
   lowAnchor: string;
+  /** Plain-words meaning of the middle band. */
+  midAnchor: string;
   /** Plain-words meaning of the top of the range. */
   highAnchor: string;
   /** One line combining both ends, for use under a score. */
@@ -128,15 +130,37 @@ export const compositeSignalScales: Record<CompositeSignalKey, SignalScale> = {
   tightness: {
     rangeLabel: "0-100",
     lowAnchor: "money is easy to raise",
+    midAnchor: "money is neither easy nor hard to raise",
     highAnchor: "money is hard to raise",
     directionLabel: "0 = easier funding \u00b7 100 = harder funding",
   },
   riskAppetite: {
     rangeLabel: "0-100",
     lowAnchor: "investors are avoiding risk",
+    midAnchor: "investors are selective about risk",
     highAnchor: "investors are funding risk",
     directionLabel: "0 = risk-averse investors \u00b7 100 = risk-hungry investors",
   },
+};
+
+/**
+ * A 0-100 score as a reader should meet it: name, number, and what that number
+ * means, in one string. A bare "74/100" is only readable to someone who already
+ * knows which end is bad, and the page that used to say so was the glossary.
+ * Every surface that prints one of the two composites prints it through this
+ * (or `SignalReading`, its rendered twin), so the meaning cannot be left behind.
+ */
+export const formatSignalReading = (key: CompositeSignalKey, score: number): string =>
+  `${regimeSignalLabel[key]} ${Math.round(score)}/100: ${signalReadingMeaning(key, score)}`;
+
+/**
+ * The meaning half of `formatSignalReading` ("money is hard to raise"), for a
+ * card that already prints the label and the number in its own type sizes.
+ */
+export const signalReadingMeaning = (key: CompositeSignalKey, score: number): string => {
+  const scale = compositeSignalScales[key];
+  const band = classifyScoreBand(score);
+  return band === "high" ? scale.highAnchor : band === "low" ? scale.lowAnchor : scale.midAnchor;
 };
 
 type ScoreBandRow = {
@@ -222,15 +246,6 @@ export const regimeSignalLabel: Record<RegimeSignalKey, string> = {
   curveSlope: signalPlainEnglish.curveSlope.plainLabel,
 };
 
-/**
- * Canonical destination for "what does this word mean" links.
- *
- * Was `/trust#beginner-glossary`. A reader who does not know what funding
- * pressure means was sent to a page named Trust, about freshness and source
- * coverage — the one reader least able to work out why they had landed there.
- */
-export const GLOSSARY_HREF = "/glossary";
-
 export const plainEnglishScoreDescription = (
   key: RegimeSignalKey,
   score: number,
@@ -240,46 +255,4 @@ export const plainEnglishScoreDescription = (
   if (band === "high") return entry.highMeans;
   if (band === "low") return entry.lowMeans;
   return entry.midMeans;
-};
-
-// ── Inline term substitution for plain-English briefs ──
-
-type TermSubstitution = {
-  pattern: RegExp;
-  replacement: string;
-};
-
-/**
- * Applied in order, so every multi-word phrase containing a term must come
- * before the bare term. "Cash tightness" placed after the bare /tightness/ rule
- * produced "Cash funding pressure" — the bare rule consumed the second word and
- * the specific rule then had nothing left to match.
- */
-export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
-  // Multi-word phrases first.
-  { pattern: /\bCapital tightness\b/gi, replacement: "Funding pressure" },
-  { pattern: /\bCash tightness\b/gi, replacement: "Funding pressure" },
-  { pattern: /\bYield curve slope\b/gi, replacement: "Recession warning gauge" },
-  { pattern: /\bCurve slope\b/gi, replacement: "Recession warning gauge" },
-  { pattern: /\brisk appetite threshold\b/gi, replacement: "risk tolerance boundary" },
-  { pattern: /\bVC funding slowdown\b/gi, replacement: "VC funding is slowing" },
-  { pattern: /\bTech layoff pressure\b/gi, replacement: "tech layoffs are rising" },
-  { pattern: /\bBase rate\b/gi, replacement: "Short-term borrowing rate" },
-  // Regime keys.
-  { pattern: /\bSCARCITY\b/g, replacement: "Freezing" },
-  { pattern: /\bDEFENSIVE\b/g, replacement: "Cloudy" },
-  { pattern: /\bVOLATILE\b/g, replacement: "Stormy" },
-  { pattern: /\bEXPANSION\b/g, replacement: "Sunny" },
-  // Bare terms last.
-  { pattern: /\btightness\b/gi, replacement: "funding pressure" },
-  { pattern: /\bregime\b/gi, replacement: "conditions" },
-  { pattern: /\bposture\b/gi, replacement: "call" },
-];
-
-export const applyPlainEnglishSubstitutions = (text: string): string => {
-  let result = text;
-  for (const sub of PLAIN_ENGLISH_SUBSTITUTIONS) {
-    result = result.replace(sub.pattern, sub.replacement);
-  }
-  return result;
 };

@@ -86,8 +86,9 @@ describe("decision transmission copy contract", () => {
 
     assert.match(brief, /• Do now:/);
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /• Confidence:/);
+    assert.match(brief, /• (High|Medium|Low) confidence/);
     assert.match(brief, /• If it is: see "Call changes if" above/);
+    assert.match(brief, /• Resume when:/);
     assert.match(brief, /• Call changes if:/);
   });
 

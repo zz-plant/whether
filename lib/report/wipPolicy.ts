@@ -12,6 +12,7 @@
  * what the cap would be; the team's own board says what it is.
  */
 import type { RegimeKey } from "../regimeEngine";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { RunwayBand } from "./operatorRunway";
 import { runwayBandLabel } from "./operatorRunway";
 
@@ -74,7 +75,7 @@ export const buildWipGuidance = ({
   const sentence = `Cap parallel bets at ${cap}${runwayClause}; finish one before pulling the next.`;
 
   const markdown = [
-    `**WIP policy — ${regime}**`,
+    `**Work-in-progress limit — ${getRegimePublicLabel(regime)}**`,
     `Parallel bets: ${cap}${runwayClause}`,
     `Rule: finish one before pulling the next.`,
   ].join("\n");

@@ -6,6 +6,9 @@ import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { formatDecisionReversal, formatDecisionThreshold } from "../../lib/report/reportFormatting";
+import { describeConditions, pauseConditionOnly } from "../../lib/export/exportTerms";
 
 type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
 
@@ -39,7 +42,8 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const trustCue = buildWeeklyTrustCueLine({
     confidenceLabel,
     freshnessLabel: homepage.reportShell.fetchedAtLabel,
-    transitionWatch: "OFF",
+    /* The model's own flag: a hardcoded "OFF" told every reader the call was not close to changing. */
+    transitionWatch: homepage.weeklyDecisionCardModel.status.transitionWatch,
   });
 
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
@@ -47,8 +51,8 @@ export function buildBriefMarkdown(homepage: HomePage): string {
     .map((item) =>
       [
         `- ${item.areaActionNow}`,
-        `(Threshold: ${item.triggerThreshold} · Reversal: ${item.reversalCondition}`,
-        ...(item.latencyLine ? [` · Timing: ${item.latencyLine}`] : []),
+        `(${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)} · ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`,
+        ...(item.latencyLine ? [` · ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
         ")",
       ].join(""),
     )
@@ -71,6 +75,10 @@ export function buildBriefMarkdown(homepage: HomePage): string {
    * the Slack paste, and /api/embed all read, so the Markdown brief now agrees with them.
    */
   const weeklyCall = homepage.weeklyCall;
+  /* `callChangesIf` is where the call itself changes; the lead rule's resume
+     line is a separate, nearer one, and prints under its own name, as does a
+     stage's `resumeWhen`. */
+  const leadResume = actionItems[0]?.reversalCondition;
 
   const operatorCopy = buildWeeklyOperatorBriefCopyText({
     assessment: reportData.assessment,
@@ -88,9 +96,8 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const markdown = md`
 # Whether Weekly Brief — ${reportData.weeklyRecordDate}
 
-> **Conditions:** ${postureLabel}  
-> **Confidence:** ${confidenceLabel}  
-> **Trust:** ${trustCue}  
+> **Conditions:** ${describeConditions(reportData.assessment.regime, postureLabel)}  
+> **Confidence:** ${trustCue}  
 > **Data as of:** ${homepage.reportShell.recordDateLabel} · Refreshed: ${homepage.reportShell.fetchedAtLabel} · Source: ${homepage.reportShell.treasurySource}
 
 ---
@@ -99,11 +106,11 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 
 ${weeklyCall.currentCall}
 
-**Do now:** ${weeklyCall.actionNow}
+**${DECISION_CONTRACT_LABELS.action.doNow}:** ${weeklyCall.actionNow}
 
-**Pause if:** ${weeklyCall.pauseIf}
+**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${pauseConditionOnly(weeklyCall.pauseIf)}
 
-${weeklyCallChangeLines(weeklyCall).map(({ label, value }) => `**${label}:** ${value}`).join("\n\n")}
+${leadResume ? `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(leadResume)}\n\n` : ""}${weeklyCallChangeLines(weeklyCall).map(({ label, value }) => `**${label}:** ${value}`).join("\n\n")}
 
 ---
 
@@ -113,7 +120,7 @@ ${decisions}
 
 ---
 
-## Revisit If
+## Other Things That Would Change the Call
 
 ${flipConditions}
 
@@ -130,7 +137,7 @@ ${operatorCopy}
 - **Data source:** ${homepage.reportShell.treasurySource}
 - **Record date:** ${homepage.reportShell.recordDateLabel}
 - **Last refreshed:** ${homepage.reportShell.fetchedAtLabel}
-- **Trust status:** ${homepage.reportShell.trustStatusLabel}
+- **Data status:** ${homepage.reportShell.trustStatusLabel}
 - **Conditions:** ${getRegimePublicLabel(homepage.reportShell.regime)}
 ${homepage.reportShell.trustStatusDetail ? `- **Detail:** ${homepage.reportShell.trustStatusDetail}` : ""}
 ${homepage.reportShell.trustStatusAction ? `- **Action:** ${homepage.reportShell.trustStatusAction}` : ""}

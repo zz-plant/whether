@@ -6,6 +6,7 @@ import type { RegimeAssessment } from "./regimeEngine";
 import { REGIME_REVERSAL_DAYS } from "./regimeEngine";
 import { BASE_RATE_SOURCE_LABELS } from "./regimeEngineCore";
 import { REGIME_LABELS } from "./regimePresentation";
+import { formatSignalReading } from "./report/signalTranslations";
 import {
   DECISION_ACTION_LABELS,
   DECISION_GUARDRAILS,
@@ -116,7 +117,10 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
      bill, and `buildShareText` copies these bullets verbatim into the block
      operators paste into a thread — so the misnaming travelled further than the
      screen it was written on. */
-  const rateLabel = BASE_RATE_SOURCE_LABELS[baseRateUsed];
+  /* The plain name leads and the instrument follows as its source, the order
+     every reader surface uses: the name says what the number does, the source
+     says where it was read. */
+  const rateLabel = `The short-term borrowing rate (${BASE_RATE_SOURCE_LABELS[baseRateUsed].replace(/^The /, "the ")})`;
   bullets.push(
     baseRate > baseRateTightness
       ? `${rateLabel} is ${baseRate.toFixed(2)}%, above the ${baseRateTightness}% line where capital gets expensive.`
@@ -126,13 +130,20 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   if (curveSlope === null) {
     bullets.push("The recession warning gauge is unavailable this week, so inversion risk is unconfirmed.");
   } else if (curveSlope < 0) {
-    bullets.push(`The yield curve is inverted at ${curveSlope.toFixed(2)}%, which historically argues for caution.`);
+    bullets.push(
+      `The recession warning gauge (10-year minus 2-year rate) is ${curveSlope.toFixed(2)}%: long-term rates are below short-term rates, which has historically come before recessions.`
+    );
   } else {
-    bullets.push(`The yield curve is positive at ${curveSlope.toFixed(2)}%, which leaves room for risk-taking.`);
+    bullets.push(
+      `The recession warning gauge (10-year minus 2-year rate) is +${curveSlope.toFixed(2)}%: long-term rates are above short-term rates, which leaves room for risk-taking.`
+    );
   }
 
+  /* Each score with its scale and meaning, not "funding pressure at 72": these
+     bullets are copied verbatim into the share text, where no chart sits beside
+     the number to say which end of 0-100 is bad. */
   bullets.push(
-    `Funding pressure at ${tightness} against risk appetite at ${riskAppetite} holds conditions in ${REGIME_LABELS[assessment.regime]}.`
+    `${formatSignalReading("tightness", tightness)}. ${formatSignalReading("riskAppetite", riskAppetite)}. Together they put conditions at ${REGIME_LABELS[assessment.regime]}.`
   );
 
   return bullets;

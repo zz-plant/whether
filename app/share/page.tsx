@@ -12,6 +12,7 @@ import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/brief
 import { buildBoardSlideBullets, buildCallCitation, buildReadingLines, buildSlackBrief } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
+import { describeConditions } from "../../lib/export/exportTerms";
 import { buildFlipProximity } from "../../lib/report/flipProximity";
 import { TransmissionPipelineGlyph } from "../components/illustrations/TransmissionPipelineGlyph";
 import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
@@ -89,7 +90,7 @@ const buildCurrentShareArtifact = async () => {
      carries posture + pause trigger + flip condition. */
   const guardrailTagBlocks = buildGuardrailTagBlocks({
     actionStripItems,
-    postureLabel: snapshot.weeklyCall.regimeStage,
+    postureLabel: describeConditions(assessment.regime, snapshot.weeklyCall.regimeStage),
     recordDate: treasury.record_date,
     flipWatchSentence: buildFlipProximity(assessment).map((entry) => entry.sentence)[0],
   });

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
 import { TREASURY_SOURCE_LABEL } from "../lib/regimeEngineCore";
-import { BEGINNER_GLOSSARY_ENTRIES, GLOSSARY_USAGE_NOTES } from "../lib/report/reportCopy";
+import { TERM_DEFINITIONS } from "../lib/report/reportCopy";
 import { TREASURY_ENDPOINTS } from "../lib/treasury/treasuryClient";
 
 /*
@@ -52,8 +52,8 @@ describe("Treasury source label", () => {
      * place a false source claim is actively harmful, because it is an
      * instruction. Both surfaces are checked here so they cannot drift apart.
      */
-    const copy = JSON.stringify([BEGINNER_GLOSSARY_ENTRIES, GLOSSARY_USAGE_NOTES]);
-    assert.ok(!copy.includes("DFF"), "glossary copy claims DFF");
-    assert.ok(!/fed(eral)?[ -]funds/i.test(copy), "glossary copy claims the fed funds rate");
+    const copy = JSON.stringify(TERM_DEFINITIONS);
+    assert.ok(!copy.includes("DFF"), "term definitions claim DFF");
+    assert.ok(!/fed(eral)?[ -]funds/i.test(copy), "term definitions claim the fed funds rate");
   });
 });

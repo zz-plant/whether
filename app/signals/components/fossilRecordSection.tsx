@@ -41,7 +41,7 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
         initialOpen={open}
         className="weather-auto-chevron"
         summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
-        summary={<span>Show the artifact table ({fossilRecord.rows.length} domains)</span>}
+        summary={<span>Show the table ({fossilRecord.rows.length} areas)</span>}
       >
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-fluid-xs">

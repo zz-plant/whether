@@ -1,6 +1,11 @@
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
-import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+import {
+  classifyScoreBand,
+  compositeSignalScales,
+  regimeSignalLabel,
+  type CompositeSignalKey,
+} from "../../../lib/report/signalTranslations";
 import type { ReportData } from "../../../lib/report/reportData";
 import type { WeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryYields } from "../../../lib/types";
@@ -26,12 +31,28 @@ export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: Mac
 const formatPercent = (value: number | null, digits = 2) =>
   value === null ? "N/A" : `${value.toFixed(digits)}%`;
 
-const SignalRow = ({ label, value }: { label: string; value: string }) => (
+const SignalRow = ({ label, value, meaning }: { label: string; value: string; meaning?: string }) => (
   <tr className="border-b border-slate-800/50 last:border-0">
-    <td className="py-2.5 font-medium text-slate-400">{label}</td>
+    <td className="py-2.5 font-medium text-slate-400">
+      {label}
+      {meaning ? <span className="mt-0.5 block text-fluid-xs font-normal text-slate-500">{meaning}</span> : null}
+    </td>
     <td className="py-2.5 text-right font-semibold tabular-nums text-slate-200">{value}</td>
   </tr>
 );
+
+/*
+ * A score out of 100 carries its scale and what that reading means, the way
+ * `formatSignalReading` states it: "72.4" beside "Funding pressure" was only
+ * readable to someone who already knew which end of the scale is bad.
+ */
+const ScoreRow = ({ signalKey, score }: { signalKey: CompositeSignalKey; score: number }) => {
+  const scale = compositeSignalScales[signalKey];
+  const band = classifyScoreBand(score);
+  const anchor = band === "high" ? scale.highAnchor : band === "low" ? scale.lowAnchor : scale.midAnchor;
+  const meaning = `${anchor.charAt(0).toUpperCase()}${anchor.slice(1)}.`;
+  return <SignalRow label={regimeSignalLabel[signalKey]} value={`${Math.round(score)}/100`} meaning={meaning} />;
+};
 
 export function ComparePeriodColumn({
   snapshot,
@@ -104,19 +125,20 @@ export function ComparePeriodColumn({
         <h3 className="type-eyebrow mb-4">Signals in {periodNoun}</h3>
         <table className="w-full text-left text-sm">
           <tbody>
-            <SignalRow label="Funding pressure" value={scores.tightness.toFixed(1)} />
-            <SignalRow label="Risk appetite" value={scores.riskAppetite.toFixed(1)} />
+            <ScoreRow signalKey="tightness" score={scores.tightness} />
+            <ScoreRow signalKey="riskAppetite" score={scores.riskAppetite} />
             <SignalRow
-              label={`${regimeSignalLabel.baseRate} (1M/3M)`}
+              label={regimeSignalLabel.baseRate}
               value={scores.baseRate !== undefined ? formatPercent(scores.baseRate) : "N/A"}
             />
-            <SignalRow label="Recession warning gauge (10Y−2Y)" value={formatPercent(spread)} />
+            <SignalRow label={`${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`} value={formatPercent(spread)} />
             <SignalRow
-              label="Corporate borrowing premium (BBB)"
+              label="Corporate borrowing premium"
+              meaning="Extra interest mid-grade companies pay over the government."
               value={formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"))}
             />
             <SignalRow
-              label="Inflation (CPI, year over year)"
+              label="Inflation, year over year"
               value={formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"))}
             />
             <SignalRow

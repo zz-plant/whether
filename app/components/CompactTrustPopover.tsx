@@ -7,15 +7,35 @@ import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { Tag } from "./ui/tag";
 
 /**
- * The published series behind each row, by FRED code. Written here rather than
- * read off the ingestion families because those name a series per signal and
- * the popover names one per *row*; the codes are the same literals
- * `lib/ingestion/families.ts` fetches, and `/trust` spells out what each is.
+ * The published series behind each row: a plain name, then its FRED code as the
+ * citation. Written here rather than read off the ingestion families because those
+ * name a series per signal and the popover names them per *row*; the codes are the
+ * same literals `lib/ingestion/families.ts` fetches. A code is never the label —
+ * "DGS1MO" tells a reader where to check a number, not what the number is.
  */
-const SERIES_CODES = {
-  yieldCurve: ["DGS1MO", "DGS2", "DGS10"],
-  creditAndStress: ["BAMLH0A0HYM2", "VIXCLS"],
+const SERIES_CITATIONS = {
+  yieldCurve: [
+    { name: "One-month Treasury bill", code: "DGS1MO" },
+    { name: "Two-year Treasury rate", code: "DGS2" },
+    { name: "Ten-year Treasury rate", code: "DGS10" },
+  ],
+  creditAndStress: [
+    { name: "High-yield credit spread", code: "BAMLH0A0HYM2" },
+    { name: "Stock-market turbulence (VIX)", code: "VIXCLS" },
+  ],
 } as const;
+
+function SeriesCitations({ series }: { series: ReadonlyArray<{ name: string; code: string }> }) {
+  return (
+    <ul className="space-y-0.5 text-right text-[10px] text-slate-500">
+      {series.map((entry) => (
+        <li key={entry.code}>
+          {entry.name} · <span className="font-mono">FRED {entry.code}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** The part of `TrackRecord` (`lib/report/trackRecord.ts`) the popover states. */
 type CompactTrustRecord = {
@@ -108,10 +128,9 @@ export function CompactTrustPopover({
             </Popover.Title>
 
             <div className="space-y-2 text-xs">
-              {/* The series codes sit under each row rather than beside it. A
-                  reader who knows FRED can check the input in one click; one who
-                  does not loses nothing, because the row still names the source
-                  in words. */}
+              {/* The series sit under each row, each named in words with its
+                  code as the citation. A reader who knows FRED can check the
+                  input in one click; one who does not still reads what it is. */}
               <div className="space-y-0.5">
                 <div className="flex items-center justify-between text-slate-300">
                   <span className="text-slate-400">Treasury rates:</span>
@@ -119,18 +138,14 @@ export function CompactTrustPopover({
                     {describeTreasurySource(treasurySource)}
                   </span>
                 </div>
-                <p className="text-right font-mono text-[10px] text-slate-500">
-                  St. Louis Fed (FRED) · {SERIES_CODES.yieldCurve.join(" · ")}
-                </p>
+                <SeriesCitations series={SERIES_CITATIONS.yieldCurve} />
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center justify-between text-slate-300">
                   <span className="text-slate-400">Credit &amp; stress:</span>
                   <span className="font-medium text-sky-300">St. Louis Fed (FRED)</span>
                 </div>
-                <p className="text-right font-mono text-[10px] text-slate-500">
-                  FRED · {SERIES_CODES.creditAndStress.join(" · ")}
-                </p>
+                <SeriesCitations series={SERIES_CITATIONS.creditAndStress} />
               </div>
               <div className="flex items-center justify-between text-slate-300">
                 <span className="text-slate-400">Status:</span>

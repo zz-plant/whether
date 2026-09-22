@@ -6,6 +6,7 @@ import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { RegimeKey } from "../lib/regimeEngine";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
+import { signalReadingMeaning } from "../lib/report/signalTranslations";
 
 const rawAssessment = evaluateRegime({
   source: "https://example.com/treasury",
@@ -70,7 +71,7 @@ describe("CadenceCallCard", () => {
     const html = render("monthly");
 
     assert.ok(html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
-    assert.ok(html.includes(DECISION_CONTRACT_LABELS.reversal.changeCourseIf));
+    assert.ok(html.includes(DECISION_CONTRACT_LABELS.reversal.resumeWhen));
     assert.match(html, /Conditions by month/);
   });
 
@@ -177,5 +178,12 @@ describe("CadenceCallCard", () => {
 
     assert.match(railFor(html, "tightness"), /Rose from 50, moving toward the trigger/);
     assert.match(railFor(html, "riskAppetite"), /Fell from 59, moving toward the trigger/);
+  });
+
+  it("says what each score means beside the number, not only which end is which", () => {
+    const html = render("monthly", false, undefined, midRange);
+    // 61 and 56 are both mid-band: a bare "61/100" is readable only to someone who knows the scale.
+    assert.ok(html.includes(signalReadingMeaning("tightness", 61)));
+    assert.ok(html.includes(signalReadingMeaning("riskAppetite", 56)));
   });
 });

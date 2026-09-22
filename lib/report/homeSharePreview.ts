@@ -152,7 +152,7 @@ export const loadHomeSharePreview = async (
     ? `${contextLabel}: ${headline} — Whether`
     : `${statusLabel}: ${headline} — Whether`;
   const description = clampText(
-    `${audienceLabel}. ${toSentence(immediateDecision)} ${toSentence(whyItMatters)} Changed: ${toSentence(weeklyDecisionCardModel.decision.decisionShiftSummary)} Flip when: ${toSentence(flipCondition)}`,
+    `${audienceLabel}. ${toSentence(immediateDecision)} ${toSentence(whyItMatters)} Changed: ${toSentence(weeklyDecisionCardModel.decision.decisionShiftSummary)} Call changes if: ${toSentence(flipCondition)}`,
     210,
   );
 

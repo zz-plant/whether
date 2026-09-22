@@ -33,7 +33,7 @@ export async function POST(request: Request) {
               type: "section",
               text: {
                 type: "mrkdwn",
-                text: `This channel${channelName ? ` (${channelName})` : ""} is now connected to Whether. Expect the weekly operating brief every Monday, plus a flash alert if the call flips mid-week.\n\n*What to expect:*\n• Current macro posture & decision delta\n• Bounded start, stop, and fence rules\n• Reversal thresholds that flip the call\n\nTo stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.`,
+                text: `This channel${channelName ? ` (${channelName})` : ""} is now connected to Whether. Expect the weekly brief every Monday, plus an alert if the call changes mid-week.\n\n*What each brief carries:*\n• This week's call and what changed\n• What to do now, with the pause and resume lines for each area\n• What would change the call\n\nTo stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.`,
               },
             },
           {

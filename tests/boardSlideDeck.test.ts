@@ -98,7 +98,7 @@ describe("board slide PPTX", () => {
     assert.doesNotMatch(slide, /SCARCITY/);
     assert.match(slide, /Freeze non-revenue hires &amp; put every commitment/);
     assert.match(slide, /hold every new commitment &lt;whatever&gt; the macro corridor/);
-    assert.match(slide, /cached snapshot, not a live read/);
+    assert.match(slide, /saved copy, not a live reading/);
     assert.doesNotMatch(slide, /<whatever>/);
     // A defensive regime wears the rose badge; an easing one the emerald.
     assert.match(slide, /F43F5E/);

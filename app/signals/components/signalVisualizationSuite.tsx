@@ -276,7 +276,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 ariaLabel="Chart cadence"
               />
             </div>
-            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="1-month, 3-month, 2-year and 10-year rates">
+            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="One-month, three-month, two-year and ten-year Treasury rates">
               {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
                 <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
@@ -393,7 +393,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </svg>
             {monthlyScatter.length ? (
               <p className="text-fluid-xs tabular-nums text-slate-400">
-                X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, " pts")}
+                X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, "%")}
               </p>
             ) : null}
             <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction, not just position.</p>
@@ -401,7 +401,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
           <FlatPanel className="lg:col-span-8">
             <PanelTitle title="4) Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
-            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="10Y-2Y and 2Y-3M inversion timeline; dashed line marks zero spread">
+            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread; dashed line marks zero">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
@@ -419,7 +419,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               <span>{latest?.label ?? "Latest"}</span>
             </div>
             <p className="text-xs text-slate-300">10Y−2Y {formatBp(toBp(latest?.spread10Y2Y ?? null))} · 2Y−3M {formatBp(toBp(latest?.spread2Y3M ?? null))}</p>
-            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, " pts")}</p>
+            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, "%")}</p>
             {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 

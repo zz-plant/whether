@@ -3,18 +3,18 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildBriefPermalinkLine } from "./briefPermalink";
 import { buildComplianceStamp } from "../exportNotices";
-import { getRegimePublicLabel } from "../regimePresentation";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import { buildFlipThreshold } from "../report/reportEvidence";
 import type { PostureStateContract } from "../report/postureStateContract";
-import { publicDecisionLabels } from "../report/reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
+import { describeBaseRateSource, describeConditions, describeWeeklyDirection, formatExportConfidence } from "./exportTerms";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -94,6 +94,9 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
 const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
 const FALLBACK_ACTION_NOW = "Keep last week's approvals as they are; start nothing new.";
 const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
+const FALLBACK_RESUME_WHEN = "Live data is back and the call has held for a week.";
+/** The curve reading's name on first use, per the vocabulary table in `lib/report/AGENTS.md`. */
+export const RECESSION_GAUGE_LABEL = `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`;
 /** The stamp's confidence note when no label was modeled: what the number measures. */
 const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line that changes the call";
 
@@ -118,13 +121,16 @@ export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLay
       modeled.actionNow,
       leadItem?.areaActionNow,
     ) ?? FALLBACK_ACTION_NOW;
-  const pauseIf =
-    firstMeaningful(leadItem?.triggerThreshold, modeled.guardrailThreshold)
-    ?? FALLBACK_PAUSE_IF;
-  // Where the call itself changes — never the lead area's resume line, which
-  // printed here under "Re-open when" whenever the model had areas and left the
-  // call-change line out of the four slots entirely. Each area's resume line is
-  // in the area rows below, under its own label.
+  // A rule sentence carries its own verb ("Resume staged approvals when …"),
+  // and under a slot label that already carries that verb it read twice. Only
+  // the rule's condition goes under the label; the fallbacks are written for it.
+  const leadPause = firstMeaningful(leadItem?.triggerThreshold, modeled.guardrailThreshold);
+  // Only an area's own resume line: `modeled.reversalTrigger` is where the call
+  // changes, and falling back to it printed the flip trigger as a resume line.
+  const leadResume = firstMeaningful(leadItem?.reversalCondition);
+  const pauseIf = leadPause ? formatDecisionThreshold(leadPause) : FALLBACK_PAUSE_IF;
+  const resumeWhen = leadResume ? formatDecisionReversal(leadResume) : FALLBACK_RESUME_WHEN;
+  // Where the call itself changes, in a slot of its own beside the resume line.
   const callChangesIf =
     firstMeaningful(modeled.reversalTrigger, options?.postureState?.whatFlipsNext.flipTrigger)
     ?? buildFlipThreshold(assessment);
@@ -133,6 +139,7 @@ export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLay
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
+    `• ${publicDecisionLabels.reversal}: ${resumeWhen}`,
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${callChangesIf}`,
   ];
 };
@@ -167,7 +174,7 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
   const nearest = kind === "pause" ? item.nearestPause : item.nearestResume;
   const qualifier = kind === "pause" ? item.pauseQualifier : item.resumeQualifier;
   if (!lines || lines.length === 0) {
-    return kind === "pause" ? item.triggerThreshold : item.reversalCondition;
+    return kind === "pause" ? formatDecisionThreshold(item.triggerThreshold) : formatDecisionReversal(item.reversalCondition);
   }
   return [
     ...lines.map((line) =>
@@ -210,8 +217,8 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
   }
 
   const trustMarkers = [
-    options?.postureState?.currentState.confidenceLabel !== "HIGH" ? "Confidence: Guarded" : "",
-    !options?.freshnessLabel || options.freshnessLabel === "Unavailable" ? "Freshness: Stale" : "",
+    options?.postureState?.currentState.confidenceLabel !== "HIGH" ? "confidence is not high" : "",
+    !options?.freshnessLabel || options.freshnessLabel === "Unavailable" ? "no live reading this week" : "",
   ].filter((marker) => marker.length > 0);
   const actionStripItems = modeled.actionStripItems ?? [];
   const currentCall =
@@ -224,25 +231,32 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     ?? currentCall;
 
   const actionStrip = actionStripItems.slice(1, 3).flatMap((item) => [
-    `• ${item.label}`,
+    `• ${decisionAreaLabel(operatingLeverToDecisionArea[item.lever])}`,
     `  ${publicDecisionLabels.action}: ${item.areaActionNow}`,
-    `  ${publicDecisionLabels.threshold}: ${item.triggerThreshold}`,
-    `  ${publicDecisionLabels.reversal}: ${item.reversalCondition}`,
+    `  ${publicDecisionLabels.threshold}: ${formatDecisionThreshold(item.triggerThreshold)}`,
+    `  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(item.reversalCondition)}`,
     ...(item.latencyLine ? [`  ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
   ]);
 
   return [
     "",
     "This week's call:",
-    `• Conditions: ${modeled.postureWithStageLabel ?? "Current read"}`,
-    `• Trend: ${(options?.trendLabel ?? "Stable").toUpperCase()}`,
+    `• Conditions: ${describeConditions(assessment.regime, modeled.postureWithStageLabel)}`,
+    ...(options?.trendLabel ? [`• vs last week: ${describeWeeklyDirection(options.trendLabel)}`] : []),
     `• Points from the line that changes the call: ${(options?.regimeDistancePoints ?? 0).toFixed(1)}`,
     `• Could the call change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
-    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${condition}`),
+    /* The posture contract's thresholds mix call-change and resume conditions,
+       so they print as one list under the heading that covers both. */
+    ...((options?.postureState?.whatFlipsNext.thresholds ?? []).length > 0
+      ? [
+          `• ${DECISION_CONTRACT_LABELS.watch.flipWatch}:`,
+          ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `  - ${condition}`),
+        ]
+      : []),
     "• Re-check: whoever owns the plan, at the next weekly review.",
-    ...(trustMarkers.length > 0 ? [`• Data: ${trustMarkers.join(" · ")}`] : []),
+    ...(trustMarkers.length > 0 ? [`• Read with care: ${trustMarkers.join("; ")}`] : []),
     ...actionStrip,
   ];
 };
@@ -256,16 +270,15 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
   const boundedBullets = layer.bullets.slice(0, 3);
   const financialSummary = layer.financialAction
     ? [
-      `Runway risk: ${layer.financialAction.runwayRisk}`,
-      `Raise timing: ${layer.financialAction.raiseTiming}`,
-      `Burn adjustment: ${layer.financialAction.burnAdjustment}`,
+      `Runway: ${layer.financialAction.runwayRisk}`,
+      `When to raise: ${layer.financialAction.raiseTiming}`,
+      `Spending: ${layer.financialAction.burnAdjustment}`,
     ]
     : [];
 
   return [
     "",
-    `Interpretation context: ${layer.label} (${layer.view})`,
-    `Interpretation summary: ${layer.summary}`,
+    `${layer.label}: ${layer.summary}`,
 
     ...boundedBullets.map((bullet) => `• ${bullet}`),
     ...financialSummary.map((line) => `• ${line}`),
@@ -282,16 +295,14 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
  */
 const buildWhyThisCouldBeWrongBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
   const mode = options?.failureModes?.[0];
-  const confidenceLine = options?.confidenceLabel
-    ? `${options.confidenceLabel} confidence`
-    : `${assessment.diagnostics.confidence} confidence`;
+  const confidenceLine = formatExportConfidence(options?.confidenceLabel ?? assessment.diagnostics.confidence);
   const whyCouldBeWrong = mode?.warning
     ?? "The scores sit near a line; a small move changes the call. Hold anything you can't undo.";
 
   return [
     "",
     "Why this could be wrong:",
-    `• Confidence: ${confidenceLine}`,
+    `• ${confidenceLine}`,
     `• ${whyCouldBeWrong}`,
     ...(mode?.mitigationCheck ? [`• Check: ${mode.mitigationCheck}`] : []),
     `• If it is: see "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, plus the readings.`,
@@ -304,10 +315,8 @@ const buildHistoricalAnalogsBlock = (options?: ExportLayerOptions) => {
 
   return [
     "",
-    "Historical analogs:",
-    ...analogs.slice(0, 3).map((analog) =>
-      `• ${analog.date} · ${(analog.similarityScore * 100).toFixed(0)}% match · ${analog.implication}`
-    ),
+    "Past weeks that looked like this one:",
+    ...analogs.slice(0, 3).map((analog) => `• ${analog.date}: ${analog.implication}`),
   ];
 };
 
@@ -324,7 +333,7 @@ export const buildBoardSlideBullets = (
 ) => {
   const areaRows = buildAreaRowLines(options);
   return [
-    `Conditions: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
+    `Conditions: ${describeConditions(assessment.regime, resolveModeledDecisionPayload(options).postureWithStageLabel)}`,
     ...buildCallLines(assessment, options),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,
@@ -351,7 +360,7 @@ export const buildSlackBrief = (
   );
   const modeled = resolveModeledDecisionPayload(options);
   const citations = buildCitationLines(treasury, macros);
-  const postureLabel = modeled.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime);
+  const conditionsLabel = describeConditions(assessment.regime, modeled.postureWithStageLabel);
   const areaRows = buildAreaRowLines(options);
 
   /*
@@ -361,15 +370,15 @@ export const buildSlackBrief = (
    */
   return [
     `Whether Weekly Brief — ${treasury.record_date}`,
-    `Conditions: ${postureLabel}`,
+    `Conditions: ${conditionsLabel}`,
     "",
-    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
     ...buildCallLines(assessment, options),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,
     ...buildReadingLines(assessment, options),
-    `${regimeSignalLabel.baseRate}: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `Recession warning gauge (10-year minus 2-year rate): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    `${regimeSignalLabel.baseRate}: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (read from ${describeBaseRateSource(assessment.scores.baseRateUsed)})`,
+    `${RECESSION_GAUGE_LABEL}: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     ...macroLines,
     ...(areaRows.length > 0 ? ["", `${EXPORT_SECTION_HEADINGS.areas}:`, ...areaRows] : []),
     "",
@@ -407,8 +416,8 @@ export const buildCallCitation = (
   options?: ExportLayerOptions,
 ) => [
   `Whether Weekly Brief — ${treasury.record_date}`,
-  `Conditions: ${options?.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
-  `Confidence: ${assessment.diagnostics.confidence} (how far the scores sit from the line that changes the call)`,
+  `Conditions: ${describeConditions(assessment.regime, options?.postureWithStageLabel)}`,
+  `${formatExportConfidence(assessment.diagnostics.confidence)} (how far the scores sit from the line that changes the call)`,
   `Source note: ${treasury.source}`,
   buildBriefPermalinkLine(treasury.record_date),
   ...buildInterpretationLayerBlock(options),

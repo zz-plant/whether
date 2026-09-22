@@ -14,8 +14,9 @@
  * allows and every reader accepts; the whole file is under 20 KB.
  */
 import { slideReadingLines, slideResumeLine, type MeetingSlidePayload } from "./meetingSlideExport";
-import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { describeConditions, formatExportConfidence, SAVED_COPY_NOTE } from "./exportTerms";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
 // ---------------------------------------------------------------------------
 // Geometry. The SVG slide is 1200×675; PowerPoint's 16:9 slide is 13.333×7.5in
@@ -66,8 +67,8 @@ type SlideCard = {
 
 /** The three cards, in the order the SVG draws them. */
 const buildCards = (payload: MeetingSlidePayload): SlideCard[] => [
-  { label: "1. ACTION NOW", body: payload.actionNow, accent: COLORS.accents[0], top: CARD_TOPS[0] },
-  { label: "2. PAUSE IF", body: payload.pauseIf, accent: COLORS.accents[1], top: CARD_TOPS[1] },
+  { label: `1. ${DECISION_CONTRACT_LABELS.action.actionNow.toUpperCase()}`, body: payload.actionNow, accent: COLORS.accents[0], top: CARD_TOPS[0] },
+  { label: `2. ${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}`, body: payload.pauseIf, accent: COLORS.accents[1], top: CARD_TOPS[1] },
   {
     label: `3. ${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}`,
     body: payload.callChangesIf,
@@ -78,14 +79,15 @@ const buildCards = (payload: MeetingSlidePayload): SlideCard[] => [
 
 /**
  * Three footer lines: each score against its line (the same text the SVG
- * slide and the pasted block print), then confidence and the snapshot marker.
+ * slide and the pasted block print), then conditions, confidence and the saved-copy marker.
  * Stated from the top in SVG pixels; both writers draw them 18px apart.
  */
 const FOOTER_TOP = 570;
 const FOOTER_LINE_HEIGHT = 18;
 const footerLines = (payload: MeetingSlidePayload): string[] => [
   ...slideReadingLines(payload),
-  `Confidence: ${payload.confidence}${payload.isFallback ? "  ·  cached snapshot, not a live read" : ""}`,
+  /* The badge carries only the weather word; its meaning rides here, where the line has room. */
+  `${describeConditions(payload.regime)}  ·  ${formatExportConfidence(payload.confidence)}${payload.isFallback ? `  ·  ${SAVED_COPY_NOTE}` : ""}`,
 ];
 
 const titleLine = (payload: MeetingSlidePayload) => `This week's call${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;

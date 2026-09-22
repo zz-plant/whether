@@ -1,6 +1,12 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+
+/* The card is shared cold, so it uses the page's names: never "Boldness" or
+   the bond desk's "10Y−2Y". A spread's move is in percentage points. */
+const RECESSION_GAUGE_NAME = regimeSignalLabel.curveSlope;
 import {
   GlyphMotif,
   OG_BG,
@@ -135,11 +141,11 @@ export const renderCompareOgImage = ({
           </div>
           <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
             <div style={metricRowStyle}>
-              <span style={metricLabelStyle}>Boldness delta</span>
+              <span style={metricLabelStyle}>Change in {OPERATING_LATITUDE_LABEL.toLowerCase()}</span>
               <BoldnessDelta epochA={epochA} epochB={epochB} />
             </div>
             <div style={metricRowStyle}>
-              <span style={metricLabelStyle}>Yield-curve delta</span>
+              <span style={metricLabelStyle}>Change in {RECESSION_GAUGE_NAME.toLowerCase()}</span>
               <CurveDelta epochA={epochA} epochB={epochB} />
             </div>
           </div>
@@ -166,11 +172,11 @@ const EpochBlock = ({ label, accent, epoch }: { label: string; accent: string; e
         <span style={metricValueStyle}>{formatScore(epoch.tightness)}</span>
       </div>
       <div style={metricRowStyle}>
-        <span style={metricLabelStyle}>Boldness</span>
+        <span style={metricLabelStyle}>{OPERATING_LATITUDE_LABEL}</span>
         <span style={metricValueStyle}>{formatScore(epoch.boldnessScore)}</span>
       </div>
       <div style={metricRowStyle}>
-        <span style={metricLabelStyle}>10Y−2Y</span>
+        <span style={metricLabelStyle}>{RECESSION_GAUGE_NAME}</span>
         <span style={metricValueStyle}>{formatPercent(epoch.curveSpread)}</span>
       </div>
     </div>
@@ -187,7 +193,7 @@ const BoldnessDelta = ({ epochA, epochB }: { epochA: CompareEpoch; epochB: Compa
   const tone = delta === 0 ? OG_TEXT : delta > 0 ? "#34d399" : "#fb7185";
   return (
     <span style={{ ...metricValueStyle, color: tone }}>
-      {delta > 0 ? "+" : ""}{delta.toFixed(0)}
+      {delta > 0 ? "+" : ""}{delta.toFixed(0)} points
     </span>
   );
 };
@@ -202,7 +208,7 @@ const CurveDelta = ({ epochA, epochB }: { epochA: CompareEpoch; epochB: CompareE
   const tone = delta === 0 ? OG_TEXT : delta > 0 ? "#34d399" : "#fb7185";
   return (
     <span style={{ ...metricValueStyle, color: tone }}>
-      {delta > 0 ? "+" : ""}{delta.toFixed(2)}%
+      {delta > 0 ? "+" : ""}{delta.toFixed(2)} percentage points
     </span>
   );
 };

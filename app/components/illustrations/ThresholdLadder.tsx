@@ -71,7 +71,7 @@ export function ThresholdLadder({
   trigger,
   triggerLabel = DECISION_CONTRACT_LABELS.threshold.pauseIf,
   reversal,
-  reversalLabel = DECISION_CONTRACT_LABELS.reversal.changeCourseIf,
+  reversalLabel = DECISION_CONTRACT_LABELS.reversal.resumeWhen,
   unit = "",
   signalLabel,
   scaleDirection,

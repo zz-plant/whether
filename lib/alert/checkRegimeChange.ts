@@ -10,6 +10,7 @@ import { isSlackWebhookUrl } from "../slack/deliverSlackBrief";
 import { siteUrl } from "../siteUrl";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
+import { formatExportConfidenceWord } from "../export/exportTerms";
 
 type CheckRegimeChangeResult = {
   ok: boolean;
@@ -155,8 +156,8 @@ export const checkRegimeChange = async (options?: {
   for (const move of flashMoves) {
     alerts.push(`FLASH — ${move.headline}`);
     await postSlackAlerts(
-      "⚡ Flash — outsized move since the last read",
-      `${move.headline}\nThe weekly call stands until the next read confirms where the scores settle. Hold irreversible commitments until then.`,
+      "⚡ Flash — an unusually large move since the last reading",
+      `${move.headline}\nThis week's call stands until the next reading shows where the scores settle. Until then, hold anything you can't undo.`,
     );
   }
 
@@ -186,7 +187,9 @@ export const checkRegimeChange = async (options?: {
   const prevConfidence = await kv.get("regime:confidence");
   const currentConfidence = assessment.diagnostics?.confidence ?? "HIGH";
   if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
-    alerts.push(`Confidence dropped from ${prevConfidence} to ${currentConfidence}. Sources disagreed this week. Read the call before acting on it.`);
+    alerts.push(
+      `Confidence dropped from ${formatExportConfidenceWord(prevConfidence).toLowerCase()} to ${formatExportConfidenceWord(currentConfidence).toLowerCase()}. Sources disagreed this week. Read the call before acting on it.`,
+    );
   }
 
   /* Persist state for next check */

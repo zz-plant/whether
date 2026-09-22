@@ -17,14 +17,14 @@ type DecisionPhraseTriplet = {
   reversal: string;
 };
 
-// action/threshold are the contract's imperative forms — read them from the one
-// vocabulary rather than restating them. call/reversal/evidence are this
+// action/threshold/reversal are the contract's imperative forms — read them
+// from the one vocabulary rather than restating them. call/evidence are this
 // surface's own words and have no slot in DECISION_CONTRACT_LABELS.
 export const publicDecisionLabels = {
   call: "Call",
   action: DECISION_CONTRACT_LABELS.action.doNow,
   threshold: DECISION_CONTRACT_LABELS.threshold.pauseIf,
-  reversal: "Re-open when",
+  reversal: DECISION_CONTRACT_LABELS.reversal.resumeWhen,
   evidence: "Evidence",
 } as const;
 
@@ -430,7 +430,7 @@ export const formatTrustStripDisplay = ({
     : freshness.maxAge === "stale"
       ? "Freshness stale"
       : "Freshness fresh";
-  const confidenceBadge = `Confidence ${confidenceLabel}`;
+  const confidenceBadge = formatConfidenceChipLabel(confidenceLabel);
   const safeProvenanceCount = Math.max(0, Math.round(provenanceCount));
   const provenanceBadge = `Sources ${safeProvenanceCount}`;
   const degraded = isFallbackSnapshot || freshness.maxAge === "stale";

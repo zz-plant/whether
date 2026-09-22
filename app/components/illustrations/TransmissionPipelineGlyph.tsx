@@ -25,8 +25,8 @@ export function TransmissionPipelineGlyph({
       aria-label="Decision transmission pipeline"
       {...props}
     >
-      <title>Decision Transmission Pipeline</title>
-      <desc>Workflow from macro posture to multi-channel operating artifacts</desc>
+      <title>From public data to a shareable brief</title>
+      <desc>Public U.S. market data becomes the weekly call, then a brief for Slack, email or a meeting</desc>
 
       {/* Central transmission hub */}
       <circle

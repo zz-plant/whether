@@ -1,12 +1,14 @@
-import { GlossaryLink } from "../../components/ui/plainLanguage";
-
 /**
  * Expands the bond-desk shorthand the curve charts are labelled in.
  *
  * The axes say "10Y-2Y", "2Y-3M", and "bp" because that is what fits in a 100-unit
  * viewBox. That is fine for a reader who already trades bonds and unreadable for
  * everyone else, so every surface that renders those labels renders this key with
- * them. Shared so the two curve surfaces cannot drift apart on what a term means.
+ * them. Shared so the curve surfaces cannot drift apart on what a term means.
+ *
+ * It is the whole definition, not a pointer to one: /signals is the method layer, where
+ * instrument names are allowed only when they are defined on the same screen. It used to
+ * end in a "Full glossary" link, and that page is gone.
  */
 
 type CurveTerm = "spread10Y2Y" | "spread2Y3M" | "maturities" | "bp";
@@ -54,9 +56,6 @@ export function CurveTermsKey({
           );
         })}
       </dl>
-      <p className="mt-2 text-xs text-slate-400">
-        <GlossaryLink>Full glossary</GlossaryLink>
-      </p>
     </div>
   );
 }

@@ -180,6 +180,13 @@ describe("interpretation layer", () => {
     assert.match(company.bullets[2], /Reverse: Reopen if risk appetite rises above 55\./);
   });
 
+  it("names the forecast's likeliest outcome by its weather word", () => {
+    const layer = buildInterpretationLayer({ view: "forecast", homeBriefModel, assessment, forecast, decisionRules });
+    // Scarcity carries 38 of the fixture's weight; the reader knows it as Freezing.
+    assert.match(layer.bullets[0], /Action: Operate for Freezing conditions while the call holds\. It carries 38%/);
+    assert.doesNotMatch(layer.bullets.join(" "), /\b(Scarcity|Expansion|Defensive|Mixed)\b|[Mm]omentum|\bflip\b/);
+  });
+
   it("keeps forecast interpretation resilient when 90-day probabilities are missing", () => {
     const sparseForecast = {
       ...forecast,
@@ -194,7 +201,7 @@ describe("interpretation layer", () => {
       decisionRules,
     });
 
-    assert.match(layer.bullets[0], /Action: Operate for DEFENSIVE while the current posture holds — it carries 0% of the next-90-day weight\./);
+    assert.match(layer.bullets[0], /Action: Operate for Cloudy conditions while the call holds\. It carries 0% of the next-90-day weight\./);
   });
 
   it("swaps interpretation content between sector and financial views", () => {

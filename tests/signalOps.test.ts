@@ -230,7 +230,7 @@ describe("signalOps", () => {
     const watch = buildDecisionVerdictHeadline({ decisionArea: "hiring", severe: false });
     assert.equal(watch, "WATCH HIRING");
     const posture = buildDecisionVerdictHeadline({ decisionArea: "posture", severe: true });
-    assert.equal(posture, "RECONSIDER OPERATING POSTURE");
+    assert.equal(posture, "RECONSIDER THE CALL");
   });
 
   it("leads alert reasons and digest bullets with the decision verdict", () => {

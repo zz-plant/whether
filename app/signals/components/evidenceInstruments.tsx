@@ -44,8 +44,9 @@ type TrendPoint = { label: string; value: number };
 
 const SUMMARY_CLASS = "cursor-pointer select-none text-base font-semibold text-slate-100";
 
+/* A score carries its scale ("72/100"); a bare "72" beside "3.50%" read as the same kind of number. */
 const formatCoordinate = (value: number, unit: "%" | "pts") =>
-  unit === "%" ? `${value.toFixed(2)}%` : value.toFixed(0);
+  unit === "%" ? `${value.toFixed(2)}%` : `${value.toFixed(0)}/100`;
 
 /**
  * The nearest of four hand-picked reference cycles, by four coordinates. This
@@ -61,7 +62,7 @@ const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssess
         Nearest reference cycle · {analog.analogPeriod} · {analog.regimeType}
       </summary>
       <p className="text-fluid-xs text-slate-400">
-        Closest of {analog.referenceCycleCount} reference cycles on the four coordinates below.
+        Closest of {analog.referenceCycleCount} reference cycles on the four readings below.
         A resemblance in the inputs, not a forecast of the outcome.
       </p>
       {/* Without explicit column widths the label column absorbs every pixel
@@ -77,7 +78,7 @@ const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssess
         </colgroup>
         <thead>
           <tr className="border-b border-slate-800/80 text-slate-400">
-            <th scope="col" className="py-1.5 pr-3 font-medium">Coordinate</th>
+            <th scope="col" className="py-1.5 pr-3 font-medium">Reading</th>
             <th scope="col" className="py-1.5 pr-3 text-right font-medium">{analog.analogPeriod}</th>
             <th scope="col" className="py-1.5 text-right font-medium">This week</th>
           </tr>

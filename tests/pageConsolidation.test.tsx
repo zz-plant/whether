@@ -48,6 +48,20 @@ describe("bounded decisions: framework and form as a section of /trust", () => {
   });
 });
 
+describe("/glossary retired", () => {
+  /* The glossary existed because pages used words they did not explain. The
+     words are explained where they appear now, so a page of definitions is a
+     second place for the same sentence to drift. The route redirects to the
+     formula cards, the one place instrument names are still in use. */
+  it("has no page, no utility row, and a permanent redirect", () => {
+    assert.equal(existsSync(appPath("/glossary/page.tsx")), false);
+    const hrefs: readonly string[] = utilityLinks.map((link) => link.href);
+    assert.equal(hrefs.includes("/glossary"), false);
+    const config = readFileSync(new URL("../next.config.js", import.meta.url).pathname, "utf8");
+    assert.match(config, /\["\/glossary", "\/trust#formula-reference"\]/);
+  });
+});
+
 describe("mockups", () => {
   it("keeps only the one the weekly-brief spec cites", () => {
     assert.ok(existsSync(appPath("/mockups/operator-brief/page.tsx")));

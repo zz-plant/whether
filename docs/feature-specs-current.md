@@ -86,9 +86,9 @@ The artifact rail now follows a routine-first hierarchy:
 - a direct handoff into Planning for board/governance repackaging and company-specific exceptions.
 On the homepage, the artifact rail is now visually collapsed behind one default path: the first scan exposes one recommended share/copy action, while alternate artifact modes and heavier packaging sit behind a `More formats` disclosure.
 Citation and continuity details remain adjacent but lower-emphasis, instead of repeating a second share summary around the primary artifact card.
-Translation and glossary help remain available, but they now sit behind supporting disclosures instead of occupying the first scan path.
-Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, and `Change course if` as the primary scan labels.
-Those four lines now come from one shared weekly-call contract rather than route-local copy assembly, so the homepage card, copy CTA, command bar, and exported operator brief stay aligned on the core call. The reversal side of that contract is `callChangesIf` (where the call changes, labelled `Call changes if`) plus, only when a stage is set, `resumeWhen` (the stage's discipline for lifting its hold, labelled `Resume when`); a stage adds the second line and never replaces the first. Shared copy/export artifacts also lead with the canonical Operating latitude from the weekly leadership summary, with tightness reserved for pause/guardrail conditions.
+Translation help sits beside the term it translates rather than on a separate page.
+Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, `Resume when` and `Call changes if` as the primary scan labels.
+Those four lines now come from one shared weekly-call contract rather than route-local copy assembly, so the homepage card, copy CTA, command bar, and exported operator brief stay aligned on the core call. The call-change side of that contract is `callChangesIf` (where the call changes, labelled `Call changes if`) plus, only when a stage is set, `resumeWhen` (the stage's discipline for lifting its hold, labelled `Resume when`); a stage adds the second line and never replaces the first. Shared copy/export artifacts also lead with the canonical Operating latitude from the weekly leadership summary, with tightness reserved for pause/guardrail conditions.
 The weekly brief sequence now favors `Operating latitude -> current call -> operating levers -> share actions -> route handoff` rather than surfacing deep proof or team translation before the transmission surface.
 The homepage global header now keeps the weekly brief calmer: it shows the direct next paths first, while the broader workspace chooser on `/` is tucked behind a collapsed `Browse workspaces` control rather than rendering as an always-open rail.
 The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure with smaller follow-on links rather than a second open card grid.
@@ -1112,14 +1112,15 @@ Shared report-shell routes now avoid stacking a separate trust summary panel ahe
 - **Weekly plan** (`/operate`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, scoped alert delivery controls, Decision Memory recall/export, and operator requests.
 
-### 1.5 Home and glossary support (`/`, `/glossary`)
-The homepage is the only canonical first-time and returning weekly workspace. Plain-English
-glossary support has its own route. It used to be a collapsed disclosure under the Trust hub, which
-sent every "unfamiliar with a term?" link — the hero's, the answer pages', the signal cards' — to a
-page about freshness, source coverage and confidence; a reader who does not know what funding
-pressure means is the one least able to work out why they landed there. The glossary explicitly
-translates U.S. market and Treasury language for the product's primary user base instead of
-assuming macro fluency, and `/trust` keeps a pointer to it.
+### 1.5 Home, and why there is no glossary (`/`)
+The homepage is the only canonical first-time and returning weekly workspace. There is no
+glossary route (retired 2026-09-22; `/glossary` redirects to `/trust#formula-reference`). A
+term carries its meaning where it appears instead: a 0–100 score prints with its scale
+(`formatSignalReading`), the three lines have names that say what happens, weather names carry
+their one-line meaning, and the instrument names only a formula needs are defined on the
+formula cards. `tests/readerVocabulary.test.tsx` bans the retired names and the pointers to the
+old page. `llms-full.txt` keeps a Terms block (`TERM_DEFINITIONS`) for machine readers.
+See `docs/glossary-retirement-plan.md`.
 
 ### 1.5.1 About and identity framing (`/about`)
 The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.

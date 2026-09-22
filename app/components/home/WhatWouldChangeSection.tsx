@@ -113,7 +113,7 @@ export function WhatWouldChangeSection({
         ) : null}
         {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
           <div className="flex gap-2">
-            <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:</dt>
+            <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}:</dt>
             <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
           </div>
         ) : null}

@@ -17,7 +17,10 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import type { MonthlyRegimeHistoryEntry } from "../summary/monthlyRegimeHistory";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
-import { getRegimePublicLabel } from "../regimePresentation";
+import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { pauseConditionOnly, SAVED_COPY_NOTE } from "./exportTerms";
+import { signalReadingMeaning } from "../report/signalTranslations";
 import { formatMonthYearShortFromValue, formatSignedDelta, formatThresholdNumber } from "../formatters";
 import type { RunwayBand } from "../report/operatorRunway";
 
@@ -109,22 +112,30 @@ export const buildInvestorUpdateSnippetParts = ({
       : `Whether's read of the operating environment moved to ${regimeLabel} as of ${recordDate}, from ${getRegimePublicLabel(prior.regime)} at the end of ${formatMonthYearShortFromValue(prior.record_date)}.`
     : `Whether's read of the operating environment is ${regimeLabel} as of ${recordDate}.`;
 
+  /* The weather word alone means nothing to an investor who has never seen the site. */
+  const meaningSentence = getRegimeWeatherRationale(assessment.regime).split(". ")[0].replace(/\.?$/, ".");
+
   const tightnessMove = describeMove(tightness, prior?.tightness);
   const riskMove = describeMove(riskAppetite, prior?.riskAppetite);
   const scoreSentence = tightnessMove && riskMove
-    ? `Over the month, funding pressure moved to ${formatThresholdNumber(tightness)} of 100 (${tightnessMove}) and risk appetite to ${formatThresholdNumber(riskAppetite)} of 100 (${riskMove}).`
-    : `Funding pressure sits at ${formatThresholdNumber(tightness)} of 100 and risk appetite at ${formatThresholdNumber(riskAppetite)} of 100.`;
+    ? `Over the month, funding pressure moved to ${formatThresholdNumber(tightness)} of 100 (${tightnessMove}; ${signalReadingMeaning("tightness", tightness)}) and risk appetite to ${formatThresholdNumber(riskAppetite)} of 100 (${riskMove}; ${signalReadingMeaning("riskAppetite", riskAppetite)}).`
+    : `Funding pressure sits at ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}) and risk appetite at ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`;
 
-  const conditions = `${regimeSentence} ${scoreSentence} The call is ${confidence}.`;
+  const conditions = `${regimeSentence} ${meaningSentence} ${scoreSentence} The call is ${confidence}.`;
 
+  /* The page's own slot names, so an investor who opens the brief finds the
+     same three lines under the same words. "Guardrail" and "change our
+     course" were two more names for them. */
   const response = [
     `Our operating response this month: ${asSentence(weeklyCall.actionNow)}`,
-    `The guardrail we are watching: ${asSentence(weeklyCall.pauseIf)}`,
-    `What would change our course: ${asSentence(weeklyCall.callChangesIf)}`,
-    ...(weeklyCall.resumeWhen ? [`When we would resume: ${asSentence(weeklyCall.resumeWhen)}`] : []),
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${asSentence(pauseConditionOnly(weeklyCall.pauseIf))}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${asSentence(weeklyCall.callChangesIf)}`,
+    ...(weeklyCall.resumeWhen
+      ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${asSentence(weeklyCall.resumeWhen)}`]
+      : []),
   ].join(" ");
 
-  const source = `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? " (cached snapshot, not a live read)" : ""}.`;
+  const source = `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}.`;
 
   return { conditions, response, source };
 };

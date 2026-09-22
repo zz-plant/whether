@@ -103,6 +103,46 @@ export const buildHistoricalTimeline = ({
   });
 };
 
+/**
+ * "Freezing for 5 months", or the weather word alone.
+ *
+ * This replaced a stage word ("Freezing — Late (Fragile)") that the engine
+ * derived from direction and distance to the line, and that a reader could only
+ * decode on the glossary. A duration needs no definition. It is counted in
+ * month-end readings, the only history the page has, and only while the latest
+ * month-end agrees with this week's call: the monthly series can trail the
+ * weekly call by up to five weeks, and a run of Sunny months printed beside a
+ * Freezing call would contradict it. Under two months the count says nothing a
+ * reader can use, so the word stands alone.
+ */
+export const formatRegimeWithDuration = ({
+  label,
+  currentRegime,
+  regimeSeries,
+  historicalSelection,
+}: {
+  label: string;
+  currentRegime: Regime;
+  regimeSeries?: HomeReportData["regimeSeries"];
+  historicalSelection?: HomeReportData["historicalSelection"];
+}): string => {
+  const selectedYear = historicalSelection?.year;
+  const selectedMonth = historicalSelection?.month;
+  const scoped = (regimeSeries ?? []).filter(
+    (entry) =>
+      !selectedYear ||
+      !selectedMonth ||
+      entry.year < selectedYear ||
+      (entry.year === selectedYear && entry.month <= selectedMonth),
+  );
+  let months = 0;
+  for (let index = scoped.length - 1; index >= 0; index -= 1) {
+    if (scoped[index]?.regime !== currentRegime) break;
+    months += 1;
+  }
+  return months >= 2 ? `${label} for ${months} months` : label;
+};
+
 const formatDelta = (value: number | null, positiveIsImproving: boolean) => {
   if (value === null || Number.isNaN(value) || value === 0) {
     return "→ unchanged";
@@ -250,7 +290,7 @@ export const buildWhyThisCall = ({
   return [
     {
       key: "distance-to-regime-change",
-      label: "Distance to regime change",
+      label: "How close the call is to changing",
       detail: pendingFlipDetail ?? `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
     },
     {
@@ -259,15 +299,15 @@ export const buildWhyThisCall = ({
       detail:
         changedSignal
           ? `${regimeSignalLabelByKey[changedSignal.key]} ${describeSignalDirection(changedSignal)}, and ${overallDirectionCopy[reportDynamics?.directionLabel ?? "stable"]}.`
-          : "Nothing moved materially. This week's posture comes from where the signals already sit, not from new motion.",
+          : "Nothing moved materially. This week's call comes from where the signals already sit, not from new motion.",
     },
     {
       key: "signal-reliability",
-      label: "Confidence",
+      label: "Call change watch",
       detail:
         transitionWatch === "ON"
-          ? "Transition watch is on. Hold net-new headcount, multi-quarter vendors, and irreversible roadmap expansion until the next live weekly refresh confirms the call."
-          : "Transition watch is off. Use this live read for this week's approvals and apply the thresholds in the current call.",
+          ? "On. Hold net-new headcount, multi-quarter vendors, and irreversible roadmap expansion until the next live weekly refresh confirms the call."
+          : "Off. Use this live read for this week's approvals and apply the thresholds in the current call.",
     },
   ];
 };
@@ -279,8 +319,8 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent: 8,
       urgencyLabel: "Unknown",
-      detailLabel: "We need one more live update before we can size flip risk with confidence.",
-      triggerLabel: "Flip trigger pending fresh data.",
+      detailLabel: "One more live reading is needed to tell how close the call is to changing.",
+      triggerLabel: "The line that changes the call needs a fresh reading.",
     };
   }
 
@@ -293,7 +333,7 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent,
       urgencyLabel: "High",
-      detailLabel: "We are close to a flip. Recheck major commitments before locking spend.",
+      detailLabel: "The call is close to changing. Recheck major commitments before locking spend.",
       triggerLabel,
     };
   }
@@ -302,7 +342,7 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent,
       urgencyLabel: "Medium",
-      detailLabel: "Flip risk is in play. Keep approvals reversible and review weekly.",
+      detailLabel: "The call could change within weeks. Keep approvals reversible and review weekly.",
       triggerLabel,
     };
   }
@@ -310,7 +350,7 @@ export const buildFlipRiskMeterState = (
   return {
     progressPercent,
     urgencyLabel: "Low",
-    detailLabel: "There is room before a flip. Keep this week’s pace unless signals turn.",
+    detailLabel: "The call has room before it changes. Keep this week’s pace unless signals turn.",
     triggerLabel,
   };
 };
@@ -397,8 +437,8 @@ export const buildStartRouteDeltaBlock = ({
     label: "Trigger / risk change",
     detail: joinSentences(
       topFailureMode,
-      `The guardrail to hold is: ${guardrail}`,
-      `The call flips when: ${reversalTrigger}`,
+      `The pause line: ${guardrail}`,
+      `The call changes if: ${reversalTrigger}`,
     ),
     href: "/operate" as const,
   });

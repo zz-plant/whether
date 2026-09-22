@@ -34,7 +34,7 @@ export const FinanceStrategyPanel = ({
             Executive summary
           </p>
           <p className="mt-2 text-sm text-slate-200">
-            {entry?.runwayPosture ?? "Runway posture will update when data refreshes."}
+            {entry?.runwayPosture ?? "The runway plan updates when data refreshes."}
           </p>
         </div>
         <Details
@@ -44,7 +44,7 @@ export const FinanceStrategyPanel = ({
           <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Runway posture
+              Runway plan
             </p>
             <p className="mt-3 text-sm text-slate-200">{entry?.runwayPosture}</p>
             <div className="mt-4 grid gap-3 text-sm text-slate-300">

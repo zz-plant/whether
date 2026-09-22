@@ -4,6 +4,8 @@ import { buildHomeBriefModel } from "../../../../lib/report/homeBriefModel";
 import { siteUrl } from "../../../../lib/siteUrl";
 import type { PostureApiResponse } from "../../../../lib/types";
 import { POSTURE_API_VERSION } from "../../../../lib/types";
+import { describeConditions, describeWeeklyDirection } from "../../../../lib/export/exportTerms";
+import { formatSignalReading } from "../../../../lib/report/signalTranslations";
 
 export const runtime = "edge";
 
@@ -39,8 +41,19 @@ export async function GET() {
   const confidence = homeBriefModel.confidencePercent / 100;
   const week = reportData.treasury.record_date;
 
-  const regimeLabel = regime.charAt(0) + regime.slice(1).toLowerCase();
-  const summary = `${regimeLabel} posture${direction ? `, ${direction}` : ""}, tightness ${reportData.assessment.scores.tightness}/100`;
+  /*
+   * `summary` is the one field an integrator shows a person, so it is written
+   * in the page's words: the weather label with its meaning, the week's
+   * direction, and the funding score with its scale. It used to read
+   * "Expansion posture, stable, tightness 12/100" — the engine key, the word
+   * the site retired, and the internal score name. The machine fields beside
+   * it keep their names; renaming them would break the published contract.
+   */
+  const summary = [
+    `Conditions: ${describeConditions(regime)}.`,
+    `vs last week: ${describeWeeklyDirection(direction)}.`,
+    `${formatSignalReading("tightness", reportData.assessment.scores.tightness)}.`,
+  ].join(" ");
 
   const body: PostureApiResponse = {
     regime,

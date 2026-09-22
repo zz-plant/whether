@@ -7,7 +7,6 @@ const FLASH_IDS = new Set([
   "current-scores",
   "thresholds",
   "ops-workstreams",
-  "beginner-glossary",
   "ops-playbook",
   "sensor-array",
   "advanced-controls",
@@ -23,10 +22,9 @@ const LANDING_POLL_MS = 60;
 const READER_INTENT_EVENTS = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
 
 /**
- * A collapsed panel cannot receive an anchor. Sections that are disclosures now
- * — the /trust glossary is 26 terms and was rendering all of them — still get
- * linked with a plain hash from six places, so a link into one has to open it
- * before the browser scrolls. Runs for the target itself and for any <details>
+ * A collapsed panel cannot receive an anchor. Sections that are disclosures
+ * still get linked with a plain hash, so a link into one has to open it before
+ * the browser scrolls. Runs for the target itself and for any <details>
  * containing it.
  */
 const revealTarget = (target: HTMLElement) => {

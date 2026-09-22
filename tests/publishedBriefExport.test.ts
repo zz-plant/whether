@@ -31,8 +31,8 @@ describe("published brief readings block", () => {
        parts `formatScoreReference` prints wherever a score appears, so the
        archive reads the way the page does. */
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure 32 of 100 · pause line 76 · 44 pts below · last week 40 · resume line 66 (already met)",
-      "Risk appetite 52 of 100 · pause line 44 · 8 pts above · last week 59 · resume line 54 (2 pts away)",
+      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts below · last week 40 · resume line 66 (already met)",
+      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts above · last week 59 · resume line 54 (2 pts away)",
     ]);
     assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
@@ -54,24 +54,24 @@ describe("published brief date-pinned exports", () => {
     const slack = buildPublishedBriefSlackUpdate(july30Brief);
 
     assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
-    assert.match(slack, /Conditions: Guarded Expansion — Late \(MED confidence\)/);
+    assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(medium confidence\)/);
     assert.match(slack, /• What changed: Pressure increased by \+1\.2 this week\./);
     assert.match(slack, /• Call: Keep expansion selective/);
     assert.match(slack, /• Do now: Conditions tightening — freeze new commitments and keep spend flexible\./);
     assert.match(slack, /• Pause if: Over-engineering before demand proves out/);
-    // The regime line under the label the email gives it; "Re-open when" stays
-    // with the areas' resume lines below.
     assert.match(slack, /• Call changes if: No flip condition is tripped yet\./);
 
     // Area-level bounded decisions
     assert.match(slack, /• Hiring: Selective hiring for revenue-linked and reliability roles\./);
     assert.match(slack, /Do now: Prioritize revenue-linked and reliability roles/);
     assert.match(slack, /Pause if: Pause net-new hiring/);
-    assert.match(slack, /Re-open when: Resume staged approvals/);
+    // The rule's own verb is dropped, so the label is not said twice.
+    assert.match(slack, /Resume when: Cash availability eases below 66 and market risk appetite is above 54/);
+    assert.doesNotMatch(slack, /Resume when: Resume/);
 
     // Provenance
     assert.match(slack, /Provenance:/);
-    assert.match(slack, /Record date Jul 30, 2026 · Canonical snapshot \(high confidence\) · captured Aug 1, 2026 at 1:51 PM UTC/);
+    assert.match(slack, /Record date Jul 30, 2026 · Saved copy of the published reading · captured Aug 1, 2026 at 1:51 PM UTC/);
     assert.match(slack, /Source: https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO/);
 
     // Permanent URL
@@ -84,8 +84,8 @@ describe("published brief date-pinned exports", () => {
     const email = buildPublishedBriefEmailUpdate(july30Brief);
 
     assert.match(email, /Whether Leadership Update — Week of Jul 30, 2026/);
-    assert.match(email, /Conditions: Guarded Expansion — Late/);
-    assert.match(email, /Confidence: MED confidence/);
+    assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
+    assert.match(email, /Confidence: Medium confidence/);
     assert.match(email, /Executive summary: Keep expansion selective/);
     assert.match(email, /What changed this week:\nPressure increased by \+1\.2 this week\./);
     assert.match(email, /• Action now: Conditions tightening — freeze new commitments and keep spend flexible\./);
@@ -96,11 +96,12 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, /• Roadmap: Speed up product work tied to activation and retention goals\./);
     assert.match(email, /- Action: Speed up on product bets/);
     assert.match(email, /- Pause if: Pause long-payback bets/);
-    assert.match(email, /- Resume when: Resume tempo on deferred bets/);
+    assert.match(email, /- Resume when: Market risk appetite is above 54/);
+    assert.doesNotMatch(email, /Resume when: Resume/);
 
     // Provenance & citations
     assert.match(email, /• Record date: Jul 30, 2026/);
-    assert.match(email, /• Source: Canonical snapshot \(high confidence\) \(https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO\)/);
+    assert.match(email, /• Source: Saved copy of the published reading \(https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO\)/);
     assert.match(email, /• Freshness: Aug 1, 2026 at 1:51 PM UTC/);
 
     // Permanent URL

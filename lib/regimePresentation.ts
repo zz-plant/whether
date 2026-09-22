@@ -145,8 +145,7 @@ export const getRegimeDisplayLabel = ({
   // The label is the weather name, full stop. This used to return "Contraction",
   // "Transitional Mixed" and "Guarded Expansion" — a third vocabulary for a state
   // the hero already called Cloudy, Stormy or Sunny. The modifier survives as data
-  // for callers that want to qualify the name; the regime's stage (Early/Mid/Late,
-  // Fragile) already carries what "guarded" used to say on screen.
+  // for callers that want to qualify the name.
   if (regime === "VOLATILE") {
     return {
       canonicalRegime: regime,
@@ -180,6 +179,12 @@ export const getRegimeDisplayLabel = ({
   };
 };
 
+/**
+ * The engine's stage word. No reader surface prints it any more: the homepage
+ * and every export name how long the conditions have held instead
+ * (`formatRegimeWithDuration`), because Early/Mid/Late needed a glossary. The
+ * CLI (`lib/cli/contracts.ts`) is the one remaining caller.
+ */
 export const deriveRegimeStage = ({
   regime,
   momentum,

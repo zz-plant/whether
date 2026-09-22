@@ -13,8 +13,10 @@ import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug } from "../isoWeek";
 import { buildCanonicalUrl } from "../seo";
-import { publicDecisionLabels } from "./reportFormatting";
+import { formatConfidenceChipLabel, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { regimeSignalLabel } from "./signalTranslations";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { buildBoundedConditionRails } from "./operatingCalls";
 import { decisionAreaLabel, decisionAreaOrder, isDecisionArea } from "./boundedDecisionRules";
 import { buildScoreReferenceLines } from "../export/scoreReference";
@@ -99,6 +101,39 @@ const previousFromDelta = (value: number, delta: number | null | undefined) =>
  * a sentence. "Last week" comes from the deltas the freeze recorded, which are
  * the real weekly move. Empty for records that carry no scores.
  */
+/**
+ * The archive's stored labels, as a reader should meet them.
+ *
+ * `data/published_briefs.json` is append-only and citable, so a record keeps the
+ * words it was frozen with — and the first weeks were frozen with the engine's:
+ * a posture description with a stage suffix ("Guarded Expansion — Late"), a confidence code ("MED"), a provenance
+ * status ("Canonical snapshot (high confidence)") and a signal name the site has
+ * since corrected ("Fed interest rate" for what is the 1-month Treasury bill).
+ * Rewriting the records would change what was published; translating at render
+ * keeps the record and gives the reader today's words. The page and both copy
+ * formats read this, so they cannot translate differently.
+ */
+const RETIRED_EVIDENCE_TITLES: Record<string, string> = {
+  "Fed interest rate": regimeSignalLabel.baseRate,
+  "Capital conditions": regimeSignalLabel.tightness,
+};
+
+export const publishedBriefDisplay = (brief: PublishedBrief) => ({
+  /* From the engine key, not the stored label: the earliest records stored a
+     third vocabulary ("Guarded Expansion — Late") that no stripping recovers. */
+  conditions: getRegimePublicLabel(brief.regime),
+  confidence: formatConfidenceChipLabel(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
+  source: /^(Canonical|Archived) snapshot/i.test(brief.sourceLabel)
+    ? "Saved copy of the published reading"
+    : brief.sourceLabel.replace(/\s*\((high|medium|low)( confidence)?\)$/i, ""),
+  /* The early headlines lead with the stored label ("Guarded Expansion — Late —
+     week of Jul 30, 2026"), so the lead is swapped for the weather name. */
+  headline: brief.headline.startsWith(brief.postureLabel)
+    ? `${getRegimePublicLabel(brief.regime)}${brief.headline.slice(brief.postureLabel.length)}`
+    : brief.headline,
+  evidenceTitle: (title: string) => RETIRED_EVIDENCE_TITLES[title] ?? title,
+});
+
 export const buildPublishedBriefReadingLines = (brief: PublishedBrief): string[] => {
   if (!brief.scores) return [];
   const corridor = brief.decisions.find((decision) => (decision.pause?.length ?? 0) > 0);
@@ -232,23 +267,22 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
       `• ${labelForArea(decision.area)}: ${decision.call}`,
       `  ${publicDecisionLabels.action}: ${decision.doNow}`,
       `  ${publicDecisionLabels.threshold}: ${decision.pauseTrigger}`,
-      `  ${publicDecisionLabels.reversal}: ${decision.resumeTrigger}`,
+      `  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(decision.resumeTrigger)}`,
     ].join("\n"),
   );
 
-  const evidenceLines = brief.evidence.map((item) => `• ${item.title} — ${item.detail}`);
+  const display = publishedBriefDisplay(brief);
+  const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)} — ${item.detail}`);
 
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
-    `Conditions: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
+    `Conditions: ${display.conditions} (${display.confidence.toLowerCase()})`,
     "",
     `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
     `• ${publicDecisionLabels.call}: ${brief.summary}`,
     `• ${publicDecisionLabels.action}: ${brief.actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${brief.guardrailThreshold}`,
-    // The regime line, labelled as the email below labels it; the areas' own
-    // resume lines follow under "Re-open when".
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${brief.flipThreshold}`,
     ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
@@ -260,7 +294,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
     "",
     "Provenance:",
-    `Record date ${brief.recordDateLabel} · ${brief.sourceLabel} · captured ${brief.freshnessLabel}`,
+    `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel}`,
     ...(brief.sourceUrl ? [`Source: ${brief.sourceUrl}`] : []),
     "",
     `Permanent URL: ${permalinkUrl}`,
@@ -279,21 +313,22 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
       `• ${labelForArea(decision.area)}: ${decision.call}`,
       `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${decision.doNow}`,
       `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${decision.pauseTrigger}`,
-      `  - Resume when: ${decision.resumeTrigger}`,
+      `  - ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(decision.resumeTrigger)}`,
     ].join("\n"),
   );
 
-  const evidenceLines = brief.evidence.map((item) => `• ${item.title}: ${item.detail}`);
+  const display = publishedBriefDisplay(brief);
+  const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)}: ${item.detail}`);
 
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
     "",
-    `Conditions: ${brief.postureLabel}`,
-    `Confidence: ${brief.confidenceLabel} confidence`,
+    `Conditions: ${display.conditions}`,
+    `Confidence: ${display.confidence}`,
     `Executive summary: ${brief.summary}`,
     "",
-    "Operating call & bounded thresholds:",
+    "This week's call:",
     `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
     `• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${brief.guardrailThreshold}`,
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${brief.flipThreshold}`,
@@ -307,7 +342,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     "",
     "Provenance & citations:",
     `• Record date: ${brief.recordDateLabel}`,
-    `• Source: ${brief.sourceLabel}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
+    `• Source: ${display.source}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
     `• Freshness: ${brief.freshnessLabel}`,
     "",
     `Permanent URL: ${permalinkUrl}`,

@@ -308,7 +308,6 @@ export type WeeklyDecisionCardViewModel = {
     regimeKey?: RegimeKey;
     postureLabel: string;
     /** Maturity stage of the current regime (Early/Mid/Late). Not to be confused with planning stepper steps or lane state steps. */
-    stageLabel: string;
     postureWithStageLabel?: string;
     postureDelta: string;
     confidenceLabel: "HIGH" | "MED" | "LOW";
@@ -375,7 +374,6 @@ export type WeeklyDecisionCardViewModel = {
       label: string;
       detail: string;
     }>;
-    glossaryHref?: string;
   };
   diagnostics: {
     regimeSignalIndicators: RegimeSignalIndicator[];

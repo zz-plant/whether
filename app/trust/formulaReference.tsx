@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { ReportSection } from "../components/reportSection";
-import { GlossaryLink } from "../components/ui/plainLanguage";
 import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/signalTranslations";
 import {
   BASE_RATE_TIGHTNESS_MULTIPLIER,
@@ -23,7 +22,7 @@ import {
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
-import { OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
+import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
 import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
 
@@ -94,24 +93,28 @@ function RegimeQuadrant() {
   );
 }
 
-/** Confidence is a three-band ladder on distance to the nearest line, drawn as one. */
+/**
+ * Confidence is a three-band ladder on distance to the nearest line, drawn as one.
+ * The bands are named in words, as every reader surface names them: the engine's
+ * LOW / MED / HIGH codes are storage, not copy.
+ */
 function ConfidenceLadder() {
   const near = REGIME_CONFIDENCE_NEAR_THRESHOLD;
   const med = REGIME_CONFIDENCE_MEDIUM_THRESHOLD;
   const max = med * 2;
   const pct = (v: number) => `${(v / max) * 100}%`;
   return (
-    <div aria-label={`Confidence: under ${near} points LOW, under ${med} MED, otherwise HIGH.`}>
+    <div aria-label={`Confidence: under ${near} points from the line is Low, under ${med} is Medium, otherwise High.`}>
       <div className="flex h-5 w-full max-w-[20rem] overflow-hidden rounded-sm text-fluid-nano font-semibold">
-        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>LOW</span>
-        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>MED</span>
-        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>HIGH</span>
+        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Low</span>
+        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Medium</span>
+        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>High</span>
       </div>
       <div className="relative mt-0.5 h-4 w-full max-w-[20rem] text-fluid-nano tabular-nums text-slate-400">
         <span className="absolute left-0">0</span>
         <span className="absolute -translate-x-1/2" style={{ left: pct(near) }}>{near}</span>
         <span className="absolute -translate-x-1/2" style={{ left: pct(med) }}>{med}</span>
-        <span className="absolute right-0">pts to line</span>
+        <span className="absolute right-0">points from the line</span>
       </div>
     </div>
   );
@@ -212,9 +215,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             </span>
           </li>
         </ol>
+        {/* No link out for the market terms: each card below says what its own terms
+            mean where they first appear, so the arithmetic can be read without leaving it. */}
         <p className="text-xs text-slate-400">
-          The cards below give the exact arithmetic, including the market terms used in it.{" "}
-          <GlossaryLink>Look up a term</GlossaryLink>
+          The cards below give the exact arithmetic. Each one says what its market terms mean
+          where they first appear.
         </p>
       </div>
 
@@ -227,17 +232,18 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series — DGS1MO (the base
-              rate; falls back to DGS3MO), DGS2, DGS10.
+              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series — DGS1MO
+              (the short-term borrowing rate; falls back to DGS3MO), DGS2, DGS10.
               <span className="mt-1 block text-xs text-slate-400">
                 FRED is the St. Louis Fed&rsquo;s free public data service; each code names one
-                published series. DGS1MO is the one-month Treasury bill rate, DGS2 the two-year,
-                DGS10 the ten-year.
+                published series. DGS1MO is the one-month Treasury bill rate, which the cards
+                below call the short-term borrowing rate. DGS3MO is the three-month bill, DGS2 the
+                two-year rate and DGS10 the ten-year.
               </span>
             </li>
             <li>
               <span className="text-slate-400">Stress reads:</span> high-yield credit spread, Chicago
-              Fed financial conditions index, VIX, VC funding velocity, tech layoff trend.
+              Fed financial conditions index, VIX, venture funding pace, tech layoff index.
               <span className="mt-1 block text-xs text-slate-400">
                 In order: the extra interest riskier companies pay to borrow, a Fed summary of
                 overall borrowing conditions, expected stock-market turbulence, the pace of venture
@@ -251,9 +257,10 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <code className="text-sky-200">
-                min({TIGHTNESS_BASE_RATE_POINTS}, (base rate − {BASE_RATE_TIGHTNESS_THRESHOLD}) ×{" "}
+                min({TIGHTNESS_BASE_RATE_POINTS}, (short-term borrowing rate − {BASE_RATE_TIGHTNESS_THRESHOLD}) ×{" "}
                 {BASE_RATE_TIGHTNESS_MULTIPLIER})
               </code>{" "}
+              The short-term borrowing rate is the one-month Treasury bill rate, in percent.
 
               <RampPlot
                 id="ramp-base-rate"
@@ -269,7 +276,9 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
                 + min({TIGHTNESS_INVERSION_POINTS}, inversion depth ×{" "}
                 {CURVE_INVERSION_TIGHTNESS_MULTIPLIER})
               </code>{" "}
-              when the recession warning gauge (10-year minus 2-year rate) is inverted.
+              when the recession warning gauge (10-year minus 2-year rate) is inverted, meaning the
+              ten-year rate is below the two-year. Inversion depth is how far below, in percentage
+              points.
               <RampPlot
                 id="ramp-inversion"
                 from={0}
@@ -281,16 +290,22 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             </li>
             <li>
               <code className="text-sky-200">
-                + min({BASE_RATE_VELOCITY_POINTS}, (trailing {BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day
-                base-rate move − {BASE_RATE_VELOCITY_THRESHOLD}) × {BASE_RATE_VELOCITY_MULTIPLIER})
+                + min({BASE_RATE_VELOCITY_POINTS}, ({BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day rise in the
+                short-term borrowing rate − {BASE_RATE_VELOCITY_THRESHOLD}) × {BASE_RATE_VELOCITY_MULTIPLIER})
               </code>{" "}
-              when base-rate history is available; the tightening-speed term, so a fast hiking
-              cycle counts before the level alone crosses the ramp.
+              when {BASE_RATE_VELOCITY_LOOKBACK_DAYS} days of rate history are available. This is the
+              speed term: rates rising fast count before their level alone reaches the ramp above.
             </li>
             <li>
-              <span className="text-slate-400">Stress add-ons:</span> high-yield spread ≥{" "}
-              {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; Chicago Fed index ≥{" "}
-              {adj.chicagoFciTighteningThreshold} adds up to +{adj.chicagoFciTightnessCap}.
+              <span className="text-slate-400">Stress add-ons:</span> a high-yield credit spread ≥{" "}
+              {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; the Chicago Fed
+              financial conditions index ≥ {adj.chicagoFciTighteningThreshold} adds up to +
+              {adj.chicagoFciTightnessCap}.
+              <span className="mt-1 block text-xs text-slate-400">
+                The high-yield credit spread is the extra interest riskier companies pay to borrow,
+                over the government&rsquo;s rate. The Chicago Fed index summarises borrowing
+                conditions across markets: zero is average, above zero is tighter than average.
+              </span>
             </li>
           </ul>
         </FormulaCard>
@@ -299,26 +314,33 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               Recession warning gauge (10-year minus 2-year rate), mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
-              +{RISK_APPETITE_MAX_SLOPE}% → 100.
+              +{RISK_APPETITE_MAX_SLOPE}% → 100. The further the ten-year rate sits above the
+              two-year, the more willing lenders are to wait for a return.
             </li>
             <li>
-              <span className="text-slate-400">Haircuts:</span> VIX ≥ {adj.vixShockThreshold}{" "}
-              subtracts up to {adj.vixRiskAppetiteCap}; VC funding velocity ≤{" "}
+              <span className="text-slate-400">Deductions:</span> the VIX ≥ {adj.vixShockThreshold}{" "}
+              subtracts up to {adj.vixRiskAppetiteCap}; venture funding pace ≤{" "}
               {adj.vcVelocitySlowdownThreshold}% subtracts up to {adj.vcVelocityRiskAppetiteCap};
-              layoff trend ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
+              the tech layoff index ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
+              <span className="mt-1 block text-xs text-slate-400">
+                The VIX is the stock market&rsquo;s own forecast of turbulence over the next month;
+                higher means more expected swings. Venture funding pace is the quarter-over-quarter
+                change in venture money invested. The layoff index is a composite of tech layoff
+                reports; higher means more layoffs.
+              </span>
             </li>
             <li>
-              <span className="text-slate-400">Market-stress veto:</span> when the trailing{" "}
-              {adj.vixVetoMeanWindow}-observation VIX mean is {adj.vixMarketStressVetoMean}+, the
-              score is capped at the line that changes the call ({RISK_APPETITE_REGIME_THRESHOLD}); between{" "}
-              {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
-              {adj.vixVetoSoftCap}. Extreme market stress, not the curve, sets the ceiling — the
-              score cannot read above the line while it holds.
+              <span className="text-slate-400">Market-stress cap:</span> when the VIX has averaged{" "}
+              {adj.vixMarketStressVetoMean} or more over its last {adj.vixVetoMeanWindow} readings,
+              the score is capped at the line that changes the call ({RISK_APPETITE_REGIME_THRESHOLD});
+              between {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
+              {adj.vixVetoSoftCap}. An average rather than one day, so a single spike does not cap a
+              week. While the cap holds, extreme market stress sets the ceiling, not the rates.
             </li>
           </ul>
         </FormulaCard>
 
-        <FormulaCard title="Conditions, headline number, confidence">
+        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, confidence`}>
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <span className="text-slate-400">Conditions:</span>
@@ -328,11 +350,15 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               </span>
             </li>
             <li>
-              <span className="text-slate-400">{OPERATING_LATITUDE_LABEL} (homepage headline):</span>{" "}
+              <span className="text-slate-400">{OPERATING_LATITUDE_LABEL}:</span>{" "}
               <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
+              <span className="mt-1 block text-xs text-slate-400">
+                The large number on the homepage: {OPERATING_LATITUDE_GLOSS}.
+              </span>
             </li>
             <li>
-              <span className="text-slate-400">Confidence:</span> distance to the nearest line.
+              <span className="text-slate-400">Confidence:</span> how far the scores sit, in points,
+              from the nearest line that would change the call.
               <div className="mt-1.5">
                 <ConfidenceLadder />
               </div>

@@ -7,6 +7,7 @@ import {
 } from "../../lib/report/cadenceCallModel";
 import type { HorizonSignalBand } from "../../lib/summary/horizonOperatingRules";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { signalReadingMeaning } from "../../lib/report/signalTranslations";
 import { REGIME_STYLE_TOKENS } from "../../lib/regimePresentation";
 
 /**
@@ -29,6 +30,7 @@ function BoundedBandRail({ band, idSuffix }: { band: HorizonSignalBand; idSuffix
           {band.label}{" "}
           <span className="font-semibold tabular-nums text-slate-200">{score}</span>
           <span className="text-white/35">/100</span>
+          <span className="text-slate-300">: {signalReadingMeaning(band.key, band.current)}</span>
           {delta ? (
             <span
               className={`ml-1.5 tabular-nums ${
@@ -140,7 +142,7 @@ export function CadenceCallCard({
         </div>
         <div className="flex flex-wrap items-baseline gap-x-2">
           <dt className="shrink-0 font-medium text-slate-400">
-            {DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:
+            {DECISION_CONTRACT_LABELS.reversal.resumeWhen}:
           </dt>
           <dd className="min-w-0 text-slate-300">{model.boundedRule.reversal}</dd>
         </div>

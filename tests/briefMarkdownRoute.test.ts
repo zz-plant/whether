@@ -65,6 +65,7 @@ describe("/brief.md", () => {
     assert.match(call.body, /\*\*Do now:\*\*\s*\S/);
     assert.match(call.body, /\*\*Pause if:\*\*\s*\S/);
     assert.match(call.body, /\*\*Call changes if:\*\*\s*\S/);
+    assert.match(call.body, /\*\*Resume when:\*\*\s*\S/);
 
     // The other half of the original defect: a non-null object would have been
     // JSON.stringify'd straight into the artifact.

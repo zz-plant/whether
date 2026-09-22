@@ -138,6 +138,10 @@ export const iaConsolidationRedirectPairs = [
   // The embed builder is a section of the share page: same artifact, different
   // container. Two doors to "get the brief out" said nothing about each other.
   ["/embed", "/share#embed"],
+  // The glossary defined 26 terms the pages used without explaining. Each one
+  // now carries its meaning where it appears, and the method terms that only a
+  // formula needs are defined on the formula cards, which is where this lands.
+  ["/glossary", "/trust#formula-reference"],
 ];
 
 export const redirectEntries = [

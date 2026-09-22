@@ -10,6 +10,21 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { buildScoreReferenceLines } from "./scoreReference";
+import { describeConditions, formatExportConfidence, pauseConditionOnly, SAVED_COPY_NOTE } from "./exportTerms";
+
+/*
+ * The slide's three slot labels are the page's. `callChangesIf` carries the
+ * line where the call itself changes, so it prints as "Call changes if"; the
+ * levels at which a pause lifts print as "Resume when". They were "Change
+ * course if" and "Clears when", two more names for concepts the page already
+ * names.
+ */
+const SLIDE_LABELS = {
+  action: DECISION_CONTRACT_LABELS.action.actionNow,
+  pause: DECISION_CONTRACT_LABELS.threshold.pauseIf,
+  callChange: DECISION_CONTRACT_LABELS.watch.postureFlips,
+  resume: DECISION_CONTRACT_LABELS.reversal.resumeWhen,
+} as const;
 
 export interface MeetingSlidePayload {
   /** The record date as displayed ("Sep 16, 2026"). */
@@ -71,7 +86,7 @@ export function extractMeetingSlidePayload(
   const stageAdj = stage ? weeklyCall.stageScopedAdjustments?.[stage] : undefined;
 
   const actionNow = stageAdj?.actionNow ?? weeklyCall.actionNow;
-  const pauseIf = stageAdj?.pauseIf ?? weeklyCall.pauseIf;
+  const pauseIf = pauseConditionOnly(stageAdj?.pauseIf ?? weeklyCall.pauseIf);
   const resumeWhen = stageAdj?.resumeWhen ?? weeklyCall.resumeWhen;
   const stageLabel = stageAdj?.label ?? (stage === "seed" ? "Seed" : stage ? "Startup" : "");
 
@@ -108,6 +123,11 @@ export const slideReadingLines = (payload: MeetingSlidePayload): string[] =>
       : DEFAULT_THRESHOLDS,
   });
 
+const resumeConditions = (payload: MeetingSlidePayload): string[] => [
+  ...(payload.clearsWhen ?? []),
+  ...(payload.resumeWhen ? [payload.resumeWhen] : []),
+];
+
 /** The stage's resume line as every slide format prints it, or null without a stage. */
 export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
   payload.resumeWhen ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.resumeWhen}` : null;
@@ -118,7 +138,7 @@ export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
     `> **Whether: this week's call** — *${payload.recordDate}*`,
-    `> **Conditions**: ${getRegimePublicLabel(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
+    `> **Conditions**: ${describeConditions(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
     // when the two are the same sentence, which is what the model returns on a
@@ -126,21 +146,20 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     ...(payload.call && payload.call.trim() !== payload.actionNow.trim()
       ? [`> **CALL**: ${payload.call}`]
       : []),
-    `> 🎯 **ACTION NOW**: ${payload.actionNow}`,
-    `> ⚠️ **PAUSE IF**: ${payload.pauseIf}`,
-    `> 🔄 **${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}**: ${payload.callChangesIf}`,
-    ...(payload.resumeWhen
-      ? [`> ↩️ **${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}**: ${payload.resumeWhen}`]
+    `> 🎯 **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
+    `> ⚠️ **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
+    // One resume line: the levels a pause lifts at, then the stage's own
+    // discipline when one is chosen. Both say when a hold lifts.
+    ...(resumeConditions(payload).length > 0
+      ? [`> ✅ **${SLIDE_LABELS.resume.toUpperCase()}**: ${resumeConditions(payload).join("; ")}`]
       : []),
-    ...(payload.clearsWhen && payload.clearsWhen.length > 0
-      ? [`> ✅ **CLEARS WHEN**: ${payload.clearsWhen.join("; ")}`]
-      : []),
+    `> 🔄 **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
     `>`,
     // The snapshot marker travels with the numbers. A slide pasted into a deck
     // during an upstream outage has to say so on the slide, not on the page it
     // was copied from.
     ...slideReadingLines(payload).map((line) => `> *${line}*`),
-    `> *Source: ${payload.provenance}${payload.isFallback ? " · cached snapshot, not a live read" : ""}*`,
+    `> *${formatExportConfidence(payload.confidence)} · Source: ${payload.provenance}${payload.isFallback ? ` · ${SAVED_COPY_NOTE}` : ""}*`,
     ...(payload.url ? [`> ${payload.url}`] : []),
   ].join("\n");
 }
@@ -158,6 +177,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
     <div>
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; font-weight: 700;">Whether · Weekly Operating Brief</span>
       <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's call${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Conditions: ${describeConditions(payload.regime)}</p>
     </div>
     <div style="text-align: right;">
       <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
@@ -168,25 +188,25 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
     <tr>
       <td style="padding: 12px; background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; border-radius: 4px 8px 8px 4px; margin-bottom: 8px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #38bdf8; letter-spacing: 0.08em;">1. Action Now</span>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #38bdf8; letter-spacing: 0.08em;">1. ${SLIDE_LABELS.action}</span>
         <div style="font-size: 13px; font-weight: 600; color: #ffffff; margin-top: 2px;">${payload.actionNow}</div>
       </td>
     </tr>
     <tr><td style="height: 8px;"></td></tr>
     <tr>
       <td style="padding: 12px; background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b; border-radius: 4px 8px 8px 4px; margin-bottom: 8px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #f59e0b; letter-spacing: 0.08em;">2. Pause If</span>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #f59e0b; letter-spacing: 0.08em;">2. ${SLIDE_LABELS.pause}</span>
         <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.pauseIf}</div>
       </td>
     </tr>
     <tr><td style="height: 8px;"></td></tr>
     <tr>
       <td style="padding: 12px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 4px 8px 8px 4px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">3. ${DECISION_CONTRACT_LABELS.watch.postureFlips}</span>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">3. ${SLIDE_LABELS.callChange}</span>
         <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.callChangesIf}</div>${
           payload.resumeWhen
             ? `
-        <span style="display: block; margin-top: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">${DECISION_CONTRACT_LABELS.reversal.resumeWhen}</span>
+        <span style="display: block; margin-top: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">${SLIDE_LABELS.resume}</span>
         <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.resumeWhen}</div>`
             : ""
         }
@@ -196,7 +216,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
 
   <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: #64748b; padding-top: 8px;">
     <span style="display: flex; flex-direction: column; gap: 2px;">${slideReadingLines(payload).map((line) => `<span>${line}</span>`).join("")}</span>
-    <span>Source: ${payload.provenance} · whether.work</span>
+    <span>${formatExportConfidence(payload.confidence)} · Source: ${payload.provenance}${payload.isFallback ? ` · ${SAVED_COPY_NOTE}` : ""} · whether.work</span>
   </div>
 </div>
 `.trim();
@@ -236,7 +256,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 70)">
     <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING CALL</text>
     <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's call${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
-    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · Source: ${esc(payload.provenance)}</text>
+    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · ${esc(describeConditions(payload.regime))} · Source: ${esc(payload.provenance)}</text>
     
     <!-- Regime Badge -->
     <g transform="translate(880, 10)">
@@ -250,7 +270,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 190)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#38bdf8"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="1.5">1. ACTION NOW</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="1.5">1. ${SLIDE_LABELS.action.toUpperCase()}</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="20" font-weight="700" fill="#ffffff">${esc(payload.actionNow)}</text>
   </g>
 
@@ -258,7 +278,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 320)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#f59e0b"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. PAUSE IF</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. ${SLIDE_LABELS.pause.toUpperCase()}</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.pauseIf)}</text>
   </g>
 
@@ -266,7 +286,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 450)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#10b981"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. ${esc(DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase())}</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. ${SLIDE_LABELS.callChange.toUpperCase()}</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.callChangesIf)}</text>
   </g>
 
@@ -279,7 +299,7 @@ ${slideReadingLines(payload)
   )
   .join("\n")}
     <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
-      Confidence: <tspan fill="#f1f5f9">${esc(payload.confidence)}</tspan>
+      <tspan fill="#f1f5f9">${esc(formatExportConfidence(payload.confidence))}</tspan>${payload.isFallback ? ` · ${SAVED_COPY_NOTE}` : ""}
     </text>
     <text x="1040" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
       whether.work

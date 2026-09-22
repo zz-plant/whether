@@ -28,7 +28,7 @@ import {
   buildDataCurrencyNotice,
 } from "../../lib/report/dataCurrencyNotice";
 import { ContentMeasurementTracker } from "../components/contentMeasurementTracker";
-import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "../components/ui/plainLanguage";
+import { PlainEnglishScoreNote, SignalScaleNote } from "../components/ui/plainLanguage";
 import { signalPlainEnglish, type CompositeSignalKey } from "../../lib/report/signalTranslations";
 import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
@@ -93,7 +93,7 @@ export async function DecisionAnswerPageContent({
     `Current call: ${payload.currentCall}`,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
-    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${payload.reversalCondition}`,
+    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
   ].join("\n");
@@ -277,9 +277,6 @@ export async function DecisionAnswerPageContent({
               </div>
             ))}
           </div>
-          <p className="mt-3 text-fluid-nano text-white/45">
-            <GlossaryLink>What these terms mean</GlossaryLink>
-          </p>
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.citation}>

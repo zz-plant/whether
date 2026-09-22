@@ -17,7 +17,6 @@ import { formatThresholdNumber } from "../../formatters";
 import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "../reportCopy";
 import {
   REGIME_SEVERITY_RANK,
-  deriveRegimeStage,
   getRegimeDisplayLabel,
   getRegimePublicLabel,
   type RegimeConfidenceLabel,
@@ -57,6 +56,7 @@ import {
 import {
   buildFlipRiskMeterState as buildFlipRiskMeterStateInternal,
   buildHistoricalTimeline,
+  formatRegimeWithDuration,
   buildMacroOverlay,
   buildMemoryRail,
   buildStartRouteDeltaBlock,
@@ -78,7 +78,6 @@ import type {
 } from "../homeBriefModel";
 import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
-import { GLOSSARY_HREF } from "../signalTranslations";
 
 export { extractExecutiveOperationalStance, buildMemoryRail };
 
@@ -403,13 +402,6 @@ export const buildHomeBriefModelInternal = (
     transitionWatch: transitionWatch === "ON",
   });
 
-  const stage = deriveRegimeStage({
-    regime: assessment.regime,
-    momentum: (reportDynamics?.directionLabel ?? "stable") as RegimeMomentum,
-    confidence: confidenceLabel,
-    distanceToFlip: nearestThresholdGap,
-  });
-
   const regimeFlipState = buildRegimeFlipState({
     regime: assessment.regime,
     scores: assessment.scores,
@@ -559,9 +551,12 @@ export const buildHomeBriefModelInternal = (
 
   return {
     postureLabel: displayRegime.label,
-    stageLabel: stage.label,
-    stageFragile: stage.fragile,
-    postureWithStageLabel: `${displayRegime.label} — ${stage.displayLabel}`,
+    postureWithStageLabel: formatRegimeWithDuration({
+      label: displayRegime.label,
+      currentRegime: assessment.regime,
+      regimeSeries,
+      historicalSelection,
+    }),
     confidenceLabel: postureState?.currentState.confidenceLabel ?? confidenceLabel,
     confidencePercent: postureState?.currentState.confidencePercent ?? confidencePercent,
     signalConfidenceReason: policyOverrideActive
@@ -671,7 +666,7 @@ export const buildHomeBriefModelInternal = (
       reportDynamics,
       transitionWatch,
       pendingFlipDetail: regimeFlipState.pendingCandidate
-        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — the call holds while the change waits on confirmation. The line that would change the flip target: ${regimeFlipState.watch.dimension === "tightness" ? "Funding pressure" : "Risk appetite"} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
+        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — the call holds while the change waits on confirmation. The line that would change where it lands: ${regimeFlipState.watch.dimension === "tightness" ? "Funding pressure" : "Risk appetite"} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
         : undefined,
     }),
   };
@@ -726,7 +721,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       statusLabel,
       regimeKey,
       postureLabel: homeBriefModel.postureLabel,
-      stageLabel: homeBriefModel.stageLabel,
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
       postureDelta: homeBriefModel.postureDeltaLabel,
       confidenceLabel: homeBriefModel.confidenceLabel,
@@ -773,7 +767,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     presentation: {
       whyItMattersLine,
       readThisCardItems,
-      glossaryHref: GLOSSARY_HREF,
     },
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,

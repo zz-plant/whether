@@ -1,7 +1,7 @@
 import { answerPageContent } from "../answerContentSource";
 import { resourceArticles } from "../resourceArticles";
 import { resourcePillarPages } from "../resourcesContent";
-import { BEGINNER_GLOSSARY_ENTRIES } from "../report/reportCopy";
+import { TERM_DEFINITIONS } from "../report/reportCopy";
 import {
   isIndexableAnswerSlug,
   isIndexableResourceArticleSlug,
@@ -102,13 +102,10 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
 
   /* The vocabulary, because every other block above uses it. An agent reading
      "funding pressure 77" with no scale cannot do anything with the number. */
-  const glossaryBlock = section([
-    heading(2, "Glossary"),
-    `URL: ${baseUrl}/glossary`,
-    ...BEGINNER_GLOSSARY_ENTRIES.map((entry) =>
-      section([heading(3, entry.term), entry.summary, entry.why]),
-    ),
+  const termsBlock = section([
+    heading(2, "Terms"),
+    ...TERM_DEFINITIONS.map((entry) => section([heading(3, entry.term), entry.summary])),
   ]);
 
-  return `${section([preamble, answerBlock, pillarBlock, articleBlock, glossaryBlock])}\n`;
+  return `${section([preamble, answerBlock, pillarBlock, articleBlock, termsBlock])}\n`;
 };

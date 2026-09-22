@@ -68,9 +68,20 @@ describe("assembleHomePage streaming contract", () => {
     const reportDataForCopy = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(artifactPayload);
-    assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /avoid|hiring|threshold|flip/i);
+    assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /PAUSE IF: /);
     assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /DELTA-ONLY BRIEF/);
     assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /Revisit now/);
+    /* The board note is read cold. Every slot uses the page's name and carries
+       its meaning; the retired names and a percent confidence must not return. */
+    const boardNote = artifactPayload?.boardSnippetText ?? "";
+    assert.match(boardNote, /^DATA: (Live, as of|Saved copy from) /m);
+    assert.match(boardNote, /^OPERATING LATITUDE: \d+\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: /m);
+    assert.match(boardNote, /^CONDITIONS: (Sunny|Cloudy|Stormy|Freezing)[^\n]*\((money|conditions) [^)]+\) · (High|Medium|Low) confidence$/m);
+    assert.match(boardNote, /^PAUSE IF: /m);
+    assert.match(boardNote, /^CALL CHANGES IF: /m);
+    assert.doesNotMatch(boardNote, /BOLDNESS|FLIP:|GUARDRAIL:|POSTURE:|TRUST:|FALLBACK|SNAPSHOT|\d+% confidence|\b(HIGH|MED|LOW)\b/);
+    assert.doesNotMatch(boardNote, /PAUSE IF: Pause /);
+    assert.doesNotMatch(artifactPayload?.weeklyCallSnapshotText ?? "", /AVOID:|WATCH:|\d+%/);
     const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
       assessment: reportDataForCopy.assessment,
       treasury: reportDataForCopy.treasury,
@@ -155,7 +166,7 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(homepage.interpretationLayer.view, "forecast");
     assert.equal(homepage.interpretationSearchParams?.view, "forecast");
     assert.equal(homepage.interpretationSearchParams?.month, "3");
-    assert.match(homepage.interpretationLayer.summary, /boundary|flip|momentum/i);
+    assert.match(homepage.interpretationLayer.summary, /how likely this call is to change/i);
     assert.match(homepage.weeklyDecisionCardModel.decision.immediateDecision, /stage|revise|hold/i);
   });
 

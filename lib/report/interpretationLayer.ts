@@ -1,7 +1,8 @@
 import type { RegimeAssessment } from "../regimeEngine";
-import type { ForecastModel } from "./forecastModel";
+import { forecastWeatherLabel, type ForecastModel, type ForecastRegimeLabel } from "./forecastModel";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { formatBoundaryDistance } from "./reportFormatting";
 import {
   buildCompanyAdjustedRules,
@@ -14,6 +15,9 @@ import {
   type PlannerStage,
 } from "./runwayPlanner";
 import { deriveSectorAdjustedPosture, type SectorKey } from "./sectorSensitivity";
+
+/** Listed rather than read off `Object.entries`, which types its keys as `string`. */
+const FORECAST_REGIME_LABELS: readonly ForecastRegimeLabel[] = ["Expansion", "Mixed", "Scarcity", "Defensive"];
 
 
 const interpretationViews = [
@@ -272,18 +276,22 @@ export const buildInterpretationLayer = ({
   }
 
   if (view === "forecast") {
-    const topRegime =
-      Object.entries(forecast.next90DayProbabilities).sort((a, b) => b[1] - a[1])[0] ??
-      [assessment.regime, 0];
+    const topForecast = FORECAST_REGIME_LABELS.flatMap((label): [ForecastRegimeLabel, number][] => {
+      const probability = forecast.next90DayProbabilities?.[label];
+      return typeof probability === "number" ? [[label, probability]] : [];
+    }).sort((a, b) => b[1] - a[1])[0];
+    const topRegime: [string, number] = topForecast
+      ? [forecastWeatherLabel[topForecast[0]], topForecast[1]]
+      : [getRegimePublicLabel(assessment.regime), 0];
     const momentumCopy: Record<
       ForecastModel["boundaryPressure"]["momentum"],
       string
     > = {
-      "toward-threshold": "Momentum is moving toward the line that changes the call.",
+      "toward-threshold": "The readings are moving toward the line that changes the call.",
       "away-from-threshold":
-        "Momentum is moving away from the line that changes the call.",
-      mixed: "Momentum is mixed across boundary signals.",
-      stable: "Momentum is stable with no directional boundary drift.",
+        "The readings are moving away from the line that changes the call.",
+      mixed: "The two readings are moving in opposite directions.",
+      stable: "Neither reading is moving toward or away from the line.",
     };
 
     const thresholds = assessment.thresholds ?? { tightnessRegime: 70, riskAppetiteRegime: 50 };
@@ -300,18 +308,18 @@ export const buildInterpretationLayer = ({
     });
     let dynamicMomentum = momentumCopy[forecast.boundaryPressure.momentum];
     if (forecast.boundaryPressure.momentum === "toward-threshold") {
-      dynamicMomentum = `${closestDistance} Momentum is toward it.`;
+      dynamicMomentum = `${closestDistance} The reading is moving toward it.`;
     } else if (forecast.boundaryPressure.momentum === "away-from-threshold") {
-      dynamicMomentum = `${closestDistance} Momentum is away from it.`;
+      dynamicMomentum = `${closestDistance} The reading is moving away from it.`;
     }
 
     return {
       view,
       label: "Forecast view",
       summary:
-        "How likely this call is to flip if the current momentum holds.",
+        "How likely this call is to change if this week's direction holds.",
       bullets: formatBullets([
-        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} while the current posture holds — it carries ${topRegime[1]}% of the next-90-day weight.`),
+        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} conditions while the call holds. It carries ${topRegime[1]}% of the next-90-day weight.`),
         boundedLine(
           DECISION_CONTRACT_LABELS.slot.threshold,
           `${formatBoundaryDistance({ label: closestDimension, points: forecast.boundaryPressure.distance, threshold: closestThreshold })} Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()}.`,

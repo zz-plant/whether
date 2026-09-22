@@ -77,11 +77,12 @@ export default function AboutPage() {
         <p className="text-sm text-slate-300">
           Whether reads public data from the St. Louis Fed (FRED) across six signal families — Treasury yields, credit
           spreads, inflation, labor, financial conditions, and volatility — and scores them into one of four
-          conditions: Sunny, Cloudy, Stormy or Freezing. The two numbers the brief leads with are built from the Chicago Fed financial conditions
-          index and the VIX, not from the yield curve alone.
+          conditions: Sunny, Cloudy, Stormy or Freezing. The two scores the brief leads with, funding pressure and
+          risk appetite, start from Treasury rates. Market-stress readings then adjust them, among them the Chicago
+          Fed&apos;s summary of borrowing conditions and the VIX, the stock market&apos;s forecast of turbulence.
         </p>
         <p className="text-sm text-slate-300">
-          Startup-market inputs — funding velocity, layoff trend, SaaS multiples — come from a curated
+          Startup-market inputs — the pace of venture funding, tech layoffs, and public software valuations — come from a curated
           snapshot rather than a live feed, and every surface that uses them says so. The scoring formulas,
           source list, refresh schedule, and stated limitations are published in full.
         </p>

@@ -26,25 +26,25 @@ export const SCENARIO_PRESETS: ScenarioPreset[] = [
     id: "easing",
     rate: 2.0,
     slope: 1.2,
-    description: "Fast cuts and a steep curve: funding loosens.",
+    description: "Fast rate cuts, and long-term rates well above short-term: funding loosens.",
   },
   {
     id: "stagflation",
     rate: 6.25,
     slope: -0.6,
-    description: "High rates with an inverted curve.",
+    description: "High rates, and short-term borrowing costing more than long-term.",
   },
   {
     id: "deep-inversion",
     rate: 5.25,
     slope: -1.25,
-    description: "A deep inversion: the recession warning at its strongest.",
+    description: "Short-term rates far above long-term: the recession warning at its strongest.",
   },
   {
     id: "soft-landing",
     rate: 3.25,
     slope: 0.85,
-    description: "Rates near neutral with a normal curve.",
+    description: "Rates near neutral, with long-term rates a little above short-term.",
   },
 ];
 

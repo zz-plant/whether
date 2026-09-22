@@ -28,10 +28,10 @@ describe("/trust says each thing once", () => {
    */
   it("does not restate its own section description in the body", () => {
     const html = renderToStaticMarkup(<FrameworkSection />);
-    const sentence = "A bounded decision has three parts";
+    const sentence = "Each decision here has three parts";
     const occurrences = html.split(sentence).length - 1;
 
-    assert.equal(occurrences, 1, "the bounded-decision sentence is rendered more than once");
+    assert.equal(occurrences, 1, "the three-parts sentence is rendered more than once");
   });
 });
 

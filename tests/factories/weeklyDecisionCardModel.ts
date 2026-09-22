@@ -1,5 +1,4 @@
 import type { WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
-import { GLOSSARY_HREF } from "../../lib/report/signalTranslations";
 
 export type WeeklyDecisionCardModelOverrides = Partial<{
   status: Partial<WeeklyDecisionCardViewModel["status"]>;
@@ -18,7 +17,6 @@ export const buildWeeklyDecisionCardModel = (
     statusLabel: "DEFENSIVE",
     regimeKey: "DEFENSIVE",
     postureLabel: "Cloudy",
-    stageLabel: "Watchful",
     postureWithStageLabel: "Defensive — Watchful",
     postureDelta: "Worse than last week",
     confidenceLabel: "MED",
@@ -269,7 +267,6 @@ export const buildWeeklyDecisionCardModel = (
       { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },
       { label: "What would reverse the call", detail: "If risk appetite rises above 55, reopen selective hiring." },
     ],
-    glossaryHref: GLOSSARY_HREF,
     ...overrides.presentation,
   },
   diagnostics: {
@@ -291,9 +288,9 @@ export const buildWeeklyDecisionCardModel = (
         influencePercentLabel: "39%",
         trendArrow: "↑",
         trendLabel: "+1.0 vs last week",
-        watchLabel: "Regime line 70.0",
+        watchLabel: "Call changes at 70.0",
         watchValue: 70,
-        watchDistanceLabel: "6.0 pts below watch line",
+        watchDistanceLabel: "6.0 pts below the line that changes the call",
         watchBuffer: 8,
         chartDomain: { min: 0, max: 100 },
         pressureDirection: "higher-is-worse",
@@ -311,9 +308,9 @@ export const buildWeeklyDecisionCardModel = (
         influencePercentLabel: "31%",
         trendArrow: "↓",
         trendLabel: "-1.0 vs last week",
-        watchLabel: "Regime line 50.0",
+        watchLabel: "Call changes at 50.0",
         watchValue: 50,
-        watchDistanceLabel: "2.0 pts above watch line",
+        watchDistanceLabel: "2.0 pts above the line that changes the call",
         watchBuffer: 8,
         chartDomain: { min: 0, max: 100 },
         pressureDirection: "lower-is-worse",
@@ -333,7 +330,7 @@ export const buildWeeklyDecisionCardModel = (
         trendLabel: "No fresh weekly delta yet.",
         watchLabel: "Cost-of-money line 5.0%",
         watchValue: 5,
-        watchDistanceLabel: "0.30% above watch line",
+        watchDistanceLabel: "0.30% above the line that changes the call",
         watchBuffer: 0.25,
         chartDomain: { min: 4.48, max: 5.83 },
         pressureDirection: "higher-is-worse",
@@ -353,7 +350,7 @@ export const buildWeeklyDecisionCardModel = (
         trendLabel: "+0.1 vs last week",
         watchLabel: "Below 0.0% = inversion",
         watchValue: 0,
-        watchDistanceLabel: "0.20% below watch line",
+        watchDistanceLabel: "0.20% below the line that changes the call",
         watchBuffer: 0.1,
         chartDomain: { min: -0.38, max: 0.18 },
         pressureDirection: "lower-is-worse",
@@ -369,7 +366,7 @@ export const buildWeeklyDecisionCardModel = (
     flipRiskMeter: {
       progressPercent: 50,
       urgencyLabel: "Medium",
-      detailLabel: "Flip risk is in play. Keep approvals reversible and review weekly.",
+      detailLabel: "The call could change within weeks. Keep approvals reversible and review weekly.",
       triggerLabel: "Tightness above 70.0.",
     },
     regimeVelocity: { status: "insufficient_history", from: "Expansion", to: "Mixed", sampleSize: 1, displayLabel: "Expansion→Mixed: insufficient history" },

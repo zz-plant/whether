@@ -34,6 +34,7 @@ import {
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { formatMonthShortUtc } from "../../lib/formatters";
 import { REGIME_COLORS } from "../viewModel";
+import { SignalReading } from "./ui/plainLanguage";
 import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 
 export type { ZoomPreset };
@@ -743,12 +744,8 @@ export function TimelineBar({
       {/* Detailed Variant Info (Optional) */}
       {variant === "detailed" && selected.entry ? (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-fluid-micro text-slate-400">
-          <span>
-            Funding pressure: <strong className="text-slate-200">{selected.entry.tightness.toFixed(0)} pts</strong>
-          </span>
-          <span>
-            Risk Appetite: <strong className="text-slate-200">{selected.entry.riskAppetite.toFixed(0)}/100</strong>
-          </span>
+          <SignalReading signalKey="tightness" score={selected.entry.tightness} />
+          <SignalReading signalKey="riskAppetite" score={selected.entry.riskAppetite} />
           <span className="text-slate-500 font-mono">
             {selected.entry.recordDate}
           </span>

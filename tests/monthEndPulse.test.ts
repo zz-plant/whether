@@ -36,7 +36,9 @@ describe("evaluateMonthEndPulse", () => {
 
     assert.equal(verdict.monthKey, "2026-09");
     assert.equal(verdict.changed, true);
-    assert.ok(verdict.headline.includes("Call moved vs last month"));
+    assert.match(verdict.headline, /since last month-end: /);
+    // Conditions are named by their weather word; the engine key never reaches a subscriber.
+    assert.doesNotMatch(verdict.headline, /\b(SCARCITY|DEFENSIVE|VOLATILE|EXPANSION)\b|regime/);
   });
 
   it("stays silent when the month-end reading matches the prior one", () => {

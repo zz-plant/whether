@@ -10,6 +10,7 @@ import {
 import { getMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading } from "../types";
+import { REGIME_WEATHER_LABELS } from "../regimePresentation";
 import type { ReportDynamics } from "./reportData";
 
 export type ForecastRegimeLabel =
@@ -81,6 +82,18 @@ const regimeKeyToForecastLabel: Record<RegimeKey, ForecastRegimeLabel> = {
   VOLATILE: "Mixed",
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
+};
+
+/**
+ * The forecast's outcome labels are a typed layer of their own, and "Scarcity"
+ * or "Mixed" in reader text is a fourth name for a weather word the reader has
+ * already learned. Anything that prints an outcome prints this.
+ */
+export const forecastWeatherLabel: Record<ForecastRegimeLabel, string> = {
+  Expansion: REGIME_WEATHER_LABELS.EXPANSION,
+  Mixed: REGIME_WEATHER_LABELS.VOLATILE,
+  Scarcity: REGIME_WEATHER_LABELS.SCARCITY,
+  Defensive: REGIME_WEATHER_LABELS.DEFENSIVE,
 };
 
 const parseDate = (value: string) => {

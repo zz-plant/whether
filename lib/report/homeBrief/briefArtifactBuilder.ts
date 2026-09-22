@@ -53,7 +53,7 @@ export const deriveBriefCallFields = (card: WeeklyCard) => {
     reversalTriggerLabel ? `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reversalTriggerLabel}` : null,
     resumeWhenLabel ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeWhenLabel}` : null,
     flipConditionLabels.length > 0
-      ? `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${flipConditionLabels.join("; ")}`
+      ? `${DECISION_CONTRACT_LABELS.watch.watchThisWeek}: ${flipConditionLabels.join("; ")}`
       : null,
   ].filter((line): line is string => Boolean(line));
 
