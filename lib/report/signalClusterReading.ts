@@ -123,9 +123,11 @@ const formatInput = (reportData: SignalReadingSource, id: string, label: string)
  * Direction, in the reader's terms rather than the number's.
  *
  * A rising funding-pressure score and a rising risk-appetite score mean opposite
- * things, so the tone cannot be read off the sign alone.
+ * things, so the tone cannot be read off the sign alone. Exported because the
+ * evidence page's changed-signals table says the same thing about the same
+ * move, and one sentence for it is the point (`lib/report/evidenceReaderModel.ts`).
  */
-const describeDirection = (
+export const describeSignalDirection = (
   delta: number | null,
   betterWhen: "higher" | "lower",
   unitWord: string,
@@ -191,7 +193,7 @@ export const buildSignalClusterReading = (
 
   if (cluster === "capital-tightness-watch") {
     const delta = findDelta(reportData, "tightness");
-    const direction = describeDirection(delta, "lower", " points", SIGNED_WHOLE);
+    const direction = describeSignalDirection(delta, "lower", " points", SIGNED_WHOLE);
 
     return {
       measure: "Funding pressure",
@@ -233,7 +235,7 @@ export const buildSignalClusterReading = (
 
   if (cluster === "risk-appetite-watch") {
     const delta = findDelta(reportData, "riskAppetite");
-    const direction = describeDirection(delta, "higher", " points", SIGNED_WHOLE);
+    const direction = describeSignalDirection(delta, "higher", " points", SIGNED_WHOLE);
 
     return {
       measure: "Risk appetite",
@@ -281,7 +283,7 @@ export const buildSignalClusterReading = (
    * be computed.
    */
   const delta = slope === null ? null : findDelta(reportData, "curveSlope");
-  const direction = describeDirection(delta, "higher", "pp", SIGNED_TWO);
+  const direction = describeSignalDirection(delta, "higher", "pp", SIGNED_TWO);
 
   return {
     measure: "Recession warning gauge",

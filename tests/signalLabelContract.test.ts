@@ -5,7 +5,6 @@ import { deltaLabelBySignal } from "../lib/report/briefFormatting";
 import { regimeSignalLabelByKey } from "../lib/report/reportFormatting";
 import { regimeSignalLabel, signalPlainEnglish } from "../lib/report/signalTranslations";
 import { BEGINNER_GLOSSARY_ENTRIES } from "../lib/report/reportCopy";
-import { buildDriverViews } from "../lib/report/driverDecisionViews";
 
 /**
  * One signal, one reader-facing name.
@@ -31,23 +30,11 @@ describe("signal label contract", () => {
     }
   });
 
-  it("names the short rate the same way in the driver card and the glossary", () => {
-    const views = buildDriverViews({
-      tightness: 77,
-      tightnessDelta: 14,
-      riskAppetite: 42,
-      tightnessRegime: 70,
-      riskAppetiteRegime: 50,
-      baseRate: 3.93,
-      baseRateUsed: "1M",
-      history: [],
-      rateHistory: [],
-    });
-
-    assert.equal(views.financing.label, regimeSignalLabel.baseRate);
-    assert.equal(views.fundingPressure.label, regimeSignalLabel.tightness);
-    assert.equal(views.riskAppetite.label, regimeSignalLabel.riskAppetite);
-
+  it("names the short rate the same way wherever it is printed", () => {
+    /* The driver card this used to render left the homepage on 2026-09-22 — the
+       changed-signals table took its place and reads its labels from the same
+       `regimeSignalLabel` map. What the case is for is unchanged: the name a
+       reader meets beside the number is the name the glossary defines. */
     const glossaryEntry = BEGINNER_GLOSSARY_ENTRIES.find((entry) => entry.value === "base-rate");
     assert.ok(glossaryEntry, "no base-rate glossary entry");
     assert.equal(glossaryEntry.term, regimeSignalLabel.baseRate);

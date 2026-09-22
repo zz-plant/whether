@@ -5,8 +5,10 @@
  */
 
 import type { OperatingSnapshot } from "../operatingState/types";
+import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
+import { buildScoreReferenceLines } from "./scoreReference";
 
 export interface MeetingSlidePayload {
   /** The record date as displayed ("Sep 16, 2026"). */
@@ -20,6 +22,13 @@ export interface MeetingSlidePayload {
   changeCourseIf: string;
   tightness: number;
   riskAppetite: number;
+  /**
+   * The lines the two scores are judged against — where the call itself
+   * changes (`assessment.thresholds`). Absent from an artifact-derived slide,
+   * which was scored on the engine's defaults; the readings then print
+   * against those, so a score never prints without its line.
+   */
+  lines?: { tightness: number; riskAppetite: number };
   confidence: string;
   provenance: string;
   /** The operating call itself. The snapshot path has only `actionNow`, which
@@ -72,10 +81,27 @@ export function extractMeetingSlidePayload(
     changeCourseIf,
     tightness: snapshot.assessment.scores.tightness,
     riskAppetite: snapshot.assessment.scores.riskAppetite,
+    lines: {
+      tightness: snapshot.assessment.thresholds.tightnessRegime,
+      riskAppetite: snapshot.assessment.thresholds.riskAppetiteRegime,
+    },
     confidence: snapshot.assessment.diagnostics.confidence,
     provenance: snapshot.provenance.sourceLabel || "U.S. Treasury",
   };
 }
+
+/**
+ * The two scores against the call-change lines, as the slide, the deck files
+ * and the pasted block all print them. A snapshot has no previous week, so
+ * none is printed.
+ */
+export const slideReadingLines = (payload: MeetingSlidePayload): string[] =>
+  buildScoreReferenceLines({
+    scores: { tightness: payload.tightness, riskAppetite: payload.riskAppetite },
+    thresholds: payload.lines
+      ? { tightnessRegime: payload.lines.tightness, riskAppetiteRegime: payload.lines.riskAppetite }
+      : DEFAULT_THRESHOLDS,
+  });
 
 /**
  * Generates formatted Markdown / Notion Callout Block
@@ -101,7 +127,8 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     // The snapshot marker travels with the numbers. A slide pasted into a deck
     // during an upstream outage has to say so on the slide, not on the page it
     // was copied from.
-    `> *Signals: Funding pressure ${payload.tightness.toFixed(0)} · Risk Appetite ${payload.riskAppetite.toFixed(0)} · Source: ${payload.provenance}${payload.isFallback ? " · cached snapshot, not a live read" : ""}*`,
+    ...slideReadingLines(payload).map((line) => `> *${line}*`),
+    `> *Source: ${payload.provenance}${payload.isFallback ? " · cached snapshot, not a live read" : ""}*`,
     ...(payload.url ? [`> ${payload.url}`] : []),
   ].join("\n");
 }
@@ -149,8 +176,8 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
     </tr>
   </table>
 
-  <div style="display: flex; justify-content: space-between; font-size: 10px; color: #64748b; padding-top: 8px;">
-    <span>Macro: Funding pressure <b>${payload.tightness.toFixed(0)}</b> · Risk Appetite <b>${payload.riskAppetite.toFixed(0)}</b></span>
+  <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: #64748b; padding-top: 8px;">
+    <span style="display: flex; flex-direction: column; gap: 2px;">${slideReadingLines(payload).map((line) => `<span>${line}</span>`).join("")}</span>
     <span>Source: ${payload.provenance} · whether.work</span>
   </div>
 </div>
@@ -225,12 +252,18 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.changeCourseIf)}</text>
   </g>
 
-  <!-- Footer Stats -->
-  <g transform="translate(80, 600)">
-    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
-      Funding pressure: <tspan fill="#f1f5f9">${payload.tightness.toFixed(0)}</tspan>  ·  Risk Appetite: <tspan fill="#f1f5f9">${payload.riskAppetite.toFixed(0)}</tspan>  ·  Confidence: <tspan fill="#f1f5f9">${esc(payload.confidence)}</tspan>
+  <!-- Footer: each score against its line, then confidence -->
+  <g transform="translate(80, 582)">
+${slideReadingLines(payload)
+  .map(
+    (line, index) =>
+      `    <text x="0" y="${index * 18}" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">${esc(line)}</text>`,
+  )
+  .join("\n")}
+    <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
+      Confidence: <tspan fill="#f1f5f9">${esc(payload.confidence)}</tspan>
     </text>
-    <text x="1040" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
+    <text x="1040" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
       whether.work
     </text>
   </g>

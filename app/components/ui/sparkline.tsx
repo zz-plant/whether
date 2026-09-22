@@ -37,7 +37,7 @@ const VIEW_W = 120;
 const VIEW_H = 24;
 const PAD_Y = 2.5;
 /** The fewest readings that make a shape rather than a segment. */
-export const MIN_SHAPE_POINTS = 3;
+const MIN_SHAPE_POINTS = 3;
 
 /** Semantic tones resolve to tokens, so light and dark themes both hold. */
 const TONE_COLOR = {

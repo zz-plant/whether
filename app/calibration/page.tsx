@@ -9,7 +9,7 @@ import {
 } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
-import { ConfidenceRecordSection } from "../trust/confidenceRecord";
+import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
 import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
 

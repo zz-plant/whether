@@ -13,7 +13,7 @@
  * than the writer. The ZIP stores its entries uncompressed, which the format
  * allows and every reader accepts; the whole file is under 20 KB.
  */
-import type { MeetingSlidePayload } from "./meetingSlideExport";
+import { slideReadingLines, type MeetingSlidePayload } from "./meetingSlideExport";
 import { getRegimePublicLabel } from "../regimePresentation";
 
 // ---------------------------------------------------------------------------
@@ -75,10 +75,17 @@ const buildCards = (payload: MeetingSlidePayload): SlideCard[] => [
   },
 ];
 
-const footerLine = (payload: MeetingSlidePayload) =>
-  `Funding pressure: ${payload.tightness.toFixed(0)}  ·  Risk appetite: ${payload.riskAppetite.toFixed(0)}  ·  Confidence: ${payload.confidence}${
-    payload.isFallback ? "  ·  cached snapshot, not a live read" : ""
-  }`;
+/**
+ * Three footer lines: each score against its line (the same text the SVG
+ * slide and the pasted block print), then confidence and the snapshot marker.
+ * Stated from the top in SVG pixels; both writers draw them 18px apart.
+ */
+const FOOTER_TOP = 570;
+const FOOTER_LINE_HEIGHT = 18;
+const footerLines = (payload: MeetingSlidePayload): string[] => [
+  ...slideReadingLines(payload),
+  `Confidence: ${payload.confidence}${payload.isFallback ? "  ·  cached snapshot, not a live read" : ""}`,
+];
 
 const titleLine = (payload: MeetingSlidePayload) => `This week's call${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;
 const subtitleLine = (payload: MeetingSlidePayload) => `${payload.recordDate} · Source: ${payload.provenance}`;
@@ -194,9 +201,21 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
     );
   }
 
+  footerLines(payload).forEach((line, index) => {
+    shapes.push(
+      textBox({
+        name: `Footer line ${index + 1}`,
+        x: 80,
+        y: FOOTER_TOP + index * FOOTER_LINE_HEIGHT,
+        width: 860,
+        height: FOOTER_LINE_HEIGHT,
+        text: line,
+        style: { sizePx: 13, bold: true, color: index === footerLines(payload).length - 1 ? COLORS.inkSoft : COLORS.inkMuted },
+      }),
+    );
+  });
   shapes.push(
-    textBox({ name: "Footer stats", x: 80, y: 588, width: 860, height: 22, text: footerLine(payload), style: { sizePx: 13, bold: true, color: COLORS.inkSoft } }),
-    textBox({ name: "Footer site", x: 940, y: 588, width: 180, height: 22, text: "whether.work", style: { sizePx: 13, bold: true, color: "475569" }, align: "r" }),
+    textBox({ name: "Footer site", x: 940, y: FOOTER_TOP + 2 * FOOTER_LINE_HEIGHT, width: 180, height: FOOTER_LINE_HEIGHT, text: "whether.work", style: { sizePx: 13, bold: true, color: "475569" }, align: "r" }),
   );
 
   return (
@@ -573,8 +592,18 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
     });
   }
 
-  drawText(footerLine(payload), { x: 80, y: 590, sizePx: 13, font: bold, fill: COLORS.inkSoft, maxWidthPx: 860 });
-  drawText("whether.work", { x: 940, y: 590, sizePx: 13, font: bold, fill: "475569", maxWidthPx: 180, align: "right" });
+  const footer = footerLines(payload);
+  footer.forEach((line, index) => {
+    drawText(line, {
+      x: 80,
+      y: FOOTER_TOP + 2 + index * FOOTER_LINE_HEIGHT,
+      sizePx: 13,
+      font: bold,
+      fill: index === footer.length - 1 ? COLORS.inkSoft : COLORS.inkMuted,
+      maxWidthPx: 860,
+    });
+  });
+  drawText("whether.work", { x: 940, y: FOOTER_TOP + 2 + 2 * FOOTER_LINE_HEIGHT, sizePx: 13, font: bold, fill: "475569", maxWidthPx: 180, align: "right" });
 
   return doc.save();
 };

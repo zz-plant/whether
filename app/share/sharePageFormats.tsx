@@ -14,7 +14,12 @@ import { BRIEF_FORMATS, formatBriefArtifact, type BriefFormatId } from "../../li
  * one effect after hydration; the long-form controls below it are server
  * rendered and carry the page until then.
  */
-export function SharePageFormats() {
+export function SharePageFormats({
+  scoreReferences = [],
+}: {
+  /** Each score with its line, distance and last week, from `formatScoreReference`; the on-screen reference for the pastes. */
+  scoreReferences?: string[];
+}) {
   const artifact = useBriefArtifact();
   const [format, setFormat] = useState<BriefFormatId>("slack");
   const { copyToClipboard, copiedTarget } = useClipboardCopy();
@@ -35,6 +40,13 @@ export function SharePageFormats() {
   return (
     <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="copy-call-heading">
       <h2 id="copy-call-heading" className="type-eyebrow">Copy this week&apos;s call</h2>
+      {scoreReferences.length > 0 ? (
+        <ul className="space-y-0.5 text-xs tabular-nums text-slate-300" aria-label="This week's scores">
+          {scoreReferences.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      ) : null}
       <BriefFormatPicker
         format={format}
         activeFormat={activeFormat}

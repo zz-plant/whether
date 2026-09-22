@@ -7,7 +7,10 @@ import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../li
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
 import { StatTile } from "../../components/ui/statTile";
-import { ComparePeriodColumn, findMacroValue, getCurveSpread } from "./comparePeriodColumn";
+import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
+import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
+import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
+import { ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
 
 export const runtime = "edge";
@@ -19,6 +22,14 @@ type CompareSearchParams = {
   monthB?: string;
 };
 
+/*
+ * The URL shape, which the homepage's "last time the call changed" card links
+ * to: `/history/compare?yearA=2024&monthA=3&yearB=2024&monthB=2`. Period A is
+ * the month under examination and period B the one it is compared against;
+ * months are 1–12, unpadded, and each pair must name a month-end the archive
+ * holds (`hasTimeMachineEntry`). A missing pair A means the current week, and
+ * a missing pair B defaults below.
+ */
 const toImageParam = (value: string | undefined) =>
   value && /^\d+$/.test(value) ? value : undefined;
 
@@ -81,15 +92,29 @@ export default async function HistoryComparePage({
   const reportA = snapA.reportData;
   const reportB = snapB.reportData;
 
-  const spreadA = getCurveSpread(reportA.treasury.yields);
-  const spreadB = getCurveSpread(reportB.treasury.yields);
-
   const bbbA = findMacroValue(reportA.macroSeries, "BBB_CREDIT_SPREAD");
   const bbbB = findMacroValue(reportB.macroSeries, "BBB_CREDIT_SPREAD");
 
-  const scoreA = snapA.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.boldnessScore;
-  const scoreB = snapB.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.boldnessScore;
-  const boldnessDelta = scoreA - scoreB;
+  /* Each score drawn once, period A filled and period B hollow, against the
+     lines in force for period A: its pause and resume lines from the rules it
+     published, and the line where the call changes from its thresholds. The
+     delta tiles this replaces printed a signed number with no line, and the
+     operating-latitude one at that — a composite of these two. */
+  const scoresA = reportA.assessment.scores;
+  const railsA = buildSharedCorridorRails(reportA.actionStripItems ?? [], scoresA);
+  const ladderFor = (metric: RuleConditionMetric, callChange: number) => {
+    const rail = railsA.find((candidate) => candidate.metric === metric);
+    return {
+      label: ruleMetricLabel[metric],
+      value: scoresA[metric],
+      previous: reportB.assessment.scores[metric],
+      lines: buildLadderLines({ pause: rail?.guardrail, resume: rail?.clearsAt, callChange }),
+    };
+  };
+  const ladders = [
+    ladderFor("tightness", reportA.assessment.thresholds.tightnessRegime),
+    ladderFor("riskAppetite", reportA.assessment.thresholds.riskAppetiteRegime),
+  ];
 
   // Build options list from cache. Regime labels come off the same threaded walk
   // /history serves — a point evaluation here would label a tightening month by
@@ -160,34 +185,26 @@ export default async function HistoryComparePage({
           <p className="type-label text-slate-400">Difference</p>
           <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <StatTile
-              label="Operating latitude change"
-              value={
-                <span className={boldnessDelta > 0 ? "text-emerald-400" : boldnessDelta < 0 ? "text-rose-400" : undefined}>
-                  {boldnessDelta > 0 ? `+${boldnessDelta}` : boldnessDelta}
-                </span>
-              }
-              unit="pts"
-              detail={
-                boldnessDelta > 0
-                  ? "Period A had more room to move"
-                  : boldnessDelta < 0
-                    ? "Period A had less room to move"
-                    : "No difference"
-              }
-            />
-            <StatTile
-              label="Yield curve slope change"
-              value={spreadA !== null && spreadB !== null ? `${(spreadA - spreadB).toFixed(2)}%` : "N/A"}
-              detail={`10-year minus 2-year: ${(spreadA ?? 0).toFixed(2)}% vs ${(spreadB ?? 0).toFixed(2)}%`}
-            />
+          <div className="mt-4 grid gap-x-8 gap-y-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_14rem]">
+            {ladders.map((ladder) => (
+              <ScoreLadder
+                key={ladder.label}
+                label={ladder.label}
+                value={ladder.value}
+                previous={ladder.previous}
+                previousLabel="Period B"
+                lines={ladder.lines}
+              />
+            ))}
             <StatTile
               label="Credit spread change"
               value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
               detail={`Credit spread: ${(bbbA ?? 0).toFixed(2)}% vs ${(bbbB ?? 0).toFixed(2)}%`}
             />
           </div>
+          <p className="mt-2 text-fluid-xs text-slate-400">
+            Period A is the filled dot, period B the hollow one; the lines are the ones in force in period A.
+          </p>
         </section>
 
         <div id="ops-compare-grid" className="grid gap-6 lg:grid-cols-2">

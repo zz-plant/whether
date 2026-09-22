@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { classifyReturnGap, weeksBetweenSlugs } from "../../../lib/activationFunnel";
@@ -87,9 +87,13 @@ const returnGapOf = (previousRecordDate: string, currentRecordDate: string) => {
  * last saw, so that is all this stores — written on every visit, read on the
  * next — and the comparison is computed against what the call is now.
  *
- * Renders nothing on a first visit and nothing when the call the reader last
- * saw is this week's. Storage is read through a store rather than during
- * render, so the server's markup — nothing — is what hydration renders too.
+ * Renders `fallback` (nothing, on the homepage) on a first visit and when the
+ * call the reader last saw is this week's. The homepage mounts its standfirst
+ * (`FirstVisitExplainer`) separately at the top, where it stays until
+ * dismissed; this line sits under the call and appears only once there is a
+ * previous call to compare against. An archived week shows neither.
+ * Storage is read through a store rather than during render, so the server's
+ * markup — the fallback — is what hydration renders too.
  *
  * A return after more than a week (`within_month` or `lapsed`) leads with a
  * delta panel — regime, call, and flip proximity — plus a one-click board
@@ -100,12 +104,15 @@ export function SinceLastVisit({
   current,
   flipProximitySentence,
   boardDeckHref,
+  fallback = null,
 }: {
   current: SeenCall;
   /** The nearest flip distance in the market's units, as the hero prints it. */
   flipProximitySentence?: string;
   /** One-click board deck download for the lapsed return path. */
   boardDeckHref?: string;
+  /** What a reader with nothing to compare against sees in this slot instead. */
+  fallback?: ReactNode;
 }) {
   const seen = useBrowserSource(lastSeenCallSource);
 
@@ -114,7 +121,7 @@ export function SinceLastVisit({
   }, [current]);
 
   const previous = seen && seen.recordDate !== current.recordDate ? seen : null;
-  if (!previous) return null;
+  if (!previous) return fallback;
 
   const regimeChanged = previous.regimeLabel !== current.regimeLabel;
   const callChanged = previous.call !== current.call;

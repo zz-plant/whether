@@ -10,7 +10,6 @@ import { Fieldset } from "@base-ui/react/fieldset";
 import { Form } from "@base-ui/react/form";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { isRoute, type Route } from "../../../lib/navigation/routeType";
-import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { ActionLink } from "../../components/ui/actionLink";
 import { SpinnerIcon } from "../../components/uiIcons";
@@ -39,7 +38,6 @@ type TimeMachinePanelProps = {
   cacheCoverage: { earliest: string | null; latest: string | null };
   monthsByYear: Record<number, number[]>;
   invalidSelection: boolean;
-  provenance: DataProvenance;
   historicalRegime?: RegimeKey | null;
   historicalSummary?: string | null;
 };
@@ -52,7 +50,6 @@ export const TimeMachinePanel = ({
   cacheCoverage,
   monthsByYear,
   invalidSelection,
-  provenance,
   historicalRegime,
   historicalSummary,
 }: TimeMachinePanelProps) => {
@@ -206,9 +203,11 @@ export const TimeMachinePanel = ({
   const nowDecisionHref = `${nowHref}#decision-summary`;
   const centeredPillLinkClass = "justify-center";
 
+  // No panel of its own: this sits inside the "Past months" disclosure on the
+  // evidence page, which is the box.
   return (
-    <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
-      <div className="weather-panel p-6">
+    <section id="time-machine" aria-labelledby="time-machine-title" className="mt-4">
+      <div>
         <SectionPanelHeader
           label="Past months"
           title="See what the brief said in an earlier month"
@@ -229,7 +228,6 @@ export const TimeMachinePanel = ({
                   Back to this week
                 </ActionLink>
               ) : null}
-              <DataProvenanceStrip provenance={provenance} />
             </>
           }
         />

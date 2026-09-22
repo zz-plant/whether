@@ -1,40 +1,32 @@
 import type { Metadata } from "next";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
-import { ActionLink } from "./components/ui/actionLink";
-import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { RunwayConditionedNotes } from "./components/RunwayConditionedNotes";
-import { SubscribeForm } from "./components/SubscribeForm";
-import { RegimeAlertToggle } from "./components/regimeAlertToggle";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
-import { QuietDayRead } from "./components/home/QuietDayRead";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
-import { isDisclosureOpenInParams } from "./components/ui/disclosureUrlState";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
 import { CompactTrustPopover } from "./components/CompactTrustPopover";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
-import { getRegimePublicLabel } from "../lib/regimePresentation";
-import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
-import { regimeDataAttribute } from "../lib/regimeAccent";
+import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
+import { CONFIDENCE_WORD } from "./components/trustStrip";
+import { isRoute } from "../lib/navigation/routeType";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatDateUTC, formatMonthYearShortFromValue } from "../lib/formatters";
-import { buildBoldnessScore } from "../lib/report/weeklyLeadershipBrief";
+import { formatDateUTC } from "../lib/formatters";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildQuietDayRead } from "../lib/report/flipProximity";
-import { guardrailMatchesRule } from "../lib/report/boundedDecisionRules";
+import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 import {
@@ -47,11 +39,20 @@ import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { KeyDriversCard } from "./components/hero/KeyDriversCard";
-import { buildDriverViews } from "../lib/report/driverDecisionViews";
-import { getTimeMachineRegimeSeries, getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
+import { WhatChangedSection } from "./components/home/WhatChangedSection";
+import { WhatItChangesSection } from "./components/home/WhatItChangesSection";
+import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
+import { DoAndShareSection } from "./components/home/DoAndShareSection";
+import {
+  buildHomeAreaRows,
+  buildSignalChangeRows,
+  describeWeeklyMovement,
+} from "../lib/report/home/homeSectionModel";
+import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
+import { previousScoresFromDynamics } from "../lib/export/scoreReference";
+import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { buildTrackRecord } from "../lib/report/trackRecord";
-import { ActionsThisWeekCard } from "./components/hero/ActionsThisWeekCard";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
@@ -101,52 +102,6 @@ export default async function Page({
  * box that lifts off its own container is what the depth ladder in surfaces.css
  * exists to prevent. That rule cannot reach a shadow written as a utility, so
  * this one stays removed at the call site. */
-function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: string }) {
-  const brief = selectCitablePermalinkBrief(currentRecordDate);
-  if (!brief) return null;
-
-  return (
-    <section className="rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-md space-y-2.5 px-4 py-3.5">
-      <p className="text-fluid-xs text-slate-300">
-        This week is published as a permanent record dated <span className="font-medium text-white">{brief.recordDateLabel}</span>.
-      </p>
-      <ActionLink href={buildPublishedBriefPath(brief.slug)} variant="pill">
-        Citable permalink
-      </ActionLink>
-    </section>
-  );
-}
-
-type BelowTheFoldEvidenceProps = {
-  operateHref?: string;
-  /** Named for the selected cadence, so the one plan CTA on the page matches the
-   *  horizon the reader is looking at. */
-  planLabel?: string;
-};
-
-function BelowTheFoldEvidence(props: BelowTheFoldEvidenceProps) {
-  return (
-    /* `pill`, not `primary`. DD-005 settled Copy Brief in the hero as the one
-       canonical primary action on this page; a second full-weight blue button
-       further down competed with it and gave the reader no way to rank them.
-       §X reserves `pill` for exactly this — a secondary navigation CTA. */
-    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.06] pt-4">
-      <ActionLink href={props.operateHref ?? "/operate"} variant="pill">
-        {props.planLabel ?? "Build this week’s plan →"}
-      </ActionLink>
-      <ActionLink href="/operate#ops-decision-shield" variant="inline">
-        Stress-test a plan →
-      </ActionLink>
-      <ActionLink href="/resolve#direct-answers" variant="inline">
-        Answers to common questions →
-      </ActionLink>
-      <ActionLink href="/api-docs" variant="inline">
-        Connect an AI assistant →
-      </ActionLink>
-    </div>
-  );
-}
-
 /** Only the horizons the cadence selector offers. `yearly` is a valid agent cadence but
  *  has no tab, so an arbitrary ?cadence= value falls back to the weekly default. */
 const HOME_CADENCE_HORIZONS: readonly CadenceCallHorizon[] = ["monthly", "quarterly"];
@@ -232,42 +187,18 @@ async function PageContent({
   const alignedRegimeHistory = Number.isFinite(asOfTimestamp)
     ? regimeHistory.filter((entry) => new Date(entry.record_date).getTime() <= asOfTimestamp)
     : regimeHistory;
-  const macroTrendline = alignedRegimeHistory.slice(-24);
 
-  // Same score the hero headlines, computed back across the window so the number
-  // carries its own history. Months missing either input are dropped rather than
-  // interpolated — a gap is honest, an invented point is not.
-  // Each month also carries the regime it was called in, drawn behind the
-  // line in the plane's hue. This is the stripe the memory rail used to draw
-  // at the foot of the page, moved to where the same 24 months were already
-  // being drawn — one graphic, one window, the score through its weather.
-  const boldnessTrend = macroTrendline.flatMap((entry) => {
-    if (entry.tightness == null || entry.riskAppetite == null) return [];
-    const regimeKey = regimeDataAttribute(entry.regime);
-    return [{
-      label: formatMonthYearShortFromValue(entry.record_date),
-      value: buildBoldnessScore(entry.tightness, entry.riskAppetite),
-      ground: regimeKey ? REGIME_HEX_COLORS[regimeKey] : null,
-      groundLabel: regimeKey ? getRegimePublicLabel(entry.regime) : undefined,
-    }];
-  });
-
-  const signalDeltas = new Map(
-    homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
+  /* Last week, through the one derivation every surface and export shares:
+     null when no comparison was made, the anomaly list counted (a move past the
+     weekly sanity limit is still a move), and a signal under the reporting floor
+     read as unmoved rather than as missing. Reading `changedSignals` alone here
+     drew a 55-point week as flat and dropped last week whenever nothing moved. */
+  const previousScores = previousScoresFromDynamics(
+    homepage.weeklyDecisionCardModel.decision.reportDynamics,
+    { tightness: reportData.assessment.scores.tightness, riskAppetite: reportData.assessment.scores.riskAppetite },
   );
-  const tightnessDelta = signalDeltas.get("tightness") ?? 0;
-  const riskAppetiteDelta = signalDeltas.get("riskAppetite") ?? 0;
-
-  // Derived from `assessment.scores` rather than from the diagnostics copy so the prior
-  // read and the current one come off the same series. `changedSignals` is empty both
-  // when nothing moved and when there is no prior read at all, and the two are not the
-  // same claim — so an empty list yields no prior read rather than an invented flat one.
-  const cadencePreviousScores = signalDeltas.size > 0
-    ? {
-        tightness: reportData.assessment.scores.tightness - tightnessDelta,
-        riskAppetite: reportData.assessment.scores.riskAppetite - riskAppetiteDelta,
-      }
-    : null;
+  const tightnessDelta = previousScores ? reportData.assessment.scores.tightness - previousScores.tightness : 0;
+  const riskAppetiteDelta = previousScores ? reportData.assessment.scores.riskAppetite - previousScores.riskAppetite : 0;
 
   // Built here rather than fetched: the previous card awaited the whole agent-interface
   // payload behind Suspense and swallowed its failure, which is why every cadence tab
@@ -282,7 +213,7 @@ async function PageContent({
           recordDateLabel: homepage.reportShell.recordDateLabel,
           regimeHistory: alignedRegimeHistory,
           planHref: operateHref,
-          previousScores: cadencePreviousScores,
+          previousScores,
         });
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
@@ -305,7 +236,6 @@ async function PageContent({
     primaryCall,
     flipConditionLabels,
     revisitQueue,
-    noChangeAreas,
     guardrailLabel,
     parsedGuardrailThreshold,
     reversalTriggerLabel,
@@ -321,10 +251,17 @@ async function PageContent({
      know the call still stands and how far it is from flipping. Derived from
      the same snapshot the hero draws, so the verdict and the flip watch cannot
      disagree; absent on a week the call moved. */
-  const quietDayLine = buildQuietDayRead({
-    steadyWeek: weeklyLeadershipSummary.steadyWeek,
-    flipProximity: v2HeroSignalData.flipProximity,
-  });
+  /* "Call unchanged" is a claim about a comparison: never on a read with no
+     previous week (`steadyWeek` is computed from a zero move there), never on a
+     week the call moved (a sub-point move can still be the confirming read),
+     and never on an archived week, which the banner above dates. */
+  const quietDayLine =
+    previousScores && !reportData.regimeAlert && !historicalSelection
+      ? buildQuietDayRead({
+          steadyWeek: weeklyLeadershipSummary.steadyWeek,
+          flipProximity: v2HeroSignalData.flipProximity,
+        })
+      : null;
 
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
@@ -342,27 +279,6 @@ async function PageContent({
         resumeQualifier: corridorRule.resume.qualifier,
       }
     : undefined;
-
-  /* The three driver rows, each built for the clock the decision it governs
-   * runs on: funding pressure as an action ladder with persistence, risk
-   * appetite as remaining cushion with its consumption pace, financing as a
-   * horizon trend with no threshold bar. The pause lines are the printed
-   * corridor rule's own — the same discipline the hero's bounded rails follow —
-   * and the rate history is the snapshot store's rolling 1M-bill series, null
-   * for months with no snapshot rather than interpolated. */
-  const driverViews = buildDriverViews({
-    tightness,
-    tightnessDelta,
-    riskAppetite,
-    tightnessRegime: reportData.assessment.thresholds.tightnessRegime,
-    riskAppetiteRegime: reportData.assessment.thresholds.riskAppetiteRegime,
-    corridorPauseLines: boundedConditions?.pause,
-    corridorPauseVerb: corridorRule?.pause.verb,
-    baseRate: v2HeroSignalData.baseRate ?? null,
-    baseRateUsed: v2HeroSignalData.baseRateUsed,
-    history: macroTrendline,
-    rateHistory: getTimeMachineRollingYieldSeries(7, reportData.treasury.record_date).oneMonth.map((point) => point.value),
-  });
 
   /* The selected horizon, named once. The page's `h1` is the weekly call
    * itself (`DecisionHero`); this labels the copied artifact, which lands in
@@ -386,17 +302,81 @@ async function PageContent({
    * window, so the second reader of the full window pays nothing. */
   const trackRecord = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
 
-  const cardActions = (homepage.weeklyDecisionCardModel.decision.actionStripItems?.length ?? 0) > 0
-    ? homepage.weeklyDecisionCardModel.decision.actionStripItems!.map((item, idx) => ({
-        id: idx + 1,
-        text: item.areaActionNow,
-        href: `${operateHref}#${item.lever}`,
-      }))
-    : (homepage.weeklyDecisionCardModel.decision.decisionRules?.slice(0, 3).map((rule, idx) => ({
-        id: idx + 1,
-        text: rule.doNow[0] ?? rule.recommendation,
-        href: `${operateHref}#${rule.area}`,
-      })) ?? []);
+  /* The five sections' data, built once here and drawn by the components under
+     app/components/home. The lines every score is judged against are the same
+     three the rules state: the area pause/resume lines from the printed rule,
+     and the call-change line from the engine's own thresholds. */
+  const callChangeLines = {
+    tightness: reportData.assessment.thresholds.tightnessRegime,
+    riskAppetite: reportData.assessment.thresholds.riskAppetiteRegime,
+  };
+  const comparisonUnavailable =
+    homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel === "unavailable";
+  const metricLines = {
+    tightness: {
+      pause: boundedConditions?.pause.find((condition) => condition.metric === "tightness")?.value,
+      resume: boundedConditions?.resume.find((condition) => condition.metric === "tightness")?.value,
+      callChange: callChangeLines.tightness,
+    },
+    riskAppetite: {
+      pause: boundedConditions?.pause.find((condition) => condition.metric === "riskAppetite")?.value,
+      resume: boundedConditions?.resume.find((condition) => condition.metric === "riskAppetite")?.value,
+      callChange: callChangeLines.riskAppetite,
+    },
+  };
+  const signalChangeRows = buildSignalChangeRows({
+    indicators: homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators,
+    dynamics: homepage.weeklyDecisionCardModel.decision.reportDynamics,
+    lines: metricLines,
+    tightnessPressure,
+    tightnessSaturated,
+  });
+  const homeAreaRows = buildHomeAreaRows({
+    actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
+    decisionRules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+    revisitQueue,
+    scores: { tightness, riskAppetite },
+  });
+  const movementSentence = describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable });
+  const scoreLadders = [
+    {
+      metric: "tightness" as const,
+      label: ruleMetricLabel.tightness,
+      value: tightness,
+      previous: previousScores ? Number((tightness - tightnessDelta).toFixed(1)) : null,
+      lines: signalChangeRows.find((row) => row.key === "tightness")?.lines ?? [
+        { kind: "callChange" as const, value: callChangeLines.tightness },
+      ],
+    },
+    {
+      metric: "riskAppetite" as const,
+      label: ruleMetricLabel.riskAppetite,
+      value: riskAppetite,
+      previous: previousScores ? Number((riskAppetite - riskAppetiteDelta).toFixed(1)) : null,
+      lines: signalChangeRows.find((row) => row.key === "riskAppetite")?.lines ?? [
+        { kind: "callChange" as const, value: callChangeLines.riskAppetite },
+      ],
+    },
+  ];
+  /* Only on a week the call moved: the last time it moved the same way, and
+     what the scores did over the three months after. Null otherwise, and the
+     section renders nothing rather than reaching for the nearest analogue. */
+  const previousRegime = reportData.regimeAlert?.previousRegime;
+  const lastTimeCallChanged = historicalSelection || !isRegimeKey(regime)
+    ? null
+    : findLastTimeCallChanged({
+        series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+        currentRegime: regime,
+        previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
+      });
+  const trustStripProps = buildTrustStripProps({
+    recordDateLabel: homepage.reportShell.recordDateLabel,
+    isFallback: homepage.reportShell.showOfflineBadge,
+    isHistorical: Boolean(historicalSelection),
+    degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 0,
+    confidenceLabel: confidenceLabel ?? "HIGH",
+    assessment: reportData.assessment,
+  });
 
   return (
     <Shell regime={regime}>
@@ -426,7 +406,7 @@ async function PageContent({
         </div>
       ) : null}
       <div className="mx-auto max-w-[64rem] space-y-4 sm:space-y-8">
-        <div className="space-y-4 sm:space-y-8 min-w-0">
+        <div className="flex flex-col gap-4 sm:gap-8 min-w-0">
           {/* Above the brief, not after it. This is the orientation line for a
               first-time visitor, and it sat below the hero, all three operating
               levers, and the compare strip — roughly 2,800px down on mobile,
@@ -530,59 +510,24 @@ async function PageContent({
                 so was the first thing a screen-reader heading list announced —
                 the call itself was second. The region still has a name; it is
                 no longer a heading competing with the one that matters. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating call" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            {/* Tier 1, and nothing else: the weather word, the call, and the
+                trust strip. Every other question the reader asks is a section
+                of its own below, in the order they ask them. */}
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating call" className="order-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
               {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
                 titleLevel={cadenceCall ? "h2" : "h1"}
-                tightness={tightness}
-                tightnessDelta={tightnessDelta}
-                tightnessPressure={tightnessPressure}
-                tightnessSaturated={tightnessSaturated}
-                riskAppetite={riskAppetite}
-                riskAppetiteDelta={riskAppetiteDelta}
-                comparisonUnavailable={homepage.weeklyDecisionCardModel.decision.reportDynamics.directionLabel === "unavailable"}
-                boldnessScore={weeklyLeadershipSummary.boldnessScore}
-                boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
-                boldnessTrend={boldnessTrend}
-                boldnessShorthand={weeklyLeadershipSummary.shorthandLine}
                 weeklyCall={primaryCall}
-                actionNow={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+                callDetail={homepage.weeklyDecisionCardModel.decision.actionNowShort}
                 regime={regime}
-                recordDate={homepage.reportShell.recordDateLabel}
-                fetchedAt={homepage.reportShell.fetchedAtLabel}
-                confidenceLabel={confidenceLabel}
-                trustStatusLabel={homepage.reportShell.trustStatusLabel}
-                treasurySource={homepage.reportShell.treasurySource}
-                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-                isFallback={homepage.reportShell.showOfflineBadge}
-                signalData={v2HeroSignalData}
-                signalIndicators={homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators}
-                flipConditions={flipConditionLabels}
-                guardrail={guardrailLabel}
-                reversalTrigger={reversalTriggerLabel}
-                boundedConditions={boundedConditions}
-                shareLines={briefShareLines}
-                revisitDecisions={homepage.weeklyDecisionCardModel.decision.revisitDecisions}
-                revisitQueue={revisitQueue}
-                noChangeAreas={noChangeAreas}
-                thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
-                signalBreakdownOpen={isDisclosureOpenInParams(searchParams, "why")}
-                activeStage={activeStage}
-                activeRunway={activeRunway}
-                runwayEmphasis={runwayEmphasis}
+                /* An archived week carries no live trust: the banner above says
+                   which week is on screen, and a freshness strip under a past
+                   call would date it to today. */
+                trust={historicalSelection ? null : trustStripProps}
               />
-              {/* Live briefs only. The profile holds the operator's runway as of
+              {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the
-                  company's cash position to the archived week, and a screenshot
-                  of a historical call would carry a stress that never existed
-                  then. The canonical historical brief stays exactly as published. */}
-              {!historicalSelection ? <RunwayConditionedNotes regime={regime} /> : null}
-              {/* Returning readers only: renders nothing on a first visit or when the
-                  call last seen is this week's. It sits under the call it compares
-                  against; the tabbed retrospective card that used to hold it, and
-                  the hindsight panel beside it, restated the hero's own delta. Live
-                  briefs only, for the same reason as the runway notes: an archived
-                  month must not become the "last seen" call. */}
+                  company’s cash position to the archived week. */}
               {!historicalSelection ? (
                 <SinceLastVisit
                   current={{
@@ -595,57 +540,52 @@ async function PageContent({
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
                 />
               ) : null}
-              {/* The quiet-day read, under the call it confirms. Live briefs only,
-                  and it renders nothing on a week the call moved — the delta path
-                  already leads there. */}
-              {!historicalSelection ? <QuietDayRead line={quietDayLine} /> : null}
             </div>
 
-            <div id="key-drivers" data-page-section="key-drivers" tabIndex={-1} aria-labelledby="key-drivers-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-              {/* The cards carry their own titles; the numbered signpost that sat
-                  here repeated them with a description in framework vocabulary. */}
-              <h2 id="key-drivers-heading" className="sr-only">Key drivers and actions this week</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
-                <KeyDriversCard views={driverViews} />
+            {/* 2. What changed. One table, every signal, each against last week
+                and against its own lines — the four signals used to be drawn
+                twice on this page, in the hero and again beside the actions. */}
+            <WhatChangedSection
+              rows={signalChangeRows}
+              lead={quietDayLine ?? movementSentence}
+              comparisonUnavailable={comparisonUnavailable}
+            />
 
-                <ActionsThisWeekCard
-                  actions={cardActions}
-                  operateHref={operateHref}
-                />
-              </div>
+            {/* 3. What that changes, by area. On a phone this renders before the
+                signals: the Monday reader is checking whether to act, not why. */}
+            <WhatItChangesSection
+              rows={homeAreaRows}
+              regime={regime}
+              activeStage={activeStage}
+              activeRunway={activeRunway}
+              runwayEmphasis={runwayEmphasis}
+              planHref={isRoute(operateHref) ? operateHref : "/operate"}
+              isHistorical={Boolean(historicalSelection)}
+            />
 
-              {/* The memory rail that sat here — 24 monthly calls as a stripe and
-                  a link to the record — is drawn behind the hero's score line now
-                  (`boldnessTrend` carries each month's regime as its ground), and
-                  the link sits in that figure's caption. Same window, same hues,
-                  one encoding for the trailing two years instead of two. */}
-            </div>
+            {/* 4. What would change the call: the two ladders with their three
+                lines and last week’s dot, the flip watch under the axis each
+                sentence describes, and — only on a week the call moved — what
+                happened the last time it moved this way. */}
+            <WhatWouldChangeSection
+              ladders={scoreLadders}
+              flipProximity={buildFlipProximity(reportData.assessment)}
+              reversalTrigger={reversalTriggerLabel}
+              guardrail={guardrailLabel}
+              flipConditions={flipConditionLabels}
+              thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
+              lastTime={lastTimeCallChanged}
+              callChangeLines={callChangeLines}
+            />
 
-          {/* Directly under the call, not 3,000px below it. The one conversion
-              on the page used to sit under the stress tester, the decision
-              tracker and the week close-out; the recipient of a shared link
-              scrolled past everything the product asked of them to reach it. */}
-          <div id="subscribe" data-page-section="subscribe" tabIndex={-1} aria-labelledby="subscribe-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-            <h2 id="subscribe-heading" className="sr-only">Get the weekly call by email</h2>
-            <SubscribeForm compact />
-            {/* Beside the email signup rather than somewhere of its own: it is
-                the same alert by another route, and a reader deciding how they
-                want to hear about a regime change should see both options in
-                one place. Renders nothing at all where push is unconfigured or
-                unsupported, which is every developer machine. */}
-            <div className="mt-4">
-              <RegimeAlertToggle />
-            </div>
-          </div>
-
-          <div id="plan-and-evidence" data-page-section="plan-and-evidence" tabIndex={-1} aria-labelledby="plan-and-evidence-heading" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-            <h2 id="plan-and-evidence-heading" className="sr-only">Turn this week’s call into a plan</h2>
-            <BelowTheFoldEvidence operateHref={operateHref} planLabel={cadenceCall?.planLabel} />
-          </div>
-        </div>
-
-        <div className="space-y-4 border-t border-slate-800/70 pt-6">
-          <CanonicalWeekPermalink currentRecordDate={reportData.treasury.record_date} />
+            {/* 5. Do and share, including the one conversion on the page. */}
+            <DoAndShareSection
+              call={primaryCall}
+              shareLines={briefShareLines}
+              operateHref={operateHref}
+              planLabel={cadenceCall?.planLabel}
+              currentRecordDate={reportData.treasury.record_date}
+            />
         </div>
       </div>
 
@@ -669,8 +609,8 @@ async function PageContent({
       <StickyCallStrip
         call={primaryCall}
         direction={signalDirection}
-        boldnessScore={weeklyLeadershipSummary.boldnessScore}
-        boldnessDelta={weeklyLeadershipSummary.boldnessDelta}
+        weatherWord={publicRegimeLabel}
+        confidenceWord={CONFIDENCE_WORD[confidenceLabel ?? "HIGH"]}
         shareLines={briefShareLines}
       />
     </Shell>

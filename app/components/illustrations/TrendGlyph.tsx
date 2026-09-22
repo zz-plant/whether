@@ -14,8 +14,8 @@
  *
  * Scope: this module handles a *scalar* move — one number against its previous
  * reading. For the shape of a whole series use `app/components/ui/sparkline.tsx`;
- * for an explicit before/after pair on a rail use `DeltaGlyph`. The three are
- * complementary, not alternatives.
+ * for a score against its lines, with last week, use `ScoreLadder`. The three
+ * are complementary, not alternatives.
  */
 
 export type TrendDirection = "up" | "down" | "mixed" | "flat";
@@ -36,9 +36,6 @@ export const trendDirectionFromDelta = (delta: number | null | undefined): Trend
  * emits as a literal character. Callers should render the glyph rather than the
  * character so the direction has a shape and an accessible name.
  */
-export const trendDirectionFromArrow = (arrow: "↑" | "↓" | "→"): TrendDirection =>
-  arrow === "↑" ? "up" : arrow === "↓" ? "down" : "flat";
-
 /**
  * Tone for a movement. `increaseIsPositive` defaults to false because
  * tightness-style scores — the majority here — rise when conditions worsen.

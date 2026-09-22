@@ -162,7 +162,7 @@ export type RegimeSignalIndicator = {
 };
 
 type InputInfluenceTone = "warning" | "positive" | "neutral";
-export type ThresholdPressureDirection = "higher-is-worse" | "lower-is-worse";
+type ThresholdPressureDirection = "higher-is-worse" | "lower-is-worse";
 
 export type FlipRiskMeterState = {
   progressPercent: number;

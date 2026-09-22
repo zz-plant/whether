@@ -209,11 +209,13 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     `${publicDecisionLabels.action}: ${payload.actionNow}`,
     `${publicDecisionLabels.threshold}: ${payload.pauseIf}`,
     `${publicDecisionLabels.reversal}: ${payload.changeCourseIf}`,
-    ...(payload.flipWatchLine ? [`${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${payload.flipWatchLine}`] : []),
     ...(supportingActionLines.length > 0
       ? ["", "Also this week:", ...supportingActionLines.map((bullet) => `• ${bullet}`)]
       : []),
+    /* What would change the call sits with the other conditions that would,
+       after the actions, in the page's order. */
     "",
+    ...(payload.flipWatchLine ? [`${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${payload.flipWatchLine}`] : []),
     `Why this could be wrong: ${payload.whyCouldBeWrong}`,
     ...(payload.flipConditionLabels.length > 0
       ? ["", "Other things that would change the call:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
@@ -270,7 +272,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           elements: [
             {
               type: "mrkdwn",
-              text: `*${publicDecisionLabels.threshold}:* ${payload.pauseIf}\n*${publicDecisionLabels.reversal}:* ${payload.changeCourseIf}${payload.flipWatchLine ? `\n*${DECISION_CONTRACT_LABELS.watch.flipWatch}:* ${payload.flipWatchLine}` : ""}`,
+              text: `*${publicDecisionLabels.threshold}:* ${payload.pauseIf}\n*${publicDecisionLabels.reversal}:* ${payload.changeCourseIf}`,
             },
           ],
         },
@@ -279,9 +281,13 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           elements: [
             {
               type: "mrkdwn",
-              text: payload.flipConditionLabels.length > 0
-                ? `*Why this could be wrong:* ${payload.whyCouldBeWrong}\n*Other things that would change the call:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
-                : `*Why this could be wrong:* ${payload.whyCouldBeWrong}`,
+              text: [
+                ...(payload.flipWatchLine ? [`*${DECISION_CONTRACT_LABELS.watch.flipWatch}:* ${payload.flipWatchLine}`] : []),
+                `*Why this could be wrong:* ${payload.whyCouldBeWrong}`,
+                ...(payload.flipConditionLabels.length > 0
+                  ? [`*Other things that would change the call:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`]
+                  : []),
+              ].join("\n"),
             },
           ],
         },

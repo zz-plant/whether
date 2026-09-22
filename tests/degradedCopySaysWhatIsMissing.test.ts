@@ -5,6 +5,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 
 import { DecisionHero } from "../app/components/DecisionHero";
+import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
+import { describeWeeklyMovement } from "../lib/report/home/homeSectionModel";
 import { CadenceCallCard } from "../app/components/CadenceCallCard";
 import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
@@ -107,16 +109,7 @@ describe("a degraded state says what is missing", () => {
 
   it("renders the absent-reading call as the h1 when the hero is handed no call", () => {
     const html = renderToStaticMarkup(
-      createElement(DecisionHero, {
-        boldnessScore: 50,
-        boldnessDelta: 0,
-        regime: "DEFENSIVE",
-        recordDate: "2026-08-31",
-        fetchedAt: "2026-08-31",
-        tightness: 60,
-        tightnessDelta: 0,
-        isFallback: true,
-      }),
+      createElement(DecisionHero, { regime: "DEFENSIVE" }),
     );
 
     const h1 = html.match(/<h1[^>]*id="weekly-call-title"[^>]*>([^<]*)<\/h1>/)?.[1] ?? "";
@@ -176,18 +169,27 @@ describe("a degraded state says what is missing", () => {
   });
 
   it("explains a score at the top of its scale as a score that can't move", () => {
+    // The signals left the hero for their own section on 2026-09-22; the
+    // sentence and the rule it answers to are unchanged.
     const html = plain(
       renderToStaticMarkup(
-        createElement(DecisionHero, {
-          boldnessScore: 40,
-          boldnessDelta: 0,
-          regime: "SCARCITY",
-          recordDate: "2026-08-31",
-          fetchedAt: "2026-08-31",
-          tightness: 100,
-          tightnessDelta: 0,
-          tightnessPressure: 148,
-          tightnessSaturated: true,
+        createElement(WhatChangedSection, {
+          rows: [
+            {
+              key: "tightness",
+              label: "Funding pressure",
+              value: 100,
+              valueLabel: "100",
+              previous: null,
+              previousLabel: null,
+              delta: 0,
+              increaseIsPositive: false,
+              lines: [{ kind: "callChange", value: 70 }],
+              saturatedPressure: 148,
+            },
+          ],
+          lead: "The scores moved toward tighter money this week.",
+          comparisonUnavailable: false,
         }),
       ),
     );
@@ -198,34 +200,16 @@ describe("a degraded state says what is missing", () => {
   });
 
   it("does not call a week steady when no previous week was compared", () => {
-    // A degraded read hands the hero zero deltas. The line under the h1 reads
-    // them, so without this flag it reported "Neither score moved much this
-    // week" for a comparison that never happened — the manufactured-stable
+    // A degraded read hands the page zero deltas. The sentence over the table
+    // reads them, so without this flag it reported "Neither score moved much
+    // this week" for a comparison that never happened — the manufactured-stable
     // claim tests/noComparisonHonesty.test.ts keeps off every other surface.
-    const render = (comparisonUnavailable: boolean) =>
-      plain(
-        renderToStaticMarkup(
-          createElement(DecisionHero, {
-            boldnessScore: 50,
-            boldnessDelta: 0,
-            regime: "DEFENSIVE",
-            recordDate: "2026-08-31",
-            fetchedAt: "2026-08-31",
-            tightness: 60,
-            tightnessDelta: 0,
-            riskAppetiteDelta: 0,
-            comparisonUnavailable,
-          }),
-        ),
-      );
-
-    const degraded = render(true);
+    const degraded = describeWeeklyMovement({ tightnessDelta: 0, riskAppetiteDelta: 0, comparisonUnavailable: true });
     assert.match(degraded, /No previous week to compare/);
-    assert.doesNotMatch(degraded, /moved much|Steady vs last week|held steady/i);
+    assert.doesNotMatch(degraded, /moved much|steady/i);
 
-    const live = render(false);
+    const live = describeWeeklyMovement({ tightnessDelta: 0, riskAppetiteDelta: 0, comparisonUnavailable: false });
     assert.match(live, /Neither score moved much this week\./);
-    assert.match(live, /Steady vs last week/);
   });
 
   it("still says nothing is missing when nothing is", () => {

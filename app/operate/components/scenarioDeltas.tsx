@@ -2,9 +2,18 @@ import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { getPlaybookGuidance } from "../../../lib/playbook";
 import { Tag } from "../../components/ui/tag";
+import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../../lib/report/boundedDecisionRules";
-import { formatScenarioDelta } from "../../../lib/report/scenarioStudio";
+import { buildScenarioLadderLines, formatScenarioDelta } from "../../../lib/report/scenarioStudio";
+
+/* Warm for a move toward trouble, cool for a move away from it: pressure
+   rising is the bad direction, appetite rising is the good one. */
+const deltaClassName = (delta: number, worseWhenUp: boolean) => {
+  if (delta === 0) return "text-slate-400";
+  const worse = worseWhenUp ? delta > 0 : delta < 0;
+  return worse ? "text-rose-400" : "text-emerald-400";
+};
 
 export function ScenarioDeltas({
   liveAssessment,
@@ -21,89 +30,66 @@ export function ScenarioDeltas({
   riskAppetiteDelta: number;
 }) {
   const regimeShifted = simulatedAssessment.regime !== liveAssessment.regime;
+  /* The scenario's own lines: where its call would change, and the pause and
+     resume lines its rules state. This week's reading is the hollow dot. */
+  const ladderLines = buildScenarioLadderLines(simulatedAssessment);
 
   return (
     <>
-      {/* Side-by-Side Then-vs-Now / Live vs Simulated Delta Panel */}
       <section aria-labelledby="deltas-heading" className="weather-panel p-6 space-y-5">
         <h3 id="deltas-heading" className="type-eyebrow">
           This week vs. this scenario
         </h3>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          {/* Regime Shift Card */}
-          <div className="weather-surface p-4 flex flex-col justify-between">
-            <p className="type-eyebrow text-slate-400">Conditions</p>
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-xs font-semibold text-slate-400 line-through">
-                {getRegimePublicLabel(liveAssessment.regime)}
-              </span>
-              <span className="text-slate-500">→</span>
-              <Tag tone={regimeShifted ? "sky" : "slate"}>
-                {getRegimePublicLabel(simulatedAssessment.regime)}
-              </Tag>
-            </div>
-            <p className="mt-2 text-[11px] text-slate-400">
-              {regimeShifted ? "The call would change" : "Same call as this week"}
-            </p>
-          </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="type-eyebrow text-slate-400">Conditions</p>
+          <span className="text-xs font-semibold text-slate-400 line-through">
+            {getRegimePublicLabel(liveAssessment.regime)}
+          </span>
+          <span className="text-slate-500">→</span>
+          <Tag tone={regimeShifted ? "sky" : "slate"}>
+            {getRegimePublicLabel(simulatedAssessment.regime)}
+          </Tag>
+          <p className="text-[11px] text-slate-400">
+            {regimeShifted ? "The call would change" : "Same call as this week"}
+          </p>
+        </div>
 
-          {/* Funding Pressure Card */}
-          <div className="weather-surface p-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <p className="type-eyebrow text-slate-400">{ruleMetricLabel.tightness}</p>
-              <span
-                className={`text-xs font-semibold tabular-nums ${
-                  tightnessDelta > 0
-                    ? "text-rose-400"
-                    : tightnessDelta < 0
-                    ? "text-emerald-400"
-                    : "text-slate-400"
-                }`}
-              >
-                {formatScenarioDelta(tightnessDelta, " pts")}
-              </span>
-            </div>
-            <div className="mt-2 flex items-baseline gap-2 tabular-nums">
-              <span className="text-2xl font-bold text-slate-100">
-                {simulatedAssessment.scores.tightness}
-              </span>
-              <span className="text-xs text-slate-400">/ 100</span>
-              {simulatedAssessment.scores.tightnessSaturated && (
-                <span className="text-[10px] text-amber-300">· ceiling</span>
-              )}
-            </div>
-            <p className="mt-1 text-[11px] text-slate-400">
-              This week: {liveAssessment.scores.tightness}
-            </p>
-          </div>
-
-          {/* Risk Appetite Card */}
-          <div className="weather-surface p-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <p className="type-eyebrow text-slate-400">{ruleMetricLabel.riskAppetite}</p>
-              <span
-                className={`text-xs font-semibold tabular-nums ${
-                  riskAppetiteDelta > 0
-                    ? "text-emerald-400"
-                    : riskAppetiteDelta < 0
-                    ? "text-rose-400"
-                    : "text-slate-400"
-                }`}
-              >
-                {formatScenarioDelta(riskAppetiteDelta, " pts")}
-              </span>
-            </div>
-            <div className="mt-2 flex items-baseline gap-2 tabular-nums">
-              <span className="text-2xl font-bold text-slate-100">
-                {simulatedAssessment.scores.riskAppetite}
-              </span>
-              <span className="text-xs text-slate-400">/ 100</span>
-            </div>
-            <p className="mt-1 text-[11px] text-slate-400">
-              This week: {liveAssessment.scores.riskAppetite}
-            </p>
-          </div>
+        {/* Two ladders, one drawing: the scenario's score as the dot, this
+            week's as the hollow one, the three lines labelled. The tiles this
+            replaces printed "79 / 100" with the line nowhere on the page. */}
+        <div className="grid gap-6 sm:grid-cols-2">
+          <ScoreLadder
+            label={
+              <>
+                {ruleMetricLabel.tightness}{" "}
+                <span className={`tabular-nums ${deltaClassName(tightnessDelta, true)}`}>
+                  {formatScenarioDelta(tightnessDelta, " pts")} vs this week
+                </span>
+                {simulatedAssessment.scores.tightnessSaturated ? (
+                  <span className="text-[10px] text-amber-300"> · ceiling</span>
+                ) : null}
+              </>
+            }
+            value={simulatedAssessment.scores.tightness}
+            previous={liveAssessment.scores.tightness}
+            previousLabel="This week"
+            lines={buildLadderLines(ladderLines.tightness)}
+          />
+          <ScoreLadder
+            label={
+              <>
+                {ruleMetricLabel.riskAppetite}{" "}
+                <span className={`tabular-nums ${deltaClassName(riskAppetiteDelta, false)}`}>
+                  {formatScenarioDelta(riskAppetiteDelta, " pts")} vs this week
+                </span>
+              </>
+            }
+            value={simulatedAssessment.scores.riskAppetite}
+            previous={liveAssessment.scores.riskAppetite}
+            previousLabel="This week"
+            lines={buildLadderLines(ladderLines.riskAppetite)}
+          />
         </div>
       </section>
 

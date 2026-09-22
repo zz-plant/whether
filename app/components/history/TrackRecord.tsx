@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type {
   TrackRecord as TrackRecordModel,
   TrackRecordRow,
@@ -17,6 +18,12 @@ import { UrlDetails } from "../ui/urlDetails";
  * This panel makes no accuracy claim. The engine does not forecast, so it cannot
  * be scored on being right; what it can be scored on is holding a call and
  * showing its work, which is what the numbers below say.
+ *
+ * Two pieces, because /history reads in the order a reader asks: the record's
+ * answer (the tiles, with the confidence record beside them) comes before the
+ * phase map that explains the mechanism, and the month-by-month table — the
+ * evidence for the tiles — comes after it. One component rendered them as one
+ * block, which put the mechanism either above the answer or below its evidence.
  */
 const renderDelta = (delta: number | null) => {
   if (delta === null) {
@@ -96,19 +103,22 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
   </table>
 );
 
-export function TrackRecord({
+/**
+ * The record's answer: four figures and the held-since line, with room beside
+ * them for the confidence record (`aside`), which grades the same months on the
+ * other question a reader asks of a record.
+ */
+export function TrackRecordTiles({
   record,
-  allMonthsOpen = false,
+  aside,
 }: {
   record: TrackRecordModel | null;
-  allMonthsOpen?: boolean;
+  aside?: ReactNode;
 }) {
   if (!record) {
     return null;
   }
 
-  const earlierRows = record.allRows.slice(record.rows.length);
-  const oldestShownDate = record.rows[record.rows.length - 1]?.recordDate ?? record.firstRecordDate;
   const yearsCovered = record.monthsCovered / 12;
   const changeRate = yearsCovered >= 1
     ? `${(Math.round((record.regimeChanges / yearsCovered) * 10) / 10).toLocaleString("en-US")} per year`
@@ -124,34 +134,67 @@ export function TrackRecord({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} />
-        <StatTile
-          label="Current call held"
-          value={record.currentHoldMonths.toLocaleString("en-US")}
-          unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
-        />
-        <StatTile label="Call changes" value={changeRate} />
-        <StatTile label="Record starts" value={formatDateUTC(record.firstRecordDate)} />
+      <div className={aside ? "grid gap-6 lg:grid-cols-2" : ""}>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-2">
+            <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} />
+            <StatTile
+              label="Current call held"
+              value={record.currentHoldMonths.toLocaleString("en-US")}
+              unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
+            />
+            <StatTile label="Call changes" value={changeRate} />
+            <StatTile label="Record starts" value={formatDateUTC(record.firstRecordDate)} />
+          </div>
+
+          {/* "The call has been X" read as a statement about the call on the site
+              today. Every figure in this panel comes from the month-end series, so
+              it is a statement about closed months, and the two disagree whenever
+              the month in progress has moved — which is how this page said "Sunny"
+              on a week the brief was calling Freezing. */}
+          <p className="text-fluid-xs text-slate-400">
+            Through {formatDateUTC(record.latestRecordDate)}, the month-end call had been{" "}
+            <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
+            since {formatDateUTC(record.currentHoldStartDate)}.{" "}
+            {CALL_CHANGE_RULE} One noisy month cannot move it, so a held call is the usual state and a
+            change is the event worth reading.
+          </p>
+        </div>
+
+        {aside ? <div className="min-w-0">{aside}</div> : null}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The evidence for the tiles: every monthly call, one disclosure away. Leading
+ * with twelve rows of the same word pushed the phase map — the graphic that
+ * shows where the call sits — under a screen of table. URL-carried per §XII.
+ */
+export function TrackRecordTable({
+  record,
+  allMonthsOpen = false,
+}: {
+  record: TrackRecordModel | null;
+  allMonthsOpen?: boolean;
+}) {
+  if (!record) {
+    return null;
+  }
+
+  const earlierRows = record.allRows.slice(record.rows.length);
+  const oldestShownDate = record.rows[record.rows.length - 1]?.recordDate ?? record.firstRecordDate;
+
+  return (
+    <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="monthly-calls-heading">
+      <div>
+        <h2 className="type-eyebrow type-eyebrow-section" id="monthly-calls-heading">Monthly calls</h2>
+        <p className="text-sm text-slate-300">
+          The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each call, newest first.
+        </p>
       </div>
 
-      {/* "The call has been X" read as a statement about the call on the site
-          today. Every figure in this panel comes from the month-end series, so
-          it is a statement about closed months, and the two disagree whenever
-          the month in progress has moved — which is how this page said "Sunny"
-          on a week the brief was calling Freezing. */}
-      <p className="text-fluid-xs text-slate-400">
-        Through {formatDateUTC(record.latestRecordDate)}, the month-end call had been{" "}
-        <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
-        since {formatDateUTC(record.currentHoldStartDate)}.{" "}
-        {CALL_CHANGE_RULE} One noisy month cannot move it, so a held call is the usual state and a
-        change is the event worth reading.
-      </p>
-
-      {/* The tiles and the held-since line are the record; the month-by-month
-          table is its evidence, one disclosure away. Leading with twelve rows
-          of the same word pushed the phase map — the graphic that shows where
-          the call sits — under a screen of table. URL-carried per §XII. */}
       <UrlDetails
         queryKey="months"
         initialOpen={allMonthsOpen}
@@ -185,7 +228,6 @@ export function TrackRecord({
           ) : null}
         </div>
       </UrlDetails>
-
     </section>
   );
 }

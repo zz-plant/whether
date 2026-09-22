@@ -4,6 +4,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { DecisionHero } from "../app/components/DecisionHero";
+import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
 
@@ -11,6 +12,7 @@ const mockAny: any = mock;
    Installed here so the file answers for its own dependencies rather than
    passing on another suite's ordering luck. */
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),

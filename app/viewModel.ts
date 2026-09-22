@@ -15,13 +15,6 @@ export const CONFIDENCE_COLOR = (label: string) =>
 
 // Record<string, string> lets consumers index dictionary keys at call sites.
 // satisfies checks that all RegimeKey values have entries — remove a regime, get a compile error.
-export const REGIME_DESCRIPTOR: Record<string, string> = {
-  EXPANSION: "growth conditions",
-  DEFENSIVE: "operating efficiently",
-  SCARCITY: "capital is constrained",
-  VOLATILE: "mixed signals",
-} satisfies Record<RegimeKey, string>;
-
 export const REGIME_COLORS: Record<string, string> = {
   SCARCITY: "bg-rose-400/60",
   DEFENSIVE: "bg-amber-400/60",

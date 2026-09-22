@@ -5,8 +5,10 @@ import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
-import { TrackRecord } from "../components/history/TrackRecord";
+import { MonthStrip } from "../components/history/monthStrip";
+import { TrackRecordTable, TrackRecordTiles } from "../components/history/TrackRecord";
 import { TrackRecordSection } from "../components/history/TrackRecordSection";
+import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordBody } from "../components/history/confidenceRecord";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
@@ -69,9 +71,14 @@ export default async function HistoryPage({
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
 
+  /* The reader's order, not the mechanism's: the record's answer first (the
+     month strip, then the tiles), the method second (the phase map), then the
+     evidence (the table) and the published weeks. The rail follows the page. */
   const historySectionLinks = [
-    { href: "#regime-map", label: "Where this month sits" },
-    { href: "#track-record", label: "Track record" },
+    ...(fullSeries.length > 0 ? [{ href: "#call-by-month", label: "The call by month" }] : []),
+    ...(trackRecord ? [{ href: "#track-record", label: "Track record" }] : []),
+    { href: "#regime-map", label: "How the two scores decide the call" },
+    ...(trackRecord ? [{ href: "#monthly-calls", label: "Monthly calls" }] : []),
     ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
   ];
 
@@ -130,9 +137,43 @@ export default async function HistoryPage({
         </div>
       ) : null}
 
-      {/* The plane first. It is the one graphic on the page that shows where the
-          call sits and how near the next one is; the record below says how often
-          it moved and lists each call. It used to sit under a twelve-row table. */}
+      {/* The record's answer, legible in a second: every month coloured by the
+          call, the changes marked, the current run named. The page used to open
+          with the phase map, which a first-time reader has to learn before it
+          says anything; the map is drawn below, as the explanation. */}
+      {fullSeries.length > 0 ? (
+        <section
+          id="call-by-month"
+          data-page-section="call-by-month"
+          tabIndex={-1}
+          aria-labelledby="call-by-month-heading"
+          className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+        >
+          <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">The call by month</h2>
+          <MonthStrip entries={fullSeries} />
+        </section>
+      ) : null}
+
+      {/* The tiles, with the confidence record beside them: "how often did the
+          call hold" and "how often was the confidence label right" are the same
+          question asked twice, and the second answer used to live on /trust. */}
+      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        <TrackRecordTiles
+          record={trackRecord}
+          aside={
+            <div className="space-y-3">
+              <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
+              <ConfidenceRecordBody />
+              <p className="text-fluid-xs text-slate-400">
+                <Link href="/calibration" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                  Read the calibration study
+                </Link>
+              </p>
+            </div>
+          }
+        />
+      </div>
+
       <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap
           series={phaseSeries}
@@ -142,8 +183,8 @@ export default async function HistoryPage({
         />
       </div>
 
-      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-        <TrackRecord
+      <div id="monthly-calls" data-page-section="monthly-calls" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        <TrackRecordTable
           record={trackRecord}
           allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
         />

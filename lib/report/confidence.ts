@@ -5,6 +5,8 @@ import {
   CONFIDENCE_PERCENT_CEILING,
   CONFIDENCE_PERCENT_IMPUTED_CEILING,
   RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
+  REGIME_CONFIDENCE_NEAR_THRESHOLD,
+  REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
 } from "../regimeEngineCore";
 
 type ConfidenceInputs = {
@@ -77,3 +79,37 @@ export const resolveConfidencePercentFromDistance = (
  */
 export const resolveConfidencePercent = (inputs: ConfidenceInputs): number =>
   resolveConfidencePercentFromDistance(resolveDistanceToFlip(inputs), hasImputedInputs(inputs));
+
+/** Past this age a fallback reading is stale: confidence drops and freshness says so. */
+export const FRESH_FALLBACK_HOURS = 48;
+const STALE_FALLBACK_HOURS = 120;
+
+/**
+ * The confidence label every surface publishes: distance from the nearest
+ * boundary, lowered one step when the reading is a bundled fallback older than
+ * 48 hours and two past 120. The brief model, and through it every route's
+ * trust strip, read this; /signals, which builds no brief model, reads it
+ * directly, so the strip cannot say High there and Medium on /trust for one
+ * reading.
+ */
+export const resolvePublishedConfidenceLabel = ({
+  scores,
+  thresholds,
+  isFallbackData,
+  recordDate,
+  now = Date.now(),
+}: ConfidenceInputs & {
+  /** A fallback read of live data; false for an archived month, which is old by design. */
+  isFallbackData: boolean;
+  recordDate?: string | null;
+  now?: number;
+}): "HIGH" | "MED" | "LOW" => {
+  const gap = resolveDistanceToFlip({ scores, thresholds });
+  const geometric = gap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : gap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
+  const ageHours = isFallbackData && recordDate
+    ? Math.max(0, (now - Date.parse(`${recordDate}T00:00:00.000Z`)) / 3_600_000)
+    : 0;
+  if (!isFallbackData || ageHours <= FRESH_FALLBACK_HOURS) return geometric;
+  if (ageHours > STALE_FALLBACK_HOURS) return geometric === "HIGH" ? "MED" : "LOW";
+  return geometric === "HIGH" ? "MED" : geometric;
+};

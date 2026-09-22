@@ -127,7 +127,8 @@ export default function PrivacyPage() {
               reading at the time so a later week can be compared against the decision&apos;s
               own assumptions. Everything else you set stays in your browser and is never sent: your
               operator profile, Decision Shield presets, threshold drafts, the last call this browser
-              saw, the theme, and which one-time explainers you have dismissed.
+              saw, which steps of the weekly plan you have ticked off this week, the theme, and which
+              one-time explainers you have dismissed.
             </p>
           </div>
 

@@ -33,7 +33,7 @@ describe("weekly retrospective recording", () => {
     assert.match(mount, /current=\{\{/, "the strip receives the current call inline");
     assert.match(page.slice(0, start).trimEnd(), /!historicalSelection \? \($/, "gated on the live brief, nothing else");
     assert.ok(start > page.indexOf("<DecisionHero"), "sits under the call it compares against");
-    assert.ok(start < page.indexOf('id="key-drivers"'), "and before the drivers band");
+    assert.ok(start < page.indexOf("<WhatChangedSection"), "and before the signals it precedes");
     assert.ok(!existsSync("app/components/home/WeeklyRetrospectiveCard.tsx"), "no tabbed card wraps it any more");
   });
 });

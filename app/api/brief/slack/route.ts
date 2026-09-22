@@ -1,5 +1,6 @@
 import { buildVersionedApiEnvelope, jsonResponse } from "../../../../lib/api/edgeResponse";
 import { buildSlackBrief } from "../../../../lib/export/briefBuilders";
+import { previousScoresFromDynamics } from "../../../../lib/export/scoreReference";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { buildPostureState } from "../../../../lib/report/postureStateSource";
 
@@ -16,7 +17,11 @@ export async function GET() {
     assessment,
     reportDynamics: reportData.reportDynamics,
   });
-  const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
+  const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
+    postureState,
+    actionStripItems: reportData.actionStripItems,
+    previousScores: previousScoresFromDynamics(reportData.reportDynamics, assessment.scores),
+  });
 
   return jsonResponse(
     buildVersionedApiEnvelope({

@@ -23,11 +23,18 @@ import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
-import { PlaybookPanel } from "../components/appendix/playbookPanel";
+import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import { ReportShell } from "../components/reportShell";
+import { TrustStrip } from "../components/trustStrip";
+import { AreaTable } from "../components/ui/areaTable";
+import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
+import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
+import { buildAreaRows } from "./areaRows";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { SharePageFormats } from "../share/sharePageFormats";
+import { buildReadingLines } from "../../lib/export/briefBuilders";
+import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
@@ -194,6 +201,19 @@ export async function buildPlanningPageModel(
     },
     children: h(Fragment, null,
       h(OperatorWorkflowRouteTracker),
+      /* Freshness and confidence, once, in the same slot every reading route
+         puts them: under the h1, before anything asks the reader to act. */
+      h(TrustStrip, {
+        ...buildTrustStripProps({
+          recordDateLabel,
+          isFallback,
+          isHistorical: Boolean(historicalSelection),
+          degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
+          confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+          assessment,
+        }),
+        href: "/trust",
+      }),
       // At the page root, not inside the Share step: that step is collapsed on
       // arrival, and the island has to exist before the nav block's Share
       // button or the picker can read it.
@@ -207,6 +227,7 @@ export async function buildPlanningPageModel(
         })
         : null,
       h(OperationsExecutionStepper, {
+        recordDate: historicalSelection ? null : reportData.weeklyRecordDate,
         steps: [
           {
             id: "ops-monthly-action-summary",
@@ -255,6 +276,9 @@ export async function buildPlanningPageModel(
                     h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.changeCourseIf),
                   ),
                 ),
+                /* One row per area, in the order every surface uses, with the rule and
+                   both its lines — the same table the brief prints. */
+                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "Items to revisit. Recheck last week's approvals before adding fixed cost or widening scope."
@@ -294,7 +318,12 @@ export async function buildPlanningPageModel(
                 // The same picker /share and the global rail use, reading the same
                 // island — one artifact pipeline. The eleven-button export panel
                 // that sat here built the brief a second way through its own lib.
-                h(SharePageFormats),
+                h(SharePageFormats, {
+                  scoreReferences: buildReadingLines(reportData.assessment, {
+                    actionStripItems,
+                    previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
+                  }),
+                }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   "Email, meeting pack, role memos, calendar hold and the embed live on ",
                   h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),
@@ -335,15 +364,15 @@ export async function buildPlanningPageModel(
                   className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100",
                 }, showAllActionLanes ? "Show top 3 only" : "Show all rules"),
               ),
-              h(PlaybookPanel, {
+              /* The per-area rows are the weekly plan step's AreaTable now — the
+                 consequence tier, in the one order every surface uses. What is
+                 left here is what to read before committing. */
+              h(RulesBeforeCommit, {
                 playbook,
                 stopItems,
                 startItems,
                 fenceItems,
-                provenance: treasuryProvenance,
-                showProvenance: false,
-                actionStripItems,
-                showAllActionLanes,
+                showAll: showAllActionLanes,
               }),
               ),
             }),

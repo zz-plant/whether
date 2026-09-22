@@ -7,11 +7,13 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { Sparkline } from "../app/components/ui/sparkline";
 import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
 import { regimeDataAttribute } from "../lib/regimeAccent";
+import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
 
 /* DecisionHero's descendants read the app router; see decisionHeroSignalBreakdown. */
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
@@ -57,15 +59,7 @@ describe("regime colour contract", () => {
 
   it("stamps the hero with the regime its copy states", () => {
     const html = renderToStaticMarkup(
-      <DecisionHero
-        tightness={77}
-        tightnessDelta={14}
-        boldnessScore={36}
-        boldnessDelta={-14}
-        regime="SCARCITY"
-        recordDate="2026-09-11"
-        fetchedAt="2026-09-15"
-      />,
+      <DecisionHero regime="SCARCITY" weeklyCall="Freeze new commitments." />,
     );
 
     assert.match(html, /data-regime="SCARCITY"/, "the card names its regime for the token layer");

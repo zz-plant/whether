@@ -324,7 +324,7 @@ export default function RootLayout({
                   Built by
                   <a href="https://kanav.net" className="ml-1 no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Kanav Jain</a>
                 </span>
-                <a href="https://nextconsensus.com" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Next Consensus</a>
+                <a href="https://nextconsensus.com" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">NextConsensus</a>
                 <span className="inline-flex min-h-[44px] items-center">© 2026 Whether</span>
               </nav>
               {/* Inside the footer now. It used to render after `</footer>`, so a

@@ -12,7 +12,7 @@ import { DECISION_SLOT_TONE } from "../../trust/frameworkSection";
  * column is one component and the page passes it a period.
  */
 
-export const getCurveSpread = (yields: TreasuryYields | undefined) =>
+const getCurveSpread = (yields: TreasuryYields | undefined) =>
   typeof yields?.tenYear === "number" && typeof yields?.twoYear === "number"
     ? yields.tenYear - yields.twoYear
     : null;

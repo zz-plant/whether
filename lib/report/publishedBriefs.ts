@@ -1,4 +1,3 @@
-import { formatSignedDeltaOrNull } from "../formatters";
 /**
  * Frozen weekly briefs.
  *
@@ -16,8 +15,9 @@ import { formatIsoWeekSlug } from "../isoWeek";
 import { buildCanonicalUrl } from "../seo";
 import { publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
-import { buildBoundedConditionRails, formatPointsToLine } from "./operatingCalls";
-import { decisionAreaLabel, isDecisionArea } from "./boundedDecisionRules";
+import { buildBoundedConditionRails } from "./operatingCalls";
+import { decisionAreaLabel, decisionAreaOrder, isDecisionArea } from "./boundedDecisionRules";
+import { buildScoreReferenceLines } from "../export/scoreReference";
 
 const PublishedRuleLineSchema = z.object({
   metric: z.enum(["tightness", "riskAppetite"]),
@@ -87,17 +87,17 @@ export const PublishedBriefIndexSchema = z.array(PublishedBriefSchema);
 export type PublishedBrief = z.infer<typeof PublishedBriefSchema>;
 export type PublishedRuleLine = z.infer<typeof PublishedRuleLineSchema>;
 
-const formatDelta = (delta: number | null | undefined) => {
-  const formatted = formatSignedDeltaOrNull(delta);
-  return formatted ? `${formatted} vs last week` : null;
-};
+/** Last week's reading from the record's real weekly move; null where the record carries none. */
+const previousFromDelta = (value: number, delta: number | null | undefined) =>
+  typeof delta === "number" && Number.isFinite(delta) ? Math.round((value - delta) * 10) / 10 : null;
 
 /**
- * The readings and the corridor as one fixed-width key/value block.
- *
- * The frozen record's prose already says the rule; this says the numbers, so a
- * reader of the pasted block sees where each reading sits against its lines
- * without parsing a sentence. Empty for records that carry no scores.
+ * The readings against their lines, one line per score, in the shape every
+ * export prints (`lib/export/scoreReference.ts`): value, line, distance, last
+ * week. The frozen record's prose already says the rule; this says the numbers,
+ * so a reader of the pasted block sees where each reading sits without parsing
+ * a sentence. "Last week" comes from the deltas the freeze recorded, which are
+ * the real weekly move. Empty for records that carry no scores.
  */
 export const buildPublishedBriefReadingLines = (brief: PublishedBrief): string[] => {
   if (!brief.scores) return [];
@@ -107,22 +107,20 @@ export const buildPublishedBriefReadingLines = (brief: PublishedBrief): string[]
     resume: corridor?.resume,
     scores: brief.scores,
   });
-  const readings: Array<{ label: string; metric: "tightness" | "riskAppetite"; value: number; delta: string | null }> = [
-    { label: "Funding pressure", metric: "tightness", value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta) },
-    { label: "Risk appetite", metric: "riskAppetite", value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta) },
-  ];
-  return readings.map((reading) => {
-    const rail = rails.find((candidate) => candidate.metric === reading.metric);
-    const parts = [
-      `${reading.label}: ${reading.value}/100`,
-      reading.delta,
-      rail ? `pause ${rail.invert ? "<" : ">"} ${rail.guardrail} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})` : null,
-      rail && rail.clearsAt !== undefined
-        ? `re-open ${rail.invert ? ">" : "<"} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
-        : null,
-    ].filter((part): part is string => Boolean(part));
-    return parts.join(" · ");
+  return buildScoreReferenceLines({
+    scores: { tightness: brief.scores.tightness, riskAppetite: brief.scores.riskAppetite },
+    rails,
+    previous: {
+      tightness: previousFromDelta(brief.scores.tightness, brief.scores.tightnessDelta),
+      riskAppetite: previousFromDelta(brief.scores.riskAppetite, brief.scores.riskAppetiteDelta),
+    },
   });
+};
+
+/** The record's area decisions in the page's row order; an area the table does not know keeps its place at the end. */
+const decisionsInAreaOrder = (brief: PublishedBrief) => {
+  const orderIndex = (area: string) => (isDecisionArea(area) ? decisionAreaOrder.indexOf(area) : decisionAreaOrder.length);
+  return [...brief.decisions].sort((left, right) => orderIndex(left.area) - orderIndex(right.area));
 };
 
 export const parsePublishedBriefs = (input: unknown): PublishedBrief[] => {
@@ -229,7 +227,7 @@ export const labelForArea = (area: string) => (isDecisionArea(area) ? decisionAr
 export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string => {
   const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const readingLines = buildPublishedBriefReadingLines(brief);
-  const decisions = brief.decisions.map((decision) =>
+  const decisions = decisionsInAreaOrder(brief).map((decision) =>
     [
       `• ${labelForArea(decision.area)}: ${decision.call}`,
       `  ${publicDecisionLabels.action}: ${decision.doNow}`,
@@ -240,20 +238,21 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
 
   const evidenceLines = brief.evidence.map((item) => `• ${item.title} — ${item.detail}`);
 
+  /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
     `Conditions: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
-    ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
-    "",
-    "Summary:",
-    `• ${brief.summary}`,
-    `• What changed: ${brief.whatChanged}`,
     "",
     `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
     `• ${publicDecisionLabels.call}: ${brief.summary}`,
     `• ${publicDecisionLabels.action}: ${brief.actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${brief.guardrailThreshold}`,
     `• ${publicDecisionLabels.reversal}: ${brief.flipThreshold}`,
+    ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
+    "",
+    "Summary:",
+    `• ${brief.summary}`,
+    `• What changed: ${brief.whatChanged}`,
     ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
@@ -273,7 +272,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
 export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string => {
   const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const readingLines = buildPublishedBriefReadingLines(brief);
-  const decisions = brief.decisions.map((decision) =>
+  const decisions = decisionsInAreaOrder(brief).map((decision) =>
     [
       `• ${labelForArea(decision.area)}: ${decision.call}`,
       `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${decision.doNow}`,
@@ -284,21 +283,22 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
 
   const evidenceLines = brief.evidence.map((item) => `• ${item.title}: ${item.detail}`);
 
+  /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
     "",
     `Conditions: ${brief.postureLabel}`,
     `Confidence: ${brief.confidenceLabel} confidence`,
-    ...readingLines,
     `Executive summary: ${brief.summary}`,
-    "",
-    "What changed this week:",
-    brief.whatChanged,
     "",
     "Operating call & bounded thresholds:",
     `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
     `• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${brief.guardrailThreshold}`,
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${brief.flipThreshold}`,
+    "",
+    "What changed this week:",
+    brief.whatChanged,
+    ...readingLines,
     ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction note: ${brief.correction}`] : []),

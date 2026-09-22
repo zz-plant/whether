@@ -12,7 +12,6 @@ import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
-import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { SpinnerIcon } from "../../components/uiIcons";
 import { createBrowserSource, useBrowserSource } from "../../components/browserSource";
@@ -139,10 +138,8 @@ const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
 
 export const ThresholdsPanel = ({
   currentThresholds,
-  provenance,
 }: {
   currentThresholds: RegimeThresholds;
-  provenance: DataProvenance;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -312,8 +309,8 @@ export const ThresholdsPanel = ({
   };
 
   return (
-    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10">
-      <div className="weather-panel p-6">
+    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-4">
+      <div>
         <SectionPanelHeader
           label="Watch-line settings"
           title="Adjust when the call changes"
@@ -473,7 +470,6 @@ export const ThresholdsPanel = ({
                   <li>Lower numbers change the call sooner.</li>
                   <li>Higher numbers wait for a bigger move.</li>
                 </ul>
-                <DataProvenanceStrip provenance={provenance} />
               </div>
             </details>
           </div>

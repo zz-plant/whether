@@ -1,8 +1,9 @@
 import { buildSlackBrief } from "../export/briefBuilders";
+import { previousScoresFromDynamics } from "../export/scoreReference";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { loadReportDataSafe } from "../report/reportData";
 import { buildPostureState } from "../report/postureStateSource";
-import { buildReportDynamics } from "../report/reportEvidence";
+import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
@@ -102,7 +103,11 @@ const buildSlackBriefPayload = async (
     assessment,
     reportDynamics: reportData.reportDynamics,
   });
-  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
+  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
+    postureState,
+    actionStripItems: reportData.actionStripItems,
+    previousScores: previousScoresFromDynamics(reportData.reportDynamics, assessment.scores),
+  });
   return {
     text,
     recordDate: treasury.record_date,
@@ -156,7 +161,12 @@ const buildSlackBriefPayloadFromSnapshot = async (
     assessment,
     reportDynamics: buildReportDynamics({ current: assessment, previous: null }),
   });
-  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
+  /* The snapshot holds no previous week, so this post prints no last week —
+     the builder's rule, rather than a zero move. The area rows it can derive. */
+  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
+    postureState,
+    actionStripItems: buildGuidanceBundleFromAssessment(assessment).actionStripItems,
+  });
   return {
     text,
     recordDate: treasury.record_date,

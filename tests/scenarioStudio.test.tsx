@@ -87,7 +87,11 @@ describe("ScenarioStudioSimulator", () => {
     assert.match(html, /Risk appetite/);
     // "posture" is not asserted here: the per-area lever labels ("Hiring posture") come from
     // lib/playbook.ts, which this component renders as given.
-    assert.doesNotMatch(html, /SCARCITY|DEFENSIVE|VOLATILE|EXPANSION|regime|Live baseline/);
+    /* Visible text only: the score ladders take their hue from the
+       `--regime-accent` / `--regime-ink` tokens, so the word appears in a style
+       attribute. What the reader sees is what this rule is about. */
+    const visible = html.replace(/<[^>]+>/g, " ");
+    assert.doesNotMatch(visible, /SCARCITY|DEFENSIVE|VOLATILE|EXPANSION|regime|Live baseline/);
 
     // Playbook
     assert.match(html, /What you&#x27;d stop and start in this scenario/);

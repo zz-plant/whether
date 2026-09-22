@@ -24,6 +24,12 @@ import type { RegimeKey } from "../../lib/regimeEngine";
 import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
+import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
+import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
+
+/** One score against its lines, this week and last, as the ladder draws it. */
+type ScorePosition = { value: number; previous: number | null; lines: readonly LadderLine[] };
+export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosition };
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
 
@@ -39,7 +45,9 @@ const adj = MACRO_ADJUSTMENT_CONSTANTS;
 /**
  * The regime rule is a 2x2: which quadrant the two scores land in. Stated in
  * prose it was one sentence carrying two thresholds and four names; drawn, it
- * is the thing itself.
+ * is the thing itself. It explains the rule; where this week's scores sit is
+ * drawn by the two ladders that open the section, the same drawing every
+ * other route uses for a score.
  */
 function RegimeQuadrant() {
   const t = TIGHTNESS_REGIME_THRESHOLD;
@@ -156,13 +164,23 @@ function FormulaCard({ title, children }: { title: string; children: ReactNode }
  * with it. Kept outside the healthy-state <details> collapse on /trust so the
  * "Sources and formulas" links from /about and /threshold land on real content.
  */
-export function FormulaReference() {
+export function FormulaReference({ positions }: { positions?: ScorePositions } = {}) {
   return (
     <ReportSection
       id="formula-reference"
       title="How the score is built"
       description="The full derivation, from public data series to the weekly call."
     >
+      {/* Where the score sits, first, and in the one drawing every route uses
+          for it. The quadrant further down used to be the only picture of the
+          two scores on this page, and it draws the rule, not the reading. */}
+      {positions ? (
+        <div className="weather-surface mb-3 grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2">
+          <ScoreLadder label={ruleMetricLabel.tightness} value={positions.tightness.value} previous={positions.tightness.previous} lines={positions.tightness.lines} />
+          <ScoreLadder label={ruleMetricLabel.riskAppetite} value={positions.riskAppetite.value} previous={positions.riskAppetite.previous} lines={positions.riskAppetite.lines} />
+        </div>
+      ) : null}
+
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score
           does in words first; the grid below it stays exact. */}

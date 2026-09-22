@@ -21,7 +21,7 @@ describe("home route render contract", () => {
       "the horizon control must sit above the call it restates",
     );
     assert.ok(
-      source.indexOf("<CadenceSelector") < source.indexOf("<BelowTheFoldEvidence"),
+      source.indexOf("<CadenceSelector") < source.indexOf("<DoAndShareSection"),
       "the horizon control must not be below the fold again",
     );
     const header = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
@@ -43,35 +43,38 @@ describe("home route render contract", () => {
   });
 
   it("keeps the active / route carrying the homepage decision contract", () => {
+    /* The hero was unpacked into the five sections a reader asks for, in that
+       order, on 2026-09-22: the call, what changed, what it changes by area,
+       what would change the call, and what to do. The rule this case has always
+       carried is unchanged — each thing is stated once, by the surface that
+       owns it — so the assertions follow the content to its new owners.
+
+       A source read, and it has to be: the claim is about which file mounts
+       what, and this page suspends at its data boundary in this suite. */
     const routeSource = readFileSync("app/page.tsx", "utf8");
 
-    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
-    // The top fold is now `WeeklyChangeReport`, rendered by the hero. The rule it
-    // carries is unchanged — one revisit block, owned by the hero — so the
-    // assertions follow it to the file that holds it rather than relaxing.
-    const changeReportSource = readFileSync("app/components/hero/weeklyChangeReport.tsx", "utf8");
-    assert.match(changeReportSource, /data-testid="weekly-top-fold"/);
-    assert.ok(heroSource.includes("<WeeklyChangeReport"), "the hero still owns the top fold");
-    assert.ok(!routeSource.includes("<WeeklyChangeReport"), "the route does not mount a second change report");
-    assert.ok(routeSource.includes("revisitDecisions="), "home route passes the canonical revisit state into the hero");
-    assert.ok(!routeSource.includes("WeeklyTopFoldContract"), "home route does not repeat the current-conditions card");
-    assert.ok(!routeSource.includes("lg:grid-cols-[1fr_18rem]"), "history does not occupy a competing sticky dashboard rail");
-    assert.ok(
-      changeReportSource.includes("What changed this week?"),
-      "the hero's top fold leads with the weekly delta",
-    );
-    // The three bands are the contract, not decoration: a change with no stated
-    // consequence and a consequence with no stated cause are both what this
-    // block exists to prevent.
-    for (const band of ["What changed", "What that changes for you", "What stays the same"]) {
-      assert.ok(changeReportSource.includes(`>${band}<`), `change report keeps the "${band}" band`);
+    for (const section of [
+      "<WhatChangedSection",
+      "<WhatItChangesSection",
+      "<WhatWouldChangeSection",
+      "<DoAndShareSection",
+    ]) {
+      assert.equal(routeSource.split(section).length - 1, 1, `${section} is mounted exactly once`);
     }
-    assert.ok(heroSource.includes("Why this call"), "diagnostics are progressively disclosed");
-    assert.ok(!routeSource.includes("DeltaTrustStrip"), "trust stays inline in the decision hero, not a duplicate summary card");
-    assert.ok(!routeSource.includes("<FlipMeter"), "flip watch lives in the hero, not a separate barometer card");
 
-    // The hero owns the bounded guardrail; no adjacent status card restates it.
-    assert.ok(!routeSource.includes("Watch:"), "guardrails stay in the decision hero, not restated in the top fold");
+    // The order in the document is the order of the questions.
+    const order = ["<DecisionHero", "<WhatChangedSection", "<WhatItChangesSection", "<WhatWouldChangeSection", "<DoAndShareSection"]
+      .map((tag) => routeSource.indexOf(tag));
+    assert.deepEqual([...order].sort((a, b) => a - b), order, "the sections read in the reader's order");
+
+    // The hero is the state tier and nothing else: every number it used to
+    // carry is a section's now, so it takes no score props at all.
+    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
+    for (const prop of ["tightness", "riskAppetite", "boldnessScore", "signalData", "boundedConditions"]) {
+      assert.ok(!heroSource.includes(`${prop}?:`), `the hero no longer takes ${prop}`);
+    }
+    assert.ok(!routeSource.includes("<DeltaTrustStrip"), "trust is the one strip under the call, not a duplicate summary card");
+    assert.ok(!routeSource.includes("<FlipMeter"), "what would change the call is a section, not a barometer card");
   });
 
   it("keeps one canonical copy action in the homepage body", () => {
@@ -81,10 +84,14 @@ describe("home route render contract", () => {
     // This used to assert against `ThreeWhethersCard`, which 69221739 stopped rendering and
     // which is now deleted. The DD-005 rule it protected is unchanged, so it moves to the
     // one other body surface that carries a copy control: the non-weekly cadence lead.
-    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
+    const actSource = readFileSync("app/components/home/DoAndShareSection.tsx", "utf8");
     const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
 
-    assert.ok(heroSource.includes("<ShareBriefButton"), "decision hero owns the canonical copy action");
+    // The act tier owns it now — the hero is the state tier and carries no
+    // controls — but it is still one button, in one place, in the page body.
+    assert.ok(actSource.includes("<ShareBriefButton"), "the act section owns the canonical copy action");
+    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
+    assert.ok(!heroSource.includes("<ShareBriefButton"), "no second copy action in the hero");
     // The cadence lead copies a different artifact — the month's or quarter's call, not the
     // week's — so it earns its own control. What DD-005 rules out is a second button under
     // the hero's name, which is why this one has to pass its own label.
@@ -162,23 +169,23 @@ describe("home route render contract", () => {
     // One control per axis at every width: the header's phone-only pills and
     // the hero's tablists above `sm` are complementary, and nothing else asks.
     const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
-    const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
     assert.match(
       headerSource,
       /<div className="[^"]*\bsm:hidden\b[^"]*">\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
       "the header keeps the phone pills, and only there",
     );
+    const consequencesSource = readFileSync("app/components/home/WhatItChangesSection.tsx", "utf8");
     assert.match(
-      heroSource,
+      consequencesSource,
       /<div className="hidden sm:flex[^"]*">\s*<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
-      "the hero keeps the sm+ tablists",
+      "the sm+ tablists sit with the rules they reshape",
     );
     assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");
     const explainerSource = readFileSync("app/components/homeFirstRunOrientation.tsx", "utf8");
     assert.ok(!explainerSource.includes("OPERATOR_STAGE_OPTIONS"), "the first-run line no longer asks the stage a third time");
 
-    // One planning CTA: the pill in the handoff.
-    assert.equal(routeSource.split("<BelowTheFoldEvidence").length - 1, 1);
+    // One planning CTA: the pill in the act section.
+    assert.equal(routeSource.split("<DoAndShareSection").length - 1, 1);
     assert.ok(!routeSource.includes("Open in Planning"), "no second plan CTA above the handoff");
 
     // The record date prints once, in the hero's trust line.

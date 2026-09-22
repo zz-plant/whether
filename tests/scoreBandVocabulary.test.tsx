@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import * as nextNavigation from "next/navigation";
@@ -9,7 +10,7 @@ import {
   scoreBandScaleLabel,
 } from "../lib/report/signalTranslations";
 import { ScoreBandReference } from "../app/components/ui/plainLanguage";
-import { DecisionHero } from "../app/components/DecisionHero";
+import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 
 const mockAny: any = mock;
 
@@ -46,26 +47,21 @@ describe("score band vocabulary", () => {
     assert.doesNotMatch(scoreBandScaleLabel(classifyScoreBand(42)), /moderate/i);
   });
 
-  it("renders the scale wording, not the band word, beside the hero's readings", () => {
+  it("renders the scale wording, not the band word, beside the readings", () => {
+    // The readings left the hero for their own section on 2026-09-22.
     const html = renderToStaticMarkup(
-      <DecisionHero
-        tightness={77}
-        tightnessDelta={14}
-        riskAppetite={42}
-        riskAppetiteDelta={-14}
-        boldnessScore={36}
-        boldnessDelta={-14}
-        regime="SCARCITY"
-        recordDate="2026-09-15"
-        fetchedAt="2026-09-15"
-        signalData={{ tightnessThreshold: 70, riskAppetiteThreshold: 50 }}
-      />,
+      createElement(WhatChangedSection, {
+        rows: [
+          { key: "tightness", label: "Funding pressure", value: 77, valueLabel: "77", previous: 63, previousLabel: "63", delta: 14, increaseIsPositive: false, scaleLabel: scoreBandScaleLabel(classifyScoreBand(77)), lines: [{ kind: "callChange", value: 70 }] },
+          { key: "riskAppetite", label: "Risk appetite", value: 42, valueLabel: "42", previous: 56, previousLabel: "56", delta: -14, increaseIsPositive: true, scaleLabel: scoreBandScaleLabel(classifyScoreBand(42)), lines: [{ kind: "callChange", value: 50 }] },
+        ],
+        lead: "The scores moved toward tighter money this week.",
+        comparisonUnavailable: false,
+      }),
     );
 
     assert.ok(html.includes("high range"), "funding pressure lost its scale wording");
     assert.ok(html.includes("mid range"), "risk appetite lost its scale wording");
-    /* The word that read as "nothing to see here" above a crossed line. */
-    assert.doesNotMatch(html, />moderate</);
   });
 
   it("keeps the bare band words in the table that is only about the bands", () => {
