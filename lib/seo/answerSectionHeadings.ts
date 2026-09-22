@@ -27,7 +27,7 @@ const THRESHOLD_FOCUS_LABELS = {
   both: "funding pressure and risk appetite",
 } as const;
 
-/** "hiring, product tempo and burn discipline" — lowercase, for mid-heading use. */
+/** "hiring, roadmap and spending" — lowercase, for mid-heading use. */
 const joinAreas = (areas: readonly DecisionArea[]): string => {
   const labels = areas.map((area) => decisionAreaLabel(area).toLowerCase());
   if (labels.length === 0) return "this week's call";
@@ -45,7 +45,7 @@ export const buildAnswerSectionHeadings = (page: AnswerSectionHeadingInput) => (
    */
   posture: `What this means for ${page.audience}`,
   rules: `Rules in force: ${joinAreas(page.mappedDecisionAreas)}`,
-  threshold: `What would flip this answer: ${THRESHOLD_FOCUS_LABELS[page.thresholdFocus]}`,
+  threshold: `What would change this answer: ${THRESHOLD_FOCUS_LABELS[page.thresholdFocus]}`,
   /** Labels the provenance block. The same block on every page. */
   citation: "Citation",
   next: `Next for ${joinAreas(page.mappedDecisionAreas)}`,

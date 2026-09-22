@@ -15,6 +15,7 @@ import { REGIME_CONFIDENCE_NEAR_THRESHOLD, REGIME_CONFIDENCE_MEDIUM_THRESHOLD } 
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { formatThresholdNumber } from "../../formatters";
+import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "../reportCopy";
 import {
   REGIME_SEVERITY_RANK,
   deriveRegimeStage,
@@ -88,11 +89,11 @@ type RevisitDriverSignal = {
 };
 
 const revisitReasonByArea: Record<WeeklyDecisionCardViewModel["decision"]["revisitQueue"][number]["id"], string> = {
-  hiring: "Recheck fixed-cost approvals before opening net-new headcount.",
-  "product-tempo": "Restage roadmap scope before treating last week's tempo as locked.",
-  "capital-raising": "Refresh raise timing assumptions before leadership treats the window as unchanged.",
-  "burn-discipline": "Re-approve discretionary spend before locking new burn commitments.",
-  "expansion-bets": "Restage expansion bets before treating them as committed.",
+  hiring: "Re-check the hiring line before opening a new role.",
+  "product-tempo": "Look at the roadmap again before assuming last week's pace still holds.",
+  "capital-raising": "If you plan to raise, re-check the timing before assuming the window is unchanged.",
+  "burn-discipline": "Re-approve optional spend before committing to new monthly costs.",
+  "expansion-bets": "Re-check new bets before treating them as committed.",
 };
 
 const signalAreaPriority: Record<RevisitDriverSignal["key"], WeeklyDecisionCardViewModel["decision"]["revisitQueue"][number]["id"][]> = {
@@ -357,8 +358,10 @@ export const buildHomeBriefModelInternal = (
   const policyOverrideActive = refusal?.refused ?? false;
   const policyOverrideReasons = refusal?.reasons ?? [];
   const policyOverrideReason = policyOverrideReasons[0] ?? null;
+  /* The same sentence the weekly contract and the cadence cards lead with under
+     a refusal, read from one table rather than restated here. */
   const effectiveOperatingStanceLine = policyOverrideActive
-    ? "Hold posture changes and keep approvals reversible until policy signals reconcile."
+    ? POLICY_OVERRIDE_CALL.currentCall
     : operatingStanceLine;
 
   const failureModes: HomeBriefTrustWarning[] = buildTrustWarnings({
@@ -466,7 +469,7 @@ export const buildHomeBriefModelInternal = (
   const guardrail = guardrailThreshold
     ?? stopItems[0]
     ?? decisionRules[0]?.pauseTrigger
-    ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
+    ?? NO_LIVE_READING_CALL.pauseIf;
   const startupVariantPolicy: StartupVariantPolicy = {
     selectedMode: startupVariantMode,
     options: startupVariantModes,
@@ -567,8 +570,8 @@ export const buildHomeBriefModelInternal = (
     signalConfidenceReason: policyOverrideActive
       ? joinSentences(
           signalConfidenceReason,
-          "A policy override is also holding the posture in place",
-          policyOverrideReason ?? "The signals disagree, or too many inputs are missing",
+          "The call is also being held this week",
+          policyOverrideReason ?? "The two scores disagree, or too many inputs are missing",
         )
       : signalConfidenceReason,
     regimeHeader: {

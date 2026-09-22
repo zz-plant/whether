@@ -7,6 +7,7 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
@@ -65,6 +66,18 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
   };
 };
 
+/*
+ * What the brief says when no reading reached it. Each names the thing that is
+ * missing and the one thing to hold; "Hold bounded operating discipline" named
+ * neither, and was pasted into Slack as if it were a call.
+ */
+const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
+const FALLBACK_ACTION_NOW = "Keep last week's approvals as they are; start nothing new.";
+const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
+const FALLBACK_CHANGE_COURSE_IF = "Re-open when live data is back and the call has held for a week.";
+/** The stamp's confidence note when no label was modeled: what the number measures. */
+const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line that changes the call";
+
 /** `??` only falls through on null/undefined, and several of these fields are
  *  optional strings that arrive as "". An empty string in a decision slot prints
  *  a bullet with a label and nothing after it. */
@@ -76,7 +89,7 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
   const topActionStripItems = (modeled.actionStripItems ?? []).slice(0, 3);
   const currentCall =
     firstMeaningful(modeled.currentCall, assessment.description)
-    ?? "Hold bounded operating discipline.";
+    ?? FALLBACK_CURRENT_CALL;
   // Never `assessment.constraints`: that is the operating-limits list printed
   // in full further down, and a constraint in this slot printed "Do now" as a
   // verbatim copy of operating limit 1.
@@ -84,13 +97,13 @@ export const buildBoundedDecisionLines = (assessment: RegimeAssessment, options?
     firstMeaningful(
       modeled.actionNow,
       topActionStripItems[0]?.areaActionNow,
-    ) ?? "Keep current approvals staged.";
+    ) ?? FALLBACK_ACTION_NOW;
   const pauseIf =
     firstMeaningful(topActionStripItems[0]?.triggerThreshold, modeled.guardrailThreshold)
-    ?? "Hold irreversible approvals until a live threshold is available; reversible approvals may continue.";
+    ?? FALLBACK_PAUSE_IF;
   const changeCourseIf =
     firstMeaningful(topActionStripItems[0]?.reversalCondition, modeled.reversalTrigger)
-    ?? "Re-open approvals when confidence and trend stabilize.";
+    ?? FALLBACK_CHANGE_COURSE_IF;
 
   return [
     `• ${publicDecisionLabels.call}: ${currentCall}`,
@@ -181,7 +194,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
   const currentCall =
     modeled.currentCall
     ?? assessment.constraints[0]
-    ?? "Hold bounded operating discipline.";
+    ?? FALLBACK_CURRENT_CALL;
   const actionNow =
     modeled.actionNow
     ?? actionStripItems[0]?.areaActionNow
@@ -197,16 +210,16 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
 
   return [
     "",
-    "Startup environment — weekly call:",
+    "This week's call:",
     `• Conditions: ${modeled.postureWithStageLabel ?? "Current read"}`,
     `• Trend: ${(options?.trendLabel ?? "Stable").toUpperCase()}`,
-    `• Distance to regime change: ${(options?.regimeDistancePoints ?? 0).toFixed(1)} points`,
+    `• Points from the line that changes the call: ${(options?.regimeDistancePoints ?? 0).toFixed(1)}`,
     `• Could the call change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${publicDecisionLabels.reversal}: ${condition}`),
     "• Re-check: whoever owns the plan, at the next weekly review.",
-    ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
+    ...(trustMarkers.length > 0 ? [`• Data: ${trustMarkers.join(" · ")}`] : []),
     ...actionStrip,
   ];
 };
@@ -238,32 +251,27 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
 
 
 
-const buildFailureModeBlock = (options?: ExportLayerOptions) => {
+/*
+ * One block, not two. The transmission check and the "false-signal warning"
+ * both printed `failureModes[0].warning`, so a brief with a warning carried it
+ * twice under two headers; the mitigation check now sits under the warning it
+ * belongs to.
+ */
+const buildWhyThisCouldBeWrongBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
   const mode = options?.failureModes?.[0];
-  if (!mode) return [];
-
-  return [
-    "",
-    "False-signal warning:",
-    `• ${mode.warning}`,
-    `• ${mode.mitigationCheck}`,
-  ];
-};
-
-const buildDecisionTransmissionRiskBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
-  const topWarning = options?.failureModes?.[0]?.warning;
   const confidenceLine = options?.confidenceLabel
     ? `${options.confidenceLabel} confidence`
     : `${assessment.diagnostics.confidence} confidence`;
-  const whyCouldBeWrong = topWarning
-    ?? "Signal mix can whipsaw near regime boundaries; keep irreversible approvals gated until confirmation reads hold.";
+  const whyCouldBeWrong = mode?.warning
+    ?? "The scores sit near a line; a small move changes the call. Hold anything you can't undo.";
 
   return [
     "",
-    "Decision transmission check:",
+    "Why this could be wrong:",
     `• Confidence: ${confidenceLine}`,
-    `• Why this could be wrong: ${whyCouldBeWrong}`,
-    `• Change-course trigger: see "${publicDecisionLabels.reversal}" above, plus the signal check.`,
+    `• ${whyCouldBeWrong}`,
+    ...(mode?.mitigationCheck ? [`• Check: ${mode.mitigationCheck}`] : []),
+    `• If it is: see "${publicDecisionLabels.reversal}" above, plus the readings.`,
   ];
 };
 
@@ -297,7 +305,7 @@ export const buildBoardSlideBullets = (
   ...buildBoundedDecisionLines(assessment, options),
   ...buildInterpretationLayerBlock(options),
   "",
-  ...buildExportStamp(treasury, "Score-based posture confidence"),
+  ...buildExportStamp(treasury, CONFIDENCE_STAMP_NOTE),
 ].join("\n");
 
 export const buildSlackBrief = (
@@ -322,19 +330,18 @@ export const buildSlackBrief = (
     `Conditions: ${postureLabel}`,
     ...buildReadingLines(assessment, options),
     `${regimeSignalLabel.baseRate}: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `Recession warning gauge (10Y−2Y): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    `Recession warning gauge (10-year minus 2-year rate): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
-    "Signal check:",
+    "The readings:",
     ...macroLines,
     "",
-    `Bounded decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
     ...decisionHighlights,
-    ...buildDecisionTransmissionRiskBlock(assessment, options),
+    ...buildWhyThisCouldBeWrongBlock(assessment, options),
     "",
-    "Operating limits:",
+    "What to hold:",
     ...assessment.constraints.map((item) => `• ${item}`),
     ...buildViralArtifactBlock(assessment, options),
-    ...buildFailureModeBlock(options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),
     "",
@@ -343,7 +350,7 @@ export const buildSlackBrief = (
     "",
     buildBriefPermalinkLine(treasury.record_date),
     "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
+    ...buildExportStamp(treasury, CONFIDENCE_STAMP_NOTE),
   ].join("\n");
 };
 

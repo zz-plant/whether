@@ -111,7 +111,7 @@ describe("runway-scaled decision rules", () => {
     const tight = adjustmentFor("series-a", { runwayBand: "tight" });
     assert.equal(tight.runwayLabel, "6–12 mo runway");
     assert.match(tight.doNowAdjustments[0] ?? "", /payback case/i);
-    assert.match(tight.doNowAdjustments[1] ?? "", /raise-window planning/i);
+    assert.match(tight.doNowAdjustments[1] ?? "", /if you plan to raise/i);
     assert.match(tight.watchAdjustments[0] ?? "", /net burn/i);
     assert.match(tight.reversalTriggerDiscipline, /twelve months|round is signed/i);
     // The stage's own emphasis still follows the gate.

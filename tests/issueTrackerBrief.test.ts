@@ -19,8 +19,8 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /^## Whether Weekly Brief — 2026-03-04$/m);
     assert.match(brief, /^\*\*Conditions:\*\* /m);
-    assert.match(brief, /^### Macro signals$/m);
-    assert.match(brief, /^### Bounded decision$/m);
+    assert.match(brief, /^### The readings$/m);
+    assert.match(brief, /^### This week's call$/m);
     assert.match(brief, /^- Chicago Fed National Financial Conditions Index: /m);
     assert.match(brief, /^Source: https:\/\/fred\.stlouisfed\.org$/m);
     // Markdown must not carry wiki markup.
@@ -33,7 +33,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /^h2\. Whether Weekly Brief — 2026-03-04$/m);
     assert.match(brief, /^\*Conditions:\* /m);
-    assert.match(brief, /^h3\. Macro signals$/m);
+    assert.match(brief, /^h3\. The readings$/m);
     assert.match(brief, /^\* Chicago Fed National Financial Conditions Index: /m);
     assert.match(brief, /^Source: \[https:\/\/fred\.stlouisfed\.org\|https:\/\/fred\.stlouisfed\.org\]$/m);
     assert.doesNotMatch(brief, /^## /m);
@@ -44,25 +44,26 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /Funding pressure:\*\* 12/);
     assert.match(brief, /Risk appetite:\*\* 68/);
-    assert.match(brief, /Base rate:\*\* 3\.75% \(1M\)/);
-    assert.match(brief, /Curve slope:\*\* 0\.55%/);
+    assert.match(brief, /Short-term borrowing rate:\*\* 3\.75% \(1M\)/);
+    assert.match(brief, /Recession warning gauge \(10-year minus 2-year rate\):\*\* 0\.55%/);
   });
 
-  it("prefers the modeled posture label over the raw regime name", () => {
+  it("prints the modeled label and never the engine key beside it", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros, {
       postureWithStageLabel: "Sunny — Late",
       confidenceLabel: "HIGH",
     });
 
     assert.match(brief, /\*\*Conditions:\*\* Sunny — Late/);
-    assert.match(brief, /\*\*Regime:\*\* EXPANSION/);
+    // A ticket is read by a whole team; the engine key is for the JSON routes.
+    assert.doesNotMatch(brief, /Regime:|EXPANSION/);
     assert.match(brief, /HIGH confidence/);
   });
 
-  it("stamps score-based confidence when no confidence label is modeled", () => {
+  it("stamps what confidence measures when no confidence label is modeled", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /Score-based posture confidence/);
+    assert.match(brief, /Confidence: how far the scores sit from the line that changes the call/);
   });
 
   it("produces identical bytes for Jira and Linear, which both consume markdown", () => {

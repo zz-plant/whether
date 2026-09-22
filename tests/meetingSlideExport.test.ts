@@ -57,7 +57,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     const payload = extractMeetingSlidePayload(snapshot, "seed");
     const markdown = formatMeetingSlideMarkdown(payload);
 
-    assert.ok(markdown.includes("> **Whether Weekly Operating Stance**"));
+    assert.ok(markdown.includes("> **Whether: this week's call**"));
     assert.ok(markdown.includes("ACTION NOW"));
     assert.ok(markdown.includes("PAUSE IF"));
     assert.ok(markdown.includes("CHANGE COURSE IF"));

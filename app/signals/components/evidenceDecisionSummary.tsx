@@ -57,7 +57,7 @@ export const SignalsDecisionSummarySection = ({
           </div>
           <p className="mt-2 text-sm font-semibold text-slate-100">
             {actionNowShort ??
-              "Hold the current operating posture while thresholds hold."}
+              "Keep this week's call while the scores stay inside their lines."}
           </p>
         </div>
         <div className="rounded-md border border-slate-800/80 bg-slate-950/45 px-3 py-3">
@@ -80,8 +80,8 @@ export const SignalsDecisionSummarySection = ({
             </>
           ) : (
             <p className="mt-2 text-sm text-slate-200">
-              Review the scorecard below to confirm the main driver before you
-              change posture.
+              Read the scorecard below to confirm the main driver before you
+              change the plan.
             </p>
           )}
         </div>

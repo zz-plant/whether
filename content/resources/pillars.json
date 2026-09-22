@@ -2,20 +2,20 @@
   {
     "slug": "capital-discipline-venture-backed-companies",
     "keyword": "capital discipline venture backed companies",
-    "title": "Capital Discipline Venture Backed Companies: A Board Operating System",
-    "description": "Capital discipline venture backed companies require governance rhythm, escalation thresholds, and reversible commitments. Use this board-ready operating system.",
-    "h1": "Capital Discipline Venture Backed Companies",
+    "title": "Capital Discipline for Venture-Backed Companies: A Board Operating System",
+    "description": "Venture-backed companies keep capital discipline with a governance rhythm, escalation thresholds, and reversible commitments. This guide is the board operating system for it.",
+    "h1": "Capital Discipline for Venture-Backed Companies",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": true,
     "cluster": "authority",
     "intent": "board",
-    "boardPackContext": "This canonical pillar anchors the parent topic and links every supporting governance artifact to board-level capital allocation decisions.",
+    "boardPackContext": "This is the parent guide. The framework and reversibility guides below build on it.",
     "midpointCtaLabel": "Download the Capital Posture Template",
     "sections": [
       {
         "heading": "Why capital discipline now defines board credibility",
         "paragraphs": [
-          "Boards of venture-backed companies are no longer judged on aspiration alone. They are judged on whether capital translates into durable learning, measurable resilience, and disciplined sequencing of risk. Capital discipline venture backed companies treat every dollar as a strategic commitment with an expected information return, not merely an expense line.",
+          "Boards of venture-backed companies are no longer judged on aspiration alone. They are judged on whether capital translates into durable learning, measurable resilience, and disciplined sequencing of risk. Venture-backed companies with capital discipline treat every dollar as a commitment that should return information, not merely an expense line.",
           "In the previous growth era, velocity often masked governance defects. Teams could grow into mistakes, refinance uncertainty, and explain misses as temporary market noise. When capital tightens, that pattern inverts. The same governance weaknesses now surface as runway compression, delayed decision quality, and reactive cuts that damage capability at the worst possible moment.",
           "A board-facing capital discipline model must therefore do three things: set a decision cadence, define thresholds for intervention, and preserve reversibility wherever possible. Without those mechanics, leadership teams oscillate between overconfidence and panic. With those mechanics, the organization can operate through volatility while preserving strategic optionality."
         ],
@@ -31,7 +31,7 @@
             "heading": "H3: The compounding cost of ambiguous commitments",
             "paragraphs": [
               "Ambiguous commitments create hidden liabilities: multi-quarter headcount burdens, vendor lock-in, go-to-market promises that outpace product readiness, and architecture decisions that degrade agility. These liabilities rarely appear in a single board packet. They emerge as a portfolio of constrained options.",
-              "Capital discipline venture backed companies treat ambiguity as risk debt. They force commitment taxonomy into planning: reversible, partially reversible, and irreversible. That taxonomy should appear in investment proposals, monthly operating reviews, and board-level governance check-ins."
+              "Venture-backed companies with capital discipline treat ambiguity as risk debt. They force commitment taxonomy into planning: reversible, partially reversible, and irreversible. That taxonomy should appear in investment proposals, monthly operating reviews, and board-level governance check-ins."
             ]
           }
         ]
@@ -65,7 +65,7 @@
         "paragraphs": [
           "Discipline is mostly a sequencing problem. Teams fail not because they invest, but because they invest out of order. Governance should prioritize commitments that increase information quality before commitments that increase fixed cost exposure.",
           "A practical sequencing hierarchy for venture-backed boards begins with resilience-preserving moves, then evidence-generating experiments, then scalable commitments. This order prevents the common trap of scaling assumptions before the assumptions are tested.",
-          "Capital discipline venture backed companies convert strategic goals into tranche-based commitments. Instead of approving a full-year spend envelope for a single thesis, boards approve staged releases tied to observable milestones."
+          "Venture-backed companies with capital discipline convert strategic goals into tranche-based commitments. Instead of approving a full-year spend envelope for a single thesis, boards approve staged releases tied to observable milestones."
         ],
         "subsections": [
           {
@@ -199,7 +199,7 @@
           "What is the first action if we are wrong? High-quality proposals include immediate containment steps and communication sequences, not only upside narratives.",
           "Which prior decision from our archive is most comparable, and what lesson has been encoded into this proposal? Governance maturity compounds through explicit historical learning.",
           "What would we stop funding if this initiative requires additional capital beyond current assumptions? Trade-off clarity is a hallmark of true capital discipline.",
-          "Have we attached conversion instrumentation to requested artifacts and CTAs so governance resources translate into measurable operator adoption? Adoption signals determine whether content and frameworks influence behavior."
+          "Have we checked whether the operating team actually uses these documents? A framework nobody opens is not governing anything."
         ]
       }
     ]
@@ -214,7 +214,7 @@
     "parentTopic": false,
     "cluster": "authority",
     "intent": "board",
-    "boardPackContext": "This supporting pillar extends the parent topic by converting posture concepts into a board-operable framework and artifact cadence.",
+    "boardPackContext": "This guide turns the capital discipline principles into a framework and a monthly set of documents a board can run.",
     "midpointCtaLabel": "Request a Board Pack Walkthrough",
     "sections": [
       {
@@ -411,7 +411,7 @@
           "What is the first action if we are wrong? High-quality proposals include immediate containment steps and communication sequences, not only upside narratives.",
           "Which prior decision from our archive is most comparable, and what lesson has been encoded into this proposal? Governance maturity compounds through explicit historical learning.",
           "What would we stop funding if this initiative requires additional capital beyond current assumptions? Trade-off clarity is a hallmark of true capital discipline.",
-          "Have we attached conversion instrumentation to requested artifacts and CTAs so governance resources translate into measurable operator adoption? Adoption signals determine whether content and frameworks influence behavior."
+          "Have we checked whether the operating team actually uses these documents? A framework nobody opens is not governing anything."
         ]
       },
       {
@@ -434,7 +434,7 @@
     "parentTopic": false,
     "cluster": "authority",
     "intent": "board",
-    "boardPackContext": "This supporting pillar explains how reversibility standards become board-level control logic linked to capital posture and escalation practices.",
+    "boardPackContext": "This guide explains how a reversibility standard becomes a board control, tied to thresholds and escalation.",
     "midpointCtaLabel": "Download Reversibility Governance Template",
     "sections": [
       {
@@ -624,11 +624,11 @@
           "What is the first action if we are wrong? High-quality proposals include immediate containment steps and communication sequences, not only upside narratives.",
           "Which prior decision from our archive is most comparable, and what lesson has been encoded into this proposal? Governance maturity compounds through explicit historical learning.",
           "What would we stop funding if this initiative requires additional capital beyond current assumptions? Trade-off clarity is a hallmark of true capital discipline.",
-          "Have we attached conversion instrumentation to requested artifacts and CTAs so governance resources translate into measurable operator adoption? Adoption signals determine whether content and frameworks influence behavior."
+          "Have we checked whether the operating team actually uses these documents? A framework nobody opens is not governing anything."
         ]
       },
       {
-        "heading": "Closing note: reversibility as board confidence infrastructure",
+        "heading": "Closing note: why a board trusts a decision it can undo",
         "paragraphs": [
           "Reversibility as governance should be treated as confidence infrastructure. It allows boards to authorize learning without surrendering control and to intervene quickly without destabilizing execution.",
           "When reversibility is institutionalized, teams become more candid about uncertainty because correction pathways are clear. Candor improves signal quality and keeps capital posture aligned with reality rather than optimism.",

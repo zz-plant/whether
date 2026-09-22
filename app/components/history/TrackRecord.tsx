@@ -3,6 +3,8 @@ import type {
   TrackRecordRow,
 } from "../../../lib/report/trackRecord";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
+import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
 import { UrlDetails } from "../ui/urlDetails";
 
 /**
@@ -48,7 +50,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
       <tr className="border-b border-slate-800/80 text-slate-400">
         <th scope="col" className="py-2 pr-3 font-medium">Month</th>
         <th scope="col" className="py-2 pr-3 font-medium">Call</th>
-        <th scope="col" className="py-2 pr-3 text-right font-medium">Latitude</th>
+        <th scope="col" className="py-2 pr-3 text-right font-medium">{OPERATING_LATITUDE_LABEL}</th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
     </thead>
@@ -138,7 +140,7 @@ export function TrackRecord({
           </dd>
         </div>
         <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-          <dt className="text-slate-400">Regime changes</dt>
+          <dt className="text-slate-400">Call changes</dt>
           <dd className="mt-1 text-lg font-bold text-slate-100">{changeRate}</dd>
         </div>
         <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
@@ -157,9 +159,9 @@ export function TrackRecord({
       <p className="text-fluid-xs text-slate-400">
         Through {formatDateUTC(record.latestRecordDate)}, the month-end call had been{" "}
         <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
-        since {formatDateUTC(record.currentHoldStartDate)}.
-        Hysteresis in the scoring means a single noisy month cannot flip it, so a held call is the
-        expected state and a change is the event worth reading.
+        since {formatDateUTC(record.currentHoldStartDate)}.{" "}
+        {CALL_CHANGE_RULE} One noisy month cannot move it, so a held call is the usual state and a
+        change is the event worth reading.
       </p>
 
       {/* The tiles and the held-since line are the record; the month-by-month
@@ -179,11 +181,11 @@ export function TrackRecord({
         }
       >
         {/* No min-width and no horizontal scroll: the delta folds into the
-            Boldness cell below sm rather than sitting off-screen. */}
+            latitude cell below sm rather than sitting off-screen. */}
         <div className="mt-3 space-y-4">
           <RecordTable
             rows={record.rows}
-            caption={`The ${record.rows.length} most recent monthly operating calls, newest first, with the boldness score behind each call.`}
+            caption={`The ${record.rows.length} most recent monthly calls, newest first, with the operating latitude score behind each call.`}
           />
           {earlierRows.length > 0 ? (
             <div>
@@ -193,7 +195,7 @@ export function TrackRecord({
               </p>
               <RecordTable
                 rows={earlierRows}
-                caption="The remainder of the monthly operating call history, newest first."
+                caption="The remainder of the monthly call history, newest first."
               />
             </div>
           ) : null}

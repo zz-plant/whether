@@ -26,7 +26,7 @@ export function CalibrationCurveGlyph({
       {...props}
     >
       <title>Empirical Calibration Distribution</title>
-      <desc>Validation curve mapping predicted regime boundary distance to observed hold rate</desc>
+      <desc>How often the call held, by how far the scores sat from the line that changes it</desc>
 
       {/* Outer frame */}
       <rect

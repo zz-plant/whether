@@ -10,6 +10,7 @@
  * they take the plan text and the verdicts already computed above them.
  */
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
+import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { isBusinessModel, type CompanyFinancialProfile, type PlanComparisonResult, type PlanStressTestResult } from "../../../lib/decisionShield";
 import type { OperatorProfile } from "../../../lib/operatorProfile";
 
@@ -42,7 +43,7 @@ export function PlanStressTestMode({
               <div>
                 <h4 className="text-sm font-bold text-slate-100">Plan stress test</h4>
                 <p className="text-fluid-xs text-slate-400">
-                  Paste any planned hiring, infra, or contract decision. Tested against live macro tightness &amp; curve slope.
+                  Paste any planned hiring, infra, or contract decision. Checked against this week&apos;s funding pressure and the yield curve.
                 </p>
               </div>
             </div>
@@ -123,7 +124,7 @@ export function PlanStressTestMode({
               </div>
 
               <div className="space-y-1.5">
-                <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">Fragile Assumptions Identified:</p>
+                <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">What this plan assumes</p>
                 <ul className="space-y-1">
                   {stressTestResult.fragileAssumptions.map((assumption, idx) => (
                     <li key={idx} className="text-fluid-xs text-amber-200/90 flex items-start gap-1.5">
@@ -136,11 +137,11 @@ export function PlanStressTestMode({
 
               <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-2 gap-3">
                 <div>
-                  <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">Bounded Guardrail:</p>
+                  <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">{publicDecisionLabels.threshold}</p>
                   <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
                 </div>
                 <div>
-                  <p className="text-fluid-nano text-sky-400 uppercase font-semibold tracking-wider">Macro-Safe Staging Compromise:</p>
+                  <p className="text-fluid-nano text-sky-400 uppercase font-semibold tracking-wider">A more reversible version</p>
                   <p className="text-fluid-xs text-sky-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
                 </div>
               </div>
@@ -174,7 +175,7 @@ export function ComparePlansMode({
             <div>
               <h4 className="text-sm font-bold text-slate-100">Compare two plans</h4>
               <p className="text-fluid-xs text-slate-400">
-                Audit two alternative initiatives to determine which path carries lower macro vulnerability.
+                Describe two plans. The one that holds up better in this week&apos;s conditions is named below.
               </p>
             </div>
 
@@ -227,7 +228,7 @@ export function ComparePlansMode({
             <div className="p-3.5 bg-sky-950/30 border border-sky-500/30 rounded-lg flex items-center justify-between" aria-live="polite">
               <span className="text-fluid-xs text-sky-300 font-semibold">
                 {comparisonReady
-                  ? `🏆 Recommendation: ${comparisonResult.comparativeRecommendation}`
+                  ? `Recommendation: ${comparisonResult.comparativeRecommendation}`
                   : "Describe both plans to compare them."}
               </span>
             </div>

@@ -279,9 +279,9 @@ export const buildInterpretationLayer = ({
       ForecastModel["boundaryPressure"]["momentum"],
       string
     > = {
-      "toward-threshold": "Momentum is moving toward a posture boundary.",
+      "toward-threshold": "Momentum is moving toward the line that changes the call.",
       "away-from-threshold":
-        "Momentum is moving away from the nearest posture boundary.",
+        "Momentum is moving away from the line that changes the call.",
       mixed: "Momentum is mixed across boundary signals.",
       stable: "Momentum is stable with no directional boundary drift.",
     };

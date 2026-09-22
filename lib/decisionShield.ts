@@ -370,16 +370,16 @@ export const stressTestDecisionPlan = (
       verdict = "DANGEROUS";
       verdictDriver = "RUNWAY";
       fragileAssumptions.push(
-        `Critical runway constraint: With only ${profile.runwayMonths} months cash buffer, capital markets in ${regimeLabel} severely penalize refinancing.`
+        `With under ${RUNWAY_CRITICAL_MONTHS} months of cash, raising in ${regimeLabel} conditions is hard.`
       );
       financialImpactSummary = `Runway of ${profile.runwayMonths} months is under the ${RUNWAY_CRITICAL_MONTHS}-month line this rule uses for ${regimeLabel} conditions.`;
     } else if (profile.businessModel === "BOOTSTRAPPED" && profile.grossMarginPct && profile.grossMarginPct >= 70) {
       if (verdict === "RISKY") {
         verdict = "SAFE";
       }
-      financialImpactSummary = `Bootstrapped profile with high gross margins (${profile.grossMarginPct}%) mitigates external equity market tightness.`;
+      financialImpactSummary = `Bootstrapped with ${profile.grossMarginPct}% gross margin, so tighter funding matters less.`;
     } else if (profile.runwayMonths !== undefined) {
-      financialImpactSummary = `Runway buffer (${profile.runwayMonths}m) evaluated against ${regimeLabel} posture baseline.`;
+      financialImpactSummary = `Runway of ${profile.runwayMonths} months, read against ${regimeLabel} conditions.`;
     }
   }
 
@@ -419,14 +419,14 @@ export const stressTestDecisionPlan = (
     } else if (runwayShare.share >= COMMITMENT_SHARE_ELEVATED) {
       verdict = adjustVerdict(verdict, "up");
       verdictDriver = "SIZE";
-      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — over the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line, so the call is one step harsher than the regime alone would give.`;
+      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — over the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line, so the call is one step harsher than conditions alone would give.`;
     } else {
       sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis}, under the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line that would move the call.`;
     }
   } else if (commitment.annualUsd !== null) {
-    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash or monthly burn — without one the verdict is the regime's alone.`;
+    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash or monthly burn — without one the verdict rests on conditions alone.`;
   } else {
-    sizingNote = "No amount in the plan, so this is graded on posture only. Add a figure to size it against your cash.";
+    sizingNote = "No amount in the plan, so this is graded on conditions only. Add a figure to size it against your cash.";
   }
 
   if (tightness > 60 && profile?.businessModel !== "BOOTSTRAPPED") {
@@ -436,17 +436,17 @@ export const stressTestDecisionPlan = (
   }
   if (curveSlope !== null && curveSlope < 0) {
     fragileAssumptions.push(
-      `Assumes steady customer procurement velocity despite inverted yield curve (${curveSlope.toFixed(2)}%), which historically stretches enterprise sales cycles.`
+      `Assumes customers keep buying at the same pace with the yield curve inverted (${curveSlope.toFixed(2)}%), which has stretched sales cycles before.`
     );
   }
   if (riskAppetite < 50) {
     fragileAssumptions.push(
-      `Assumes investor and market risk tolerance supports aggressive capital burn (current risk appetite is subdued at ${riskAppetite}/100).`
+      `Assumes investors will fund fast burn while risk appetite is low (${riskAppetite}/100).`
     );
   }
   if (fragileAssumptions.length === 0) {
     fragileAssumptions.push(
-      `Macro conditions are relatively accommodative, but monitor sudden Fed base rate shifts above ${baseRate.toFixed(2)}%.`
+      `Funding is loose now; watch for the short-term borrowing rate moving above ${baseRate.toFixed(2)}%.`
     );
   }
 
@@ -459,7 +459,7 @@ export const stressTestDecisionPlan = (
       "Avoid multi-year upfront reservations; use 6-to-12 month convertible commitments or monthly rolling tiers to preserve liquidity.";
   } else if (category === "PRICING") {
     reversibleAlternative =
-      "Condition discounts strictly on 100% annual upfront cash collection to generate non-dilutive working capital.";
+      "Give a discount only for the full year paid upfront, so it brings in cash you don't have to raise.";
   } else if (category === "ROADMAP") {
     reversibleAlternative =
       "Stage the technical refactor in 2-week vertical slices rather than a monolithic multi-month lock-in.";
@@ -515,13 +515,13 @@ export const compareDecisionPlans = (
 
   if (scoreA > scoreB) {
     preferredPlan = "A";
-    comparativeRecommendation = `Plan A (${planA.verdict}) carries significantly lower macro risk than Plan B (${planB.verdict}) under current ${REGIME_LABELS[assessment.regime]} posture.`;
+    comparativeRecommendation = `Plan A (${planA.verdict}) holds up better than Plan B (${planB.verdict}) in ${REGIME_LABELS[assessment.regime]} conditions.`;
   } else if (scoreB > scoreA) {
     preferredPlan = "B";
     comparativeRecommendation = `Plan B (${planB.verdict}) is structurally safer than Plan A (${planA.verdict}) by preserving higher reversibility.`;
   } else {
     preferredPlan = "TIE";
-    comparativeRecommendation = `Both plans carry equivalent macro risk profiles (${planA.verdict}). Prioritize the option with shorter commitment duration.`;
+    comparativeRecommendation = `Both plans grade ${planA.verdict}. Prefer the one with the shorter commitment.`;
   }
 
   return {

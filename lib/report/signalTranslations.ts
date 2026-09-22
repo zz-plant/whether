@@ -272,8 +272,8 @@ export const PLAIN_ENGLISH_SUBSTITUTIONS: TermSubstitution[] = [
   { pattern: /\bEXPANSION\b/g, replacement: "Sunny" },
   // Bare terms last.
   { pattern: /\btightness\b/gi, replacement: "funding pressure" },
-  { pattern: /\bregime\b/gi, replacement: "operating environment" },
-  { pattern: /\bposture\b/gi, replacement: "operating stance" },
+  { pattern: /\bregime\b/gi, replacement: "conditions" },
+  { pattern: /\bposture\b/gi, replacement: "call" },
 ];
 
 export const applyPlainEnglishSubstitutions = (text: string): string => {

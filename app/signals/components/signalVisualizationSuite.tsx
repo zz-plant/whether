@@ -173,7 +173,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     .filter((point): point is { x: number; y: number; key: string } => typeof point.x === "number" && typeof point.y === "number");
   // This panel always plots monthly data, but it used to borrow rateMin/rateMax
   // and spreadMin/spreadMax from `points` — which follow the cadence toggle. So
-  // switching the Rate stack to weekly or yearly silently rescaled this chart
+  // switching the rates chart to weekly or yearly silently rescaled this chart
   // from a different aggregation, sliding every dot and pushing some outside the
   // viewBox entirely. Its domain now comes from its own data.
   const scatterXs = monthlyScatter.map((point) => point.x);
@@ -238,20 +238,19 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     <section id="visual-diagnostics" className="min-w-0 space-y-4" aria-labelledby="visual-diagnostics-title">
       <header className="space-y-2">
         <p className="text-xs font-semibold tracking-[0.22em] text-slate-300">Visual diagnostics</p>
-        <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">Yield-curve terminal</h2>
-        <p className="text-sm text-slate-300">Cleaner one-screen view: 5 panels, minimal framing.</p>
+        <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">Yield curve</h2>
       </header>
 
       <Collapsible.Root open={terminalOpen} onOpenChange={setTerminalOpen} className="group rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
         <Collapsible.Trigger className="flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
-          <span>One-screen terminal · 5 chart panels</span>
+          <span>Five charts</span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-slate-700/70 text-slate-400 transition-transform data-[panel-open]:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
         </Collapsible.Trigger>
 
         <Collapsible.Panel>
 
         <div className="mt-3 border-b border-slate-800/80 pb-3 text-xs text-slate-300">
-          YCURVE | Last: {treasury.record_date} | Live/Cache: {treasury.isLive ? "Live" : "Cache"}
+          Latest: {treasury.record_date} · {treasury.isLive ? "Live reading" : "Last saved reading"}
         </div>
 
         {/* Five panels labelled entirely in maturities and spreads. The key goes
@@ -263,16 +262,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
         <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-12">
           <FlatPanel className="lg:col-span-12">
-            <PanelTitle title="1) Curve signal ribbon" subtitle="One block per period. Green = normal, Amber = flattening, Red = inverted (recession warning)." />
+            <PanelTitle title="1) Recession warning gauge over time" subtitle="One block per period. Green = normal, Amber = flattening, Red = inverted (recession warning)." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.curveSignal)}`} title={`${point.label}: ${formatPercent(point.curveSignal)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
-            <p className="mono text-xs text-slate-300">Latest curve signal: {formatPercent(latest?.curveSignal ?? null)}</p>
+            <p className="mono text-xs text-slate-300">Latest: {formatPercent(latest?.curveSignal ?? null)}</p>
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <PanelTitle title="2) Rate stack" subtitle="What the government pays to borrow, by how long it is borrowing for." />
+              <PanelTitle title="2) Rates by term" subtitle="What the government pays to borrow, by how long it is borrowing for." />
               <div className="inline-flex max-w-full flex-wrap rounded-md bg-slate-900/70 p-1">
                 {(["weekly", "monthly", "yearly"] as Cadence[]).map((option) => (
                   <button
@@ -286,7 +285,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 ))}
               </div>
             </div>
-            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="1M, 3M, 2Y and 10Y rate stack">
+            <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="1-month, 3-month, 2-year and 10-year rates">
               {[...oneMonthSeries.missingColumns, ...threeMonthSeries.missingColumns, ...twoYearSeries.missingColumns, ...tenYearSeries.missingColumns].map((column, index) => (
                 <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
@@ -434,7 +433,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
-            <PanelTitle title="5) Shock ladder" subtitle="The weeks the two-year and ten-year rates moved most, largest first." />
+            <PanelTitle title="5) Biggest weekly rate moves" subtitle="The weeks the two-year and ten-year rates moved most, largest first." />
             <ul className="space-y-1 text-xs text-slate-200">
               {topShocks.length ? (
                 topShocks.map((shock) => (
@@ -443,7 +442,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   </li>
                 ))
               ) : (
-                <li className="text-slate-400">No historical deltas available.</li>
+                <li className="text-slate-400">No past weeks to compare.</li>
               )}
             </ul>
           </FlatPanel>

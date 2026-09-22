@@ -120,25 +120,25 @@ const buildOutageExitGate = ({
   const criteria: TrustExitGateCriterion[] = [
     {
       key: "live-mode",
-      label: "Live mode restored",
+      label: "Live data is back",
       met: !isFallback,
     },
     {
       key: "freshness",
-      label: "Fresh timestamp available",
+      label: "The reading carries a fresh timestamp",
       met: !freshnessUnavailable,
     },
     {
       key: "confidence",
-      label: "Confidence above LOW",
+      label: "Confidence is above low",
       met: !confidenceLow,
     },
   ];
   const metCount = criteria.filter((criterion) => criterion.met).length;
 
   return {
-    label: "Outage mode exits when 3/3 checks pass.",
-    summary: `${metCount}/${criteria.length} checks passed this refresh.`,
+    label: "The hold lifts once all three are true.",
+    summary: `${metCount} of ${criteria.length} are true on this refresh.`,
     metCount,
     totalCount: criteria.length,
     criteria,
@@ -147,19 +147,19 @@ const buildOutageExitGate = ({
 
 const ALLOWED_DETAILS: Record<TrustStatusTone, [string, string, string]> = {
   historical: [
-    "Retrospective analysis and scenario planning only.",
-    "Weekly pacing changes until live data loads.",
-    "New fixed cost approvals.",
+    "Reading a past week and testing a plan against it.",
+    "Any change to this week's plan, until you are back on the current week.",
+    "New fixed-cost commitments.",
   ],
   warning: [
-    "Reversible adjustments inside existing guardrails.",
-    "Headcount expansion or multi-quarter vendor commitments.",
-    "Irreversible approvals until one verified live refresh.",
+    "Changes you can undo, inside the pause lines already set.",
+    "New hires and multi-quarter vendor contracts.",
+    "Anything you can't undo, until one live refresh lands.",
   ],
   stable: [
-    "Standard weekly approvals under the current call.",
-    "No additional holds while trust remains stable.",
-    "No outage-specific blocks in this state.",
+    "This week's normal approvals under the current call.",
+    "Nothing extra.",
+    "Nothing.",
   ],
 };
 
@@ -260,8 +260,8 @@ export const buildTrustWarnings = ({
   if (staleSignal) {
     warnings.push({
       id: "stale-cached",
-      warning: "Stale snapshot: live signal freshness is degraded.",
-      mitigationCheck: "Confirm next live update before approving big bets.",
+      warning: "No live reading: this is a cached snapshot.",
+      mitigationCheck: "Wait for the next live update before approving anything you can't undo.",
     });
   }
 
@@ -272,16 +272,16 @@ export const buildTrustWarnings = ({
   ) {
     warnings.push({
       id: "boundary-whipsaw",
-      warning: "Boundary whipsaw: call is near a flip threshold with unstable weekly motion.",
-      mitigationCheck: "Require one confirming week before escalating fixed-cost commitments.",
+      warning: "The call sits near a line and the scores moved both ways this week.",
+      mitigationCheck: "Wait for one more week that reads the same way before adding fixed costs.",
     });
   }
 
   if (anomalySignals.length >= 2) {
     warnings.push({
       id: "anomaly-divergence",
-      warning: "Signal divergence: multiple anomalies may overstate this week's directional call.",
-      mitigationCheck: "Cross-check anomalous inputs against source-level sources before changing pace.",
+      warning: "Two or more inputs read as outliers this week, so the direction may be overstated.",
+      mitigationCheck: "Check those inputs against the source pages before changing pace.",
     });
   }
 
@@ -297,7 +297,8 @@ export const buildWeeklyTrustCueLine = ({
   freshnessLabel: string;
   transitionWatch: "ON" | "OFF";
 }) => {
-  return `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Regime shift watch ${transitionWatch}`;
+  const changeWatch = transitionWatch === "ON" ? "The call could change next week" : "The call is not close to changing";
+  return `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
 };
 export const buildCompactTrustSummary = ({
   confidenceLabel,
@@ -313,18 +314,18 @@ export const buildCompactTrustSummary = ({
   const normalizedFreshness = normalizeFreshnessLabel(freshnessLabel);
 
   if (isHistoricalSelection) {
-    return `Historical snapshot (${normalizedFreshness}) — retrospectives only, not live approvals.`;
+    return `Historical snapshot (${normalizedFreshness}). A past week, not this one; do not treat it like this week's.`;
   }
 
   if (isFallbackSnapshot) {
-    return `Cached snapshot (${normalizedFreshness}) — safe for planning, wait for live update before big bets.`;
+    return `Cached snapshot (${normalizedFreshness}). Live data is late; hold anything you can't undo until it lands.`;
   }
 
   if (confidenceLabel !== "HIGH") {
-    return `Confidence ${confidenceLabel} (${normalizedFreshness}) — stage approvals until confidence returns to HIGH.`;
+    return `Confidence ${confidenceLabel} (${normalizedFreshness}). Hold anything you can't undo until confidence is back to high.`;
   }
 
-  return `Confidence ${confidenceLabel} (${normalizedFreshness}) — safe for near-term operating decisions.`;
+  return `Confidence ${confidenceLabel} (${normalizedFreshness}). Fine to act on this week.`;
 };
 
 /**
@@ -351,8 +352,8 @@ type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
  */
 const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
-  partlyCached: "Some sources are cached. Stage decisions; do not commit until every source is current.",
-  cachedSnapshot: "Cached snapshot. Stage decisions; do not lock hiring, spend or vendor commitments until live data returns.",
+  partlyCached: "Some sources are cached. Hold anything you can't undo until every source is current.",
+  cachedSnapshot: "Live data is late. Keep last week's plan; hold new hires, spend and vendor contracts until it returns.",
   historical: "Historical snapshot. Compare against the live read before changing current plans.",
 };
 
@@ -441,15 +442,23 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "historical",
-      detail: "Historical snapshot. Not for live approvals.",
+      detail: "Historical snapshot. A past week, not this one.",
     };
   }
 
-  if (confidenceLabel === "LOW" || freshnessWeak) {
+  if (freshnessWeak) {
     return {
       label: "Hold",
       tone: "warning",
-      detail: "Keep current operations running. Pause new hires, vendor contracts, or capital commitments until fresh data arrives.",
+      detail: "Live data is late. Keep last week's plan; anything you can't undo can wait for it.",
+    };
+  }
+
+  if (confidenceLabel === "LOW") {
+    return {
+      label: "Hold",
+      tone: "warning",
+      detail: "The call sits close to a line. Keep last week's plan; anything you can't undo can wait for a clearer reading.",
     };
   }
 
@@ -457,7 +466,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Act with caution",
       tone: "warning",
-      detail: `Policy override: ${policyRefusalReasons[0] ?? "signals disagree or data gaps prevent a posture change"}. Keep approvals reversible.`,
+      detail: `The call is held this week: ${policyRefusalReasons[0] ?? "the two scores point in different directions."} Keep approvals reversible.`,
     };
   }
 
@@ -465,14 +474,16 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Act with caution",
       tone: "warning",
-      detail: `Use weekly call for careful moves. Gate big bets until confidence rises from ${confidenceLabel} (${normalizedFreshness}).`,
+      detail: isFallbackSnapshot
+        ? `Cached reading (${normalizedFreshness}). Act on moves you can undo; hold the rest until live data returns.`
+        : `Confidence is medium (${normalizedFreshness}). Act on moves you can undo; hold the rest until it is high.`,
     };
   }
 
   return {
     label: "Act",
     tone: "stable",
-    detail: `Live data (${normalizedFreshness}) and HIGH confidence support this week's approvals.`,
+    detail: `Live data (${normalizedFreshness}) and high confidence. Nothing here argues for holding back this week.`,
   };
 };
 
@@ -487,7 +498,7 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Posture ${statusLabel} · Confidence ${confidenceLabel} · Decision as-of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Call ${statusLabel} · Confidence ${confidenceLabel} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
 
 export const buildTrustStatus = ({
   historicalSelection,
@@ -534,23 +545,23 @@ export const buildTrustStatus = ({
       ? "Using cached data"
       : policyRefusalActive
         ? "Live data, but signals unstable"
-      : "Live • Treasury verified";
+      : "Live · all sources answered";
 
   const detail = historicalSelection
-    ? `Retrospective only — not for live decisions.${historicalMacroCoverageDetail}`
+    ? `A past week, not this one — not for live decisions.${historicalMacroCoverageDetail}`
     : isFallback
-      ? `Data sources are delayed. Stage decisions, don't commit until live data returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
+      ? `Live data is late; this is a cached reading. Keep last week's plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
       : policyRefusalActive
-        ? `Live data is available, but recent signals are too contradictory to recommend a posture change. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
-      : "All signals aligned. Proceed with normal approvals.";
+        ? `Live data is in, but the two scores point in different directions, so the call is not changing this week. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
+      : "Every source answered and nothing here argues for holding back this week.";
 
   const action = historicalSelection
     ? `${historicalAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: switch to current live data before changing spending pace.`
     : isFallback
-      ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: live data updates and verifies across all sources.`
+      ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: live data returns from every source.`
       : policyRefusalActive
-        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: signals reconcile and the contradictions resolve.`
-      : `${stableAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: confidence remains above LOW or transition risk drops.`;
+        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: the two scores point the same way again.`
+      : `${stableAction} ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: confidence drops to low or the call moves within reach of a line.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"
@@ -565,12 +576,12 @@ export const buildTrustStatus = ({
   });
 
   const outageWindow = historicalSelection
-    ? "Retrospective only. Not for live approvals."
+    ? "A past week. Not for live approvals."
     : isFallback
-      ? "Safe for reversible moves only until a live update lands."
+      ? "Only moves you can undo, until a live update lands."
       : policyRefusalActive
-        ? "Safe for staged moves only until policy signals clear."
-      : "Use this live read for this week's approvals; apply the thresholds shown in the current call.";
+        ? "Only moves you can undo, until the two scores agree."
+      : "Use this live reading for this week's approvals; the pause lines in the call apply.";
 
   const outageExitGate = buildOutageExitGate({
     isFallback,

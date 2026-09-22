@@ -88,7 +88,7 @@ describe("published brief date-pinned exports", () => {
     assert.ok(email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: No flip condition is tripped yet.`));
 
     // Area decisions
-    assert.match(email, /• Product tempo: Speed up product work tied to activation and retention goals\./);
+    assert.match(email, /• Roadmap: Speed up product work tied to activation and retention goals\./);
     assert.match(email, /- Action: Speed up on product bets/);
     assert.match(email, /- Pause if: Pause long-payback bets/);
     assert.match(email, /- Resume when: Resume tempo on deferred bets/);

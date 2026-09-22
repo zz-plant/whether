@@ -54,8 +54,8 @@ export function EmbedBuilder() {
             Add a live brief to a newsletter, wiki or dashboard
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
-            Embed a live US macro brief in any newsletter or webpage. Readers get the current
-            operating call, bounded decisions, and flip watch — updated automatically every week.
+            Embed the live brief in any newsletter or webpage. Readers get this week&apos;s call, what to do
+            now, and what would change it — updated automatically every week.
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export function EmbedBuilder() {
             {[
               { step: "Copy", desc: "Paste the snippet into your newsletter HTML or website. No API key needed." },
               { step: "Customise", desc: "Optional: pick a ticker and company stage that fits your audience." },
-              { step: "Publish", desc: "The brief updates automatically every week. Fresh posture, zero maintenance." },
+              { step: "Publish", desc: "The brief updates automatically every week. Nothing to maintain." },
             ].map((item) => (
               <div key={item.step} className="weather-card">
                 <p className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-300">{item.step}</p>

@@ -51,13 +51,13 @@ export default function AboutPage() {
       <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
         <p className="text-sm text-slate-300">
-          Whether turns public macro signals into a weekly operating posture for startup and product leaders. Each
-          week it answers three things: what should change right now, how sure we are, and what would flip the call.
+          Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
+          week it answers three things: what should change right now, how sure we are, and what would change the call.
         </p>
         <p className="text-sm text-slate-300">
-          It is not a macro blog and not a prediction engine. Every call is bounded — an action, the threshold that
-          triggers it, and the condition that reverses it — so a team can act on it and revisit it later without
-          re-litigating the reasoning.
+          It is not a macro blog and not a prediction engine. Every call comes as an action, the line that pauses it,
+          and the condition that resumes it, so you can act on it and revisit it later without re-arguing the
+          reasoning.
         </p>
         <div className="pt-2">
           <OperatingLoopGlyph variant="detailed" />
@@ -75,22 +75,22 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
         <p className="text-sm text-slate-300">
-          Whether reads public data from FRED across six signal families — Treasury yields, credit spreads,
-          inflation, labor, financial conditions, and volatility — and scores them into one of four operating
-          regimes. The two numbers the brief leads with are built from the Chicago Fed financial conditions
+          Whether reads public data from the St. Louis Fed (FRED) across six signal families — Treasury yields, credit
+          spreads, inflation, labor, financial conditions, and volatility — and scores them into one of four
+          conditions: Sunny, Cloudy, Stormy or Freezing. The two numbers the brief leads with are built from the Chicago Fed financial conditions
           index and the VIX, not from the yield curve alone.
         </p>
         <p className="text-sm text-slate-300">
           Startup-market inputs — funding velocity, layoff trend, SaaS multiples — come from a curated
           snapshot rather than a live feed, and every surface that uses them says so. The scoring formulas,
-          source list, refresh cadence, and stated limitations are published in full.
+          source list, refresh schedule, and stated limitations are published in full.
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <ActionLink href="/trust" variant="pill">
             Sources and formulas
           </ActionLink>
           <ActionLink href="/history" variant="pill">
-            Every past posture
+            Every past call
           </ActionLink>
         </div>
       </section>

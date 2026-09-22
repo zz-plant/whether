@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
 import {
   FREE_FOREVER_PROMISE,
+  PAID_PLANS_ON_SALE,
   findPricingPlan,
   formatMonthlyPrice,
   pricingPlans,
@@ -54,5 +56,19 @@ describe("pricing offer", () => {
 
   it("is reachable from navigation", () => {
     assert.ok(utilityLinks.some((link) => link.href === "/pricing"));
+  });
+
+  it("does not promise a reserved rate or an onboarding schedule while nothing is on sale", async () => {
+    // The cohort paragraph claims a reserved tier rate and priority onboarding.
+    // Both exist only once checkout is wired; until then a request records
+    // interest and nothing else, and the page has to say that instead.
+    const page = await import("../app/pricing/page");
+    const html = renderToStaticMarkup(page.default());
+    if (PAID_PLANS_ON_SALE) {
+      assert.match(html, /reserves your tier rate/);
+    } else {
+      assert.doesNotMatch(html, /reserves your tier rate|pilot organizations|priority onboarding/i);
+      assert.match(html, /cannot be bought yet/);
+    }
   });
 });

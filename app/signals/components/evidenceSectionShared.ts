@@ -14,7 +14,7 @@ const SIGNAL_LABEL_COPY: Record<string, string> = {
   "Regime timeline": "Past changes",
   "Macro source series": "Raw source data",
   "Threshold logic": "Watch lines",
-  "Time machine": "Past snapshots",
+  "Time machine": "Past months",
 };
 
 export const displaySignalLabel = (label: string) => SIGNAL_LABEL_COPY[label] ?? label;

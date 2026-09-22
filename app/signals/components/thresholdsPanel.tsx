@@ -1,6 +1,6 @@
 /**
- * Thresholds panel to tune capital posture classification and log overrides.
- * Keeps URL-driven state and audit trail visible for operators.
+ * Thresholds panel: move the lines the call is judged against, and keep the
+ * recent changes visible. The lines live in the URL so a shared link matches.
  */
 "use client";
 
@@ -161,13 +161,13 @@ export const ThresholdsPanel = ({
     {
       id: "balanced",
       label: "Standard",
-      detail: "Default guardrails aligned with baseline regime behavior.",
+      detail: "The published lines.",
       thresholds: appliedDefaults,
     },
     {
       id: "early-alert",
       label: "Sooner warnings",
-      detail: "Trip earlier so teams react sooner to tightening conditions.",
+      detail: "Lines closer to today's scores, so the call changes sooner.",
       thresholds: {
         baseRateTightness: 4.5,
         tightnessRegime: 48,
@@ -176,8 +176,8 @@ export const ThresholdsPanel = ({
     },
     {
       id: "strict",
-      label: "Harder to flip",
-      detail: "Require stronger moves before the posture label flips.",
+      label: "Slower to change",
+      detail: "Lines further out, so the call changes only on a bigger move.",
       thresholds: {
         baseRateTightness: 6,
         tightnessRegime: 56,
@@ -310,9 +310,9 @@ export const ThresholdsPanel = ({
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Watch-line settings"
-          title="Adjust when the regime label changes"
+          title="Adjust when the call changes"
           titleId="thresholds-title"
-          description="These values decide when the regime label changes. They stay in the URL so shared links match."
+          description="These values decide when the call changes. They stay in the URL so shared links match."
           aside={
             <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-xs font-semibold tracking-[0.1em] text-slate-200">
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
@@ -478,17 +478,17 @@ export const ThresholdsPanel = ({
                           How these thresholds work
                         </Popover.Title>
                         <Popover.Description className="mt-2 text-xs text-slate-400">
-                          Thresholds define when a score flips the posture label. Adjust them to
-                          reflect your risk tolerance, then share the URL for audit-ready review.
+                          These lines decide when a score changes the call. Move them to match your
+                          own risk tolerance, then share this link.
                         </Popover.Description>
                         <ul className="mt-3 space-y-2 text-xs text-slate-300">
                           <li className="flex gap-2">
                             <span className="text-slate-400">•</span>
-                            <span>Lower numbers mean earlier alerts and stricter guardrails.</span>
+                            <span>Lower numbers change the call sooner.</span>
                           </li>
                           <li className="flex gap-2">
                             <span className="text-slate-400">•</span>
-                            <span>Higher numbers delay changes until signals are extreme.</span>
+                            <span>Higher numbers wait for a bigger move.</span>
                           </li>
                         </ul>
                         <Popover.Close className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-sm border border-slate-800/70 px-3 py-2 text-fluid-micro font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100">
@@ -509,7 +509,7 @@ export const ThresholdsPanel = ({
                 type="button"
                 className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
               >
-                Audit trail (recent overrides)
+                Recent changes
               </Collapsible.Trigger>
               <Collapsible.Panel className="mt-3">
                 {auditLog.length ? (
@@ -517,7 +517,7 @@ export const ThresholdsPanel = ({
                     {auditLog.map((entry) => (
                       <li key={`${entry.timestamp}-${entry.source}`}>
                         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                          {entry.source === "reset" ? "Reset" : entry.source === "preset" ? "Preset" : "Override"} ·{" "}
+                          {entry.source === "reset" ? "Reset" : entry.source === "preset" ? "Preset" : "Edited"} ·{" "}
                           {new Date(entry.timestamp).toLocaleString("en-US", {
                             timeStyle: "short",
                             dateStyle: "medium",
@@ -533,7 +533,7 @@ export const ThresholdsPanel = ({
                   </ul>
                 ) : (
                   <p className="text-xs text-slate-400">
-                    No overrides logged yet. Defaults are active.
+                    Using the defaults.
                   </p>
                 )}
               </Collapsible.Panel>

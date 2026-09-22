@@ -85,9 +85,9 @@ describe("decision transmission copy contract", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
     assert.match(brief, /• Do now:/);
-    assert.match(brief, /Decision transmission check:/);
+    assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Confidence:/);
-    assert.match(brief, /• Change-course trigger:/);
+    assert.match(brief, /• If it is: see "Re-open when" above/);
     assert.match(brief, /• Re-open when:/);
   });
 

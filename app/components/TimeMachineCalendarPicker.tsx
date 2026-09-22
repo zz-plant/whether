@@ -123,7 +123,7 @@ export function TimeMachineCalendarPicker({
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08]">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
               <Calendar size={14} className="text-sky-400" />
-              <span>Historical Time Machine</span>
+              <span>Past weeks</span>
             </div>
             {isHistorical && (
               <button
@@ -132,7 +132,7 @@ export function TimeMachineCalendarPicker({
                 className="inline-flex items-center gap-1 text-[11px] font-medium text-sky-300 hover:text-sky-200 transition-colors bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20"
               >
                 <Sparkles size={11} />
-                <span>Return to Live</span>
+                <span>Back to this week</span>
               </button>
             )}
           </div>

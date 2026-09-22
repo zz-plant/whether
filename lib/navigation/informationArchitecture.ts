@@ -42,7 +42,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Plan",
     navLabel: "Plan",
     description: "Turn this week's brief into decisions on hiring, spend, roadmap, and what to share.",
-    boundary: "Use this when you are ready to turn the brief into approvals.",
+    boundary: "Use this when you want to act on the brief.",
     tier: "supporting",
     parentKey: "weekly-brief",
   },
@@ -85,8 +85,8 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/history",
     label: "History",
     navLabel: "History",
-    description: "See how tightness and risk appetite have changed over time.",
-    boundary: "Use this to spot regime transitions and compare current conditions to past periods.",
+    description: "See how funding pressure and risk appetite have changed over time.",
+    boundary: "Use this to see when the call changed and to compare this week to past months.",
     tier: "supporting",
     parentKey: "signals",
   },
@@ -96,7 +96,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Compare periods",
     navLabel: "Compare",
     description: "Compare signals and operating calls between any two past months.",
-    boundary: "Use this to contrast the current posture with previous periods.",
+    boundary: "Use this to set this week's scores against past months.",
     tier: "supporting",
     parentKey: "history",
   },
@@ -155,7 +155,7 @@ export const utilityLinks = [
     /* Was "Macro Analogs" here and "Compare periods" in the navigation layer above —
        one URL under two names, in two menus, on the same site. */
     label: "Compare periods",
-    description: "Compare current posture to 2001, 2008, and 2022 historical epochs",
+    description: "This week's scores against past downturns: 2001, 2008 and 2022",
   },
   {
     // Carries the embed builder too: same artifact in a different container,
@@ -182,7 +182,7 @@ export const utilityLinks = [
   {
     href: "/calibration",
     label: "Calibration",
-    description: "15-year empirical validation of published confidence metrics against market outcomes",
+    description: "How often the confidence label has been right, 2012–2026",
   },
   {
     href: "/search",

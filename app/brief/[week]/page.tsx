@@ -68,7 +68,7 @@ export function generateStaticParams() {
 }
 
 const briefTitle = (brief: PublishedBrief) =>
-  `${brief.postureLabel}: the operating call for the week of ${brief.recordDateLabel}`;
+  `${brief.postureLabel}: the call for the week of ${brief.recordDateLabel}`;
 
 const briefDescription = (brief: PublishedBrief) => `${brief.summary} What changed: ${brief.whatChanged}`;
 
@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: briefTitle(brief),
     description: briefDescription(brief),
     path: buildPublishedBriefPath(brief.slug),
-    imageAlt: `Whether operating posture for the week of ${brief.recordDateLabel}`,
+    imageAlt: `Whether's call for the week of ${brief.recordDateLabel}`,
     imageParams: { template: "brief-chart", week: brief.slug, posture: brief.postureLabel, regime: brief.regime },
   });
 
@@ -294,7 +294,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         </section>
 
         <section className="weather-panel space-y-3 px-6 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">What would flip the call</h2>
+          <h2 className="text-lg font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.flipWatch}</h2>
           <p className="text-sm text-slate-300">
             <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
             <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
@@ -307,7 +307,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
         {brief.decisions.length ? (
           <section className="weather-panel space-y-4 px-6 py-6">
-            <h2 className="text-lg font-semibold text-slate-100">Bounded calls</h2>
+            <h2 className="text-lg font-semibold text-slate-100">The call by area</h2>
             {tabulateDecisions && frozenScores ? (
               /* Every area's rule is a pair of the same four lines, drawn once
                  above. A row per area says which lines apply and how far off
@@ -430,7 +430,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           This week&apos;s brief
         </ActionLink>
         <ActionLink href="/history" variant="pill">
-          Every past posture
+          Every past call
         </ActionLink>
         <ActionLink href="/about" variant="pill">
           About Whether

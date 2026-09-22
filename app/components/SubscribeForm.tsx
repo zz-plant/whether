@@ -91,8 +91,8 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
           {compact ? null : (
             <p className="text-fluid-xs text-slate-400 mt-0.5">
               {channel === "slack"
-                ? "Every Monday morning at 9:00 AM ET: your team receives the weekly brief in your chosen channel."
-                : "Monday morning: the regime, the one action it calls for, and a link to the evidence behind it."}
+                ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
+                : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
             </p>
           )}
         </div>

@@ -79,7 +79,7 @@ const buildThresholdDecision = (
 ): AlertDecision => ({
   type: "threshold",
   severity: threshold === 75 ? "warning" : "info",
-  headline: `${label} crossed ${threshold} boundary (${score.toFixed(1)})`,
+  headline: `${label} crossed ${threshold} (now ${score.toFixed(1)})`,
   metric,
   department: metric === "credit" ? "Finance" : "Operations",
   rolePreset: metric === "credit" ? "CFO" : "COO",

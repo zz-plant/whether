@@ -107,6 +107,6 @@ describe("runway planner", () => {
     assert.equal(output.runwayRisk.level, "critical");
     assert.ok(output.burnAdjustmentRange.floorPercent <= -35);
     assert.equal(output.raiseTimingWindow.startMonth, 0);
-    assert.match(output.boundedRules.burnDiscipline, /Pause discretionary burn expansion/i);
+    assert.match(output.boundedRules.burnDiscipline, /Pause new discretionary spend/i);
   });
 });

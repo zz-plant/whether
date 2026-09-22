@@ -74,12 +74,12 @@ export const DECISION_VERDICT_MATRIX: Record<
 export const DECISION_GUARDRAILS: Record<DecisionAction, string> = {
   HIRE: "Phase hiring in 30-day tranches; each cohort must show payback traction within 120 days via booked revenue or verified cost reduction.",
   REWRITE: "Ship rewrite milestones every 45 days and continue only while release throughput trends at least 1.5x above baseline.",
-  LAUNCH: "Launch behind staged rollouts (10%→50%→100%) and continue only while churn and ARPA stay at or above pre-launch trend over the first 60 days.",
+  LAUNCH: "Launch behind staged rollouts (10%→50%→100%) and continue only while churn and revenue per account stay at or above pre-launch trend over the first 60 days.",
   DISCOUNT: "Use discount windows capped at 30 days and pair each concession with annual prepay, multi-year term, or measurable expansion rights.",
-  EXPAND: "Expand in waves and hold each wave unless support SLA, retention, and margin stay within 5% of baseline for two consecutive monthly reads.",
-  ACQUIRE: "Advance only with an integration plan that shows leading KPI lift inside 90 days and clear payback path inside 12 months at current burn.",
+  EXPAND: "Expand in waves and hold each wave unless support response times, retention, and margin stay within 5% of baseline for two consecutive monthly reads.",
+  ACQUIRE: "Advance only with an integration plan that shows a lift in the numbers that lead revenue inside 90 days and clear payback path inside 12 months at current burn.",
   DIVEST: "Execute with signed transition owners and service continuity checkpoints every 30 days until revenue retention stabilizes.",
-  INFRA_SPEND: "Release infrastructure spend in milestones and continue only when unit-cost or SLA gains are visible within the first 90 days.",
+  INFRA_SPEND: "Release infrastructure spend in milestones and continue only when unit-cost or response-time gains are visible within the first 90 days.",
   REGIONAL_EXPANSION: "Open regions in pilot mode first; scale only after two consecutive monthly cohorts hit demand, activation, and support readiness thresholds.",
   RESTRUCTURE: "Proceed in sequenced phases and continue only while runway extends by at least one quarter without breaching delivery commitments.",
 };

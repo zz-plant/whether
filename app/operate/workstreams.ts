@@ -20,19 +20,19 @@ export type Workstream = {
 export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
   financial: {
     slug: "financial",
-    title: "Financial Strategy — Capital Posture This Week",
-    description: "CFO and financial operating guardrails aligned with current interest rates and credit conditions.",
-    imageAlt: "Whether financial strategy view",
-    pageTitle: "Financial strategy",
-    pageSummary: "CFO runway planning and capital efficiency settings for the current macro regime.",
+    title: "Runway planner: burn, raise timing, and a memo",
+    description: "Enter runway, burn and revenue to get a safe runway band, a raise window, and a memo sized to this week's call.",
+    imageAlt: "Whether runway planner view",
+    pageTitle: "Runway planner",
+    pageSummary: "Burn, raise timing, and a memo, sized to this week's call.",
   },
   scenarios: {
     slug: "scenarios",
-    title: "Scenario Studio — Counterfactual Macro Simulator",
-    description: "Interactive counterfactual simulation: test rate cuts, inversions, and stress scenarios against live posture.",
-    imageAlt: "Whether scenario studio counterfactual simulator view",
-    pageTitle: "Scenario studio",
-    pageSummary: "Simulate counterfactual macro conditions, rate cuts, or deeper inversions to stress-test your operating plan.",
+    title: "Scenario studio: what if the numbers were different",
+    description: "Set a different short-term rate and yield curve and see what the call and the rules would be.",
+    imageAlt: "Whether scenario studio view",
+    pageTitle: "Scenarios",
+    pageSummary: "Move two sliders to see what the call would be in a different week.",
   },
 };
 

@@ -29,7 +29,6 @@ describe("DecisionHero at the tightness ceiling", () => {
     boldnessScore: 58,
     boldnessDelta: -2,
     regime: "DEFENSIVE" as const,
-    postureLabel: "Contraction",
     signalDirection: "tighten" as const,
     recordDate: "2026-08-14",
     fetchedAt: "2026-08-15",
@@ -41,8 +40,9 @@ describe("DecisionHero at the tightness ceiling", () => {
       <DecisionHero {...baseProps} tightness={100} tightnessDelta={0} tightnessPressure={148} tightnessSaturated />,
     );
 
-    assert.match(html, /At the ceiling — a clipped score cannot show a weekly move\./);
-    assert.match(html, /ceiling \(148\)/, "the raw pressure stays visible beside it");
+    assert.match(html, /Off the top of the scale\. The score can’t rise further, so it can’t show a move\./);
+    assert.match(html, /would read 148/, "the raw pressure stays visible beside it");
+    assert.doesNotMatch(html, /\bclipped\b|\bceiling\b|100-point/i, "said in the reader's terms, not the scoring code's");
   });
 
   it("stays silent when the score is simply flat and not clipped", () => {
@@ -50,7 +50,7 @@ describe("DecisionHero at the tightness ceiling", () => {
       <DecisionHero {...baseProps} tightness={64} tightnessDelta={0} />,
     );
 
-    assert.ok(!html.includes("At the ceiling"), "a flat week is not a clipped one");
+    assert.ok(!html.includes("Off the top of the scale"), "a flat week is not a clipped one");
   });
 
   it("shows the move when there is one", () => {
@@ -58,7 +58,7 @@ describe("DecisionHero at the tightness ceiling", () => {
       <DecisionHero {...baseProps} tightness={64} tightnessDelta={3} />,
     );
 
-    assert.ok(!html.includes("At the ceiling"));
+    assert.ok(!html.includes("Off the top of the scale"));
     assert.match(html, /pts/);
   });
 });

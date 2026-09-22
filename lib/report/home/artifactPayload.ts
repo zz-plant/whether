@@ -49,7 +49,7 @@ const buildDeltaOnlyBriefText = ({
 }) => {
   const revisitLines = homeBriefModel.revisitQueue.length > 0
     ? homeBriefModel.revisitQueue.map((item) => `- ${item.label}: ${item.action}. Flip back in if ${item.flipCondition}.`)
-    : [`- Hold the current bounded rules until the next material weekly delta prints.`];
+    : [`- Keep this week's rules until next week's reading moves.`];
 
   return [
     "DELTA-ONLY BRIEF",
@@ -143,7 +143,7 @@ export const buildLeadershipArtifactPayload = async ({
       changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
       guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
       flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,
-      stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
+      stabilityLine: "STABILITY: Act on a change in the call only after two weekly readings agree, unless it fires at HIGH confidence.",
     });
     const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
     const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({

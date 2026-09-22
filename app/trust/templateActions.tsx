@@ -28,7 +28,7 @@ const TEMPLATE_MARKDOWN = [
   "## Reversal (clears when)",
   "",
   "",
-  "## Review cadence",
+  "## When you will check",
   "",
   "",
   "---",

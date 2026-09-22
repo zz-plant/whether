@@ -19,16 +19,16 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(result.trustStatusTone, "stable");
-    assert.match(result.trustStatusLabel, /Live • Treasury verified/);
-    assert.equal(result.trustStatusDetail, "All signals aligned. Proceed with normal approvals.");
+    assert.match(result.trustStatusLabel, /Live · all sources answered/);
+    assert.equal(result.trustStatusDetail, "Every source answered and nothing here argues for holding back this week.");
     assert.match(result.trustStatusAction, /Proceed with normal approvals\./);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: confidence remains above LOW or transition risk drops`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: confidence drops to low or the call moves within reach of a line`));
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);
     assert.equal(
       result.decisionImpactWindow,
-      "Use this live read for this week's approvals; apply the thresholds shown in the current call.",
+      "Use this live reading for this week's approvals; the pause lines in the call apply.",
     );
   });
 
@@ -45,10 +45,10 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "warning");
     assert.match(result.trustStatusLabel, /Using cached data/);
-    assert.match(result.trustStatusDetail, /Data sources are delayed/);
+    assert.match(result.trustStatusDetail, /Live data is late; this is a cached reading/);
     assert.match(result.trustStatusDetail, /Treasury API timeout/);
     assert.match(result.trustStatusAction, /Use cached read for pacing/);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: live data updates and verifies across all sources`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: live data returns from every source`));
     assert.equal(result.outageType, "feed-unavailable");
     assert.equal(result.outageSeverity, "critical");
     assert.equal(result.outageExitGate.metCount, 1);
@@ -65,7 +65,7 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "historical");
     assert.match(result.trustStatusLabel, /Historical snapshot/);
-    assert.match(result.trustStatusDetail, /Retrospective only/);
+    assert.match(result.trustStatusDetail, /A past week, not this one/);
     assert.match(result.trustStatusAction, /Use this view for retrospective review/);
     assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: switch to current live data`));
     assert.equal(result.outageType, "historical-snapshot");
@@ -84,10 +84,10 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "warning");
     assert.match(result.trustStatusLabel, /Live data, but signals unstable/);
-    assert.match(result.trustStatusDetail, /too contradictory to recommend a posture change/);
+    assert.match(result.trustStatusDetail, /the two scores point in different directions, so the call is not changing this week/);
     assert.match(result.trustStatusDetail, /Reason: Composite disagreement exceeded threshold\./);
     assert.match(result.trustStatusAction, /Keep approvals reversible\./);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: signals reconcile and the contradictions resolve`));
+    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: the two scores point the same way again`));
   });
 
   it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {
@@ -133,7 +133,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /fresh data/i);
+    assert.match(hold.detail, /Live data is late/);
   });
 
   it("treats stale structured freshness as hold even when a timestamp string exists", () => {
@@ -150,7 +150,19 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /fresh data|contracts/i);
+    assert.match(hold.detail, /Live data is late/);
+  });
+
+  it("holds on low confidence with fresh data, and says why without an engine word", () => {
+    const hold = buildDecisionReadinessState({
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      isFallbackSnapshot: false,
+    });
+
+    assert.equal(hold.label, "Hold");
+    assert.match(hold.detail, /close to a line/);
+    assert.doesNotMatch(hold.detail, /fresh data|posture|policy/i);
   });
 
   it("caps readiness at caution when policy refusal is active", () => {
@@ -169,7 +181,8 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(caution.label, "Act with caution");
-    assert.match(caution.detail, /Policy override/i);
+    assert.match(caution.detail, /The call is held this week: Composite disagreement exceeded threshold\./);
+    assert.doesNotMatch(caution.detail, /policy override|posture/i);
   });
 
 });

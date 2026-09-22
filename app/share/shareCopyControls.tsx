@@ -156,8 +156,8 @@ export function ShareCopyControls({
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Investor update</h2>
           <p className="text-xs leading-relaxed text-slate-300">
             {runwayBand
-              ? "Copy two paragraphs for the market section of a monthly letter: the regime and its move since last month-end, then the call and what your runway band means for it."
-              : "Copy two paragraphs for the market section of a monthly letter: the regime and its move since last month-end, then the call. Pick a runway band on the brief to add what it means for your cash."}
+              ? "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the call and what your runway band means for it."
+              : "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the call. Pick a runway band on the brief to add what it means for your cash."}
           </p>
           <button
             type="button"

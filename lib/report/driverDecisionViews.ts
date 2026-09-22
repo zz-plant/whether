@@ -102,7 +102,7 @@ export const buildFundingPressureDriverView = ({
   const ladder: FundingPressureLadderLine[] = [
     {
       value: tightnessRegime,
-      action: "posture boundary",
+      action: "the line that changes the call",
       crossed: tightness > tightnessRegime,
       points: Math.abs(tightness - tightnessRegime),
     },

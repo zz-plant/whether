@@ -642,6 +642,42 @@ reach a rendered sentence. The answer pages render offline because `loadWeeklyBr
 back to the bundled snapshot — which is worth knowing generally: **a page that reads through a
 loader that degrades gracefully is testable here**, unlike one that suspends at a data boundary.
 
+## One name per concept, counted (2026-09-22)
+
+A copy audit read every route and every artifact that leaves the site against four questions:
+cryptic, figurative, abstract, presumptuous. Nearly every surface failed at least one, and the
+failures shared a shape rather than a page. Three vocabularies for the four market states, with
+the engine key (EXPANSION/DEFENSIVE/VOLATILE/SCARCITY) winning wherever text left the site: every
+subscriber alert, the meeting slide, the compare picker, half the glossary. "Posture" as the
+load-bearing noun on every surface and defined on one. The pause/resume pair called "corridor",
+"line" and "lane" on one screen. Fallback copy that was the most abstract copy on the page ("Hold
+bounded operating discipline."), so the site was least legible exactly when the model was least
+sure. And an approvals-committee register that assumed a board, a CEO, a finance lead and a
+Mon/Thu operating review, printed into the Slack brief.
+
+Two findings were worse than wording, and shipped first on their own
+(`tests/exportsCarryNoFixtureCompany.test.ts`): the Slack brief carried a "Financial implications"
+block computed from a hardcoded company (13 months of runway, $700k burn, growth-stage B2B SaaS)
+with nothing marking it as a sample, in the artifact that travels furthest; and the board annex
+asserted, under "Prepared for the Board of Directors", that management had "backfilled
+revenue-critical roles only" and "preserved forward cash buffer above 18 months". A published
+field with no reading behind it, twice more, both about the reader's own company.
+
+The naming decisions live in `lib/report/AGENTS.md` as a table, and `tests/readerVocabulary.test.tsx`
+holds them the way the suppression census holds its numbers: it renders every route that renders
+offline and runs every export, alert and email builder, bans the words that are never a reader's
+(engine keys, `tightness`, pipeline/payload/cache/override, hysteresis/whipsaw, the fixture
+company), and ratchets the ones that have a place somewhere (`posture`, `regime`, `bounded`,
+`board`) against an inline baseline that may only fall. Abbreviations may appear only after their
+expansion on the same surface. `<code>` is stripped before counting, because an API signature on
+`/api-docs` names the parameter the API takes.
+
+What the guardrail cannot see, recorded here: `buildTrustStatus` still computes `approvalBuckets`,
+`recoveryPlan`, `outageExitGate` and `decisionImpactWindow`, threaded through `homePageAssembler`
+into the page contracts, and nothing under `app/` renders any of them. Their strings were rewritten
+along with everything else, which is the wrong fix for a field nothing draws; they belong to the
+"published field with no reading behind it" class above and should go.
+
 ## What a page says against what the rest of the site says (2026-09-17)
 
 Found by rendering the routes and reading them — `bun run ui:shots` against a dev server, then

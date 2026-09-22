@@ -83,7 +83,7 @@ export async function buildPlanningPageModel(
         name: "Whether Weekly Brief — Planning",
         url: `${siteUrl}/planning`,
         description:
-          "Approve the weekly plan, guardrails, finance direction, and share-ready brief for the current market backdrop.",
+          "Turn the call into this week's plan: the rules, your runway, and the brief to share.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
@@ -160,7 +160,7 @@ export async function buildPlanningPageModel(
            most repeated inconsistency in this IA. The <title> keeps its longer
            descriptive form; only the on-page heading is the section's name. */
         pageTitle: "Plan",
-        pageSummary: "Prepare for this week's conditions: set guardrails, check runway, brief the team.",
+        pageSummary: "Set the rules, check runway, and share the brief for this week's conditions.",
         sectionLinks: operationsSectionLinks.plan,
       },
       trust: {
@@ -241,8 +241,8 @@ export async function buildPlanningPageModel(
               }),
               h("section", { className: "space-y-4" },
                 h("div", { className: "space-y-2" },
-                  h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "Weekly approval boundary"),
-                  h("p", { className: "text-sm text-slate-300" }, "Confirm this week's move first."),
+                  h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "This week's call"),
+                  h("p", { className: "text-sm text-slate-300" }, "Read this first."),
                 ),
                 h("div", { className: "grid gap-3 md:grid-cols-3" },
                   h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
@@ -261,7 +261,7 @@ export async function buildPlanningPageModel(
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "Items to revisit. Recheck last week's approvals before adding fixed cost or widening scope."
-                    : "No items to revisit. Keep the current plan unless a watch line trips.",
+                    : `No items to revisit. Keep the current plan unless funding pressure crosses ${assessment.thresholds.tightnessRegime}.`,
                 ),
               ),
               // The monthly call has one owner: the Monthly tab on the brief. A
@@ -279,7 +279,7 @@ export async function buildPlanningPageModel(
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Leadership team brief, plain-English brief, or board-ready version.",
+            description: "Copy or download the brief in the format you need.",
             hashAliases: [
               "ops-export-briefs-panel",
               "ops-operator-requests",
@@ -386,7 +386,7 @@ export async function buildPlanningPageModel(
               h(PremiumGate, {
                 source: "runway_planner",
                 title: "Runway planner",
-                description: "Model burn, revenue, and growth rate against the current regime to see how far your runway actually stretches.",
+                description: "Enter burn, revenue, and growth to see how far your runway goes in this week's conditions.",
                 children: h(RunwayPlannerPanel, { assessment, sensors, macroSeries, recordDateLabel }),
               }),
               ),
@@ -397,11 +397,11 @@ export async function buildPlanningPageModel(
       h("section", { id: "ops-failure-patterns", className: "weather-panel space-y-4 px-5 py-5", "aria-labelledby": "ops-failure-patterns-title" },
         h("div", { className: "space-y-2" },
           h("p", { className: "type-eyebrow type-eyebrow-section" }, "Risk checks"),
-          h("h2", { id: "ops-failure-patterns-title", className: "text-lg font-semibold text-slate-100" }, "Pressure-test the plan before you approve it"),
-          h("p", { className: "text-sm text-slate-300" }, "Use these warnings to catch weak assumptions before the plan goes out."),
+          h("h2", { id: "ops-failure-patterns-title", className: "text-lg font-semibold text-slate-100" }, "Warnings to read before you approve"),
+          h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it."),
         ),
         failureModes.length === 0
-          ? h("div", { className: "weather-surface border px-4 py-4 text-sm text-slate-200" }, "No active warning right now. Hold standard guardrails and go deeper only if freshness drops or confidence weakens.")
+          ? h("div", { className: "weather-surface border px-4 py-4 text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or confidence drops.")
           : h("div", { className: "grid gap-3 lg:grid-cols-2" },
             failureModes.map((warning) => h("article", { key: warning.id, className: "weather-surface border px-4 py-4" },
               h("p", { className: "text-sm font-semibold text-slate-100" }, warning.warning),
@@ -409,17 +409,17 @@ export async function buildPlanningPageModel(
             )),
           ),
         h("div", { className: "flex flex-wrap gap-2" },
-          h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Recheck guardrails"),
-          h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, "Trust risk checks"),
+          h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Recheck the rules"),
+          h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
         ),
       ),
       h("details", { className: "weather-panel weather-auto-chevron space-y-3 px-5 py-5" },
-        h("summary", { className: "cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200" }, "Board-ready templates"),
+        h("summary", { className: "cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200" }, "Templates"),
         h("div", { className: "mt-4 space-y-4 rounded-lg border border-slate-800/80 bg-slate-950/40 px-4 py-4" },
           h("div", { className: "space-y-1" },
             h("p", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-slate-400" }, "Resources"),
-            h("h2", { className: "text-lg font-semibold text-slate-100" }, "Board-ready templates"),
-            h("p", { className: "text-sm text-slate-300" }, "Templates for board and leadership reviews."),
+            h("h2", { className: "text-lg font-semibold text-slate-100" }, "Templates"),
+            h("p", { className: "text-sm text-slate-300" }, "Templates you can fill in and share."),
           ),
           h("div", { className: "grid gap-3 md:grid-cols-3" },
             resourcePillarPages.map((pillar) => h(Link, {
@@ -427,7 +427,6 @@ export async function buildPlanningPageModel(
               href: `/resources/${pillar.slug}` as Route,
               className: "weather-surface border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
             },
-              h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.14em] text-slate-400" }, "Governance pillar"),
               h("p", { className: "mt-2 font-semibold text-slate-100" }, pillar.h1),
               h("p", { className: "mt-2 text-sm text-slate-300" }, pillar.description),
             )),
@@ -441,7 +440,7 @@ export async function buildPlanningPageModel(
             h(Link, {
               href: canonicalCapitalDisciplinePath as Route,
               className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]",
-            }, "Open governance pillar"),
+            }, "Read the full guide"),
           ),
         ),
       ),

@@ -24,7 +24,7 @@ const sharedDeepDiveSections: ResourceArticleSection[] = [
     paragraphs: [
       "Week 1 should produce one source-of-truth decision inventory. List every meaningful commitment across hiring, roadmap, vendor spend, and channel investment. For each item, document owner, expected business effect, time-to-evidence, and reversal path. Most organizations skip this step because it feels administrative, but without it you cannot prioritize risk. In high-pressure periods, invisible commitments become the real source of runway erosion because they continue by inertia. By forcing a complete inventory early, leadership converts diffuse anxiety into a tractable operating map.",
       "Weeks 2 through 4 should establish threshold design and meeting cadence. Select a small set of indicators that are decision-relevant and resistant to vanity inflation: retention quality, conversion efficiency, delivery reliability, burn multiple movement, and forecast error. Then assign explicit breach duration rules. A single weak week should trigger diagnostic review, not wholesale posture change. Two or more persistent breaches should trigger escalation. The discipline here is consistency, not prediction perfection. Consistent trigger application is what allows teams to make hard calls without re-litigating governance every cycle.",
-      "Weeks 5 through 8 should focus on tranche execution. Every RISKY item should move in bounded increments with kill criteria, while SAFE items continue through a lighter approval path. This period is where most teams discover mismatches between declared posture and practical behavior. Expect to adjust owner maps, escalation SLAs, and reporting format. Weeks 9 through 12 should emphasize retrospective quality: which triggers fired, which decisions reversed, how quickly rollback happened, and what friction slowed action. The board does not need perfect outcomes; it needs evidence that the operating system is becoming more reliable under stress.",
+      "Weeks 5 through 8 should focus on tranche execution. Every RISKY item should move in bounded increments with kill criteria, while SAFE items continue through a lighter approval path. This period is where most teams discover mismatches between declared posture and practical behavior. Expect to adjust owner maps, escalation response times, and reporting format. Weeks 9 through 12 should emphasize retrospective quality: which triggers fired, which decisions reversed, how quickly rollback happened, and what friction slowed action. The board does not need perfect outcomes; it needs evidence that the operating system is becoming more reliable under stress.",
     ],
   },
   {
@@ -179,7 +179,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             <div className="grid gap-3 sm:grid-cols-2">
               {decisionArtifact.mappedRules.map((rule) => (
                 <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
-                  <p className="type-eyebrow text-sky-200">Bounded rule · {decisionAreaLabel(rule.area)}</p>
+                  <p className="type-eyebrow text-sky-200">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>
                   <p className="font-semibold text-slate-100">{rule.recommendation}</p>
                   <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
                   <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
@@ -202,7 +202,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         </section>
 
         <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-          <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Summary to forward to the board</h2>
+          <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Summary to forward</h2>
           <ul className="space-y-2 text-sm text-slate-200 print:text-slate-700">
             {article.boardSummary.map((item) => <li key={item}>• {item}</li>)}
           </ul>
@@ -273,7 +273,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
           </Link>
           <div className="space-y-2 border-t border-slate-700/80 pt-3 text-xs text-slate-300">
             <p className="font-semibold text-slate-100">Related pages</p>
-            <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital Discipline pillar</Link>
+            <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link>
             <Link href={boardFrameworkPath} className="block text-sky-200 underline underline-offset-4">Board-level Capital Posture Framework</Link>
             <Link href={article.toolLink.href as Route} className="block text-sky-200 underline underline-offset-4">Tool page</Link>
           </div>

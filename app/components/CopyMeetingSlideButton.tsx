@@ -61,18 +61,18 @@ export function CopyMeetingSlideButton({
     <button
       type="button"
       onClick={handleCopy}
-      title="Copy 16:9 Meeting Stance formatted for Notion, Keynote, or Google Slides"
+      title="Copy this week's call as one slide, formatted for Notion, Keynote or Google Slides"
       className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs font-semibold text-slate-200 shadow-sm transition hover:border-slate-500 hover:bg-slate-800 hover:text-white weather-focus-ring weather-press-scale ${className}`}
     >
       {didCopy ? (
         <>
           <CheckIcon className="h-3.5 w-3.5 text-emerald-400" />
-          <span className="text-emerald-300">Copied Meeting Slide!</span>
+          <span className="text-emerald-300">Copied the slide</span>
         </>
       ) : (
         <>
           <CopyIcon className="h-3.5 w-3.5 text-slate-400" />
-          <span>Copy for Meeting / Notion</span>
+          <span>Copy as a slide</span>
         </>
       )}
     </button>

@@ -106,44 +106,67 @@ export const DECISION_CONTRACT_LABELS = {
  * reading "scale proven bets" through a refusal, so a surface that renders it while
  * the weekly call says "slow approvals" puts two opposite instructions on one screen.
  * Both the weekly contract and the cadence lead read these.
+ *
+ * Written in the reader's terms: what is held and why. "Policy override" and
+ * "policy signals" name the engine's mechanism, which a reader cannot act on.
  */
 export const POLICY_OVERRIDE_CALL = {
-  currentCall: "Hold posture changes and keep approvals reversible until policy signals reconcile.",
-  actionNow: "Slow approvals, require reversible bets, and cap new experiments until disagreement clears.",
-  pauseIf: "Pause irreversible approvals while the policy override remains active.",
+  currentCall: "The two scores point in different directions, so the call is not changing this week.",
+  actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
+  pauseIf: "Hold anything you can't undo while the two scores disagree.",
   changeCourseIf:
-    "Resume normal posture changes only after policy disagreement clears and the weekly flip thresholds recover.",
+    "The two scores point the same way for a second reading; until then the call is not changing.",
+} as const;
+
+/**
+ * The call when no live reading produced one.
+ *
+ * A fallback sentence has to say what is missing and what to hold. "Hold bounded
+ * operating discipline" said neither, and it was printed into Slack, email and
+ * the meeting pack whenever the real call was absent — the page was least legible
+ * exactly when the model was least sure. The weekly contract and the home brief
+ * builder both read these so the two cannot drift.
+ */
+export const NO_LIVE_READING_CALL = {
+  currentCall: "No live reading this week. Keep last week's plan.",
+  pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
+  changeCourseIf: "A live reading lands; until then the call is not changing.",
 } as const;
 
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
 
+/* Written to one reader. The earlier version assumed a room — "align on that
+   first before debating edge cases", "only if someone asks why" — and the page
+   knows nothing about who else is there. */
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
     detail:
-      "Start with the main read, what to pause, and what would change it. The brief starts from a U.S. market view, so align on that first before debating edge cases.",
+      "Read the call first: what to do, what to pause, and what would change it. It starts from the U.S. market environment, not from your company.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
     label: "Proof",
     detail:
-      "Open the evidence view only if someone asks why the market view changed or which thresholds matter most.",
-    example: "Example decision: check the recession warning gauge before approving long-payback projects.",
+      "Open the score details only if you want to know why the call moved or which line is closest.",
+    example: "Example decision: check the recession warning gauge before approving a project that pays back slowly.",
   },
   {
     label: "Actions",
     detail:
-      "Use the planning page to turn the weekly read into clear company-specific do, don't, and limit rules for the week.",
+      "Use the planning page to turn the call into this week's do, don't and limit rules.",
     example: "Example decision: focus on retention when risk appetite is cautious.",
   },
 ];
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
-  { text: "Top fold leads with Action now + Pause if + Change course if for fast operating decisions." },
-  { text: "The weekly brief starts from a U.S. market read so teams can make a decision before debating edge cases." },
-  { text: "Confidence and trend tell you how reliable this week's read is before you dig into the score details." },
-  { text: "Historical context is available, but the current decision takes priority." },
+  {
+    text: `The call is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}.`,
+  },
+  { text: "Your stage and runway, if you set them, change the notes under the call and nothing else." },
+  { text: "Confidence says how far the scores sit from the line that changes the call." },
+  { text: "Past weeks are one click away; this week's call comes first." },
 ];
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
@@ -372,7 +395,7 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "fred-series",
-    term: "FRED series codes (DGS1MO, DGS2, DGS10)",
+    term: "St. Louis Fed (FRED) series codes (DGS1MO, DGS2, DGS10)",
     summary:
       "FRED is the Federal Reserve's free public data service. Each code names one published series — DGS1MO is the one-month Treasury bill this uses as its base rate, DGS2 the two-year Treasury rate, DGS10 the ten-year.",
     why: "Why it matters: the codes are what make the score auditable — anyone can pull the same series and recompute it.",
@@ -385,17 +408,17 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "How to use this glossary",
     bullets: [
-      { emphasis: "U.S. market starting point", detail: "anchors this week's read before company-specific judgment kicks in." },
-      { emphasis: "Terms become constraints", detail: "for discussing bets." },
-      { emphasis: "Linked sections", detail: "provide supporting evidence quickly." },
+      { emphasis: "Start from the U.S. reading", detail: "then adjust for your own stage and runway." },
+      { emphasis: "Use these words in the meeting", detail: "so everyone is arguing about the same number." },
+      { emphasis: "Each entry links", detail: "to the page where the number is used." },
     ],
   },
   {
     title: "Reading notes",
     bullets: [
-      { emphasis: "Current environment label", detail: "summarizes the U.S. backdrop for this week's decision." },
-      { emphasis: "Evidence maps to constraints", detail: "rather than forecasts." },
-      { emphasis: "Exports support alignment", detail: "across teams." },
+      { emphasis: "The weather word is the environment this week", detail: "Sunny, Cloudy, Stormy or Freezing, read from U.S. rates and credit." },
+      { emphasis: "Nothing here is a forecast", detail: "each number is where the market sits now." },
+      { emphasis: "The copy formats carry the same words", detail: "so a pasted brief reads the same as the page." },
     ],
   },
 ];

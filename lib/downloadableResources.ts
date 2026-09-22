@@ -30,11 +30,11 @@ export const downloadableResources = {
     internalLinks: [
       {
         href: "/resources/capital-discipline-venture-backed-companies",
-        label: "Canonical pillar: Capital Discipline",
+        label: "Guide: capital discipline",
       },
       {
         href: "/resources/board-level-capital-posture-framework",
-        label: "Board Framework page",
+        label: "The board framework",
       },
     ],
     printModeClassNames: {
@@ -76,11 +76,11 @@ export const downloadableResources = {
     internalLinks: [
       {
         href: "/resources/capital-discipline-venture-backed-companies",
-        label: "Canonical pillar: Capital Discipline",
+        label: "Guide: capital discipline",
       },
       {
         href: "/resources/board-level-capital-posture-framework",
-        label: "Board Framework page",
+        label: "The board framework",
       },
     ],
   },
@@ -121,11 +121,11 @@ export const downloadableResources = {
     internalLinks: [
       {
         href: "/resources/capital-discipline-venture-backed-companies",
-        label: "Canonical pillar: Capital Discipline",
+        label: "Guide: capital discipline",
       },
       {
         href: "/resources/board-level-capital-posture-framework",
-        label: "Board Framework page",
+        label: "The board framework",
       },
     ],
     printModeClassNames: {

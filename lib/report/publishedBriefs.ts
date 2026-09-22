@@ -17,6 +17,7 @@ import { buildCanonicalUrl } from "../seo";
 import { publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { buildBoundedConditionRails, formatPointsToLine } from "./operatingCalls";
+import { decisionAreaLabel, isDecisionArea } from "./boundedDecisionRules";
 
 const PublishedRuleLineSchema = z.object({
   metric: z.enum(["tightness", "riskAppetite"]),
@@ -217,15 +218,9 @@ export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as con
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });
 
-const decisionAreaLabels: Record<string, string> = {
-  hiring: "Hiring",
-  "product-tempo": "Product tempo",
-  "capital-raising": "Capital raising",
-  "burn-discipline": "Burn discipline",
-  "expansion-bets": "Expansion bets",
-};
-
-export const labelForArea = (area: string) => decisionAreaLabels[area] ?? area;
+/* One table: this used to carry its own copy of the five area names, so /brief/<week> called an
+   area "Product tempo" while the homepage called it "Roadmap". */
+export const labelForArea = (area: string) => (isDecisionArea(area) ? decisionAreaLabel(area) : area);
 
 /**
  * Generates a date-pinned Slack update constructed strictly from PublishedBrief.
@@ -254,7 +249,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     `• ${brief.summary}`,
     `• What changed: ${brief.whatChanged}`,
     "",
-    `Bounded decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
+    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal}):`,
     `• ${publicDecisionLabels.call}: ${brief.summary}`,
     `• ${publicDecisionLabels.action}: ${brief.actionNow}`,
     `• ${publicDecisionLabels.threshold}: ${brief.guardrailThreshold}`,

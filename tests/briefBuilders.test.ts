@@ -50,13 +50,13 @@ describe("buildSlackBrief", () => {
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
-    assert.match(brief, /Re-open when: Funding pressure < 66 \(already met\) and budget payback proof is intact/);
+    assert.match(brief, /Re-open when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
     assert.doesNotMatch(brief, /Do now: Constraint one/, "Do now must not fall through to the operating-limits list");
   });
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
-    const referenced = brief.match(/Change-course trigger: see "([^"]+)"/)?.[1];
+    const referenced = brief.match(/If it is: see "([^"]+)"/)?.[1];
     assert.ok(referenced, "no change-course cross-reference found");
     assert.ok(
       brief.includes(`• ${referenced}:`),
@@ -110,7 +110,7 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Bounded decision \(Call \/ Do now \/ Pause if \/ Re-open when\):/);
+    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Re-open when\):/);
     assert.match(brief, /• Call: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
@@ -118,10 +118,10 @@ describe("buildSlackBrief", () => {
     assert.ok(brief.indexOf("• Call: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
     assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
-    assert.match(brief, /Decision transmission check:/);
+    assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Confidence: MEDIUM confidence/);
-    assert.match(brief, /• Why this could be wrong:/);
-    assert.match(brief, /• Change-course trigger:/);
+    assert.match(brief, /• The scores sit near a line; a small move changes the call\./);
+    assert.match(brief, /• If it is: see "Re-open when" above/);
   });
 
   it("carries each lever's timing line into the per-lever bullets", async () => {
@@ -192,7 +192,7 @@ describe("buildSlackBrief", () => {
   it("formats bps values with readable spacing", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
-    assert.match(brief, /BBB credit spread \(OAS\): 174\.00 bps \(basis points\) · refreshed 2026-03-04/);
+    assert.match(brief, /BBB credit spread \(OAS\): 174\.00 basis points · refreshed 2026-03-04/);
   });
 
   it("carries interpretation context into board and citation artifacts", () => {
@@ -245,14 +245,14 @@ describe("buildSlackBrief", () => {
       ],
     });
 
-    assert.match(brief, /Startup environment — weekly call:/);
+    assert.match(brief, /This week's call:/);
     assert.match(brief, /• Conditions: Guarded Expansion — Late/);
     assert.match(brief, /• Trend: DETERIORATING/);
-    assert.match(brief, /• Distance to regime change: 2\.0 points/);
+    assert.match(brief, /• Points from the line that changes the call: 2\.0/);
     assert.match(brief, /• Could the call change next week: yes/);
     assert.match(brief, /• Call: Stage decisions/);
     assert.match(brief, /• Re-check: whoever owns the plan/);
-    assert.match(brief, /• Trust markers: Confidence: Guarded/);
+    assert.match(brief, /• Data: Confidence: Guarded/);
     assert.match(brief, /• Conditions:/);
     assert.match(brief, /Do now: Backfills only/);
     assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
@@ -269,7 +269,7 @@ describe("buildSlackBrief", () => {
 
 
 
-  it("includes at least one false-signal warning line when active", () => {
+  it("prints the active failure mode's warning once, with its check, under why-this-could-be-wrong", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
       failureModes: [
         {
@@ -279,9 +279,9 @@ describe("buildSlackBrief", () => {
       ],
     });
 
-    assert.match(brief, /False-signal warning:/);
-    assert.match(brief, /Boundary whipsaw/);
-    assert.match(brief, /Require one confirming/);
+    assert.match(brief, /Why this could be wrong:/);
+    assert.equal(brief.match(/Boundary whipsaw/g)?.length, 1, "the warning is printed once, not under two headers");
+    assert.match(brief, /• Check: Require one confirming/);
   });
 
   it("adds compact historical analog references when provided", () => {

@@ -22,7 +22,7 @@ describe("formatNumberWithUnit", () => {
   });
 
   it("adds readable spacing for bps values", () => {
-    assert.equal(formatNumberWithUnit(174, "bps"), "174.00 bps (basis points)");
+    assert.equal(formatNumberWithUnit(174, "bps"), "174.00 basis points");
   });
 
   it("keeps percent values unchanged", () => {

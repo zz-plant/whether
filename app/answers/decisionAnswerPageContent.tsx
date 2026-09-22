@@ -188,7 +188,7 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageSection title={headings.copy}>
           <div className="space-y-3">
             <p className="text-sm text-slate-200">
-              Copy the bounded answer, threshold, and citation as a meeting-ready brief.
+              Copy the answer, its pause line, and the citation, ready to paste into a meeting note.
             </p>
             <ReportCta
               href={pagePath}
@@ -268,7 +268,7 @@ export async function DecisionAnswerPageContent({
           <div className="flex flex-wrap gap-2">
             <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
             <ActionLink href="/resolve#unresolved-question-router" variant="pill">Decision Tools</ActionLink>
-            <ActionLink href="/operate" variant="pill">Operating guardrails</ActionLink>
+            <ActionLink href="/operate" variant="pill">Plan the week</ActionLink>
             <ActionLink href="/resolve#direct-answers" variant="pill">More direct answers</ActionLink>
             {relatedPages.map((related) => (
               <ActionLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ActionLink>

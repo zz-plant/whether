@@ -71,7 +71,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "focus",
         label: "Toggle focus / present mode",
-        description: "Presentation mode for Zoom & leadership standups",
+        description: "Full-screen, one frame at a time",
         icon: Maximize2,
         action: toggleFocusMode,
         shortcut: "F",
@@ -79,7 +79,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "calendar-hold",
         label: "Add Monday calendar reminder",
-        description: "Add recurring 9:00 AM sync to Google Calendar",
+        description: "A recurring Monday reminder in Google Calendar",
         icon: Calendar,
         action: () => {
           window.open(buildMondayCalendarUrl(), "_blank", "noopener,noreferrer");
@@ -104,7 +104,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "compare-periods",
         label: "Compare two months",
-        description: "Two months side by side — regime, budget, and operating rules",
+        description: "Two months side by side — conditions, scores, and the rules in force",
         icon: Columns2,
         action: () => navigateTo("/history/compare"),
       },
@@ -136,7 +136,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "history",
         label: "View history & track record",
-        description: "Browse past briefs and audited historical timeline",
+        description: "Browse past briefs and the month-end record",
         icon: Archive,
         action: () => navigateTo("/history"),
         shortcut: "H",

@@ -17,7 +17,7 @@ describe("bounded decisions: framework and form as a section of /trust", () => {
     assert.match(html, /Why it works/);
     // From the form half, which used to be /template.
     assert.match(html, /Fill one in/);
-    assert.match(html, /Review cadence/);
+    assert.match(html, /When you will check/);
     assert.match(html, /No signup required/);
   });
 

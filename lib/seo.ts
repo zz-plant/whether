@@ -16,7 +16,7 @@ export const organizationName = "Whether";
  */
 export const websiteName = "Whether — Weekly Operating Call for Startup Leaders";
 export const canonicalPositioningLine =
-  "Whether turns macro conditions into a weekly operating call for startup leaders.";
+  "Each Monday: what interest rates and credit mean for your hiring, spend and raise.";
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 

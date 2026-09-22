@@ -17,12 +17,12 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   },
   {
     href: "/operate/financial",
-    label: "Financial strategy",
+    label: "Runway planner",
     description: "CFO runway planning, burn adjustments, and budget planning board memo exporter.",
   },
   {
     href: "/operate/scenarios",
-    label: "Scenario studio",
+    label: "Scenarios",
     description: "Interactive counterfactual simulation: test rate cuts, inversions, and stress scenarios.",
   },
 ];

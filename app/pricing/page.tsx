@@ -24,14 +24,14 @@ export const runtime = "edge";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "The weekly operating call, the API, MCP, and embeds are free forever. Pro and Team buy continuity and team ritual.",
+    "The weekly operating call, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     type: "website",
     url: buildCanonicalUrl("/pricing"),
     title: "Pricing | Whether",
     description:
-      "The weekly operating call, the API, MCP, and embeds are free forever. Pro and Team buy continuity and team ritual.",
+      "The weekly operating call, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
   },
 };
 
@@ -128,14 +128,24 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* Priority onboarding and cohort rollout. Stated with institutional clarity
-            while preserving the free forever promise. */}
+        {/* What a request does. While nothing is on sale, the honest sentence is that
+            it records interest and nothing else; the cohort paragraph below claims a
+            reserved rate and an onboarding schedule, which only exist once checkout is
+            wired, so it renders only when the plans are on sale. */}
         <section className="weather-panel space-y-3 px-5 py-5">
-          <h2 className="type-eyebrow">Priority cohort onboarding</h2>
-          <p className="max-w-2xl text-fluid-xs text-slate-300">
-            Pro and Team tiers are currently onboarding pilot organizations in staged cohorts.
-            Requesting access reserves your tier rate and schedules priority onboarding for Slack regime alerts, board presentation export, and team decision memory. The core weekly brief, API, and MCP remain free forever.
-          </p>
+          <h2 className="type-eyebrow">{PAID_PLANS_ON_SALE ? "Priority onboarding" : "Not on sale yet"}</h2>
+          {PAID_PLANS_ON_SALE ? (
+            <p className="max-w-2xl text-fluid-xs text-slate-300">
+              Pro and Team are onboarding in staged cohorts. Requesting access reserves your tier rate
+              and schedules onboarding for Slack alerts, board exports, and team decision memory. The
+              weekly call, the API, and MCP stay free.
+            </p>
+          ) : (
+            <p className="max-w-2xl text-fluid-xs text-slate-300">
+              Pro and Team cannot be bought yet. Requesting access records that you want one, and
+              nothing else; the weekly call, the API, and embeds stay free either way.
+            </p>
+          )}
           <p className="max-w-2xl text-fluid-xs text-slate-400">
             Questions about custom enterprise models or multi-team rollouts?{" "}
             <Link href="/contact" className="underline decoration-slate-600 underline-offset-4 hover:text-white">

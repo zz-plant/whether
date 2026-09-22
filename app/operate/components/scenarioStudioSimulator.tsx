@@ -12,10 +12,10 @@ import { getPlaybookGuidance } from "../../../lib/playbook";
 import { CopyIcon, SlidersIcon } from "../../components/uiIcons";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { ruleMetricLabel } from "../../../lib/report/boundedDecisionRules";
 
 type ScenarioPreset = {
   id: string;
-  label: string;
   rate: number;
   slope: number;
   description: string;
@@ -24,31 +24,27 @@ type ScenarioPreset = {
 const PRESETS: ScenarioPreset[] = [
   {
     id: "easing",
-    label: "Aggressive Easing",
     rate: 2.0,
     slope: 1.2,
-    description: "Fast rate cuts, steep curve, capital loosening",
+    description: "Fast cuts and a steep curve: funding loosens.",
   },
   {
     id: "stagflation",
-    label: "Stagflation Trap",
     rate: 6.25,
     slope: -0.6,
-    description: "Stubborn inflation, restrictive policy, inverted curve",
+    description: "High rates with an inverted curve.",
   },
   {
     id: "deep-inversion",
-    label: "Deep Inversion",
     rate: 5.25,
     slope: -1.25,
-    description: "Liquidity freeze, severe yield inversion, recession warning",
+    description: "A deep inversion: the recession warning at its strongest.",
   },
   {
     id: "soft-landing",
-    label: "Soft Landing",
     rate: 3.25,
     slope: 0.85,
-    description: "Normalized rates, positive curve, balanced expansion",
+    description: "Rates near neutral with a normal curve.",
   },
 ];
 
@@ -162,30 +158,30 @@ export function ScenarioStudioSimulator({
   const handleCopySimulatedBrief = async () => {
     const briefText = [
       "==================================================",
-      "⚠️ [SIMULATED SCENARIO · COUNTERFACTUAL MODEL]",
-      "Not live Treasury data. Modeled via Whether Scenario Studio.",
+      "SCENARIO — NOT THIS WEEK'S READING",
+      "Numbers set by hand in the Whether scenario studio, not this week's data.",
       "==================================================",
-      `Parameters: Base Rate ${simulatedBaseRate.toFixed(2)}% (${formatDelta(baseRateDelta, "%")}) | 10Y-2Y Slope ${simulatedCurveSlope.toFixed(2)}% (${formatDelta(curveSlopeDelta, "%")})`,
-      `Simulated Regime: ${simulatedAssessment.regime} (Baseline: ${liveAssessment.regime})`,
-      `Funding Pressure: ${simulatedAssessment.scores.tightness}/100 (${formatDelta(tightnessDelta, " pts")})`,
-      `Risk Appetite: ${simulatedAssessment.scores.riskAppetite}/100 (${formatDelta(riskAppetiteDelta, " pts")})`,
+      `Short-term borrowing rate ${simulatedBaseRate.toFixed(2)}% (${formatDelta(baseRateDelta, "%")}) | Recession warning gauge (10-year minus 2-year rate) ${simulatedCurveSlope.toFixed(2)}% (${formatDelta(curveSlopeDelta, "%")})`,
+      `Conditions: ${getRegimePublicLabel(simulatedAssessment.regime)} (this week: ${getRegimePublicLabel(liveAssessment.regime)})`,
+      `${ruleMetricLabel.tightness}: ${simulatedAssessment.scores.tightness}/100 (${formatDelta(tightnessDelta, " pts")})`,
+      `${ruleMetricLabel.riskAppetite}: ${simulatedAssessment.scores.riskAppetite}/100 (${formatDelta(riskAppetiteDelta, " pts")})`,
       "",
       `Mandate: "${simulatedPlaybook.playbook?.mandate ?? ""}"`,
       `Tone: ${simulatedPlaybook.playbook?.tone ?? ""}`,
       "",
-      "--- OPERATING CONSTRAINTS ---",
+      "--- WHAT CHANGES ---",
       "What to STOP in this scenario:",
       ...simulatedPlaybook.stopItems.map((item) => ` • STOP: ${item}`),
       "",
       "What to START in this scenario:",
       ...simulatedPlaybook.startItems.map((item) => ` • START: ${item}`),
       "",
-      "--- KEY DECISION LEVERS ---",
+      "--- RULES BY AREA ---",
       ...simulatedPlaybook.operatingLevers.map(
         (lever) => ` • ${lever.label}: ${lever.actionNow} (${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${lever.triggerThreshold})`,
       ),
       "",
-      `Shareable simulation link: ${window.location.href}`,
+      `Link to this scenario: ${window.location.href}`,
     ].join("\n");
 
     await copyToClipboard(briefText, "simulated-brief");
@@ -209,16 +205,15 @@ export function ScenarioStudioSimulator({
               Simulated Scenario
             </span>
             <p className="text-xs font-semibold text-amber-100">
-              Interactive Counterfactual Model
+              What if the numbers were different
             </p>
           </div>
           <span className="text-fluid-nano text-amber-300/80">
-            Assumptions active · Not live Treasury data
+            Not this week&apos;s data
           </span>
         </div>
         <p className="mt-2 text-xs leading-relaxed text-amber-200/90">
-          This counterfactual workspace tests how team pace, spend guardrails, and hiring approvals
-          shift when the macro climate changes. Adjust sliders below to stress-test your strategy.
+          Move the sliders to test a plan against a different week.
         </p>
       </div>
 
@@ -227,10 +222,10 @@ export function ScenarioStudioSimulator({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 id="scenario-presets-heading" className="type-eyebrow">
-              Scenario Presets Library
+              Presets
             </h3>
             <p className="mt-1 text-xs text-slate-300">
-              One-click macro archetypes to test upside, downside, and stagflation postures.
+              Four preset scenarios. Each sets the short-term borrowing rate and the recession warning gauge (10-year minus 2-year rate).
             </p>
           </div>
           <button
@@ -243,7 +238,7 @@ export function ScenarioStudioSimulator({
                 : "border-sky-500/50 text-sky-200 hover:border-sky-400 hover:bg-sky-500/15"
             }`}
           >
-            ↺ Reset to Live Baseline
+            Reset to this week
           </button>
         </div>
 
@@ -266,18 +261,13 @@ export function ScenarioStudioSimulator({
               >
                 <div className="flex w-full items-center justify-between">
                   <span className="text-xs font-semibold text-slate-100">
-                    {preset.label}
+                    Rate {preset.rate.toFixed(2)}%, curve {formatDelta(preset.slope, "%")}
                   </span>
                   {isActive && (
                     <span className="text-[10px] font-bold text-sky-300 uppercase tracking-widest">
                       Active
                     </span>
                   )}
-                </div>
-                <div className="mt-1.5 flex items-center gap-2 font-mono text-[11px] text-sky-200">
-                  <span>Rate: {preset.rate.toFixed(2)}%</span>
-                  <span>·</span>
-                  <span>Slope: {formatDelta(preset.slope, "%")}</span>
                 </div>
                 <p className="mt-2 text-[11px] leading-snug text-slate-400">
                   {preset.description}
@@ -294,10 +284,10 @@ export function ScenarioStudioSimulator({
           <div>
             <h3 id="sliders-controls-heading" className="type-section text-slate-100 flex items-center gap-2">
               <SlidersIcon className="h-4 w-4 text-sky-400" />
-              Counterfactual Parameter Sliders
+              Sliders
             </h3>
             <p className="mt-1 text-sm text-slate-300">
-              Drag sliders to recalculate regime classification, score boundaries, and operating guidance in real time.
+              Move either slider. The call, the scores, and the rules below update while you move it.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -307,7 +297,7 @@ export function ScenarioStudioSimulator({
               className="weather-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:text-slate-100 transition-colors"
             >
               <CopyIcon className="h-3.5 w-3.5" />
-              {copiedTarget === "shareable-link" ? "Link Copied!" : "Copy Shareable Link"}
+              {copiedTarget === "shareable-link" ? "Link copied" : "Copy link"}
             </button>
             <button
               type="button"
@@ -315,7 +305,7 @@ export function ScenarioStudioSimulator({
               className="weather-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-200 hover:text-sky-100 hover:border-sky-400/60 transition-colors"
             >
               <CopyIcon className="h-3.5 w-3.5" />
-              {copiedTarget === "simulated-brief" ? "Brief Copied!" : "Copy Simulated Brief"}
+              {copiedTarget === "simulated-brief" ? "Copied" : "Copy this scenario"}
             </button>
           </div>
         </div>
@@ -325,14 +315,14 @@ export function ScenarioStudioSimulator({
           <div className="weather-surface p-5 space-y-3">
             <div className="flex items-center justify-between">
               <label htmlFor="base-rate-slider" className="text-xs font-semibold text-slate-300">
-                Policy Base Rate (Fed Funds / 1M Yield)
+                Short-term borrowing rate
               </label>
               <div className="flex items-center gap-2 font-mono">
                 <span className="text-sm font-bold text-sky-200">
                   {simulatedBaseRate.toFixed(2)}%
                 </span>
                 <span className="text-xs text-slate-400">
-                  ({formatDelta(baseRateDelta, "%")} vs live)
+                  ({formatDelta(baseRateDelta, "%")} vs this week)
                 </span>
               </div>
             </div>
@@ -347,10 +337,10 @@ export function ScenarioStudioSimulator({
               className="w-full h-2 rounded-lg bg-slate-800 appearance-none cursor-pointer accent-sky-400"
             />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-              <span>0.00% (ZIRP)</span>
-              <span>2.50% (Neutral)</span>
-              <span>5.00% (Tight)</span>
-              <span>8.00% (Extreme)</span>
+              <span>0.00% (zero rates)</span>
+              <span>2.50% (neutral)</span>
+              <span>5.00% (tight)</span>
+              <span>8.00% (extreme)</span>
             </div>
           </div>
 
@@ -358,14 +348,14 @@ export function ScenarioStudioSimulator({
           <div className="weather-surface p-5 space-y-3">
             <div className="flex items-center justify-between">
               <label htmlFor="curve-slope-slider" className="text-xs font-semibold text-slate-300">
-                10Y − 2Y Yield Curve Slope
+                Recession warning gauge (10-year minus 2-year rate)
               </label>
               <div className="flex items-center gap-2 font-mono">
                 <span className="text-sm font-bold text-sky-200">
                   {simulatedCurveSlope.toFixed(2)}%
                 </span>
                 <span className="text-xs text-slate-400">
-                  ({formatDelta(curveSlopeDelta, "%")} vs live)
+                  ({formatDelta(curveSlopeDelta, "%")} vs this week)
                 </span>
               </div>
             </div>
@@ -380,10 +370,10 @@ export function ScenarioStudioSimulator({
               className="w-full h-2 rounded-lg bg-slate-800 appearance-none cursor-pointer accent-sky-400"
             />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-              <span>-1.50% (Deep Inversion)</span>
-              <span>0.00% (Flat)</span>
-              <span>+1.00% (Normal)</span>
-              <span>+2.50% (Steep)</span>
+              <span>-1.50% (deeply inverted)</span>
+              <span>0.00% (flat)</span>
+              <span>+1.00% (normal)</span>
+              <span>+2.50% (steep)</span>
             </div>
           </div>
         </div>
@@ -392,7 +382,7 @@ export function ScenarioStudioSimulator({
       {/* Side-by-Side Then-vs-Now / Live vs Simulated Delta Panel */}
       <section aria-labelledby="deltas-heading" className="weather-panel p-6 space-y-5">
         <h3 id="deltas-heading" className="type-eyebrow">
-          Then vs. Now · Live Baseline vs. Counterfactual Delta
+          This week vs. this scenario
         </h3>
 
         <div className="grid gap-4 sm:grid-cols-3">
@@ -422,7 +412,7 @@ export function ScenarioStudioSimulator({
           {/* Funding Pressure Card */}
           <div className="weather-surface p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <p className="type-eyebrow text-slate-400">Funding Pressure</p>
+              <p className="type-eyebrow text-slate-400">{ruleMetricLabel.tightness}</p>
               <span
                 className={`text-xs font-mono font-semibold ${
                   tightnessDelta > 0
@@ -445,14 +435,14 @@ export function ScenarioStudioSimulator({
               )}
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
-              Live baseline: {liveAssessment.scores.tightness}
+              This week: {liveAssessment.scores.tightness}
             </p>
           </div>
 
           {/* Risk Appetite Card */}
           <div className="weather-surface p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <p className="type-eyebrow text-slate-400">Risk Appetite</p>
+              <p className="type-eyebrow text-slate-400">{ruleMetricLabel.riskAppetite}</p>
               <span
                 className={`text-xs font-mono font-semibold ${
                   riskAppetiteDelta > 0
@@ -472,7 +462,7 @@ export function ScenarioStudioSimulator({
               <span className="text-xs text-slate-400 font-mono">/ 100</span>
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
-              Live baseline: {liveAssessment.scores.riskAppetite}
+              This week: {liveAssessment.scores.riskAppetite}
             </p>
           </div>
         </div>
@@ -482,16 +472,13 @@ export function ScenarioStudioSimulator({
       <section aria-labelledby="playbook-deltas-heading" className="weather-panel p-6 space-y-6">
         <div>
           <h3 id="playbook-deltas-heading" className="type-section text-slate-100">
-            Counterfactual Operating Posture & Playbook
+            What you&apos;d stop and start in this scenario
           </h3>
-          <p className="mt-1 text-sm text-slate-300">
-            How your operational cadence, budget allocations, and hiring gates must adjust under this scenario.
-          </p>
         </div>
 
         {simulatedPlaybook.playbook && (
           <div className="weather-surface p-4 border-l-4 border-sky-400">
-            <p className="type-eyebrow text-sky-200">Operating Mandate</p>
+            <p className="type-eyebrow text-sky-200">The call in this scenario</p>
             <p className="mt-1 text-base font-semibold text-slate-100">
               &quot;{simulatedPlaybook.playbook.mandate}&quot;
             </p>
@@ -538,13 +525,13 @@ export function ScenarioStudioSimulator({
         {/* Operating Levers Table */}
         <div className="space-y-3">
           <h4 className="type-eyebrow text-slate-400">
-            Departmental Decision Levers Under Simulation
+            Rules by area in this scenario
           </h4>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300 border-collapse">
               <thead>
                 <tr className="border-b border-slate-800 text-slate-400 font-medium">
-                  <th scope="col" className="py-2 pr-3 w-1/5">Business Area</th>
+                  <th scope="col" className="py-2 pr-3 w-1/5">Area</th>
                   <th scope="col" className="py-2 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.action.actionNow}</th>
                   <th scope="col" className="py-2 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
                 </tr>

@@ -37,18 +37,18 @@ const resolveAnalogImplication = ({
   distanceToFlip,
 }: AnalogScoreDimensions) => {
   if (postureMatch >= 0.99 && trendDirection >= 0.99) {
-    return "Posture and momentum closely match this week; reuse operating pace unless boundary distance compresses.";
+    return "Same conditions and the same direction as this week. Keep the same pace unless the scores move closer to a line.";
   }
 
   if (distanceToFlip < 0.65) {
-    return "Similar regime but closer to a flip boundary; tighten approval thresholds and monitor reversal triggers daily.";
+    return "Similar conditions, but closer to the line that changes the call. Hold anything you can't undo and check the call daily.";
   }
 
   if (confidence < 0.65) {
-    return "Pattern match exists with lower confidence; keep experiments reversible until confidence improves.";
+    return "A looser match. Keep new experiments reversible until confidence improves.";
   }
 
-  return "Comparable operating setup; preserve bounded rules and revisit if trend direction diverges next update.";
+  return "A comparable week. Keep the same rules and re-check if the direction changes next week.";
 };
 
 export const buildHistoricalAnalogs = ({

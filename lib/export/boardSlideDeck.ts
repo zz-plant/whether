@@ -66,9 +66,9 @@ type SlideCard = {
 /** The three cards, in the order the SVG draws them. */
 const buildCards = (payload: MeetingSlidePayload): SlideCard[] => [
   { label: "1. ACTION NOW", body: payload.actionNow, accent: COLORS.accents[0], top: CARD_TOPS[0] },
-  { label: "2. PAUSE IF (GUARDRAIL)", body: payload.pauseIf, accent: COLORS.accents[1], top: CARD_TOPS[1] },
+  { label: "2. PAUSE IF", body: payload.pauseIf, accent: COLORS.accents[1], top: CARD_TOPS[1] },
   {
-    label: "3. CHANGE COURSE IF (REVERSAL TRIGGER)",
+    label: "3. CHANGE COURSE IF",
     body: payload.changeCourseIf,
     accent: COLORS.accents[2],
     top: CARD_TOPS[2],

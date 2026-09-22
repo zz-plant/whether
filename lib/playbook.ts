@@ -44,7 +44,7 @@ const DEFAULT_STOP_ITEMS = ["Avoid unbudgeted bets."];
 const DEFAULT_START_ITEMS = ["Invest in margin-positive moves."];
 
 const CANONICAL_RULE_FALLBACK = {
-  actionNow: formatDecisionAction("Maintain current posture and gate new commitments."),
+  actionNow: formatDecisionAction("Keep last week's plan and hold new commitments."),
   triggerThreshold: formatDecisionThreshold("Pause if funding pressure rises above 60 or risk appetite falls below 40."),
   reversalCondition: formatDecisionReversal("Resume staged approvals when funding pressure falls below 50 and risk appetite is above 50."),
 } satisfies Omit<PlaybookOperatingLever, "lever" | "label">;

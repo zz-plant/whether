@@ -80,7 +80,7 @@ export default function ContactPage() {
             </span>
             <span>
               <span className="font-semibold text-slate-100">Method questions.</span> The formulas and sources are
-              published on the readiness page first — start there.
+              published on the sources page first — start there.
             </span>
           </li>
           <li className="flex gap-2">

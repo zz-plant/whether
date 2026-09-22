@@ -36,12 +36,8 @@ export const AdvancedThresholdsSection = ({
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Advanced controls</p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Threshold and audit controls are hidden by default.
+              Move the lines the call is judged against.
             </h2>
-            <p className="mt-2 text-sm text-slate-300">
-              Focus presets and ranked signals stay in the main flow, while this panel covers
-              threshold tuning and audit history.
-            </p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -51,7 +47,7 @@ export const AdvancedThresholdsSection = ({
             type="button"
             className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100"
           >
-            Open advanced threshold controls
+            Open the line settings
             <span className="text-fluid-micro text-slate-400">Show / hide</span>
           </Collapsible.Trigger>
           <Collapsible.Panel>

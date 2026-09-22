@@ -88,7 +88,7 @@ const HORIZON_COPY: Record<
     cadenceLabel: "Monthly call",
     periodNoun: "month",
     periodNounPlural: "months",
-    historyLabel: "Regime by month",
+    historyLabel: "Conditions by month",
     weeklyBridge: "The weekly read behind this month's call",
     planLabel: "Build this month's plan →",
     shareTitle: "Whether Monthly Call",
@@ -99,7 +99,7 @@ const HORIZON_COPY: Record<
     cadenceLabel: "Quarterly call",
     periodNoun: "quarter",
     periodNounPlural: "quarters",
-    historyLabel: "Regime by quarter",
+    historyLabel: "Conditions by quarter",
     weeklyBridge: "The weekly read behind this quarter's call",
     planLabel: "Build this quarter's plan →",
     shareTitle: "Whether Quarterly Call",
@@ -117,25 +117,25 @@ const formatSignedScore = (value: number) =>
   );
 
 /**
- * The two distances a rail carries, named with the same two words the sentences above
- * it are chipped with. A rail that invented its own vocabulary for the edges would
- * leave the reader matching "5 to no rule" against "Reopen broader scope when …" on
- * their own; naming the edges with the contract pair makes the number and the sentence
- * the same claim.
+ * The two distances a rail carries, as points from the pause line and from the
+ * resume line — the two names the rest of the page uses for the pair. An
+ * earlier version chipped the edges with the contract labels ("5 to Pause if ·
+ * Change course if short by 3"), which read as a sentence with its verbs
+ * missing.
  *
  * A tripped edge is stated rather than measured — zero distance to a line is
  * not the same thing to act on as a condition that already fires.
  */
 export const formatBandHeadroom = (band: HorizonSignalBand): string => {
   if (band.pauseTripped) {
-    return `${DECISION_CONTRACT_LABELS.threshold.pauseIf} tripped`;
+    return "Past the pause line";
   }
 
-  const toPause = `${formatScore(band.toPause)} to ${DECISION_CONTRACT_LABELS.threshold.pauseIf}`;
+  const toPause = `${formatScore(band.toPause)} points from the pause line`;
 
   return band.resumeHolds
-    ? `${formatScore(band.toResume)} to ${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} · ${toPause}`
-    : `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf} short by ${formatScore(band.toResume)} · ${toPause}`;
+    ? `${toPause} · ${formatScore(band.toResume)} from the resume line`
+    : `${toPause} · ${formatScore(band.toResume)} short of the resume line`;
 };
 
 /** The reading itself, and the move that produced it. Null movement stays null rather
@@ -300,7 +300,7 @@ export const buildCadenceCallModel = ({
   });
 
   const overrideReason = assessment.policyAssessment.refusal.refused
-    ? assessment.policyAssessment.refusal.reasons[0] ?? "Policy signals disagree."
+    ? assessment.policyAssessment.refusal.reasons[0] ?? "The two scores disagree."
     : null;
 
   // `currentCall` up top, `actionNow` in the rule. The weekly hero directly below

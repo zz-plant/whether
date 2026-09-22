@@ -42,7 +42,7 @@ const SETTLE_MS = 700;
 
 const StartFromAJob = () => (
   <section aria-labelledby="search-start-heading" className="space-y-3">
-    <h2 id="search-start-heading" className="type-eyebrow">Start from a job</h2>
+    <h2 id="search-start-heading" className="type-eyebrow">Start from what you&apos;re deciding</h2>
     <div className="flex flex-wrap gap-2">
       <ActionLink href="/signals#decision-summary" variant="pill">{searchJobLabels.check}</ActionLink>
       <ActionLink href="/operate" variant="pill">{searchJobLabels.approve}</ActionLink>
@@ -57,12 +57,12 @@ const NothingMatched = ({ query }: { query: string }) => (
   <section aria-labelledby="search-empty-heading" className="space-y-3">
     <h2 id="search-empty-heading" className="type-eyebrow">Nothing matched “{query}”</h2>
     <p className="text-sm text-slate-300">
-      The index covers toolkits, failure modes, and the site&apos;s main surfaces. Try a decision word — hiring,
+      The index covers toolkits, what could go wrong, and the site&apos;s main pages. Try a decision word — hiring,
       runway, rollback, pricing — or start from one of these.
     </p>
     <div className="flex flex-wrap gap-2">
       <ActionLink href="/signals" variant="pill">Evidence</ActionLink>
-      <ActionLink href="/operate" variant="pill">Operating guardrails</ActionLink>
+      <ActionLink href="/operate" variant="pill">Plan</ActionLink>
       <ActionLink href={buildToolkitLibraryHref()} variant="pill">Toolkit library</ActionLink>
       <ActionLink href="/trust" variant="pill">Trust</ActionLink>
     </div>
@@ -156,7 +156,7 @@ export const SearchResults = ({
         <p className="text-fluid-xs text-slate-400">
           Filtered to “{searchJobLabels[activeJob]}”.{" "}
           <Link href={`/search?q=${encodeURIComponent(trimmed)}`} className="text-sky-200 underline decoration-sky-600">
-            Show every job
+            Show everything
           </Link>
         </p>
       ) : null}

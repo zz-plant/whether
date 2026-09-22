@@ -78,8 +78,8 @@ describe("checkRegimeChange Slack delivery", () => {
       "regime change must reach a webhook the channel subscribed",
     );
     assert.ok(
-      posted.some((entry) => entry.body.includes("Reconsider Operating Posture")),
-      "the post must carry the reconsider-posture alert",
+      posted.some((entry) => entry.body.includes("The call changed")),
+      "the post must carry the call-changed alert",
     );
   });
 

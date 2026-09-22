@@ -9,7 +9,7 @@
 | Initiative | Class | Owner | Reversal path | Next review |
 |---|---|---|---|---|
 
-## 3) Trigger dashboard (30-day confirmation)
+## 3) Trigger dashboard (a signal must hold for 30 days before the posture changes)
 | Signal | Threshold | Current | Direction | Action if breached |
 |---|---|---|---|---|
 

@@ -139,8 +139,8 @@ export const checkRegimeChange = async (options?: {
      */
     pushOutcome = await sendRegimeChangePush().catch(() => null);
     await postSlackAlerts(
-      "⚠️ Reconsider Operating Posture",
-      `*${previousRegime}* → *${currentRegime}*\nThe assumptions supporting the current posture have moved. Review the weekly brief for updated guidance.`,
+      "⚠️ The call changed",
+      `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\nRead this week's call before acting on last week's plan.`,
     );
   }
 
@@ -174,10 +174,10 @@ export const checkRegimeChange = async (options?: {
   if (projection.weeksToFlip && projection.weeksToFlip <= 2) {
     const prevWeeks = prevWeeksToFlip ? parseInt(prevWeeksToFlip, 10) : null;
     if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
-      alerts.push(`WATCH DECISIONS — flip window narrowing: ${projection.velocityLabel}`);
+      alerts.push(`WATCH — the call could change soon: ${projection.velocityLabel}`);
       await postSlackAlerts(
-        "👀 Watch Decisions — Flip Window Narrowing",
-        `${projection.velocityLabel}\nConditions are approaching a boundary that would change the operating call. Hold irreversible moves until it resolves.`,
+        "👀 The call could change soon",
+        `${projection.velocityLabel}\nA score is closing on the line that changes the call. Hold anything you can't undo until it settles.`,
       );
     }
   }
@@ -186,7 +186,7 @@ export const checkRegimeChange = async (options?: {
   const prevConfidence = await kv.get("regime:confidence");
   const currentConfidence = assessment.diagnostics?.confidence ?? "HIGH";
   if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
-    alerts.push(`Confidence dropped from ${prevConfidence} to ${currentConfidence}. Data is getting noisier — review thresholds.`);
+    alerts.push(`Confidence dropped from ${prevConfidence} to ${currentConfidence}. Sources disagreed this week. Read the call before acting on it.`);
   }
 
   /* Persist state for next check */

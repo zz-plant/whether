@@ -70,7 +70,7 @@ export default async function SignalsPage({
       trustStatusTone={model.trust.trustStatusTone}
       showOfflineBadge={model.isFallback && !model.historicalSelection}
       pageTitle="Why the weekly brief changed"
-      pageSummary="What moved, why it matters, and what would flip the call."
+      pageSummary="What moved, why it matters, and what would change the call."
       sectionLinks={model.sectionLinks}
       nextStep={{
         href: "/operate",

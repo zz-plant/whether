@@ -102,7 +102,7 @@ export function CompactTrustPopover({
     return (
       <span className="inline-flex min-h-11 sm:min-h-8 items-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-300">
         <span className="h-2 w-2 rounded-full bg-amber-400" />
-        <span>Archived Snapshot</span>
+        <span>Past week</span>
       </span>
     );
   }
@@ -124,12 +124,12 @@ export function CompactTrustPopover({
 
       {open && (
         <div
-          aria-label="Data provenance and trust status"
+          aria-label="Sources and freshness"
           className="absolute right-0 top-full mt-2 z-50 w-72 rounded-xl border border-slate-800 bg-slate-950/95 p-3.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
         >
           <div className="flex items-center gap-2 pb-2 mb-2.5 border-b border-white/[0.08]">
             <ShieldCheck size={16} className="text-sky-400" />
-            <h4 className="text-xs font-semibold text-white">Provenance &amp; Trust</h4>
+            <h4 className="text-xs font-semibold text-white">Sources</h4>
           </div>
 
           <div className="space-y-2 text-xs">
@@ -139,13 +139,13 @@ export function CompactTrustPopover({
                 in words. */}
             <div className="space-y-0.5">
               <div className="flex justify-between items-center text-slate-300">
-                <span className="text-slate-400">Yield Curve:</span>
+                <span className="text-slate-400">Treasury rates:</span>
                 <span className="font-medium text-sky-300 truncate max-w-[140px]" title={treasurySource}>
                   {describeTreasurySource(treasurySource)}
                 </span>
               </div>
               <p className="text-right font-mono text-[10px] text-slate-500">
-                FRED {SERIES_CODES.yieldCurve.join(" · ")}
+                St. Louis Fed (FRED) · {SERIES_CODES.yieldCurve.join(" · ")}
               </p>
             </div>
             <div className="space-y-0.5">
@@ -154,13 +154,13 @@ export function CompactTrustPopover({
                 <span className="font-medium text-sky-300">St. Louis Fed (FRED)</span>
               </div>
               <p className="text-right font-mono text-[10px] text-slate-500">
-                FRED {SERIES_CODES.creditAndStress.join(" · ")}
+                FRED · {SERIES_CODES.creditAndStress.join(" · ")}
               </p>
             </div>
             <div className="flex justify-between items-center text-slate-300">
-              <span className="text-slate-400">Feed Health:</span>
+              <span className="text-slate-400">Status:</span>
               <span className="font-medium text-white">
-                {degradedCount === 0 ? "100% Verified Primary" : `${degradedCount} degraded`}
+                {degradedCount === 0 ? "All sources live" : `${degradedCount} not live`}
               </span>
             </div>
             {recordDateLabel && (
@@ -190,19 +190,19 @@ export function CompactTrustPopover({
                 href="/history#track-record"
                 className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-sky-400 hover:text-sky-300 no-underline"
               >
-                <span>Audit the record</span>
+                <span>See the record</span>
                 <ExternalLink size={10} />
               </Link>
             </div>
           ) : null}
 
           <div className="mt-3 pt-2 border-t border-white/[0.08] flex justify-between items-center">
-            <span className="text-[10px] text-slate-500">Deterministic model</span>
+            <span className="text-[10px] text-slate-500">Same rule every week</span>
             <Link
               href="/trust"
               className="inline-flex items-center gap-1 text-[11px] font-medium text-sky-400 hover:text-sky-300 no-underline"
             >
-              <span>Full methodology</span>
+              <span>How the score is built</span>
               <ExternalLink size={10} />
             </Link>
           </div>

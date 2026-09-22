@@ -82,7 +82,7 @@ export function extractMeetingSlidePayload(
  */
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
-    `> **Whether Weekly Operating Stance** — *${payload.recordDate}*`,
+    `> **Whether: this week's call** — *${payload.recordDate}*`,
     `> **Conditions**: ${getRegimePublicLabel(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
@@ -213,7 +213,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 320)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#f59e0b"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. PAUSE IF (GUARDRAIL)</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. PAUSE IF</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.pauseIf)}</text>
   </g>
 
@@ -221,7 +221,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 450)">
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#10b981"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. CHANGE COURSE IF (REVERSAL TRIGGER)</text>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. CHANGE COURSE IF</text>
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.changeCourseIf)}</text>
   </g>
 

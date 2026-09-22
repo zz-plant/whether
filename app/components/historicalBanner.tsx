@@ -66,8 +66,8 @@ export const HistoricalBanner = ({
             ) : null}
           </p>
           <p className="mt-1 text-xs text-[var(--app-text-muted)]">
-            Live signals are hidden, and this call is not this week&apos;s. Return to the live brief
-            before approving anything.
+            Live signals are hidden, and this call is not this week&apos;s. Go back to this week&apos;s
+            call before acting on it.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export const HistoricalBanner = ({
           {liveHref ? (
             <ActionLink href={liveHref} variant="primary" className="gap-1.5">
               <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              Back to live brief
+              Back to this week
             </ActionLink>
           ) : null}
           {backwardHref ? (

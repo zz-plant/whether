@@ -19,8 +19,10 @@ const formatSignedPoints = (points: number) => {
   return `${rounded > 0 ? "↑" : rounded < 0 ? "↓" : "→"} ${abs}`;
 };
 
-const formatSignedBps = (bps: number) =>
-  `${bps > 0 ? "+" : bps < 0 ? "−" : ""}${Math.abs(bps)} bps`;
+/* The model carries the move in basis points; the reader gets a percentage,
+   because "bps" is the one unit on this card nothing on the page expands. */
+const formatSignedRateMove = (bps: number) =>
+  `${bps > 0 ? "+" : bps < 0 ? "−" : ""}${(Math.abs(bps) / 100).toFixed(2)}%`;
 
 const rowLinkClass = "flex items-center gap-2.5 group no-underline min-w-0";
 const rowIconClass =
@@ -71,7 +73,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
                 <strong className="text-sm font-semibold text-white">{fundingPressure.current}</strong>
                 {fundingPressure.weeklyDelta !== null && fundingPressure.weeklyDelta !== 0 ? (
                   <span className={`text-[11px] font-semibold ${fundingPressure.weeklyDelta > 0 ? "text-rose-300" : "text-semantic-easing-fg"}`}>
-                    {formatSignedPoints(fundingPressure.weeklyDelta)} WoW
+                    {formatSignedPoints(fundingPressure.weeklyDelta)} this week
                   </span>
                 ) : null}
               </span>
@@ -79,7 +81,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
 
             {typeof fundingPressure.beyondBoundaryMonths === "number" && fundingPressure.beyondBoundaryMonths >= 1 ? (
               <p className="text-[11px] font-medium text-amber-300">
-                Above the posture boundary for {fundingPressure.beyondBoundaryMonths} month{fundingPressure.beyondBoundaryMonths === 1 ? "" : "s"}
+                Past the line that changes the call for {fundingPressure.beyondBoundaryMonths} month{fundingPressure.beyondBoundaryMonths === 1 ? "" : "s"}
               </p>
             ) : null}
           </div>
@@ -106,7 +108,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
             ) : null}
             {riskAppetite.monthsToBoundaryAtPace !== null ? (
               <p className="text-[11px] text-amber-300 tabular-nums">
-                At recent pace, ≈{riskAppetite.monthsToBoundaryAtPace} month{riskAppetite.monthsToBoundaryAtPace === 1 ? "" : "s"} to the boundary
+                At this pace, about {riskAppetite.monthsToBoundaryAtPace} month{riskAppetite.monthsToBoundaryAtPace === 1 ? "" : "s"} to the line that changes the call
               </p>
             ) : null}
           </div>
@@ -125,7 +127,7 @@ export function KeyDriversCard({ views, className = "" }: KeyDriversCardProps) {
                 </strong>
                 {financing.change ? (
                   <span className={`text-[11px] font-semibold ${financing.change.bps > 0 ? "text-rose-300" : financing.change.bps < 0 ? "text-semantic-easing-fg" : "text-slate-400"}`}>
-                    {formatSignedBps(financing.change.bps)} / {financing.change.windowMonths}mo
+                    {formatSignedRateMove(financing.change.bps)} over {financing.change.windowMonths} months
                   </span>
                 ) : null}
               </span>

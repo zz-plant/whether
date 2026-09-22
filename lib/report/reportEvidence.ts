@@ -21,24 +21,24 @@ type WeeklyTone = "tightening" | "easing" | "holding";
 // disagreed about the same call. Direction picks the row; regime picks the verb.
 const ACTION_NOW_BY_REGIME: Record<RegimeKey, Record<WeeklyTone, string>> = {
   EXPANSION: {
-    tightening: "Conditions tightening — keep proven bets moving, but stage anything new.",
-    easing: "Conditions easing — scale proven bets with milestone gates.",
-    holding: "Conditions holding — keep scaling proven bets at the current pace.",
+    tightening: "Conditions tightening — keep what is working. Don't start anything new this week.",
+    easing: "Conditions easing — grow what is working, one milestone at a time.",
+    holding: "Conditions holding — keep growing what is working at the current pace.",
   },
   VOLATILE: {
-    tightening: "Conditions tightening — keep only reversible bets and cap concurrent experiments.",
-    easing: "Conditions easing — reopen staged bets one tranche at a time.",
-    holding: "Conditions holding — run reversible bets with named rollback owners.",
+    tightening: "Conditions tightening — keep only the bets you can stop, and run fewer experiments at once.",
+    easing: "Conditions easing — restart paused work one item at a time.",
+    holding: "Conditions holding — only start things one person can stop.",
   },
   DEFENSIVE: {
     tightening: "Conditions tightening — freeze new commitments and keep spend flexible.",
     easing: "Conditions easing — resume paused work with clear milestones.",
-    holding: "Conditions holding — continue at current pace with measurable outcomes.",
+    holding: "Conditions holding — continue at the current pace, with a number on each outcome.",
   },
   SCARCITY: {
     tightening: "Conditions tightening — freeze new commitments and protect runway.",
     easing: "Conditions easing — resume paused work with clear milestones.",
-    holding: "Conditions holding — hold spend flat and require short paybacks.",
+    holding: "Conditions holding — hold spend flat and require paybacks inside 6 months.",
   },
 };
 
@@ -276,7 +276,7 @@ export const buildReportEvidenceItems = ({
         ? "No measurable move against the prior snapshot."
         : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${direction === "tightening" ? "tightening" : "easing"} the read.`,
       thresholdDistance === null
-        ? `${signalLabels[key]} feeds this week's call but carries no regime threshold of its own.`
+        ? `${signalLabels[key]} feeds this week's call but has no line of its own that changes it.`
         : formatBoundaryDistance({
             label: signalLabels[key],
             points: thresholdDistance,

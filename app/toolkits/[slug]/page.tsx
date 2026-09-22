@@ -82,25 +82,25 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
             <dd className="text-slate-100 font-medium">{toolkit.decisionThisSession}</dd>
           </div>
           <div className="weather-surface p-3.5 space-y-1">
-            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">Operating outcome</dt>
+            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">What it gets you</dt>
             <dd className="text-slate-100 font-medium">{toolkit.operatingOutcome}</dd>
           </div>
           <div className="weather-surface p-3.5 space-y-1 sm:col-span-2">
-            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">Artifact you leave with</dt>
+            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">What you leave with</dt>
             <dd className="text-slate-100 font-medium">{toolkit.decisionArtifact}</dd>
           </div>
         </dl>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Bounded operating rules</h2>
+        <h2 className="text-lg font-semibold text-slate-100">What to do at each pace</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action} in tighter conditions:</span> {toolkit.tightenNow}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action} in easier conditions:</span> {toolkit.loosenNow}</li>
-          <li>• <span className="font-semibold text-slate-100">Proceed threshold:</span> {toolkit.proceedThreshold}</li>
+          <li>• <span className="font-semibold text-slate-100">Go ahead when:</span> {toolkit.proceedThreshold}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {toolkit.stopTrigger}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {toolkit.reversalTrigger}</li>
         </ul>
-        <p className="text-sm text-slate-300"><span className="font-semibold">Posture split:</span> {toolkit.byPosture}</p>
+        <p className="text-sm text-slate-300"><span className="font-semibold">By pace:</span> {toolkit.byPosture}</p>
         <p className="text-sm text-slate-300"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>
       </section>
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -133,7 +133,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         </ol>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Success signals</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Signs it worked</h2>
         <ul className="space-y-1 text-sm text-slate-200">
           {toolkit.successSignals.map((item) => <li key={item}>• {item}</li>)}
         </ul>

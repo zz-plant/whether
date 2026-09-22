@@ -237,7 +237,7 @@ This memo lines the budget and spending limits up with those conditions:
 ## 4. Sources
 - **Short-term borrowing rate**: ${baseRateVal}% (Source: US Treasury)
 - **Recession warning gauge (10-year minus 2-year)**: ${slopeVal} (Source: US Treasury)
-- **BBB Credit Spreads**: ${bbbVal}% (Source: FRED Moody's BBB Corporate Bond Yield Relative to 10Y Treasury)
+- **BBB credit spread**: ${bbbVal}% (Source: St. Louis Fed, Moody's BBB corporate bond yield relative to the 10-year Treasury)
 - **CPI Inflation (YoY)**: ${cpiVal}% (Source: Bureau of Labor Statistics)
 - **Unemployment Rate**: ${unempVal}% (Source: Bureau of Labor Statistics)
 
@@ -272,13 +272,13 @@ This memo lines the budget and spending limits up with those conditions:
                   : "border-slate-600/70 text-slate-200 hover:border-sky-400/70"
               }`}
             >
-              {showMemo ? "Hide Budget Memo" : "Generate Budget Memo"}
+              {showMemo ? "Hide budget memo" : "Show budget memo"}
             </button>
           ) : null}
         </div>
         {showMethodology ? (
           <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
-            Runway risk combines runway gap, burn multiple, growth, and the current market setting. The planner turns that pressure plus regime context into practical guidance for approval pace, payback discipline, and how reversible new commitments should be. Growth compounds monthly; with revenue at zero the burn multiple is treated as 4x.
+            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions; growth compounds monthly, and with no revenue the burn multiple is read as 4x.
           </div>
         ) : null}
       </div>
@@ -385,7 +385,7 @@ This memo lines the budget and spending limits up with those conditions:
                 <span className="text-sm text-slate-500">/100</span>
                 <span className="text-sm text-slate-300">{output.runwayRisk.level}</span>
                 <span className="ml-auto text-fluid-nano text-slate-400">
-                  downside flip <span className="text-slate-200">{output.runwayRisk.macroRiskDownsideFlip}</span>
+                  if conditions worsen <span className="text-slate-200">{output.runwayRisk.macroRiskDownsideFlip}</span>
                 </span>
               </p>
               <RangeBar
@@ -394,7 +394,7 @@ This memo lines the budget and spending limits up with those conditions:
                 band={{ from: output.runwayRisk.macroRiskBase, to: output.runwayRisk.macroRiskDownsideFlip }}
                 point={output.runwayRisk.score}
                 tone={output.runwayRisk.score >= 60 ? "rose" : output.runwayRisk.score >= 35 ? "amber" : "emerald"}
-                label="Runway risk now and on a downside flip"
+                label="Runway risk now and if conditions worsen"
               />
               <p className="mt-2 text-fluid-xs text-slate-400">{output.runwayRisk.summary}</p>
             </article>
@@ -463,13 +463,13 @@ This memo lines the budget and spending limits up with those conditions:
               />
               <p className="mt-2 text-fluid-xs text-slate-400">{output.burnAdjustmentRange.summary}</p>
               <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.08em] ${paybackStrictnessState.tone}`}>
-                Payback strictness: {paybackStrictnessState.label} ({paybackStrictnessLevel}/3)
+                Payback bar: {paybackStrictnessState.label.toLowerCase()}
               </p>
             </article>
           </div>
 
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Bounded guardrails</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">The rules this sets</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
               <li>• {output.boundedRules.capitalRaising}</li>
               <li>• {output.boundedRules.burnDiscipline}</li>
@@ -483,11 +483,11 @@ This memo lines the budget and spending limits up with those conditions:
             <div id="ops-board-memo" className="weather-surface border-sky-500/25 bg-slate-950/60 p-5 space-y-4">
               <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
                 <div>
-                  <p className="type-eyebrow text-sky-200">Generated board memo</p>
-                  <p className="text-fluid-xs text-slate-400">Built from the figures above. Review before circulating.</p>
+                  <p className="type-eyebrow text-sky-200">Budget memo</p>
+                  <p className="text-fluid-xs text-slate-400">Built from the figures above. Check them before you send it.</p>
                 </div>
                 <ClipboardActionRow
-                  label="Copy board memo"
+                  label="Copy memo"
                   state={memoClipboardState}
                   onClick={() => {
                     void copyToClipboard(memoMarkdown, "budget-memo");
@@ -502,9 +502,9 @@ This memo lines the budget and spending limits up with those conditions:
           ) : null}
 
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-slate-400">Copy this compact block into Slack or your weekly finance sync.</p>
+            <p className="text-xs text-slate-400">Copy this block into Slack or a note.</p>
             <ClipboardActionRow
-              label="Copy financial block"
+              label="Copy block"
               state={clipboardState}
               onClick={() => {
                 void copyToClipboard(shareBlock, "runway-plan");

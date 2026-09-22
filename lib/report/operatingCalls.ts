@@ -142,13 +142,15 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
 
 const OPERATING_LEVER_FALLBACK = {
-  areaActionNow: "Maintain current operating posture.",
+  areaActionNow: "Keep last week's plan for this area.",
   triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
   reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
 
-const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "Unavailable — review thresholds manually.";
-const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "Unavailable — review reversal conditions manually.";
+/* Said as what is missing. The reader cannot "review thresholds manually"; the
+   rule table did not supply a line this week, and that is the fact to carry. */
+const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "No pause line this week — check the call before acting.";
+const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "No resume line this week — check the call before acting.";
 
 const hasText = (value: string | undefined | null): value is string => typeof value === "string" && value.trim().length > 0;
 

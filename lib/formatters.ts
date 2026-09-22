@@ -43,7 +43,7 @@ const MS_PER_DAY = 24 * MS_PER_HOUR;
 const MS_PER_MONTH = 30.4375 * MS_PER_DAY;
 
 const formatUnitSuffix = (unit: string) => {
-  if (unit === "bps") return " bps (basis points)";
+  if (unit === "bps") return " basis points";
   if (unit === "index") return "";
   return unit;
 };

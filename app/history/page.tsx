@@ -28,11 +28,11 @@ import { buildPageMetadata } from "../../lib/seo";
  * off, the largest single cluster in the sitemap.
  */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Regime History and Track Record",
+  title: "History and Track Record",
   description:
-    "Every monthly regime call on record, when the posture changed, how long each regime held, and the published weekly briefs behind the track record.",
+    "Every monthly call on record, when it changed, how long each one held, and the published weekly briefs behind the track record.",
   path: "/history",
-  imageAlt: "Whether regime history and track record",
+  imageAlt: "Whether history and track record",
 });
 
 type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string };
@@ -69,7 +69,7 @@ export default async function HistoryPage({
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
 
   const historySectionLinks = [
-    { href: "#regime-map", label: "Regime plane" },
+    { href: "#regime-map", label: "Where this month sits" },
     { href: "#track-record", label: "Track record" },
     ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
   ];
@@ -162,8 +162,8 @@ export default async function HistoryPage({
                 append-only rule is the guarantee worth stating. */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? "Permanent, append-only weekly brief records paired with 176 months of continuous regime history (2012–2026). Entries are never edited after publication, so past calls read the way they were made."
-                : `${publishedBriefs.length} weekly brief records paired with 176 months of continuous regime history (2012–2026). Entries are never edited after publication, so past calls read the way they were made.`}
+                ? "Permanent, append-only weekly brief records paired with 176 months of monthly calls (2012–2026). Entries are never edited after publication, so past calls read the way they were made."
+                : `${publishedBriefs.length} weekly brief records paired with 176 months of monthly calls (2012–2026). Entries are never edited after publication, so past calls read the way they were made.`}
             </p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -199,9 +199,9 @@ export default async function HistoryPage({
         aria-labelledby="posture-by-year-heading"
         className="weather-panel space-y-4 px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       >
-        <h2 id="posture-by-year-heading" className="type-eyebrow type-eyebrow-section">Posture by year</h2>
+        <h2 id="posture-by-year-heading" className="type-eyebrow type-eyebrow-section">The call by year</h2>
         <p className="text-sm text-slate-300">
-          What the operating posture was in each closed period, with the regime splits and mid-period reversals behind it.
+          What the call was in each closed year, how the months split, and where it changed mid-year.
         </p>
         <ul className="flex flex-wrap gap-2">
           {postureArchiveYears.map((year) => (

@@ -147,7 +147,7 @@ export function SignalInversionPreview({
             <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
           ) : null}
         </svg>
-        <p className="mt-1 text-xs text-slate-400">Dashed zero line: boundary for inversion</p>
+        <p className="mt-1 text-xs text-slate-400">Dashed zero line. Below it, the curve is inverted.</p>
         <div className="mt-2 flex items-center justify-between type-eyebrow">
           <span>{monthlyPoints[0]?.label}</span>
           <span>{midPoint?.label}</span>
@@ -176,7 +176,7 @@ export function SignalInversionPreview({
             2Y-3M inverted {monthsInverted2Y3M} mo
           </span>
           <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">
-            Below zero = inversion pressure
+            Below zero = inverted
           </span>
           {hasGaps ? (
             <span className="rounded-sm border border-slate-700/70 bg-slate-950/70 px-2 py-1 text-slate-300">

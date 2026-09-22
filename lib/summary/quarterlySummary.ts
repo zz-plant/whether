@@ -28,7 +28,7 @@ const quarterlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
   SCARCITY:
     "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
   DEFENSIVE:
-    "prioritize durable revenue, reduce structural cost, and sequence bets around resilience",
+    "put revenue that repeats first, cut fixed cost, and order new bets by how easily they can be undone",
   VOLATILE:
     "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
   EXPANSION:

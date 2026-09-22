@@ -199,14 +199,14 @@ export const buildSignalClusterReading = (
       displayValue: WHOLE.format(scores.tightness),
       unit: "",
       scaleNote: "of 100",
-      threshold: { value: thresholds.tightnessRegime, label: `the ${WHOLE.format(thresholds.tightnessRegime)} regime threshold` },
+      threshold: { value: thresholds.tightnessRegime, label: `the line at ${WHOLE.format(thresholds.tightnessRegime)} that changes the call` },
       delta,
       betterWhen: "lower",
       distanceLabel: describeDistance(
         scores.tightness,
         thresholds.tightnessRegime,
         " points",
-        `the ${WHOLE.format(thresholds.tightnessRegime)} regime threshold`,
+        `the line at ${WHOLE.format(thresholds.tightnessRegime)} that changes the call`,
       ),
       directionLabel: direction.label,
       directionTone: direction.tone,
@@ -226,8 +226,7 @@ export const buildSignalClusterReading = (
           + "Read it as \"at or above the top of the scale\" rather than as a flat week."
         : null,
       implication:
-        "Long-payback commitments are the exposure this measures: the higher it runs, the shorter the payback "
-        + "window a new commitment should be underwritten against.",
+        "The higher it runs, the sooner a new commitment has to pay back.",
       unavailableReason: null,
     };
   }
@@ -242,14 +241,14 @@ export const buildSignalClusterReading = (
       displayValue: WHOLE.format(scores.riskAppetite),
       unit: "",
       scaleNote: "of 100",
-      threshold: { value: thresholds.riskAppetiteRegime, label: `the ${WHOLE.format(thresholds.riskAppetiteRegime)} regime threshold` },
+      threshold: { value: thresholds.riskAppetiteRegime, label: `the line at ${WHOLE.format(thresholds.riskAppetiteRegime)} that changes the call` },
       delta,
       betterWhen: "higher",
       distanceLabel: describeDistance(
         scores.riskAppetite,
         thresholds.riskAppetiteRegime,
         " points",
-        `the ${WHOLE.format(thresholds.riskAppetiteRegime)} regime threshold`,
+        `the line at ${WHOLE.format(thresholds.riskAppetiteRegime)} that changes the call`,
       ),
       directionLabel: direction.label,
       directionTone: direction.tone,
@@ -268,8 +267,7 @@ export const buildSignalClusterReading = (
         "Risk appetite is derived from the curve, and the curve also feeds funding pressure. "
         + "A move in the curve shows up on both watches at once, so treat them as one reading rather than two confirmations.",
       implication:
-        "This is the pacing input for growth and hiring exposure: the lower it runs, the more of a new commitment "
-        + "should be reversible within the quarter.",
+        "The lower it runs, the more of any new hire or growth spend should be reversible within the quarter.",
       unavailableReason: null,
     };
   }
@@ -286,11 +284,11 @@ export const buildSignalClusterReading = (
   const direction = describeDirection(delta, "higher", "pp", SIGNED_TWO);
 
   return {
-    measure: "Curve slope",
+    measure: "Recession warning gauge",
     value: slope,
     displayValue: slope === null ? null : `${ONE_DECIMAL.format(slope)}pp`,
     unit: "pp",
-    scaleNote: "10-year minus 2-year",
+    scaleNote: "10-year minus 2-year rate",
     threshold: { value: 0, label: "the zero line where the curve inverts" },
     delta,
     betterWhen: "higher",
@@ -305,13 +303,12 @@ export const buildSignalClusterReading = (
       ? "The curve is inverted. This is the condition the watch exists for, not a warning that one is approaching."
       : null,
     implication:
-      "Irreversible bets are what this guards: the closer the slope runs to zero, the more a commitment should "
-      + "carry an explicit way out before it is signed.",
+      "The closer this runs to zero, the more a new commitment needs a written way out before it is signed.",
     /* An empty state that says what is missing and what still holds, rather than
        a dash. The slope is nullable whenever either leg fails to resolve. */
     unavailableReason: slope === null
-      ? "The 2-year or 10-year leg did not resolve this week, so the spread cannot be computed. "
-        + "The bounded call below still stands on the rest of the rate stack."
+      ? "The 2-year or 10-year rate did not resolve this week, so the gap between them cannot be computed. "
+        + "The call below still stands on the other rates."
       : null,
   };
 };

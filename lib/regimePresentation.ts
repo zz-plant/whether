@@ -23,18 +23,24 @@ const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 
+/**
+ * One fact about money and one instruction per weather word. The metaphor is
+ * cashed out here rather than extended: "protect heat" and "move only with
+ * shelter" told a reader what the weather was like, not what to do about it.
+ */
 export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
-  SCARCITY: "Everything costs more to move, so protect heat, conserve cash, and avoid one-way commitments.",
-  DEFENSIVE: "Conditions are workable but muted, so stay selective and keep efficiency layers on.",
-  VOLATILE: "Windows open and close quickly, so move only with shelter, rollback paths, and proof.",
-  EXPANSION: "Visibility is high and footing is firm, so move faster while keeping guardrails in place.",
+  SCARCITY: "Money is expensive and hard to raise. Conserve cash and avoid commitments you can't undo.",
+  DEFENSIVE: "Money is available but pricey. Fund what is already working; hold the rest.",
+  VOLATILE: "Conditions are changing week to week. Only commit where you can reverse.",
+  EXPANSION: "Money is cheap and available. Move faster, and keep the pause line in view.",
 };
 
+/* The same sentence, led by the weather word, for the legend's screen-reader label. */
 const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity regime: freezing weather; capital is constrained and each move needs protection.",
-  DEFENSIVE: "Defensive regime: cloudy weather; conditions are workable but visibility is muted.",
-  VOLATILE: "Transitional regime: stormy weather; windows open and close quickly.",
-  EXPANSION: "Expansion regime: sunny weather; visibility is high and conditions support faster movement.",
+  SCARCITY: `${REGIME_LABELS.SCARCITY}: ${REGIME_WEATHER_RATIONALES.SCARCITY}`,
+  DEFENSIVE: `${REGIME_LABELS.DEFENSIVE}: ${REGIME_WEATHER_RATIONALES.DEFENSIVE}`,
+  VOLATILE: `${REGIME_LABELS.VOLATILE}: ${REGIME_WEATHER_RATIONALES.VOLATILE}`,
+  EXPANSION: `${REGIME_LABELS.EXPANSION}: ${REGIME_WEATHER_RATIONALES.EXPANSION}`,
 };
 
 export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({

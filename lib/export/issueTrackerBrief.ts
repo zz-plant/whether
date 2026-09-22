@@ -17,6 +17,7 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildBoundedDecisionLines, type ModeledExportDecisionPayload } from "./briefBuilders";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { regimeSignalLabel } from "../report/signalTranslations";
 import type { ActionStripItem } from "../report/operatingCalls";
 
 type IssueTrackerFormat = "markdown" | "wiki";
@@ -66,19 +67,17 @@ export const buildIssueTrackerMarkdownBrief = (
   return [
     `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
     `${strong("Conditions")} ${postureLabel}`,
-    // The posture label is display copy ("Sunny — Late") and the regime is an
-    // engine key ("EXPANSION"), so this line effectively always renders. Kept as
-    // it was: the engine key is useful in a ticket, and dropping it would change
-    // every existing exported brief.
-    ...(postureLabel !== assessment.regime ? [`${strong("Regime")} ${assessment.regime}`] : []),
+    // No engine key beside the label. It used to print `**Regime:** EXPANSION`
+    // under "Conditions: Sunny", a second vocabulary for one state on a card
+    // a whole team reads; the JSON routes are where a machine looks it up.
     `${strong("Funding pressure")} ${assessment.scores.tightness} / ${strong("Risk appetite")} ${assessment.scores.riskAppetite}`,
-    `${strong("Base rate")} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `${strong("Curve slope")} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    `${strong(regimeSignalLabel.baseRate)} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `${strong("Recession warning gauge (10-year minus 2-year rate)")} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
-    `${heading3}Macro signals`,
+    `${heading3}The readings`,
     ...macroLines,
     "",
-    `${heading3}Bounded decision`,
+    `${heading3}This week's call`,
     ...boundedDecisionLines,
     "",
     sourceLine,
@@ -87,7 +86,7 @@ export const buildIssueTrackerMarkdownBrief = (
       treasury,
       decisionModel?.confidenceLabel
         ? `${decisionModel.confidenceLabel} confidence`
-        : "Score-based posture confidence",
+        : "how far the scores sit from the line that changes the call",
     ),
   ].join("\n");
 };
