@@ -26,6 +26,13 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Returns HTTP 400 for invalid cadence values.
 - Includes read-only CORS headers for browser-based tool clients.
 - Supports `OPTIONS /api/agent` preflight with `204`.
+- Returns `publishReadiness` — the judgment the Monday Slack post and email refuse on
+  (`lib/report/briefPublishGuard.ts`). `degraded` is not a freshness signal; this is.
+- `?format=jev` returns the week as a ready-to-send request for TypeSafe's Jev decision model
+  (`typesafe/jev`, `lib/jev/jevHandoff.ts`): the agent payload's call as typed state with an empty
+  `plan` slot, and four questions about a plan against the call. The caller fills the plan and calls
+  Jev; Whether never receives it, which is why this is a format and not an endpoint that takes a
+  plan. `automationReady` carries `publishReadiness`. Any other `format` is a 400.
 
 Machine-discovery routes:
 
