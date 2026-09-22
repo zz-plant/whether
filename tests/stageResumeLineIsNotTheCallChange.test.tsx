@@ -118,7 +118,11 @@ describe("a snapshot stored before the split", () => {
     const snapshot = buildOperatingSnapshot({ treasury: snapshotData, macroSeries });
     const { callChangesIf, ...rest } = snapshot.weeklyCall;
     const legacy = { ...snapshot, weeklyCall: { ...rest, changeCourseIf: callChangesIf } };
-    const kv = { get: async () => JSON.stringify(legacy), put: async () => {} } as unknown as KvNamespace;
+    const kv: KvNamespace = {
+      get: async () => JSON.stringify(legacy),
+      put: async () => {},
+      list: async () => ({ keys: [], list_complete: true }),
+    };
 
     const read = await new KvOperatingSnapshotStore(kv).readLatest();
     assert.ok(read, "a pre-split snapshot still reads");
