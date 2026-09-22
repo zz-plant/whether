@@ -55,19 +55,27 @@ export function WhatChangedSection({
       className="order-3 md:order-2"
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[34rem] border-collapse text-left text-sm" data-testid="what-changed-table">
+        <table className="w-full min-w-[42rem] table-fixed border-collapse text-left text-sm" data-testid="what-changed-table">
+          {/* The signal column carries the scale note and what the score means at
+              its level, so it needs room: left to itself the browser gave it the
+              width of its longest word and wrapped the notes one word per line. */}
+          <colgroup>
+            <col className="w-[15rem]" />
+            <col className="w-[11rem]" />
+            <col />
+          </colgroup>
           <caption className="sr-only">Each signal this week against last week and against its lines</caption>
           <thead>
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">Last week → this week</th>
-              <th scope="col" className="w-full py-2 font-medium">Against its lines</th>
+              <th scope="col" className="py-2 font-medium">Against its lines</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.key} className="border-b border-slate-800/50 align-top" data-signal={row.key}>
-                <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100">
+                <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100">
                   {row.label}
                   {row.scaleLabel ? <span className="block text-xs font-normal text-slate-500">{row.scaleLabel}</span> : null}
                   {/* Which end of the scale is which. A composite score is the one
@@ -81,7 +89,7 @@ export function WhatChangedSection({
                     <PlainEnglishScoreNote
                       signalKey={row.key}
                       score={row.value}
-                      className="mt-1 max-w-[16rem] whitespace-normal font-normal"
+                      className="mt-1 whitespace-normal font-normal"
                     />
                   ) : null}
                 </th>

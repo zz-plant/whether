@@ -48,8 +48,12 @@ describe("answer page reader copy", () => {
   it("gives every bare score a name, a scale, and a reading", async () => {
     const html = await renderAnswer(answerPages[0]?.slug ?? "");
 
-    assert.match(html, /Funding pressure: \d+ \/ 100/);
-    assert.match(html, /Risk appetite: \d+ \/ 100/);
+    /* Each score is drawn on its ladder now, against the line that would change
+       this answer — the same primitive the homepage and /trust use. The claim
+       is unchanged: no score appears without a name, a scale and a reading. */
+    assert.match(html, /Funding pressure<\/span><span[^>]*>\d+ of 100 · \d+ pts (above|below) the call changes line/);
+    assert.match(html, /Risk appetite<\/span><span[^>]*>\d+ of 100 · \d+ pts (above|below) the call changes line/);
+    assert.equal((html.match(/data-score-ladder/g) ?? []).length, 2, "both composite scores are drawn against their line");
     assert.ok(
       html.includes(compositeSignalScales.tightness.directionLabel),
       "no scale note under the funding pressure score",

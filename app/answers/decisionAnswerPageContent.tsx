@@ -14,6 +14,9 @@ import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { ActionLink } from "../components/ui/actionLink";
+import { ScoreLadder } from "../components/ui/scoreLadder";
+import { AreaTable } from "../components/ui/areaTable";
+import { TrustStrip } from "../components/trustStrip";
 import { formatConfidenceChipLabel, publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
@@ -153,9 +156,9 @@ export async function DecisionAnswerPageContent({
         ? `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}.`
         : `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, or funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
 
-  const compositeReadings: Array<{ key: CompositeSignalKey; score: number }> = [
-    { key: "tightness", score: Math.round(assessment.scores.tightness) },
-    { key: "riskAppetite", score: Math.round(assessment.scores.riskAppetite) },
+  const compositeReadings: Array<{ key: CompositeSignalKey; score: number; line: number }> = [
+    { key: "tightness", score: Math.round(assessment.scores.tightness), line: assessment.thresholds.tightnessRegime },
+    { key: "riskAppetite", score: Math.round(assessment.scores.riskAppetite), line: assessment.thresholds.riskAppetiteRegime },
   ];
 
   return (
@@ -183,6 +186,16 @@ export async function DecisionAnswerPageContent({
               ) : null}
             </div>
           )}
+        />
+
+        <TrustStrip
+          recordDateLabel={recordDateLabel}
+          sourcesLive={!degraded}
+          sourcesLabel={degraded ? "Cached snapshot" : "Live"}
+          confidenceLabel={homeBriefModel.confidenceLabel}
+          couldChangeNextWeek={Boolean(assessment.diagnostics.transitionWatch)}
+          href="/trust"
+          className="mb-6"
         />
 
         <SecondaryPageSection title={headings.copy}>
@@ -218,20 +231,18 @@ export async function DecisionAnswerPageContent({
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.rules}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {mappedRules.map((rule) => (
-              <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
-                <p className="type-eyebrow text-sky-200">{decisionAreaLabel(rule.area)}</p>
-                <p className="font-semibold text-slate-100">{rule.recommendation}</p>
-                <p className="text-xs text-slate-300">Scope: {rule.scope}</p>
-                {rule.doNow[0] ? (
-                  <p className="text-xs text-emerald-200">{publicDecisionLabels.action}: {rule.doNow[0]}</p>
-                ) : null}
-                <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
-                <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
-              </article>
-            ))}
-          </div>
+          {/* The same row, in the same order, as the homepage and the plan page:
+              a reader who clicks through from here meets a table they have read
+              before rather than a second shape for one thing. */}
+          <AreaTable
+            caption="What this week's call changes for each decision area"
+            rows={mappedRules.map((rule) => ({
+              area: rule.area,
+              rule: rule.doNow[0] ?? rule.recommendation,
+              pause: { line: rule.pauseTrigger },
+              resume: { line: rule.resumeTrigger },
+            }))}
+          />
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.threshold}>
@@ -246,9 +257,14 @@ export async function DecisionAnswerPageContent({
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {compositeReadings.map((reading) => (
               <div key={reading.key} className="space-y-1">
-                <p className="text-sm tabular-nums text-slate-200">
-                  {signalPlainEnglish[reading.key].plainLabel}: {reading.score} / 100
-                </p>
+                {/* Drawn against the line, not printed bare: how far the score sits
+                    from where the call changes is the fact this page turns on. */}
+                <ScoreLadder
+                  label={signalPlainEnglish[reading.key].plainLabel}
+                  value={reading.score}
+                  previous={null}
+                  lines={[{ kind: "callChange", value: reading.line }]}
+                />
                 <SignalScaleNote signalKey={reading.key} />
                 <PlainEnglishScoreNote signalKey={reading.key} score={reading.score} lead="On this signal alone" />
               </div>

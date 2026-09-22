@@ -105,6 +105,21 @@ export function ScoreLadder({
   className = "",
 }: ScoreLadderProps) {
   const caption = describeLadderPosition(value, lines);
+  /* The three lines can sit within a few points of each other — 66, 70 and 76
+     is the common case — and their labels then overlap into one smudge. Each
+     label that would collide with the one before it drops to the next row, on
+     a longer tick, so every line keeps a label the reader can read. */
+  const laidOut = [...lines]
+    .sort((left, right) => left.value - right.value)
+    .map((line, index, sorted) => {
+      const previous = sorted[index - 1];
+      const collides = previous !== undefined && (line.value - previous.value) / max < 0.13;
+      return { line, collides };
+    })
+    .reduce<{ line: LadderLine; row: number }[]>((rows, entry) => {
+      const previousRow = rows[rows.length - 1]?.row ?? 0;
+      return [...rows, { line: entry.line, row: entry.collides ? previousRow + 1 : 0 }];
+    }, []);
   const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
   return (
     <figure className={`space-y-1.5 ${className}`.trim()} data-score-ladder>
@@ -113,15 +128,19 @@ export function ScoreLadder({
         <span className="tabular-nums text-slate-400">{caption}</span>
       </figcaption>
       {hasPrevious ? <span className="sr-only">{previousLabel} {formatPoints(previous)}.</span> : null}
-      <div className="relative h-8" aria-hidden="true">
+      <div
+        className="relative"
+        style={{ height: `${34 + Math.max(0, ...laidOut.map((entry) => entry.row)) * 11}px` }}
+        aria-hidden="true"
+      >
         <div className="absolute inset-x-0 top-3 h-1.5 rounded-full bg-slate-800" />
-        {lines.map((line) => (
+        {laidOut.map(({ line, row }) => (
           <div
             key={`${line.kind}-${line.value}`}
             className="absolute top-1.5 flex -translate-x-1/2 flex-col items-center"
             style={{ left: `${clampPercent(line.value, max)}%` }}
           >
-            <span className={`h-4.5 w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} />
+            <span className={`w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} style={{ height: `${18 + row * 11}px` }} />
             <span className={`mt-0.5 whitespace-nowrap text-[10px] leading-none ${LINE_CLASS[line.kind].split(" ")[1]}`}>
               {line.label ?? LINE_LABELS[line.kind]} {formatPoints(line.value)}
             </span>

@@ -26,6 +26,11 @@ import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPane
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import { ReportShell } from "../components/reportShell";
+import { TrustStrip } from "../components/trustStrip";
+import { AreaTable } from "../components/ui/areaTable";
+import { buildTrustStripProps } from "./trustStripProps";
+import { buildAreaRows } from "./areaRows";
+import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { SharePageFormats } from "../share/sharePageFormats";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
@@ -194,6 +199,18 @@ export async function buildPlanningPageModel(
     },
     children: h(Fragment, null,
       h(OperatorWorkflowRouteTracker),
+      /* Freshness and confidence, once, in the same slot every reading route
+         puts them: under the h1, before anything asks the reader to act. */
+      h(TrustStrip, buildTrustStripProps({
+        recordDateLabel,
+        isFallback,
+        sourcesLabel: resolveDataStatusLabel({
+          isHistoricalSelection: Boolean(historicalSelection),
+          isFallbackSnapshot: isFallback,
+        }),
+        confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+        transitionWatch: assessment.diagnostics.transitionWatch ? "ON" : "OFF",
+      })),
       // At the page root, not inside the Share step: that step is collapsed on
       // arrival, and the island has to exist before the nav block's Share
       // button or the picker can read it.
@@ -256,6 +273,9 @@ export async function buildPlanningPageModel(
                     h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.changeCourseIf),
                   ),
                 ),
+                /* One row per area, in the order every surface uses, with the rule and
+                   both its lines — the same table the brief prints. */
+                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "Items to revisit. Recheck last week's approvals before adding fixed cost or widening scope."
