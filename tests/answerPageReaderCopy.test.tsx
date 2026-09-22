@@ -3,7 +3,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
-import { GLOSSARY_HREF, compositeSignalScales } from "../lib/report/signalTranslations";
+import { compositeSignalScales } from "../lib/report/signalTranslations";
 
 const mockAny: any = mock;
 
@@ -62,7 +62,9 @@ describe("answer page reader copy", () => {
       html.includes(compositeSignalScales.riskAppetite.directionLabel),
       "no scale note under the risk appetite score",
     );
-    assert.ok(html.includes(GLOSSARY_HREF), "no way from this page to the glossary");
+    // The scale note and the plain-English band above carry the meaning on the
+    // page, so nothing here should send a first-time reader somewhere else to decode it.
+    assert.ok(!html.includes('href="/glossary"'), "the page still sends a reader to the glossary");
   });
 
   it("keeps the engine's own vocabulary off every one of them", async () => {

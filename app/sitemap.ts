@@ -163,7 +163,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     // deep link, and compare is a disclosure under history. Both stay indexable;
     // neither is ranked like a hub.
     { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
-    { path: "/glossary", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     /* Derived from the bundled archive at module load, so the monthly refresh
        moves it — it takes the report's date, not the static one. */
     { path: "/calibration", lastModified: reportLastModified, changeFrequency: "monthly", priority: 0.6 },

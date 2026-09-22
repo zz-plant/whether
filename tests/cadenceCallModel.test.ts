@@ -277,6 +277,6 @@ describe("buildCadenceCallModel", () => {
     assert.equal(build("monthly").shareTitle, "Whether Monthly Call");
     assert.equal(build("quarterly").shareTitle, "Whether Quarterly Call");
     assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.threshold.pauseIf}: `)));
-    assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: `)));
+    assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: `)));
   });
 });

@@ -219,7 +219,7 @@ export const buildRegimeFlipState = ({
     text +=
       altCandidate === regime
         ? ` If ${otherPhrase}, the readings return to ${getRegimePublicLabel(regime)}.`
-        : ` If ${otherPhrase}, the flip target becomes ${getRegimePublicLabel(altCandidate)}.`;
+        : ` If ${otherPhrase}, the call would change to ${getRegimePublicLabel(altCandidate)}.`;
 
     watch = { dimension: other, direction: otherDirection, threshold: otherThreshold, current: otherCurrent };
   } else {

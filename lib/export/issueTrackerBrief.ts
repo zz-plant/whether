@@ -13,13 +13,16 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { formatNumberWithUnit } from "../formatters";
-import { getRegimePublicLabel } from "../regimePresentation";
 import { buildComplianceStamp } from "../exportNotices";
-import { EXPORT_SECTION_HEADINGS, buildAreaRowLines, buildCallLines, type ModeledExportDecisionPayload } from "./briefBuilders";
+import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, buildCallLines, type ModeledExportDecisionPayload } from "./briefBuilders";
+import { describeBaseRateSource, describeConditions, formatExportConfidenceWord } from "./exportTerms";
 import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { regimeSignalLabel } from "../report/signalTranslations";
+import { formatDecisionReversal, formatDecisionThreshold } from "../report/reportFormatting";
 import { buildSharedCorridorRails, type ActionStripItem } from "../report/operatingCalls";
+import { decisionAreaLabel } from "../report/boundedDecisionRules";
+import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 
 type IssueTrackerFormat = "markdown" | "wiki";
 
@@ -51,8 +54,7 @@ export const buildIssueTrackerMarkdownBrief = (
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = getRegimePublicLabel(assessment.regime);
-  const postureLabel = decisionModel?.postureWithStageLabel ?? regimeLabel;
+  const conditionsLabel = describeConditions(assessment.regime, decisionModel?.postureWithStageLabel);
   const isWiki = format === "wiki";
   const bullet = isWiki ? "*" : "-";
   const heading2 = isWiki ? "h2. " : "## ";
@@ -87,22 +89,22 @@ export const buildIssueTrackerMarkdownBrief = (
    */
   return [
     `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
-    `${strong("Conditions")} ${postureLabel}`,
+    `${strong("Conditions")} ${conditionsLabel}`,
     "",
     `${heading3}This week's call`,
     ...callLines,
     "",
     `${heading3}${EXPORT_SECTION_HEADINGS.changed}`,
     ...readingLines,
-    `${bullet} ${strong(regimeSignalLabel.baseRate)} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `${bullet} ${strong("Recession warning gauge (10-year minus 2-year rate)")} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
+    `${bullet} ${strong(regimeSignalLabel.baseRate)} ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (read from ${describeBaseRateSource(assessment.scores.baseRateUsed)})`,
+    `${bullet} ${strong(RECESSION_GAUGE_LABEL)} ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     ...macroLines,
     ...(areaRows.length > 0 ? ["", `${heading3}${EXPORT_SECTION_HEADINGS.areas}`, ...areaRows] : []),
     ...(sourceLine ? ["", sourceLine] : []),
     "",
     ...buildExportStamp(
       treasury,
-      `${decisionModel?.confidenceLabel ?? assessment.diagnostics.confidence} (how far the scores sit from the line that changes the call)`,
+      `${formatExportConfidenceWord(decisionModel?.confidenceLabel ?? assessment.diagnostics.confidence)} (how far the scores sit from the line that changes the call)`,
     ),
   ].join("\n");
 };
@@ -145,10 +147,13 @@ export const buildGuardrailTagBlocks = ({
     label: item.label,
     ownerLabel: item.ownerLabel,
     markdown: [
+      /* The pause and resume lines below name only their condition, so the area
+         they belong to heads the block. */
+      `**${decisionAreaLabel(operatingLeverToDecisionArea[item.lever])}**`,
       `**Conditions:** ${postureLabel}`,
       `**${DECISION_CONTRACT_LABELS.action.actionNow}:** ${item.areaActionNow}`,
-      `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${item.triggerThreshold}`,
-      `**${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:** ${item.reversalCondition}`,
+      `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${formatDecisionThreshold(item.triggerThreshold)}`,
+      `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(item.reversalCondition)}`,
       ...(flipWatchSentence ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${flipWatchSentence}`] : []),
       `_Week of ${recordDate}_`,
     ].join("\n"),

@@ -70,9 +70,9 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
                   </td>
                   <td className={`py-2.5 ${transition.signaled ? "text-emerald-300/90" : "text-amber-300/90"}`}>
                     {transition.signaled
-                      ? `in the near band ${transition.leadMonths} mo before`
+                      ? `within ${record.nearBandPts} points of its line ${transition.leadMonths} mo before`
                       : shockByDate.get(transition.atDate)
-                        ? "no advance signal — the score jumped its line from well outside the near band"
+                        ? `no advance signal — the score crossed its line from more than ${record.nearBandPts} points away in one month`
                         : "no advance signal"}
                   </td>
                 </tr>

@@ -148,7 +148,7 @@ export const insightDatabase = {
         ],
         start: [
           "Security features and compliance (SOC 2)",
-          "Reliability SLAs",
+          "Uptime and response-time commitments",
           "Trust signals in every funnel step",
         ],
         metric: "Win rate (how often deals die as 'no decision')",
@@ -425,7 +425,7 @@ export const insightDatabase = {
         headline: "Safety posture: prioritize trust, reliability, and proof.",
         narrative:
           "Liquidity exists but confidence is shaky. Buyers demand safety signals and reliable delivery.",
-        priorities: ["Trust & compliance", "Reliability SLAs", "Customer risk reduction"],
+        priorities: ["Trust & compliance", "Uptime and response-time commitments", "Customer risk reduction"],
         watchlist: ["Pipeline stalls", "Security incidents", "Procurement delays"],
         reversalTriggers: ["Risk appetite rebound", "Bravery signal crosses threshold"],
       },
@@ -457,7 +457,10 @@ export const insightDatabase = {
           "Pricing: exchange discounts for upfront cash.",
           "Roadmap: ship stability and monetization only.",
         ],
-        reversalTriggers: ["Curve exits inversion", "Policy easing signals stabilize"],
+        reversalTriggers: [
+          "Long-term rates climb back above short-term rates",
+          "Short-term borrowing rates stop rising",
+        ],
       },
       {
         key: "DEFENSIVE",
@@ -465,14 +468,14 @@ export const insightDatabase = {
         decisionGuardrails: [
           "Tie new spend to margin lift or churn reduction.",
           "Limit expansion to proven channels.",
-          "Keep cadence stable; avoid whiplash pivots.",
+          "Keep the operating rhythm steady; avoid abrupt changes of direction.",
         ],
         decisionTemplates: [
-          "Hiring: accretive revenue roles only.",
+          "Hiring: only roles that add revenue.",
           "Pricing: optimize packaging before adding discounts.",
           "Roadmap: prioritize retention and upsell.",
         ],
-        reversalTriggers: ["Risk appetite rises", "Base rates begin sustained decline"],
+        reversalTriggers: ["Risk appetite rises", "Short-term borrowing rates fall for several months running"],
       },
       {
         key: "VOLATILE",
@@ -487,7 +490,7 @@ export const insightDatabase = {
           "Pricing: keep models simple and predictable.",
           "Roadmap: emphasize safety features.",
         ],
-        reversalTriggers: ["Risk appetite improves", "Curve steepens positively"],
+        reversalTriggers: ["Risk appetite improves", "Long-term rates pull further above short-term rates"],
       },
       {
         key: "EXPANSION",
@@ -502,7 +505,7 @@ export const insightDatabase = {
           "Pricing: prioritize adoption and market penetration.",
           "Roadmap: accelerate new product lines.",
         ],
-        reversalTriggers: ["Risk appetite drops", "Rates move into tight band"],
+        reversalTriggers: ["Risk appetite drops", "Short-term borrowing rates rise to where money gets expensive"],
       },
     ],
   },

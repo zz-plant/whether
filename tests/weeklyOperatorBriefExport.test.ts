@@ -57,7 +57,9 @@ describe("weekly operator brief export adapters", () => {
       delta: -3,
       line: "The call moved slightly more defensive this week.",
     });
-    assert.equal(payload.confidence, "HIGH confidence");
+    assert.equal(payload.confidence, "High confidence");
+    // The paste line adds what the weather means; the contract field stays the modeled label.
+    assert.match(payload.conditions, /^Defensive · Late Cycle \(money is [a-z ]+\)$/);
     assert.ok(payload.doNowBullets.length > 0);
     assert.ok(payload.whyCouldBeWrong.length > 0);
     assert.ok(payload.flipTrigger.length > 0);
@@ -78,14 +80,18 @@ describe("weekly operator brief export adapters", () => {
     const cardText = buildWeeklyOperatorBriefCardText(payload);
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
-    assert.match(text, /Operating latitude: 58\/100 \(\+4 vs last week\)/);
+    // The number never travels without what it measures.
+    assert.match(text, /Operating latitude: 58\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: \+4 points/);
+    assert.match(text, /^Medium confidence$/m);
+    assert.doesNotMatch(text, /\bMED\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);
     assert.match(text, /Call:/);
     assert.match(text, /Do now:/);
     assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
-    assert.match(text, /Re-open when:/); // replaces Clears when
+    // `changeCourseIf` is where the call itself changes, so it prints under that name.
+    assert.match(text, /Call changes if:/);
     assert.equal(cardText, text);
   });
 
@@ -202,9 +208,10 @@ describe("weekly call snapshot export", () => {
     assert.match(text, /CONDITIONS: Defensive — Late Cycle/);
     assert.match(text, /CALL: Hold approval velocity and protect runway\./);
     assert.match(text, /DO NOW: Ship only reversible roadmap items\./);
-    assert.match(text, /AVOID: Pause net-new fixed burn commitments\./);
-    assert.match(text, /WATCH: Track threshold pressure near regime boundary\./);
-    assert.match(text, /WHAT WOULD CHANGE THE CALL:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
+    assert.match(text, /PAUSE IF: Pause net-new fixed burn commitments\./);
+    assert.match(text, /CALL CHANGES IF: Track threshold pressure near regime boundary\./);
+    assert.doesNotMatch(text, /AVOID:|WATCH:/);
+    assert.match(text, /OTHER THINGS THAT WOULD CHANGE THE CALL:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
   });
 });
 

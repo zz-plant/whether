@@ -1,4 +1,6 @@
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { formatConfidenceChipLabel } from "./reportFormatting";
+import { formatSignalReading } from "./signalTranslations";
 import {
   formatMeetingSlideMarkdown,
   type MeetingSlidePayload,
@@ -185,7 +187,7 @@ export const briefConditionEntries = (
     ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: artifact.reversal }]
     : []),
   ...(artifact.clearsWhen && artifact.clearsWhen.length > 0
-    ? [{ label: DECISION_CONTRACT_LABELS.reversal.changeCourseIf, value: artifact.clearsWhen.join("; ") }]
+    ? [{ label: DECISION_CONTRACT_LABELS.watch.watchThisWeek, value: artifact.clearsWhen.join("; ") }]
     : []),
 ];
 
@@ -218,16 +220,18 @@ const provenanceLine = (artifact: BriefArtifact) =>
   [
     `Source: ${artifact.source}`,
     `data as of ${artifact.recordDateLabel}`,
-    artifact.confidenceLabel ? `confidence ${artifact.confidenceLabel}` : null,
+    artifact.confidenceLabel ? formatConfidenceChipLabel(artifact.confidenceLabel).toLowerCase() : null,
     artifact.isFallback ? "cached snapshot, not a live read" : null,
   ]
     .filter(Boolean)
     .join(" · ");
 
+/* Each score carries what its number means, because a pasted "64/100" reaches
+   people who have never seen the scale and cannot tell which end is bad. */
 const signalLine = (artifact: BriefArtifact) =>
   [
-    `Funding pressure ${artifact.tightness}/100`,
-    typeof artifact.riskAppetite === "number" ? `risk appetite ${artifact.riskAppetite}/100` : null,
+    formatSignalReading("tightness", artifact.tightness),
+    typeof artifact.riskAppetite === "number" ? formatSignalReading("riskAppetite", artifact.riskAppetite) : null,
   ]
     .filter(Boolean)
     .join(" · ");

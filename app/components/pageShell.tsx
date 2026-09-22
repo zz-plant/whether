@@ -39,8 +39,7 @@ export function PageShell({
       <WebVitalsTracker />
       {structuredData ? <JsonLdScript data={structuredData} /> : null}
       {/* Renders nothing until the hash matches one of its target ids, and it is
-          what opens a collapsed panel an anchor points into — the /trust glossary
-          is linked from six places. It was once gated on TV ambient mode, which
+          what opens a collapsed panel an anchor points into. It was once gated on TV ambient mode, which
           made it dead for every ordinary visit. */}
       <AnchorFeedback />
 

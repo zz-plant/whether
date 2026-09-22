@@ -52,13 +52,13 @@ const validateDraft = (draft: ThresholdDraft): ThresholdErrorMap => {
   const { baseRate, tightness, risk } = parseDraft(draft);
 
   if (Number.isNaN(baseRate) || baseRate < 0 || baseRate > 10) {
-    errors.baseRateTightness = "Base rate threshold must be between 0 and 10.";
+    errors.baseRateTightness = "The short-term borrowing rate line must be between 0 and 10.";
   }
   if (Number.isNaN(tightness) || tightness < 0 || tightness > 100) {
-    errors.tightnessRegime = "Funding-pressure threshold must be between 0 and 100.";
+    errors.tightnessRegime = "The funding pressure line must be between 0 and 100.";
   }
   if (Number.isNaN(risk) || risk < 0 || risk > 100) {
-    errors.riskAppetiteRegime = "Risk appetite threshold must be between 0 and 100.";
+    errors.riskAppetiteRegime = "The risk appetite line must be between 0 and 100.";
   }
 
   return errors;
@@ -275,7 +275,7 @@ export const ThresholdsPanel = ({
   };
 
   const handleReset = () => {
-    if (!confirm("Reset all thresholds to defaults? Your custom watch-line settings will be replaced.")) {
+    if (!confirm("Reset all thresholds to defaults? Your custom lines will be replaced.")) {
       return;
     }
     const defaultDraft = buildDraft(appliedDefaults);
@@ -312,7 +312,7 @@ export const ThresholdsPanel = ({
     <section id="thresholds" aria-labelledby="thresholds-title" className="mt-4">
       <div>
         <SectionPanelHeader
-          label="Watch-line settings"
+          label="Lines that change the call"
           title="Adjust when the call changes"
           titleId="thresholds-title"
           description="These values decide when the call changes. They stay in the URL so shared links match."
@@ -321,9 +321,11 @@ export const ThresholdsPanel = ({
                which is the class the page's pill-shaped links press. */
             <dl className="flex items-baseline gap-1.5 text-fluid-xs">
               <dt className="text-slate-400">Defaults:</dt>
+              {/* Each number named: "3.5% · 70/50" asked the reader to know
+                  which score each figure belonged to. */}
               <dd className="font-semibold tabular-nums text-slate-200">
-                {appliedDefaults.baseRateTightness}% · {appliedDefaults.tightnessRegime}/
-                {appliedDefaults.riskAppetiteRegime}
+                rate {appliedDefaults.baseRateTightness}% · funding pressure {appliedDefaults.tightnessRegime} ·
+                risk appetite {appliedDefaults.riskAppetiteRegime}
               </dd>
             </dl>
           }
@@ -333,7 +335,7 @@ export const ThresholdsPanel = ({
           <div className="weather-surface p-4">
             <p className="type-eyebrow">Quick presets</p>
             <p className="mt-2 text-sm text-slate-300">
-              Start with one preset, then expand the detailed controls only if you need custom watch lines.
+              Start with one preset, then expand the detailed controls only if you need your own lines.
             </p>
             <div className="mt-3 grid gap-3 md:grid-cols-3">
               {thresholdPresets.map((preset) => (
@@ -367,7 +369,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-base-rate"
                     name={THRESHOLD_PARAM_KEYS.baseRate}
-                    label="Base-rate watch line (%)"
+                    label="Short-term borrowing rate line (%)"
                     min={0}
                     max={10}
                     step={0.01}
@@ -382,7 +384,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-tightness"
                     name={THRESHOLD_PARAM_KEYS.tightness}
-                    label="Funding-pressure score line"
+                    label="Funding pressure line (0–100)"
                     min={0}
                     max={100}
                     step={0.01}
@@ -397,7 +399,7 @@ export const ThresholdsPanel = ({
                   <ThresholdNumberField
                     id="threshold-risk"
                     name={THRESHOLD_PARAM_KEYS.risk}
-                    label="Risk-appetite score line"
+                    label="Risk appetite line (0–100)"
                     min={0}
                     max={100}
                     step={0.01}
@@ -417,7 +419,7 @@ export const ThresholdsPanel = ({
                       className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
                       {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
-                      {isPending ? "Applying" : "Apply watch lines"}
+                      {isPending ? "Applying" : "Apply lines"}
                     </button>
                     <button
                       type="button"
@@ -441,15 +443,15 @@ export const ThresholdsPanel = ({
             <p className="type-eyebrow">Applied thresholds</p>
             <div className="mt-3 space-y-2 text-sm text-slate-300">
               <p>
-                Base rate threshold:{" "}
+                Short-term borrowing rate line:{" "}
                 <span className="mono text-slate-100">{formattedCurrent.baseRateTightness}%</span>
               </p>
               <p>
-                Funding-pressure threshold:{" "}
+                Funding pressure line (0–100):{" "}
                 <span className="mono text-slate-100">{formattedCurrent.tightnessRegime}</span>
               </p>
               <p>
-                Risk appetite threshold:{" "}
+                Risk appetite line (0–100):{" "}
                 <span className="mono text-slate-100">{formattedCurrent.riskAppetiteRegime}</span>
               </p>
             </div>
@@ -466,9 +468,12 @@ export const ThresholdsPanel = ({
                   These lines decide when a score changes the call. Move them to match your own
                   risk tolerance, then share this link.
                 </p>
+                {/* The two scores cross their lines in opposite directions, so "lower
+                    changes the call sooner" was true of funding pressure and backwards
+                    for risk appetite — the "Sooner warnings" preset raises that line. */}
                 <ul className="list-disc space-y-1 pl-4">
-                  <li>Lower numbers change the call sooner.</li>
-                  <li>Higher numbers wait for a bigger move.</li>
+                  <li>A lower funding pressure line, or a higher risk appetite line, changes the call sooner.</li>
+                  <li>Moving either the other way waits for a bigger move.</li>
                 </ul>
               </div>
             </details>

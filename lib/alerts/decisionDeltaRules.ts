@@ -54,7 +54,7 @@ export const buildDecisionDeltaRules = (
       action: tightnessUp
         ? "Tighten discretionary spend and hold non-critical hiring reqs."
         : "Loosen budget holds for pre-approved growth bets.",
-      thresholdLabel: "Funding pressure regime threshold",
+      thresholdLabel: "Funding pressure line",
       thresholdValue: tightnessThreshold,
       reversal: tightnessUp
         ? `Re-open spend only if funding pressure falls back to ${tightnessThreshold} or below for two updates.`
@@ -77,7 +77,7 @@ export const buildDecisionDeltaRules = (
       action: riskUp
         ? "Restart paused pipeline roles tied to revenue capacity."
         : "Pause net-new hiring outside committed customer delivery.",
-      thresholdLabel: "Risk appetite threshold",
+      thresholdLabel: "Risk appetite line",
       thresholdValue: riskThreshold,
       reversal: riskUp
         ? `Pause again if risk appetite drops back to ${riskThreshold} or lower for two updates.`
@@ -125,7 +125,7 @@ export const applyConfidenceGate = (
 };
 
 const AREA_LABEL: Record<DecisionArea, string> = {
-  posture: "operating posture",
+  posture: "the call",
   hiring: "hiring",
   spend: "spending",
   risk: "risk appetite",
@@ -139,7 +139,7 @@ const AREA_LABEL: Record<DecisionArea, string> = {
 export const buildDecisionVerdictHeadline = (
   delta: Pick<DecisionDeltaRule, "decisionArea" | "severe">,
 ): string => {
-  const area = AREA_LABEL[delta.decisionArea] ?? "operating posture";
+  const area = AREA_LABEL[delta.decisionArea] ?? AREA_LABEL.posture;
   return delta.severe
     ? `RECONSIDER ${area.toUpperCase()}`
     : `WATCH ${area.toUpperCase()}`;

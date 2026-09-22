@@ -52,7 +52,7 @@ export type SignalClusterReading = {
    * numbers can be acted on. `value` stays numeric for comparisons and tests.
    */
   displayValue: string | null;
-  /** Rendered after the number: "of 100", "pp". */
+  /** Rendered after the number: "of 100", "%". */
   unit: string;
   /** How to read the scale, in words. */
   scaleNote: string;
@@ -165,9 +165,8 @@ export const describeSignalDirection = (
  * directions, and reads as plainly false for the other. Above and below are true
  * for both; the colour on the week-over-week row carries the judgement.
  *
- * `unit` carries its own leading space where one belongs ("\u00a0points" vs "pp"),
- * so the distance line joins the same way the headline figure does — the panel
- * renders "0.4pp" above and would otherwise say "0.4 pp" two lines below it.
+ * `unit` carries its own leading space (" points", " percentage points"), so the
+ * distance line reads as prose while the headline figure above it stays compact.
  */
 const describeDistance = (
   value: number | null,
@@ -183,6 +182,9 @@ const describeDistance = (
 
   return `${formatter.format(gap)}${unit} ${value > threshold ? "above" : "below"} ${thresholdLabel}.`;
 };
+
+/** Zero is the line itself, so it is named for what crossing it means. */
+const ZERO_LINE_LABEL = "zero, where long-term rates drop below short-term rates";
 
 export const buildSignalClusterReading = (
   cluster: SignalClusterSlug,
@@ -213,8 +215,8 @@ export const buildSignalClusterReading = (
       directionLabel: direction.label,
       directionTone: direction.tone,
       inputs: [
-        formatInput(reportData, "base-rate", "Base rate"),
-        formatInput(reportData, "curve-slope", "Curve slope"),
+        formatInput(reportData, "base-rate", "Short-term borrowing rate"),
+        formatInput(reportData, "curve-slope", "Recession warning gauge"),
       ].filter((input): input is SignalReadingInput => input !== null),
       /*
        * The score is clipped at 100 by design and its components over-subscribe
@@ -255,9 +257,9 @@ export const buildSignalClusterReading = (
       directionLabel: direction.label,
       directionTone: direction.tone,
       inputs: [
-        formatInput(reportData, "curve-slope", "Curve slope"),
-        formatInput(reportData, "two-year", "2-year"),
-        formatInput(reportData, "ten-year", "10-year"),
+        formatInput(reportData, "curve-slope", "Recession warning gauge"),
+        formatInput(reportData, "two-year", "2-year rate"),
+        formatInput(reportData, "ten-year", "10-year rate"),
       ].filter((input): input is SignalReadingInput => input !== null),
       /*
        * Deliberately states the shared driver without restating the threshold's
@@ -266,8 +268,8 @@ export const buildSignalClusterReading = (
        * to change.
        */
       caveat:
-        "Risk appetite is derived from the curve, and the curve also feeds funding pressure. "
-        + "A move in the curve shows up on both watches at once, so treat them as one reading rather than two confirmations.",
+        "Risk appetite is derived from the recession warning gauge, and the gauge also feeds funding pressure. "
+        + "A move in the gauge shows up on both watches at once, so treat them as one reading rather than two confirmations.",
       implication:
         "The lower it runs, the more of any new hire or growth spend should be reversible within the quarter.",
       unavailableReason: null,
@@ -279,30 +281,35 @@ export const buildSignalClusterReading = (
    * No slope, no move. `buildReportDynamics` computes this delta as
    * `(current ?? 0) - (previous ?? 0)`, so an unresolved leg produces a
    * confident-looking number measured from zero — and the panel would quote
-   * "-0.29pp since last week" directly beneath a line saying the spread cannot
+   * "-0.29 percentage points since last week" directly beneath a line saying the spread cannot
    * be computed.
    */
   const delta = slope === null ? null : findDelta(reportData, "curveSlope");
-  const direction = describeSignalDirection(delta, "higher", "pp", SIGNED_TWO);
+  /*
+   * One unit per quantity: the figure is a percentage, written "%", and every move or
+   * distance measured on it is in percentage points, written out. "pp" and "bp" are
+   * desk shorthand; this page has no key to expand them (the charts on /signals do).
+   */
+  const direction = describeSignalDirection(delta, "higher", " percentage points", SIGNED_TWO);
 
   return {
     measure: "Recession warning gauge",
     value: slope,
-    displayValue: slope === null ? null : `${ONE_DECIMAL.format(slope)}pp`,
-    unit: "pp",
+    displayValue: slope === null ? null : `${ONE_DECIMAL.format(slope)}%`,
+    unit: "%",
     scaleNote: "10-year minus 2-year rate",
-    threshold: { value: 0, label: "the zero line where the curve inverts" },
+    threshold: { value: 0, label: ZERO_LINE_LABEL },
     delta,
     betterWhen: "higher",
-    distanceLabel: describeDistance(slope, 0, "pp", "the zero line where the curve inverts", ONE_DECIMAL),
+    distanceLabel: describeDistance(slope, 0, " percentage points", ZERO_LINE_LABEL, ONE_DECIMAL),
     directionLabel: direction.label,
     directionTone: direction.tone,
     inputs: [
-      formatInput(reportData, "two-year", "2-year"),
-      formatInput(reportData, "ten-year", "10-year"),
+      formatInput(reportData, "two-year", "2-year rate"),
+      formatInput(reportData, "ten-year", "10-year rate"),
     ].filter((input): input is SignalReadingInput => input !== null),
     caveat: slope !== null && slope < 0
-      ? "The curve is inverted. This is the condition the watch exists for, not a warning that one is approaching."
+      ? "Long-term rates are below short-term rates now (an inverted curve). This is the condition the watch exists for, not a warning that one is approaching."
       : null,
     implication:
       "The closer this runs to zero, the more a new commitment needs a written way out before it is signed.",

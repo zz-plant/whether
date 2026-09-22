@@ -195,7 +195,7 @@ describe("signal cluster reading", () => {
   it("names the shared curve driver on the risk-appetite watch", () => {
     const reading = buildSignalClusterReading("risk-appetite-watch", buildReportData());
 
-    assert.match(reading.caveat ?? "", /curve also feeds funding pressure/);
+    assert.match(reading.caveat ?? "", /gauge also feeds funding pressure/);
     // The engine owns the slope-to-threshold mapping; the page must not restate it.
     assert.ok(!/0\.25/.test(reading.caveat ?? ""), "does not encode the slope value behind the threshold");
   });
@@ -206,14 +206,14 @@ describe("signal cluster reading", () => {
       buildReportData({ scores: { curveSlope: -0.4 } }),
     );
     assert.match(inverted.caveat ?? "", /inverted/);
-    assert.match(inverted.distanceLabel, /0\.4pp below the zero line/);
+    assert.match(inverted.distanceLabel, /0\.4 percentage points below zero, where long-term rates drop below short-term rates/);
 
     const positive = buildSignalClusterReading(
       "yield-curve-flip-watch",
       buildReportData({ scores: { curveSlope: 0.6 } }),
     );
     assert.equal(positive.caveat, null);
-    assert.match(positive.distanceLabel, /0\.6pp above the zero line/);
+    assert.match(positive.distanceLabel, /0\.6 percentage points above zero/);
   });
 
   /*
@@ -242,11 +242,11 @@ describe("signal cluster reading", () => {
     });
 
     const tightness = buildSignalClusterReading("capital-tightness-watch", reportData);
-    assert.deepEqual(tightness.inputs.map((input) => input.label), ["Base rate", "Curve slope"]);
+    assert.deepEqual(tightness.inputs.map((input) => input.label), ["Short-term borrowing rate", "Recession warning gauge"]);
     assert.equal(tightness.inputs[0]?.value, "3.7%");
 
     const curve = buildSignalClusterReading("yield-curve-flip-watch", reportData);
-    assert.deepEqual(curve.inputs.map((input) => input.label), ["2-year", "10-year"]);
+    assert.deepEqual(curve.inputs.map((input) => input.label), ["2-year rate", "10-year rate"]);
   });
 
   it("drops an input the week could not resolve rather than printing an empty value", () => {
@@ -258,7 +258,7 @@ describe("signal cluster reading", () => {
     });
 
     const reading = buildSignalClusterReading("capital-tightness-watch", reportData);
-    assert.deepEqual(reading.inputs.map((input) => input.label), ["Base rate"]);
+    assert.deepEqual(reading.inputs.map((input) => input.label), ["Short-term borrowing rate"]);
   });
 
   /*
@@ -276,7 +276,7 @@ describe("signal cluster reading", () => {
       buildReportData({ scores: { curveSlope: 4.5 - 4.21 } }),
     );
 
-    assert.equal(reading.displayValue, "0.3pp");
+    assert.equal(reading.displayValue, "0.3%");
     assert.ok(
       !/\d\.\d{3,}/.test(reading.displayValue ?? ""),
       `displayValue must be rounded for display, got ${reading.displayValue}`,
@@ -292,7 +292,7 @@ describe("signal cluster reading", () => {
     assert.equal(reading.displayValue, null);
   });
 
-  it("keeps the unit joined the same way in the figure and the lines under it", () => {
+  it("writes the figure as a percentage and every move on it in percentage points", () => {
     const reading = buildSignalClusterReading(
       "yield-curve-flip-watch",
       buildReportData({
@@ -301,9 +301,12 @@ describe("signal cluster reading", () => {
       }),
     );
 
-    // "0.3pp", "0.3pp above …", "-0.18pp since …" — never "0.3 pp".
-    assert.equal(reading.displayValue, "0.3pp");
-    assert.match(reading.distanceLabel, /0\.3pp above/);
-    assert.match(reading.directionLabel, /-0\.18pp since last week/);
+    // One unit per quantity, and no desk shorthand: this page has no key for "pp" or "bp".
+    assert.equal(reading.displayValue, "0.3%");
+    assert.match(reading.distanceLabel, /0\.3 percentage points above/);
+    assert.match(reading.directionLabel, /-0\.18 percentage points since last week/);
+    for (const line of [reading.displayValue, reading.distanceLabel, reading.directionLabel]) {
+      assert.ok(!/\b(pp|bp)\b/.test(line ?? ""), `desk shorthand in "${line}"`);
+    }
   });
 });

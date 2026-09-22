@@ -437,12 +437,17 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
                       {/* The reading and its distance are one phrase; letting it wrap
                           broke "from 70" across lines while the label beside it had
                           room to spare. The label takes the wrap instead. */}
+                      {/* Out of 100, and the distance said as a direction: "72 / +2 from
+                          70" asked the reader to know the scale and to read a slash
+                          and a sign as "two above the line". */}
                       <dd className="whitespace-nowrap tabular-nums text-slate-200">
-                        {gap.axis === "tightness" ? current.tightness : current.riskAppetite}
+                        {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
                         <span className="text-slate-500">
-                          {" "}
-                          / {gap.side === "above" ? "+" : gap.side === "below" ? "−" : "±"}
-                          {gap.distance} from {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
+                          {" · "}
+                          {gap.side === "on"
+                            ? "on"
+                            : `${gap.distance} ${gap.side}`}{" "}
+                          the line at {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
                         </span>
                       </dd>
                     </div>
@@ -508,8 +513,8 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               <tr>
                 <th scope="col" className="px-2.5 py-1.5 font-medium">Month</th>
                 <th scope="col" className="px-2.5 py-1.5 font-medium">Call</th>
-                <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Pressure</th>
-                <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Appetite</th>
+                <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Funding pressure (0–100)</th>
+                <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Risk appetite (0–100)</th>
               </tr>
             </thead>
             <tbody className="text-slate-300">

@@ -19,10 +19,11 @@ describe("formula reference visuals", () => {
     assert.doesNotMatch(html, /quadrant of funding pressure vs/, "the prose form is gone");
   });
 
-  it("draws confidence as a three-band ladder", () => {
-    assert.match(html, />LOW</);
-    assert.match(html, />MED</);
-    assert.match(html, />HIGH</);
+  it("draws confidence as a three-band ladder, named in words", () => {
+    assert.match(html, />Low</);
+    assert.match(html, />Medium</);
+    assert.match(html, />High</);
+    assert.doesNotMatch(html, />(LOW|MED|HIGH)</, "the engine's band codes are storage, not copy");
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_NEAR_THRESHOLD}<`));
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_MEDIUM_THRESHOLD}<`));
   });
@@ -51,5 +52,27 @@ describe("formula reference visuals", () => {
   it("draws both score ramps", () => {
     assert.match(html, /Rate component: 0 points at/);
     assert.match(html, /Inversion component: 0 points at no inversion/);
+  });
+
+  /*
+   * The method layer defines its own terms in place (docs/glossary-retirement-plan.md,
+   * Phase 4). Every instrument a formula names is glossed inside the card that uses it,
+   * and nothing points the reader at a separate page to decode it.
+   */
+  it("says what each market term means where the formula uses it", () => {
+    const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    for (const [term, gloss] of [
+      ["high-yield credit spread", /extra interest riskier companies pay to borrow/],
+      ["Chicago Fed", /zero is average, above zero is tighter than average/],
+      ["Inversion depth", /how far below, in percentage points/],
+      ["VIX", /forecast of turbulence over the next month/],
+      ["short-term borrowing rate", /one-month Treasury bill rate/],
+      ["Operating latitude", /room to hire, spend and commit/],
+    ] as const) {
+      assert.ok(text.includes(term), `formula cards should name ${term}`);
+      assert.match(text, gloss, `${term} should be glossed in place`);
+    }
+    assert.doesNotMatch(text, /homepage headline|Haircuts|veto|hiking cycle|base-rate move/i);
+    assert.doesNotMatch(html, /href="\/glossary"/, "no link out to decode the arithmetic");
   });
 });

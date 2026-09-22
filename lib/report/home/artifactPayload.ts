@@ -6,7 +6,10 @@ import {
   buildWeeklyOperatorBriefPlainText,
 } from "../../export/weeklyOperatorBrief";
 import { buildCanonicalDecisionCopy } from "../canonicalDecisionCopy";
-import { DECISION_CONTRACT_LABELS } from "../reportCopy";
+import { DECISION_CONTRACT_LABELS, OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../reportCopy";
+import { formatDecisionReversal } from "../reportFormatting";
+import { resolveDataStatusGuidance } from "../trustStatus";
+import { describeConditions, formatExportConfidence, pauseConditionOnly } from "../../export/exportTerms";
 import { buildInterpretationLayer, type InterpretationView } from "../interpretationLayer";
 import type { buildHomeBriefModel } from "../homeBriefModel";
 import type { buildPostureState } from "../postureStateSource";
@@ -48,7 +51,9 @@ const buildDeltaOnlyBriefText = ({
   citation: string;
 }) => {
   const revisitLines = homeBriefModel.revisitQueue.length > 0
-    ? homeBriefModel.revisitQueue.map((item) => `- ${item.label}: ${item.action}. Flip back in if ${item.flipCondition}.`)
+    ? homeBriefModel.revisitQueue.map(
+        (item) => `- ${item.label}: ${item.action}. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.flipCondition)}.`,
+      )
     : [`- Keep this week's rules until next week's reading moves.`];
 
   return [
@@ -60,8 +65,8 @@ const buildDeltaOnlyBriefText = ({
     ...revisitLines,
     "",
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${homeBriefModel.guardrail}`,
-    `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${canonicalDecisionCopy.flipTrigger}`,
-    `Trust: ${homeBriefModel.decisionReadiness.detail}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${canonicalDecisionCopy.flipTrigger}`,
+    `Data: ${homeBriefModel.decisionReadiness.detail}`,
     `Data refreshed: ${freshnessLabel}`,
     "",
     "Citation",
@@ -135,22 +140,41 @@ export const buildLeadershipArtifactPayload = async ({
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
     });
 
+    /*
+     * The board note is read cold, by people who have never opened the page,
+     * so every slot carries its meaning on its own line and uses the page's
+     * names. It used to open "TRUST: FALLBACK SNAPSHOT" and "BOLDNESS BUDGET",
+     * print confidence as a percent, and label the call-change line "FLIP:".
+     * `weeklyCall.changeCourseIf` is the line where the call itself changes
+     * (the lead rule's resume line is a separate, lower one), so it is printed
+     * under that name; the resume line comes from the lead rule when it has one.
+     */
+    const isSavedCopy = Boolean(treasury.fallback_at || treasury.fallback_reason);
+    const latitude = homeBriefModel.weeklyLeadershipSummary;
+    const latitudeDelta = latitude.boldnessDelta === 0
+      ? "no change"
+      : `${latitude.boldnessDelta > 0 ? "+" : ""}${latitude.boldnessDelta} ${Math.abs(latitude.boldnessDelta) === 1 ? "point" : "points"}`;
+    const leadResume = homeBriefModel.actionStripItems?.[0]?.reversalCondition;
     const boardSnippetText = buildWeeklyBoardSnippetPlainText({
-      trustLine: treasury.fallback_at || treasury.fallback_reason
-        ? `TRUST: FALLBACK SNAPSHOT · As of ${freshnessLabel}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
-        : `TRUST: LIVE · As of ${freshnessLabel}`,
-      postureLine: `BOLDNESS BUDGET: ${homeBriefModel.weeklyLeadershipSummary.boldnessScore}/100 (${homeBriefModel.weeklyLeadershipSummary.boldnessDelta === 0 ? "no change vs last week" : `${homeBriefModel.weeklyLeadershipSummary.boldnessDelta > 0 ? "+" : ""}${homeBriefModel.weeklyLeadershipSummary.boldnessDelta} vs last week`}) · POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
+      dataLine: isSavedCopy
+        ? `DATA: Saved copy from ${freshnessLabel}. ${resolveDataStatusGuidance({ isFallbackSnapshot: true })}`
+        : `DATA: Live, as of ${freshnessLabel}`,
+      latitudeLine: `${OPERATING_LATITUDE_LABEL.toUpperCase()}: ${latitude.boldnessScore}/100 (${OPERATING_LATITUDE_GLOSS}) · vs last week: ${latitudeDelta}`,
+      conditionsLine: `CONDITIONS: ${describeConditions(assessment.regime, canonicalDecisionCopy.currentRegimeLabel)} · ${formatExportConfidence(homeBriefModel.confidenceLabel)}`,
       changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
-      guardrailLine: `GUARDRAIL: ${weeklyCall.pauseIf}`,
-      flipLine: `FLIP: ${weeklyCall.changeCourseIf}`,
-      stabilityLine: "STABILITY: Act on a change in the call only after two weekly readings agree, unless it fires at HIGH confidence.",
+      pauseLine: `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}: ${pauseConditionOnly(weeklyCall.pauseIf)}`,
+      resumeLine: leadResume
+        ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}: ${formatDecisionReversal(leadResume)}`
+        : undefined,
+      callChangeLine: `${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}: ${weeklyCall.changeCourseIf}`,
+      stabilityLine: "WHEN THE CALL CHANGES: wait for two weekly readings that agree before acting, unless the change comes with high confidence.",
     });
     const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
     const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
       regime: canonicalDecisionCopy.currentRegimeLabel,
       call: canonicalDecisionCopy.operatingCall,
       trend: homeBriefModel.trendLabel,
-      confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
+      confidence: formatExportConfidence(homeBriefModel.confidenceLabel),
       doNow: weeklyCall.actionNow,
       avoid: weeklyCall.pauseIf,
       watch: weeklyCall.changeCourseIf,

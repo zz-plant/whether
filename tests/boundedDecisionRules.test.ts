@@ -282,7 +282,7 @@ describe("regime-derived WIP caps", () => {
   it("carries the cap as a copyable block", () => {
     const guidance = buildWipGuidance({ regime: "VOLATILE", runwayBand: "tight" });
 
-    assert.match(guidance.markdown, /WIP policy — VOLATILE/);
+    assert.match(guidance.markdown, /Work-in-progress limit — Stormy/);
     assert.match(guidance.markdown, /Parallel bets: 2/);
     assert.match(guidance.markdown, /finish one before pulling the next/);
   });

@@ -4,7 +4,11 @@
  */
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import type { FlashMove } from "./flashMoves";
+import { formatPointsMove, type FlashMove } from "./flashMoves";
+
+/** What a flash asks of the reader, in the mail's text and HTML alike. */
+const FLASH_GUIDANCE =
+  "A move this size between two readings is unusual. This week's call stands until the next reading shows where the scores settle; until then, hold anything you can't undo.";
 
 type EmailContent = {
   subject: string;
@@ -107,7 +111,7 @@ export const decisionVerdictEmail = ({
     `Whether Decision Alert`,
     headline,
     why,
-    `${DECISION_CONTRACT_LABELS.slot.action}: ${actionNow}`,
+    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
     `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reversal}`,
     ``,
     `View full brief: https://whether.work`,
@@ -187,12 +191,15 @@ export const flashMoveEmail = (
   move: FlashMove,
   unsubscribeToken?: string | null,
 ): EmailContent => {
-  const size = `${move.delta > 0 ? "+" : ""}${move.delta.toFixed(2)}%`;
-  const subject = `Whether Flash — ${move.label.toLowerCase()} moved ${size} since the last read`;
+  const size = formatPointsMove(move.delta);
+  const direction = move.delta < 0 ? "fell" : "rose";
+  /* The subject line keeps the short name; the body's headline carries the gloss. */
+  const shortLabel = move.label.replace(/\s*\(.*\)$/, "").toLowerCase();
+  const subject = `Whether Flash — ${shortLabel} ${direction} ${size} since the last reading`;
   const text = [
     `Whether Flash Alert`,
     move.headline,
-    `A move this size between two reads is outside a normal session. The weekly call stands until the next read confirms where the scores settle; hold irreversible commitments until then.`,
+    FLASH_GUIDANCE,
     ``,
     `View full brief: https://whether.work`,
     `---`,
@@ -204,12 +211,12 @@ export const flashMoveEmail = (
     [
       alertBanner("critical", `<strong>${move.headline}</strong>`),
       `<div style="margin-top:12px;">`,
-      sectionBlock(move.label, `${move.from.toFixed(2)}% → ${move.to.toFixed(2)}% (${size})`, "#fbbf24", "#fde68a"),
+      sectionBlock(move.label, `${move.from.toFixed(2)}% → ${move.to.toFixed(2)}% (${direction === "rose" ? "up" : "down"} ${size})`, "#fbbf24", "#fde68a"),
       `</div>`,
       `<div style="margin-top:12px;">`,
       sectionBlock(
         "What to do",
-        "A move this size between two reads is outside a normal session. The weekly call stands until the next read confirms where the scores settle; hold irreversible commitments until then.",
+        FLASH_GUIDANCE,
       ),
       `</div>`,
     ].join("\n"),

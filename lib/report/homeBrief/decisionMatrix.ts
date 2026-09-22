@@ -85,11 +85,11 @@ export const buildDecisionMatrixPayload = ({
           reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",
         },
         flip: {
-          text: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
+          text: compactMatrixText(flipSummary, "Resume only after the reading recovers past the line"),
           detail: flipDetail || "Resume only with sustained threshold recovery.",
           action: rule ? formatBoundedDecisionAction(rule) : fallbackApprove,
           threshold: rule ? formatBoundedDecisionThreshold(rule) : fallbackFlipCondition,
-          reversal: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
+          reversal: compactMatrixText(flipSummary, "Resume only after the reading recovers past the line"),
         },
       },
     };
@@ -99,7 +99,7 @@ export const buildDecisionMatrixPayload = ({
     columns: [
       { key: "approve", label: "Approve" },
       { key: "delay", label: "Delay" },
-      { key: "flip", label: DECISION_CONTRACT_LABELS.reversal.changeCourseIf },
+      { key: "flip", label: DECISION_CONTRACT_LABELS.reversal.resumeWhen },
     ],
     rows,
   };

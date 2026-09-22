@@ -1,6 +1,8 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { formatConfidenceChipLabel, publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import {
   GlyphMotif,
   OG_BG,
@@ -117,6 +119,8 @@ const detailCard = ({
 export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => {
   const tone = contextTone(preview);
   const confidenceTone = metricToneByConfidence[preview.confidenceLabel];
+  /* The card travels furthest of anything the site makes; "MED" is the engine's code, not a word. */
+  const confidenceChip = formatConfidenceChipLabel(preview.confidenceLabel);
 
   return (
     <div style={frameStyle}>
@@ -182,7 +186,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <div style={pill(preview.statusLabel, tone)}>{preview.statusLabel}</div>
-                  <div style={pill(`${preview.confidenceLabel} confidence`, confidenceTone)}>{preview.confidenceLabel} confidence</div>
+                  <div style={pill(confidenceChip, confidenceTone)}>{confidenceChip}</div>
                 </div>
               </div>
             </div>
@@ -208,14 +212,14 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
               </div>
               <div style={{ display: "flex", gap: 12 }}>
                 {detailCard({
-                  label: "Flip When",
+                  label: DECISION_CONTRACT_LABELS.watch.postureFlips,
                   value: preview.flipCondition,
                   background: "#3b2d0b",
                   border: "1px solid #f59e0b55",
                   labelColor: "#fcd34d",
                 })}
                 {detailCard({
-                  label: "Operating Stance",
+                  label: `The ${publicDecisionLabels.call.toLowerCase()}`,
                   value: preview.operatingStanceLine,
                   background: "#0c2536",
                   border: "1px solid #38bdf855",
@@ -244,7 +248,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
               }}
             >
               <div style={{ fontSize: 13, fontWeight: 600, color: OG_TEXT_MUTED, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Snapshot
+                This week
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <div style={pill(preview.trendLabel, "#e2e8f0")}>{preview.trendLabel}</div>
@@ -253,12 +257,12 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", gap: 10 }}>
-                {metricCard("Confidence", preview.confidenceLabel, confidenceTone)}
+                {metricCard("Confidence", confidenceChip.replace(/ confidence$/, ""), confidenceTone)}
                 {metricCard("Trend", preview.trendLabel, "#e2e8f0")}
               </div>
               <div style={{ display: "flex", gap: 10 }}>
-                {metricCard("Base Rate", preview.baseRateLabel, "#7dd3fc")}
-                {metricCard("10Y-2Y", preview.curveSlopeLabel, "#67e8f9")}
+                {metricCard(regimeSignalLabel.baseRate, preview.baseRateLabel, "#7dd3fc")}
+                {metricCard(regimeSignalLabel.curveSlope, preview.curveSlopeLabel, "#67e8f9")}
               </div>
             </div>
             <div

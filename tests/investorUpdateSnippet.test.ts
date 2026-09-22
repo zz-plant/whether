@@ -22,7 +22,7 @@ const treasury: TreasuryData = {
 const weeklyCall = {
   actionNow: "Hold net-new hiring and require reversible commitments.",
   pauseIf: "Pause if funding pressure crosses 66",
-  changeCourseIf: "Re-open when risk appetite clears 50 for two reads",
+  changeCourseIf: "Resume when risk appetite clears 50 for two reads",
 };
 
 const history: MonthlyRegimeHistoryEntry[] = [
@@ -51,11 +51,15 @@ describe("investor update snippet", () => {
     });
     assert.match(parts.conditions, /as of 2026-09-16/);
     assert.match(parts.conditions, /(unchanged since|moved to .* from .* at) the end of Aug 2026/);
-    assert.match(parts.conditions, /Over the month, funding pressure moved to \d+ of 100 \((\+|-)?\d+ points|unchanged\)/);
+    assert.match(parts.conditions, /Over the month, funding pressure moved to \d+ of 100 \(((\+|-)?\d+ points|unchanged); money is [a-z ]+\)/);
+    // The weather word carries what it means for money, for an investor who has never seen the site.
+    assert.match(parts.conditions, /\. Money is [a-z ,]+\. /);
     assert.match(parts.conditions, /The call is (well clear of|within reach of|close to) the line that would change it\./);
     assert.match(parts.response, /^Our operating response this month: Hold net-new hiring/);
-    assert.match(parts.response, /The guardrail we are watching: Pause if funding pressure crosses 66\./);
-    assert.match(parts.response, /What would change our course: Re-open when risk appetite clears 50 for two reads\.$/);
+    // The page's slot names, and the rule's own verb dropped under a label that already says it.
+    assert.match(parts.response, /Pause if: Funding pressure crosses 66\./);
+    assert.match(parts.response, /Call changes if: Resume when risk appetite clears 50 for two reads\.$/);
+    assert.doesNotMatch(parts.response, /guardrail|change our course/i);
     assert.doesNotMatch(parts.response, /commitments\.\./, "an existing full stop is not doubled");
     assert.equal(parts.source, "Source: U.S. Treasury, 2026-09-16, via whether.work.");
 
@@ -87,7 +91,7 @@ describe("investor update snippet", () => {
       monthlyHistory: [{ record_date: "2026-08-31", regime: assessment.regime }],
       sourceLabel: treasury.source,
     });
-    assert.match(scoreless.conditions, /Funding pressure sits at \d+ of 100 and risk appetite at \d+ of 100\./);
+    assert.match(scoreless.conditions, /Funding pressure sits at \d+ of 100 \([a-z ]+\) and risk appetite at \d+ of 100 \([a-z ]+\)\./);
     assert.doesNotMatch(scoreless.conditions, /over the month/i);
 
     const first = buildInvestorUpdateSnippetParts({
@@ -129,6 +133,6 @@ describe("investor update snippet", () => {
       sourceLabel: treasury.source,
       isFallback: true,
     });
-    assert.match(parts.source, /cached snapshot, not a live read/);
+    assert.match(parts.source, /saved copy, not a live reading/);
   });
 });

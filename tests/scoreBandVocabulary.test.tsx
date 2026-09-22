@@ -7,9 +7,9 @@ import * as nextNavigation from "next/navigation";
 import {
   SCORE_BAND_LABELS,
   classifyScoreBand,
+  scoreBandReference,
   scoreBandScaleLabel,
 } from "../lib/report/signalTranslations";
-import { ScoreBandReference } from "../app/components/ui/plainLanguage";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 
 const mockAny: any = mock;
@@ -64,16 +64,12 @@ describe("score band vocabulary", () => {
     assert.ok(html.includes("mid range"), "risk appetite lost its scale wording");
   });
 
-  it("keeps the bare band words in the table that is only about the bands", () => {
+  it("keeps the bare band words for the list that is only about the bands", () => {
     /* `scoreBandReference` lists the three bands with their ranges and
        meanings. Nothing else is claimed there, so "Moderate" is the right
        word — the scale-position wording exists for the places a line is in
        view, not everywhere. */
-    const html = renderToStaticMarkup(
-      <ScoreBandReference signalKey="riskAppetite" score={42} />,
-    );
-
-    assert.ok(html.includes("31-69"), "band ranges are not rendered");
+    assert.deepEqual(scoreBandReference("riskAppetite").map((row) => row.rangeLabel), ["0-30", "31-69", "70-100"]);
     assert.equal(SCORE_BAND_LABELS.mid, "Moderate");
   });
 });

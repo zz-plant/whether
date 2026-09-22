@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
-  BEGINNER_GLOSSARY_ENTRIES,
   FIRST_TIME_GUIDE_HIGHLIGHTS,
   FIRST_TIME_GUIDE_NEXT_LINKS,
   FIRST_TIME_GUIDE_STEPS,
-  GLOSSARY_USAGE_NOTES,
+  TERM_DEFINITIONS,
 } from "../lib/report/reportCopy";
 
 describe("reportCopy", () => {
@@ -21,42 +20,17 @@ describe("reportCopy", () => {
     });
   });
 
-  it("includes glossary entries with report anchors", () => {
-    assert.ok(BEGINNER_GLOSSARY_ENTRIES.length >= 4);
-    BEGINNER_GLOSSARY_ENTRIES.forEach((entry) => {
-      assert.ok(entry.value);
+  it("defines each term once, in a sentence", () => {
+    const values = new Set(TERM_DEFINITIONS.map((entry) => entry.value));
+    assert.equal(values.size, TERM_DEFINITIONS.length);
+    TERM_DEFINITIONS.forEach((entry) => {
       assert.ok(entry.term);
-      assert.ok(entry.summary);
-      assert.ok(entry.why.startsWith("Why it matters:"));
-      assert.ok(entry.usedInHref.startsWith("/"));
+      assert.match(entry.summary, /\.$/);
     });
   });
 
-  it("keeps glossary notes and quick links non-empty", () => {
+  it("keeps the first-time guide's quick links", () => {
     assert.ok(FIRST_TIME_GUIDE_HIGHLIGHTS.length > 0);
     assert.ok(FIRST_TIME_GUIDE_NEXT_LINKS.length >= 3);
-    assert.equal(GLOSSARY_USAGE_NOTES.length, 2);
-
-    GLOSSARY_USAGE_NOTES.forEach((note) => {
-      assert.ok(note.title.length > 0);
-      assert.equal(note.bullets.length, 3);
-      note.bullets.forEach((bullet) => {
-        assert.ok(bullet.emphasis.length > 0);
-        assert.ok(bullet.detail.length > 0);
-      });
-    });
   });
-
-  it("keeps canonical noun map in glossary usage copy", () => {
-    const serialized = JSON.stringify({
-      firstStep: FIRST_TIME_GUIDE_STEPS[0],
-      notes: GLOSSARY_USAGE_NOTES,
-    });
-
-    assert.match(serialized, /read/i);
-    assert.match(serialized, /environment/i);
-    assert.match(serialized, /U\.S\./i);
-    assert.doesNotMatch(serialized, /climate.*stance/i);
-  });
-
 });

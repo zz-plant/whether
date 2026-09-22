@@ -125,7 +125,7 @@ describe("canonical decision copy contract", () => {
     assert.match(snapshot, /CONDITIONS: Defensive — Watchful/);
     assert.match(snapshot, /CALL: Stage approvals and protect runway\./);
     assert.match(snapshot, /DO NOW: Pause net-new fixed burn commitments this week\./);
-    assert.match(snapshot, /WATCH: Flip when tightness falls below 65 and holds\./);
+    assert.match(snapshot, /CALL CHANGES IF: Flip when tightness falls below 65 and holds\./);
   });
 
   it("keeps command bar flip list unique when canonical conditions include the trigger", () => {

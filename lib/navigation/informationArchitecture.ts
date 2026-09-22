@@ -175,11 +175,6 @@ export const utilityLinks = [
     description: "What is free forever, and what Pro and Team add",
   },
   {
-    href: "/glossary",
-    label: "Glossary",
-    description: "Plain-English definitions of every term the brief uses",
-  },
-  {
     href: "/calibration",
     label: "Calibration",
     description: "How often the confidence label has been right, 2012–2026",

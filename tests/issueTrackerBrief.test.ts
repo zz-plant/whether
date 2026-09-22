@@ -45,9 +45,11 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
     // Each score with the line it is judged against and the distance to it.
-    assert.match(brief, /Funding pressure 12 of 100 · call changes at 70 · 58 pts below/);
-    assert.match(brief, /Risk appetite 68 of 100 · call changes at 50 · 18 pts above/);
-    assert.match(brief, /Short-term borrowing rate:\*\* 3\.75% \(1M\)/);
+    assert.match(brief, /Funding pressure 12 of 100 \(money is easy to raise\) · call changes at 70 · 58 pts below/);
+    assert.match(brief, /Risk appetite 68 of 100 \(investors are selective about risk\) · call changes at 50 · 18 pts above/);
+    // The series is named in words, never as the engine's "(1M)".
+    assert.match(brief, /Short-term borrowing rate:\*\* 3\.75% \(read from the 1-month Treasury bill\)/);
+    assert.doesNotMatch(brief, /\(1M\)/);
     assert.match(brief, /Recession warning gauge \(10-year minus 2-year rate\):\*\* 0\.55%/);
   });
 
@@ -57,17 +59,18 @@ describe("buildIssueTrackerMarkdownBrief", () => {
       confidenceLabel: "HIGH",
     });
 
-    assert.match(brief, /\*\*Conditions:\*\* Sunny — Late/);
+    assert.match(brief, /\*\*Conditions:\*\* Sunny — Late \(money is cheap and available\)/);
     // A ticket is read by a whole team; the engine key is for the JSON routes.
     assert.doesNotMatch(brief, /Regime:|EXPANSION/);
-    assert.match(brief, /Confidence: HIGH \(how far the scores sit/);
+    assert.match(brief, /Confidence: High \(how far the scores sit/);
   });
 
   it("stamps what confidence measures when no confidence label is modeled", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
     // With no modeled label the stamp still prints a value, from the reading itself.
-    assert.match(brief, /Confidence: MEDIUM \(how far the scores sit from the line that changes the call\)/);
+    assert.match(brief, /Confidence: Medium \(how far the scores sit from the line that changes the call\)/);
+    assert.doesNotMatch(brief, /MEDIUM/);
   });
 
   it("produces identical bytes for Jira and Linear, which both consume markdown", () => {
@@ -121,11 +124,14 @@ describe("buildGuardrailTagBlocks", () => {
       assert.match(block.markdown, /\*\*Conditions:\*\* Cloudy/);
       assert.match(block.markdown, /\*\*Action now:\*\* /);
       assert.match(block.markdown, /\*\*Pause if:\*\* /);
-      assert.match(block.markdown, /\*\*Change course if:\*\* /);
+      assert.match(block.markdown, /\*\*Resume when:\*\* /);
       assert.match(block.markdown, /Week of 2026-03-04/);
     }
     assert.match(blocks[0].markdown, /Hold speculative hiring\./);
-    assert.match(blocks[0].markdown, /Pause net-new hiring above 56\./);
+    // The area heads the block, so the lines under it carry only their condition.
+    assert.match(blocks[0].markdown, /^\*\*Hiring\*\*$/m);
+    assert.match(blocks[0].markdown, /\*\*Pause if:\*\* Net-new hiring above 56$/m);
+    assert.doesNotMatch(blocks[0].markdown, /Pause if:\*\* Pause|Resume when:\*\* Resume/);
     assert.match(blocks[1].markdown, /Keep expansion bets reversible\./);
   });
 

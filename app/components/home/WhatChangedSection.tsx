@@ -1,6 +1,6 @@
 import { HomeSection } from "./HomeSection";
 import { ScoreLadder } from "../ui/scoreLadder";
-import { GlossaryLink, PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
+import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
 import { compositeSignalScales } from "../../../lib/report/signalTranslations";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
@@ -12,6 +12,10 @@ import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/ho
  * drawing. The sentence over the table is the week's movement in one line,
  * and on a read with no previous week it says so once, instead of four empty
  * chips saying nothing.
+ *
+ * Every term defines itself in its row (the scale note, what the score means
+ * at its level, the line names on the ladder), so the section no longer ends
+ * by sending a reader to a glossary.
  */
 const DeltaChip = ({ row }: { row: SignalChangeRow }) => {
   if (row.previous === null || row.delta === null) {
@@ -141,9 +145,6 @@ export function WhatChangedSection({
           </tbody>
         </table>
       </div>
-      <p className="text-fluid-nano text-white/45">
-        Unfamiliar with a term here? <GlossaryLink>Open the glossary</GlossaryLink>
-      </p>
     </HomeSection>
   );
 }

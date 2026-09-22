@@ -46,8 +46,8 @@ mockAny.module("next/navigation", () => ({
  *
  * - Banned outright: a word that is never the reader's. An engine key, an infrastructure noun,
  *   a mechanism name, a fixture company's figures, a UI implementation detail.
- * - Ratcheted: a word that has a place on some surface (the glossary defines "posture") but
- *   was doing a plain sentence's work on all of them. The count may fall and may not rise,
+ * - Ratcheted: a word that has a place on some surface but was doing a plain sentence's work
+ *   on all of them. The count may fall and may not rise,
  *   the way scripts/check-suppression-census.ts holds its numbers. Lower the baseline when
  *   work earns it; raising one is a decision and belongs in its own PR with the reason.
  *
@@ -71,6 +71,15 @@ const BANNED: { name: string; pattern: RegExp }[] = [
      answers it; "Risk-On" alone is the engine's old name for a pace. */
   { name: "policy-engine vocabulary", pattern: /\b(policy signals|policy override|Safety Mode|Risk-On(?!\s+or\s+Risk-Off)|Capital-Tight|Capital-Loose)\b/ },
   { name: "UI implementation detail", pattern: /\bYCURVE\b|1\.91:1|16:9|without a reload|hidden by default/ },
+  /* The retired names for the three lines and the latitude score (2026-09-22). Each had a
+     glossary entry whose job was telling it apart from its neighbour; the names that replaced
+     them say what happens, so the entries went with the page. */
+  {
+    name: "retired line name",
+    pattern: /\b(Re-open when|Change course if|Clears (only )?when|[Ww]atch lines?|Posture flips|Flip watch|Flip trigger|GUARDRAIL:|FLIP:|AVOID:)/,
+  },
+  { name: "retired score name", pattern: /\b(Boldness|BOLDNESS|Latitude signal)\b/ },
+  { name: "glossary pointer", pattern: /\b(Open the glossary|Full glossary|Look up a term|What these terms mean)\b/ },
 ];
 
 /*
@@ -138,7 +147,6 @@ const routeSurfaces: Surface[] = [
       return visibleText(renderToStaticMarkup(await page.default({ params: Promise.resolve({ slug: toolkit.slug }) })));
     },
   })),
-  { name: "/glossary", text: async () => visibleText(renderToStaticMarkup((await import("../app/glossary/page")).default())) },
   { name: "/pricing", text: async () => visibleText(renderToStaticMarkup((await import("../app/pricing/page")).default())) },
   { name: "/about", text: async () => visibleText(renderToStaticMarkup((await import("../app/about/page")).default())) },
   { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },

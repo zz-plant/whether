@@ -16,7 +16,6 @@ import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
 import { buildTrustPageModel } from "./trustPageModel";
-import { GLOSSARY_HREF } from "../../lib/report/signalTranslations";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -112,9 +111,9 @@ export default async function MethodPage({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">What to watch</p>
             <ul className="space-y-2 text-sm text-slate-200">
-              <li><span className="text-slate-400">This recommendation breaks if:</span> {reportData.flipThreshold}</li>
+              <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              <li><span className="text-slate-400">Reopen fixed-cost approvals when:</span> confidence is back to high and the call has held for a second reading.</li>
+              <li><span className="text-slate-400">Resume fixed-cost commitments when:</span> confidence is back to high and the call has held for a second reading.</li>
             </ul>
           </article>
           <article className="weather-hub-card space-y-3 px-4 py-4">
@@ -136,7 +135,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="The percent measures how far the scores sit from the line that changes the call. Whether calls at that distance actually held is measured separately, over the whole archive."
+        description="Confidence measures how far the scores sit from the line that changes the call. Whether calls at that distance actually held is measured separately, over the whole archive."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -179,22 +178,6 @@ export default async function MethodPage({
         <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200">
           <code>{meetingSnippet}</code>
         </pre>
-      </ReportSection>
-
-      {/* The glossary itself moved to /glossary. A pointer stays because this
-          page is where a reader checking the brief before a decision ends up,
-          and "what does that word mean" is a question they arrive with — but
-          the definitions are not a trust artifact, and six links across the
-          site used to send someone who did not know a term to a page about
-          source freshness. */}
-      <ReportSection
-        id="beginner-glossary"
-        title="Unfamiliar with a term?"
-        description="Every term this site uses, in plain English, and what each one changes for a decision."
-      >
-        <ActionLink href={GLOSSARY_HREF} variant="pill">
-          Open the glossary
-        </ActionLink>
       </ReportSection>
     </>
   );

@@ -15,7 +15,7 @@ export const publisherAuthor = {
   /** Rendered as a mailto: link on /contact and used as the schema.org contact point. */
   email: "kanavj@gmail.com",
   bio:
-    "Kanav Jain writes and maintains Whether's weekly operating brief, and owns the regime model that turns public macro data into a posture call.",
+    "Kanav Jain writes and maintains Whether's weekly operating brief, and owns the model that turns public U.S. market data into the weekly call.",
   /** The author's own site, linked from the footer; `sameAs` on the Person node. */
   sameAs: ["https://kanav.net"],
 } as const;

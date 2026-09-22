@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
-import { compositeSignalScales, GLOSSARY_HREF } from "../lib/report/signalTranslations";
+import { compositeSignalScales } from "../lib/report/signalTranslations";
 import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
 
 /*
@@ -14,8 +14,8 @@ import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
  * lines are.
  *
  * The plain-language layer travels with it: a composite score is the one
- * number on the page with no unit, so it keeps the scale direction and the
- * way to the glossary (CLAUDE.md, "Who the copy is written for").
+ * number on the page with no unit, so it keeps the scale direction and what
+ * the score means at its level (CLAUDE.md, "Who the copy is written for").
  */
 const rows: SignalChangeRow[] = [
   {
@@ -68,8 +68,8 @@ describe("the changed-signals table", () => {
     assert.match(curveRow, /Feeds both scores; the call is judged on those\./, "an input that feeds the scores says so");
   });
 
-  it("offers the glossary from the section a stranger reads first", () => {
-    assert.ok(html.includes(GLOSSARY_HREF));
+  it("explains its terms in the rows rather than sending a stranger to a glossary", () => {
+    assert.ok(!html.includes('href="/glossary"'));
   });
 
   it("draws no delta at all when there was no comparison", () => {

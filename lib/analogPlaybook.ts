@@ -55,62 +55,62 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
   {
     id: "q3_2007",
     period: "Q3 2007",
-    regimeType: "Late-Cycle Pre-Inversion",
+    regimeType: "High rates, recession warning about to fire",
     baseRate: 5.25,
     curveSlope: -0.25,
     tightness: 70,
     riskAppetite: 40,
     consensusTrap:
-      "Expanded enterprise direct sales headcount expecting a Q4 demand rebound; burned 35% of cash buffer with zero closed-won conversions as enterprise procurement timelines doubled.",
+      "Hired more enterprise salespeople expecting a fourth-quarter rebound; burned 35% of the cash buffer without closing a deal as enterprise buying cycles doubled.",
     winningMove:
-      "Restructured pricing to 100% annual upfront cash collection with a 15% incentive; converted open engineering reqs to 6-month contract-to-hire.",
+      "Moved to annual contracts paid up front, with a 15% discount for doing so; turned open engineering roles into 6-month contract-to-hire positions.",
     reversalMarker:
-      "Yield curve un-inversion past +0.25% combined with 2 consecutive months of tightening contraction signaled the safe expansion window.",
+      "The recession warning gauge climbing back above +0.25%, with funding pressure falling two months in a row, marked the safe time to expand again.",
   },
   {
     id: "q4_2018",
     period: "Q4 2018",
-    regimeType: "Mid-Cycle Tightening Scare",
+    regimeType: "A rate-rise scare mid-expansion",
     baseRate: 2.50,
     curveSlope: 0.15,
     tightness: 62,
     riskAppetite: 35,
     consensusTrap:
-      "Froze all product releases and panicked on marketing spend right before the Fed pivoted to an easing pause.",
+      "Froze product releases and cut marketing spend in a panic, right before the Federal Reserve stopped raising rates.",
     winningMove:
-      "Accelerated core product velocity while competitors stalled; renegotiated annual cloud commits to monthly rolling tiers.",
+      "Shipped core product faster while competitors stalled; moved annual cloud contracts to month-to-month.",
     reversalMarker:
-      "Fed pause announcement and Risk Appetite rising past 55 signaled the green light for aggressive GTM resumption.",
+      "The Federal Reserve's pause, and risk appetite rising past 55, marked the time to restart sales and marketing spending.",
   },
   {
     id: "q2_2022",
     period: "Q2 2022",
-    regimeType: "Rapid Rate & Valuation Shock",
+    regimeType: "Fast rate rises and falling valuations",
     baseRate: 3.50,
     curveSlope: -0.40,
     tightness: 78,
     riskAppetite: 28,
     consensusTrap:
-      "Maintained high gross burn assuming secondary venture funding rounds would remain available at 2021 valuation multiples.",
+      "Kept spending heavily on the assumption that the next venture round would still come at 2021 valuations.",
     winningMove:
-      "Cut non-essential vendor SaaS bloat immediately; extended runway beyond 24 months to bypass dilutive down-rounds entirely.",
+      "Cut non-essential software subscriptions at once; extended runway past 24 months to avoid raising at a lower valuation than the last round.",
     reversalMarker:
-      "Stabilization of base rate hikes and tightness leveling off below 65.",
+      "Short-term rates stopped climbing and funding pressure settled below 65.",
   },
   {
     id: "q2_2021",
     period: "Q2 2021",
-    regimeType: "Accommodative Expansion",
+    regimeType: "Near-zero rates, easy money",
     baseRate: 0.25,
     curveSlope: 1.20,
     tightness: 25,
     riskAppetite: 85,
     consensusTrap:
-      "Hired indiscriminately without onboarding infrastructure, driving down per-employee productivity and ballooning fixed overhead.",
+      "Hired fast without the onboarding to support it, which cut output per person and swelled fixed costs.",
     winningMove:
-      "Raised multi-year capital reserves while cost of capital was near zero; locked in long-term enterprise anchor customers.",
+      "Raised enough for several years while borrowing cost almost nothing; signed long-term contracts with large anchor customers.",
     reversalMarker:
-      "Initial inflation surge above 3.5% and yield curve flattening signaled the impending end of frictionless capital.",
+      "Inflation rising above 3.5%, and the gap between long- and short-term rates narrowing, marked the end of cheap money.",
   },
 ];
 
@@ -181,8 +181,8 @@ export function getHistoricalAnalogPlaybook(assessment: AnalogPlaybookInput): An
   const matchScore = Math.max(0, Math.min(100, Math.round(100 / (1 + lowestDistance))));
 
   const matchBasis: AnalogCoordinate[] = [
-    { key: "baseRate", label: "Base rate", historical: bestMatch.baseRate, live: baseRate, unit: "%" },
-    { key: "curveSlope", label: "10Y−2Y slope", historical: bestMatch.curveSlope, live: currentSlope, unit: "%" },
+    { key: "baseRate", label: "Short-term borrowing rate", historical: bestMatch.baseRate, live: baseRate, unit: "%" },
+    { key: "curveSlope", label: "Recession warning gauge (10-year minus 2-year rate)", historical: bestMatch.curveSlope, live: currentSlope, unit: "%" },
     { key: "tightness", label: "Funding pressure", historical: bestMatch.tightness, live: tightness, unit: "pts" },
     { key: "riskAppetite", label: "Risk appetite", historical: bestMatch.riskAppetite, live: riskAppetite, unit: "pts" },
   ];

@@ -2,6 +2,7 @@ import type { RegimeConfidenceLabel } from "../../regimePresentation";
 import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
 import type { ReportDynamics } from "../reportDataTypes";
+import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 
 const regimeShiftTargets = {
   SCARCITY: { defensive: "DEFENSIVE" },
@@ -12,6 +13,12 @@ const regimeShiftTargets = {
 
 export const resolvePrimaryShiftRegimeKey = (regime: Regime) =>
   regimeShiftTargets[regime].defensive;
+
+/* `reversalTrigger` here is the line where the call itself changes (the caller
+   passes `conciseFlipThreshold`), so it takes that line's name. It read
+   "Re-open when", which is the resume line's old name — the same string was
+   labelled one line on the hero and the other line here. */
+const CALL_CHANGES_IF = DECISION_CONTRACT_LABELS.watch.postureFlips;
 
 export const buildDecisionShiftSummary = ({
   severityDelta,
@@ -28,18 +35,18 @@ export const buildDecisionShiftSummary = ({
     /* Nothing was compared, so "no significant change" is not available to say.
        The call still stands on where the signals sit; what is missing is the
        week-over-week half of the sentence. */
-    return `No previous reading to compare this week against. The call below comes from where the signals sit now. Re-open when: ${reversalTrigger}`;
+    return `No previous reading to compare this week against. The call below comes from where the signals sit now. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
   }
   if (changeCount === 0 || directionLabel === "stable") {
-    return `No significant change this week. Keep your current plan. Re-open when: ${reversalTrigger}`;
+    return `No significant change this week. Keep your current plan. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
   }
   if (severityDelta < 0 || directionLabel === "improving") {
-    return `Conditions improved. Move faster on what's working. Re-open when: ${reversalTrigger}`;
+    return `Conditions improved. Move faster on what's working. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
   }
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return `Conditions tightened. Slow new commitments and focus on what's already in motion. Re-open when: ${reversalTrigger}`;
+    return `Conditions tightened. Slow new commitments and focus on what's already in motion. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
   }
-  return `Mixed signals this week. Hold steady and keep new moves reversible. Re-open when: ${reversalTrigger}`;
+  return `Mixed signals this week. Hold steady and keep new moves reversible. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
 };
 
 export const buildWeeklyMovementMetric = ({
@@ -114,10 +121,10 @@ export const buildSignalConfidenceReason = ({
 }) => {
   const boundaryClause =
     nearestThresholdGap <= 5
-      ? "This call is sitting on a regime boundary"
+      ? "This call is sitting on the line that changes it"
       : nearestThresholdGap <= 12
-        ? "This call has modest room before the nearest boundary"
-        : "This call is well clear of the nearest boundary";
+        ? "This call has modest room before the line that changes it"
+        : "This call is well clear of the line that changes it";
 
   const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
   const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);
@@ -203,7 +210,7 @@ export const buildWeeklyMemoLines = ({
   // condition instead of restating it.
   transitionWatch === "ON"
     ? `The call could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `The call is not close to changing, so this week's calls hold. Change course when: ${changeCourseIf}`,
+    : `The call is not close to changing, so this week's calls hold. ${CALL_CHANGES_IF}: ${changeCourseIf}`,
 ];
 
 export const buildWhyItMattersLine = ({

@@ -24,7 +24,6 @@ const liveRoutes = [
   // The plain-language entry point. It was a disclosure inside /trust, so the
   // one surface addressed to a reader who does not yet know the vocabulary was
   // never captured and never reviewed.
-  { slug: "glossary", label: "Glossary", path: "/glossary" },
 ];
 
 const liveTargets = liveRoutes.flatMap(({ slug, label, path }) => [

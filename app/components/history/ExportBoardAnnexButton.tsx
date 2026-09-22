@@ -4,6 +4,7 @@ import type { TrackRecord } from "../../../lib/report/trackRecord";
 import { ClipboardActionRow } from "../clipboardActionRow";
 import { CheckIcon, CopyIcon } from "../uiIcons";
 import { getClipboardUiState, useClipboardCopy } from "../useClipboardCopy";
+import { describeConditions } from "../../../lib/export/exportTerms";
 
 type Props = {
   record: TrackRecord | null;
@@ -29,12 +30,12 @@ export const buildRecordSummary = (record: TrackRecord, origin: string) =>
     `Source: Whether (${origin})`,
     "",
     "## The reading",
-    `- **Conditions:** ${record.currentRegimeLabel}`,
+    `- **Conditions:** ${describeConditions(record.currentRegime, record.currentRegimeLabel)}`,
     `- **Held for:** ${record.currentHoldMonths} consecutive month-end readings`,
     `- **Record length:** ${record.monthsCovered} months of public market data`,
     "",
     "## Sources",
-    "- Federal Reserve Economic Data (FRED): Treasury yields, credit spreads, VIX, and the Chicago Fed financial conditions index.",
+    "- Federal Reserve Economic Data (FRED): Treasury yields, the extra interest companies pay to borrow, stock market volatility, and the Chicago Fed financial conditions index.",
     "- US Department of the Treasury: constant-maturity daily rates.",
     `- The full record: ${origin}/history`,
   ].join("\n");

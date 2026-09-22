@@ -140,7 +140,7 @@ export default async function HistoryComparePage({
 
   const compareSectionLinks = [
     { href: "#compare-selectors", label: "Period selection" },
-    { href: "#compare-key-deltas", label: "Macro deltas" },
+    { href: "#compare-key-deltas", label: "What changed" },
     { href: "#ops-compare-grid", label: "Side-by-side rules" },
   ];
 
@@ -196,10 +196,12 @@ export default async function HistoryComparePage({
                 lines={ladder.lines}
               />
             ))}
+            {/* Named for what it costs a company, not for the bond index it is read
+                from (Moody's BBB corporate yield over the 10-year Treasury). */}
             <StatTile
-              label="Credit spread change"
+              label="Corporate borrowing premium, A minus B"
               value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
-              detail={`Credit spread: ${(bbbA ?? 0).toFixed(2)}% vs ${(bbbB ?? 0).toFixed(2)}%`}
+              detail={`Extra interest mid-grade companies pay over the government: ${(bbbA ?? 0).toFixed(2)}% vs ${(bbbB ?? 0).toFixed(2)}%`}
             />
           </div>
           <p className="mt-2 text-fluid-xs text-slate-400">

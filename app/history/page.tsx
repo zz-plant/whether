@@ -12,7 +12,7 @@ import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordBody } from "../components/his
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
@@ -218,7 +218,7 @@ export default async function HistoryPage({
             {publishedBriefs.map((brief) => (
               <li key={brief.slug}>
                 <Link href={buildPublishedBriefPath(brief.slug)} className="weather-hub-link-card text-slate-100">
-                  <p className="text-sm font-semibold text-slate-100 line-clamp-1">{brief.headline}</p>
+                  <p className="text-sm font-semibold text-slate-100 line-clamp-1">{publishedBriefDisplay(brief).headline}</p>
                   <p className="flex items-center justify-between gap-2">
                     <span className="text-fluid-micro tabular-nums text-slate-400">{brief.recordDateLabel}</span>
                     <Tag tone="slate">{getRegimePublicLabel(brief.regime)}</Tag>
@@ -262,7 +262,7 @@ export default async function HistoryPage({
         initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
         className="weather-auto-chevron weather-panel px-5 py-4"
         summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
-        summary={<span>Explore raw historical conditions</span>}
+        summary={<span>Every month&rsquo;s readings</span>}
       >
         <div className="mt-4 space-y-5">
           {/* The whole record, not the trailing 24 months `regimeSeries` holds

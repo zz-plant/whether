@@ -1,6 +1,6 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { buildPublishedBriefPath, getPublishedBriefs } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { siteUrl } from "../../lib/siteUrl";
 
 export const runtime = "edge";
@@ -68,20 +68,21 @@ ${items.map(renderItem).join("\n")}
  */
 const publishedItems = (): FeedItem[] =>
   getPublishedBriefs().map((brief) => {
+    const display = publishedBriefDisplay(brief);
     const link = `${siteUrl}${buildPublishedBriefPath(brief.slug)}`;
     return {
-      title: `Week ${brief.slug}: ${brief.postureLabel} — ${brief.headline}`,
+      title: `Week ${brief.slug}: ${display.headline.startsWith(display.conditions) ? display.headline : `${display.conditions} — ${display.headline}`}`,
       link,
       guid: link,
       isPermaLink: true,
       pubDate: toRfc822(brief.publishedAt),
       description: brief.summary,
       html: [
-        `        <p><strong>Conditions:</strong> ${escapeXml(brief.postureLabel)}</p>`,
+        `        <p><strong>Conditions:</strong> ${escapeXml(display.conditions)}</p>`,
         `        <p>${escapeXml(brief.summary)}</p>`,
         `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
         `        <p><strong>What changed:</strong> ${escapeXml(brief.whatChanged)}</p>`,
-        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · <strong>Confidence:</strong> ${escapeXml(brief.confidenceLabel)}</p>`,
+        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · ${escapeXml(display.confidence)}</p>`,
         `        <p><a href="${escapeXml(link)}">Read the published brief →</a></p>`,
       ].join("\n"),
     };

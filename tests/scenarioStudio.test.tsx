@@ -68,10 +68,10 @@ describe("ScenarioStudioSimulator", () => {
 
     // Presets say what they set, not a scenario name
     assert.match(html, /Four preset scenarios/);
-    assert.match(html, /Rate 2\.00%, curve \+1\.2%/);
-    assert.match(html, /Rate 6\.25%, curve -0\.6%/);
-    assert.match(html, /Rate 5\.25%, curve -1\.25%/);
-    assert.match(html, /Rate 3\.25%, curve \+0\.85%/);
+    assert.match(html, /Short-term borrowing rate 2\.00%, recession warning gauge \+1\.2%/);
+    assert.match(html, /Short-term borrowing rate 6\.25%, recession warning gauge -0\.6%/);
+    assert.match(html, /Short-term borrowing rate 5\.25%, recession warning gauge -1\.25%/);
+    assert.match(html, /Short-term borrowing rate 3\.25%, recession warning gauge \+0\.85%/);
     assert.doesNotMatch(html, /Stagflation|Liquidity freeze|archetype/);
 
     // Sliders carry the reader's names and expand the abbreviation

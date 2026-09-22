@@ -4,7 +4,9 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { getRegimePublicLabel } from "../regimePresentation";
+import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
+import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } from "../export/exportTerms";
+import { signalReadingMeaning } from "../report/signalTranslations";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
 
@@ -30,7 +32,7 @@ const distanceFromLine = (
   if (points === 0) return { label: "sitting on the line that changes the call", worse: true };
 
   const side = vsThreshold > 0 ? "above" : "below";
-  return { label: `${points} pts ${side} the line that changes the call`, worse: side === worseSide };
+  return { label: `${points} points ${side} the line that changes the call`, worse: side === worseSide };
 };
 
 /**
@@ -63,27 +65,33 @@ type WeeklyEmailReadingSource = {
 export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | undefined) => {
   if (!snapshot) return [];
   const { scores, diagnostics } = snapshot.assessment;
-  const confidence = diagnostics.confidence === "MEDIUM" ? "MED" : diagnostics.confidence;
+  /* Each score carries what it means, because the inbox has no page beside it
+     to say which end of the scale is bad. */
   return [
     {
       label: "Funding pressure",
       value: `${scores.tightness}/100`,
+      meaning: signalReadingMeaning("tightness", scores.tightness),
       /* Above the line is the tighter regime, so above is the worse side here. */
       distance: distanceFromLine(diagnostics.tightnessVsThreshold, "above"),
     },
     {
       label: "Risk appetite",
       value: `${scores.riskAppetite}/100`,
+      meaning: signalReadingMeaning("riskAppetite", scores.riskAppetite),
       /* The risk line is a floor: below it is risk-off. */
       distance: distanceFromLine(diagnostics.riskAppetiteVsThreshold, "below"),
     },
-    { label: "Confidence", value: confidence, distance: null },
+    { label: "Confidence", value: formatExportConfidenceWord(diagnostics.confidence), meaning: null, distance: null },
   ];
 };
 
 /** One line per reading, as the plain-text email renders it. Exported so a test reads the line rather than the fields behind it. */
 export const readingsText = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
-  readings.map((reading) => `${reading.label}: ${reading.value}${reading.distance ? ` (${reading.distance.label})` : ""}`);
+  readings.map(
+    (reading) =>
+      `${reading.label}: ${reading.value}${reading.meaning ? `, ${reading.meaning}` : ""}${reading.distance ? ` (${reading.distance.label})` : ""}`,
+  );
 
 const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
   readings.length === 0
@@ -96,6 +104,7 @@ const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
             `<td style="padding:12px 16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;vertical-align:top;">`,
             `<p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 4px;">${reading.label}</p>`,
             `<p style="font-size:1.25rem;font-weight:600;margin:0;color:#f1f5f9;font-variant-numeric:tabular-nums;">${reading.value}</p>`,
+            reading.meaning ? `<p style="font-size:0.8rem;margin:4px 0 0;color:#cbd5e1;">${reading.meaning}</p>` : "",
             reading.distance ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.distance.label}</p>` : "",
             `</td>`,
           ].join("");
@@ -194,7 +203,7 @@ export const sendWeeklyBrief = async (options?: {
   const regimeLabel = getRegimePublicLabel(regime);
   const readings = buildWeeklyEmailReadings(snapshot);
   const actionNow = weeklyCall.actionNow;
-  const pauseIf = weeklyCall.pauseIf;
+  const pauseIf = pauseConditionOnly(weeklyCall.pauseIf);
   const changeCourseIf = weeklyCall.changeCourseIf;
   const recordDate = snapshot.provenance.recordDateLabel;
 
@@ -208,11 +217,11 @@ export const sendWeeklyBrief = async (options?: {
 
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
-        `Conditions: ${regimeLabel}`,
+        `Conditions: ${describeConditions(regime)}`,
         ...readingsText(readings),
         `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
-        `${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}: ${changeCourseIf}`,
+        `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${changeCourseIf}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         `---`,
@@ -227,6 +236,7 @@ export const sendWeeklyBrief = async (options?: {
         `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
         `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">Conditions</p>`,
         `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#f1f5f9;">${regimeLabel}</p>`,
+        `<p style="font-size:0.85rem;margin:4px 0 0;color:#cbd5e1;">${getRegimeWeatherRationale(regime)}</p>`,
         `</td></tr></table>`,
         readingsHtml(readings),
       );
@@ -237,7 +247,7 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:#f1f5f9;">${actionNow}</p>`,
         `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>`,
         `<p style="font-size:0.9rem;margin:0 0 12px;color:#cbd5e1;">${pauseIf}</p>`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.watch.postureFlips}</p>`,
         `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${changeCourseIf}</p>`,
         `</td></tr></table>`
       );

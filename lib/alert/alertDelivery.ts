@@ -12,6 +12,8 @@ import { getSubscriberStore, type Subscriber } from "../email/subscriberStore";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { getRegimePublicLabel } from "../regimePresentation";
+import { describeConditions } from "../export/exportTerms";
 
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
@@ -122,11 +124,13 @@ export const deliverAlertToSubscriber = async (
     if (alert.type === "flash" && alert.flash) {
       template = flashMoveEmail(alert.flash, unsubscribeToken);
     } else if (alert.type === "regime_change") {
+      /* The engine key reached every subscriber here ("shifted to SCARCITY");
+         the weather word and what it means for money is what a reader acts on. */
       template = decisionVerdictEmail({
-        headline: "RECONSIDER OPERATING POSTURE",
-        why: `The operating regime shifted to ${conditions.regime}. The assumptions behind the current posture have moved.`,
+        headline: `THE CALL MOVED TO ${getRegimePublicLabel(conditions.regime).toUpperCase()}`,
+        why: `Conditions are now ${describeConditions(conditions.regime)}. Last week's plan rested on the previous conditions.`,
         actionNow: conditions.posture,
-        reversal: "Revert only if the prior regime state holds across two consecutive updates.",
+        reversal: "The readings return to the previous conditions for two updates in a row.",
         unsubscribeToken,
       });
     } else if (alert.metric === "credit") {

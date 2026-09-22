@@ -32,6 +32,7 @@ import { unsubscribeFooterText } from "./alertTemplates";
 import { getSlackWebhookStore } from "../slack/slackWebhookStore";
 import { isSlackWebhookUrl } from "../slack/deliverSlackBrief";
 import { siteUrl } from "../siteUrl";
+import { getRegimePublicLabel } from "../regimePresentation";
 
 const LAST_PULSED_KEY = "month-end:last-pulsed";
 
@@ -70,11 +71,15 @@ const describeMonthChange = (
   }
 
   const parts: string[] = [];
-  if (regimeChanged) parts.push(`the regime moved to ${assessment.regime} from ${prior.regime}`);
+  if (regimeChanged) {
+    parts.push(`conditions moved to ${getRegimePublicLabel(assessment.regime)} from ${getRegimePublicLabel(prior.regime)}`);
+  }
   if (tightnessMoved) parts.push(`funding pressure moved ${tightness > prior.tightness! ? "up" : "down"} to ${tightness}`);
   if (riskMoved) parts.push(`risk appetite moved ${riskAppetite > prior.riskAppetite! ? "up" : "down"} to ${riskAppetite}`);
 
-  return { changed: true, headline: `Call moved vs last month: ${parts.join("; ")}.` };
+  /* "Call moved" only when the conditions did; a score moving inside the same conditions is a change, not a new call. */
+  const lead = regimeChanged ? "The call moved since last month-end" : "Changed since last month-end";
+  return { changed: true, headline: `${lead}: ${parts.join("; ")}.` };
 };
 
 /** The month-end evaluation, pure and testable. */
