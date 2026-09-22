@@ -57,7 +57,7 @@ describe("runway-conditioned notes", () => {
 
   it("marks long runway as non-binding and preserves raise discipline in tightening regimes", () => {
     const defensive = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 24 });
-    assert.match(defensive[0].note, /not this week's binding constraint/);
+    assert.match(defensive[0].note, /not what limits you this week/);
     assert.ok(defensive.some((note) => note.area === "capital-raising"));
 
     const expansion = buildRunwayConditionedNotes({ regime: "EXPANSION", runwayMonths: 24 });

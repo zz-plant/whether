@@ -25,10 +25,13 @@ type OperatorStageOption = {
 };
 
 export const OPERATOR_STAGE_OPTIONS: readonly OperatorStageOption[] = [
-  { key: "seed", label: "Seed", sublabel: "Runway & Proof" },
-  { key: "series-a", label: "Series A", sublabel: "Payback & GTM" },
-  { key: "series-b", label: "Series B+", sublabel: "Operating Leverage" },
-  { key: "bootstrapped", label: "Bootstrapped", sublabel: "Cash Flow Defense" },
+  /* The sublabels used to prescribe each stage a single concern ("Payback & GTM", "Operating
+     Leverage") in a control that decides which rules the reader sees. They say who the rules
+     are for now, and nothing about what that company should care about. */
+  { key: "seed", label: "Seed", sublabel: "Pre-revenue or early revenue" },
+  { key: "series-a", label: "Series A", sublabel: "First repeatable revenue" },
+  { key: "series-b", label: "Series B+", sublabel: "Scaling" },
+  { key: "bootstrapped", label: "Bootstrapped", sublabel: "Funded by revenue" },
 ];
 
 /** The brief's untouched default; the hero drops `?stage=` for it. */

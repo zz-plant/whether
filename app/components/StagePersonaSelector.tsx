@@ -49,7 +49,7 @@ export function StagePersonaSelector({
     key: option.key,
     label: option.label,
     sublabel: option.sublabel,
-    title: `Tailor operating rules for ${option.label} (${option.sublabel})`,
+    title: `Rules for a ${option.label} company (${option.sublabel.toLowerCase()})`,
   }));
 
   const handleSelectStage = (stage: OperatorStage) => {

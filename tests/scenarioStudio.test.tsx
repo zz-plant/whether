@@ -33,7 +33,8 @@ describe("FossilRecordSection", () => {
     assert.match(html, /Self-serve help centers/);
     assert.match(html, /Pricing/);
     assert.match(html, /Reverse trials/);
-    assert.match(html, /SCARCITY CLIMATE/);
+    assert.match(html, /Now: Freezing/);
+    assert.doesNotMatch(html, /SCARCITY|CLIMATE/);
   });
 });
 
@@ -66,7 +67,7 @@ describe("ScenarioStudioSimulator", () => {
 
     // Then-vs-now comparisons
     assert.match(html, /Then vs\. Now/);
-    assert.match(html, /Macro Regime/);
+    assert.match(html, /Conditions/);
     assert.match(html, /Funding Pressure/);
     assert.match(html, /Risk Appetite/);
 

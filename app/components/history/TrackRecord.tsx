@@ -48,7 +48,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
       <tr className="border-b border-slate-800/80 text-slate-400">
         <th scope="col" className="py-2 pr-3 font-medium">Month</th>
         <th scope="col" className="py-2 pr-3 font-medium">Call</th>
-        <th scope="col" className="py-2 pr-3 text-right font-medium">Boldness</th>
+        <th scope="col" className="py-2 pr-3 text-right font-medium">Latitude</th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
     </thead>

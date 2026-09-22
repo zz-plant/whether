@@ -79,9 +79,9 @@ describe("weekly operator brief export adapters", () => {
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     assert.match(text, /Operating latitude: 58\/100 \(\+4 vs last week\)/);
-    assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Posture:"));
-    assert.match(text, /Posture:/);
-    assert.match(text, /Posture:/); // replaces Forecast
+    assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
+    assert.match(text, /Conditions:/);
+    assert.match(text, /Call:/);
     assert.match(text, /Do now:/);
     assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
@@ -107,10 +107,10 @@ describe("weekly operator brief export adapters", () => {
     assert.doesNotMatch(payload.flipWatchLine!, /tightness|riskAppetite|score/i);
 
     const text = buildWeeklyOperatorBriefPlainText(payload);
-    assert.match(text, /Flip watch: \d+\.\d{2}% /);
+    assert.match(text, /What would change the call: \d+\.\d{2}% /);
 
     const blocks = buildWeeklyOperatorBriefSlackBlocks(payload);
-    assert.ok(blocks.includes("Flip watch"));
+    assert.ok(blocks.includes("What would change the call"));
   });
 
   it("renders Slack blocks adapter with required sections", () => {

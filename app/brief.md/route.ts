@@ -86,7 +86,7 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const markdown = md`
 # Whether Weekly Brief — ${reportData.weeklyRecordDate}
 
-> **Posture:** ${postureLabel}  
+> **Conditions:** ${postureLabel}  
 > **Confidence:** ${confidenceLabel}  
 > **Trust:** ${trustCue}  
 > **Data as of:** ${homepage.reportShell.recordDateLabel} · Refreshed: ${homepage.reportShell.fetchedAtLabel} · Source: ${homepage.reportShell.treasurySource}

@@ -152,6 +152,6 @@ export const buildWeeklyLeadershipBriefModel = ({
           : "+0 notch",
     netDeltaLabel: getNetDeltaLabel(boldnessDelta),
     macroLabel:
-      assessment.regime === "EXPANSION" ? "Risk-On / Capital-Loose" : "Risk-Off / Capital-Tight",
+      assessment.regime === "EXPANSION" ? "Money cheap and available" : "Money expensive or scarce",
   };
 };

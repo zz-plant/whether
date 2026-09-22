@@ -5,6 +5,7 @@
  */
 
 import type { OperatingSnapshot } from "../operatingState/types";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 
 export interface MeetingSlidePayload {
@@ -82,7 +83,7 @@ export function extractMeetingSlidePayload(
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
     `> **Whether Weekly Operating Stance** — *${payload.recordDate}*`,
-    `> **Regime**: \`${payload.regime}\`${payload.stageLabel ? ` · **Stage**: \`${payload.stageLabel}\`` : ""}`,
+    `> **Conditions**: ${getRegimePublicLabel(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
     // when the two are the same sentence, which is what the model returns on a
@@ -120,7 +121,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
       <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's call${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
     </div>
     <div style="text-align: right;">
-      <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${payload.regime}</span>
+      <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
       <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">${payload.recordDate}</p>
     </div>
   </div>
@@ -195,7 +196,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <!-- Regime Badge -->
     <g transform="translate(880, 10)">
       <rect x="0" y="0" width="160" height="42" rx="21" fill="${badgeColor}" fill-opacity="0.15" stroke="${badgeColor}" stroke-width="1.5"/>
-      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeColor}" text-anchor="middle" letter-spacing="1">${esc(payload.regime)}</text>
+      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeColor}" text-anchor="middle" letter-spacing="1">${esc(getRegimePublicLabel(payload.regime))}</text>
     </g>
   </g>
 

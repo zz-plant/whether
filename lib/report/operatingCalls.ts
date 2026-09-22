@@ -78,9 +78,9 @@ export type ThresholdBusinessConsequence = {
 const thresholdConsequenceByLever: Record<BusinessAreaKey, string> = {
   "hiring-stance": "the hiring pause line",
   "investment-pace": "the expansion pause line",
-  "sales-posture": "the raise-timing line",
+  "sales-posture": "the fundraising pause line",
   "product-priorities": "the roadmap pause line",
-  "risk-tolerance": "the plan-review line",
+  "risk-tolerance": "the spending pause line",
 };
 
 const decisionAreaByLever: Record<BusinessAreaKey, DecisionArea> = {

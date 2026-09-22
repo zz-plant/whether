@@ -198,10 +198,10 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
   return [
     "",
     "Startup environment — weekly call:",
-    `• Posture: ${modeled.postureWithStageLabel ?? "Current read"}`,
+    `• Conditions: ${modeled.postureWithStageLabel ?? "Current read"}`,
     `• Trend: ${(options?.trendLabel ?? "Stable").toUpperCase()}`,
     `• Distance to regime change: ${(options?.regimeDistancePoints ?? 0).toFixed(1)} points`,
-    `• Regime shift watch: ${options?.transitionWatch ?? "OFF"}`,
+    `• Could the call change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• ${publicDecisionLabels.reversal}: ${condition}`),
@@ -230,7 +230,7 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
     "",
     `Interpretation context: ${layer.label} (${layer.view})`,
     `Interpretation summary: ${layer.summary}`,
-    "Interpretation trust: translation layer only; canonical posture/confidence/thresholds unchanged.",
+
     ...boundedBullets.map((bullet) => `• ${bullet}`),
     ...financialSummary.map((line) => `• ${line}`),
   ];
@@ -291,7 +291,7 @@ export const buildBoardSlideBullets = (
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
 ) => [
-  `Posture: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
+  `Conditions: ${resolveModeledDecisionPayload(options).postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
   `Funding pressure ${assessment.scores.tightness} / Risk appetite ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...buildBoundedDecisionLines(assessment, options),
@@ -319,7 +319,7 @@ export const buildSlackBrief = (
 
   return [
     `Whether Weekly Brief — ${treasury.record_date}`,
-    `Posture: ${postureLabel}`,
+    `Conditions: ${postureLabel}`,
     ...buildReadingLines(assessment, options),
     `${regimeSignalLabel.baseRate}: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Recession warning gauge (10Y−2Y): ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
@@ -365,9 +365,8 @@ export const buildCallCitation = (
   options?: ExportLayerOptions,
 ) => [
   `Whether Weekly Brief — ${treasury.record_date}`,
-  `Posture: ${options?.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)} (${assessment.regime})`,
-  `Confidence: Score-based posture confidence`,
-  `Signal refresh cadence: 15m`,
+  `Conditions: ${options?.postureWithStageLabel ?? getRegimePublicLabel(assessment.regime)}`,
+  `Confidence: ${assessment.diagnostics.confidence} (how far the scores sit from the line that changes the call)`,
   `Source note: ${treasury.source}`,
   buildBriefPermalinkLine(treasury.record_date),
   ...buildInterpretationLayerBlock(options),

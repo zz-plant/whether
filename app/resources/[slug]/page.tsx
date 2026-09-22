@@ -168,7 +168,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           article={article}
           decisionArtifact={{
             decisionShiftSummary: homeBriefModel.decisionShiftSummary,
-            postureSummary: `Posture: ${displayRegime.label} (${displayRegime.canonicalRegime}) · Weekly momentum: ${reportData.reportDynamics.directionLabel === "unavailable" ? "not compared" : reportData.reportDynamics.directionLabel} · Revisit decisions: ${homeBriefModel.revisitDecisions ? "YES" : "NO"}`,
+            postureSummary: `Conditions are ${displayRegime.label}${reportData.reportDynamics.directionLabel === "unavailable" ? ", with no comparison to last week available" : ` and ${reportData.reportDynamics.directionLabel} this week`}; ${homeBriefModel.revisitDecisions ? "recheck last week's approvals" : "last week's approvals stand"}.`,
             mappedRules,
             freshnessLabel: reportData.fetchedAtLabel,
             citation: callCitation,

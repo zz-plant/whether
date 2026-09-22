@@ -18,7 +18,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
     assert.match(brief, /^## Whether Weekly Brief — 2026-03-04$/m);
-    assert.match(brief, /^\*\*Posture:\*\* /m);
+    assert.match(brief, /^\*\*Conditions:\*\* /m);
     assert.match(brief, /^### Macro signals$/m);
     assert.match(brief, /^### Bounded decision$/m);
     assert.match(brief, /^- Chicago Fed National Financial Conditions Index: /m);
@@ -32,7 +32,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros, undefined, "wiki");
 
     assert.match(brief, /^h2\. Whether Weekly Brief — 2026-03-04$/m);
-    assert.match(brief, /^\*Posture:\* /m);
+    assert.match(brief, /^\*Conditions:\* /m);
     assert.match(brief, /^h3\. Macro signals$/m);
     assert.match(brief, /^\* Chicago Fed National Financial Conditions Index: /m);
     assert.match(brief, /^Source: \[https:\/\/fred\.stlouisfed\.org\|https:\/\/fred\.stlouisfed\.org\]$/m);
@@ -54,7 +54,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
       confidenceLabel: "HIGH",
     });
 
-    assert.match(brief, /\*\*Posture:\*\* Sunny — Late/);
+    assert.match(brief, /\*\*Conditions:\*\* Sunny — Late/);
     assert.match(brief, /\*\*Regime:\*\* EXPANSION/);
     assert.match(brief, /HIGH confidence/);
   });
@@ -113,7 +113,7 @@ describe("buildGuardrailTagBlocks", () => {
 
     assert.equal(blocks.length, 2);
     for (const block of blocks) {
-      assert.match(block.markdown, /\*\*Posture:\*\* Cloudy/);
+      assert.match(block.markdown, /\*\*Conditions:\*\* Cloudy/);
       assert.match(block.markdown, /\*\*Action now:\*\* /);
       assert.match(block.markdown, /\*\*Pause if:\*\* /);
       assert.match(block.markdown, /\*\*Change course if:\*\* /);
@@ -142,7 +142,7 @@ describe("buildGuardrailTagBlocks", () => {
       recordDate: "2026-03-04",
     });
 
-    assert.ok(blocks.every((block) => !block.markdown.includes("Flip watch")));
+    assert.ok(blocks.every((block) => !block.markdown.includes("would change the call")));
   });
 
   it("returns no blocks for an empty action strip", () => {

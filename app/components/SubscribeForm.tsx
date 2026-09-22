@@ -210,10 +210,10 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
         <span>
           {compact
             ? channel === "slack"
-              ? "Monday mornings, plus a flash if the call flips. To stop, delete the webhook in Slack."
-              : "One email a week, one more if the call flips. Unsubscribe in one click."
+              ? "Monday mornings, and an alert the day the call changes. To stop, delete the webhook in Slack."
+              : "One email a week, one more the day the call changes. Unsubscribe in one click."
             : channel === "slack"
-              ? "Set a recurring Monday hold for the team"
+              ? "Set a recurring Monday hold"
               : "Prefer calendar holds over email?"}
         </span>
         <a

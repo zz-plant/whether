@@ -180,7 +180,7 @@ describe("Slack brief delivery", () => {
       assert.equal(result.status, "posted");
       assert.equal(result.delivered, 1);
       assert.match(sentBody, /Whether Weekly Brief — 2099-12-31/);
-      assert.match(sentBody, /Posture:/);
+      assert.match(sentBody, /Conditions:/);
     } finally {
       globalThis.fetch = originalFetch;
     }

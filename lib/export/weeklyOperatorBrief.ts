@@ -196,8 +196,8 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
   return [
     `Weekly Operator Brief — ${payload.date}`,
     payload.boldnessBudget ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${boldnessDeltaLabel})` : null,
-    payload.boldnessBudget?.line ? `Latitude signal: ${payload.boldnessBudget.line}` : null,
-    `Posture: ${payload.regimeStage}`,
+    payload.boldnessBudget?.line ?? null,
+    `Conditions: ${payload.regimeStage}`,
     `Confidence: ${payload.confidence}`,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
     "",
@@ -232,7 +232,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
           type: "section",
           fields: [
             ...(payload.boldnessBudget ? [{ type: "mrkdwn" as const, text: `*${OPERATING_LATITUDE_LABEL}*\n${payload.boldnessBudget.score}/100` }] : []),
-            { type: "mrkdwn", text: `*Posture*\n${payload.regimeStage}` },
+            { type: "mrkdwn", text: `*Conditions*\n${payload.regimeStage}` },
             { type: "mrkdwn", text: `*Confidence*\n${payload.confidence}` },
           ],
         },

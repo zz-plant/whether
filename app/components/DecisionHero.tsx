@@ -540,7 +540,7 @@ export function DecisionHero({
               )}
             </div>
 
-            <div className="text-xs text-slate-400">{OPERATING_LATITUDE_LABEL}</div>
+            <div className="text-xs text-slate-400">{OPERATING_LATITUDE_LABEL} · room to hire, spend and commit</div>
 
             {trendPoints && trendDomain ? (
               <figure className="mt-1 flex flex-col items-start sm:items-end text-fluid-nano">

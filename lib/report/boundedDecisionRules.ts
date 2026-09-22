@@ -650,10 +650,10 @@ const scaleAdjustmentToRunway = (
         ...base.avoidAdjustments,
       ],
       watchAdjustments: [
-        "Cash gate: under six months of runway, hold every new commitment whatever the macro corridor says.",
+        "Cash gate: under six months of runway, hold every new commitment whatever this week's call says.",
         ...base.watchAdjustments,
       ],
-      thresholdEmphasis: "Runway is the binding constraint this week, not the regime line; the corridor sets tempo again once cash clears nine months.",
+      thresholdEmphasis: "Runway is what limits you this week, not the call. The pause and resume lines apply again once cash clears nine months.",
       reversalTriggerDiscipline: "Reverse the freeze only after runway extends past nine months or bridge financing is banked.",
     };
   }

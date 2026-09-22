@@ -84,7 +84,7 @@ describe("assembleHomePage streaming contract", () => {
     });
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
-    assert.match(headerOperatorBriefCopy, /Posture:/);
+    assert.match(headerOperatorBriefCopy, /Conditions:/);
     assert.match(headerOperatorBriefCopy, /Do now:/);
     assert.match(headerOperatorBriefCopy, /Pause if:/);
     assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);

@@ -77,7 +77,7 @@ export const DECISION_CONTRACT_LABELS = {
     changeCourseIf: "Change course if",
   },
   watch: {
-    flipWatch: "Flip watch",
+    flipWatch: "What would change the call",
     /**
      * The regime line, as distinct from a rule's pause line: where the call
      * itself changes.
@@ -89,7 +89,7 @@ export const DECISION_CONTRACT_LABELS = {
      * all, "Watch line". So the reader met a third threshold under a fourth
      * name, between two it had just learned.
      */
-    postureFlips: "Posture flips",
+    postureFlips: "Call changes if",
     watchThisWeek: "Watch this week",
     watchNext: "Watch next",
   },
@@ -191,9 +191,9 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "regime",
-    term: "Current conditions (regime)",
-    summary: "Whether identifies 4 conditions: Freezing, Cloudy, Stormy, and Sunny — each with a specific operating forecast.",
-    why: "Why it matters: current conditions set the operating forecast for every decision this week.",
+    term: "Conditions (the four weather labels)",
+    summary: "Whether sorts each week into one of four: Sunny (money cheap and available), Cloudy (available but pricey), Stormy (changing week to week), Freezing (expensive and hard to raise).",
+    why: "Why it matters: the label is the short form of every rule on the site this week. Knowing which one you are in is what makes the trade-offs legible.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
@@ -226,9 +226,9 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "posture-flip",
-    term: "Posture flips",
-    summary: "The reading at which the weekly call itself changes — a different set of conditions, not a paused decision inside the current one. It sits on the same 0-100 scale as the pause and re-open lines.",
-    why: "Why it matters: a pause is a move inside this week's posture; a flip means the posture you planned around is no longer the one you are in.",
+    term: "Call changes if",
+    summary: "The reading at which the weekly call itself changes — different conditions, not a paused decision inside the current ones. It sits on the same 0-100 scale as the pause and re-open lines.",
+    why: "Why it matters: a pause is a move inside this week's call; a change means the conditions you planned around are no longer the ones you are in.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },
@@ -266,17 +266,9 @@ export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [
   },
   {
     value: "posture",
-    term: "Operating stance (posture)",
-    summary: "The overall recommendation for how aggressively to operate this week, derived from signal scores and thresholds.",
-    why: "Why it matters: your posture tells you whether to tighten, loosen, or hold—before you debate any specific initiative.",
-    usedInLabel: "Weekly brief",
-    usedInHref: "/",
-  },
-  {
-    value: "regime-types",
-    term: "The 4 regimes",
-    summary: "EXPANSION (credit available, investors optimistic—scale proven bets) · SCARCITY (credit tight, investors cautious—preserve cash) · DEFENSIVE (credit tight, investors willing to fund) · VOLATILE (credit available, investors cautious—conditions can shift quickly)",
-    why: "Why it matters: each regime sets a different operating forecast. Know which one you're in to make trade-offs.",
+    term: "The call (also: posture, stance)",
+    summary: "The week's recommendation for how aggressively to operate — tighten, hold, or loosen — read from the two scores against their lines.",
+    why: "Why it matters: it says whether to tighten, loosen, or hold before any specific decision is argued.",
     usedInLabel: "Weekly brief",
     usedInHref: "/",
   },

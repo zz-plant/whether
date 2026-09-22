@@ -94,7 +94,7 @@ describe("runway-scaled decision rules", () => {
       assert.match(critical.reversalTriggerDiscipline, /past nine months|bridge financing/i);
       assert.doesNotMatch(critical.reversalTriggerDiscipline, /risk appetite|funding pressure/i);
       // The binding constraint is named, and not with the pause sentence again.
-      assert.match(critical.thresholdEmphasis, /binding constraint/i);
+      assert.match(critical.thresholdEmphasis, /what limits you this week/i);
       assert.notEqual(critical.thresholdEmphasis, critical.watchAdjustments[0]);
     }
   });

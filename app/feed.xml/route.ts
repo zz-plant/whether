@@ -77,7 +77,7 @@ const publishedItems = (): FeedItem[] =>
       pubDate: toRfc822(brief.publishedAt),
       description: brief.summary,
       html: [
-        `        <p><strong>Posture:</strong> ${escapeXml(brief.postureLabel)}</p>`,
+        `        <p><strong>Conditions:</strong> ${escapeXml(brief.postureLabel)}</p>`,
         `        <p>${escapeXml(brief.summary)}</p>`,
         `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
         `        <p><strong>What changed:</strong> ${escapeXml(brief.whatChanged)}</p>`,

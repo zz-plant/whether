@@ -20,10 +20,13 @@ type RunwayBandOption = {
 };
 
 export const RUNWAY_BAND_OPTIONS: readonly RunwayBandOption[] = [
-  { key: "critical", label: "<6 mo", sublabel: "Cash Preservation", months: 4, minMonths: 0, maxMonths: 6 },
-  { key: "tight", label: "6–12 mo", sublabel: "Payback Gate", months: 9, minMonths: 6, maxMonths: 12 },
-  { key: "balanced", label: "12–24 mo", sublabel: "Macro Corridor", months: 18, minMonths: 12, maxMonths: 24 },
-  { key: "abundant", label: "24+ mo", sublabel: "Counter-Cyclical", months: 30, minMonths: 24, maxMonths: null },
+  /* The sublabels used to be internal band names — "Payback Gate", "Macro Corridor",
+     "Counter-Cyclical" — shown to someone picking how much cash they have. They say what the
+     band changes now, in the reader's terms. */
+  { key: "critical", label: "<6 mo", sublabel: "Cash first", months: 4, minMonths: 0, maxMonths: 6 },
+  { key: "tight", label: "6–12 mo", sublabel: "Short payback only", months: 9, minMonths: 6, maxMonths: 12 },
+  { key: "balanced", label: "12–24 mo", sublabel: "Follow the call", months: 18, minMonths: 12, maxMonths: 24 },
+  { key: "abundant", label: "24+ mo", sublabel: "Room to spend", months: 30, minMonths: 24, maxMonths: null },
 ];
 
 export const DEFAULT_RUNWAY_BAND: RunwayBand = "balanced";

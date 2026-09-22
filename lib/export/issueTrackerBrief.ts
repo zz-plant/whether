@@ -65,7 +65,7 @@ export const buildIssueTrackerMarkdownBrief = (
 
   return [
     `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
-    `${strong("Posture")} ${postureLabel}`,
+    `${strong("Conditions")} ${postureLabel}`,
     // The posture label is display copy ("Sunny — Late") and the regime is an
     // engine key ("EXPANSION"), so this line effectively always renders. Kept as
     // it was: the engine key is useful in a ticket, and dropping it would change
@@ -130,7 +130,7 @@ export const buildGuardrailTagBlocks = ({
     label: item.label,
     ownerLabel: item.ownerLabel,
     markdown: [
-      `**Posture:** ${postureLabel}`,
+      `**Conditions:** ${postureLabel}`,
       `**${DECISION_CONTRACT_LABELS.action.actionNow}:** ${item.areaActionNow}`,
       `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${item.triggerThreshold}`,
       `**${DECISION_CONTRACT_LABELS.reversal.changeCourseIf}:** ${item.reversalCondition}`,

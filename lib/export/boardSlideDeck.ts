@@ -14,6 +14,7 @@
  * allows and every reader accepts; the whole file is under 20 KB.
  */
 import type { MeetingSlidePayload } from "./meetingSlideExport";
+import { getRegimePublicLabel } from "../regimePresentation";
 
 // ---------------------------------------------------------------------------
 // Geometry. The SVG slide is 1200×675; PowerPoint's 16:9 slide is 13.333×7.5in
@@ -181,7 +182,7 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
     textBox({ name: "Title", x: 80, y: 82, width: 860, height: 44, text: titleLine(payload), style: { sizePx: 34, bold: true, color: COLORS.ink } }),
     textBox({ name: "Subtitle", x: 80, y: 130, width: 860, height: 24, text: subtitleLine(payload), style: { sizePx: 16, color: COLORS.inkSoft } }),
     rectangle({ name: "Regime badge", x: 960, y: 80, width: 160, height: 42, fill: "1A2334", line: badgeColor, rounded: true }),
-    textBox({ name: "Regime", x: 960, y: 80, width: 160, height: 42, text: payload.regime, style: { sizePx: 15, bold: true, color: badgeColor, tracking: 100 }, align: "ctr", anchor: "ctr" }),
+    textBox({ name: "Regime", x: 960, y: 80, width: 160, height: 42, text: getRegimePublicLabel(payload.regime), style: { sizePx: 15, bold: true, color: badgeColor, tracking: 100 }, align: "ctr", anchor: "ctr" }),
   );
 
   for (const card of buildCards(payload)) {
@@ -541,7 +542,7 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
     borderColor: color(badgeColor),
     borderWidth: 1.2,
   });
-  drawText(payload.regime, { x: 960, y: 92, sizePx: 15, font: bold, fill: badgeColor, maxWidthPx: 160, align: "center" });
+  drawText(getRegimePublicLabel(payload.regime), { x: 960, y: 92, sizePx: 15, font: bold, fill: badgeColor, maxWidthPx: 160, align: "center" });
 
   for (const card of buildCards(payload)) {
     page.drawRectangle({

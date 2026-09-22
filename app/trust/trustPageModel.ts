@@ -58,7 +58,7 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Posture: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
+  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nDecision as-of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
 
   const revisitBullets: Array<{ label: string; detail?: string; href: string }> = [
     {

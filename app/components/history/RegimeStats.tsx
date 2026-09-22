@@ -1,4 +1,5 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 
 type RegimeStats = {
   avgDuration: number;
@@ -59,7 +60,7 @@ export function RegimeStats({ series }: { series: TimeMachineRegimeEntry[] }) {
 
   return (
     <section className="space-y-3">
-      <p className="type-eyebrow">How often the regime changes</p>
+      <p className="type-eyebrow">How often the call changes</p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
         <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
           <p className="text-slate-400">Avg duration</p>
@@ -74,8 +75,8 @@ export function RegimeStats({ series }: { series: TimeMachineRegimeEntry[] }) {
           <p className="mt-1 text-lg font-bold text-slate-100">{stats.currentStreak}<span className="text-sm font-normal text-slate-400"> mo</span></p>
         </div>
         <div className="rounded-md bg-slate-950/40 px-3 py-2.5">
-          <p className="text-slate-400">Longest {stats.longestStreak.regime}</p>
-          <p className="mt-1 text-lg font-bold text-slate-100">{stats.longestStreak.months}<span className="text-sm font-normal text-slate-400"> mo</span></p>
+          <p className="text-slate-400">Longest run</p>
+          <p className="mt-1 text-lg font-bold text-slate-100">{stats.longestStreak.months}<span className="text-sm font-normal text-slate-400"> mo · {getRegimePublicLabel(stats.longestStreak.regime)}</span></p>
         </div>
       </div>
     </section>

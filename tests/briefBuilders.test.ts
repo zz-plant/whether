@@ -16,7 +16,7 @@ describe("buildSlackBrief", () => {
     const slot = (label: string) =>
       brief.match(new RegExp(`• ${label}: (.+)`))?.[1] ?? "";
 
-    const posture = slot("Posture");
+    const posture = slot("Call");
     const doNow = slot("Do now");
     const pauseIf = slot("Pause if");
     const reopenWhen = slot("Re-open when");
@@ -110,12 +110,12 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Bounded decision \(Posture \/ Do now \/ Pause if \/ Re-open when\):/);
-    assert.match(brief, /• Posture: Capital is available and risk appetite is healthy\./);
+    assert.match(brief, /Bounded decision \(Call \/ Do now \/ Pause if \/ Re-open when\):/);
+    assert.match(brief, /• Call: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     assert.match(brief, /• Pause if: Pause approvals when tightness > 70\./);
     assert.match(brief, /• Re-open when: Resume when tightness < 64\./);
-    assert.ok(brief.indexOf("• Posture: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
+    assert.ok(brief.indexOf("• Call: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Pause approvals when tightness > 70."));
     assert.ok(brief.indexOf("• Pause if: Pause approvals when tightness > 70.") < brief.indexOf("• Re-open when: Resume when tightness < 64."));
     assert.match(brief, /Decision transmission check:/);
@@ -186,7 +186,6 @@ describe("buildSlackBrief", () => {
 
     assert.match(brief, /Interpretation context: Financial view \(financial\)/);
     assert.match(brief, /Interpretation summary: Runway translation for near-term operating cadence\./);
-    assert.match(brief, /Interpretation trust: translation layer only; canonical posture\/confidence\/thresholds unchanged\./);
     assert.match(brief, /• Action: Tighten non-core spend\./);
   });
 
@@ -221,8 +220,9 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, { postureWithStageLabel: stageLabel });
     const citation = buildCallCitation(assessment, treasury, { postureWithStageLabel: stageLabel });
 
-    assert.match(brief, /Posture: Expansion — Late \(Fragile\)/);
-    assert.match(citation, /Posture: Expansion — Late \(Fragile\) \(EXPANSION\)/);
+    assert.match(brief, /Conditions: Expansion — Late \(Fragile\)/);
+    assert.match(citation, /Conditions: Expansion — Late \(Fragile\)/);
+    assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");
   });
 
   it("adds compact weekly call artifact lines when operating stance context is provided", () => {
@@ -246,14 +246,14 @@ describe("buildSlackBrief", () => {
     });
 
     assert.match(brief, /Startup environment — weekly call:/);
-    assert.match(brief, /• Posture: Guarded Expansion — Late/);
+    assert.match(brief, /• Conditions: Guarded Expansion — Late/);
     assert.match(brief, /• Trend: DETERIORATING/);
     assert.match(brief, /• Distance to regime change: 2\.0 points/);
-    assert.match(brief, /• Regime shift watch: ON/);
-    assert.match(brief, /• Posture: Stage decisions/);
+    assert.match(brief, /• Could the call change next week: yes/);
+    assert.match(brief, /• Call: Stage decisions/);
     assert.match(brief, /• Re-check: whoever owns the plan/);
     assert.match(brief, /• Trust markers: Confidence: Guarded/);
-    assert.match(brief, /• Posture:/);
+    assert.match(brief, /• Conditions:/);
     assert.match(brief, /Do now: Backfills only/);
     assert.match(brief, /Pause if: Pause net-new hiring if tightness > 76/);
     assert.match(brief, /Re-open when: Resume staged approvals when tightness < 66/);

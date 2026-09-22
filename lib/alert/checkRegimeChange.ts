@@ -1,3 +1,4 @@
+import { getRegimePublicLabel } from "../regimePresentation";
 import { loadReportData } from "../report/reportData";
 import { getRegimeProjection } from "../report/regimeContext";
 import { getWhetherKv } from "../runtime/kv";
@@ -125,7 +126,7 @@ export const checkRegimeChange = async (options?: {
 
   /* 1. Regime change — highest priority alert */
   if (previousRegime && previousRegime !== currentRegime) {
-    alerts.push(`RECONSIDER OPERATING POSTURE — regime shifted from ${previousRegime} to ${currentRegime}`);
+    alerts.push(`The call moved from ${getRegimePublicLabel(previousRegime)} to ${getRegimePublicLabel(currentRegime)}. Read the brief before acting on last week's plan.`);
     /*
      * Here and nowhere else. A notification that fires on every cron run,
      * whether or not anything happened, is one people turn off — and then the

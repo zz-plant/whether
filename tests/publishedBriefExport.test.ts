@@ -51,9 +51,9 @@ describe("published brief date-pinned exports", () => {
     const slack = buildPublishedBriefSlackUpdate(july30Brief);
 
     assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
-    assert.match(slack, /Posture: Guarded Expansion — Late \(MED confidence\)/);
+    assert.match(slack, /Conditions: Guarded Expansion — Late \(MED confidence\)/);
     assert.match(slack, /• What changed: Pressure increased by \+1\.2 this week\./);
-    assert.match(slack, /• Posture: Keep expansion selective/);
+    assert.match(slack, /• Call: Keep expansion selective/);
     assert.match(slack, /• Do now: Conditions tightening — freeze new commitments and keep spend flexible\./);
     assert.match(slack, /• Pause if: Over-engineering before demand proves out/);
     assert.match(slack, /• Re-open when: No flip condition is tripped yet\./);
@@ -79,7 +79,7 @@ describe("published brief date-pinned exports", () => {
     const email = buildPublishedBriefEmailUpdate(july30Brief);
 
     assert.match(email, /Whether Leadership Update — Week of Jul 30, 2026/);
-    assert.match(email, /Posture: Guarded Expansion — Late/);
+    assert.match(email, /Conditions: Guarded Expansion — Late/);
     assert.match(email, /Confidence: MED confidence/);
     assert.match(email, /Executive summary: Keep expansion selective/);
     assert.match(email, /What changed this week:\nPressure increased by \+1\.2 this week\./);

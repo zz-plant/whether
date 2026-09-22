@@ -1,4 +1,5 @@
 import type { DecisionDepartment } from "../decisionMemory";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { FlashMove } from "./flashMoves";
 
 type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
@@ -65,7 +66,7 @@ const checkThresholdCrossing = (
 const buildRegimeDecision = (regime: string): AlertDecision => ({
   type: "regime_change",
   severity: "critical",
-  headline: `Regime changed to ${regime}`,
+  headline: `The call moved to ${getRegimePublicLabel(regime)}`,
   department: "Executive",
   rolePreset: "CFO",
 });

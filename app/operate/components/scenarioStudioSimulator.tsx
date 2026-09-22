@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { TreasuryData } from "../../../lib/types";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import {
   evaluateRegime,
   type RegimeAssessment,
@@ -397,10 +398,10 @@ export function ScenarioStudioSimulator({
         <div className="grid gap-4 sm:grid-cols-3">
           {/* Regime Shift Card */}
           <div className="weather-surface p-4 flex flex-col justify-between">
-            <p className="type-eyebrow text-slate-400">Macro Regime</p>
+            <p className="type-eyebrow text-slate-400">Conditions</p>
             <div className="mt-3 flex items-center gap-3">
               <span className="text-xs font-semibold text-slate-400 line-through">
-                {liveAssessment.regime}
+                {getRegimePublicLabel(liveAssessment.regime)}
               </span>
               <span className="text-slate-500">→</span>
               <span
@@ -410,11 +411,11 @@ export function ScenarioStudioSimulator({
                     : "bg-slate-800 text-slate-200"
                 }`}
               >
-                {simulatedAssessment.regime}
+                {getRegimePublicLabel(simulatedAssessment.regime)}
               </span>
             </div>
             <p className="mt-2 text-[11px] text-slate-400">
-              {regimeShifted ? "Regime boundary crossed" : "Within current regime envelope"}
+              {regimeShifted ? "The call would change" : "Same call as this week"}
             </p>
           </div>
 

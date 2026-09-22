@@ -247,7 +247,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
 
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
-    `Posture: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
+    `Conditions: ${brief.postureLabel} (${brief.confidenceLabel} confidence)`,
     ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
     "Summary:",
@@ -292,7 +292,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
   return [
     `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
     "",
-    `Posture: ${brief.postureLabel}`,
+    `Conditions: ${brief.postureLabel}`,
     `Confidence: ${brief.confidenceLabel} confidence`,
     ...readingLines,
     `Executive summary: ${brief.summary}`,

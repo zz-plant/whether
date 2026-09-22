@@ -40,7 +40,7 @@ const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
       <div className="min-w-0">
         <h3 className="text-base font-semibold text-slate-50">{row.title}</h3>
         <p className="mt-1 text-xs text-slate-400">
-          {row.isPostureSnapshot ? "Posture recorded" : "Decision recorded"} against the {row.recordedOn} reading
+          {row.isPostureSnapshot ? "Call recorded" : "Decision recorded"} against the {row.recordedOn} reading
         </p>
       </div>
       <span className={`shrink-0 rounded-sm border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${VERDICT_STYLES[row.verdict]}`}>
