@@ -17,6 +17,8 @@ import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
 import { TrustStrip } from "../components/trustStrip";
+import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
+import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { formatConfidenceChipLabel, publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
@@ -188,12 +190,17 @@ export async function DecisionAnswerPageContent({
           )}
         />
 
+        {/* `degraded` is assembly failing outright; a read that fell back to
+            the bundled snapshot succeeds, so it said "Live" over a snapshot
+            weeks old. The fallback flags are what move under an outage. */}
         <TrustStrip
-          recordDateLabel={recordDateLabel}
-          sourcesLive={!degraded}
-          sourcesLabel={degraded ? "Cached snapshot" : "Live"}
-          confidenceLabel={homeBriefModel.confidenceLabel}
-          couldChangeNextWeek={Boolean(assessment.diagnostics.transitionWatch)}
+          {...buildTrustStripProps({
+            recordDateLabel,
+            isFallback: degraded || Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+            degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
+            confidenceLabel: homeBriefModel.confidenceLabel,
+            assessment,
+          })}
           href="/trust"
           className="mb-6"
         />

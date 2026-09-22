@@ -56,6 +56,42 @@ const clampPercent = (value: number, max: number) => Math.min(100, Math.max(0, (
 
 const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
 
+/*
+ * Label collision is a pixel question asked of a percentage track. The labels
+ * are centred on their ticks at 10px type, so two neighbours need half of each
+ * label's width between them. Judged against the narrowest track a ladder is
+ * drawn in (the 14rem column of the homepage table), so a pair that clears
+ * there clears everywhere; a fixed share of the track (the first version used
+ * 13%) cleared on a wide desktop column and overprinted "Pause 55" and
+ * "Call changes 70" in a narrow one.
+ */
+const NARROWEST_TRACK_PX = 224;
+const LABEL_CHAR_PX = 5.6;
+const LABEL_GAP_PX = 6;
+
+const labelText = (line: LadderLine) => `${line.label ?? LINE_LABELS[line.kind]} ${formatPoints(line.value)}`;
+
+/**
+ * Each label on the lowest row where it clears every label already placed on
+ * that row. Greedy over lines sorted by value, so three close lines take three
+ * rows and two far-apart ones share the first.
+ */
+export const layoutLadderLabels = (lines: readonly LadderLine[], max = 100): { line: LadderLine; row: number }[] => {
+  const placed: { line: LadderLine; row: number; centre: number; halfWidth: number }[] = [];
+  for (const line of [...lines].sort((left, right) => left.value - right.value)) {
+    const centre = (clampPercent(line.value, max) / 100) * NARROWEST_TRACK_PX;
+    const halfWidth = (labelText(line).length * LABEL_CHAR_PX) / 2;
+    let row = 0;
+    while (
+      placed.some((other) => other.row === row && Math.abs(centre - other.centre) < halfWidth + other.halfWidth + LABEL_GAP_PX)
+    ) {
+      row += 1;
+    }
+    placed.push({ line, row, centre, halfWidth });
+  }
+  return placed.map(({ line, row }) => ({ line, row }));
+};
+
 /** The line nearest the value, and the distance to it, for the caption and for callers that print one. */
 export const nearestLadderLine = (value: number, lines: readonly LadderLine[]) => {
   let best: { line: LadderLine; distance: number } | null = null;
@@ -106,20 +142,10 @@ export function ScoreLadder({
 }: ScoreLadderProps) {
   const caption = describeLadderPosition(value, lines);
   /* The three lines can sit within a few points of each other — 66, 70 and 76
-     is the common case — and their labels then overlap into one smudge. Each
-     label that would collide with the one before it drops to the next row, on
-     a longer tick, so every line keeps a label the reader can read. */
-  const laidOut = [...lines]
-    .sort((left, right) => left.value - right.value)
-    .map((line, index, sorted) => {
-      const previous = sorted[index - 1];
-      const collides = previous !== undefined && (line.value - previous.value) / max < 0.13;
-      return { line, collides };
-    })
-    .reduce<{ line: LadderLine; row: number }[]>((rows, entry) => {
-      const previousRow = rows[rows.length - 1]?.row ?? 0;
-      return [...rows, { line: entry.line, row: entry.collides ? previousRow + 1 : 0 }];
-    }, []);
+     is the common case — and their labels then overlap into one smudge. A
+     label that would collide drops to the next free row, on a longer tick, so
+     every line keeps a label the reader can read. */
+  const laidOut = layoutLadderLabels(lines, max);
   const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
   return (
     <figure className={`space-y-1.5 ${className}`.trim()} data-score-ladder>
@@ -127,7 +153,6 @@ export function ScoreLadder({
         <span className="font-medium text-slate-200">{label}</span>
         <span className="tabular-nums text-slate-400">{caption}</span>
       </figcaption>
-      {hasPrevious ? <span className="sr-only">{previousLabel} {formatPoints(previous)}.</span> : null}
       <div
         className="relative"
         style={{ height: `${34 + Math.max(0, ...laidOut.map((entry) => entry.row)) * 11}px` }}
@@ -142,7 +167,7 @@ export function ScoreLadder({
           >
             <span className={`w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} style={{ height: `${18 + row * 11}px` }} />
             <span className={`mt-0.5 whitespace-nowrap text-[10px] leading-none ${LINE_CLASS[line.kind].split(" ")[1]}`}>
-              {line.label ?? LINE_LABELS[line.kind]} {formatPoints(line.value)}
+              {labelText(line)}
             </span>
           </div>
         ))}
@@ -158,6 +183,14 @@ export function ScoreLadder({
           style={{ left: `${clampPercent(value, max)}%` }}
         />
       </div>
+      {/* The hollow dot's key. It was a tooltip inside an aria-hidden track, so
+          a sighted reader had nothing saying which dot was which. */}
+      {hasPrevious ? (
+        <p className="flex items-center gap-1.5 text-[10px] leading-none text-slate-400">
+          <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-2 border-slate-300" />
+          {previousLabel} {formatPoints(previous)}
+        </p>
+      ) : null}
     </figure>
   );
 }

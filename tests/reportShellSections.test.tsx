@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 const mockAny: any = mock;
 
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({
@@ -22,6 +23,7 @@ mockAny.module("next/link", () => ({
 }));
 
 import { CommandCenterNavBlock, ReportShell } from "../app/components/reportShell";
+import * as nextNavigation from "next/navigation";
 
 describe("ReportShell extracted sections", () => {
   it("renders the intro block: kicker, status line, title, summary, stamp, actions", () => {

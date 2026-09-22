@@ -7,11 +7,13 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { Sparkline } from "../app/components/ui/sparkline";
 import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
 import { regimeDataAttribute } from "../lib/regimeAccent";
+import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
 
 /* DecisionHero's descendants read the app router; see decisionHeroSignalBreakdown. */
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),

@@ -18,8 +18,10 @@ import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import {
   buildCallLineLadders,
   buildSignalReferenceRows,
-  trustStripFromAssessment,
+  buildTrustStripProps,
 } from "../../lib/report/evidenceReaderModel";
+import { resolvePublishedConfidenceLabel } from "../../lib/report/confidence";
+import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
@@ -200,10 +202,18 @@ const deriveSignalsPageModel = (
       "Hold anything you cannot undo until live data is back.",
     stableAction: "Evidence is live with current thresholds and timestamps.",
   });
-  const trustStrip = trustStripFromAssessment(assessment, {
+  const trustStrip = buildTrustStripProps({
     recordDateLabel,
     isFallback,
     isHistorical: Boolean(historicalSelection),
+    degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
+    confidenceLabel: resolvePublishedConfidenceLabel({
+      scores: assessment.scores,
+      thresholds: assessment.thresholds,
+      isFallbackData: isFallback && !historicalSelection,
+      recordDate: treasury.record_date,
+    }),
+    assessment,
   });
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold

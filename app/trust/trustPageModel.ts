@@ -1,4 +1,6 @@
 import type { ComponentProps } from "react";
+import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
+import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShell } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
@@ -49,36 +51,28 @@ export async function buildTrustPageModel() {
   /* The strip under the h1: the four facts a reader checks before acting, in
      the slot every reading route gives them. The sources cell keeps the words
      the five-cell System status strip used for the same three states. */
-  const trustStrip: Omit<TrustStripProps, "href"> = {
+  const trustStrip: Omit<TrustStripProps, "href"> = buildTrustStripProps({
     recordDateLabel: reportData.recordDateLabel,
-    sourcesLive: !isFallback && degradedSourceRows.length === 0,
-    sourcesLabel: isFallback
-      ? "Cached snapshot"
-      : degradedSourceRows.length > 0
-        ? `Partly cached · ${degradedSourceRows.length}`
-        : "All sources live",
+    isFallback,
+    isHistorical: Boolean(reportData.historicalSelection),
+    degradedSourceCount: degradedSourceRows.length,
     confidenceLabel: homeBriefModel.confidenceLabel,
-    couldChangeNextWeek: homeBriefModel.transitionWatch === "ON",
-  };
+    assessment: reportData.assessment,
+  });
   /* Where the two scores sit against their lines, for the ladders that open
-     "How the score is built". Last week is read off the same dynamics the
-     homepage's movement line uses: a signal missing from `changedSignals`
-     moved under 0.01, and no previous reading at all is `"unavailable"`, which
-     draws no hollow dot rather than a dot claiming a comparison nobody made. */
+     "How the score is built". Last week comes from `previousScoresFromDynamics`,
+     the derivation the homepage and every export use: no previous reading at
+     all is `"unavailable"`, which draws no hollow dot rather than a dot claiming
+     a comparison nobody made, and a move past the weekly sanity limit counts. */
   const scores = reportData.assessment.scores;
   const thresholds = reportData.assessment.thresholds;
   const rails = buildSharedCorridorRails(reportData.actionStripItems ?? [], scores);
-  const previousScore = (key: "tightness" | "riskAppetite") => {
-    const dynamics = reportData.reportDynamics;
-    if (dynamics.directionLabel === "unavailable") return null;
-    const delta = dynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? 0;
-    return scores[key] - delta;
-  };
+  const previousScores = previousScoresFromDynamics(reportData.reportDynamics, scores);
   const positionFor = (key: "tightness" | "riskAppetite", callChange: number) => {
     const rail = rails.find((candidate) => candidate.metric === key);
     return {
       value: scores[key],
-      previous: previousScore(key),
+      previous: previousScores?.[key] ?? null,
       lines: buildLadderLines({ pause: rail?.guardrail, resume: rail?.clearsAt, callChange }),
     };
   };

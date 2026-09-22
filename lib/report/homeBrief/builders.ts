@@ -10,8 +10,7 @@ import {
   buildRoleAwareOperatingTemplates,
   buildThresholdBusinessConsequence,
 } from "../operatingCalls";
-import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "../confidence";
-import { REGIME_CONFIDENCE_NEAR_THRESHOLD, REGIME_CONFIDENCE_MEDIUM_THRESHOLD } from "../../regimeEngineCore";
+import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolveConfidencePercentFromDistance, resolvePublishedConfidenceLabel } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { formatThresholdNumber } from "../../formatters";
@@ -271,18 +270,16 @@ export const buildHomeBriefModelInternal = (
     scores: assessment.scores,
     thresholds: assessment.thresholds,
   });
-  const geometricConfidence: RegimeConfidenceLabel = nearestThresholdGap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : nearestThresholdGap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
   const isFallbackData = Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection;
   const recordDateAgeHours = isFallbackData && treasury?.record_date
     ? Math.max(0, (Date.now() - Date.parse(`${treasury.record_date}T00:00:00.000Z`)) / 3_600_000)
     : 0;
-  const FRESH_FALLBACK_HOURS = 48;
-  const STALE_FALLBACK_HOURS = 120;
-  const confidenceLabel: RegimeConfidenceLabel = isFallbackData && recordDateAgeHours > FRESH_FALLBACK_HOURS
-    ? recordDateAgeHours > STALE_FALLBACK_HOURS
-      ? geometricConfidence === "HIGH" ? "MED" : geometricConfidence === "MED" ? "LOW" : "LOW"
-      : geometricConfidence === "HIGH" ? "MED" : geometricConfidence
-    : geometricConfidence;
+  const confidenceLabel: RegimeConfidenceLabel = resolvePublishedConfidenceLabel({
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+    isFallbackData,
+    recordDate: treasury?.record_date,
+  });
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = resolveConfidencePercentFromDistance(nearestThresholdGap);
   const signalConfidenceReason = buildSignalConfidenceReason({

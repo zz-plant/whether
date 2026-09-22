@@ -9,6 +9,7 @@ import { describeSignalDirection } from "./signalClusterReading";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
+import { resolveDataStatusLabel } from "./trustStatus";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
@@ -22,17 +23,18 @@ import type { TrustStripProps } from "../../app/components/trustStrip";
  * records a signal's move in `changedSignals` (or `anomalySignals` when it
  * moved past the sanity bound), and says `directionLabel: "unavailable"` when
  * there was no previous reading at all — so a signal absent from both lists
- * under a real comparison moved less than the 0.01 floor, and under no
- * comparison has no previous value. `previous` is null in both of the cases
- * where nothing is known, which is what the primitives require
- * (`tests/noComparisonHonesty.test.ts`).
+ * under a real comparison moved less than the 0.01 floor, and reads as
+ * unmoved; under no comparison it has no previous value. `previous` is null
+ * only where nothing is known, which is what the primitives require
+ * (`tests/noComparisonHonesty.test.ts`). The exports, the homepage and /trust
+ * read last week through `findSignalDelta` too, so a signal that did not move
+ * prints the same way on every surface.
  */
 
 export const SIGNAL_KEYS: readonly RegimeSignalKey[] = ["tightness", "riskAppetite", "baseRate", "curveSlope"];
 
 type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel">;
 
-type AssessmentSource = Pick<RegimeAssessment, "scores" | "thresholds" | "diagnostics">;
 
 export type SignalReferenceRow = {
   key: RegimeSignalKey;
@@ -84,13 +86,16 @@ const SIGNED_TWO = new Intl.NumberFormat("en-US", {
   signDisplay: "exceptZero",
 });
 
-/** The recorded move for a signal, from either list it can land in. */
+/**
+ * The recorded move for a signal, from either list it can land in: null when
+ * no comparison was made, 0 when one was and the signal moved under the floor.
+ */
 export const findSignalDelta = (dynamics: DynamicsSource, key: RegimeSignalKey): number | null => {
   if (dynamics.directionLabel === "unavailable") return null;
   return (
     dynamics.changedSignals.find((signal) => signal.key === key)?.delta
     ?? dynamics.anomalySignals.find((signal) => signal.key === key)?.delta
-    ?? null
+    ?? 0
   );
 };
 
@@ -181,34 +186,57 @@ export const buildCallLineLadders = (
   return [forKey("tightness", thresholds.tightnessRegime), forKey("riskAppetite", thresholds.riskAppetiteRegime)];
 };
 
-/** The four trust facts, from what every reading route already has. */
+/** The two engine facts "could change next week" reads, and nothing else. */
+type CallChangeSource = {
+  diagnostics: Pick<RegimeAssessment["diagnostics"], "transitionWatch">;
+  regimeTransition?: Pick<NonNullable<RegimeAssessment["regimeTransition"]>, "pending">;
+};
+
+/**
+ * The four trust facts, the one way every reading route states them.
+ *
+ * Each route used to fill the strip from what it happened to hold, so one
+ * reading could say High on /signals and Medium on /trust, "could change: Yes"
+ * on one and No on the next, and "Live" on an answer page serving the bundled
+ * snapshot. Now:
+ *
+ * - sources: `resolveDataStatusLabel`, the phrase table /trust and the homepage
+ *   banner already share (historical, cached snapshot, partly cached, live);
+ * - confidence: the published label (`resolvePublishedConfidenceLabel`, which
+ *   drops a step on a stale fallback), passed in by the caller that holds it;
+ * - could change: near a line, or a change held back for its confirming read.
+ */
 export const buildTrustStripProps = ({
   recordDateLabel,
   isFallback,
   isHistorical = false,
-  confidence,
-  couldChangeNextWeek,
+  degradedSourceCount = 0,
+  confidenceLabel,
+  assessment,
 }: {
   recordDateLabel: string;
   isFallback: boolean;
   isHistorical?: boolean;
-  confidence: RegimeAssessment["diagnostics"]["confidence"] | "MED";
-  couldChangeNextWeek: boolean;
+  /** Sources answering from a fallback (`buildDegradedSourceRows(...).length`). */
+  degradedSourceCount?: number;
+  confidenceLabel: TrustStripProps["confidenceLabel"];
+  assessment: CallChangeSource;
 }): Omit<TrustStripProps, "href" | "className"> => ({
   recordDateLabel,
-  sourcesLive: !isFallback && !isHistorical,
-  sourcesLabel: isHistorical ? "Historical snapshot" : isFallback ? "Cached snapshot" : "All sources live",
-  confidenceLabel: confidence === "MEDIUM" ? "MED" : confidence,
-  couldChangeNextWeek,
+  sourcesLive: !isHistorical && !isFallback && degradedSourceCount === 0,
+  sourcesLabel: resolveDataStatusLabel({
+    isHistoricalSelection: isHistorical,
+    isFallbackSnapshot: isFallback,
+    degradedSourceCount,
+  }),
+  confidenceLabel,
+  couldChangeNextWeek: couldCallChangeNextWeek(assessment),
 });
 
-/** `buildTrustStripProps` from an assessment, for the routes that carry one. */
-export const trustStripFromAssessment = (
-  assessment: AssessmentSource,
-  args: { recordDateLabel: string; isFallback: boolean; isHistorical?: boolean },
-) =>
-  buildTrustStripProps({
-    ...args,
-    confidence: assessment.diagnostics.confidence,
-    couldChangeNextWeek: assessment.diagnostics.transitionWatch,
-  });
+/**
+ * Yes when a score sits near its line (`transitionWatch`), or when the engine
+ * is holding a change back for its confirming reading — the week the call
+ * changes next reading if it holds, which a distance test alone reads as No.
+ */
+const couldCallChangeNextWeek = (assessment: CallChangeSource) =>
+  Boolean(assessment.diagnostics.transitionWatch || assessment.regimeTransition?.pending);

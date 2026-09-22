@@ -98,7 +98,7 @@ describe("/history/compare draws each score against its lines", () => {
       await page.default({ searchParams: Promise.resolve({ yearA: "2024", monthA: "3", yearB: "2020", monthB: "3" }) }),
     );
     assert.equal((html.match(/data-score-ladder/g) ?? []).length, 2);
-    assert.match(html, /Period B \d+(\.\d+)?\./, "the hollow dot is named for period B, not last week");
+    assert.match(html, /Period B \d+(\.\d+)?/, "the hollow dot is named for period B, not last week");
     assert.doesNotMatch(html, /Last week/);
     assert.match(html, /Credit spread change/);
     assert.doesNotMatch(html, /Operating latitude change|Yield curve slope change/, "the delta tiles are the ladders now");

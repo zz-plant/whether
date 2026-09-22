@@ -6,6 +6,7 @@ import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type Rul
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
 import type { BoundedDecisionRule, DecisionArea } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../homeBriefModel";
+import { findSignalDelta } from "../evidenceReaderModel";
 
 /**
  * The homepage as five sections in the reader's order: the call, what changed,
@@ -58,10 +59,13 @@ type MetricLines = Partial<Record<"tightness" | "riskAppetite", { pause?: number
 export const buildSignalChangeRows = ({
   indicators,
   lines,
+  dynamics,
   tightnessPressure,
   tightnessSaturated,
 }: {
   indicators: readonly RegimeSignalIndicator[];
+  /** The week's comparison. Last week comes from here, not from the indicator's label. */
+  dynamics: Parameters<typeof findSignalDelta>[0];
   lines: MetricLines;
   tightnessPressure?: number;
   tightnessSaturated?: boolean;
@@ -71,7 +75,11 @@ export const buildSignalChangeRows = ({
     const indicator = byKey.get(key);
     if (!indicator) return [];
     const value = indicator.rawValue;
-    const delta = indicator.isFallback ? null : parseDelta(indicator.trendDeltaLabel);
+    /* Through the same `findSignalDelta` /signals and the exports read, so a
+       signal that did not move reads as unmoved (not as "no comparison"), and
+       a move past the weekly sanity limit is still drawn. The indicator's own
+       label drops both: it only knows `changedSignals`. */
+    const delta = typeof value === "number" ? findSignalDelta(dynamics, key) : null;
     const previous = typeof value === "number" && delta !== null ? Number((value - delta).toFixed(2)) : null;
     const isScore = key === "tightness" || key === "riskAppetite";
     const metricLines = isScore ? lines[key] : undefined;
@@ -96,14 +104,6 @@ export const buildSignalChangeRows = ({
         key === "tightness" && tightnessSaturated && typeof tightnessPressure === "number" ? tightnessPressure : undefined,
     }];
   });
-};
-
-/* The indicator carries its delta only as the label it prints ("+22.0 vs last
-   week"); the number is read back off it rather than recomputed from a second
-   source, so the chip cannot disagree with the sentence the model wrote. */
-const parseDelta = (label: string): number | null => {
-  const match = /^([+-]?\d+(?:\.\d+)?)/.exec(label);
-  return match ? Number(match[1]) : null;
 };
 
 /**

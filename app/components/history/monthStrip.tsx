@@ -1,4 +1,4 @@
-import { REGIME_LABELS, isRegimeKey } from "../../../lib/regimePresentation";
+import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/regimePresentation";
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 
 /**
@@ -35,6 +35,15 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
   const run = describeCurrentRun(sorted);
   if (!run) return null;
   const changes = sorted.filter((entry, index) => index > 0 && entry.regime !== sorted[index - 1].regime).length;
+  /* The key. Colour alone named nothing: the month names were tooltips on an
+     aria-hidden band, so a sighted reader could not tell which past runs were
+     which. Each condition that appears, mildest first, with its month count. */
+  const counts = new Map<string, number>();
+  for (const entry of sorted) counts.set(entry.regime, (counts.get(entry.regime) ?? 0) + 1);
+  const legend = [...counts.entries()].sort(
+    ([left], [right]) =>
+      (isRegimeKey(left) ? REGIME_SEVERITY_RANK[left] : 99) - (isRegimeKey(right) ? REGIME_SEVERITY_RANK[right] : 99),
+  );
   return (
     <figure className={`space-y-2 ${className}`.trim()} data-month-strip>
       <p className="sr-only">
@@ -53,6 +62,19 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
           );
         })}
       </div>
+      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300" aria-label="Months under each call">
+        {legend.map(([regime, months]) => (
+          <li key={regime} className="flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              data-regime={regimeDataAttribute(regime)}
+              className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--regime-accent)]"
+            />
+            {isRegimeKey(regime) ? REGIME_LABELS[regime] : regime}
+            <span className="tabular-nums text-slate-500">{months} {months === 1 ? "month" : "months"}</span>
+          </li>
+        ))}
+      </ul>
       <figcaption className="flex flex-wrap justify-between gap-x-4 text-xs text-slate-400">
         <span>
           {monthLabel(sorted[0].recordDate)} – {monthLabel(run.latest)} · {changes} call {changes === 1 ? "change" : "changes"}

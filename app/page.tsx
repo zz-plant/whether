@@ -6,7 +6,6 @@ import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefA
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { RunwayConditionedNotes } from "./components/RunwayConditionedNotes";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { ActivationTracker } from "./components/activationTracker";
@@ -19,7 +18,7 @@ import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/ca
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { CONFIDENCE_WORD } from "./components/trustStrip";
 import { isRoute } from "../lib/navigation/routeType";
-import { resolveDataStatusGuidance, resolveDataStatusLabel } from "../lib/report/trustStatus";
+import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
   type SignalDirection,
@@ -50,6 +49,8 @@ import {
   describeWeeklyMovement,
 } from "../lib/report/home/homeSectionModel";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
+import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { buildTrackRecord } from "../lib/report/trackRecord";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
@@ -187,29 +188,17 @@ async function PageContent({
     ? regimeHistory.filter((entry) => new Date(entry.record_date).getTime() <= asOfTimestamp)
     : regimeHistory;
 
-  // Same score the hero headlines, computed back across the window so the number
-  // carries its own history. Months missing either input are dropped rather than
-  // interpolated — a gap is honest, an invented point is not.
-  // Each month also carries the regime it was called in, drawn behind the
-  // line in the plane's hue. This is the stripe the memory rail used to draw
-  // at the foot of the page, moved to where the same 24 months were already
-  // being drawn — one graphic, one window, the score through its weather.
-  const signalDeltas = new Map(
-    homepage.weeklyDecisionCardModel.decision.reportDynamics.changedSignals.map((s) => [s.key, s.delta] as const)
+  /* Last week, through the one derivation every surface and export shares:
+     null when no comparison was made, the anomaly list counted (a move past the
+     weekly sanity limit is still a move), and a signal under the reporting floor
+     read as unmoved rather than as missing. Reading `changedSignals` alone here
+     drew a 55-point week as flat and dropped last week whenever nothing moved. */
+  const previousScores = previousScoresFromDynamics(
+    homepage.weeklyDecisionCardModel.decision.reportDynamics,
+    { tightness: reportData.assessment.scores.tightness, riskAppetite: reportData.assessment.scores.riskAppetite },
   );
-  const tightnessDelta = signalDeltas.get("tightness") ?? 0;
-  const riskAppetiteDelta = signalDeltas.get("riskAppetite") ?? 0;
-
-  // Derived from `assessment.scores` rather than from the diagnostics copy so the prior
-  // read and the current one come off the same series. `changedSignals` is empty both
-  // when nothing moved and when there is no prior read at all, and the two are not the
-  // same claim — so an empty list yields no prior read rather than an invented flat one.
-  const cadencePreviousScores = signalDeltas.size > 0
-    ? {
-        tightness: reportData.assessment.scores.tightness - tightnessDelta,
-        riskAppetite: reportData.assessment.scores.riskAppetite - riskAppetiteDelta,
-      }
-    : null;
+  const tightnessDelta = previousScores ? reportData.assessment.scores.tightness - previousScores.tightness : 0;
+  const riskAppetiteDelta = previousScores ? reportData.assessment.scores.riskAppetite - previousScores.riskAppetite : 0;
 
   // Built here rather than fetched: the previous card awaited the whole agent-interface
   // payload behind Suspense and swallowed its failure, which is why every cadence tab
@@ -224,7 +213,7 @@ async function PageContent({
           recordDateLabel: homepage.reportShell.recordDateLabel,
           regimeHistory: alignedRegimeHistory,
           planHref: operateHref,
-          previousScores: cadencePreviousScores,
+          previousScores,
         });
 
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
@@ -262,10 +251,17 @@ async function PageContent({
      know the call still stands and how far it is from flipping. Derived from
      the same snapshot the hero draws, so the verdict and the flip watch cannot
      disagree; absent on a week the call moved. */
-  const quietDayLine = buildQuietDayRead({
-    steadyWeek: weeklyLeadershipSummary.steadyWeek,
-    flipProximity: v2HeroSignalData.flipProximity,
-  });
+  /* "Call unchanged" is a claim about a comparison: never on a read with no
+     previous week (`steadyWeek` is computed from a zero move there), never on a
+     week the call moved (a sub-point move can still be the confirming read),
+     and never on an archived week, which the banner above dates. */
+  const quietDayLine =
+    previousScores && !reportData.regimeAlert && !historicalSelection
+      ? buildQuietDayRead({
+          steadyWeek: weeklyLeadershipSummary.steadyWeek,
+          flipProximity: v2HeroSignalData.flipProximity,
+        })
+      : null;
 
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
@@ -330,6 +326,7 @@ async function PageContent({
   };
   const signalChangeRows = buildSignalChangeRows({
     indicators: homepage.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators,
+    dynamics: homepage.weeklyDecisionCardModel.decision.reportDynamics,
     lines: metricLines,
     tightnessPressure,
     tightnessSaturated,
@@ -346,7 +343,7 @@ async function PageContent({
       metric: "tightness" as const,
       label: ruleMetricLabel.tightness,
       value: tightness,
-      previous: comparisonUnavailable ? null : Number((tightness - tightnessDelta).toFixed(1)),
+      previous: previousScores ? Number((tightness - tightnessDelta).toFixed(1)) : null,
       lines: signalChangeRows.find((row) => row.key === "tightness")?.lines ?? [
         { kind: "callChange" as const, value: callChangeLines.tightness },
       ],
@@ -355,7 +352,7 @@ async function PageContent({
       metric: "riskAppetite" as const,
       label: ruleMetricLabel.riskAppetite,
       value: riskAppetite,
-      previous: comparisonUnavailable ? null : Number((riskAppetite - riskAppetiteDelta).toFixed(1)),
+      previous: previousScores ? Number((riskAppetite - riskAppetiteDelta).toFixed(1)) : null,
       lines: signalChangeRows.find((row) => row.key === "riskAppetite")?.lines ?? [
         { kind: "callChange" as const, value: callChangeLines.riskAppetite },
       ],
@@ -372,19 +369,14 @@ async function PageContent({
         currentRegime: regime,
         previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
       });
-  const trustStripProps = {
+  const trustStripProps = buildTrustStripProps({
     recordDateLabel: homepage.reportShell.recordDateLabel,
-    sourcesLive: !homepage.reportShell.showOfflineBadge,
-    /* The same phrase /trust prints for the same state, from the same table —
-       "Live", "Partly cached", "Cached snapshot". */
-    sourcesLabel: resolveDataStatusLabel({
-      isHistoricalSelection: Boolean(historicalSelection),
-      isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
-      degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 0,
-    }),
+    isFallback: homepage.reportShell.showOfflineBadge,
+    isHistorical: Boolean(historicalSelection),
+    degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 0,
     confidenceLabel: confidenceLabel ?? "HIGH",
-    couldChangeNextWeek: Boolean(reportData.assessment.diagnostics.transitionWatch),
-  };
+    assessment: reportData.assessment,
+  });
 
   return (
     <Shell regime={regime}>
@@ -536,7 +528,6 @@ async function PageContent({
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the
                   company’s cash position to the archived week. */}
-              {!historicalSelection ? <RunwayConditionedNotes regime={regime} /> : null}
               {!historicalSelection ? (
                 <SinceLastVisit
                   current={{

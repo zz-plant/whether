@@ -3,6 +3,7 @@ import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "../regimeEngineCore";
 import { ruleMetricLabel, type RuleConditionMetric } from "../report/boundedDecisionRules";
 import { buildSharedCorridorRails, formatPointsToLine } from "../report/operatingCalls";
 import type { ReportDynamics } from "../report/reportDataTypes";
+import { findSignalDelta } from "../report/evidenceReaderModel";
 
 /**
  * The two scores as every export prints them: value, the line each is judged
@@ -49,8 +50,7 @@ export const previousScoresFromDynamics = (
   current: ScorePair,
 ): ScorePair | null => {
   if (!dynamics || dynamics.directionLabel === "unavailable") return null;
-  const deltaFor = (metric: RuleConditionMetric) =>
-    [...dynamics.changedSignals, ...dynamics.anomalySignals].find((signal) => signal.key === metric)?.delta ?? 0;
+  const deltaFor = (metric: RuleConditionMetric) => findSignalDelta(dynamics, metric) ?? 0;
   return {
     tightness: roundToTenth(current.tightness - deltaFor("tightness")),
     riskAppetite: roundToTenth(current.riskAppetite - deltaFor("riskAppetite")),

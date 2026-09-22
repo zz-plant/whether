@@ -13,6 +13,12 @@ type ScoreReference = {
   line: { value: number; label: string };
   previous?: number | null;
   /**
+   * What `previous` is. "Last week" everywhere but the one cell that compares
+   * against something else (the month a past call changed), where printing
+   * "last week" over a years-old reading needed a footnote to take it back.
+   */
+  previousLabel?: string;
+  /**
    * Units for a reading that is not a 0–100 score. The base rate is a percent
    * and the curve is a spread in points, and both are judged against a line
    * the same way; the defaults print a score ("12 of 100 · … · 64 pts below").
@@ -38,7 +44,7 @@ const formatDistance = (distance: number, units: Required<ScoreUnits>) =>
 
 const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
 
-export const formatScoreReference = ({ label, value, line, previous, units }: ScoreReference) => {
+export const formatScoreReference = ({ label, value, line, previous, previousLabel = "Last week", units }: ScoreReference) => {
   const resolved = resolveUnits(units);
   const distance = Math.abs(value - line.value);
   const side = distance === 0 ? "at" : value > line.value ? "above" : "below";
@@ -47,13 +53,13 @@ export const formatScoreReference = ({ label, value, line, previous, units }: Sc
     `${line.label} ${formatPoints(line.value)}${resolved.suffix}`,
     distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${side}`,
   ];
-  if (typeof previous === "number" && Number.isFinite(previous)) parts.push(`last week ${formatPoints(previous)}${resolved.suffix}`);
+  if (typeof previous === "number" && Number.isFinite(previous)) parts.push(`${previousLabel.toLowerCase()} ${formatPoints(previous)}${resolved.suffix}`);
   return parts.join(" · ");
 };
 
 type ScoreCellProps = ScoreReference & { className?: string; children?: ReactNode };
 
-export function ScoreCell({ label, value, line, previous = null, units, className = "", children }: ScoreCellProps) {
+export function ScoreCell({ label, value, line, previous = null, previousLabel = "Last week", units, className = "", children }: ScoreCellProps) {
   const resolved = resolveUnits(units);
   const distance = Math.abs(value - line.value);
   const side = distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${value > line.value ? "above" : "below"}`;
@@ -71,7 +77,7 @@ export function ScoreCell({ label, value, line, previous = null, units, classNam
       </dd>
       {hasPrevious ? (
         <>
-          <dt className="text-slate-400">Last week</dt>
+          <dt className="text-slate-400">{previousLabel}</dt>
           <dd className="tabular-nums text-slate-300">{formatPoints(previous)}{resolved.suffix}</dd>
         </>
       ) : null}

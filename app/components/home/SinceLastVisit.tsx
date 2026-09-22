@@ -87,11 +87,11 @@ const returnGapOf = (previousRecordDate: string, currentRecordDate: string) => {
  * last saw, so that is all this stores — written on every visit, read on the
  * next — and the comparison is computed against what the call is now.
  *
- * Renders `fallback` on a first visit and when the call the reader last saw is
- * this week's. The page keeps one orientation element at its top, chosen by
- * state — the standfirst for a newcomer, this line for a returning reader, the
- * archived-week banner when a past week is loaded — never two, so the
- * standfirst is handed in as the fallback rather than mounted beside this.
+ * Renders `fallback` (nothing, on the homepage) on a first visit and when the
+ * call the reader last saw is this week's. The homepage mounts its standfirst
+ * (`FirstVisitExplainer`) separately at the top, where it stays until
+ * dismissed; this line sits under the call and appears only once there is a
+ * previous call to compare against. An archived week shows neither.
  * Storage is read through a store rather than during render, so the server's
  * markup — the fallback — is what hydration renders too.
  *

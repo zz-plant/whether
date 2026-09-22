@@ -187,7 +187,7 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
  * read `diagnostics.tightnessDelta` as a weekly move, and that field was a
  * distance from the regime threshold — so an unchanged week still claimed one.
  */
-const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
+export const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
   const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
   return buildScoreReferenceLines({

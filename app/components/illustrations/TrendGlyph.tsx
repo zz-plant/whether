@@ -14,8 +14,8 @@
  *
  * Scope: this module handles a *scalar* move — one number against its previous
  * reading. For the shape of a whole series use `app/components/ui/sparkline.tsx`;
- * for an explicit before/after pair on a rail use `DeltaGlyph`. The three are
- * complementary, not alternatives.
+ * for a score against its lines, with last week, use `ScoreLadder`. The three
+ * are complementary, not alternatives.
  */
 
 export type TrendDirection = "up" | "down" | "mixed" | "flat";

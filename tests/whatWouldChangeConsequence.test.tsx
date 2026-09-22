@@ -3,6 +3,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WhatWouldChangeSection } from "../app/components/home/WhatWouldChangeSection";
 import type { ThresholdBusinessConsequence } from "../lib/report/operatingCalls";
+import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
 
@@ -19,6 +20,7 @@ const mockAny: any = mock;
 
    Installing it here makes the file answer for its own dependencies. */
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({

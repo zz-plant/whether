@@ -28,11 +28,13 @@ import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import { ReportShell } from "../components/reportShell";
 import { TrustStrip } from "../components/trustStrip";
 import { AreaTable } from "../components/ui/areaTable";
-import { buildTrustStripProps } from "./trustStripProps";
+import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
+import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { buildAreaRows } from "./areaRows";
-import { resolveDataStatusLabel } from "../../lib/report/trustStatus";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { SharePageFormats } from "../share/sharePageFormats";
+import { buildReadingLines } from "../../lib/export/briefBuilders";
+import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
@@ -201,16 +203,17 @@ export async function buildPlanningPageModel(
       h(OperatorWorkflowRouteTracker),
       /* Freshness and confidence, once, in the same slot every reading route
          puts them: under the h1, before anything asks the reader to act. */
-      h(TrustStrip, buildTrustStripProps({
-        recordDateLabel,
-        isFallback,
-        sourcesLabel: resolveDataStatusLabel({
-          isHistoricalSelection: Boolean(historicalSelection),
-          isFallbackSnapshot: isFallback,
+      h(TrustStrip, {
+        ...buildTrustStripProps({
+          recordDateLabel,
+          isFallback,
+          isHistorical: Boolean(historicalSelection),
+          degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
+          confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+          assessment,
         }),
-        confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-        transitionWatch: assessment.diagnostics.transitionWatch ? "ON" : "OFF",
-      })),
+        href: "/trust",
+      }),
       // At the page root, not inside the Share step: that step is collapsed on
       // arrival, and the island has to exist before the nav block's Share
       // button or the picker can read it.
@@ -224,7 +227,7 @@ export async function buildPlanningPageModel(
         })
         : null,
       h(OperationsExecutionStepper, {
-        recordDate: treasury.record_date,
+        recordDate: historicalSelection ? null : reportData.weeklyRecordDate,
         steps: [
           {
             id: "ops-monthly-action-summary",
@@ -315,7 +318,12 @@ export async function buildPlanningPageModel(
                 // The same picker /share and the global rail use, reading the same
                 // island — one artifact pipeline. The eleven-button export panel
                 // that sat here built the brief a second way through its own lib.
-                h(SharePageFormats),
+                h(SharePageFormats, {
+                  scoreReferences: buildReadingLines(reportData.assessment, {
+                    actionStripItems,
+                    previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
+                  }),
+                }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   "Email, meeting pack, role memos, calendar hold and the embed live on ",
                   h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),

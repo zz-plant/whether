@@ -6,6 +6,7 @@ import { formatDateUTC, formatMonthYearShortFromValue } from "../../lib/formatte
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/visitorStrip";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
+import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import { buildSignalsPageModel, focusLabelByTab, type SignalsPageSearchParams } from "./evidencePageModel";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { SignalsEvidenceBody } from "./components/evidencePageBody";
@@ -33,6 +34,8 @@ export default async function SignalsPage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const model = await buildSignalsPageModel(resolvedSearchParams);
+  const visibleRowKeys = new Set(model.changedSignalRows.map((row) => row.key));
+  const rowHref = (key: RegimeSignalKey) => (visibleRowKeys.has(key) ? `#${key}` : `/signals#${key}`);
   const monthlyRegimeHistory = getMonthlyRegimeHistory().slice(-12);
   const tightnessTrend = monthlyRegimeHistory.flatMap((entry) =>
     typeof entry.tightness === "number"
@@ -77,14 +80,16 @@ export default async function SignalsPage({
     >
       <OperatorWorkflowRouteTracker />
       {/* Renders nothing on a first visit. Its links land on the rows of the
-          changed-signals table below, which carry the signal keys as ids. */}
+          changed-signals table below, whose ids are the signal keys — when
+          the focus filter shows that row; otherwise on the unfiltered page,
+          since a fragment for a row the filter removed lands nowhere. */}
       <ReturningVisitorDeltaStrip
         assessment={model.assessment}
         recordDate={model.treasury.record_date}
         impactLinks={[
-          { label: "Funding pressure", href: "#tightness", metric: "tightness" },
-          { label: "Risk appetite", href: "#riskAppetite", metric: "riskAppetite" },
-          { label: regimeSignalLabel.baseRate, href: "#baseRate", metric: "baseRate" },
+          { label: "Funding pressure", href: rowHref("tightness"), metric: "tightness" },
+          { label: "Risk appetite", href: rowHref("riskAppetite"), metric: "riskAppetite" },
+          { label: regimeSignalLabel.baseRate, href: rowHref("baseRate"), metric: "baseRate" },
         ]}
         openPanelHref="#what-changed"
       />

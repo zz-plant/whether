@@ -103,12 +103,14 @@ export const resolveOperationsExecutionStepIdFromLocation = ({
  * The done control: a checkbox drawn as a button, because it is one. The
  * state lives on `aria-pressed`, the glyph only echoes it, and the label stays
  * "Done" in both states so the accessible name does not change under the
- * reader's finger.
+ * reader's finger. The step's title is part of that name: six buttons all
+ * announced as "Done" gave a screen reader no way to tell which step each marks.
  */
-const DoneButton = ({ pressed, onClick }: { pressed: boolean; onClick: () => void }) => (
+const DoneButton = ({ pressed, onClick, stepTitle }: { pressed: boolean; onClick: () => void; stepTitle: string }) => (
   <button
     type="button"
     aria-pressed={pressed}
+    aria-label={`Done: ${stepTitle}`}
     onClick={onClick}
     className="weather-button inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] hover:border-sky-400/70 hover:text-slate-100"
   >
@@ -142,7 +144,8 @@ function StepPanel({
   isActive: boolean;
   isDone: boolean;
   onToggleOpen: () => void;
-  onToggleDone: () => void;
+  /** Absent on an archived month: its plan is for reading, not for ticking off. */
+  onToggleDone?: () => void;
 }) {
   if (isDone) {
     return (
@@ -160,13 +163,14 @@ function StepPanel({
               <button
                 type="button"
                 onClick={onToggleDone}
+                aria-label={`Undo: ${step.title}`}
                 className="inline-flex min-h-11 items-center font-semibold text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
               >
                 Undo
               </button>
             </p>
           </div>
-          <DoneButton pressed onClick={onToggleDone} />
+          {onToggleDone ? <DoneButton pressed onClick={onToggleDone} stepTitle={step.title} /> : null}
         </div>
       </section>
     );
@@ -221,7 +225,7 @@ function StepPanel({
             {step.description}
           </p>
           {/* Facts about the step, not controls: a pill is a button
-              shape, and three of them in a row read as three actions. */}
+              shape, and three of them in a row look like three actions. */}
           {step.owner || step.approvalStatus || step.changeSignal ? (
             <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-fluid-xs text-slate-300">
               {step.owner ? (
@@ -249,7 +253,7 @@ function StepPanel({
               above and still on screen. Six identical controls
               pointing at visible content is navigation noise. */}
         </div>
-        <DoneButton pressed={false} onClick={onToggleDone} />
+        {onToggleDone ? <DoneButton pressed={false} onClick={onToggleDone} stepTitle={step.title} /> : null}
       </div>
       {isOpen && (
         <div id={`${step.id}-body`} className="mt-4">
@@ -275,15 +279,20 @@ export function OperationsExecutionStepper({
   recordDate,
 }: {
   steps: OperationsExecutionStep[];
-  /** The reading's record date: the week the ticks belong to. */
-  recordDate: string;
+  /**
+   * The week the ticks belong to (`weeklyRecordDate`, the week-ending date —
+   * the daily record date moved every business day and reset the list). Null
+   * on an archived month, which shows no checklist: a tick there would have
+   * replaced this week's record.
+   */
+  recordDate: string | null;
 }) {
   const firstStepId = steps[0]?.id ?? "";
   const [checklist, setChecklist] = useLocalStorageState<WeekChecklist>(
     WEEK_CHECKLIST_STORAGE_KEY,
     EMPTY_WEEK_CHECKLIST,
   );
-  const doneStepIds = doneStepsForWeek(checklist, recordDate);
+  const doneStepIds = recordDate ? doneStepsForWeek(checklist, recordDate) : [];
   // Openness is a set; `currentStepId` stays singular because aria-current is.
   const [openStepIds, setOpenStepIds] = useState<Set<string>>(
     () => new Set(resolveInitialOpenStepIds({ steps })),
@@ -327,6 +336,7 @@ export function OperationsExecutionStepper({
   };
 
   const toggleDone = (stepId: string) => {
+    if (!recordDate) return;
     setChecklist((prev) => toggleWeekStep(prev, recordDate, stepId));
   };
 
@@ -342,12 +352,14 @@ export function OperationsExecutionStepper({
           list the same steps from `operationsSectionLinks.plan`, so this row was
           the page's second index — a third, counting the card grid that used to
           close the page. The `aria-current="step"` state lives on the panels. */}
-      <p className="text-xs text-slate-400" aria-live="polite" data-week-progress>
-        <span className="font-semibold tabular-nums text-slate-200">
-          {doneCount} of {steps.length}
-        </span>{" "}
-        done this week
-      </p>
+      {recordDate ? (
+        <p className="text-xs text-slate-400" aria-live="polite" data-week-progress>
+          <span className="font-semibold tabular-nums text-slate-200">
+            {doneCount} of {steps.length}
+          </span>{" "}
+          done this week
+        </p>
+      ) : null}
       <div className="space-y-6">
         {steps.map((step) => {
           const isDone = doneStepIds.includes(step.id);
@@ -359,7 +371,7 @@ export function OperationsExecutionStepper({
               isActive={step.id === currentStepId}
               isDone={isDone}
               onToggleOpen={() => toggleOpen(step.id)}
-              onToggleDone={() => toggleDone(step.id)}
+              onToggleDone={recordDate ? () => toggleDone(step.id) : undefined}
             />
           );
         })}

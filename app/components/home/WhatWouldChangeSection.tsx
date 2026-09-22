@@ -68,7 +68,7 @@ export function WhatWouldChangeSection({
       className="order-4"
     >
       {ladders.length > 0 ? (
-        <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2" aria-label="Distance to this week's lines">
+        <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
           {ladders.map((ladder) => (
             <div key={ladder.metric} className="min-w-0 space-y-1.5" data-ladder={ladder.metric}>
               <ScoreLadder label={ladder.label} value={ladder.value} previous={ladder.previous} lines={ladder.lines} />

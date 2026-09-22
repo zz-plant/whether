@@ -5,9 +5,11 @@ import { STORAGE_KEYS } from "../../lib/storage/keys";
  *
  * The plan page is the one place the reader acts, and nothing recorded what
  * had been done: six steps, every visit, all of them looking equally undone.
- * The record is keyed by the reading's record date rather than cleared on a
- * timer, so a new week starts clean by construction and a mid-week return
- * finds the ticks where they were left. Pure, so the two rules that matter —
+ * The record is keyed by the reading's week-ending date (`weeklyRecordDate`)
+ * rather than cleared on a timer, so a new week starts clean by construction
+ * and a mid-week return finds the ticks where they were left. Not the daily
+ * record date: Treasury publishes a row every business day, so a key on that
+ * reset the list each morning. Pure, so the two rules that matter —
  * a tick belongs to one week, and a different week reads as nothing done —
  * are pinned without a DOM.
  */

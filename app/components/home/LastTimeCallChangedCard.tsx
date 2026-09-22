@@ -40,17 +40,16 @@ export function LastTimeCallChangedCard({
           value={record.tightness.later}
           line={{ value: callChangeLines.tightness, label: DECISION_CONTRACT_LABELS.watch.postureFlips }}
           previous={record.tightness.atChange}
+          previousLabel={changedAt}
         />
         <ScoreCell
           label={regimeSignalLabel.riskAppetite}
           value={record.riskAppetite.later}
           line={{ value: callChangeLines.riskAppetite, label: DECISION_CONTRACT_LABELS.watch.postureFlips }}
           previous={record.riskAppetite.atChange}
+          previousLabel={changedAt}
         />
       </div>
-      <p className="text-fluid-nano text-slate-500">
-        &ldquo;Last week&rdquo; in these two cells is {changedAt}, the month the call moved.
-      </p>
       <ActionLink href={buildLastTimeCompareHref(record)} variant="inline">
         Compare {changedAt} with {after} →
       </ActionLink>

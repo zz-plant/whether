@@ -115,8 +115,13 @@ export function WhatChangedSection({
                       lines={row.lines}
                     />
                   ) : (
+                    /* An input, not a score: the call is decided on the two scores
+                       it feeds. "No line of its own" was false for the base rate,
+                       which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
-                      Feeds the scores above; no line of its own.
+                      {row.key === "baseRate"
+                        ? "Feeds funding pressure; the call is judged on that score."
+                        : "Feeds both scores; the call is judged on those."}
                     </span>
                   )}
                 </td>

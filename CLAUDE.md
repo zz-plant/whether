@@ -526,9 +526,11 @@ mockAny.module("next/navigation", () => ({ ...nextNavigation, useRouter: () => (
 ```
 
 The two files that render a *route* were fixed this way (`toolkitHowToAnchors`,
-`answerPageReaderCopy`) and eight shuffled runs went green; the eight component suites still list
-their three exports and have not been observed to trigger it, because they never dynamically import
-a route. Keeping the real `notFound` has a second benefit: `resourceArticleRoutes.test.ts` asserts
+`answerPageReaderCopy`) and eight shuffled runs went green. The component suites that still listed
+their three exports were thought safe because they never import a route themselves — but the stub
+is process-wide, so it is the *next* file that pays: on 2026-09-22 seed `56385488` put one ahead of
+the answer-page suites and failed 13 tests on a missing `notFound`. Every suite spreads the real
+module now; a new one that does not is the same bug waiting for its seed. Keeping the real `notFound` has a second benefit: `resourceArticleRoutes.test.ts` asserts
 against what Next actually throws instead of against a stub written in another file.
 
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for

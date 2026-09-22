@@ -9,7 +9,7 @@ import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
-import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../../lib/export/briefBuilders";
+import { buildBoardSlideBullets, buildCallCitation, buildReadingLines, buildSlackBrief } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
 import { buildFlipProximity } from "../../lib/report/flipProximity";
@@ -23,6 +23,7 @@ import {
 import { buildBriefPermalinkLine } from "../../lib/export/briefPermalink";
 import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdateSnippet";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
 
@@ -41,15 +42,23 @@ export const metadata: Metadata = {
 const buildCurrentShareArtifact = async () => {
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/share" });
   const { assessment, treasury, sensors, macroSeries } = reportData;
+  /* The area rows and last week are what the builders' five-area section and
+     score lines are made of; without them every paste on this page dropped the
+     section and printed each score with no last week and no pause line. */
+  const actionStripItems = snapshot.homeBriefModel.actionStripItems ?? [];
+  const previousScores = previousScoresFromDynamics(reportData.reportDynamics, assessment.scores);
   const exportOptions = {
     postureWithStageLabel: snapshot.weeklyCall.regimeStage,
     operatingStanceLine: snapshot.weeklyCall.currentCall,
+    actionStripItems,
+    previousScores,
     modeledDecision: {
       postureWithStageLabel: snapshot.weeklyCall.regimeStage,
       currentCall: snapshot.weeklyCall.currentCall,
       actionNow: snapshot.weeklyCall.actionNow,
       guardrailThreshold: snapshot.weeklyCall.pauseIf,
       reversalTrigger: snapshot.weeklyCall.changeCourseIf,
+      actionStripItems,
     },
   };
   const weeklyOperatorBrief = buildWeeklyOperatorBriefPlainText(
@@ -71,7 +80,7 @@ const buildCurrentShareArtifact = async () => {
     treasury,
     sensors,
     macroSeries,
-    exportOptions.modeledDecision,
+    { ...exportOptions.modeledDecision, previousScores },
   );
   /* The credential-free slice of the Linear/Jira sync: one paste-ready
      guardrail block per business area, built from the same bounded-rule fields
@@ -79,17 +88,17 @@ const buildCurrentShareArtifact = async () => {
      operator pastes the block into the work item description and the card
      carries posture + pause trigger + flip condition. */
   const guardrailTagBlocks = buildGuardrailTagBlocks({
-    actionStripItems: snapshot.homeBriefModel.actionStripItems ?? [],
+    actionStripItems,
     postureLabel: snapshot.weeklyCall.regimeStage,
     recordDate: treasury.record_date,
     flipWatchSentence: buildFlipProximity(assessment).map((entry) => entry.sentence)[0],
   });
   /* Kanban pull policies: the same pause/resume conditions re-verbed for a
      pull system, copyable for a board header or wiki. */
-  const pullPolicyBlocks = buildPullPolicyBlocks(snapshot.homeBriefModel.actionStripItems ?? []);
+  const pullPolicyBlocks = buildPullPolicyBlocks(actionStripItems);
   /* The same five rows the plan page tabulates, so an area's rule and its two
      lines read identically on both surfaces. */
-  const areaRows = buildAreaRows(snapshot.homeBriefModel.actionStripItems ?? []);
+  const areaRows = buildAreaRows(actionStripItems);
   /* The regime as a numeric WIP cap. The runway band is browser-held (cookie),
      so the server copy states the regime cap; the pull-policy section above
      carries the thresholds that gate it. */
@@ -131,6 +140,9 @@ const buildCurrentShareArtifact = async () => {
     recordDateLabel: reportData.recordDateLabel,
     assessment,
     trustLine: `Source: ${treasury.source}`,
+    // The score lines the pastes below print, shown above the picker so the
+    // reader sees what they are about to copy.
+    scoreReferences: buildReadingLines(assessment, exportOptions),
     // The picker's object, from the same snapshot the long-form builders read.
     briefArtifact: buildBriefArtifactFromSnapshot({
       reportData,
@@ -196,7 +208,7 @@ export default async function SharePage() {
           </div>
         </section>
 
-        <SharePageFormats />
+        <SharePageFormats scoreReferences={artifact.scoreReferences} />
 
         <section className="weather-panel space-y-3 px-5 py-5" aria-labelledby="longer-formats-heading">
           <h2 id="longer-formats-heading" className="type-eyebrow">Longer formats</h2>

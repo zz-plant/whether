@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ScoreLadder, buildLadderLines, describeLadderPosition, nearestLadderLine } from "../app/components/ui/scoreLadder";
+import { ScoreLadder, buildLadderLines, describeLadderPosition, layoutLadderLabels, nearestLadderLine, type LadderLine } from "../app/components/ui/scoreLadder";
 import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell";
 import { AreaTable } from "../app/components/ui/areaTable";
 import { TrustStrip } from "../app/components/trustStrip";
@@ -31,7 +31,7 @@ describe("ScoreLadder", () => {
 
   it("draws last week hollow only when there is a last week", () => {
     const withPrevious = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={72} previous={68} lines={lines} />);
-    assert.match(withPrevious, /Last week 68\./);
+    assert.match(withPrevious, /Last week 68/);
     const without = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={72} previous={null} lines={lines} />);
     assert.doesNotMatch(without, /Last week/);
     assert.doesNotMatch(without, /role="img"/);
@@ -43,8 +43,20 @@ describe("ScoreLadder", () => {
     const html = renderToStaticMarkup(
       <ScoreLadder label="Funding pressure" value={72} previous={61} previousLabel="Period B" lines={lines} />,
     );
-    assert.match(html, /Period B 61\./);
+    assert.match(html, /Period B 61/);
     assert.doesNotMatch(html, /Last week/);
+  });
+
+  it("stacks labels that would overprint in the narrowest column, and only those", () => {
+    /* 55 and 70 are 15 points apart: clear by the old 13%-of-track rule, and
+       overprinted in the homepage's 14rem column, where "Pause 55" and
+       "Call changes 70" need about 70px between their ticks. */
+    const rows = (values: LadderLine[]) =>
+      Object.fromEntries(layoutLadderLabels(values).map(({ line, row }) => [line.kind, row]));
+    assert.deepEqual(rows([{ kind: "pause", value: 55 }, { kind: "callChange", value: 70 }]), { pause: 0, callChange: 1 });
+    assert.deepEqual(rows([{ kind: "resume", value: 10 }, { kind: "callChange", value: 70 }]), { resume: 0, callChange: 0 });
+    const three = rows([{ kind: "resume", value: 66 }, { kind: "callChange", value: 70 }, { kind: "pause", value: 76 }]);
+    assert.equal(new Set(Object.values(three)).size, 3, "three lines within ten points take three rows");
   });
 
   it("builds the three lines from the numbers a surface has, drawing only the ones it states", () => {
@@ -134,6 +146,8 @@ describe("MonthStrip", () => {
     assert.match(html, /Cloudy, held 3 months since May 2026/);
     const visible = html.replace(/<[^>]+>/g, " ");
     assert.doesNotMatch(visible, /EXPANSION|DEFENSIVE/, "the strip must not print engine keys (the data-regime attribute is how it gets its colour)");
-    assert.equal((html.match(/data-regime=/g) ?? []).length, 5);
+    /* Five month segments and one legend swatch per condition that appears. */
+    assert.equal((html.match(/data-regime=/g) ?? []).length, 5 + 2);
+    assert.match(visible, /Sunny\s+2 months/, "the legend names each colour and its months");
   });
 });

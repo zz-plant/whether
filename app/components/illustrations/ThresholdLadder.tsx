@@ -341,9 +341,9 @@ export function ThresholdLadder({
         </>
       ) : null}
 
-      {/* Movement leg, in the same ghost-dot → solid-dot vocabulary as
-          `DeltaGlyph`: where the signal was, the path it took, and a chevron at
-          the midpoint so the direction survives without colour. */}
+      {/* Movement leg, in the same hollow-dot → solid-dot vocabulary as
+          `ScoreLadder`'s last-week dot: where the signal was, the path it took,
+          and a chevron at the midpoint so the direction survives without colour. */}
       {hasMovement && xPrevious !== undefined ? (
         <>
           <line

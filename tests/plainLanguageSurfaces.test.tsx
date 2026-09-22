@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import * as nextNavigation from "next/navigation";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
 
@@ -25,8 +26,11 @@ const mockAny: any = mock;
    that installs this mock. `mock.module` patches the registry process-wide, so a
    full run left the router standing here by ordering luck. Installing it here
    makes the file answer for its own dependencies. See
-   decisionHeroThresholdConsequence.test.tsx, where that luck ran out. */
+   whatWouldChangeConsequence.test.tsx, where that luck ran out. The real module
+   is spread under the override: a stub narrower than `next/navigation` removes
+   `notFound` for every file that runs after it (CLAUDE.md). */
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({
