@@ -113,7 +113,7 @@ export async function GET(request: Request) {
         `Whether — Weekly brief${tickerParam ? ` for ${tickerParam}` : ""}`,
         `Regime: ${briefData.regimeLabel} • Confidence: ${confidenceLabel} • ${briefData.recordDate}`,
         ``,
-        `Operating call: ${operatingCall}`,
+        `Operating guidance: ${operatingCall}`,
         `Decision now: ${actionNow}`,
         ...(doNowItems.length > 0 ? [`${DECISION_CONTRACT_LABELS.action.doNow}: ${doNowItems.join(", ")}`] : []),
         ...(flipTrigger ? [`Watch: ${flipTrigger}`] : []),
@@ -227,7 +227,7 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
     <span style="font-size:10px;color:rgba(255,255,255,0.3);">${escapeHtml(metaParts.join(" · "))}</span>
   </div>
   <div style="background:rgba(56,189,248,0.08);border-left:3px solid rgba(56,189,248,0.4);padding:12px 14px;border-radius:6px;margin:8px 0;">
-    <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">Operating call</p>
+    <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">Operating guidance</p>
     <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(operatingCall)}</p>
   </div>
   <p style="font-size:14px;color:rgba(255,255,255,0.7);margin:12px 0;"><strong style="color:rgba(255,255,255,0.8);">Decision now:</strong> ${escapeHtml(actionNow)}</p>

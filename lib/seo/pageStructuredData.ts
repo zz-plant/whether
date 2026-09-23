@@ -93,7 +93,7 @@ export const buildHistoryStructuredData = ({
       "@id": `${url}#dataset`,
       name: "Whether monthly regime history",
       description:
-        "Every month-end regime call on record: the operating posture, when it changed, and how long each regime held, scored from public US Treasury and macro series.",
+        "Every month-end reading on record: the operating posture, when it changed, and how long each regime held, scored from public US Treasury and macro series.",
       url,
       creator: buildPublisherSchema(organizationName),
       license: buildCanonicalUrl("/terms-of-service"),
@@ -148,7 +148,7 @@ export const buildPricingStructuredData = ({
       "@id": `${url}#product`,
       name: "Whether Weekly Brief",
       description:
-        "A weekly operating call for startup leaders, with the API, MCP endpoint and embeds free forever. Paid plans add delivery, alerts and team ritual.",
+        "Weekly operating guidance for startup leaders, with the API, MCP endpoint and embeds free forever. Paid plans add delivery, alerts and team ritual.",
       /* Inlined, not referenced. An `@id` only resolves against nodes on the
          same page (see the header), and this graph carries no Organization —
          the reference dangled, which is the unresolvable entity these builders
@@ -257,7 +257,7 @@ export const buildApiDocsStructuredData = (): JsonLdGraph => {
       "@id": `${url}#api`,
       name: "Whether Agent API",
       description:
-        "Programmatic access to the weekly operating call, regime data, SaaS multiples, and the decision framework: an MCP server, REST endpoints, a Markdown brief, and an embeddable widget. No API key.",
+        "Programmatic access to the weekly operating guidance, regime data, SaaS multiples, and the decision framework: an MCP server, REST endpoints, a Markdown brief, and an embeddable widget. No API key.",
       documentation: url,
       url: buildCanonicalUrl("/api/agent"),
       termsOfService: buildCanonicalUrl("/terms-of-service"),

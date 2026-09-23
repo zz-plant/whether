@@ -54,16 +54,16 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
   return (
     <div className="space-y-3">
       <p className="text-sm text-slate-200">
-        Across {totals.months} month-end readings, the call was the same the following month{" "}
+        Across {totals.months} month-end readings, conditions were the same the following month{" "}
         {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often than the
         percent those months reported, and the two least-confident bands run in the wrong order —
-        so the number is a distance, not a probability. It says how much room the call has before
-        the line that changes it; the count beside it says how often that room mattered.
+        so the number is a distance, not a probability. It says how much room there is before
+        the line where conditions change; the count beside it says how often that room mattered.
       </p>
 
       <table className="w-full text-sm text-slate-200">
         <caption className="sr-only">
-          How often the call held, by distance from the nearest line that changes it
+          How often conditions held, by distance from the nearest change line
         </caption>
         <thead>
           <tr className="type-eyebrow text-slate-400">
@@ -91,7 +91,7 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
 
       <p className="text-fluid-xs text-slate-400">
         Derived from the month-end archive each time this page is built, so it improves as the
-        record grows. A held month means the call did not change.
+        record grows. A held month means conditions did not change.
         {includeCallChangeRule ? <> {CALL_CHANGE_RULE}</> : null}
       </p>
     </div>
@@ -106,7 +106,7 @@ export function ConfidenceRecordSection() {
     <ReportSection
       id="confidence-record"
       title={CONFIDENCE_RECORD_TITLE}
-      description="The percent measures how far the scores sit from the line that changes the call. This is what calls at that distance actually did."
+      description="The percent measures how far the scores sit from the line where conditions change. This is what readings at that distance actually did."
     >
       <ConfidenceRecordBody includeCallChangeRule />
     </ReportSection>

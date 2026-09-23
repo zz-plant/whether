@@ -57,7 +57,7 @@ export default function ApiDocsPage() {
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
         <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
-          Read this week's call from an AI agent, a script, or a dashboard. Whether serves the call, the two
+          Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
           scores behind it, and the pause and resume lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Free forever, no API key required.
         </p>
 
@@ -68,7 +68,7 @@ export default function ApiDocsPage() {
           </div>
           <p className="text-xs text-slate-300">
             <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
-            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's call, how far each score sits from its line, and what a scenario would produce, while it reasons.
+            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, how far each score sits from its line, and what a scenario would produce, while it reasons.
           </p>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
@@ -140,7 +140,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_posture_current"
             >
-              Stable JSON endpoint for the current call. Returns the conditions, funding pressure, direction,
+              Stable JSON endpoint for the current guidance. Returns the conditions, funding pressure, direction,
               confidence, week, summary, url, and version. Type contract at lib/types.ts.
             </Endpoint>
             <Endpoint
@@ -158,11 +158,11 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_agent_jev"
             >
-              This week&apos;s call as a ready-to-send request for TypeSafe&apos;s Jev decision model
+              This week&apos;s guidance as a ready-to-send request for TypeSafe&apos;s Jev decision model
               (<code className="font-mono">typesafe/jev</code> on Cloudflare Workers AI). Put a short
               description of your plan in <code className="font-mono">request.state.plan</code> and send
-              the request yourself; Jev answers whether the plan goes against the call, which decision it
-              touches, how hard it is to undo, and whether it is safer after the call changes. Whether
+              the request yourself; Jev answers whether the plan goes against the guidance, which decision it
+              touches, how hard it is to undo, and whether it is safer after conditions change. Whether
               never sees the plan. Check <code className="font-mono">automationReady</code> before you
               act on an answer: it is false when this week&apos;s reading is not live or not current.
             </Endpoint>
@@ -173,7 +173,7 @@ export default function ApiDocsPage() {
               tryCta="try_scores"
             >
               The two headline numbers on their own — funding pressure, risk appetite, both deltas, plus
-              distance to the line that changes the call and which score would cross first.
+              distance to the line where conditions change and which score would cross first.
             </Endpoint>
             <Endpoint
               signature="GET /api/cadence"
@@ -199,11 +199,11 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_regime_alerts"
             >
-              Paginated history of alerts sent when the call changed. Read access is open; only the Monday run writes.
+              Paginated history of alerts sent when conditions changed. Read access is open; only the Monday run writes.
             </Endpoint>
             <Endpoint signature="GET /api/decision-memory?format=records">
-              The call history in NDJSON, shaped by the Revisable Delegation record schema — one
-              belief record per published call. Scoped to the caller: it reads your own decision
+              Past guidance in NDJSON, shaped by the Revisable Delegation record schema — one
+              belief record per week of published guidance. Scoped to the caller: it reads your own decision
               memory, so it needs an <span className="text-sky-200">x-whether-client-id</span> header
               and answers 401 without one. No &quot;Try it&quot; link for that reason.
             </Endpoint>
@@ -219,7 +219,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_brief_slack"
             >
-              The week&apos;s call preformatted for Slack — action, threshold, reversal condition.
+              The week&apos;s guidance preformatted for Slack — action, threshold, reversal condition.
               Post it to a channel without reformatting.
             </Endpoint>
             <Endpoint
@@ -239,7 +239,7 @@ export default function ApiDocsPage() {
               tryCta="try_image_slide"
               tryAriaLabel="View the brief as a meeting slide"
             >
-              The call as a widescreen meeting slide — hand-written SVG, so it stays sharp at projector
+              The guidance as a widescreen meeting slide — hand-written SVG, so it stays sharp at projector
               size and the labels are still editable text in Figma or Keynote. Accepts seed,
               series-a, series-b, or growth.
             </Endpoint>
@@ -261,7 +261,7 @@ export default function ApiDocsPage() {
               tryCta="try_embed_api"
             >
               The brief as a snippet a newsletter build step can insert at send time, in plain
-              text, JSON, or ready-to-paste HTML. Takes ticker and stage, so the call is calibrated
+              text, JSON, or ready-to-paste HTML. Takes ticker and stage, so the guidance is calibrated
               to one company rather than generic.
             </Endpoint>
             <Endpoint
@@ -295,7 +295,7 @@ export default function ApiDocsPage() {
           <div className="weather-surface px-4 py-3 space-y-2">
             <p className="text-fluid-xs font-semibold text-sky-200">Embeddable widget</p>
             <p className="text-xs text-slate-300">
-              Drop the current call into an internal dashboard or wiki. It updates itself each week.
+              Drop the current guidance into an internal dashboard or wiki. It updates itself each week.
               Add <span className="text-sky-200">data-whether-ticker</span> or{" "}
               <span className="text-sky-200">data-whether-stage</span> to tailor it to one company.
             </p>
@@ -317,11 +317,11 @@ export default function ApiDocsPage() {
           <h2 className="type-eyebrow">Command line</h2>
           <p className="text-xs text-slate-300">
             The <span className="text-sky-200">whether</span> CLI is an operator terminal for the
-            same data: conditions, the call, what changed, what would change it.
+            same data: conditions, the guidance, what changed, what would change it.
           </p>
           <div className="space-y-3">
             <Endpoint signature="whether status">
-              This week&apos;s call and the numbers behind it. Add{" "}
+              This week&apos;s guidance and the numbers behind it. Add{" "}
               <span className="text-sky-200">--as-of 2026-03</span> to read any past month.
             </Endpoint>
             <Endpoint signature="whether brief slack | exec | board | investor">
@@ -331,13 +331,13 @@ export default function ApiDocsPage() {
               Export the brief to json, csv, markdown, pdf, or a full briefing pack.
             </Endpoint>
             <Endpoint signature="whether watch --interval 60 --changes-only">
-              Poll for a change in the call and print only what changed.
+              Poll for a change in the guidance and print only what changed.
             </Endpoint>
             <Endpoint signature="whether scenario --tightness 74 --risk-appetite 32">
-              Model a hypothetical and see which call it produces.
+              Model a hypothetical and see which guidance it produces.
             </Endpoint>
             <Endpoint signature="whether explain flip">
-              What would have to move, and by how much, to change this week&apos;s call.
+              What would have to move, and by how much, to change this week&apos;s guidance.
             </Endpoint>
           </div>
           <p className="text-xs text-slate-300">

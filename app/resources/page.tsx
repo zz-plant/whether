@@ -9,7 +9,7 @@ import { GovernancePillarsGlyph } from "../components/illustrations/GovernancePi
 export const metadata: Metadata = buildPageMetadata({
   title: "Governance Resources",
   description:
-    "Capital discipline, board-level capital posture, and reversibility as governance: the long-form guides behind the weekly operating call, with the decision guides operators ask for most.",
+    "Capital discipline, board-level capital posture, and reversibility as governance: the long-form guides behind the weekly operating guidance, with the decision guides operators ask for most.",
   path: "/resources",
   imageAlt: "Whether governance resources",
 });
@@ -33,7 +33,7 @@ export default function ResourcesHubPage() {
           <div className="space-y-2 max-w-2xl">
             <h1 className="text-fluid-2xl font-semibold text-slate-100">Governance resources</h1>
             <p className="text-sm text-slate-300">
-              The long-form guides behind the weekly operating call, and the decision guides operators ask for most.
+              The long-form guides behind the weekly operating guidance, and the decision guides operators ask for most.
               Evergreen by design: what changes week to week is on the brief, not here.
             </p>
           </div>

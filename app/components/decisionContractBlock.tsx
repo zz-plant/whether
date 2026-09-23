@@ -21,8 +21,8 @@ export function DecisionContractBlock({
   handoffHref = "/",
 }: DecisionContractBlockProps) {
   return (
-    <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6" aria-label="This week's bounded call">
-      <h2 className="text-lg font-semibold text-slate-100">This week&apos;s bounded call</h2>
+    <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6" aria-label="This week's bounded guidance">
+      <h2 className="text-lg font-semibold text-slate-100">This week&apos;s bounded guidance</h2>
       <ul className="space-y-2 text-sm text-slate-200">
         <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {call}</li>
         <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {action}</li>

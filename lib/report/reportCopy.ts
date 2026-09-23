@@ -90,7 +90,7 @@ export const DECISION_CONTRACT_LABELS = {
     resumeWhen: "Resume when",
   },
   watch: {
-    flipWatch: "What would change the call",
+    flipWatch: "What would change this guidance",
     /**
      * The regime line, as distinct from a rule's pause line: where the call
      * itself changes.
@@ -102,7 +102,7 @@ export const DECISION_CONTRACT_LABELS = {
      * all, "Watch line". So the reader met a third threshold under a fourth
      * name, between two it had just learned.
      */
-    postureFlips: "Call changes if",
+    postureFlips: "Conditions change if",
     watchThisWeek: "Watch this week",
     watchNext: "Watch next",
   },
@@ -124,11 +124,11 @@ export const DECISION_CONTRACT_LABELS = {
  * "policy signals" name the engine's mechanism, which a reader cannot act on.
  */
 export const POLICY_OVERRIDE_CALL = {
-  currentCall: "The two scores point in different directions, so the call is not changing this week.",
+  currentCall: "The two scores point in different directions, so the guidance is not changing this week.",
   actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
   pauseIf: "Hold anything you can't undo while the two scores disagree.",
   callChangesIf:
-    "The two scores point the same way for a second reading; until then the call is not changing.",
+    "The two scores point the same way for a second reading; until then the guidance is not changing.",
 } as const;
 
 /**
@@ -143,7 +143,7 @@ export const POLICY_OVERRIDE_CALL = {
 export const NO_LIVE_READING_CALL = {
   currentCall: "No live reading this week. Keep last week's plan.",
   pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
-  callChangesIf: "A live reading lands; until then the call is not changing.",
+  callChangesIf: "A live reading lands; until then the guidance is not changing.",
 } as const;
 
 export const PRIMARY_AUDIENCE_SUMMARY =
@@ -156,36 +156,36 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
     detail:
-      "Read the call first: what to do, what to pause, and what would change it. It starts from the U.S. market environment, not from your company.",
+      "Read the guidance first: what to do, what to pause, and what would change it. It starts from the U.S. market environment, not from your company.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
     label: "Proof",
     detail:
-      "Open the score details only if you want to know why the call moved or which line is closest.",
+      "Open the score details only if you want to know why the guidance changed or which line is closest.",
     example: "Example decision: check the recession warning gauge before approving a project that pays back slowly.",
   },
   {
     label: "Actions",
     detail:
-      "Use the planning page to turn the call into this week's do, don't and limit rules.",
+      "Use the planning page to turn the guidance into this week's do, don't and limit rules.",
     example: "Example decision: focus on retention when risk appetite is cautious.",
   },
 ];
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
   {
-    text: `The call is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}.`,
+    text: `The guidance is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}.`,
   },
-  { text: "Your stage and runway, if you set them, change the notes under the call and nothing else." },
-  { text: "Confidence says how far the scores sit from the line that changes the call." },
-  { text: "Past weeks are one click away; this week's call comes first." },
+  { text: "Your stage and runway, if you set them, change the notes under the guidance and nothing else." },
+  { text: "Confidence says how far the scores sit from the line where conditions change." },
+  { text: "Past weeks are one click away; this week's guidance comes first." },
 ];
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   /* Was `#executive-snapshot`, which no page renders. The guide had never been
      rendered either, so nobody could click it and find that out. */
-  { href: "#weekly-call", label: "This week's call" },
+  { href: "#weekly-call", label: "This week's guidance" },
   { href: "/operate#ops-playbook", label: "Planning" },
   { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
 ];
@@ -253,12 +253,12 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   {
     value: "posture-flip",
     term: DECISION_CONTRACT_LABELS.watch.postureFlips,
-    summary: "The reading at which the weekly call itself changes to different conditions, rather than pausing a decision inside the current ones.",
+    summary: "The reading at which conditions themselves change, and the weekly guidance with them, rather than pausing a decision inside the current ones.",
   },
   {
     value: "confidence",
     term: "Confidence (High, Medium, Low)",
-    summary: "How far this week's scores sit from the nearest line. Low means a small move would change the call, so keep commitments reversible.",
+    summary: "How far this week's scores sit from the nearest line. Low means a small move would change conditions, so keep commitments reversible.",
   },
   {
     value: "fallback-mode",

@@ -150,8 +150,8 @@ const OPERATING_LEVER_FALLBACK = {
 
 /* Said as what is missing. The reader cannot "review thresholds manually"; the
    rule table did not supply a line this week, and that is the fact to carry. */
-const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "No pause line this week — check the call before acting.";
-const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "No resume line this week — check the call before acting.";
+const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "No pause line this week — check the guidance before acting.";
+const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "No resume line this week — check the guidance before acting.";
 
 const hasText = (value: string | undefined | null): value is string => typeof value === "string" && value.trim().length > 0;
 

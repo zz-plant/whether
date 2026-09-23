@@ -28,7 +28,7 @@ export const assessment: RegimeAssessment = {
     weakReadCount: 0,
     twoWeakReadsWarning: false,
   },
-  description: "Capital is available and risk appetite is healthy. The weekly call sets the tempo inside that window.",
+  description: "Capital is available and risk appetite is healthy. The weekly guidance sets the tempo inside that window.",
   constraints: ["Constraint one", "Constraint two", "Constraint three"],
   tightnessExplanation: "",
   riskAppetiteExplanation: "",

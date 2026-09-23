@@ -58,7 +58,7 @@ const buildMovedAssumptions = (
     moved.push({
       dimension: "capital",
       label: CAPITAL_LABEL,
-      detail: `Funding pressure rose from ${recorded.tightness} to ${current.tightness} (the call changes at ${recorded.tightnessThreshold}).`,
+      detail: `Funding pressure rose from ${recorded.tightness} to ${current.tightness} (conditions change at ${recorded.tightnessThreshold}).`,
     });
   }
 
@@ -66,7 +66,7 @@ const buildMovedAssumptions = (
     moved.push({
       dimension: "risk",
       label: RISK_LABEL,
-      detail: `Risk appetite weakened from ${recorded.riskAppetite} to ${current.riskAppetite} (the call changes at ${recorded.riskAppetiteThreshold}).`,
+      detail: `Risk appetite weakened from ${recorded.riskAppetite} to ${current.riskAppetite} (conditions change at ${recorded.riskAppetiteThreshold}).`,
     });
   }
 

@@ -30,7 +30,7 @@ export const PUBLISHED_CALL_POLL_MS = 15 * 60 * 1000;
 export const publishedCallNoticeCopy = {
   /* No "regime", no "record date", no "revalidate": the reader is told what
      changed about their week, not what changed about our pipeline. */
-  message: "The call has been updated since you opened this page.",
+  message: "The guidance has been updated since you opened this page.",
   weekOnly: "A newer reading has been published since you opened this page.",
   action: "Show the new one",
 } as const;

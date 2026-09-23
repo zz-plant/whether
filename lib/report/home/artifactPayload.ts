@@ -174,7 +174,7 @@ export const buildLeadershipArtifactPayload = async ({
         ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}: ${resumeConditions.join("; ")}`
         : undefined,
       callChangeLine: `${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}: ${weeklyCall.callChangesIf}`,
-      stabilityLine: "WHEN THE CALL CHANGES: wait for two weekly readings that agree before acting, unless the change comes with high confidence.",
+      stabilityLine: "WHEN CONDITIONS CHANGE: wait for two weekly readings that agree before acting, unless the change comes with high confidence.",
     });
     const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
     const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
@@ -193,7 +193,7 @@ export const buildLeadershipArtifactPayload = async ({
       "BOARD NOTE",
       boardSnippetText,
       "",
-      "Call snapshot",
+      "Guidance snapshot",
       weeklyCallSnapshotText,
       "",
       "WEEKLY BRIEF",

@@ -57,7 +57,7 @@ export type SignalReferenceRow = {
 };
 
 /** The line at which the call itself changes; the ladder's own label for that kind. */
-const CALL_CHANGE_LINE_LABEL = "Call changes";
+const CALL_CHANGE_LINE_LABEL = "Change line";
 const INVERSION_LINE_LABEL = "Inversion line";
 const BASE_RATE_LINE_LABEL = "Pressure line";
 

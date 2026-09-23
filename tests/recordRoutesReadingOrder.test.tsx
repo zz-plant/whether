@@ -34,11 +34,11 @@ describe("/history leads with the record's answer", () => {
     const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
     const headings = headingsInOrder(html);
 
-    const strip = headings.indexOf("The call by month");
+    const strip = headings.indexOf("Conditions by month");
     const record = headings.indexOf("Track record");
     const confidence = headings.indexOf("What the confidence number has been worth");
-    const map = headings.indexOf("How the two scores decide the call");
-    const table = headings.indexOf("Monthly calls");
+    const map = headings.indexOf("How the two scores set conditions");
+    const table = headings.indexOf("Monthly readings");
     const briefs = headings.indexOf("Published weekly briefs");
 
     assert.ok(strip !== -1 && record !== -1 && map !== -1 && table !== -1, `headings: ${headings.join(" | ")}`);
@@ -52,7 +52,7 @@ describe("/history leads with the record's answer", () => {
     assert.doesNotMatch(html, /Where this month sits/);
     /* The confidence record prints the rule on /calibration; here it sits
        beside the tiles that already state it, and the rule is once per page. */
-    assert.equal(html.split(CALL_CHANGE_RULE).length - 1, 1, "the call-change rule is stated once on /history");
+    assert.equal(html.split(CALL_CHANGE_RULE).length - 1, 1, "the change rule is stated once on /history");
   });
 
   it("keeps the rail in page order under the sections' own names", async () => {

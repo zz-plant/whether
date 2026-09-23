@@ -34,12 +34,12 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
       <div>
         <h2 id="track-record-grading-heading" className="type-eyebrow type-eyebrow-section">How the record held up</h2>
         <p className="text-sm text-slate-300">
-          How the calls held up, graded against the same data that produced them.
+          How the readings held up, graded against the same data that produced them.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile label="Call changes" value={record.transitions.length} unit={`in ${record.observations} mo`} />
+        <StatTile label="Changes in conditions" value={record.transitions.length} unit={`in ${record.observations} mo`} />
         <StatTile label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
         <StatTile
           label="Median hold"
@@ -82,14 +82,14 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
         </div>
       ) : currentSpell ? (
         <p className="text-fluid-xs text-slate-300">
-          No call changes in this window — {label(currentSpell.regime)} has held all{" "}
+          No changes in conditions in this window — {label(currentSpell.regime)} has held all{" "}
           {currentSpell.months} months.
         </p>
       ) : null}
 
       <p className="text-fluid-nano leading-relaxed text-slate-400">
         Signaled = the score that crossed had spent at least a month within{" "}
-        {record.nearBandPts} pts of its line, on either side, before the call changed. Unsignaled
+        {record.nearBandPts} pts of its line, on either side, before conditions changed. Unsignaled
         changes are listed just the same — that is the point of this table.
       </p>
     </section>

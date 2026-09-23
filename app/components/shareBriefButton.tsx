@@ -52,7 +52,7 @@ export function ShareBriefButton({
     // `title` names the artifact, so the pasted block has to use it. Hardcoding the
     // weekly heading here meant a monthly or quarterly call arrived in Slack labelled
     // "Whether Weekly Brief" — the wrong horizon on a message people act on.
-    const formattedSlackBrief = `*${title}*\n> *Operating Call:* ${text}${bulletBlock}\n\n*Full brief:* ${url || "https://whether.work"}`;
+    const formattedSlackBrief = `*${title}*\n> *Guidance:* ${text}${bulletBlock}\n\n*Full brief:* ${url || "https://whether.work"}`;
     void copyToClipboard(formattedSlackBrief, "share-brief");
   }, [title, text, lines, url, copyToClipboard]);
 

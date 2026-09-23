@@ -73,7 +73,7 @@ export const getNetDeltaLabel = (delta: number) => {
   if (delta < 0) {
     return "Slightly more defensive than last week.";
   }
-  return "The call is holding where it was last week.";
+  return "The guidance is holding where it was last week.";
 };
 
 export const buildWeeklyLeadershipBriefModel = ({

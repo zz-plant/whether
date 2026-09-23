@@ -25,7 +25,7 @@ export const RUNWAY_BAND_OPTIONS: readonly RunwayBandOption[] = [
      band changes now, in the reader's terms. */
   { key: "critical", label: "<6 mo", sublabel: "Cash first", months: 4, minMonths: 0, maxMonths: 6 },
   { key: "tight", label: "6–12 mo", sublabel: "Short payback only", months: 9, minMonths: 6, maxMonths: 12 },
-  { key: "balanced", label: "12–24 mo", sublabel: "Follow the call", months: 18, minMonths: 12, maxMonths: 24 },
+  { key: "balanced", label: "12–24 mo", sublabel: "Follow the guidance", months: 18, minMonths: 12, maxMonths: 24 },
   { key: "abundant", label: "24+ mo", sublabel: "Room to spend", months: 30, minMonths: 24, maxMonths: null },
 ];
 

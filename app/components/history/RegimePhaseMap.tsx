@@ -123,7 +123,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
   const currentTitle = `${current.monthLabel}: ${current.regimeLabel} — funding pressure ${current.tightness}, risk appetite ${current.riskAppetite}`;
   const description = [
     `${current.monthLabel} reads ${current.regimeLabel}: funding pressure ${current.tightness}, risk appetite ${current.riskAppetite}.`,
-    `The call changes when funding pressure crosses ${thresholds.tightness} or risk appetite crosses ${thresholds.riskAppetite}.`,
+    `Conditions change when funding pressure crosses ${thresholds.tightness} or risk appetite crosses ${thresholds.riskAppetite}.`,
     describePhaseGap(gaps.tightness),
     describePhaseGap(gaps.riskAppetite),
     `The plotted path covers ${model.points.length} months, from ${oldest.monthLabel} to ${current.monthLabel}, and crosses a boundary ${model.changes.length} times.`,
@@ -139,11 +139,11 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               heading that said "where this month sits" made it compete with
               them for the first question. */}
           <h2 className="type-eyebrow type-eyebrow-section" id="phase-map-heading">
-            How the two scores decide the call
+            How the two scores set conditions
           </h2>
           <p className="max-w-prose text-sm text-slate-300">
-            Funding pressure and risk appetite together are one point on this chart, and the call
-            is whichever quarter of it the point lands in. The lines at {thresholds.tightness} and{" "}
+            Funding pressure and risk appetite together are one point on this chart, and conditions
+            follow whichever quarter of it the point lands in. The lines at {thresholds.tightness} and{" "}
             {thresholds.riskAppetite} are the same two numbers the weekly brief cites.
           </p>
         </div>
@@ -394,7 +394,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
             {model.points.length} of {totalMonths.toLocaleString("en-US")} months on record, from {oldest.monthLabel} at
             the hollow grey marker to {current.monthLabel} at the filled one. Coloured rings mark the{" "}
             {model.changes.length}{" "}
-            {model.changes.length === 1 ? "month" : "months"} the published call changed.
+            {model.changes.length === 1 ? "month" : "months"} conditions changed.
             {model.saturatedMonths > 0 ? (
               <>
                 {" "}
@@ -462,7 +462,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
                   Every point here is a month-end reading, so this is the last completed
                   month rather than{" "}
                   <Link href="/" className="text-sky-300">
-                    this week&rsquo;s call
+                    this week&rsquo;s guidance
                   </Link>
                   .
                 </p>
@@ -506,13 +506,13 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
         <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-white/[0.06]">
           <table className="w-full text-left text-fluid-nano tabular-nums">
             <caption className="sr-only">
-              Every month drawn on the phase map, newest first, with its coordinates and the call it
+              Every month drawn on the phase map, newest first, with its coordinates and the conditions it
               produced.
             </caption>
             <thead className="sticky top-0 bg-slate-950/90 text-slate-400">
               <tr>
                 <th scope="col" className="px-2.5 py-1.5 font-medium">Month</th>
-                <th scope="col" className="px-2.5 py-1.5 font-medium">Call</th>
+                <th scope="col" className="px-2.5 py-1.5 font-medium">Conditions</th>
                 <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Funding pressure (0–100)</th>
                 <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Risk appetite (0–100)</th>
               </tr>

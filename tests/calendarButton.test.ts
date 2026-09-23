@@ -48,7 +48,7 @@ describe("buildMondayCalendarUrl", () => {
     for (const [index, step] of MONDAY_AGENDA_STEPS.entries()) {
       assert.ok(details.includes(`${index + 1}. ${step.label} (${step.minutes} min)`), `hold lost step: ${step.label}`);
     }
-    assert.match(details, /This week's call: https:\/\/[^\s]+\/$/);
+    assert.match(details, /This week's guidance: https:\/\/[^\s]+\/$/);
     assert.ok(!/\d+\/100/.test(details), "the standing hold must not carry a score");
   });
 });

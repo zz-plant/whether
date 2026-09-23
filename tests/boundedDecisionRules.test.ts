@@ -131,7 +131,7 @@ it("avoids zero-distance watch copy at regime boundaries", () => {
     scores: { tightness: 62.01, riskAppetite: 55 },
   });
 
-  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the line that changes the call/i);
+  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the line where conditions change/i);
   assert.doesNotMatch(seedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
 
   const bootstrappedAdjustment = buildScopedVariantDecisionAdjustment({

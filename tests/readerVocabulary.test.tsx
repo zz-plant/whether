@@ -97,6 +97,15 @@ const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
   { name: "stance", pattern: /\bstance\b/gi, baseline: 1 },
   { name: "flip", pattern: /\bflips?\b/gi, baseline: 0 },
   { name: "board", pattern: /\bboard\b/gi, baseline: 11 },
+  /* "The call" did three jobs — the recommendation, the market state and the line between
+     states — and was retired on 2026-09-23 for "guidance", "conditions" and "the change line"
+     (lib/report/AGENTS.md). Counted in those senses only, so the verb ("call for") and a
+     person's own decision ("a risky call") do not. */
+  {
+    name: "the call",
+    pattern: /\b(the|this week's|this week’s|weekly|published|monthly|quarterly|live|week's) calls?\b|\bcalls? chang(e|es|ed)\b/gi,
+    baseline: 0,
+  },
 ];
 
 /*

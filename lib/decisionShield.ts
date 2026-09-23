@@ -44,9 +44,9 @@ export type DecisionVerdict = "SAFE" | "RISKY" | "DANGEROUS";
 const VERDICT_ORDER: DecisionVerdict[] = ["SAFE", "RISKY", "DANGEROUS"];
 
 const VERDICT_COPY: Record<DecisionVerdict, string> = {
-  SAFE: "a safe call",
-  RISKY: "a risky call",
-  DANGEROUS: "a dangerous call",
+  SAFE: "a safe move",
+  RISKY: "a risky move",
+  DANGEROUS: "a dangerous move",
 };
 
 const LIFECYCLE_COPY: Record<LifecycleStage, string> = {
@@ -430,9 +430,9 @@ export const stressTestDecisionPlan = (
     } else if (runwayShare.share >= COMMITMENT_SHARE_ELEVATED) {
       verdict = adjustVerdict(verdict, "up");
       verdictDriver = "SIZE";
-      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — over the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line, so the call is one step harsher than conditions alone would give.`;
+      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — over the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line, so the verdict is one step harsher than conditions alone would give.`;
     } else {
-      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis}, under the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line that would move the call.`;
+      sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis}, under the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line that would move the verdict.`;
     }
   } else if (commitment.annualUsd !== null) {
     sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash or monthly burn — without one the verdict rests on conditions alone.`;

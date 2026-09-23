@@ -35,7 +35,7 @@ export const buildDecisionShiftSummary = ({
     /* Nothing was compared, so "no significant change" is not available to say.
        The call still stands on where the signals sit; what is missing is the
        week-over-week half of the sentence. */
-    return `No previous reading to compare this week against. The call below comes from where the signals sit now. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
+    return `No previous reading to compare this week against. The guidance below comes from where the signals sit now. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
   }
   if (changeCount === 0 || directionLabel === "stable") {
     return `No significant change this week. Keep your current plan. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
@@ -61,7 +61,7 @@ export const buildWeeklyMovementMetric = ({
   /* Absence of a comparison scores nothing. Without this the inputs of "no
      previous reading" and "a week that moved nothing" are identical — both are
      a zero severity delta and an empty signal list — and this function reported
-     the second: "Conditions held steady this week. Last week's calls stand." */
+     the second: "Conditions held steady this week. Last week's guidance stands." */
   if (directionLabel === "unavailable") {
     return {
       score: null,
@@ -106,7 +106,7 @@ export const buildWeeklyMovementMetric = ({
   return {
     score,
     direction: "stable" as const,
-    summary: "Conditions held steady this week. Last week's calls stand.",
+    summary: "Conditions held steady this week. Last week's guidance stands.",
   };
 };
 
@@ -121,10 +121,10 @@ export const buildSignalConfidenceReason = ({
 }) => {
   const boundaryClause =
     nearestThresholdGap <= 5
-      ? "This call is sitting on the line that changes it"
+      ? "Conditions are sitting on the line where they change"
       : nearestThresholdGap <= 12
-        ? "This call has modest room before the line that changes it"
-        : "This call is well clear of the line that changes it";
+        ? "Conditions have modest room before the line where they change"
+        : "Conditions are well clear of the line where they change";
 
   const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
   const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);
@@ -163,7 +163,7 @@ export const buildOperatingStanceLine = ({
       return "Tighten approvals around retention, margin, and revenue-linked work.";
     }
     if (currentRegime === "VOLATILE") {
-      return "De-risk the call: ship reliability, trust, and short-payback releases.";
+      return "De-risk this week: ship reliability, trust, and short-payback releases.";
     }
     return "Keep expansion selective: add capacity only in proven demand lanes and keep rollback criteria explicit.";
   }
@@ -209,8 +209,8 @@ export const buildWeeklyMemoLines = ({
   // The stance line is already line 2, so this line adds the watch state and its
   // condition instead of restating it.
   transitionWatch === "ON"
-    ? `The call could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `The call is not close to changing, so this week's calls hold. ${CALL_CHANGES_IF}: ${callChangesIf}`,
+    ? `Conditions could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
+    : `Conditions are not close to changing, so this week's guidance holds. ${CALL_CHANGES_IF}: ${callChangesIf}`,
 ];
 
 export const buildWhyItMattersLine = ({
@@ -254,7 +254,7 @@ export const buildReadThisCardItems = ({
       detail: immediateDecision.trim(),
     },
     {
-      label: "What would reverse the call",
+      label: DECISION_CONTRACT_LABELS.watch.flipWatch,
       detail: reversalTrigger.trim(),
     },
   ].filter((item) => item.detail.length > 0);

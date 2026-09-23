@@ -48,7 +48,7 @@ export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlo
         <h2 id="guardrail-tags-heading" className="type-eyebrow">Pause and resume lines for work items</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           Copy one block per business area into a Linear or Jira card description. No integration,
-          no tokens — the card carries this week&apos;s call, its pause line, and what would change it.
+          no tokens — the card carries this week&apos;s guidance, its pause line, and what would change it.
         </p>
       </div>
       <AreaTable rows={rows} caption="This week's rule, pause line and resume line for each area, as the tags carry them" />

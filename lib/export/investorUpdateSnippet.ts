@@ -48,15 +48,15 @@ const RUNWAY_IMPLICATIONS: Record<RunwayBand, string> = {
   tight:
     "With six to twelve months of runway, every new commitment has to pay back inside [n] months, and [where we are on raise planning].",
   balanced:
-    "With twelve to twenty-four months of runway, the weekly call sets our pace.",
+    "With twelve to twenty-four months of runway, the weekly guidance sets our pace.",
   abundant:
     "With more than two years of runway we are [what the cushion is going on], without loosening the payback bar.",
 };
 
 const CONFIDENCE_PHRASES: Record<RegimeAssessment["diagnostics"]["confidence"], string> = {
-  HIGH: "well clear of the line that would change it",
-  MEDIUM: "within reach of the line that would change it",
-  LOW: "close to the line that would change it",
+  HIGH: "well clear of the line where they would change",
+  MEDIUM: "within reach of the line where they would change",
+  LOW: "close to the line where they would change",
 };
 
 /** The last month-end reading before the month the record date falls in. */
@@ -121,7 +121,7 @@ export const buildInvestorUpdateSnippetParts = ({
     ? `Over the month, funding pressure moved to ${formatThresholdNumber(tightness)} of 100 (${tightnessMove}; ${signalReadingMeaning("tightness", tightness)}) and risk appetite to ${formatThresholdNumber(riskAppetite)} of 100 (${riskMove}; ${signalReadingMeaning("riskAppetite", riskAppetite)}).`
     : `Funding pressure sits at ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}) and risk appetite at ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`;
 
-  const conditions = `${regimeSentence} ${meaningSentence} ${scoreSentence} The call is ${confidence}.`;
+  const conditions = `${regimeSentence} ${meaningSentence} ${scoreSentence} Conditions are ${confidence}.`;
 
   /* The page's own slot names, so an investor who opens the brief finds the
      same three lines under the same words. "Guardrail" and "change our

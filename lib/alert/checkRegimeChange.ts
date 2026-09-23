@@ -127,7 +127,7 @@ export const checkRegimeChange = async (options?: {
 
   /* 1. Regime change — highest priority alert */
   if (previousRegime && previousRegime !== currentRegime) {
-    alerts.push(`The call moved from ${getRegimePublicLabel(previousRegime)} to ${getRegimePublicLabel(currentRegime)}. Read the brief before acting on last week's plan.`);
+    alerts.push(`Conditions changed from ${getRegimePublicLabel(previousRegime)} to ${getRegimePublicLabel(currentRegime)}. Read the brief before acting on last week's plan.`);
     /*
      * Here and nowhere else. A notification that fires on every cron run,
      * whether or not anything happened, is one people turn off — and then the
@@ -140,8 +140,8 @@ export const checkRegimeChange = async (options?: {
      */
     pushOutcome = await sendRegimeChangePush().catch(() => null);
     await postSlackAlerts(
-      "⚠️ The call changed",
-      `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\nRead this week's call before acting on last week's plan.`,
+      "⚠️ Conditions changed",
+      `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\nRead this week's guidance before acting on last week's plan.`,
     );
   }
 
@@ -157,7 +157,7 @@ export const checkRegimeChange = async (options?: {
     alerts.push(`FLASH — ${move.headline}`);
     await postSlackAlerts(
       "⚡ Flash — an unusually large move since the last reading",
-      `${move.headline}\nThis week's call stands until the next reading shows where the scores settle. Until then, hold anything you can't undo.`,
+      `${move.headline}\nThis week's guidance stands until the next reading shows where the scores settle. Until then, hold anything you can't undo.`,
     );
   }
 
@@ -175,10 +175,10 @@ export const checkRegimeChange = async (options?: {
   if (projection.weeksToFlip && projection.weeksToFlip <= 2) {
     const prevWeeks = prevWeeksToFlip ? parseInt(prevWeeksToFlip, 10) : null;
     if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
-      alerts.push(`WATCH — the call could change soon: ${projection.velocityLabel}`);
+      alerts.push(`WATCH — conditions could change soon: ${projection.velocityLabel}`);
       await postSlackAlerts(
-        "👀 The call could change soon",
-        `${projection.velocityLabel}\nA score is closing on the line that changes the call. Hold anything you can't undo until it settles.`,
+        "👀 Conditions could change soon",
+        `${projection.velocityLabel}\nA score is closing on the line where conditions change. Hold anything you can't undo until it settles.`,
       );
     }
   }
@@ -188,7 +188,7 @@ export const checkRegimeChange = async (options?: {
   const currentConfidence = assessment.diagnostics?.confidence ?? "HIGH";
   if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
     alerts.push(
-      `Confidence dropped from ${formatExportConfidenceWord(prevConfidence).toLowerCase()} to ${formatExportConfidenceWord(currentConfidence).toLowerCase()}. Sources disagreed this week. Read the call before acting on it.`,
+      `Confidence dropped from ${formatExportConfidenceWord(prevConfidence).toLowerCase()} to ${formatExportConfidenceWord(currentConfidence).toLowerCase()}. Sources disagreed this week. Read the guidance before acting on it.`,
     );
   }
 

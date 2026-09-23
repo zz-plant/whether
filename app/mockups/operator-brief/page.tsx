@@ -62,7 +62,7 @@ const proofItems = [
  * are illustrative.
  */
 const copyBriefText = [
-  "SAMPLE — design concept, not a real reading. The live call is at https://whether.work",
+  "SAMPLE — design concept, not a real reading. The live guidance is at https://whether.work",
   `Whether · ${weeklyCall.readiness}`,
   weeklyCall.currentCall,
   `${publicDecisionLabels.action}: ${weeklyCall.actionNow}`,
@@ -136,7 +136,7 @@ export default async function OperatorBriefMockupPage({
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)]">
             <div className="rounded-lg border border-slate-700/70 bg-slate-900/72 p-5">
-              <SectionLabel>Weekly operating call</SectionLabel>
+              <SectionLabel>Weekly operating guidance</SectionLabel>
               <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.5rem]">
                 {weeklyCall.currentCall}
               </h1>
@@ -186,7 +186,7 @@ export default async function OperatorBriefMockupPage({
           </div>
 
           <section className="rounded-lg border border-slate-700/70 bg-slate-950/58 px-4 py-4 sm:px-5">
-            <SectionLabel>Why this call</SectionLabel>
+            <SectionLabel>Why this guidance</SectionLabel>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               {proofItems.map((item) => (
                 <div

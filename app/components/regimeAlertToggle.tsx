@@ -166,11 +166,11 @@ export const RegimeAlertToggle = () => {
         onClick={() => void (state.subscribed ? unsubscribe(state.publicKey) : subscribe(state.publicKey))}
         className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-sky-500/60 hover:text-sky-200 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {busy ? "Working…" : state.subscribed ? "Stop notifying this browser" : "Notify this browser when the call changes"}
+        {busy ? "Working…" : state.subscribed ? "Stop notifying this browser" : "Notify this browser when conditions change"}
       </button>
       <p className="text-sm leading-6 text-slate-400">
         {state.subscribed
-          ? "This browser will be notified when the weekly call moves to a different posture — not every week, only when it changes."
+          ? "This browser will be notified when conditions change — not every week, only when they do."
           : "One notification when the posture changes, which is a handful of times a year. Nothing weekly, and nothing that needs an email address."}
       </p>
     </div>

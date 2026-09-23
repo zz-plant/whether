@@ -39,7 +39,7 @@ export function SharePageFormats({
 
   return (
     <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="copy-call-heading">
-      <h2 id="copy-call-heading" className="type-eyebrow">Copy this week&apos;s call</h2>
+      <h2 id="copy-call-heading" className="type-eyebrow">Copy this week&apos;s guidance</h2>
       {scoreReferences.length > 0 ? (
         <ul className="space-y-0.5 text-xs tabular-nums text-slate-300" aria-label="This week's scores">
           {scoreReferences.map((line) => (

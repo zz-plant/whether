@@ -57,7 +57,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "copy-slack",
         label: "Copy Slack brief",
-        description: "Copy 60-second weekly call formatted for Slack",
+        description: "Copy 60-second weekly guidance formatted for Slack",
         icon: Copy,
         action: () => {
           const btn = document.querySelector<HTMLButtonElement>('[data-testid="copy-slack-brief-button"]');

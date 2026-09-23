@@ -18,12 +18,12 @@ export const buildExecutiveMemo = (
 ) => {
 
   if (!template) {
-    return "No memo for this week's call.";
+    return "No memo for this week's guidance.";
   }
 
   return [
     `Brief — ${recordDateLabel}`,
-    `This week's call: ${getRegimePublicLabel(assessment.regime)}`,
+    `This week's conditions: ${getRegimePublicLabel(assessment.regime)}`,
     "",
     `Summary: ${template.executiveSummary}`,
     "",
@@ -65,8 +65,8 @@ const visualSections = [
   },
   {
     key: "decisionTemplates",
-    title: "Decision calls",
-    subtitle: "Ready-made calls",
+    title: "Decision guidance",
+    subtitle: "Ready-made guidance",
   },
   {
     key: "reversalTriggers",
@@ -114,7 +114,7 @@ export const ExecutiveBriefingPanel = ({
   if (!template) {
     return (
       <p className="text-sm text-slate-300">
-        No memo for this week&apos;s call.
+        No memo for this week&apos;s guidance.
       </p>
     );
   }

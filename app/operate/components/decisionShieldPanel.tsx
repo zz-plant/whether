@@ -401,7 +401,7 @@ export const DecisionShieldPanel = ({
               Is this move safe right now?
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Apply this week&apos;s call to a specific decision, then copy the verdict.
+              Apply this week&apos;s guidance to a specific decision, then copy the verdict.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">

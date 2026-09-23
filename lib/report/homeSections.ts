@@ -4,7 +4,7 @@
  * outline — a reader had to scroll past it to know it existed.
  */
 export const homeSectionSequence = [
-  { href: "#weekly-posture-brief-title", label: "Call" },
+  { href: "#weekly-posture-brief-title", label: "Guidance" },
   { href: "#stress-test", label: "Stress-test a plan" },
   { href: "#audit-this-call", label: "Evidence" },
   { href: "#approve-this-weeks-plan", label: "Planning" },
@@ -12,7 +12,7 @@ export const homeSectionSequence = [
 ] as const;
 
 const homeSectionCompactLabelByHref: Record<(typeof homeSectionSequence)[number]["href"], string> = {
-  "#weekly-posture-brief-title": "Call",
+  "#weekly-posture-brief-title": "Guidance",
   "#stress-test": "Stress-test",
   "#audit-this-call": "Evidence",
   "#approve-this-weeks-plan": "Planning",

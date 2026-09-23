@@ -120,7 +120,7 @@ export function ShareCopyControls({
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Email</h2>
-          <p className="text-xs leading-relaxed text-slate-300">Copy the same call with citation context for leadership notes.</p>
+          <p className="text-xs leading-relaxed text-slate-300">Copy the same guidance with citation context for leadership notes.</p>
           <ClipboardActionRow
             label="Copy email brief"
             state={clipboardState("email")}
@@ -131,7 +131,7 @@ export function ShareCopyControls({
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Meeting pack</h2>
-          <p className="text-xs leading-relaxed text-slate-300">Copy the board note, call snapshot, weekly brief, board summary, and citation.</p>
+          <p className="text-xs leading-relaxed text-slate-300">Copy the board note, guidance snapshot, weekly brief, board summary, and citation.</p>
           <ClipboardActionRow
             label="Copy meeting pack"
             state={clipboardState("meeting")}
@@ -142,7 +142,7 @@ export function ShareCopyControls({
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Issue tracker</h2>
-          <p className="text-xs leading-relaxed text-slate-300">Copy the call in Markdown for a Jira or Linear ticket, or a wiki page.</p>
+          <p className="text-xs leading-relaxed text-slate-300">Copy the guidance in Markdown for a Jira or Linear ticket, or a wiki page.</p>
           <ClipboardActionRow
             label="Copy ticket brief"
             state={clipboardState("tracker")}
@@ -155,8 +155,8 @@ export function ShareCopyControls({
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Investor update</h2>
           <p className="text-xs leading-relaxed text-slate-300">
             {runwayBand
-              ? "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the call and what your runway band means for it."
-              : "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the call. Pick a runway band on the brief to add what it means for your cash."}
+              ? "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the guidance and what your runway band means for it."
+              : "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the guidance. Pick a runway band on the brief to add what it means for your cash."}
           </p>
           <ClipboardActionRow
             label="Copy investor update"
@@ -168,7 +168,7 @@ export function ShareCopyControls({
 
         <article className="weather-surface space-y-3 px-4 py-4">
           <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Calendar</h2>
-          <p className="text-xs leading-relaxed text-slate-300">Open a Monday review invite with the current call in the agenda.</p>
+          <p className="text-xs leading-relaxed text-slate-300">Open a Monday review invite with the current guidance in the agenda.</p>
           <a
             href={calendarHref}
             target="_blank"

@@ -94,7 +94,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
           <p className="text-fluid-sm font-medium text-white">
             {channel === "slack"
               ? "Automate Monday brief delivery directly to Slack"
-              : "Get the call every Monday, and a note the day it changes"}
+              : "Get the guidance every Monday, and a note the day it changes"}
           </p>
           {compact ? null : (
             <p className="text-fluid-xs text-slate-400 mt-0.5">
@@ -203,8 +203,8 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
         <span>
           {compact
             ? channel === "slack"
-              ? "Monday mornings, and an alert the day the call changes. To stop, delete the webhook in Slack."
-              : "One email a week, one more the day the call changes. Unsubscribe in one click."
+              ? "Monday mornings, and an alert the day conditions change. To stop, delete the webhook in Slack."
+              : "One email a week, one more the day conditions change. Unsubscribe in one click."
             : channel === "slack"
               ? "Set a recurring Monday hold"
               : "Prefer calendar holds over email?"}

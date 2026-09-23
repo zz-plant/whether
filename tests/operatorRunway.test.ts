@@ -48,7 +48,7 @@ describe("operatorRunway", () => {
     assert.equal(runwayBandLabel("critical"), "<6 mo");
     assert.equal(runwayBandLabel("abundant"), "24+ mo");
     assert.equal(runwayBandSublabel("critical"), "Cash first");
-    assert.equal(runwayBandSublabel("balanced"), "Follow the call");
+    assert.equal(runwayBandSublabel("balanced"), "Follow the guidance");
   });
 
   it("parses the ?runway= parameter from a band key or a month count", () => {

@@ -78,7 +78,7 @@ const describeMonthChange = (
   if (riskMoved) parts.push(`risk appetite moved ${riskAppetite > prior.riskAppetite! ? "up" : "down"} to ${riskAppetite}`);
 
   /* "Call moved" only when the conditions did; a score moving inside the same conditions is a change, not a new call. */
-  const lead = regimeChanged ? "The call moved since last month-end" : "Changed since last month-end";
+  const lead = regimeChanged ? "Conditions changed since last month-end" : "Changed since last month-end";
   return { changed: true, headline: `${lead}: ${parts.join("; ")}.` };
 };
 

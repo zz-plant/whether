@@ -328,7 +328,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     `Confidence: ${display.confidence}`,
     `Executive summary: ${brief.summary}`,
     "",
-    "This week's call:",
+    "This week's guidance:",
     `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
     `• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${brief.guardrailThreshold}`,
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${brief.flipThreshold}`,

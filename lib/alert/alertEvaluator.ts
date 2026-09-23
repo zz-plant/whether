@@ -66,7 +66,7 @@ const checkThresholdCrossing = (
 const buildRegimeDecision = (regime: string): AlertDecision => ({
   type: "regime_change",
   severity: "critical",
-  headline: `The call moved to ${getRegimePublicLabel(regime)}`,
+  headline: `Conditions turned ${getRegimePublicLabel(regime)}`,
   department: "Executive",
   rolePreset: "CFO",
 });

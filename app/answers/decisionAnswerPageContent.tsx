@@ -90,7 +90,7 @@ export async function DecisionAnswerPageContent({
   const copyText = [
     page.title,
     `Short answer: ${liveShortAnswer}`,
-    `Current call: ${payload.currentCall}`,
+    `Current guidance: ${payload.currentCall}`,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
     `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
@@ -110,7 +110,7 @@ export async function DecisionAnswerPageContent({
        "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
        comparisons, one of them under the engine's name for a score the rest of
        the site calls funding pressure. */
-    answer: `${liveShortAnswer} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} line that would change this call; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
+    answer: `${liveShortAnswer} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
@@ -242,7 +242,7 @@ export async function DecisionAnswerPageContent({
               a reader who clicks through from here meets a table they have read
               before rather than a second shape for one thing. */}
           <AreaTable
-            caption="What this week's call changes for each decision area"
+            caption="What this week's guidance changes for each decision area"
             rows={mappedRules.map((rule) => ({
               area: rule.area,
               rule: rule.doNow[0] ?? rule.recommendation,
