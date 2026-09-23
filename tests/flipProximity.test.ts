@@ -19,7 +19,7 @@ describe("flip proximity", () => {
     for (const entry of [nearest, next]) {
       // In the market's own terms, with no abbreviation: "10Y−2Y" was the one
       // bond-desk token in the one line saying how close the call is to changing.
-      assert.match(entry.sentence, /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), the call changes to (Sunny|Cloudy|Stormy|Freezing)\.$/);
+      assert.match(entry.sentence, /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), conditions turn (Sunny|Cloudy|Stormy|Freezing)\.$/);
       assert.doesNotMatch(entry.sentence, /10Y|2Y|1M\b/);
       assert.notEqual(entry.crossesTo, assessment.regime);
       assert.doesNotMatch(entry.sentence, /tightness|riskAppetite|threshold|score/i, "reader copy carries no engine vocabulary");
@@ -77,16 +77,16 @@ describe("flip proximity", () => {
 
 describe("quiet-day read", () => {
   const sentences = [
-    "If long rates fall 0.15% closer to short rates, the call changes to Cloudy.",
-    "If the 1-month Treasury bill rate falls 0.40%, the call changes to Stormy.",
+    "If long rates fall 0.15% closer to short rates, conditions turn Cloudy.",
+    "If the 1-month Treasury bill rate falls 0.40%, conditions turn Stormy.",
   ];
 
-  it("leads a steady week with the call-unchanged verdict and the nearest flip distance", () => {
+  it("leads a steady week with the conditions-unchanged verdict and the nearest flip distance", () => {
     const line = buildQuietDayRead({ steadyWeek: true, flipProximity: sentences });
-    assert.equal(line, "Call unchanged — If long rates fall 0.15% closer to short rates, the call changes to Cloudy.");
+    assert.equal(line, "Conditions unchanged — If long rates fall 0.15% closer to short rates, conditions turn Cloudy.");
   });
 
-  it("renders nothing when the call moved this week", () => {
+  it("renders nothing when conditions moved this week", () => {
     assert.equal(buildQuietDayRead({ steadyWeek: false, flipProximity: sentences }), null);
   });
 

@@ -57,7 +57,7 @@ describe("the weekly email labels what it shows", () => {
     const funding = readings.find((reading) => reading.label === "Funding pressure");
 
     assert.equal(funding?.value, "79/100");
-    assert.equal(funding?.distance?.label, "9 points above the line that changes the call");
+    assert.equal(funding?.distance?.label, "9 points above the line where conditions change");
     assert.equal(funding?.distance?.worse, true, "above the funding line is the tighter side");
   });
 
@@ -69,7 +69,7 @@ describe("the weekly email labels what it shows", () => {
   it("knows which side of each line is the worse one", () => {
     const risk = buildWeeklyEmailReadings(snapshot).find((reading) => reading.label === "Risk appetite");
 
-    assert.equal(risk?.distance?.label, "3 points above the line that changes the call");
+    assert.equal(risk?.distance?.label, "3 points above the line where conditions change");
     assert.equal(risk?.distance?.worse, false);
   });
 
@@ -78,7 +78,7 @@ describe("the weekly email labels what it shows", () => {
     const joined = lines.join(" | ");
 
     // The score carries what it means, because an inbox has no page to explain the scale.
-    assert.ok(lines.includes("Funding pressure: 79/100, money is hard to raise (9 points above the line that changes the call)"), joined);
+    assert.ok(lines.includes("Funding pressure: 79/100, money is hard to raise (9 points above the line where conditions change)"), joined);
     assert.ok(lines.includes("Confidence: " + buildWeeklyEmailReadings(snapshot)[2].value), joined);
     assert.ok(!/\b(HIGH|MED|MEDIUM|LOW)\b|\bpts\b/.test(joined), `the readings block prints an engine code or an abbreviation: ${joined}`);
     assert.ok(!joined.includes("vs last week"), "the readings block claims a weekly move it cannot compute");

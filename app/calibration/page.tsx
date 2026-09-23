@@ -35,7 +35,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Confidence score calibration study",
   description:
-    "Whether's published confidence percent, checked against every month-end reading since 2012: how often the call held at each distance from the line that changes it.",
+    "Whether's published confidence percent, checked against every month-end reading since 2012: how often conditions held at each distance from the line where they change.",
   path: "/calibration",
   imageAlt: "Whether confidence calibration study",
 });
@@ -50,7 +50,7 @@ export default function CalibrationPage() {
       <SecondaryPageHeader
         eyebrow="The record"
         title="Confidence score calibration study"
-        description={`The published confidence percent, checked against ${totals.months} month-end readings from 2012 to 2026: how often the call held at each distance from the line that changes it.`}
+        description={`The published confidence percent, checked against ${totals.months} month-end readings from 2012 to 2026: how often conditions held at each distance from the line where they change.`}
         aside={<CalibrationCurveGlyph size={64} />}
       />
 
@@ -66,12 +66,12 @@ export default function CalibrationPage() {
             that has a following month to compare against — {totals.months} of them.
           </li>
           <li>
-            <span className="text-slate-100">Outcome.</span> Whether the call was the same one month
+            <span className="text-slate-100">Outcome.</span> Whether conditions were the same one month
             later. No other outcome is scored, and none is weighted.
           </li>
           <li>
-            <span className="text-slate-100">Bands.</span> Distance to the nearest line that changes
-            the call, in points of funding pressure. The cut points were chosen before the outcomes
+            <span className="text-slate-100">Bands.</span> Distance to the nearest line where
+            conditions change, in points of funding pressure. The cut points were chosen before the outcomes
             were looked at — they are the distances at which the published label changes.
           </li>
         </ul>
@@ -83,12 +83,12 @@ export default function CalibrationPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            Six changes of call in fourteen years is not enough to estimate a probability per band. A
+            Six changes in conditions in fourteen years is not enough to estimate a probability per band. A
             curve fitted to that base rate would report about 97% every week and discriminate
             nothing, which is worse than a number that at least measures something real.
           </li>
           <li>
-            One month is the only horizon tested. Nothing here says what a call is worth over a
+            One month is the only horizon tested. Nothing here says what a reading is worth over a
             quarter.
           </li>
           <li>
@@ -117,7 +117,7 @@ export default function CalibrationPage() {
           <li>
             Archive and method:{" "}
             <ActionLink href="/trust" variant="inline">
-              how the call is computed
+              how the scores are computed
             </ActionLink>
             .
           </li>

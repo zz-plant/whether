@@ -110,7 +110,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.transitionWatch, /ON|OFF/);
     assert.equal(typeof model.guardrail, "string");
     assert.doesNotMatch(model.weeklyMemoLines.join(" "), /current track|next release/i);
-    assert.match(model.weeklyMemoLines.join(" "), /The call changes when:|next live weekly refresh/i);
+    assert.match(model.weeklyMemoLines.join(" "), /Conditions change if:|next live weekly refresh/i);
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.startupVariantPolicy.options.length, 6);
@@ -161,8 +161,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.regimeSignalIndicators.length, 4);
     assert.equal(model.inputInfluence.length, 4);
     assert.equal(model.inputInfluence[0]?.key, "tightness");
-    assert.match(model.inputInfluence[0]?.effectDetail ?? "", /line that changes the call|approvals/i);
-    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /line that changes the call/i);
+    assert.match(model.inputInfluence[0]?.effectDetail ?? "", /where conditions change|approvals/i);
+    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /the change line/i);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
     assert.equal(model.regimeSignalIndicators[0]?.label, "Funding pressure");
@@ -207,7 +207,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.match(model.decisionShiftSummary, /No significant change/);
-    assert.match(model.decisionShiftSummary, /Call changes if:/);
+    assert.match(model.decisionShiftSummary, /Conditions change if:/);
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.roleAwareTemplates.length, 2);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
@@ -645,7 +645,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.equal(model.sinceLastReview.hasMeaningfulDelta, false);
-    assert.match(model.sinceLastReview.fallbackCopy, /No change\. Last week's calls stand\./);
+    assert.match(model.sinceLastReview.fallbackCopy, /No change\. Last week's guidance stands\./);
     assert.match(model.sinceLastReview.fallbackCopy, /Re-check when:/);
     assert.equal(model.sinceLastReview.items.length, 0);
   });

@@ -57,7 +57,7 @@ export const OfflineNotice = ({ recordDateLabel }: { recordDateLabel: string }) 
       <span className="font-medium">You are offline.</span>
       <span>
         This is the reading recorded {recordDateLabel}, saved the last time this browser loaded the page.
-        Reconnect to see whether the call has moved.
+        Reconnect to see whether the guidance has changed.
       </span>
     </output>
   );

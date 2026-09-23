@@ -90,9 +90,9 @@ const footerLines = (payload: MeetingSlidePayload): string[] => [
   `${describeConditions(payload.regime)}  ·  ${formatExportConfidence(payload.confidence)}${payload.isFallback ? `  ·  ${SAVED_COPY_NOTE}` : ""}`,
 ];
 
-const titleLine = (payload: MeetingSlidePayload) => `This week's call${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;
+const titleLine = (payload: MeetingSlidePayload) => `This week's guidance${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;
 const subtitleLine = (payload: MeetingSlidePayload) => `${payload.recordDate} · Source: ${payload.provenance}`;
-const EYEBROW = "WHETHER · WEEKLY OPERATING CALL";
+const EYEBROW = "WHETHER · WEEKLY OPERATING GUIDANCE";
 
 // ---------------------------------------------------------------------------
 // PPTX
@@ -294,7 +294,7 @@ const THEME_XML =
 
 const buildCoreXml = (payload: MeetingSlidePayload, created: string) =>
   `${XML_HEADER}<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">` +
-  `<dc:title>${escapeXml(`Whether weekly operating call — ${payload.recordDate}`)}</dc:title>` +
+  `<dc:title>${escapeXml(`Whether weekly operating guidance — ${payload.recordDate}`)}</dc:title>` +
   "<dc:creator>Whether</dc:creator>" +
   `<dcterms:created xsi:type="dcterms:W3CDTF">${created}</dcterms:created>` +
   `<dcterms:modified xsi:type="dcterms:W3CDTF">${created}</dcterms:modified>` +
@@ -497,7 +497,7 @@ const hex = (value: string) => {
 export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<Uint8Array> => {
   const { PDFDocument, StandardFonts, rgb } = await import("@cantoo/pdf-lib");
   const doc = await PDFDocument.create();
-  doc.setTitle(`Whether weekly operating call — ${payload.recordDate}`);
+  doc.setTitle(`Whether weekly operating guidance — ${payload.recordDate}`);
   doc.setAuthor("Whether");
   const regular = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);

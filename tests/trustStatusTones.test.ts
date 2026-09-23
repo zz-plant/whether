@@ -22,13 +22,13 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Live · all sources answered/);
     assert.equal(result.trustStatusDetail, "Every source answered and nothing here argues for holding back this week.");
     assert.match(result.trustStatusAction, /Proceed with normal approvals\./);
-    assert.ok(result.trustStatusAction.includes("Hold back if confidence drops to low or the call moves within reach of a line"));
+    assert.ok(result.trustStatusAction.includes("Hold back if confidence drops to low or conditions move within reach of a line"));
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);
     assert.equal(
       result.decisionImpactWindow,
-      "Use this live reading for this week's approvals; the pause lines in the call apply.",
+      "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.",
     );
   });
 
@@ -84,7 +84,7 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(result.trustStatusTone, "warning");
     assert.match(result.trustStatusLabel, /Live data, but signals unstable/);
-    assert.match(result.trustStatusDetail, /the two scores point in different directions, so the call is not changing this week/);
+    assert.match(result.trustStatusDetail, /the two scores point in different directions, so the guidance is not changing this week/);
     assert.match(result.trustStatusDetail, /Reason: Composite disagreement exceeded threshold\./);
     assert.match(result.trustStatusAction, /Keep approvals reversible\./);
     assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again`));
@@ -181,7 +181,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(caution.label, "Act with caution");
-    assert.match(caution.detail, /The call is held this week: Composite disagreement exceeded threshold\./);
+    assert.match(caution.detail, /The guidance is being held this week: Composite disagreement exceeded threshold\./);
     assert.doesNotMatch(caution.detail, /policy override|posture/i);
   });
 

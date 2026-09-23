@@ -29,10 +29,10 @@ const distanceFromLine = (
   if (typeof vsThreshold !== "number" || !Number.isFinite(vsThreshold)) return null;
 
   const points = Math.round(Math.abs(vsThreshold) * 10) / 10;
-  if (points === 0) return { label: "sitting on the line that changes the call", worse: true };
+  if (points === 0) return { label: "sitting on the line where conditions change", worse: true };
 
   const side = vsThreshold > 0 ? "above" : "below";
-  return { label: `${points} points ${side} the line that changes the call`, worse: side === worseSide };
+  return { label: `${points} points ${side} the line where conditions change`, worse: side === worseSide };
 };
 
 /**
@@ -190,7 +190,7 @@ export const sendWeeklyBrief = async (options?: {
   });
 
   if (!snapshot || !weeklyCall) {
-    return refuse("No operating snapshot is available; there is no call to send.");
+    return refuse("No operating snapshot is available; there is no guidance to send.");
   }
 
   const readiness = assessSendReadiness(snapshot, options?.now ?? new Date());

@@ -21,18 +21,18 @@ export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
   financial: {
     slug: "financial",
     title: "Runway planner: burn, raise timing, and a memo",
-    description: "Enter runway, burn and revenue to get a safe runway band, a raise window, and a memo sized to this week's call.",
+    description: "Enter runway, burn and revenue to get a safe runway band, a raise window, and a memo sized to this week's guidance.",
     imageAlt: "Whether runway planner view",
     pageTitle: "Runway planner",
-    pageSummary: "Burn, raise timing, and a memo, sized to this week's call.",
+    pageSummary: "Burn, raise timing, and a memo, sized to this week's guidance.",
   },
   scenarios: {
     slug: "scenarios",
     title: "Scenario studio: what if the numbers were different",
-    description: "Set a different short-term rate and yield curve and see what the call and the rules would be.",
+    description: "Set a different short-term rate and yield curve and see what the guidance and the rules would be.",
     imageAlt: "Whether scenario studio view",
     pageTitle: "Scenarios",
-    pageSummary: "Move two sliders to see what the call would be in a different week.",
+    pageSummary: "Move two sliders to see what the guidance would be in a different week.",
   },
 };
 

@@ -196,14 +196,14 @@ const buildLeadershipShorthandLine = (boldnessDelta: number) => {
   const magnitude = Math.abs(boldnessDelta);
 
   if (magnitude === 0) {
-    return "The call is holding steady this week.";
+    return "This week's guidance is unchanged.";
   }
 
   const size = magnitude >= 12 ? "sharply " : magnitude >= 4 ? "" : "slightly ";
 
   return boldnessDelta > 0
-    ? `The call turned ${size}more aggressive this week.`
-    : `The call turned ${size}more defensive this week.`;
+    ? `This week's guidance is ${size}more aggressive.`
+    : `This week's guidance is ${size}more defensive.`;
 };
 
 export const buildHomeBriefModelInternal = (
@@ -545,7 +545,7 @@ export const buildHomeBriefModelInternal = (
   const netConstraintSummary = joinSentences(
     displayRegime.label,
     pressureLine,
-    conciseActionNow || decisionRules[0]?.doNow[0] || "Last week's hiring, roadmap, and spend calls stand",
+    conciseActionNow || decisionRules[0]?.doNow[0] || "Last week's hiring, roadmap, and spend guidance stands",
     conciseFlipThreshold,
   );
 
@@ -562,7 +562,7 @@ export const buildHomeBriefModelInternal = (
     signalConfidenceReason: policyOverrideActive
       ? joinSentences(
           signalConfidenceReason,
-          "The call is also being held this week",
+          "The guidance is also being held this week",
           policyOverrideReason ?? "The two scores disagree, or too many inputs are missing",
         )
       : signalConfidenceReason,
@@ -666,7 +666,7 @@ export const buildHomeBriefModelInternal = (
       reportDynamics,
       transitionWatch,
       pendingFlipDetail: regimeFlipState.pendingCandidate
-        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — the call holds while the change waits on confirmation. The line that would change where it lands: ${regimeFlipState.watch.dimension === "tightness" ? "Funding pressure" : "Risk appetite"} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
+        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — conditions hold where they are while the change waits on confirmation. The line that would change where it lands: ${regimeFlipState.watch.dimension === "tightness" ? "Funding pressure" : "Risk appetite"} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
         : undefined,
     }),
   };
@@ -705,7 +705,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     ?? canonicalDecisionCopy?.doNowLines[0]
     ?? homeBriefModel.actionNowShort?.trim()
     ?? (homeBriefModel.revisitDecisions
-      ? "Revise hiring and roadmap calls now."
+      ? "Revise hiring and roadmap plans now."
       : "Hold last week's operating rules.");
   const whyItMattersLine = buildWhyItMattersLine({
     weeklyMovement: homeBriefModel.weeklyMovement,

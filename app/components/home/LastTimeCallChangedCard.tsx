@@ -26,10 +26,10 @@ export function LastTimeCallChangedCard({
   return (
     <aside
       data-testid="last-time-call-changed"
-      aria-label="The last time the call moved this way"
+      aria-label="The last time conditions moved this way"
       className="space-y-3 border-t border-slate-800/60 pt-4"
     >
-      <p className="type-eyebrow">The last time the call moved this way</p>
+      <p className="type-eyebrow">The last time conditions moved this way</p>
       <p className="text-fluid-xs leading-5 text-slate-200">
         <span className="font-semibold text-white">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.

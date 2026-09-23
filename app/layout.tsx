@@ -101,7 +101,7 @@ export const metadata: Metadata = {
     "product strategy",
     "engineering strategy",
     "capital markets",
-    "weekly market call",
+    "weekly market guidance",
     "operating guardrails"
   ],
   authors: [{ name: publisherAuthor.name, url: `${siteUrl}${publisherProfilePath}` }],

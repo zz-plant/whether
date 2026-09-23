@@ -94,11 +94,11 @@ const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExp
 const FALLBACK_CURRENT_CALL = NO_LIVE_READING_CALL.currentCall;
 const FALLBACK_ACTION_NOW = "Keep last week's approvals as they are; start nothing new.";
 const FALLBACK_PAUSE_IF = NO_LIVE_READING_CALL.pauseIf;
-const FALLBACK_RESUME_WHEN = "Live data is back and the call has held for a week.";
+const FALLBACK_RESUME_WHEN = "Live data is back and conditions have held for a week.";
 /** The curve reading's name on first use, per the vocabulary table in `lib/report/AGENTS.md`. */
 export const RECESSION_GAUGE_LABEL = `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`;
 /** The stamp's confidence note when no label was modeled: what the number measures. */
-const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line that changes the call";
+const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line where conditions change";
 
 /** `??` only falls through on null/undefined, and several of these fields are
  *  optional strings that arrive as "". An empty string in a decision slot prints
@@ -240,11 +240,11 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
 
   return [
     "",
-    "This week's call:",
+    "This week's guidance:",
     `• Conditions: ${describeConditions(assessment.regime, modeled.postureWithStageLabel)}`,
     ...(options?.trendLabel ? [`• vs last week: ${describeWeeklyDirection(options.trendLabel)}`] : []),
-    `• Points from the line that changes the call: ${(options?.regimeDistancePoints ?? 0).toFixed(1)}`,
-    `• Could the call change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
+    `• Points from the change line: ${(options?.regimeDistancePoints ?? 0).toFixed(1)}`,
+    `• Could conditions change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,
     `• ${publicDecisionLabels.action}: ${actionNow}`,
     /* The posture contract's thresholds mix call-change and resume conditions,
@@ -297,7 +297,7 @@ const buildWhyThisCouldBeWrongBlock = (assessment: RegimeAssessment, options?: E
   const mode = options?.failureModes?.[0];
   const confidenceLine = formatExportConfidence(options?.confidenceLabel ?? assessment.diagnostics.confidence);
   const whyCouldBeWrong = mode?.warning
-    ?? "The scores sit near a line; a small move changes the call. Hold anything you can't undo.";
+    ?? "The scores sit near a line; a small move could change conditions. Hold anything you can't undo.";
 
   return [
     "",
@@ -417,7 +417,7 @@ export const buildCallCitation = (
 ) => [
   `Whether Weekly Brief — ${treasury.record_date}`,
   `Conditions: ${describeConditions(assessment.regime, options?.postureWithStageLabel)}`,
-  `${formatExportConfidence(assessment.diagnostics.confidence)} (how far the scores sit from the line that changes the call)`,
+  `${formatExportConfidence(assessment.diagnostics.confidence)} (how far the scores sit from the line where conditions change)`,
   `Source note: ${treasury.source}`,
   buildBriefPermalinkLine(treasury.record_date),
   ...buildInterpretationLayerBlock(options),

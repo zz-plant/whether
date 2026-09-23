@@ -52,7 +52,7 @@ export default async function DecisionsPage() {
       <SecondaryPageHeader
         eyebrow="Your record"
         title="Your decision record"
-        description="Every call you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed, so this page tells you which of those have moved."
+        description="Every decision you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed, so this page tells you which of those have moved."
         aside={(
           <div className="weather-surface flex items-center gap-3.5 px-4 py-3.5">
             <DecisionShieldGlyph size={44} />

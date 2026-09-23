@@ -16,11 +16,11 @@ describe("buildSlackBrief", () => {
     const slot = (label: string) =>
       brief.match(new RegExp(`• ${label}: (.+)`))?.[1] ?? "";
 
-    const posture = slot("Call");
+    const posture = slot("Guidance");
     const doNow = slot("Do now");
     const pauseIf = slot("Pause if");
     const reopenWhen = slot("Resume when");
-    const callChangesIf = slot("Call changes if");
+    const callChangesIf = slot("Conditions change if");
 
     for (const [label, value] of Object.entries({ posture, doNow, pauseIf, callChangesIf })) {
       assert.ok(value.length > 0, `${label} slot is empty`);
@@ -37,7 +37,7 @@ describe("buildSlackBrief", () => {
     );
     assert.ok(
       !assessment.constraints.includes(callChangesIf),
-      "Call changes if is being filled from the operating-constraints list",
+      "Conditions change if is being filled from the operating-constraints list",
     );
   });
 
@@ -116,8 +116,8 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /This week's decision \(Call \/ Do now \/ Pause if \/ Resume when \/ Call changes if\):/);
-    assert.match(brief, /• Call: Capital is available and risk appetite is healthy\./);
+    assert.match(brief, /This week's decision \(Guidance \/ Do now \/ Pause if \/ Resume when \/ Conditions change if\):/);
+    assert.match(brief, /• Guidance: Capital is available and risk appetite is healthy\./);
     assert.match(brief, /• Do now: Limit net new hiring\./);
     // The slot label carries the verb, so only the rule's condition prints under it.
     assert.match(brief, /• Pause if: Tightness > 70$/m);
@@ -125,19 +125,19 @@ describe("buildSlackBrief", () => {
     assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
     // Where the call itself changes has a slot of its own; the area's resume
     // line never stands in for it.
-    const callChangesIf = brief.match(/• Call changes if: (.+)/)?.[1] ?? "";
+    const callChangesIf = brief.match(/• Conditions change if: (.+)/)?.[1] ?? "";
     assert.match(callChangesIf, /Funding pressure|Risk appetite/);
     assert.doesNotMatch(callChangesIf, /Tightness < 64/);
-    assert.ok(brief.indexOf("• Call: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
+    assert.ok(brief.indexOf("• Guidance: Capital is available") < brief.indexOf("• Do now: Limit net new hiring."));
     assert.ok(brief.indexOf("• Do now: Limit net new hiring.") < brief.indexOf("• Pause if: Tightness > 70"));
     assert.ok(brief.indexOf("• Pause if: Tightness > 70") < brief.indexOf("• Resume when: Tightness < 64"));
-    assert.ok(brief.indexOf("• Resume when: Tightness < 64") < brief.indexOf("• Call changes if: "));
+    assert.ok(brief.indexOf("• Resume when: Tightness < 64") < brief.indexOf("• Conditions change if: "));
     assert.match(brief, /Why this could be wrong:/);
     // The engine's code ("MEDIUM") never reaches a paste; the band reads as a word.
     assert.match(brief, /^• Medium confidence$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
-    assert.match(brief, /• The scores sit near a line; a small move changes the call\./);
-    assert.match(brief, /• If it is: see "Call changes if" above/);
+    assert.match(brief, /• The scores sit near a line; a small move could change conditions\./);
+    assert.match(brief, /• If it is: see "Conditions change if" above/);
   });
 
   it("carries each lever's timing line into the per-lever bullets", async () => {
@@ -266,12 +266,12 @@ describe("buildSlackBrief", () => {
       ],
     });
 
-    assert.match(brief, /This week's call:/);
+    assert.match(brief, /This week's guidance:/);
     assert.match(brief, /• Conditions: Guarded Expansion — Late/);
     assert.match(brief, /• vs last week: worse/);
-    assert.match(brief, /• Points from the line that changes the call: 2\.0/);
-    assert.match(brief, /• Could the call change next week: yes/);
-    assert.match(brief, /• Call: Stage decisions/);
+    assert.match(brief, /• Points from the change line: 2\.0/);
+    assert.match(brief, /• Could conditions change next week: yes/);
+    assert.match(brief, /• Guidance: Stage decisions/);
     assert.match(brief, /• Re-check: whoever owns the plan/);
     assert.match(brief, /• Read with care: confidence is not high; no live reading this week/);
     assert.match(brief, /• Conditions:/);

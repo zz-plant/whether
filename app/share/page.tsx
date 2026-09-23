@@ -36,7 +36,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Share the Current Weekly Brief",
   description:
-    "Copy this week's Whether call for Slack, a slide, or a citation; add a meeting pack or calendar hold; or embed a live brief in a newsletter or wiki.",
+    "Copy this week's Whether guidance for Slack, a slide, or a citation; add a meeting pack or calendar hold; or embed a live brief in a newsletter or wiki.",
   alternates: { canonical: "/share" },
 };
 
@@ -152,7 +152,7 @@ const buildCurrentShareArtifact = async () => {
     }),
     slackBrief: weeklyOperatorBrief,
     emailBrief: [
-      "Whether: this week's call",
+      "Whether: this week's guidance",
       "",
       weeklyOperatorBrief,
       "",
@@ -169,7 +169,7 @@ const buildCurrentShareArtifact = async () => {
     pullPolicyBlocks,
     wipGuidance,
     calendarDetails: [
-      "Read this week's Whether call.",
+      "Read this week's Whether guidance.",
       "",
       weeklyOperatorBrief,
       "",
@@ -197,9 +197,9 @@ export default async function SharePage() {
               <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
                 Current weekly artifact
               </p>
-              <h1 id="share-page-title" className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s call</h1>
+              <h1 id="share-page-title" className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
               <p className="text-sm leading-relaxed text-white/60">
-                Copy this week&apos;s call, its pause and resume lines, and its source into Slack, a slide, or a
+                Copy this week&apos;s guidance, its pause and resume lines, and its source into Slack, a slide, or a
                 citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
                 embed for a newsletter or wiki is at the end.
               </p>

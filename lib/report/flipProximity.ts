@@ -103,7 +103,7 @@ const riskAppetiteProximity = (inputs: ProximityInputs): FlipProximity | null =>
     inputMove: crossing.move,
     pointsToBoundary: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime),
     crossesTo: crossing.regime,
-    sentence: `If ${move}, the call changes to ${getRegimePublicLabel(crossing.regime)}.`,
+    sentence: `If ${move}, conditions turn ${getRegimePublicLabel(crossing.regime)}.`,
   };
 };
 
@@ -132,7 +132,7 @@ const tightnessProximity = ({ regime, scores, thresholds }: ProximityInputs): Fl
     inputMove: crossing.move,
     pointsToBoundary: Math.abs(scores.tightness - thresholds.tightnessRegime),
     crossesTo: crossing.regime,
-    sentence: `If ${label.charAt(0).toLowerCase()}${label.slice(1)} rate ${direction} ${formatMove(crossing.move)}, the call changes to ${getRegimePublicLabel(crossing.regime)}.`,
+    sentence: `If ${label.charAt(0).toLowerCase()}${label.slice(1)} rate ${direction} ${formatMove(crossing.move)}, conditions turn ${getRegimePublicLabel(crossing.regime)}.`,
   };
 };
 
@@ -173,5 +173,5 @@ export const buildQuietDayRead = ({
   if (!steadyWeek) return null;
   const nearest = flipProximity[0];
   if (!nearest) return null;
-  return `Call unchanged — ${nearest}`;
+  return `Conditions unchanged — ${nearest}`;
 };

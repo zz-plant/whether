@@ -40,7 +40,7 @@ export const AdvancedThresholdsSection = ({
       <div>
         <p className="type-eyebrow">Advanced controls</p>
         <h3 id="advanced-controls-heading" className="mt-1 text-base font-semibold text-slate-100">
-          Move the lines the call is judged against.
+          Move the lines where conditions change.
         </h3>
       </div>
       {/* Kept as a JS collapsible rather than a native `<details>`, on

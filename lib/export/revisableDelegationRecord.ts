@@ -120,12 +120,12 @@ const conditionsFromAssumptions = (
     const tightnessSide = assumptions.tightness >= assumptions.tightnessThreshold ? "below" : "at or above";
     const riskSide = assumptions.riskAppetite >= assumptions.riskAppetiteThreshold ? "below" : "at or above";
     conditions.push({
-      condition: `funding pressure moves ${tightnessSide} the ${assumptions.tightnessThreshold} line that changes the call (recorded ${assumptions.tightness})`,
+      condition: `funding pressure moves ${tightnessSide} the ${assumptions.tightnessThreshold} line where conditions change (recorded ${assumptions.tightness})`,
       check: checkUrl,
       clock: "P7D",
     });
     conditions.push({
-      condition: `risk appetite moves ${riskSide} the ${assumptions.riskAppetiteThreshold} line that changes the call (recorded ${assumptions.riskAppetite})`,
+      condition: `risk appetite moves ${riskSide} the ${assumptions.riskAppetiteThreshold} line where conditions change (recorded ${assumptions.riskAppetite})`,
       check: checkUrl,
       clock: "P7D",
     });
@@ -136,7 +136,7 @@ const conditionsFromAssumptions = (
   }
   if (conditions.length === 0) {
     conditions.push({
-      condition: `the operating regime moves off ${entry.regime.label}, or the week this call covers ends`,
+      condition: `the operating regime moves off ${entry.regime.label}, or the week this guidance covers ends`,
       check: checkUrl,
       clock: "P7D",
     });
@@ -221,7 +221,7 @@ const buildUnsealedRecords = (entry: DecisionMemoryEntry, baseUrl: string): Unse
       {
         ...regimeRecord,
         record_id: `whether:belief:${entry.id}:call`,
-        subject: "weekly operating call",
+        subject: "weekly operating guidance",
         summary: entry.outcome.summary,
         content: {
           proposition: entry.outcome.summary,

@@ -44,7 +44,7 @@ const buildFallbackPostureState = (
     timestamp: null,
     fromState: null,
     toState: assessment.regime,
-    reason: "No record of the last change to the call; this is the current reading.",
+    reason: "No record of the last change in conditions; this is the current reading.",
     source: "state-machine",
   },
   whatFlipsNext: {
@@ -93,7 +93,7 @@ export const buildWeeklyMandateEnvelope = (
       "### What to hold",
       ...constraints.map((item) => `- ${item}`),
       "",
-      `Last change to the call: ${resolvedPostureState.lastCommittedChangeEvent.timestamp ?? "not recorded"} · ${resolvedPostureState.lastCommittedChangeEvent.reason}`,
+      `Last change in conditions: ${resolvedPostureState.lastCommittedChangeEvent.timestamp ?? "not recorded"} · ${resolvedPostureState.lastCommittedChangeEvent.reason}`,
       `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${resolvedPostureState.whatFlipsNext.flipTrigger}`,
       ...resolvedPostureState.whatFlipsNext.reversalConditions.map(
         (condition) => `- ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${condition}`,

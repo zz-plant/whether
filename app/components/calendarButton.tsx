@@ -5,7 +5,7 @@ import {
 } from "../../lib/report/briefArtifact";
 import { siteUrl } from "../../lib/siteUrl";
 
-const MONDAY_HOLD_TITLE = "Whether: Monday call (3 min)";
+const MONDAY_HOLD_TITLE = "Whether: Monday review (3 min)";
 
 /**
  * The invite body: the standing agenda, not this week's call. The hold repeats
@@ -20,7 +20,7 @@ export const buildMondayAgendaDescription = (briefUrl = `${siteUrl}/`) =>
       (step, index) => `${index + 1}. ${step.label} (${step.minutes} min) — ${step.prompt}`,
     ),
     "",
-    `This week's call: ${briefUrl}`,
+    `This week's guidance: ${briefUrl}`,
   ].join("\n");
 
 export function buildMondayCalendarUrl(

@@ -16,7 +16,7 @@ const payload: MeetingSlidePayload = {
   stageLabel: "Series A",
   actionNow: "Freeze non-revenue hires & put every commitment behind a second signoff.",
   pauseIf: "Cash gate: hold every new commitment <whatever> the macro corridor says.",
-  callChangesIf: "Funding pressure at or below 70 (83 today) changes the call.",
+  callChangesIf: "Funding pressure at or below 70 (83 today) changes conditions.",
   resumeWhen: "Reverse the freeze only after runway extends past nine months → then re-open.",
   tightness: 83,
   riskAppetite: 40,
@@ -89,11 +89,11 @@ describe("board slide PPTX", () => {
     const slide = readStoredZip(buildBoardSlidePptx(payload)).get("ppt/slides/slide1.xml")?.content ?? "";
     assert.match(slide, /1\. ACTION NOW/);
     assert.match(slide, /2\. PAUSE IF/);
-    assert.match(slide, /3\. CALL CHANGES IF/);
+    assert.match(slide, /3\. CONDITIONS CHANGE IF/);
     assert.match(slide, /Funding pressure at or below 70/);
-    // The stage's resume line sits beside the call-change line, never in its card.
+    // The stage's resume line sits beside the change line, never in its card.
     assert.match(slide, /Resume when: Reverse the freeze only after runway extends/);
-    assert.match(slide, /This week's call \(Series A\)/);
+    assert.match(slide, /This week's guidance \(Series A\)/);
     assert.match(slide, /<a:t>Freezing<\/a:t>/);
     assert.doesNotMatch(slide, /SCARCITY/);
     assert.match(slide, /Freeze non-revenue hires &amp; put every commitment/);
@@ -114,7 +114,7 @@ describe("board slide PPTX", () => {
 });
 
 describe("board slide PDF", () => {
-  it("is a one-page 16:9 document carrying the call, with unencodable characters mapped", async () => {
+  it("is a one-page 16:9 document carrying the guidance, with unencodable characters mapped", async () => {
     const bytes = await buildBoardSlidePdf(payload);
     const text = new TextDecoder("latin1").decode(bytes);
     assert.match(text, /^%PDF-1\./);
@@ -125,7 +125,7 @@ describe("board slide PDF", () => {
     // the library rather than grepping the bytes.
     const { PDFDocument } = await import("@cantoo/pdf-lib");
     const reloaded = await PDFDocument.load(bytes);
-    assert.equal(reloaded.getTitle(), "Whether weekly operating call — Sep 16, 2026");
+    assert.equal(reloaded.getTitle(), "Whether weekly operating guidance — Sep 16, 2026");
     assert.equal(reloaded.getPageCount(), 1);
   });
 });

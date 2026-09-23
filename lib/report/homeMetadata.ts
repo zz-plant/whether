@@ -10,7 +10,7 @@ export type { HomePageSearchParams };
 // Keeps "macro" (the search term people actually type) while leading with the
 // ruled stance noun and naming the operator this is built for rather than
 // "leadership teams", which describes a buying committee nobody has met yet.
-const HOME_TITLE = "Weekly Operating Call for Startup Leaders";
+const HOME_TITLE = "Weekly Operating Guidance for Startup Leaders";
 const HOME_DESCRIPTION = decisionTransmissionSearchDescription;
 
 const buildImageParams = (searchParams: HomePageSearchParams | undefined, reportData?: HomeReportData) => {
@@ -62,7 +62,7 @@ export const buildHomeMetadata = async (
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: "Whether: this week's call",
+          alt: "Whether: this week's guidance",
         },
       ],
     },

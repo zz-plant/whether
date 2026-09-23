@@ -23,7 +23,7 @@ describe("P2 beginner copy semantics", () => {
       summary.summaryLine,
       "Conditions are Guarded Expansion and worsening; revisit last week's decisions.",
     );
-    assert.equal(summary.classificationLine, "Underneath, the call is Sunny.");
+    assert.equal(summary.classificationLine, "Underneath, the scores read Sunny.");
     assert.doesNotMatch(summary.summaryLine, /posture|momentum|YES|NO\b/);
 
     const noComparison = buildDecisionAnswerContextSummary({
@@ -39,7 +39,7 @@ describe("P2 beginner copy semantics", () => {
     assert.equal(noComparison.classificationLine, null);
   });
 
-  it("names this week's call in Decision Shield shares", () => {
+  it("names this week's conditions in Decision Shield shares", () => {
     const assessment = buildAssessmentFixture({ regime: "DEFENSIVE" });
     const output = evaluateDecision(assessment, {
       lifecycle: "GROWTH",
@@ -48,7 +48,7 @@ describe("P2 beginner copy semantics", () => {
     });
     const shareText = buildShareText(assessment, "GROWTH", "HIRING", "HIRE", output);
 
-    assert.match(shareText, /This week's call: Cloudy/);
+    assert.match(shareText, /This week's conditions: Cloudy/);
     assert.doesNotMatch(shareText, /^Regime:|Posture/m);
   });
 
@@ -58,7 +58,7 @@ describe("P2 beginner copy semantics", () => {
     const executiveMemo = buildExecutiveMemo(assessment, "Mar 1, 2026", executiveTemplate);
     const checklist = buildGuardrailChecklist(assessment, executiveTemplate);
 
-    assert.match(executiveMemo, /This week's call: Cloudy/);
+    assert.match(executiveMemo, /This week's conditions: Cloudy/);
     assert.doesNotMatch(executiveMemo, /^Regime:|Posture|Executive/m);
     assert.match(checklist, /Pause-if Checklist — Cloudy/);
   });

@@ -79,7 +79,7 @@ describe("CadenceCallCard", () => {
     const html = render("monthly", true);
 
     assert.ok(!html.includes(DECISION_CONTRACT_LABELS.threshold.pauseIf));
-    assert.match(html, /Call held:/);
+    assert.match(html, /Guidance held:/);
     assert.match(html, /Signals disagree\./);
   });
 
@@ -105,9 +105,9 @@ describe("CadenceCallCard", () => {
     // non-weekly cadence and copies a different artifact, so it must not share that name.
     const monthly = render("monthly");
 
-    assert.match(monthly, /aria-label="Copy monthly call"/);
+    assert.match(monthly, /aria-label="Copy monthly guidance"/);
     assert.doesNotMatch(monthly, /aria-label="Copy Brief"/);
-    assert.match(render("quarterly"), /aria-label="Copy quarterly call"/);
+    assert.match(render("quarterly"), /aria-label="Copy quarterly guidance"/);
   });
 
   it("renders the two horizons differently", () => {

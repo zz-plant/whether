@@ -93,7 +93,7 @@ describe("integration briefs", () => {
     assert.match(envelope.markdown, /## Whether weekly mandate/);
     // Pasted with no page beside it: the scores carry their scale and the lines use the page's names.
     assert.match(envelope.summary, /Funding pressure 72\/100: money is hard to raise\./);
-    assert.match(envelope.markdown, /Call changes if: /);
+    assert.match(envelope.markdown, /Conditions change if: /);
     assert.match(envelope.markdown, /- Resume when: Risk appetite/);
     assert.doesNotMatch(envelope.markdown, /flip|Reversal:|regime|DEFENSIVE/i);
   });

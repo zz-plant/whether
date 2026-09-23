@@ -98,14 +98,14 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       },
       about: {
         "@type": "Thing",
-        name: "The weekly call: what rates and credit mean for hiring, spend and raising",
+        name: "The weekly guidance: what rates and credit mean for hiring, spend and raising",
       },
       mainEntity: {
         "@type": "Dataset",
         "@id": `${siteUrl}/#dataset`,
         name: "US Treasury yield curve snapshot",
         description:
-          "The weekly US Treasury reading Whether makes the call from, with its confidence and what would change it.",
+          "The weekly US Treasury reading Whether bases its guidance on, with its confidence and what would change it.",
         creator: {
           "@id": `${siteUrl}#organization`,
         },
@@ -156,7 +156,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
           {
             "@type": "DataDownload",
             encodingFormat: "application/json",
-            name: "Current call (JSON)",
+            name: "Current guidance (JSON)",
             contentUrl: `${siteUrl}/api/posture/current`,
           },
           {
@@ -177,7 +177,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       abstract: brief.description,
       about: {
         "@type": "Thing",
-        name: "This week's call for startup leaders",
+        name: "This week's guidance for startup leaders",
       },
       datePublished: brief.datePublishedIso,
       dateModified: brief.dateModifiedIso,

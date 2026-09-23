@@ -85,21 +85,21 @@ describe("/history dates what it is showing", () => {
   const record = buildTrackRecord(series);
   assert.ok(record, "expected the fixture window to be long enough for a record");
 
-  it("does not present a month-end reading as the current call", () => {
+  it("does not present a month-end reading as the current conditions", () => {
     const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
     assert.doesNotMatch(html, /Reading now/i);
     assert.doesNotMatch(
       html,
-      /The call has been/i,
-      "a present-perfect claim about 'the call' reads as this week's call, not the month-end series",
+      /The call has been|Conditions have been/i,
+      "a present-perfect claim about conditions reads as this week's reading, not the month-end series",
     );
   });
 
   it("stamps the period the record runs through", () => {
     const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
-    assert.match(html, /month-end call/i);
+    assert.match(html, /month-end conditions/i);
     assert.match(html, /Through /);
   });
 

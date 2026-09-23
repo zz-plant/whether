@@ -366,7 +366,7 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
     ],
   },
   EXPANSION: {
-    description: "Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window.",
+    description: "Capital is available and financing conditions are supportive. The weekly guidance sets the tempo inside that window.",
     constraints: [
       "Prioritize reach and learning velocity over perfect finish.",
       "Spend with clear guardrails, even if some experiments fail.",

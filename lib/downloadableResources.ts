@@ -13,7 +13,7 @@ export const downloadableResources = {
     heroDescription:
       "Use this skimmable template for weekly leadership syncs and monthly board packets.",
     heroItems: [
-      "Posture call + confidence + timestamp",
+      "Guidance + confidence + timestamp",
       "SAFE / RISKY / DANGEROUS decision map",
       "Reversal triggers with owners and escalation windows",
     ],
@@ -102,11 +102,11 @@ export const downloadableResources = {
     heroDescription:
       "A worked quarter — posture, decisions, triggers and board asks, filled in — so you can see the format carrying real content before you write your own.",
     heroItems: [
-      "One-sentence posture call with the reading behind it",
+      "One-sentence guidance with the reading behind it",
       "SAFE / RISKY / DANGEROUS decisions classified by reversibility, not size",
       "Three reversal triggers, each with a number, a duration, an owner and a consequence",
       "Board approvals and guardrails requested",
-      "Illustrative figures throughout — not a published reading. The live call is on the home page.",
+      "Illustrative figures throughout — not a published reading. The live guidance is on the home page.",
     ],
     downloadCta: {
       href: "/downloads/quarterly-capital-posture-memo-example.md",

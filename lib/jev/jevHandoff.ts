@@ -29,10 +29,10 @@ const PLAN_QUESTIONS: Record<string, JevQuestion> = {
   conflicts_with_call: {
     type: "noul",
     instructions:
-      "Does the plan in state.plan go against this week's operating call in state.whether (its constraints and decision rules)?",
+      "Does the plan in state.plan go against this week's operating guidance in state.whether (its constraints and decision rules)?",
     criteria: {
-      true: "The plan does something the call says to pause, hold, or avoid right now",
-      false: "The plan fits within what the call allows, or the call says nothing about it",
+      true: "The plan does something the guidance says to pause, hold, or avoid right now",
+      false: "The plan fits within what the guidance allows, or the guidance says nothing about it",
     },
   },
   decision_area: {
@@ -51,7 +51,7 @@ const PLAN_QUESTIONS: Record<string, JevQuestion> = {
   wait_for_flip: {
     type: "noul",
     instructions:
-      "Would the plan in state.plan be clearly safer to start after the call changes, as described in state.whether.flip_watch?",
+      "Would the plan in state.plan be clearly safer to start after conditions change, as described in state.whether.flip_watch?",
     criteria: {
       true: "Waiting for the change would materially lower the plan's risk",
       false: "The change would make little difference to the plan",
@@ -96,7 +96,7 @@ export const buildJevHandoff = ({
     "Set request.state.plan to a short description of the plan you want checked, then send request to typesafe/jev.",
     "Whether never receives the plan: this response is the whole exchange with Whether.",
     "Act on an answer in your own code, with your own threshold. A noul near 0.5 is a coin toss; route it to a person.",
-    "Whether's confidence label measures distance from the line that changes the call, not a probability. The record behind it is at /trust#confidence-record.",
+    "Whether's confidence label measures distance from the line where conditions change, not a probability. The record behind it is at /trust#confidence-record.",
     "If automationReady is false, this week's reading is not live or not current (automationRefusal says which); do not automate on it.",
   ],
 });

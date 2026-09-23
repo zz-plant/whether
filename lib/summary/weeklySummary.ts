@@ -245,10 +245,10 @@ export const buildWeeklySummary = ({
   const financingSaturated = assessment.scores.tightnessSaturated === true;
   const guidance = getWeeklyActionGuidance(assessment.regime, { financingSaturated });
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? "A score is sitting near the line that changes the call, so check again before expanding any commitment."
+    ? "A score is sitting near the line where conditions change, so check again before expanding any commitment."
     : "";
   const shockCue = assessment.diagnostics.shockCrossing
-    ? "This flip crossed its line in one jump, so no published reversal condition fired — treat the call as unconfirmed until the next read."
+    ? "This flip crossed its line in one jump, so no published reversal condition fired — treat the change in conditions as unconfirmed until the next read."
     : "";
   const refusalCue = assessment.policyAssessment.refusal.refused
     ? joinSentences(

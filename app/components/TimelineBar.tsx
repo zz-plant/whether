@@ -487,7 +487,7 @@ export function TimelineBar({
             {isLive ? (
               <span
                 className="ml-1 rounded px-1 py-0.2 bg-emerald-500/20 text-emerald-300 font-mono text-[10px] uppercase tracking-wider"
-                title="Newest month on record. The weekly call above is more recent."
+                title="Newest month on record. The weekly guidance above is more recent."
               >
                 Latest
               </span>

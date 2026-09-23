@@ -129,7 +129,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
       ...(shareLines ?? []),
       "whether.work",
     ].filter(Boolean).join(" — ");
-    await copyToClipboard(text, "Weekly call");
+    await copyToClipboard(text, "Weekly guidance");
   };
 
   return (
@@ -197,7 +197,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
               type="button"
               onClick={handleCopy}
               className="weather-button weather-focus-ring weather-press-scale inline-flex flex-shrink-0 items-center justify-center gap-1.5 text-fluid-xs"
-              aria-label={isCopied ? "Copied weekly call" : "Copy weekly call"}
+              aria-label={isCopied ? "Copied weekly guidance" : "Copy weekly guidance"}
             >
               {isCopied ? (
                 <>

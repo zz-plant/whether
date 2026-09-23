@@ -89,7 +89,7 @@ export async function buildPlanningPageModel(
         name: "Whether Weekly Brief — Planning",
         url: `${siteUrl}/planning`,
         description:
-          "Turn the call into this week's plan: the rules, your runway, and the brief to share.",
+          "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
@@ -260,7 +260,7 @@ export async function buildPlanningPageModel(
               }),
               h("section", { className: "space-y-4" },
                 h("div", { className: "space-y-2" },
-                  h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "This week's call"),
+                  h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "This week's guidance"),
                   h("p", { className: "text-sm text-slate-300" }, "Read this first."),
                 ),
                 h("div", { className: "grid gap-3 md:grid-cols-3" },
@@ -295,7 +295,7 @@ export async function buildPlanningPageModel(
               // exposition on the page that is supposed to turn the call into a plan.
               h("p", { className: "text-xs leading-5 text-slate-400" },
                 "Planning a month, not a week? ",
-                h("a", { href: "/?cadence=monthly", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Open the monthly call"),
+                h("a", { href: "/?cadence=monthly", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Open the monthly guidance"),
                 ".",
               ),
               ),

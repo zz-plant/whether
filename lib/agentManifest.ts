@@ -65,7 +65,7 @@ const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
   // authorizes nothing and acts on nothing, so it emits belief records only.
   revisableDelegation: {
     loopPosition: "act",
-    loopRole: "turns changed conditions into a weekly operating call; the operator acts",
+    loopRole: "turns changed conditions into weekly operating guidance; the operator acts",
     standard: REVISABLE_DELEGATION_STANDARD_URL,
     schema: REVISABLE_DELEGATION_SCHEMA_URL,
     schemaVersion: REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION,

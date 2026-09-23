@@ -26,7 +26,7 @@ export function CalibrationCurveGlyph({
       {...props}
     >
       <title>Empirical Calibration Distribution</title>
-      <desc>How often the call held, by how far the scores sat from the line that changes it</desc>
+      <desc>How often conditions held, by how far the scores sat from the line where conditions change</desc>
 
       {/* Outer frame */}
       <rect

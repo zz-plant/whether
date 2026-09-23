@@ -74,7 +74,7 @@ describe("homepage heading contract", () => {
   it("leaves no competing h1 or heading above the call in the route", () => {
     assert.doesNotMatch(page, /<h1\b/, "the route renders no h1 of its own");
     assert.doesNotMatch(page, /weekly-call-heading/, "the sr-only label is an aria-label now");
-    assert.match(page, /aria-label="This week’s operating call"/);
+    assert.match(page, /aria-label="This week’s operating guidance"/);
   });
 
   /* Also route-level. Matches the fallback label, not the operator that selects it:

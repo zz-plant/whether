@@ -215,7 +215,7 @@ export const TimeMachinePanel = ({
           description={
             <>
               Pick a month. The page loads the last Treasury reading on or before it and shows the
-              call from that month.
+              guidance from that month.
             </>
           }
           aside={
@@ -248,7 +248,7 @@ export const TimeMachinePanel = ({
             ) : (
               <>
                 This page is showing this week ({latestRecordLabel}). Pick a month below to see what
-                the call was then.
+                the guidance was then.
               </>
             )}
           </p>
@@ -354,7 +354,7 @@ export const TimeMachinePanel = ({
               <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-3 py-3 sm:col-span-2">
                 <p className="type-label text-sky-200">Month picked</p>
                 <p className="mt-2 text-sm text-slate-200">
-                  {selectedLabel} is picked. Load it to see that month&apos;s call.
+                  {selectedLabel} is picked. Load it to see that month&apos;s guidance.
                 </p>
               </div>
             ) : null}

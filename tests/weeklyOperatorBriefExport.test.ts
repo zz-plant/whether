@@ -86,12 +86,12 @@ describe("weekly operator brief export adapters", () => {
     assert.doesNotMatch(text, /\bMED\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);
-    assert.match(text, /Call:/);
+    assert.match(text, /Guidance:/);
     assert.match(text, /Do now:/);
     assert.match(text, /Pause if:/); // replaces Watch for
     assert.match(text, /Why this could be wrong:/);
-    // The call-change line sits under the label every other surface gives it.
-    assert.match(text, /Call changes if:/);
+    // The change condition sits under the label every other surface gives it.
+    assert.match(text, /Conditions change if:/);
     assert.equal(cardText, text);
   });
 
@@ -108,15 +108,15 @@ describe("weekly operator brief export adapters", () => {
     assert.ok(payload.flipWatchLine, "the assessment fixture has a reachable crossing");
     assert.match(
       payload.flipWatchLine!,
-      /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), the call changes to (Sunny|Cloudy|Stormy|Freezing)\.$/,
+      /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), conditions turn (Sunny|Cloudy|Stormy|Freezing)\.$/,
     );
     assert.doesNotMatch(payload.flipWatchLine!, /tightness|riskAppetite|score/i);
 
     const text = buildWeeklyOperatorBriefPlainText(payload);
-    assert.match(text, /What would change the call: If /);
+    assert.match(text, /What would change this guidance: If /);
 
     const blocks = buildWeeklyOperatorBriefSlackBlocks(payload);
-    assert.ok(blocks.includes("What would change the call"));
+    assert.ok(blocks.includes("What would change this guidance"));
   });
 
   it("renders Slack blocks adapter with required sections", () => {
@@ -206,12 +206,12 @@ describe("weekly call snapshot export", () => {
     });
 
     assert.match(text, /CONDITIONS: Defensive — Late Cycle/);
-    assert.match(text, /CALL: Hold approval velocity and protect runway\./);
+    assert.match(text, /GUIDANCE: Hold approval velocity and protect runway\./);
     assert.match(text, /DO NOW: Ship only reversible roadmap items\./);
     assert.match(text, /PAUSE IF: Pause net-new fixed burn commitments\./);
-    assert.match(text, /CALL CHANGES IF: Track threshold pressure near regime boundary\./);
+    assert.match(text, /CONDITIONS CHANGE IF: Track threshold pressure near regime boundary\./);
     assert.doesNotMatch(text, /AVOID:|WATCH:/);
-    assert.match(text, /OTHER THINGS THAT WOULD CHANGE THE CALL:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
+    assert.match(text, /OTHER THINGS THAT WOULD CHANGE THIS GUIDANCE:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
   });
 });
 

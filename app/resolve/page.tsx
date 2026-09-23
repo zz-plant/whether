@@ -80,7 +80,7 @@ export default async function DecidePage({
       fetchedAtLabel={reportData.fetchedAtLabel}
       trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
       pageTitle="Resolve one open decision"
-      pageSummary="One yes-or-no answer per open decision, under this week's call."
+      pageSummary="One yes-or-no answer per open decision, under this week's guidance."
       sectionLinks={sectionLinks.slice(0, 2)}
       sidebarVariant="hidden"
       nextStep={{
@@ -97,7 +97,7 @@ export default async function DecidePage({
       <ReportSection
         id="direct-answers"
         title="Direct answers"
-        description={`Under this week's call: ${liveCall.action}`}
+        description={`Under this week's guidance: ${liveCall.action}`}
       >
         <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
           {featuredAnswerPages.map((page) => (
