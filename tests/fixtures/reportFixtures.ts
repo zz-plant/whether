@@ -173,7 +173,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
       recordDateLabel: "Static",
       timestampLabel: "Static catalog",
       ageLabel: "Static.",
-      statusLabel: "Simulated (low)",
+      statusLabel: "Curated catalog (static)",
     },
     invalidHistoricalSelection: false,
     lastYearComparison: null,
