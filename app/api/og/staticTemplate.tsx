@@ -8,7 +8,7 @@ import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG
  * Discover reject `image/svg+xml` outright, so these render through
  * `ImageResponse` as PNG like every other template here.
  */
-type StaticOgTemplate = "operations" | "signals" | "method" | "solutions" | "guides";
+type StaticOgTemplate = "operations" | "signals" | "method" | "solutions" | "guides" | "reading";
 
 const templateAccent: Record<StaticOgTemplate, string> = {
   operations: "#22d3ee",
@@ -16,6 +16,7 @@ const templateAccent: Record<StaticOgTemplate, string> = {
   method: "#a78bfa",
   solutions: "#34d399",
   guides: "#f59e0b",
+  reading: "#fb923c",
 };
 
 const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string; body: string }> = {
@@ -43,6 +44,13 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
     label: "GUIDES LENS",
     title: "Team enablement",
     body: "Give product, finance and strategy the same guidance to plan against.",
+  },
+  /* /concepts. The panel is fixed per template, and every other one describes a
+     guidance surface, which is not what a shared reading list is. */
+  reading: {
+    label: "READING LIST",
+    title: "Dated against the market",
+    body: "Each essay placed on the conditions of the month it came out.",
   },
 };
 

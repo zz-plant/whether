@@ -1,7 +1,7 @@
 import { isRegimeKey } from "../../../lib/regimePresentation";
 /**
  * Open Graph image generator for shareable Capital Posture Governance pages.
- * Supports specialized templates for report, operations, signals, solutions, and guides.
+ * Supports specialized templates for report, operations, signals, solutions, guides, and the reading list.
  */
 import { ImageResponse } from "next/og";
 import { loadOgFonts } from "../../../lib/image/ogFonts";
@@ -18,7 +18,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 
-type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "brief-chart" | "compare" | "answers";
+type OgTemplate = "report" | "operations" | "signals" | "method" | "solutions" | "guides" | "reading" | "brief-chart" | "compare" | "answers";
 
 const normalizeRegime = (value: string): RegimeKey => (isRegimeKey(value) ? value : "VOLATILE");
 
@@ -57,6 +57,7 @@ const readTemplate = (searchParams: URLSearchParams): OgTemplate => {
     case "method":
     case "solutions":
     case "guides":
+    case "reading":
     case "brief-chart":
     case "compare":
     case "answers":
