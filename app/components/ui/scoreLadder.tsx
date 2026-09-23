@@ -43,7 +43,7 @@ type ScoreLadderProps = {
 const LINE_LABELS: Record<LadderLineKind, string> = {
   pause: "Pause",
   resume: "Resume",
-  callChange: "Call changes",
+  callChange: "Change line",
 };
 
 const LINE_CLASS: Record<LadderLineKind, string> = {
@@ -122,13 +122,20 @@ export const buildLadderLines = ({
   { kind: "callChange" as const, value: callChange },
 ];
 
+/** The line's name inside a sentence ("9 pts above the pause line"). */
+const LINE_PHRASES: Record<LadderLineKind, string> = {
+  pause: "pause line",
+  resume: "resume line",
+  callChange: "change line",
+};
+
 export const describeLadderPosition = (value: number, lines: readonly LadderLine[]) => {
   const nearest = nearestLadderLine(value, lines);
   if (!nearest) return `${formatPoints(value)} of 100`;
-  const label = (nearest.line.label ?? LINE_LABELS[nearest.line.kind]).toLowerCase();
-  if (nearest.distance === 0) return `${formatPoints(value)} of 100 · at the ${label} line`;
+  const phrase = nearest.line.label ? `${nearest.line.label.toLowerCase()} line` : LINE_PHRASES[nearest.line.kind];
+  if (nearest.distance === 0) return `${formatPoints(value)} of 100 · at the ${phrase}`;
   const side = value > nearest.line.value ? "above" : "below";
-  return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} pts ${side} the ${label} line`;
+  return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} pts ${side} the ${phrase}`;
 };
 
 export function ScoreLadder({

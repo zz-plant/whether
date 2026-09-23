@@ -84,19 +84,19 @@ describe("signal cluster reading", () => {
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 52 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(above.distanceLabel, /2 points above the line at 50 that changes the call/);
+    assert.match(above.distanceLabel, /2 points above the line at 50 where conditions change/);
 
     const below = buildSignalClusterReading(
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 41 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(below.distanceLabel, /9 points below the line at 50 that changes the call/);
+    assert.match(below.distanceLabel, /9 points below the line at 50 where conditions change/);
 
     const exact = buildSignalClusterReading(
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 50 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(exact.distanceLabel, /Exactly at the line at 50 that changes the call/);
+    assert.match(exact.distanceLabel, /Exactly at the line at 50 where conditions change/);
   });
 
   /*
@@ -228,7 +228,7 @@ describe("signal cluster reading", () => {
 
     assert.equal(reading.value, null);
     assert.match(reading.unavailableReason ?? "", /did not resolve/);
-    assert.match(reading.unavailableReason ?? "", /call below still stands/);
+    assert.match(reading.unavailableReason ?? "", /guidance below still stands/);
   });
 
   it("builds the reading from the inputs each signal actually uses", () => {

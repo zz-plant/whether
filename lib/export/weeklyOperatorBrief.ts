@@ -13,7 +13,7 @@ import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weekly
 import { buildFlipProximity } from "../report/flipProximity";
 
 /** The confidence line when no label was modeled: what the number measures rather than a grade. */
-const CONFIDENCE_FROM_DISTANCE = "Confidence from how far the scores sit from the line that changes the call";
+const CONFIDENCE_FROM_DISTANCE = "Confidence from how far the scores sit from the line where conditions change";
 
 type WeeklyOperatorBriefPayload = {
   date: string;
@@ -194,7 +194,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     whyCouldBeWrong:
       postureConfidenceLabel === "HIGH"
         ? "The sources agree this week and can stop agreeing before next Monday. Hold anything you can't undo until then."
-        : "Confidence is not high: a score sits near a line, and a small move changes the call.",
+        : "Confidence is not high: a score sits near a line, and a small move could change conditions.",
     flipTrigger: resolvedFlipTrigger,
     flipConditionLabels: resolvedFlipConditionLabels,
     customTeamNote,
@@ -237,7 +237,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     ...(payload.flipWatchLine ? [`${DECISION_CONTRACT_LABELS.watch.flipWatch}: ${payload.flipWatchLine}`] : []),
     `Why this could be wrong: ${payload.whyCouldBeWrong}`,
     ...(payload.flipConditionLabels.length > 0
-      ? ["", "Other things that would change the call:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
+      ? ["", "Other things that would change this guidance:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
       : []),
   ].filter((line): line is string => line != null).join("\n");
 };
@@ -309,7 +309,7 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
                 ...(payload.flipWatchLine ? [`*${DECISION_CONTRACT_LABELS.watch.flipWatch}:* ${payload.flipWatchLine}`] : []),
                 `*Why this could be wrong:* ${payload.whyCouldBeWrong}`,
                 ...(payload.flipConditionLabels.length > 0
-                  ? [`*Other things that would change the call:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`]
+                  ? [`*Other things that would change this guidance:*\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`]
                   : []),
               ].join("\n"),
             },
@@ -325,14 +325,14 @@ export const buildWeeklyOperatorBriefCardText = (payload: WeeklyOperatorBriefPay
   buildWeeklyOperatorBriefPlainText(payload);
 
 export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayload) => [
-  "Weekly call snapshot",
+  "Weekly guidance snapshot",
   `CONDITIONS: ${payload.regime}`,
-  `CALL: ${payload.call}`,
+  `GUIDANCE: ${payload.call}`,
   `${publicDecisionLabels.action.toUpperCase()}: ${payload.doNow}`,
   `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}: ${pauseConditionOnly(payload.avoid)}`,
   `${DECISION_CONTRACT_LABELS.watch.postureFlips.toUpperCase()}: ${payload.watch}`,
   ...(payload.resume ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toUpperCase()}: ${payload.resume}`] : []),
-  "OTHER THINGS THAT WOULD CHANGE THE CALL:",
+  "OTHER THINGS THAT WOULD CHANGE THIS GUIDANCE:",
   ...(payload.flipConditions.length > 0
     ? payload.flipConditions.map((condition) => `• ${condition}`)
     : ["• No live line this week; check again after the next refresh."]),

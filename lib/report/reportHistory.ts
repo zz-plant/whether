@@ -41,7 +41,7 @@ const resolveAnalogImplication = ({
   }
 
   if (distanceToFlip < 0.65) {
-    return "Similar conditions, but closer to the line that changes the call. Hold anything you can't undo and check the call daily.";
+    return "Similar conditions, but closer to the line where they change. Hold anything you can't undo and check conditions daily.";
   }
 
   if (confidence < 0.65) {

@@ -1,12 +1,12 @@
 # `app/operate/components` agent guide
 
-This directory owns the planning and artifact checkpoint after the weekly call.
+This directory owns the planning and artifact checkpoint after the weekly guidance.
 
 Use this guide when editing planning stepper content, guardrail approval, share/export flows, or delivery panels.
 
 ## What this directory owns
 
-- Planning translation of the weekly call into this week's executable plan
+- Planning translation of the weekly guidance into this week's executable plan
 - Guardrail and approval sequencing
 - Artifact packaging and delivery after the plan is settled
 - Company-specific exceptions and follow-through controls that happen after the canonical brief
@@ -20,7 +20,7 @@ Use this guide when editing planning stepper content, guardrail approval, share/
 
 ## Planning and export rules
 
-- `/planning` is downstream of the weekly call. It should sharpen execution, not reopen the whole macro narrative by default.
+- `/planning` is downstream of the weekly guidance. It should sharpen execution, not reopen the whole macro narrative by default.
 - Exports are transmission surfaces, not parallel interpretations.
 - Every primary artifact should inherit the same bounded decision contract: action, threshold, and reversal or flip condition.
 - One default routine path should lead. Heavier packaging, governance formats, and company-specific overrides should remain clearly secondary.
@@ -56,4 +56,4 @@ When planning/export semantics or order change, update:
 
 - Export panels drifting into their own vocabulary
 - Share actions competing equally with board/governance exception paths
-- Planning pages re-explaining the weekly call instead of advancing it into execution
+- Planning pages re-explaining the weekly guidance instead of advancing it into execution

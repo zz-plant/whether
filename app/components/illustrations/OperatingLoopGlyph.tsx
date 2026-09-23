@@ -9,7 +9,7 @@ type OperatingLoopGlyphProps = HTMLAttributes<HTMLOListElement> & {
 
 const stages = [
   { key: "signals", label: "Signals", title: "Public signals", detail: "St. Louis Fed & Treasury feeds", path: "M4 16L9 9L14 13L20 5" },
-  { key: "posture", label: "Call", title: "The weekly call", detail: "Sunny, Cloudy, Stormy or Freezing", path: "M12 3A9 9 0 1 0 12 21A9 9 0 1 0 12 3M12 8A4 4 0 1 0 12 16A4 4 0 1 0 12 8" },
+  { key: "posture", label: "Conditions", title: "This week's conditions", detail: "Sunny, Cloudy, Stormy or Freezing", path: "M12 3A9 9 0 1 0 12 21A9 9 0 1 0 12 3M12 8A4 4 0 1 0 12 16A4 4 0 1 0 12 8" },
   { key: "plan", label: "Plan", title: "The plan", detail: "Do now, pause if, resume when", path: "M6 5V19M18 5V19M6 12H18" },
   { key: "share", label: "Share", title: "Shared artifact", detail: "Meeting & Slack block", path: "M6 3H18V21H6ZM9 9H15M9 13H15M9 17H13" },
 ] as const;

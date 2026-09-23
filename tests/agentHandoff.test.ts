@@ -269,7 +269,7 @@ describe("flip watch under a held call", () => {
       pending_count: 1,
       reason: "Risk appetite crossed below 50. Transition pending confidence gate (1/2).",
     });
-    assert.match(payload.flip_watch?.summary ?? "", /^Flip to Freezing is pending confirmation; the call holds at Sunny/);
+    assert.match(payload.flip_watch?.summary ?? "", /^Flip to Freezing is pending confirmation; conditions hold at Sunny/);
     assert.match(payload.flip_watch?.summary ?? "", /Transition watch is OFF/);
   });
 

@@ -96,8 +96,8 @@ export const buildRunwayConditionedNotes = ({
       {
         area: "burn-discipline",
         note: monthlyBurnUsd
-          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months. Burn is where this week's call moves runway fastest.`
-          : `At ${runwayMonths} months of runway, cash is what limits you this week, and burn is where the call moves it fastest.`,
+          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months. Burn is the lever that moves runway fastest this week.`
+          : `At ${runwayMonths} months of runway, cash is what limits you this week, and burn is the lever that moves it fastest.`,
       },
       {
         area: "capital-raising",
@@ -135,13 +135,13 @@ export const buildRunwayConditionedNotes = ({
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
-        note: `At ${runwayMonths} months of runway you can act on the printed call — no emergency cuts while funding pressure stays this side of the pause line.`,
+        note: `At ${runwayMonths} months of runway you can act on the printed guidance — no emergency cuts while funding pressure stays this side of the pause line.`,
       },
     ];
     if (isExpansion) {
       notes.push({
         area: "expansion-bets",
-        note: "With runway above a year, spare runway goes furthest into the reversible bets the call allows.",
+        note: "With runway above a year, spare runway goes furthest into the reversible bets the guidance allows.",
       });
     }
     return notes;

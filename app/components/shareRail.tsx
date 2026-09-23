@@ -79,19 +79,19 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
 
   const buildShareText = useCallback(() => {
     const context = includeContext
-      ? "Whether is a weekly call on what interest rates and credit mean for a startup's hiring, spend and raise.\n\n"
+      ? "Whether is weekly guidance on what interest rates and credit mean for a startup's hiring, spend and raise.\n\n"
       : "";
     const briefUrl = `${window.location.origin}/`;
 
     switch (preset) {
       case "ceo":
-        return `${context}This week's call, in case it changes anything on your side.\n${briefUrl}`;
+        return `${context}This week's guidance, in case it changes anything on your side.\n${briefUrl}`;
       case "finance":
-        return `${context}This week's call, with its sources and how fresh the data is.\n${briefUrl}/trust`;
+        return `${context}This week's guidance, with its sources and how fresh the data is.\n${briefUrl}/trust`;
       case "team":
-        return `${context}This week's call, what to do now, and the evidence behind it.\n${briefUrl}`;
+        return `${context}This week's guidance, what to do now, and the evidence behind it.\n${briefUrl}`;
       default:
-        return `${context}This week's call from Whether.\n${briefUrl}`;
+        return `${context}This week's guidance from Whether.\n${briefUrl}`;
     }
   }, [preset, includeContext]);
 

@@ -172,8 +172,8 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         />
         {decisionArtifact ? (
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-            <p className="type-eyebrow">This week&apos;s call</p>
-            <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">What the live call says before you read on</h2>
+            <p className="type-eyebrow">This week&apos;s guidance</p>
+            <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">What the live guidance says before you read on</h2>
             <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.postureSummary}</p>
             <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.decisionShiftSummary}</p>
             <div className="grid gap-3 sm:grid-cols-2">

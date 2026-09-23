@@ -1,18 +1,18 @@
 # `app/signals` agent guide
 
-This directory owns the evidence surface for the weekly call.
+This directory owns the evidence surface for the weekly guidance.
 
 Use this guide when editing `/signals`, evidence-mode routing, threshold tuning, replay, or signal diagnostics.
 
 ## What this directory owns
 
-- Evidence depth for why the call moved
+- Evidence depth for why the guidance changed
 - Threshold, replay, and signal diagnostic tools
-- Compact implication-first summaries that support the canonical weekly call
+- Compact implication-first summaries that support the canonical weekly guidance
 
 ## What this directory must not own
 
-- The canonical operating call itself
+- The canonical operating guidance itself
 - New trust-audit surfaces that belong to `/trust`
 - Planning/export behavior that belongs to `/planning`
 - Long-form educational content that weakens the evidence job
@@ -21,7 +21,7 @@ Use this guide when editing `/signals`, evidence-mode routing, threshold tuning,
 
 - `/signals` should answer: what moved, how close are we to the watch lines, and what would change if the evidence crossed them.
 - Explanation should support action. It should not become a parallel recommendation engine.
-- Threshold and replay tools should stay explicitly subordinate to the current weekly call.
+- Threshold and replay tools should stay explicitly subordinate to the current weekly guidance.
 - Advanced controls are allowed, but implication-first reading should remain viable for a first pass.
 
 ## Canonical upstream sources
@@ -39,7 +39,7 @@ Treat these as upstream:
 - Preserve explicit freshness, fallback, and provenance cues near the evidence they qualify.
 - Keep threshold edits and advanced diagnostics measurable. Avoid vague cautionary prose.
 - When adding a new signal view, make clear how it changes confidence, watch distance, or operating implication.
-- Replay and inversion views should help pressure-test the current call, not distract from it.
+- Replay and inversion views should help pressure-test the current guidance, not distract from it.
 
 ## Tests and docs to update
 

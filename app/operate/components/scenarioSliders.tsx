@@ -46,7 +46,7 @@ export function ScenarioSliders({
             <Tag tone="amber">Not this week&apos;s data</Tag>
           </div>
           <p className="mt-1 text-sm text-slate-300">
-            Move either slider. The call, the scores, and the rules below update while you move it.
+            Move either slider. The guidance, the scores, and the rules below update while you move it.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

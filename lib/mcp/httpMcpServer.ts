@@ -33,7 +33,7 @@ const SERVER_INFO = {
 } as const;
 
 const SERVER_INSTRUCTIONS =
-  "Whether turns public macro data into a weekly operating call for startup leaders. " +
+  "Whether turns public macro data into weekly operating guidance for startup leaders. " +
   "Call get_brief for the current regime, action, and confidence; get_decision_rules for the " +
   "bounded rules behind it; get_context and get_projection for regime trajectory; " +
   "get_recent_history for one signal's trailing window; get_comps for SaaS valuation multiples.";
@@ -89,7 +89,7 @@ const TOOLS: ToolDefinition[] = [
     name: "get_brief",
     title: "Get the current operating brief",
     description:
-      "Current regime, weekly operating call, confidence, and record date for the requested cadence.",
+      "Current regime, weekly operating guidance, confidence, and record date for the requested cadence.",
     inputSchema: {
       type: "object",
       properties: {

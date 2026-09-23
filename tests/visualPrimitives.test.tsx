@@ -24,7 +24,7 @@ const lines = [
 describe("ScoreLadder", () => {
   it("names the nearest line and the distance to it", () => {
     assert.equal(nearestLadderLine(72, lines)?.line.kind, "callChange");
-    assert.equal(describeLadderPosition(72, lines), "72 of 100 · 2 pts above the call changes line");
+    assert.equal(describeLadderPosition(72, lines), "72 of 100 · 2 pts above the change line");
     assert.equal(describeLadderPosition(76, lines), "76 of 100 · at the pause line");
     assert.equal(describeLadderPosition(60, lines), "60 of 100 · 6 pts below the resume line");
   });
@@ -40,10 +40,10 @@ describe("ScoreLadder", () => {
   it("paints every tick before any label, so no tick crosses a label", () => {
     /* Each line used to be one translated wrapper holding its tick and label.
        A transform makes a stacking context, so a later line's tick painted
-       over an earlier line's label ("Call changes|70" on a phone). */
+       over an earlier line's label ("Change line|70" on a phone). */
     const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={85} lines={lines} />);
     const lastTick = html.lastIndexOf("w-0.5");
-    const firstLabel = Math.min(...["Resume 66", "Call changes 70", "Pause 76"].map((label) => html.indexOf(label)));
+    const firstLabel = Math.min(...["Resume 66", "Change line 70", "Pause 76"].map((label) => html.indexOf(label)));
     assert.ok(lastTick > 0 && firstLabel > 0);
     assert.ok(lastTick < firstLabel, "all ticks come before the first label in paint order");
   });
@@ -61,7 +61,7 @@ describe("ScoreLadder", () => {
   it("stacks labels that would overprint in the narrowest column, and only those", () => {
     /* 55 and 70 are 15 points apart: clear by the old 13%-of-track rule, and
        overprinted in the homepage's 14rem column, where "Pause 55" and
-       "Call changes 70" need about 70px between their ticks. */
+       "Change line 70" need about 70px between their ticks. */
     const rows = (values: LadderLine[]) =>
       Object.fromEntries(layoutLadderLabels(values).map(({ line, row }) => [line.kind, row]));
     assert.deepEqual(rows([{ kind: "pause", value: 55 }, { kind: "callChange", value: 70 }]), { pause: 0, callChange: 1 });
@@ -174,7 +174,7 @@ describe("MonthStrip", () => {
   it("counts changes and the current run from the data", () => {
     assert.deepEqual(describeCurrentRun(entries), { label: "Cloudy", held: 3, since: "2026-05-31", latest: "2026-07-31" });
     const html = renderToStaticMarkup(<MonthStrip entries={[...entries].reverse()} />);
-    assert.match(html, /1 call change/);
+    assert.match(html, /1 change in conditions/);
     assert.match(html, /Cloudy, held 3 months since May 2026/);
     const visible = html.replace(/<[^>]+>/g, " ");
     assert.doesNotMatch(visible, /EXPANSION|DEFENSIVE/, "the strip must not print engine keys (the data-regime attribute is how it gets its colour)");

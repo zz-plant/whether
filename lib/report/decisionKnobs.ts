@@ -173,7 +173,7 @@ const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobConte
   }
 
   if (context.nearestThresholdGap <= 8) {
-    return `${knob} stays constrained because the call sits within ${context.nearestThresholdGap.toFixed(1)} points of a boundary. ${signalQuality}`;
+    return `${knob} stays constrained because conditions sit within ${context.nearestThresholdGap.toFixed(1)} points of a boundary. ${signalQuality}`;
   }
 
   return `${knob} matches the ${posture} setting with room to spare before the nearest boundary. ${signalQuality}`;

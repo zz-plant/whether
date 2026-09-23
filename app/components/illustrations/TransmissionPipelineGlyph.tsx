@@ -26,7 +26,7 @@ export function TransmissionPipelineGlyph({
       {...props}
     >
       <title>From public data to a shareable brief</title>
-      <desc>Public U.S. market data becomes the weekly call, then a brief for Slack, email or a meeting</desc>
+      <desc>Public U.S. market data becomes the weekly guidance, then a brief for Slack, email or a meeting</desc>
 
       {/* Central transmission hub */}
       <circle

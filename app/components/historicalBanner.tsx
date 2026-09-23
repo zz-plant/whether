@@ -66,8 +66,8 @@ export const HistoricalBanner = ({
             ) : null}
           </p>
           <p className="mt-1 text-xs text-[var(--app-text-muted)]">
-            Live signals are hidden, and this call is not this week&apos;s. Go back to this week&apos;s
-            call before acting on it.
+            Live signals are hidden, and this guidance is not this week&apos;s. Go back to this week&apos;s
+            guidance before acting on it.
           </p>
         </div>
 

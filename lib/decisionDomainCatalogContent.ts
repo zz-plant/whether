@@ -250,7 +250,7 @@ export const rawDecisionDomainCatalog = {
         },
         {
           phase: "Prioritize",
-          objective: "Choose what to keep, pause, or speed up under this week's call.",
+          objective: "Choose what to keep, pause, or speed up under this week's guidance.",
           prompts: [
             "Which item matters most in the next 90 days?",
             "What can be paused with the smallest customer/regret impact?",
@@ -340,9 +340,9 @@ export const rawDecisionDomainCatalog = {
       loosenNow: "Delegate more authority so calls close faster.",
       proceedThreshold: "Proceed when every critical decision has one owner, a named reviewer, and a response time.",
       stopTrigger:
-        "Stop deciding by consensus in meetings when no owner is named or the call could change next week.",
+        "Stop deciding by consensus in meetings when no owner is named or the decision could change next week.",
       reversalTrigger:
-        "Return to tighter approvals if delegated calls exceed their risk limits or a score nears the line that changes the call.",
+        "Return to tighter approvals if delegated calls exceed their risk limits or a score nears the line where conditions change.",
       decisionArtifact: "Decision rights matrix with an escalation ladder and a weekly review slot.",
       timeToRun: "60 minutes to map rights, plus 15-minute weekly operating review.",
       recommendedParticipants:
@@ -588,7 +588,7 @@ export const rawDecisionDomainCatalog = {
       firstMoves: [
         "Publish one call, with a confidence level and a review date.",
         "Align hiring, roadmap scope, and spend approvals to that call before launching new initiatives.",
-        "Write down what would change the call, so teams know what evidence matters next.",
+        "Write down what would change the decision, so teams know what evidence matters next.",
       ],
       linkedToolkits: [
         { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },

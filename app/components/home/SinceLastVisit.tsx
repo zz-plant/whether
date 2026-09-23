@@ -137,8 +137,8 @@ export function SinceLastVisit({
       {regimeChanged
         ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
         : callChanged
-          ? `still ${current.regimeLabel}, but the call moved.`
-          : `the call held, ${current.regimeLabel} and the same do-now line.`}
+          ? `still ${current.regimeLabel}, but the guidance changed.`
+          : `the guidance held, ${current.regimeLabel} and the same do-now line.`}
       {callChanged ? (
         <span className="block text-white/60">Then: “{previous.call}”</span>
       ) : null}
@@ -155,10 +155,10 @@ export function SinceLastVisit({
         <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}:</span>{" "}
         {regimeChanged
           ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
-          : `still ${current.regimeLabel}${callChanged ? ", but the call moved" : ""}.`}
+          : `still ${current.regimeLabel}${callChanged ? ", but the guidance changed" : ""}.`}
       </p>
       <p className="text-fluid-xs leading-5 text-white/60">
-        {callChanged ? <>Then: “{previous.call}” · Now: “{current.call}”</> : <>The call holds: “{current.call}”</>}
+        {callChanged ? <>Then: “{previous.call}” · Now: “{current.call}”</> : <>The guidance holds: “{current.call}”</>}
         {flipProximitySentence ? <span className="block text-sky-200/80">{flipProximitySentence}</span> : null}
       </p>
       {boardDeckHref ? (
@@ -168,7 +168,7 @@ export function SinceLastVisit({
           rel="noreferrer"
           className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
         >
-          Download this week&apos;s call as a slide
+          Download this week&apos;s guidance as a slide
         </a>
       ) : null}
       <p className="text-fluid-nano text-slate-400">

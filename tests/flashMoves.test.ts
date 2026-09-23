@@ -98,11 +98,11 @@ describe("flash alerts in the evaluator and the mail", () => {
     assert.equal(alertDeliveryKey({ type: "regime_change", severity: "critical", headline: "x" }), "regime_change");
   });
 
-  it("mails the move in the input's units and says the call stands until the next read", () => {
+  it("mails the move in the input's units and says the guidance stands until the next read", () => {
     const mail = flashMoveEmail(move!, "token-1");
     assert.match(mail.subject, /^Whether Flash — the short-term borrowing rate fell 0\.30 percentage points since the last reading$/);
     assert.match(mail.text, /4\.60% to 4\.30%/);
-    assert.match(mail.text, /This week's call stands until the next reading/);
+    assert.match(mail.text, /This week's guidance stands until the next reading/);
     assert.match(mail.html, /4\.60% → 4\.30%/);
     assert.match(mail.text, /unsubscribe/i);
     assert.doesNotMatch(mail.text, /tightness|riskAppetite/);

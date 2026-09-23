@@ -82,7 +82,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
     return (
       <div id="runway-notes" className="space-y-1.5">
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="type-eyebrow text-slate-300">What this call means at your runway</p>
+          <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
           {/* Deliberately nothing selected. The operator has not said what their
               runway is, and a default would be this panel inventing one — the
               same rule the note builder keeps ("a missing runway never reads
@@ -94,11 +94,11 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
           <RunwayQuickPicks activeMonths={undefined} onPick={setRunway} />
         </div>
         <p className="text-fluid-nano text-slate-400">
-          Pick a band and this week&rsquo;s call gains a line per decision it changes: which area
+          Pick a band and this week&rsquo;s guidance gains a line per decision it changes: which area
           protects runway fastest, and roughly how many months a 10% burn cut buys.
         </p>
         <p className="text-fluid-nano text-slate-500">
-          Nothing leaves this browser, and the call above does not change; only the notes under it do.
+          Nothing leaves this browser, and the guidance above does not change; only the notes under it do.
         </p>
       </div>
     );
@@ -108,7 +108,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
     <div id="runway-notes" className="space-y-1.5">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <p className="type-eyebrow text-slate-300">
-          What this call means at {profile.runwayMonths} months of runway
+          What this guidance means at {profile.runwayMonths} months of runway
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <RunwayQuickPicks activeMonths={profile.runwayMonths} onPick={setRunway} />
@@ -122,7 +122,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         </div>
       </div>
       <p className="text-fluid-nano text-slate-500">
-        Your figures stay in this browser. These notes translate the call; the thresholds above are
+        Your figures stay in this browser. These notes translate the guidance; the thresholds above are
         unchanged.{" "}
         <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
           Enter the exact runway and burn

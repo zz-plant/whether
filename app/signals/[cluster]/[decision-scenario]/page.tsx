@@ -39,7 +39,7 @@ const buildSignalDecisionBrief = ({
 }) =>
   [
     `${signalTitle} — ${scenarioTitle}`,
-    `Current call: ${payload.currentCall}`,
+    `${publicDecisionLabels.call}: ${payload.currentCall}`,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
     `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
@@ -88,7 +88,7 @@ export const buildSignalDecisionScenarioMetadata = ({
      * The live action used to trail it; that belongs on the page, where it is
      * dated, not in a snippet a crawler caches.
      */
-    description: `${signalSummary} What it means for ${scenarioTitle.toLowerCase()} decisions, and the line that would change the call.`,
+    description: `${signalSummary} What it means for ${scenarioTitle.toLowerCase()} decisions, and the line where conditions change.`,
     path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
   });
@@ -164,7 +164,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         ) : null}
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">This week&apos;s call</h2>
+        <h2 className="text-lg font-semibold text-slate-100">This week&apos;s guidance</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</li>

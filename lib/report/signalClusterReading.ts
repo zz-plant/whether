@@ -203,14 +203,14 @@ export const buildSignalClusterReading = (
       displayValue: WHOLE.format(scores.tightness),
       unit: "",
       scaleNote: "of 100",
-      threshold: { value: thresholds.tightnessRegime, label: `the line at ${WHOLE.format(thresholds.tightnessRegime)} that changes the call` },
+      threshold: { value: thresholds.tightnessRegime, label: `the line at ${WHOLE.format(thresholds.tightnessRegime)} where conditions change` },
       delta,
       betterWhen: "lower",
       distanceLabel: describeDistance(
         scores.tightness,
         thresholds.tightnessRegime,
         " points",
-        `the line at ${WHOLE.format(thresholds.tightnessRegime)} that changes the call`,
+        `the line at ${WHOLE.format(thresholds.tightnessRegime)} where conditions change`,
       ),
       directionLabel: direction.label,
       directionTone: direction.tone,
@@ -245,14 +245,14 @@ export const buildSignalClusterReading = (
       displayValue: WHOLE.format(scores.riskAppetite),
       unit: "",
       scaleNote: "of 100",
-      threshold: { value: thresholds.riskAppetiteRegime, label: `the line at ${WHOLE.format(thresholds.riskAppetiteRegime)} that changes the call` },
+      threshold: { value: thresholds.riskAppetiteRegime, label: `the line at ${WHOLE.format(thresholds.riskAppetiteRegime)} where conditions change` },
       delta,
       betterWhen: "higher",
       distanceLabel: describeDistance(
         scores.riskAppetite,
         thresholds.riskAppetiteRegime,
         " points",
-        `the line at ${WHOLE.format(thresholds.riskAppetiteRegime)} that changes the call`,
+        `the line at ${WHOLE.format(thresholds.riskAppetiteRegime)} where conditions change`,
       ),
       directionLabel: direction.label,
       directionTone: direction.tone,
@@ -317,7 +317,7 @@ export const buildSignalClusterReading = (
        a dash. The slope is nullable whenever either leg fails to resolve. */
     unavailableReason: slope === null
       ? "The 2-year or 10-year rate did not resolve this week, so the gap between them cannot be computed. "
-        + "The call below still stands on the other rates."
+        + "The guidance below still stands on the other rates."
       : null,
   };
 };

@@ -114,9 +114,9 @@ export async function GET(request: Request) {
       renderAnswerOgImage({
         question: readParam(searchParams, "title", "An operator answer", 72),
         shortAnswer: readParam(searchParams, "subtitle", "", 170),
-        call: readParam(searchParams, "call", "This week's call", 90),
+        call: readParam(searchParams, "call", "This week's guidance", 90),
         action: readParam(searchParams, "action", "", 120),
-        kicker: readParam(searchParams, "kicker", "Whether — weekly operating call", 72),
+        kicker: readParam(searchParams, "kicker", "Whether — weekly operating guidance", 72),
       }),
       imageOptions,
     );

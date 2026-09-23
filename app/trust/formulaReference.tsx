@@ -172,7 +172,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
     <ReportSection
       id="formula-reference"
       title="How the score is built"
-      description="The full derivation, from public data series to the weekly call."
+      description="The full derivation, from public data series to the weekly guidance."
     >
       {/* Where the score sits, first, and in the one drawing every route uses
           for it. The quadrant further down used to be the only picture of the
@@ -209,7 +209,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             </span>
           </li>
           <li>
-            <span className="font-semibold text-slate-100">3. Turn the pair into one call.</span>{" "}
+            <span className="font-semibold text-slate-100">3. Turn the pair into conditions.</span>{" "}
             <span className="text-slate-300">
               The quadrant the two scores land in is the environment; the diagram below draws it.
             </span>
@@ -332,7 +332,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             <li>
               <span className="text-slate-400">Market-stress cap:</span> when the VIX has averaged{" "}
               {adj.vixMarketStressVetoMean} or more over its last {adj.vixVetoMeanWindow} readings,
-              the score is capped at the line that changes the call ({RISK_APPETITE_REGIME_THRESHOLD});
+              the score is capped at the line where conditions change ({RISK_APPETITE_REGIME_THRESHOLD});
               between {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
               {adj.vixVetoSoftCap}. An average rather than one day, so a single spike does not cap a
               week. While the cap holds, extreme market stress sets the ceiling, not the rates.
@@ -346,7 +346,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               <span className="text-slate-400">Conditions:</span>
               <RegimeQuadrant />
               <span className="mt-1 block text-xs text-slate-400">
-                At low confidence the call does not change at all.
+                At low confidence conditions do not change at all.
               </span>
             </li>
             <li>
@@ -358,7 +358,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             </li>
             <li>
               <span className="text-slate-400">Confidence:</span> how far the scores sit, in points,
-              from the nearest line that would change the call.
+              from the nearest line where conditions would change.
               <div className="mt-1.5">
                 <ConfidenceLadder />
               </div>

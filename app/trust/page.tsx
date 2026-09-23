@@ -21,9 +21,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Trust — freshness, confidence, and what would change the call",
+  title: "Trust — freshness, confidence, and what would change the guidance",
   description:
-    "Check how fresh the sources are, how sure the call is, and how the score is built, before acting on anything you can't undo.",
+    "Check how fresh the sources are, how sure the reading is, and how the score is built, before acting on anything you can't undo.",
   path: "/trust",
   imageAlt: "Whether trust hub",
 });
@@ -86,7 +86,7 @@ export default async function MethodPage({
 
       <ReportSection
         id="sources-freshness"
-        title="Cite this call"
+        title="Cite this guidance"
         description="The one-line citation for a recap or sourcing note."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
@@ -113,7 +113,7 @@ export default async function MethodPage({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              <li><span className="text-slate-400">Resume fixed-cost commitments when:</span> confidence is back to high and the call has held for a second reading.</li>
+              <li><span className="text-slate-400">Resume fixed-cost commitments when:</span> confidence is back to high and conditions have held for a second reading.</li>
             </ul>
           </article>
           <article className="weather-hub-card space-y-3 px-4 py-4">
@@ -135,7 +135,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="Confidence measures how far the scores sit from the line that changes the call. Whether calls at that distance actually held is measured separately, over the whole archive."
+        description="Confidence measures how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -147,7 +147,7 @@ export default async function MethodPage({
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Active warnings</p>
             {warnings.length === 0 ? (
-              <p className="text-sm text-slate-300">No warning is active. Act on the call; the pause line still applies.</p>
+              <p className="text-sm text-slate-300">No warning is active. Act on the guidance; the pause line still applies.</p>
             ) : (
               <ul className="space-y-3 text-sm text-slate-200">
                 {warnings.map((warning) => (

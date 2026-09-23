@@ -150,7 +150,7 @@ export const SignalsInstrumentsSection = ({
     <div>
       <p className="type-eyebrow type-eyebrow-section">Deeper evidence</p>
       <h2 id="instruments-heading" className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">
-        Charts, past months, and the checks that would overturn the call.
+        Charts, past months, and the checks that would overturn the guidance.
       </h2>
     </div>
 
@@ -158,7 +158,7 @@ export const SignalsInstrumentsSection = ({
         instruments a reader had open is incidental to a shared link, except
         the month picker below, whose open state other pages link into. */}
     <details id="signal-diagnostics" open className="weather-auto-chevron weather-panel space-y-4 p-5">
-      <summary className={SUMMARY_CLASS}>Every chart behind the call.</summary>
+      <summary className={SUMMARY_CLASS}>Every chart behind the guidance.</summary>
       <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
       <SignalInversionPreview yieldCurveSeries={yieldCurveSeries} />
       <div id="trends" className="space-y-4 border-t border-slate-800/60 pt-4">

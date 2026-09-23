@@ -110,7 +110,7 @@ describe("STD-07 export of decision memory", () => {
     assert.equal(snapshot.invalidated_by.length, 1);
     assert.equal(
       snapshot.invalidated_by[0].condition,
-      "the operating regime moves off DEFENSIVE, or the week this call covers ends",
+      "the operating regime moves off DEFENSIVE, or the week this guidance covers ends",
     );
     assert.equal(snapshot.invalidated_by[0].clock, "P7D");
   });
@@ -119,8 +119,8 @@ describe("STD-07 export of decision memory", () => {
     const [regime, decision] = await toRevisableDelegationRecords([decisionEntry], { baseUrl: "https://whether.work" });
     const conditions = decision.invalidated_by.map((entry) => entry.condition);
     assert.equal(conditions.length, 3);
-    assert.match(conditions[0], /funding pressure moves below the 70 line that changes the call \(recorded 72\)/);
-    assert.match(conditions[1], /risk appetite moves below the 50 line that changes the call \(recorded 52\)/);
+    assert.match(conditions[0], /funding pressure moves below the 70 line where conditions change \(recorded 72\)/);
+    assert.match(conditions[1], /risk appetite moves below the 50 line where conditions change \(recorded 52\)/);
     assert.equal(conditions[2], "tightness drops below 70");
     assert.ok(decision.invalidated_by.every((entry) => entry.check === "https://whether.work/api/weekly"));
     assert.equal(regime.invalidated_by.length, 2);

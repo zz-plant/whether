@@ -48,10 +48,10 @@ describe("runway-conditioned notes", () => {
     assert.doesNotMatch(defensiveRaise.note, /favorable window/);
   });
 
-  it("keeps adequate runway canonical: act on the printed call", () => {
+  it("keeps adequate runway canonical: act on the printed guidance", () => {
     const notes = buildRunwayConditionedNotes({ regime: "VOLATILE", runwayMonths: 14 });
     assert.equal(notes.length, 1);
-    assert.match(notes[0].note, /act on the printed call/);
+    assert.match(notes[0].note, /act on the printed guidance/);
     assert.doesNotMatch(notes[0].note, /pause is what protects|raise planning belongs|binding constraint/);
   });
 

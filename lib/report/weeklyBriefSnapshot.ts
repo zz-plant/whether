@@ -46,7 +46,7 @@ type BuildWeeklyBriefSnapshotArgs = {
 
 const defaultTrustStatusCopy = {
   historicalAction:
-    "Use for retrospectives only; avoid live planning calls until you return to current data.",
+    "Use for retrospectives only; avoid live planning decisions until you return to current data.",
   fallbackAction:
     "Pause irreversible decisions until the live feed returns or you confirm the cache.",
   stableAction:

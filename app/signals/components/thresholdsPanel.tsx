@@ -170,7 +170,7 @@ export const ThresholdsPanel = ({
     {
       id: "early-alert",
       label: "Sooner warnings",
-      detail: "Lines closer to today's scores, so the call changes sooner.",
+      detail: "Lines closer to today's scores, so conditions change sooner.",
       thresholds: {
         baseRateTightness: 4.5,
         tightnessRegime: 48,
@@ -180,7 +180,7 @@ export const ThresholdsPanel = ({
     {
       id: "strict",
       label: "Slower to change",
-      detail: "Lines further out, so the call changes only on a bigger move.",
+      detail: "Lines further out, so conditions change only on a bigger move.",
       thresholds: {
         baseRateTightness: 6,
         tightnessRegime: 56,
@@ -312,10 +312,10 @@ export const ThresholdsPanel = ({
     <section id="thresholds" aria-labelledby="thresholds-title" className="mt-4">
       <div>
         <SectionPanelHeader
-          label="Lines that change the call"
-          title="Adjust when the call changes"
+          label="Change lines"
+          title="Adjust when conditions change"
           titleId="thresholds-title"
-          description="These values decide when the call changes. They stay in the URL so shared links match."
+          description="These values decide when conditions change. They stay in the URL so shared links match."
           aside={
             /* A labelled value, not a control: it was set in `weather-pill`,
                which is the class the page's pill-shaped links press. */
@@ -465,14 +465,14 @@ export const ThresholdsPanel = ({
               <summary className={DISCLOSURE_SUMMARY_CLASS}>How this works</summary>
               <div className="mt-3 space-y-3 text-xs text-slate-300">
                 <p className="text-slate-400">
-                  These lines decide when a score changes the call. Move them to match your own
+                  These lines decide when conditions change. Move them to match your own
                   risk tolerance, then share this link.
                 </p>
                 {/* The two scores cross their lines in opposite directions, so "lower
                     changes the call sooner" was true of funding pressure and backwards
                     for risk appetite — the "Sooner warnings" preset raises that line. */}
                 <ul className="list-disc space-y-1 pl-4">
-                  <li>A lower funding pressure line, or a higher risk appetite line, changes the call sooner.</li>
+                  <li>A lower funding pressure line, or a higher risk appetite line, makes conditions change sooner.</li>
                   <li>Moving either the other way waits for a bigger move.</li>
                 </ul>
               </div>

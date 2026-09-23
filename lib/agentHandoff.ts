@@ -164,7 +164,7 @@ const buildFlipWatch = (assessment: RegimeAssessment, support: AgentDecisionSupp
       : `Transition watch is OFF. Primary trigger: ${support.postureState.whatFlipsNext.flipTrigger}`;
   return {
     summary: pendingTransition
-      ? `Flip to ${pendingTransition.candidate_label} is pending confirmation; the call holds at ${getRegimePublicLabel(assessment.regime)} until the next read confirms it. ${pendingTransition.reason} ${watchSummary}`
+      ? `Flip to ${pendingTransition.candidate_label} is pending confirmation; conditions hold at ${getRegimePublicLabel(assessment.regime)} until the next read confirms it. ${pendingTransition.reason} ${watchSummary}`
       : watchSummary,
     pending_transition: pendingTransition,
     transition_watch: support.postureState.currentState.transitionWatch,

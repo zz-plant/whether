@@ -43,7 +43,7 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
     heading(1, "Whether — full text corpus"),
     "Whether turns public macro signals into a weekly operating posture for startup and product leaders.",
     [
-      "This file is the site's stable editorial content in one document. It does **not** carry this week's call,",
+      "This file is the site's stable editorial content in one document. It does **not** carry this week's guidance,",
       `which changes weekly under one URL — fetch ${baseUrl}/brief.md for that, or ${baseUrl}/api/agent for JSON.`,
       `A dated, citable copy of a past week lives at ${baseUrl}/brief/<year>-w<week>.`,
     ].join(" "),

@@ -27,7 +27,7 @@ type PreviousScores = Partial<Record<RuleConditionMetric, number | null>>;
 const SCORE_LINE_LABELS = {
   pause: "pause line",
   resume: "resume line",
-  callChange: "call changes at",
+  callChange: "change line",
 } as const;
 
 type CorridorRail = ReturnType<typeof buildSharedCorridorRails>[number];

@@ -55,7 +55,7 @@ type CompactTrustRecord = {
 export const describeRecord = (record: CompactTrustRecord, regime: string | undefined) => {
   const held = `${record.currentHoldMonths} ${record.currentHoldMonths === 1 ? "month" : "months"}`;
   return regime && regime !== record.currentRegime
-    ? `Call moved this month, after ${record.currentRegimeLabel} held ${held}`
+    ? `Conditions changed this month, after ${record.currentRegimeLabel} held ${held}`
     : `${record.currentRegimeLabel} has held ${held}`;
 };
 

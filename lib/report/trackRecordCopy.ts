@@ -9,4 +9,4 @@
  * The fact is stated here once, in the reader's terms, and imported.
  */
 export const CALL_CHANGE_RULE =
-  "The call changes only after a score has crossed its line and stayed there for a second reading.";
+  "Conditions change only after a score has crossed its line and stayed there for a second reading.";

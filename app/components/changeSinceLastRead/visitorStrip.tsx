@@ -123,7 +123,7 @@ export const ReturningVisitorDeltaStrip = ({
         <div className="space-y-2">
           <p className="type-eyebrow">Since your last review</p>
           <h2 id="returning-visitor-delta-title" className="text-base font-semibold text-slate-100 sm:text-lg">
-            What changed for your current call.
+            What changed for your current guidance.
           </h2>
           <p className="text-xs text-slate-300">
             Previous snapshot {formatDateLabel(previous.recordDate)} · now {formatDateLabel(recordDate)}

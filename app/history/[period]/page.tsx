@@ -53,7 +53,7 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
 };
 
 const describePeriod = (period: PostureArchivePeriod) =>
-  `Whether's call for ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
+  `Conditions in ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
 
 const cadenceNoun = (period: PostureArchivePeriod) =>
   period.sampleCadence === "weekly" ? "weekly readings" : "monthly readings";
@@ -79,10 +79,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!period) return {};
 
   return buildPageMetadata({
-    title: `${period.title} call — ${toWeatherLabel(period.operatorLabel)}`,
+    title: `${period.title} conditions — ${toWeatherLabel(period.operatorLabel)}`,
     description: describePeriod(period),
     path: buildPostureArchivePath(period.slug),
-    imageAlt: `Whether's call for ${period.title}`,
+    imageAlt: `Whether's reading of conditions in ${period.title}`,
   });
 }
 
@@ -112,7 +112,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const articleStructuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: `${period.title} call — ${toWeatherLabel(period.operatorLabel)}`,
+    headline: `${period.title} conditions — ${toWeatherLabel(period.operatorLabel)}`,
     description: describePeriod(period),
     datePublished: period.asOf,
     dateModified: period.asOf,
@@ -149,7 +149,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          What the call was in {period.title}
+          Conditions in {period.title}
         </h1>
         <p className="text-sm text-slate-300">{period.headline}</p>
         <p className="text-sm text-slate-300">
@@ -205,7 +205,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
       {period.transitions.length ? (
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Call changes inside {period.title}</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.transitions.map((transition) => (
               <li key={transition.asOf} className="flex flex-wrap items-baseline gap-2">
@@ -219,9 +219,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         </section>
       ) : (
         <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Call changes inside {period.title}</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
           <p className="text-sm text-slate-300">
-            The call held at {toWeatherLabel(period.operatorLabel)} for the whole period.
+            Conditions held at {toWeatherLabel(period.operatorLabel)} for the whole period.
           </p>
         </section>
       )}
@@ -310,9 +310,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What is the call now?</h2>
+        <h2 className="text-lg font-semibold text-slate-100">What are conditions now?</h2>
         <p className="text-sm text-slate-300">
-          {period.title} is a closed record. The current call, what to do this week, and what would change it live on
+          {period.title} is a closed record. Current conditions, what to do this week, and what would change them live on
           the weekly brief.
         </p>
         <ActionLink href="/" variant="primary">

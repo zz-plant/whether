@@ -147,7 +147,7 @@ describe("a degraded state says what is missing", () => {
     assertDegradedSentence(contract.flipConditionLabels[0] ?? "", "the first held-call condition");
   });
 
-  it("carries the held call, not the regime's guidance, on the monthly and quarterly cards", () => {
+  it("carries the held guidance, not the regime's default guidance, on the monthly and quarterly cards", () => {
     for (const horizon of ["monthly", "quarterly"] as const) {
       const model = buildCadenceCallModel({
         horizon,
@@ -163,7 +163,7 @@ describe("a degraded state says what is missing", () => {
       assert.equal(model.overrideReason, "Too many inputs are missing.");
 
       const html = plain(renderToStaticMarkup(createElement(CadenceCallCard, { model })));
-      assert.match(html, /Call held:/);
+      assert.match(html, /Guidance held:/);
       assert.doesNotMatch(html, /Posture change held|policy/i);
     }
   });

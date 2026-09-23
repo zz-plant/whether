@@ -93,8 +93,8 @@ export const buildDecisionDeltaRules = (
     rules.push({
       code: "regime-change",
       decisionArea: "posture",
-      action: `The call moved from ${getRegimePublicLabel(previous.regime)} to ${getRegimePublicLabel(current.regime)}; reread last week's plan.`,
-      thresholdLabel: "The line that changes the call",
+      action: `Conditions changed from ${getRegimePublicLabel(previous.regime)} to ${getRegimePublicLabel(current.regime)}; reread last week's plan.`,
+      thresholdLabel: "The line where conditions change",
       thresholdValue: 0,
       reversal: "Go back only if the previous conditions hold across two readings in a row.",
       metricValue: 0,
@@ -125,7 +125,7 @@ export const applyConfidenceGate = (
 };
 
 const AREA_LABEL: Record<DecisionArea, string> = {
-  posture: "the call",
+  posture: "the guidance",
   hiring: "hiring",
   spend: "spending",
   risk: "risk appetite",

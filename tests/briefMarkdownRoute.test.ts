@@ -55,16 +55,16 @@ describe("/brief.md", () => {
     assert.deepEqual(empty, [], `empty section(s) under a heading: ${empty.join(", ")}`);
   });
 
-  it("states the call, and never as a serialized object", async () => {
+  it("states the guidance, and never as a serialized object", async () => {
     const markdown = await renderBrief();
 
-    const call = sectionsOf(markdown).find((section) => section.heading === "This Week's Call");
-    assert.ok(call, "expected a 'This Week's Call' section");
+    const call = sectionsOf(markdown).find((section) => section.heading === "This Week's Guidance");
+    assert.ok(call, "expected a 'This Week's Guidance' section");
 
     // The three parts of a bounded decision, which is what this section promises.
     assert.match(call.body, /\*\*Do now:\*\*\s*\S/);
     assert.match(call.body, /\*\*Pause if:\*\*\s*\S/);
-    assert.match(call.body, /\*\*Call changes if:\*\*\s*\S/);
+    assert.match(call.body, /\*\*Conditions change if:\*\*\s*\S/);
     assert.match(call.body, /\*\*Resume when:\*\*\s*\S/);
 
     // The other half of the original defect: a non-null object would have been

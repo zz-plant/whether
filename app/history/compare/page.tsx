@@ -154,7 +154,7 @@ export default async function HistoryComparePage({
         },
         page: {
           pageTitle: "Compare two periods",
-          pageSummary: "Signals and operating calls for any two past months, side by side.",
+          pageSummary: "Signals and operating guidance for any two past months, side by side.",
           sectionLinks: compareSectionLinks,
         },
         trust: {

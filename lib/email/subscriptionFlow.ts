@@ -64,12 +64,12 @@ export const subscribeAndSendVerification = async ({
     html: [
       "<!DOCTYPE html><html><body style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#1e293b;'>",
       "<h1 style='font-size:1.1rem;font-weight:600;'>Confirm your subscription</h1>",
-      `<p style='font-size:0.95rem;'>Click the button to confirm you want the Whether weekly brief${subscriber.alerts ? ", plus an email when the call changes between Mondays" : ""}.</p>`,
+      `<p style='font-size:0.95rem;'>Click the button to confirm you want the Whether weekly brief${subscriber.alerts ? ", plus an email when conditions change between Mondays" : ""}.</p>`,
       `<a href='${verifyUrl}' style='display:inline-block;padding:10px 20px;border-radius:6px;background:#0f172a;color:#fff;text-decoration:none;font-weight:600;'>Confirm subscription</a>`,
       "<p style='font-size:0.8rem;color:#64748b;margin-top:20px;'>If you didn't request this, ignore this email.</p>",
       "</body></html>",
     ].join(""),
-    text: `Confirm your Whether subscription${subscriber.alerts ? " (weekly brief plus an email when the call changes)" : ""}: ${verifyUrl}`,
+    text: `Confirm your Whether subscription${subscriber.alerts ? " (weekly brief plus an email when conditions change)" : ""}: ${verifyUrl}`,
   });
 
   if (!result.ok) throw new Error(result.error);

@@ -91,7 +91,7 @@ export const buildIssueTrackerMarkdownBrief = (
     `${heading2}Whether Weekly Brief — ${treasury.record_date}`,
     `${strong("Conditions")} ${conditionsLabel}`,
     "",
-    `${heading3}This week's call`,
+    `${heading3}This week's guidance`,
     ...callLines,
     "",
     `${heading3}${EXPORT_SECTION_HEADINGS.changed}`,
@@ -104,7 +104,7 @@ export const buildIssueTrackerMarkdownBrief = (
     "",
     ...buildExportStamp(
       treasury,
-      `${formatExportConfidenceWord(decisionModel?.confidenceLabel ?? assessment.diagnostics.confidence)} (how far the scores sit from the line that changes the call)`,
+      `${formatExportConfidenceWord(decisionModel?.confidenceLabel ?? assessment.diagnostics.confidence)} (how far the scores sit from the line where conditions change)`,
     ),
   ].join("\n");
 };

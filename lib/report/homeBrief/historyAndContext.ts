@@ -169,9 +169,9 @@ const getMacroSeriesDelta = (
 };
 
 const sectorActionBiasCopy = {
-  loosen: "Run a step ahead of the base call.",
-  tighten: "Run a step behind the base call.",
-  hold: "Hold the base call as written.",
+  loosen: "Run a step ahead of the base guidance.",
+  tighten: "Run a step behind the base guidance.",
+  hold: "Hold the base guidance as written.",
 } as const;
 
 const describeSectorOverlay = (
@@ -290,7 +290,7 @@ export const buildWhyThisCall = ({
   return [
     {
       key: "distance-to-regime-change",
-      label: "How close the call is to changing",
+      label: "How close conditions are to changing",
       detail: pendingFlipDetail ?? `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
     },
     {
@@ -299,15 +299,15 @@ export const buildWhyThisCall = ({
       detail:
         changedSignal
           ? `${regimeSignalLabelByKey[changedSignal.key]} ${describeSignalDirection(changedSignal)}, and ${overallDirectionCopy[reportDynamics?.directionLabel ?? "stable"]}.`
-          : "Nothing moved materially. This week's call comes from where the signals already sit, not from new motion.",
+          : "Nothing moved materially. This week's guidance comes from where the signals already sit, not from new motion.",
     },
     {
       key: "signal-reliability",
-      label: "Call change watch",
+      label: "Change watch",
       detail:
         transitionWatch === "ON"
-          ? "On. Hold net-new headcount, multi-quarter vendors, and irreversible roadmap expansion until the next live weekly refresh confirms the call."
-          : "Off. Use this live read for this week's approvals and apply the thresholds in the current call.",
+          ? "On. Hold net-new headcount, multi-quarter vendors, and irreversible roadmap expansion until the next live weekly refresh confirms the guidance."
+          : "Off. Use this live read for this week's approvals and apply the thresholds in the current guidance.",
     },
   ];
 };
@@ -319,8 +319,8 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent: 8,
       urgencyLabel: "Unknown",
-      detailLabel: "One more live reading is needed to tell how close the call is to changing.",
-      triggerLabel: "The line that changes the call needs a fresh reading.",
+      detailLabel: "One more live reading is needed to tell how close conditions are to changing.",
+      triggerLabel: "The line where conditions change needs a fresh reading.",
     };
   }
 
@@ -333,7 +333,7 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent,
       urgencyLabel: "High",
-      detailLabel: "The call is close to changing. Recheck major commitments before locking spend.",
+      detailLabel: "Conditions are close to changing. Recheck major commitments before locking spend.",
       triggerLabel,
     };
   }
@@ -342,7 +342,7 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent,
       urgencyLabel: "Medium",
-      detailLabel: "The call could change within weeks. Keep approvals reversible and review weekly.",
+      detailLabel: "Conditions could change within weeks. Keep approvals reversible and review weekly.",
       triggerLabel,
     };
   }
@@ -350,7 +350,7 @@ export const buildFlipRiskMeterState = (
   return {
     progressPercent,
     urgencyLabel: "Low",
-    detailLabel: "The call has room before it changes. Keep this week’s pace unless signals turn.",
+    detailLabel: "Conditions have room before they change. Keep this week’s pace unless signals turn.",
     triggerLabel,
   };
 };
@@ -387,7 +387,7 @@ export const buildStartRouteDeltaBlock = ({
       isReturningUser: false,
       hasMeaningfulDelta: false,
       fallbackCopy:
-        "First review this cycle. Start with the current posture call, then set your first bounded operating decision.",
+        "First review this cycle. Start with this week's guidance, then set your first bounded operating decision.",
       items: [],
     };
   }
@@ -397,7 +397,7 @@ export const buildStartRouteDeltaBlock = ({
       isReturningUser: true,
       hasMeaningfulDelta: false,
       fallbackCopy:
-        `No change. Last week's calls stand. ${heldDecision} Re-check when: ${reversalTrigger}`,
+        `No change. Last week's guidance stands. ${heldDecision} Re-check when: ${reversalTrigger}`,
       items: [],
     };
   }
@@ -413,7 +413,7 @@ export const buildStartRouteDeltaBlock = ({
     items.push({
       id: "posture-shift" as const,
       label: "Conditions changed",
-      detail: `Conditions moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check this week's call before committing anything you can't undo.`,
+      detail: `Conditions moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check this week's guidance before committing anything you can't undo.`,
       href: "/resolve" as const,
     });
   }
@@ -438,7 +438,7 @@ export const buildStartRouteDeltaBlock = ({
     detail: joinSentences(
       topFailureMode,
       `The pause line: ${guardrail}`,
-      `The call changes if: ${reversalTrigger}`,
+      `Conditions change if: ${reversalTrigger}`,
     ),
     href: "/operate" as const,
   });

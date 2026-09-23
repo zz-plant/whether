@@ -26,7 +26,7 @@ import { SignalReading } from "./ui/plainLanguage";
  * formats use, so the summary at the end cannot drift from what is on screen.
  */
 
-const FRAME_TITLES = ["The call", "Decisions to revisit", DECISION_CONTRACT_LABELS.watch.flipWatch] as const;
+const FRAME_TITLES = ["The guidance", "Decisions to revisit", DECISION_CONTRACT_LABELS.watch.flipWatch] as const;
 
 export function PresentationFrames({ onExit }: { onExit: () => void }) {
   const artifact = useBriefArtifact();

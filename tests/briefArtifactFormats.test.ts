@@ -213,13 +213,13 @@ describe("brief artifact formats", () => {
 
   it("keeps the slide's stance line distinct from its action", () => {
     const slide = formatBriefArtifact(artifact, "slide", origin);
-    assert.match(slide, /\*\*CALL\*\*: Hold hiring at current headcount\./);
+    assert.match(slide, /\*\*GUIDANCE\*\*: Hold hiring at current headcount\./);
     assert.match(slide, /\*\*ACTION NOW\*\*: Stage offers behind the September close\./);
 
     // On a week where the model has no stage-scoped action the two hold the same
     // sentence, and the slide states it once.
     const restated = formatBriefArtifact({ ...artifact, actionNow: artifact.call }, "slide", origin);
-    assert.ok(!restated.includes("**CALL**:"));
+    assert.ok(!restated.includes("**GUIDANCE**:"));
   });
 
   it("keeps the weekly call defined in one place", () => {
@@ -253,7 +253,7 @@ describe("brief artifact formats", () => {
     const lines = agenda.split("\n");
 
     assert.match(lines[0], /^### .* \(3 min\) — 2026-09-04$/);
-    assert.equal(lines[1], `**Operating call:** ${artifact.call} (${artifact.regimeLabel})`);
+    assert.equal(lines[1], `**Guidance:** ${artifact.call} (${artifact.regimeLabel})`);
 
     for (const [index, step] of MONDAY_AGENDA_STEPS.entries()) {
       assert.ok(

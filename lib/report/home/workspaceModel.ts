@@ -59,7 +59,7 @@ const resolveApprovalDetail = ({
   }
 
   if (regimeKey === "DEFENSIVE") {
-    return "Approve the highest-payback moves this week's call supports and keep the stop line visible.";
+    return "Approve the highest-payback moves this week's guidance supports and keep the stop line visible.";
   }
 
   return "Limit approvals to cash-critical work until the stop line clears.";
@@ -273,7 +273,7 @@ export const buildHomeWorkspaceModel = ({
       fallbackUtility: {
         href: "/resolve#direct-answers",
         title: "Direct answers",
-        detail: "One yes-or-no answer per open decision, under this week's call.",
+        detail: "One yes-or-no answer per open decision, under this week's guidance.",
       },
       toolkitShortcuts: toolkitShortcuts.map((toolkit) => ({
         href: `/toolkits/${toolkit.slug}`,

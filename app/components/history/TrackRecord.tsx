@@ -57,7 +57,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
     <thead>
       <tr className="border-b border-slate-800/80 text-slate-400">
         <th scope="col" className="py-2 pr-3 font-medium">Month</th>
-        <th scope="col" className="py-2 pr-3 font-medium">Call</th>
+        <th scope="col" className="py-2 pr-3 font-medium">Conditions</th>
         <th scope="col" className="py-2 pr-3 text-right font-medium">{OPERATING_LATITUDE_LABEL} (0–100)</th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
@@ -129,7 +129,7 @@ export function TrackRecordTiles({
       <div>
         <h2 className="type-eyebrow type-eyebrow-section" id="track-record-heading">Track record</h2>
         <p className="text-sm text-slate-300">
-          Every call Whether has made, from the same published formula. Not a forecast — a record
+          Every reading Whether has made, from the same published formula. Not a forecast — a record
           you can audit.
         </p>
       </div>
@@ -139,11 +139,11 @@ export function TrackRecordTiles({
           <div className="grid grid-cols-2 gap-2">
             <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} />
             <StatTile
-              label="Current call held"
+              label="Current conditions held"
               value={record.currentHoldMonths.toLocaleString("en-US")}
               unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
             />
-            <StatTile label="Call changes" value={changeRate} />
+            <StatTile label="Changes in conditions" value={changeRate} />
             <StatTile label="Record starts" value={formatDateUTC(record.firstRecordDate)} />
           </div>
 
@@ -153,10 +153,10 @@ export function TrackRecordTiles({
               the month in progress has moved — which is how this page said "Sunny"
               on a week the brief was calling Freezing. */}
           <p className="text-fluid-xs text-slate-400">
-            Through {formatDateUTC(record.latestRecordDate)}, the month-end call had been{" "}
+            Through {formatDateUTC(record.latestRecordDate)}, month-end conditions had been{" "}
             <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
             since {formatDateUTC(record.currentHoldStartDate)}.{" "}
-            {CALL_CHANGE_RULE} One noisy month cannot move it, so a held call is the usual state and a
+            {CALL_CHANGE_RULE} One noisy month cannot move it, so unchanged conditions are the usual state and a
             change is the event worth reading.
           </p>
         </div>
@@ -189,9 +189,9 @@ export function TrackRecordTable({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
-        <h2 className="type-eyebrow type-eyebrow-section" id="monthly-calls-heading">Monthly calls</h2>
+        <h2 className="type-eyebrow type-eyebrow-section" id="monthly-calls-heading">Monthly readings</h2>
         <p className="text-sm text-slate-300">
-          The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each call, newest first. It runs
+          The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each reading, newest first. It runs
           0 to 100: {OPERATING_LATITUDE_GLOSS}.
         </p>
       </div>
@@ -203,7 +203,7 @@ export function TrackRecordTable({
         summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
         summary={
           <span>
-            Monthly calls ({record.allRows.length.toLocaleString("en-US")}) ·{" "}
+            Monthly readings ({record.allRows.length.toLocaleString("en-US")}) ·{" "}
             {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(record.latestRecordDate)}
           </span>
         }
@@ -213,7 +213,7 @@ export function TrackRecordTable({
         <div className="mt-3 space-y-4">
           <RecordTable
             rows={record.rows}
-            caption={`The ${record.rows.length} most recent monthly calls, newest first, with the operating latitude score behind each call.`}
+            caption={`The ${record.rows.length} most recent monthly readings, newest first, with the operating latitude score behind each one.`}
           />
           {earlierRows.length > 0 ? (
             <div>
@@ -223,7 +223,7 @@ export function TrackRecordTable({
               </p>
               <RecordTable
                 rows={earlierRows}
-                caption="The remainder of the monthly call history, newest first."
+                caption="The remainder of the monthly readings, newest first."
               />
             </div>
           ) : null}

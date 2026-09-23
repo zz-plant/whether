@@ -8,13 +8,13 @@ export const organizationName = "Whether";
  *
  * Two nouns are load-bearing and neither may be substituted on an outward
  * surface: the product is the **Whether Weekly Brief**, and what it delivers is
- * the **weekly operating call**. Marketing surfaces kept minting third options
+ * the **weekly operating guidance**. Marketing surfaces kept minting third options
  * ("operating posture", "pacing authority", "decision-translation layer"), which
  * is fine internally and costly outwardly — this product spreads by someone
  * repeating it in a Slack channel, and a phrase that changes per surface does not
  * survive the retelling. See docs/editorial-guardrails.md -> Category line.
  */
-export const websiteName = "Whether — Weekly Operating Call for Startup Leaders";
+export const websiteName = "Whether — Weekly Operating Guidance for Startup Leaders";
 export const canonicalPositioningLine =
   "Each Monday: what interest rates and credit mean for your hiring, spend and raise.";
 export const defaultSiteDescription =

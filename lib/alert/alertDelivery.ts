@@ -127,7 +127,7 @@ export const deliverAlertToSubscriber = async (
       /* The engine key reached every subscriber here ("shifted to SCARCITY");
          the weather word and what it means for money is what a reader acts on. */
       template = decisionVerdictEmail({
-        headline: `THE CALL MOVED TO ${getRegimePublicLabel(conditions.regime).toUpperCase()}`,
+        headline: `CONDITIONS TURNED ${getRegimePublicLabel(conditions.regime).toUpperCase()}`,
         why: `Conditions are now ${describeConditions(conditions.regime)}. Last week's plan rested on the previous conditions.`,
         actionNow: conditions.posture,
         reversal: "The readings return to the previous conditions for two updates in a row.",

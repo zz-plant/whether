@@ -82,7 +82,7 @@ export function HistoryExplorer({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h2>
-          <p className="text-sm text-slate-300">The call and funding pressure, month by month, since 2012.</p>
+          <p className="text-sm text-slate-300">Conditions and funding pressure, month by month, since 2012.</p>
         </div>
         <ActionLink href="/history/compare" variant="pill">Compare two periods &rarr;</ActionLink>
       </div>

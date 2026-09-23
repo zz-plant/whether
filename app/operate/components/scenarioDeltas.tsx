@@ -51,7 +51,7 @@ export function ScenarioDeltas({
             {getRegimePublicLabel(simulatedAssessment.regime)}
           </Tag>
           <p className="text-[11px] text-slate-400">
-            {regimeShifted ? "The call would change" : "Same call as this week"}
+            {regimeShifted ? "Conditions would change" : "Same conditions as this week"}
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export function ScenarioDeltas({
 
         {simulatedPlaybook.playbook && (
           <div className="weather-surface p-4 border-l-4 border-sky-400">
-            <p className="type-eyebrow text-sky-200">The call in this scenario</p>
+            <p className="type-eyebrow text-sky-200">Guidance in this scenario</p>
             <p className="mt-1 text-base font-semibold text-slate-100">
               &quot;{simulatedPlaybook.playbook.mandate}&quot;
             </p>

@@ -178,7 +178,7 @@ export const buildWeeklyCallContract = ({
   const flipConditionLabels = policyOverrideActive
     ? dedupeLines(
         [
-          policyOverrideReason ? `Why the call is held: ${policyOverrideReason}` : undefined,
+          policyOverrideReason ? `Why the guidance is held: ${policyOverrideReason}` : undefined,
           "Hold anything you can't undo until the two scores agree.",
           ...defaultFlipConditionLabels,
         ],
@@ -188,8 +188,8 @@ export const buildWeeklyCallContract = ({
   const whyCouldBeWrong = policyOverrideActive
     ? "The two scores disagree, or too many inputs are missing, so this week’s direction may be overstated."
     : homeBriefModel.confidenceLabel === "HIGH"
-      ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the call."
-      : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s call.";
+      ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the guidance."
+      : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s guidance.";
 
   return applyStageToWeeklyCall(
     {

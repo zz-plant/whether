@@ -80,7 +80,7 @@ export function DoAndShareSection({
           below them. The push toggle sits with it: it is the same alert by
           another route, and renders nothing where push is unconfigured. */}
       <div id="subscribe" className="space-y-4 border-t border-slate-800/60 pt-4">
-        <h3 className="sr-only">Get the weekly call by email</h3>
+        <h3 className="sr-only">Get the weekly guidance by email</h3>
         <SubscribeForm compact />
         <RegimeAlertToggle />
       </div>

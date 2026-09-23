@@ -28,7 +28,7 @@ export const SignalsEvidenceBody = ({
 }) => (
   <>
     <SignalsCallSection
-      callLine={model.actionNowShort ?? "Keep this week's call while the scores stay inside their lines."}
+      callLine={model.actionNowShort ?? "Keep this week's guidance while the scores stay inside their lines."}
       trustStrip={model.trustStrip}
     />
     <SignalsWhatChangedSection

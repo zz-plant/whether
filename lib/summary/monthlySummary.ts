@@ -120,8 +120,8 @@ export const buildMonthlyStructured = ({
   const postureSummary = [
     formatConfidenceSentence(confidence, intensity),
     transitionWatch
-      ? "The call is close to a boundary, so keep reversals cheap."
-      : "The call is clear of its boundaries.",
+      ? "Conditions are close to a boundary, so keep reversals cheap."
+      : "Conditions are clear of their boundaries.",
   ];
   const boundedNextActions = [
     "Approve only work that serves the month's priority; hold the rest for the next read.",
@@ -172,10 +172,10 @@ export const buildMonthlySummary = ({
   const guidance = getMonthlyActionGuidance(assessment.regime, { financingSaturated });
   const operatingRules = getMonthlyOperatingRules(assessment);
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? "A score is sitting near the line that changes the call, so hold major scope changes until the next reading."
+    ? "A score is sitting near the line where conditions change, so hold major scope changes until the next reading."
     : "";
   const shockCue = assessment.diagnostics.shockCrossing
-    ? "This flip crossed its line in one jump, so no published reversal condition fired — hold the call as unconfirmed until the next read."
+    ? "This flip crossed its line in one jump, so no published reversal condition fired — treat the change in conditions as unconfirmed until the next read."
     : "";
   const summary = joinSentences(
     `${regimeLabel}: ${assessment.description}`,

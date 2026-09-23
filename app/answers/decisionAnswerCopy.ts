@@ -28,7 +28,7 @@ export const buildDecisionAnswerContextSummary = ({
 }) => {
   const canonicalLabel = getRegimePublicLabel(canonicalRegime);
   const classificationLine = canonicalLabel !== displayLabel
-    ? `Underneath, the call is ${canonicalLabel}.`
+    ? `Underneath, the scores read ${canonicalLabel}.`
     : null;
   const movement = MOVEMENT_PHRASES[momentumLabel] ?? "";
   const standing = revisitDecisions ? "revisit last week's decisions." : "last week's decisions stand.";

@@ -56,10 +56,10 @@ describe("published brief date-pinned exports", () => {
     assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
     assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(medium confidence\)/);
     assert.match(slack, /• What changed: Pressure increased by \+1\.2 this week\./);
-    assert.match(slack, /• Call: Keep expansion selective/);
+    assert.match(slack, /• Guidance: Keep expansion selective/);
     assert.match(slack, /• Do now: Conditions tightening — freeze new commitments and keep spend flexible\./);
     assert.match(slack, /• Pause if: Over-engineering before demand proves out/);
-    assert.match(slack, /• Call changes if: No flip condition is tripped yet\./);
+    assert.match(slack, /• Conditions change if: No flip condition is tripped yet\./);
 
     // Area-level bounded decisions
     assert.match(slack, /• Hiring: Selective hiring for revenue-linked and reliability roles\./);

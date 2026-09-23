@@ -32,17 +32,17 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
   method: {
     label: "METHOD LENS",
     title: "How it works",
-    body: "Trace every call to its formula, its sources and when they last updated.",
+    body: "Trace every reading to its formula, its sources and when they last updated.",
   },
   solutions: {
     label: "SOLUTIONS LENS",
     title: "Decision support",
-    body: "Turn the weekly call into pause and resume lines for each team.",
+    body: "Turn the weekly guidance into pause and resume lines for each team.",
   },
   guides: {
     label: "GUIDES LENS",
     title: "Team enablement",
-    body: "Give product, finance and strategy one call to plan against.",
+    body: "Give product, finance and strategy the same guidance to plan against.",
   },
 };
 

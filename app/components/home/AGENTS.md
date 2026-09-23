@@ -1,6 +1,6 @@
 # `app/components/home` agent guide
 
-This directory owns homepage orchestration after the canonical weekly call.
+This directory owns homepage orchestration after the canonical weekly guidance.
 
 Use this guide when editing the home route shell, workspace bands, route handoffs, or homepage-only fallback/loading behavior.
 
@@ -13,7 +13,7 @@ Use this guide when editing the home route shell, workspace bands, route handoff
 
 ## What this directory must not own
 
-- The canonical weekly-call semantics themselves
+- The canonical weekly-guidance semantics themselves
 - Deep evidence/trust workflows that belong on `/signals` or `/trust`
 - Export payload semantics that belong in `lib/report/*` or `/planning`
 - Standalone surfaces that duplicate the weekly brief loop
@@ -21,8 +21,8 @@ Use this guide when editing the home route shell, workspace bands, route handoff
 ## Homepage sequencing rules
 
 The homepage should read as:
-1. settle the weekly call
-2. turn the call into this week's plan
+1. settle the weekly guidance
+2. turn the guidance into this week's plan
 3. open proof, trust, or deeper tools only if challenged
 
 Planning is the default next step.
@@ -43,7 +43,7 @@ Prefer changing these before changing home presentation:
 - Use home bands to route work, not to recreate downstream pages inline.
 - Route copy should stay plain-English and job-focused. Avoid internal framework language.
 - If a section starts reading like a second dashboard, compress it.
-- Fallback states should preserve the same ritual sequence as the resolved homepage: call first, then plan, then exceptions.
+- Fallback states should preserve the same ritual sequence as the resolved homepage: guidance first, then plan, then exceptions.
 - Home-specific helper copy should reinforce the five-surface loop rather than invent local taxonomy.
 
 ## Tests and docs to update
