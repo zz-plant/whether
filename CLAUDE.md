@@ -1051,6 +1051,22 @@ snapshot-by-design one only when it is past its own window. It was the first thi
 was told about the data, and a warning that never turns off is one readers learn to skip on the
 week it is true. `tests/sourceHealth.test.ts` holds all three cases.
 
+## One runway setting (2026-09-23)
+
+`/` had two "cash runway" settings: the header pill and section selector (a cookie the server
+calibrates the guidance to, bands <6 / 6–12 / 12–24 / 24+) and a picker in the runway-notes panel
+(the browser profile, bands under 6 / 6–12 / 12–18 / 18+). Neither updated the other, and they were
+half-linked in the worst way: choosing a band wrote its representative figure into the profile, so
+"12–24 mo — Follow the guidance" became "18 months" in the planner and the stress test, and 18
+crossed the notes' long-runway line: "runway is not what limits you this week".
+
+Now: the band (cookie) is the setting, and the notes branch on the band table's own boundaries.
+Choosing a band writes no figure, and clears an entered one it excludes. An exact figure entered
+on `/operate` moves the band (`syncRunwayBandToMonths` in `useOperatorProfile`). A band reads as
+its range in the notes ("With 12–24 months of runway"), never as a number the reader did not give,
+and burn arithmetic runs only on a real figure. The server-rendered default band produces no note:
+it is shown as a default ("It shows 12–24 mo until you choose"), not as an answer.
+
 ## An artifact that names itself
 
 `public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —

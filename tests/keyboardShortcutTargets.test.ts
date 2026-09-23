@@ -135,7 +135,8 @@ describe("tablists support the keyboard", () => {
    */
   it("routes every segmented control through the shared primitive", async () => {
     const componentsDir = join(testDir, "..", "app", "components");
-    const consumers = ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx", "RunwayConditionedNotes.tsx"];
+    // RunwayConditionedNotes.tsx left the list on 2026-09-23: it no longer draws a control of its own.
+    const consumers = ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx"];
 
     for (const name of consumers) {
       const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
@@ -154,7 +155,7 @@ describe("tablists support the keyboard", () => {
   it("keeps a setting out of the history stack", async () => {
     const componentsDir = join(testDir, "..", "app", "components");
 
-    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx", "StageDropdownPill.tsx", "RunwayDropdownPill.tsx"]) {
+    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx", "StageDropdownPill.tsx", "RunwayDropdownPill.tsx", "RunwayConditionedNotes.tsx"]) {
       const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
       assert.match(source, /router\.replace\(/, `${name} should replace rather than push`);
       assert.doesNotMatch(source, /router\.push\(/, `${name} pushes a setting onto history`);

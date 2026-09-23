@@ -9,6 +9,7 @@ import {
   setOperatorProfileField,
   type OperatorProfile,
 } from "../../lib/operatorProfile";
+import { syncRunwayBandToMonths } from "./useOperatorRunway";
 
 /**
  * The operator's own figures, shared by every surface that needs one. Backed by
@@ -28,6 +29,8 @@ export const useOperatorProfile = () => {
   const setProfileField = useCallback(
     <K extends keyof OperatorProfile>(key: K, value: OperatorProfile[K] | undefined) => {
       setStored((previous) => setOperatorProfileField(previous, key, value));
+      // One runway setting: an exact figure moves the band with it.
+      if (key === "runwayMonths") syncRunwayBandToMonths(typeof value === "number" ? value : undefined);
     },
     [setStored],
   );
