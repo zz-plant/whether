@@ -221,7 +221,7 @@ export async function DecisionAnswerPageContent({
                 intent: measurement.intent,
                 ctaId: "copy_decision_brief",
               }}
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
             />
           </div>
         </SecondaryPageSection>

@@ -43,7 +43,7 @@ const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
           {row.isPostureSnapshot ? "Guidance recorded" : "Decision recorded"} against the {row.recordedOn} reading
         </p>
       </div>
-      <span className={`shrink-0 rounded-sm border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${VERDICT_STYLES[row.verdict]}`}>
+      <span className={`shrink-0 rounded-sm border px-3 py-1 text-xs font-semibold ${VERDICT_STYLES[row.verdict]}`}>
         {row.verdict}
       </span>
     </div>

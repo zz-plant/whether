@@ -214,7 +214,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
             intent: contentIntent,
             ctaId: "copy_signal_brief",
           }}
-          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
         />
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

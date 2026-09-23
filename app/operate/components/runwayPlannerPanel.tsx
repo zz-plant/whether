@@ -223,7 +223,7 @@ export function RunwayPlannerPanel({
         {/* Native disclosure: the method is evidence for the figures below,
             and its open state is nobody else's business, so no query key. */}
         <details className="weather-auto-chevron mt-3">
-          <summary className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+          <summary className="text-xs font-semibold text-slate-200">
             How is this calculated?
           </summary>
           <p className="rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
@@ -351,7 +351,7 @@ export function RunwayPlannerPanel({
               <p className="mt-2 text-fluid-xs text-slate-400">{output.runwayRisk.summary}</p>
             </article>
             <article className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Safe runway band</p>
+              <p className="text-xs font-semibold text-slate-400">Safe runway band</p>
               <p className="mt-2 flex items-baseline gap-2 tabular-nums">
                 <span className="text-2xl font-semibold text-slate-100">{output.safeRunwayBand.minMonths}–{output.safeRunwayBand.maxMonths}</span>
                 <span className="text-sm text-slate-500">months</span>
@@ -371,7 +371,7 @@ export function RunwayPlannerPanel({
               <p className="mt-2 text-fluid-xs text-slate-400">{output.safeRunwayBand.summary}</p>
             </article>
             <article className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Raise timing window</p>
+              <p className="text-xs font-semibold text-slate-400">Raise timing window</p>
               <p className="mt-2 flex items-baseline gap-2 tabular-nums">
                 <span className="text-2xl font-semibold text-slate-100">
                   month {output.raiseTimingWindow.startMonth}–{output.raiseTimingWindow.endMonth}
@@ -393,7 +393,7 @@ export function RunwayPlannerPanel({
               <p className="mt-2 text-fluid-xs text-slate-400">{output.raiseTimingWindow.summary}</p>
             </article>
             <article className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Burn adjustment range</p>
+              <p className="text-xs font-semibold text-slate-400">Burn adjustment range</p>
               <p className="mt-2 flex items-baseline gap-2 tabular-nums">
                 <span className="text-2xl font-semibold text-slate-100">
                   {output.burnAdjustmentRange.recommendedDeltaPercent > 0 ? "+" : ""}
@@ -414,14 +414,14 @@ export function RunwayPlannerPanel({
                 label="Recommended burn change inside its range"
               />
               <p className="mt-2 text-fluid-xs text-slate-400">{output.burnAdjustmentRange.summary}</p>
-              <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.08em] ${paybackStrictnessState.tone}`}>
+              <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold ${paybackStrictnessState.tone}`}>
                 Payback bar: {paybackStrictnessState.label.toLowerCase()}
               </p>
             </article>
           </div>
 
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">The rules this sets</p>
+            <p className="text-xs font-semibold text-slate-400">The rules this sets</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
               <li>• {output.boundedRules.capitalRaising}</li>
               <li>• {output.boundedRules.burnDiscipline}</li>
@@ -432,7 +432,7 @@ export function RunwayPlannerPanel({
           </div>
 
           <details id="ops-board-memo" className="weather-surface weather-auto-chevron p-5">
-            <summary className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+            <summary className="text-xs font-semibold text-slate-200">
               Budget memo
             </summary>
             <div className="space-y-4">
