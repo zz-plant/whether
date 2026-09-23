@@ -428,7 +428,7 @@ export const DecisionShieldPanel = ({
         <div className="mt-4 min-h-[260px]">
           {error && lastAttemptedTarget === "verdict" ? (
             <div className="rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
-              <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
+              <p className="text-xs font-semibold text-amber-200">
                 Clipboard blocked
               </p>
               <p className="mt-2 text-amber-100/90">
@@ -533,7 +533,7 @@ export const DecisionShieldPanel = ({
             <Form onFormSubmit={handlePresetSave} className="mt-4">
               <Fieldset.Root className="flex min-w-0 flex-wrap items-start gap-3 border-0 p-0">
                 <Fieldset.Legend className="sr-only">Save a reusable Decision Shield preset</Fieldset.Legend>
-                <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 sm:max-w-xs">
+                <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold text-slate-400 sm:max-w-xs">
                   <Field.Label nativeLabel={false} render={<span />}>Preset name</Field.Label>
                   <Input
                     ref={presetInputRef}
@@ -550,7 +550,7 @@ export const DecisionShieldPanel = ({
                 </Field.Root>
                 <button
                   type="submit"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   Save preset
                 </button>
@@ -574,7 +574,7 @@ export const DecisionShieldPanel = ({
               ) : (
                 presets.map((preset) => (
                   <div key={preset.id} className="rounded-lg border border-slate-800/60 p-3">
-                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    <p className="text-xs font-semibold text-slate-400">
                       {preset.name}
                     </p>
                     <p className="mt-2 text-sm text-slate-200">
@@ -586,14 +586,14 @@ export const DecisionShieldPanel = ({
                       <button
                         type="button"
                         onClick={() => handlePresetApply(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                       >
                         Apply
                       </button>
                       <button
                         type="button"
                         onClick={() => handlePresetDelete(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
                       >
                         Remove
                       </button>
@@ -608,7 +608,7 @@ export const DecisionShieldPanel = ({
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Decision verdict</p>
               <div
-                className={`mt-3 inline-flex items-center rounded-sm border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
+                className={`mt-3 inline-flex items-center rounded-sm border px-3 py-1 text-xs font-semibold ${verdictStyles[output.verdict]}`}
               >
                 {output.verdict}
               </div>

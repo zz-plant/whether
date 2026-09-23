@@ -345,10 +345,10 @@ export const ThresholdsPanel = ({
                   onClick={() => handlePresetApply(preset.thresholds)}
                   disabled={isPending}
                   aria-busy={isPending}
-                  className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
+                  className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                 >
                   <span className="text-slate-100">{preset.label}</span>
-                  <span className="text-fluid-xs font-medium tracking-[0.08em] text-slate-400">
+                  <span className="text-fluid-xs font-medium text-slate-400">
                     {preset.detail}
                   </span>
                 </button>
@@ -416,7 +416,7 @@ export const ThresholdsPanel = ({
                       type="submit"
                       disabled={isPending}
                       aria-busy={isPending}
-                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
                       {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
                       {isPending ? "Applying" : "Apply lines"}
@@ -426,7 +426,7 @@ export const ThresholdsPanel = ({
                       onClick={handleReset}
                       disabled={isPending}
                       aria-busy={isPending}
-                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                     >
                       {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
                       {isPending ? "Resetting" : "Reset"}
@@ -486,7 +486,7 @@ export const ThresholdsPanel = ({
                   <ul className="space-y-3 text-xs text-slate-400">
                     {auditLog.map((entry) => (
                       <li key={`${entry.timestamp}-${entry.source}`}>
-                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                        <p className="text-xs font-semibold text-slate-400">
                           {entry.source === "reset" ? "Reset" : entry.source === "preset" ? "Preset" : "Edited"} ·{" "}
                           {new Date(entry.timestamp).toLocaleString("en-US", {
                             timeStyle: "short",

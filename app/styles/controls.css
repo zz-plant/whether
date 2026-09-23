@@ -90,7 +90,7 @@
 }
 
 .weather-cta {
-  @apply inline-flex items-center justify-center border text-xs font-semibold leading-tight tracking-[0.12em] no-underline;
+  @apply inline-flex items-center justify-center border text-xs font-semibold leading-tight no-underline;
   min-height: 46px;
   border-radius: var(--radius-lg);
   padding: 0.55rem 1.05rem;
@@ -202,7 +202,6 @@ input:not([type="range"]) {
   background: rgba(15, 23, 42, 0.95);
   padding: 0.6rem 1.2rem;
   font-size: 0.75rem;
-  letter-spacing: 0.2em;
   text-transform: none;
   color: rgba(248, 250, 252, 0.9);
 }

@@ -44,7 +44,7 @@ export function RulesBeforeCommit({
       <div className="grid gap-4 lg:grid-cols-3">
         {lists.map((list) => (
           <div key={list.key} className={`weather-surface border-l-4 p-4 ${list.className}`}>
-            <p className={`text-xs font-semibold tracking-[0.12em] ${list.labelClassName}`}>{list.label}</p>
+            <p className={`text-xs font-semibold ${list.labelClassName}`}>{list.label}</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {list.items.map((item) => (
                 <li key={item} className="break-words">
@@ -57,12 +57,12 @@ export function RulesBeforeCommit({
       </div>
       {playbook ? (
         <details className="weather-auto-chevron">
-          <summary className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+          <summary className="text-xs font-semibold text-slate-300">
             Leadership signals (phrases to use or avoid)
           </summary>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">More often</p>
+              <p className="text-xs font-semibold text-emerald-200">More often</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {playbook.leadershipPhrases.more.map((item) => (
                   <li key={item} className="break-words">
@@ -72,7 +72,7 @@ export function RulesBeforeCommit({
               </ul>
             </div>
             <div>
-              <p className="text-xs font-semibold tracking-[0.12em] text-rose-200">Less often</p>
+              <p className="text-xs font-semibold text-rose-200">Less often</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {playbook.leadershipPhrases.less.map((item) => (
                   <li key={item} className="break-words">

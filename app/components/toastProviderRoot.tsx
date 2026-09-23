@@ -34,7 +34,7 @@ const ToastList = () => {
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 {toast.title ? (
-                  <Toast.Title className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+                  <Toast.Title className="text-xs font-semibold text-slate-200">
                     {icon ? <span className="mr-1.5 inline-flex align-[-2px]">{icon}</span> : null}
                     {toast.title}
                   </Toast.Title>

@@ -163,7 +163,7 @@ html[data-theme="light"] .weather-page-intro {
 }
 
 .weather-data-mode {
-  @apply inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-semibold tracking-[0.14em];
+  @apply inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-semibold;
 }
 
 .weather-data-mode-dynamic {
@@ -250,7 +250,7 @@ html[data-theme="light"] .weather-page-intro {
   border-radius: var(--radius-sm);
   font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   text-transform: none;
   font-variant-numeric: tabular-nums;
 }
@@ -260,7 +260,7 @@ html[data-theme="light"] .weather-page-intro {
   padding: 0.2rem 0.6rem;
   font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   text-transform: none;
   font-variant-numeric: tabular-nums;
   transition: border-color var(--transition-fast) var(--ease-out),

@@ -36,7 +36,7 @@ export const OperatorRequestsPanel = ({
             key={request.title}
             className="weather-surface px-4 py-4"
           >
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <p className="text-xs font-semibold text-slate-400">
               {request.title}
             </p>
             <p className="mt-2 text-sm text-slate-200">{request.description}</p>

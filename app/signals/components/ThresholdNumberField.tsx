@@ -33,7 +33,7 @@ export const ThresholdNumberField = ({
   step,
   value,
 }: ThresholdNumberFieldProps) => (
-  <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+  <Field.Root className="space-y-2 text-xs font-semibold text-slate-400">
     <Field.Label>{label}</Field.Label>
     <NumberField.Root
       id={id}

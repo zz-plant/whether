@@ -23,7 +23,7 @@ export function NextStepCard({ nextStep }: { nextStep?: { description: string; h
         <p className="max-w-[40ch] text-fluid-base font-semibold text-slate-50">{nextStep.description}</p>
         <InternalAwareLink
           href={nextStep.href}
-          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-fluid-xs font-semibold tracking-[0.08em] text-slate-100 no-underline"
+          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-fluid-xs font-semibold text-slate-100 no-underline"
         >
           Continue →
         </InternalAwareLink>
