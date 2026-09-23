@@ -1,4 +1,6 @@
 import type { CSSProperties, ReactElement } from "react";
+import type { RegimeKey } from "../../../lib/regimeEngine";
+import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_BORDER } from "./ogTheme";
 
 /**
@@ -70,6 +72,19 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
   plain: null,
 };
 
+type OgPanel = { label: string; title: string; body: string };
+
+/** One segment per state the period spent time in, sized by its share. */
+export type OgRegimeMix = Array<{ regime: RegimeKey; count: number }>;
+
+const MixBar = ({ mix }: { mix: OgRegimeMix }) => (
+  <div style={{ display: "flex", height: 18, marginTop: 18, borderRadius: 4, overflow: "hidden" }}>
+    {mix.map((entry) => (
+      <div key={entry.regime} style={{ display: "flex", flexGrow: entry.count, background: REGIME_HEX_COLORS[entry.regime] }} />
+    ))}
+  </div>
+);
+
 const frameStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
@@ -88,6 +103,8 @@ export const renderStaticOgImage = ({
   subtitle,
   kicker,
   accent: accentOverride,
+  panel: panelOverride,
+  mix,
 }: {
   template: StaticOgTemplate;
   eyebrow: string;
@@ -96,12 +113,22 @@ export const renderStaticOgImage = ({
   kicker: string;
   /** A record card is keyed to its period's conditions, the way the page is. */
   accent?: string;
+  /**
+   * The page's own fact for the side panel. The fixed copy below was the same on
+   * every page of a template — "THE RECORD / A closed period" on all 83 archive
+   * cards, "EVIDENCE / What moved" on all 19 signals cards — a third of the card
+   * spent saying nothing about the page being shared. It stays as the fallback.
+   */
+  panel?: OgPanel;
+  /** Drawn under the panel title: the share of each state in the period. */
+  mix?: OgRegimeMix;
 }): ReactElement => {
   const accent = accentOverride ?? templateAccent[template];
   /* Titles run from "Privacy" to a 65-character trust heading; at one size the
      long ones wrapped to four lines and ran into the footer. */
   const titleSize = title.length > 48 ? 44 : title.length > 30 ? 52 : 58;
-  const panel = templatePanelCopy[template];
+  const panel = panelOverride ?? templatePanelCopy[template];
+  const panelTitleSize = !panel ? 34 : panel.title.length > 80 ? 23 : panel.title.length > 44 ? 26 : panel.title.length > 26 ? 30 : 34;
 
   return (
     <div style={frameStyle}>
@@ -139,9 +166,10 @@ export const renderStaticOgImage = ({
           <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: accent }}>
             {panel.label}
           </div>
-          <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: "#f8fafc", marginTop: 14 }}>
+          <div style={{ display: "flex", fontSize: panelTitleSize, fontWeight: 700, lineHeight: 1.2, color: "#f8fafc", marginTop: 14 }}>
             {panel.title}
           </div>
+          {mix && mix.length > 0 ? <MixBar mix={mix} /> : null}
           <div style={{ display: "flex", fontSize: 22, lineHeight: 1.4, color: "#94a3b8", marginTop: 14 }}>
             {panel.body}
           </div>

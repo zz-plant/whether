@@ -97,7 +97,16 @@ export const buildSignalDecisionScenarioMetadata = ({
     description: `For ${scenarioTitle.toLowerCase()}: ${signalSummary.charAt(0).toLowerCase()}${signalSummary.slice(1)}`,
     path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
-    imageParams: { template: "signals", eyebrow: "Evidence" },
+    /* This week's action for this decision on the card, as the answer cards
+       carry theirs — only from a current, publishable payload, so a card that
+       platforms cache never advertises a stale call. */
+    imageParams: {
+      template: "signals",
+      eyebrow: "Evidence",
+      ...(payload?.immediateAction && !shouldNoindexPayload(payload)
+        ? { panelLabel: "This week", panelTitle: payload.immediateAction, panelBody: payload.currentCall }
+        : {}),
+    },
   });
 
   if (shouldNoindexPayload(payload)) {

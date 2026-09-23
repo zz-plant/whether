@@ -29,11 +29,6 @@ export type HomeSharePreview = {
   immediateDecision: string;
   flipCondition: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
-  trendLabel: string;
-  postureDelta: string;
-  baseRateLabel: string;
-  curveSlopeLabel: string;
-  freshnessLine: string;
   sourceLabel: string;
   isHistorical: boolean;
   isFallback: boolean;
@@ -46,9 +41,6 @@ type HomeSharePreviewDependencies = {
 const defaultDependencies: HomeSharePreviewDependencies = {
   loadWeeklyBriefSnapshot,
 };
-
-const formatRateValue = (value: number | null | undefined) =>
-  typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(2)}%` : "n/a";
 
 /* "Canonical ingestion (FRED)" names our pipeline; a reader wants the publisher.
    Every treasury source resolves to one of these two. */
@@ -129,7 +121,7 @@ export const loadHomeSharePreview = async (
     { route: "/" },
     { overlaySector: searchParams?.sector },
   );
-  const { isFallback, freshnessMeta, weeklyDecisionCardModel } = snapshot;
+  const { isFallback, weeklyDecisionCardModel } = snapshot;
 
   const sharePath = buildHomeSharePath(searchParams);
   const imageUrl = buildOgImageUrl(buildImageParams(searchParams));
@@ -198,11 +190,6 @@ export const loadHomeSharePreview = async (
     immediateDecision,
     flipCondition,
     confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
-    trendLabel: weeklyDecisionCardModel.status.trendLabel,
-    postureDelta: weeklyDecisionCardModel.status.postureDelta,
-    baseRateLabel: formatRateValue(reportData.assessment.scores.baseRate),
-    curveSlopeLabel: formatRateValue(reportData.assessment.scores.curveSlope),
-    freshnessLine: freshnessMeta.line,
     sourceLabel: readerSourceLabel(reportData.treasuryProvenance.sourceLabel),
     isHistorical: Boolean(reportData.historicalSelection),
     isFallback,

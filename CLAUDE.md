@@ -1013,6 +1013,16 @@ can read any card; `tests/shareCardCoverage.test.tsx` walks the sitemap to every
 `tests/readerVocabulary.test.tsx` holds every distinct card to the bans. **Give a new page its
 metadata through `buildPageMetadata`**, and name a template if the plain card is not the right one.
 
+**Drawn for the size it is seen at (2026-09-23).** A feed shows a card at about 500px wide, so
+everything prints at ~40%. The weekly card had twelve boxes and chips with most labels at 13–17px,
+about 6px in a feed; it is five blocks now with nothing under 20px. The static templates spent a third
+of the card on a side panel that said the same thing on every page of a template ("THE RECORD / A
+closed period" on all 83 archive cards); a page can now pass its own `panelLabel` / `panelTitle` /
+`panelBody` (all three or none) and a `mix` bar. Archive periods carry their reading count, mix and
+how often conditions changed; signal hubs this week's figure; scenario pages this week's action for that decision —
+the live ones only from a read that is current, because platforms cache a card for days.
+`tests/shareCardContent.test.tsx` holds the type floor, the panels and the gates.
+
 ## What a crawler receives (2026-09-23)
 
 A crawl of every sitemap URL against a local server, reading what each response actually carries

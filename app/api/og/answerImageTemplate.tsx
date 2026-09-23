@@ -76,7 +76,7 @@ export const renderAnswerOgImage = ({
         <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: ACCENT }}>
           THIS WEEK
         </div>
-        <div style={{ display: "flex", fontSize: 28, fontWeight: 700, lineHeight: 1.2, color: "#f8fafc", marginTop: 14 }}>
+        <div style={{ display: "flex", fontSize: call.length > 100 ? 23 : call.length > 70 ? 25 : 28, fontWeight: 700, lineHeight: 1.2, color: "#f8fafc", marginTop: 14 }}>
           {call}
         </div>
         <div style={{ display: "flex", fontSize: 21, lineHeight: 1.4, color: "#94a3b8", marginTop: 14 }}>
