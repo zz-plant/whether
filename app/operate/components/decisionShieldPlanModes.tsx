@@ -124,7 +124,7 @@ export function PlanStressTestMode({
               </div>
 
               <div className="space-y-1.5">
-                <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">What this plan assumes</p>
+                <p className="type-eyebrow">What this plan assumes</p>
                 <ul className="space-y-1">
                   {stressTestResult.fragileAssumptions.map((assumption, idx) => (
                     <li key={idx} className="text-fluid-xs text-amber-200/90 flex items-start gap-1.5">
@@ -137,11 +137,11 @@ export function PlanStressTestMode({
 
               <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-2 gap-3">
                 <div>
-                  <p className="text-fluid-nano text-slate-400 uppercase font-semibold tracking-wider">{publicDecisionLabels.threshold}</p>
+                  <p className="type-eyebrow">{publicDecisionLabels.threshold}</p>
                   <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
                 </div>
                 <div>
-                  <p className="text-fluid-nano text-sky-400 uppercase font-semibold tracking-wider">A more reversible version</p>
+                  <p className="type-eyebrow text-sky-400">A more reversible version</p>
                   <p className="text-fluid-xs text-sky-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
                 </div>
               </div>

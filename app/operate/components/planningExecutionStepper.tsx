@@ -105,6 +105,10 @@ export const resolveOperationsExecutionStepIdFromLocation = ({
  * "Done" in both states so the accessible name does not change under the
  * reader's finger. The step's title is part of that name: six buttons all
  * announced as "Done" gave a screen reader no way to tell which step each marks.
+ *
+ * No button frame and no tracking: the checkbox glyph is the affordance, and
+ * five bordered, letter-spaced "Done" boxes down one page were the loudest
+ * thing on it (DD-029). The 44px target stays.
  */
 const DoneButton = ({ pressed, onClick, stepTitle }: { pressed: boolean; onClick: () => void; stepTitle: string }) => (
   <button
@@ -112,7 +116,7 @@ const DoneButton = ({ pressed, onClick, stepTitle }: { pressed: boolean; onClick
     aria-pressed={pressed}
     aria-label={`Done: ${stepTitle}`}
     onClick={onClick}
-    className="weather-button inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] hover:border-sky-400/70 hover:text-slate-100"
+    className="inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-[var(--radius-md)] px-2 py-2 text-sm font-medium text-slate-300 hover:text-slate-100"
   >
     <span
       aria-hidden="true"

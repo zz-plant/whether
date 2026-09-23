@@ -57,7 +57,9 @@ describe("the changed-signals table", () => {
     assert.match(row, /Funding pressure/);
     assert.match(row, /61/, "last week's reading");
     assert.match(row, /64/, "this week's");
-    assert.match(row, /Pause 76/, "and the line it is judged against");
+    // The ladder's key names the line; its tick carries only the number.
+    const text = row.replace(/<[^>]+>/g, "");
+    assert.match(text, /Pause 76/, "and the line it is judged against");
   });
 
   it("keeps the scale direction on a composite score and not on a market input", () => {

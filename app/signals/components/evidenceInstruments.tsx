@@ -100,7 +100,7 @@ const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssess
           { label: "What marked the turn", value: analog.reversalMarker },
         ].map((cell) => (
           <div key={cell.label}>
-            <dt className="text-fluid-nano font-semibold uppercase tracking-wider text-slate-400">{cell.label}</dt>
+            <dt className="type-eyebrow">{cell.label}</dt>
             <dd className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{cell.value}</dd>
           </div>
         ))}

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { WorkstreamNavFallback } from "../app/components/suspenseFallbacks";
+import { WORKSTREAM_NAV_CLASS } from "../app/operate/components/workstreamNavLayout";
 
 const fallbacks = [
   { name: "WorkstreamNavFallback", html: renderToStaticMarkup(<WorkstreamNavFallback />) },
@@ -32,9 +33,11 @@ describe("suspense fallbacks", () => {
   it("mirrors the wrapper of the component it stands in for", () => {
     // Height comes out right by construction when the fallback reuses the real
     // component's outer classes, rather than being guessed at with `h-28`.
-    // `<output>` is inline by default, so it carries `block` to keep the panel's
-    // box; the wrapper classes it mirrors follow.
-    assert.match(fallbacks[0].html, /class="(block )?weather-panel px-4 py-4"/);
+    // The class string is shared with the real row, not copied from it, and
+    // `<output>` takes no `block` when the row already sets a display.
+    assert.ok(fallbacks[0].html.includes(`class="${WORKSTREAM_NAV_CLASS}"`));
+    const navSource = readFileSync("app/operate/components/planningWorkstreamNav.tsx", "utf8");
+    assert.match(navSource, /className=\{WORKSTREAM_NAV_CLASS\}/, "the switcher reads the same constant");
   });
 });
 

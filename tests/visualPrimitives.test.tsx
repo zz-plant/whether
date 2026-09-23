@@ -42,8 +42,8 @@ describe("ScoreLadder", () => {
        A transform makes a stacking context, so a later line's tick painted
        over an earlier line's label ("Change line|70" on a phone). */
     const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={85} lines={lines} />);
-    const lastTick = html.lastIndexOf("w-0.5");
-    const firstLabel = Math.min(...["Resume 66", "Change line 70", "Pause 76"].map((label) => html.indexOf(label)));
+    const lastTick = html.lastIndexOf("data-ladder-tick");
+    const firstLabel = html.indexOf("data-ladder-row=");
     assert.ok(lastTick > 0 && firstLabel > 0);
     assert.ok(lastTick < firstLabel, "all ticks come before the first label in paint order");
   });
@@ -58,16 +58,30 @@ describe("ScoreLadder", () => {
     assert.doesNotMatch(html, /Last week/);
   });
 
-  it("stacks labels that would overprint in the narrowest column, and only those", () => {
-    /* 55 and 70 are 15 points apart: clear by the old 13%-of-track rule, and
-       overprinted in the homepage's 14rem column, where "Pause 55" and
-       "Change line 70" need about 70px between their ticks. */
-    const rows = (values: LadderLine[]) =>
-      Object.fromEntries(layoutLadderLabels(values).map(({ line, row }) => [line.kind, row]));
-    assert.deepEqual(rows([{ kind: "pause", value: 55 }, { kind: "callChange", value: 70 }]), { pause: 0, callChange: 1 });
-    assert.deepEqual(rows([{ kind: "resume", value: 10 }, { kind: "callChange", value: 70 }]), { resume: 0, callChange: 0 });
-    const three = rows([{ kind: "resume", value: 66 }, { kind: "callChange", value: 70 }, { kind: "pause", value: 76 }]);
-    assert.equal(new Set(Object.values(three)).size, 3, "three lines within ten points take three rows");
+  it("labels ticks with their number and names the lines in a key, left to right", () => {
+    /* A named tick label ("Change line 70") is ~80px of text, so the common
+       66/70/76 lines stacked three rows deep at any width. Ticks carry the
+       number; the key carries the names, in the order the ticks sit. */
+    const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={85} lines={lines} />);
+    assert.doesNotMatch(html, /data-ladder-row="\d+"[^>]*>[^<]*[A-Za-z]/, "a tick label carries no name");
+    const key = html.slice(html.indexOf("data-ladder-key"));
+    const order = ["Resume", "Change line", "Pause"].map((name) => key.indexOf(`>${name}<`));
+    assert.ok(order.every((index) => index > 0), "the key names every line");
+    assert.deepEqual([...order].sort((a, b) => a - b), order, "the key reads in tick order");
+  });
+
+  it("lays labels out per track width, and puts the common lines on one row on a wide track", () => {
+    const rows = (values: LadderLine[], trackPx?: number) =>
+      Object.fromEntries(layoutLadderLabels(values, 100, trackPx).map(({ line, row }) => [line.kind, row]));
+    const common: LadderLine[] = [{ kind: "resume", value: 66 }, { kind: "callChange", value: 70 }, { kind: "pause", value: 76 }];
+    assert.deepEqual(rows(common, 448), { resume: 0, callChange: 0, pause: 0 }, "one row from 28rem");
+    assert.deepEqual(rows(common, 224), { resume: 0, callChange: 1, pause: 0 }, "two rows in the 14rem column");
+    assert.deepEqual(rows([{ kind: "pause", value: 55 }, { kind: "callChange", value: 70 }]), { pause: 0, callChange: 0 });
+    assert.deepEqual(rows([{ kind: "pause", value: 69 }, { kind: "callChange", value: 70 }], 448), { pause: 0, callChange: 1 });
+
+    const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={85} lines={common} />);
+    assert.match(html, /@container/, "the ladder is its own query container");
+    assert.match(html, /--ladder-rows:1;--ladder-rows-wide:0/);
   });
 
   it("builds the three lines from the numbers a surface has, drawing only the ones it states", () => {
