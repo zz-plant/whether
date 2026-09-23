@@ -595,6 +595,13 @@ export const buildHomeBriefModelInternal = (
       changeCount: reportDynamics?.changedSignals.length ?? 0,
       reversalTrigger: conciseFlipThreshold,
     }),
+    /* The same sentence without its change clause, for every surface that prints
+       its own change line beside it. */
+    decisionShiftHeadline: buildDecisionShiftSummary({
+      severityDelta,
+      directionLabel: reportDynamics?.directionLabel,
+      changeCount: reportDynamics?.changedSignals.length ?? 0,
+    }),
     weeklyMovement,
     transitionProbabilities: forecast?.next4WeekProbabilities ?? {
       Expansion: 25,
@@ -711,7 +718,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     weeklyMovement: homeBriefModel.weeklyMovement,
   });
   const readThisCardItems = buildReadThisCardItems({
-    decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+    decisionShiftSummary: homeBriefModel.decisionShiftHeadline,
     immediateDecision,
     reversalTrigger: weeklyCall?.callChangesIf ?? homeBriefModel.reversalTrigger,
   });
@@ -749,6 +756,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       canonicalFlipConditions: homeBriefModel.canonicalFlipConditions,
       reportDynamics,
       decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+      decisionShiftHeadline: homeBriefModel.decisionShiftHeadline,
       transitionProbabilities: homeBriefModel.transitionProbabilities,
       decisionRules: homeBriefModel.decisionRules,
       decisionMatrix: homeBriefModel.decisionMatrix,

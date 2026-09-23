@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 
 import { answerPages } from "../app/answers/decisionPages";
+import { signalScenarioRoutes } from "../app/seoRouteClusters";
 import { toolkitDefinitions } from "../lib/decisionDomainCatalog";
 import { buildBoardBrief, buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
@@ -154,6 +155,15 @@ const routeSurfaces: Surface[] = [
     text: async () => {
       const page = await import("../app/toolkits/[slug]/page");
       return visibleText(renderToStaticMarkup(await page.default({ params: Promise.resolve({ slug: toolkit.slug }) })));
+    },
+  })),
+  /* The engine key reached these as "Call SCARCITY" while no guard rendered them. */
+  ...signalScenarioRoutes.map((route) => ({
+    name: `/signals/${route.signalSlug}/${route.decisionScenario}`,
+    text: async () => {
+      const page = await import("../app/signals/[cluster]/[decision-scenario]/page");
+      const params = Promise.resolve({ cluster: route.signalSlug, "decision-scenario": route.decisionScenario });
+      return visibleText(renderToStaticMarkup(await page.default({ params })));
     },
   })),
   { name: "/pricing", text: async () => visibleText(renderToStaticMarkup((await import("../app/pricing/page")).default())) },

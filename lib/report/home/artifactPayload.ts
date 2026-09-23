@@ -59,7 +59,7 @@ const buildDeltaOnlyBriefText = ({
   return [
     "DELTA-ONLY BRIEF",
     `Readiness: ${homeBriefModel.decisionReadiness.label}`,
-    `Changed: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
+    `Changed: ${homeBriefModel.decisionShiftHeadline}`,
     "",
     "Revisit now",
     ...revisitLines,
@@ -166,7 +166,7 @@ export const buildLeadershipArtifactPayload = async ({
         : `DATA: Live, as of ${freshnessLabel}`,
       latitudeLine: `${OPERATING_LATITUDE_LABEL.toUpperCase()}: ${latitude.boldnessScore}/100 (${OPERATING_LATITUDE_GLOSS}) · vs last week: ${latitudeDelta}`,
       conditionsLine: `CONDITIONS: ${describeConditions(assessment.regime, canonicalDecisionCopy.currentRegimeLabel)} · ${formatExportConfidence(homeBriefModel.confidenceLabel)}`,
-      changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
+      changedLine: `CHANGED: ${homeBriefModel.decisionShiftHeadline}`,
       pauseLine: `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}: ${pauseConditionOnly(weeklyCall.pauseIf)}`,
       // The lead area's resume level, then the stage's discipline when one is
       // chosen: both say when a hold lifts, so they share the one resume line.

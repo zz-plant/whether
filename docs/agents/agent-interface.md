@@ -34,6 +34,13 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
   Jev; Whether never receives it, which is why this is a format and not an endpoint that takes a
   plan. `automationReady` carries `publishReadiness`. Any other `format` is a 400.
 
+  **Reader text is never sent to Jev (decided 2026-09-23).** Routing `/search` queries or recorded
+  decisions through Jev was considered and declined. `/privacy` says the search payload has no field
+  that could hold the query, and that everything but recorded decisions stays in the browser. A
+  server-side Jev call on that text would make both statements false, and a third-party model reading it
+  would need its own section there. The site's use of Jev stays where it is: the handoff format above,
+  where the caller sends their own plan, and `audit:jev-copy`, which reads only the site's own copy.
+
 Machine-discovery routes:
 
 - `GET /llms.txt` provides a plain-text integration guide for autonomous agents.

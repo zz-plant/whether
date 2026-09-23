@@ -87,9 +87,9 @@ export const buildRegimeAlert = (
 };
 
 const confidencePlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Low (near threshold, stage decisions)",
-  MED: "Medium (mixed signal reliability)",
-  HIGH: "High (safe for near-term operating cadence)",
+  LOW: "Low (close to the line where conditions change; stage decisions)",
+  MED: "Medium (some room before conditions change)",
+  HIGH: "High (well clear of the line where conditions change)",
 };
 
 /** The engine's codes, as words. Derived so a rename cannot leave the two apart. */
