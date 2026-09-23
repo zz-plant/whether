@@ -79,15 +79,15 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
 
         <dl className="grid gap-3 pt-2 sm:grid-cols-2 text-sm border-t border-slate-800/80">
           <div className="weather-surface p-3.5 space-y-1">
-            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">Decide now</dt>
+            <dt className="type-eyebrow">Decide now</dt>
             <dd className="text-slate-100 font-medium">{toolkit.decisionThisSession}</dd>
           </div>
           <div className="weather-surface p-3.5 space-y-1">
-            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">What it gets you</dt>
+            <dt className="type-eyebrow">What it gets you</dt>
             <dd className="text-slate-100 font-medium">{toolkit.operatingOutcome}</dd>
           </div>
           <div className="weather-surface p-3.5 space-y-1 sm:col-span-2">
-            <dt className="text-fluid-micro font-semibold uppercase tracking-wider text-slate-400">What you leave with</dt>
+            <dt className="type-eyebrow">What you leave with</dt>
             <dd className="text-slate-100 font-medium">{toolkit.decisionArtifact}</dd>
           </div>
         </dl>

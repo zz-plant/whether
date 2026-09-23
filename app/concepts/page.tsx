@@ -160,7 +160,7 @@ export default function ProductCanonPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-300">
             <caption className="sr-only">Essays published in each set of conditions, against months on record</caption>
-            <thead className="text-xs uppercase tracking-wide text-slate-400">
+            <thead className="type-eyebrow">
               <tr>
                 <th scope="col" className="py-2 pr-4 font-medium">Conditions</th>
                 <th scope="col" className="py-2 pr-4 font-medium">Months on record</th>
@@ -199,7 +199,7 @@ export default function ProductCanonPage() {
         <ol className="space-y-5">
           {timeline.map((essay) => (
             <li key={essay.slug} id={essay.slug} className="border-t border-slate-800 pt-4 first:border-t-0 first:pt-0">
-              <p className="text-xs uppercase tracking-wide text-slate-400">
+              <p className="type-eyebrow">
                 <time dateTime={`${essay.published.year}-${String(essay.published.month).padStart(2, "0")}`}>
                   {formatCanonPublished(essay)}
                 </time>

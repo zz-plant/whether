@@ -259,25 +259,22 @@ export async function buildPlanningPageModel(
                 viewBoxWidth: 420,
               }),
               h("section", { className: "space-y-4" },
-                h("div", { className: "space-y-2" },
-                  h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "This week's guidance"),
-                  h("p", { className: "text-sm text-slate-300" }, "Read this first."),
-                ),
-                h("div", { className: "grid gap-3 md:grid-cols-3" },
-                  h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200" }, DECISION_CONTRACT_LABELS.action.actionNow),
-                    h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.actionNow),
-                  ),
-                  h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-amber-200" }, DECISION_CONTRACT_LABELS.threshold.pauseIf),
-                    h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.pauseIf),
-                  ),
-                  h("article", { className: "space-y-3 rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    ...weeklyCallChangeLines(weeklyCall).map(({ label, value }) =>
-                      h("div", { key: label },
-                        h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200" }, label),
-                        h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, value),
-                      ),
+                /* The call, as a plain list. It was three bordered cards under
+                   "This week's guidance · Read this first.", each headed in its
+                   own colour in tracked capitals — three encodings (box, hue,
+                   case) for three labels, on a page whose job is the plan below
+                   them. Colour marks state here, not labels (ui-ux-standards
+                   §XVIII); these are the one statement of the call on /operate,
+                   so they stay, in the register the rest of the step reads in. */
+                h("dl", { className: "grid gap-x-6 gap-y-3 sm:grid-cols-[max-content_1fr]" },
+                  ...[
+                    { label: DECISION_CONTRACT_LABELS.action.actionNow, value: weeklyCall.actionNow },
+                    { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: weeklyCall.pauseIf },
+                    ...weeklyCallChangeLines(weeklyCall),
+                  ].map(({ label, value }) =>
+                    h("div", { key: label, className: "contents" },
+                      h("dt", { className: "type-eyebrow sm:pt-0.5" }, label),
+                      h("dd", { className: "text-sm text-slate-100" }, value),
                     ),
                   ),
                 ),

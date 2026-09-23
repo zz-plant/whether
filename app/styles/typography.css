@@ -23,7 +23,7 @@
   text-transform: none;
 }
 
-/* Uppercase section eyebrow. The one label style the app actually renders 282
+/* Section eyebrow. The one label style the app actually renders 282
    times, previously hand-rolled inline at ten different tracking values
    (0.06/0.08/0.1/0.12/0.14/0.15/0.16/0.18/0.2/0.22em) and three sizes, so the
    same element was tuned by eye at every call site.
@@ -31,12 +31,19 @@
    Distinct from .type-label, which is the sentence-case metadata label the
    surface system was migrating toward. Keeping them separate means the case
    change can happen here, once, rather than being decided per call site.
-   Values are the dominant ones: fluid-xs at 0.12em (125 of the 282). */
+   Values are the dominant ones: fluid-xs at 0.12em (125 of the 282).
+
+   Sentence case since 2026-09-23 (DD-028, ui-ux-standards §XVIII). The case
+   change happened here, once, as the paragraph above intended: capitals are
+   for stamps (.type-badge, the regime tag, the sticky strip), and a page whose
+   every label shouts has no way left to mark the one that should. Tracking
+   drops with the capitals — 0.12em is spacing for caps, and on lowercase it
+   reads as a typo. */
 
 .type-eyebrow {
-  @apply font-semibold uppercase text-slate-400;
+  @apply font-semibold text-slate-400;
   font-size: var(--fs-xs);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.01em;
   /* An eyebrow is a label, whatever element carries it. Without this, the
      `:where(h1, h2)` display-face rule below set every h2 eyebrow in the serif
      while the p eyebrows beside them stayed sans — "SIGNAL WATCHES" in
@@ -58,14 +65,14 @@
 /* SVG <text> sizes itself from the fontSize presentation attribute, which a CSS
    font-size always beats. Applying either primitive to a chart label therefore
    resizes it to body-text scale — it blew up the yield-curve labels once. Chart
-   labels keep uppercase + tracking inline and let the attribute drive size. */
+   labels keep their own case and tracking inline and let the attribute drive size. */
 svg :where(.type-eyebrow, .type-badge) {
   font-size: inherit;
 }
 
-/* Uppercase micro badge — status pills, mode chips, trust tags. Shares the
-   uppercase treatment with .type-eyebrow but is deliberately a separate
-   primitive: these sit on dynamic tone classes (trustToneClass, STATUS_COLORS,
+/* Uppercase micro badge — status pills, mode chips, trust tags. The one
+   primitive that keeps capitals: a badge is a stamp, not a label. Deliberately
+   separate from .type-eyebrow: these sit on dynamic tone classes (trustToneClass, STATUS_COLORS,
    regimeStyle) that set their own color, so the eyebrow's slate default would
    fight them. Sets typography only, never color. */
 

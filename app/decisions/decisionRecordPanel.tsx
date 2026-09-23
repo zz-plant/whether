@@ -65,13 +65,13 @@ const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
         {row.guardrail ? (
           <div>
-            <dt className="text-xs uppercase tracking-wide text-slate-500">{publicDecisionLabels.threshold}</dt>
+            <dt className="type-eyebrow">{publicDecisionLabels.threshold}</dt>
             <dd className="mt-0.5 text-slate-300">{row.guardrail}</dd>
           </div>
         ) : null}
         {row.reversalTrigger ? (
           <div>
-            <dt className="text-xs uppercase tracking-wide text-slate-500">{publicDecisionLabels.reversal}</dt>
+            <dt className="type-eyebrow">{publicDecisionLabels.reversal}</dt>
             <dd className="mt-0.5 text-slate-300">{row.reversalTrigger}</dd>
           </div>
         ) : null}

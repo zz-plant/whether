@@ -1,3 +1,4 @@
+import { WORKSTREAM_NAV_CLASS } from "../operate/components/workstreamNavLayout";
 import { Skeleton } from "./skeleton";
 
 /**
@@ -28,7 +29,13 @@ function LoadingRegion({
   children: React.ReactNode;
 }) {
   return (
-    <output aria-busy="true" aria-label={label} className={`block ${className ?? ""}`.trimEnd()}>
+    // `<output>` is inline by default, so it gets `block` — unless the caller
+    // already set a display of its own, which `block` would contend with.
+    <output
+      aria-busy="true"
+      aria-label={label}
+      className={(/(^|\s)(flex|grid|inline-flex|inline-grid|block)(\s|$)/.test(className ?? "") ? className ?? "" : `block ${className ?? ""}`).trim()}
+    >
       {children}
     </output>
   );
@@ -37,16 +44,12 @@ function LoadingRegion({
 /** Mirrors `OperationsWorkstreamNav`: intro pair, then a 4-up card grid. */
 export function WorkstreamNavFallback() {
   return (
-    <LoadingRegion label="Loading workstream navigation" className="weather-panel px-4 py-4">
-      <div className="flex flex-col gap-1">
-        <Skeleton className="h-3 w-32 rounded-sm bg-slate-500/28" />
-        <Skeleton className="h-4 w-3/4 rounded-sm bg-slate-500/20" />
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {[0, 1, 2, 3].map((index) => (
-          <Skeleton key={index} className="h-20 w-full rounded-lg bg-slate-500/22" />
-        ))}
-      </div>
+    <LoadingRegion label="Loading workstream navigation" className={WORKSTREAM_NAV_CLASS}>
+      {[0, 1, 2].map((index) => (
+        <div key={index} className="inline-flex min-h-11 items-center">
+          <Skeleton className="h-4 w-24 rounded-sm bg-slate-500/22" />
+        </div>
+      ))}
     </LoadingRegion>
   );
 }

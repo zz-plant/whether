@@ -91,7 +91,7 @@ export function MockupShell({
                     <Link
                       key={option.value}
                       href={buildHref({ pathname, viewport: option.value, density })}
-                      className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                      className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold ${
                         active ? "border-sky-300/80 text-slate-100" : "text-slate-300"
                       }`}
                     >
@@ -113,7 +113,7 @@ export function MockupShell({
                     <Link
                       key={option.value}
                       href={buildHref({ pathname, viewport, density: option.value })}
-                      className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                      className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold ${
                         active ? "border-sky-300/80 text-slate-100" : "text-slate-300"
                       }`}
                     >
@@ -129,10 +129,10 @@ export function MockupShell({
 
       <section className="space-y-4">
         <div className="flex flex-wrap gap-2">
-          <Link href="/mockups" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+          <Link href="/mockups" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold">
             All mockups
           </Link>
-          <Link href={buildHref({ pathname, viewport: "desktop", density: "comfortable" })} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+          <Link href={buildHref({ pathname, viewport: "desktop", density: "comfortable" })} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
             Reset view
           </Link>
         </div>
