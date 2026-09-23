@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import {
-  RUNWAY_QUICK_PICKS,
-  buildRunwayConditionedNotes,
-  findRunwayQuickPick,
-} from "../lib/report/runwayConditionedNotes";
+import { RUNWAY_BAND_OPTIONS } from "../lib/report/operatorRunway";
+import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../lib/report/runwayConditionedNotes";
 
 describe("runway-conditioned notes", () => {
   it("renders nothing when no runway is given", () => {
@@ -22,7 +19,7 @@ describe("runway-conditioned notes", () => {
       notes.map((note) => note.area),
       ["burn-discipline", "capital-raising", "hiring"],
     );
-    assert.match(notes[0].note, /At 5 months of runway/);
+    assert.match(notes[0].note, /With 5 months of runway/);
   });
 
   it("computes the burn-cut extension from the operator's own months", () => {
@@ -97,30 +94,44 @@ describe("runway-conditioned notes", () => {
     }
   });
 
-  it("offers one quick pick per note band, each landing inside the band it names", () => {
-    // The homepage dial is derived from the same thresholds the notes branch
-    // on, so a pick cannot name one band and produce another band's note. Four
-    // branches above, four picks, and each pick's figure resolves back to
-    // itself.
-    assert.equal(RUNWAY_QUICK_PICKS.length, 4);
-    for (const pick of RUNWAY_QUICK_PICKS) {
-      assert.equal(findRunwayQuickPick(pick.months)?.label, pick.label);
-      assert.ok(pick.months >= pick.min && (pick.max === null || pick.months < pick.max));
-      const notes = buildRunwayConditionedNotes({ regime: "DEFENSIVE", runwayMonths: pick.months });
-      assert.ok(notes.length > 0, `pick "${pick.label}" produces no note`);
+  it("branches on the runway bands' own boundaries, so a band lands on the note its label names", () => {
+    /* The notes branched at 6 / 12 / 18 and the bands at 6 / 12 / 24, so
+       "12–24 mo — Follow the guidance" produced "runway is not what limits you". */
+    const firstNote = (band: (typeof RUNWAY_BAND_OPTIONS)[number]["key"]) => {
+      const runway = resolveRunwayForNotes({ band });
+      assert.ok(runway);
+      return buildRunwayConditionedNotes({ regime: "VOLATILE", ...runway })[0]?.note ?? "";
+    };
+    assert.match(firstNote("critical"), /cash is what limits you/);
+    assert.match(firstNote("tight"), /raise planning has the least slack/);
+    assert.match(firstNote("balanced"), /act on the printed guidance/);
+    assert.match(firstNote("abundant"), /runway is not what limits you/);
+    for (const option of RUNWAY_BAND_OPTIONS) {
+      const runway = resolveRunwayForNotes({ band: option.key });
+      const notes = buildRunwayConditionedNotes({ regime: "DEFENSIVE", ...runway! });
+      assert.ok(notes.length > 0, `band ${option.label} produces no note`);
     }
-    // Contiguous and exhaustive: every positive runway lands in exactly one band.
-    for (let months = 1; months <= 60; months += 1) {
-      assert.equal(RUNWAY_QUICK_PICKS.filter((pick) => findRunwayQuickPick(months) === pick).length, 1);
-    }
-    assert.equal(findRunwayQuickPick(undefined), null);
-    assert.equal(findRunwayQuickPick(0), null);
   });
 
-  it("names each band by the thresholds the notes use", () => {
-    assert.deepEqual(
-      RUNWAY_QUICK_PICKS.map((pick) => pick.label),
-      ["Under 6 mo", "6–12 mo", "12–18 mo", "18+ mo"],
-    );
+  it("states a band as its range and never invents a figure or burn arithmetic for it", () => {
+    const band = resolveRunwayForNotes({ band: "balanced" });
+    assert.deepEqual(band, { runwayMonths: 18, runwayPhrase: "12–24 months", runwayIsExact: false });
+    const notes = buildRunwayConditionedNotes({ regime: "SCARCITY", ...band!, monthlyBurnUsd: 200_000 });
+    const text = notes.map((note) => note.note).join(" ");
+    assert.match(text, /With 12–24 months of runway/);
+    assert.doesNotMatch(text, /18 months|burn cut adds|cut adds about/);
+
+    const critical = buildRunwayConditionedNotes({ regime: "SCARCITY", ...resolveRunwayForNotes({ band: "critical" })!, monthlyBurnUsd: 200_000 });
+    assert.doesNotMatch(critical.map((note) => note.note).join(" "), /adds about/, "burn math needs a real figure");
+  });
+
+  it("prefers an entered figure over the band, and reads nothing from the default", () => {
+    assert.deepEqual(resolveRunwayForNotes({ exactMonths: 14, band: "abundant" }), {
+      runwayMonths: 14,
+      runwayPhrase: "14 months",
+      runwayIsExact: true,
+    });
+    assert.equal(resolveRunwayForNotes({ band: null }), null);
+    assert.equal(resolveRunwayForNotes({ exactMonths: 0, band: null }), null);
   });
 });

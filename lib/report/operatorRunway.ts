@@ -4,8 +4,13 @@
  * Parallel to `operatorStage.ts`, this defines the canonical cash runway bands
  * that scale bounded operating decisions across Whether's surfaces.
  *
- * Stored in `whether-company-runway` cookie and synchronized with the browser's
- * `whether.operatorProfile` localStorage.
+ * One setting. The band lives in the `whether-company-runway` cookie, which the
+ * server reads to calibrate the guidance; an exact figure entered on /operate
+ * lives in the browser profile and moves the band with it. Choosing a band
+ * never writes a figure: "12–24 mo" is not "18 months", and writing 18 into
+ * the profile used to put an invented runway into the planner and the stress
+ * test. (There were two runway settings on `/` until 2026-09-23, with
+ * different bands, and neither updated the other.)
  */
 
 export type RunwayBand = "critical" | "tight" | "balanced" | "abundant";
@@ -15,6 +20,8 @@ type RunwayBandOption = {
   label: string;
   sublabel: string;
   months: number;
+  /** The band in a sentence: "With 12–24 months of runway…". */
+  phrase: string;
   minMonths: number;
   maxMonths: number | null;
 };
@@ -23,10 +30,10 @@ export const RUNWAY_BAND_OPTIONS: readonly RunwayBandOption[] = [
   /* The sublabels used to be internal band names — "Payback Gate", "Macro Corridor",
      "Counter-Cyclical" — shown to someone picking how much cash they have. They say what the
      band changes now, in the reader's terms. */
-  { key: "critical", label: "<6 mo", sublabel: "Cash first", months: 4, minMonths: 0, maxMonths: 6 },
-  { key: "tight", label: "6–12 mo", sublabel: "Short payback only", months: 9, minMonths: 6, maxMonths: 12 },
-  { key: "balanced", label: "12–24 mo", sublabel: "Follow the guidance", months: 18, minMonths: 12, maxMonths: 24 },
-  { key: "abundant", label: "24+ mo", sublabel: "Room to spend", months: 30, minMonths: 24, maxMonths: null },
+  { key: "critical", label: "<6 mo", sublabel: "Cash first", months: 4, phrase: "less than 6 months", minMonths: 0, maxMonths: 6 },
+  { key: "tight", label: "6–12 mo", sublabel: "Short payback only", months: 9, phrase: "6–12 months", minMonths: 6, maxMonths: 12 },
+  { key: "balanced", label: "12–24 mo", sublabel: "Follow the guidance", months: 18, phrase: "12–24 months", minMonths: 12, maxMonths: 24 },
+  { key: "abundant", label: "24+ mo", sublabel: "Room to spend", months: 30, phrase: "more than 24 months", minMonths: 24, maxMonths: null },
 ];
 
 export const DEFAULT_RUNWAY_BAND: RunwayBand = "balanced";
@@ -45,15 +52,23 @@ export const runwayBandLabel = (band: RunwayBand): string =>
 export const runwayBandSublabel = (band: RunwayBand): string =>
   RUNWAY_BAND_OPTIONS.find((opt) => opt.key === band)?.sublabel ?? "";
 
+export const runwayBandPhrase = (band: RunwayBand): string =>
+  RUNWAY_BAND_OPTIONS.find((opt) => opt.key === band)?.phrase ?? runwayBandLabel(band);
+
+/** From the band table, so a moved boundary moves every reader of it. */
 export const runwayBandForMonths = (months: number | undefined | null): RunwayBand | null => {
   if (typeof months !== "number" || !Number.isFinite(months) || months <= 0) {
     return null;
   }
-  if (months < 6) return "critical";
-  if (months < 12) return "tight";
-  if (months < 24) return "balanced";
-  return "abundant";
+  return (
+    RUNWAY_BAND_OPTIONS.find((opt) => months >= opt.minMonths && (opt.maxMonths === null || months < opt.maxMonths))?.key ??
+    null
+  );
 };
+
+/** Whether an exact figure sits inside a band. */
+export const runwayMonthsFitBand = (months: number | undefined | null, band: RunwayBand): boolean =>
+  runwayBandForMonths(months) === band;
 
 /** A band wins over a figure; a figure alone is banded; neither is null. */
 export const resolveRunwayBand = (

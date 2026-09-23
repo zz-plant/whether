@@ -10,6 +10,9 @@ import {
   runwayBandForMonths,
   runwayBandLabel,
   runwayBandSublabel,
+  runwayBandPhrase,
+  runwayMonthsFitBand,
+  RUNWAY_BAND_OPTIONS,
 } from "../lib/report/operatorRunway";
 
 describe("operatorRunway", () => {
@@ -83,5 +86,29 @@ describe("operatorRunway", () => {
     const cookie = buildOperatorRunwayCookie(null);
     assert.ok(cookie.includes(`${OPERATOR_RUNWAY_COOKIE}=;`));
     assert.ok(cookie.includes("max-age=0"));
+  });
+});
+
+describe("one runway setting", () => {
+  it("bands a figure by the band table itself", () => {
+    // Contiguous and exhaustive: every positive runway lands in exactly one band,
+    // and each band's representative figure lands in its own band.
+    for (let months = 0.5; months <= 60; months += 0.5) {
+      const band = runwayBandForMonths(months);
+      assert.ok(band, `${months} months has no band`);
+      assert.ok(runwayMonthsFitBand(months, band));
+    }
+    for (const option of RUNWAY_BAND_OPTIONS) {
+      assert.equal(runwayBandForMonths(option.months), option.key);
+    }
+    assert.equal(runwayBandForMonths(0), null);
+    assert.equal(runwayBandForMonths(undefined), null);
+  });
+
+  it("says each band in a sentence by its range", () => {
+    assert.deepEqual(
+      RUNWAY_BAND_OPTIONS.map((option) => runwayBandPhrase(option.key)),
+      ["less than 6 months", "6–12 months", "12–24 months", "more than 24 months"],
+    );
   });
 });
