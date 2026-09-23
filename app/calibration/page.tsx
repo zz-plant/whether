@@ -35,7 +35,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Confidence score calibration study",
   description:
-    "Whether's published confidence percent, checked against every month-end reading since 2012: how often conditions held at each distance from the line where they change.",
+    "Whether's confidence percent, checked against every month-end reading since 2012: how often conditions held at each distance from the line where they change.",
   path: "/calibration",
   imageAlt: "Whether confidence calibration study",
   imageParams: { template: "method", eyebrow: "The record" },
