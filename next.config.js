@@ -51,8 +51,12 @@ export const canonicalSurfaceRedirectPairs = [
   ["/learn", "/trust"],
   ["/learn/failure-modes", "/trust#revisit-call"],
   ["/learn/failure-modes/:slug", "/trust#revisit-call"],
-  // Concepts (all paths) → Trust hub
-  ["/concepts/:path*", "/trust"],
+  // /concepts itself is a page again (restored 2026-09-23). The first version's
+  // detail, focus, audience and conflicts pages are not: one page carries the
+  // list now, with an anchor per essay. The old `/concepts` -> `/trust` rule was a
+  // 308, so a browser that followed it keeps landing on /trust until its cache
+  // clears; the `/resources` note below records the same standing cost.
+  ["/concepts/:path+", "/concepts"],
   // Decide redirect stubs. Both spellings, and both above the wildcard below:
   // team-context is not a generated param on either route, so without these it
   // would 404 rather than land on the plan.

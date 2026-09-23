@@ -31,7 +31,8 @@ Supporting surfaces are intentionally subordinate:
 - `/resources` now redirects straight back into Planning's export/artifact checkpoint; deeper governance material still lives on focused `/resources/[slug]` detail pages.
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
 - `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
-- `/concepts` and `/learn/failure-modes` now permanently redirect into canonical decision/trust workflows rather than acting as independently indexable content hubs.
+- `/learn/failure-modes` permanently redirects into the trust workflow rather than acting as an independently indexable content hub.
+- `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing, each entry placed on the month-end record (conditions that month, how long they had held), with the essays' share per set of conditions beside the months' share so no coincidence reads as a cause. Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Module: `lib/productCanon.ts`; test: `tests/productCanon.test.ts`.
 
 The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
 

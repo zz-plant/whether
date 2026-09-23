@@ -86,6 +86,10 @@ describe("redirect resolution", () => {
       ["/history/decisions", "/history"],
       ["/threshold", "/trust#framework"],
       ["/planning/financial", "/operate/financial"],
+      // The first version's detail, focus and conflicts pages fold into the one list.
+      ["/concepts/escaping-the-build-trap", "/concepts"],
+      ["/concepts/focus/strategy", "/concepts"],
+      ["/concepts/conflicts", "/concepts"],
     ] as const) {
       assert.equal(resolve(from).landing, to, `${from} should land on ${to}`);
     }
@@ -100,6 +104,8 @@ describe("redirect resolution", () => {
     assert.equal(resolve("/planning/cli").landing, "/operate");
     assert.equal(resolve("/planning/integrations").landing, "/operate");
     assert.equal(resolve("/resolve/team-context").landing, "/operate#ops-monthly-action-summary");
+    // A page again: the sub-path rule must not claim the bare path.
+    assert.equal(resolve("/concepts").hops, 0);
   });
 
   it("lands every redirect in one hop", () => {

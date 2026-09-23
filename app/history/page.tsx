@@ -168,6 +168,10 @@ export default async function HistoryPage({
                 <Link href="/calibration" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
                 </Link>
+                {" · "}
+                <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                  Product writing on the same record
+                </Link>
               </p>
             </div>
           }

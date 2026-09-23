@@ -17,6 +17,7 @@ const ROUTES_WITH_SELF_CANONICAL = [
   ["app/history/page.tsx", "/history"],
   ["app/share/page.tsx", "/share"],
   ["app/api-docs/page.tsx", "/api-docs"],
+  ["app/concepts/page.tsx", "/concepts"],
 ] as const;
 
 /**

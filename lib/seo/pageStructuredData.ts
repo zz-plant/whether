@@ -454,3 +454,50 @@ export const buildCalibrationStudyStructuredData = ({
     buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }, { path: "/calibration", label: name }])),
   ]);
 };
+
+/**
+ * `/concepts`: a `CollectionPage` whose `ItemList` names each essay on the page
+ * as the `CreativeWork` it is — its own author, its own URL, its first
+ * publication month. The items are the external works themselves, not anchors
+ * on this page, because that is what the list is a list of.
+ */
+export const buildProductCanonStructuredData = ({
+  essays,
+}: {
+  essays: ReadonlyArray<{
+    title: string;
+    author: string;
+    sourceUrl: string;
+    published: { year: number; month: number };
+  }>;
+}): JsonLdGraph => {
+  const url = buildCanonicalUrl("/concepts");
+  const name = "Product writing, against the market it was written in";
+  return graph([
+    {
+      "@type": "CollectionPage",
+      "@id": `${url}#page`,
+      url,
+      name,
+      inLanguage: "en",
+      isPartOf: isPartOfSite,
+      publisher: buildPublisherSchema(organizationName),
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: essays.length,
+        itemListElement: essays.map((essay, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "CreativeWork",
+            name: essay.title,
+            url: essay.sourceUrl,
+            author: { "@type": "Person", name: essay.author },
+            datePublished: `${essay.published.year}-${String(essay.published.month).padStart(2, "0")}`,
+          },
+        })),
+      },
+    },
+    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/history" }, { path: "/concepts", label: name }])),
+  ]);
+};

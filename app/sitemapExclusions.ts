@@ -21,7 +21,6 @@ export const retiredSitemapPaths = [
   "/plan",
   "/brief/stage",
   "/startup-macro-posture",
-  "/concepts",
   "/concepts/audience",
   "/concepts/conflicts",
   "/concepts/focus",

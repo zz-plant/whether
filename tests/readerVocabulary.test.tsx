@@ -153,6 +153,7 @@ const routeSurfaces: Surface[] = [
   { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },
   { name: "/resources", text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/page")).default())) },
   { name: "/calibration", text: async () => visibleText(renderToStaticMarkup((await import("../app/calibration/page")).default())) },
+  { name: "/concepts", text: async () => visibleText(renderToStaticMarkup((await import("../app/concepts/page")).default())) },
   { name: "/api-docs", text: async () => visibleText(renderToStaticMarkup((await import("../app/api-docs/page")).default())) },
 ];
 
