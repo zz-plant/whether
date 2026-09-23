@@ -24,14 +24,14 @@ export const runtime = "edge";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "The weekly operating call, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
+    "Weekly operating guidance, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     type: "website",
     url: buildCanonicalUrl("/pricing"),
     title: "Pricing | Whether",
     description:
-      "The weekly operating call, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
+      "Weekly operating guidance, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
   },
 };
 
@@ -82,7 +82,7 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
       <div className="mt-auto pt-2">
         {isFree ? (
           <ActionLink href="/" variant="primary">
-            Read this week&apos;s call
+            Read this week&apos;s guidance
           </ActionLink>
         ) : (
           <ActionLink
@@ -138,12 +138,12 @@ export default function PricingPage() {
             <p className="max-w-2xl text-fluid-xs text-slate-300">
               Pro and Team are onboarding in staged cohorts. Requesting access reserves your tier rate
               and schedules onboarding for Slack alerts, board exports, and team decision memory. The
-              weekly call, the API, and MCP stay free.
+              weekly guidance, the API, and MCP stay free.
             </p>
           ) : (
             <p className="max-w-2xl text-fluid-xs text-slate-300">
               Pro and Team cannot be bought yet. Requesting access records that you want one, and
-              nothing else; the weekly call, the API, and embeds stay free either way.
+              nothing else; the weekly guidance, the API, and embeds stay free either way.
             </p>
           )}
           <p className="max-w-2xl text-fluid-xs text-slate-400">

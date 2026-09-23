@@ -276,7 +276,7 @@ export const buildReportEvidenceItems = ({
         ? "No measurable move against the prior snapshot."
         : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${direction === "tightening" ? "tightening" : "easing"} the read.`,
       thresholdDistance === null
-        ? `${signalLabels[key]} feeds this week's call but has no line of its own that changes it.`
+        ? `${signalLabels[key]} feeds this week's guidance but has no line of its own that changes it.`
         : formatBoundaryDistance({
             label: signalLabels[key],
             points: thresholdDistance,

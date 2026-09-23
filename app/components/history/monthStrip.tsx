@@ -47,7 +47,7 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
   return (
     <figure className={`space-y-2 ${className}`.trim()} data-month-strip>
       <p className="sr-only">
-        The call by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes} changes; {run.label} held {run.held} months.
+        Conditions by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes} {changes === 1 ? "change" : "changes"}; {run.label} held {run.held} {run.held === 1 ? "month" : "months"}.
       </p>
       <div className="flex h-6 w-full overflow-hidden rounded-md" aria-hidden="true">
         {sorted.map((entry, index) => {
@@ -62,7 +62,7 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
           );
         })}
       </div>
-      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300" aria-label="Months under each call">
+      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300" aria-label="Months under each condition">
         {legend.map(([regime, months]) => (
           <li key={regime} className="flex items-center gap-1.5">
             <span
@@ -77,7 +77,7 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
       </ul>
       <figcaption className="flex flex-wrap justify-between gap-x-4 text-xs text-slate-400">
         <span>
-          {monthLabel(sorted[0].recordDate)} – {monthLabel(run.latest)} · {changes} call {changes === 1 ? "change" : "changes"}
+          {monthLabel(sorted[0].recordDate)} – {monthLabel(run.latest)} · {changes} {changes === 1 ? "change" : "changes"} in conditions
         </span>
         <span className="text-slate-200">
           {run.label}, held {run.held} {run.held === 1 ? "month" : "months"} since {monthLabel(run.since)}

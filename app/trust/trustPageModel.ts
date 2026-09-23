@@ -120,7 +120,7 @@ export async function buildTrustPageModel() {
       label: "How you'd know it cleared",
       detail: isFallback
         ? "One live refresh has landed from every source."
-        : "Confidence is back to high and the call has held for a second reading.",
+        : "Confidence is back to high and conditions have held for a second reading.",
       href: "#source-board",
       linkLabel: "Check source dates",
     },
@@ -138,7 +138,7 @@ export async function buildTrustPageModel() {
       : "stable";
   /* Each label is the section's own title. Two had drifted: "Snapshot" for a
      section headed "System status", and "Sources & freshness" for one headed
-     "Cite this call" — so the rail offered "Sources" and "Sources & freshness"
+     "Cite this call" (now "Cite this guidance") — so the rail offered "Sources" and "Sources & freshness"
      next to each other, and the second went to a citation block. The id stays
      as it is; an anchor someone has already linked to outlives its label. */
   const sectionLinks = [
@@ -147,7 +147,7 @@ export async function buildTrustPageModel() {
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
     { href: "#source-board", label: "Sources" },
-    { href: "#sources-freshness", label: "Cite this call" },
+    { href: "#sources-freshness", label: "Cite this guidance" },
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#framework", label: "Using the thresholds" },
@@ -163,8 +163,8 @@ export async function buildTrustPageModel() {
     trustStatusTone,
     degradedSourceRows,
     showOfflineBadge: isFallback,
-    pageTitle: "How much to trust this week's call",
-    pageSummary: "Check whether this week's call is current enough to act on.",
+    pageTitle: "How much to trust this week's guidance",
+    pageSummary: "Check whether this week's guidance is current enough to act on.",
     sectionLinks,
     activeStep: "posture",
     sidebarVariant: "full",

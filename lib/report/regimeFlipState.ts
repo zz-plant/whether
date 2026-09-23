@@ -78,7 +78,7 @@ const buildBoundaryTriggerText = ({
 }) => {
   const dimensionLabel = dimension === "tightness" ? TIGHTNESS_BOUNDARY_LABEL : RISK_BOUNDARY_LABEL;
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
-  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today), which flips the call to ${targetRegimeLabel}.`;
+  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today), which turns conditions ${targetRegimeLabel}.`;
 };
 
 /**
@@ -184,7 +184,7 @@ export const buildRegimeFlipState = ({
     .map((dimension, index) => beyondClause(dimension, index > 0))
     .join("; ");
 
-  let text = `${causeClause}, but the call has not flipped yet. It stays ${getRegimePublicLabel(regime)} while the change waits on confirmation and flips to ${candidateLabel} once it holds.`;
+  let text = `${causeClause}, but conditions have not changed yet. They stay ${getRegimePublicLabel(regime)} while the change waits on confirmation and turn ${candidateLabel} once it holds.`;
 
   let watch: RegimeFlipState["watch"];
   if (causes.length === 1) {
@@ -219,7 +219,7 @@ export const buildRegimeFlipState = ({
     text +=
       altCandidate === regime
         ? ` If ${otherPhrase}, the readings return to ${getRegimePublicLabel(regime)}.`
-        : ` If ${otherPhrase}, the call would change to ${getRegimePublicLabel(altCandidate)}.`;
+        : ` If ${otherPhrase}, conditions would turn ${getRegimePublicLabel(altCandidate)}.`;
 
     watch = { dimension: other, direction: otherDirection, threshold: otherThreshold, current: otherCurrent };
   } else {

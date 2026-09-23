@@ -106,13 +106,13 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
             sits beside the subscribe form for whoever wants it. */}
         {arrival === "share" ? (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-            This is the weekly call: what interest rates and credit mean for hiring, spend and
+            This is the weekly guidance: what interest rates and credit mean for hiring, spend and
             raising. {canonicalPositioningLine}
           </p>
         ) : (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
             How hard it is to raise money right now, and how much risk investors will fund, scored into
-            one operating call each Monday.
+            operating guidance each Monday.
           </p>
         )}
         <button

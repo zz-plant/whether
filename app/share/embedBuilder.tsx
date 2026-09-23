@@ -58,7 +58,7 @@ export function EmbedBuilder() {
           Add a live brief to a newsletter, wiki or dashboard
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">
-          Embed the live brief in any newsletter or webpage. Readers get this week&apos;s call, what to do
+          Embed the live brief in any newsletter or webpage. Readers get this week&apos;s guidance, what to do
           now, and what would change it — updated automatically every week.
         </p>
       </div>

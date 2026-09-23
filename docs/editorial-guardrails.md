@@ -64,20 +64,26 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   (Expansion / Mixed / Scarcity / Defensive, `lib/report/forecastModel.ts`) stays a typed
   internal layer; `forecastWeatherLabel` is what reaches a reader. Four names for four states
   was the second vocabulary a reader had to look up.
-- **The stance object is the call**: "the call", with "weekly operating call" on first
-  mention in cold surfaces (shares, metadata, answer pages). "Posture" is retired from reader
-  copy and ratcheted down by `tests/readerVocabulary.test.tsx`; do not mint
-  recommendation/verdict as user-facing stance synonyms ("verdict" is internal).
+- **The stance object is the guidance** (2026-09-23): "this week's guidance", with "weekly
+  operating guidance" on first mention in cold surfaces (shares, metadata, answer pages).
+  "Guidance" is uncountable: never "a guidance"; rewrite. "The call" is retired, because it
+  did three jobs — the recommendation, the market state and the line between states — so "the
+  call changes to Stormy" and "call changes at 70" both read as the recommendation changing.
+  The state is **conditions** ("conditions turn Stormy", "Conditions by month"); the line is
+  **the change line** in labels and "the line where conditions change" in prose. The
+  retired senses are ratcheted at zero by `tests/readerVocabulary.test.tsx`, as is "Posture";
+  do not mint recommendation/verdict/call as user-facing stance synonyms ("verdict" is
+  internal). Identifiers, API fields and `#anchors` keep `call`: they are contracts, not copy.
 - **The forward-look noun is forecast** ("why the forecast shifted", the forecast cone).
   Do not add synonyms (outlook/conditions) for the forward estimate. The command bar's
   "{regime} outlook" chip is a pass-through descriptor of current conditions, not a
   forecast synonym.
 - **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
   (`lib/report/reportCopy.ts`): general imperative forms on screens are Do now / Pause if /
-  Resume when, and the line where the call itself changes is Call changes if. "Change course
-  if" and "Re-open when" are retired (2026-09-22): the first read as the call changing, which
-  it named only on some surfaces, and the second was a third name for the resume line. Other
-  conditions that would change the call print under "Watch this week". Noun slots in exports remain Action / Threshold / Reversal. Consume these
+  Resume when, and the line where conditions themselves change is Conditions change if. "Change
+  course if" and "Re-open when" are retired (2026-09-22): the first read as the guidance changing,
+  which it named only on some surfaces, and the second was a third name for the resume line.
+  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports remain Action / Threshold / Reversal. Consume these
   exports instead of hardcoding slot words in components. Per-area bounded rules now render on
   `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
   (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not
@@ -91,7 +97,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   + decision area). Do not mint synonyms like "attention needed" or "review now" for these
   verdict labels.
 - **The category line has one source: `canonicalPositioningLine` / `websiteName` in
-  `lib/seo.ts`.** Whether is *the weekly operating call for startup leaders*. Outward
+  `lib/seo.ts`.** Whether is *weekly operating guidance for startup leaders*. Outward
   surfaces — homepage title and metadata, README, launch copy, sales decks, answer pages —
   consume that constant or restate it verbatim; they do not describe the product in their
   own words. Three coinages are **internal only** and must not appear on an outward

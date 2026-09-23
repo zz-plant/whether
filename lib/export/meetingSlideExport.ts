@@ -137,14 +137,14 @@ export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
  */
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
-    `> **Whether: this week's call** — *${payload.recordDate}*`,
+    `> **Whether: this week's guidance** — *${payload.recordDate}*`,
     `> **Conditions**: ${describeConditions(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
     // when the two are the same sentence, which is what the model returns on a
     // week with no stage-scoped action.
     ...(payload.call && payload.call.trim() !== payload.actionNow.trim()
-      ? [`> **CALL**: ${payload.call}`]
+      ? [`> **GUIDANCE**: ${payload.call}`]
       : []),
     `> 🎯 **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
     `> ⚠️ **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
@@ -176,7 +176,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
     <div>
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; font-weight: 700;">Whether · Weekly Operating Brief</span>
-      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's call${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
+      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's guidance${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
       <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Conditions: ${describeConditions(payload.regime)}</p>
     </div>
     <div style="text-align: right;">
@@ -254,8 +254,8 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
 
   <!-- Header Container -->
   <g transform="translate(80, 70)">
-    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING CALL</text>
-    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's call${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
+    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING GUIDANCE</text>
+    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's guidance${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
     <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · ${esc(describeConditions(payload.regime))} · Source: ${esc(payload.provenance)}</text>
     
     <!-- Regime Badge -->

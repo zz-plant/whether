@@ -165,12 +165,12 @@ export const MONDAY_AGENDA_STEPS: readonly {
   minutes: number;
   prompt: string;
 }[] = [
-  { id: "changed", label: "What changed", minutes: 1, prompt: "Read the call and what moved since last Monday." },
+  { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
   { id: "thresholds", label: "Check the thresholds", minutes: 1, prompt: "Guardrail and reversal trigger, against this week's scores." },
   { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of a threshold?" },
 ];
 
-export const MONDAY_AGENDA_TITLE = "Monday operating call review";
+export const MONDAY_AGENDA_TITLE = "Monday guidance review";
 
 export const MONDAY_AGENDA_MINUTES = MONDAY_AGENDA_STEPS.reduce((total, step) => total + step.minutes, 0);
 
@@ -202,7 +202,7 @@ export const briefConditionEntries = (
  * True when the action is a restatement of the call.
  *
  * The two fields carry the same sentence on a week where the model has no
- * stage-scoped action to add, and a pasted block that says "Operating call: X"
+ * stage-scoped action to add, and a pasted block that says "Guidance: X"
  * and then "Do now: X" reads as a formatting bug in someone else's channel.
  * `DecisionHero` already suppresses the second line on this exact test; the
  * copy formats have to apply it too, or the screen and the paste disagree.
@@ -275,7 +275,7 @@ export const resolveSharedBriefUrl = (artifact: BriefArtifact, origin: string) =
 const formatSlack = (artifact: BriefArtifact, origin: string) =>
   [
     `*${artifact.title} — ${artifact.recordDateLabel}*`,
-    `> *Operating call:* ${artifact.call}`,
+    `> *Guidance:* ${artifact.call}`,
     ...conditionLines(artifact).map((line) => `> • ${line}`),
     "",
     `${signalLine(artifact)} · ${artifact.regimeLabel}`,
@@ -292,7 +292,7 @@ const formatSlack = (artifact: BriefArtifact, origin: string) =>
 const formatAgenda = (artifact: BriefArtifact, origin: string) =>
   [
     `### ${MONDAY_AGENDA_TITLE} (${MONDAY_AGENDA_MINUTES} min) — ${artifact.recordDateLabel}`,
-    `**Operating call:** ${artifact.call} (${artifact.regimeLabel})`,
+    `**Guidance:** ${artifact.call} (${artifact.regimeLabel})`,
     ...(actionRestatesCall(artifact)
       ? []
       : [`**${DECISION_CONTRACT_LABELS.action.doNow}:** ${artifact.actionNow}`]),
@@ -331,7 +331,7 @@ export const briefArtifactToSlidePayload = (
   pauseIf: artifact.guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
   // Not a resume sentence: this slot is where the call changes, and an artifact
   // without one says so rather than borrowing a condition from another line.
-  callChangesIf: artifact.reversal ?? "No call-change line was published with this brief.",
+  callChangesIf: artifact.reversal ?? "No change line was published with this brief.",
   ...(artifact.resumeWhen ? { resumeWhen: artifact.resumeWhen } : {}),
   tightness: artifact.tightness,
   riskAppetite: artifact.riskAppetite ?? 50,
@@ -360,7 +360,7 @@ const formatCitation = (artifact: BriefArtifact, origin: string) => {
 
   return [
     `Whether. "${artifact.title} — ${artifact.recordDateLabel}."`,
-    `Call: ${artifact.call}`,
+    `Guidance: ${artifact.call}`,
     ...conditionLines(artifact),
     `Conditions: ${artifact.regimeLabel}. ${signalLine(artifact)}.`,
     provenanceLine(artifact) + ".",

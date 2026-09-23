@@ -72,7 +72,7 @@ export function CopyMeetingSlideButton({
       stateIcons={{ copied: <CheckIcon className="text-emerald-400" /> }}
       buttonLabels={{ copied: <span className="text-emerald-300">Copied the slide</span> }}
       buttonProps={{
-        title: "Copy this week's call as one slide, formatted for Notion, Keynote or Google Slides",
+        title: "Copy this week's guidance as one slide, formatted for Notion, Keynote or Google Slides",
       }}
     />
   );

@@ -31,9 +31,9 @@ describe("buildRegimeFlipState", () => {
 
     assert.equal(state.pendingCandidate, "DEFENSIVE");
     assert.match(state.text, /already above its 70 boundary/);
-    assert.match(state.text, /has not flipped yet/);
+    assert.match(state.text, /conditions have not changed yet/);
     assert.match(state.text, /waits on confirmation/);
-    assert.match(state.text, /flips to Cloudy once it holds/);
+    assert.match(state.text, /turn Cloudy once it holds/);
     // The watched line is the one that changes the flip target, not the one
     // already crossed.
     assert.equal(state.watch.dimension, "riskAppetite");
@@ -51,7 +51,7 @@ describe("buildRegimeFlipState", () => {
     // The nearest boundary is risk appetite, and crossing it from a willing-risk
     // call names the regime that crossing actually produces — Stormy, the
     // loose-unwilling quadrant — not the call's primary shift target.
-    assert.match(state.text, /Risk appetite falls to or below 50 \(62 today\), which flips the call to Stormy\./);
+    assert.match(state.text, /Risk appetite falls to or below 50 \(62 today\), which turns conditions Stormy\./);
     assert.equal(state.watch.dimension, "riskAppetite");
   });
 
@@ -64,7 +64,7 @@ describe("buildRegimeFlipState", () => {
     });
 
     assert.equal(state.pendingCandidate, null);
-    assert.match(state.text, /flips the call to/);
+    assert.match(state.text, /which turns conditions /);
   });
 
   it("names the target change when the watched boundary would cross", () => {
@@ -86,6 +86,6 @@ describe("buildRegimeFlipState", () => {
       },
     });
 
-    assert.match(state.text, /If risk appetite falls to or below 50, the call would change to Freezing\./);
+    assert.match(state.text, /If risk appetite falls to or below 50, conditions would turn Freezing\./);
   });
 });

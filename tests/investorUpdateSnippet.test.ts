@@ -54,11 +54,11 @@ describe("investor update snippet", () => {
     assert.match(parts.conditions, /Over the month, funding pressure moved to \d+ of 100 \(((\+|-)?\d+ points|unchanged); money is [a-z ]+\)/);
     // The weather word carries what it means for money, for an investor who has never seen the site.
     assert.match(parts.conditions, /\. Money is [a-z ,]+\. /);
-    assert.match(parts.conditions, /The call is (well clear of|within reach of|close to) the line that would change it\./);
+    assert.match(parts.conditions, /Conditions are (well clear of|within reach of|close to) the line where they would change\./);
     assert.match(parts.response, /^Our operating response this month: Hold net-new hiring/);
     // The page's slot names, and the rule's own verb dropped under a label that already says it.
     assert.match(parts.response, /Pause if: Funding pressure crosses 66\./);
-    assert.match(parts.response, /Call changes if: Risk appetite rises above 50 for two reads\.$/);
+    assert.match(parts.response, /Conditions change if: Risk appetite rises above 50 for two reads\.$/);
     assert.doesNotMatch(parts.response, /guardrail|change our course/i);
     assert.doesNotMatch(parts.response, /commitments\.\./, "an existing full stop is not doubled");
     assert.equal(parts.source, "Source: U.S. Treasury, 2026-09-16, via whether.work.");
@@ -109,7 +109,7 @@ describe("investor update snippet", () => {
     assert.equal(formatInvestorUpdateSnippet(parts, undefined), "C.\n\nR.\n\nS.");
     assert.match(formatInvestorUpdateSnippet(parts, "critical"), /^C\.\n\nR\. With under six months of runway, cash comes before/);
     assert.match(formatInvestorUpdateSnippet(parts, "tight"), /pay back inside \[n\] months/);
-    assert.match(formatInvestorUpdateSnippet(parts, "balanced"), /the weekly call sets our pace/);
+    assert.match(formatInvestorUpdateSnippet(parts, "balanced"), /the weekly guidance sets our pace/);
     assert.match(formatInvestorUpdateSnippet(parts, "abundant"), /without loosening the payback bar/);
     // The runway clause is the reader's own choice; what the company is doing about it is not,
     // so every band but the neutral one leaves that as a bracketed prompt rather than asserting

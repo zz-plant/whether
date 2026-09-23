@@ -74,7 +74,7 @@ export default async function DecideDetailPage({
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Common mistakes</h2>
           <ul className="space-y-2 text-sm text-slate-300">{role.failureModes.map((item) => <li key={item}>• {item}</li>)}</ul>
-          <h2 className="pt-2 text-lg font-semibold text-slate-100">When the call changes</h2>
+          <h2 className="pt-2 text-lg font-semibold text-slate-100">When conditions change</h2>
           <ul className="space-y-2 text-sm text-slate-300">{role.postureShifts.map((item) => <li key={item}>• {item}</li>)}</ul>
         </section>
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

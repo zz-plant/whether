@@ -51,8 +51,8 @@ describe("answer page reader copy", () => {
     /* Each score is drawn on its ladder now, against the line that would change
        this answer — the same primitive the homepage and /trust use. The claim
        is unchanged: no score appears without a name, a scale and a reading. */
-    assert.match(html, /Funding pressure<\/span><span[^>]*>\d+ of 100 · \d+ pts (above|below) the call changes line/);
-    assert.match(html, /Risk appetite<\/span><span[^>]*>\d+ of 100 · \d+ pts (above|below) the call changes line/);
+    assert.match(html, /Funding pressure<\/span><span[^>]*>\d+ of 100 · \d+ pts (above|below) the change line/);
+    assert.match(html, /Risk appetite<\/span><span[^>]*>\d+ of 100 · \d+ pts (above|below) the change line/);
     assert.equal((html.match(/data-score-ladder/g) ?? []).length, 2, "both composite scores are drawn against their line");
     assert.ok(
       html.includes(compositeSignalScales.tightness.directionLabel),

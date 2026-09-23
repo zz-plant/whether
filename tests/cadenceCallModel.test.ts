@@ -273,9 +273,9 @@ describe("buildCadenceCallModel", () => {
     assert.equal(model.history.at(-1)?.label, "Aug 2026");
   });
 
-  it("names the artifact by horizon so a shared call is not labelled weekly", () => {
-    assert.equal(build("monthly").shareTitle, "Whether Monthly Call");
-    assert.equal(build("quarterly").shareTitle, "Whether Quarterly Call");
+  it("names the artifact by horizon so shared guidance is not labelled weekly", () => {
+    assert.equal(build("monthly").shareTitle, "Whether Monthly Guidance");
+    assert.equal(build("quarterly").shareTitle, "Whether Quarterly Guidance");
     assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.threshold.pauseIf}: `)));
     assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: `)));
   });

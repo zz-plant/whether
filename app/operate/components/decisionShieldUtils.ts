@@ -74,7 +74,7 @@ export const buildShareText = (
 ) => {
   const lines = [
     "Decision Shield — Whether Weekly Brief",
-    `This week's call: ${getRegimePublicLabel(assessment.regime)}`,
+    `This week's conditions: ${getRegimePublicLabel(assessment.regime)}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,

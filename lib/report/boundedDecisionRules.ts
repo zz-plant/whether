@@ -485,7 +485,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           describeBoundaryGap({
             dimension: "tightness",
             gap: tightnessGap,
-            whenNearBoundary: () => "Runway trigger: tighten now; funding pressure is already at the line that changes the call.",
+            whenNearBoundary: () => "Runway trigger: tighten now; funding pressure is already at the line where conditions change.",
             whenAway: (formattedGap) => `Runway trigger: tighten if funding pressure moves within ${formattedGap} points of the line for 2 readings in a row.`,
           }),
         ],
@@ -509,7 +509,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           describeBoundaryGap({
             dimension: "risk appetite",
             gap: riskGap,
-            whenNearBoundary: () => "Payback trigger: revisit the plan now; risk appetite is already at the line that changes the call.",
+            whenNearBoundary: () => "Payback trigger: revisit the plan now; risk appetite is already at the line where conditions change.",
             whenAway: (formattedGap) => `Payback trigger: revisit the plan if risk appetite moves within ${formattedGap} points of the line.`,
           }),
         ],
@@ -533,7 +533,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           describeBoundaryGap({
             dimension: "tightness",
             gap: tightnessGap,
-            whenNearBoundary: () => "Leverage trigger: hold expansion now; funding pressure is already at the line that changes the call.",
+            whenNearBoundary: () => "Leverage trigger: hold expansion now; funding pressure is already at the line where conditions change.",
             whenAway: (formattedGap) => `Leverage trigger: hold expansion if funding pressure moves within ${formattedGap} points of the line.`,
           }),
         ],
@@ -557,7 +557,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           describeBoundaryGap({
             dimension: "risk appetite",
             gap: riskGap,
-            whenNearBoundary: () => "Growth trigger: re-sequence expansion now; risk appetite is already at the line that changes the call.",
+            whenNearBoundary: () => "Growth trigger: re-sequence expansion now; risk appetite is already at the line where conditions change.",
             whenAway: (formattedGap) => `Growth trigger: re-sequence expansion if risk appetite moves within ${formattedGap} points of the line.`,
           }),
         ],
@@ -581,7 +581,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           describeBoundaryGap({
             dimension: "tightness",
             gap: tightnessGap,
-            whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now; funding pressure is already at the line that changes the call.",
+            whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now; funding pressure is already at the line where conditions change.",
             whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if funding pressure moves within ${formattedGap} points of the line.`,
           }),
         ],
@@ -605,7 +605,7 @@ export const buildScopedVariantDecisionAdjustment = ({
         describeBoundaryGap({
           dimension: "a boundary",
           gap: Math.min(riskGap, tightnessGap),
-          whenNearBoundary: () => "Cash trigger: tighten spend now; at least one score is already at the line that changes the call.",
+          whenNearBoundary: () => "Cash trigger: tighten spend now; at least one score is already at the line where conditions change.",
           whenAway: (formattedGap) => `Cash trigger: tighten spend if either score comes within ${formattedGap} points of its line.`,
         }),
       ],
@@ -645,7 +645,7 @@ const scaleAdjustmentToRunway = (
       ...base,
       runwayBand: band,
       runwayLabel,
-      description: `${base.description} Under six months of cash, keeping cash overrides this week's call.`,
+      description: `${base.description} Under six months of cash, keeping cash overrides this week's guidance.`,
       doNowAdjustments: [
         "Freeze non-revenue hires and put a second signoff on every discretionary commitment.",
         "Bring cash forward where you can: annual-upfront terms, earlier invoicing.",
@@ -656,10 +656,10 @@ const scaleAdjustmentToRunway = (
         ...base.avoidAdjustments,
       ],
       watchAdjustments: [
-        "Cash gate: under six months of runway, hold every new commitment whatever this week's call says.",
+        "Cash gate: under six months of runway, hold every new commitment whatever this week's guidance says.",
         ...base.watchAdjustments,
       ],
-      thresholdEmphasis: "Runway is what limits you this week, not the call. The pause and resume lines apply again once cash clears nine months.",
+      thresholdEmphasis: "Runway is what limits you this week, not the guidance. The pause and resume lines apply again once cash clears nine months.",
       reversalTriggerDiscipline: "Reverse the freeze only after runway extends past nine months or bridge financing is banked.",
     };
   }

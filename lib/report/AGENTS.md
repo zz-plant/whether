@@ -52,18 +52,19 @@ Typical downstream renderers:
   | Concept | The name | Defined in | Never |
   | --- | --- | --- | --- |
   | The four market states | the weather label (Sunny, Cloudy, Stormy, Freezing); "conditions" as the noun | `regimePresentation.ts` `REGIME_LABELS` / `getRegimePublicLabel` | an engine key in reader text; "regime" |
-  | The weekly recommendation | "the call" | `reportFormatting.ts` `publicDecisionLabels.call` | posture, stance, operating call |
+  | The weekly recommendation | "guidance" ("this week's guidance"), never countable | `reportFormatting.ts` `publicDecisionLabels.call` | posture, stance, operating call, "the call" |
   | `PolicyPosture` (RISK_ON / SAFETY_MODE / TRANSITION) | "pace": Speed up / Hold / Slow down | `paceLabels.ts` | Risk-On, Safety Mode, Transition |
   | The pause/resume threshold pair | "the pause line", "the resume line"; slot labels "Pause if" / "Resume when"; a decision category is an "area" | `reportCopy.ts` `DECISION_CONTRACT_LABELS`, `boundedDecisionRules.ts` `decisionAreaLabel` | corridor, lane, rail, watch line, Change course if, Re-open when |
   | The 0–100 room-to-act score | "Operating latitude", with `OPERATING_LATITUDE_GLOSS` beside the number | `reportCopy.ts` `OPERATING_LATITUDE_LABEL` | Boldness, latitude signal |
   | A 0–100 score in prose | name, number and meaning together: `formatSignalReading` / `SignalReading` | `signalTranslations.ts` | a bare "74/100" |
-  | How settled the call is | "High / Medium / Low confidence" (the word only) | `reportFormatting.ts` `formatConfidenceChipLabel` | HIGH/MED/LOW codes, a percent, "confidence" for data freshness |
+  | How settled the guidance is | "High / Medium / Low confidence" (the word only) | `reportFormatting.ts` `formatConfidenceChipLabel` | HIGH/MED/LOW codes, a percent, "confidence" for data freshness |
   | The pressure score | "Funding pressure" | `boundedDecisionRules.ts` `ruleMetricLabel`, `signalTranslations.ts` | tightness, credit conditions |
   | The curve number | "Recession warning gauge (10-year minus 2-year rate)" on first use | `signalTranslations.ts` `regimeSignalLabel` | 10Y−2Y alone, curve slope, curve signal |
-  | The call changing | "what would change the call", "the call changes if" | `DECISION_CONTRACT_LABELS.watch` | flip, flip watch |
-  | How the call changes | `trackRecordCopy.ts` `CALL_CHANGE_RULE`, once per page | `trackRecordCopy.ts` | hysteresis, confirmation gate, dwelt crossing |
+  | Conditions changing | "what would change this guidance", "conditions change if" | `DECISION_CONTRACT_LABELS.watch` | flip, flip watch, "the call changes" |
+  | The line where conditions change | "the change line" in labels, "the line where conditions change" in prose | `app/components/ui/scoreLadder.tsx` | call-change line, "the line that changes the call" |
+  | How conditions change | `trackRecordCopy.ts` `CALL_CHANGE_RULE`, once per page | `trackRecordCopy.ts` | hysteresis, confirmation gate, dwelt crossing |
   | No live reading | `reportCopy.ts` `NO_LIVE_READING_CALL`: what is missing and what to hold | `reportCopy.ts` | "bounded operating discipline", "policy override" |
-- If a component needs to display `Action`, `Threshold`, `Reversal`, `Pause if`, `Resume when`, or `Call changes if`, route that phrasing through shared report/export formatting instead of custom string assembly.
+- If a component needs to display `Action`, `Threshold`, `Reversal`, `Pause if`, `Resume when`, or `Conditions change if`, route that phrasing through shared report/export formatting instead of custom string assembly.
 - Keep translation-only layers translation-only. Interpretation layers may change explanatory bullets, but they must not mutate canonical posture, confidence, readiness, or threshold semantics.
 - Keep fallback behavior explicit and non-fatal. Historical or degraded modes must remain renderable with a compact operating implication.
 - Preserve contract stability where possible. If you change a type or semantic contract here, update all affected consumers in the same change.
@@ -86,4 +87,4 @@ When semantics change, update:
 - Rewording the same decision labels independently in `/`, `/planning`, and export builders
 - Moving trust language into multiple parallel summaries
 - Letting components invent local “friendlier” labels that drift from canonical decision semantics
-- Treating exports as a separate brief instead of a transmission layer of the same call
+- Treating exports as a separate brief instead of a transmission layer of the same guidance

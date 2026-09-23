@@ -8,7 +8,7 @@ import { formatPointsMove, type FlashMove } from "./flashMoves";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =
-  "A move this size between two readings is unusual. This week's call stands until the next reading shows where the scores settle; until then, hold anything you can't undo.";
+  "A move this size between two readings is unusual. This week's guidance stands until the next reading shows where the scores settle; until then, hold anything you can't undo.";
 
 type EmailContent = {
   subject: string;
@@ -153,7 +153,7 @@ export const thresholdCrossingEmail = (
      50 and 75 marks on a 0-100 score, and are named as marks, not as rules. */
   const lineName = metric === "credit" && threshold === 75 ? "the pause line" : `the ${threshold} line`;
   const reading = `${metricLabel} is ${value.toFixed(1)}; ${lineName} is ${threshold}.`;
-  const whatToDo = `It crossed ${direction} that line since the last reading. Read this week's call before acting on last week's plan.`;
+  const whatToDo = `It crossed ${direction} that line since the last reading. Read this week's guidance before acting on last week's plan.`;
   const subject = `Whether Alert — ${metricLabel} crossed ${threshold}`;
   const text = [
     `Whether Threshold Alert`,

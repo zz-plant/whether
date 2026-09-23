@@ -52,10 +52,10 @@ export default function AboutPage() {
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
         <p className="text-sm text-slate-300">
           Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
-          week it answers three things: what should change right now, how sure we are, and what would change the call.
+          week it answers three things: what should change right now, how sure we are, and what would change the guidance.
         </p>
         <p className="text-sm text-slate-300">
-          It is not a macro blog and not a prediction engine. Every call comes as an action, the line that pauses it,
+          It is not a macro blog and not a prediction engine. Every week's guidance comes as an action, the line that pauses it,
           and the condition that resumes it, so you can act on it and revisit it later without re-arguing the
           reasoning.
         </p>
@@ -91,7 +91,7 @@ export default function AboutPage() {
             Sources and formulas
           </ActionLink>
           <ActionLink href="/history" variant="pill">
-            Every past call
+            All past guidance
           </ActionLink>
         </div>
       </section>

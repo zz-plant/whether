@@ -157,7 +157,7 @@ const ALLOWED_DETAILS: Record<TrustStatusTone, [string, string, string]> = {
     "Anything you can't undo, until one live refresh lands.",
   ],
   stable: [
-    "This week's normal approvals under the current call.",
+    "This week's normal approvals under the current guidance.",
     "Nothing extra.",
     "Nothing.",
   ],
@@ -272,7 +272,7 @@ export const buildTrustWarnings = ({
   ) {
     warnings.push({
       id: "boundary-whipsaw",
-      warning: "The call sits near a line and the scores moved both ways this week.",
+      warning: "Conditions sit near a line and the scores moved both ways this week.",
       mitigationCheck: "Wait for one more week that reads the same way before adding fixed costs.",
     });
   }
@@ -297,7 +297,7 @@ export const buildWeeklyTrustCueLine = ({
   freshnessLabel: string;
   transitionWatch: "ON" | "OFF";
 }) => {
-  const changeWatch = transitionWatch === "ON" ? "The call could change next week" : "The call is not close to changing";
+  const changeWatch = transitionWatch === "ON" ? "Conditions could change next week" : "Conditions are not close to changing";
   return `${formatConfidenceChipLabel(confidenceLabel)} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
 };
 export const buildCompactTrustSummary = ({
@@ -458,7 +458,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: "The call sits close to a line. Keep last week's plan; anything you can't undo can wait for a clearer reading.",
+      detail: "Conditions sit close to a line. Keep last week's plan; anything you can't undo can wait for a clearer reading.",
     };
   }
 
@@ -466,7 +466,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Act with caution",
       tone: "warning",
-      detail: `The call is held this week: ${policyRefusalReasons[0] ?? "the two scores point in different directions."} Keep approvals reversible.`,
+      detail: `The guidance is being held this week: ${policyRefusalReasons[0] ?? "the two scores point in different directions."} Keep approvals reversible.`,
     };
   }
 
@@ -498,7 +498,7 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Call ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Conditions: ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
 
 export const buildTrustStatus = ({
   historicalSelection,
@@ -552,7 +552,7 @@ export const buildTrustStatus = ({
     : isFallback
       ? `Live data is late; this is a cached reading. Keep last week's plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
       : policyRefusalActive
-        ? `Live data is in, but the two scores point in different directions, so the call is not changing this week. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
+        ? `Live data is in, but the two scores point in different directions, so the guidance is not changing this week. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
       : "Every source answered and nothing here argues for holding back this week.";
 
   const action = historicalSelection
@@ -561,7 +561,7 @@ export const buildTrustStatus = ({
       ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
       : policyRefusalActive
         ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again.`
-      : `${stableAction} Hold back if confidence drops to low or the call moves within reach of a line.`;
+      : `${stableAction} Hold back if confidence drops to low or conditions move within reach of a line.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"
@@ -581,7 +581,7 @@ export const buildTrustStatus = ({
       ? "Only moves you can undo, until a live update lands."
       : policyRefusalActive
         ? "Only moves you can undo, until the two scores agree."
-      : "Use this live reading for this week's approvals; the pause lines in the call apply.";
+      : "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.";
 
   const outageExitGate = buildOutageExitGate({
     isFallback,

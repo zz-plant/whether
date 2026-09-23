@@ -181,10 +181,10 @@ export const buildInterpretationLayer = ({
 
     const paceCopy =
       adjusted.actionBias === "loosen"
-        ? "Run this sector a step ahead of the base call."
+        ? "Run this sector a step ahead of the base guidance."
         : adjusted.actionBias === "tighten"
-          ? "Run this sector a step behind the base call."
-          : "Run this sector at the base call.";
+          ? "Run this sector a step behind the base guidance."
+          : "Run this sector at the base guidance.";
     const sectorAction = `${adjusted.adjustedPostureLabel}. ${paceCopy}`;
 
     return {
@@ -220,7 +220,7 @@ export const buildInterpretationLayer = ({
       view,
       label: "Company view",
       summary: hasCompanyProfile(companyProfile)
-        ? "Translate the weekly call into company-specific bounded rules without changing the base posture."
+        ? "Translate the weekly guidance into company-specific bounded rules without changing the base posture."
         : "Illustrative: these rules assume a Series B company with $1–10M ARR and 12–18 months of runway. Whether does not take your company's figures here; use the runway planner on Planning for yours.",
       bullets: formatBullets(
         adjustedRules
@@ -254,8 +254,8 @@ export const buildInterpretationLayer = ({
       view,
       label: "Financial view",
       summary: financialInput
-        ? "This week's call, translated into runway: how fast to spend, when to raise, and how far burn can move."
-        : "Illustrative: this week's call translated into runway for a typical company in this regime, not your figures. The runway planner on Planning sizes it with yours.",
+        ? "This week's guidance, translated into runway: how fast to spend, when to raise, and how far burn can move."
+        : "Illustrative: this week's guidance translated into runway for a typical company in this regime, not your figures. The runway planner on Planning sizes it with yours.",
       bullets: formatBullets([
         boundedLine(DECISION_CONTRACT_LABELS.slot.action, actionPhrase),
         boundedLine(
@@ -287,9 +287,9 @@ export const buildInterpretationLayer = ({
       ForecastModel["boundaryPressure"]["momentum"],
       string
     > = {
-      "toward-threshold": "The readings are moving toward the line that changes the call.",
+      "toward-threshold": "The readings are moving toward the line where conditions change.",
       "away-from-threshold":
-        "The readings are moving away from the line that changes the call.",
+        "The readings are moving away from the line where conditions change.",
       mixed: "The two readings are moving in opposite directions.",
       stable: "Neither reading is moving toward or away from the line.",
     };
@@ -317,9 +317,9 @@ export const buildInterpretationLayer = ({
       view,
       label: "Forecast view",
       summary:
-        "How likely this call is to change if this week's direction holds.",
+        "How likely conditions are to change if this week's direction holds.",
       bullets: formatBullets([
-        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} conditions while the call holds. It carries ${topRegime[1]}% of the next-90-day weight.`),
+        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} conditions while they hold. They carry ${topRegime[1]}% of the next-90-day weight.`),
         boundedLine(
           DECISION_CONTRACT_LABELS.slot.threshold,
           `${formatBoundaryDistance({ label: closestDimension, points: forecast.boundaryPressure.distance, threshold: closestThreshold })} Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()}.`,

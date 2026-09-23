@@ -514,7 +514,7 @@ async function PageContent({
             {/* Tier 1, and nothing else: the weather word, the call, and the
                 trust strip. Every other question the reader asks is a section
                 of its own below, in the order they ask them. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating call" className="order-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating guidance" className="order-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
               {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
                 titleLevel={cadenceCall ? "h2" : "h1"}

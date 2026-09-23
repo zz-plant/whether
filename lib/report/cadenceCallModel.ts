@@ -85,25 +85,25 @@ const HORIZON_COPY: Record<
   }
 > = {
   monthly: {
-    cadenceLabel: "Monthly call",
+    cadenceLabel: "Monthly guidance",
     periodNoun: "month",
     periodNounPlural: "months",
     historyLabel: "Conditions by month",
-    weeklyBridge: "The weekly read behind this month's call",
+    weeklyBridge: "The weekly read behind this month's guidance",
     planLabel: "Build this month's plan →",
-    shareTitle: "Whether Monthly Call",
-    shareLabel: "Copy monthly call",
+    shareTitle: "Whether Monthly Guidance",
+    shareLabel: "Copy monthly guidance",
     historyLength: 6,
   },
   quarterly: {
-    cadenceLabel: "Quarterly call",
+    cadenceLabel: "Quarterly guidance",
     periodNoun: "quarter",
     periodNounPlural: "quarters",
     historyLabel: "Conditions by quarter",
-    weeklyBridge: "The weekly read behind this quarter's call",
+    weeklyBridge: "The weekly read behind this quarter's guidance",
     planLabel: "Build this quarter's plan →",
-    shareTitle: "Whether Quarterly Call",
-    shareLabel: "Copy quarterly call",
+    shareTitle: "Whether Quarterly Guidance",
+    shareLabel: "Copy quarterly guidance",
     historyLength: 4,
   },
 };
@@ -342,7 +342,7 @@ export const buildCadenceCallModel = ({
     planLabel: copy.planLabel,
     shareTitle: copy.shareTitle,
     shareLabel: copy.shareLabel,
-    shareCopiedLabel: "Call copied",
+    shareCopiedLabel: "Guidance copied",
     shareLines: [
       `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${boundedRule.threshold}`,
       `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${boundedRule.reversal}`,

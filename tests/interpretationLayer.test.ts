@@ -183,7 +183,7 @@ describe("interpretation layer", () => {
   it("names the forecast's likeliest outcome by its weather word", () => {
     const layer = buildInterpretationLayer({ view: "forecast", homeBriefModel, assessment, forecast, decisionRules });
     // Scarcity carries 38 of the fixture's weight; the reader knows it as Freezing.
-    assert.match(layer.bullets[0], /Action: Operate for Freezing conditions while the call holds\. It carries 38%/);
+    assert.match(layer.bullets[0], /Action: Operate for Freezing conditions while they hold\. They carry 38%/);
     assert.doesNotMatch(layer.bullets.join(" "), /\b(Scarcity|Expansion|Defensive|Mixed)\b|[Mm]omentum|\bflip\b/);
   });
 
@@ -201,7 +201,7 @@ describe("interpretation layer", () => {
       decisionRules,
     });
 
-    assert.match(layer.bullets[0], /Action: Operate for Cloudy conditions while the call holds\. It carries 0% of the next-90-day weight\./);
+    assert.match(layer.bullets[0], /Action: Operate for Cloudy conditions while they hold\. They carry 0% of the next-90-day weight\./);
   });
 
   it("swaps interpretation content between sector and financial views", () => {
@@ -212,7 +212,7 @@ describe("interpretation layer", () => {
     const financialText = layerText(financial);
 
     assert.match(sectorText, /Sector view/);
-    assert.match(sectorText, /Action: Cloudy\+\. Run this sector a step ahead of the base call\./);
+    assert.match(sectorText, /Action: Cloudy\+\. Run this sector a step ahead of the base guidance\./);
     assert.ok(sectorText.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}: Hold irreversible hiring.`));
     assert.match(sectorText, /Reverse: Drop the sector tilt if funding pressure rises above 70\./);
     assert.match(financialText, /Financial view/);

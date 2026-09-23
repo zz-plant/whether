@@ -123,8 +123,8 @@ export const RegimeTimelinePanel = ({
     <section id="regime-timeline" aria-labelledby="regime-timeline-title" className="mt-6 border-t border-slate-800/60 pt-6">
       <div>
         <SectionPanelHeader
-          label="Past calls"
-          title="The call, month by month, over 24 months"
+          label="Past conditions"
+          title="Conditions, month by month, over 24 months"
           titleId="regime-timeline-title"
           description="Pick a month to load it."
           aside={
@@ -198,7 +198,7 @@ export const RegimeTimelinePanel = ({
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Call changes</p>
+              <p className="type-label text-slate-400">Changes in conditions</p>
               <p className="mt-2 text-sm text-slate-200">
                 {changeCount} changes across the last {series.length} months.
               </p>

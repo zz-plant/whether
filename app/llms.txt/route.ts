@@ -54,7 +54,7 @@ export async function GET() {
     "",
     "### Jev decision request",
     `- GET ${baseUrl}/api/agent?format=jev`,
-    "- Returns: this week's call as a ready-to-send request for TypeSafe's Jev decision model (typesafe/jev): typed state with a `plan` slot, plus questions (does the plan conflict with the call, which decision area, how reversible, is it safer after the call changes)",
+    "- Returns: this week's guidance as a ready-to-send request for TypeSafe's Jev decision model (typesafe/jev): typed state with a `plan` slot, plus questions (does the plan conflict with the guidance, which decision area, how reversible, is it safer after conditions change)",
     "- Fill `request.state.plan` and send `request` to Jev yourself; Whether never receives the plan",
     "- Check `automationReady` first: false means the reading is not live or not current",
     "",

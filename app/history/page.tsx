@@ -33,7 +33,7 @@ import { buildPageMetadata } from "../../lib/seo";
 export const metadata: Metadata = buildPageMetadata({
   title: "History and Track Record",
   description:
-    "Every monthly call on record, when it changed, how long each one held, and the published weekly briefs behind the track record.",
+    "Every month-end reading on record, when conditions changed, how long each spell held, and the published weekly briefs behind the track record.",
   path: "/history",
   imageAlt: "Whether history and track record",
 });
@@ -75,10 +75,10 @@ export default async function HistoryPage({
      month strip, then the tiles), the method second (the phase map), then the
      evidence (the table) and the published weeks. The rail follows the page. */
   const historySectionLinks = [
-    ...(fullSeries.length > 0 ? [{ href: "#call-by-month", label: "The call by month" }] : []),
+    ...(fullSeries.length > 0 ? [{ href: "#call-by-month", label: "Conditions by month" }] : []),
     ...(trackRecord ? [{ href: "#track-record", label: "Track record" }] : []),
-    { href: "#regime-map", label: "How the two scores decide the call" },
-    ...(trackRecord ? [{ href: "#monthly-calls", label: "Monthly calls" }] : []),
+    { href: "#regime-map", label: "How the two scores set conditions" },
+    ...(trackRecord ? [{ href: "#monthly-calls", label: "Monthly readings" }] : []),
     ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
   ];
 
@@ -123,7 +123,7 @@ export default async function HistoryPage({
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },
-        page: { pageTitle: "History", pageSummary: "Past calls, as they were published.", sectionLinks: historySectionLinks },
+        page: { pageTitle: "History", pageSummary: "Past guidance, as it was published.", sectionLinks: historySectionLinks },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },
@@ -149,7 +149,7 @@ export default async function HistoryPage({
           aria-labelledby="call-by-month-heading"
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
-          <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">The call by month</h2>
+          <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">Conditions by month</h2>
           <MonthStrip entries={fullSeries} />
         </section>
       ) : null}
@@ -210,8 +210,8 @@ export default async function HistoryPage({
                 append-only rule is the guarantee worth stating. */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? "Permanent, append-only weekly brief records paired with 176 months of monthly calls (2012–2026). Entries are never edited after publication, so past calls read the way they were made."
-                : `${publishedBriefs.length} weekly brief records paired with 176 months of monthly calls (2012–2026). Entries are never edited after publication, so past calls read the way they were made.`}
+                ? "Permanent, append-only weekly brief records paired with 176 months of monthly readings (2012–2026). Entries are never edited after publication, so past guidance reads the way it was published."
+                : `${publishedBriefs.length} weekly brief records paired with 176 months of monthly readings (2012–2026). Entries are never edited after publication, so past guidance reads the way it was published.`}
             </p>
           </div>
           {/* A link card, not a pill coerced into one: the `pill` variant is a
@@ -245,9 +245,9 @@ export default async function HistoryPage({
         aria-labelledby="posture-by-year-heading"
         className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       >
-        <h2 id="posture-by-year-heading" className="type-eyebrow type-eyebrow-section">The call by year</h2>
+        <h2 id="posture-by-year-heading" className="type-eyebrow type-eyebrow-section">Conditions by year</h2>
         <p className="text-sm text-slate-300">
-          What the call was in each closed year, how the months split, and where it changed mid-year.
+          What conditions were in each closed year, how the months split, and where they changed mid-year.
         </p>
         <ul className="flex flex-wrap gap-2">
           {postureArchiveYears.map((year) => (

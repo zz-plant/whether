@@ -244,7 +244,7 @@ export const buildWeeklyDecisionCardModel = (
     decisionReadiness: {
       label: "Act with caution",
       tone: "warning",
-      detail: "Use the weekly call for staged moves, but keep irreversible commitments gated until reliability improves from MED (Updated 2h ago).",
+      detail: "Use the weekly guidance for staged moves, but keep irreversible commitments gated until reliability improves from MED (Updated 2h ago).",
     },
     weeklyLeadershipSummary: {
       boldnessScore: 58,

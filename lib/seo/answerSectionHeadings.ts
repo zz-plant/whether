@@ -30,7 +30,7 @@ const THRESHOLD_FOCUS_LABELS = {
 /** "hiring, roadmap and spending" — lowercase, for mid-heading use. */
 const joinAreas = (areas: readonly DecisionArea[]): string => {
   const labels = areas.map((area) => decisionAreaLabel(area).toLowerCase());
-  if (labels.length === 0) return "this week's call";
+  if (labels.length === 0) return "this week's guidance";
   if (labels.length === 1) return labels[0];
   return `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
 };

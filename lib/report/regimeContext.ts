@@ -108,13 +108,13 @@ export function getRegimeProjection(
   const minDist = Math.min(Math.abs(tightDist), Math.abs(riskDist));
 
   if (maxVelocity < 0.5 || minDist > 40) {
-    return { weeksToFlip: null, projectedRegime: null, velocityLabel: "Slow movement — no change to the call expected soon." };
+    return { weeksToFlip: null, projectedRegime: null, velocityLabel: "Slow movement — no change in conditions expected soon." };
   }
 
   const weeksEstimate = Math.round(minDist / maxVelocity);
   const velocityLabel = weeksEstimate <= 4
     ? `At current pace, threshold crossing possible within ${weeksEstimate} ${weeksEstimate === 1 ? "week" : "weeks"}.`
-    : `Slow trend — no change to the call expected soon.`;
+    : `Slow trend — no change in conditions expected soon.`;
 
   /* Project which regime would follow */
   const tightDir = tightnessVelocity > 0 ? "tightening" : "easing";

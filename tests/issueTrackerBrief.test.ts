@@ -19,10 +19,10 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /^## Whether Weekly Brief — 2026-03-04$/m);
     assert.match(brief, /^\*\*Conditions:\*\* /m);
-    assert.match(brief, /^### This week's call$/m);
+    assert.match(brief, /^### This week's guidance$/m);
     assert.match(brief, /^### What changed this week$/m);
-    // The page's order: the call, then what moved. The brief reads the same way.
-    assert.ok(brief.indexOf("This week's call") < brief.indexOf("What changed this week"));
+    // The page's order: the guidance, then what moved. The brief reads the same way.
+    assert.ok(brief.indexOf("This week's guidance") < brief.indexOf("What changed this week"));
     assert.match(brief, /^- Chicago Fed National Financial Conditions Index: /m);
     assert.match(brief, /^Source: https:\/\/fred\.stlouisfed\.org · 2026-03-04 · Confidence: /m);
     // Markdown must not carry wiki markup.
@@ -35,7 +35,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
 
     assert.match(brief, /^h2\. Whether Weekly Brief — 2026-03-04$/m);
     assert.match(brief, /^\*Conditions:\* /m);
-    assert.match(brief, /^h3\. This week's call$/m);
+    assert.match(brief, /^h3\. This week's guidance$/m);
     assert.match(brief, /^\* Chicago Fed National Financial Conditions Index: /m);
     assert.match(brief, /^Source: \[https:\/\/fred\.stlouisfed\.org\|https:\/\/fred\.stlouisfed\.org\]$/m);
     assert.doesNotMatch(brief, /^## /m);
@@ -45,8 +45,8 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
     // Each score with the line it is judged against and the distance to it.
-    assert.match(brief, /Funding pressure 12 of 100 \(money is easy to raise\) · call changes at 70 · 58 pts below/);
-    assert.match(brief, /Risk appetite 68 of 100 \(investors are selective about risk\) · call changes at 50 · 18 pts above/);
+    assert.match(brief, /Funding pressure 12 of 100 \(money is easy to raise\) · change line 70 · 58 pts below/);
+    assert.match(brief, /Risk appetite 68 of 100 \(investors are selective about risk\) · change line 50 · 18 pts above/);
     // The series is named in words, never as the engine's "(1M)".
     assert.match(brief, /Short-term borrowing rate:\*\* 3\.75% \(read from the 1-month Treasury bill\)/);
     assert.doesNotMatch(brief, /\(1M\)/);
@@ -69,7 +69,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
 
     // With no modeled label the stamp still prints a value, from the reading itself.
-    assert.match(brief, /Confidence: Medium \(how far the scores sit from the line that changes the call\)/);
+    assert.match(brief, /Confidence: Medium \(how far the scores sit from the line where conditions change\)/);
     assert.doesNotMatch(brief, /MEDIUM/);
   });
 
@@ -116,7 +116,7 @@ describe("buildGuardrailTagBlocks", () => {
       actionStripItems: items,
       postureLabel: "Cloudy",
       recordDate: "2026-03-04",
-      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change the call.",
+      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change conditions.",
     });
 
     assert.equal(blocks.length, 2);
@@ -140,10 +140,10 @@ describe("buildGuardrailTagBlocks", () => {
       actionStripItems: items,
       postureLabel: "Cloudy",
       recordDate: "2026-03-04",
-      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change the call.",
+      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change conditions.",
     });
 
-    assert.ok(blocks.every((block) => block.markdown.includes("0.15% flatter on the 10Y−2Y curve would change the call.")));
+    assert.ok(blocks.every((block) => block.markdown.includes("0.15% flatter on the 10Y−2Y curve would change conditions.")));
   });
 
   it("omits the flip watch line when no axis is reachable", () => {
@@ -153,7 +153,7 @@ describe("buildGuardrailTagBlocks", () => {
       recordDate: "2026-03-04",
     });
 
-    assert.ok(blocks.every((block) => !block.markdown.includes("would change the call")));
+    assert.ok(blocks.every((block) => !block.markdown.includes("would change conditions")));
   });
 
   it("returns no blocks for an empty action strip", () => {

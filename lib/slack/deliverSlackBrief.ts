@@ -57,7 +57,7 @@ export const buildSlackBriefBlocks = (
     /* The weekly call as rendered, when the Monday cron captured one (lib/export/briefScreenshot.ts).
        Slack fetches the URL once and proxies it, so the block costs one read of the stored PNG. */
     ...(options.imageUrl
-      ? [{ type: "image", image_url: options.imageUrl, alt_text: `Whether weekly call card for ${recordDate}` }]
+      ? [{ type: "image", image_url: options.imageUrl, alt_text: `Whether weekly guidance card for ${recordDate}` }]
       : []),
     { type: "section", text: { type: "mrkdwn", text: body } },
     {

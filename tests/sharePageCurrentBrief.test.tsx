@@ -43,8 +43,8 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Conditions:/);
     assert.match(html, /Do now/);
     assert.match(html, /Pause if/);
-    // The call-change line under its own label, not the resume vocabulary.
-    assert.match(html, /Call changes if: Re-open only from the next committed snapshot\./);
+    // The change condition under its own label, not the resume vocabulary.
+    assert.match(html, /Conditions change if: Re-open only from the next committed snapshot\./);
     assert.match(html, /Resume when/);
     assert.match(html, /Meeting pack/);
     assert.match(html, /Share the persisted call exactly\./);

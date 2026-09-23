@@ -21,7 +21,7 @@ type DecisionPhraseTriplet = {
 // from the one vocabulary rather than restating them. call/evidence are this
 // surface's own words and have no slot in DECISION_CONTRACT_LABELS.
 export const publicDecisionLabels = {
-  call: "Call",
+  call: "Guidance",
   action: DECISION_CONTRACT_LABELS.action.doNow,
   threshold: DECISION_CONTRACT_LABELS.threshold.pauseIf,
   reversal: DECISION_CONTRACT_LABELS.reversal.resumeWhen,

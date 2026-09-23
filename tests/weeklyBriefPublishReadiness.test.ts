@@ -59,7 +59,7 @@ describe("the weekly email refuses what it cannot stand behind", () => {
     assert.equal(result.ok, false);
     assert.equal(result.sent, 0);
     assert.match(result.error ?? "", /^refused_unpublishable: /);
-    assert.match(result.error ?? "", /no call to send/);
+    assert.match(result.error ?? "", /no guidance to send/);
   });
 
   it("refuses a fallback reading rather than mailing it as this week", async () => {

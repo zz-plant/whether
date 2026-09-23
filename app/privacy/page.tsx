@@ -40,7 +40,7 @@ export default function PrivacyPage() {
     <LegalPageShell title="Privacy" effectiveDate="9/17/2026">
       <section className="space-y-4">
         <p className={paragraph}>
-          Whether is a weekly operating call built on public macroeconomic data. The call itself, the
+          Whether is weekly operating guidance built on public macroeconomic data. The guidance itself, the
           API, the MCP endpoint, and embeds need no account, so most readers are never asked for
           anything. This page lists what is stored when you do give something, where it lives, and
           what it is used for.
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
             tells no third party that you did.
           </li>
           <li>
-            No account, key, or email is required to read the weekly call, call the API, use the MCP
+            No account, key, or email is required to read the weekly guidance, call the API, use the MCP
             endpoint, or embed the brief.
           </li>
           <li>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             <h3 className={subheading}>2.1 Your email address, if you subscribe</h3>
             <p className={paragraph}>
               Subscribing stores your address, the time you subscribed, whether you have confirmed
-              it, whether you opted in to alerts between Mondays (the call changing, a score crossing
+              it, whether you opted in to alerts between Mondays (conditions changing, a score crossing
               its line, or an outsized move in a market input) as well as the Monday brief, and a
               random token that makes the confirmation and unsubscribe links work. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
@@ -126,17 +126,17 @@ export default function PrivacyPage() {
               Decisions you record are stored in Cloudflare KV against the identifier above, with the
               reading at the time so a later week can be compared against the decision&apos;s
               own assumptions. Everything else you set stays in your browser and is never sent: your
-              operator profile, Decision Shield presets, threshold drafts, the last call this browser
+              operator profile, Decision Shield presets, threshold drafts, the last guidance this browser
               saw, which steps of the weekly plan you have ticked off this week, the theme, and which
               one-time explainers you have dismissed.
             </p>
           </div>
 
           <div className="space-y-2">
-            <h3 className={subheading}>2.5 Two cookies, set only if you calibrate the call</h3>
+            <h3 className={subheading}>2.5 Two cookies, set only if you calibrate the guidance</h3>
             <p className={paragraph}>
               Picking a company stage writes a cookie so the panels on a page agree with each other
-              and the call is calibrated the same way everywhere. Picking a cash runway band writes a
+              and the guidance is calibrated the same way everywhere. Picking a cash runway band writes a
               second one for the same reason. Each holds only the band you picked &mdash; never a
               cash figure &mdash; is read only by this site, and is set by no other action.
             </p>
@@ -171,11 +171,11 @@ export default function PrivacyPage() {
           <div className="space-y-2">
             <h3 className={subheading}>2.6b Browser notifications, if you turn them on</h3>
             <p className={paragraph}>
-              If you ask this browser to notify you when the call changes, your browser generates a
+              If you ask this browser to notify you when conditions change, your browser generates a
               subscription — an address its own push service assigned, and two keys it made — and we store
               those three things against the random identifier above. That is the whole record: no email
-              address, no reading, and no history of what was sent. It is used to wake this browser when the
-              published call changes, which is a handful of times a year, and for
+              address, no reading, and no history of what was sent. It is used to wake this browser when
+              conditions change, which is a handful of times a year, and for
               nothing else.
             </p>
             <p className={paragraph}>

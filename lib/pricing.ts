@@ -41,23 +41,23 @@ export type PricingPlan = {
 export const PAID_PLANS_ON_SALE = false;
 
 export const FREE_FOREVER_PROMISE =
-  "The weekly operating call, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans add Monday delivery to email and Slack — never access to the call itself.";
+  "The weekly operating guidance, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans add Monday delivery to email and Slack — never access to the guidance itself.";
 
 export const pricingPlans: PricingPlan[] = [
   {
     id: "free",
     name: "Free",
     monthlyPriceUsd: null,
-    tagline: "The whole call, permanently",
-    audience: "Any operator who wants the Monday call",
+    tagline: "All the guidance, permanently",
+    audience: "Any operator who wants Monday's guidance",
     promise: FREE_FOREVER_PROMISE,
     features: [
-      "The weekly operating call, scored and dated",
+      "The weekly operating guidance, scored and dated",
       "Published scoring, thresholds, and reversal conditions",
       "Copyable Slack, email, and meeting artifacts",
       "Agent API and MCP endpoint — no key, no rate card",
       "Embeds for a dashboard or wiki",
-      "The full call history and archive",
+      "The full guidance history and archive",
       /* Split because the two are stored in different places, and saying
          "saved in this browser" of both contradicted /privacy 2.4, which tells
          a reader that recorded decisions are held in Cloudflare KV against the
@@ -65,7 +65,7 @@ export const pricingPlans: PricingPlan[] = [
          direction that costs trust. */
       "Decisions you record, kept against this browser's identifier",
       "Week close-outs and what you have already reviewed, in this browser",
-      "Email when the call changes between Mondays",
+      "Email when conditions change between Mondays",
     ],
   },
   {
@@ -73,10 +73,10 @@ export const pricingPlans: PricingPlan[] = [
     name: "Pro",
     monthlyPriceUsd: 49,
     tagline: "Monday delivery to your inbox",
-    audience: "One person who reads the call every Monday",
+    audience: "One person who reads the guidance every Monday",
     features: [
-      "The call in your inbox every Monday morning",
-      "Threshold alerts — when a score crosses a pause or resume line, not only when the call changes",
+      "The guidance in your inbox every Monday morning",
+      "Threshold alerts — when a score crosses a pause or resume line, not only when conditions change",
       "Decision memory that follows you across devices and survives a cleared browser",
     ],
   },
@@ -84,8 +84,8 @@ export const pricingPlans: PricingPlan[] = [
     id: "team",
     name: "Team",
     monthlyPriceUsd: 199,
-    tagline: "One call the whole team is reading",
-    audience: "A team that reads the same call each week",
+    tagline: "The same guidance for the whole team",
+    audience: "A team that reads the same guidance each week",
     features: [
       "Everything in Pro, for the whole team",
       "Slack delivery into the channel where the decision happens",

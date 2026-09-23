@@ -78,7 +78,7 @@ describe("assembleHomePage streaming contract", () => {
     assert.match(boardNote, /^OPERATING LATITUDE: \d+\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: /m);
     assert.match(boardNote, /^CONDITIONS: (Sunny|Cloudy|Stormy|Freezing)[^\n]*\((money|conditions) [^)]+\) · (High|Medium|Low) confidence$/m);
     assert.match(boardNote, /^PAUSE IF: /m);
-    assert.match(boardNote, /^CALL CHANGES IF: /m);
+    assert.match(boardNote, /^CONDITIONS CHANGE IF: /m);
     assert.doesNotMatch(boardNote, /BOLDNESS|FLIP:|GUARDRAIL:|POSTURE:|TRUST:|FALLBACK|SNAPSHOT|\d+% confidence|\b(HIGH|MED|LOW)\b/);
     assert.doesNotMatch(boardNote, /PAUSE IF: Pause /);
     assert.doesNotMatch(artifactPayload?.weeklyCallSnapshotText ?? "", /AVOID:|WATCH:|\d+%/);
@@ -99,7 +99,7 @@ describe("assembleHomePage streaming contract", () => {
     assert.match(headerOperatorBriefCopy, /Do now:/);
     assert.match(headerOperatorBriefCopy, /Pause if:/);
     assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);
-    assert.match(headerOperatorBriefCopy, /Call changes if:/);
+    assert.match(headerOperatorBriefCopy, /Conditions change if:/);
     assert.equal(artifactPayload?.weeklyOperatorBriefText, headerOperatorBriefCopy);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operate#ops-monthly-action-summary");
@@ -166,7 +166,7 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(homepage.interpretationLayer.view, "forecast");
     assert.equal(homepage.interpretationSearchParams?.view, "forecast");
     assert.equal(homepage.interpretationSearchParams?.month, "3");
-    assert.match(homepage.interpretationLayer.summary, /how likely this call is to change/i);
+    assert.match(homepage.interpretationLayer.summary, /how likely conditions are to change/i);
     assert.match(homepage.weeklyDecisionCardModel.decision.immediateDecision, /stage|revise|hold/i);
   });
 

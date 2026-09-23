@@ -52,7 +52,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
     notes: {
       tightness: "How hard current conditions make new long-payback commitments",
       riskAppetite: "How willing markets are to fund risk and faster expansion",
-      curveSlope: "The earliest sign of whether this week's call will hold",
+      curveSlope: "The earliest sign of whether this week's conditions will hold",
     },
     instruments: [],
   },
@@ -60,7 +60,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
     signals: ["curveSlope"],
     notes: { curveSlope: "The earliest read on whether growth is slowing" },
     instruments: [
-      { label: "Past changes", why: "How the last few call changes played out", href: "#regime-timeline" },
+      { label: "Past changes", why: "How the last few changes in conditions played out", href: "#regime-timeline" },
       { label: "Raw source data", why: "Check the growth inputs at their source", href: "#signal-diagnostics" },
     ],
   },
@@ -71,22 +71,22 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
       tightness: "When money is tight, higher costs are harder to pass on",
     },
     instruments: [
-      { label: "Lines that change the call", why: "Where the lines sit, if inflation is the main worry", href: "#advanced-controls" },
+      { label: "Change lines", why: "Where the lines sit, if inflation is the main worry", href: "#advanced-controls" },
     ],
   },
   labor: {
     signals: ["riskAppetite"],
     notes: { riskAppetite: "How willing investors are to fund hiring ahead of revenue" },
     instruments: [
-      { label: "Past changes", why: "How long the call has held; a hiring plan outlasts one week's number", href: "#regime-timeline" },
-      { label: "Past months", why: "What the call said in past months, to test a hiring plan against", href: "#time-machine" },
+      { label: "Past changes", why: "How long conditions have held; a hiring plan outlasts one week's number", href: "#regime-timeline" },
+      { label: "Past months", why: "What the guidance said in past months, to test a hiring plan against", href: "#time-machine" },
     ],
   },
   financial: {
     signals: ["tightness", "riskAppetite"],
     notes: {
       tightness: "How hard money is to raise or borrow right now",
-      riskAppetite: "How willing investors are to fund risk, which moves with the call",
+      riskAppetite: "How willing investors are to fund risk, which moves with conditions",
     },
     instruments: [
       { label: "Raw source data", why: "Check the inputs at their source before a move that depends on rates", href: "#signal-diagnostics" },
@@ -133,7 +133,7 @@ const buildStructuredData = () => ({
         "@type": "Dataset",
         name: "Macro signal evidence feed",
         description:
-          "Macro signal dataset for Whether, including thresholds, sensor readings, and the evidence behind the call.",
+          "Macro signal dataset for Whether, including thresholds, sensor readings, and the evidence behind the guidance.",
         creator: {
           "@id": `${siteUrl}#organization`,
         },
