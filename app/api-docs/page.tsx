@@ -10,7 +10,7 @@ import { buildPageMetadata } from "../../lib/seo";
 export const metadata: Metadata = {
   ...buildPageMetadata({
     title: "API & Agent Tools",
-    description: "Programmatic access to the weekly brief, the month-by-month record, SaaS multiples, and the decision rules. MCP server, REST endpoints, CLI, and embeddable widget.",
+    description: "The weekly brief, the monthly record, SaaS multiples and the decision rules, programmatically: an MCP server, REST endpoints, a CLI and an embeddable widget.",
     path: "/api-docs",
     imageAlt: "Whether API and agent tools",
   }),

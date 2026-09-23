@@ -41,7 +41,18 @@ export function HeaderChoicePill<Key extends string>({
   const selected = options.find((option) => option.key === value) ?? options[0];
 
   return (
+    /* A fixed id, not Base UI's generated one. The header is the one part of
+       every page whose server and client ids disagreed: the server always
+       rendered `base-ui-_R_5p6l6_` (production too, every load), and in about
+       half of hydrations the client computed a path one level shallower, so
+       React logged a mismatch on both pills and left the server's id in the
+       DOM. `useId` derives from the tree path, and something above the header
+       resolves at a different depth depending on when the streamed payload
+       lands; ids inside the page never disagreed. Each pill appears once per
+       page, so its label is a stable id, and the trigger and the hidden input
+       both derive theirs from the root's. */
     <Select.Root
+      id={`header-choice-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
       value={value}
       onValueChange={(next) => {
         const option = options.find((candidate) => candidate.key === next);

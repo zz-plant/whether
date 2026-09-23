@@ -90,7 +90,11 @@ export const buildSignalDecisionScenarioMetadata = ({
      * The live action used to trail it; that belongs on the page, where it is
      * dated, not in a snippet a crawler caches.
      */
-    description: `${signalSummary} What it means for ${scenarioTitle.toLowerCase()} decisions, and the line where conditions change.`,
+    // The scenario leads, so the five pages under one watch differ in their
+    // first words, and the snippet fits: the old tail ("What it means for …
+    // decisions, and the line where conditions change.") ran the curve watch's
+    // pages to 191 characters and printed "new bets decisions".
+    description: `For ${scenarioTitle.toLowerCase()}: ${signalSummary.charAt(0).toLowerCase()}${signalSummary.slice(1)}`,
     path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
     imageParams: { template: "signals", eyebrow: "Evidence" },

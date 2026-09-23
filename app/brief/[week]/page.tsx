@@ -69,7 +69,14 @@ export function generateStaticParams() {
 const briefTitle = (brief: PublishedBrief) =>
   `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
 
-const briefDescription = (brief: PublishedBrief) => `${brief.summary} What changed: ${brief.whatChanged}`;
+/* The call, then what moved if it fits a snippet. Both published weeks ran
+   190–204 characters, so the part a search result cut was the one that said
+   what changed. */
+const BRIEF_DESCRIPTION_LIMIT = 160;
+const briefDescription = (brief: PublishedBrief) => {
+  const full = `${brief.summary} What changed: ${brief.whatChanged}`;
+  return full.length <= BRIEF_DESCRIPTION_LIMIT ? full : brief.summary;
+};
 
 /* The card reads like the page: the conditions in the weather words (the stored
    label on early records is "Guarded Expansion — Late") and the week as a date,

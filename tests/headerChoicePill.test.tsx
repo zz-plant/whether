@@ -16,4 +16,15 @@ describe("header choice pill", () => {
     assert.match(text, /^Stage Series A/);
     assert.match(html, /aria-label="Stage: Series A"/, "the accessible name is unchanged");
   });
+
+  it("renders a fixed id rather than one derived from its place in the tree", () => {
+    /* The server rendered base-ui-_R_5p6l6_ on every load and the client
+       computed a shallower path in about half of hydrations, so React logged a
+       mismatch on both header pills. */
+    const html = renderToStaticMarkup(
+      <HeaderChoicePill label="Cash runway" options={OPERATOR_STAGE_OPTIONS} value="seed" onSelect={() => {}} />,
+    );
+    assert.match(html, /id="header-choice-cash-runway"/);
+    assert.doesNotMatch(html, /_R_/, "no id generated from the tree path");
+  });
 });
