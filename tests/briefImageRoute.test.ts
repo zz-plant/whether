@@ -135,9 +135,9 @@ describe("brief decision card render", () => {
     // The faces are Latin subsets; an uncovered glyph sends satori to a Google
     // font download, and that failing aborts the render the same way.
     assert.doesNotMatch(imageText, /[\u2264\u2265\u2192]/);
-    assert.match(imageText, /tightness >= 76/);
-    assert.match(imageText, /Tightness <= 66/);
-    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a <= b >= c -> d");
+    assert.match(imageText, /tightness at or above 76/);
+    assert.match(imageText, /Tightness at or below 66/);
+    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a at or below b at or above c -> d");
   });
 
   it("produces a non-empty PNG", async () => {
@@ -155,11 +155,11 @@ describe("brief decision card render", () => {
 });
 
 describe("brief chart OG template", () => {
-  it("renders a dated record badge and week label when week is provided", async () => {
+  it("labels a published brief by its date, with a key to the quarterly bars", async () => {
     const { renderBriefChartOgImage } = await import("../app/api/og/briefChartTemplate");
     const chart = renderBriefChartOgImage({
-      posture: "Guarded Expansion — Late",
-      weekLabel: "2026-w31",
+      posture: "Sunny",
+      weekLabel: "Jul 30, 2026",
       regime: "EXPANSION",
       points: [
         { label: "2026-Q1", regime: "EXPANSION", intensity: 0.8 },
@@ -168,9 +168,11 @@ describe("brief chart OG template", () => {
     });
 
     const text = collectText(chart);
-    assert.match(text, /Dated Record · 2026-w31/);
-    assert.match(text, /Week of 2026-w31/);
-    assert.match(text, /Guarded Expansion — Late/);
+    assert.match(text, /Published brief/);
+    assert.match(text, /Week of Jul 30, 2026/);
+    assert.doesNotMatch(text, /\d{4}-w\d+/, "the archive slug is not a date a reader knows");
+    assert.match(text, /Conditions by quarter/);
+    for (const label of ["Freezing", "Cloudy", "Stormy", "Sunny"]) assert.match(text, new RegExp(label));
   });
 });
 

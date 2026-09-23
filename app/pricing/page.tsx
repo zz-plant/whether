@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
-import { buildCanonicalUrl } from "../../lib/seo";
+import { buildPageMetadata } from "../../lib/seo";
 import { buildPricingStructuredData } from "../../lib/seo/pageStructuredData";
 import {
   FREE_FOREVER_PROMISE,
@@ -21,19 +21,16 @@ import {
 
 export const runtime = "edge";
 
-export const metadata: Metadata = {
+/* Through the shared builder, like every other page. The hand-written block set
+   `openGraph` without `images`, and Next replaces that object rather than merging
+   it, so /pricing was the one page shared with no preview image at all. */
+export const metadata: Metadata = buildPageMetadata({
   title: "Pricing",
   description:
     "Weekly operating guidance, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
-  alternates: { canonical: "/pricing" },
-  openGraph: {
-    type: "website",
-    url: buildCanonicalUrl("/pricing"),
-    title: "Pricing | Whether",
-    description:
-      "Weekly operating guidance, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
-  },
-};
+  path: "/pricing",
+  imageAlt: "Whether pricing: free forever, with Pro and Team for Monday delivery",
+});
 
 /**
  * Pricing before paywall.

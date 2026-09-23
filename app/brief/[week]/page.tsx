@@ -73,8 +73,17 @@ const briefTitle = (brief: PublishedBrief) =>
 
 const briefDescription = (brief: PublishedBrief) => `${brief.summary} What changed: ${brief.whatChanged}`;
 
-const briefImageUrl = (brief: PublishedBrief) =>
-  buildOgImageUrl({ template: "brief-chart", week: brief.slug, posture: brief.postureLabel, regime: brief.regime });
+/* The card reads like the page: the conditions in the weather words (the stored
+   label on early records is "Guarded Expansion — Late") and the week as a date,
+   not the archive's "2026-w38" slug. */
+const briefImageParams = (brief: PublishedBrief) => ({
+  template: "brief-chart",
+  week: brief.recordDateLabel,
+  posture: publishedBriefDisplay(brief).conditions,
+  regime: brief.regime,
+});
+
+const briefImageUrl = (brief: PublishedBrief) => buildOgImageUrl(briefImageParams(brief));
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { week } = await params;
@@ -87,7 +96,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: briefDescription(brief),
     path: buildPublishedBriefPath(brief.slug),
     imageAlt: `Whether's guidance for the week of ${brief.recordDateLabel}`,
-    imageParams: { template: "brief-chart", week: brief.slug, posture: brief.postureLabel, regime: brief.regime },
+    imageParams: briefImageParams(brief),
   });
 
   metadata.authors = [{ name: publisherAuthor.name, url: buildCanonicalUrl("/about") }];

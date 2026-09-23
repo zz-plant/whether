@@ -99,6 +99,54 @@ export const serializeJsonLd = (value: unknown) =>
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
 
+/* The /api/og templates that draw a title and subtitle a page supplies (the rest
+   draw live data or a published record). Kept in step with `StaticOgTemplate`. */
+const TEXT_CARD_TEMPLATES: ReadonlySet<string> = new Set([
+  "operations",
+  "signals",
+  "method",
+  "solutions",
+  "guides",
+  "reading",
+  "record",
+  "plain",
+]);
+
+/** A page title minus its section suffix ("Capital tightness | Evidence"). */
+const cardTitle = (title: string) => title.split(" | ")[0] ?? title;
+
+/** A subtitle that ends on a word, inside what the card draws. */
+const cardSubtitle = (description: string, maxLength = 160) => {
+  const normalized = description.trim().replace(/\s+/g, " ");
+  if (normalized.length <= maxLength) return normalized;
+  const cut = normalized.slice(0, maxLength - 1);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), Math.floor(maxLength * 0.6))).trimEnd()}\u2026`;
+};
+
+/**
+ * What the share card for a page draws.
+ *
+ * A page that passed nothing used to get the bare `/api/og`, which is the *live
+ * weekly card* — so 113 pages, the privacy policy and all 82 archive periods
+ * among them, previewed this week's reading when shared. A page that wants the
+ * live card now asks for it (`template: "report"`); everything else gets a card
+ * with its own title and description, and a text template that names only a
+ * template gets the page's words rather than a site-wide default subtitle.
+ */
+const resolveCardParams = (
+  title: string,
+  description: string,
+  imageParams: Record<string, string> | undefined,
+): Record<string, string> => {
+  if (imageParams === undefined) {
+    return { template: "plain", title: cardTitle(title), subtitle: cardSubtitle(description) };
+  }
+  if (TEXT_CARD_TEMPLATES.has(imageParams.template ?? "")) {
+    return { title: cardTitle(title), subtitle: cardSubtitle(description), ...imageParams };
+  }
+  return imageParams;
+};
+
 export const buildPageMetadata = ({
   title,
   description,
@@ -115,7 +163,9 @@ export const buildPageMetadata = ({
   imageParams?: Record<string, string>;
 }): Metadata => {
   const canonicalUrl = buildCanonicalUrl(path);
-  const imageUrl = imagePath ? buildSocialImageUrl(imagePath) : buildOgImageUrl(imageParams);
+  const imageUrl = imagePath
+    ? buildSocialImageUrl(imagePath)
+    : buildOgImageUrl(resolveCardParams(title, description, imageParams));
 
   return {
     title,

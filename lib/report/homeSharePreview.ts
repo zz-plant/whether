@@ -1,3 +1,4 @@
+import type { RegimeKey } from "../regimeEngine";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { loadWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 
@@ -17,7 +18,10 @@ export type HomeSharePreview = {
   audienceLabel: string;
   weekLabel: string;
   statusLabel: string;
-  contextLabel: string;
+  /** The conditions' engine key, so the card can draw them in their own hue. */
+  regime: RegimeKey;
+  /** Why this reading is not simply this week's live one, or null when it is. */
+  contextLabel: string | null;
   headline: string;
   whyItMatters: string;
   operatingStanceLine: string;
@@ -45,6 +49,15 @@ const defaultDependencies: HomeSharePreviewDependencies = {
 
 const formatRateValue = (value: number | null | undefined) =>
   typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(2)}%` : "n/a";
+
+/* "Canonical ingestion (FRED)" names our pipeline; a reader wants the publisher.
+   Every treasury source resolves to one of these two. */
+const readerSourceLabel = (sourceLabel: string) =>
+  /FRED/i.test(sourceLabel)
+    ? "US Treasury rates, via the St. Louis Fed (FRED)"
+    : /treasury/i.test(sourceLabel)
+      ? "US Treasury daily yield curve"
+      : sourceLabel;
 
 const normalizeWhitespace = (value: string) => value.trim().replace(/\s+/g, " ");
 
@@ -122,11 +135,16 @@ export const loadHomeSharePreview = async (
   const imageUrl = buildOgImageUrl(buildImageParams(searchParams));
   const weekLabel = reportData.weeklyRecordDateLabel;
   const statusLabel = weeklyDecisionCardModel.status.statusLabel;
+  /* The provenance strip's status ("Canonical snapshot (high confidence)") is the
+     pipeline's word for where a reading came from. On the card, the only thing a
+     reader needs is whether this is *not* this week's live reading, and why. */
   const contextLabel = reportData.historicalSelection
     ? reportData.historicalSelection.banner
     : searchParams?.month || searchParams?.year
-      ? "Time Machine selection unavailable"
-      : reportData.treasuryProvenance.statusLabel;
+      ? "That month is not on record"
+      : isFallback
+        ? "Saved reading, not live"
+        : null;
   const operatingStanceLine = clampText(weeklyDecisionCardModel.decision.operatingStanceLine, 120);
   const immediateDecision = clampText(
     normalizeSentence(weeklyDecisionCardModel.decision.immediateDecision),
@@ -149,7 +167,7 @@ export const loadHomeSharePreview = async (
     ? `For operators in ${reportData.historicalSelection.banner.replace(/^Historical mode active\s+·\s+/i, "")}`
     : "For operators this week";
   const title = reportData.historicalSelection
-    ? `${contextLabel}: ${headline} — Whether`
+    ? `${reportData.historicalSelection.banner}: ${headline} — Whether`
     : `${statusLabel}: ${headline} — Whether`;
   const description = clampText(
     `${audienceLabel}. ${toSentence(immediateDecision)} ${toSentence(whyItMatters)} Changed: ${toSentence(weeklyDecisionCardModel.decision.decisionShiftHeadline)} Conditions change if: ${toSentence(flipCondition)}`,
@@ -166,11 +184,17 @@ export const loadHomeSharePreview = async (
     audienceLabel,
     weekLabel,
     statusLabel,
+    regime: reportData.assessment.regime,
     contextLabel,
     headline,
     whyItMatters,
     operatingStanceLine,
-    changeSummary: clampText(weeklyDecisionCardModel.decision.decisionShiftSummary, 140),
+    /* The summary ends by restating the change line, which has its own box on the
+       card; cut there so the two boxes say two different things. */
+    changeSummary: clampText(
+      weeklyDecisionCardModel.decision.decisionShiftSummary.split(/\s*Conditions change if:/)[0] ?? "",
+      140,
+    ),
     immediateDecision,
     flipCondition,
     confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
@@ -179,7 +203,7 @@ export const loadHomeSharePreview = async (
     baseRateLabel: formatRateValue(reportData.assessment.scores.baseRate),
     curveSlopeLabel: formatRateValue(reportData.assessment.scores.curveSlope),
     freshnessLine: freshnessMeta.line,
-    sourceLabel: reportData.treasuryProvenance.sourceLabel,
+    sourceLabel: readerSourceLabel(reportData.treasuryProvenance.sourceLabel),
     isHistorical: Boolean(reportData.historicalSelection),
     isFallback,
   };

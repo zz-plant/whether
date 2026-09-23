@@ -26,6 +26,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Check how fresh the sources are, how sure the reading is, and how the score is built, before acting on anything you can't undo.",
   path: "/trust",
   imageAlt: "Whether trust hub",
+  imageParams: { template: "method", eyebrow: "Trust" },
 });
 
 export default async function MethodPage({

@@ -2,6 +2,10 @@ import type { CompareOgImageProps, CompareEpoch } from "../../app/api/og/compare
 import { getRegimePublicLabel } from "../regimePresentation";
 import { toImageSafeText } from "./ogFonts";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
+import { hasTimeMachineEntry } from "../timeMachine/timeMachineCache";
+
+/* The page's own default baseline (`app/history/compare/page.tsx`). */
+const DEFAULT_B = { year: 2020, month: 3 };
 
 export type CompareSearchParams = {
   yearA?: string;
@@ -52,7 +56,6 @@ const buildEpoch = (
 
   return {
     label,
-    recordDate: toImageSafeText(reportData.weeklyRecordDateLabel),
     regime: reportData.assessment.regime,
     postureLabel: toImageSafeText(
       model.status.postureWithStageLabel ?? model.status.postureLabel,
@@ -73,10 +76,16 @@ export const loadComparePreview = async (
 ): Promise<CompareOgImageProps> => {
   const yearA = toNumber(searchParams?.yearA);
   const monthA = toNumber(searchParams?.monthA);
-  const yearB = toNumber(searchParams?.yearB) ?? 2020;
-  const monthB = toNumber(searchParams?.monthB) ?? 3;
+  /* A month the archive does not hold loads the live week instead, silently, so
+     "Dec 2008" printed this week's numbers under its label. Only a month on
+     record keeps its name; anything else falls back the way the page does. */
+  const requestedB = { year: toNumber(searchParams?.yearB), month: toNumber(searchParams?.monthB) };
+  const bOnRecord =
+    requestedB.year !== undefined && requestedB.month !== undefined && hasTimeMachineEntry(requestedB.year, requestedB.month);
+  const yearB = bOnRecord && requestedB.year !== undefined ? requestedB.year : DEFAULT_B.year;
+  const monthB = bOnRecord && requestedB.month !== undefined ? requestedB.month : DEFAULT_B.month;
 
-  const hasA = yearA !== undefined && monthA !== undefined;
+  const hasA = yearA !== undefined && monthA !== undefined && hasTimeMachineEntry(yearA, monthA);
   const searchA = hasA ? { year: String(yearA), month: String(monthA) } : undefined;
   const searchB = { year: String(yearB), month: String(monthB) };
 
@@ -85,25 +94,23 @@ export const loadComparePreview = async (
     loadWeeklyBriefSnapshot(searchB, { route: "/api/og/compare" }),
   ]);
 
-  const epochA = buildEpoch(resultA.snapshot, formatEpochLabel(yearA ?? yearB, monthA ?? monthB));
+  /* With no pair A the page compares the current week, so the card says "This
+     week". It used to label that live reading with period B's month, so the
+     default card compared "Mar 2020" against Mar 2020. */
+  const epochA = buildEpoch(resultA.snapshot, hasA ? formatEpochLabel(yearA, monthA) : "This week");
   const epochB = buildEpoch(resultB.snapshot, formatEpochLabel(yearB, monthB));
 
-  const boldnessDelta =
-    epochA.boldnessScore !== null && epochB.boldnessScore !== null
-      ? epochA.boldnessScore - epochB.boldnessScore
-      : null;
+  /* A is the month under examination and B the one it is measured against, the
+     page's own framing — so the sentence is "A against B" and every delta is
+     A − B. The headline used to read "Freezing to Sunny · boldness -19": "to"
+     implied the move ran A to B while the number was A − B, so a rise of 19
+     points printed as a fall, under a name the site retired. */
   const regimeA = getRegimePublicLabel(epochA.regime);
   const regimeB = getRegimePublicLabel(epochB.regime);
 
-  const headlineParts = [`${regimeA} to ${regimeB}`];
-  if (boldnessDelta !== null) {
-    headlineParts.push(`boldness ${boldnessDelta > 0 ? "+" : ""}${boldnessDelta.toFixed(0)}`);
-  }
-  headlineParts.push("across two periods");
-
   return {
     eyebrow: "Compare periods",
-    headline: toImageSafeText(clampText(headlineParts.join(" · "), 72)),
+    headline: toImageSafeText(clampText(`${epochA.label} (${regimeA}) against ${epochB.label} (${regimeB})`, 72)),
     epochA,
     epochB,
   };

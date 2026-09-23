@@ -23,6 +23,8 @@ import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexBu
 import type { TrackRecord } from "../lib/report/trackRecord";
 import type { RunwayBand } from "../lib/report/operatorRunway";
 import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
+import { renderOgElement } from "../app/api/og/renderOgElement";
+import { collectPageShareCards } from "./fixtures/pageShareCards";
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -79,7 +81,9 @@ const BANNED: { name: string; pattern: RegExp }[] = [
     name: "retired line name",
     pattern: /\b(Re-open when|Change course if|Clears (only )?when|[Ww]atch lines?|Posture flips|Flip watch|Flip trigger|GUARDRAIL:|FLIP:|AVOID:)/,
   },
-  { name: "retired score name", pattern: /\b(Boldness|BOLDNESS|Latitude signal)\b/ },
+  /* Any case: the compare card printed "boldness -19" in lower case, past a rule that
+     only knew the capitalised forms. */
+  { name: "retired score name", pattern: /\b(boldness|latitude signal)\b/i },
   { name: "glossary pointer", pattern: /\b(Open the glossary|Full glossary|Look up a term|What these terms mean)\b/ },
 ];
 
@@ -273,6 +277,40 @@ describe("reader vocabulary", () => {
     const summary = RATCHET.map((rule) => `${rule.name} ${totals.get(rule.name) ?? 0}/${rule.baseline}`).join(", ");
     if (process.env.WHETHER_VOCABULARY_REPORT) console.log(`[reader-vocabulary] ${summary}\n${perSurface.join("\n")}`);
     assert.deepEqual(rose, [], `\nratcheted words rose:\n${rose.join("\n")}\n(${summary})\n`);
+  });
+
+  /*
+   * The share cards, which this suite never saw: "boldness" reached the compare
+   * card and "Canonical snapshot" the weekly one after both were retired here,
+   * on the image that travels furthest. Every distinct card a sitemap page names,
+   * plus the live card and the default comparison, which no page's metadata
+   * reaches offline. Held to the bans and to every ratchet at zero; a card
+   * repeats its page's title, so the counted words stay counted where the page is.
+   */
+  it("holds every share card to the same rules", async () => {
+    const cards = await collectPageShareCards();
+    const queries = new Set<string>(["template=report", "template=compare"]);
+    for (const card of cards) if (card.imageUrl) queries.add(card.imageUrl.searchParams.toString());
+    const zeroRatchets = RATCHET.filter((rule) => rule.baseline === 0);
+    const violations: string[] = [];
+    for (const query of queries) {
+      const text = visibleText(renderToStaticMarkup(await renderOgElement(new URLSearchParams(query))));
+      const label = `share card ?${query.slice(0, 80)}`;
+      for (const rule of BANNED) {
+        const found = rule.pattern.exec(text);
+        if (found) violations.push(`${label}: ${rule.name} — "${found[0]}"`);
+      }
+      for (const rule of zeroRatchets) {
+        const found = text.match(rule.pattern);
+        if (found) violations.push(`${label}: ${rule.name} — "${found[0]}"`);
+      }
+      for (const rule of ABBREVIATIONS) {
+        const short = rule.short.exec(text);
+        const long = short ? rule.long.exec(text) : null;
+        if (short && (!long || long.index > short.index)) violations.push(`${label}: "${short[0]}" before any expansion`);
+      }
+    }
+    assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
   });
 
   it("expands an abbreviation before using it, or does not use it", async () => {

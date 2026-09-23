@@ -3,12 +3,18 @@ import type { Metadata } from "next";
 import { PageShell } from "../components/pageShell";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
+import { buildPageMetadata } from "../../lib/seo";
 
+/* Through the shared builder, for the reason /share records: without its own
+   `openGraph` this page previewed as the homepage when its link was shared. */
 export const metadata: Metadata = {
-  title: "API & Agent Tools",
-  description: "Programmatic access to the weekly brief, the month-by-month record, SaaS multiples, and the decision rules. MCP server, REST endpoints, CLI, and embeddable widget.",
+  ...buildPageMetadata({
+    title: "API & Agent Tools",
+    description: "Programmatic access to the weekly brief, the month-by-month record, SaaS multiples, and the decision rules. MCP server, REST endpoints, CLI, and embeddable widget.",
+    path: "/api-docs",
+    imageAlt: "Whether API and agent tools",
+  }),
   robots: { index: true, follow: true },
-  alternates: { canonical: "/api-docs" },
 };
 
 type EndpointProps = {

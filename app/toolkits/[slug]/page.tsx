@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       description: toolkit.whenToUse,
       path: `/toolkits/${slug}`,
       imageAlt: toolkit.title,
+      imageParams: { template: "solutions", eyebrow: "Toolkit" },
     }),
     robots: noindexRobots,
   };
