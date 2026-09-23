@@ -21,7 +21,7 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Trust — freshness, confidence, and what would change the guidance",
+  title: "How much to trust this week's guidance",
   description:
     "Check how fresh the sources are, how sure the reading is, and how the score is built, before acting on anything you can't undo.",
   path: "/trust",

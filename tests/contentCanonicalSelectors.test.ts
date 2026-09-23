@@ -33,6 +33,8 @@ describe("canonical content selectors", () => {
   it("maps resource article intents to bounded decision areas", () => {
     const boardAreas = getResourceArticleDecisionAreas({
       slug: "how-much-runway-do-we-need-tightening-market",
+      publishedAt: "2026-03-03",
+      updatedAt: "2026-09-22",
       title: "t",
       description: "d",
       keyword: "k",

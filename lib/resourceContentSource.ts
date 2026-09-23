@@ -60,6 +60,11 @@ const resourcePillarPageSchema = z.object({
     "board-level-capital-posture-framework",
     "reversibility-as-governance",
   ]),
+  /* When the page first went out and when its own text last changed, from
+     git history (2026-09-23 backfill). Bump `updatedAt` with any edit to the
+     page's copy: it is published as dateModified and as the sitemap lastmod. */
+  publishedAt: z.iso.date(),
+  updatedAt: z.iso.date(),
   keyword: z.string().min(1),
   title: z.string().min(1),
   description: z.string().min(1),
@@ -93,6 +98,11 @@ const resourceArticleSchema = z.object({
     "should-we-freeze-hiring-high-interest-rate-environment",
     "how-much-runway-do-we-need-tightening-market",
   ]),
+  /* When the page first went out and when its own text last changed, from
+     git history (2026-09-23 backfill). Bump `updatedAt` with any edit to the
+     page's copy: it is published as dateModified and as the sitemap lastmod. */
+  publishedAt: z.iso.date(),
+  updatedAt: z.iso.date(),
   title: z.string().min(1),
   description: z.string().min(1),
   keyword: z.string().min(1),

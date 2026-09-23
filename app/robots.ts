@@ -66,7 +66,11 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: RETRIEVAL_CRAWLERS, allow: ALLOWED_PATHS, disallow: DISALLOWED_PATHS },
       { userAgent: TRAINING_CRAWLERS, allow: ALLOWED_PATHS, disallow: DISALLOWED_PATHS },
     ],
-    sitemap: `${siteUrl}/sitemap.xml`,
+    /* The feed is submitted as a sitemap of its own, which is how Google takes
+       an RSS feed: it names the newest weeks, the URLs a crawler most needs to
+       find quickly. It used to sit inside sitemap.xml as a <url> entry, where it
+       is not a page and was crawled as one. */
+    sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/feed.xml`],
     host: siteUrl,
   };
 }

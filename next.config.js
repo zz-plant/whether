@@ -189,9 +189,34 @@ const evidenceCacheHeaders = [
   },
 ];
 
+/*
+ * Which user agents get metadata in <head> instead of streamed into <body>.
+ *
+ * A page whose `generateMetadata` awaits the report read (every answer page,
+ * every published week) streams its <title>, description, canonical and OG
+ * tags after the content — 43KB into the body on an answer page — unless the
+ * requester is on this list. The framework default names the social unfurlers
+ * and Bing, and leaves off Googlebot (it runs JavaScript, so the tags reach
+ * <head> after hydration) and every AI crawler. That is the wrong trade here:
+ * Google ignores a rel=canonical outside <head> in the HTML it first fetches,
+ * and the retrieval crawlers `app/robots.ts` names as the readers this site
+ * exists for do not run JavaScript at all. So: the default list, then Google's
+ * own crawler, then every agent `robots.ts` names.
+ * `tests/htmlLimitedBots.test.ts` fails if robots.ts names one this does not.
+ */
+export const htmlLimitedBots = [
+  String.raw`[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight`,
+  "Googlebot",
+  "OAI-SearchBot|ChatGPT-User|GPTBot",
+  "PerplexityBot|Perplexity-User",
+  "ClaudeBot|Claude-User|Claude-SearchBot|anthropic-ai",
+  "Amazonbot|CCBot|meta-externalagent",
+].join("|");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  htmlLimitedBots,
   async headers() {
     return [
       {

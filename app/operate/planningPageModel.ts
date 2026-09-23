@@ -4,7 +4,7 @@ import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import type { Route } from "../../lib/navigation/routeType";
-import { buildBreadcrumbList, websiteName } from "../../lib/seo";
+import { buildBreadcrumbList, organizationId, websiteName } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
 import {
@@ -96,10 +96,7 @@ export async function buildPlanningPageModel(
           name: websiteName,
           url: siteUrl,
         },
-        publisher: {
-          "@type": "Organization",
-          name: "Whether",
-        },
+        publisher: { "@id": organizationId },
       },
       buildBreadcrumbList(
         createBreadcrumbTrail([

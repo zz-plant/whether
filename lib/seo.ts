@@ -147,6 +147,10 @@ const resolveCardParams = (
   return imageParams;
 };
 
+/** The share card a page's metadata names, for structured data that must name the same image. */
+export const buildPageImageUrl = (title: string, description: string, imageParams?: Record<string, string>) =>
+  buildOgImageUrl(resolveCardParams(title, description, imageParams));
+
 export const buildPageMetadata = ({
   title,
   description,
@@ -165,7 +169,7 @@ export const buildPageMetadata = ({
   const canonicalUrl = buildCanonicalUrl(path);
   const imageUrl = imagePath
     ? buildSocialImageUrl(imagePath)
-    : buildOgImageUrl(resolveCardParams(title, description, imageParams));
+    : buildPageImageUrl(title, description, imageParams);
 
   return {
     title,

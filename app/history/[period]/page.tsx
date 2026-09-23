@@ -4,12 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { Tag } from "../../components/ui/tag";
-import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getRegimeWeatherRationale } from "../../../lib/regimePresentation";
 import {
-  buildBreadcrumbList,
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
@@ -54,8 +52,29 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
   SCARCITY: "rose",
 };
 
-const describePeriod = (period: PostureArchivePeriod) =>
-  `Conditions in ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
+/*
+ * The search snippet for a period, so it has to say what is particular to it.
+ * It was the label, then the whole headline — "Conditions in 2010: Sunny. Sunny
+ * mode. Capital is available…" — which restated the label, ran 218–270
+ * characters against a ~160 snippet, and was word-for-word the same for every
+ * period in the same state bar the year. The mix of readings and the number of
+ * changes are the facts only this period has; the headline's first real
+ * sentence is the fallback for a period with no readings behind it.
+ */
+const DESCRIPTION_LIMIT = 160;
+const countChanges = (count: number) =>
+  count === 0 ? "the call held throughout" : count === 1 ? "the call changed once" : `the call changed ${count} times`;
+const describePeriod = (period: PostureArchivePeriod) => {
+  const label = toWeatherLabel(period.operatorLabel);
+  const lead = `Conditions in ${period.title} closed ${label}.`;
+  const unit = period.sampleCadence === "weekly" ? "weekly" : "monthly";
+  const mix = [...period.regimeMix].sort((left, right) => right.periods - left.periods);
+  const facts = period.sampleCount > 0 && mix.length > 0
+    ? ` Across ${period.sampleCount} ${unit} readings: ${mix.map((entry) => `${entry.periods} ${toWeatherLabel(entry.label)}`).join(", ")}; ${countChanges(period.transitions.length)}.`
+    : ` ${period.headline.replace(new RegExp(`^${label} mode\\.\\s*`, "i"), "").split(/(?<=\.)\s/)[0] ?? ""}`;
+  const text = `${lead}${facts}`.trim();
+  return text.length <= DESCRIPTION_LIMIT ? text : `${text.slice(0, DESCRIPTION_LIMIT - 1).replace(/\s+\S*$/, "")}…`;
+};
 
 const cadenceNoun = (period: PostureArchivePeriod) =>
   period.sampleCadence === "weekly" ? "weekly readings" : "monthly readings";
@@ -116,17 +135,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const essays = essaysPublishedIn({ year: period.year, quarter: period.kind === "quarter" ? period.quarter : undefined });
   const canonicalUrl = buildCanonicalUrl(buildPostureArchivePath(period.slug));
 
-  const breadcrumbStructuredData = {
-    "@context": "https://schema.org",
-    ...buildBreadcrumbList(
-      createBreadcrumbTrail([
-        { path: "/" },
-        { path: "/history" },
-        ...(parent ? [{ path: buildPostureArchivePath(parent.slug), label: parent.title }] : []),
-        { path: buildPostureArchivePath(period.slug), label: period.title },
-      ]),
-    ),
-  };
 
   const articleStructuredData = {
     "@context": "https://schema.org",
@@ -145,7 +153,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
   return (
     <ContentPageShell>
-      <JsonLdScript data={breadcrumbStructuredData} />
       <JsonLdScript data={articleStructuredData} />
 
       <Breadcrumbs

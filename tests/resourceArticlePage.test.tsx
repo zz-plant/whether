@@ -6,6 +6,8 @@ import type { ResourceArticle } from "../lib/resourceArticles";
 
 const baseArticle: ResourceArticle = {
   slug: "should-we-freeze-hiring-high-interest-rate-environment",
+  publishedAt: "2026-03-03",
+  updatedAt: "2026-09-22",
   title: "Test title",
   description: "Test description",
   keyword: "test keyword",
