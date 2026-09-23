@@ -1038,6 +1038,19 @@ rather than what the metadata code intends, found gaps none of the SEO suites co
 - **Five lookalike Organization nodes** (a name, sometimes a URL, no `@id`) are the site entity by
   id now, and the RSS feed moved out of `sitemap.xml` into a second `Sitemap:` line in robots.txt.
 
+## A warning that is always on (2026-09-23)
+
+Every page showed **"Sources: Partly cached"** in warning amber on every visit, production
+included, and `/signals`, `/operate` and the answer pages told the reader to "hold anything you
+can't undo until every source is current". `buildDegradedSourceRows` counted every source that was
+not live, and "Startup/private markets" is a curated snapshot by design (`supportsLive: false`,
+45-day window) that is never live — so the condition could never clear. `/trust` read the same
+data and said "No warning is active… Fine to act on this week" under a header saying the opposite.
+A row now carries `expectsLive`: a live-by-design source is degraded when it is not live, and a
+snapshot-by-design one only when it is past its own window. It was the first thing a new visitor
+was told about the data, and a warning that never turns off is one readers learn to skip on the
+week it is true. `tests/sourceHealth.test.ts` holds all three cases.
+
 ## An artifact that names itself
 
 `public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —
