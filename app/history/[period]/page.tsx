@@ -7,6 +7,7 @@ import { Tag } from "../../components/ui/tag";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { getRegimeWeatherRationale } from "../../../lib/regimePresentation";
 import {
   buildBreadcrumbList,
   buildCanonicalUrl,
@@ -84,6 +85,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: describePeriod(period),
     path: buildPostureArchivePath(period.slug),
     imageAlt: `Whether's reading of conditions in ${period.title}`,
+    /* The period's own card, in its conditions' hue. These 82 pages used to share
+       the live weekly card, so a link to 2014 previewed this week's reading. */
+    /* The subtitle is the site's current sentence for those conditions, not the
+       stored headline: the archive keeps the words it was generated with ("Sunny
+       mode … the weekly call sets the tempo"), and a share card is new copy. */
+    imageParams: {
+      template: "record",
+      eyebrow: "History",
+      title: `${period.title}: ${toWeatherLabel(period.operatorLabel)}`,
+      /* The fact half only ("Money is cheap and available."): the instruction half
+         is advice for this week, not for a closed year. */
+      subtitle: getRegimeWeatherRationale(period.regime).split(/(?<=\.)\s/)[0] ?? "",
+      regime: period.regime,
+    },
   });
 }
 

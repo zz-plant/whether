@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: clusterDefinition.summary,
     path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,
+    imageParams: { template: "signals", eyebrow: "Evidence" },
   });
 
   /*

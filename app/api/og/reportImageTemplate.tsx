@@ -1,8 +1,9 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { formatConfidenceChipLabel, publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatConfidenceChipLabel } from "../../../lib/report/reportFormatting";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import {
   GlyphMotif,
   OG_BG,
@@ -173,7 +174,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <div style={pill(preview.audienceLabel, "#e2e8f0")}>{preview.audienceLabel}</div>
-                  <div style={pill(preview.contextLabel, tone)}>{preview.contextLabel}</div>
+                  {preview.contextLabel ? <div style={pill(preview.contextLabel, tone)}>{preview.contextLabel}</div> : null}
                   <div style={pill(preview.weekLabel, "#cbd5e1")}>{preview.weekLabel}</div>
                 </div>
               </div>
@@ -184,48 +185,32 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
                 <div style={{ fontSize: 22, lineHeight: 1.28, color: OG_TEXT_SECONDARY }}>
                   {preview.whyItMatters}
                 </div>
+                {/* The conditions in their own hue, as on every page; the context tone
+                    painted Freezing sky-blue. Confidence is the tile on the right. */}
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <div style={pill(preview.statusLabel, tone)}>{preview.statusLabel}</div>
-                  <div style={pill(confidenceChip, confidenceTone)}>{confidenceChip}</div>
+                  <div style={pill(preview.statusLabel, REGIME_HEX_COLORS[preview.regime])}>{preview.statusLabel}</div>
                 </div>
               </div>
             </div>
-            {/* Satori has no display:grid — rows of flex:1 cards instead.
-                Card hues mirror the site's decision semantics in tokens.css:
-                neutral, decision-do (emerald), caution (amber), flip (sky). */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div style={{ display: "flex", gap: 12 }}>
-                {detailCard({
-                  label: "What Changed",
-                  value: preview.changeSummary,
-                  background: OG_PANEL,
-                  border: `1px solid ${OG_BORDER}`,
-                  labelColor: OG_TEXT_MUTED,
-                })}
-                {detailCard({
-                  label: DECISION_CONTRACT_LABELS.action.doNow,
-                  value: preview.immediateDecision,
-                  background: "#123023",
-                  border: "1px solid #34d39955",
-                  labelColor: "#6ee7b7",
-                })}
-              </div>
-              <div style={{ display: "flex", gap: 12 }}>
-                {detailCard({
-                  label: DECISION_CONTRACT_LABELS.watch.postureFlips,
-                  value: preview.flipCondition,
-                  background: "#3b2d0b",
-                  border: "1px solid #f59e0b55",
-                  labelColor: "#fcd34d",
-                })}
-                {detailCard({
-                  label: `The ${publicDecisionLabels.call.toLowerCase()}`,
-                  value: preview.operatingStanceLine,
-                  background: "#0c2536",
-                  border: "1px solid #38bdf855",
-                  labelColor: "#7dd3fc",
-                })}
-              </div>
+            {/* One row of two, not two rows of four: the second row was drawn below
+                the canvas, so "Conditions change if" and the guidance box never
+                reached a reader, and of the four boxes, the action box repeated the
+                headline and the guidance box repeated the line under it. */}
+            <div style={{ display: "flex", gap: 12 }}>
+              {detailCard({
+                label: "What changed",
+                value: preview.changeSummary,
+                background: OG_PANEL,
+                border: `1px solid ${OG_BORDER}`,
+                labelColor: OG_TEXT_MUTED,
+              })}
+              {detailCard({
+                label: DECISION_CONTRACT_LABELS.watch.postureFlips,
+                value: preview.flipCondition,
+                background: "#3b2d0b",
+                border: "1px solid #f59e0b55",
+                labelColor: "#fcd34d",
+              })}
             </div>
           </div>
           <div
@@ -256,9 +241,9 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {/* Trend is already the first pill above; a tile repeating it cost a slot. */}
               <div style={{ display: "flex", gap: 10 }}>
                 {metricCard("Confidence", confidenceChip.replace(/ confidence$/, ""), confidenceTone)}
-                {metricCard("Trend", preview.trendLabel, "#e2e8f0")}
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 {metricCard(regimeSignalLabel.baseRate, preview.baseRateLabel, "#7dd3fc")}

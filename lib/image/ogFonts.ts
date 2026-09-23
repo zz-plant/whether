@@ -25,14 +25,29 @@ export const OG_FONT_BODY = "IBM Plex Sans";
  * downloading as a 0-byte PNG. Rewriting them keeps every image inside the subset.
  */
 const UNSUPPORTED_GLYPHS: ReadonlyArray<readonly [RegExp, string]> = [
-  [/\u2264/g, "<="],
-  [/\u2265/g, ">="],
+  /* Words, not "<=": the cards travel to people who do not read code, and the
+     sentences these come from ("Funding pressure ≤ 66") read naturally either way. */
+  [/\s*\u2264\s*/g, " at or below "],
+  [/\s*\u2265\s*/g, " at or above "],
   [/\u2192/g, "->"],
 ];
 
 /** Rewrites text so an image template can only emit glyphs the faces carry. */
 export const toImageSafeText = (value: string): string =>
   UNSUPPORTED_GLYPHS.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), value);
+
+/**
+ * The same rewrite over every string field of a template's props. Applied where a
+ * route hands props to a template, so a template added later cannot forget it —
+ * the weekly card did, and printed "Funding pressure ▯ 66" on the most-shared image.
+ */
+export const toImageSafeProps = <T extends object>(props: T): T => {
+  const safe = { ...props };
+  for (const [key, value] of Object.entries(safe)) {
+    if (typeof value === "string") Reflect.set(safe, key, toImageSafeText(value));
+  }
+  return safe;
+};
 
 type OgFont = {
   name: string;

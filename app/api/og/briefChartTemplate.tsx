@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { REGIME_ORDER, getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_TEXT, OG_TEXT_MUTED } from "./ogTheme";
 
 /**
@@ -16,12 +18,9 @@ export type BriefChartPoint = {
   intensity: number;
 };
 
-const regimeColor: Record<RegimeKey, string> = {
-  EXPANSION: "#34d399",
-  VOLATILE: "#fbbf24",
-  DEFENSIVE: "#38bdf8",
-  SCARCITY: "#fb7185",
-};
+/* The site's four hues. This card had its own table, with Stormy amber and Cloudy
+   sky — so a Stormy week was the colour of every link on the page it pointed to. */
+const regimeColor = REGIME_HEX_COLORS;
 
 const frameStyle: CSSProperties = {
   display: "flex",
@@ -73,7 +72,7 @@ export const renderBriefChartOgImage = ({
               textTransform: "uppercase",
             }}
           >
-            {`Dated Record · ${weekLabel}`}
+            Published brief
           </div>
         ) : null}
       </div>
@@ -119,6 +118,17 @@ export const renderBriefChartOgImage = ({
         }}
       >
         <div style={{ display: "flex" }}>{visible[0]?.label ?? ""}</div>
+        {/* The bars are quarters, so the newest one can disagree with this week's
+            headline. The caption says what they are; the key says what each hue means. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 18 }}>
+          <div style={{ display: "flex", color: "#94a3b8" }}>Conditions by quarter</div>
+          {REGIME_ORDER.map((key) => (
+            <div key={key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ display: "flex", width: 12, height: 12, borderRadius: 3, background: regimeColor[key] }} />
+              <div style={{ display: "flex" }}>{getRegimePublicLabel(key)}</div>
+            </div>
+          ))}
+        </div>
         <div style={{ display: "flex" }}>{visible[visible.length - 1]?.label ?? ""}</div>
       </div>
     </div>

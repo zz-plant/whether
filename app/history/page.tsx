@@ -36,6 +36,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Every month-end reading on record, when conditions changed, how long each spell held, and the published weekly briefs behind the track record.",
   path: "/history",
   imageAlt: "Whether history and track record",
+  imageParams: { template: "record", eyebrow: "History" },
 });
 
 type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string };

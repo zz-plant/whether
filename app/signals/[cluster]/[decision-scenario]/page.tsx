@@ -91,6 +91,7 @@ export const buildSignalDecisionScenarioMetadata = ({
     description: `${signalSummary} What it means for ${scenarioTitle.toLowerCase()} decisions, and the line where conditions change.`,
     path: `/signals/${cluster}/${decisionScenario}`,
     imageAlt: `${signalTitle} ${scenarioTitle}`,
+    imageParams: { template: "signals", eyebrow: "Evidence" },
   });
 
   if (shouldNoindexPayload(payload)) {

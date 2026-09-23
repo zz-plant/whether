@@ -995,6 +995,24 @@ alert, the weekly email's four links, and `app/brief.md`'s footer. All resolve t
 now. `lib/fred.ts` and `lib/github/repoClient.ts` keep the literal on purpose: a `user-agent` names
 who to contact, not where this deployment lives.
 
+## What a shared link previews as (2026-09-23)
+
+An audit of every sitemap page's `og:image` found the share cards were the one surface no check
+read. 113 pages, the privacy policy and all 82 archive periods among them, previewed the *live
+weekly card*, because a page that passed no image settings got the bare `/api/og`, so a link to 2014
+showed this week's reading. `/pricing` previewed nothing, and `/share` and `/api-docs` previewed as
+the homepage (its title and URL): all three set `openGraph` by hand or not at all, and Next replaces
+that object rather than merging it. The cards themselves carried "boldness" (retired), "Canonical
+ingestion" (banned), a `≤` the font subset lacks, a second row drawn below the canvas, and a compare
+headline whose sign ran backwards.
+
+What holds it now: `buildPageMetadata` gives a page with no settings a card of its own title and
+description, and the live card is something a page asks for (`template: "report"`: `/` and
+`/share`). `/api/og`'s logic lives in `app/api/og/renderOgElement.tsx`, outside the route, so tests
+can read any card; `tests/shareCardCoverage.test.tsx` walks the sitemap to every page's card, and
+`tests/readerVocabulary.test.tsx` holds every distinct card to the bans. **Give a new page its
+metadata through `buildPageMetadata`**, and name a template if the plain card is not the right one.
+
 ## An artifact that names itself
 
 `public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —

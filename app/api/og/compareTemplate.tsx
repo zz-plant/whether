@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 
@@ -20,7 +21,6 @@ import {
 
 export type CompareEpoch = {
   label: string;
-  recordDate: string;
   regime: RegimeKey;
   postureLabel: string;
   tightness: number | null;
@@ -35,11 +35,14 @@ export type CompareOgImageProps = {
   epochB: CompareEpoch;
 };
 
-const regimeAccent: Record<RegimeKey, string> = {
-  EXPANSION: "#34d399",
-  VOLATILE: "#fbbf24",
-  DEFENSIVE: "#38bdf8",
-  SCARCITY: "#fb7185",
+/* The site's four hues, not a local table that had Stormy amber and Cloudy sky. */
+const regimeAccent = REGIME_HEX_COLORS;
+
+/* "Sunny for 9 months" already names the conditions; "Freezing" alone would print
+   "Freezing — Freezing" under a naive join. */
+const epochTitle = (epoch: CompareEpoch) => {
+  const conditions = getRegimePublicLabel(epoch.regime);
+  return epoch.postureLabel.startsWith(conditions) ? epoch.postureLabel : `${conditions} — ${epoch.postureLabel}`;
 };
 
 const formatPercent = (value: number | null, decimals = 2) =>
@@ -79,7 +82,7 @@ const metricRowStyle: CSSProperties = {
 
 const metricLabelStyle: CSSProperties = {
   display: "flex",
-  fontSize: 12,
+  fontSize: 14,
   fontWeight: 600,
   textTransform: "uppercase",
   letterSpacing: "0.06em",
@@ -88,7 +91,7 @@ const metricLabelStyle: CSSProperties = {
 
 const metricValueStyle: CSSProperties = {
   display: "flex",
-  fontSize: 18,
+  fontSize: 24,
   fontWeight: 700,
   color: OG_TEXT,
 };
@@ -124,31 +127,30 @@ export const renderCompareOgImage = ({
           <div style={{ display: "flex", fontSize: 15, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: OG_TEXT_MUTED }}>
             {eyebrow}
           </div>
-          <div style={{ display: "flex", flex: 1 }} />
-          <div style={{ display: "flex", fontSize: 13, fontWeight: 600, color: OG_TEXT_MUTED }}>
-            {`${epochA.recordDate} » ${epochB.recordDate}`}
-          </div>
         </div>
 
-        <div style={{ display: "flex", fontSize: 34, lineHeight: 1.14, fontWeight: 600, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, letterSpacing: "-0.01em", marginTop: 12 }}>
+        <div style={{ display: "flex", fontSize: 40, lineHeight: 1.14, fontWeight: 600, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, letterSpacing: "-0.01em", marginTop: 16 }}>
           {headline}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
-          <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 18, marginTop: 22 }}>
+          <div style={{ display: "flex", gap: 16 }}>
             <EpochBlock label="Period A" accent={accentA} epoch={epochA} />
             <EpochBlock label="Period B" accent={accentB} epoch={epochB} />
           </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
-            <div style={metricRowStyle}>
-              <span style={metricLabelStyle}>Change in {OPERATING_LATITUDE_LABEL.toLowerCase()}</span>
-              <BoldnessDelta epochA={epochA} epochB={epochB} />
+          <div style={{ display: "flex", gap: 32, alignItems: "baseline" }}>
+            <div style={{ ...metricRowStyle, gap: 12 }}>
+              <span style={metricLabelStyle}>{`${OPERATING_LATITUDE_LABEL}, A against B`}</span>
+              <LatitudeDelta epochA={epochA} epochB={epochB} />
             </div>
-            <div style={metricRowStyle}>
-              <span style={metricLabelStyle}>Change in {RECESSION_GAUGE_NAME.toLowerCase()}</span>
+            <div style={{ ...metricRowStyle, gap: 12 }}>
+              <span style={metricLabelStyle}>{`${RECESSION_GAUGE_NAME}, A against B`}</span>
               <CurveDelta epochA={epochA} epochB={epochB} />
             </div>
           </div>
+        </div>
+        <div style={{ display: "flex", fontSize: 18, color: "#64748b", padding: "0 0 22px" }}>
+          Whether — weekly operating guidance
         </div>
       </div>
     </div>
@@ -163,8 +165,8 @@ const EpochBlock = ({ label, accent, epoch }: { label: string; accent: string; e
       <span style={{ display: "flex", flex: 1 }} />
       <span style={{ display: "flex", fontSize: 13, color: OG_TEXT_MUTED }}>{epoch.label}</span>
     </div>
-    <div style={{ display: "flex", fontSize: 22, fontWeight: 700, color: OG_TEXT, lineHeight: 1.2 }}>
-      {getRegimePublicLabel(epoch.regime)} — {epoch.postureLabel}
+    <div style={{ display: "flex", fontSize: 28, fontWeight: 700, color: OG_TEXT, lineHeight: 1.2 }}>
+      {epochTitle(epoch)}
     </div>
     <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
       <div style={metricRowStyle}>
@@ -183,7 +185,7 @@ const EpochBlock = ({ label, accent, epoch }: { label: string; accent: string; e
   </div>
 );
 
-const BoldnessDelta = ({ epochA, epochB }: { epochA: CompareEpoch; epochB: CompareEpoch }) => {
+const LatitudeDelta = ({ epochA, epochB }: { epochA: CompareEpoch; epochB: CompareEpoch }) => {
   const a = epochA.boldnessScore;
   const b = epochB.boldnessScore;
   if (a === null || b === null) {
