@@ -13,8 +13,10 @@ import { formatDateUTC } from "../../lib/formatters";
 import {
   buildCanonBaseRate,
   buildCanonTimeline,
+  canonEssays,
   describeCanonBaseRate,
   essaysWrittenIn,
+  formatCanonAuthors,
   formatCanonPublished,
   type CanonReading,
 } from "../../lib/productCanon";
@@ -30,12 +32,24 @@ export const runtime = "edge";
  * this page is one the record actually varies by, and the page states the base
  * rate before a reader can mistake a coincidence for a finding.
  */
+/* The title is the search: "product management reading list" is what people type,
+   and the whole tag has to fit a result line (~60 characters with the site suffix).
+   The description leads with what no other reading list has, before Google cuts it. */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Product management writing, against the market it was written in",
+  title: "Product Management Reading List, Dated by Market",
   description:
-    "Widely read product management essays and books, each placed on Whether's month-end record since 2012: the conditions the month it was published, how long they had held, and how that compares with the record as a whole.",
+    `${canonEssays.length} product management essays and books, from Cagan to Torres, each dated and placed on the market conditions of the month it came out.`,
   path: "/concepts",
-  imageAlt: "Product management writing placed on Whether's month-end record",
+  imageAlt: "Product management reading list, dated by market conditions",
+  /* Without these the share card is the live weekly-guidance card, so a link to a
+     reading list previewed as this week's numbers. */
+  imageParams: {
+    template: "reading",
+    eyebrow: "Product management reading list",
+    title: "Product writing, against the market it was written in",
+    subtitle: `${canonEssays.length} essays and books, each dated and placed on the month-end record since 2012.`,
+    kicker: "Whether — weekly operating guidance",
+  },
 });
 
 const percent = (share: number) => `${Math.round(share * 100)}%`;
@@ -126,7 +140,7 @@ export default function ProductCanonPage() {
                   <a href={`#${essay.slug}`} className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">
                     {essay.title}
                   </a>{" "}
-                  — {essay.author}, {formatCanonPublished(essay)}
+                  — {formatCanonAuthors(essay)}, {formatCanonPublished(essay)}
                 </li>
               ))}
             </ul>
@@ -199,7 +213,7 @@ export default function ProductCanonPage() {
                   {essay.title}
                 </a>
               </h3>
-              <p className="text-sm text-slate-400">{essay.author}</p>
+              <p className="text-sm text-slate-400">{formatCanonAuthors(essay)}</p>
               <p className="mt-2 text-sm text-slate-300">{essay.argument}</p>
               {essay.publishedNote ? <p className="mt-1 text-xs text-slate-400">{essay.publishedNote}</p> : null}
               <p className="mt-2 text-sm">

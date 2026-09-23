@@ -27,6 +27,7 @@ import {
   type PostureArchivePeriod,
 } from "../../../lib/summary/postureArchive";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { essaysPublishedIn, formatCanonAuthors, formatCanonPublished } from "../../../lib/productCanon";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
@@ -95,6 +96,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const parent = period.parentSlug ? findPostureArchivePeriod(period.parentSlug) : undefined;
   const previous = period.previousSlug ? findPostureArchivePeriod(period.previousSlug) : undefined;
   const next = period.nextSlug ? findPostureArchivePeriod(period.nextSlug) : undefined;
+  /* The reading list places each essay on this record; this is the other half of
+     that link, so a year page names the product writing that came out inside it. */
+  const essays = essaysPublishedIn({ year: period.year, quarter: period.kind === "quarter" ? period.quarter : undefined });
   const canonicalUrl = buildCanonicalUrl(buildPostureArchivePath(period.slug));
 
   const breadcrumbStructuredData = {
@@ -254,6 +258,32 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
                 </a>
               </>
             ) : null}
+          </p>
+        </section>
+      ) : null}
+
+      {essays.length ? (
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+          <h2 className="text-lg font-semibold text-slate-100">Product writing published in {period.title}</h2>
+          <ul className="space-y-2 text-sm text-slate-300">
+            {essays.map((essay) => (
+              <li key={essay.slug}>
+                <Link
+                  href={`/concepts#${essay.slug}`}
+                  className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white"
+                >
+                  {essay.title}
+                </Link>{" "}
+                — {formatCanonAuthors(essay)}, {formatCanonPublished(essay)}
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-slate-400">
+            From the{" "}
+            <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+              product management reading list
+            </Link>
+            , where each is placed on the conditions of the month it came out.
           </p>
         </section>
       ) : null}

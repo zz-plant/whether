@@ -32,7 +32,10 @@ export type CanonEssay = {
   /** The anchor on /concepts. */
   slug: string;
   title: string;
-  author: string;
+  /** One entry per person, so each is a separate author in the page's markup. */
+  authors: readonly string[];
+  /** A book is marked up as one; everything else (essays, posts, articles) as an article. */
+  format: "essay" | "book";
   published: { year: number; month: number };
   /** What the date refers to, when it could mean more than one thing. */
   publishedNote?: string;
@@ -55,8 +58,9 @@ export type CanonEssay = {
 export const canonEssays: readonly CanonEssay[] = [
   {
     slug: "how-to-hire-a-product-manager",
+    format: "essay",
     title: "How to Hire a Product Manager",
-    author: "Ken Norton",
+    authors: ["Ken Norton"],
     published: { year: 2005, month: 6 },
     sourceUrl: "https://www.bringthedonuts.com/essays/productmanager.html",
     argument:
@@ -64,8 +68,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-only-thing-that-matters",
+    format: "essay",
     title: "The only thing that matters",
-    author: "Marc Andreessen",
+    authors: ["Marc Andreessen"],
     published: { year: 2007, month: 6 },
     sourceUrl: "https://pmarchive.com/guide_to_startups_part4.html",
     argument:
@@ -73,8 +78,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-startup-pyramid",
+    format: "essay",
     title: "The Startup Pyramid",
-    author: "Sean Ellis",
+    authors: ["Sean Ellis"],
     published: { year: 2009, month: 7 },
     sourceUrl: "https://www.startup-marketing.com/2009/07/",
     argument:
@@ -82,8 +88,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "what-exactly-is-a-product-manager",
+    format: "essay",
     title: "What, exactly, is a Product Manager?",
-    author: "Martin Eriksson",
+    authors: ["Martin Eriksson"],
     published: { year: 2011, month: 10 },
     sourceUrl: "https://www.mindtheproduct.com/what-exactly-is-a-product-manager/",
     argument:
@@ -91,8 +98,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "how-to-manufacture-desire",
+    format: "essay",
     title: "How To Manufacture Desire",
-    author: "Nir Eyal",
+    authors: ["Nir Eyal"],
     published: { year: 2012, month: 3 },
     publishedNote: "The essay. It became the book Hooked, self-published in December 2013.",
     sourceUrl: "https://techcrunch.com/2012/03/04/how-to-manufacture-desire/",
@@ -100,8 +108,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "good-product-manager-bad-product-manager",
+    format: "essay",
     title: "Good Product Manager/Bad Product Manager",
-    author: "Ben Horowitz and David Weiden",
+    authors: ["Ben Horowitz", "David Weiden"],
     published: { year: 2012, month: 6 },
     publishedNote:
       "The date is its publication on the open web. It was written as a Netscape training memo in the late 1990s.",
@@ -111,8 +120,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "product-strategy-means-saying-no",
+    format: "essay",
     title: "Product strategy means saying no",
-    author: "Des Traynor",
+    authors: ["Des Traynor"],
     published: { year: 2013, month: 7 },
     sourceUrl: "https://www.intercom.com/blog/product-strategy-means-saying-no/",
     argument:
@@ -120,8 +130,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-mom-test",
+    format: "book",
     title: "The Mom Test",
-    author: "Rob Fitzpatrick",
+    authors: ["Rob Fitzpatrick"],
     published: { year: 2013, month: 9 },
     sourceUrl: "https://www.momtestbook.com/",
     argument:
@@ -129,8 +140,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-build-trap",
+    format: "essay",
     title: "The Build Trap",
-    author: "Melissa Perri",
+    authors: ["Melissa Perri"],
     published: { year: 2014, month: 8 },
     publishedNote: "The blog post. It became the book Escaping the Build Trap in November 2018.",
     sourceUrl: "https://melissaperri.com/blog/2014/08/05/the-build-trap",
@@ -139,8 +151,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-alternative-to-roadmaps",
+    format: "essay",
     title: "The Alternative to Roadmaps",
-    author: "Marty Cagan",
+    authors: ["Marty Cagan"],
     published: { year: 2015, month: 9 },
     sourceUrl: "https://www.svpg.com/the-alternative-to-roadmaps/",
     argument:
@@ -148,8 +161,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "mvpm-minimum-viable-product-manager",
+    format: "essay",
     title: "MVPM: Minimum Viable Product Manager",
-    author: "Brandon Chu",
+    authors: ["Brandon Chu"],
     published: { year: 2016, month: 4 },
     sourceUrl: "https://blackboxofpm.substack.com/p/mvpm-minimum-viable-product-manager-e1aeb8dd421",
     argument:
@@ -157,8 +171,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "know-your-customers-jobs-to-be-done",
+    format: "essay",
     title: "Know Your Customers' “Jobs to Be Done”",
-    author: "Clayton M. Christensen, Taddy Hall, Karen Dillon and David S. Duncan",
+    authors: ["Clayton M. Christensen", "Taddy Hall", "Karen Dillon", "David S. Duncan"],
     published: { year: 2016, month: 9 },
     sourceUrl: "https://hbr.org/2016/09/know-your-customers-jobs-to-be-done",
     argument:
@@ -166,8 +181,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "why-product-market-fit-isnt-enough",
+    format: "essay",
     title: "Why Product Market Fit Isn't Enough",
-    author: "Brian Balfour",
+    authors: ["Brian Balfour"],
     published: { year: 2017, month: 6 },
     sourceUrl: "https://brianbalfour.com/essays/product-market-fit-isnt-enough",
     argument:
@@ -175,8 +191,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "superhuman-product-market-fit-engine",
+    format: "essay",
     title: "How Superhuman Built an Engine to Find Product/Market Fit",
-    author: "Rahul Vohra",
+    authors: ["Rahul Vohra"],
     published: { year: 2018, month: 11 },
     sourceUrl: "https://review.firstround.com/how-superhuman-built-an-engine-to-find-product-market-fit/",
     argument:
@@ -184,16 +201,18 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-making-of-a-manager",
+    format: "book",
     title: "The Making of a Manager",
-    author: "Julie Zhuo",
+    authors: ["Julie Zhuo"],
     published: { year: 2019, month: 3 },
     sourceUrl: "https://www.juliezhuo.com/book/manager.html",
     argument: "A working guide for new managers: purpose, people and process, and how feedback, hiring and meetings serve them.",
   },
   {
     slug: "product-led-growth",
+    format: "book",
     title: "Product-Led Growth",
-    author: "Wes Bush",
+    authors: ["Wes Bush"],
     published: { year: 2019, month: 5 },
     sourceUrl: "https://www.amazon.com/Product-Led-Growth-Build-Product-Itself/dp/1798434520",
     argument:
@@ -201,8 +220,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "intercom-product-management-career-ladder",
+    format: "essay",
     title: "Steps to success: the importance of a clear career path for product managers",
-    author: "Jane Honey and Brian Donohue",
+    authors: ["Jane Honey", "Brian Donohue"],
     published: { year: 2019, month: 6 },
     sourceUrl: "https://www.intercom.com/blog/evolving-your-product-management-career-ladder/",
     argument:
@@ -210,8 +230,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "shape-up",
+    format: "book",
     title: "Shape Up",
-    author: "Ryan Singer",
+    authors: ["Ryan Singer"],
     published: { year: 2019, month: 7 },
     publishedNote: "The free online edition. A print edition followed.",
     sourceUrl: "https://basecamp.com/shapeup",
@@ -220,8 +241,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "how-to-kickstart-and-scale-a-marketplace",
+    format: "essay",
     title: "How to kickstart and scale a marketplace business",
-    author: "Lenny Rachitsky",
+    authors: ["Lenny Rachitsky"],
     published: { year: 2019, month: 11 },
     sourceUrl: "https://www.lennysnewsletter.com/p/how-to-kickstart-and-scale-a-marketplace",
     argument:
@@ -229,8 +251,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "product-strategy-overview",
+    format: "essay",
     title: "Product Strategy – Overview",
-    author: "Marty Cagan",
+    authors: ["Marty Cagan"],
     published: { year: 2020, month: 2 },
     sourceUrl: "https://www.svpg.com/product-strategy-overview/",
     argument:
@@ -238,8 +261,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "empowered",
+    format: "book",
     title: "Empowered",
-    author: "Marty Cagan and Chris Jones",
+    authors: ["Marty Cagan", "Chris Jones"],
     published: { year: 2020, month: 12 },
     sourceUrl: "https://www.wiley.com/en-us/EMPOWERED:+Ordinary+People,+Extraordinary+Products-p-9781119691297",
     argument:
@@ -247,8 +271,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "continuous-discovery-habits",
+    format: "book",
     title: "Continuous Discovery Habits",
-    author: "Teresa Torres",
+    authors: ["Teresa Torres"],
     published: { year: 2021, month: 5 },
     publishedNote: "The book. The opportunity solution tree it is built around was first published in 2016.",
     sourceUrl: "https://www.producttalk.org/continuous-discovery-habits/",
@@ -257,8 +282,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-product-momentum-gap",
+    format: "book",
     title: "The Product Momentum Gap",
-    author: "Dave Martin and Andrea Saez",
+    authors: ["Dave Martin", "Andrea Saez"],
     published: { year: 2023, month: 10 },
     sourceUrl: "https://www.amazon.com/Product-Momentum-Gap-Bringing-together/dp/B0CK9Y3V28",
     argument:
@@ -266,8 +292,9 @@ export const canonEssays: readonly CanonEssay[] = [
   },
   {
     slug: "the-ai-product-playbook",
+    format: "book",
     title: "The AI Product Playbook",
-    author: "Marily Nika and Diego Granados",
+    authors: ["Marily Nika", "Diego Granados"],
     published: { year: 2025, month: 9 },
     publishedNote: "The e-book. Print followed in October 2025.",
     sourceUrl:
@@ -409,6 +436,22 @@ export const describeCanonBaseRate = (baseRate: CanonBaseRate): string => {
 /** Essays written in the given conditions, oldest first. */
 export const essaysWrittenIn = (timeline: readonly CanonTimelineEntry[], regime: RegimeKey) =>
   timeline.filter((entry) => entry.reading.kind === "reading" && entry.reading.regime === regime);
+
+/** "A", "A and B", "A, B, C and D". */
+export const formatCanonAuthors = (essay: Pick<CanonEssay, "authors">) =>
+  essay.authors.length <= 2
+    ? essay.authors.join(" and ")
+    : `${essay.authors.slice(0, -1).join(", ")} and ${essay.authors[essay.authors.length - 1]}`;
+
+/** Essays first published inside an archive year, or one quarter of it. */
+export const essaysPublishedIn = (period: { year: number; quarter?: number }, essays: readonly CanonEssay[] = canonEssays) =>
+  [...essays]
+    .filter(
+      (essay) =>
+        essay.published.year === period.year
+        && (period.quarter === undefined || Math.ceil(essay.published.month / 3) === period.quarter),
+    )
+    .sort(byPublished);
 
 export const formatCanonPublished = (essay: Pick<CanonEssay, "published">) =>
   new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" }).format(
