@@ -1013,6 +1013,31 @@ can read any card; `tests/shareCardCoverage.test.tsx` walks the sitemap to every
 `tests/readerVocabulary.test.tsx` holds every distinct card to the bans. **Give a new page its
 metadata through `buildPageMetadata`**, and name a template if the plain card is not the right one.
 
+## What a crawler receives (2026-09-23)
+
+A crawl of every sitemap URL against a local server, reading what each response actually carries
+rather than what the metadata code intends, found gaps none of the SEO suites could see:
+
+- **Metadata streamed into `<body>` for Googlebot and every AI crawler.** A page whose
+  `generateMetadata` awaits the report read (every answer page, every published week) sends its
+  title, description, canonical and OG tags after the content — 43KB in on an answer page — unless
+  the user agent is on the framework's "HTML-limited" list, which names the social unfurlers and
+  Bing and omits Googlebot and every crawler `app/robots.ts` names. Google ignores a canonical
+  outside `<head>` in the HTML it fetches, and the retrieval crawlers do not run JavaScript.
+  `htmlLimitedBots` in `next.config.js` now adds them; `tests/htmlLimitedBots.test.ts` fails if
+  robots.ts names an agent it does not cover. Check with `curl -A Googlebot` — a browser fetch
+  shows the streamed version, which is correct for a browser.
+- **Fifteen sitemap URLs had no inbound link.** The signal hubs' own comment called the scenario
+  pages their children and never linked them. `tests/crawlPaths.test.tsx` holds it.
+- **Breadcrumbs as data.** Eleven routes drew a trail and two described one, one of them a
+  different trail. `<Breadcrumbs>` now emits the BreadcrumbList from the items it draws.
+- **`lastmod` was one constant**, 2026-02-01, on fifteen pages, twelve of which did not exist then,
+  and on five that change weekly. Undated static pages now omit it; weekly pages carry the read's
+  date, `/history` its newest entry, resources their own `updatedAt`. A resource's `updatedAt` in
+  `content/resources/*.json` has to move with its copy — it is the sitemap date and `dateModified`.
+- **Five lookalike Organization nodes** (a name, sometimes a URL, no `@id`) are the site entity by
+  id now, and the RSS feed moved out of `sitemap.xml` into a second `Sitemap:` line in robots.txt.
+
 ## An artifact that names itself
 
 `public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —

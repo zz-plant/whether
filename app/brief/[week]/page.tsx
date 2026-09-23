@@ -7,10 +7,8 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { Tag } from "../../components/ui/tag";
 import { BoundedValue } from "../../components/ui/boundedValue";
-import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import {
-  buildBreadcrumbList,
   buildCanonicalUrl,
   buildOgImageUrl,
   buildPageMetadata,
@@ -162,12 +160,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         mainEntityOfPage: canonicalUrl,
         isAccessibleForFree: true,
       },
-      buildBreadcrumbList(
-        createBreadcrumbTrail([
-          { path: "/" },
-          { path: buildPublishedBriefPath(brief.slug), label: `Week of ${brief.recordDateLabel}` },
-        ]),
-      ),
+      // The trail is described by <Breadcrumbs> below, from the trail it draws.
     ],
   };
 

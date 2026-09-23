@@ -3,10 +3,11 @@ import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
 import {
   buildCanonicalUrl,
+  buildPageImageUrl,
   buildPageMetadata,
   organizationName,
 } from "../../../lib/seo";
-import { buildAuthorSchema } from "../../../lib/publisher";
+import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
@@ -146,10 +147,15 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
     headline: article.title,
     description: article.description,
     author: buildAuthorSchema(),
-    publisher: { "@type": "Organization", name: organizationName },
+    publisher: buildPublisherSchema(organizationName),
     mainEntityOfPage: canonicalUrl,
     url: canonicalUrl,
     keywords: [article.keyword, "capital posture", "board memo"],
+    // Google's Article rich result asks for both dates and an image; the page
+    // published neither, so it was eligible for a plain blue link only.
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt,
+    image: [buildPageImageUrl(article.title, article.description, { template: "guides", title: article.title })],
   };
 
   return (

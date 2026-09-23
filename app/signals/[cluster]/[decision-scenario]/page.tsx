@@ -17,6 +17,8 @@ import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClu
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { ReportCta } from "../../../components/reportCta";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
+import { Breadcrumbs } from "../../../components/ui/breadcrumbs";
+import { toRoute } from "../../../../lib/navigation/routeType";
 import { compositeSignalScales } from "../../../../lib/report/signalTranslations";
 import { ruleMetricLabel } from "../../../../lib/report/boundedDecisionRules";
 
@@ -144,6 +146,14 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       data-content-measurement-root={pagePath}
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="authority" intent={contentIntent} />
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Evidence", href: "/signals" },
+          { label: signal.title, href: toRoute(`/signals/${cluster}`) },
+          { label: scenario.title },
+        ]}
+      />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{signal.title}: {scenario.title}</h1>
         <p className="text-sm text-slate-300">{signal.summary}</p>
@@ -222,7 +232,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
           <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">The evidence</Link>
-          <Link href={`/resolve/ceo/${decisionScenario}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
+          <Link href="/resolve/ceo" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
           <Link href="/operate#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">What to do</Link>
         </div>
       </section>
