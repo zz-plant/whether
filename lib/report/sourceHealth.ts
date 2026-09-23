@@ -14,6 +14,8 @@ export type SourceHealthRow = {
   ageLabel: string | null;
   activeFallbackReason: string | null;
   mode: SourceModeStatus;
+  /** Whether this source is meant to answer live. False only for a curated snapshot by design. */
+  expectsLive: boolean;
 };
 
 type SourceHealthCoverageSummary = {
@@ -257,13 +259,33 @@ const buildGroupedRow = ({
       ? buildLiveGroupFallbackReason({ group, relevantSeries, macroStatusLabel })
       : null,
     mode,
+    expectsLive: group.supportsLive,
   };
 };
 
 /** Non-live sources in the shape the report shell and trust surfaces render. One builder, so every page counts the same rows. */
+/*
+ * Degraded means "not what this source is supposed to be right now". A live
+ * source answering from a fallback is degraded; so is any source past its own
+ * freshness window. A source that is a curated snapshot *by design*
+ * ("Startup/private markets", `supportsLive: false`) and is inside its window
+ * is exactly what it is supposed to be.
+ *
+ * This used to count every row that was not live, and that one curated group
+ * is never live, so every page on every visit reported "Partly cached" in
+ * warning amber and told the reader to "hold anything you can't undo until
+ * every source is current" — a condition that can never be met — while /trust,
+ * reading the same read, said no warning was active and it was fine to act. A
+ * warning that is always on is one a reader learns to skip, including on the
+ * week it is true, and it was the first thing a new visitor was told about the
+ * data.
+ */
+const isDegradedSource = (row: SourceHealthRow) =>
+  row.expectsLive ? row.mode !== "live" : row.freshnessStatus !== "fresh";
+
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows
-    .filter((row) => row.mode !== "live")
+    .filter(isDegradedSource)
     .map((row) => ({
       sourceName: row.sourceName,
       modeLabel: formatSourceModeLabel(row.mode),
@@ -318,6 +340,7 @@ export const buildSourceHealthRows = ({
       ageLabel: formatAgeSpan(treasuryLastSuccessfulFetchAt, now),
       activeFallbackReason: treasuryFallbackReason,
       mode: treasuryFallbackReason ? "fallback" : treasury.isLive ? "live" : "snapshot",
+      expectsLive: true,
     },
     ...macroSourceGroups.map((group) => buildGroupedRow({ group, macroSeries, macroStatusLabel, now })),
   ];

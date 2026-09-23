@@ -52,7 +52,16 @@ export function HeaderChoicePill<Key extends string>({
         aria-label={`${label}: ${selected?.label ?? ""}`}
         className={`weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold ${className}`}
       >
-        <Select.Value>{selected?.label}</Select.Value>
+        {/* The face names the setting as well as its value. It showed the
+            value alone — "Series A", "12–24 mo" — which on a first visit is
+            the page asserting a stage and a runway nobody gave it. With the
+            name above, it reads as a setting with a default, which is what it
+            is. Two lines inside the same 44px target, so the header does not
+            widen at phone width. */}
+        <span className="flex flex-col items-start leading-none">
+          <span aria-hidden="true" className="text-[10px] font-medium text-slate-400">{label}</span>
+          <Select.Value className="mt-0.5">{selected?.label}</Select.Value>
+        </span>
         <Select.Icon>
           <ChevronDownIcon className="h-3.5 w-3.5 text-slate-400" />
         </Select.Icon>

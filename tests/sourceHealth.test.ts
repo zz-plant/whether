@@ -4,6 +4,7 @@ import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 import {
   buildSourceHealthRows,
   summarizeSourceHealthCoverage,
+  buildDegradedSourceRows,
   formatSourceFreshnessLabel,
   formatSourceModeLabel,
 } from "../lib/report/sourceHealth";
@@ -136,6 +137,7 @@ describe("buildSourceHealthRows", () => {
         ageLabel: "1d",
         activeFallbackReason: null,
         mode: "live",
+        expectsLive: true,
       },
       {
         sourceName: "Startup/private markets",
@@ -146,6 +148,7 @@ describe("buildSourceHealthRows", () => {
         ageLabel: "9d",
         activeFallbackReason: null,
         mode: "snapshot",
+        expectsLive: false,
       },
       {
         sourceName: "Labor",
@@ -156,6 +159,7 @@ describe("buildSourceHealthRows", () => {
         ageLabel: null,
         activeFallbackReason: "Labor unavailable; no series were loaded for this refresh.",
         mode: "fallback",
+        expectsLive: true,
       },
     ]);
 
@@ -177,6 +181,7 @@ describe("stale source disclosure states its age", () => {
     lastSuccessfulFetchAt: "2026-02-02T00:00:00.000Z",
     activeFallbackReason: null,
     mode: "snapshot",
+    expectsLive: false,
   } as const;
 
   // "Stale · Curated snapshot" read identically at one day past SLA and at seven months past
@@ -220,5 +225,40 @@ describe("stale source disclosure states its age", () => {
     assert.equal(startup?.freshnessStatus, "stale");
     assert.equal(startup?.ageLabel, "7mo");
     assert.equal(formatSourceFreshnessLabel(startup!), "Stale 7mo · Curated snapshot");
+  });
+});
+
+describe("degraded sources", () => {
+  /*
+   * "Startup/private markets" is a curated snapshot by design and is never
+   * live. Counting it as degraded put "Partly cached" on every page, on every
+   * visit, in warning amber — with the guidance to hold until "every source is
+   * current", which could never happen.
+   */
+  const now = new Date("2026-03-11T00:00:00.000Z");
+  const liveMacro = (["CPI_YOY", "UNEMPLOYMENT_RATE", "BBB_CREDIT_SPREAD", "HY_CREDIT_SPREAD", "CHICAGO_FCI", "VIX_INDEX"] as const).map(
+    (id) => buildMacroSeriesReading({ id, fetched_at: "2026-03-10T09:00:00.000Z", isLive: true }),
+  );
+  const curated = (fetched_at: string) =>
+    (["VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND", "SAAS_VALUATION_MULTIPLE", "EARNINGS_REVISION_INDEX", "AI_COMPUTE_COST_TREND", "REGULATORY_RISK_TRACKER"] as const).map(
+      (id) => buildMacroSeriesReading({ id, fetched_at, isLive: false }),
+    );
+  const degradedNames = (macroSeries: MacroSeriesReading[], treasury = buildTreasury({ fetched_at: "2026-03-10T20:00:00.000Z" })) =>
+    buildDegradedSourceRows(buildSourceHealthRows({ treasury, macroSeries, now })).map((row) => row.sourceName);
+
+  it("does not count a curated snapshot inside its window", () => {
+    assert.deepEqual(degradedNames([...liveMacro, ...curated("2026-03-01T00:00:00.000Z")]), []);
+  });
+
+  it("counts a curated snapshot past its window", () => {
+    assert.deepEqual(degradedNames([...liveMacro, ...curated("2026-01-01T00:00:00.000Z")]), ["Startup/private markets"]);
+  });
+
+  it("counts a live source that is not answering live, whatever its age", () => {
+    const names = degradedNames(
+      [...liveMacro, ...curated("2026-03-01T00:00:00.000Z")],
+      buildTreasury({ fetched_at: "2026-03-10T20:00:00.000Z", isLive: false }),
+    );
+    assert.deepEqual(names, ["Treasury"]);
   });
 });
