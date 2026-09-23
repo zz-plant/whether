@@ -23,56 +23,47 @@
  *   padding, in which two of the four rows the popover restated, and in the
  *   number of columns. One render; the variant is the column count.
  */
+import {
+  PROVENANCE_CATALOG_STATUS,
+  PROVENANCE_FALLBACK_STATUS,
+  PROVENANCE_STATUS,
+  type ProvenanceStripStatus,
+  type ReportProvenance,
+} from "../../lib/report/provenanceStatus";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 import { Tag } from "./ui/tag";
 
-export type DataProvenance = {
-  sourceLabel: string;
-  sourceUrl?: string;
-  recordDateLabel: string;
-  timestampLabel: string;
-  ageLabel: string;
-  statusLabel: string;
+export type DataProvenance = ReportProvenance;
+
+type StatusPresentation = {
+  /** Tag tone tracks the confidence tier the label itself states. */
+  tone: "emerald" | "amber" | "rose" | "slate";
+  dataMode: { label: string; live: boolean };
 };
 
-// Tag tone tracks the confidence tier the label states (high = emerald,
-// medium = amber, low = rose) so the hue is monotonic in trust. Live-vs-static
-// is carried separately by the data-mode chip's circle/square icon.
-const statusTones: Record<string, "emerald" | "amber" | "rose"> = {
-  "Live (high confidence)": "emerald",
-  "Archived snapshot (high)": "emerald",
-  "Previously cached (medium)": "amber",
-  "Fallback active (low)": "rose",
-  "Modeled estimate (low)": "rose",
-};
-
-const statusDataMode: Record<string, { label: string; icon: string; className: string }> = {
-  "Live (high confidence)": {
-    label: "Dynamic · live feed",
-    icon: "live",
-    className: "weather-data-mode weather-data-mode-dynamic",
-  },
-  "Archived snapshot (high)": {
-    label: "Static · historical archive",
-    icon: "static",
-    className: "weather-data-mode weather-data-mode-static",
-  },
-  "Previously cached (medium)": {
-    label: "Static · cached reading",
-    icon: "static",
-    className: "weather-data-mode weather-data-mode-static",
-  },
-  "Fallback active (low)": {
-    label: "Static · fallback source",
-    icon: "static",
-    className: "weather-data-mode weather-data-mode-static",
-  },
-  "Modeled estimate (low)": {
-    label: "Static · model estimate",
-    icon: "static",
-    className: "weather-data-mode weather-data-mode-static",
-  },
-};
+/**
+ * Keyed on every label the loader can produce, so a status without an entry is
+ * a type error here. These tables used to be keyed on five labels nothing
+ * produced ("Archived snapshot (high)", "Fallback active (low)", ...): only
+ * "Live" matched, and every other reading rendered a grey tag and a generic
+ * "Static · snapshot" chip.
+ *
+ * Tone is monotonic in trust (high = emerald, medium = amber, low = rose);
+ * live-vs-static is carried separately by the data-mode chip's icon. The
+ * playbook catalog is not a reading, so it gets no trust colour.
+ */
+export const STATUS_PRESENTATION = {
+  [PROVENANCE_STATUS.live]: { tone: "emerald", dataMode: { label: "Dynamic · live feed", live: true } },
+  [PROVENANCE_STATUS.canonical]: { tone: "emerald", dataMode: { label: "Static · scheduled refresh", live: false } },
+  [PROVENANCE_STATUS.cached]: { tone: "amber", dataMode: { label: "Static · cached reading", live: false } },
+  [PROVENANCE_STATUS.historicalAligned]: { tone: "amber", dataMode: { label: "Static · historical archive", live: false } },
+  [PROVENANCE_STATUS.historicalPartial]: { tone: "amber", dataMode: { label: "Static · historical archive", live: false } },
+  [PROVENANCE_STATUS.treasuryOnly]: { tone: "rose", dataMode: { label: "Static · historical archive", live: false } },
+  [PROVENANCE_STATUS.simulated]: { tone: "rose", dataMode: { label: "Static · historical archive", live: false } },
+  [PROVENANCE_FALLBACK_STATUS.cached]: { tone: "rose", dataMode: { label: "Static · fallback source", live: false } },
+  [PROVENANCE_FALLBACK_STATUS.unavailable]: { tone: "rose", dataMode: { label: "Static · fallback source", live: false } },
+  [PROVENANCE_CATALOG_STATUS]: { tone: "slate", dataMode: { label: "Static · curated catalog", live: false } },
+} as const satisfies Record<ProvenanceStripStatus, StatusPresentation>;
 
 const ROW_COLUMNS = {
   full: "sm:grid-cols-2 xl:grid-cols-4",
@@ -88,15 +79,9 @@ export const DataProvenanceStrip = ({
   label?: string;
   variant?: "full" | "compact";
 }) => {
-  const statusTone = statusTones[provenance.statusLabel] ?? "slate";
-  const dataMode =
-    statusDataMode[provenance.statusLabel] ?? {
-      label: "Static · snapshot",
-      icon: "static",
-      className: "weather-data-mode weather-data-mode-static",
-    };
-
-  const dataModeIcon = dataMode.icon === "live"
+  const { tone: statusTone, dataMode }: StatusPresentation = STATUS_PRESENTATION[provenance.statusLabel];
+  const dataModeClassName = `weather-data-mode ${dataMode.live ? "weather-data-mode-dynamic" : "weather-data-mode-static"}`;
+  const dataModeIcon = dataMode.live
     ? <StatusLiveIcon className="h-2.5 w-2.5" />
     : <StatusStaticIcon className="h-2.5 w-2.5" />;
 
@@ -137,7 +122,7 @@ export const DataProvenanceStrip = ({
     <div className="space-y-2 rounded-md border border-[color:var(--border-subtle)] px-4 py-3 text-xs text-slate-300">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-400 type-eyebrow">{label}</span>
-        <span className={`${dataMode.className} type-badge`}>
+        <span className={`${dataModeClassName} type-badge`}>
           <span aria-hidden="true">{dataModeIcon}</span>
           <span>{dataMode.label}</span>
         </span>

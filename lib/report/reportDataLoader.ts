@@ -1,9 +1,12 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { RegimeAssessment, RegimeThresholds, RegimeTrend } from "../regimeEngine";
 import {
+  PROVENANCE_CATALOG_STATUS,
+  PROVENANCE_FALLBACK_STATUS,
   PROVENANCE_STATUS,
   historicalMacroStatus,
   resolveProvenanceStatus,
+  type ReportProvenance,
 } from "./provenanceStatus";
 
 /**
@@ -409,7 +412,9 @@ export const loadReportDataUncachedInternal = async ({
     isCanonical: isCanonicalRead,
     isLive: Boolean(treasury.isLive),
   });
-  const treasuryProvenance = {
+  // Annotated rather than inferred: the fallback loader stamps these fields with
+  // its own labels, and both loaders have to produce one type.
+  const treasuryProvenance: ReportProvenance = {
     sourceLabel: operatingSnapshot?.provenance.sourceLabel
       ?? (canonicalInputs ? "Canonical ingestion (FRED)" : "Federal Reserve Economic Data (FRED)"),
     sourceUrl: treasury.source,
@@ -424,7 +429,7 @@ export const loadReportDataUncachedInternal = async ({
   const macroTimestamp = deps.getLatestParseableTimestamp(macroSeries.map((series) => (series as { fetched_at?: string }).fetched_at)) ?? treasury.fetched_at;
   const macroRecordDate = getLatestRecordDate(macroSeries.map((series) => (series as { record_date?: string }).record_date)) ?? treasury.record_date;
   const macroAgeLabel = deps.formatAgeHours(macroTimestamp, now);
-  const macroProvenance = {
+  const macroProvenance: ReportProvenance = {
     sourceLabel: "FRED & US Treasury",
     sourceUrl: (freshestMacroSeries as { sourceUrl?: string } | undefined)?.sourceUrl ?? (macroSeries[0] as { sourceUrl?: string } | undefined)?.sourceUrl,
     recordDateLabel: deps.formatDateUTC(macroRecordDate),
@@ -438,12 +443,12 @@ export const loadReportDataUncachedInternal = async ({
       isLive: macroSeries.some(hasLiveFlag),
     }),
   };
-  const internalProvenance = {
+  const internalProvenance: ReportProvenance = {
     sourceLabel: "Whether curated playbook catalog",
     recordDateLabel: "Static",
     timestampLabel: "Static catalog",
     ageLabel: "Static.",
-    statusLabel: "Simulated (low)",
+    statusLabel: PROVENANCE_CATALOG_STATUS,
   };
   const statusLabel = deps.formatRegimeLabel(assessment.regime);
   const historicalComparison =
@@ -663,7 +668,7 @@ export const buildFallbackReportDataInternal = ({
   const sourceHealth = deps.buildSourceHealthRows({
     treasury: fallbackTreasury,
     macroSeries: [],
-    macroStatusLabel: "Unavailable (fallback)",
+    macroStatusLabel: PROVENANCE_FALLBACK_STATUS.unavailable,
     now,
   });
 
@@ -682,7 +687,7 @@ export const buildFallbackReportDataInternal = ({
       recordDateLabel: "Static",
       timestampLabel: "Static catalog",
       ageLabel: "Static.",
-      statusLabel: "Simulated (low)",
+      statusLabel: PROVENANCE_CATALOG_STATUS,
     },
     invalidHistoricalSelection,
     lastYearComparison: null,
@@ -694,7 +699,7 @@ export const buildFallbackReportDataInternal = ({
       recordDateLabel,
       timestampLabel: fetchedAtLabel,
       ageLabel,
-      statusLabel: "Unavailable (fallback)",
+      statusLabel: PROVENANCE_FALLBACK_STATUS.unavailable,
     },
     macroSeries: [],
     playbook,
@@ -732,7 +737,7 @@ export const buildFallbackReportDataInternal = ({
       recordDateLabel,
       timestampLabel: fetchedAtLabel,
       ageLabel,
-      statusLabel: "Cached (fallback)",
+      statusLabel: PROVENANCE_FALLBACK_STATUS.cached,
     },
     stale: true,
     lastCachedTimestamp: fallbackTreasury.fetched_at,

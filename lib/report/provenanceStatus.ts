@@ -22,6 +22,28 @@ export const PROVENANCE_STATUS = {
 export type ProvenanceStatusLabel = (typeof PROVENANCE_STATUS)[keyof typeof PROVENANCE_STATUS];
 
 /**
+ * What the loader's own fallback (`buildFallbackReportData`) stamps on a strip
+ * when report assembly failed outright. Kept beside the policy labels so the
+ * strip can be keyed on every value it will ever be handed.
+ */
+export const PROVENANCE_FALLBACK_STATUS = {
+  cached: "Cached (fallback)",
+  unavailable: "Unavailable (fallback)",
+} as const;
+
+/**
+ * The playbook catalog is written, not read from a feed, so no tier applies.
+ * It used to borrow "Simulated (low)", which on a strip reads as a replayed
+ * market reading of low quality.
+ */
+export const PROVENANCE_CATALOG_STATUS = "Curated catalog (static)";
+
+export type ProvenanceStripStatus =
+  | ProvenanceStatusLabel
+  | (typeof PROVENANCE_FALLBACK_STATUS)[keyof typeof PROVENANCE_FALLBACK_STATUS]
+  | typeof PROVENANCE_CATALOG_STATUS;
+
+/**
  * A replay reports what its coverage supports and stops there — it never claims
  * the canonical or live tiers, whatever else is loaded.
  */
@@ -46,4 +68,14 @@ export const resolveProvenanceStatus = ({
   if (historicalLabel) return historicalLabel;
   if (isCanonical) return PROVENANCE_STATUS.canonical;
   return isLive ? PROVENANCE_STATUS.live : PROVENANCE_STATUS.cached;
+};
+
+/** One provenance strip's worth of facts, as the loader hands it to a page. */
+export type ReportProvenance = {
+  sourceLabel: string;
+  sourceUrl?: string;
+  recordDateLabel: string;
+  timestampLabel: string;
+  ageLabel: string;
+  statusLabel: ProvenanceStripStatus;
 };
