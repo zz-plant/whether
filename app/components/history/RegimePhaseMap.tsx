@@ -432,18 +432,20 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               <>
                 <dl className="mt-1 space-y-1 text-fluid-xs">
                   {[gaps.tightness, gaps.riskAppetite].map((gap) => (
-                    <div key={gap.axis} className="flex items-baseline justify-between gap-2">
+                    <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
                       <dt className="text-slate-400">{gap.label}</dt>
-                      {/* The reading and its distance are one phrase; letting it wrap
-                          broke "from 70" across lines while the label beside it had
-                          room to spare. The label takes the wrap instead. */}
                       {/* Out of 100, and the distance said as a direction: "72 / +2 from
                           70" asked the reader to know the scale and to read a slash
                           and a sign as "two above the line". */}
-                      <dd className="whitespace-nowrap tabular-nums text-slate-200">
-                        {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
-                        <span className="text-slate-500">
-                          {" · "}
+                      {/* The score and the distance each stay whole, so "from 70" never
+                          splits, but the distance may drop under the score: held on one
+                          line, it ran past the card's edge on a 360px phone. */}
+                      <dd className="ml-auto text-right tabular-nums text-slate-200">
+                        <span className="whitespace-nowrap">
+                          {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
+                          <span className="text-slate-500"> ·</span>
+                        </span>{" "}
+                        <span className="whitespace-nowrap text-slate-500">
                           {gap.side === "on"
                             ? "on"
                             : `${gap.distance} ${gap.side}`}{" "}

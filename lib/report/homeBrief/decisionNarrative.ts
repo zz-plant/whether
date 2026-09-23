@@ -29,24 +29,28 @@ export const buildDecisionShiftSummary = ({
   severityDelta: number;
   directionLabel: ReportDynamics["directionLabel"] | undefined;
   changeCount: number;
-  reversalTrigger: string;
+  /* Omitted by the surfaces that print their own change line: appended there,
+     the board note read "Conditions change if" twice, naming two different lines. */
+  reversalTrigger?: string;
 }) => {
+  const withTrigger = (headline: string) =>
+    reversalTrigger ? `${headline} ${CALL_CHANGES_IF}: ${reversalTrigger}` : headline;
   if (directionLabel === "unavailable") {
     /* Nothing was compared, so "no significant change" is not available to say.
        The call still stands on where the signals sit; what is missing is the
        week-over-week half of the sentence. */
-    return `No previous reading to compare this week against. The guidance below comes from where the signals sit now. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
+    return withTrigger("No previous reading to compare this week against. The guidance below comes from where the signals sit now.");
   }
   if (changeCount === 0 || directionLabel === "stable") {
-    return `No significant change this week. Keep your current plan. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
+    return withTrigger("No significant change this week. Keep your current plan.");
   }
   if (severityDelta < 0 || directionLabel === "improving") {
-    return `Conditions improved. Move faster on what's working. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
+    return withTrigger("Conditions improved. Move faster on what's working.");
   }
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return `Conditions tightened. Slow new commitments and focus on what's already in motion. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
+    return withTrigger("Conditions tightened. Slow new commitments and focus on what's already in motion.");
   }
-  return `Mixed signals this week. Hold steady and keep new moves reversible. ${CALL_CHANGES_IF}: ${reversalTrigger}`;
+  return withTrigger("Mixed signals this week. Hold steady and keep new moves reversible.");
 };
 
 export const buildWeeklyMovementMetric = ({

@@ -24,7 +24,7 @@ export const buildWeeklyDecisionCardModel = (
     signalConfidenceReason: "Reason: regime boundary proximity + volatile macro signals",
     regimeHeader: {
       regime: "DEFENSIVE",
-      confidence: "Medium (mixed signal reliability)",
+      confidence: "Medium (some room before conditions change)",
       primaryRisk: "Downside: Funding pressure tightened (1.0).",
     },
     trendLabel: "Improving",
@@ -55,6 +55,7 @@ export const buildWeeklyDecisionCardModel = (
     compactFlipConditionLabels: ["Risk appetite > 55"],
     reportDynamics: { directionLabel: "deteriorating", totalSignalChanges: 0, regimeChanged: false, changedSignals: [], anomalySignals: [] },
     decisionShiftSummary: "Decision delta: tighten roadmap optionality while protecting core delivery.",
+    decisionShiftHeadline: "Decision delta: tighten roadmap optionality while protecting core delivery.",
     transitionProbabilities: { Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 },
     decisionRules: [],
     decisionMatrix: {

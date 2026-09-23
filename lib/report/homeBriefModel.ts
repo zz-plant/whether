@@ -346,6 +346,8 @@ export type WeeklyDecisionCardViewModel = {
     canonicalFlipConditions?: CanonicalFlipCondition[];
     reportDynamics: ReportDynamics;
     decisionShiftSummary: string;
+    /** `decisionShiftSummary` without its change clause, for surfaces that print their own. */
+    decisionShiftHeadline: string;
     transitionProbabilities: Record<ForecastRegimeLabel, number>;
     decisionRules: BoundedDecisionRule[];
     decisionMatrix?: DecisionMatrixPayload;

@@ -74,6 +74,10 @@ describe("assembleHomePage streaming contract", () => {
     /* The board note is read cold. Every slot uses the page's name and carries
        its meaning; the retired names and a percent confidence must not return. */
     const boardNote = artifactPayload?.boardSnippetText ?? "";
+    /* The CHANGED line used to carry its own "Conditions change if" clause, naming
+       a different line from the one printed three rows below it. */
+    assert.equal(boardNote.match(/conditions change if/gi)?.length, 1);
+    assert.equal(artifactPayload?.deltaOnlyBriefText.match(/conditions change if/gi)?.length, 1);
     assert.match(boardNote, /^DATA: (Live, as of|Saved copy from) /m);
     assert.match(boardNote, /^OPERATING LATITUDE: \d+\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: /m);
     assert.match(boardNote, /^CONDITIONS: (Sunny|Cloudy|Stormy|Freezing)[^\n]*\((money|conditions) [^)]+\) · (High|Medium|Low) confidence$/m);
