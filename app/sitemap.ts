@@ -182,6 +182,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
+    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history/compare", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.4 },
     { path: "/pricing", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },

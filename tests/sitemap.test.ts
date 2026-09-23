@@ -35,7 +35,7 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/operate/scenarios`));
     assert.ok(!urls.has(`${siteUrl}/search`));
     assert.ok(!urls.has(`${siteUrl}/learn/failure-modes`));
-    assert.ok(!urls.has(`${siteUrl}/concepts`));
+    assert.ok(urls.has(`${siteUrl}/concepts`));
 
     for (const retiredPath of retiredSitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${retiredPath}`));

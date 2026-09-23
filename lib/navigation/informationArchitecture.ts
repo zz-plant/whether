@@ -180,6 +180,11 @@ export const utilityLinks = [
     description: "How often the confidence label has been right, 2012–2026",
   },
   {
+    href: "/concepts",
+    label: "Product writing",
+    description: "Widely read product essays, placed on the record since 2012",
+  },
+  {
     href: "/search",
     label: "Search",
     description: "Find a decision, signal, or past guidance",
