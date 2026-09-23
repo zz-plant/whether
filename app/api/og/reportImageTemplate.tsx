@@ -175,7 +175,10 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <div style={pill(preview.audienceLabel, "#e2e8f0")}>{preview.audienceLabel}</div>
                   {preview.contextLabel ? <div style={pill(preview.contextLabel, tone)}>{preview.contextLabel}</div> : null}
-                  <div style={pill(preview.weekLabel, "#cbd5e1")}>{preview.weekLabel}</div>
+                  {/* The week-ending Friday (`formatWeekEndingUTC`), not the record date: printed
+                      bare, a Monday card read "Sep 25" two days before it, which looked like a
+                      reading from the future. */}
+                  <div style={pill(`Week ending ${preview.weekLabel}`, "#cbd5e1")}>{`Week ending ${preview.weekLabel}`}</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
