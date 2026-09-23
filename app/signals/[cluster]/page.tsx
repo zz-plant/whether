@@ -28,12 +28,32 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!clusterDefinition) return {};
 
+  const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const stale = isStaleForIndexing({
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
+  });
+  /* This week's reading on the card, where every signals card carried the same
+     "EVIDENCE / What moved" box. Only while the reading is live: a stale figure
+     on a card that platforms cache for days is the one place it would outlive
+     the page's own warning. */
+  const reading = !stale && isSignalClusterSlug(cluster) ? buildSignalClusterReading(cluster, reportData) : null;
+  const readingPanel: Record<string, string> = reading?.displayValue
+    ? {
+        panelLabel: "This week",
+        // The card's title already names the measure; the panel leads with the figure.
+        panelTitle: `${reading.displayValue}${reading.unit ? ` ${reading.unit}` : ""}`,
+        panelBody: reading.distanceLabel,
+      }
+    : {};
+
   const metadata = buildPageMetadata({
     title: `${clusterDefinition.title} | Evidence`,
     description: clusterDefinition.summary,
     path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,
-    imageParams: { template: "signals", eyebrow: "Evidence" },
+    imageParams: { template: "signals", eyebrow: "Evidence", ...readingPanel },
   });
 
   /*
@@ -59,12 +79,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
    * few hours past its refresh is still indexed and one older than the window
    * is not, whichever store it came from.
    */
-  const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const stale = isStaleForIndexing({
-    fetchedAtIso: reportData.treasury.fetched_at,
-    isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
-  });
   if (stale) {
     metadata.robots = { index: false, follow: true };
   }

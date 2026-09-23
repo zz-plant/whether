@@ -63,7 +63,7 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
  */
 const DESCRIPTION_LIMIT = 160;
 const countChanges = (count: number) =>
-  count === 0 ? "the call held throughout" : count === 1 ? "the call changed once" : `the call changed ${count} times`;
+  count === 0 ? "conditions held throughout" : count === 1 ? "conditions changed once" : `conditions changed ${count} times`;
 const describePeriod = (period: PostureArchivePeriod) => {
   const label = toWeatherLabel(period.operatorLabel);
   const lead = `Conditions in ${period.title} closed ${label}.`;
@@ -74,6 +74,35 @@ const describePeriod = (period: PostureArchivePeriod) => {
     : ` ${period.headline.replace(new RegExp(`^${label} mode\\.\\s*`, "i"), "").split(/(?<=\.)\s/)[0] ?? ""}`;
   const text = `${lead}${facts}`.trim();
   return text.length <= DESCRIPTION_LIMIT ? text : `${text.slice(0, DESCRIPTION_LIMIT - 1).replace(/\s+\S*$/, "")}…`;
+};
+
+/*
+ * The card's side panel: this period's own record, where every archive card used
+ * to carry the same "A closed period" box. The count, the mix as a bar in the
+ * regimes' colours, and how often conditions changed — the facts a link to 2022
+ * has and a link to 2014 does not. The ten 2010–2011 periods have no readings
+ * behind them and keep the fixed panel.
+ */
+const recordCardPanel = (period: PostureArchivePeriod): Record<string, string> => {
+  if (period.sampleCount <= 0 || period.regimeMix.length === 0) return {};
+  const unit = period.sampleCadence === "weekly" ? "week" : "month";
+  const mix = [...period.regimeMix].sort((left, right) => right.periods - left.periods);
+  const only = mix.length === 1 ? mix[0] : null;
+  const title = only
+    ? `${only.periods} of ${period.sampleCount} ${unit}s ${toWeatherLabel(only.label)}`
+    : `${period.sampleCount} ${cadenceNoun(period)}`;
+  const changes = period.transitions.length;
+  // "Conditions", not "the call": lib/report/AGENTS.md retired the noun on 2026-09-23.
+  const changeLine = changes === 0 ? "Conditions held throughout." : changes === 1 ? "Conditions changed once." : `Conditions changed ${changes} times.`;
+  const body = only
+    ? changeLine
+    : `${mix.map((entry) => `${entry.periods} ${toWeatherLabel(entry.label)}`).join(" · ")}. ${changeLine}`;
+  return {
+    panelLabel: "The record",
+    panelTitle: title,
+    panelBody: body,
+    mix: mix.map((entry) => `${entry.regime}:${entry.periods}`).join(","),
+  };
 };
 
 const cadenceNoun = (period: PostureArchivePeriod) =>
@@ -117,6 +146,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
          is advice for this week, not for a closed year. */
       subtitle: getRegimeWeatherRationale(period.regime).split(/(?<=\.)\s/)[0] ?? "",
       regime: period.regime,
+      ...recordCardPanel(period),
     },
   });
 }

@@ -1,14 +1,14 @@
 import type { ReactElement } from "react";
 import { isRegimeKey } from "../../../lib/regimePresentation";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
-import { toImageSafeProps } from "../../../lib/image/ogFonts";
+import { toImageSafeProps, toImageSafeText } from "../../../lib/image/ogFonts";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { loadComparePreview } from "../../../lib/image/compareImagePayload";
 import { canonicalPositioningLine } from "../../../lib/seo";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
 import { renderCompareOgImage } from "./compareTemplate";
-import { renderStaticOgImage, type StaticOgTemplate } from "./staticTemplate";
+import { renderStaticOgImage, type OgRegimeMix, type StaticOgTemplate } from "./staticTemplate";
 import { renderAnswerOgImage } from "./answerImageTemplate";
 import postureTimeline from "../../../data/posture_og_timeline.json";
 import type { RegimeKey } from "../../../lib/regimeEngine";
@@ -62,6 +62,33 @@ const readParam = (searchParams: URLSearchParams, key: string, fallback: string,
   return value ? clampToWord(value, maxLength) : fallback;
 };
 
+/* "VOLATILE:22,SCARCITY:22,EXPANSION:8" — unknown keys and non-counts are dropped. */
+const readMix = (searchParams: URLSearchParams): OgRegimeMix | undefined => {
+  const raw = searchParams.get("mix")?.trim();
+  if (!raw) return undefined;
+  const mix = raw.split(",").flatMap((part) => {
+    const [key, value] = part.split(":");
+    const regime = key?.trim().toUpperCase() ?? "";
+    const count = Number(value);
+    return isRegimeKey(regime) && Number.isFinite(count) && count > 0 ? [{ regime, count }] : [];
+  });
+  return mix.length > 0 ? mix.slice(0, 4) : undefined;
+};
+
+/* A page's own panel, all three parts or none: half a panel over the fixed copy reads as a bug. */
+const readPanel = (searchParams: URLSearchParams) => {
+  const label = searchParams.get("panelLabel")?.trim();
+  const title = searchParams.get("panelTitle")?.trim();
+  const body = searchParams.get("panelBody")?.trim();
+  if (!label || !title || !body) return undefined;
+  // Nested, so `toImageSafeProps` (top-level strings only) would not reach it.
+  return {
+    label: toImageSafeText(readParam(searchParams, "panelLabel", "", 24).toUpperCase()),
+    title: toImageSafeText(readParam(searchParams, "panelTitle", "", 110)),
+    body: toImageSafeText(readParam(searchParams, "panelBody", "", 120)),
+  };
+};
+
 const readRegime = (searchParams: URLSearchParams): RegimeKey | null => {
   const value = searchParams.get("regime")?.trim().toUpperCase() ?? "";
   return isRegimeKey(value) ? value : null;
@@ -104,7 +131,9 @@ export const renderOgElement = async (searchParams: URLSearchParams): Promise<Re
       toImageSafeProps({
         question: readParam(searchParams, "title", "An operator answer", 72),
         shortAnswer: readParam(searchParams, "subtitle", "", 170),
-        call: readParam(searchParams, "call", "This week's guidance", 90),
+        // 90 cut a normal call mid-thought ("…over the ones that close…"); the
+        // panel sizes its type to the length instead.
+        call: readParam(searchParams, "call", "This week's guidance", 130),
         action: readParam(searchParams, "action", "", 120),
         kicker: readParam(searchParams, "kicker", DEFAULT_KICKER, 72),
       }),
@@ -121,6 +150,8 @@ export const renderOgElement = async (searchParams: URLSearchParams): Promise<Re
         eyebrow: readParam(searchParams, "eyebrow", "Whether", 42),
         kicker: readParam(searchParams, "kicker", DEFAULT_KICKER, 72),
         accent: regime ? REGIME_HEX_COLORS[regime] : undefined,
+        panel: readPanel(searchParams),
+        mix: readMix(searchParams),
       }),
     );
   }
