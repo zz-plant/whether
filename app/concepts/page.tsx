@@ -6,7 +6,8 @@ import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from ".
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
-import { latestPublishedBrief, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, latestPublishedBrief, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { REGIME_STYLE_TOKENS, getOrderedRegimeLegend } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
@@ -41,7 +42,11 @@ const percent = (share: number) => `${Math.round(share * 100)}%`;
 
 const monthsLabel = (months: number) => (months === 1 ? "1 month" : `${months} months`);
 
-function ReadingLabel({ reading, recordStart }: { reading: CanonReading; recordStart: string | null }) {
+/* The archive publishes a page per completed year; the current year has none yet,
+   so a reading from it stays plain text rather than linking to a 404. */
+const archivedYears = new Set(postureArchiveYears.map((year) => year.slug));
+
+function ReadingLabel({ reading, year, recordStart }: { reading: CanonReading; year: number; recordStart: string | null }) {
   if (reading.kind === "before-record") {
     return (
       <span className="text-slate-400">
@@ -56,7 +61,16 @@ function ReadingLabel({ reading, recordStart }: { reading: CanonReading; recordS
   return (
     <span className="inline-flex items-center gap-2">
       <span aria-hidden="true" className={`inline-block h-2 w-2 rounded-full ${tokens.marker}`} />
-      <span className="text-slate-100">{reading.conditions}</span>
+      {archivedYears.has(String(year)) ? (
+        <a
+          href={buildPostureArchivePath(String(year))}
+          className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white"
+        >
+          {reading.conditions}
+        </a>
+      ) : (
+        <span className="text-slate-100">{reading.conditions}</span>
+      )}
       <span className="text-slate-400">
         {reading.heldSinceRecordStart
           ? `· at least ${monthsLabel(reading.heldMonths)} running, since the record starts`
@@ -79,6 +93,7 @@ export default function ProductCanonPage() {
     ? {
         conditions: publishedBriefDisplay(latestPublishedBrief).conditions,
         publishedLabel: formatDateUTC(latestPublishedBrief.publishedAt),
+        href: buildPublishedBriefPath(latestPublishedBrief.slug),
         essays: essaysWrittenIn(timeline, latestPublishedBrief.regime),
         monthsInConditions: baseRate.rows.find((row) => row.regime === latestPublishedBrief.regime)?.months ?? 0,
       }
@@ -97,10 +112,10 @@ export default function ProductCanonPage() {
       {thisWeek ? (
         <SecondaryPageSection
           title={`Written in conditions like this week's: ${thisWeek.conditions}`}
-          description={`The latest published call, ${thisWeek.publishedLabel}, is ${thisWeek.conditions}. These were published in ${thisWeek.conditions} months.`}
+          description={`This week's guidance, published ${thisWeek.publishedLabel}, is for ${thisWeek.conditions} conditions. These were published in ${thisWeek.conditions} months.`}
           actions={
-            <ActionLink href="/" variant="pill">
-              Read this week&rsquo;s call
+            <ActionLink href={thisWeek.href} variant="pill">
+              Read this week&rsquo;s guidance
             </ActionLink>
           }
         >
@@ -189,7 +204,7 @@ export default function ProductCanonPage() {
               {essay.publishedNote ? <p className="mt-1 text-xs text-slate-400">{essay.publishedNote}</p> : null}
               <p className="mt-2 text-sm">
                 <span className="text-slate-400">Conditions that month: </span>
-                <ReadingLabel reading={essay.reading} recordStart={recordStart} />
+                <ReadingLabel reading={essay.reading} year={essay.published.year} recordStart={recordStart} />
               </p>
             </li>
           ))}
@@ -198,7 +213,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="What the four conditions mean"
-        description="The same four words the weekly call uses, and what each asks of a team today."
+        description="The same four words this week's guidance uses, and what each asks of a team today."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           {getOrderedRegimeLegend().map((entry) => (
@@ -216,7 +231,7 @@ export default function ProductCanonPage() {
             <ActionLink href="/history" variant="inline">
               the history page
             </ActionLink>
-            , computed the same way as the weekly call.
+            , computed by the same method behind this week&rsquo;s guidance. Each essay&rsquo;s conditions link to that year&rsquo;s page in the archive.
           </li>
           <li>
             Essays: linked at each title, to the author or original publisher wherever it is still online.

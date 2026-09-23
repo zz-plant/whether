@@ -136,4 +136,18 @@ describe("product canon: the list itself", () => {
     }
     assert.doesNotMatch(html, /scale proven bets|guidance that month/i);
   });
+
+  /* Two ways into the rest of the site: each reading opens its year in the
+     archive, and "this week" opens the published brief it compares against. */
+  it("links readings to archive years that exist, and this week to its published brief", async () => {
+    const { postureArchiveYears } = await import("../lib/summary/postureArchiveYears");
+    const { latestPublishedBrief } = await import("../lib/report/publishedBriefs");
+    const page = await import("../app/concepts/page");
+    const html = renderToStaticMarkup(page.default());
+    const years = new Set(postureArchiveYears.map((year) => year.slug));
+    const linked = [...html.matchAll(/href="\/history\/(\d{4})"/g)].map(([, year]) => year);
+    assert.ok(linked.length > 0, "readings link into the archive");
+    for (const year of linked) assert.ok(years.has(year), `/history/${year} is a real archive page`);
+    if (latestPublishedBrief) assert.ok(html.includes(`href="/brief/${latestPublishedBrief.slug}"`));
+  });
 });
