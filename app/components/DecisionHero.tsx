@@ -75,31 +75,32 @@ export function DecisionHero({
       data-regime={regimeKey ?? undefined}
     >
       <div className="relative z-10 min-w-0 space-y-2.5">
-        {/* The regime stamp: sharp (§XIV), in the regime's own ink with visual weather glyph. */}
-        <span
-          className="inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
-          style={{
-            color: "var(--regime-ink)",
-            borderColor: "color-mix(in srgb, var(--regime-accent) 40%, transparent)",
-            backgroundColor: "color-mix(in srgb, var(--regime-accent) 14%, transparent)",
-          }}
-        >
-          {regimeKey ? (
-            <span className="inline-block w-4 shrink-0" aria-hidden="true">
-              <RegimeGlyph idPrefix="hero-stamp" regime={regimeKey} />
-            </span>
-          ) : (
-            <WeatherIcon size={14} aria-hidden="true" />
-          )}
-          <span>{regimeWeatherLabel}</span>
-        </span>
+        {/* The regime stamp and its meaning, grouped on the eyebrow line so the eye path flows directly into the call. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span
+            className="inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
+            style={{
+              color: "var(--regime-ink)",
+              borderColor: "color-mix(in srgb, var(--regime-accent) 40%, transparent)",
+              backgroundColor: "color-mix(in srgb, var(--regime-accent) 14%, transparent)",
+            }}
+          >
+            {regimeKey ? (
+              <span className="inline-block w-4 shrink-0" aria-hidden="true">
+                <RegimeGlyph idPrefix="hero-stamp" regime={regimeKey} />
+              </span>
+            ) : (
+              <WeatherIcon size={14} aria-hidden="true" />
+            )}
+            <span>{regimeWeatherLabel}</span>
+          </span>
 
-        {/* What the weather word means for money, in one sentence, under the word itself. */}
-        {regimeKey ? (
-          <p className="max-w-xl text-xs leading-relaxed text-slate-400">
-            {REGIME_WEATHER_RATIONALES[regimeKey]}
-          </p>
-        ) : null}
+          {regimeKey ? (
+            <p className="text-xs leading-relaxed text-slate-400">
+              {REGIME_WEATHER_RATIONALES[regimeKey]}
+            </p>
+          ) : null}
+        </div>
 
         {/* The homepage's `h1`. It was an `h2` under a visually hidden `h1`
             reading "Weekly Brief", so the one heading a crawler and a

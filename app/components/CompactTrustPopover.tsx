@@ -113,9 +113,9 @@ export function CompactTrustPopover({
 
   return (
     <Popover.Root>
-      <Popover.Trigger className="weather-chip inline-flex min-h-11 items-center gap-1.5 text-sky-200 sm:min-h-8">
+      <Popover.Trigger className="inline-flex min-h-11 sm:min-h-8 items-center gap-1.5 rounded-md border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-300 hover:border-slate-700 hover:text-white transition-colors">
         <span>{formatConfidenceChipLabel(confidenceLabel)}</span>
-        <Info size={12} className="text-sky-400/80" aria-hidden="true" />
+        <Info size={12} className="text-slate-400" aria-hidden="true" />
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="end" sideOffset={8} className="z-50">

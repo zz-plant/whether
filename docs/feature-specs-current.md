@@ -9,6 +9,17 @@ Dynamic decision copy follows the same bounded contract across weekly, evidence,
 
 ## 1) Product surfaces (UI routes)
 
+### Current reading and disclosure behavior (2026-09-24)
+
+- The weekly brief reads in the same visual and document order on phones and desktop:
+  the call, what changed, what it changes by area, what would change the call, then what to do.
+- Planning's rule lists expand in place. `actions=all` preserves the expanded view in shared
+  links; toggling retains the other query parameters, and Back/Forward restores the list state.
+- The desktop `More` menu closes on an outside click or Escape; Escape returns focus to its trigger.
+- Answer pages expose `Copy decision brief` in the header and after the decision content.
+  Both copy the same answer, bounded rule, citation, and freshness line.
+- Evidence and Trust use the shared `Pause if` and `Resume when` labels.
+
 ### 1.0 Rationalized IA (one screen + reachable depth)
 Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
 as supporting layers, deep links, or URL-driven states of `/`:

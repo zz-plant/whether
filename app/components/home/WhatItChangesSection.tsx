@@ -62,7 +62,7 @@ export function WhatItChangesSection({
     <HomeSection
       id={HOME_SECTIONS.consequences.id}
       heading={HOME_SECTIONS.consequences.heading}
-      className="order-2 md:order-3"
+      className="order-3"
     >
       {/* Stage and runway: the sm+ tablists. The header carries the phone pills,
           so one control per axis at every width. */}

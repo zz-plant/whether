@@ -5,6 +5,7 @@ import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
 import { resolvePublishedConfidenceLabel } from "../lib/report/confidence";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
+import type { KvNamespace } from "../lib/runtime/kv";
 
 const mockAny: any = mock;
 
@@ -62,10 +63,24 @@ describe("answer page trust strip", () => {
      label "Live", because it checked `degraded` (assembly failing) rather than
      the fallback flags. */
   it("does not call a snapshot read live", async () => {
-    const { DecisionAnswerPageContent } = await import("../app/answers/decisionAnswerPageContent");
-    const slug = answerPages[0]?.slug ?? "";
-    const html = renderToStaticMarkup(await DecisionAnswerPageContent({ slug, route: `/answers/${slug}` }));
-    assert.doesNotMatch(html, />Live</);
-    assert.match(html, /Cached snapshot|Partly cached/);
+    // Own the cold store: a developer's materialized data must neither decide
+    // this test's result nor be deleted to force the fallback path.
+    const previousBinding = Object.getOwnPropertyDescriptor(globalThis, "WHETHER_DURABLE_KV");
+    const emptyKv: KvNamespace = {
+      async get() { return null; },
+      async put() {},
+      async list() { return { keys: [], list_complete: true }; },
+    };
+    Object.assign(globalThis, { WHETHER_DURABLE_KV: emptyKv });
+    try {
+      const { DecisionAnswerPageContent } = await import("../app/answers/decisionAnswerPageContent");
+      const slug = answerPages[0]?.slug ?? "";
+      const html = renderToStaticMarkup(await DecisionAnswerPageContent({ slug, route: `/answers/${slug}` }));
+      assert.doesNotMatch(html, />Live</);
+      assert.match(html, /Cached snapshot|Partly cached/);
+    } finally {
+      if (previousBinding) Object.defineProperty(globalThis, "WHETHER_DURABLE_KV", previousBinding);
+      else Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
+    }
   });
 });
