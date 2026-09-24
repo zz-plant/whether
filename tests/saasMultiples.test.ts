@@ -57,6 +57,26 @@ describe("fetchSaaSValuations", () => {
     await assert.rejects(fetchSaaSValuations(), QuoteSourceUnavailableError);
   });
 
+  it("releases every refused response's body instead of holding its connection", async () => {
+    // A Worker has six open connections per request and the basket is fetched
+    // in parallel; an unread body holds one until the runtime cancels it, which
+    // production logged on every /comps request the quote source declined.
+    let cancelled = 0;
+    stubFetch(() =>
+      new Response(
+        new ReadableStream({
+          cancel() {
+            cancelled += 1;
+          },
+        }),
+        { status: 429 },
+      ),
+    );
+
+    await assert.rejects(fetchSaaSValuations(), QuoteSourceUnavailableError);
+    assert.equal(cancelled, SAAS_BASKET.length);
+  });
+
   it("reports what it did get when only some of the basket is refused", async () => {
     stubFetch((url) =>
       url.includes(`/${SAAS_BASKET[0]}?`)

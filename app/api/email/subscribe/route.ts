@@ -17,8 +17,10 @@ export async function POST(request: Request) {
     // existing subscriber's choice alone rather than enrolling them in a second mail
     // stream on a value the caller did not mean as consent.
     const alerts = typeof body.alerts === "boolean" ? body.alerts : undefined;
+    // Same rule for the Monday brief: only `false` makes an alerts-only subscription.
+    const weekly = typeof body.weekly === "boolean" ? body.weekly : undefined;
 
-    await subscribeAndSendVerification({ email, alerts, request });
+    await subscribeAndSendVerification({ email, alerts, weekly, request });
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {

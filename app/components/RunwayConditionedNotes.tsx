@@ -4,44 +4,8 @@ import { useMemo } from "react";
 import Link from "next/link";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
-import {
-  RUNWAY_QUICK_PICKS,
-  buildRunwayConditionedNotes,
-  findRunwayQuickPick,
-} from "../../lib/report/runwayConditionedNotes";
+import { buildRunwayConditionedNotes } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
-import { SegmentedControl } from "./ui/segmentedControl";
-
-/**
- * The runway bands.
- *
- * It was the third hand-rolled version of one control: a `fieldset` with
- * `aria-pressed` and no keyboard movement at all, beside a cadence selector
- * using `aria-current` and a stage selector claiming `role="tablist"`. It reads
- * the shared radio group now, so the arrows work here too.
- */
-const RunwayQuickPicks = ({
-  activeMonths,
-  onPick,
-}: {
-  activeMonths: number | undefined;
-  onPick: (months: number) => void;
-}) => {
-  const active = findRunwayQuickPick(activeMonths);
-  const options = RUNWAY_QUICK_PICKS.map((pick) => ({ key: pick.label, label: pick.label }));
-
-  return (
-    <SegmentedControl
-      options={options}
-      value={active?.label}
-      onSelect={(label) => {
-        const pick = RUNWAY_QUICK_PICKS.find((candidate) => candidate.label === label);
-        if (pick) onPick(pick.months);
-      }}
-      ariaLabel="Cash runway"
-    />
-  );
-};
 
 const useRunwayNotes = (regime: RegimeKey) => {
   const { profile, setProfileField } = useOperatorProfile();
@@ -78,27 +42,20 @@ const useRunwayNotes = (regime: RegimeKey) => {
 export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
   const { profile, notes, setRunway } = useRunwayNotes(regime);
 
+  /* No picker of its own. It used to carry a second four-button runway control,
+     banded at 18 months where the selector heading this section bands at 24,
+     so one screen offered two runway controls that disagreed. The selector (the
+     header pill on a phone) is the one control; this says what choosing does. */
   if (notes.length === 0) {
     return (
       <div id="runway-notes" className="space-y-1.5">
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
-          {/* Deliberately nothing selected. The operator has not said what their
-              runway is, and a default would be this panel inventing one — the
-              same rule the note builder keeps ("a missing runway never reads
-              like zero"). What was missing is not a default but the invitation
-              below: the panel used to offer four unexplained buttons over a
-              sentence about browser storage, so the first thing a reader was
-              told about a control they had no reason to touch was where the
-              value would be kept. */}
-          <RunwayQuickPicks activeMonths={undefined} onPick={setRunway} />
-        </div>
+        <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
         <p className="text-fluid-nano text-slate-400">
-          Pick a band and this week&rsquo;s guidance gains a line per decision it changes: which area
+          Choose your cash runway and each rule below gains a line for the areas it changes: which one
           protects runway fastest, and roughly how many months a 10% burn cut buys.
         </p>
         <p className="text-fluid-nano text-slate-500">
-          Nothing leaves this browser, and the guidance above does not change; only the notes under it do.
+          Nothing leaves this browser, and the guidance does not change; only the notes under it do.
         </p>
       </div>
     );
@@ -111,7 +68,6 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
           What this guidance means at {profile.runwayMonths} months of runway
         </p>
         <div className="flex flex-wrap items-center gap-2">
-          <RunwayQuickPicks activeMonths={profile.runwayMonths} onPick={setRunway} />
           <button
             type="button"
             onClick={() => setRunway(undefined)}

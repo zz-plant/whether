@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
@@ -76,5 +77,14 @@ describe("confidence calibration", () => {
     const rates = populated.map((bucket) => bucket.held / bucket.months);
     const monotone = rates.every((rate, index) => index === 0 || rate >= rates[index - 1]);
     assert.ok(!monotone, "hold rate now rises with distance; the /trust copy needs revisiting");
+  });
+});
+
+describe("the confidence record's archive extract", () => {
+  it("is exactly what the full archive yields, so `bun run archive:index` was run after the archive changed", async () => {
+    const { extractCalibrationMonths } = await import("../lib/report/confidenceCalibration");
+    const archive: unknown = JSON.parse(readFileSync(new URL("../data/summary_archive.json", import.meta.url), "utf8"));
+    const extract: unknown = JSON.parse(readFileSync(new URL("../data/confidence_record_months.json", import.meta.url), "utf8"));
+    assert.deepEqual(extract, extractCalibrationMonths(archive));
   });
 });

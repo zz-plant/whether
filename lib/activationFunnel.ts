@@ -46,8 +46,17 @@ export type ActivationCommitment =
  */
 type ActivationReturnGap = "same_week" | "next_week" | "within_month" | "lapsed";
 
+/**
+ * Where a visit arrived from, as one of seven words. Never the referring URL,
+ * its path, or a query string: the hostname is read in the browser, matched
+ * against the lists below, and discarded. `/privacy` 2.6 promises exactly this
+ * bucket, and for a while it promised it with nothing behind it.
+ */
+type ActivationArrival = "direct" | "search" | "social" | "chat" | "shared-link" | "internal" | "other";
+
 type ActivationEvent =
-  | { step: "visited" | "oriented"; path: string }
+  | { step: "visited"; path: string; arrival?: ActivationArrival; firstVisit?: boolean }
+  | { step: "oriented"; path: string }
   | { step: "committed"; path: string; commitment: ActivationCommitment }
   | { step: "returned"; path: string; gap: ActivationReturnGap };
 
@@ -61,30 +70,96 @@ const COMMITMENTS: ActivationCommitment[] = [
 
 const RETURN_GAPS: ActivationReturnGap[] = ["same_week", "next_week", "within_month", "lapsed"];
 
+const ARRIVALS: ActivationArrival[] = ["direct", "search", "social", "chat", "shared-link", "internal", "other"];
+
+/* Matched on the hostname's registrable tail, so `www.google.co.uk` and
+   `l.facebook.com` land where a reader would expect. */
+const SEARCH_HOSTS = ["google.", "bing.com", "duckduckgo.com", "search.yahoo.com", "ecosia.org", "search.brave.com", "kagi.com", "perplexity.ai", "chatgpt.com", "claude.ai"];
+const SOCIAL_HOSTS = ["t.co", "x.com", "twitter.com", "linkedin.com", "lnkd.in", "news.ycombinator.com", "reddit.com", "facebook.com", "threads.net", "bsky.app", "substack.com"];
+const CHAT_HOSTS = ["slack.com", "teams.microsoft.com", "teams.live.com", "discord.com", "discordapp.com", "mail.google.com", "outlook.live.com", "outlook.office.com"];
+
+const hostMatches = (host: string, candidates: readonly string[]) =>
+  candidates.some((candidate) =>
+    candidate.endsWith(".") ? host.includes(candidate) : host === candidate || host.endsWith(`.${candidate}`));
+
+/**
+ * Buckets an arrival. Pure, so the rule is testable without a browser: the
+ * caller hands in `document.referrer`, the site's own host, and whether the
+ * link carried the share tag the copy formats print (`?ref=share`), which wins
+ * because a pasted brief opened from a desktop Slack client arrives with no
+ * referrer at all.
+ */
+export const classifyArrival = ({
+  referrer,
+  siteHost,
+  sharedLink,
+}: {
+  referrer: string;
+  siteHost: string;
+  sharedLink: boolean;
+}): ActivationArrival => {
+  if (sharedLink) return "shared-link";
+  if (!referrer) return "direct";
+  let host: string;
+  try {
+    host = new URL(referrer).hostname.toLowerCase();
+  } catch {
+    return "other";
+  }
+  if (host === siteHost.toLowerCase()) return "internal";
+  if (hostMatches(host, SEARCH_HOSTS)) return "search";
+  if (hostMatches(host, SOCIAL_HOSTS)) return "social";
+  if (hostMatches(host, CHAT_HOSTS)) return "chat";
+  return "other";
+};
+
+/* The fields each step may carry, and nothing else. The intake's promise on
+   `/privacy` is that a record with an unexpected field is refused, and this
+   validator used to accept any extra key a caller sent. */
+const ALLOWED_KEYS: Record<ActivationEvent["step"], readonly string[]> = {
+  visited: ["step", "path", "arrival", "firstVisit"],
+  oriented: ["step", "path"],
+  committed: ["step", "path", "commitment"],
+  returned: ["step", "path", "gap"],
+};
+
+const isStep = (value: unknown): value is ActivationEvent["step"] =>
+  value === "visited" || value === "oriented" || value === "committed" || value === "returned";
+
 export const isActivationEvent = (input: unknown): input is ActivationEvent => {
   if (!input || typeof input !== "object") {
     return false;
   }
 
-  const payload = input as Record<string, unknown>;
+  const step: unknown = Reflect.get(input, "step");
+  const path: unknown = Reflect.get(input, "path");
 
-  if (typeof payload.path !== "string" || payload.path.length === 0) {
+  if (!isStep(step) || typeof path !== "string" || path.length === 0) {
     return false;
   }
 
-  if (payload.step === "visited" || payload.step === "oriented") {
-    return true;
+  if (Object.keys(input).some((key) => !ALLOWED_KEYS[step].includes(key))) {
+    return false;
   }
 
-  if (payload.step === "committed") {
-    return COMMITMENTS.includes(payload.commitment as ActivationCommitment);
+  if (step === "visited") {
+    const arrival: unknown = Reflect.get(input, "arrival");
+    const firstVisit: unknown = Reflect.get(input, "firstVisit");
+    return (arrival === undefined || ARRIVALS.some((bucket) => bucket === arrival))
+      && (firstVisit === undefined || typeof firstVisit === "boolean");
   }
 
-  if (payload.step === "returned") {
-    return RETURN_GAPS.includes(payload.gap as ActivationReturnGap);
+  if (step === "committed") {
+    const commitment: unknown = Reflect.get(input, "commitment");
+    return COMMITMENTS.some((candidate) => candidate === commitment);
   }
 
-  return false;
+  if (step === "returned") {
+    const gap: unknown = Reflect.get(input, "gap");
+    return RETURN_GAPS.some((candidate) => candidate === gap);
+  }
+
+  return true;
 };
 
 /** ISO weeks between two week slugs, or null when either is unreadable. */

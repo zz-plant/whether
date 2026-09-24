@@ -22,7 +22,7 @@ export function SharePageFormats({
 }) {
   const artifact = useBriefArtifact();
   const [format, setFormat] = useState<BriefFormatId>("slack");
-  const { copyToClipboard, copiedTarget } = useClipboardCopy();
+  const { copyToClipboard, copiedTarget } = useClipboardCopy({ commitment: "copied_brief" });
   const activeFormat = BRIEF_FORMATS.find((option) => option.id === format) ?? BRIEF_FORMATS[0];
 
   const briefText = useMemo(

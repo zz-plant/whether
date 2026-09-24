@@ -18,6 +18,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
+import { activationLastWeekStorageKey } from "../lib/activationFunnel";
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
@@ -63,6 +64,11 @@ const buildOrientationBootstrapScript = () => `
     const dismissed = window.localStorage.getItem(${JSON.stringify(orientationDismissKey)}) === "1";
 
     root.dataset.homeOrientationDismissed = dismissed ? "true" : "false";
+    // First visit: this browser has never rendered the brief (ActivationTracker
+    // stores the week on every visit) and never dismissed the explainer. The
+    // homepage folds everything below the call behind one question for it.
+    const seenBefore = window.localStorage.getItem(${JSON.stringify(activationLastWeekStorageKey)}) !== null;
+    root.dataset.homeFirstVisit = dismissed || seenBefore ? "false" : "true";
 
     if (!document.head.querySelector('style[data-weather-ui-bootstrap="orientation"]')) {
       const style = document.createElement("style");

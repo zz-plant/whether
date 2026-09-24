@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { ClipboardActionRow } from "./clipboardActionRow";
+import { trackActivationEvent } from "../../lib/activationFunnel";
 import { CopyIcon, CheckIcon } from "./uiIcons";
 import { formatMeetingSlideHtml, formatMeetingSlideMarkdown } from "../../lib/export/meetingSlideExport";
 import { briefArtifactToSlidePayload } from "../../lib/report/briefArtifact";
@@ -33,29 +34,39 @@ export function CopyMeetingSlideButton({
     const markdown = formatMeetingSlideMarkdown(payload);
     const html = formatMeetingSlideHtml(payload);
 
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        if (typeof ClipboardItem !== "undefined") {
-          const item = new ClipboardItem({
-            "text/plain": new Blob([markdown], { type: "text/plain" }),
-            "text/html": new Blob([html], { type: "text/html" }),
-          });
-          await navigator.clipboard.write([item]);
-        } else {
-          await navigator.clipboard.writeText(markdown);
+    /* The rich copy first, then plain text. "Copied" shows only after a write
+       resolved: the fallback used to be fired without waiting and the button
+       said "Copied the slide" whether or not anything reached the clipboard,
+       the defect `docs/feature-specs-current.md` 1.1.10 records for the other
+       copy controls. */
+    const writeSlide = async () => {
+      if (typeof navigator === "undefined" || !navigator.clipboard) return false;
+      if (typeof ClipboardItem !== "undefined") {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "text/plain": new Blob([markdown], { type: "text/plain" }),
+              "text/html": new Blob([html], { type: "text/html" }),
+            }),
+          ]);
+          return true;
+        } catch {
+          // Fall through to plain text.
         }
-
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setDidCopy(true);
-        timeoutRef.current = setTimeout(() => setDidCopy(false), 2500);
       }
-    } catch {
-      // Fallback
-      void navigator?.clipboard?.writeText(markdown);
-      setDidCopy(true);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setDidCopy(false), 2500);
-    }
+      try {
+        await navigator.clipboard.writeText(markdown);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    if (!(await writeSlide())) return;
+    trackActivationEvent({ step: "committed", path: window.location.pathname, commitment: "copied_meeting" });
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setDidCopy(true);
+    timeoutRef.current = setTimeout(() => setDidCopy(false), 2500);
   }, [artifact]);
 
   /* The shared row, so this and "Copy Brief" beside it are one control drawn

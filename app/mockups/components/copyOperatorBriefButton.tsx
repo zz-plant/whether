@@ -4,7 +4,7 @@ import { Copy, CopyCheck } from "lucide-react";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 
 export function CopyOperatorBriefButton({ text }: { text: string }) {
-  const { status, copyToClipboard } = useClipboardCopy();
+  const { status, copyToClipboard } = useClipboardCopy({ commitment: null });
   const isCopied = status === "copied";
 
   return (

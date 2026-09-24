@@ -161,33 +161,18 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
 ];
 
-const homepageCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, s-maxage=300, stale-while-revalidate=600",
-  },
-];
-
-const shareCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, s-maxage=300, stale-while-revalidate=600",
-  },
-];
-
-const trustCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, s-maxage=900, stale-while-revalidate=1800",
-  },
-];
-
-const evidenceCacheHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, s-maxage=900, stale-while-revalidate=1800",
-  },
-];
+/*
+ * No page Cache-Control here, on purpose. Four blocks used to set
+ * `public, s-maxage=…` on `/`, `/share`, `/trust` and `/signals`, and none of them
+ * ever shipped: every one of those routes reads `searchParams`, which makes it
+ * dynamic, and vinext stamps `no-store, must-revalidate` on a dynamic response
+ * over whatever this config says (node_modules/vinext/dist/server/cache-control.js).
+ * The homepage one would have been a bug the day it did ship: `/` renders from the
+ * stage and runway cookies (lib/report/operatorContext.ts), so a shared edge cache
+ * would serve one reader's tailored page to the next. Measured 2026-09-23, warm
+ * responses are 80-180ms on every route; the slow tail is cold starts, which a
+ * header cannot fix. `tests/pageCacheHeaders.test.ts` keeps them out.
+ */
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -197,22 +182,6 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
-      },
-      {
-        source: "/",
-        headers: homepageCacheHeaders,
-      },
-      {
-        source: "/share",
-        headers: shareCacheHeaders,
-      },
-      {
-        source: "/trust",
-        headers: trustCacheHeaders,
-      },
-      {
-        source: "/signals",
-        headers: evidenceCacheHeaders,
       },
     ];
   },

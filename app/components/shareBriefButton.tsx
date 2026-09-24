@@ -38,7 +38,7 @@ export function ShareBriefButton({
    * `setDidCopy(true)`. On the homepage hero, that meant the brief people paste
    * into Slack reported "Brief Copied" whether or not anything was copied.
    */
-  const { status, copyToClipboard } = useClipboardCopy();
+  const { status, copyToClipboard } = useClipboardCopy({ commitment: "copied_slack" });
   const didFail = status === "error";
 
   const handleClick = useCallback(() => {

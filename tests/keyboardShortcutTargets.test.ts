@@ -135,7 +135,10 @@ describe("tablists support the keyboard", () => {
    */
   it("routes every segmented control through the shared primitive", async () => {
     const componentsDir = join(testDir, "..", "app", "components");
-    const consumers = ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx", "RunwayConditionedNotes.tsx"];
+    // RunwayConditionedNotes left this list on 2026-09-23: its runway picker was
+    // a second control for the axis RunwayPersonaSelector already sets, and it
+    // went (tests/runwayDial.test.tsx holds that it stays gone).
+    const consumers = ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx"];
 
     for (const name of consumers) {
       const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
@@ -154,10 +157,16 @@ describe("tablists support the keyboard", () => {
   it("keeps a setting out of the history stack", async () => {
     const componentsDir = join(testDir, "..", "app", "components");
 
-    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayPersonaSelector.tsx", "StageDropdownPill.tsx", "RunwayDropdownPill.tsx"]) {
+    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "StageDropdownPill.tsx", "RunwayServerSync.tsx"]) {
       const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
       assert.match(source, /router\.replace\(/, `${name} should replace rather than push`);
       assert.doesNotMatch(source, /router\.push\(/, `${name} pushes a setting onto history`);
+    }
+    // The runway controls do not navigate at all since 2026-09-23: they write
+    // the cookie, and RunwayServerSync (checked above) re-renders from it.
+    for (const name of ["RunwayPersonaSelector.tsx", "RunwayDropdownPill.tsx"]) {
+      const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
+      assert.doesNotMatch(source, /router\.(push|replace)\(|params\.set\("runway"/, `${name} writes the runway into the address again`);
     }
   });
 });

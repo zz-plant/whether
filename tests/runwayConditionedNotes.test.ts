@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
-  RUNWAY_QUICK_PICKS,
+  buildCommitmentImpact,
   buildRunwayConditionedNotes,
-  findRunwayQuickPick,
 } from "../lib/report/runwayConditionedNotes";
+import { RUNWAY_BAND_OPTIONS, runwayBandForMonths } from "../lib/report/operatorRunway";
 
 describe("runway-conditioned notes", () => {
   it("renders nothing when no runway is given", () => {
@@ -97,30 +97,54 @@ describe("runway-conditioned notes", () => {
     }
   });
 
-  it("offers one quick pick per note band, each landing inside the band it names", () => {
-    // The homepage dial is derived from the same thresholds the notes branch
-    // on, so a pick cannot name one band and produce another band's note. Four
-    // branches above, four picks, and each pick's figure resolves back to
-    // itself.
-    assert.equal(RUNWAY_QUICK_PICKS.length, 4);
-    for (const pick of RUNWAY_QUICK_PICKS) {
-      assert.equal(findRunwayQuickPick(pick.months)?.label, pick.label);
-      assert.ok(pick.months >= pick.min && (pick.max === null || pick.months < pick.max));
-      const notes = buildRunwayConditionedNotes({ regime: "DEFENSIVE", runwayMonths: pick.months });
-      assert.ok(notes.length > 0, `pick "${pick.label}" produces no note`);
+  it("bands on the same ladder as the runway selector and the server", () => {
+    // One ladder: the note a figure gets is the note for the band the selector
+    // and the rules put it in. This module used to split at 18 months where
+    // the selector splits at 24, so 20 months read two different ways.
+    for (const option of RUNWAY_BAND_OPTIONS) {
+      const notes = buildRunwayConditionedNotes({ regime: "DEFENSIVE", runwayMonths: option.months });
+      assert.ok(notes.length > 0, `band "${option.label}" produces no note`);
     }
-    // Contiguous and exhaustive: every positive runway lands in exactly one band.
-    for (let months = 1; months <= 60; months += 1) {
-      assert.equal(RUNWAY_QUICK_PICKS.filter((pick) => findRunwayQuickPick(months) === pick).length, 1);
-    }
-    assert.equal(findRunwayQuickPick(undefined), null);
-    assert.equal(findRunwayQuickPick(0), null);
+    const at = (months: number) =>
+      buildRunwayConditionedNotes({ regime: "DEFENSIVE", runwayMonths: months }).find((note) => note.area === "burn-discipline")?.note ?? "";
+    assert.match(at(20), /act on the printed guidance/);
+    assert.equal(runwayBandForMonths(20), "balanced");
+    assert.match(at(24), /runway is not what limits you/);
+    assert.equal(runwayBandForMonths(24), "abundant");
+  });
+});
+
+describe("buildCommitmentImpact", () => {
+  it("holds cash constant: runway after is runway times burn over burn plus cost", () => {
+    const impact = buildCommitmentImpact({
+      regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
+    });
+    assert.ok(impact);
+    assert.equal(impact.runwayAfter, 11.2);
+    assert.deepEqual(impact.bandChange, { from: "12–24 mo", to: "6–12 mo" });
+    assert.match(impact.summary, /from 13 to 11\.2 months/);
   });
 
-  it("names each band by the thresholds the notes use", () => {
-    assert.deepEqual(
-      RUNWAY_QUICK_PICKS.map((pick) => pick.label),
-      ["Under 6 mo", "6–12 mo", "12–18 mo", "18+ mo"],
-    );
+  it("quotes the note the guidance already carries at the runway after, for that area", () => {
+    const impact = buildCommitmentImpact({
+      regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
+    });
+    const expected = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 11.2, monthlyBurnUsd: 290_000 })
+      .find((note) => note.area === "hiring")?.note;
+    assert.equal(impact?.noteAfter, expected);
+  });
+
+  it("names no band change when the runway stays in its band", () => {
+    const impact = buildCommitmentImpact({
+      regime: "EXPANSION", area: "burn-discipline", runwayMonths: 30, monthlyBurnUsd: 100_000, newMonthlyCostUsd: 10_000,
+    });
+    assert.equal(impact?.bandChange, null);
+    assert.doesNotMatch(impact?.summary ?? "", /moves you/);
+  });
+
+  it("returns nothing rather than a guess when a figure is missing or not positive", () => {
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 0, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 1 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: Number.NaN, newMonthlyCostUsd: 1 }), null);
   });
 });

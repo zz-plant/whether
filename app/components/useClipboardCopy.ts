@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
 
 type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
 type ClipboardCopyErrorReason = "unavailable" | "write-failed";
@@ -16,6 +17,20 @@ type ClipboardUiStateOptions = {
 
 type UseClipboardCopyOptions = {
   resetDelay?: number;
+  /**
+   * The activation funnel's `committed` step, for a copy of the guidance itself.
+   * Reported once per confirmed write, never on a failed one. A function picks
+   * it per target, for a control that copies more than one format; returning
+   * null leaves that target unreported. Plain `null` is a caller saying the
+   * copy is not the guidance at all — an article anchor, a blank template, a
+   * preview-only sample — and `tests/copyCommitmentCoverage.test.ts` requires
+   * every caller to say one or the other.
+   *
+   * Only `/share` reported a copy until 2026-09-23, so every copy made on `/` —
+   * Copy Brief, the sticky strip, the share rail — was invisible to the funnel
+   * that defines activation as a copy or a subscribe.
+   */
+  commitment?: ActivationCommitment | null | ((target: string | null) => ActivationCommitment | null);
 };
 
 export type ClipboardCopyState = {
@@ -57,7 +72,7 @@ export const isClipboardTargetDisabled = (
 export const useClipboardCopy = (
   options: UseClipboardCopyOptions = {}
 ): ClipboardCopyState => {
-  const { resetDelay = 2000 } = options;
+  const { resetDelay = 2000, commitment } = options;
   const [status, setStatus] = useState<ClipboardCopyStatus>("idle");
   const [error, setError] = useState(false);
   const [errorReason, setErrorReason] = useState<ClipboardCopyErrorReason | null>(null);
@@ -101,6 +116,10 @@ export const useClipboardCopy = (
         setStatus("copied");
         statusRef.current = "copied";
         setCopiedTarget(target ?? null);
+        const committed = typeof commitment === "function" ? commitment(target ?? null) : commitment;
+        if (committed) {
+          trackActivationEvent({ step: "committed", path: window.location.pathname, commitment: committed });
+        }
         clearResetTimer();
         timeoutRef.current = window.setTimeout(() => {
           setStatus("idle");
@@ -118,7 +137,7 @@ export const useClipboardCopy = (
         setActiveTarget(null);
       }
     },
-    [clearResetTimer, resetDelay]
+    [clearResetTimer, commitment, resetDelay]
   );
 
   return {

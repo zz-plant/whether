@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../../lib/report/briefArtifact";
 import {
   activationLastWeekStorageKey,
+  classifyArrival,
   resolveReturnVisit,
   trackActivationEvent,
 } from "../../lib/activationFunnel";
@@ -33,7 +35,15 @@ export function ActivationTracker({ path }: { path: string }) {
       // Ignore storage failures; they cost a measurement, not a page.
     }
 
-    trackActivationEvent({ step: "visited", path });
+    // The bucket, not the URL: `classifyArrival` reads the referrer's hostname
+    // and keeps one word. `firstVisit` is what lets the funnel be read for the
+    // first-visit front door on its own.
+    const arrival = classifyArrival({
+      referrer: document.referrer,
+      siteHost: window.location.hostname,
+      sharedLink: new URLSearchParams(window.location.search).get(SHARE_REFERRAL_PARAM) === SHARE_REFERRAL_VALUE,
+    });
+    trackActivationEvent({ step: "visited", path, arrival, firstVisit: storedSlug === null });
 
     if (gap) {
       trackActivationEvent({ step: "returned", path, gap });

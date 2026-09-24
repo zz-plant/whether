@@ -1059,6 +1059,101 @@ outcomes actually happened (`posted` / `partial` / `skipped_unconfigured` /
   (sentiment/credit lines) deliberately stays email-only, and Slack subscriptions carry no
   per-channel delivery preferences.
 
+### 1.1.21 A first visit gets one question, not the whole brief (2026-09-23)
+
+A first-time reader met a call about the market and roughly 3,200px of evidence for it, with
+nothing connecting either to the decision they arrived with. For a browser that has never
+rendered the brief, `/` now folds sections 2 to 5 away and shows `FirstVisitDecisionPicker`
+under the call:
+
+- **"What are you deciding this week?"** Five choices (hire, roadmap, raise, spend, something new),
+  each answered with that area's row of the same table the full brief prints (the rule, its pause
+  and resume lines, and the distance to each), plus the answer page that leads with that area.
+- **"Test it against your runway"**, under the picked answer: runway, monthly burn and the monthly
+  cost of the decision give the runway after it, whether that crosses a band, and the runway note this
+  week's guidance already carries for the area at the new figure (`buildCommitmentImpact`). Runway
+  and burn are the shared browser-only operator profile; the decision's cost is not stored.
+- **"Tell me when this changes"**, an alerts-only signup (`weekly: false` on the subscriber record)
+  beside the condition that would change the call. No Monday email; one note when the guidance
+  changes or a score crosses its line. Records written before the flag read as weekly subscribers.
+- **The last four turning points**, linked into the time machine, so a sceptical reader can check
+  what the site said against what they remember.
+- **"Show the full brief"**, which unfolds the page and scrolls to what changed. A link to a folded
+  section's anchor unfolds it too.
+
+First visit is decided before paint by the layout bootstrap from `whether.activation.lastWeek`,
+which `ActivationTracker` writes on every visit, and the fold is a stylesheet rule keyed on the
+attribute it sets. With no attribute (crawlers, no scripts, a failed bootstrap) the page is the full
+brief and the picker is hidden, so indexing and returning readers are unchanged. It applies to the
+live weekly view only; an archived month or a monthly horizon is reached by choosing it. Picking a
+decision records the `oriented` activation step, and the `visited` step now carries a coarse arrival
+bucket (direct, search, social, chat, shared-link, internal, other; never the URL) and a first-visit
+flag. `/privacy` 2.6 had promised that bucket with no code behind it. The activation intake now
+refuses any field a step does not carry, which `/privacy` also promised and the validator did not
+enforce. Conversion cannot be attributed to a source, by design: no event carries an identity to
+join on. Pinned by `tests/firstVisitFrontDoor.test.tsx` and `tests/subscriberWeeklyFlag.test.ts`.
+
+### 1.1.22 Every copy counts, and a copy is claimed only when it happened (2026-09-23)
+
+The activation funnel defines commitment as a copy or a subscribe, and only `/share` reported a
+copy. Copy Brief, the sticky strip, the share rail, the slide button and every `/operate` export were
+invisible to it, so 30 days read 554 homepage visits and zero commitments, and a product problem could
+not be told from a measurement one. The shared clipboard hook now takes a `commitment` and reports it
+once the write resolves; `/share` uses the same path instead of its own effect. Callers whose copy is
+not the guidance (an article anchor, the blank template, the preview-only mockup) pass `null`, and
+`tests/copyCommitmentCoverage.test.ts` requires every caller to say one or the other.
+
+`CopyMeetingSlideButton` showed "Copied the slide" after a failed rich copy whether or not its
+plain-text fallback worked, the 1.1.10 defect in the one control that did not use the shared hook. It
+now claims and reports a copy only after a write resolves.
+
+### 1.1.23 One runway: one ladder, one write path, one control (2026-09-23)
+
+Runway was two systems that disagreed. The band selector and the header pill banded at 6/12/24 months
+and wrote both the browser profile and the cookie the server scales the rules with; the runway notes
+banded at 6/12/18 with a four-button picker of their own in the same section, and wrote only the
+profile, as did every exact-figure field (`/operate`, the runway test). So one screen offered two runway
+controls with different bands, and a reader who typed 5 months kept rules scaled for whatever band the
+cookie last held.
+
+- **One ladder.** `RUNWAY_BAND_OPTIONS` in `lib/report/operatorRunway.ts`. The notes branch on
+  `runwayBandForMonths`; their own thresholds and quick picks are gone.
+- **One write path.** `writeOperatorRunwayMonths` stores the figure and derives the cookie's band from
+  it, and `useOperatorProfile().setProfileField("runwayMonths", …)` routes through it, so every field
+  that edits runway updates what the server reads. Picking a band keeps an entered figure that already
+  sits inside it (`runwayMonthsForBandPick`) instead of rewriting 13 months to 18.
+- **One control per screen.** The selector (the header pill on a phone); the notes panel says what
+  choosing does and links to the exact figures.
+
+**The band lives in the cookie, not the address.** The selectors used to also write `?runway=`, which
+outranks the cookie on the server, so an exact figure typed afterwards was ignored on reload, and a
+pasted URL carried the reader's runway band to its recipient and overrode theirs. The controls now
+write only the cookie. `RunwayServerSync` (mounted with the global header) re-renders the page when a
+band is *picked*, and drops a stale `?runway=`. A band implied by a *typed* figure only updates the
+cookie and strips the parameter with `history.replaceState`: a refresh remounts the page's client
+components, which closed the first-visit answer card mid-typing. The first-visit picker refreshes on
+"Show the full brief" if the band moved while the rules were folded. Links that carry `?runway=` on
+purpose (the embed, exports) still work.
+
+`runwayPlanner`'s "safe runway band" is a different thing (the range a team like yours should hold,
+not where you are) and is untouched.
+
+### 1.1.24 The confidence record stopped bundling the archive (2026-09-23)
+
+`lib/report/confidenceCalibration.ts` imported the 5MB `data/summary_archive.json` to read five fields
+from 176 monthly rows. The bundler inlined it as a 4.3MB chunk on `/trust`, `/history` and
+`/calibration`, compiled and validated on every fresh Worker instance; those were the three slowest
+pages in the 30-day real-user timings. It reads `data/confidence_record_months.json` (13KB) now,
+written with the archive by `scripts/summaryArchive.ts` and by `bun run archive:index`, and
+`tests/confidenceCalibration.test.ts` fails if the extract and the archive disagree. The chunk is 17KB;
+cold module evaluation measured 33ms against 1.6ms on a workstation. This undid a regression of the
+rule `generatePostureArchiveIndex.ts` already stated: the full archive stays out of route bundles.
+
+Found in the same production tail: `/comps` logged "a stalled HTTP response was canceled to prevent
+deadlock" on every request where the quote source declined, because `lib/saasMultiples.ts` returned
+early without reading the refused responses' bodies while fetching the basket in parallel. They are
+released now.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

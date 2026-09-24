@@ -30,15 +30,28 @@ const buildEmailActionUrl = (path: string, request?: Request) => {
   return new URL(path, baseUrl).toString();
 };
 
+/** What the confirmation promises, stated from the stored record rather than the request. */
+export const describeSubscription = ({ alerts, weekly }: { alerts: boolean; weekly: boolean }) => {
+  if (weekly && alerts) return "the Whether weekly brief, plus an email when conditions change between Mondays";
+  if (weekly) return "the Whether weekly brief";
+  if (alerts) return "an email from Whether when conditions change, and no weekly brief";
+  // Both off is an existing subscriber who turned alerts off and had already left the
+  // weekly brief; confirming still reactivates the record, so say what it holds.
+  return "your Whether subscription";
+};
+
 export const subscribeAndSendVerification = async ({
   email,
   alerts,
+  weekly,
   request,
   adapter = createCloudflareEmailAdapter(),
 }: {
   email: string;
   /** Opt-in to regime-change alert mail. Omitted leaves an existing choice alone. */
   alerts?: boolean;
+  /** The Monday brief. Omitted leaves an existing choice alone; a new record gets it. */
+  weekly?: boolean;
   request?: Request;
   adapter?: EmailDeliveryAdapter;
 }) => {
@@ -52,7 +65,8 @@ export const subscribeAndSendVerification = async ({
   }
 
   const store = getSubscriberStore();
-  const subscriber = await store.subscribe(email, { alerts });
+  const subscriber = await store.subscribe(email, { alerts, weekly });
+  const promise = describeSubscription(subscriber);
   const verifyUrl = buildEmailActionUrl(
     `/api/email/verify?token=${encodeURIComponent(subscriber.token)}`,
     request,
@@ -64,12 +78,12 @@ export const subscribeAndSendVerification = async ({
     html: [
       "<!DOCTYPE html><html><body style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#1e293b;'>",
       "<h1 style='font-size:1.1rem;font-weight:600;'>Confirm your subscription</h1>",
-      `<p style='font-size:0.95rem;'>Click the button to confirm you want the Whether weekly brief${subscriber.alerts ? ", plus an email when conditions change between Mondays" : ""}.</p>`,
+      `<p style='font-size:0.95rem;'>Click the button to confirm you want ${promise}.</p>`,
       `<a href='${verifyUrl}' style='display:inline-block;padding:10px 20px;border-radius:6px;background:#0f172a;color:#fff;text-decoration:none;font-weight:600;'>Confirm subscription</a>`,
       "<p style='font-size:0.8rem;color:#64748b;margin-top:20px;'>If you didn't request this, ignore this email.</p>",
       "</body></html>",
     ].join(""),
-    text: `Confirm your Whether subscription${subscriber.alerts ? " (weekly brief plus an email when conditions change)" : ""}: ${verifyUrl}`,
+    text: `Confirm your Whether subscription (${promise}): ${verifyUrl}`,
   });
 
   if (!result.ok) throw new Error(result.error);

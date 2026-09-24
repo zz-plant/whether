@@ -38,7 +38,7 @@ export function ScenarioStudioSimulator({
     () => parseScenarioParam(searchParams?.get("slope"), SCENARIO_SLOPE_RANGE) ?? liveCurveSlope,
   );
 
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
 
   /* The URL is written where the value changes, not mirrored back through an
      effect. `replaceState` rather than the router: a range input fires on

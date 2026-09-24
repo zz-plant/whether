@@ -99,3 +99,18 @@ export const buildOperatorRunwayCookie = (band: RunwayBand | null): string => {
   const maxAge = band ? OPERATOR_RUNWAY_COOKIE_MAX_AGE_SECONDS : 0;
   return `${OPERATOR_RUNWAY_COOKIE}=${band ?? ""}; path=/; max-age=${maxAge}; SameSite=Lax`;
 };
+
+/**
+ * The runway figure to store when a band is picked. A figure the operator
+ * entered that already sits inside the picked band is kept — picking "12–24 mo"
+ * over an exact 13 must not rewrite it to 18 — and otherwise the band's
+ * representative figure stands in. No band clears the figure.
+ */
+export const runwayMonthsForBandPick = (
+  currentMonths: number | undefined,
+  band: RunwayBand | null,
+): number | undefined => {
+  if (!band) return undefined;
+  if (runwayBandForMonths(currentMonths) === band) return currentMonths;
+  return monthsForRunwayBand(band);
+};
