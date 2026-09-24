@@ -10,6 +10,7 @@ import {
   operationsWorkstreamLinks,
   type OperationsWorkstreamLink,
 } from "../../../lib/navigation/planningNavigation";
+import { WORKSTREAM_NAV_CLASS } from "./workstreamNavLayout";
 
 /*
  * The switcher is the route nav for the three planning pages. A second
@@ -28,9 +29,15 @@ export const CompactWorkstreamSwitcher = ({ currentPath }: { currentPath: Route 
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
 
+  /* A tab row: the three planning pages are one route's views, and the active
+     one is marked by an underline rather than a filled pill. It was three
+     bordered pills under a monospace "Workstream:" label — monospace is for
+     figures that must align (ui-ux-standards §XVIII), and the label named the
+     control instead of the choice. No rule of its own under the row: the
+     shell's section divider sits directly below it, and a second line 33px
+     above that one drew the same edge twice. */
   return (
-    <nav aria-label="Planning views" className="flex flex-wrap items-center gap-2 pb-2">
-      <span className="text-xs font-mono font-medium text-slate-400 mr-1">Workstream:</span>
+    <nav aria-label="Planning views" className={WORKSTREAM_NAV_CLASS}>
       {operationsWorkstreamLinks.map((link) => {
         const isActive = link.href === currentPath;
         const href = currentSearch ? `${link.href}?${currentSearch}` : link.href;
@@ -39,13 +46,13 @@ export const CompactWorkstreamSwitcher = ({ currentPath }: { currentPath: Route 
             key={link.href}
             href={toRoute(href)}
             aria-current={isActive ? "page" : undefined}
-            className={`inline-flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-md)] border transition-colors ${
+            className={`inline-flex min-h-11 items-center gap-1.5 border-b-2 text-sm font-medium no-underline transition-colors ${
               isActive
-                ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                : "border-slate-800/80 bg-slate-900/60 text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                ? "border-[var(--regime-accent)] text-slate-100"
+                : "border-transparent text-slate-400 hover:border-slate-600 hover:text-slate-200"
             }`}
           >
-            <span className={isActive ? "text-sky-300" : "text-slate-400"} aria-hidden="true">
+            <span className={isActive ? "text-slate-200" : "text-slate-500"} aria-hidden="true">
               {workstreamIconByLabel[link.label]}
             </span>
             <span>{link.label}</span>

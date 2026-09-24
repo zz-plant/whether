@@ -124,7 +124,7 @@ export const ExecutiveBriefingPanel = ({
       <div className="weather-surface p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+            <p className="text-xs font-semibold text-slate-300">
               Summary
             </p>
             <p className="mt-2 text-xl font-semibold text-slate-50">
@@ -165,7 +165,7 @@ export const ExecutiveBriefingPanel = ({
 
       <div className="weather-surface p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+          <p className="text-xs font-semibold text-slate-400">
             Pause-if checklist
           </p>
           <ClipboardActionRow
@@ -178,7 +178,7 @@ export const ExecutiveBriefingPanel = ({
       </div>
 
       <details className="weather-surface weather-auto-chevron p-4">
-        <summary className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+        <summary className="text-xs font-semibold text-slate-300">
           Full memo
         </summary>
         <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">

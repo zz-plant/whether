@@ -995,6 +995,93 @@ alert, the weekly email's four links, and `app/brief.md`'s footer. All resolve t
 now. `lib/fred.ts` and `lib/github/repoClient.ts` keep the literal on purpose: a `user-agent` names
 who to contact, not where this deployment lives.
 
+## What a shared link previews as (2026-09-23)
+
+An audit of every sitemap page's `og:image` found the share cards were the one surface no check
+read. 113 pages, the privacy policy and all 82 archive periods among them, previewed the *live
+weekly card*, because a page that passed no image settings got the bare `/api/og`, so a link to 2014
+showed this week's reading. `/pricing` previewed nothing, and `/share` and `/api-docs` previewed as
+the homepage (its title and URL): all three set `openGraph` by hand or not at all, and Next replaces
+that object rather than merging it. The cards themselves carried "boldness" (retired), "Canonical
+ingestion" (banned), a `≤` the font subset lacks, a second row drawn below the canvas, and a compare
+headline whose sign ran backwards.
+
+What holds it now: `buildPageMetadata` gives a page with no settings a card of its own title and
+description, and the live card is something a page asks for (`template: "report"`: `/` and
+`/share`). `/api/og`'s logic lives in `app/api/og/renderOgElement.tsx`, outside the route, so tests
+can read any card; `tests/shareCardCoverage.test.tsx` walks the sitemap to every page's card, and
+`tests/readerVocabulary.test.tsx` holds every distinct card to the bans. **Give a new page its
+metadata through `buildPageMetadata`**, and name a template if the plain card is not the right one.
+
+**Drawn for the size it is seen at (2026-09-23).** A feed shows a card at about 500px wide, so
+everything prints at ~40%. The weekly card had twelve boxes and chips with most labels at 13–17px,
+about 6px in a feed; it is five blocks now with nothing under 20px. The static templates spent a third
+of the card on a side panel that said the same thing on every page of a template ("THE RECORD / A
+closed period" on all 83 archive cards); a page can now pass its own `panelLabel` / `panelTitle` /
+`panelBody` (all three or none) and a `mix` bar. Archive periods carry their reading count, mix and
+how often conditions changed; signal hubs this week's figure; scenario pages this week's action for that decision —
+the live ones only from a read that is current, because platforms cache a card for days.
+`tests/shareCardContent.test.tsx` holds the type floor, the panels and the gates.
+
+## What a crawler receives (2026-09-23)
+
+A crawl of every sitemap URL against a local server, reading what each response actually carries
+rather than what the metadata code intends, found gaps none of the SEO suites could see:
+
+- **Metadata streamed into `<body>` for Googlebot and every AI crawler.** A page whose
+  `generateMetadata` awaits the report read (every answer page, every published week) sends its
+  title, description, canonical and OG tags after the content — 43KB in on an answer page — unless
+  the user agent is on the framework's "HTML-limited" list, which names the social unfurlers and
+  Bing and omits Googlebot and every crawler `app/robots.ts` names. Google ignores a canonical
+  outside `<head>` in the HTML it fetches, and the retrieval crawlers do not run JavaScript.
+  `htmlLimitedBots` in `next.config.js` now adds them; `tests/htmlLimitedBots.test.ts` fails if
+  robots.ts names an agent it does not cover. Check with `curl -A Googlebot` — a browser fetch
+  shows the streamed version, which is correct for a browser.
+- **Fifteen sitemap URLs had no inbound link.** The signal hubs' own comment called the scenario
+  pages their children and never linked them. `tests/crawlPaths.test.tsx` holds it.
+- **Breadcrumbs as data.** Eleven routes drew a trail and two described one, one of them a
+  different trail. `<Breadcrumbs>` now emits the BreadcrumbList from the items it draws.
+- **`lastmod` was one constant**, 2026-02-01, on fifteen pages, twelve of which did not exist then,
+  and on five that change weekly. Undated static pages now omit it; weekly pages carry the read's
+  date, `/history` its newest entry, resources their own `updatedAt`. A resource's `updatedAt` in
+  `content/resources/*.json` has to move with its copy — it is the sitemap date and `dateModified`.
+- **Five lookalike Organization nodes** (a name, sometimes a URL, no `@id`) are the site entity by
+  id now, and the RSS feed moved out of `sitemap.xml` into a second `Sitemap:` line in robots.txt.
+
+## A warning that is always on (2026-09-23)
+
+Every page showed **"Sources: Partly cached"** in warning amber on every visit, production
+included, and `/signals`, `/operate` and the answer pages told the reader to "hold anything you
+can't undo until every source is current". `buildDegradedSourceRows` counted every source that was
+not live, and "Startup/private markets" is a curated snapshot by design (`supportsLive: false`,
+45-day window) that is never live — so the condition could never clear. `/trust` read the same
+data and said "No warning is active… Fine to act on this week" under a header saying the opposite.
+A row now carries `expectsLive`: a live-by-design source is degraded when it is not live, and a
+snapshot-by-design one only when it is past its own window. It was the first thing a new visitor
+was told about the data, and a warning that never turns off is one readers learn to skip on the
+week it is true. `tests/sourceHealth.test.ts` holds all three cases.
+
+## One runway setting (2026-09-23)
+
+`/` had two "cash runway" settings: the header pill and section selector (a cookie the server
+calibrates the guidance to, bands <6 / 6–12 / 12–24 / 24+) and a picker in the runway-notes panel
+(the browser profile, bands under 6 / 6–12 / 12–18 / 18+). Neither updated the other, and they were
+half-linked in the worst way: choosing a band wrote its representative figure into the profile, so
+"12–24 mo — Follow the guidance" became "18 months" in the planner and the stress test, and 18
+crossed the notes' long-runway line: "runway is not what limits you this week".
+
+Now: the band (cookie) is the setting, and the notes branch on the band table's own boundaries.
+Choosing a band writes no figure, and clears an entered one it excludes. An exact figure entered
+on `/operate` moves the band (`syncRunwayBandToMonths` in `useOperatorProfile`). A band reads as
+its range in the notes ("With 12–24 months of runway"), never as a number the reader did not give,
+and burn arithmetic runs only on a real figure. The server-rendered default band produces no note:
+it is shown as a default ("It shows 12–24 mo until you choose"), not as an answer.
+
+The band lives in the cookie and never in the address: the selectors stopped writing `?runway=`
+(which outranked the cookie and travelled in pasted URLs), and `RunwayServerSync` re-renders the page
+when a band is picked. A typed figure moves the cookie without a refresh, because vinext's refresh
+remounts the page's client components.
+
 ## An artifact that names itself
 
 `public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —

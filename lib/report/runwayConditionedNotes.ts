@@ -15,11 +15,26 @@
  */
 import type { DecisionArea } from "./boundedDecisionRules";
 import type { RegimeKey } from "../regimeEngine";
-import { runwayBandForMonths, runwayBandLabel } from "./operatorRunway";
+import {
+  RUNWAY_BAND_OPTIONS,
+  monthsForRunwayBand,
+  runwayBandForMonths,
+  runwayBandLabel,
+  runwayBandPhrase,
+  type RunwayBand,
+} from "./operatorRunway";
 
 type RunwayConditionedNoteInput = {
   regime: RegimeKey;
   runwayMonths?: number;
+  /**
+   * How the runway reads in a sentence. An exact figure is "14 months"; a band
+   * is its range ("12–24 months"), because a reader who picked a band did not
+   * say 18 and the note must not say it for them. Defaults to the figure.
+   */
+  runwayPhrase?: string;
+  /** False when `runwayMonths` stands for a band. The burn arithmetic needs a real figure. */
+  runwayIsExact?: boolean;
   monthlyBurnUsd?: number;
 };
 
@@ -29,13 +44,39 @@ type RunwayConditionedNote = {
 };
 
 /*
- * The bands are the operator runway bands (`RUNWAY_BAND_OPTIONS`: under 6, 6–12,
- * 12–24, 24+ months) — the same ladder the band selector offers and the server
- * scales the rules with. This module used to carry a second ladder, split at 18
- * months instead of 24, with its own four-button picker beside the selector on
- * the same screen: a reader at 20 months was "12–24 mo, follow the guidance" in
- * one control and "18+ mo, runway is not what limits you" in the next.
+ * The branch boundaries are the runway bands' own, so the band a reader picks
+ * and the note it produces cannot disagree. They were 6 / 12 / 18 here and
+ * 6 / 12 / 24 in the header, so "12–24 mo — Follow the guidance" wrote 18
+ * months into the profile, and 18 landed on the long-runway note: "runway is
+ * not what limits you this week".
  */
+const bandCeiling = (band: RunwayBand) => RUNWAY_BAND_OPTIONS.find((option) => option.key === band)?.maxMonths ?? 0;
+/** Below this, runway — not the corridor — is the binding constraint this week. */
+const CRITICAL_RUNWAY_MONTHS = bandCeiling("critical");
+const TIGHT_RUNWAY_MONTHS = bandCeiling("tight");
+const LONG_RUNWAY_MONTHS = bandCeiling("balanced");
+
+/**
+ * What the notes read from: the exact figure when one was entered, else the
+ * chosen band, else nothing. The band default the server calibrates to is not a
+ * choice, so it produces no note — a missing runway never reads as a runway.
+ */
+export const resolveRunwayForNotes = ({
+  exactMonths,
+  band,
+}: {
+  exactMonths?: number;
+  band: RunwayBand | null;
+}): { runwayMonths: number; runwayPhrase: string; runwayIsExact: boolean } | null => {
+  if (typeof exactMonths === "number" && Number.isFinite(exactMonths) && exactMonths > 0) {
+    return { runwayMonths: exactMonths, runwayPhrase: `${exactMonths} months`, runwayIsExact: true };
+  }
+  if (band) {
+    return { runwayMonths: monthsForRunwayBand(band), runwayPhrase: runwayBandPhrase(band), runwayIsExact: false };
+  }
+  return null;
+};
+
 const compactUsd = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 0 });
 
 /**
@@ -49,61 +90,64 @@ const monthsBoughtByTenPercentCut = (runwayMonths: number) =>
 export const buildRunwayConditionedNotes = ({
   regime,
   runwayMonths,
+  runwayPhrase,
+  runwayIsExact = true,
   monthlyBurnUsd,
 }: RunwayConditionedNoteInput): RunwayConditionedNote[] => {
-  const band = runwayBandForMonths(runwayMonths);
-  if (!band || typeof runwayMonths !== "number") {
+  if (typeof runwayMonths !== "number" || !Number.isFinite(runwayMonths) || runwayMonths <= 0) {
     return [];
   }
 
   const isExpansion = regime === "EXPANSION";
   const isTightening = regime === "SCARCITY" || regime === "DEFENSIVE";
+  const runway = runwayPhrase ?? `${runwayMonths} months`;
+  const burn = runwayIsExact ? monthlyBurnUsd : undefined;
 
-  if (band === "critical") {
+  if (runwayMonths < CRITICAL_RUNWAY_MONTHS) {
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
-        note: monthlyBurnUsd
-          ? `At ${runwayMonths} months of runway and $${compactUsd.format(monthlyBurnUsd)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months. Burn is the lever that moves runway fastest this week.`
-          : `At ${runwayMonths} months of runway, cash is what limits you this week, and burn is the lever that moves it fastest.`,
+        note: burn
+          ? `With ${runway} of runway and $${compactUsd.format(burn)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months. Burn is the lever that moves runway fastest this week.`
+          : `With ${runway} of runway, cash is what limits you this week, and burn is the lever that moves it fastest.`,
       },
       {
         area: "capital-raising",
-        note: `At ${runwayMonths} months, a raise process started this quarter is what lands cash before runway ends — waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
+        note: `With ${runway} of runway, a raise process started this quarter is what lands cash before runway ends — waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
       },
       {
         area: "hiring",
-        note: `At ${runwayMonths} months, the hiring pause is what protects the runway every other rule assumes. Reversing it is what spends that runway.`,
+        note: `With ${runway} of runway, the hiring pause is what protects the runway every other rule assumes. Reversing it is what spends that runway.`,
       },
     ];
     return notes;
   }
 
-  if (band === "tight") {
+  if (runwayMonths < TIGHT_RUNWAY_MONTHS) {
     const notes: RunwayConditionedNote[] = [
       {
         area: "capital-raising",
-        note: `At ${runwayMonths} months, raise planning has the least slack: if you plan to raise, the process has to finish inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
+        note: `With ${runway} of runway, raise planning has the least slack: if you plan to raise, the process has to finish inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
       },
       {
         area: "hiring",
-        note: `At ${runwayMonths} months, each net-new role commits fixed cost against months you cannot extend — its payback proof carries that weight.`,
+        note: `With ${runway} of runway, each net-new role commits fixed cost against months you cannot extend — its payback proof carries that weight.`,
       },
     ];
-    if (monthlyBurnUsd) {
+    if (burn) {
       notes.push({
         area: "burn-discipline",
-        note: `At $${compactUsd.format(monthlyBurnUsd)}/month, a 10% cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months of cushion.`,
+        note: `At $${compactUsd.format(burn)}/month, a 10% cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months of cushion.`,
       });
     }
     return notes;
   }
 
-  if (band === "balanced") {
+  if (runwayMonths < LONG_RUNWAY_MONTHS) {
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
-        note: `At ${runwayMonths} months of runway you can act on the printed guidance — no emergency cuts while funding pressure stays this side of the pause line.`,
+        note: `With ${runway} of runway you can act on the printed guidance — no emergency cuts while funding pressure stays this side of the pause line.`,
       },
     ];
     if (isExpansion) {
@@ -118,7 +162,7 @@ export const buildRunwayConditionedNotes = ({
   const notes: RunwayConditionedNote[] = [
     {
       area: "burn-discipline",
-      note: `At ${runwayMonths} months, runway is not what limits you this week. The pause and resume lines are.`,
+      note: `With ${runway} of runway, runway is not what limits you this week. The pause and resume lines are.`,
     },
   ];
   if (isTightening) {

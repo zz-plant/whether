@@ -37,7 +37,7 @@ export function LiveDataFallbackAlert({
           label="Retry live data"
           refreshingLabel="Retrying…"
           title="Reload the page to retry a live data check for this brief."
-          className="weather-pill inline-flex min-h-[44px] items-center justify-center border-amber-300/50 bg-amber-500/15 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-amber-50 hover:border-amber-200/80 hover:text-white disabled:cursor-not-allowed disabled:border-amber-700/40 disabled:text-amber-200/70"
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center border-amber-300/50 bg-amber-500/15 px-3 py-2 text-xs font-semibold text-amber-50 hover:border-amber-200/80 hover:text-white disabled:cursor-not-allowed disabled:border-amber-700/40 disabled:text-amber-200/70"
         />
       </div>
     </section>

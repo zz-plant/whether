@@ -43,7 +43,7 @@ const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
           {row.isPostureSnapshot ? "Guidance recorded" : "Decision recorded"} against the {row.recordedOn} reading
         </p>
       </div>
-      <span className={`shrink-0 rounded-sm border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${VERDICT_STYLES[row.verdict]}`}>
+      <span className={`shrink-0 rounded-sm border px-3 py-1 text-xs font-semibold ${VERDICT_STYLES[row.verdict]}`}>
         {row.verdict}
       </span>
     </div>
@@ -65,13 +65,13 @@ const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
         {row.guardrail ? (
           <div>
-            <dt className="text-xs uppercase tracking-wide text-slate-500">{publicDecisionLabels.threshold}</dt>
+            <dt className="type-eyebrow">{publicDecisionLabels.threshold}</dt>
             <dd className="mt-0.5 text-slate-300">{row.guardrail}</dd>
           </div>
         ) : null}
         {row.reversalTrigger ? (
           <div>
-            <dt className="text-xs uppercase tracking-wide text-slate-500">{publicDecisionLabels.reversal}</dt>
+            <dt className="type-eyebrow">{publicDecisionLabels.reversal}</dt>
             <dd className="mt-0.5 text-slate-300">{row.reversalTrigger}</dd>
           </div>
         ) : null}

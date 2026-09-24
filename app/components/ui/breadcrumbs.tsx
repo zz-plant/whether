@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
+import { buildCanonicalUrl } from "../../../lib/seo";
+import { JsonLdScript } from "../jsonLdScript";
 
 type BreadcrumbEntry = {
   label: string;
@@ -15,8 +17,29 @@ export function Breadcrumbs({
 }) {
   if (!items || items.length === 0) return null;
 
+  /* The trail as structured data, from the same items the reader sees. Eleven
+     routes drew a breadcrumb and only two described one, and one of those two
+     described a different trail (Home › Week, over a visible Home › History ›
+     Week). The current page, last and unlinked, carries no `item`, which
+     schema.org allows for the final crumb. A trail with an unlinked crumb
+     before the last has no URL to give it, so it emits nothing. */
+  const describable = items.every((item, index) => index === items.length - 1 || item.href);
+  const structuredData = describable && items.length > 1
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: items.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.label,
+          ...(item.href ? { item: buildCanonicalUrl(item.href) } : {}),
+        })),
+      }
+    : null;
+
   return (
     <nav aria-label="Breadcrumb" className={className}>
+      {structuredData ? <JsonLdScript data={structuredData} /> : null}
       <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

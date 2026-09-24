@@ -7,6 +7,8 @@ import {
   buildCanonTimeline,
   canonEssays,
   describeCanonBaseRate,
+  essaysPublishedIn,
+  formatCanonAuthors,
   readingForMonth,
   type CanonEssay,
 } from "../lib/productCanon";
@@ -32,7 +34,8 @@ const series = [
 const essay = (slug: string, year: number, monthNumber: number): CanonEssay => ({
   slug,
   title: slug,
-  author: "A. Author",
+  authors: ["A. Author"],
+  format: "essay",
   published: { year, month: monthNumber },
   sourceUrl: `https://example.test/${slug}`,
   argument: "An argument.",
@@ -119,7 +122,12 @@ describe("product canon: the list itself", () => {
      claim with no author is not a piece of writing anyone can go and read. */
   it("credits every entry to someone who wrote it", () => {
     for (const entry of canonEssays) {
-      assert.doesNotMatch(entry.author, /synthesis|various|and peers|anonymous/i, entry.slug);
+      assert.ok(entry.authors.length > 0, entry.slug);
+      for (const author of entry.authors) {
+        assert.doesNotMatch(author, /synthesis|various|and peers|anonymous/i, entry.slug);
+        /* One person per entry: a joined name is one Person in the markup. */
+        assert.doesNotMatch(author, /,| and /, `${entry.slug}: "${author}" is more than one person`);
+      }
     }
   });
 
@@ -149,5 +157,64 @@ describe("product canon: the list itself", () => {
     assert.ok(linked.length > 0, "readings link into the archive");
     for (const year of linked) assert.ok(years.has(year), `/history/${year} is a real archive page`);
     if (latestPublishedBrief) assert.ok(html.includes(`href="/brief/${latestPublishedBrief.slug}"`));
+  });
+});
+
+describe("product canon: search and the archive", () => {
+  it("joins authors the way a byline reads", () => {
+    assert.equal(formatCanonAuthors({ authors: ["A"] }), "A");
+    assert.equal(formatCanonAuthors({ authors: ["A", "B"] }), "A and B");
+    assert.equal(formatCanonAuthors({ authors: ["A", "B", "C"] }), "A, B and C");
+  });
+
+  it("finds the essays published in an archive year or quarter", () => {
+    const list = [essay("jan", 2016, 1), essay("apr", 2016, 4), essay("sep", 2016, 9), essay("other", 2017, 4)];
+    assert.deepEqual(essaysPublishedIn({ year: 2016 }, list).map((entry) => entry.slug), ["jan", "apr", "sep"]);
+    assert.deepEqual(essaysPublishedIn({ year: 2016, quarter: 2 }, list).map((entry) => entry.slug), ["apr"]);
+    assert.deepEqual(essaysPublishedIn({ year: 2016, quarter: 4 }, list), []);
+  });
+
+  /* A search result shows about sixty characters of title; the layout appends " | Whether". */
+  it("keeps the title inside a result line and gives the share card its own image", async () => {
+    const { metadata } = await import("../app/concepts/page");
+    assert.equal(typeof metadata.title, "string");
+    const title = `${typeof metadata.title === "string" ? metadata.title : ""} | Whether`;
+    assert.ok(title.length <= 60, `${title.length} characters: ${title}`);
+    assert.ok((metadata.description ?? "").length <= 160);
+    const images = metadata.openGraph?.images;
+    const first = Array.isArray(images) ? images[0] : images;
+    const url = typeof first === "object" && first !== null && "url" in first ? String(first.url) : String(first);
+    assert.match(url, /template=reading/, "not the live weekly-guidance card");
+  });
+
+  it("marks books as books and each co-author as a person", async () => {
+    const { buildProductCanonStructuredData } = await import("../lib/seo/pageStructuredData");
+    /* Read it the way a crawler does: as JSON, not as the builder's types. */
+    const graph = JSON.parse(JSON.stringify(buildProductCanonStructuredData({ essays: canonEssays })));
+    const page = graph["@graph"].find((node: { "@type": string }) => node["@type"] === "CollectionPage");
+    const items: Array<{ "@type": string; name: string; author: unknown[] }> =
+      page?.mainEntity.itemListElement.map((element: { item: unknown }) => element.item) ?? [];
+    assert.equal(items.length, canonEssays.length);
+    assert.equal(items.find((item) => item.name === "The Mom Test")?.["@type"], "Book");
+    assert.equal(items.find((item) => item.name === "The Alternative to Roadmaps")?.["@type"], "Article");
+    assert.equal(items.find((item) => item.name === "Empowered")?.author.length, 2);
+  });
+});
+
+describe("product canon: the archive's side of the link", () => {
+  it("lists the essays a year page covers, each linking to its entry on the reading list", async () => {
+    const page = await import("../app/history/[period]/page");
+    const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ period: "2016" }) }));
+    for (const entry of essaysPublishedIn({ year: 2016 })) {
+      assert.ok(html.includes(`href="/concepts#${entry.slug}"`), `2016 links to ${entry.slug}`);
+    }
+    assert.ok(essaysPublishedIn({ year: 2016 }).length > 0, "the fixture year has essays");
+  });
+
+  it("leaves the section out of a year with none", async () => {
+    const page = await import("../app/history/[period]/page");
+    const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ period: "2010" }) }));
+    assert.equal(essaysPublishedIn({ year: 2010 }).length, 0);
+    assert.doesNotMatch(html, /Product writing published in/);
   });
 });

@@ -131,7 +131,7 @@ export const ReturningVisitorDeltaStrip = ({
         </div>
         <a
           href={openPanelHref}
-          className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+          className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         >
           {openPanelLabel}
         </a>
@@ -141,7 +141,7 @@ export const ReturningVisitorDeltaStrip = ({
           <li key={item.label}>
             <a
               href={item.href}
-              className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-sm border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${item.tone.className}`}
+              className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-sm border px-3 py-2 text-xs font-semibold ${item.tone.className}`}
             >
               <TrendGlyph direction={trendDirectionFromDelta(item.delta)} className="h-3.5 w-3.5 shrink-0" />
               <span aria-hidden="true">

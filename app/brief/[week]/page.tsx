@@ -7,10 +7,8 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { Tag } from "../../components/ui/tag";
 import { BoundedValue } from "../../components/ui/boundedValue";
-import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import {
-  buildBreadcrumbList,
   buildCanonicalUrl,
   buildOgImageUrl,
   buildPageMetadata,
@@ -71,10 +69,26 @@ export function generateStaticParams() {
 const briefTitle = (brief: PublishedBrief) =>
   `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
 
-const briefDescription = (brief: PublishedBrief) => `${brief.summary} What changed: ${brief.whatChanged}`;
+/* The call, then what moved if it fits a snippet. Both published weeks ran
+   190–204 characters, so the part a search result cut was the one that said
+   what changed. */
+const BRIEF_DESCRIPTION_LIMIT = 160;
+const briefDescription = (brief: PublishedBrief) => {
+  const full = `${brief.summary} What changed: ${brief.whatChanged}`;
+  return full.length <= BRIEF_DESCRIPTION_LIMIT ? full : brief.summary;
+};
 
-const briefImageUrl = (brief: PublishedBrief) =>
-  buildOgImageUrl({ template: "brief-chart", week: brief.slug, posture: brief.postureLabel, regime: brief.regime });
+/* The card reads like the page: the conditions in the weather words (the stored
+   label on early records is "Guarded Expansion — Late") and the week as a date,
+   not the archive's "2026-w38" slug. */
+const briefImageParams = (brief: PublishedBrief) => ({
+  template: "brief-chart",
+  week: brief.recordDateLabel,
+  posture: publishedBriefDisplay(brief).conditions,
+  regime: brief.regime,
+});
+
+const briefImageUrl = (brief: PublishedBrief) => buildOgImageUrl(briefImageParams(brief));
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { week } = await params;
@@ -87,7 +101,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: briefDescription(brief),
     path: buildPublishedBriefPath(brief.slug),
     imageAlt: `Whether's guidance for the week of ${brief.recordDateLabel}`,
-    imageParams: { template: "brief-chart", week: brief.slug, posture: brief.postureLabel, regime: brief.regime },
+    imageParams: briefImageParams(brief),
   });
 
   metadata.authors = [{ name: publisherAuthor.name, url: buildCanonicalUrl("/about") }];
@@ -153,12 +167,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         mainEntityOfPage: canonicalUrl,
         isAccessibleForFree: true,
       },
-      buildBreadcrumbList(
-        createBreadcrumbTrail([
-          { path: "/" },
-          { path: buildPublishedBriefPath(brief.slug), label: `Week of ${brief.recordDateLabel}` },
-        ]),
-      ),
+      // The trail is described by <Breadcrumbs> below, from the trail it draws.
     ],
   };
 

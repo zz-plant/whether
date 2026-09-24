@@ -1,9 +1,11 @@
 [
   {
     "slug": "capital-discipline-venture-backed-companies",
+    "publishedAt": "2026-03-03",
+    "updatedAt": "2026-09-23",
     "keyword": "capital discipline venture backed companies",
-    "title": "Capital Discipline for Venture-Backed Companies: A Board Operating System",
-    "description": "Venture-backed companies keep capital discipline with a governance rhythm, escalation thresholds, and reversible commitments. This guide is the board operating system for it.",
+    "title": "Capital Discipline for Venture-Backed Companies",
+    "description": "Keep capital discipline in a venture-backed company with a governance rhythm, escalation thresholds and reversible commitments: a board operating system.",
     "h1": "Capital Discipline for Venture-Backed Companies",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": true,
@@ -206,8 +208,10 @@
   },
   {
     "slug": "board-level-capital-posture-framework",
+    "publishedAt": "2026-03-03",
+    "updatedAt": "2026-09-23",
     "keyword": "board level capital posture framework",
-    "title": "Board Level Capital Posture Framework for Venture Governance",
+    "title": "Board-Level Capital Posture Framework",
     "description": "A board level capital posture framework aligns risk, spend, and sequencing through confirmation logic, thresholds, and reversible governance artifacts.",
     "h1": "Board Level Capital Posture Framework",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
@@ -426,8 +430,10 @@
   },
   {
     "slug": "reversibility-as-governance",
+    "publishedAt": "2026-03-03",
+    "updatedAt": "2026-09-23",
     "keyword": "reversibility as governance",
-    "title": "Reversibility as Governance for Board-Grade Decision Control",
+    "title": "Reversibility as Governance for Board Decisions",
     "description": "Reversibility as governance gives boards a practical method for decision rights, escalation thresholds, and rollback discipline under uncertain capital regimes.",
     "h1": "Reversibility as Governance",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",

@@ -11,7 +11,7 @@ export function CopyOperatorBriefButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={() => void copyToClipboard(text, "operator-brief")}
-      className="weather-pill inline-flex min-h-[46px] items-center justify-center gap-2 rounded px-4 py-3 text-sm font-semibold tracking-[0.08em] text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400"
+      className="weather-pill inline-flex min-h-[46px] items-center justify-center gap-2 rounded px-4 py-3 text-sm font-semibold text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400"
     >
       {isCopied ? (
         <CopyCheck className="h-4 w-4 text-emerald-300" aria-hidden="true" />

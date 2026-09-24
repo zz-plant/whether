@@ -44,10 +44,9 @@ const ogFontFaces = [
 ];
 
 const baseProps: CompareOgImageProps = {
-  headline: "Cloudy to Sunny · boldness +12 across two periods",
+  headline: "Mar 2024 (Cloudy) against Feb 2024 (Sunny)",
   epochA: {
     label: "Mar 2024",
-    recordDate: "Mar 3, 2024",
     regime: "DEFENSIVE",
     postureLabel: "Selective footing",
     tightness: 61,
@@ -56,7 +55,6 @@ const baseProps: CompareOgImageProps = {
   },
   epochB: {
     label: "Mar 2026",
-    recordDate: "Mar 6, 2026",
     regime: "EXPANSION",
     postureLabel: "Guarded Expansion",
     tightness: 49,
@@ -74,7 +72,7 @@ describe("epoch compare OG template", () => {
   it("uses only glyphs the OG font subset can draw", () => {
     const imageText = collectText(renderCompareOgImage(baseProps));
     assert.doesNotMatch(imageText, /[\u2264\u2265\u2192]/);
-    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a <= b >= c -> d");
+    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a at or below b at or above c -> d");
   });
 
   it("produces a non-empty PNG", async () => {
@@ -92,9 +90,28 @@ describe("epoch compare OG template", () => {
 });
 
 describe("loadComparePreview", () => {
-  it("defaults to a fixed comparison when no periods are selected", async () => {
+  it("labels the default comparison as this week against its fixed baseline", async () => {
     const preview = await loadComparePreview();
     assert.equal(preview.eyebrow, "Compare periods");
-    assert.match(preview.headline, /across two periods/);
+    /* Period A is the live week when no pair is given; it used to borrow B's month. */
+    assert.equal(preview.epochA.label, "This week");
+    assert.match(preview.headline, /^This week \(\w+\) against Mar 2020 \(\w+\)$/);
+  });
+
+  /* Dec 2008 is not on record, so the loader served the live week — and the card
+     printed this week's scores under "Dec 2008". */
+  it("does not put a month's name on a reading the archive does not hold", async () => {
+    const preview = await loadComparePreview({ yearA: "2008", monthA: "12", yearB: "2026", monthB: "8" });
+    assert.equal(preview.epochA.label, "This week");
+  });
+
+  it("names the months it compares and never the retired score name", async () => {
+    const preview = await loadComparePreview({ yearA: "2020", monthA: "3", yearB: "2026", monthB: "8" });
+    assert.equal(preview.epochA.label, "Mar 2020");
+    assert.equal(preview.epochB.label, "Aug 2026");
+    assert.match(preview.headline, /^Mar 2020 \(\w+\) against Aug 2026 \(\w+\)$/);
+    const text = collectText(renderCompareOgImage(preview));
+    assert.doesNotMatch(text, /boldness/i);
+    assert.doesNotMatch(text, /(\w+) — \1/, "no \"Freezing — Freezing\"");
   });
 });

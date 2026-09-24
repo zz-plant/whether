@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import sitemap from "../app/sitemap";
+import { findResourcePillarBySlug } from "../lib/resourcesContent";
 import { snapshotData } from "../lib/snapshot";
 import { siteUrl } from "../lib/siteUrl";
 import { resourceArticles } from "../lib/resourceArticles";
@@ -72,18 +73,37 @@ describe("sitemap", () => {
     assert.ok(root?.lastModified instanceof Date);
     assert.equal(root?.lastModified?.toISOString(), new Date(snapshotData.record_date).toISOString());
 
+    // A page nothing dates makes no lastmod claim, rather than one constant
+    // that predated most of the pages it was stamped on.
     const method = entries.find((entry) => entry.url === `${siteUrl}/trust`);
-    assert.ok(method?.lastModified instanceof Date);
-    assert.equal(method?.lastModified?.toISOString(), new Date("2026-02-01T00:00:00.000Z").toISOString());
+    assert.ok(method);
+    assert.equal(method?.lastModified, undefined);
 
+    // A resource carries the date its own copy last changed.
     const firstAuthorityResource = entries.find(
       (entry) => entry.url === `${siteUrl}/resources/capital-discipline-venture-backed-companies`,
     );
-    assert.ok(firstAuthorityResource?.lastModified instanceof Date);
-    assert.equal(
-      firstAuthorityResource?.lastModified?.toISOString(),
-      new Date("2026-02-01T00:00:00.000Z").toISOString(),
-    );
+    const resourceDate = firstAuthorityResource?.lastModified;
+    assert.ok(resourceDate instanceof Date);
+    assert.equal(resourceDate.toISOString(), new Date(findResourcePillarBySlug("capital-discipline-venture-backed-companies")?.updatedAt ?? "").toISOString());
+  });
+
+  it("dates the weekly pages to the read, never to a fixed day", async () => {
+    const entries = await sitemap({ programmaticEligible: true });
+    const byUrl = new Map(entries.map((entry) => [entry.url, entry]));
+    const reportDate = byUrl.get(siteUrl)?.lastModified;
+    assert.ok(reportDate instanceof Date);
+    const operate = byUrl.get(`${siteUrl}/operate`)?.lastModified;
+    assert.ok(operate instanceof Date);
+    assert.equal(operate.toISOString(), reportDate.toISOString());
+    const history = byUrl.get(`${siteUrl}/history`)?.lastModified;
+    assert.ok(history instanceof Date, "/history is dated by its newest entry");
+    assert.ok(history.getTime() > new Date("2026-02-01").getTime());
+    for (const entry of entries) {
+      if (entry.changeFrequency === "weekly") {
+        assert.ok(entry.lastModified instanceof Date, `${entry.url} claims weekly changes with no date`);
+      }
+    }
   });
 
   it("keeps curated authority pages below the primary hubs", async () => {

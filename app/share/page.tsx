@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
 import { ShareCopyControls } from "./shareCopyControls";
@@ -33,12 +34,18 @@ export const revalidate = 300;
 
 // No "| Whether" in the title: the root layout's title template already appends
 // it, so carrying the brand here rendered "… | Whether | Whether".
-export const metadata: Metadata = {
+/* Through the shared builder: with no `openGraph` of its own the page inherited
+   the root layout's, so a shared /share link previewed as the homepage — its
+   title, its description and its URL. The live card is the right one here: the
+   page exists to hand this week's brief to someone else. */
+export const metadata: Metadata = buildPageMetadata({
   title: "Share the Current Weekly Brief",
   description:
     "Copy this week's Whether guidance for Slack, a slide, or a citation; add a meeting pack or calendar hold; or embed a live brief in a newsletter or wiki.",
-  alternates: { canonical: "/share" },
-};
+  path: "/share",
+  imageAlt: "This week's Whether guidance",
+  imageParams: { template: "report" },
+});
 
 const buildCurrentShareArtifact = async () => {
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/share" });

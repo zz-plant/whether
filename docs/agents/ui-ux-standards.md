@@ -349,3 +349,32 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
 - Put multi-series legends outside the plot where they can wrap. Labels tied to nearby
   endpoint values overlap as the series converge. Preserve domain and freshness captions.
 - Check mobile and desktop in both themes; use the canonical regime colors in diagrams.
+
+## XVIII. Type register (capitals, faces, and one encoding per fact)
+
+Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
+
+- **Capitals are for stamps.** A stamp is a short, fixed status mark that is not read as a sentence:
+  `.type-badge`, the regime tag in the hero, the sticky strip's call, timeline badges, the
+  historical banner, a `<kbd>`. Every other label — section eyebrows, field names, table headers,
+  `<dt>`s — is sentence case through `.type-eyebrow`. A page where every label shouts has no way
+  left to mark the one that should.
+- **Tracking goes with the capitals.** `0.08em`–`0.2em` is spacing for caps; on lowercase it reads
+  as a typo. A sentence-case label carries at most `0.02em`.
+- **Nothing clickable is capitalised or tracked.** A link or button reads as the sentence it
+  completes. `tests/typeRegister.test.tsx` holds this for `<a>` and `<Link>`.
+- **Hand-rolled labels use the class.** `text-xs uppercase tracking-wide text-slate-500` beside a
+  `<dt>` is `.type-eyebrow` spelled out at a different size; spelling it out is how a case change
+  made once in the stylesheet misses nine call sites.
+- **Monospace is for figures that must align** — columns of numbers, a code sample. A control
+  label ("Workstream:") in the mono face is decoration borrowing the register of data.
+- **Colour marks state, not labels.** The regime ink marks a section (§XVI); caution, easing and
+  the accent mark lines and states. Three labels in three hues say "these three are different
+  kinds of thing" when they are three rows of one list.
+- **Draw each encoding once.** A fact already carried by position and a key does not also need a
+  box, a hue and a case. When a block has a border *and* a coloured heading *and* capitals, pick
+  one.
+- **Labels on a chart are laid out for the width they are drawn at.** The server cannot measure
+  a track, so compute the layout for each width the component is actually drawn at and let a
+  container query choose (`ScoreLadder`); computing for the narrowest width and applying it
+  everywhere stacks labels that had room to spare.

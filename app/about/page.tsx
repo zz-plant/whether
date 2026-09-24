@@ -6,10 +6,12 @@ import {
   buildBreadcrumbList,
   buildCanonicalUrl,
   buildPageMetadata,
+  organizationId,
   organizationName,
 } from "../../lib/seo";
 import {
   buildAuthorSchema,
+  buildPublisherSchema,
   publisherAuthor,
   publisherContactPath,
   publisherProfilePath,
@@ -33,12 +35,14 @@ export default function AboutPage() {
         "@type": "AboutPage",
         url: buildCanonicalUrl(publisherProfilePath),
         name: "About Whether",
-        publisher: { "@type": "Organization", name: organizationName, url: buildCanonicalUrl("/") },
+        // The site entity by its id, not a lookalike with a name and a URL: an
+        // unlinked Organization node reads to a parser as a second publisher.
+        publisher: buildPublisherSchema(organizationName),
       },
       {
         ...buildAuthorSchema(),
         description: publisherAuthor.bio,
-        worksFor: { "@type": "Organization", name: organizationName, url: buildCanonicalUrl("/") },
+        worksFor: { "@id": organizationId },
       },
       buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherProfilePath, label: "About" }])),
     ],

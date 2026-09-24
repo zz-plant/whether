@@ -28,7 +28,8 @@ type SitemapEntryDescriptor = {
   path: `/${string}` | "";
   changeFrequency: ChangeFrequency;
   priority: number;
-  lastModified: Date;
+  /** Null when nothing tracks when the page's content last changed; see below. */
+  lastModified: Date | null;
 };
 
 const fallbackLastModified = new Date("2026-02-01T00:00:00.000Z");
@@ -46,7 +47,18 @@ const resolveLastModified = (...candidates: string[]): Date => {
   return fallbackLastModified;
 };
 
-const staticContentLastModified = new Date("2026-02-01T00:00:00.000Z");
+/*
+ * No `lastmod` for a page nothing dates. This was one constant, 2026-02-01,
+ * submitted for fifteen pages — twelve of which did not exist yet on that date
+ * (/privacy was written 2026-09-17, /pricing 2026-08-28) — and for five that
+ * change every week (/history, /operate, /history/compare and the answer pages)
+ * beside `changefreq: weekly`. Google reads `lastmod` only from a sitemap whose
+ * dates it finds consistently accurate, so a wrong date on a static page costs
+ * the weekly pages the signal they actually need. An omitted `lastmod` makes no
+ * claim; a page that has a real date — the live read, a published week, an
+ * archive period, a resource's `updatedAt` — carries it.
+ */
+const staticContentLastModified = null;
 
 const buildEntry = ({
   path,
@@ -55,7 +67,7 @@ const buildEntry = ({
   lastModified,
 }: SitemapEntryDescriptor): MetadataRoute.Sitemap[number] => ({
   url: `${siteUrl}${path}`,
-  lastModified,
+  ...(lastModified ? { lastModified } : {}),
   changeFrequency,
   priority,
 });
@@ -154,6 +166,13 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       };
   const { programmaticEligible, reportLastModified } = readiness;
 
+  /* /history lists every published week and every archive period, so it
+     changes when either gains an entry. */
+  const historyLastModified = [
+    ...getPublishedBriefs().map((brief) => parseLastModified(brief.publishedAt)),
+    ...getPostureArchivePeriods().map((period) => parseLastModified(period.asOf)),
+  ].reduce<Date | null>((latest, date) => (date && (!latest || date > latest) ? date : latest), null);
+
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
@@ -166,7 +185,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     /* Derived from the bundled archive at module load, so the monthly refresh
        moves it — it takes the report's date, not the static one. */
     { path: "/calibration", lastModified: reportLastModified, changeFrequency: "monthly", priority: 0.6 },
-    { path: "/operate", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
+    { path: "/operate", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.84 },
     // The two workstreams are indexable pages with their own metadata; they
     // were submitted nowhere because the page file kept its route map private.
     ...workstreamSlugs.map((slug): SitemapEntryDescriptor => ({
@@ -181,21 +200,20 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
-    { path: "/history", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.7 },
+    { path: "/history", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.7 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
-    { path: "/history/compare", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.4 },
+    { path: "/history/compare", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.4 },
     { path: "/pricing", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
     { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },
     { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },
-    { path: "/feed.xml", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 },
   ];
 
   const resourcePillarEntries: SitemapEntryDescriptor[] = resourcePillarPages
     .filter((page) => isIndexableResourcePillarSlug(page.slug))
     .map((page) => ({
     path: `/resources/${page.slug}`,
-    lastModified: staticContentLastModified,
+    lastModified: resolveLastModified(page.updatedAt),
     changeFrequency: "monthly",
     priority: 0.6,
   }));
@@ -204,7 +222,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     .filter((article) => isIndexableResourceArticleSlug(article.slug))
     .map((article) => ({
     path: `/resources/${article.slug}`,
-    lastModified: staticContentLastModified,
+    lastModified: resolveLastModified(article.updatedAt),
     changeFrequency: "monthly",
     priority: 0.58,
     }));
@@ -228,7 +246,8 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     .filter((page) => isIndexableAnswerSlug(page.slug))
     .map((page) => ({
       path: `/answers/${page.slug}`,
-      lastModified: staticContentLastModified,
+      // Each answer states this week's call, so it moves with the read.
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
       priority: 0.58,
     }));

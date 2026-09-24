@@ -9,6 +9,9 @@ import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { SignalReadingPanel } from "../components/signalReadingPanel";
 import { buildSignalClusterReading, isSignalClusterSlug } from "../../../lib/report/signalClusterReading";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import Link from "next/link";
+import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../seoRouteClusters";
+import { toRoute } from "../../../lib/navigation/routeType";
 
 type Params = { cluster: string };
 
@@ -25,11 +28,32 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!clusterDefinition) return {};
 
+  const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const stale = isStaleForIndexing({
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
+  });
+  /* This week's reading on the card, where every signals card carried the same
+     "EVIDENCE / What moved" box. Only while the reading is live: a stale figure
+     on a card that platforms cache for days is the one place it would outlive
+     the page's own warning. */
+  const reading = !stale && isSignalClusterSlug(cluster) ? buildSignalClusterReading(cluster, reportData) : null;
+  const readingPanel: Record<string, string> = reading?.displayValue
+    ? {
+        panelLabel: "This week",
+        // The card's title already names the measure; the panel leads with the figure.
+        panelTitle: `${reading.displayValue}${reading.unit ? ` ${reading.unit}` : ""}`,
+        panelBody: reading.distanceLabel,
+      }
+    : {};
+
   const metadata = buildPageMetadata({
     title: `${clusterDefinition.title} | Evidence`,
     description: clusterDefinition.summary,
     path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,
+    imageParams: { template: "signals", eyebrow: "Evidence", ...readingPanel },
   });
 
   /*
@@ -55,12 +79,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
    * few hours past its refresh is still indexed and one older than the window
    * is not, whichever store it came from.
    */
-  const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const stale = isStaleForIndexing({
-    fetchedAtIso: reportData.treasury.fetched_at,
-    isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
-  });
   if (stale) {
     metadata.robots = { index: false, follow: true };
   }
@@ -106,6 +124,29 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
         reversal={reportData.flipThreshold}
         evidence={clusterDefinition.evidence}
       />
+      {/* The five decision pages under this signal. They were in the sitemap
+          and linked from nowhere on the site, so the only path to them was the
+          sitemap itself — and this page, whose metadata comment calls them its
+          children, never named them. */}
+      {signalScenarioRoutes.some((route) => route.signalSlug === cluster) ? (
+        <nav aria-labelledby="signal-decisions-heading" className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+          <h2 id="signal-decisions-heading" className="text-lg font-semibold text-slate-100">
+            What this signal means for each decision
+          </h2>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {decisionScenarioDefinitions.map((scenario) => (
+              <li key={scenario.slug}>
+                <Link
+                  href={toRoute(`/signals/${cluster}/${scenario.slug}`)}
+                  className="text-sm font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
+                >
+                  {clusterDefinition.title}: {scenario.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
     </ContentPageShell>
   );
 }

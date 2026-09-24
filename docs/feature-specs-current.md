@@ -1107,36 +1107,21 @@ not the guidance (an article anchor, the blank template, the preview-only mockup
 plain-text fallback worked, the 1.1.10 defect in the one control that did not use the shared hook. It
 now claims and reports a copy only after a write resolves.
 
-### 1.1.23 One runway: one ladder, one write path, one control (2026-09-23)
+### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
-Runway was two systems that disagreed. The band selector and the header pill banded at 6/12/24 months
-and wrote both the browser profile and the cookie the server scales the rules with; the runway notes
-banded at 6/12/18 with a four-button picker of their own in the same section, and wrote only the
-profile, as did every exact-figure field (`/operate`, the runway test). So one screen offered two runway
-controls with different bands, and a reader who typed 5 months kept rules scaled for whatever band the
-cookie last held.
+The runway unification itself landed on `main` separately (7f264a26, recorded in CLAUDE.md, "One
+runway setting"): the band is the setting, the notes branch on its boundaries, and an exact figure
+moves the band. This branch adds one thing on top.
 
-- **One ladder.** `RUNWAY_BAND_OPTIONS` in `lib/report/operatorRunway.ts`. The notes branch on
-  `runwayBandForMonths`; their own thresholds and quick picks are gone.
-- **One write path.** `writeOperatorRunwayMonths` stores the figure and derives the cookie's band from
-  it, and `useOperatorProfile().setProfileField("runwayMonths", …)` routes through it, so every field
-  that edits runway updates what the server reads. Picking a band keeps an entered figure that already
-  sits inside it (`runwayMonthsForBandPick`) instead of rewriting 13 months to 18.
-- **One control per screen.** The selector (the header pill on a phone); the notes panel says what
-  choosing does and links to the exact figures.
-
-**The band lives in the cookie, not the address.** The selectors used to also write `?runway=`, which
-outranks the cookie on the server, so an exact figure typed afterwards was ignored on reload, and a
-pasted URL carried the reader's runway band to its recipient and overrode theirs. The controls now
-write only the cookie. `RunwayServerSync` (mounted with the global header) re-renders the page when a
-band is *picked*, and drops a stale `?runway=`. A band implied by a *typed* figure only updates the
-cookie and strips the parameter with `history.replaceState`: a refresh remounts the page's client
-components, which closed the first-visit answer card mid-typing. The first-visit picker refreshes on
-"Show the full brief" if the band moved while the rules were folded. Links that carry `?runway=` on
-purpose (the embed, exports) still work.
-
-`runwayPlanner`'s "safe runway band" is a different thing (the range a team like yours should hold,
-not where you are) and is untouched.
+The band selectors also wrote `?runway=` into the address, which outranks the cookie on the server.
+So an exact figure typed afterwards was ignored on reload, and a pasted URL carried the reader's
+runway band to its recipient and overrode theirs. The controls now write only the cookie.
+`RunwayServerSync` (mounted with the global header) re-renders the page when a band is *picked*, and
+drops a stale `?runway=`. A band implied by a *typed* figure only updates the cookie and strips the
+parameter with `history.replaceState`: a refresh remounts the page's client components, which closed
+the first-visit answer card mid-typing. The first-visit picker refreshes on "Show the full brief" if the
+band moved while the rules were folded. Links that carry `?runway=` on purpose (the embed, exports)
+still work.
 
 ### 1.1.24 The confidence record stopped bundling the archive (2026-09-23)
 

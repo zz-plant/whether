@@ -2,60 +2,86 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
-import { buildRunwayConditionedNotes } from "../../lib/report/runwayConditionedNotes";
+import { DEFAULT_RUNWAY_BAND, runwayBandLabel } from "../../lib/report/operatorRunway";
+import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
+import { persistOperatorRunway, useOperatorRunway } from "./useOperatorRunway";
 
+/*
+ * One runway setting, read here rather than chosen here.
+ *
+ * This panel carried its own four-band picker ("Under 6 · 6–12 · 12–18 ·
+ * 18+ mo") directly under the header's and the section's ("<6 · 6–12 · 12–24 ·
+ * 24+ mo"): two controls for the same fact, with different bands, stored in two
+ * places, neither updating the other. A reader who picked 12–18 here left the
+ * guidance above calibrated to whatever the header said. The band control above
+ * (the section selector at sm+, the header pill on a phone) is now the only
+ * one, and an exact figure entered on /operate moves it.
+ */
 const useRunwayNotes = (regime: RegimeKey) => {
-  const { profile, setProfileField } = useOperatorProfile();
-  const notes = useMemo(
-    () =>
-      buildRunwayConditionedNotes({
-        regime,
-        runwayMonths: profile.runwayMonths,
-        monthlyBurnUsd: profile.monthlyBurnUsd,
-      }),
-    [regime, profile.runwayMonths, profile.monthlyBurnUsd],
+  const { profile } = useOperatorProfile();
+  const { runwayBand } = useOperatorRunway();
+  const runway = useMemo(
+    () => resolveRunwayForNotes({ exactMonths: profile.runwayMonths, band: runwayBand }),
+    [profile.runwayMonths, runwayBand],
   );
-  return { profile, notes, setRunway: (months: number | undefined) => setProfileField("runwayMonths", months) };
+  const notes = useMemo(
+    () => (runway ? buildRunwayConditionedNotes({ regime, ...runway, monthlyBurnUsd: profile.monthlyBurnUsd }) : []),
+    [regime, runway, profile.monthlyBurnUsd],
+  );
+  return { runway, notes };
 };
 
+/** Back to no runway given: the band cookie, the `?runway` param and an entered figure all go. */
+function ClearRunwayButton() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { setProfileField } = useOperatorProfile();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        persistOperatorRunway(null);
+        setProfileField("runwayMonths", undefined);
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.delete("runway");
+        const query = params.toString();
+        router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+      }}
+      className="inline-flex min-h-[44px] sm:min-h-9 items-center rounded-sm px-2 text-fluid-micro text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+    >
+      Clear
+    </button>
+  );
+}
+
 /**
- * The weekly call, conditioned on the operator's own runway: the control.
+ * The weekly call, conditioned on the operator's own runway.
  *
  * The canonical call is server-rendered and company-agnostic; this reads the
- * browser-local operator profile after mount. A missing number never reads as
- * zero, and the brief stays canonical for every other reader of the same URL.
- *
- * Until a runway is stored it offers the four bands instead of nothing. The
- * figure used to be settable only on `/operate`, so the one line on `/` that
- * translates the call to a company was invisible to anyone who had not been
- * there — which is every reader arriving from a shared link. A band is enough
- * to pick the note; the exact figure and burn still live on `/operate`.
- *
- * The notes themselves no longer print here as a list of their own: each one
- * sits under the rule for the area it concerns, in the table this control
- * heads (`RunwayAreaNote`), so a reader finds the runway caveat on the row it
- * qualifies rather than in a second list of the same five areas.
+ * chosen band (or an exact figure) after mount. A missing runway never reads as
+ * one, and the brief stays canonical for every other reader of the same URL.
+ * The notes themselves sit under the rule for the area they concern
+ * (`RunwayAreaNote`); this is the heading and the invitation.
  */
 export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
-  const { profile, notes, setRunway } = useRunwayNotes(regime);
+  const { runway } = useRunwayNotes(regime);
 
-  /* No picker of its own. It used to carry a second four-button runway control,
-     banded at 18 months where the selector heading this section bands at 24,
-     so one screen offered two runway controls that disagreed. The selector (the
-     header pill on a phone) is the one control; this says what choosing does. */
-  if (notes.length === 0) {
+  if (!runway) {
     return (
       <div id="runway-notes" className="space-y-1.5">
         <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
+        {/* The control is above, not here. It shows the default until a
+            reader chooses, so this says so rather than letting the default
+            read as an answer the reader gave. */}
         <p className="text-fluid-nano text-slate-400">
-          Choose your cash runway and each rule below gains a line for the areas it changes: which one
-          protects runway fastest, and roughly how many months a 10% burn cut buys.
-        </p>
-        <p className="text-fluid-nano text-slate-500">
-          Nothing leaves this browser, and the guidance does not change; only the notes under it do.
+          Choose your cash runway above and each rule below gains a line on what it changes at that runway:
+          which area protects runway fastest, and what a burn cut buys. It shows{" "}
+          {runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you choose.
         </p>
       </div>
     );
@@ -63,25 +89,15 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
 
   return (
     <div id="runway-notes" className="space-y-1.5">
-      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="type-eyebrow text-slate-300">
-          What this guidance means at {profile.runwayMonths} months of runway
-        </p>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setRunway(undefined)}
-            className="inline-flex min-h-[44px] sm:min-h-9 items-center rounded-sm px-2 text-fluid-micro text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-          >
-            Clear
-          </button>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="type-eyebrow text-slate-300">What this guidance means at {runway.runwayPhrase} of runway</p>
+        <ClearRunwayButton />
       </div>
       <p className="text-fluid-nano text-slate-500">
         Your figures stay in this browser. These notes translate the guidance; the thresholds above are
         unchanged.{" "}
         <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-          Enter the exact runway and burn
+          {runway.runwayIsExact ? "Change the exact runway and burn" : "Enter the exact runway and burn"}
         </Link>
         .
       </p>

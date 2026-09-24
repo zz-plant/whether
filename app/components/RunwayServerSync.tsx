@@ -14,11 +14,10 @@ const isRunwayChangedDetail = (value: unknown): value is RunwayChangedDetail =>
  * Re-renders the server's part of the page when the runway band moves.
  *
  * The server scales the rules it renders to the band in the runway cookie.
- * Every runway write goes through `writeOperatorRunwayMonths`, which announces
- * whether the band changed; this is the one listener, so a band picked in the
- * selector, the header pill, or implied by an exact figure typed anywhere all
- * reach the cookie the same way. A picked band re-renders at once; a band implied
- * by a typed figure waits (see `RunwayChangedDetail`).
+ * Both runway writers (`persistOperatorRunway` for a picked band,
+ * `syncRunwayBandToMonths` for a typed figure) announce whether the band
+ * changed; this is the one listener. A picked band re-renders at once; a band
+ * implied by a typed figure waits (see `RunwayChangedDetail`).
  *
  * A `?runway=` in the address outranks the cookie on the server (links from
  * the embed and the exports carry one on purpose), so when the reader changes

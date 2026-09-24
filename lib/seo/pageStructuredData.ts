@@ -466,7 +466,8 @@ export const buildProductCanonStructuredData = ({
 }: {
   essays: ReadonlyArray<{
     title: string;
-    author: string;
+    authors: readonly string[];
+    format: "essay" | "book";
     sourceUrl: string;
     published: { year: number; month: number };
   }>;
@@ -489,10 +490,10 @@ export const buildProductCanonStructuredData = ({
           "@type": "ListItem",
           position: index + 1,
           item: {
-            "@type": "CreativeWork",
+            "@type": essay.format === "book" ? "Book" : "Article",
             name: essay.title,
             url: essay.sourceUrl,
-            author: { "@type": "Person", name: essay.author },
+            author: essay.authors.map((name) => ({ "@type": "Person", name })),
             datePublished: `${essay.published.year}-${String(essay.published.month).padStart(2, "0")}`,
           },
         })),

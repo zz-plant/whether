@@ -4,7 +4,7 @@ import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import type { Route } from "../../lib/navigation/routeType";
-import { buildBreadcrumbList, websiteName } from "../../lib/seo";
+import { buildBreadcrumbList, organizationId, websiteName } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
 import {
@@ -96,10 +96,7 @@ export async function buildPlanningPageModel(
           name: websiteName,
           url: siteUrl,
         },
-        publisher: {
-          "@type": "Organization",
-          name: "Whether",
-        },
+        publisher: { "@id": organizationId },
       },
       buildBreadcrumbList(
         createBreadcrumbTrail([
@@ -259,25 +256,22 @@ export async function buildPlanningPageModel(
                 viewBoxWidth: 420,
               }),
               h("section", { className: "space-y-4" },
-                h("div", { className: "space-y-2" },
-                  h("p", { className: "text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200" }, "This week's guidance"),
-                  h("p", { className: "text-sm text-slate-300" }, "Read this first."),
-                ),
-                h("div", { className: "grid gap-3 md:grid-cols-3" },
-                  h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-sky-200" }, DECISION_CONTRACT_LABELS.action.actionNow),
-                    h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.actionNow),
-                  ),
-                  h("article", { className: "rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-amber-200" }, DECISION_CONTRACT_LABELS.threshold.pauseIf),
-                    h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, weeklyCall.pauseIf),
-                  ),
-                  h("article", { className: "space-y-3 rounded-md border border-slate-800/60 bg-slate-950/45 px-3 py-3" },
-                    ...weeklyCallChangeLines(weeklyCall).map(({ label, value }) =>
-                      h("div", { key: label },
-                        h("p", { className: "text-fluid-xs font-semibold uppercase tracking-[0.12em] text-violet-200" }, label),
-                        h("p", { className: "mt-2 text-sm font-semibold text-slate-100" }, value),
-                      ),
+                /* The call, as a plain list. It was three bordered cards under
+                   "This week's guidance · Read this first.", each headed in its
+                   own colour in tracked capitals — three encodings (box, hue,
+                   case) for three labels, on a page whose job is the plan below
+                   them. Colour marks state here, not labels (ui-ux-standards
+                   §XVIII); these are the one statement of the call on /operate,
+                   so they stay, in the register the rest of the step reads in. */
+                h("dl", { className: "grid gap-x-6 gap-y-3 sm:grid-cols-[max-content_1fr]" },
+                  ...[
+                    { label: DECISION_CONTRACT_LABELS.action.actionNow, value: weeklyCall.actionNow },
+                    { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: weeklyCall.pauseIf },
+                    ...weeklyCallChangeLines(weeklyCall),
+                  ].map(({ label, value }) =>
+                    h("div", { key: label, className: "contents" },
+                      h("dt", { className: "type-eyebrow sm:pt-0.5" }, label),
+                      h("dd", { className: "text-sm text-slate-100" }, value),
                     ),
                   ),
                 ),
@@ -366,7 +360,7 @@ export async function buildPlanningPageModel(
                 h("p", { className: "text-xs text-slate-300" }, showAllActionLanes ? "Full rule list." : "Top 3 rules per area."),
                 h("a", {
                   href: buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes),
-                  className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100",
+                  className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100",
                 }, showAllActionLanes ? "Show top 3 only" : "Show all rules"),
               ),
               /* The per-area rows are the weekly plan step's AreaTable now — the
@@ -442,15 +436,15 @@ export async function buildPlanningPageModel(
             )),
           ),
         h("div", { className: "flex flex-wrap gap-2" },
-          h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]" }, "Recheck the rules"),
+          h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck the rules"),
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
         ),
       ),
       h("details", { className: "weather-panel weather-auto-chevron space-y-3 px-5 py-5" },
-        h("summary", { className: "cursor-pointer list-none text-sm font-semibold uppercase tracking-[0.12em] text-sky-200" }, "Templates"),
+        h("summary", { className: "cursor-pointer list-none text-sm font-semibold text-sky-200" }, "Templates"),
         h("div", { className: "mt-4 space-y-4 rounded-lg border border-slate-800/80 bg-slate-950/40 px-4 py-4" },
           h("div", { className: "space-y-1" },
-            h("p", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-slate-400" }, "Resources"),
+            h("p", { className: "type-eyebrow" }, "Resources"),
             h("h2", { className: "text-lg font-semibold text-slate-100" }, "Templates"),
             h("p", { className: "text-sm text-slate-300" }, "Templates you can fill in and share."),
           ),
@@ -472,7 +466,7 @@ export async function buildPlanningPageModel(
             }, resource.title)),
             h(Link, {
               href: canonicalCapitalDisciplinePath as Route,
-              className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]",
+              className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold",
             }, "Read the full guide"),
           ),
         ),

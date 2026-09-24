@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   buildCanonicalUrl,
+  buildPageImageUrl,
   buildPageMetadata,
   organizationName,
 } from "../../../lib/seo";
@@ -192,15 +193,11 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
     url: canonicalUrl,
     mainEntityOfPage: canonicalUrl,
     isPartOf: buildCanonicalUrl(page.canonicalPath),
+    datePublished: page.publishedAt,
+    dateModified: page.updatedAt,
+    image: [buildPageImageUrl(page.title, page.description, { template: "guides", title: page.h1 })],
   };
 
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: organizationName,
-    url: buildCanonicalUrl("/"),
-    sameAs: [buildCanonicalUrl("/")],
-  };
 
   const midpointIndex = Math.floor(page.sections.length / 2);
 
@@ -212,7 +209,6 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         intent={page.intent}
       />
       <JsonLdScript data={articleSchema} />
-      <JsonLdScript data={organizationSchema} />
 
       <Breadcrumbs
         items={[

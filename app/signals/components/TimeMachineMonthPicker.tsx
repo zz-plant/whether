@@ -30,7 +30,7 @@ const yearStepperButtonClass =
   "weather-button inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center px-0 py-0 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-400";
 
 const monthOptionBaseClass =
-  "inline-flex min-h-[44px] items-center justify-center rounded-md border px-2 py-2 text-fluid-xs font-semibold tracking-[0.12em] transition-colors";
+  "inline-flex min-h-[44px] items-center justify-center rounded-md border px-2 py-2 text-fluid-xs font-semibold transition-colors";
 
 export const TimeMachineMonthPicker = ({
   calendarMonths,
@@ -50,7 +50,7 @@ export const TimeMachineMonthPicker = ({
   selectedLabel,
   year,
 }: TimeMachineMonthPickerProps) => (
-  <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+  <Field.Root className="space-y-2 text-xs font-semibold text-slate-300">
     <Field.Label>Month</Field.Label>
     <Popover.Root>
       <Popover.Trigger

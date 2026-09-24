@@ -4,7 +4,7 @@ import {
   buildOperatorRunwayCookie,
   readOperatorRunwayCookie,
   runwayBandForMonths,
-  runwayMonthsForBandPick,
+  runwayMonthsFitBand,
   type RunwayBand,
 } from "../../lib/report/operatorRunway";
 import {
@@ -18,12 +18,17 @@ export const RUNWAY_CHANGED_EVENT = "whether-operator-runway-changed";
 
 /**
  * Carried by the change event: whether the band the server reads moved, and
- * whether a band was picked or implied by a figure being typed. Only a pick
- * re-renders the page straight away: a refresh remounts the page's client
- * components, which closes whatever the reader has open and would eat a
- * half-typed figure.
+ * whether it was picked or implied by a figure being typed. Only a pick
+ * re-renders the page straight away (`RunwayServerSync`): a refresh remounts
+ * the page's client components, which closes whatever the reader has open and
+ * would eat a half-typed figure.
  */
 export type RunwayChangedDetail = { bandChanged: boolean; source: "pick" | "figure" };
+
+const announceRunwayChange = (previousBand: RunwayBand | null, nextBand: RunwayBand | null, source: RunwayChangedDetail["source"]) => {
+  const detail: RunwayChangedDetail = { bandChanged: previousBand !== nextBand, source };
+  window.dispatchEvent(new CustomEvent(RUNWAY_CHANGED_EVENT, { detail }));
+};
 
 const readInitialRunwayBand = (): RunwayBand | null => {
   const fromCookie = readOperatorRunwayCookie(document.cookie);
@@ -63,46 +68,44 @@ export const useOperatorRunway = () => {
 };
 
 /**
- * The one write path for the operator's runway.
+ * Choose a band. The band is the setting; it writes no figure.
  *
- * Runway is stored twice, for two readers: the exact figure in the browser
- * profile (the notes, the runway test, `/operate`) and its band in a cookie
- * (the server, which scales the rules it renders). They used to be written by
- * different controls: the band selectors wrote both, while the notes' own
- * picker and every exact-figure field wrote only the profile — so a reader who
- * typed 5 months kept rules scaled for whatever band the cookie last held.
- * Every runway write goes through here now, and the band is always derived from
- * the figure, so the two cannot disagree.
+ * It used to write the band's representative month count into the profile as
+ * if the reader had typed it, so "12–24 mo" became "18 months" in the runway
+ * planner, the stress test and the homepage notes. Now a figure the reader
+ * entered stays unless the new band excludes it — then it goes, because the two
+ * would disagree about the same company and the band is the newer answer.
  */
-export const writeOperatorRunwayMonths = (months: number | undefined, source: RunwayChangedDetail["source"] = "figure") => {
+export const persistOperatorRunway = (band: RunwayBand | null) => {
   const previousBand = readOperatorRunwayCookie(document.cookie);
-  const nextBand = runwayBandForMonths(months);
-  document.cookie = buildOperatorRunwayCookie(nextBand);
+  document.cookie = buildOperatorRunwayCookie(band);
 
   try {
     const raw = window.localStorage.getItem(OPERATOR_PROFILE_STORAGE_KEY);
-    const current: unknown = raw ? JSON.parse(raw) : undefined;
-    const updated = setOperatorProfileField(current, "runwayMonths", months);
-    window.localStorage.setItem(OPERATOR_PROFILE_STORAGE_KEY, JSON.stringify(updated));
-    // The profile hook listens for this, so every panel holding the figure
-    // re-reads it now rather than on its next unrelated render.
-    window.dispatchEvent(new StorageEvent("storage", { key: OPERATOR_PROFILE_STORAGE_KEY }));
+    const current = raw ? parseOperatorProfile(JSON.parse(raw)) : undefined;
+    const exact = current?.runwayMonths;
+    if (current && typeof exact === "number" && (!band || !runwayMonthsFitBand(exact, band))) {
+      const updated = setOperatorProfileField(current, "runwayMonths", undefined);
+      window.localStorage.setItem(OPERATOR_PROFILE_STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new StorageEvent("storage", { key: OPERATOR_PROFILE_STORAGE_KEY }));
+    }
   } catch {
     /* non-fatal */
   }
 
-  const detail: RunwayChangedDetail = { bandChanged: previousBand !== nextBand, source };
-  window.dispatchEvent(new CustomEvent(RUNWAY_CHANGED_EVENT, { detail }));
+  announceRunwayChange(previousBand, band, "pick");
 };
 
-/** Picking a band: keeps an entered figure that is already inside it. */
-export const persistOperatorRunway = (band: RunwayBand | null) => {
-  let currentMonths: number | undefined;
-  try {
-    const raw = window.localStorage.getItem(OPERATOR_PROFILE_STORAGE_KEY);
-    currentMonths = raw ? parseOperatorProfile(JSON.parse(raw)).runwayMonths : undefined;
-  } catch {
-    currentMonths = undefined;
-  }
-  writeOperatorRunwayMonths(runwayMonthsForBandPick(currentMonths, band), "pick");
+/**
+ * An exact figure was entered: move the band to the one it falls in, so the
+ * header, the homepage selector and the server-calibrated rules agree with it.
+ * A cleared figure leaves the band alone — clearing a number is not choosing a
+ * runway.
+ */
+export const syncRunwayBandToMonths = (months: number | undefined) => {
+  const band = runwayBandForMonths(months);
+  if (!band) return;
+  const previousBand = readOperatorRunwayCookie(document.cookie);
+  document.cookie = buildOperatorRunwayCookie(band);
+  announceRunwayChange(previousBand, band, "figure");
 };

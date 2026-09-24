@@ -9,7 +9,7 @@ import { GovernancePillarsGlyph } from "../components/illustrations/GovernancePi
 export const metadata: Metadata = buildPageMetadata({
   title: "Governance Resources",
   description:
-    "Capital discipline, board-level capital posture, and reversibility as governance: the long-form guides behind the weekly operating guidance, with the decision guides operators ask for most.",
+    "Long-form guides behind the weekly guidance — capital discipline, board-level capital posture, reversibility as governance — and the most-asked decision guides.",
   path: "/resources",
   imageAlt: "Whether governance resources",
 });

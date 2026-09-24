@@ -4,11 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { Tag } from "../../components/ui/tag";
-import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { getRegimeWeatherRationale } from "../../../lib/regimePresentation";
 import {
-  buildBreadcrumbList,
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
@@ -27,6 +26,7 @@ import {
   type PostureArchivePeriod,
 } from "../../../lib/summary/postureArchive";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { essaysPublishedIn, formatCanonAuthors, formatCanonPublished } from "../../../lib/productCanon";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
@@ -52,8 +52,58 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
   SCARCITY: "rose",
 };
 
-const describePeriod = (period: PostureArchivePeriod) =>
-  `Conditions in ${period.title}: ${toWeatherLabel(period.operatorLabel)}. ${period.headline}`;
+/*
+ * The search snippet for a period, so it has to say what is particular to it.
+ * It was the label, then the whole headline — "Conditions in 2010: Sunny. Sunny
+ * mode. Capital is available…" — which restated the label, ran 218–270
+ * characters against a ~160 snippet, and was word-for-word the same for every
+ * period in the same state bar the year. The mix of readings and the number of
+ * changes are the facts only this period has; the headline's first real
+ * sentence is the fallback for a period with no readings behind it.
+ */
+const DESCRIPTION_LIMIT = 160;
+const countChanges = (count: number) =>
+  count === 0 ? "conditions held throughout" : count === 1 ? "conditions changed once" : `conditions changed ${count} times`;
+const describePeriod = (period: PostureArchivePeriod) => {
+  const label = toWeatherLabel(period.operatorLabel);
+  const lead = `Conditions in ${period.title} closed ${label}.`;
+  const unit = period.sampleCadence === "weekly" ? "weekly" : "monthly";
+  const mix = [...period.regimeMix].sort((left, right) => right.periods - left.periods);
+  const facts = period.sampleCount > 0 && mix.length > 0
+    ? ` Across ${period.sampleCount} ${unit} readings: ${mix.map((entry) => `${entry.periods} ${toWeatherLabel(entry.label)}`).join(", ")}; ${countChanges(period.transitions.length)}.`
+    : ` ${period.headline.replace(new RegExp(`^${label} mode\\.\\s*`, "i"), "").split(/(?<=\.)\s/)[0] ?? ""}`;
+  const text = `${lead}${facts}`.trim();
+  return text.length <= DESCRIPTION_LIMIT ? text : `${text.slice(0, DESCRIPTION_LIMIT - 1).replace(/\s+\S*$/, "")}…`;
+};
+
+/*
+ * The card's side panel: this period's own record, where every archive card used
+ * to carry the same "A closed period" box. The count, the mix as a bar in the
+ * regimes' colours, and how often conditions changed — the facts a link to 2022
+ * has and a link to 2014 does not. The ten 2010–2011 periods have no readings
+ * behind them and keep the fixed panel.
+ */
+const recordCardPanel = (period: PostureArchivePeriod): Record<string, string> => {
+  if (period.sampleCount <= 0 || period.regimeMix.length === 0) return {};
+  const unit = period.sampleCadence === "weekly" ? "week" : "month";
+  const mix = [...period.regimeMix].sort((left, right) => right.periods - left.periods);
+  const only = mix.length === 1 ? mix[0] : null;
+  const title = only
+    ? `${only.periods} of ${period.sampleCount} ${unit}s ${toWeatherLabel(only.label)}`
+    : `${period.sampleCount} ${cadenceNoun(period)}`;
+  const changes = period.transitions.length;
+  // "Conditions", not "the call": lib/report/AGENTS.md retired the noun on 2026-09-23.
+  const changeLine = changes === 0 ? "Conditions held throughout." : changes === 1 ? "Conditions changed once." : `Conditions changed ${changes} times.`;
+  const body = only
+    ? changeLine
+    : `${mix.map((entry) => `${entry.periods} ${toWeatherLabel(entry.label)}`).join(" · ")}. ${changeLine}`;
+  return {
+    panelLabel: "The record",
+    panelTitle: title,
+    panelBody: body,
+    mix: mix.map((entry) => `${entry.regime}:${entry.periods}`).join(","),
+  };
+};
 
 const cadenceNoun = (period: PostureArchivePeriod) =>
   period.sampleCadence === "weekly" ? "weekly readings" : "monthly readings";
@@ -83,6 +133,21 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: describePeriod(period),
     path: buildPostureArchivePath(period.slug),
     imageAlt: `Whether's reading of conditions in ${period.title}`,
+    /* The period's own card, in its conditions' hue. These 82 pages used to share
+       the live weekly card, so a link to 2014 previewed this week's reading. */
+    /* The subtitle is the site's current sentence for those conditions, not the
+       stored headline: the archive keeps the words it was generated with ("Sunny
+       mode … the weekly call sets the tempo"), and a share card is new copy. */
+    imageParams: {
+      template: "record",
+      eyebrow: "History",
+      title: `${period.title}: ${toWeatherLabel(period.operatorLabel)}`,
+      /* The fact half only ("Money is cheap and available."): the instruction half
+         is advice for this week, not for a closed year. */
+      subtitle: getRegimeWeatherRationale(period.regime).split(/(?<=\.)\s/)[0] ?? "",
+      regime: period.regime,
+      ...recordCardPanel(period),
+    },
   });
 }
 
@@ -95,19 +160,11 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const parent = period.parentSlug ? findPostureArchivePeriod(period.parentSlug) : undefined;
   const previous = period.previousSlug ? findPostureArchivePeriod(period.previousSlug) : undefined;
   const next = period.nextSlug ? findPostureArchivePeriod(period.nextSlug) : undefined;
+  /* The reading list places each essay on this record; this is the other half of
+     that link, so a year page names the product writing that came out inside it. */
+  const essays = essaysPublishedIn({ year: period.year, quarter: period.kind === "quarter" ? period.quarter : undefined });
   const canonicalUrl = buildCanonicalUrl(buildPostureArchivePath(period.slug));
 
-  const breadcrumbStructuredData = {
-    "@context": "https://schema.org",
-    ...buildBreadcrumbList(
-      createBreadcrumbTrail([
-        { path: "/" },
-        { path: "/history" },
-        ...(parent ? [{ path: buildPostureArchivePath(parent.slug), label: parent.title }] : []),
-        { path: buildPostureArchivePath(period.slug), label: period.title },
-      ]),
-    ),
-  };
 
   const articleStructuredData = {
     "@context": "https://schema.org",
@@ -126,7 +183,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
   return (
     <ContentPageShell>
-      <JsonLdScript data={breadcrumbStructuredData} />
       <JsonLdScript data={articleStructuredData} />
 
       <Breadcrumbs
@@ -254,6 +310,32 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
                 </a>
               </>
             ) : null}
+          </p>
+        </section>
+      ) : null}
+
+      {essays.length ? (
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+          <h2 className="text-lg font-semibold text-slate-100">Product writing published in {period.title}</h2>
+          <ul className="space-y-2 text-sm text-slate-300">
+            {essays.map((essay) => (
+              <li key={essay.slug}>
+                <Link
+                  href={`/concepts#${essay.slug}`}
+                  className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white"
+                >
+                  {essay.title}
+                </Link>{" "}
+                — {formatCanonAuthors(essay)}, {formatCanonPublished(essay)}
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-slate-400">
+            From the{" "}
+            <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+              product management reading list
+            </Link>
+            , where each is placed on the conditions of the month it came out.
           </p>
         </section>
       ) : null}
