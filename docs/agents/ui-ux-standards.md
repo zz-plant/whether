@@ -378,3 +378,25 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
   a track, so compute the layout for each width the component is actually drawn at and let a
   container query choose (`ScoreLadder`); computing for the narrowest width and applying it
   everywhere stacks labels that had room to spare.
+
+## XIX. Reading order and narrative progression (Document order = visual order)
+
+Added 2026-09-24 with DD-031 (`docs/design-debt-prioritized.md`).
+
+- **Document order is reading order.** Primary narrative sections on responsive views must never use CSS flex ordering hacks (`order-3 md:order-2`) to rearrange the page sequence.
+- **The cognitive loop is fixed.** On the weekly brief, the reader decodes the week in decision order:
+  1. The guidance (the call and immediate posture)
+  2. What changed (the four public signals and deltas)
+  3. What it changes (consequences by business area)
+  4. What would flip it (threshold proximity and watch conditions)
+  5. What to do now and how to share it
+- Reversing steps 2 and 3 on phones to chase a layout quirk broke the logical narrative and violated WCAG 1.3.2 (Meaningful Sequence): a screen reader or keyboard tab navigation met the consequences before knowing what moved.
+- If a mobile layout feels awkward, re-architect the vertical spacing and visual hierarchy—do not scramble the DOM order.
+
+## XX. Action placement vs. comprehension (Comprehension before export)
+
+Added 2026-09-24 with DD-033 (`docs/design-debt-prioritized.md`).
+
+- **Comprehension precedes the export artifact.** On direct answer and explanation pages (`/answers/*`), a reader arriving from search or a deep link must see the direct answer, the operational rules, and the threshold lines before encountering a full-width block asking them to copy the brief into a meeting note. Asking a first-time reader to copy an answer they have not yet evaluated creates cognitive dissonance.
+- **Quick-action parity for returning operators.** To preserve under-60-second decision transmission for power users who already know what they want, expose a compact copy CTA in `SecondaryPageHeader`'s `actions` slot. Power users copy at the top; evaluators read the evidence and copy at the bottom.
+
