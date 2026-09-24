@@ -267,7 +267,7 @@ export default async function HistoryPage({
         initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
         className="weather-auto-chevron weather-panel px-5 py-4"
         summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
-        summary={<span>Every month&rsquo;s readings</span>}
+        summary={<span>Explore past months and signal trends</span>}
       >
         <div className="mt-4 space-y-5">
           {/* The whole record, not the trailing 24 months `regimeSeries` holds

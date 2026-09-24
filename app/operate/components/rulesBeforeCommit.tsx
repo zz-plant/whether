@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useId, useState } from "react";
 import type { PlaybookEntry } from "../../../lib/playbook";
 
 /**
@@ -17,7 +20,7 @@ export function RulesBeforeCommit({
   stopItems,
   startItems,
   fenceItems,
-  showAll,
+  showAll: initialShowAll,
 }: {
   playbook: PlaybookEntry | null;
   stopItems: string[];
@@ -26,14 +29,60 @@ export function RulesBeforeCommit({
   /** All of each list, rather than the top three. */
   showAll: boolean;
 }) {
+  const [isExpanded, setIsExpanded] = useState(initialShowAll);
+  const [prevShowAll, setPrevShowAll] = useState(initialShowAll);
+  const rulesId = useId();
+
+  if (prevShowAll !== initialShowAll) {
+    setPrevShowAll(initialShowAll);
+    setIsExpanded(initialShowAll);
+  }
+
+  useEffect(() => {
+    const syncFromLocation = () => {
+      setIsExpanded(new URLSearchParams(window.location.search).get("actions") === "all");
+    };
+    window.addEventListener("popstate", syncFromLocation);
+    return () => window.removeEventListener("popstate", syncFromLocation);
+  }, []);
+
+  const handleToggle = () => {
+    const next = !isExpanded;
+    setIsExpanded(next);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (next) {
+        url.searchParams.set("actions", "all");
+      } else {
+        url.searchParams.delete("actions");
+      }
+      url.hash = "ops-playbook";
+      window.history.pushState(window.history.state, "", url.toString());
+    }
+  };
+
   const lists = [
-    { key: "stop", label: "Stop", items: visible(stopItems, showAll), className: "border-rose-500/50 bg-rose-500/10", labelClassName: "text-rose-100" },
-    { key: "start", label: "Start", items: visible(startItems, showAll), className: "border-emerald-400/50 bg-emerald-500/10", labelClassName: "text-emerald-100" },
-    { key: "limit", label: "Keep limited", items: visible(fenceItems, showAll), className: "border-sky-400/50", labelClassName: "text-slate-400" },
+    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), className: "border-rose-500/50 bg-rose-500/10", labelClassName: "text-rose-100" },
+    { key: "start", label: "Start", items: visible(startItems, isExpanded), className: "border-emerald-400/50 bg-emerald-500/10", labelClassName: "text-emerald-100" },
+    { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), className: "border-sky-400/50", labelClassName: "text-slate-400" },
   ];
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-slate-300">
+          {isExpanded ? "Full rule list." : "Top 3 rules per area."}
+        </p>
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={isExpanded}
+          aria-controls={rulesId}
+          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100 cursor-pointer"
+        >
+          {isExpanded ? "Show top 3 only" : "Show all rules"}
+        </button>
+      </div>
       <div>
         <p className="type-label text-slate-400">Rules for this week</p>
         <h3 className="type-section text-slate-100">{playbook?.title ?? "Rules for new commitments"}</h3>
@@ -41,7 +90,7 @@ export function RulesBeforeCommit({
           {playbook ? playbook.insight : "Playbook data unavailable. Use operating guardrails until data recovers."}
         </p>
       </div>
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div id={rulesId} className="grid gap-4 lg:grid-cols-3">
         {lists.map((list) => (
           <div key={list.key} className={`weather-surface border-l-4 p-4 ${list.className}`}>
             <p className={`text-xs font-semibold ${list.labelClassName}`}>{list.label}</p>

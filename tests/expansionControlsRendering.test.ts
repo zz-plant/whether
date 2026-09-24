@@ -8,6 +8,10 @@ describe("expansion controls rendering", () => {
     const href = buildActionsExpansionHref({ year: "2025", month: "2" }, true);
 
     assert.equal(href, "/operate?year=2025&month=2&actions=all#ops-playbook");
+    assert.equal(
+      buildActionsExpansionHref({ year: "2025", month: "2", actions: "all" }, false),
+      "/operate?year=2025&month=2#ops-playbook",
+    );
   });
 
   it("shows the top three of each list until asked for all of them", () => {
@@ -24,9 +28,11 @@ describe("expansion controls rendering", () => {
     const top3 = renderToStaticMarkup(require("react").createElement(RulesBeforeCommit, { ...props, showAll: false }));
     assert.match(top3, /Stop 3/);
     assert.doesNotMatch(top3, /Stop 4/, "the fourth item needs the expansion control");
+    assert.match(top3, /aria-expanded="false"/);
 
     const all = renderToStaticMarkup(require("react").createElement(RulesBeforeCommit, { ...props, showAll: true }));
     assert.match(all, /Stop 4/);
+    assert.match(all, /aria-expanded="true"/);
   });
 
   it("tabulates each area's lines with a distance instead of reprinting the corridor per area", () => {

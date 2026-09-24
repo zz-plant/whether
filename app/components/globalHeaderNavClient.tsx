@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   resolveGlobalHeaderLoopLinks,
   type GlobalHeaderNavigationLink,
@@ -102,6 +102,30 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
     [resolvedPathname],
   );
 
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent | TouchEvent) => {
+      const details = detailsRef.current;
+      if (!details || !details.open) return;
+      if (event.target instanceof Node && !details.contains(event.target)) {
+        details.removeAttribute("open");
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && detailsRef.current?.open) {
+        detailsRef.current.removeAttribute("open");
+        detailsRef.current.querySelector("summary")?.focus();
+      }
+    };
+    document.addEventListener("click", handleDocumentClick);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("click", handleDocumentClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   /* Six text tabs, the active one underlined. The loop used to sit inside a
      closed "Plan, Evidence & more" disclosure so that the bar carried only the
      brief; the cost was that the five surfaces the product is built around
@@ -148,7 +172,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <span className="mx-1.5 h-4 w-px bg-slate-800" aria-hidden="true" />
       {/* Native details so it works without JS and costs nothing until
           opened. Utility links only: the loop is in the tabs now. */}
-      <details className="group relative">
+      <details ref={detailsRef} className="group relative">
         <summary
           tabIndex={0}
           className="list-none cursor-pointer rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center gap-1 text-slate-400 font-medium hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 [&::-webkit-details-marker]:hidden"

@@ -207,11 +207,11 @@ export const SignalsCallLinesSection = ({
           the label rather than on a box around it. */}
       <dl className="space-y-1.5 text-sm text-slate-200">
         <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-semantic-caution-fg">Wrong if:</dt>
+          <dt className="shrink-0 font-semibold text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
           <dd className="min-w-0">{renderCondition(triggerCondition)}</dd>
         </div>
         <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-semantic-easing-fg">Safe again when:</dt>
+          <dt className="shrink-0 font-semibold text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</dt>
           <dd className="min-w-0">{renderCondition(reversalCondition)}</dd>
         </div>
       </dl>

@@ -173,6 +173,21 @@ export async function DecisionAnswerPageContent({
           eyebrow="Direct answer"
           title={page.title}
           description={liveDirectAnswer}
+          actions={(
+            <ReportCta
+              href={pagePath}
+              label="Copy decision brief"
+              copyText={copyText}
+              copyTarget="Decision brief"
+              telemetryEvent={{
+                pagePath,
+                cluster: measurement.cluster,
+                intent: measurement.intent,
+                ctaId: "copy_decision_brief_header",
+              }}
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
+            />
+          )}
           aside={(
             <div className="weather-surface space-y-2 px-4 py-4">
               <div className="flex items-center justify-between gap-2">
@@ -204,27 +219,6 @@ export async function DecisionAnswerPageContent({
           href="/trust"
           className="mb-6"
         />
-
-        <SecondaryPageSection title={headings.copy}>
-          <div className="space-y-3">
-            <p className="text-sm text-slate-200">
-              Copy the answer, its pause line, and the citation, ready to paste into a meeting note.
-            </p>
-            <ReportCta
-              href={pagePath}
-              label="Copy decision brief"
-              copyText={copyText}
-              copyTarget="Decision brief"
-              telemetryEvent={{
-                pagePath,
-                cluster: measurement.cluster,
-                intent: measurement.intent,
-                ctaId: "copy_decision_brief",
-              }}
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
-            />
-          </div>
-        </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.posture}>
           <div className="space-y-2 text-sm text-slate-200">
@@ -276,6 +270,27 @@ export async function DecisionAnswerPageContent({
                 <PlainEnglishScoreNote signalKey={reading.key} score={reading.score} lead="On this signal alone" />
               </div>
             ))}
+          </div>
+        </SecondaryPageSection>
+
+        <SecondaryPageSection title={headings.copy}>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-200">
+              Copy the answer, its pause line, and the citation, ready to paste into a meeting note.
+            </p>
+            <ReportCta
+              href={pagePath}
+              label="Copy decision brief"
+              copyText={copyText}
+              copyTarget="Decision brief"
+              telemetryEvent={{
+                pagePath,
+                cluster: measurement.cluster,
+                intent: measurement.intent,
+                ctaId: "copy_decision_brief",
+              }}
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
+            />
           </div>
         </SecondaryPageSection>
 

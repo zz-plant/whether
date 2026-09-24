@@ -66,6 +66,11 @@ describe("home route render contract", () => {
     const order = ["<DecisionHero", "<WhatChangedSection", "<WhatItChangesSection", "<WhatWouldChangeSection", "<DoAndShareSection"]
       .map((tag) => routeSource.indexOf(tag));
     assert.deepEqual([...order].sort((a, b) => a - b), order, "the sections read in the reader's order");
+    // CSS must not reverse that reading order for sighted phone users.
+    const changedSource = readFileSync("app/components/home/WhatChangedSection.tsx", "utf8");
+    const consequencesSource = readFileSync("app/components/home/WhatItChangesSection.tsx", "utf8");
+    assert.match(changedSource, /className="order-2"/);
+    assert.match(consequencesSource, /className="order-3"/);
 
     // The hero is the state tier and nothing else: every number it used to
     // carry is a section's now, so it takes no score props at all.
