@@ -1077,6 +1077,11 @@ its range in the notes ("With 12–24 months of runway"), never as a number the 
 and burn arithmetic runs only on a real figure. The server-rendered default band produces no note:
 it is shown as a default ("It shows 12–24 mo until you choose"), not as an answer.
 
+The band lives in the cookie and never in the address: the selectors stopped writing `?runway=`
+(which outranked the cookie and travelled in pasted URLs), and `RunwayServerSync` re-renders the page
+when a band is picked. A typed figure moves the cookie without a refresh, because vinext's refresh
+remounts the page's client components.
+
 ## An artifact that names itself
 
 `public/downloads/quarterly-capital-posture-memo-example.md` was 310 bytes of empty headings —

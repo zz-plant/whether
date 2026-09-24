@@ -37,7 +37,7 @@ const TEMPLATE_MARKDOWN = [
 ].join("\n");
 
 export function TemplateActions() {
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: null });
 
   const handlePrint = useCallback(() => {
     window.print();

@@ -31,7 +31,7 @@ const FRAME_TITLES = ["The guidance", "Decisions to revisit", DECISION_CONTRACT_
 export function PresentationFrames({ onExit }: { onExit: () => void }) {
   const artifact = useBriefArtifact();
   const [frame, setFrame] = useState(0);
-  const { copyToClipboard, status } = useClipboardCopy();
+  const { copyToClipboard, status } = useClipboardCopy({ commitment: "copied_meeting" });
 
   const summary = useMemo(
     () => (artifact ? formatBriefArtifact(artifact, "slack", window.location.origin) : ""),

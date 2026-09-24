@@ -26,11 +26,22 @@ export type Subscriber = {
    * false, so nobody is enrolled by the migration.
    */
   alerts: boolean;
+  /**
+   * Receives the Monday brief. False only for someone who asked for alert mail and
+   * nothing else — the "tell me when this changes" signup, for a reader who wants
+   * the one email that matters rather than a weekly one.
+   *
+   * Absent on every record written before 2026-09-23, and every one of those
+   * subscribed to the weekly brief, so `hydrateSubscriber` reads absent as true.
+   */
+  weekly: boolean;
 };
 
 export type SubscribeOptions = {
   /** Omitted leaves an existing subscriber's choice alone; a new record defaults to false. */
   alerts?: boolean;
+  /** Omitted leaves an existing subscriber's choice alone; a new record defaults to true. */
+  weekly?: boolean;
 };
 
 type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
@@ -44,6 +55,8 @@ export interface SubscriberStore {
   listActiveSubscribers(): Promise<Subscriber[]>;
   /** The subset of those who opted into alert mail. */
   listAlertSubscribers(): Promise<Subscriber[]>;
+  /** The subset of those who receive the Monday brief. */
+  listWeeklySubscribers(): Promise<Subscriber[]>;
   getSubscriberByEmail(email: string): Promise<Subscriber | null>;
   getSubscriberByToken(token: string): Promise<Subscriber | null>;
   backendStatus(): "durable" | "local-fallback";
@@ -62,6 +75,9 @@ const readStoredString = (source: object, key: string): string | undefined => {
 
 /** `=== true`, so a missing or non-boolean field reads as false rather than as consent. */
 const readStoredFlag = (source: object, key: string): boolean => Reflect.get(source, key) === true;
+
+/** `!== false`, for a field whose absence predates it and meant yes. */
+const readStoredFlagDefaultOn = (source: object, key: string): boolean => Reflect.get(source, key) !== false;
 
 /**
  * Builds a Subscriber out of a stored record, field by field.
@@ -85,6 +101,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     active: readStoredFlag(raw, "active"),
     subscribedAt: readStoredString(raw, "subscribedAt") ?? new Date().toISOString(),
     alerts: readStoredFlag(raw, "alerts"),
+    weekly: readStoredFlagDefaultOn(raw, "weekly"),
   };
 };
 
@@ -115,6 +132,7 @@ class KvSubscriberStore implements SubscriberStore {
         // An omitted option keeps the standing choice: re-subscribing from a form that
         // does not ask about alerts must not silently switch them off.
         alerts: options?.alerts ?? existing.alerts,
+        weekly: options?.weekly ?? existing.weekly,
       };
       await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
       await this.kv.put(TOKEN_PREFIX + updated.token, normalized).catch(() => { /* non-fatal: token index repaired when KV is available */ });
@@ -133,6 +151,7 @@ class KvSubscriberStore implements SubscriberStore {
       token,
       active: true,
       alerts: options?.alerts === true,
+      weekly: options?.weekly !== false,
     };
 
     await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(subscriber)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
@@ -184,6 +203,11 @@ class KvSubscriberStore implements SubscriberStore {
   async listAlertSubscribers(): Promise<Subscriber[]> {
     const subscribers = await this.listActiveSubscribers();
     return subscribers.filter((sub) => sub.alerts);
+  }
+
+  async listWeeklySubscribers(): Promise<Subscriber[]> {
+    const subscribers = await this.listActiveSubscribers();
+    return subscribers.filter((sub) => sub.weekly);
   }
 
   async listActiveSubscribers(): Promise<Subscriber[]> {
@@ -288,6 +312,11 @@ class InMemorySubscriberStore implements SubscriberStore {
     return subscribers.filter((sub) => sub.alerts);
   }
 
+  async listWeeklySubscribers(): Promise<Subscriber[]> {
+    const subscribers = await this.listActiveSubscribers();
+    return subscribers.filter((sub) => sub.weekly);
+  }
+
   async subscribe(email: string, options?: SubscribeOptions): Promise<Subscriber> {
     const normalized = normalizeEmail(email);
     if (!normalized) throw new Error("Invalid email address");
@@ -296,6 +325,7 @@ class InMemorySubscriberStore implements SubscriberStore {
     if (existing) {
       existing.active = true;
       existing.alerts = options?.alerts ?? existing.alerts;
+      existing.weekly = options?.weekly ?? existing.weekly;
       return existing;
     }
 
@@ -307,6 +337,7 @@ class InMemorySubscriberStore implements SubscriberStore {
       token,
       active: true,
       alerts: options?.alerts === true,
+      weekly: options?.weekly !== false,
     };
     this.saveToMemory(sub);
     return sub;

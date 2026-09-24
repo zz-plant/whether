@@ -7,7 +7,7 @@ type CopyAnchorButtonProps = {
 };
 
 export function CopyAnchorButton({ anchor }: CopyAnchorButtonProps) {
-  const { copyToClipboard, copiedTarget } = useClipboardCopy();
+  const { copyToClipboard, copiedTarget } = useClipboardCopy({ commitment: null });
 
   return (
     <button

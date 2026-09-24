@@ -4,11 +4,13 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import type { MonthlySummary } from "../lib/summary/monthlySummary";
+import { extractCalibrationMonths } from "../lib/report/confidenceCalibration";
 import type { QuarterlySummary } from "../lib/summary/quarterlySummary";
 import type { WeeklySummary } from "../lib/summary/weeklySummary";
 import type { YearlySummary } from "../lib/summary/yearlySummary";
 
 const ARCHIVE_PATH = "data/summary_archive.json";
+const CALIBRATION_MONTHS_PATH = "data/confidence_record_months.json";
 
 type WeeklySummaryArchiveEntry = {
   year: number;
@@ -225,4 +227,9 @@ export const writeSummaryArchive = async ({
 
   const sorted = sortArchive(nextEntries);
   await writeFile(ARCHIVE_PATH, `${JSON.stringify(sorted, null, 2)}\n`, "utf8");
+  // The confidence record reads a five-field extract of this file so its pages
+  // do not bundle 5MB (lib/report/confidenceCalibration.ts). Written here, with
+  // the archive, so no workflow step can refresh one and forget the other;
+  // tests/confidenceCalibration.test.ts fails if they ever disagree.
+  await writeFile(CALIBRATION_MONTHS_PATH, `${JSON.stringify(extractCalibrationMonths(sorted))}\n`, "utf8");
 };

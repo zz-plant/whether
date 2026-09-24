@@ -46,7 +46,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean } = {}) {
         trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
       }
     } else {
-      const result = await requestSubscription(email, { alerts: true });
+      const result = await requestSubscription(email, { alerts: true, weekly: true });
       setStatus(result.ok ? "success" : "error");
       setMessage(result.message);
       if (result.ok) {

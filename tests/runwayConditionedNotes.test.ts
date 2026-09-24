@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { RUNWAY_BAND_OPTIONS } from "../lib/report/operatorRunway";
-import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../lib/report/runwayConditionedNotes";
+import {
+  buildCommitmentImpact, buildRunwayConditionedNotes, resolveRunwayForNotes } from "../lib/report/runwayConditionedNotes";
 
 describe("runway-conditioned notes", () => {
   it("renders nothing when no runway is given", () => {
@@ -133,5 +134,40 @@ describe("runway-conditioned notes", () => {
     });
     assert.equal(resolveRunwayForNotes({ band: null }), null);
     assert.equal(resolveRunwayForNotes({ exactMonths: 0, band: null }), null);
+  });
+});
+
+describe("buildCommitmentImpact", () => {
+  it("holds cash constant: runway after is runway times burn over burn plus cost", () => {
+    const impact = buildCommitmentImpact({
+      regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
+    });
+    assert.ok(impact);
+    assert.equal(impact.runwayAfter, 11.2);
+    assert.deepEqual(impact.bandChange, { from: "12–24 mo", to: "6–12 mo" });
+    assert.match(impact.summary, /from 13 to 11\.2 months/);
+  });
+
+  it("quotes the note the guidance already carries at the runway after, for that area", () => {
+    const impact = buildCommitmentImpact({
+      regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
+    });
+    const expected = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 11.2, monthlyBurnUsd: 290_000 })
+      .find((note) => note.area === "hiring")?.note;
+    assert.equal(impact?.noteAfter, expected);
+  });
+
+  it("names no band change when the runway stays in its band", () => {
+    const impact = buildCommitmentImpact({
+      regime: "EXPANSION", area: "burn-discipline", runwayMonths: 30, monthlyBurnUsd: 100_000, newMonthlyCostUsd: 10_000,
+    });
+    assert.equal(impact?.bandChange, null);
+    assert.doesNotMatch(impact?.summary ?? "", /moves you/);
+  });
+
+  it("returns nothing rather than a guess when a figure is missing or not positive", () => {
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 0, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 1 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: Number.NaN, newMonthlyCostUsd: 1 }), null);
   });
 });

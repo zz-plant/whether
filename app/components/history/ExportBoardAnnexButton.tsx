@@ -51,6 +51,7 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
    */
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({
     resetDelay: 2500,
+    commitment: "copied_brief",
   });
 
   if (!record) return null;

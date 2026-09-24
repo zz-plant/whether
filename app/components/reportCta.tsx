@@ -22,7 +22,7 @@ export function ReportCta({
   telemetryEvent,
   children,
 }: ReportCtaProps) {
-  const { status, activeTarget, copyToClipboard } = useClipboardCopy();
+  const { status, activeTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const router = useRouter();
   const resolvedCopyTarget = copyTarget ?? label;
   const isCopying = status === "copying" && activeTarget === resolvedCopyTarget;

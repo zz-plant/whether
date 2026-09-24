@@ -67,6 +67,11 @@ const GenericSharePresets = ({
 </div>
 );
 
+/* Slack is its own destination in the funnel; the plain text, the brief and the
+   link are all a copy of this week's guidance (the reason `/share` gives for not
+   widening the commitment union). */
+const shareRailCommitment = (target: string | null) => (target === "slack" ? "copied_slack" : "copied_brief");
+
 export function ShareRail({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<SharePreset>("team");
   const [includeContext, setIncludeContext] = useState(true);
@@ -75,7 +80,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   const { active: slackOverlayActive, toggle: handleToggleSlackOverlay } = useSlackPreviewOverlay();
   const includeContextLabelId = useId();
   const slackOverlayLabelId = useId();
-  const { copyToClipboard, copiedTarget } = useClipboardCopy();
+  const { copyToClipboard, copiedTarget } = useClipboardCopy({ commitment: shareRailCommitment });
 
   const buildShareText = useCallback(() => {
     const context = includeContext

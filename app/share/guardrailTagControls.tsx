@@ -29,7 +29,7 @@ const areaOfBlock = (block: GuardrailTagBlock): DecisionArea | null =>
   isLever(block.area) ? operatingLeverToDecisionArea[block.area] : null;
 
 export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlock[]; rows: AreaRowText[] }) {
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = (target: string) =>
     getClipboardUiState(target, { status, error, activeTarget, copiedTarget });
 

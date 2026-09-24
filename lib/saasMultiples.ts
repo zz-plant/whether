@@ -150,6 +150,21 @@ const writeCachedQuote = async (cache: QuoteCache, symbol: string, result: Quote
   }
 };
 
+/**
+ * Hands an unread response's connection back. The basket is fetched in
+ * parallel, and a Worker gets six open connections per request: a response
+ * returned early without its body read holds one until the runtime cancels it,
+ * which it logs as "a stalled HTTP response was canceled to prevent deadlock"
+ * — on every `/comps` request where the quote source declined, until 2026-09-23.
+ */
+const releaseBody = async (res: Response) => {
+  try {
+    await res.body?.cancel();
+  } catch {
+    /* already consumed or closed */
+  }
+};
+
 const fetchQuoteFromSource = async (symbol: string): Promise<QuoteResult> => {
   const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price,financialData,defaultKeyStatistics,cashflowStatementHistory`;
 
@@ -162,8 +177,14 @@ const fetchQuoteFromSource = async (symbol: string): Promise<QuoteResult> => {
 
   // 404 is a verdict about the symbol. Everything else -- 429 rate limiting,
   // 401 crumb rejection, 5xx -- is the source declining to answer at all.
-  if (res.status === 404) return { status: "missing" };
-  if (!res.ok) return { status: "unavailable", reason: `quote source returned ${res.status}` };
+  if (res.status === 404) {
+    await releaseBody(res);
+    return { status: "missing" };
+  }
+  if (!res.ok) {
+    await releaseBody(res);
+    return { status: "unavailable", reason: `quote source returned ${res.status}` };
+  }
 
   let body: unknown;
   try {
@@ -295,7 +316,10 @@ export async function fetchAlphaVantageValuation(symbol: string, apiKey: string)
     return { status: "unavailable", reason: redactAlphaVantageKey(reason) };
   }
 
-  if (!res.ok) return { status: "unavailable", reason: `Alpha Vantage returned ${res.status}` };
+  if (!res.ok) {
+    await releaseBody(res);
+    return { status: "unavailable", reason: `Alpha Vantage returned ${res.status}` };
+  }
 
   let body: unknown;
   try {

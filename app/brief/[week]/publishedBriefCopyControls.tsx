@@ -25,7 +25,7 @@ export function PublishedBriefCopyControls({
   permanentUrl,
 }: PublishedBriefCopyControlsProps) {
   const [activeFormat, setActiveFormat] = useState<ActiveFormat>("slack");
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: (target) => (target === "Slack update" ? "copied_slack" : target === "Email update" ? "copied_email" : "copied_brief") });
 
   const activeText = activeFormat === "slack" ? slackUpdate : emailUpdate;
 

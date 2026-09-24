@@ -5,3 +5,16 @@
 }
 
 
+
+/* The first-visit fold (FirstVisitDecisionPicker.tsx). The layout bootstrap
+   sets `data-home-first-visit` before paint from whether this browser has
+   rendered the brief before. Keyed so the default — no attribute, which is a
+   crawler, a reader without scripts, or a failed bootstrap — is the full brief
+   and no picker. */
+html:not([data-home-first-visit="true"]) [data-first-visit-only="true"] {
+  display: none !important;
+}
+
+html[data-home-first-visit="true"] [data-first-visit-collapsible="true"] {
+  display: none !important;
+}

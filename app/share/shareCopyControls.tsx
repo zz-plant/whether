@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { trackActivationEvent, type ActivationCommitment } from "../../lib/activationFunnel";
+import { useMemo } from "react";
+import type { ActivationCommitment } from "../../lib/activationFunnel";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import { useOperatorRunway } from "../components/useOperatorRunway";
@@ -51,6 +51,10 @@ const nextMondayIsoDate = () => {
   return date.toISOString().split("T")[0];
 };
 
+/* Reported by the shared clipboard hook once the write is confirmed, the same
+   path every other copy control on the site uses. */
+const shareCommitment = (target: string | null) => (isCopyTarget(target) ? copyCommitments[target] : null);
+
 export function ShareCopyControls({
   recordDate,
   slackBrief,
@@ -60,7 +64,7 @@ export function ShareCopyControls({
   investorUpdate,
   calendarDetails,
 }: ShareCopyControlsProps) {
-  const { status, error, activeTarget, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy({ commitment: shareCommitment });
   const clipboardState = (target: CopyTarget) =>
     getClipboardUiState(target, { status, error, activeTarget, copiedTarget: copiedKey });
   // The one paragraph that depends on the reader's company comes from the
@@ -72,16 +76,6 @@ export function ShareCopyControls({
   );
   const copiedTarget = isCopyTarget(copiedKey) ? copiedKey : null;
   const copyError = error ? "Clipboard access failed. Select the preview text and copy it manually." : null;
-  const trackedRef = useRef<string | null>(null);
-  // The funnel's `committed` step fires once per successful copy, after the
-  // shared hook has confirmed the write actually happened.
-  useEffect(() => {
-    if (status === "copied" && copiedTarget && trackedRef.current !== copiedTarget) {
-      trackedRef.current = copiedTarget;
-      trackActivationEvent({ step: "committed", path: "/share", commitment: copyCommitments[copiedTarget] });
-    }
-    if (status !== "copied") trackedRef.current = null;
-  }, [status, copiedTarget]);
   const calendarHref = useMemo(() => {
     const date = nextMondayIsoDate();
     const params = new URLSearchParams({

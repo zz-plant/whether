@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   DEFAULT_RUNWAY_BAND,
   RUNWAY_BAND_OPTIONS,
@@ -25,26 +24,18 @@ export function RunwayDropdownPill({
   activeRunway,
   className = "",
 }: RunwayDropdownPillProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const { runwayBand: storedRunway } = useOperatorRunway();
 
   const selectedRunwayKey = activeRunway ?? storedRunway ?? DEFAULT_RUNWAY_BAND;
 
   const handleSelectRunway = (band: RunwayBand) => {
+    // The cookie is the one place the band lives; `RunwayServerSync` re-renders
+    // the page from it. This used to also write `?runway=` into the address,
+    // which then outranked the cookie on the server — so an exact figure typed
+    // afterwards was ignored — and handed the reader's runway band, and a
+    // setting that overrode theirs, to anyone the URL was pasted to.
     persistOperatorRunway(band);
-    const params = new URLSearchParams(searchParams?.toString() ?? "");
-    if (band === DEFAULT_RUNWAY_BAND) {
-      params.delete("runway");
-    } else {
-      params.set("runway", band);
-    }
-    const query = params.toString();
-    // `replace`, like the sm+ selector for the same setting: this is the same
-    // choice at a different width, and the two must not disagree about Back.
-    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   return (

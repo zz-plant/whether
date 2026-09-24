@@ -85,8 +85,8 @@ export default function PrivacyPage() {
             <p className={paragraph}>
               Subscribing stores your address, the time you subscribed, whether you have confirmed
               it, whether you opted in to alerts between Mondays (conditions changing, a score crossing
-              its line, or an outsized move in a market input) as well as the Monday brief, and a
-              random token that makes the confirmation and unsubscribe links work. It is held in
+              its line, or an outsized move in a market input), whether you want the Monday brief itself,
+              and a random token that makes the confirmation and unsubscribe links work. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
               you click the confirmation link. Every email carries an unsubscribe link, and using it
               deactivates the record immediately.
@@ -147,7 +147,7 @@ export default function PrivacyPage() {
             <p className={paragraph}>
               Pages report how fast they loaded, which route was moved to from which, a coarse bucket
               for where a visit arrived from (a search engine, a link, typed directly — never the
-              referring URL), the steps of the checkout funnel, and the shape of a search as
+              referring URL) and whether this browser had opened the brief before, the steps of the checkout funnel, and the shape of a search as
               described above. These go to Cloudflare Analytics Engine.
             </p>
             <p className={paragraph}>

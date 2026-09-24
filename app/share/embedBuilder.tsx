@@ -28,7 +28,7 @@ const TICKER_PRESETS = [
 export function EmbedBuilder() {
   const [ticker, setTicker] = useState("");
   const [stage, setStage] = useState("");
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   /* Remounts the preview whenever the snippet's attributes change, so embed.js
      hydrates it again. This was a counter bumped from an effect on every change
      to either field — a second render to reach a value both fields already

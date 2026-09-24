@@ -57,6 +57,11 @@ import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCach
 import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
+import { FirstVisitDecisionPicker, type DecisionPickerOption } from "./components/home/FirstVisitDecisionPicker";
+import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
+import { findLeadAnswerForArea } from "./answers/decisionPages";
 
 export const revalidate = 300;
 export const runtime = "edge";
@@ -370,6 +375,20 @@ async function PageContent({
         currentRegime: regime,
         previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
       });
+  /* The first-visit fold applies to the live weekly brief only. An archived
+     month or a monthly horizon was reached by choosing it, which is not a
+     first-time reader's arrival. */
+  const offersFirstVisitFold = !historicalSelection && activeCadence === "weekly";
+  const decisionPickerOptions: DecisionPickerOption[] = decisionAreaOrder.flatMap((area) => {
+    const row = homeAreaRows.find((candidate) => candidate.area === area);
+    if (!row) return [];
+    const answer = findLeadAnswerForArea(area);
+    return [{ ...row, answer: answer ? { href: `/answers/${answer.slug}`, title: answer.title } : undefined }];
+  });
+  const turningPoints = findRecentCallChanges(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), 4).map((change) => ({
+    label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
+    href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
+  }));
   const trustStripProps = buildTrustStripProps({
     recordDateLabel: homepage.reportShell.recordDateLabel,
     isFallback: homepage.reportShell.showOfflineBadge,
@@ -543,6 +562,19 @@ async function PageContent({
               ) : null}
             </div>
 
+            {offersFirstVisitFold ? (
+              <FirstVisitDecisionPicker
+                options={decisionPickerOptions}
+                regime={regime}
+                flipCondition={reversalTriggerLabel}
+                turningPoints={turningPoints}
+              />
+            ) : null}
+
+            {/* Sections 2 to 5, folded on a first visit behind the picker above.
+                `contents` keeps each section a flex item of the column, so the
+                phone and desktop `order-*` classes below still apply. */}
+            <div data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined} className="contents">
             {/* 2. What changed. One table, every signal, each against last week
                 and against its own lines — the four signals used to be drawn
                 twice on this page, in the hero and again beside the actions. */}
@@ -588,6 +620,7 @@ async function PageContent({
               planLabel={cadenceCall?.planLabel}
               currentRecordDate={reportData.treasury.record_date}
             />
+            </div>
         </div>
       </div>
 

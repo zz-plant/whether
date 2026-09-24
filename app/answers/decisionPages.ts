@@ -85,3 +85,12 @@ const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
 export const tierOneDecisionPages = answerPages;
 
 export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);
+
+/**
+ * The decision answer that leads with this area, for a surface that offers one
+ * answer per area (the homepage's first-visit picker). A page counts only when
+ * the area is the first it maps: every page lists spending among its areas, and
+ * "the answer about raising money" is the one whose subject is raising money.
+ */
+export const findLeadAnswerForArea = (area: DecisionArea) =>
+  answerPages.find((page) => page.category === "decision" && page.mappedDecisionAreas[0] === area);

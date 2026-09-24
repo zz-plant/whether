@@ -82,7 +82,9 @@ import { getSubscriberStore } from "./subscriberStore";
 
 export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
   const store = getSubscriberStore();
-  const subscribers = await store.listActiveSubscribers();
+  // The Monday fan-out: an alerts-only subscriber is active and verified and asked
+  // not to get this mail.
+  const subscribers = await store.listWeeklySubscribers();
   // Carries the token, which the weekly brief's unsubscribe link needs. This returned
   // bare addresses until 2026-09-07, which is why that mail went out without one.
   return subscribers.map((sub) => ({ email: sub.email, token: sub.token }));

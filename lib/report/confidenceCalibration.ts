@@ -1,5 +1,5 @@
 import { z } from "zod";
-import rawArchive from "../../data/summary_archive.json";
+import rawCalibrationMonths from "../../data/confidence_record_months.json";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { resolveDistanceToFlip } from "./confidence";
 
@@ -30,8 +30,15 @@ import { resolveDistanceToFlip } from "./confidence";
  * and the record is published beside it rather than folded into it. An operator
  * asking "will this call change" gets a count of months, not a modelled number.
  *
- * Derived at module load from the bundled archive rather than baked into a
- * constant, so the monthly refresh improves it instead of dating it.
+ * Derived from the archive rather than baked into a constant, so the monthly
+ * refresh improves it instead of dating it — but from a five-field extract of
+ * it (`data/confidence_record_months.json`, written by `bun run archive:index`
+ * with `extractCalibrationMonths` below), not the archive itself. Importing the
+ * 5MB archive put a 4.3MB chunk on `/trust`, `/history` and `/calibration`,
+ * parsed and validated on every fresh Worker instance before the first byte:
+ * those were the three slowest pages in the real-user timings on 2026-09-23.
+ * `tests/confidenceCalibration.test.ts` fails if the extract and the archive
+ * ever disagree.
  */
 type ConfidenceCalibrationBucket = {
   /** Inclusive lower bound, in tightness-equivalent points from the nearest boundary. */
@@ -53,12 +60,12 @@ type ConfidenceCalibrationBucket = {
 const BUCKET_EDGES = [0, 5, 10, 20, 37] as const;
 
 /*
- * Parsed, not asserted. Only the four fields this calculation reads are
- * described, and `catchall` lets every other field through untouched, so a
- * month that is missing one is skipped rather than crashing a page — the
- * archive is generated data and predates some of its own columns.
+ * Parsed, not asserted. Only the fields this calculation reads are described,
+ * and `loose` lets every other field through untouched, so a month that is
+ * missing one is skipped rather than crashing a page — the archive is
+ * generated data and predates some of its own columns.
  */
-const monthRowSchema = z.object({
+const archiveMonthSchema = z.object({
   cadence: z.literal("monthly"),
   asOf: z.string(),
   tightness: z.number(),
@@ -66,18 +73,31 @@ const monthRowSchema = z.object({
   summary: z.object({ regime: z.string() }).loose(),
 });
 
-type MonthRow = z.infer<typeof monthRowSchema>;
+const calibrationMonthSchema = z.object({
+  asOf: z.string(),
+  tightness: z.number(),
+  riskAppetite: z.number(),
+  regime: z.string(),
+});
 
-const monthlyRows = (): MonthRow[] =>
+type CalibrationMonth = z.infer<typeof calibrationMonthSchema>;
+
+/** The month-end rows the record needs, out of a full summary archive, in date order. */
+export const extractCalibrationMonths = (archive: unknown): CalibrationMonth[] =>
   z
     .array(z.unknown())
     .catch([])
-    .parse(rawArchive)
+    .parse(archive)
     .flatMap((row) => {
-      const parsed = monthRowSchema.safeParse(row);
-      return parsed.success ? [parsed.data] : [];
+      const parsed = archiveMonthSchema.safeParse(row);
+      return parsed.success
+        ? [{ asOf: parsed.data.asOf, tightness: parsed.data.tightness, riskAppetite: parsed.data.riskAppetite, regime: parsed.data.summary.regime }]
+        : [];
     })
     .sort((left, right) => left.asOf.localeCompare(right.asOf));
+
+const monthlyRows = (): CalibrationMonth[] =>
+  z.array(calibrationMonthSchema).catch([]).parse(rawCalibrationMonths);
 
 const bucketFor = (distance: number): number => {
   for (let index = BUCKET_EDGES.length - 1; index >= 0; index -= 1) {
@@ -106,7 +126,7 @@ const build = (): ConfidenceCalibrationBucket[] => {
     });
     const bucket = buckets[bucketFor(distance)];
     bucket.months += 1;
-    if (months[index + 1].summary.regime === month.summary.regime) bucket.held += 1;
+    if (months[index + 1].regime === month.regime) bucket.held += 1;
   }
 
   return buckets;

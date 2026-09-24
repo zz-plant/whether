@@ -87,3 +87,30 @@ export const findLastTimeCallChanged = ({
 /** The comparison page for the change month against the month three later. */
 export const buildLastTimeCompareHref = (record: LastTimeCallChanged) =>
   `/history/compare?yearA=${record.changedAt.year}&monthA=${record.changedAt.month}&yearB=${record.after.year}&monthB=${record.after.month}`;
+
+type RecentCallChange = MonthRef & { fromLabel: string; toLabel: string };
+
+/**
+ * The most recent months the call changed, newest first — the turning points a
+ * first-time reader can open in the time machine to check what the site said
+ * then against what they remember happening. Read off the same month-end walk
+ * as the card above, so a month offered here is one the time machine covers.
+ */
+export const findRecentCallChanges = (
+  series: readonly TimeMachineRegimeEntry[],
+  count: number,
+): RecentCallChange[] => {
+  const ordered = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+  const changes: RecentCallChange[] = [];
+  for (let index = ordered.length - 1; index >= 1 && changes.length < count; index -= 1) {
+    const entry = ordered[index];
+    const before = ordered[index - 1];
+    if (entry.regime === before.regime) continue;
+    changes.push({
+      ...monthRef(entry),
+      fromLabel: getRegimePublicLabel(before.regime),
+      toLabel: getRegimePublicLabel(entry.regime),
+    });
+  }
+  return changes;
+};

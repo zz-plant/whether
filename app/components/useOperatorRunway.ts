@@ -14,7 +14,21 @@ import {
 } from "../../lib/operatorProfile";
 import { createBrowserSource, useBrowserSource, useHydrated } from "./browserSource";
 
-const RUNWAY_CHANGED_EVENT = "whether-operator-runway-changed";
+export const RUNWAY_CHANGED_EVENT = "whether-operator-runway-changed";
+
+/**
+ * Carried by the change event: whether the band the server reads moved, and
+ * whether it was picked or implied by a figure being typed. Only a pick
+ * re-renders the page straight away (`RunwayServerSync`): a refresh remounts
+ * the page's client components, which closes whatever the reader has open and
+ * would eat a half-typed figure.
+ */
+export type RunwayChangedDetail = { bandChanged: boolean; source: "pick" | "figure" };
+
+const announceRunwayChange = (previousBand: RunwayBand | null, nextBand: RunwayBand | null, source: RunwayChangedDetail["source"]) => {
+  const detail: RunwayChangedDetail = { bandChanged: previousBand !== nextBand, source };
+  window.dispatchEvent(new CustomEvent(RUNWAY_CHANGED_EVENT, { detail }));
+};
 
 const readInitialRunwayBand = (): RunwayBand | null => {
   const fromCookie = readOperatorRunwayCookie(document.cookie);
@@ -63,6 +77,7 @@ export const useOperatorRunway = () => {
  * would disagree about the same company and the band is the newer answer.
  */
 export const persistOperatorRunway = (band: RunwayBand | null) => {
+  const previousBand = readOperatorRunwayCookie(document.cookie);
   document.cookie = buildOperatorRunwayCookie(band);
 
   try {
@@ -78,7 +93,7 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
     /* non-fatal */
   }
 
-  window.dispatchEvent(new CustomEvent(RUNWAY_CHANGED_EVENT));
+  announceRunwayChange(previousBand, band, "pick");
 };
 
 /**
@@ -90,6 +105,7 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
 export const syncRunwayBandToMonths = (months: number | undefined) => {
   const band = runwayBandForMonths(months);
   if (!band) return;
+  const previousBand = readOperatorRunwayCookie(document.cookie);
   document.cookie = buildOperatorRunwayCookie(band);
-  window.dispatchEvent(new CustomEvent(RUNWAY_CHANGED_EVENT));
+  announceRunwayChange(previousBand, band, "figure");
 };

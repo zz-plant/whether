@@ -13,6 +13,7 @@ import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
 import { StageDropdownPill } from "./StageDropdownPill";
 import { RunwayDropdownPill } from "./RunwayDropdownPill";
+import { RunwayServerSync } from "./RunwayServerSync";
 
 type GlobalHeaderRouteGateProps = {
   initialPathname?: string;
@@ -58,6 +59,9 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
 
   return (
     <GlobalHeaderScrollWrapper>
+      {/* Every route has the header, so the runway band's one re-render
+          listener lives here rather than beside any one control. */}
+      <RunwayServerSync />
       <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
         <div className="flex items-center justify-between gap-2 px-3 py-2 sm:gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-2.5 no-underline">

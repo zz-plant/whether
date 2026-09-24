@@ -1,8 +1,9 @@
 /**
  * Posture archive index generator.
  *
- * Compresses `data/summary_archive.json` (~4.5MB, 686 entries) into the small
- * per-period records the static `/history/[period]` routes render. The full
+ * Compresses `data/summary_archive.json` (~5MB, 712 entries) into the small
+ * per-period records the static `/history/[period]` routes render, and the
+ * month-end extract the confidence record reads. The full
  * archive stays out of route bundles — see
  * docs/research/2026-03-09-cloudflare-bundle-composition.md for why that matters.
  */
@@ -11,12 +12,16 @@ import { getSummaryArchive, type SummaryArchiveEntry } from "../lib/summary/summ
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import type { RegimeKey } from "../lib/regimeEngine";
 import type { PostureArchivePeriod, PostureArchiveRegimeShare } from "../lib/summary/postureArchiveTypes";
+import { extractCalibrationMonths } from "../lib/report/confidenceCalibration";
+import rawArchive from "../data/summary_archive.json";
 
 const OUTPUT_PATH = new URL("../data/posture_archive_index.json", import.meta.url);
 /** Tiny companion file so client bundles can link the archive without the full index. */
 const YEARS_OUTPUT_PATH = new URL("../data/posture_archive_years.json", import.meta.url);
 /** Minimal chart data for the OG renderer, which must not bundle the full index. */
 const OG_TIMELINE_OUTPUT_PATH = new URL("../data/posture_og_timeline.json", import.meta.url);
+/** The five month-end fields the confidence record reads, so `/trust`, `/history` and `/calibration` do not bundle the archive. */
+const CALIBRATION_MONTHS_OUTPUT_PATH = new URL("../data/confidence_record_months.json", import.meta.url);
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
 
@@ -244,7 +249,10 @@ const ogTimeline = periods
   }));
 await writeFile(OG_TIMELINE_OUTPUT_PATH, `${JSON.stringify(ogTimeline, null, 2)}\n`, "utf8");
 
+const calibrationMonths = extractCalibrationMonths(rawArchive);
+await writeFile(CALIBRATION_MONTHS_OUTPUT_PATH, `${JSON.stringify(calibrationMonths)}\n`, "utf8");
+
 const quarterCount = periods.filter((period) => period.kind === "quarter").length;
 console.log(
-  `Wrote ${periods.length} posture archive periods (${years.length} yearly, ${quarterCount} quarterly) and compact OG timeline data`,
+  `Wrote ${periods.length} posture archive periods (${years.length} yearly, ${quarterCount} quarterly), compact OG timeline data, and ${calibrationMonths.length} confidence-record months`,
 );

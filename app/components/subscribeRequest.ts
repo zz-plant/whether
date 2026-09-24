@@ -13,6 +13,8 @@ type SubscribeResult = { ok: boolean; message: string };
 export type SubscribeOptions = {
   /** Also send regime-change alerts between Mondays. Omitted leaves a standing choice alone. */
   alerts?: boolean;
+  /** Also send the Monday brief. `false` is the alerts-only signup. Omitted leaves a standing choice alone. */
+  weekly?: boolean;
 };
 
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
@@ -35,11 +37,13 @@ export async function requestSubscription(
     const res = await fetch(SUBSCRIBE_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        typeof options?.alerts === "boolean"
-          ? { email: trimmed, alerts: options.alerts }
-          : { email: trimmed },
-      ),
+      /* Only the flags the caller set: an absent key is what tells the route to
+         leave a standing choice alone. */
+      body: JSON.stringify({
+        email: trimmed,
+        ...(typeof options?.alerts === "boolean" ? { alerts: options.alerts } : {}),
+        ...(typeof options?.weekly === "boolean" ? { weekly: options.weekly } : {}),
+      }),
     });
     const data: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);
 

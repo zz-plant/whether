@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   DEFAULT_RUNWAY_BAND,
   RUNWAY_BAND_OPTIONS,
@@ -24,17 +23,13 @@ interface RunwayPersonaSelectorProps {
  * versions and why one survives). Same primitive now, so the two controls a
  * reader meets side by side agree about focus, arrows and what Back means.
  *
- * `replace`, not `push`, for the reason `StagePersonaSelector` gives: a band is
- * a setting, and it used to take four Back presses to leave the page after
- * trying the four options.
+ * Picking writes the cookie and nothing else, so trying the four bands adds
+ * no history entries and leaves the address canonical.
  */
 export function RunwayPersonaSelector({
   activeRunway,
   className = "",
 }: RunwayPersonaSelectorProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const selected = activeRunway ?? DEFAULT_RUNWAY_BAND;
 
   const options: readonly SegmentedOption<RunwayBand>[] = RUNWAY_BAND_OPTIONS.map((option) => ({
@@ -45,15 +40,12 @@ export function RunwayPersonaSelector({
   }));
 
   const handleSelectRunway = (band: RunwayBand) => {
+    // The cookie is the one place the band lives; `RunwayServerSync` re-renders
+    // the page from it. This used to also write `?runway=` into the address,
+    // which then outranked the cookie on the server — so an exact figure typed
+    // afterwards was ignored — and handed the reader's runway band, and a
+    // setting that overrode theirs, to anyone the URL was pasted to.
     persistOperatorRunway(band);
-    const params = new URLSearchParams(searchParams.toString());
-    if (band === DEFAULT_RUNWAY_BAND) {
-      params.delete("runway");
-    } else {
-      params.set("runway", band);
-    }
-    const query = params.toString();
-    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   return (

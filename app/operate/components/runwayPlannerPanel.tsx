@@ -189,7 +189,7 @@ export function RunwayPlannerPanel({
   );
 
   const shareBlock = useMemo(() => (output ? formatRunwayPlanCompactBlock(output) : ""), [output]);
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = getClipboardUiState("runway-plan", { status, error, activeTarget, copiedTarget });
   const memoClipboardState = getClipboardUiState("budget-memo", { status, error, activeTarget, copiedTarget });
   const paybackStrictnessLevel = output ? Number.parseInt(output.decisionKnobs.paybackStrictnessLabel, 10) || 0 : 0;

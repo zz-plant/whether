@@ -15,7 +15,14 @@
  */
 import type { DecisionArea } from "./boundedDecisionRules";
 import type { RegimeKey } from "../regimeEngine";
-import { RUNWAY_BAND_OPTIONS, monthsForRunwayBand, runwayBandPhrase, type RunwayBand } from "./operatorRunway";
+import {
+  RUNWAY_BAND_OPTIONS,
+  monthsForRunwayBand,
+  runwayBandForMonths,
+  runwayBandLabel,
+  runwayBandPhrase,
+  type RunwayBand,
+} from "./operatorRunway";
 
 type RunwayConditionedNoteInput = {
   regime: RegimeKey;
@@ -165,4 +172,66 @@ export const buildRunwayConditionedNotes = ({
     });
   }
   return notes;
+};
+
+type CommitmentImpact = {
+  runwayBefore: number;
+  runwayAfter: number;
+  /** Set only when the commitment moves the runway into a different band. */
+  bandChange: { from: string; to: string } | null;
+  /** One sentence: what the commitment does to runway, in the reader's own figures. */
+  summary: string;
+  /** The note this week's guidance carries for the area at the runway after, if the band has one. */
+  noteAfter: string | null;
+};
+
+const roundMonths = (months: number) => Math.round(months * 10) / 10;
+
+/**
+ * What one new monthly commitment does to the operator's runway, and what this
+ * week's guidance says about the area at the runway it leaves them with.
+ *
+ * Same contract as the notes above: arithmetic on the operator's own figures
+ * plus the note the band already carries. It adds no threshold, no action and
+ * no directive — "the two hires take you under a year" is a fact about their
+ * cash, and what the guidance says at under a year is already written above.
+ * Cash is held constant, so runway after is runway × burn ÷ (burn + cost).
+ * Anything missing or non-positive returns null rather than a guess.
+ */
+export const buildCommitmentImpact = ({
+  regime,
+  area,
+  runwayMonths,
+  monthlyBurnUsd,
+  newMonthlyCostUsd,
+}: {
+  regime: RegimeKey;
+  area: DecisionArea;
+  runwayMonths?: number;
+  monthlyBurnUsd?: number;
+  newMonthlyCostUsd?: number;
+}): CommitmentImpact | null => {
+  const valid = (value: number | undefined): value is number =>
+    typeof value === "number" && Number.isFinite(value) && value > 0;
+  if (!valid(runwayMonths) || !valid(monthlyBurnUsd) || !valid(newMonthlyCostUsd)) return null;
+
+  const runwayBefore = roundMonths(runwayMonths);
+  const runwayAfter = roundMonths((runwayMonths * monthlyBurnUsd) / (monthlyBurnUsd + newMonthlyCostUsd));
+  const bandBefore = runwayBandForMonths(runwayBefore);
+  const bandAfter = runwayBandForMonths(runwayAfter);
+  const bandChange = bandBefore && bandAfter && bandBefore !== bandAfter
+    ? { from: runwayBandLabel(bandBefore), to: runwayBandLabel(bandAfter) }
+    : null;
+
+  const monthsSpent = roundMonths(runwayBefore - runwayAfter);
+  const summary =
+    `At $${compactUsd.format(newMonthlyCostUsd)} more a month, runway goes from ${runwayBefore} to ${runwayAfter} months ` +
+    `(${monthsSpent} ${monthsSpent === 1 ? "month" : "months"} spent)` +
+    (bandChange ? `, which moves you from ${bandChange.from} into ${bandChange.to}.` : ".");
+
+  const noteAfter =
+    buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, monthlyBurnUsd: monthlyBurnUsd + newMonthlyCostUsd })
+      .find((note) => note.area === area)?.note ?? null;
+
+  return { runwayBefore, runwayAfter, bandChange, summary, noteAfter };
 };

@@ -90,7 +90,7 @@ export const ExecutiveBriefingPanel = ({
   recordDateLabel: string;
 }) => {
   const { status, error, activeTarget, copiedTarget, copyToClipboard } =
-    useClipboardCopy();
+    useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = (target: string) =>
     getClipboardUiState(target, { status, error, activeTarget, copiedTarget });
 

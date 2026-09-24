@@ -51,7 +51,7 @@ const DIRECTION_BADGE: Record<SignalDirection, { glyph: TrendDirection; tone: st
 const HERO_ID = "share-ready-artifact";
 
 export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, shareLines }: Props) {
-  const { status, copyToClipboard } = useClipboardCopy();
+  const { status, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const isCopied = status === "copied";
   const currentSearchParams = useSearchParams();
   const [showStrip, setShowStrip] = useState(false);
