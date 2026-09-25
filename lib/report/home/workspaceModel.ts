@@ -3,7 +3,7 @@ import {
   findToolkitDefinition,
   situationUseCaseDefinitions,
 } from "../../decisionDomainCatalog";
-import { formatSourceFreshnessLabel, formatSourceModeLabel } from "../sourceHealth";
+import { buildDegradedSourceRows, formatSourceFreshnessLabel, formatSourceModeLabel } from "../sourceHealth";
 import type { buildWeeklyDecisionCardViewModel } from "../homeBriefModel";
 import type { ReportData, ReportDataFallback } from "../reportData";
 import type { buildTrustStatus } from "../trustStatus";
@@ -208,13 +208,7 @@ export const buildHomeWorkspaceModel = ({
         modeLabel: formatSourceModeLabel(row.mode),
         freshnessStatus: formatSourceFreshnessLabel(row),
       })),
-      degradedSourceRows: reportData.sourceHealth
-        .filter((row) => row.mode !== "live")
-        .map((row) => ({
-          sourceName: row.sourceName,
-          modeLabel: formatSourceModeLabel(row.mode),
-          freshnessStatus: formatSourceFreshnessLabel(row),
-        })),
+      degradedSourceRows: buildDegradedSourceRows(reportData.sourceHealth),
       revisitHeadline: resolveRevisitHeadline({
         revisitDecisions: diagnosticsLane.revisitDecisions,
         trustStatusTone,
