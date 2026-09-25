@@ -121,6 +121,10 @@ export default async function DecidePage({
             </li>
           ))}
         </ul>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
+          <Link href="/comps" className="weather-hub-chip">Public SaaS valuation context</Link>
+          <Link href="/history/compare" className="weather-hub-chip">Compare historical funding conditions</Link>
+        </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </ReportSection>
 

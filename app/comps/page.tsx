@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ActionLink } from "../components/ui/actionLink";
 import { PageShell } from "../components/pageShell";
 import { buildPageMetadata } from "../../lib/seo";
 import { buildCompsStructuredData } from "../../lib/seo/pageStructuredData";
@@ -164,8 +165,8 @@ export default async function CompsPage() {
           </dl>
           <p className="text-sm text-slate-300">
             {comps.status === "ok" && comps.data.medianEvToRevenue !== null
-              ? `Read the ${formatMultiple(comps.data.medianEvToRevenue)} median as the price the public market is paying for a dollar of recurring revenue this week. It sets the comparable a late-stage round is argued against, so it moves the burden of proof on a raise rather than the decision itself.`
-              : "With no median this week, the fundraising rule above rests on interest rates alone — the comparable is missing, not zero."}
+              ? `The ${formatMultiple(comps.data.medianEvToRevenue)} median compares enterprise value with reported revenue in this public basket. Use it to discuss valuation assumptions alongside the dated fundraising guidance; it does not price a private round.`
+              : "With no median available, the fundraising guidance still uses the brief's macro signals. The public valuation comparison is missing, not zero."}
           </p>
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
             Open the weekly brief
@@ -185,10 +186,18 @@ export default async function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="type-eyebrow">Why this matters</h2>
+          <h2 className="type-eyebrow">Use public multiples in a fundraising discussion</h2>
           <p className="text-sm text-slate-300 leading-relaxed">
-            The same public-market investors often lead or influence late-stage rounds, so a compression in public multiples reaches private valuations with a lag rather than not at all. That lag is why this page is worth reading before a raise is priced, not after.
+            Founders, finance teams and board members can use the basket to question valuation assumptions.
+            Compare growth, gross margin, retention, scale and the revenue period before choosing a comparable.
+            Public shares are liquid; a private round also depends on its terms, investor demand and company risk.
+            Multiplying private ARR by this median does not produce a supported valuation.
           </p>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            For the board note, record the observation date, selected comparable, revenue basis and the differences
+            that matter. Revisit the financing plan when actual investor feedback or the cash deadline changes.
+          </p>
+          <ActionLink href="/answers/should-startups-raise-capital-now" variant="inline">Decide when to prepare a raise</ActionLink>
           <p className="text-sm text-slate-300 leading-relaxed">
             <Link href="/api-docs" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
               Fetch this by API

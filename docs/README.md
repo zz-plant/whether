@@ -89,7 +89,7 @@ Use these when shaping follow-on work, not as sole implementation truth:
 - `roadmap-prioritized-spec.md` — prioritized, detailed specs for open roadmap items
 - `premium-launch-readiness.md` — launch readiness for pricing/billing
 - `product-marketing-review-2026-08-29.md` — PMM review and launch checks
-- `seo/roadmap.md` — SEO content roadmap
+- `seo/roadmap.md` — prioritized decision topics, answer-page contract and evidence gates for SEO expansion
 - `seo/quality-gates.md` — publish gates and QA checklist
 - `seo/measurement-model.md` — analytics and event schema
 - `seo/refresh-loop.md` — refresh trigger criteria

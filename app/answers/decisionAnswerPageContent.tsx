@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import { buildLiveDirectAnswer, buildLiveShortAnswer } from "./liveShortAnswers";
 import {
   answerPages,
   findDecisionPage,
@@ -71,8 +70,6 @@ export async function DecisionAnswerPageContent({
     momentumLabel: reportDynamics.directionLabel,
     revisitDecisions: homeBriefModel.revisitDecisions,
   });
-  const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
-  const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
   /*
    * Ranked by shared decision areas, and filtered to pages that are actually
    * indexable — the old rule selected for a *different* category and took the
@@ -89,13 +86,19 @@ export async function DecisionAnswerPageContent({
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [
     page.title,
-    `Short answer: ${liveShortAnswer}`,
+    `Short answer: ${page.shortAnswer}`,
+    `For: ${page.audience}`,
+    `Company inputs to check: ${page.companyInputs.join(" ")}`,
+    `Decision note to complete: ${page.decisionNote}`,
+    `Market guidance as of ${recordDateLabel}`,
     `Current guidance: ${payload.currentCall}`,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
     `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
+    ...(dataCurrency ? [`Data status: ${dataCurrency.summary}`] : []),
+    `References: ${page.supportingLinks.map((link) => link.href).join(", ")}`,
   ].join("\n");
 
   /*
@@ -110,7 +113,7 @@ export async function DecisionAnswerPageContent({
        "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
        comparisons, one of them under the engine's name for a score the rest of
        the site calls funding pressure. */
-    answer: `${liveShortAnswer} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
+    answer: `${page.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
@@ -118,6 +121,10 @@ export async function DecisionAnswerPageContent({
        a passage an answer engine can quote and attribute; none of them were in
        the payload a machine reads. */
     additionalQuestions: [
+      {
+        question: "Which company inputs should we check before acting?",
+        answer: page.companyInputs.join(" "),
+      },
       {
         question: "What should we do about it this week?",
         answer: payload.immediateAction,
@@ -172,7 +179,7 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageHeader
           eyebrow="Direct answer"
           title={page.title}
-          description={liveDirectAnswer}
+          description={page.directAnswer}
           actions={(
             <ReportCta
               href={pagePath}
@@ -194,7 +201,7 @@ export async function DecisionAnswerPageContent({
                 <p className="type-eyebrow">Short answer</p>
                 <ResolutionCompassGlyph size={26} />
               </div>
-              <p className="text-sm font-semibold text-sky-200">{liveShortAnswer}</p>
+              <p className="text-sm font-semibold text-sky-200">{page.shortAnswer}</p>
               {dataCurrency ? (
                 <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
                   {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
@@ -222,6 +229,7 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title={headings.posture}>
           <div className="space-y-2 text-sm text-slate-200">
+            <p className="text-xs text-slate-400">Market guidance as of {recordDateLabel}</p>
             <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</p>
             <p><span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</p>
             <p>{contextSummary.summaryLine}</p>
@@ -229,6 +237,14 @@ export async function DecisionAnswerPageContent({
               <p className="text-xs text-slate-400">{contextSummary.classificationLine}</p>
             ) : null}
           </div>
+        </SecondaryPageSection>
+
+        <SecondaryPageSection title={page.contextHeading}>
+          <p className="text-sm text-slate-200">{page.context}</p>
+          <h3 className="mt-4 text-sm font-semibold text-slate-100">Company inputs to check</h3>
+          <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-200">
+            {page.companyInputs.map((input) => <li key={input}>{input}</li>)}
+          </ul>
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.rules}>
@@ -275,8 +291,10 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title={headings.copy}>
           <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-slate-100">Decision note to complete</h3>
+            <p className="text-sm text-slate-200">{page.decisionNote}</p>
             <p className="text-sm text-slate-200">
-              Copy the answer, its pause line, and the citation, ready to paste into a meeting note.
+              Copy this template with the dated market guidance and citation. Fill in the company inputs before using it as an approval.
             </p>
             <ReportCta
               href={pagePath}
@@ -297,6 +315,11 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
           <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
+          <ul className="mt-3 space-y-1">
+            {page.supportingLinks.map((link) => (
+              <li key={link.href}><ActionLink href={link.href} variant="inline">{link.label}</ActionLink></li>
+            ))}
+          </ul>
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.next}>

@@ -11,9 +11,9 @@ describe("canonical content selectors", () => {
     assert.deepEqual(
       featuredAnswerPages.slice(0, 3).map((page) => page.slug),
       [
+        "when-should-startups-cut-burn",
         "should-startups-hire-engineers-right-now",
-        "should-startups-slow-roadmap-expansion",
-        "is-it-risk-on-or-risk-off-for-startups",
+        "should-startups-raise-capital-now",
       ],
     );
 
