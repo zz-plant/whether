@@ -7,8 +7,8 @@ Refresh any page meeting one of:
 - Assisted conversion contribution in top quartile for 2 consecutive months.
 
 ## Refresh actions
-1. Update thresholds/examples to match current operating context.
-2. Refresh metadata (title/description/open graph cues).
+1. Verify the dated guidance comes from the canonical report. Review company examples and inputs; do not hardcode current macro thresholds in editorial content.
+2. Refresh metadata only when the enduring answer or query fit changes. Keep weekly readings on the page and live social card, not in stable search descriptions.
 3. Verify CTA language and destination still map to current funnel.
 4. Re-check internal links and keep at least three canonical links live.
 
