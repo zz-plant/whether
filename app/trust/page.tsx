@@ -15,6 +15,7 @@ import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord"
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
+import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
 
 export const runtime = "edge";
@@ -45,6 +46,7 @@ export default async function MethodPage({
     trustStrip,
     scorePositions,
     runHistory,
+    readerReturns,
     reportShellProps,
   } = await buildTrustPageModel();
 
@@ -212,6 +214,8 @@ export default async function MethodPage({
       </section>
 
       <RunHistorySection runHistory={runHistory} />
+
+      {readerReturns ? <ReaderReturnsSection line={readerReturns.line} generatedAt={readerReturns.generatedAt} /> : null}
 
       <FormulaReference positions={scorePositions} />
 
