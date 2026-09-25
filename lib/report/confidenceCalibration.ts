@@ -80,7 +80,7 @@ const calibrationMonthSchema = z.object({
   regime: z.string(),
 });
 
-type CalibrationMonth = z.infer<typeof calibrationMonthSchema>;
+export type CalibrationMonth = z.infer<typeof calibrationMonthSchema>;
 
 /** The month-end rows the record needs, out of a full summary archive, in date order. */
 export const extractCalibrationMonths = (archive: unknown): CalibrationMonth[] =>
@@ -96,7 +96,8 @@ export const extractCalibrationMonths = (archive: unknown): CalibrationMonth[] =
     })
     .sort((left, right) => left.asOf.localeCompare(right.asOf));
 
-const monthlyRows = (): CalibrationMonth[] =>
+/** The month-end rows the extract holds, in date order. The one input every calibration question reads. */
+export const calibrationMonthRows = (): CalibrationMonth[] =>
   z.array(calibrationMonthSchema).catch([]).parse(rawCalibrationMonths);
 
 const bucketFor = (distance: number): number => {
@@ -106,8 +107,8 @@ const bucketFor = (distance: number): number => {
   return 0;
 };
 
-const build = (): ConfidenceCalibrationBucket[] => {
-  const months = monthlyRows();
+/** The bands with their held counts, over whichever months a question is asking about. */
+export const calibrationBuckets = (months: CalibrationMonth[]): ConfidenceCalibrationBucket[] => {
   const buckets: ConfidenceCalibrationBucket[] = BUCKET_EDGES.map((from, index) => ({
     from,
     to: index + 1 < BUCKET_EDGES.length ? BUCKET_EDGES[index + 1] : null,
@@ -135,7 +136,8 @@ const build = (): ConfidenceCalibrationBucket[] => {
 let cached: ConfidenceCalibrationBucket[] | null = null;
 
 /** The bands, each with how many month-ends landed in it and how many held. */
-export const confidenceCalibration = (): ConfidenceCalibrationBucket[] => (cached ??= build());
+export const confidenceCalibration = (): ConfidenceCalibrationBucket[] =>
+  (cached ??= calibrationBuckets(calibrationMonthRows()));
 
 /** The band a reading at this distance belongs to, or null when the archive has none. */
 export const calibrationForDistance = (distance: number): ConfidenceCalibrationBucket | null => {
