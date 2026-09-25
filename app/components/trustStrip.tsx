@@ -45,7 +45,12 @@ export function TrustStrip({
     { label: "As of", value: recordDateLabel },
     { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution" },
     { label: "Confidence", value: CONFIDENCE_WORD[confidenceLabel], tone: confidenceLabel === "LOW" ? "caution" : undefined },
-    { label: "Could change next week", value: couldChangeNextWeek ? "Yes" : "No", tone: couldChangeNextWeek ? "caution" : undefined },
+    /* "Not expected", not "No". The boolean says nothing is near its line
+     * *this* reading; printed as "No" beside a Medium confidence it read as
+     * a promise about the future the confidence cell had just declined to
+     * make. "Not expected" states the expectation the score distance gives,
+     * and lets the adjacent confidence qualify it. */
+    { label: "Could change next week", value: couldChangeNextWeek ? "Yes" : "Not expected", tone: couldChangeNextWeek ? "caution" : undefined },
   ];
   return (
     <div className={`flex flex-wrap items-center gap-x-5 gap-y-1 text-xs ${className}`.trim()} data-trust-strip>

@@ -15,10 +15,6 @@ import {
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
-import {
-  buildTimeMachineHref,
-  getAdjacentTimeMachineRequest,
-} from "../../lib/timeMachine/timeMachineSelection";
 import { HistoricalBanner } from "../components/historicalBanner";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
@@ -125,13 +121,6 @@ export async function buildPlanningPageModel(
     treasury,
     treasuryProvenance,
   } = reportData;
-  const previousHistoricalSelection = historicalSelection
-    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
-    : null;
-  const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/operate", previousHistoricalSelection)
-    : undefined;
-  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const { trustStatusTone } = snapshot.trustStatus;
 
@@ -170,10 +159,10 @@ export async function buildPlanningPageModel(
         showOfflineBadge: isFallback && !historicalSelection,
       },
       actions: {
-        // Share is the one hero action: it opens the global rail. The "Review
-        // the weekly plan" button scrolled to the step directly beneath the
-        // hero, and "Return to Weekly Brief" duplicated the header's Brief tab.
-        showShare: true,
+        // No hero Share. The Share step further down the same page owns
+        // sharing here — on a phone the hero button and the step it opens were
+        // two "Share the brief" actions in one viewport. The header's Brief tab
+        // already covers the route the hero's neighbours used to point at.
         // The handoff to Resolve, in the shell's one predictable place. It used
         // to be a "Decision help" section of its own at the tail — a sentence,
         // this link, and a "Back to sharing options" link to a step on the same
@@ -191,8 +180,6 @@ export async function buildPlanningPageModel(
             month: historicalSelection.month,
             asOfLabel: formatDateUTC(historicalSelection.asOf),
             liveHref: "/operate",
-            previousHref: previousHistoricalHref,
-            timeMachineHref: historicalTimeMachineHref,
           })
           : null,
       },

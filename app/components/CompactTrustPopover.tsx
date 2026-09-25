@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Popover } from "@base-ui/react/popover";
 import { Info } from "lucide-react";
 import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
-import { Tag } from "./ui/tag";
 
 /**
  * The published series behind each row: a plain name, then its FRED code as the
@@ -107,8 +106,14 @@ export function CompactTrustPopover({
   record = null,
   regime,
 }: CompactTrustPopoverProps) {
+  /* An archived week renders no chip here. The historical banner at the top
+     * of the page is the mode's one marker — a second amber tag beside the
+     * week title read as another control and said what the banner had already
+     * said. The live trust chip (confidence, sources, record date) is only
+     * truth for a live reading, so it does not render either.
+     */
   if (isHistorical) {
-    return <Tag tone="amber">Past week</Tag>;
+    return null;
   }
 
   return (

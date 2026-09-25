@@ -65,7 +65,7 @@ export function CommandCenterNavBlock({
 
   return (
     <section
-      className="weather-surface-secondary weather-page-intro relative min-w-0 px-4 py-3.5 sm:px-5 sm:py-4"
+      className="weather-surface-secondary weather-page-intro relative min-w-0 px-4 py-3 sm:px-5 sm:py-4"
       aria-label="Page introduction"
     >
       {/* Two columns from lg up: the reading block keeps its measure on the
@@ -73,17 +73,32 @@ export function CommandCenterNavBlock({
           full-width box holding a max-w-3xl column, so ~40% of every report
           hero rendered empty — and the CTAs sat a title, a summary and a meta
           line below the fold-line they belong on. */}
-      <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:space-y-0">
-        <div className="min-w-0 space-y-2">
-          <p className="type-label text-slate-400">Weekly brief</p>
-          <p className="text-fluid-micro leading-4 text-slate-400">
-            {statusLabel ? (
-              <span className="font-semibold text-[color:var(--regime-ink)]">{statusLabel}</span>
-            ) : null}
-            {statusLabel && introMetaRest ? " • " : null}
-            {introMetaRest}
-          </p>
-          <h1 style={{ viewTransitionName: "page-title" }} className="max-w-3xl font-semibold text-slate-100 text-fluid-2xl">{pageTitle}</h1>
+      <div className="space-y-2 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:space-y-0">
+        <div className="min-w-0 space-y-1.5">
+          {/* No kicker. "Weekly brief" above every H1 restated the route the
+              header tab, the sidebar and the bottom bar already name, and it
+              made distinct pages read as variations of one landing page. */}
+          {/* The condition leads, the page title follows. A phone shows the
+              route name in the bottom bar already, and the week's word —
+              Freezing, Sunny — is the fact the reader came for. The word
+              prints in the regime ink at the reading's own size; the trust
+              headline and the record date stay micro under it. */}
+          {statusLabel ? (
+            <p className="text-fluid-lg font-bold leading-tight">
+              <span className="text-[color:var(--regime-ink)]">{statusLabel}</span>
+              {introMetaRest ? (
+                <span className="ml-2 text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
+              ) : null}
+            </p>
+          ) : introMetaRest ? (
+            <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
+          ) : null}
+          <h1
+            style={{ viewTransitionName: "page-title" }}
+            className="max-w-3xl font-semibold text-slate-100 text-fluid-base lg:text-fluid-2xl"
+          >
+            {pageTitle}
+          </h1>
           <p className="max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base">
             {pageSummary}
           </p>
@@ -92,14 +107,21 @@ export function CommandCenterNavBlock({
         {activeStep || showStamp || showActions ? (
           <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
             {activeStep ? (
-              <div className="flex lg:justify-end">
+              /* Phone: hidden. The loop the glyph draws is the bottom bar's
+                 row of tabs there, and under the intro it was a second
+                 navigation band pushing the first task block down. */
+              <div className="hidden lg:flex lg:justify-end">
                 <OperatingLoopGlyph activeStep={activeStep} />
               </div>
             ) : null}
 
             {showStamp ? (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right">
-                {fetchedAtLabel ? <span>Updated {fetchedAtLabel}</span> : null}
+                {/* "Signals refreshed", not "Updated": two dates print inside
+                    one viewport (this and "As of" above), and the reader has
+                    to be able to tell the pipeline's fetch from the reading's
+                    record date apart. */}
+                {fetchedAtLabel ? <span>Signals refreshed {fetchedAtLabel}</span> : null}
                 {resolvedNextRefreshLabel ? (
                   <span>{resolvedNextRefreshLabel}</span>
                 ) : null}
