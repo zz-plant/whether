@@ -1764,3 +1764,17 @@ Measured at 430px after the change: no document overflow on `/`, `/operate`, `/s
 `/history` or archive mode; `/operate`'s first task block begins at y≈498 (intro ends at 317);
 the archive banner is 123px with one action; the palette sheet spans the bottom 613px of the
 viewport with 56px rows.
+
+### 1.1.26 The confidence record grades the recent year (2026-09-25)
+
+The calibration study's table is a whole-archive average, and nothing said whether it still
+described the current year — a finding from 2012–2024 wearing a 2026 date would read the same.
+`lib/report/calibrationDrift.ts` now grades the most recent twelve month-end readings from the
+same extract, per band: did readings at that distance still hold more often than the percent
+publishes for it? A rate-delta comparison against the historical baseline was built first and
+rejected: eleven graded readings make a five-point threshold flag a two-reading band, which is
+noise promoted to a claim. The published check is a direction, not a threshold. "Stable" and
+"drifting" render one sentence in `ConfidenceRecordBody` (shared by `/calibration` and
+`/history`, so the two cannot say different things); "unmeasured" renders nothing — a year too
+thin to grade is a gap, not a guess. `tests/calibrationDrift.test.ts` pins the real archive's
+current "stable" verdict, so the sentence and the data fail together.
