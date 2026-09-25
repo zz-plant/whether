@@ -114,6 +114,16 @@
   under the sections' own names. Until 2026-09-15 `/operate` carried three — the sidebar list, the
   stepper's own sticky chip row, and a card grid at the tail — with three vocabularies for the same
   five sections.
+- MUST: give the mobile index row a scroll affordance. `MobileSectionChips` fades whichever edge
+  has content beyond it; a row that silently clips its overflow reads as broken labels, not as
+  something you can scroll. The fades are state, tracked on scroll, not decoration.
+- MUST: make the page intro state the week, not the route (2026-09-25). The status word (the
+  regime label) leads, in the regime ink at the reading's own size; the trust headline and record
+  date follow in the meta half of the same line; the H1 is secondary below `lg` — the bottom tab
+  bar owns the route name on a phone. No kicker: "Weekly brief" above every H1 restated the route
+  the header, the sidebar and the tab bar already name. The operating-loop glyph renders from `lg`
+  up only — below that its four steps are the tab bar's tabs, and under the intro it was a second
+  navigation band.
 - NEVER: give the hero an action that targets the block directly beneath it, or a button to a route
   the header tab already reaches. Four routes pointed the hero button, an inline "↓" link and the
   first index entry at the same anchor, and every secondary button pointed at `/`. A hero action

@@ -8,31 +8,28 @@ import { formatMonthLongLabel } from "../../lib/timeMachine/monthFormatting";
  * Whether is a screenshot product: the hero is meant to be pasted into Slack and read
  * as the current call. That makes an unmarked historical view the most expensive state
  * in the app — a March 2020 brief and this Monday's brief are visually identical once
- * cropped. So the marker is a caution-toned band rather than neutral chrome, and it
- * carries the exact record date, not just the month someone selected.
+ * cropped. So the marker is a caution-toned band, and it carries the exact record date,
+ * not just the month someone selected.
  *
- * Three things changed here from the version that only `/signals` rendered:
+ * One row, one action. It used to stack an eyebrow, a title, an explanatory paragraph
+ * and up to three buttons — the archive state occupied half a phone screen before the
+ * historical guidance began. The escape ("Back to this week") is the one action that
+ * leaves the mode; going further *into* the archive is what the period controls next to
+ * the week title are for (the calendar picker, and the command palette's archive
+ * commands everywhere).
  *
- * 1. The date is formatted for a person. It printed `formatHistoricalBanner`'s
- *    "Historical mode active · 2020-03" — a machine string, and the second half of a
- *    label whose first half already said "Viewing past data". It now reads "March 2020"
- *    through `Intl` (per the i18n rule in docs/agents/ui-ux-standards.md).
- * 2. One action is primary. All three links were the same weight, so the way *out* of
- *    the mode had no more affordance than the two that go further into it.
- * 3. It is a named landmark. An `<aside>` with an accessible name is reachable from a
- *    screen reader's landmark list and announced on entry, so the mode is discoverable
- *    without reading down to a stale number. (Not `role="status"`: a live region
- *    announces mutations, and this is server-rendered — it would never fire.)
+ * Still a named landmark: an `<aside>` with an accessible name is reachable from a
+ * screen reader's landmark list and announced on entry, so the mode is discoverable
+ * without reading down to a stale number. (Not `role="status"`: a live region announces
+ * mutations, and this is server-rendered — it would never fire.)
  */
 
 type HistoricalBannerProps = {
   year: number;
   month: number;
-  /** Record date the snapshot actually resolves to, e.g. "Mar 31, 2020". */
+  /** Record date the snapshot actually resolves to, e.g. "Aug 31, 2026". */
   asOfLabel?: string;
   liveHref?: string;
-  previousHref?: string;
-  timeMachineHref?: string;
 };
 
 export const HistoricalBanner = ({
@@ -40,58 +37,33 @@ export const HistoricalBanner = ({
   month,
   asOfLabel,
   liveHref,
-  previousHref,
-  timeMachineHref,
 }: HistoricalBannerProps) => {
   const monthLabel = formatMonthLongLabel(year, month);
-  const backwardHref = previousHref ?? timeMachineHref;
 
   return (
     <aside
       aria-label={`Viewing archived data for ${monthLabel}`}
-      className="mt-6 overflow-hidden rounded-lg border border-l-4 border-[color:var(--color-semantic-caution-border)] bg-[color:var(--color-semantic-caution-bg)]"
+      className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-l-4 border-[color:var(--color-semantic-caution-border)] bg-[color:var(--color-semantic-caution-bg)] px-4 py-2.5"
     >
-      <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          {/* Not `.type-label`: it applies a hardcoded `text-slate-400` that outranks a
-              Tailwind color utility here, so the eyebrow rendered grey in both themes
-              and the band lost the one word that names the state. */}
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--color-semantic-caution-fg)]">
-            Archived view
-          </p>
-          <p className="mt-0.5 text-sm font-semibold text-[var(--app-text)]">
-            Viewing {monthLabel}
-            {asOfLabel ? (
-              <span className="font-normal text-[var(--app-text-muted)]"> · data as of {asOfLabel}</span>
-            ) : null}
-          </p>
-          <p className="mt-1 text-xs text-[var(--app-text-muted)]">
-            Live signals are hidden, and this guidance is not this week&apos;s. Go back to this week&apos;s
-            guidance before acting on it.
-          </p>
-        </div>
-
-        {/* Escape first and filled: it is the only action here that leaves the mode. */}
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {liveHref ? (
-            <ActionLink href={liveHref} variant="primary" className="gap-1.5">
-              <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              Back to this week
-            </ActionLink>
-          ) : null}
-          {backwardHref ? (
-            <ActionLink href={backwardHref} variant="ghost" className="gap-1.5">
-              <ArrowRightIcon className="h-3.5 w-3.5 rotate-180" aria-hidden="true" />
-              Earlier month
-            </ActionLink>
-          ) : null}
-          {timeMachineHref ? (
-            <ActionLink href={timeMachineHref} variant="ghost">
-              Pick a date
-            </ActionLink>
-          ) : null}
-        </div>
-      </div>
+      {/* Not `.type-label`: it applies a hardcoded `text-slate-400` that outranks a
+          Tailwind color utility here, so the eyebrow rendered grey in both themes
+          and the band lost the one word that names the state. */}
+      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--color-semantic-caution-fg)]">
+        Archived view
+      </p>
+      <p className="min-w-0 text-sm font-semibold text-[var(--app-text)]">
+        Viewing {monthLabel}
+        {asOfLabel ? (
+          <span className="font-normal text-[var(--app-text-muted)]"> · data as of {asOfLabel}</span>
+        ) : null}
+      </p>
+      {/* Escape first and filled: it is the only action here. */}
+      {liveHref ? (
+        <ActionLink href={liveHref} variant="primary" className="ml-auto gap-1.5">
+          Back to this week
+          <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
+        </ActionLink>
+      ) : null}
     </aside>
   );
 };

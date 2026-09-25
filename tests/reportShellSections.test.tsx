@@ -43,15 +43,18 @@ describe("ReportShell extracted sections", () => {
       />,
     );
 
-    // One kicker on every report route. "Weekly operating brief" used to appear
-    // on whichever routes forgot to ask for the compact variant.
-    assert.match(html, /Weekly brief/);
-    assert.doesNotMatch(html, /Weekly operating brief/);
-    // The status word is the route's stamp: it prints in the regime ink, and
-    // the rest of the line stays neutral after it.
-    assert.match(html, /text-\[color:var\(--regime-ink\)\][^>]*>DEFENSIVE<\/span> • HIGH • As of Mar 5/);
+    // No kicker. "Weekly brief" above every H1 restated the route the header
+    // tab and the bottom bar already name; the status word leads instead.
+    assert.doesNotMatch(html, />Weekly brief</);
+    // The status word is the route's stamp: it prints first, in the regime
+    // ink, at the reading's own size; the trust headline and the record date
+    // follow it in the meta half of the same line.
+    assert.match(html, /text-\[color:var\(--regime-ink\)\]">DEFENSIVE<\/span>/);
+    assert.match(html, /HIGH • As of Mar 5/);
     assert.match(html, /Decision summary/);
-    assert.match(html, /Updated Mar 6/);
+    // The refresh stamp is labelled for what it is — the pipeline's fetch,
+    // distinct from the reading's record date in the status line above.
+    assert.match(html, /Signals refreshed Mar 6/);
     assert.match(html, /Start/);
     assert.match(html, /Export/);
   });

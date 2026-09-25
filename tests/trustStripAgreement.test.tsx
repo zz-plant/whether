@@ -30,7 +30,7 @@ const assessment = (transitionWatch: boolean, pending = false) => ({
 describe("buildTrustStripProps", () => {
   it("names the four data states with the phrase table /trust uses", () => {
     const base = { recordDateLabel: "Sep 18, 2026", confidenceLabel: "HIGH" as const, assessment: assessment(false) };
-    assert.equal(buildTrustStripProps({ ...base, isFallback: false }).sourcesLabel, "Live");
+    assert.equal(buildTrustStripProps({ ...base, isFallback: false }).sourcesLabel, "All sources live");
     assert.equal(buildTrustStripProps({ ...base, isFallback: false, degradedSourceCount: 2 }).sourcesLabel, "Partly cached");
     assert.equal(buildTrustStripProps({ ...base, isFallback: true }).sourcesLabel, "Cached snapshot");
     const historical = buildTrustStripProps({ ...base, isFallback: false, isHistorical: true });

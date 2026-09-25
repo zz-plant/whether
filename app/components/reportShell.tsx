@@ -160,8 +160,11 @@ export const ReportShell = (props: ReportShellProps) => {
 
         {/* Between whole report sections. Was space-y-5/6, the same 20-24px
             used between items *inside* a section, so section boundaries
-            carried no more weight than item boundaries. */}
-        <div className={`order-1 min-w-0 space-y-10 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+            carried no more weight than item boundaries. On phones the outer
+            gap stays tighter than the desktop one: 40px between the chips
+            row, the notice and the intro was unused space above the first
+            task block, not separation. */}
+        <div className={`order-1 min-w-0 space-y-6 sm:space-y-8 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
           {/* The outline, in chip form, where the rail is hidden. Renders
               nothing on a page with fewer than two sections. */}
           <MobileSectionChips sectionLinks={sectionLinks} />
@@ -218,7 +221,7 @@ export const ReportShell = (props: ReportShellProps) => {
                 // divider: an empty ~64px band between two rules on a first visit.
                 <div
                   key={sectionKey}
-                  className={`empty:hidden ${index === 0 ? "pb-6 lg:pb-8" : "py-6 lg:py-8"}`}
+                  className={`empty:hidden ${index === 0 ? "pb-5 lg:pb-8" : "py-5 lg:py-8"}`}
                 >
                   {section}
                 </div>

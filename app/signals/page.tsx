@@ -72,8 +72,6 @@ export default async function SignalsPage({
             month={model.historicalSelection.month}
             asOfLabel={formatDateUTC(model.historicalSelection.asOf)}
             liveHref="/signals"
-            previousHref={model.previousHistoricalHref}
-            timeMachineHref={model.historicalTimeMachineHref}
           />
         ) : null
       }

@@ -1698,3 +1698,69 @@ surfaces do not reintroduce the old words.
 
 Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
 archive is append-only and its exports are expected to read as they did on the day.
+
+### 1.1.25 The phone gets the reading, not the shell (2026-09-25)
+
+A mobile review of `/operate`, `/signals` and the archive mode found the report routes opening
+with chrome that restated the route instead of the week: a "Weekly brief" kicker above every H1,
+the operating-loop glyph as a second navigation band under the bottom tab bar, a hero Share button
+duplicating the page's own Share step, and a chips row that clipped its overflow with no affordance.
+The intro also inverted the hierarchy the product claims — "Freezing" printed in micro type under a
+display-size "Plan", on a page whose route name the bottom bar already carries. Changes, all in the
+shell so every report route inherits them:
+
+- **`CommandCenterNavBlock`: no kicker.** "Weekly brief" above every H1 restated the route the
+  header tab, the sidebar and the bottom bar already name, and made distinct pages read as
+  variations of one landing page.
+- **The status word leads the intro.** The regime word prints first, in the regime ink, at the
+  reading's own size; the trust headline and record date follow it in the meta half of the same
+  line. The H1 drops to `text-fluid-base` below `lg` — the bottom bar owns the route name on a
+  phone; the week's word is the fact the reader came for.
+- **The operating-loop glyph is desktop-only** (`hidden lg:flex`): on a phone its four steps are
+  the bottom bar's tabs, and under the intro it was a second navigation band pushing the first
+  task block down.
+- **`/operate` drops the hero Share button.** The Share step further down the same page owns
+  sharing; on a phone both were in one viewport as "Share the brief" twice.
+- **The refresh stamp reads "Signals refreshed …"**, not "Updated …" — two dates print inside one
+  viewport and the reader has to be able to tell the pipeline's fetch from the reading's record
+  date apart. The data-status vocabulary renames `live` to "All sources live": "Live" beside a
+  dated reading claimed something about the page, when what is live is the sources.
+- **`MobileSectionChips` fades its hidden edges** wherever content sits beyond them — a row that
+  silently clips reads as broken labels, not as something you can scroll (the DD-001 affordance
+  call, applied to the outline row).
+- **Shell spacing tightens below `lg`** (`space-y-6 sm:space-y-8 lg:space-y-12`, section paddings
+  `py-5 lg:py-8`): 40px between the chips row, the offline notice and the intro was unused space
+  above the first task block, not separation.
+- **The week checklist count is `text-sm`.** "0 of 5 done this week" is the most actionable fact
+  under the intro and printed in the same micro size as the trust metadata above it.
+
+**Command palette (`Cmd+K`).** Below `md` the palette is a bottom sheet, not a centered dialog:
+touch-height rows (`min-h-11`), no keyboard-shortcut badges, no shortcut footer, no pre-selected
+highlight (with no hardware keyboard the index never moves, and a permanent first-row highlight
+only competes with the field above), and a neutral placeholder — the e/p/h mnemonics are for the
+keyboard help, not the phone's only path to `/search`. The `.weather-kbd` badges hide behind a
+wrapper span because the class is unlayered CSS and outranks the `hidden` utility.
+
+**Archive mode.** The historical banner is one row with one action — "Archived view · Viewing
+August 2026 · data as of Aug 31 · Back to this week". It was an eyebrow, a title, a paragraph and
+up to three buttons, occupying half a phone screen before the historical guidance began; "Earlier
+month" and "Pick a date" went with it, because the calendar picker beside the week title and the
+palette's archive commands are where going deeper into the archive lives. The "Past week" tag
+beside the week title is gone too — the banner is the mode's one marker, and the tag read as
+another control while saying what the banner had already said. `CompactTrustPopover` renders
+nothing in historical mode; its sources and dates are only truth for a live reading.
+
+**The weather rationale is the condition, not the advice.** `REGIME_WEATHER_RATIONALES` keeps
+the money fact and drops the instruction half ("Move faster", "Conserve cash"): beside a cautionary
+call it read as two recommendations disagreeing, when the truth is one condition and one
+constraint — the stamp states the condition, the heading owns the instruction. Consumers that
+already took the fact half (the OG subtitle, the investor snippet) are unchanged.
+
+**The trust strip's flip-risk cell answers "Not expected"**, not "No": the boolean says nothing is
+near its line this reading; printed as "No" beside Medium confidence it read as a promise about
+the future the confidence cell had just declined to make.
+
+Measured at 430px after the change: no document overflow on `/`, `/operate`, `/signals`,
+`/history` or archive mode; `/operate`'s first task block begins at y≈498 (intro ends at 317);
+the archive banner is 123px with one action; the palette sheet spans the bottom 613px of the
+viewport with 56px rows.

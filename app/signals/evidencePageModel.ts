@@ -3,10 +3,6 @@ import { loadReportDataSafe } from "../../lib/report/reportData";
 import type { ReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import {
-  buildTimeMachineHref,
-  getAdjacentTimeMachineRequest,
-} from "../../lib/timeMachine/timeMachineSelection";
-import {
   buildBreadcrumbList,
   organizationName,
   websiteName,
@@ -181,13 +177,6 @@ const deriveSignalsPageModel = (
     treasuryProvenance,
     reportDynamics,
   } = reportData;
-  const previousHistoricalSelection = historicalSelection
-    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
-    : null;
-  const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/signals", previousHistoricalSelection)
-    : undefined;
-  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   /* `advanced=1` is the query key the month picker's disclosure carries, so
      every link written as `/signals?advanced=1#time-machine` opens it. A month
      already loaded opens it too: the reader is in the middle of using it. */
@@ -255,8 +244,6 @@ const deriveSignalsPageModel = (
     actionNowShort,
     treasury,
     treasuryProvenance,
-    previousHistoricalHref,
-    historicalTimeMachineHref,
     monthPickerOpen,
     isFallback,
     trust,

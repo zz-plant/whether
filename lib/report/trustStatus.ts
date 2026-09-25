@@ -336,7 +336,11 @@ export const buildCompactTrustSummary = ({
  * systems operational about the same read at the same moment.
  */
 const DATA_STATUS_LABELS = {
-  live: "Live",
+  /* "Live" alone was ambiguous beside a dated reading: it sounds like a claim
+   * about the page ("this is live now") while the data is as-of its record
+   * date and may be partly cached. What is live is the sources — the badge
+   * says so. */
+  live: "All sources live",
   partlyCached: "Partly cached",
   cachedSnapshot: "Cached snapshot",
   historical: "Historical snapshot",

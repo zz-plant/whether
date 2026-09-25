@@ -417,11 +417,6 @@ async function PageContent({
             month={historicalSelection.month}
             asOfLabel={formatDateUTC(historicalSelection.asOf)}
             liveHref="/"
-            previousHref={
-              previousHistoricalRequest
-                ? buildTimeMachineHref("/", previousHistoricalRequest)
-                : undefined
-            }
           />
         </div>
       ) : null}
