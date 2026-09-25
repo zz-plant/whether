@@ -388,7 +388,10 @@ export async function fetchSaaSValuations(
   const median = (vals: number[]) => {
     if (vals.length === 0) return null;
     const sorted = [...vals].sort((a, b) => a - b);
-    return sorted[Math.floor(sorted.length / 2)];
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 1
+      ? sorted[mid]
+      : Math.round(((sorted[mid - 1] + sorted[mid]) / 2) * 10) / 10;
   };
 
   return {

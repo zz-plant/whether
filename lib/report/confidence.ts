@@ -104,6 +104,7 @@ export const resolvePublishedConfidenceLabel = ({
   recordDate?: string | null;
   now?: number;
 }): "HIGH" | "MED" | "LOW" => {
+  if (hasImputedInputs({ scores, thresholds })) return "LOW";
   const gap = resolveDistanceToFlip({ scores, thresholds });
   const geometric = gap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : gap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
   const ageHours = isFallbackData && recordDate
