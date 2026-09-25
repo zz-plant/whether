@@ -38,12 +38,12 @@ const installKv = (initial: Record<string, string> = {}): FakeKv => {
       list_complete: true,
     }),
   };
-  (globalThis as { WHETHER_DURABLE_KV?: unknown }).WHETHER_DURABLE_KV = kv;
+  Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });
   return kv;
 };
 
 const clearKv = () => {
-  delete (globalThis as { WHETHER_DURABLE_KV?: unknown }).WHETHER_DURABLE_KV;
+  Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
 };
 
 const ok = (returned: number, visited = returned * 10): ActivationFunnelReport => ({

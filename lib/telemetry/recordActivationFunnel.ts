@@ -16,6 +16,8 @@
  * The stored record is aggregate counts with no identity, which is the same property the
  * browser-side events have. It is not a growth report and should not be turned into one.
  */
+import { z } from "zod";
+
 import { getWhetherKv } from "../runtime/kv";
 import {
   loadActivationFunnelReport,
@@ -35,32 +37,38 @@ type StoredActivationFunnel = {
   weeks: StoredWeek[];
 };
 
-const isFunnelWeek = (value: unknown): value is FunnelWeek => {
-  if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<FunnelWeek>;
-  return (
-    typeof candidate.week === "string" &&
-    !!candidate.counts &&
-    typeof candidate.counts.visited === "number" &&
-    typeof candidate.counts.oriented === "number" &&
-    typeof candidate.counts.committed === "number" &&
-    typeof candidate.counts.returned === "number" &&
-    !!candidate.commitments &&
-    typeof candidate.commitments === "object"
-  );
-};
-
 /** Validated on the way out of KV, so a hand-edited or truncated value cannot render as a week. */
+const storedWeekSchema = z.object({
+  week: z.string(),
+  counts: z.object({
+    visited: z.number(),
+    oriented: z.number(),
+    committed: z.number(),
+    returned: z.number(),
+  }),
+  commitments: z.record(z.string(), z.number()),
+  generatedAt: z.string(),
+});
+
+const storedEnvelopeSchema = z.object({
+  generatedAt: z.string(),
+  weeks: z.array(z.unknown()),
+});
+
 export const parseStoredActivationFunnel = (raw: string | null): StoredActivationFunnel | null => {
   if (!raw) return null;
   try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return null;
-    const candidate = parsed as Partial<StoredActivationFunnel>;
-    if (typeof candidate.generatedAt !== "string" || !Array.isArray(candidate.weeks)) return null;
-    const weeks = candidate.weeks.filter(isFunnelWeek);
+    const envelope = storedEnvelopeSchema.safeParse(JSON.parse(raw));
+    if (!envelope.success) return null;
+    /* Per week, not whole record: one bad week is dropped and the rest still render, which
+       is what "a hand-edited value cannot render as a week" has always promised. */
+    const weeks: StoredWeek[] = [];
+    for (const candidate of envelope.data.weeks) {
+      const week = storedWeekSchema.safeParse(candidate);
+      if (week.success) weeks.push(week.data);
+    }
     if (weeks.length === 0) return null;
-    return { generatedAt: candidate.generatedAt, weeks: weeks as StoredWeek[] };
+    return { generatedAt: envelope.data.generatedAt, weeks };
   } catch {
     return null;
   }

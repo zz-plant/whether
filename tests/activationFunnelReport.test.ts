@@ -159,8 +159,8 @@ describe("activation funnel report", () => {
     const fullPage = JSON.stringify({
       data: Array.from({ length: 5_000 }, () => ({ timestamp: "2026-09-16 10:00:00", blob2: JSON.stringify(visit()) })),
     });
-    const fetcher = (async () =>
-      new Response(fullPage, { status: 200, headers: { "content-type": "application/json" } })) as unknown as typeof fetch;
+    const fetcher = async () =>
+      new Response(fullPage, { status: 200, headers: { "content-type": "application/json" } });
 
     const report = await loadActivationFunnelReport({
       now: NOW,
@@ -175,8 +175,8 @@ describe("activation funnel report", () => {
   it("reads the closed weeks and leaves the running week's rows alone", async () => {
     resetActivationFunnelCacheForTests();
     const seen: string[] = [];
-    const fetcher = (async (_url: unknown, init: unknown) => {
-      seen.push(String((init as { body: string }).body));
+    const fetcher = async (_url: unknown, init: unknown) => {
+      seen.push(typeof init === "object" && init !== null && "body" in init ? String(init.body) : "");
       return new Response(
         JSON.stringify({
           data: [
@@ -186,7 +186,7 @@ describe("activation funnel report", () => {
         }),
         { status: 200, headers: { "content-type": "application/json" } },
       );
-    }) as unknown as typeof fetch;
+    };
 
     const report = await loadActivationFunnelReport({
       now: NOW,
@@ -207,7 +207,7 @@ describe("activation funnel report", () => {
 
   it("says a failed read is unavailable, with the reason, rather than as zero visits", async () => {
     resetActivationFunnelCacheForTests();
-    const fetcher = (async () => new Response("nope", { status: 403 })) as unknown as typeof fetch;
+    const fetcher = async () => new Response("nope", { status: 403 });
 
     const report = await loadActivationFunnelReport({
       now: NOW,
@@ -282,10 +282,10 @@ describe("activation funnel report", () => {
   it("reads one reader per fifteen minutes and forgets a failed read", async () => {
     resetActivationFunnelCacheForTests();
     let calls = 0;
-    const fetcher = (async () => {
+    const fetcher = async () => {
       calls += 1;
       return new Response("nope", { status: 500 });
-    }) as unknown as typeof fetch;
+    };
 
     const config = { accountId: "acct", token: "t", dataset: "whether_telemetry" };
     await loadActivationFunnelReport({ now: NOW, config, fetcher });
@@ -294,8 +294,7 @@ describe("activation funnel report", () => {
     assert.equal(calls, 2, "a failed read is retried rather than remembered for fifteen minutes");
 
     resetActivationFunnelCacheForTests();
-    const ok = (async () =>
-      new Response(JSON.stringify({ data: [] }), { status: 200 })) as unknown as typeof fetch;
+    const ok = async () => new Response(JSON.stringify({ data: [] }), { status: 200 });
     await loadActivationFunnelReport({ now: NOW, config, fetcher: ok });
     const before = calls;
     await loadActivationFunnelReport({ now: new Date(NOW.getTime() + 60_000), config, fetcher: ok });
