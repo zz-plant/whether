@@ -19,6 +19,8 @@ import type { TrustStripProps } from "../components/trustStrip";
 import type { ScorePositions } from "./formulaReference";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { loadCronRunHistory } from "../../lib/telemetry/runHistory";
+import { formatActivationFunnelLine } from "../../lib/telemetry/activationFunnelReport";
+import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivationFunnel";
 
 type ReportShellProps = Omit<ComponentProps<typeof ReportShell>, "children">;
 
@@ -33,11 +35,19 @@ export async function buildTrustPageModel() {
     ),
   };
   /* Read alongside the brief, not after it: the run history has its own deadline and
-     fails soft, so it never lengthens the page past the report path's own bound. */
-  const [{ reportData, snapshot }, runHistory] = await Promise.all([
+     fails soft, so it never lengthens the page past the report path's own bound. The
+     funnel is a KV get of a record the Monday cron already wrote, so it costs one read
+     and cannot fail into a slow page the way an Analytics Engine query would. */
+  const [{ reportData, snapshot }, runHistory, storedFunnel] = await Promise.all([
     loadWeeklyBriefSnapshot(undefined, { route: "/trust" }),
     loadCronRunHistory(),
+    readStoredActivationFunnel(),
   ]);
+  /* Null in both directions that matter: no run has ever written a record, or the
+     record's two weeks both held nothing. The section renders on the line alone, so a
+     measured zero and an unmeasured week stay out of the markup rather than becoming
+     "0 readers" in a place no reader can tell apart from the other. */
+  const readerReturnsLine = storedFunnel ? formatActivationFunnelLine({ status: "ok", weeks: storedFunnel.weeks }) : null;
   const homeBriefModel = snapshot.homeBriefModel;
   const isFallback = snapshot.isFallback;
   const degradedSourceRows = buildDegradedSourceRows(reportData.sourceHealth);
@@ -146,6 +156,8 @@ export async function buildTrustPageModel() {
     // Only when the telemetry read is configured: an index entry for a section that
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
+    // Same rule: an index entry for a section that never renders is a broken anchor.
+    ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
     { href: "#source-board", label: "Sources" },
     { href: "#sources-freshness", label: "Cite this guidance" },
     { href: "#confidence-limits", label: "Confidence & limits" },
@@ -188,6 +200,7 @@ export async function buildTrustPageModel() {
     trustStrip,
     scorePositions,
     runHistory,
+    readerReturns: storedFunnel && readerReturnsLine ? { line: readerReturnsLine, generatedAt: storedFunnel.generatedAt } : null,
     reportShellProps,
   };
 }

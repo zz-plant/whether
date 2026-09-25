@@ -36,6 +36,10 @@ const CRON_STEP_LABELS: Record<string, string> = {
   "slack/deliver-brief": "Slack brief",
   "artifact/brief-screenshot": "Brief screenshot",
   "summary-history": "Month in progress",
+  /* Monday only. Records how many readers came back, which is the one number the product
+     has no other way to learn; a red row here usually means the Analytics Engine read
+     credentials are absent rather than that anyone stopped reading. */
+  "activation-funnel": "Reader return record",
   "check-regime-change": "Regime-change check",
   "alert-deliveries": "Alert deliveries",
   "regime-history-workflow": "Regime history pull request",

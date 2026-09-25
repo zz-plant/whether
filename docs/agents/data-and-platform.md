@@ -89,3 +89,10 @@ step with runs, failures, and last success over 30 days. Unconfigured renders no
 read renders its reason. Every scheduled step writes that stream, including the signal refresh
 itself since 2026-09-14, so an empty window means the cron did not fire, not that nothing was
 measured.
+
+The activation funnel is the second read. `lib/telemetry/activationFunnelReport.ts` counts the
+`activation` stream's four steps per completed ISO week — never the week in flight — and the
+Monday cron records the result to KV (`lib/telemetry/recordActivationFunnel.ts`) so `/trust` can
+render "Reader returns" from one KV get instead of a paged SQL query on the render path. An
+unconfigured or failed read writes nothing, so absent credentials never overwrite last week's
+counts with zeros.
