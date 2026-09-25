@@ -11,6 +11,7 @@ import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
+import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
 import { WHETHER_AGENT_MANIFEST_PATH, agentManifestResponse } from "../lib/agentManifest";
 import { installBindings } from "./bindings";
 
@@ -201,6 +202,18 @@ export default {
       await runCronStep("brief-freeze-start", async () => {
         await workflow.create({ id: `brief-freeze-${new Date().toISOString().slice(0, 10)}`, params: { base: "main" } });
         return { ok: true };
+      });
+    }
+
+    /* The week's activation funnel, recorded so the "which step is leaking" question
+       `ROADMAP.md` puts first has an answer that does not require running a credentialed
+       script by hand. Monday only, because the unit is an ISO week and a daily re-run
+       would keep rewriting a week that is still running. Writes nothing when the read is
+       unconfigured, so absent credentials never overwrite last week's counts with zeros. */
+    if (!isDailyIngestion) {
+      await runCronStep("activation-funnel", async () => {
+        const result = await recordActivationFunnel();
+        return { ok: result.ok, error: result.error };
       });
     }
 
