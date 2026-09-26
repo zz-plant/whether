@@ -219,57 +219,57 @@ export const DecisionShieldPanel = ({
                   triggerClassName="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70"
                 />
               </Fieldset.Root>
+
+              <DecisionShieldPresetsSection
+                currentSelection={currentSelection}
+                onApplyPreset={applyPresetSelection}
+              />
+
+              <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
+                <div className="weather-surface p-4">
+                  <p className="type-label text-slate-400">Decision verdict</p>
+                  <div
+                    className={`mt-3 inline-flex items-center rounded-sm border px-3 py-1 text-xs font-semibold ${verdictStyles[output.verdict]}`}
+                  >
+                    {output.verdict}
+                  </div>
+                  <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
+                  <p className="mt-3 text-xs text-slate-400">
+                    A summary you can paste. It says what the reading was, not what will happen.
+                  </p>
+                </div>
+                <div className="weather-surface p-4">
+                  <p className="type-label text-slate-400">Why</p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    {output.bullets.slice(0, 4).map((bullet) => (
+                      <li key={bullet} className="flex gap-2">
+                        <span className="text-slate-400">•</span>
+                        <span className="break-words">{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="weather-surface p-4">
+                  <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
+                  <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
+                  {/* Printed, not tucked behind a hover glyph a touch screen never shows. */}
+                  {hiringPauseApplies(action) ? (
+                    <p className="mt-2 text-xs text-slate-400">
+                      Pause new hiring, long-term commitments, and major spend increases if this line is crossed.
+                    </p>
+                  ) : null}
+                </div>
+                <div className="weather-surface p-4">
+                  <p className="type-label text-slate-400">{publicDecisionLabels.reversal}</p>
+                  <p className="mt-3 type-data text-slate-300 break-words">
+                    {output.reversalTrigger}
+                  </p>
+                </div>
+              </div>
             </>
           )}
-
-          <DecisionShieldPresetsSection
-            currentSelection={currentSelection}
-            onApplyPreset={applyPresetSelection}
-          />
-
-          <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Decision verdict</p>
-              <div
-                className={`mt-3 inline-flex items-center rounded-sm border px-3 py-1 text-xs font-semibold ${verdictStyles[output.verdict]}`}
-              >
-                {output.verdict}
-              </div>
-              <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
-              <p className="mt-3 text-xs text-slate-400">
-                A summary you can paste. It says what the reading was, not what will happen.
-              </p>
-            </div>
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Why</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                {output.bullets.slice(0, 4).map((bullet) => (
-                  <li key={bullet} className="flex gap-2">
-                    <span className="text-slate-400">•</span>
-                    <span className="break-words">{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
-              <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
-              {/* Printed, not tucked behind a hover glyph a touch screen never shows. */}
-              {hiringPauseApplies(action) ? (
-                <p className="mt-2 text-xs text-slate-400">
-                  Pause new hiring, long-term commitments, and major spend increases if this line is crossed.
-                </p>
-              ) : null}
-            </div>
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">{publicDecisionLabels.reversal}</p>
-              <p className="mt-3 type-data text-slate-300 break-words">
-                {output.reversalTrigger}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </section>

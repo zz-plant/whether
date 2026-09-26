@@ -175,6 +175,7 @@ describe("DecisionShieldPanel markup", () => {
     assert.ok(markup.includes("Compare two plans"));
     assert.ok(markup.includes("Pick from a list"));
     assert.ok(markup.includes("Decision verdict"));
+    assert.ok(!markup.includes("Saved scenarios"), "dropdown presets section should not render in plan mode");
   });
 });
 

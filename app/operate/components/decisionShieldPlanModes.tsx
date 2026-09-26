@@ -142,27 +142,31 @@ export function PlanStressTestMode({
             {/* Stress Test Audit Output — only once there is a plan to grade. */}
             {!planReady ? (
               <div className="rounded-lg border border-dashed border-slate-800 bg-slate-950/60 p-4" aria-live="polite">
-                <p className="text-sm text-slate-200">Describe the plan to grade it.</p>
+                <p className="type-label text-slate-400">Decision verdict</p>
+                <p className="mt-1.5 text-sm text-slate-200 font-medium">Describe a plan or choose an example above to grade it.</p>
                 <p className="mt-1 text-fluid-xs text-slate-400">
                   Name the commitment and its size. Runway and burn are optional; with both, the verdict is sized against your cash.
                 </p>
               </div>
             ) : (
             <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 text-xs font-bold rounded-sm ${
-                    stressTestResult.verdict === "SAFE"
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                      : stressTestResult.verdict === "RISKY"
-                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                      : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
-                  }`}>
-                    {stressTestResult.verdict}
-                  </span>
-                  <span className="text-fluid-xs text-slate-300 font-semibold">
-                    Category: {stressTestResult.detectedCategory}
-                  </span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <p className="type-label text-slate-400">Decision verdict</p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-sm ${
+                      stressTestResult.verdict === "SAFE"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                        : stressTestResult.verdict === "RISKY"
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                        : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                    }`}>
+                      {stressTestResult.verdict}
+                    </span>
+                    <span className="text-fluid-xs text-slate-300 font-semibold">
+                      Category: {stressTestResult.detectedCategory}
+                    </span>
+                  </div>
                 </div>
                 {stressTestResult.financialImpactSummary && (
                   <span className="text-fluid-nano text-slate-400 tabular-nums">
@@ -170,6 +174,17 @@ export function PlanStressTestMode({
                   </span>
                 )}
               </div>
+
+              <p className="type-data text-slate-200 break-words font-medium">
+                {stressTestResult.headline}
+              </p>
+
+              {stressTestResult.sizingNote ? (
+                <div className="rounded border border-slate-800/80 bg-slate-900/60 p-2.5">
+                  <p className="type-eyebrow">Sizing</p>
+                  <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.sizingNote}</p>
+                </div>
+              ) : null}
 
               <div className="space-y-1.5">
                 <p className="type-eyebrow">What this plan assumes</p>
@@ -183,7 +198,7 @@ export function PlanStressTestMode({
                 </ul>
               </div>
 
-              <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-2 gap-3">
+              <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-3 gap-3">
                 <div>
                   <p className="type-eyebrow">{publicDecisionLabels.threshold}</p>
                   <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
@@ -191,6 +206,10 @@ export function PlanStressTestMode({
                 <div>
                   <p className="type-eyebrow text-sky-400">A more reversible version</p>
                   <p className="text-fluid-xs text-sky-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
+                </div>
+                <div>
+                  <p className="type-eyebrow">{publicDecisionLabels.reversal}</p>
+                  <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.reversalTrigger}</p>
                 </div>
               </div>
             </div>
