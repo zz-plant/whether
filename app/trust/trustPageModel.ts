@@ -1,7 +1,6 @@
-import type { ComponentProps } from "react";
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
-import type { ReportShell } from "../components/reportShell";
+import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -22,7 +21,6 @@ import { loadCronRunHistory } from "../../lib/telemetry/runHistory";
 import { formatActivationFunnelLine } from "../../lib/telemetry/activationFunnelReport";
 import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivationFunnel";
 
-type ReportShellProps = Omit<ComponentProps<typeof ReportShell>, "children">;
 
 export async function buildTrustPageModel() {
   const breadcrumbStructuredData = {
@@ -167,25 +165,37 @@ export async function buildTrustPageModel() {
     { href: "#meeting-snippet", label: "Meeting snippet" },
   ];
 
-  const reportShellProps = {
-    statusLabel: reportData.statusLabel,
-    regime: reportData.assessment.regime,
-    recordDateLabel: reportData.recordDateLabel,
-    fetchedAtLabel: reportData.fetchedAtLabel,
-    trustStatusTone,
-    degradedSourceRows,
-    showOfflineBadge: isFallback,
-    pageTitle: "How much to trust this week's guidance",
-    pageSummary: "Check whether this week's guidance is current enough to act on.",
-    sectionLinks,
-    activeStep: "posture",
-    sidebarVariant: "full",
-    nextStep: {
-      href: "/signals",
-      description: "Check evidence",
+  const reportShellModel: ReportShellModel = {
+    status: {
+      statusLabel: reportData.statusLabel,
+      regime: reportData.assessment.regime,
+      recordDateLabel: reportData.recordDateLabel,
+      fetchedAtLabel: reportData.fetchedAtLabel,
     },
-    structuredData: breadcrumbStructuredData,
-  } satisfies ReportShellProps;
+    page: {
+      pageTitle: "How much to trust this week's guidance",
+      pageSummary: "Check whether this week's guidance is current enough to act on.",
+      sectionLinks,
+      activeStep: "posture",
+    },
+    trust: {
+      trustStatusTone,
+      degradedSourceRows,
+      showOfflineBadge: isFallback,
+    },
+    chrome: {
+      sidebarVariant: "full",
+    },
+    actions: {
+      nextStep: {
+        href: "/signals",
+        description: "Check evidence",
+      },
+    },
+    payloads: {
+      structuredData: breadcrumbStructuredData,
+    },
+  };
 
   return {
     reportData,
@@ -201,6 +211,6 @@ export async function buildTrustPageModel() {
     scorePositions,
     runHistory,
     readerReturns: storedFunnel && readerReturnsLine ? { line: readerReturnsLine, generatedAt: storedFunnel.generatedAt } : null,
-    reportShellProps,
+    reportShellModel,
   };
 }

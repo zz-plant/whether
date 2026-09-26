@@ -47,7 +47,7 @@ export default async function MethodPage({
     scorePositions,
     runHistory,
     readerReturns,
-    reportShellProps,
+    reportShellModel,
   } = await buildTrustPageModel();
 
   const secondaryContent = (
@@ -186,7 +186,7 @@ export default async function MethodPage({
   );
 
   return (
-    <ReportShell {...reportShellProps}>
+    <ReportShell model={reportShellModel}>
       {/* The strip, directly under the h1, in the slot every reading route
           gives it: record date, sources, confidence, could the call change.
           This was a five-cell "System status" card — data, freshness, sources,
