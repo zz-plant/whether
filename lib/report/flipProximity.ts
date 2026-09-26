@@ -175,3 +175,29 @@ export const buildQuietDayRead = ({
   if (!nearest) return null;
   return `Conditions unchanged — ${nearest}`;
 };
+
+/**
+ * The standup flip line: a one-sentence input for engineering/leadership standups.
+ *
+ * Teams need a compact, zero-friction answer for "did macro conditions move
+ * this week, and how close are we to a pace change?" When conditions held,
+ * it reports the call unchanged, the nearest flip distance, and "no pace change."
+ * When conditions shifted, it names the new call, the distance to the next flip,
+ * and calls for a pace review.
+ */
+export const buildStandupFlipLine = ({
+  regime,
+  steadyWeek,
+  proximity = [],
+}: {
+  regime: RegimeKey;
+  steadyWeek: boolean;
+  proximity?: readonly FlipProximity[];
+}): string => {
+  const nearest = proximity[0];
+  const distance = nearest ? `${formatMove(nearest.inputMove)} from flip` : "no near flip";
+  if (steadyWeek) {
+    return `Call unchanged, ${distance}; no pace change.`;
+  }
+  return `Call changed to ${getRegimePublicLabel(regime)}, ${distance}; review pace.`;
+};
