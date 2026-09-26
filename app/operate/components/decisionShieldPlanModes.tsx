@@ -203,7 +203,11 @@ export function ComparePlansMode({
                 {planReady ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
                   <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
-                    comparisonResult.planA.verdict === "SAFE" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
+                    comparisonResult.planA.verdict === "SAFE"
+                      ? "bg-emerald-500/20 text-emerald-300"
+                      : comparisonResult.planA.verdict === "RISKY"
+                      ? "bg-amber-500/20 text-amber-300"
+                      : "bg-rose-500/20 text-rose-300"
                   }`}>
                     Verdict: {comparisonResult.planA.verdict}
                   </span>
@@ -225,7 +229,11 @@ export function ComparePlansMode({
                 {planBText.trim() ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
                   <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
-                    comparisonResult.planB.verdict === "SAFE" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
+                    comparisonResult.planB.verdict === "SAFE"
+                      ? "bg-emerald-500/20 text-emerald-300"
+                      : comparisonResult.planB.verdict === "RISKY"
+                      ? "bg-amber-500/20 text-amber-300"
+                      : "bg-rose-500/20 text-rose-300"
                   }`}>
                     Verdict: {comparisonResult.planB.verdict}
                   </span>

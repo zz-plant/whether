@@ -241,28 +241,86 @@ export const DecisionShieldPanel = ({
   /* The stored snapshot is the reading on screen, not a fresh read: a decision
      is only judgeable later against the conditions its author actually saw. */
   const buildLedgerPayload = useCallback(
-    (): DecisionMemoryPayload => ({
+    (): DecisionMemoryPayload => {
+      if (planMode === "natural_language" && planReady) {
+        return {
+          recordDate,
+          decision: {
+            lifecycle,
+            category: stressTestResult.detectedCategory,
+            action: stressTestResult.detectedAction,
+            context: planText.trim(),
+          },
+          outcome: {
+            verdict: stressTestResult.verdict,
+            summary: stressTestResult.headline,
+            guardrail: stressTestResult.boundedGuardrail,
+            reversalTrigger: stressTestResult.reversalTrigger,
+          },
+          assessment: {
+            regime: assessment.regime,
+            scores: assessment.scores,
+            thresholds: assessment.thresholds,
+            inputs: assessment.inputs,
+          },
+        };
+      }
+      return {
+        recordDate,
+        decision: { lifecycle, category, action },
+        outcome: {
+          verdict: output.verdict,
+          summary: output.summary,
+          guardrail: output.guardrail,
+          reversalTrigger: output.reversalTrigger,
+        },
+        assessment: {
+          regime: assessment.regime,
+          scores: assessment.scores,
+          thresholds: assessment.thresholds,
+          inputs: assessment.inputs,
+        },
+      };
+    },
+    [
       recordDate,
-      decision: { lifecycle, category, action },
-      outcome: {
-        verdict: output.verdict,
-        summary: output.summary,
-        guardrail: output.guardrail,
-        reversalTrigger: output.reversalTrigger,
-      },
-      assessment: {
-        regime: assessment.regime,
-        scores: assessment.scores,
-        thresholds: assessment.thresholds,
-        inputs: assessment.inputs,
-      },
-    }),
-    [recordDate, lifecycle, category, action, output, assessment],
+      planMode,
+      planReady,
+      planText,
+      stressTestResult,
+      lifecycle,
+      category,
+      action,
+      output,
+      assessment,
+    ],
   );
 
   const shareText = useMemo(
-    () => buildShareText(assessment, lifecycle, category, action, output),
-    [assessment, lifecycle, category, action, output]
+    () =>
+      buildShareText(assessment, lifecycle, category, action, output, {
+        planMode,
+        planText,
+        planBText,
+        stressTestResult,
+        comparisonResult,
+        businessModel,
+        grossMarginPct: profile.grossMarginPct,
+      }),
+    [
+      assessment,
+      lifecycle,
+      category,
+      action,
+      output,
+      planMode,
+      planText,
+      planBText,
+      stressTestResult,
+      comparisonResult,
+      businessModel,
+      profile.grossMarginPct,
+    ],
   );
 
   useEffect(() => {
