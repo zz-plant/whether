@@ -1522,6 +1522,16 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`) — the same shape the Decision
   Shield writes, with the graded sentence as `decision.context` — checks `response.ok`, and
   shows "Save failed — retry" otherwise (`tests/planStressTestMemoryPayload.test.ts`).
+- The Decision Shield on `/operate` now exports and records what is on screen (2026-09-26). The
+  share text and the Decision Memory payload follow the active plan mode: in natural-language
+  mode the share artifact is the plan stress test (plan text, model, verdict, sizing, fragile
+  assumptions, guardrail, reversal trigger — bootstrapped mode prints the profile's gross margin)
+  and the memory entry records the plan's detected category and action with the stress-test
+  outcome; in compare mode it exports both plans, both verdicts, and the recommendation. Both
+  previously exported the dropdown-mode reading even when the operator had just graded a plan,
+  so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
+  split UNSAFE (rose) from RISKY (amber); both used to render amber
+  (`tests/decisionShield.test.ts`).
 - The hero's canonical revisit block now reads **What changed this week?** and renders three bands
   (change, consequence, unchanged) via `WeeklyChangeReport`. See section 2 for why the previous
   single-list form dropped the signal move on a multi-item week.
