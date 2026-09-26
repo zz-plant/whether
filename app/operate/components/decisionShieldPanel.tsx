@@ -218,8 +218,9 @@ export const DecisionShieldPanel = ({
   const companyProfile = useMemo<CompanyFinancialProfile>(() => ({
     runwayMonths: profile.runwayMonths,
     monthlyBurnUsd: profile.monthlyBurnUsd,
+    grossMarginPct: profile.grossMarginPct,
     businessModel,
-  }), [profile.runwayMonths, profile.monthlyBurnUsd, businessModel]);
+  }), [profile.runwayMonths, profile.monthlyBurnUsd, profile.grossMarginPct, businessModel]);
   const planReady = planText.trim().length > 0;
   const comparisonReady = planReady && planBText.trim().length > 0;
 

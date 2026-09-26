@@ -31,6 +31,7 @@ const PARSERS: Record<OperatorProfileNumberKey, (raw: string) => number | null> 
     return /^\$?\s*0+(?:\.0+)?$/.test(text) ? 0 : parseMoneyInput(text);
   },
   monthlyGrowthPct: parsePlainNumberInput,
+  grossMarginPct: parsePlainNumberInput,
 };
 
 const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
@@ -38,6 +39,7 @@ const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
   monthlyBurnUsd: "Enter dollars, like $150k or 150000.",
   monthlyRevenueUsd: "Enter dollars, like $80k, or 0 before revenue.",
   monthlyGrowthPct: "Enter a percentage, like 6.",
+  grossMarginPct: "Enter a percentage, like 75.",
 };
 
 const withinLimits = (field: OperatorProfileNumberKey, value: number) =>

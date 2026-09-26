@@ -494,3 +494,51 @@ describe("stress test — the headline names what actually decided", () => {
     assert.equal(regimeDriven.headline, "Hire is considered SAFE in Sunny conditions.");
   });
 });
+
+describe("stress test — bootstrapped mode calibration", () => {
+  it("decouples VC fundraising assumptions and warns on operating reserves when runway is critical", () => {
+    const defensive: RegimeAssessment = {
+      ...buildExpansionAssessment(),
+      regime: "DEFENSIVE",
+      scores: { tightness: 80, riskAppetite: 35, baseRateUsed: "1M", baseRate: 5.25, curveSlope: -0.2 },
+    };
+
+    const vcResult = stressTestDecisionPlan(defensive, {
+      planText: "hire 2 engineers",
+      companyProfile: { runwayMonths: 6, businessModel: "VC_BACKED" },
+    });
+    assert.ok(vcResult.fragileAssumptions.some((a) => a.includes("raising in Cloudy conditions is hard")));
+    assert.ok(vcResult.fragileAssumptions.some((a) => a.includes("Assumes investors will fund fast burn")));
+
+    const bootstrappedResult = stressTestDecisionPlan(defensive, {
+      planText: "hire 2 engineers",
+      companyProfile: { runwayMonths: 6, businessModel: "BOOTSTRAPPED" },
+    });
+    assert.ok(bootstrappedResult.fragileAssumptions.some((a) => a.includes("navigating Cloudy conditions leaves little room for operating losses")));
+    assert.ok(!bootstrappedResult.fragileAssumptions.some((a) => a.includes("raising in Cloudy conditions is hard")));
+    assert.ok(!bootstrappedResult.fragileAssumptions.some((a) => a.includes("Assumes investors will fund fast burn")));
+    assert.ok(!bootstrappedResult.fragileAssumptions.some((a) => a.includes("Assumes capital and debt refinancing remain cheap")));
+  });
+
+  it("upgrades RISKY to SAFE when bootstrapped with strong gross margin (>= 70%)", () => {
+    const defensive: RegimeAssessment = {
+      ...buildExpansionAssessment(),
+      regime: "DEFENSIVE",
+      scores: { tightness: 75, riskAppetite: 40, baseRateUsed: "1M", baseRate: 5.25, curveSlope: 0.1 },
+    };
+
+    const lowMargin = stressTestDecisionPlan(defensive, {
+      planText: "expand product into new vertical",
+      companyProfile: { runwayMonths: 18, businessModel: "BOOTSTRAPPED", grossMarginPct: 45 },
+    });
+    assert.ok(lowMargin.fragileAssumptions.some((a) => a.includes("Gross margin (45%) provides limited buffer")));
+
+    const highMargin = stressTestDecisionPlan(defensive, {
+      planText: "expand product into new vertical",
+      companyProfile: { runwayMonths: 18, businessModel: "BOOTSTRAPPED", grossMarginPct: 80 },
+    });
+    assert.equal(highMargin.verdict, "SAFE");
+    assert.match(highMargin.financialImpactSummary ?? "", /Bootstrapped with 80% gross margin/);
+  });
+});
+
