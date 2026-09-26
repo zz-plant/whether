@@ -50,31 +50,41 @@ export default async function SignalsPage({
 
   return (
     <ReportShell
-      statusLabel={model.statusLabel}
-      regime={model.assessment.regime}
-      recordDateLabel={model.recordDateLabel}
-      fetchedAtLabel={model.fetchedAtLabel}
-      trustStatusTone={model.trust.trustStatusTone}
-      showOfflineBadge={model.isFallback && !model.historicalSelection}
-      pageTitle="Why the weekly brief changed"
-      pageSummary="What moved, why it matters, and what would change the guidance."
-      sectionLinks={model.sectionLinks}
-      activeStep="signals"
-      nextStep={{
-        href: "/operate",
-        description: "Set guardrails for this week's plan",
+      model={{
+        status: {
+          statusLabel: model.statusLabel,
+          regime: model.assessment.regime,
+          recordDateLabel: model.recordDateLabel,
+          fetchedAtLabel: model.fetchedAtLabel,
+        },
+        page: {
+          pageTitle: "Why the weekly brief changed",
+          pageSummary: "What moved, why it matters, and what would change the guidance.",
+          sectionLinks: model.sectionLinks,
+          activeStep: "signals",
+        },
+        trust: {
+          trustStatusTone: model.trust.trustStatusTone,
+          showOfflineBadge: model.isFallback && !model.historicalSelection,
+        },
+        actions: {
+          nextStep: {
+            href: "/operate",
+            description: "Set guardrails for this week's plan",
+          },
+        },
+        payloads: {
+          structuredData: model.structuredData,
+          historicalBanner: model.historicalSelection ? (
+            <HistoricalBanner
+              year={model.historicalSelection.year}
+              month={model.historicalSelection.month}
+              asOfLabel={formatDateUTC(model.historicalSelection.asOf)}
+              liveHref="/signals"
+            />
+          ) : null,
+        },
       }}
-      structuredData={model.structuredData}
-      historicalBanner={
-        model.historicalSelection ? (
-          <HistoricalBanner
-            year={model.historicalSelection.year}
-            month={model.historicalSelection.month}
-            asOfLabel={formatDateUTC(model.historicalSelection.asOf)}
-            liveHref="/signals"
-          />
-        ) : null
-      }
     >
       <OperatorWorkflowRouteTracker />
       {/* Renders nothing on a first visit. Its links land on the rows of the

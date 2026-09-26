@@ -84,16 +84,24 @@ describe("ReportShell extracted sections", () => {
     // an anchor no route renders, so /history shipped a dead button.
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Signals"
-        pageSummary="Deep evidence appendix."
-        sectionLinks={[
-          { href: "#current-scores", label: "Current scores" },
-          { href: "#thresholds", label: "Thresholds" },
-        ]}
-        trustStatusTone="stable"
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Signals",
+            pageSummary: "Deep evidence appendix.",
+            sectionLinks: [
+              { href: "#current-scores", label: "Current scores" },
+              { href: "#thresholds", label: "Thresholds" },
+            ],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+        }}
       >
         <section>Body</section>
       </ReportShell>,
@@ -111,14 +119,24 @@ describe("ReportShell extracted sections", () => {
   it("keeps a hero action a real link when a route passes one", () => {
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Signals"
-        pageSummary="Deep evidence appendix."
-        sectionLinks={[{ href: "#current-scores", label: "Current scores" }]}
-        trustStatusTone="stable"
-        primaryCta={{ href: "/history/compare", label: "Compare periods" }}
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Signals",
+            pageSummary: "Deep evidence appendix.",
+            sectionLinks: [{ href: "#current-scores", label: "Current scores" }],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+          actions: {
+            primaryCta: { href: "/history/compare", label: "Compare periods" },
+          },
+        }}
       >
         <section>Body</section>
       </ReportShell>,
@@ -132,18 +150,28 @@ describe("ReportShell extracted sections", () => {
   it("renders the home brief share action in the header and keeps the body CTA rail quiet", () => {
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Weekly Brief"
-        pageSummary="This week's call and the share-ready path."
-        sectionLinks={[]}
-        trustStatusTone="stable"
-        exportCta={{
-          href: "#share-ready-artifact",
-          label: "Copy weekly brief",
-          copyText: "WEEKLY BRIEF\nAction: Hold posture.",
-          copyTarget: "Weekly brief",
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Weekly Brief",
+            pageSummary: "This week's call and the share-ready path.",
+            sectionLinks: [],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+          actions: {
+            exportCta: {
+              href: "#share-ready-artifact",
+              label: "Copy weekly brief",
+              copyText: "WEEKLY BRIEF\nAction: Hold posture.",
+              copyTarget: "Weekly brief",
+            },
+          },
         }}
       >
         <section>Body</section>
@@ -163,14 +191,24 @@ describe("ReportShell extracted sections", () => {
   it("puts the next-step card at the end of the page, once", () => {
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Plan"
-        pageSummary="Prepare for this week's conditions."
-        sectionLinks={[]}
-        trustStatusTone="stable"
-        nextStep={{ href: "/resolve", description: "One question still open? Resolve it" }}
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Plan",
+            pageSummary: "Prepare for this week's conditions.",
+            sectionLinks: [],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+          actions: {
+            nextStep: { href: "/resolve", description: "One question still open? Resolve it" },
+          },
+        }}
       >
         <section>Body</section>
       </ReportShell>,

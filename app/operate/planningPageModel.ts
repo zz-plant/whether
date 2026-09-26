@@ -22,7 +22,7 @@ import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
-import { ReportShell } from "../components/reportShell";
+import type { ReportShellModel } from "../components/reportShell";
 import { TrustStrip } from "../components/trustStrip";
 import { AreaTable } from "../components/ui/areaTable";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
@@ -43,11 +43,6 @@ export type PlanningSearchParams = {
   [key: string]: string | undefined;
 };
 
-type ReportShellModel = Parameters<typeof ReportShell>[0] extends infer Props
-  ? Props extends { model: infer Model }
-    ? Model
-    : never
-  : never;
 
 type PlanningPageModel = {
   reportShellModel: ReportShellModel;
