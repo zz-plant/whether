@@ -294,7 +294,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   }
 
   const lower = text.toLowerCase();
-  if (/\b(hire|hiring|headcount|recruiting|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
+  if (/\b(hire|hiring|headcount|recruiting|poach|principal|architect|lead|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
     return { category: "HIRING", action: "HIRE", confidence: "MATCHED" };
   }
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
@@ -303,13 +303,13 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: "MATCHED" };
   }
-  if (/\b(discount|pricing|price|deal|contract discount|payment term)\b/.test(lower)) {
+  if (/\b(discount|pricing|price|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contract)\b/.test(lower)) {
     return { category: "PRICING", action: "DISCOUNT", confidence: "MATCHED" };
   }
   if (/\b(acquire|acquisition|merger|m&a|buy company)\b/.test(lower)) {
     return { category: "M_AND_A", action: "ACQUIRE", confidence: "MATCHED" };
   }
-  if (/\b(rewrite|refactor|architecture|rebuild|v2 migration)\b/.test(lower)) {
+  if (/\b(rewrite|refactor|architecture|rebuild|v2 migration|tech debt)\b/.test(lower)) {
     return { category: "ROADMAP", action: "REWRITE", confidence: "MATCHED" };
   }
   if (/\b(expand|international|europe|asia|new market|geo)\b/.test(lower)) {

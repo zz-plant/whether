@@ -17,6 +17,38 @@ import {
 
 const PRESET_HINT_ID = "preset-limit-hint";
 
+const STARTER_SCENARIOS: readonly {
+  name: string;
+  lifecycle: CurrentSelection["lifecycle"];
+  category: CurrentSelection["category"];
+  action: CurrentSelection["action"];
+}[] = [
+  {
+    name: "Procurement: Vendor discount vs yield",
+    lifecycle: "GROWTH",
+    category: "PRICING",
+    action: "DISCOUNT",
+  },
+  {
+    name: "Engineering: Tech debt refactor window",
+    lifecycle: "GROWTH",
+    category: "ROADMAP",
+    action: "REWRITE",
+  },
+  {
+    name: "Talent: Strategic senior hire",
+    lifecycle: "GROWTH",
+    category: "HIRING",
+    action: "HIRE",
+  },
+  {
+    name: "Capital: Discretionary spend control",
+    lifecycle: "GROWTH",
+    category: "RESTRUCTURING",
+    action: "RESTRUCTURE",
+  },
+];
+
 export const DecisionShieldPresetsSection = ({
   currentSelection,
   onApplyPreset,
@@ -88,9 +120,24 @@ export const DecisionShieldPresetsSection = ({
       </output>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {presets.length === 0 ? (
-          <p className="text-sm text-slate-400">
-            No presets yet. Save one to come back to this decision.
-          </p>
+          <div className="col-span-full space-y-3">
+            <p className="text-sm text-slate-400">
+              No presets yet. Save one to come back to this decision.
+            </p>
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-fluid-nano text-slate-400">Or load a starter scenario:</span>
+              {STARTER_SCENARIOS.map((starter) => (
+                <button
+                  key={starter.name}
+                  type="button"
+                  onClick={() => onApplyPreset(starter)}
+                  className="inline-flex items-center rounded-sm border border-slate-700/80 bg-slate-900/90 px-2.5 py-0.5 text-fluid-nano font-medium text-slate-300 transition-colors hover:border-sky-500/50 hover:bg-slate-800 hover:text-sky-200"
+                >
+                  {starter.name}
+                </button>
+              ))}
+            </div>
+          </div>
         ) : (
           presets.map((preset) => (
             <div key={preset.id} className="rounded-lg border border-slate-800/60 p-3">

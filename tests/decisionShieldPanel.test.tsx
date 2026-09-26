@@ -93,11 +93,65 @@ describe("DecisionShieldPresetsSection markup", () => {
     assert.ok(markup.includes("Saved scenarios"));
     assert.ok(markup.includes("Max 8 presets"));
     assert.ok(markup.includes("No presets yet. Save one to come back to this decision."));
+    assert.ok(markup.includes("Or load a starter scenario:"));
+    assert.ok(markup.includes("Procurement: Vendor discount vs yield"));
+    assert.ok(markup.includes("Engineering: Tech debt refactor window"));
+    assert.ok(markup.includes("Talent: Strategic senior hire"));
+    assert.ok(markup.includes("Capital: Discretionary spend control"));
     assert.ok(markup.includes("Save preset"));
   });
 });
 
 import { Toast } from "@base-ui/react/toast";
+import { PlanStressTestMode, ComparePlansMode } from "../app/operate/components/decisionShieldPlanModes";
+import { stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
+import { EMPTY_OPERATOR_PROFILE } from "../lib/operatorProfile";
+
+describe("DecisionShieldPlanModes markup", () => {
+  it("renders starter example chips in PlanStressTestMode", () => {
+    const stressResult = stressTestDecisionPlan(sampleAssessment, { planText: "" });
+    const markup = renderToStaticMarkup(
+      createElement(PlanStressTestMode, {
+        planText: "",
+        setPlanText: () => {},
+        planReady: false,
+        profile: EMPTY_OPERATOR_PROFILE,
+        setProfileField: () => {},
+        businessModel: "VC_BACKED",
+        setBusinessModel: () => {},
+        stressTestResult: stressResult,
+      })
+    );
+
+    assert.ok(markup.includes("Plan stress test"));
+    assert.ok(markup.includes("Try an example:"));
+    assert.ok(markup.includes("Vendor prepay vs. yield"));
+    assert.ok(markup.includes("Senior talent sniping"));
+    assert.ok(markup.includes("Sprint tech debt refactor"));
+    assert.ok(markup.includes("Flexible contract terms"));
+  });
+
+  it("renders comparison templates in ComparePlansMode", () => {
+    const cmpResult = compareDecisionPlans(sampleAssessment, "", "");
+    const markup = renderToStaticMarkup(
+      createElement(ComparePlansMode, {
+        planText: "",
+        setPlanText: () => {},
+        planBText: "",
+        setPlanBText: () => {},
+        planReady: false,
+        comparisonReady: false,
+        comparisonResult: cmpResult,
+      })
+    );
+
+    assert.ok(markup.includes("Compare two plans"));
+    assert.ok(markup.includes("Compare common tradeoffs:"));
+    assert.ok(markup.includes("Vendor Prepay vs. Monthly Flex"));
+    assert.ok(markup.includes("Full-Time Hire vs. Contractor"));
+    assert.ok(markup.includes("Speculative Feature vs. Tech Debt"));
+  });
+});
 
 describe("DecisionShieldPanel markup", () => {
   it("renders the decision shield panel with mode switcher and copy controls", () => {
