@@ -74,21 +74,35 @@ export default async function DecidePage({
 
   return (
     <ReportShell
-      statusLabel={reportData.statusLabel}
-      regime={reportData.assessment.regime}
-      recordDateLabel={reportData.recordDateLabel}
-      fetchedAtLabel={reportData.fetchedAtLabel}
-      trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
-      pageTitle="Resolve one open decision"
-      pageSummary="One yes-or-no answer per open decision, under this week's guidance."
-      sectionLinks={sectionLinks.slice(0, 2)}
-      sidebarVariant="hidden"
-      nextStep={{
-        href: "/operate",
-        description: "Return to Planning next",
+      model={{
+        status: {
+          statusLabel: reportData.statusLabel,
+          regime: reportData.assessment.regime,
+          recordDateLabel: reportData.recordDateLabel,
+          fetchedAtLabel: reportData.fetchedAtLabel,
+        },
+        page: {
+          pageTitle: "Resolve one open decision",
+          pageSummary: "One yes-or-no answer per open decision, under this week's guidance.",
+          sectionLinks: sectionLinks.slice(0, 2),
+        },
+        trust: {
+          trustStatusTone: snapshot.isFallback ? "warning" : "stable",
+        },
+        chrome: {
+          sidebarVariant: "hidden",
+        },
+        actions: {
+          nextStep: {
+            href: "/operate",
+            description: "Return to Planning next",
+          },
+        },
+        payloads: {
+          structuredData: breadcrumbStructuredData,
+        },
       }}
-      structuredData={breadcrumbStructuredData}
-      >
+    >
         <OperatorWorkflowRouteTracker />
       {/* The page is the answers. The old router asked "which decision is still
           open?" and offered a recommended path, two answers, two roles, two
