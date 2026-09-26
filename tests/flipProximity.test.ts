@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildFlipProximity, buildQuietDayRead } from "../lib/report/flipProximity";
+import { buildFlipProximity, buildQuietDayRead, buildStandupFlipLine } from "../lib/report/flipProximity";
 import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
@@ -100,5 +100,65 @@ describe("quiet-day read", () => {
     const line = buildQuietDayRead({ steadyWeek: true, flipProximity: heroSentences });
     assert.ok(line);
     assert.ok(heroSentences.some((sentence) => line!.includes(sentence)));
+  });
+});
+
+describe("standup flip line", () => {
+  it("formats a steady week with nearest move and no pace change", () => {
+    const proximity = [
+      {
+        axis: "riskAppetite" as const,
+        input: "curveSlope" as const,
+        inputMove: 0.08,
+        pointsToBoundary: 3,
+        crossesTo: "DEFENSIVE" as const,
+        sentence: "If long rates rise 0.08% further above short rates, conditions turn Cloudy.",
+      },
+    ];
+    const line = buildStandupFlipLine({
+      regime: "EXPANSION",
+      steadyWeek: true,
+      proximity,
+    });
+    assert.equal(line, "Call unchanged, 0.08% from flip; no pace change.");
+  });
+
+  it("formats a changed call with the new regime, nearest move, and review pace", () => {
+    const proximity = [
+      {
+        axis: "tightness" as const,
+        input: "baseRate" as const,
+        inputMove: -0.15,
+        pointsToBoundary: 6,
+        crossesTo: "SCARCITY" as const,
+        sentence: "If base rate falls 0.15%, conditions turn Freezing.",
+      },
+    ];
+    const line = buildStandupFlipLine({
+      regime: "DEFENSIVE",
+      steadyWeek: false,
+      proximity,
+    });
+    assert.equal(line, "Call changed to Cloudy, 0.15% from flip; review pace.");
+  });
+
+  it("handles a week with no reachable crossing cleanly", () => {
+    const line = buildStandupFlipLine({
+      regime: "VOLATILE",
+      steadyWeek: true,
+      proximity: [],
+    });
+    assert.equal(line, "Call unchanged, no near flip; no pace change.");
+  });
+
+  it("derives the distance consistently from real proximity output", () => {
+    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const proximity = buildFlipProximity(assessment);
+    const line = buildStandupFlipLine({
+      regime: assessment.regime,
+      steadyWeek: true,
+      proximity,
+    });
+    assert.match(line, /^Call unchanged, \d+\.\d{2}% from flip; no pace change\.$/);
   });
 });

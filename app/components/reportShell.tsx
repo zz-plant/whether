@@ -41,88 +41,71 @@ import { NextStepCard } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
 
-type ReportShellInput = {
-  statusLabel: string;
-  regime?: RegimeIconType;
-  recordDateLabel: string;
-  fetchedAtLabel: string;
-  pageTitle: string;
-  pageSummary: string;
-  sectionLinks: ReportSectionLink[];
-  /** The route's step in the operating loop, drawn beside the intro. */
-  activeStep?: OperatingLoopStep;
-  trustStatusTone: "stable" | "warning" | "historical";
-  degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
-  showOfflineBadge?: boolean;
-  offlineBadgeLabel?: string;
-  sidebarVariant?: "full" | "hidden";
+export type ReportShellModel = {
+  status: {
+    statusLabel: string;
+    regime?: RegimeIconType;
+    recordDateLabel: string;
+    fetchedAtLabel?: string;
+  };
+  page: {
+    pageTitle: string;
+    pageSummary: string;
+    sectionLinks: ReportSectionLink[];
+    /** The route's step in the operating loop, drawn beside the intro. */
+    activeStep?: OperatingLoopStep;
+  };
+  trust: {
+    trustStatusTone: "stable" | "warning" | "historical";
+    degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
+    showOfflineBadge?: boolean;
+    offlineBadgeLabel?: string;
+  };
+  chrome?: {
+    sidebarVariant?: "full" | "hidden";
+  };
   /** A hero action, for a destination the header and the page index do not
    *  already reach. No route needs one today; the slot stays for the one that does. */
-  primaryCta?: ReportCtaProps;
-  exportCta?: ExportCtaProps | null;
-  showShare?: boolean;
-  structuredData?: unknown;
-  historicalBanner?: ReactNode;
-  nextStep?: { description: string; href: string };
-  nextRefreshLabel?: string;
+  actions?: {
+    primaryCta?: ReportCtaProps;
+    exportCta?: ExportCtaProps | null;
+    showShare?: boolean;
+    nextStep?: { description: string; href: string };
+    nextRefreshLabel?: string;
+  };
+  payloads?: {
+    structuredData?: unknown;
+    historicalBanner?: ReactNode;
+  };
 };
 
-type ReportShellModel = {
-  status: Pick<ReportShellInput, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel">;
-  page: Pick<ReportShellInput, "pageTitle" | "pageSummary" | "sectionLinks" | "activeStep">;
-  trust: Pick<ReportShellInput, "trustStatusTone" | "degradedSourceRows" | "showOfflineBadge" | "offlineBadgeLabel">;
-  chrome?: Pick<ReportShellInput, "sidebarVariant">;
-  actions?: Pick<ReportShellInput, "primaryCta" | "exportCta" | "showShare" | "nextStep" | "nextRefreshLabel">;
-  payloads?: Pick<ReportShellInput, "structuredData" | "historicalBanner">;
+type ReportShellProps = {
+  model: ReportShellModel;
+  children?: ReactNode;
 };
-
-type ReportShellProps = { children: ReactNode } & (
-  | ({ model: ReportShellModel } & { [K in keyof ReportShellInput]?: never })
-  | ({ model?: never } & ReportShellInput)
-);
 
 export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 
-const normalizeReportShellInput = (props: ReportShellProps): ReportShellInput => {
-  if ("model" in props && props.model) {
-    const { model } = props;
-    return {
-      ...model.status,
-      ...model.page,
-      ...model.trust,
-      ...model.chrome,
-      ...model.actions,
-      ...model.payloads,
-    };
-  }
-
-  return props;
-};
-
-export const ReportShell = (props: ReportShellProps) => {
-  const { children } = props;
+export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
-    statusLabel,
-    regime,
-    recordDateLabel,
-    fetchedAtLabel,
-    pageTitle,
-    pageSummary,
-    sectionLinks,
-    activeStep,
-    trustStatusTone,
-    degradedSourceRows,
-    showOfflineBadge = false,
-    offlineBadgeLabel = "Cached snapshot",
-    sidebarVariant = "full",
-    primaryCta,
-    exportCta = null,
-    showShare = false,
-    structuredData,
-    historicalBanner,
-    nextStep,
-    nextRefreshLabel,
-  } = normalizeReportShellInput(props);
+    status: { statusLabel, regime, recordDateLabel, fetchedAtLabel = "" },
+    page: { pageTitle, pageSummary, sectionLinks, activeStep },
+    trust: {
+      trustStatusTone,
+      degradedSourceRows,
+      showOfflineBadge = false,
+      offlineBadgeLabel = "Cached snapshot",
+    },
+    chrome: { sidebarVariant = "full" } = {},
+    actions: {
+      primaryCta,
+      exportCta = null,
+      showShare = false,
+      nextStep,
+      nextRefreshLabel,
+    } = {},
+    payloads: { structuredData, historicalBanner } = {},
+  } = model;
   // Only a historical selection has a refresh state worth a label. The live
   // masthead used to add "15m cadence" beside the decision date and the refresh
   // timestamp — a third time marker, advertising a poll interval on a product

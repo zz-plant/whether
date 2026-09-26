@@ -14,17 +14,19 @@ type ShareCopyControlsProps = {
   recordDate: string;
   slackBrief: string;
   emailBrief: string;
+  standupLine: string;
   meetingPack: string;
   issueTrackerBrief: string;
   investorUpdate: InvestorUpdateSnippetParts;
   calendarDetails: string;
 };
 
-type CopyTarget = "slack" | "email" | "meeting" | "tracker" | "investor";
+type CopyTarget = "slack" | "email" | "standup" | "meeting" | "tracker" | "investor";
 
 const copyLabels: Record<CopyTarget, string> = {
   slack: "Slack brief",
   email: "Email brief",
+  standup: "Standup line",
   meeting: "Meeting pack",
   tracker: "Ticket brief",
   investor: "Investor update",
@@ -36,6 +38,7 @@ const isCopyTarget = (value: string | null): value is CopyTarget => value !== nu
 const copyCommitments: Record<CopyTarget, ActivationCommitment> = {
   slack: "copied_slack",
   email: "copied_email",
+  standup: "copied_brief",
   meeting: "copied_meeting",
   /* The generic one rather than a fifth value: the funnel's question is whether
      a reader copied the call, and widening a telemetry union to split one
@@ -59,6 +62,7 @@ export function ShareCopyControls({
   recordDate,
   slackBrief,
   emailBrief,
+  standupLine,
   meetingPack,
   issueTrackerBrief,
   investorUpdate,
@@ -90,6 +94,23 @@ export function ShareCopyControls({
 
   const copyText = (target: CopyTarget, text: string) => copyToClipboard(text, target);
 
+  const previewText = useMemo(() => {
+    switch (copiedTarget) {
+      case "email":
+        return emailBrief;
+      case "standup":
+        return standupLine;
+      case "meeting":
+        return meetingPack;
+      case "tracker":
+        return issueTrackerBrief;
+      case "investor":
+        return investorUpdateText;
+      default:
+        return slackBrief;
+    }
+  }, [copiedTarget, emailBrief, standupLine, meetingPack, issueTrackerBrief, investorUpdateText, slackBrief]);
+
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       {/* content-start: the preview column beside this one is tall, and without
@@ -119,6 +140,17 @@ export function ShareCopyControls({
             label="Copy email brief"
             state={clipboardState("email")}
             onClick={() => void copyText("email", emailBrief)}
+            buttonLabels={{ error: "Copy failed" }}
+          />
+        </article>
+
+        <article className="weather-surface space-y-3 px-4 py-4">
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Standup</h2>
+          <p className="text-xs leading-relaxed text-slate-300">Copy the one-sentence macro status line for daily standup.</p>
+          <ClipboardActionRow
+            label="Copy standup line"
+            state={clipboardState("standup")}
+            onClick={() => void copyText("standup", standupLine)}
             buttonLabels={{ error: "Copy failed" }}
           />
         </article>
@@ -185,7 +217,7 @@ export function ShareCopyControls({
         </div>
         {copyError ? <p className="text-xs text-amber-200">{copyError}</p> : null}
         <pre className="max-h-[32rem] overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200">
-          {slackBrief}
+          {previewText}
         </pre>
       </article>
     </div>
