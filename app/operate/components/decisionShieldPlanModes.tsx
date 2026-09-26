@@ -48,7 +48,7 @@ export function PlanStressTestMode({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className={`grid gap-3 sm:grid-cols-3 ${businessModel === "BOOTSTRAPPED" ? "lg:grid-cols-4" : ""}`}>
               <OperatorProfileNumberField
                 field="runwayMonths"
                 label="Runway (months)"
@@ -65,6 +65,16 @@ export function PlanStressTestMode({
                 onCommit={(value) => setProfileField("monthlyBurnUsd", value)}
                 optional
               />
+              {businessModel === "BOOTSTRAPPED" ? (
+                <OperatorProfileNumberField
+                  field="grossMarginPct"
+                  label="Gross margin (%)"
+                  placeholder="e.g. 75"
+                  value={profile.grossMarginPct}
+                  onCommit={(value) => setProfileField("grossMarginPct", value)}
+                  optional
+                />
+              ) : null}
               <div>
                 <label htmlFor="decision-shield-model" className="block text-fluid-nano text-slate-400">Model</label>
                 <select

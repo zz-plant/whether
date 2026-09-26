@@ -20,6 +20,7 @@ describe("operator profile: the figures the reader gave, and nothing else", () =
       monthlyBurnUsd: "450000",
       monthlyRevenueUsd: -5,
       monthlyGrowthPct: 6,
+      grossMarginPct: 75,
       sector: "fintech",
       updatedAt: "2026-09-04T00:00:00.000Z",
     });
@@ -27,6 +28,7 @@ describe("operator profile: the figures the reader gave, and nothing else", () =
       version: 1,
       runwayMonths: 14,
       monthlyGrowthPct: 6,
+      grossMarginPct: 75,
       updatedAt: "2026-09-04T00:00:00.000Z",
     });
   });

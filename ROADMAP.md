@@ -180,7 +180,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - [x] Dynamic runway-scaled guardrails (<6m, 12m, 24m+ cash bands) scaling stop/start/fence rules. Shipped: `lib/report/operatorRunway.ts` and `scaleAdjustmentToRunway` in `boundedDecisionRules.ts` (2026-09-17).
 - [x] Stage profile presets (Seed vs. Series A vs. Growth) adjusting hiring speed and burn tolerance. Shipped: `lib/report/operatorStage.ts` and the per-stage adjustments in `boundedDecisionRules.ts` (see `docs/feature-specs-current.md` §1.1.7, 2026-09-06).
 - [ ] Sector overlays (B2B SaaS vs. Consumer vs. DeepTech / AI Infrastructure).
-- [ ] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin).
+- [x] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin). Shipped: decoupled investor assumptions in Decision Shield, added gross margin calibration and buffer checks (2026-09-26).
 - [ ] ARR-per-employee and burn multiple efficiency benchmark thresholds.
 - [ ] Tech talent heat index integration (WARN notices and layoffs tracking) to calibrate hiring pacing.
 

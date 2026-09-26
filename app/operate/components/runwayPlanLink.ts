@@ -32,6 +32,7 @@ const NUMBER_PARAMS: Record<OperatorProfileNumberKey, string> = {
   monthlyBurnUsd: "burn",
   monthlyRevenueUsd: "revenue",
   monthlyGrowthPct: "growth",
+  grossMarginPct: "margin",
 };
 
 /* Iterated instead of `Object.keys`, which widens to string and then needs a
@@ -42,6 +43,7 @@ const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
   "monthlyBurnUsd",
   "monthlyRevenueUsd",
   "monthlyGrowthPct",
+  "grossMarginPct",
 ];
 
 /* `isPlannerSector` and `isOperatorStage` are the guards the select controls
