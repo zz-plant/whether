@@ -27,6 +27,25 @@ type PlanStressTestModeProps = {
   stressTestResult: PlanStressTestResult;
 };
 
+const STARTER_PLANS = [
+  {
+    label: "Vendor prepay vs. yield",
+    plan: "Prepay annual SaaS vendor for $60k to lock in a 25% discount",
+  },
+  {
+    label: "Senior talent sniping",
+    plan: "Hire 1 principal architect at $240k during competitor freeze",
+  },
+  {
+    label: "Sprint tech debt refactor",
+    plan: "Allocate 40% sprint capacity to tech debt refactor",
+  },
+  {
+    label: "Flexible contract terms",
+    plan: "Shift enterprise renewals from $60k ARR commit to usage flex",
+  },
+] as const;
+
 export function PlanStressTestMode({
   planText,
   setPlanText,
@@ -93,38 +112,61 @@ export function PlanStressTestMode({
               </div>
             </div>
 
-            <textarea
-              value={planText}
-              onChange={(e) => setPlanText(e.target.value)}
-              rows={3}
-              className="weather-input w-full p-3 text-xs text-slate-100 placeholder-slate-500 border border-slate-700 bg-slate-950/80"
-              placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
-            />
+            <div className="space-y-1.5">
+              <label htmlFor="decision-shield-plan-input" className="block text-fluid-nano text-slate-400">
+                Plan description
+              </label>
+              <textarea
+                id="decision-shield-plan-input"
+                value={planText}
+                onChange={(e) => setPlanText(e.target.value)}
+                rows={3}
+                className="weather-input w-full p-3 text-xs text-slate-100 placeholder-slate-500 border border-slate-700 bg-slate-950/80"
+                placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
+              />
+              <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                <span className="text-fluid-nano text-slate-400">Try an example:</span>
+                {STARTER_PLANS.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => setPlanText(item.plan)}
+                    className="inline-flex items-center rounded-sm border border-slate-700/80 bg-slate-900/90 px-2.5 py-0.5 text-fluid-nano font-medium text-slate-300 transition-colors hover:border-sky-500/50 hover:bg-slate-800 hover:text-sky-200"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Stress Test Audit Output — only once there is a plan to grade. */}
             {!planReady ? (
               <div className="rounded-lg border border-dashed border-slate-800 bg-slate-950/60 p-4" aria-live="polite">
-                <p className="text-sm text-slate-200">Describe the plan to grade it.</p>
+                <p className="type-label text-slate-400">Decision verdict</p>
+                <p className="mt-1.5 text-sm text-slate-200 font-medium">Describe a plan or choose an example above to grade it.</p>
                 <p className="mt-1 text-fluid-xs text-slate-400">
                   Name the commitment and its size. Runway and burn are optional; with both, the verdict is sized against your cash.
                 </p>
               </div>
             ) : (
             <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 text-xs font-bold rounded-sm ${
-                    stressTestResult.verdict === "SAFE"
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                      : stressTestResult.verdict === "RISKY"
-                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                      : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
-                  }`}>
-                    {stressTestResult.verdict}
-                  </span>
-                  <span className="text-fluid-xs text-slate-300 font-semibold">
-                    Category: {stressTestResult.detectedCategory}
-                  </span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <p className="type-label text-slate-400">Decision verdict</p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-sm ${
+                      stressTestResult.verdict === "SAFE"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                        : stressTestResult.verdict === "RISKY"
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                        : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                    }`}>
+                      {stressTestResult.verdict}
+                    </span>
+                    <span className="text-fluid-xs text-slate-300 font-semibold">
+                      Category: {stressTestResult.detectedCategory}
+                    </span>
+                  </div>
                 </div>
                 {stressTestResult.financialImpactSummary && (
                   <span className="text-fluid-nano text-slate-400 tabular-nums">
@@ -132,6 +174,17 @@ export function PlanStressTestMode({
                   </span>
                 )}
               </div>
+
+              <p className="type-data text-slate-200 break-words font-medium">
+                {stressTestResult.headline}
+              </p>
+
+              {stressTestResult.sizingNote ? (
+                <div className="rounded border border-slate-800/80 bg-slate-900/60 p-2.5">
+                  <p className="type-eyebrow">Sizing</p>
+                  <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.sizingNote}</p>
+                </div>
+              ) : null}
 
               <div className="space-y-1.5">
                 <p className="type-eyebrow">What this plan assumes</p>
@@ -145,7 +198,7 @@ export function PlanStressTestMode({
                 </ul>
               </div>
 
-              <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-2 gap-3">
+              <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-3 gap-3">
                 <div>
                   <p className="type-eyebrow">{publicDecisionLabels.threshold}</p>
                   <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
@@ -153,6 +206,10 @@ export function PlanStressTestMode({
                 <div>
                   <p className="type-eyebrow text-sky-400">A more reversible version</p>
                   <p className="text-fluid-xs text-sky-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
+                </div>
+                <div>
+                  <p className="type-eyebrow">{publicDecisionLabels.reversal}</p>
+                  <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.reversalTrigger}</p>
                 </div>
               </div>
             </div>
@@ -171,6 +228,24 @@ type ComparePlansModeProps = {
   comparisonResult: PlanComparisonResult;
 };
 
+const COMPARISON_TEMPLATES = [
+  {
+    label: "Vendor Prepay vs. Monthly Flex",
+    planA: "Prepay annual SaaS vendor for $60k upfront to lock in 25% discount",
+    planB: "Pay SaaS vendor $6k monthly on flexible rolling terms",
+  },
+  {
+    label: "Full-Time Hire vs. Contractor",
+    planA: "Hire 2 full-time senior engineers at $200k",
+    planB: "Engage 1 specialized contractor for 3 months at $15k/mo",
+  },
+  {
+    label: "Speculative Feature vs. Tech Debt",
+    planA: "Hire 3 engineers to build speculative enterprise feature",
+    planB: "Allocate 40% sprint capacity to tech debt refactor",
+  },
+] as const;
+
 export function ComparePlansMode({
   planText,
   setPlanText,
@@ -187,6 +262,22 @@ export function ComparePlansMode({
               <p className="text-fluid-xs text-slate-400">
                 Describe two plans. The one that holds up better in this week&apos;s conditions is named below.
               </p>
+              <div className="flex flex-wrap items-center gap-1.5 pt-2">
+                <span className="text-fluid-nano text-slate-400">Compare common tradeoffs:</span>
+                {COMPARISON_TEMPLATES.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      setPlanText(item.planA);
+                      setPlanBText(item.planB);
+                    }}
+                    className="inline-flex items-center rounded-sm border border-slate-700/80 bg-slate-900/90 px-2.5 py-0.5 text-fluid-nano font-medium text-slate-300 transition-colors hover:border-sky-500/50 hover:bg-slate-800 hover:text-sky-200"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">

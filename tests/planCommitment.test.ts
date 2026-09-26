@@ -44,10 +44,13 @@ describe("parsePlanCommitment — headcount and per-unit multiplication", () => 
     assert.equal(parsePlanCommitment("hire 3 senior backend engineers").headcount, 3);
     assert.equal(parsePlanCommitment("add 2 enterprise AEs").headcount, 2);
     assert.equal(parsePlanCommitment("open 4 roles").headcount, 4);
+    assert.equal(parsePlanCommitment("hire 1 principal architect").headcount, 1);
+    assert.equal(parsePlanCommitment("poach 2 tech leads").headcount, 2);
   });
 
   it("reads a count that follows the verb", () => {
     assert.equal(parsePlanCommitment("hire 5 for the platform team").headcount, 5);
+    assert.equal(parsePlanCommitment("poach 1 from competitor").headcount, 1);
   });
 
   it("multiplies only on an explicit per-unit marker", () => {

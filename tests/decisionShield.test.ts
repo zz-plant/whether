@@ -435,11 +435,35 @@ describe("stress test — detection confidence", () => {
   });
 
   it("reports a real keyword match as matched", () => {
-    const result = stressTestDecisionPlan(buildExpansionAssessment(), {
+    const cloud = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "signing a $50k annual cloud commit",
     });
-    assert.equal(result.detectedCategory, "INFRASTRUCTURE");
-    assert.equal(result.detectionConfidence, "MATCHED");
+    assert.equal(cloud.detectedCategory, "INFRASTRUCTURE");
+    assert.equal(cloud.detectionConfidence, "MATCHED");
+
+    const prepay = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Prepay annual SaaS vendor for $60k to lock in a 25% discount",
+    });
+    assert.equal(prepay.detectedCategory, "PRICING");
+    assert.equal(prepay.detectionConfidence, "MATCHED");
+
+    const techDebt = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Allocate 40% sprint capacity to tech debt refactor",
+    });
+    assert.equal(techDebt.detectedCategory, "ROADMAP");
+    assert.equal(techDebt.detectionConfidence, "MATCHED");
+
+    const poach = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Poach 1 principal architect from competitor",
+    });
+    assert.equal(poach.detectedCategory, "HIRING");
+    assert.equal(poach.detectionConfidence, "MATCHED");
+
+    const usageFlex = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Shift enterprise renewals from $60k ARR commit to usage flex",
+    });
+    assert.equal(usageFlex.detectedCategory, "PRICING");
+    assert.equal(usageFlex.detectionConfidence, "MATCHED");
   });
 
   it("treats an explicit category override as matched, not assumed", () => {
