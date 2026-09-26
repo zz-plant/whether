@@ -4,75 +4,32 @@
  */
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Field } from "@base-ui/react/field";
+import { useMemo } from "react";
 import { Fieldset } from "@base-ui/react/fieldset";
-import { Form } from "@base-ui/react/form";
-import { Input } from "@base-ui/react/input";
-import { Toast } from "@base-ui/react/toast";
 import { LabeledSelectField, type LabeledSelectOption } from "../../components/labeledSelectField";
-import { usePathname, useSearchParams } from "next/navigation";
-import {
-  evaluateDecision,
-  formatDecisionAction,
-  stressTestDecisionPlan,
-  compareDecisionPlans,
-  type DecisionAction,
-  type DecisionCategory,
-  type LifecycleStage,
-  type CompanyFinancialProfile,
+import type {
+  DecisionAction,
+  DecisionCategory,
+  LifecycleStage,
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import {
-  lifecycleStageForOperatorStage,
-  operatorStageForLifecycleStage,
-} from "../../../lib/report/operatorStage";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { SegmentedControl, type SegmentedOption } from "../../components/ui/segmentedControl";
 import { SpinnerIcon } from "../../components/uiIcons";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
-import { useOperatorProfile } from "../../components/useOperatorProfile";
-import { useOperatorStage } from "../../components/useOperatorStage";
-import {
-  getClipboardUiState,
-  useClipboardCopy,
-  type ClipboardCopyState,
-} from "../../components/useClipboardCopy";
-import { createOpaqueId, usePersistentClientId } from "../../components/clientIdentity";
-import { createKeyedBrowserSource, useBrowserSource } from "../../components/browserSource";
+import { getClipboardUiState } from "../../components/useClipboardCopy";
 import { ComparePlansMode, PlanStressTestMode } from "./decisionShieldPlanModes";
 import { RecordDecisionButton } from "./recordDecisionButton";
-import type { DecisionMemoryPayload } from "../../../lib/decisionMemory";
-import { usePersistedQuerySelections } from "./usePersistedQuerySelections";
+import { DecisionShieldPresetsSection } from "./decisionShieldPresetsSection";
+import { useDecisionShieldState, type PlanMode } from "./useDecisionShieldState";
 import {
   actionOptions,
-  buildShareText,
   categoryOptions,
-  formatOptionLabel,
   hiringPauseApplies,
   lifecycleOptions,
-  parseParam,
   verdictStyles,
 } from "./decisionShieldUtils";
-
-const decisionShieldFieldConfigs = {
-  lifecycle: {
-    queryParam: "lifecycle",
-    parse: (value: string | null) => parseParam(value, lifecycleOptions),
-    serialize: (value: LifecycleStage) => value,
-  },
-  category: {
-    queryParam: "category",
-    parse: (value: string | null) => parseParam(value, categoryOptions),
-    serialize: (value: DecisionCategory) => value,
-  },
-  action: {
-    queryParam: "action",
-    parse: (value: string | null) => parseParam(value, actionOptions),
-    serialize: (value: DecisionAction) => value,
-  },
-} as const;
 
 const lifecycleSelectOptions: LabeledSelectOption<LifecycleStage>[] = lifecycleOptions.map((option) => ({
   value: option.value,
@@ -89,63 +46,11 @@ const actionSelectOptions: LabeledSelectOption<DecisionAction>[] = actionOptions
   label: option.label,
 }));
 
-type PlanMode = "dropdown" | "natural_language" | "compare";
-
 const planModeOptions: readonly SegmentedOption<PlanMode>[] = [
   { key: "natural_language", label: "Describe a plan" },
   { key: "compare", label: "Compare two plans" },
   { key: "dropdown", label: "Pick from a list" },
 ];
-
-type DecisionShieldPreset = {
-  id: string;
-  name: string;
-  lifecycle: LifecycleStage;
-  category: DecisionCategory;
-  action: DecisionAction;
-  createdAt: string;
-};
-
-/* Presets are stored per browser, under the persistent client id, with the
-   pre-id key read once as a fallback so an existing reader keeps theirs. The
-   key is itself a browser value, so this is keyed and memoised rather than a
-   module constant: a source built during render would be a new subscription on
-   every render. */
-const LEGACY_PRESET_STORAGE_KEY = "whether.decisionShieldPresets";
-const NO_PRESETS: DecisionShieldPreset[] = [];
-
-/* Checked rather than asserted. The stored list is whatever a previous build of
-   this panel wrote, and a shape that no longer matches would otherwise reach the
-   apply handler and set fields to undefined. */
-const isPreset = (value: unknown): value is DecisionShieldPreset => {
-  if (typeof value !== "object" || value === null) return false;
-  const candidate: Record<string, unknown> = { ...value };
-  return (
-    typeof candidate.id === "string"
-    && typeof candidate.name === "string"
-    && typeof candidate.lifecycle === "string"
-    && typeof candidate.category === "string"
-    && typeof candidate.action === "string"
-    && typeof candidate.createdAt === "string"
-  );
-};
-
-const presetsSourceFor = createKeyedBrowserSource<DecisionShieldPreset[]>({
-  read: (key) => {
-    try {
-      const stored = window.localStorage.getItem(key) ?? window.localStorage.getItem(LEGACY_PRESET_STORAGE_KEY);
-      if (!stored) return NO_PRESETS;
-      const parsed: unknown = JSON.parse(stored);
-      if (!Array.isArray(parsed)) return NO_PRESETS;
-      const presets = parsed.filter(isPreset);
-      return presets.length > 0 ? presets : NO_PRESETS;
-    } catch {
-      // A slot this browser cannot read is the same as one it has not filled.
-      return NO_PRESETS;
-    }
-  },
-  serverValue: NO_PRESETS,
-});
 
 export const DecisionShieldPanel = ({
   assessment,
@@ -158,297 +63,39 @@ export const DecisionShieldPanel = ({
   recordDate: string;
 }) => {
   const {
-    state: { lifecycle, category, action },
+    lifecycle,
+    category,
+    action,
     setField,
-  } = usePersistedQuerySelections({
-    initialState: {
-      lifecycle: "GROWTH" as LifecycleStage,
-      category: "HIRING" as DecisionCategory,
-      action: "HIRE" as DecisionAction,
-    },
-    storageKey: "whether.decisionShield",
-    fields: decisionShieldFieldConfigs,
-  });
-  // Null until the reader adds or deletes one; the stored list is the default.
-  const [editedPresets, setEditedPresets] = useState<DecisionShieldPreset[] | null>(null);
-  const [presetName, setPresetName] = useState("");
-  const [presetError, setPresetError] = useState<string | null>(null);
-  const [presetStatus, setPresetStatus] = useState<string | null>(null);
-  const { add } = Toast.useToastManager();
-  const presetInputRef = useRef<HTMLInputElement | null>(null);
-  const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
-  const lastClipboardStatusRef = useRef<ClipboardCopyState["status"]>("idle");
-  const [lastAttemptedTarget, setLastAttemptedTarget] = useState<"verdict" | "link" | null>(null);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const clientId = usePersistentClientId();
-  const presetStorageKey = clientId ? `whether.decisionShieldPresets:${clientId}` : null;
-  /* Read through a keyed store: the slot is named after the persistent client
-     id, which does not exist until hydration, so this is one of the few reads
-     that genuinely cannot be a module constant. It replaces an effect that
-     assigned the stored list — or `[]` — into state on every key change. */
-  const storedPresets = useBrowserSource(presetsSourceFor(presetStorageKey));
-  const presets = editedPresets ?? storedPresets;
-
-  // No sample plan and no sample company: the panel used to open on a
-  // fictional hiring plan with 14 months of runway and a 75% gross margin no
-  // control ever exposed, and the margin alone could turn RISKY into SAFE.
-  const [planMode, setPlanMode] = useState<PlanMode>("natural_language");
-  const [planText, setPlanText] = useState("");
-  const [planBText, setPlanBText] = useState("");
-  const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">("VC_BACKED");
-  const { profile, setProfileField } = useOperatorProfile();
-  const { stage, setStage } = useOperatorStage();
-  const initialUrlLifecycle = useRef(searchParams.get("lifecycle"));
-
-  // The stage cookie is the same answer this panel's lifecycle asks for. A link
-  // that names a lifecycle keeps it; otherwise the cookie sets it, and choosing
-  // one here writes the cookie back so the brief and the planner follow.
-  useEffect(() => {
-    if (!stage || initialUrlLifecycle.current !== null) return;
-    setField("lifecycle", lifecycleStageForOperatorStage[stage]);
-  }, [setField, stage]);
-
-  const selectLifecycle = (value: LifecycleStage) => {
-    setField("lifecycle", value);
-    setStage(operatorStageForLifecycleStage[value]);
-  };
-
-  const companyProfile = useMemo<CompanyFinancialProfile>(() => ({
-    runwayMonths: profile.runwayMonths,
-    monthlyBurnUsd: profile.monthlyBurnUsd,
-    grossMarginPct: profile.grossMarginPct,
+    selectLifecycle,
+    applyPresetSelection,
+    planMode,
+    setPlanMode,
+    planText,
+    setPlanText,
+    planBText,
+    setPlanBText,
     businessModel,
-  }), [profile.runwayMonths, profile.monthlyBurnUsd, profile.grossMarginPct, businessModel]);
-  const planReady = planText.trim().length > 0;
-  const comparisonReady = planReady && planBText.trim().length > 0;
+    setBusinessModel,
+    profile,
+    setProfileField,
+    planReady,
+    comparisonReady,
+    stressTestResult,
+    comparisonResult,
+    output,
+    buildLedgerPayload,
+    shareText,
+    handleCopy,
+    handleCopyLink,
+    clipboardState,
+    lastAttemptedTarget,
+  } = useDecisionShieldState({ assessment, recordDate });
 
-  const stressTestResult = useMemo(
-    () => stressTestDecisionPlan(assessment, { planText, lifecycle, companyProfile }),
-    [assessment, planText, lifecycle, companyProfile]
+  const currentSelection = useMemo(
+    () => ({ lifecycle, category, action }),
+    [lifecycle, category, action]
   );
-
-  const comparisonResult = useMemo(
-    () => compareDecisionPlans(assessment, planText, planBText, companyProfile),
-    [assessment, planText, planBText, companyProfile]
-  );
-
-  const output = useMemo(
-    () => evaluateDecision(assessment, { lifecycle, category, action }),
-    [assessment, lifecycle, category, action]
-  );
-  /* The stored snapshot is the reading on screen, not a fresh read: a decision
-     is only judgeable later against the conditions its author actually saw. */
-  const buildLedgerPayload = useCallback(
-    (): DecisionMemoryPayload => {
-      if (planMode === "natural_language" && planReady) {
-        return {
-          recordDate,
-          decision: {
-            lifecycle,
-            category: stressTestResult.detectedCategory,
-            action: stressTestResult.detectedAction,
-            context: planText.trim(),
-          },
-          outcome: {
-            verdict: stressTestResult.verdict,
-            summary: stressTestResult.headline,
-            guardrail: stressTestResult.boundedGuardrail,
-            reversalTrigger: stressTestResult.reversalTrigger,
-          },
-          assessment: {
-            regime: assessment.regime,
-            scores: assessment.scores,
-            thresholds: assessment.thresholds,
-            inputs: assessment.inputs,
-          },
-        };
-      }
-      return {
-        recordDate,
-        decision: { lifecycle, category, action },
-        outcome: {
-          verdict: output.verdict,
-          summary: output.summary,
-          guardrail: output.guardrail,
-          reversalTrigger: output.reversalTrigger,
-        },
-        assessment: {
-          regime: assessment.regime,
-          scores: assessment.scores,
-          thresholds: assessment.thresholds,
-          inputs: assessment.inputs,
-        },
-      };
-    },
-    [
-      recordDate,
-      planMode,
-      planReady,
-      planText,
-      stressTestResult,
-      lifecycle,
-      category,
-      action,
-      output,
-      assessment,
-    ],
-  );
-
-  const shareText = useMemo(
-    () =>
-      buildShareText(assessment, lifecycle, category, action, output, {
-        planMode,
-        planText,
-        planBText,
-        stressTestResult,
-        comparisonResult,
-        businessModel,
-        grossMarginPct: profile.grossMarginPct,
-      }),
-    [
-      assessment,
-      lifecycle,
-      category,
-      action,
-      output,
-      planMode,
-      planText,
-      planBText,
-      stressTestResult,
-      comparisonResult,
-      businessModel,
-      profile.grossMarginPct,
-    ],
-  );
-
-  useEffect(() => {
-    if (!presetStorageKey) {
-      return;
-    }
-    try {
-      window.localStorage.setItem(presetStorageKey, JSON.stringify(presets));
-    } catch {
-      // Intentionally ignore storage persistence errors to keep console clean.
-    }
-  }, [presetStorageKey, presets]);
-
-  useEffect(() => {
-    if (!presetStatus) {
-      return;
-    }
-    const timeout = window.setTimeout(() => setPresetStatus(null), 2000);
-    return () => window.clearTimeout(timeout);
-  }, [presetStatus]);
-
-  const handlePresetSave = () => {
-    if (!presetName.trim()) {
-      setPresetError("Name your preset so it can be reused.");
-      presetInputRef.current?.focus();
-      return;
-    }
-    const nextPreset = {
-      id: createOpaqueId(),
-      name: presetName.trim(),
-      lifecycle,
-      category,
-      action,
-      createdAt: new Date().toISOString(),
-    };
-    setEditedPresets([nextPreset, ...presets].slice(0, 8));
-    setPresetName("");
-    setPresetError(null);
-    setPresetStatus("Preset saved.");
-  };
-
-  const handlePresetApply = (presetId: string) => {
-    const preset = presets.find((item) => item.id === presetId);
-    if (!preset) {
-      return;
-    }
-    setField("lifecycle", preset.lifecycle);
-    setField("category", preset.category);
-    setField("action", preset.action);
-    setPresetStatus("Preset applied.");
-  };
-
-  const handlePresetDelete = (presetId: string) => {
-    const presetToDelete = presets.find((p) => p.id === presetId);
-    if (!presetToDelete) return;
-
-    if (confirm(`Delete preset "${presetToDelete.name}"? This cannot be undone.`)) {
-      setEditedPresets(presets.filter((item) => item.id !== presetId));
-      setPresetStatus(`Preset "${presetToDelete.name}" deleted.`);
-    }
-  };
-
-  const handlePresetBlur = () => {
-    if (!presetName.trim()) {
-      setPresetError("Name your preset so it can be reused.");
-    } else {
-      setPresetError(null);
-    }
-  };
-
-  const handleCopy = async () => {
-    if (status === "copying") {
-      return;
-    }
-    setLastAttemptedTarget("verdict");
-    await copyToClipboard(shareText, "verdict");
-  };
-
-  const handleCopyLink = async () => {
-    if (status === "copying") {
-      return;
-    }
-    const link = `${window.location.origin}${pathname}?${searchParams.toString()}`;
-    setLastAttemptedTarget("link");
-    await copyToClipboard(link, "link");
-  };
-
-
-
-  useEffect(() => {
-    if (status === lastClipboardStatusRef.current) {
-      return;
-    }
-    if (status === "copied") {
-      if (copiedTarget === "verdict") {
-        add({
-          title: "Decision Shield copied",
-          description: "The verdict is ready to paste.",
-          type: "success",
-        });
-      }
-      if (copiedTarget === "link") {
-        add({
-          title: "Link copied",
-          description: "The link opens this decision with these settings.",
-          type: "success",
-        });
-      }
-    }
-    if (status === "error") {
-      const isBlocked = errorReason === "unavailable";
-      const onLink = lastAttemptedTarget === "link";
-      add({
-        title: isBlocked ? "Clipboard blocked" : "Copy failed",
-        description: onLink
-          ? isBlocked
-            ? "Copy the URL from your browser address bar."
-            : "Clipboard access failed. Try copying the URL manually."
-          : isBlocked
-            ? "Select the verdict text to share it manually."
-            : "Clipboard access failed. Try copying manually.",
-        type: "error",
-      });
-    }
-    lastClipboardStatusRef.current = status;
-  }, [add, copiedTarget, errorReason, lastAttemptedTarget, status]);
-
-  const presetHintId = "preset-limit-hint";
 
   return (
     <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
@@ -466,14 +113,14 @@ export const DecisionShieldPanel = ({
           <div className="flex flex-col items-end gap-3">
             <ClipboardActionRow
               label="Copy verdict"
-              state={getClipboardUiState("verdict", { status, error, activeTarget, copiedTarget })}
+              state={getClipboardUiState("verdict", clipboardState)}
               buttonVariant="pill"
               stateIcons={{ copying: <SpinnerIcon className="h-3 w-3" /> }}
               onClick={handleCopy}
             />
             <ClipboardActionRow
               label="Copy link"
-              state={getClipboardUiState("link", { status, error, activeTarget, copiedTarget })}
+              state={getClipboardUiState("link", clipboardState)}
               buttonVariant="pill"
               buttonLabels={{ copied: "Link copied" }}
               onClick={handleCopyLink}
@@ -484,7 +131,7 @@ export const DecisionShieldPanel = ({
         </div>
         {/* The toast above is the one announcement of a copy result; two
             live regions restating it read every outcome three times. */}
-        {error && lastAttemptedTarget === "verdict" ? (
+        {clipboardState.error && lastAttemptedTarget === "verdict" ? (
           <div className="mt-4 rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
             <p className="text-xs font-semibold text-amber-200">
               Clipboard blocked
@@ -575,91 +222,10 @@ export const DecisionShieldPanel = ({
             </>
           )}
 
-          <div className="weather-surface p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="type-label text-slate-400">Saved scenarios</p>
-                <p className="mt-2 text-sm text-slate-300">
-                  Save these settings to come back to them.
-                </p>
-              </div>
-              <p id={presetHintId} className="text-xs text-slate-400">
-                Max 8 presets
-              </p>
-            </div>
-            <Form onFormSubmit={handlePresetSave} className="mt-4">
-              <Fieldset.Root className="flex min-w-0 flex-wrap items-start gap-3 border-0 p-0">
-                <Fieldset.Legend className="sr-only">Save a reusable Decision Shield preset</Fieldset.Legend>
-                <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold text-slate-400 sm:max-w-xs">
-                  <Field.Label nativeLabel={false} render={<span />}>Preset name</Field.Label>
-                  <Input
-                    ref={presetInputRef}
-                    type="text"
-                    value={presetName}
-                    onChange={(event) => setPresetName(event.target.value)}
-                    onBlur={handlePresetBlur}
-                    aria-invalid={Boolean(presetError)}
-                    aria-describedby={[presetError ? "preset-error" : null, presetHintId]
-                      .filter(Boolean)
-                      .join(" ")}
-                    className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
-                  />
-                </Field.Root>
-                <button
-                  type="submit"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Save preset
-                </button>
-              </Fieldset.Root>
-            </Form>
-            <div className="mt-2 min-h-[20px]">
-              {presetError ? (
-                <p id="preset-error" className="text-xs text-amber-200">
-                  {presetError}
-                </p>
-              ) : null}
-            </div>
-            <output className="sr-only" aria-live="polite">
-              {presetStatus ?? ""}
-            </output>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {presets.length === 0 ? (
-                <p className="text-sm text-slate-400">
-                  No presets yet. Save one to come back to this decision.
-                </p>
-              ) : (
-                presets.map((preset) => (
-                  <div key={preset.id} className="rounded-lg border border-slate-800/60 p-3">
-                    <p className="text-xs font-semibold text-slate-400">
-                      {preset.name}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-200">
-                      {formatOptionLabel(preset.lifecycle, lifecycleOptions)} ·{" "}
-                      {formatOptionLabel(preset.category, categoryOptions)} ·{" "}
-                      {formatDecisionAction(preset.action)}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handlePresetApply(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                      >
-                        Apply
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handlePresetDelete(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          <DecisionShieldPresetsSection
+            currentSelection={currentSelection}
+            onApplyPreset={applyPresetSelection}
+          />
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
             <div className="weather-surface p-4">
