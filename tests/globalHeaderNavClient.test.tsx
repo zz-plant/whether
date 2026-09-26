@@ -1,8 +1,21 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { GlobalHeaderNavClient, MobileNavContent } from "../app/components/globalHeaderNavClient";
 import { resolveGlobalHeaderNavigationLinks } from "../lib/navigation/globalHeader";
+import * as nextNavigation from "next/navigation";
+
+const mockAny: any = mock;
+
+/* The header reads the app router; renderToStaticMarkup mounts none. Installed
+   here so the file answers for its own dependencies rather than passing on
+   another suite's ordering luck. */
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+}));
 
 describe("GlobalHeaderNavClient", () => {
   it("renders the whole loop as tabs in the bar, in IA order, with utilities inside More", () => {

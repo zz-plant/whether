@@ -260,7 +260,10 @@ export const deliverSlackBrief = async (options?: {
       });
       if (!response.ok) {
         if (response.status === 404 || response.status === 410) {
-          getSlackWebhookStore().deactivateByUrl(url).catch(() => undefined);
+          /* Awaited, not floated: the delivery's return means its bookkeeping
+             is done — in a Worker a floating promise can die with the request,
+             leaving a revoked webhook counted as a target forever. */
+          await getSlackWebhookStore().deactivateByUrl(url).catch(() => undefined);
         }
         throw new Error(`slack_webhook_${response.status}`);
       }

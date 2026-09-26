@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { beforeEach, describe, it } from "bun:test";
+import { afterEach, beforeEach, describe, it } from "bun:test";
 
 import {
   ACTIVATION_FUNNEL_KV_KEY,
@@ -57,6 +57,15 @@ const ok = (returned: number, visited = returned * 10): ActivationFunnelReport =
 
 describe("activation funnel record", () => {
   beforeEach(() => {
+    clearKv();
+  });
+
+  /* clearKv runs after every test too, not just before the next one: a leaked
+     globalThis.WHETHER_DURABLE_KV survives into whatever file the shuffled
+     order runs next, and those files' stores read a stranger's fake KV —
+     slackWebhookStore saw webhooks it never subscribed under deploy-gate
+     seed 1947389216. The binding this file installs is this file's alone. */
+  afterEach(() => {
     clearKv();
   });
 

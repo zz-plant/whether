@@ -1,10 +1,23 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FossilRecordSection } from "../app/signals/components/fossilRecordSection";
 import { ScenarioStudioSimulator } from "../app/operate/components/scenarioStudioSimulator";
 import type { TreasuryData } from "../lib/types";
 import { evaluateRegime } from "../lib/regimeEngine";
+import * as nextNavigation from "next/navigation";
+
+const mockAny: any = mock;
+
+/* The simulator reads the app router's search params; renderToStaticMarkup
+   mounts none. Installed here so the file answers for its own dependencies
+   rather than passing on another suite's ordering luck. */
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  usePathname: () => "/signals",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+}));
 
 const mockTreasury: TreasuryData = {
   source: "FRED",
