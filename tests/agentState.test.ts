@@ -112,6 +112,32 @@ describe("the agent state", () => {
     }
   });
 
+  it("says what the change did to the decisions, from the same lines the scores are read against", async () => {
+    const context = await loadAgentInterfaceContext("test");
+    const state = buildAgentState(context);
+
+    assert.match(state.change.summary ?? "", /^Since [A-Z][a-z]{2} \d{1,2}, /, "the summary names the reading it is against");
+    for (const group of state.change.crossed) {
+      assert.ok(group.areas.length > 0 && group.because.length > 0, "a group names its areas and the lines that decided it");
+      for (const line of group.because) {
+        // A pause moved on a pause line and a resume moved on a resume line: the ones in `scores`.
+        const named = group.moved === "paused" || group.moved === "lifted" ? state.scores[line.score].pause : state.scores[line.score].resume;
+        assert.equal(line.line, named?.line, `${group.moved} on ${line.score} names the line the score is read against`);
+      }
+    }
+
+    // A week that moved nothing across a line says so once, and lists no area.
+    const held = buildAgentState({
+      ...context,
+      reportData: {
+        ...context.reportData,
+        reportDynamics: { ...context.reportData.reportDynamics, directionLabel: "stable", changedSignals: [], anomalySignals: [], movement: undefined },
+      },
+    });
+    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}; no pause or resume line was crossed\. Last week's guidance stands\.$/);
+    assert.deepEqual(held.change.crossed, []);
+  });
+
   it("says nothing about movement when nothing was compared, rather than a move of zero", async () => {
     const context = await loadAgentInterfaceContext("test");
     const uncompared: AgentInterfaceContext = {
@@ -143,6 +169,8 @@ describe("the agent state", () => {
       comparedWith: null,
       days: null,
       note: null,
+      summary: null,
+      crossed: [],
     });
   });
 

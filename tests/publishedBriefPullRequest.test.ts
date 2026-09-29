@@ -250,6 +250,14 @@ describe("assembleCurrentWeekBrief", () => {
     assert.equal(result.record.correction, null);
     assert.ok(result.record.decisions.length > 0);
     assert.ok(result.record.scores);
+    /* The archive is citable and append-only. The two weeks it froze before this said "Pressure
+       increased by +3.0 this week. Slow new commitments until conditions stabilize" beside "freeze
+       new commitments": a figure in a unit nothing else uses, and an instruction of its own. */
+    assert.doesNotMatch(result.record.whatChanged, /Pressure (increased|eased)|Slow new commitments|Move faster on/);
+    assert.match(
+      result.record.whatChanged,
+      /no pause or resume line was crossed|pause now applies|pause no longer applies|resume line is now met|resume line is no longer met/,
+    );
   });
 
   it("keeps an existing week's publication stamp and correction on a re-freeze", async () => {

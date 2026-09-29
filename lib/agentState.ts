@@ -5,6 +5,7 @@ import { REGIME_WEATHER_RATIONALES } from "./regimePresentation";
 import { ruleMetricLabel } from "./report/boundedDecisionRules";
 import { assessPublishReadiness } from "./report/briefPublishGuard";
 import { comparisonBasis } from "./report/comparisonBasis";
+import { buildDecisionMovementForReport } from "./report/decisionMovement";
 import { findSignalDelta } from "./report/evidenceReaderModel";
 import { buildSharedCorridorRails } from "./report/operatingCalls";
 import { describeScoreMovementCaveat, listScoreMovementParts } from "./report/scoreMovement";
@@ -92,6 +93,31 @@ export const agentStateSchema = z.object({
       .describe("The earlier reading every `previous` and `delta` is measured against: the previous month-end snapshot, not last week."),
     days: z.number().nullable().describe("Days between that reading and this one."),
     note: z.string().nullable().describe("A caveat on `moved` where a part is an input the earlier score never had."),
+    summary: z
+      .string()
+      .nullable()
+      .describe("What the change did to the decisions, in one sentence: which areas' pause or resume lines were crossed since `comparedWith`, or that none were. Null when nothing was compared."),
+    crossed: z
+      .array(
+        z.object({
+          moved: z
+            .enum(["paused", "lifted", "resumable", "resumeLost"])
+            .describe("paused: the pause now applies. lifted: it no longer does, and the resume line is not met yet. resumable: the resume lines now hold. resumeLost: they no longer do."),
+          areas: z
+            .array(z.enum(["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"]))
+            .describe("The areas that moved this way, in the brief's row order."),
+          because: z
+            .array(
+              z.object({
+                score: z.enum(["tightness", "riskAppetite"]),
+                line: z.number().describe("The score at which the line sits."),
+                direction: z.enum(["rose", "fell"]).describe("Which way the score went through it."),
+              }),
+            )
+            .describe("The lines that decided it, for any of those areas."),
+        }),
+      )
+      .describe("How the areas' pause or resume state changed since `comparedWith`, grouped by the way it moved. Empty when none changed, or when nothing was compared; an area not listed is where it was."),
   }),
   guidance: z.object({
     call: z.string(),
@@ -184,6 +210,7 @@ export const buildAgentState = (
     };
   };
 
+  const decisionMovement = buildDecisionMovementForReport({ assessment, reportDynamics, actionStripItems });
   const tightness = scoreState("tightness");
   const riskAppetite = scoreState("riskAppetite");
   const conditionsMeaning = lowerFirst((REGIME_WEATHER_RATIONALES[assessment.regime].split(". ")[0] ?? "").replace(/\.$/, ""));
@@ -214,6 +241,12 @@ export const buildAgentState = (
       comparedWith: reportDynamics.comparedWith ?? null,
       days,
       note: describeScoreMovementCaveat(reportDynamics.movement, basis),
+      summary: decisionMovement?.sentence ?? null,
+      crossed: (decisionMovement?.groups ?? []).map((group) => ({
+        moved: group.kind,
+        areas: group.areas,
+        because: group.crossed.map((line) => ({ score: line.metric, line: line.value, direction: line.direction })),
+      })),
     },
     guidance: {
       call: actionNowShort,

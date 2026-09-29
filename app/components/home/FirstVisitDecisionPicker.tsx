@@ -148,7 +148,13 @@ export function FirstVisitDecisionPicker({
         <div aria-live="polite" className="space-y-2 border-l-2 border-sky-500/50 pl-4">
           <p className="type-eyebrow">{decisionAreaLabel(active.area)}</p>
           <p className="max-w-[64ch] text-fluid-sm font-semibold leading-snug text-white">{active.rule}</p>
-          {active.changed ? <p className="max-w-[64ch] text-fluid-xs text-amber-200/90">{active.changed}</p> : null}
+          {active.changed ? (
+            /* Amber for an area the week moved, slate for one it did not: the
+               same table cell says "No line crossed" for both. */
+            <p className={`max-w-[64ch] text-fluid-xs ${active.changedKind === "held" ? "text-slate-400" : "text-amber-200/90"}`}>
+              {active.changed}
+            </p>
+          ) : null}
           <dl className="grid max-w-[64ch] gap-1 text-fluid-xs text-slate-300 sm:grid-cols-[auto_1fr] sm:gap-x-4">
             {active.pause ? (
               <>

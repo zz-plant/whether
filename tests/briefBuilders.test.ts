@@ -299,6 +299,29 @@ describe("buildSlackBrief", () => {
     assert.match(dated, /was 56 on Aug 31/);
   });
 
+  it("leads what changed with what the week did to the decisions, and prints nothing where nothing was compared", async () => {
+    const { buildCanonicalBoundedDecisionRules } = await import("../lib/report/boundedDecisionRules");
+    const { buildActionStripItems } = await import("../lib/report/operatingCalls");
+    const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+    const rules = buildCanonicalBoundedDecisionRules({ regime: "EXPANSION", thresholds: assessment.thresholds, scores });
+    const modeledDecision = { actionStripItems: buildActionStripItems(rules, scores) };
+    const previousScores = { tightness: 90, riskAppetite: 43, comparedWith: { recordDate: "2026-08-31", label: "Aug 31" } };
+
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, { modeledDecision, previousScores });
+    const lines = brief.split("\n");
+    const changed = lines.indexOf("What changed this week:");
+
+    // Recovery from the Sep 25 reading: the sentence comes before the readings that are its evidence.
+    assert.equal(
+      lines[changed + 1],
+      "Since Aug 31, conditions changed from Freezing to Sunny and the resume line is now met for every area: funding pressure fell through 66 and risk appetite rose through 54.",
+    );
+    assert.match(lines[changed + 2] ?? "", /^Funding pressure 12 of 100 /);
+
+    const uncompared = buildSlackBrief(assessment, treasury, sensors, macros, { modeledDecision });
+    assert.doesNotMatch(uncompared, /pause or resume line|resume line is now met|pause now applies/);
+  });
+
   it("keeps citation-ready source lines in exported briefs", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
     assert.match(brief, /Citations:/);

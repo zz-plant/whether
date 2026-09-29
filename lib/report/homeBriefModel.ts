@@ -1,5 +1,6 @@
 import type { MacroSeriesReading, TreasuryMetadata } from "../types";
 import type { RegimeStateTransition } from "./regimeStateMachine";
+import type { DecisionMovement } from "./decisionMovement";
 import type { ComparedWith } from "./reportDataTypes";
 import type {
   DecisionTransmission,
@@ -92,6 +93,8 @@ export type HomeReportData = {
     }>;
     signalContributions?: ReportDynamics["signalContributions"];
     anomalySignals?: Array<{
+      key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+      delta: number;
       reason: string;
     }>;
     /** What the moves are measured against, so the model's labels can name it. */
@@ -290,7 +293,7 @@ type WeeklyLeadershipSummary = {
   comparedWith?: ComparedWith;
 };
 
-export type RevisitQueueItem = {
+type RevisitQueueItem = {
   id: BoundedDecisionRule["area"];
   label: string;
   action: string;
@@ -374,6 +377,8 @@ export type WeeklyDecisionCardViewModel = {
       direction: "tightening" | "easing" | "stable" | "unavailable";
       summary: string;
     };
+    /** What the week did to each area's lines since the reading it is compared with; null when nothing was compared. */
+    decisionMovement: DecisionMovement | null;
   };
   presentation?: {
     whyItMattersLine?: string;

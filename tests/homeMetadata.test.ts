@@ -91,3 +91,20 @@ describe("buildHomeMetadata", () => {
     assert.equal(metadata.robots, undefined);
   });
 });
+
+/*
+ * A link preview has 210 characters and the card's change box 140. The sentence that says which lines a
+ * week crossed ran past both and was cut in the middle of them ("...funding pressure rose through 76
+ * and risk…"), so those two surfaces carry the consequence without the evidence.
+ */
+describe("what the share preview says changed", () => {
+  it("carries the consequence whole, not the sentence cut through its evidence", async () => {
+    const { loadHomeSharePreview } = await import("../lib/report/homeSharePreview");
+    const preview = await loadHomeSharePreview();
+
+    assert.ok(preview.changeSummary.length <= 140);
+    assert.doesNotMatch(preview.changeSummary, /…$|\.\.\.$/, "the change box is a whole sentence");
+    assert.doesNotMatch(preview.changeSummary, /(?:rose|fell) through \d+(?: and| risk| funding)?$/, "and not cut mid-line-list");
+    assert.doesNotMatch(preview.changeSummary, /Pressure increased|Slow new commitments/);
+  });
+});

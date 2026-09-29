@@ -3,7 +3,7 @@ import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "../regimeEngineCore";
 import { ruleMetricLabel, type RuleConditionMetric } from "../report/boundedDecisionRules";
 import { buildSharedCorridorRails, formatPointsToLine } from "../report/operatingCalls";
 import type { ComparedWith, ReportDynamics } from "../report/reportDataTypes";
-import { findSignalDelta } from "../report/evidenceReaderModel";
+import { findSignalDelta, type SignalDynamicsSource } from "../report/evidenceReaderModel";
 import { comparisonBasis } from "../report/comparisonBasis";
 import { describeScoreMovementLine } from "../report/scoreMovement";
 import { signalReadingMeaning } from "../report/signalTranslations";
@@ -72,10 +72,7 @@ const roundToTenth = (value: number) => Math.round(value * 10) / 10;
  * has the evidence.
  */
 export const previousScoresFromDynamics = (
-  dynamics:
-    | Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith" | "movement">
-    | null
-    | undefined,
+  dynamics: SignalDynamicsSource | null | undefined,
   current: ScorePair,
 ): PreviousReading | null => {
   if (!dynamics || dynamics.directionLabel === "unavailable") return null;

@@ -136,7 +136,7 @@ const AGENT_TOOLS: readonly AgentTool[] = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer (about 3KB): the conditions and how sure, whether the data is live and current (automation.ready), where each score sits against its pause, resume and change lines, what moved each score since the earlier reading, and the guidance.",
+      "Start here. The current reading in one small answer (about 3KB): the conditions and how sure, whether the data is live and current (automation.ready), where each score sits against its pause, resume and change lines, what moved each score since the earlier reading and which areas' pause or resume lines that crossed, and the guidance.",
     input: {},
     output: agentStateSchema,
     example: {},

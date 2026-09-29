@@ -127,8 +127,9 @@ export default function PrivacyPage() {
               reading at the time so a later week can be compared against the decision&apos;s
               own assumptions. Everything else you set stays in your browser and is never sent: your
               operator profile, Decision Shield presets, threshold drafts, the last guidance this browser
-              saw, which steps of the weekly plan you have ticked off this week, the theme, and which
-              one-time explainers you have dismissed. A Decision Shield link you copy is the exception:
+              saw, which steps of the weekly plan you have ticked off this week, how many decisions you
+              last recorded (so the brief only asks for your record when there is one), the theme, and
+              which one-time explainers you have dismissed. A Decision Shield link you copy is the exception:
               the plan you typed is written into the link, so whoever opens it sends that text to this
               site, where it can appear in the request logs described in 2.7.
             </p>

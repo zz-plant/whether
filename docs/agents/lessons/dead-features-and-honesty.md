@@ -374,3 +374,31 @@ input the server had not understood, which is worse than an error: it reads as a
   carried it. `/api/weekly` and `/api/monthly` still do (their archive regenerates from the same builders);
   a decision for the owner, recorded in `docs/feature-specs-current.md` §6.9.
 
+## A "what changed" sentence is a claim about the decisions, and it needs the lines to make one (2026-09-29)
+
+The archive froze "Pressure increased by +3.0 this week. Slow new commitments until conditions stabilize." on
+two consecutive weeks, beside guidance that said "freeze new commitments". The number was in a unit nothing
+else used, the instruction was the sentence's own and disagreed with the guidance under it, and "this week"
+was Aug 31. It was correct about one thing (the score rose) and useless for the reader's question, which is
+whether anything crossed a line. A move of eight points while already past a pause line changes nothing to do;
+a move of one point through it changes what four areas should do. Direction and size cannot tell those apart.
+
+- **Derive "what changed" from the same lines the table prints, through the same predicate**
+  (`lib/report/decisionMovement.ts` uses `isRuleConditionMet`), and give every surface that says it one
+  function. There were three sentences for it (`weeklyMovement.summary`, `decisionShiftSummary`, the table's
+  "Changed" cell) and each named a direction and prescribed an action.
+- **A sentence that prescribes belongs to the guidance, not to the change.** "Slow new commitments" was true of
+  no week in particular.
+- **A claim about the market state needs both of its sources to agree.** The earlier state is what the earlier
+  scores classify into; the current one is the assessed state, which can be a step behind its own scores while a
+  change waits on confirmation. A fixture whose regime did not match its own scores produced "conditions changed
+  from Stormy to Cloudy" on a week with no move at all. When the two disagree the sentence says nothing about the
+  state, because a change from one to the other would describe a pair nobody assessed.
+- **A number read from a widened type must still read the list the big moves land in.** The homepage model is
+  handed a looser `reportDynamics` than the loader's, and reading `changedSignals` alone treats a move past
+  the weekly sanity limit (the largest ones) as no move: the same defect `tests/lastWeekDerivation.test.ts`
+  records for the page, reproduced one layer down. `SignalDynamicsSource` types what the read needs.
+- **An earlier month is one outcome from one starting point.** "By Dec 2022 the scores stood here" reads as a
+  forecast unless the card says the change it matched was a different one (Stormy to Freezing, not Sunny to
+  Freezing) from very different scores (risk appetite 7, not 43).
+

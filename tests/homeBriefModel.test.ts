@@ -192,7 +192,14 @@ describe("buildHomeBriefModel", () => {
     assert.equal(dated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs Aug 31");
     assert.equal(dated.weeklyLeadershipSummary.comparedWith?.label, "Aug 31");
     assert.match(dated.weeklyLeadershipSummary.netDeltaLabel, /since Aug 31\.$|where it was on Aug 31\.$/);
-    assert.match(dated.weeklyMovement.summary, /^(Pressure (increased by \+|eased by -)\d\.\d|Conditions held steady) since Aug 31\./);
+    /* A sentence about the decisions, not a figure in a unit of its own: funding pressure 55 to 57
+       crosses the pause line at 56, so four of the five areas pause. */
+    assert.equal(
+      dated.weeklyMovement.summary,
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets: funding pressure rose through 56.",
+    );
+    assert.equal(dated.decisionMovement?.comparedWith, "Aug 31");
+    assert.doesNotMatch(dated.weeklyMovement.summary, /Pressure increased|Slow new commitments/);
 
     // A week that does not date its comparison reads as it always did.
     const undated = build();
@@ -200,7 +207,41 @@ describe("buildHomeBriefModel", () => {
     assert.equal(undated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs last week");
     assert.equal(undated.weeklyLeadershipSummary.comparedWith, undefined);
     assert.match(undated.weeklyLeadershipSummary.netDeltaLabel, /than last week\.$|where it was last week\.$/);
-    assert.match(undated.weeklyMovement.summary, / this week\./);
+    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*: funding pressure rose through 56\.$/);
+  });
+
+  /*
+   * The model is handed a looser `reportDynamics` than the loader's, and the moves past the weekly
+   * sanity limit are the biggest ones: they land in `anomalySignals` and not in `changedSignals`.
+   * Reading the second list alone read the Aug 31 to Sep 25 move (63 to 90 and 56 to 43) as no move at
+   * all, and said no line had been crossed on the week both pause lines were.
+   */
+  it("reads a move that landed in anomalySignals as the move it is, when it says what crossed a line", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "SCARCITY",
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+        scores: { tightness: 90, riskAppetite: 43 },
+      },
+      regimeAlert: { previousRegime: "EXPANSION" },
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [],
+        anomalySignals: [
+          { key: "tightness", delta: 27, reason: "Moved past the weekly sanity limit." },
+          { key: "riskAppetite", delta: -13, reason: "Moved past the weekly sanity limit." },
+        ],
+        comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
+      },
+    });
+
+    assert.equal(
+      model.weeklyMovement.summary,
+      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding pressure rose through 76 and risk appetite fell through 44.",
+    );
+    assert.equal(model.decisionShiftHeadline, model.weeklyMovement.summary);
+    assert.equal(model.decisionMovement?.moved.length, 5);
   });
 
   it("preserves all normalized evidence items including curve-slope", () => {
@@ -240,8 +281,9 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.decisionShiftSummary, /No significant change/);
+    assert.match(model.decisionShiftSummary, /^Conditions held steady this week; no pause or resume line was crossed\. Last week's guidance stands\./);
     assert.match(model.decisionShiftSummary, /Conditions change if:/);
+    assert.equal(model.decisionMovement?.moved.length, 0);
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.roleAwareTemplates.length, 2);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);

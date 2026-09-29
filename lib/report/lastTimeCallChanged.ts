@@ -1,6 +1,7 @@
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import { REGIME_SEVERITY_RANK, getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeKey } from "../regimeEngine";
+import { signalReadingMeaning } from "./signalTranslations";
 
 /**
  * The last time the call moved the way it moved this week, and what the two
@@ -18,6 +19,12 @@ import type { RegimeKey } from "../regimeEngine";
  * Direction, not the exact pair: six changes in fourteen years is too few for
  * "Sunny to Freezing" to have a precedent most weeks, and the card names the
  * pair it found so a reader can tell the two apart.
+ *
+ * What it found is one earlier month, and a reader takes it for a pattern unless the
+ * card says how that month differed from this one: the scores three months on
+ * stood where they stood because of where they started, and the change it matched
+ * may have come from another state. `today` carries this week's pair and scores so
+ * the card can put the two side by side (`describeAgainstToday`).
  */
 const FOLLOW_THROUGH_MONTHS = 3;
 
@@ -30,6 +37,8 @@ export type LastTimeCallChanged = {
   monthsLater: number;
   tightness: { atChange: number; later: number };
   riskAppetite: { atChange: number; later: number };
+  /** This week's change and scores, for the comparison with the month that was found. */
+  today: { from: RegimeKey; to: RegimeKey; tightness: number; riskAppetite: number };
 };
 
 const severityStep = (from: RegimeKey, to: RegimeKey) =>
@@ -45,12 +54,15 @@ export const findLastTimeCallChanged = ({
   series,
   currentRegime,
   previousRegime,
+  currentScores,
 }: {
   /** The month-end walk, any order; only entries with both scores count. */
   series: readonly TimeMachineRegimeEntry[];
   currentRegime: RegimeKey;
   /** The call before this week's. Absent or equal means the call did not change. */
   previousRegime: RegimeKey | null | undefined;
+  /** Where the two scores stand this week. */
+  currentScores: { tightness: number; riskAppetite: number };
 }): LastTimeCallChanged | null => {
   if (!previousRegime || previousRegime === currentRegime) return null;
   const step = severityStep(previousRegime, currentRegime);
@@ -79,9 +91,41 @@ export const findLastTimeCallChanged = ({
       monthsLater: FOLLOW_THROUGH_MONTHS,
       tightness: { atChange: entry.tightness, later: after.tightness },
       riskAppetite: { atChange: entry.riskAppetite, later: after.riskAppetite },
+      today: { from: previousRegime, to: currentRegime, ...currentScores },
     };
   }
   return null;
+};
+
+/* Inside this many points a score is "about where it was": the walk is monthly and the
+   scores are whole numbers, so a gap this small is not a difference worth naming. */
+const ABOUT_THE_SAME = 5;
+
+/**
+ * The month that was found, set against this week: the change it was and the one this
+ * week is, then each score with what it meant, then and now. The meaning rides beside
+ * every number (`signalReadingMeaning`), so "7" and "43" say "avoiding risk" and
+ * "selective about risk" without the reader knowing which end of the scale is which.
+ * `alike` is where the two are the same change with both scores about where they were;
+ * anything else says it is one earlier outcome and not a forecast, because that is what
+ * a reader who sees "3 months on, the scores stood here" is most likely to take it for.
+ */
+export const describeAgainstToday = (record: LastTimeCallChanged): { alike: boolean; text: string } => {
+  const { today, changedAt } = record;
+  const samePair = changedAt.from === today.from && changedAt.to === today.to;
+  const alike =
+    samePair
+    && Math.abs(today.tightness - record.tightness.atChange) <= ABOUT_THE_SAME
+    && Math.abs(today.riskAppetite - record.riskAppetite.atChange) <= ABOUT_THE_SAME;
+  const reading = (key: "tightness" | "riskAppetite", score: number) => `${score} (${signalReadingMeaning(key, score)})`;
+  const sentences = [
+    ...(samePair
+      ? []
+      : [`That change was ${changedAt.fromLabel} to ${changedAt.toLabel}; this week's is ${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}.`]),
+    `Then, funding pressure was ${reading("tightness", record.tightness.atChange)} and risk appetite ${reading("riskAppetite", record.riskAppetite.atChange)}; now they are ${reading("tightness", today.tightness)} and ${reading("riskAppetite", today.riskAppetite)}.`,
+    ...(alike ? [] : ["It is one earlier outcome, not a forecast."]),
+  ];
+  return { alike, text: sentences.join(" ") };
 };
 
 /** The comparison page for the change month against the month three later. */

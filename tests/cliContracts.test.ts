@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
+import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
+import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { buildActionStripItems } from "../lib/report/operatingCalls";
 import {
   buildCliCallContract,
   buildCliChangesContract,
@@ -115,6 +118,39 @@ describe("cli contracts", () => {
     const undated = buildCliChangesContract({ reportData, postureState, degraded: false });
     assert.equal(undated.basis, "since last week");
     assert.equal(undated.comparedWith, null);
+  });
+
+  /*
+   * "Pressure increased by +3.0 … Slow new commitments" was the archive's account of a week that
+   * crossed no line. The CLI names what the change did to the decisions in the sentence the page,
+   * the state and the pastes carry, and says nothing where nothing was compared.
+   */
+  it("names what the change did to the decisions, in the page's own sentence", () => {
+    const scores = { tightness: 90, riskAppetite: 43 };
+    const rules = buildCanonicalBoundedDecisionRules({ regime: "SCARCITY", thresholds: DEFAULT_THRESHOLDS, scores });
+    const crossing = {
+      ...reportData,
+      assessment: { ...reportData.assessment, regime: "SCARCITY", scores: { ...reportData.assessment.scores, ...scores }, thresholds: DEFAULT_THRESHOLDS },
+      actionStripItems: buildActionStripItems(rules, scores),
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [
+          { key: "tightness", label: "Funding pressure", delta: 27 },
+          { key: "riskAppetite", label: "Risk appetite", delta: -13 },
+        ],
+        anomalySignals: [],
+        comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
+      },
+    };
+
+    assert.equal(
+      buildCliChangesContract({ reportData: crossing, postureState, degraded: false }).decision,
+      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding pressure rose through 76 and risk appetite fell through 44.",
+    );
+    assert.equal(
+      buildCliChangesContract({ reportData: { ...crossing, reportDynamics: { ...crossing.reportDynamics, directionLabel: "unavailable", changedSignals: [] } }, postureState, degraded: false }).decision,
+      null,
+    );
   });
 
   it("builds scenario contract", () => {

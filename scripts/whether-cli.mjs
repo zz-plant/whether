@@ -895,7 +895,7 @@ const changesText = (body) => {
     return `- ${item.label ?? item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})${split ? `\n    made of: ${split}` : ""}`;
   });
   return `What changed ${basis}
-Freshness: ${freshnessText(body)}\n\nCHANGED\n${changed.join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${distanceText(item.distance)}`).join("\n")}`;
+Freshness: ${freshnessText(body)}${body.decision ? `\n\nDECISIONS\n${body.decision}` : ""}\n\nCHANGED\n${changed.join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${distanceText(item.distance)}`).join("\n")}`;
 };
 const signed = (value) => (value > 0 ? `+${value}` : String(value));
 
@@ -919,7 +919,7 @@ const stateText = (body) => `Whether — State, reading of ${body.recordDate}
 ${body.headline}
 
 ${stateScoreText(body.scores.tightness, body.change.comparedWith)}
-${stateScoreText(body.scores.riskAppetite, body.change.comparedWith)}${body.change.note ? `\n${body.change.note}` : ""}
+${stateScoreText(body.scores.riskAppetite, body.change.comparedWith)}${body.change.note ? `\n${body.change.note}` : ""}${body.change.summary ? `\n\n${body.change.summary}` : ""}
 
 Call: ${body.guidance.call}
 
