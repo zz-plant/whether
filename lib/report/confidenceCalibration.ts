@@ -8,7 +8,7 @@ import { resolveDistanceToFlip } from "./confidence";
  *
  * The percent is `55 + distance-to-the-nearest-regime-boundary`, capped at 92.
  * It has never been checked against whether calls at a given distance actually
- * held, and CLAUDE.md has carried that as the open work since the scale was
+ * held, and docs/agents/lessons/regime-scoring.md has carried that as the open work since the scale was
  * written. This is the check, run over the 176 month-end readings in
  * `data/summary_archive.json` (2012-01 to 2026-08).
  *

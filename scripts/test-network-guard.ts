@@ -24,7 +24,7 @@
  * Invariant 1 ("reading performs zero writes") passed in a sandbox that reaches
  * nothing and failed every Cloudflare build from 2026-08-30 to 2026-09-02, where
  * FRED answers and the read path therefore ingested and took the refresh lock.
- * CLAUDE.md draws the rule from it — "a test about writes has to serve its own
+ * docs/agents/lessons/automation-and-deploy-gate.md draws the rule from it — "a test about writes has to serve its own
  * upstreams" — and this makes the rule the default instead of a thing each test
  * has to remember. The same argument the runner already makes about a stray API
  * key: a result that depends on what the environment happens to allow is not a

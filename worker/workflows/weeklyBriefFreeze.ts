@@ -88,7 +88,7 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
    * missing token, and the alternative was `mock.module` on
    * `publishedBriefRecord` — which patches the registry process-wide and broke
    * `publishedBriefPullRequest.test.ts` the moment both files ran together, in
-   * exactly the way CLAUDE.md records. One overridable method costs less than a
+   * exactly the way docs/agents/lessons/automation-and-deploy-gate.md records. One overridable method costs less than a
    * suite that passes on ordering luck.
    */
   protected assembleWeek(): ReturnType<typeof assembleCurrentWeekBrief> {

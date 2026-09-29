@@ -41,7 +41,7 @@ difference between "the archive job is behind" and "this product stopped being m
   A missing module is neutral; a stale date is a negative claim.
 - Treat the Thursday freeze routine as a *marketing* dependency, not a data chore: it is the only thing
   producing the citable corpus. Its PRs need a merge owner, or the routine needs to write directly.
-  Per `CLAUDE.md`, a quiet week and a failed run look identical from the repo — for this artifact that
+  Per `docs/agents/lessons/automation-and-deploy-gate.md`, a quiet week and a failed run look identical from the repo — for this artifact that
   ambiguity is expensive.
 
 **Reversal condition.** If the freeze routine resumes and the archive is within a week, restore the

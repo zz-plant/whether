@@ -147,7 +147,7 @@ match an actual operator query. The same gate independently sets `noindex` on th
 (`app/answers/[slug]/page.tsx:41`, `app/signals/[cluster]/[decision-scenario]/page.tsx:55-58`).
 
 The intent is right and documented: do not index a stale posture call. The cost is that the failure
-mode is all-or-nothing on the *URL*, and CLAUDE.md records FRED outages lasting weeks (the brief
+mode is all-or-nothing on the *URL*, and docs/agents/lessons/automation-and-deploy-gate.md records FRED outages lasting weeks (the brief
 freeze routine "has not completed a good run since" June). Every outage resets these pages'
 accumulated ranking signals, and re-indexing lags recovery by days to weeks.
 

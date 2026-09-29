@@ -34,7 +34,7 @@ const TASKS = [
    * files. Advisory means nobody runs it, which is the whole argument.
    *
    * On pre-push and `bun run check`, not the deploy gate. It reads the type
-   * graph, so it is the slowest task here, and CLAUDE.md records one run that
+   * graph, so it is the slowest task here, and docs/agents/lessons/toolchain-and-gates.md records one run that
    * reported findings later runs could not reproduce. A check that might flake
    * belongs where a human is standing next to it, not where the only log is one
    * nobody can read.

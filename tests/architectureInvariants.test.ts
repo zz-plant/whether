@@ -310,7 +310,7 @@ describe("Architecture Invariants", () => {
    * binding is present, in production as anywhere else: the write succeeds and
    * goes nowhere durable. Whether it should refuse instead is a live question —
    * this repo has paid for silent fallbacks before (see the brief freeze) — but
-   * it is a change to a write path, not a cleanup, and CLAUDE.md records it.
+   * it is a change to a write path, not a cleanup, and docs/agents/lessons/dead-features-and-honesty.md records it.
    */
   it("Invariant 6: the snapshot store falls back to memory when no KV is bound, and says so here", () => {
     Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");

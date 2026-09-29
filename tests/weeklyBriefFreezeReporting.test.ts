@@ -77,7 +77,7 @@ type WeeklyBriefFreeze = InstanceType<
 /* The live read is overridden by subclassing the workflow's own seam. `mock.module`
    on `publishedBriefRecord` would patch the registry process-wide and broke
    publishedBriefPullRequest.test.ts the moment both files ran, which is the hazard
-   CLAUDE.md records for this suite. */
+   docs/agents/lessons/automation-and-deploy-gate.md records for this suite. */
 const freezeWorkflow = async (env: Record<string, unknown>, assemble: () => Promise<AssembleResult>) => {
   const { WeeklyBriefFreezeWorkflow } = await import("../worker/workflows/weeklyBriefFreeze");
   class StubbedFreeze extends WeeklyBriefFreezeWorkflow {

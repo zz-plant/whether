@@ -7,7 +7,7 @@ export function resolveBranchFromGit(): string;
  * Only preview builds do. Production is gated too, but by the configured build
  * command (`check:vinext`), which runs on every push before anything is built —
  * this is the inner arrival, reached from the deploy command afterwards. See
- * CLAUDE.md for why the two-gate shape once read as "production skips the gate".
+ * docs/agents/lessons/automation-and-deploy-gate.md for why the two-gate shape once read as "production skips the gate".
  */
 export function shouldRunChecks(
   env?: Record<string, string | undefined>,

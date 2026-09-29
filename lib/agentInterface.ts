@@ -39,7 +39,7 @@ type SummaryByCadence = {
    `degraded` carries the same meaning here as on those sibling routes and no more:
    `!reportResult.ok`, assembly failed outright. It is deliberately not a freshness signal.
    Under a total live-data outage treasury and macro fall back to their own snapshots,
-   assembly succeeds, and this flag stays false — the trap CLAUDE.md records, where a script
+   assembly succeeds, and this flag stays false — the trap docs/agents/lessons/automation-and-deploy-gate.md records, where a script
    read through a gracefully degrading loader and froze a ten-week-old brief while exiting 0.
    `lib/report/briefPublishGuard.ts` is what judges publish readiness, on the fallback and
    record-age flags that do move under an outage. Anything that writes from this payload

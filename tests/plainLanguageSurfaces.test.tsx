@@ -24,7 +24,7 @@ const mockAny: any = mock;
    makes the file answer for its own dependencies. See
    whatWouldChangeConsequence.test.tsx, where that luck ran out. The real module
    is spread under the override: a stub narrower than `next/navigation` removes
-   `notFound` for every file that runs after it (CLAUDE.md). */
+   `notFound` for every file that runs after it (docs/agents/lessons/automation-and-deploy-gate.md). */
 mockAny.module("next/navigation", () => ({
   ...nextNavigation,
   usePathname: () => "/",

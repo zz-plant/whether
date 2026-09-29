@@ -55,7 +55,7 @@ mockAny.module("next/navigation", () => ({
  *   work earns it; raising one is a decision and belongs in its own PR with the reason.
  *
  * Routes behind the report read path stay out (they suspend at their data boundary offline;
- * CLAUDE.md records why). Everything here renders from the bundled snapshot or from a fixture.
+ * docs/agents/lessons/tests-and-copy-rules.md records why). Everything here renders from the bundled snapshot or from a fixture.
  */
 
 const BANNED: { name: string; pattern: RegExp }[] = [
