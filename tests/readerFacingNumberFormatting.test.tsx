@@ -14,7 +14,7 @@ const mockAny: any = mock;
 
 /* Spread the real module and override only what is needed — a stub listing a
    few exports installs a `next/navigation` with only those for every file in
-   the run, which is the shuffled-order link failure CLAUDE.md records. */
+   the run, which is the shuffled-order link failure docs/agents/lessons/automation-and-deploy-gate.md records. */
 mockAny.module("next/navigation", () => ({
   ...nextNavigation,
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),

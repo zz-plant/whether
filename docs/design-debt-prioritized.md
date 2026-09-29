@@ -88,7 +88,7 @@ changed, and the numbers below are the measured ones.
 
 | ID | Item | Status |
 | --- | --- | --- |
-| DD-011 | Lint backlog switched off at the oxlint swap | Shipped — `no-unused-vars` (84), every `jsx-a11y` rule (50), `no-useless-escape` (12), `no-extra-boolean-cast` (3), `no-useless-rename` (2), `unicorn/no-useless-fallback-in-spread` (1) all fixed to zero and **enforced**. Remaining rules and counts are listed in CLAUDE.md → Toolchain notes. |
+| DD-011 | Lint backlog switched off at the oxlint swap | Shipped — `no-unused-vars` (84), every `jsx-a11y` rule (50), `no-useless-escape` (12), `no-extra-boolean-cast` (3), `no-useless-rename` (2), `unicorn/no-useless-fallback-in-spread` (1) all fixed to zero and **enforced**. Remaining rules and counts are listed in docs/agents/lessons/toolchain-and-gates.md → Toolchain notes. |
 | DD-012 | Dead CSS in the custom layer | Shipped — 41 of 138 `weather-*` classes were defined but never rendered. 321 lines removed across 9 stylesheets. Verified inert: 14 routes were crawled and none references a removed class. `@keyframes weather-stream-reveal` was kept, since live rules still animate it. |
 | DD-013 | `/mockups` served in production | Shipped — `app/mockups/layout.tsx` calls `notFound()` unless `NODE_ENV !== "production"` or `WHETHER_ENABLE_MOCKUPS=1`, which `wrangler.toml` sets on the preview lane only. Four routes were publicly reachable; they were `noindex` but still served. No inbound links existed. |
 | DD-014 | No file-size budget on product code | Shipped — `max-lines` enforced at 800 effective lines across `app/**` and `lib/**`. Deliberately not applied to `scripts/**` or `tests/**`. Nine files sit between 500 and 800; **500 is the ratchet target**. |

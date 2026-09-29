@@ -1120,7 +1120,7 @@ now claims and reports a copy only after a write resolves.
 
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
-The runway unification itself landed on `main` separately (7f264a26, recorded in CLAUDE.md, "One
+The runway unification itself landed on `main` separately (7f264a26, recorded in docs/agents/lessons/dead-features-and-honesty.md, "One
 runway setting"): the band is the setting, the notes branch on its boundaries, and an exact figure
 moves the band. This branch adds one thing on top.
 

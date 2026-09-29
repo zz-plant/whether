@@ -8,7 +8,7 @@ import { ReaderReturnsSection } from "../app/trust/readerReturnsSection";
  * the page the navigation points a reader to "when you want to sanity-check the brief before
  * a big decision".
  *
- * Rendered rather than read off the source, per the rule in CLAUDE.md: this is a plain
+ * Rendered rather than read off the source, per the rule in docs/agents/lessons/tests-and-copy-rules.md: this is a plain
  * server component over two props, so the claim is about what the markup says.
  *
  * The claims worth pinning are the ones that are easy to lose in a copy edit. A percentage

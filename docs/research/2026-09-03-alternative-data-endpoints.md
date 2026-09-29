@@ -57,7 +57,7 @@ Two further findings, both negative and both worth recording so nobody spends a 
 
 | # | Claim | Source | Type | Confidence |
 | --- | --- | --- | --- | --- |
-| 1 | Pipeline reaches 5 hosts: `fred.stlouisfed.org`, `api.stlouisfed.org`, `home.treasury.gov`, `query1.finance.yahoo.com`, `www.alphavantage.co` | repo grep; `CLAUDE.md` egress list | primary | high |
+| 1 | Pipeline reaches 5 hosts: `fred.stlouisfed.org`, `api.stlouisfed.org`, `home.treasury.gov`, `query1.finance.yahoo.com`, `www.alphavantage.co` | repo grep; `docs/agents/lessons/automation-and-deploy-gate.md` egress list | primary | high |
 | 2 | **10** series pulled: DGS1MO, DGS3MO, DGS2, DGS10, BAA10Y, BAMLH0A0HYM2, CPIAUCSL, UNRATE, NFCI, VIXCLS | `lib/ingestion/families.ts` | primary | high |
 | 2b | **DFF is never fetched.** `TREASURY_ENDPOINTS.fedFunds` is declared but absent from the endpoints object the client actually builds, and no bundled snapshot carries a `fedFunds` value — so `getBaseRate`'s `"FED"` branch is unreachable and the base rate is always the 1-month bill | `lib/treasury/treasuryClient.ts:32,395-400`; `lib/regimeEngineCore.ts:238-248`; `grep fedFunds data/*.json` → no match | primary | high |
 | 2c | Two user-facing strings nonetheless name DFF as a source: `TREASURY_SOURCE_LABEL` and the trust page's formula reference | `lib/regimeEngineCore.ts:160`; `app/trust/formulaReference.tsx:97-101` | primary | high |
@@ -81,7 +81,7 @@ engineered web endpoint can't be cited the way a documented feed can, and neithe
 change policy — so "the number moved because the endpoint changed shape" is indistinguishable from
 "the number moved."
 
-**The egress allowlist is the real operational constraint.** `CLAUDE.md` records three routines all
+**The egress allowlist is the real operational constraint.** `docs/agents/lessons/automation-and-deploy-gate.md` records three routines all
 reporting FAILED on `connect_rejected`. Every host is a permission that has to exist in every
 environment. Dropping `fred.stlouisfed.org` is worth more than the code change suggests: it is one
 fewer thing to get wrong per environment, and it retires an interface with no stability contract.

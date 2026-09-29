@@ -20,7 +20,7 @@ const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
  * run at once, and this suite declares none, so the value changed nothing. The
  * same 20 files took 8.26s at 1 and 8.10s at 8. Bun runs every file in one
  * process, sequentially, and exposes no worker count to lower — which is also why
- * CLAUDE.md can say module state leaks between files. The knob is gone rather
+ * docs/agents/lessons/automation-and-deploy-gate.md can say module state leaks between files. The knob is gone rather
  * than re-tuned: a setting that reads as protection and provides none is worse
  * than no setting, because it stops anyone looking for the real cause. The real
  * contention here is `tests/whetherCli.test.ts` spawning 62 Node processes while
@@ -266,7 +266,7 @@ for (const key of [
 /*
  * Order. Bun runs every file in one process, so module-level state (mock.module patches,
  * memoized loaders, the FRED circuit breaker) leaks between files, and a suite that only
- * ever runs in one order can pass because of that order — CLAUDE.md records a build that
+ * ever runs in one order can pass because of that order — docs/agents/lessons/automation-and-deploy-gate.md records a build that
  * did. The deploy gate shuffles; bun prints the seed on every run, and BUN_TEST_SEED=<seed>
  * replays one. A local run keeps a fixed order unless BUN_TEST_RANDOMIZE=1 asks otherwise.
  */

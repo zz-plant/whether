@@ -7,7 +7,7 @@ import { readFile } from "node:fs/promises";
  *
  * It cannot be rendered or imported here — it runs in a worker scope this suite
  * has no way to create, and `self.addEventListener("fetch")` means nothing in a
- * test process. So this reads the file, which CLAUDE.md's rule allows for
+ * test process. So this reads the file, which the rule in docs/agents/lessons/tests-and-copy-rules.md allows for
  * exactly this case and requires saying so at the site.
  *
  * What is worth guarding is not the caching strategy but the refusals. A

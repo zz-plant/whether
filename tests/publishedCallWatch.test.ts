@@ -13,7 +13,7 @@ import {
  * The failure this guards against is not missing a change — it is announcing
  * one that did not happen. A weekly brief is left open; a banner that cries
  * "updated" on a failed poll, an unparseable body, or an unchanged week is the
- * warning-about-data-that-is-fine problem CLAUDE.md records, and the next one
+ * warning-about-data-that-is-fine problem docs/agents/lessons/tests-and-copy-rules.md records, and the next one
  * gets ignored.
  */
 

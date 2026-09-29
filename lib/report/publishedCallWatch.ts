@@ -59,7 +59,7 @@ export type PublishedCallChange = null | { kind: "call"; message: string } | { k
  * A moved regime is a different call and says so. A moved record date under the
  * same regime is a newer reading of the same call, which is worth offering and
  * is not worth alarming anyone about — the two get different sentences because
- * they are different news, and CLAUDE.md already records what happens when a
+ * they are different news, and docs/agents/lessons/tests-and-copy-rules.md already records what happens when a
  * warning fires on something that is fine.
  */
 export const describePublishedCallChange = (
