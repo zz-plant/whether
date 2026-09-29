@@ -16,6 +16,7 @@ import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
+import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
 import { describeBaseRateSource, describeConditions, describeWeeklyDirection, formatExportConfidence } from "./exportTerms";
 
 /*
@@ -207,7 +208,18 @@ export const buildReadingLines = (assessment: RegimeAssessment, options?: Export
   const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
   const movementLine = buildScoreMovementLine(options?.previousScores);
+  /* What the week did to the decisions leads: the readings under it are the evidence,
+     and a paste read by someone who never sees the page should get the consequence
+     first. Absent, like the earlier reading it is measured against, without one. */
+  const decisionLine = buildDecisionMovement({
+    scores,
+    previous: options?.previousScores ?? null,
+    thresholds: assessment.thresholds,
+    regime: assessment.regime,
+    areas: areaLinesFromActionStrip(items),
+  })?.sentence;
   return [
+    ...(decisionLine ? [decisionLine] : []),
     ...buildScoreReferenceLines({
       scores,
       thresholds: assessment.thresholds,

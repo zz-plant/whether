@@ -8,6 +8,7 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
+import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
@@ -27,6 +28,7 @@ import { formatDateUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildQuietDayRead } from "../lib/report/flipProximity";
+import { buildChangedLead } from "../lib/report/decisionMovement";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
@@ -244,7 +246,6 @@ async function PageContent({
   const {
     primaryCall,
     flipConditionLabels,
-    revisitQueue,
     guardrailLabel,
     parsedGuardrailThreshold,
     reversalTriggerLabel,
@@ -341,13 +342,22 @@ async function PageContent({
     tightnessPressure,
     tightnessSaturated,
   });
+  const decisionMovement = homepage.weeklyDecisionCardModel.decision.decisionMovement;
   const homeAreaRows = buildHomeAreaRows({
     actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
     decisionRules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
-    revisitQueue,
+    movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
-  const movementSentence = describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis });
+  /* The section's lead is what the week did to the decisions: which areas' lines
+     were crossed, or that none were. The score-direction sentence is what remains
+     where no lines could be read. */
+  const movementSentence = buildChangedLead({
+    movement: decisionMovement,
+    quietDayLine,
+    nearestLine: v2HeroSignalData.flipProximity[0],
+    fallback: describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }),
+  });
   const scoreLadders = [
     {
       metric: "tightness" as const,
@@ -378,6 +388,7 @@ async function PageContent({
         series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
         currentRegime: regime,
         previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
+        currentScores: { tightness, riskAppetite },
       });
   /* The first-visit fold applies to the live weekly brief only. An archived
      month or a monthly horizon was reached by choosing it, which is not a
@@ -559,6 +570,9 @@ async function PageContent({
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
                 />
               ) : null}
+              {/* The reader's own decisions against this week's reading, for a browser
+                  that has recorded some: one line, and nothing at all for the rest. */}
+              {!historicalSelection ? <YourRecordNote tightness={tightness} riskAppetite={riskAppetite} /> : null}
             </div>
 
             {offersFirstVisitFold ? (
@@ -579,7 +593,7 @@ async function PageContent({
                 drawn twice on this page, in the hero and again beside the actions. */}
             <WhatChangedSection
               rows={signalChangeRows}
-              lead={quietDayLine ?? movementSentence}
+              lead={movementSentence}
               comparisonUnavailable={comparisonUnavailable}
               basis={basis}
             />

@@ -1293,6 +1293,76 @@ like-for-like means scoring the earlier reading with the market series as they s
 published delta, the regime alert, and comparability with the archive, so it is a product call and is
 recorded here, with the real numbers, rather than made.
 
+### 1.1.28 Say what the move did to the decisions (2026-09-29)
+
+The archive's account of two consecutive weeks was the same sentence: `data/published_briefs.json` w38 and
+w39 both say "Pressure increased by +3.0 this week. Slow new commitments until conditions stabilize.",
+beside the guidance "freeze new commitments". Three things were wrong with it. "+3.0" is a figure in a unit
+nothing else uses (`buildWeeklyMovementMetric` sums a regime step and per-signal moves and clips them at ±3).
+"Slow new commitments" is an instruction of its own, printed whenever pressure rose, over guidance that had
+already said something stronger. And "this week" was not the comparison: both weeks were measured against
+Aug 31 (§1.1.26). Nothing said what a reader who acts on lines needs to know, which is whether anything
+*crossed* one. Against Aug 31 (63 and 56) both weeks did, and against each other (w38 77 and 42, w39 85 and
+39) neither did.
+
+**What ships.** One derivation, `buildDecisionMovement` (`lib/report/decisionMovement.ts`), read by every
+surface below. Each area is a small state against its own lines, taken from the same conditions the rules
+table prints through the same `isRuleConditionMet`: *paused* when any pause line holds, *resumable* when
+every numeric resume line holds, *holding* otherwise. It compares the state at the earlier reading with the
+state now and names the lines that decided it. Five movements: `paused`, `lifted`, `resumable`,
+`resumeLost`, `held`. Coming out of a pause into resumable names the resume line, the further one a score
+has passed. The sentence, for the Sep 25 read:
+
+> Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding
+> pressure rose through 76 and risk appetite fell through 44.
+
+A week nothing crossed says so and stops: `Conditions held steady since Sep 15; no pause or resume line was
+crossed. Last week's guidance stands.` A change of conditions with no line crossed says that
+(`tests/decisionMovement.test.ts` holds the shapes). It claims nothing without an earlier reading, nothing
+about the market state when the assessed state is not what the scores classify into (a change waiting on
+confirmation), and reads "this week" where the source did not date the earlier reading.
+
+**Where it prints.** The lead over "What changed this week" (followed by the nearest line on a quiet week,
+`buildChangedLead`); the by-area table's **Changed** column, which used to carry a fixed re-check sentence for
+whichever three areas the largest moves pointed at whether or not the rule had anything to re-check, and now
+says what happened to that area's own lines ("Pause now applies: risk appetite fell through 44."), says
+"No line crossed since Aug 31." for an area a move did not touch, and draws no column on a week nothing
+crossed; the first-visit picker's amber note for the chosen area; `weeklyMovement.summary`, and so the frozen
+record's `whatChanged` (new freezes only: the archive is append-only, and w38 and w39 keep the sentence they
+were frozen with); `decisionShiftSummary` and `decisionShiftHeadline`, which are the "Changed:" line in the
+share artifact, `/api/decision` and the read-this card; the lead line of "What changed this week" in every
+paste (`buildReadingLines`, which the issue-tracker form now shares instead of keeping a private copy); the
+agent state (`change.summary`, and `change.crossed`, grouped by how the areas moved with the lines that
+decided it); and `whether changes` (`decision`). `weeklyMovement.score` and `.direction` are unchanged.
+**Not on the brief card**, which is at 769px of its 800 in the worst case (§1.1.27); it already prints each
+score against the line and the earlier reading.
+
+**Your record, on the brief.** `/decisions` was reachable from the footer, the command palette and the confirmation under the Decision Shield's record button, and nothing in the brief connected the two halves of one question (which of my commitments rest on what moved?). A
+browser that has recorded a decision now gets one line under the returning-visitor strip, in the record's own
+headline ("1 decision rests on conditions that have moved since it was recorded." / "All 3 decisions on this
+browser still rest on conditions that hold.") and a link to the rows (`YourRecordNote`,
+`app/components/home/YourRecordNote.tsx`). Nothing renders for a browser with no record, on a failed read, or
+on an archived week. Nearly every browser on `/` has an id (the alert toggle mints one), so the page asks
+the server only when the browser remembers having recorded something: `whether.decisionMemory:<id>` (a key
+the registry already accounted for and nothing used) holds the count, kept by `fetchDecisionLedger` and
+`logDecisionToLedger`. A browser that recorded before this shipped sees the note after it next opens
+`/decisions`. `/privacy` 2.4 says so.
+
+**The analogue says how it differed.** "The last time conditions moved this way" printed Sep 2022 and where the
+scores stood three months on, which reads as a forecast to anyone who is not told where that month started.
+On the Sep 25 read it found Stormy to Freezing at funding pressure 79 and risk appetite 7; this week is Sunny
+to Freezing at 90 and 43. The card now adds `Against this week:` (`describeAgainstToday`): the change it was
+and this week's when they differ, each score then and now with what it means (`signalReadingMeaning`), and
+"It is one earlier outcome, not a forecast." unless it is the same change with both scores within 5 points.
+
+**Found, not changed.** The comparison is the previous month-end snapshot (§1.1.26), so every brief in a month
+restates the same crossing: w40 would say what w38 said. A weekly basis for the archive is the previous
+*published record* (its `scores` and `decisions[].pause/resume` are enough to run the same derivation), which
+means both freeze writers (`scripts/freezeWeeklyBrief.ts`, `worker/workflows/weeklyBriefFreeze.ts`) supply
+the earlier record to `buildPublishedBriefRecord`, and the archive page would then name a different basis
+from the live one. Not done: it is a change to what the archive says about a week, which is an owner
+decision.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -1764,6 +1834,7 @@ Changes, all additive except where noted:
   as `perWeek`.
 - **Browsers.** `/api/mcp` answers its CORS preflight and carries `Access-Control-Allow-Origin: *` on the JSON-RPC transport and the reads; `?tool=subscribe` stays closed.
 - **CLI**: `whether state` (and `--require-ready`, which exits 8 when the data is not live and current); a mistyped command is refused as one (it was answered "too many arguments for 'status'"); `changes` names the dated reading it compares with, uses reader names and says what moved a score.
+- **What the change did to the decisions** (§1.1.28): the state carries `change.summary` (one sentence) and `change.crossed` (the areas whose pause or resume state changed since `comparedWith`, grouped by how they moved, with the lines that decided it; empty when none did); `whether changes` prints the same sentence under `DECISIONS`, and the changes contract carries it as `decision`. Additive.
 
 ### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
 Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
@@ -1807,6 +1878,7 @@ surfaces.
 
 The one system of record for "what did we decide and when": server-backed entries keyed by
 client id, saved from the hero, browsed on `/operate/memory`, and checked for staleness on `/`.
+The brief says how many of a browser's decisions rest on conditions that moved (`YourRecordNote`, §1.1.28); the rows are on `/decisions`.
 
 Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
 a spec update, and with it the only writer of the `whether_decision_history` localStorage key.

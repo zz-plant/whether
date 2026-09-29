@@ -26,10 +26,16 @@ export const buildDecisionShiftSummary = ({
   directionLabel,
   changeCount,
   reversalTrigger,
+  movementSentence,
 }: {
   severityDelta: number;
   directionLabel: ReportDynamics["directionLabel"] | undefined;
   changeCount: number;
+  /* What the week did to the decisions (`buildDecisionMovement`). When a comparison
+     was made it is the whole answer: the branches below name a direction and
+     prescribe an action ("Slow new commitments…") that the guidance under them
+     already states, and on a week nothing crossed a line they said it anyway. */
+  movementSentence?: string;
   /* Omitted by the surfaces that print their own change line: appended there,
      the board note read "Conditions change if" twice, naming two different lines. */
   reversalTrigger?: string;
@@ -42,6 +48,7 @@ export const buildDecisionShiftSummary = ({
        week-over-week half of the sentence. */
     return withTrigger("No previous reading to compare this week against. The guidance below comes from where the signals sit now.");
   }
+  if (movementSentence) return withTrigger(movementSentence);
   if (changeCount === 0 || directionLabel === "stable") {
     return withTrigger("No significant change this week. Keep your current plan.");
   }
@@ -59,12 +66,15 @@ export const buildWeeklyMovementMetric = ({
   changedSignals,
   directionLabel,
   basis = comparisonBasis(),
+  movementSentence,
 }: {
   severityDelta: number;
   changedSignals: SignalChange[];
   directionLabel: ReportDynamics["directionLabel"] | undefined;
   /** What the moves are measured against; "this week" wording when the week does not date it. */
   basis?: ComparisonBasis;
+  /** What the week did to the decisions (`buildDecisionMovement`); the archive's "what changed". */
+  movementSentence?: string;
 }) => {
   /* The comparison is the previous monthly snapshot, so a week that records its
      date says "since Aug 31" where these sentences used to say "this week". */
@@ -98,11 +108,16 @@ export const buildWeeklyMovementMetric = ({
   const rawScore = severityDelta + directionalPressure;
   const score = Number(Math.max(-3, Math.min(3, rawScore)).toFixed(1));
 
+  /* The summary is a sentence about decisions. It used to be "Pressure increased by
+     +3.0 this week. Slow new commitments until conditions stabilize", which the
+     archive printed on two consecutive weeks beside "freeze new commitments": a
+     figure in a unit nothing else uses, and an instruction of its own. Without the
+     lines to read it against, it says which way the scores went and nothing more. */
   if (score >= 0.25) {
     return {
       score,
       direction: "tightening" as const,
-      summary: `Pressure increased by +${score.toFixed(1)} ${window}. Slow new commitments until conditions stabilize.`,
+      summary: movementSentence ?? `Conditions tightened ${window}.`,
     };
   }
 
@@ -110,14 +125,14 @@ export const buildWeeklyMovementMetric = ({
     return {
       score,
       direction: "easing" as const,
-      summary: `Pressure eased by ${score.toFixed(1)} ${window}. Move faster on what's already working.`,
+      summary: movementSentence ?? `Conditions eased ${window}.`,
     };
   }
 
   return {
     score,
     direction: "stable" as const,
-    summary: `Conditions held steady ${window}. Last week's guidance stands.`,
+    summary: movementSentence ?? `Conditions held steady ${window}. Last week's guidance stands.`,
   };
 };
 

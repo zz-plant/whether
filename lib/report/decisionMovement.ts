@@ -1,0 +1,329 @@
+import { previousScoresFromDynamics } from "../export/scoreReference";
+import { formatThresholdNumber } from "../formatters";
+import type { RegimeKey } from "../regimeEngine";
+import { getRegimePublicLabel } from "../regimePresentation";
+import {
+  decisionAreaLabel,
+  decisionAreaOrder,
+  isRuleConditionMet,
+  ruleMetricLabel,
+  type BoundedDecisionRule,
+  type DecisionArea,
+  type RuleCondition,
+  type RuleConditionMetric,
+} from "./boundedDecisionRules";
+import { operatingLeverToDecisionArea } from "./businessAreaMap";
+import { comparisonBasis } from "./comparisonBasis";
+import type { ActionStripItem } from "./operatingCalls";
+import { classifyRegimeQuadrant } from "./regimeStateMachine";
+import type { ComparedWith, ReportDynamics } from "./reportDataTypes";
+
+/**
+ * What the week's move did to the decisions, not to the market.
+ *
+ * A score can move a long way and change nothing anyone should do: funding pressure
+ * going from 84 to 90 while it is already past its pause line is a bigger number and the
+ * same guidance. The other way round, a two-point move across a line changes what an area
+ * should do this week. The sentence this replaces said "Pressure increased by +3.0 this
+ * week. Slow new commitments until conditions stabilize", in the archive, twice, beside
+ * "freeze new commitments" — an invented unit and an instruction that disagreed with the
+ * guidance it sat under.
+ *
+ * Each area is a small state against its own lines: paused when any pause line holds,
+ * resumable when every numeric resume line holds, holding otherwise. This compares that
+ * state at the earlier reading with the state now, and names the lines that decided it.
+ * Nothing here scores or classifies: it reads the same conditions the rules table prints,
+ * through the same `isRuleConditionMet`, so it cannot say a line was crossed that the row
+ * beside it does not draw.
+ */
+
+type Scores = Record<RuleConditionMetric, number>;
+
+/** One area's numeric lines. A rule with no line for a side leaves that side empty. */
+type AreaLines = {
+  area: DecisionArea;
+  pause: readonly RuleCondition[];
+  resume: readonly RuleCondition[];
+};
+
+export const areaLinesFromRules = (
+  rules: readonly Pick<BoundedDecisionRule, "area" | "pause" | "resume">[],
+): AreaLines[] =>
+  rules.map((rule) => ({ area: rule.area, pause: rule.pause.conditions, resume: rule.resume.conditions }));
+
+export const areaLinesFromActionStrip = (
+  items: readonly Pick<ActionStripItem, "lever" | "pauseConditions" | "resumeConditions">[],
+): AreaLines[] =>
+  items.map((item) => ({
+    area: operatingLeverToDecisionArea[item.lever],
+    pause: item.pauseConditions ?? [],
+    resume: item.resumeConditions ?? [],
+  }));
+
+type AreaState = "pause" | "hold" | "resume";
+
+/**
+ * How an area moved between the two readings. `resumable` is where the resume lines now
+ * hold, from a pause or from holding: a state that excludes the pause, so a pause that
+ * lifted on the way is not a separate movement. `lifted` is a pause that no longer applies
+ * with the resume lines not yet met.
+ */
+export type AreaMovementKind = "paused" | "lifted" | "resumable" | "resumeLost" | "held";
+
+type CrossedLine = {
+  metric: RuleConditionMetric;
+  /** "Funding pressure" */
+  label: string;
+  /** The score at which the line sits. */
+  value: number;
+  /** Which way the score went through it. */
+  direction: "rose" | "fell";
+};
+
+type AreaMovement = {
+  area: DecisionArea;
+  kind: AreaMovementKind;
+  /** Where the area stands now: what its lines say, not what the guidance text says. */
+  state: AreaState;
+  /** The lines that decided the movement, in the order the area states them. Empty when it held. */
+  crossed: CrossedLine[];
+  /** A table cell's worth: "Pause now applies: funding pressure rose through 76." */
+  text: string;
+};
+
+/** The areas that moved the same way, with the lines that decided it for any of them, once each. */
+type MovementGroup = {
+  kind: Exclude<AreaMovementKind, "held">;
+  areas: DecisionArea[];
+  crossed: CrossedLine[];
+};
+
+export type DecisionMovement = {
+  /** "Aug 31", or null where the source did not date the earlier reading. */
+  comparedWith: string | null;
+  /** Set when the market state itself changed between the two readings, as reader names. */
+  conditions: { from: string; to: string } | null;
+  /** Every area, in the page's row order. */
+  areas: AreaMovement[];
+  /** The areas whose state moved, in the same order. */
+  moved: AreaMovement[];
+  /** `moved`, grouped by how it moved: the clauses of the sentence, for a surface that wants them as data. */
+  groups: MovementGroup[];
+  /** The one sentence: what changed for decisions, and which lines did it. */
+  sentence: string;
+  /** `sentence` without the lines that did it, for a surface with room for the consequence and not the evidence (a link preview, a card). */
+  headline: string;
+};
+
+const stateAt = (lines: AreaLines, scores: Scores): AreaState => {
+  if (lines.pause.some((line) => isRuleConditionMet(line, scores[line.metric]))) return "pause";
+  if (lines.resume.length > 0 && lines.resume.every((line) => isRuleConditionMet(line, scores[line.metric]))) return "resume";
+  return "hold";
+};
+
+const kindOf = (from: AreaState, to: AreaState): AreaMovementKind => {
+  if (from === to) return "held";
+  if (to === "pause") return "paused";
+  if (to === "resume") return "resumable";
+  return from === "pause" ? "lifted" : "resumeLost";
+};
+
+type Flip = CrossedLine & { holds: boolean };
+
+/** The lines whose verdict differs between the two readings, with the verdict now. */
+const flippedLines = (conditions: readonly RuleCondition[], previous: Scores, current: Scores): Flip[] =>
+  conditions.flatMap((line) => {
+    const holds = isRuleConditionMet(line, current[line.metric]);
+    if (isRuleConditionMet(line, previous[line.metric]) === holds) return [];
+    return [
+      {
+        metric: line.metric,
+        label: ruleMetricLabel[line.metric],
+        value: line.value,
+        direction: current[line.metric] > previous[line.metric] ? "rose" : "fell",
+        holds,
+      },
+    ];
+  });
+
+const lowerFirst = (value: string) => `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
+const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+
+const joinAnd = (items: readonly string[]) =>
+  items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+
+const describeCrossing = (line: CrossedLine) =>
+  `${lowerFirst(line.label)} ${line.direction} through ${formatThresholdNumber(line.value)}`;
+
+const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
+  paused: "Pause now applies",
+  lifted: "Pause lifted",
+  resumable: "Resume line met",
+  resumeLost: "Resume line no longer met",
+};
+
+const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
+  paused: (areas) => `the pause now applies to ${areas}`,
+  lifted: (areas) => `the pause no longer applies to ${areas}`,
+  resumable: (areas) => `the resume line is now met for ${areas}`,
+  resumeLost: (areas) => `the resume line is no longer met for ${areas}`,
+};
+
+const GROUP_ORDER: readonly Exclude<AreaMovementKind, "held">[] = ["paused", "lifted", "resumable", "resumeLost"];
+
+const moveOf = (
+  lines: AreaLines,
+  previous: Scores,
+  current: Scores,
+  window: string,
+): AreaMovement => {
+  const from = stateAt(lines, previous);
+  const to = stateAt(lines, current);
+  const kind = kindOf(from, to);
+  const pauseFlips = flippedLines(lines.pause, previous, current);
+  const resumeFlips = flippedLines(lines.resume, previous, current);
+  const liftedPause = pauseFlips.filter((flip) => !flip.holds);
+  const resumeNowHolds = resumeFlips.filter((flip) => flip.holds);
+  /* Coming out of a pause into resumable, the resume line is the further one a score has
+     passed, so it is the line named; the pause line it also passed is implied by it. */
+  const decisive: Record<AreaMovementKind, Flip[]> = {
+    held: [],
+    paused: pauseFlips.filter((flip) => flip.holds),
+    lifted: liftedPause,
+    resumable: resumeNowHolds.length > 0 ? resumeNowHolds : liftedPause,
+    resumeLost: resumeFlips.filter((flip) => !flip.holds),
+  };
+  const crossed = decisive[kind].map(({ metric, label, value, direction }) => ({ metric, label, value, direction }));
+  const text =
+    kind === "held"
+      ? `No line crossed ${window}.`
+      : `${from === "pause" && kind === "resumable" ? "Pause lifted, resume line met" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
+  return { area: lines.area, kind, state: to, crossed, text };
+};
+
+const listAreas = (areas: readonly DecisionArea[], total: number) =>
+  total > 1 && areas.length === total ? "every area" : joinAnd(areas.map(decisionAreaLabel));
+
+const uniqueLines = (lines: readonly CrossedLine[]) =>
+  lines.filter(
+    (line, index) =>
+      lines.findIndex((other) => other.metric === line.metric && other.value === line.value && other.direction === line.direction) === index,
+  );
+
+/**
+ * The week's decision movement, or null when nothing was compared (or no area states a
+ * line): the caller keeps its "no previous reading" sentence rather than getting a claim
+ * that nothing crossed from a comparison nobody made.
+ *
+ * "Since Aug 31" names the reading the move is against — the previous month-end snapshot,
+ * not last week (`lib/report/comparisonBasis.ts`) — and reads "this week" where the source
+ * did not date it.
+ */
+export const buildDecisionMovement = ({
+  scores,
+  previous,
+  thresholds,
+  regime,
+  areas,
+}: {
+  scores: Scores;
+  previous: (Scores & { comparedWith?: Pick<ComparedWith, "label"> | null }) | null | undefined;
+  thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
+  /** The market state now, as assessed. The earlier one is what the earlier scores classify into. */
+  regime: RegimeKey;
+  areas: readonly AreaLines[];
+}): DecisionMovement | null => {
+  if (!previous || areas.length === 0) return null;
+
+  const basis = comparisonBasis(previous.comparedWith);
+  const window = basis.date ? basis.since : "this week";
+  const earlier: Scores = { tightness: previous.tightness, riskAppetite: previous.riskAppetite };
+  const ordered = [...areas].sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area));
+  const movements = ordered.map((lines) => moveOf(lines, earlier, scores, window));
+  const moved = movements.filter((entry) => entry.kind !== "held");
+
+  /* The earlier state is what the earlier scores classify into, which is how the loader
+     scored that reading. The state now is the assessed one, and it can be a step behind its
+     own scores while a change waits on confirmation. Then the two sources disagree about
+     "now", and a change from one to the other would be a claim about the wrong pair, so the
+     sentence says nothing about the state rather than guess (the hero and the confirmation
+     notice already carry it). */
+  const previousRegime = classifyRegimeQuadrant({ ...earlier, thresholds });
+  const scoresAgreeWithState = classifyRegimeQuadrant({ ...scores, thresholds }) === regime;
+  const conditions =
+    scoresAgreeWithState && previousRegime !== regime
+      ? { from: getRegimePublicLabel(previousRegime), to: getRegimePublicLabel(regime) }
+      : null;
+
+  const groups: MovementGroup[] = GROUP_ORDER.flatMap((kind) => {
+    const inGroup = moved.filter((entry) => entry.kind === kind);
+    return inGroup.length > 0
+      ? [{ kind, areas: inGroup.map((entry) => entry.area), crossed: uniqueLines(inGroup.flatMap((entry) => entry.crossed)) }]
+      : [];
+  });
+
+  const { sentence, headline } = ((): { sentence: string; headline: string } => {
+    if (moved.length === 0) {
+      const nothing = conditions
+        ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or resume line was crossed.`
+        : `Conditions held steady ${window}; no pause or resume line was crossed. Last week's guidance stands.`;
+      return { sentence: nothing, headline: nothing };
+    }
+    const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
+    const causes = uniqueLines(groups.flatMap((group) => group.crossed)).map(describeCrossing);
+    const lead = conditions
+      ? `${upperFirst(window)}, conditions changed from ${conditions.from} to ${conditions.to} and `
+      : `${upperFirst(window)}, `;
+    return { sentence: `${lead}${clauses.join("; ")}: ${joinAnd(causes)}.`, headline: `${lead}${clauses.join("; ")}.` };
+  })();
+
+  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, sentence, headline };
+};
+
+/**
+ * The same movement for a loaded report, for the surfaces that hold the whole thing (the
+ * agent state, the CLI): the earlier scores come from the week's dynamics through the
+ * derivation every paste and page shares, and the areas' lines from the action strip the
+ * rules table prints.
+ */
+export const buildDecisionMovementForReport = ({
+  assessment,
+  reportDynamics,
+  actionStripItems,
+}: {
+  assessment: { regime: RegimeKey; scores: Scores; thresholds: { tightnessRegime: number; riskAppetiteRegime: number } };
+  reportDynamics: Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith">;
+  actionStripItems?: readonly ActionStripItem[];
+}): DecisionMovement | null => {
+  const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+  return buildDecisionMovement({
+    scores,
+    previous: previousScoresFromDynamics(reportDynamics, scores),
+    thresholds: assessment.thresholds,
+    regime: assessment.regime,
+    areas: areaLinesFromActionStrip(actionStripItems ?? []),
+  });
+};
+
+/**
+ * The line over "What changed this week". With a comparison it is what the week did to the
+ * decisions; on a quiet week (`quietDayLine` is set) it is followed by the nearest line, so
+ * "nothing changed" arrives with the one thing that would change it. Without a comparison
+ * that could be read against the lines it is the quiet-day line, and failing that the
+ * direction the scores moved.
+ */
+export const buildChangedLead = ({
+  movement,
+  quietDayLine,
+  nearestLine,
+  fallback,
+}: {
+  movement: Pick<DecisionMovement, "sentence" | "moved"> | null;
+  quietDayLine: string | null;
+  nearestLine: string | undefined;
+  fallback: string;
+}): string => {
+  if (!movement) return quietDayLine ?? fallback;
+  const quiet = quietDayLine !== null && movement.moved.length === 0;
+  return quiet && nearestLine ? `${movement.sentence} ${nearestLine}` : movement.sentence;
+};

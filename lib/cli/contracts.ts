@@ -1,6 +1,7 @@
 import { deriveRegimeStage } from "../regimePresentation";
 import type { RuleCondition } from "../report/boundedDecisionRules";
 import { comparisonBasis } from "../report/comparisonBasis";
+import { buildDecisionMovementForReport } from "../report/decisionMovement";
 import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData, ReportDynamics } from "../report/reportData";
 import { buildCompactFreshnessMeta } from "../report/reportFormatting";
@@ -61,6 +62,8 @@ type CliChangesContract = {
   basis: string;
   /** The earlier reading itself, when the loader recorded it; null when it did not. */
   comparedWith: { recordDate: string; label: string } | null;
+  /** What the change did to the decisions: which areas' pause or resume lines were crossed since `comparedWith`, or that none were. Null when nothing was compared. */
+  decision: string | null;
   changed: Array<{
     metric: "tightness" | "risk_appetite" | "base_rate" | "curve_slope";
     /** What a reader sees this signal called; `metric` is the stable key. */
@@ -223,6 +226,7 @@ export const buildCliChangesContract = ({ reportData, postureState, degraded }: 
   freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
   basis: comparisonBasis(reportData.reportDynamics.comparedWith).since,
   comparedWith: reportData.reportDynamics.comparedWith ?? null,
+  decision: buildDecisionMovementForReport(reportData)?.sentence ?? null,
   changed: reportData.reportDynamics.changedSignals.map((signal) => {
     const raw = rawForKey(reportData, signal.key);
     const to = Number((typeof raw === "number" ? raw : signal.delta).toFixed(2));

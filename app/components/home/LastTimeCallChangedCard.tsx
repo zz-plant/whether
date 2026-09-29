@@ -3,7 +3,7 @@ import { ScoreCell } from "../ui/scoreCell";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { buildLastTimeCompareHref, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import { buildLastTimeCompareHref, describeAgainstToday, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 
 /**
  * On a week the call changed: the last time it moved this way, what the two
@@ -12,6 +12,10 @@ import { buildLastTimeCompareHref, type LastTimeCallChanged } from "../../../lib
  * years of record on offer only to a reader who went looking. Both scores
  * print through the score cell — the later reading, the line the call turns
  * on, and the reading at the change as "last" — so neither is a bare number.
+ *
+ * Under them, how that month differed from this week: an earlier month is one
+ * outcome from one starting point, and "the scores stood here three months on"
+ * reads as a forecast to anyone who is not told where they started.
  */
 export function LastTimeCallChangedCard({
   record,
@@ -23,6 +27,7 @@ export function LastTimeCallChangedCard({
 }) {
   const changedAt = formatMonthLabel(record.changedAt.year, record.changedAt.month);
   const after = formatMonthLabel(record.after.year, record.after.month);
+  const versus = describeAgainstToday(record);
   return (
     <aside
       data-testid="last-time-call-changed"
@@ -50,6 +55,9 @@ export function LastTimeCallChangedCard({
           previousLabel={changedAt}
         />
       </div>
+      <p data-testid="last-time-versus-today" className="max-w-[64ch] text-fluid-xs leading-5 text-slate-300">
+        <span className="font-semibold text-slate-100">Against this week:</span> {versus.text}
+      </p>
       <ActionLink href={buildLastTimeCompareHref(record)} variant="inline">
         Compare {changedAt} with {after} →
       </ActionLink>

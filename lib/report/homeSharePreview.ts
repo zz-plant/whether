@@ -185,8 +185,12 @@ export const loadHomeSharePreview = async (
   const title = reportData.historicalSelection
     ? `${reportData.historicalSelection.banner}: ${headline} — Whether`
     : `${statusLabel}: ${headline} — Whether`;
+  /* The consequence without the lines that did it: a link preview has 210 characters,
+     and the sentence with its evidence ran past them and was cut in the middle of it. */
+  const changed = weeklyDecisionCardModel.decision.decisionMovement?.headline
+    ?? weeklyDecisionCardModel.decision.decisionShiftHeadline;
   const description = clampText(
-    `${audienceLabel}. ${toSentence(immediateDecision)} ${toSentence(whyItMatters)} Changed: ${toSentence(weeklyDecisionCardModel.decision.decisionShiftHeadline)} Conditions change if: ${toSentence(flipCondition)}`,
+    `${audienceLabel}. ${toSentence(immediateDecision)} ${toSentence(whyItMatters)} Changed: ${toSentence(changed)} Conditions change if: ${toSentence(flipCondition)}`,
     210,
   );
 
@@ -208,7 +212,9 @@ export const loadHomeSharePreview = async (
     /* The summary ends by restating the change line, which has its own box on the
        card; cut there so the two boxes say two different things. */
     changeSummary: clampText(
-      weeklyDecisionCardModel.decision.decisionShiftSummary.split(/\s*Conditions change if:/)[0] ?? "",
+      weeklyDecisionCardModel.decision.decisionMovement?.headline
+        ?? weeklyDecisionCardModel.decision.decisionShiftSummary.split(/\s*Conditions change if:/)[0]
+        ?? "",
       140,
     ),
     immediateDecision,

@@ -14,6 +14,8 @@ import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { comparisonBasis } from "../comparisonBasis";
+import { areaLinesFromRules, buildDecisionMovement } from "../decisionMovement";
+import { previousScoresFromDynamics } from "../../export/scoreReference";
 import { formatThresholdNumber } from "../../formatters";
 import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "../reportCopy";
 import {
@@ -510,11 +512,25 @@ export const buildHomeBriefModelInternal = (
     confidenceDegraded: confidenceLabel === "LOW",
     freshnessDegraded: isFallbackData && recordDateAgeHours > FRESH_FALLBACK_HOURS,
   });
+  /* What the week did to the decisions: which areas' lines were crossed since the
+     reading the week is compared with. Null with no comparison, and every sentence
+     below that says what changed reads it instead of naming a direction. */
+  const decisionMovement = buildDecisionMovement({
+    scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
+    previous: previousScoresFromDynamics(reportDynamics, {
+      tightness: assessment.scores.tightness,
+      riskAppetite: assessment.scores.riskAppetite,
+    }),
+    thresholds: assessment.thresholds,
+    regime: assessment.regime,
+    areas: areaLinesFromRules(decisionRules),
+  });
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
     directionLabel: reportDynamics?.directionLabel,
     basis,
+    movementSentence: decisionMovement?.sentence,
   });
   const revisitQueue = buildRevisitQueue({
     revisitDecisions,
@@ -597,6 +613,7 @@ export const buildHomeBriefModelInternal = (
       directionLabel: reportDynamics?.directionLabel,
       changeCount: reportDynamics?.changedSignals.length ?? 0,
       reversalTrigger: conciseFlipThreshold,
+      movementSentence: decisionMovement?.sentence,
     }),
     /* The same sentence without its change clause, for every surface that prints
        its own change line beside it. */
@@ -604,8 +621,10 @@ export const buildHomeBriefModelInternal = (
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,
       changeCount: reportDynamics?.changedSignals.length ?? 0,
+      movementSentence: decisionMovement?.sentence,
     }),
     weeklyMovement,
+    decisionMovement,
     transitionProbabilities: forecast?.next4WeekProbabilities ?? {
       Expansion: 25,
       Mixed: 25,
@@ -775,6 +794,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       decisionReadiness: homeBriefModel.decisionReadiness,
       weeklyLeadershipSummary: homeBriefModel.weeklyLeadershipSummary,
       weeklyMovement: homeBriefModel.weeklyMovement,
+      decisionMovement: homeBriefModel.decisionMovement,
     },
     presentation: {
       whyItMattersLine,

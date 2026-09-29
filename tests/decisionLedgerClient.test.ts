@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import {
   downloadDecisionLedger,
   fetchDecisionLedger,
+  loadRecordNoteView,
   logDecisionToLedger,
 } from "../app/components/decisionLedgerClient";
 import { CLIENT_ID_HEADER } from "../lib/api/clientIdHeader";
@@ -136,5 +137,113 @@ describe("decision ledger client", () => {
 
     assert.equal(headerOf(calls[0]?.init), "browser-1");
     assert.match(calls[0]?.url ?? "", /format=records/);
+  });
+});
+
+/*
+ * The homepage's read of the record. `/` is the busiest route on the site and nearly every browser
+ * on it has an id and no decisions, so it asks the server only when this browser remembers having
+ * recorded one, and the memory is kept by the two calls that change what the record holds.
+ */
+describe("the record note's read", () => {
+  const memory = () => {
+    const values = new Map<string, string>();
+    return {
+      values,
+      storage: {
+        getItem: (key: string) => values.get(key) ?? null,
+        setItem: (key: string, value: string) => void values.set(key, value),
+        removeItem: (key: string) => void values.delete(key),
+      },
+    };
+  };
+  const KEY = "whether.decisionMemory:browser-1";
+
+  const ledgerEntry = (id: string, recorded: { tightness: number; riskAppetite: number }) => ({
+    id,
+    createdAt: "2026-09-14T00:00:00.000Z",
+    context: { clientId: "browser-1", recordDate: "2026-09-14" },
+    decision: { lifecycle: "GROWTH", category: "HIRING", action: "HIRE" },
+    outcome: { verdict: "SAFE", summary: "Hire the two open roles.", guardrail: "Pause above 85.", reversalTrigger: "Re-open below 65." },
+    regime: { label: "EXPANSION", scores: {} },
+    sources: [],
+    assumptions: {
+      tightness: recorded.tightness,
+      riskAppetite: recorded.riskAppetite,
+      tightnessThreshold: recorded.tightness,
+      riskAppetiteThreshold: recorded.riskAppetite,
+    },
+  });
+  const current = { tightness: 60, riskAppetite: 40 };
+
+  it("does not ask the server about a browser that has never recorded a decision", async () => {
+    const { calls, fetchImpl } = capture({ entries: [ledgerEntry("a", { tightness: 10, riskAppetite: 90 })] });
+    const { storage } = memory();
+
+    assert.equal(await loadRecordNoteView("browser-1", current, fetchImpl, storage), null);
+    assert.equal(calls.length, 0, "no request for an answer that has always been none");
+  });
+
+  it("reads the record when the browser remembers one, and keeps the memory current", async () => {
+    const { calls, fetchImpl } = capture({
+      entries: [ledgerEntry("moved", { tightness: 10, riskAppetite: 90 }), ledgerEntry("holds", { tightness: 90, riskAppetite: 10 })],
+    });
+    const { storage, values } = memory();
+    values.set(KEY, "1");
+
+    const view = await loadRecordNoteView("browser-1", current, fetchImpl, storage);
+
+    assert.equal(calls.length, 1);
+    assert.equal(view?.rows.length, 2);
+    assert.equal(view?.headline, "1 decision rests on conditions that have moved since it was recorded.");
+    assert.equal(values.get(KEY), "2", "the record held two, so the browser now remembers two");
+  });
+
+  it("forgets a record that is gone, and says nothing for it", async () => {
+    const { fetchImpl } = capture({ entries: [] });
+    const { storage, values } = memory();
+    values.set(KEY, "3");
+
+    assert.equal(await loadRecordNoteView("browser-1", current, fetchImpl, storage), null);
+    assert.equal(values.has(KEY), false, "an emptied record stops being asked about");
+  });
+
+  it("puts nothing under the call when the record cannot be read", async () => {
+    const { fetchImpl } = capture({ error: "unavailable" }, 503);
+    const { storage, values } = memory();
+    values.set(KEY, "2");
+
+    assert.equal(await loadRecordNoteView("browser-1", current, fetchImpl, storage), null);
+    assert.equal(values.get(KEY), "2", "a failed read is not evidence the record is empty");
+  });
+
+  it("remembers a decision the moment it is recorded, and not one that was refused", async () => {
+    const { storage, values } = memory();
+
+    await logDecisionToLedger("browser-1", payload, capture({ ok: true }, 201).fetchImpl, storage);
+    assert.equal(values.get(KEY), "1");
+    await logDecisionToLedger("browser-1", payload, capture({ ok: true }, 201).fetchImpl, storage);
+    assert.equal(values.get(KEY), "2");
+
+    await logDecisionToLedger("browser-1", payload, capture({ error: "no" }, 500).fetchImpl, storage);
+    assert.equal(values.get(KEY), "2", "a decision that was not recorded is not counted");
+  });
+
+  it("carries on where storage is blocked", async () => {
+    const blocked = {
+      getItem: () => {
+        throw new Error("blocked");
+      },
+      setItem: () => {
+        throw new Error("blocked");
+      },
+      removeItem: () => {
+        throw new Error("blocked");
+      },
+    };
+
+    assert.equal(await loadRecordNoteView("browser-1", current, capture({ entries: [] }).fetchImpl, blocked), null);
+    assert.equal((await logDecisionToLedger("browser-1", payload, capture({ ok: true }, 201).fetchImpl, blocked)).ok, true);
+    assert.equal((await fetchDecisionLedger("browser-1", capture({ entries: [] }).fetchImpl, blocked)).ok, true);
   });
 });

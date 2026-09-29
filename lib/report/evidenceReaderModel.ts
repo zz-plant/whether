@@ -39,6 +39,21 @@ export const SIGNAL_KEYS: readonly RegimeSignalKey[] = ["tightness", "riskAppeti
 
 type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith" | "movement">;
 
+/**
+ * Just what a signal's recorded move needs. The homepage model is handed a looser
+ * `reportDynamics` than the loader's (no labels), and its callers still have to read
+ * the same moves — including the ones past the weekly sanity limit, which are only in
+ * `anomalySignals` and are otherwise read as a week that did not move.
+ */
+type SignalDeltaSource = {
+  directionLabel: ReportDynamics["directionLabel"];
+  changedSignals: ReadonlyArray<{ key: RegimeSignalKey; delta: number }>;
+  anomalySignals?: ReadonlyArray<{ key: RegimeSignalKey; delta: number }>;
+};
+
+/** `SignalDeltaSource` plus the reading the moves are against and what they are made of, where the source has them. */
+export type SignalDynamicsSource = SignalDeltaSource & Partial<Pick<ReportDynamics, "comparedWith" | "movement">>;
+
 
 export type SignalReferenceRow = {
   key: RegimeSignalKey;
@@ -98,11 +113,11 @@ const SIGNED_TWO = new Intl.NumberFormat("en-US", {
  * The recorded move for a signal, from either list it can land in: null when
  * no comparison was made, 0 when one was and the signal moved under the floor.
  */
-export const findSignalDelta = (dynamics: DynamicsSource, key: RegimeSignalKey): number | null => {
+export const findSignalDelta = (dynamics: SignalDeltaSource, key: RegimeSignalKey): number | null => {
   if (dynamics.directionLabel === "unavailable") return null;
   return (
     dynamics.changedSignals.find((signal) => signal.key === key)?.delta
-    ?? dynamics.anomalySignals.find((signal) => signal.key === key)?.delta
+    ?? dynamics.anomalySignals?.find((signal) => signal.key === key)?.delta
     ?? 0
   );
 };
