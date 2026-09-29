@@ -183,11 +183,11 @@ export default function RootLayout({
         {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
             so there is no fonts.googleapis.com stylesheet in the critical path
             and no preconnect to a third-party host. Only the two faces that
-            render above the fold are preloaded. Fraunces 600, not 700: the hero
+            render above the fold are preloaded. Plex Serif 600, not 700: the hero
             headline is font-semibold, so 700 is never requested on first paint
             and preloading it just burned a round-trip. The remaining weights
             load from the same origin when the stylesheet asks for them. */}
-        <link rel="preload" href="/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link rel="preload" href="/fonts/ibm-plex-serif-600.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="preload" href="/fonts/ibm-plex-sans-400.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
