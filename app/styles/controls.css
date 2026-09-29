@@ -141,6 +141,21 @@ input:not([type="range"]) {
     color var(--transition-base) var(--ease-out);
 }
 
+/* The selected pill in a set of links — the /signals filters, the year row on
+   an archive period. Those links carried `border-sky-300/80` when active, and
+   this rule set's `border-color` above is unlayered, so it beat the layered
+   utility: every filter drew identically and nothing said which one the table
+   below was showing. The state rides on `aria-current`, which is what the
+   links already set for assistive tech, so the paint and the announcement
+   cannot disagree. The fill matches the selected segment in a segmented
+   control (bg-sky-500/15). */
+.weather-pill[aria-current="page"] {
+  border-color: rgba(125, 211, 252, 0.6);
+  background-image: none;
+  background-color: rgba(14, 165, 233, 0.15);
+  color: var(--app-text);
+}
+
 /* The focus ring is declared once, on the elements that can take focus
    (decision-flow.css), plus `.weather-focus-ring` below for a control with no
    class. This block used to repeat it per control class.

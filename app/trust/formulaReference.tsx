@@ -367,6 +367,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         </FormulaCard>
       </div>
 
+      {/* The two links sit inside the sentence, so they are inline with vertical
+          padding rather than 44px inline-flex boxes: padding on an inline box
+          widens what a finger can hit without raising the line it sits on (§II,
+          "expand invisible hitboxes"). As boxes, each one set its own line to
+          44px and the paragraph read with a gap under its first line. */}
       <p className="mt-3 text-xs leading-5 text-slate-400">
         Every constant above is imported from the scoring engine, not retyped — if the engine
         changes, this page changes with it.{" "}
@@ -374,12 +379,12 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           href={ENGINE_SOURCE_URL}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex min-h-[44px] items-center font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           Read the engine source →
         </a>{" "}
         For the act / pause / reverse method the thresholds feed, see{" "}
-        <a href="#framework" className="inline-flex min-h-[44px] items-center font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+        <a href="#framework" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
           how to use the thresholds ↓
         </a>
       </p>

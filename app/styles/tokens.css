@@ -792,6 +792,12 @@ html[data-theme="light"] .weather-pill-muted {
   background-image: none;
   box-shadow: var(--shadow-light);
 }
+/* The selected pill (controls.css), which the rule above would otherwise
+   repaint as an unselected one. */
+html[data-theme="light"] .weather-pill[aria-current="page"] {
+  border-color: rgba(3, 105, 161, 0.55);
+  background-color: rgba(14, 165, 233, 0.12);
+}
 /* Dark nested surfaces (bg-slate-800/900/950 at any alpha) inverted to a light
    tint. Enumerating single alphas missed bg-slate-950/45, which composited to a
    mid-grey card that swallowed its own label text on /evidence. Anchored to a

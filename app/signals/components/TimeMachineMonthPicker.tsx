@@ -66,7 +66,7 @@ export const TimeMachineMonthPicker = ({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="start" sideOffset={10}>
-          <Popover.Popup className="weather-panel-static w-72 rounded-lg border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-2xl">
+          <Popover.Popup className="weather-panel-static w-72 p-4 text-xs text-slate-300 shadow-2xl">
             <div className="flex items-center justify-between gap-2">
               <button
                 type="button"

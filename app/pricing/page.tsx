@@ -41,7 +41,7 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
   return (
     <article
       className={`weather-surface flex flex-col gap-4 px-5 py-5 ${
-        isFree ? "border-sky-500/30" : ""
+        isFree ? "!border-sky-500/40" : ""
       }`}
     >
       {/* No tier icon. Each card carried a stock glyph in a ring (a code

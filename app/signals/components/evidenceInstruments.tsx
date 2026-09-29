@@ -147,7 +147,9 @@ export const SignalsInstrumentsSection = ({
   searchParams?: SignalsPageSearchParams;
 }) => (
   <section id="instruments" aria-labelledby="instruments-heading" className="space-y-6">
-    <div>
+    {/* The same inset as a ReportSection's header (px-5, none on a phone), so
+        this title lines up with every section title above it. */}
+    <div className="px-5 max-sm:px-0">
       <p className="type-eyebrow type-eyebrow-section">Deeper evidence</p>
       <h2 id="instruments-heading" className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">
         Charts, past months, and the checks that would overturn the guidance.

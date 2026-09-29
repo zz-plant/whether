@@ -6,6 +6,11 @@ import type { ReactNode } from "react";
  * `weather-surface text-center text-2xl` — so a reader crossing one page met
  * the same fact in three frames. One surface, one type size, an optional unit
  * and an optional line under the figure.
+ *
+ * The frame is the data tier (§XIV: stat tiles are 4px, flat). It was
+ * `.weather-surface` — the 16px radius and the drop shadow of the page's
+ * outermost container — so a row of figures drew as the softest, most lifted
+ * thing in its section, the opposite of the register a figure asserts in.
  */
 type StatTileProps = {
   label: ReactNode;
@@ -17,7 +22,7 @@ type StatTileProps = {
 
 export function StatTile({ label, value, unit, detail, className = "" }: StatTileProps) {
   return (
-    <div className={`weather-surface px-3 py-2.5 ${className}`.trim()}>
+    <div className={`rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-3 py-2.5 ${className}`.trim()}>
       <p className="text-xs text-slate-400">{label}</p>
       <p className="mt-1 text-lg font-bold tabular-nums text-slate-100">
         {value}

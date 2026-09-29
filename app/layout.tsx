@@ -261,8 +261,11 @@ export default function RootLayout({
                   {/* Wraps horizontally on mobile, stacks on `sm`. A vertical list
                       gives every link its own 44px row, which on a phone turned a
                       ~400px footer into a ~1000px one; the labelled groups are the
-                      part worth keeping, not the column shape at every width. */}
-                  <ul className="flex flex-wrap gap-x-5 sm:block">
+                      part worth keeping, not the column shape at every width.
+                      Two columns from `sm`, like the list beside it: seven links
+                      at 44px each made this the tallest thing in the footer and
+                      set the footer's height on every page. */}
+                  <ul className="flex flex-wrap gap-x-5 sm:block sm:columns-2">
                     {navigationLayers.map((layer) => (
                       <li key={layer.href} className="break-inside-avoid">
                         <Link
