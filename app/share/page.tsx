@@ -15,7 +15,6 @@ import { buildAreaRows } from "../operate/areaRows";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
 import { describeConditions } from "../../lib/export/exportTerms";
 import { buildFlipProximity, buildStandupFlipLine } from "../../lib/report/flipProximity";
-import { TransmissionPipelineGlyph } from "../components/illustrations/TransmissionPipelineGlyph";
 import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
 import { buildWipGuidance } from "../../lib/report/wipPolicy";
 import {
@@ -46,6 +45,15 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "This week's Whether guidance",
   imageParams: { template: "report" },
 });
+
+/** "fred.stlouisfed.org" for a link's text; the raw string when it is not a URL. */
+const describeSourceHost = (source: string) => {
+  try {
+    return new URL(source).hostname.replace(/^www\./, "");
+  } catch {
+    return source;
+  }
+};
 
 const buildCurrentShareArtifact = async () => {
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/share" });
@@ -153,7 +161,8 @@ const buildCurrentShareArtifact = async () => {
     recordDate: treasury.record_date,
     recordDateLabel: reportData.recordDateLabel,
     assessment,
-    trustLine: `Source: ${treasury.source}`,
+    sourceUrl: treasury.source,
+    sourceHost: describeSourceHost(treasury.source),
     // The score lines the pastes below print, shown above the picker so the
     // reader sees what they are about to copy.
     scoreReferences: buildReadingLines(assessment, exportOptions),
@@ -205,21 +214,28 @@ export default async function SharePage() {
           padding tier, so each group's surfaces are the outermost boxes that
           draw anything and own their own elevation. */}
       <div className="space-y-5 sm:space-y-8">
-        <section className="weather-panel space-y-5 px-5 max-sm:px-0 py-5" aria-labelledby="share-page-title">
+        {/* No bottom padding: `.weather-panel` draws no frame, so its padding and
+            the next panel's stacked with the gap between them into ~70px of
+            empty ground under a three-line intro. */}
+        <section className="weather-panel space-y-5 px-5 max-sm:px-0 pt-5 pb-0" aria-labelledby="share-page-title">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-2xl space-y-2">
-              <p className="text-fluid-micro font-semibold tracking-[0.04em] text-sky-200">
-                Current weekly artifact
-              </p>
-              <h1 id="share-page-title" className="text-fluid-xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
+              {/* The week, where the kicker read "Current weekly artifact" — the
+                  product's internal noun for what a reader calls the brief. */}
+              <p className="type-eyebrow type-eyebrow-section">Week of {artifact.recordDateLabel}</p>
+              <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
               <p className="text-sm leading-relaxed text-white/60">
-                Copy this week&apos;s guidance, its pause and resume lines, and its source into Slack, a slide, or a
-                citation, or take it as a slide image. Longer formats and a calendar hold are below; a live
-                embed for a newsletter or wiki is at the end.
+                Paste it into Slack, a slide, a ticket or an email. Every format below carries the same
+                pause and resume lines and names its source.
               </p>
-              <p className="text-fluid-xs text-white/60">{artifact.trustLine}</p>
+              {/* A link named for the host, not a bare URL printed as text. */}
+              <p className="text-fluid-xs text-white/60">
+                Source:{" "}
+                <a href={artifact.sourceUrl} className="text-sky-300 underline-offset-2 hover:underline">
+                  {artifact.sourceHost}
+                </a>
+              </p>
             </div>
-            <TransmissionPipelineGlyph size={64} className="self-start sm:self-center" />
           </div>
         </section>
 

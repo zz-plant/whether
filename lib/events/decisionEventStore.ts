@@ -270,14 +270,14 @@ export const buildReversalConditions = (
   const tightening = isTightening(previousState, nextState);
   if (tightening) {
     return [
-      `Funding pressure <= ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
-      `Risk appetite > ${thresholds.riskAppetiteRegime} for 2 consecutive refreshes.`,
+      `Funding pressure <= ${thresholds.tightnessRegime} for two readings in a row.`,
+      `Risk appetite > ${thresholds.riskAppetiteRegime} for two readings in a row.`,
     ];
   }
 
   return [
-    `Funding pressure > ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
-    `Risk appetite <= ${thresholds.riskAppetiteRegime} for 2 consecutive refreshes.`,
+    `Funding pressure > ${thresholds.tightnessRegime} for two readings in a row.`,
+    `Risk appetite <= ${thresholds.riskAppetiteRegime} for two readings in a row.`,
   ];
 };
 

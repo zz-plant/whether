@@ -17,7 +17,7 @@ describe("SignalInversionPreview", () => {
       />,
     );
 
-    assert.match(html, /Inversion timeline before you open the deeper evidence\./);
+    assert.match(html, /Has the yield curve inverted in the last year\?/);
     assert.match(html, /aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread"/);
     assert.match(html, /Curve context/);
     assert.match(html, /Nov 2025/);

@@ -1,298 +1,204 @@
 import { stageGuides } from "./stageGuides";
 
+/*
+ * Written for the person in the role, about what they would do differently this
+ * week. The first version was the register a reader now recognises as machine
+ * copy: "alignment architecture", "narrative infrastructure", "planning
+ * entropy", a "Promotion accelerant" block with career ladders drawn in arrows,
+ * eight bullets per role that restated one idea eight ways, and a positioning
+ * line per role ("Founder/CEO → Lead with clarity."). Each bullet here names a
+ * thing the reader can do with a pause line, a resume line or the weekly
+ * reading.
+ */
 type StakeholderGuide = {
   slug: string;
   title: string;
-  seoTitle: string;
-  seoDescription: string;
   tagline: string;
-  positioning: string;
   bullets: readonly string[];
   stageSpecificContent: readonly {
     stageSlug: (typeof stageGuides)[number]["slug"];
     guidance: string;
   }[];
-  promotionAccelerator?: {
-    title: string;
-    summary: string;
-    signals: readonly string[];
-  };
 };
 
 export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "founders-ceos",
-    title: "Founders / CEOs",
-    seoTitle: "Whether for Founders & CEOs",
-    seoDescription:
-      "See how founders and CEOs can turn macro volatility into clear operating posture, hiring discipline, and investor-ready communication.",
-    tagline: "Lead with confidence as market conditions shift.",
-    positioning: "Founder/CEO → Lead with clarity.",
+    title: "Founders and CEOs",
+    tagline: "Decide what to hire, spend and raise this week, and say why in one line.",
     bullets: [
-      "Decide when to accelerate growth and when to protect runway.",
-      "Time fundraising conversations to real market conditions.",
-      "Keep your leadership team aligned on one operating stance.",
-      "Reduce headline-driven debates and emotional decision loops.",
-      "Explain strategy to investors with clear, disciplined logic.",
-      "Bring stronger capital fluency into board conversations.",
-      "Avoid over-hiring in tight cycles and under-investing in expansion cycles.",
-      "Turn volatility into structured, repeatable decisions.",
+      "Check the pause line before approving a hire or a large contract.",
+      "Time a raise against how hard money is to get, not against the news.",
+      "Give the leadership team one reading to argue from on Monday.",
+      "Send investors the same guidance you are running the company on.",
     ],
     stageSpecificContent: [
       {
         stageSlug: "seed",
         guidance:
-          "Use Whether for investor narrative clarity and fundraising timing language, while keeping product learning velocity as the primary driver.",
+          "Use it to time the raise and to answer \"why now\". Product and customers still decide the roadmap.",
       },
       {
         stageSlug: "series-a",
         guidance:
-          "Set 6–8 week guardrails for hiring pace and burn so the company scales with posture, not optimism swings.",
+          "Set hiring and burn rules for the next six to eight weeks, and write down what would loosen them.",
       },
       {
         stageSlug: "series-b",
         guidance:
-          "Pair with your CFO on a single operating baseline to prevent planning politics across functions.",
+          "Agree one set of pause and resume lines with your finance lead, so planning arguments start from the same numbers.",
       },
       {
         stageSlug: "series-c",
         guidance:
-          "Use posture language as governance infrastructure so board narrative, planning approvals, and major investments stay coherent.",
+          "Keep the same lines quarter to quarter, so board updates and large approvals are judged against a record.",
       },
     ],
   },
   {
     slug: "heads-of-product",
-    title: "Heads of Product",
-    seoTitle: "Whether for Heads of Product",
-    seoDescription:
-      "Learn how product leaders can align roadmap pace, prioritization, and burn decisions with the current funding climate.",
-    tagline: "Connect product strategy to capital reality.",
-    positioning: "Head of Product → Prioritize with posture.",
+    title: "Heads of product",
+    tagline: "Pace the roadmap to how much money there is to spend.",
     bullets: [
-      "Set roadmap pace based on the current funding climate.",
-      "Prioritize work by payback, risk, and exposure—not just demand.",
-      "Align product bets with executive and finance expectations.",
-      "Resolve growth-versus-efficiency tradeoffs with shared posture language.",
-      "Raise the quality of executive memos and review conversations.",
-      "Show strategic maturity in promotion and performance discussions.",
-      "Manage burn through product choices, not only budget controls.",
-      "Shift the question from “What should we build next?” to “How should we operate now?”",
+      "Put short-payback work first while funding pressure is above its pause line.",
+      "Defer long bets until the resume line clears, and say which line you are waiting on.",
+      "Argue for scope with the same numbers finance is using.",
+      "Cut burn through what you choose to build, not only through budget cuts.",
     ],
     stageSpecificContent: [
       {
         stageSlug: "seed",
-        guidance:
-          "If you are the first product leader, keep posture simple: tie roadmap ambition to runway and avoid abstract macro theater.",
+        guidance: "Keep it simple: tie roadmap ambition to runway. Customers still set the priorities.",
       },
       {
         stageSlug: "series-a",
-        guidance:
-          "Translate posture into explicit sequencing: short-payback bets first, defer long-horizon exposure unless conditions improve.",
+        guidance: "Order the work by payback: short first, long bets only once conditions improve.",
       },
       {
         stageSlug: "series-b",
         guidance:
-          "Frame roadmap choices as exposure management so Product, Finance, and Engineering debate parameters, not personalities.",
+          "Bring the pause and resume lines to roadmap reviews, so the debate is about numbers rather than people.",
       },
       {
         stageSlug: "series-c",
-        guidance:
-          "Use multi-quarter posture language and exit criteria so major roadmap commitments are board-defensible.",
+        guidance: "Write exit criteria into multi-quarter commitments, so they hold up when the board asks.",
       },
     ],
-    promotionAccelerator: {
-      title: "Promotion accelerant: PM → Head of Product",
-      summary:
-        "The leap is not better taste. It is proving you can set posture, manage exposure, align functions, and write memos leadership can reuse.",
-      signals: [
-        "Senior PM → Group PM: portfolio language replaces feature-by-feature arguments.",
-        "Group PM → Director: you run cross-team operating cadence and guardrails.",
-        "Director → Head/VP Product: roadmap becomes capital allocation under constraints.",
-      ],
-    },
   },
   {
     slug: "finance-leaders",
-    title: "CFOs / Finance Leaders",
-    seoTitle: "Whether for CFOs and Finance Leaders",
-    seoDescription:
-      "Translate rates, risk appetite, and funding climate into practical planning guardrails for cross-functional teams.",
-    tagline: "Turn macro conditions into practical operating guardrails.",
-    positioning: "CFO/Finance → Convert macro into guardrails.",
+    title: "CFOs and finance leads",
+    tagline: "Turn rates and risk appetite into spending rules other teams can follow.",
     bullets: [
-      "Translate rates and risk appetite into planning constraints teams can use.",
-      "Align hiring pace and spend posture with current capital conditions.",
-      "Create a consistent risk posture across product, engineering, and ops.",
-      "Reduce reactive cost-cutting with proactive posture guidance.",
-      "Improve capital literacy across cross-functional leadership.",
-      "Support board updates with an external, structured reference point.",
-      "Frame discipline as environment-aware leadership, not fear-driven cuts.",
-      "Replace ad hoc macro interpretation with a repeatable framework.",
+      "Give each area a pause line and a resume line instead of a blanket freeze.",
+      "Set hiring and spend limits that move when the reading moves, not when someone panics.",
+      "Show the board an outside reference for why the plan is tight or loose.",
+      "Replace everyone's own take on the economy with one weekly reading anyone can check.",
     ],
     stageSpecificContent: [
       {
         stageSlug: "seed",
-        guidance:
-          "Keep macro guidance lightweight and narrative-oriented so founders can fundraise without overfitting the model.",
+        guidance: "Keep it light. It helps with fundraising timing; don't build a model around it.",
       },
       {
         stageSlug: "series-a",
-        guidance:
-          "Set practical guardrails for hiring and spend to avoid scaling burn before repeatable growth exists.",
+        guidance: "Set hiring and spend limits so burn does not grow ahead of repeatable revenue.",
       },
       {
         stageSlug: "series-b",
-        guidance:
-          "Partner with CEO and Product on one baseline so financial rigor informs roadmap decisions early.",
+        guidance: "Agree one baseline with the CEO and the head of product, so the numbers shape the roadmap early.",
       },
       {
         stageSlug: "series-c",
-        guidance:
-          "Standardize posture and board language across quarters to strengthen governance confidence.",
+        guidance: "Use the same lines and wording every quarter, so the board can compare like with like.",
       },
     ],
-    promotionAccelerator: {
-      title: "Promotion accelerant: Finance Manager → Director FP&A / CFO-track",
-      summary:
-        "Show the CFO muscle by translating external constraints into operating guardrails teams adopt, not just forecasts they read.",
-      signals: [
-        "Create assumptions that Product, Eng, and Sales can use in planning.",
-        "Tie hiring, burn gates, and payback expectations to one narrative.",
-        "Improve board narrative consistency with reusable posture language.",
-      ],
-    },
   },
   {
     slug: "strategy-chief-of-staff",
-    title: "Strategy / Chief of Staff",
-    seoTitle: "Whether for Strategy and Chiefs of Staff",
-    seoDescription:
-      "Use Whether to create alignment architecture, improve executive narrative quality, and reduce planning entropy during uncertainty.",
-    tagline: "Build alignment infrastructure before teams debate tactics.",
-    positioning: "Strategy/CoS → Build alignment architecture.",
+    title: "Strategy and chiefs of staff",
+    tagline: "Get the leadership team working from the same reading before planning starts.",
     bullets: [
-      "Introduce a shared external reference point for planning.",
-      "Reduce personality-driven planning cycles and narrative drift.",
-      "Keep executive storytelling consistent across functions.",
-      "Strengthen scenario planning with structured, recurring signals.",
-      "Clarify constraints before teams enter tactical tradeoff discussions.",
-      "Increase quality and consistency of board-ready materials.",
-      "Create coherence across product, finance, and operations.",
-      "Lower internal entropy during uncertain markets.",
+      "Open planning with this week's guidance, so trade-offs start from agreed limits.",
+      "Keep board and investor material consistent with what the company is actually doing.",
+      "Note which decisions were made under which conditions, and revisit them when a line moves.",
+      "Spend less time settling whose view of the market wins.",
     ],
     stageSpecificContent: [
       {
         stageSlug: "seed",
-        guidance:
-          "Codify simple founder-facing posture language so investor messaging remains calm and consistent.",
+        guidance: "Keep investor updates calm and consistent with one line on market conditions.",
       },
       {
         stageSlug: "series-a",
-        guidance:
-          "Run a recurring 6–8 week posture memo that aligns leadership before quarterly plans are drafted.",
+        guidance: "Circulate a short note every six to eight weeks, before quarterly plans are drafted.",
       },
       {
         stageSlug: "series-b",
-        guidance:
-          "Use Whether as the planning baseline to lower strategy drift and reduce coordination overhead.",
+        guidance: "Use the weekly reading as the shared starting point for planning across teams.",
       },
       {
         stageSlug: "series-c",
-        guidance:
-          "Treat posture as narrative infrastructure across executive reviews, board prep, and investor communication.",
+        guidance: "Carry the same wording through executive reviews, board prep and investor updates.",
       },
     ],
   },
   {
     slug: "vps-of-engineering",
-    title: "VPs of Engineering",
-    seoTitle: "Whether for VPs of Engineering",
-    seoDescription:
-      "Align engineering capacity, hiring pace, and infrastructure investment with business posture and capital constraints.",
-    tagline: "Match engineering capacity to business posture.",
-    positioning: "Engineering → Match capacity to capital.",
+    title: "Engineering leads",
+    tagline: "Match hiring and infrastructure spend to what the company can afford.",
     bullets: [
-      "Know when to emphasize reliability versus delivery speed.",
-      "Avoid scaling infrastructure too early during tight capital cycles.",
-      "Justify hiring and org-shape decisions with external market context.",
-      "Improve planning coordination with product and finance partners.",
-      "Reduce whiplash from frequent leadership direction changes.",
-      "Tie sprint focus and hiring approvals to operating posture.",
-      "Plan platform investments against funding climate realities.",
-      "Increase predictability when markets are uncertain.",
+      "Favour reliability and cost work when money is tight, and delivery speed when it is not.",
+      "Hold off on infrastructure built for scale you have not reached.",
+      "Back hiring plans with the reading finance and product also use.",
+      "Change the plan when a line is crossed, not when the mood changes.",
     ],
     stageSpecificContent: [
       {
         stageSlug: "seed",
-        guidance:
-          "Keep team shape lean and bias toward shipping; reliability investment should match actual customer risk.",
+        guidance: "Stay lean and ship. Spend on reliability only where customers feel it.",
       },
       {
         stageSlug: "series-a",
-        guidance:
-          "Set capacity guardrails so reliability and roadmap commitments stay feasible with current hiring pace.",
+        guidance: "Set team-size limits that keep roadmap and reliability promises realistic.",
       },
       {
         stageSlug: "series-b",
         guidance:
-          "Anchor engineering investment to shared posture to prevent whiplash between growth pushes and cost controls.",
+          "Tie engineering spend to the same lines as the rest of the company, to avoid swinging between growth pushes and cuts.",
       },
       {
         stageSlug: "series-c",
-        guidance:
-          "Translate climate posture into governance for commitments, hiring bars, and infrastructure spend.",
+        guidance: "Use the lines to set hiring bars and to approve large infrastructure spend.",
       },
     ],
-    promotionAccelerator: {
-      title: "Promotion accelerant: VP Eng / Director Eng → CTO-scope",
-      summary:
-        "Scope expansion happens when you can run delivery, reliability, and hiring as a constraint-aware system.",
-      signals: [
-        "Reliability posture is framed as operating risk management.",
-        "Capacity planning and hiring bars map to explicit guardrails.",
-        "Tradeoff governance is transparent and reusable across teams.",
-      ],
-    },
   },
   {
     slug: "boards-investors",
-    title: "Boards / Investors",
-    seoTitle: "Whether for Boards and Investors",
-    seoDescription:
-      "Understand management posture in context: hiring pace, burn profile, and strategic exposure relative to market conditions.",
-    tagline: "See disciplined exposure management from the leadership team.",
-    positioning: "Board/Investors → See disciplined exposure management.",
+    title: "Boards and investors",
+    tagline: "See whether management's plan fits the conditions it is operating in.",
     bullets: [
-      "Evaluate strategy in the context of current capital conditions.",
-      "Understand the logic behind hiring pace, burn profile, and risk posture.",
-      "Reduce surprises during tightening cycles.",
-      "Improve the quality of strategic dialogue with management.",
-      "Align expectations with real macro constraints and opportunities.",
-      "Encourage expansion when conditions support it and defense when warranted.",
-      "Recognize environment-aware execution as a leadership strength.",
-      "Track management maturity through consistent capital literacy.",
+      "Judge hiring pace and burn against how hard money is to raise right now.",
+      "Ask management which line would change their plan, and check it next quarter.",
+      "Expect fewer surprises when conditions tighten.",
+      "Back expansion when conditions allow it, and restraint when they don't.",
     ],
     stageSpecificContent: [
       {
         stageSlug: "seed",
-        guidance:
-          "Look for narrative maturity without over-rotation: product signal should still dominate company direction.",
+        guidance: "Don't over-weight it: at seed, product and customers should set direction.",
       },
       {
         stageSlug: "series-a",
-        guidance:
-          "Assess whether management can hold hiring and burn posture under pressure.",
+        guidance: "Watch whether management keeps to its hiring and burn limits under pressure.",
       },
       {
         stageSlug: "series-b",
-        guidance:
-          "Expect explicit exposure management and coherent cross-functional planning assumptions.",
+        guidance: "Expect written pause and resume lines, and planning assumptions shared across teams.",
       },
       {
         stageSlug: "series-c",
-        guidance:
-          "Use posture consistency as a proxy for governance quality and strategic control.",
+        guidance: "How consistently the lines are kept over time is a fair test of how the company is run.",
       },
     ],
   },

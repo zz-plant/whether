@@ -206,7 +206,7 @@ describe("ReportShell extracted sections", () => {
             trustStatusTone: "stable",
           },
           actions: {
-            nextStep: { href: "/resolve", description: "One question still open? Resolve it" },
+            nextStep: { href: "/resolve", description: "Still stuck on one decision? Get a yes or no for it.", label: "Resolve a decision" },
           },
         }}
       >
@@ -217,5 +217,8 @@ describe("ReportShell extracted sections", () => {
     assert.equal(html.split('data-testid="next-step-card"').length - 1, 1);
     assert.ok(html.indexOf("Body") < html.indexOf("next-step-card"));
     assert.match(html, /href="\/resolve"/);
+    // The button names where it goes; it said "Continue →" on every page.
+    assert.match(html, />Resolve a decision</);
+    assert.doesNotMatch(html, /Continue →/);
   });
 });

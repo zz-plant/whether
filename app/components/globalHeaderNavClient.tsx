@@ -150,9 +150,15 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
               shortcuts: no help page needed to learn "p" opens Plan. The
               breakpoint hide sits on a wrapper: `.weather-kbd` sets display
               from unlayered CSS, which would beat a `hidden` utility on the
-              keycap itself. */}
+              keycap itself.
+
+              Out of flow, under the tab. In flow, the transparent keycap still
+              took its width, so every tab but Brief (the one without a
+              shortcut) carried ~16px of blank space after its word: the gaps
+              between tabs were uneven and each active underline overshot its
+              label. */}
           {link.shortcut ? (
-            <span className="hidden lg:inline">
+            <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2.5 hidden -translate-x-1/2 lg:inline">
               <kbd
                 aria-hidden="true"
                 className="weather-kbd opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"

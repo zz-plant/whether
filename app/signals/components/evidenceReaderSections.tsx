@@ -148,7 +148,11 @@ export const SignalsWhatChangedSection = ({
                   {row.value === null ? (
                     <span className="text-slate-500">—</span>
                   ) : (
-                    <ScoreCell label={row.label} value={row.value} line={row.line} previous={row.previous} units={row.units} />
+                    /* "This week", not the signal's name: the row header one
+                       column over already says it, so every row printed
+                       "Funding pressure" twice and on a phone the two sat
+                       two lines apart. It pairs with "Last week" below it. */
+                    <ScoreCell label="This week" value={row.value} line={row.line} previous={row.previous} units={row.units} />
                   )}
                 </td>
                 {showNotes ? (

@@ -39,8 +39,11 @@ const DEFAULT_UNITS: Required<ScoreUnits> = { suffix: "", scale: "of 100", dista
 
 const resolveUnits = (units?: ScoreUnits): Required<ScoreUnits> => ({ ...DEFAULT_UNITS, ...units });
 
+/* "1 pts above" was printing wherever a reading sat one point from its line. */
 const formatDistance = (distance: number, units: Required<ScoreUnits>) =>
-  units.distance ? `${formatPoints(distance)} ${units.distance}` : `${formatPoints(distance)}${units.suffix}`;
+  units.distance
+    ? `${formatPoints(distance)} ${distance === 1 && units.distance === "pts" ? "pt" : units.distance}`
+    : `${formatPoints(distance)}${units.suffix}`;
 
 const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
 

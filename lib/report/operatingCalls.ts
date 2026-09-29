@@ -406,7 +406,7 @@ export const formatPointsToLine = (
   if (points === undefined || !Number.isFinite(points)) return "—";
   if (met) return kind === "pause" ? "crossed" : "already met";
   if (points === 0) return "at the line";
-  return `${points.toFixed(points % 1 === 0 ? 0 : 1)} pts away`;
+  return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
 };
 
 /**

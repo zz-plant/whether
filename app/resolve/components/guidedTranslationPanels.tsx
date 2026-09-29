@@ -12,7 +12,6 @@ const defaultFeaturedStakeholderSlugs = [
   "founders-ceos",
   "heads-of-product",
   "finance-leaders",
-  "operations-leaders",
 ] as const;
 
 export function buildGuidedTranslationHref(params?: GuidedTranslationSearchParams) {
@@ -106,8 +105,7 @@ export function GuidedTranslationPanels({
                 Clear team choice
               </Link>
             </div>
-            <p className="text-sm font-semibold text-sky-200">{selectedStakeholder.tagline}</p>
-            <p className="text-sm text-slate-200">{selectedStakeholder.positioning}</p>
+            <p className="text-sm font-semibold text-slate-100">{selectedStakeholder.tagline}</p>
             <ul className="space-y-2 text-sm text-slate-200">
               {selectedStakeholder.bullets.map((bullet) => (
                 <li key={bullet} className="flex gap-3">
@@ -137,24 +135,6 @@ export function GuidedTranslationPanels({
                 );
               })}
             </ul>
-            {selectedStakeholder.promotionAccelerator ? (
-              <div className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
-                <p className="type-eyebrow">
-                  {selectedStakeholder.promotionAccelerator.title}
-                </p>
-                <p className="mt-2 text-sm text-slate-200">
-                  {selectedStakeholder.promotionAccelerator.summary}
-                </p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {selectedStakeholder.promotionAccelerator.signals.map((signal) => (
-                    <li key={signal} className="flex gap-3">
-                      <span aria-hidden="true" className="text-sky-300">•</span>
-                      <span>{signal}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </article>
         </div>
       ) : null}
@@ -175,7 +155,7 @@ export function GuidedTranslationPanels({
               </Link>
             </div>
             <p className="text-sm text-slate-200">{selectedStage.summary}</p>
-            <p className="text-sm text-slate-200"><span className="font-semibold text-slate-100">Primary value:</span> {selectedStage.primaryValue}</p>
+            <p className="text-sm text-slate-200"><span className="font-semibold text-slate-100">Most useful for:</span> {selectedStage.primaryValue}</p>
             <p className="text-sm text-slate-200"><span className="font-semibold text-slate-100">Best use:</span> {selectedStage.bestUse}</p>
             <ul className="space-y-2 text-sm text-slate-200">
               {selectedStage.whoBenefitsMost.map((entry) => (
@@ -187,7 +167,7 @@ export function GuidedTranslationPanels({
             </ul>
             {selectedStage.failureMode ? (
               <p className="rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
-                <span className="font-semibold">Failure mode:</span> {selectedStage.failureMode}
+                <span className="font-semibold">Where it goes wrong:</span> {selectedStage.failureMode}
               </p>
             ) : null}
           </article>
@@ -217,7 +197,6 @@ export function GuidedTranslationPanels({
           <article key={guide.slug} className="weather-hub-card space-y-2 px-4 py-4">
             <h3 className="text-base font-semibold text-slate-100">{guide.title}</h3>
             <p className="text-sm text-slate-300">{guide.tagline}</p>
-            <p className="text-sm text-slate-200">{guide.positioning}</p>
             <Link
               href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage?.slug })}
               className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
@@ -235,14 +214,12 @@ export function GuidedTranslationPanels({
         <div className="mt-4 space-y-4">
           {showStageLibrary ? (
             <div className="overflow-x-auto weather-hub-card px-4 py-4">
-              <table className="w-full min-w-[620px] text-left text-sm text-slate-200">
+              <table className="w-full min-w-[420px] text-left text-sm text-slate-200">
                 <thead>
                   <tr className="border-b border-slate-700 type-eyebrow">
                     <th className="py-2 pr-4">Stage</th>
                     <th className="py-2 pr-4">Team size</th>
-                    <th className="py-2 pr-4">Primary value</th>
-                    <th className="py-2 pr-4">Operational leverage</th>
-                    <th className="py-2">Narrative leverage</th>
+                    <th className="py-2">Most useful for</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -250,9 +227,7 @@ export function GuidedTranslationPanels({
                     <tr key={stage.slug} className="border-b border-slate-800/80 align-top">
                       <td className="py-3 pr-4 font-semibold text-slate-100">{stage.title}</td>
                       <td className="py-3 pr-4">{stage.teamSize}</td>
-                      <td className="py-3 pr-4">{stage.primaryValue}</td>
-                      <td className="py-3 pr-4">{stage.operationalLeverage}</td>
-                      <td className="py-3">{stage.narrativeLeverage}</td>
+                      <td className="py-3">{stage.primaryValue}</td>
                     </tr>
                   ))}
                 </tbody>

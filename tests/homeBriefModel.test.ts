@@ -439,7 +439,11 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.match(model.postureLabel, /Freezing|Cloudy|Stormy|Sunny/);
-    assert.match(model.operatingStanceLine, /posture|operate|approval/i);
+    // An instruction a reader can act on, not a label for a mode: the line used
+    // to read "Operate for proof: ship reliability, trust, and short-payback
+    // releases", and this assertion only checked that it said "operate".
+    assert.ok(model.operatingStanceLine.length > 0);
+    assert.doesNotMatch(model.operatingStanceLine, /posture|stance|survival mode|lanes?\b|^[A-Z][a-z]+ for [a-z]+:/i);
     assert.doesNotMatch(model.netConstraintSummary, /climate stance/i);
   });
 
@@ -581,7 +585,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(matrix.rows[0]?.cells.approve.text, "Stage approvals on short-cycle proof");
     assert.equal(matrix.rows[0]?.cells.delay.text, "Delay irreversible commitments");
     assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Funding pressure ≤/);
-    assert.match(matrix.rows[3]?.cells.flip.text ?? "", /resumes tighten stance/i);
+    assert.match(matrix.rows[3]?.cells.flip.text ?? "", /: tighten again/i);
     assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
     assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
     assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Funding pressure ≤/);
