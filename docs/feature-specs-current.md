@@ -1749,6 +1749,19 @@ Changes, all additive except where noted:
   `automation` check (it promised "MCP tools" and listed none); `/llms.txt` and `/api-docs` name every tool;
   `tests/agentDiscoveryParity.test.ts` holds each place that names a tool to the registry.
 - **`get_context` counts months.** Its counts came from the Time Machine's regime series, one entry per month-end, and were named `weeksActive` / `historicalAvgWeeks`: "8 weeks" was 8 months (§1.1.26, the same period-word defect). They are `monthsActive` / `historicalAvgMonths` now (**breaking** for a caller reading the old names; its only caller in the repo is the tool), with the `latestSnapshot` they run to, and a `note` when the count is 0 because the regime is newer than the last month-end.
+- **`get_projection` is direction-aware** (`projectRegimeFromPace`, `lib/report/regimeContext.ts`): it steps
+  the scores by their weekly pace and classifies each step with the engine's own quadrant table, so a score
+  moving away from its line does not cross it and the regime it lands in is the table's, not a guess. Called
+  with no arguments (today's scores at today's pace) the old function reported a crossing within a week
+  on the Sep 25 read, when both scores were moving deeper into the regime.
+  **Found, not changed:** `getRegimeProjection`, the function it replaced for the tool, still drives the
+  alert path (`lib/alert/checkRegimeChange.ts`, "Conditions could change soon" to Slack, and the
+  `regime:weeks-to-flip` state), and that path has two defects of its own. The function divides the nearest
+  line's distance by the fastest pace whichever way either score moves, and the caller passes it
+  `reportDynamics.changedSignals[].delta`, which is the change since the previous *month-end* snapshot
+  (§1.1.26), as if it were a weekly pace. Both make the alert early or spurious. What Slack subscribers are
+  sent is an owner decision; the fix is to call `projectRegimeFromPace` with the pace `get_state` publishes
+  as `perWeek`.
 - **Browsers.** `/api/mcp` answers its CORS preflight and carries `Access-Control-Allow-Origin: *` on the JSON-RPC transport and the reads; `?tool=subscribe` stays closed.
 - **CLI**: `whether state` (and `--require-ready`, which exits 8 when the data is not live and current); a mistyped command is refused as one (it was answered "too many arguments for 'status'"); `changes` names the dated reading it compares with, uses reader names and says what moved a score.
 

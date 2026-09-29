@@ -107,6 +107,9 @@ const presentArguments = (args: unknown): Record<string, unknown> => {
   );
 };
 
+/* What a type is called to a caller: "must be text", not "must be string". */
+const TYPE_WORDS: Record<string, string> = { number: "a number", string: "text", boolean: "true or false" };
+
 const describeIssue = (issue: z.core.$ZodIssue, given: Record<string, unknown>, tool: string, takes: readonly string[]): AgentInputProblem => {
   if (issue.code === "unrecognized_keys") {
     const names = issue.keys.map(quote).join(", ");
@@ -127,8 +130,8 @@ const describeIssue = (issue: z.core.$ZodIssue, given: Record<string, unknown>, 
   if (allowed) {
     return { argument, message: `Unknown ${argument} ${quote(received)}.${use}`, allowed };
   }
-  const expected = issue.code === "invalid_type" ? issue.expected : "a valid value";
-  return { argument, message: `Argument ${argument} must be ${expected === "number" ? "a number" : expected}; got ${quote(received)}.` };
+  const expected = issue.code === "invalid_type" ? (TYPE_WORDS[issue.expected] ?? issue.expected) : "a valid value";
+  return { argument, message: `Argument ${argument} must be ${expected}; got ${quote(received)}.` };
 };
 
 /**

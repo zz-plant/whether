@@ -7,7 +7,7 @@ import { stressTestDecisionPlan } from "../decisionShield";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules, formatBoundedDecisionTriplet } from "../report/boundedDecisionRules";
-import { getRegimeContext, getRegimeProjection } from "../report/regimeContext";
+import { getRegimeContext, projectRegimeFromPace } from "../report/regimeContext";
 import { buildUseConstraint } from "../report/useConstraint";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { fetchSaaSValuations } from "../saasMultiples";
@@ -188,9 +188,9 @@ const AGENT_TOOLS: readonly AgentTool[] = [
     name: "get_projection",
     title: "Project weeks to a change in conditions",
     description:
-      "Weeks until a score crosses the line where conditions change, at a given pace. With no arguments it uses today's scores and their pace; give scores to ask what-if, and any pace you leave out is taken as 0. `inputs` says which values were yours, which were today's, and which were assumed.",
+      "Weeks until the scores, at a given pace, sit on the other side of a line where conditions change, and the regime they would then be in. A score moving away from its line does not cross it. With no arguments it uses today's scores and their pace; give scores to ask what-if, and any pace you leave out is taken as 0. `inputs` says which values were yours, which were today's, and which were assumed.",
     input: {
-      regime: regimeInput.optional().describe(`${REGIME_ARGUMENT} Defaults to today's conditions.`),
+      regime: regimeInput.optional().describe(`${REGIME_ARGUMENT} Defaults to today's conditions. The projection runs from where the scores sit; the result says so when they sit in another regime.`),
       tightness: numberInput.optional().describe("Funding pressure, 0 to 100. Defaults to today's."),
       riskAppetite: numberInput.optional().describe("Risk appetite, 0 to 100. Defaults to today's."),
       tightnessDelta: numberInput.optional().describe("Funding pressure's pace in points per week, not the total change since an earlier reading. Defaults to today's pace when no score is given, else 0."),
@@ -219,14 +219,19 @@ const AGENT_TOOLS: readonly AgentTool[] = [
         tightnessDelta: pace(tightnessDelta, "tightness"),
         riskAppetiteDelta: pace(riskAppetiteDelta, "riskAppetite"),
       };
+      const { sitsIn, ...projection } = projectRegimeFromPace({
+        tightness: resolvedTightness,
+        riskAppetite: resolvedRiskAppetite,
+        tightnessPerWeek: inputs.tightnessDelta.value,
+        riskAppetitePerWeek: inputs.riskAppetiteDelta.value,
+      });
       return {
-        ...getRegimeProjection(
-          resolvedRegime,
-          resolvedTightness,
-          resolvedRiskAppetite,
-          inputs.tightnessDelta.value,
-          inputs.riskAppetiteDelta.value,
-        ),
+        ...projection,
+        /* The scores decide, not the label: today's committed regime can lag them (a change waits
+           for confirmation), and a caller can give a regime the scores do not describe. */
+        ...(sitsIn === resolvedRegime
+          ? {}
+          : { note: `These scores sit in ${sitsIn}, not ${resolvedRegime} (a change waiting for confirmation, or a regime that does not match the scores): the projection runs from the scores.` }),
         inputs,
       };
     },

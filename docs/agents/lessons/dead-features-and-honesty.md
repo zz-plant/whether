@@ -363,6 +363,12 @@ input the server had not understood, which is worse than an error: it reads as a
   typo into a plausible answer to a question nobody asked.
 - **A default that fills what the caller left out says so.** `get_context` and `get_projection` return
   `inputs` with `given`, `today` or `assumed` against each value.
+- **Making a call easy makes its answer the one that gets read, so audit what it returns first.**
+  `get_projection` with no arguments (today's scores at today's pace: "if the trend continues, when do
+  conditions change?") was the one call defaults made trivial, and it reported a crossing within a week on a
+  read where both scores were moving deeper into their regime. The function behind it ignores direction and
+  also drives a Slack alert; the tool now asks a direction-aware one (`projectRegimeFromPace`), and the alert
+  is left for the owner (`docs/feature-specs-current.md` §6.9).
 - **A field that reads the wrong thing under the right name stays wrong on every surface that copies it.**
   `summary.confidence` was the engine's confirmation gate, not the published confidence, and three routes
   carried it. `/api/weekly` and `/api/monthly` still do (their archive regenerates from the same builders);

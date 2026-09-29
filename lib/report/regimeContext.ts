@@ -1,4 +1,5 @@
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
+import { classifyRegimeQuadrant } from "./regimeStateMachine";
 
 type RegimeContext = {
   currentRegime: string;
@@ -96,6 +97,13 @@ export function getRegimeContext(currentRegime: string): RegimeContext {
 
 /**
  * Project how many weeks until a threshold crossing, given current scores and deltas.
+ *
+ * Direction-blind: it divides the nearest line's distance by the fastest pace, whichever way
+ * either score is moving, so two scores running away from both lines read as a crossing in a
+ * week. The alert path (`lib/alert/checkRegimeChange.ts`) still calls this, and feeds it the
+ * change since the previous month-end snapshot as if it were a weekly pace; changing what
+ * that posts to Slack is a decision for the owner and is not made here
+ * (docs/feature-specs-current.md §6.9). The agent tool asks `projectRegimeFromPace`.
  */
 export function getRegimeProjection(
   currentRegime: string,
@@ -144,4 +152,77 @@ export function getRegimeProjection(
     : null;
 
   return { weeksToFlip: weeksEstimate <= 4 ? weeksEstimate : null, projectedRegime, velocityLabel };
+}
+
+/** How far ahead a pace is read: a straight line drawn further than a month says more than the data does. */
+const PROJECTION_HORIZON_WEEKS = 4;
+
+/** Below this many points a week a score is not moving. */
+const MIN_PACE_POINTS_PER_WEEK = 0.5;
+
+/**
+ * Where the two scores land if they keep their pace, and how soon that is a different regime.
+ *
+ * Direction-aware, and drawn from the engine's own quadrant table (`classifyRegimeQuadrant`):
+ * each week both scores move by their pace, and the first week they classify differently from
+ * where they sit now is the answer, with the regime they classify into. Scores moving away from
+ * their lines do not cross them. `sitsIn` is the regime the scores classify into today, which
+ * is not always the committed one: a change waits for confirmation.
+ */
+export function projectRegimeFromPace({
+  tightness,
+  riskAppetite,
+  tightnessPerWeek,
+  riskAppetitePerWeek,
+  tightnessThreshold = 70,
+  riskAppetiteThreshold = 50,
+}: {
+  tightness: number;
+  riskAppetite: number;
+  /** Points per week: the pace, not the change since an earlier reading. */
+  tightnessPerWeek: number;
+  riskAppetitePerWeek: number;
+  tightnessThreshold?: number;
+  riskAppetiteThreshold?: number;
+}): RegimeProjection & { sitsIn: string } {
+  const thresholds = { tightnessRegime: tightnessThreshold, riskAppetiteRegime: riskAppetiteThreshold };
+  const quadrantAt = (week: number) =>
+    classifyRegimeQuadrant({
+      tightness: tightness + tightnessPerWeek * week,
+      riskAppetite: riskAppetite + riskAppetitePerWeek * week,
+      thresholds,
+    });
+  const sitsIn = quadrantAt(0);
+
+  if (tightnessPerWeek === 0 && riskAppetitePerWeek === 0) {
+    return { weeksToFlip: null, projectedRegime: null, velocityLabel: "Stable — no significant movement.", sitsIn };
+  }
+  if (Math.max(Math.abs(tightnessPerWeek), Math.abs(riskAppetitePerWeek)) < MIN_PACE_POINTS_PER_WEEK) {
+    return { weeksToFlip: null, projectedRegime: null, velocityLabel: "Slow movement — no change in conditions expected soon.", sitsIn };
+  }
+
+  for (let week = 1; week <= PROJECTION_HORIZON_WEEKS; week += 1) {
+    const then = quadrantAt(week);
+    if (then !== sitsIn) {
+      return {
+        weeksToFlip: week,
+        projectedRegime: then,
+        velocityLabel: `At current pace, threshold crossing possible within ${week} ${week === 1 ? "week" : "weeks"}.`,
+        sitsIn,
+      };
+    }
+  }
+
+  const closing = [
+    { score: tightness, pace: tightnessPerWeek, line: tightnessThreshold },
+    { score: riskAppetite, pace: riskAppetitePerWeek, line: riskAppetiteThreshold },
+  ].some(({ score, pace, line }) => Math.abs(pace) >= MIN_PACE_POINTS_PER_WEEK && Math.abs(score + pace - line) < Math.abs(score - line));
+  return {
+    weeksToFlip: null,
+    projectedRegime: null,
+    velocityLabel: closing
+      ? "Slow trend — no change in conditions expected soon."
+      : "Moving away from the lines — no change in conditions expected soon.",
+    sitsIn,
+  };
 }

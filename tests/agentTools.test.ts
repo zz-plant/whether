@@ -146,6 +146,9 @@ describe("what an agent may pass, and what it is told when it passes something e
 
     const error = await refusal(runAgentTool("get_projection", { tightness: "high" }, "http"));
     assert.equal(error.message, 'Argument tightness must be a number; got "high".');
+
+    const text = await refusal(runAgentTool("stress_test_plan", { planText: 5 }, "http"));
+    assert.equal(text.message, "Argument planText must be text; got 5.");
   });
 
   it("takes a lifecycle stage in any case, and refuses one it does not know", async () => {

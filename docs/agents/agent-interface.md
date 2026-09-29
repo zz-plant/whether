@@ -182,6 +182,14 @@ values that would have worked:
   says which of `given`, `today` or `assumed` each value was. A what-if (any score given) assumes 0
   pace rather than borrowing today's for other scores. `tightnessDelta`/`riskAppetiteDelta` are
   points **per week**; `get_state`'s `perWeek` is that number.
+- `get_projection` steps the scores by their pace and asks the engine's own regime table
+  (`classifyRegimeQuadrant`) where they land, so a score moving away from its line does not cross it,
+  and it names the regime they would then be in. The scores decide, not the label: when they sit in
+  another regime than the one given (a change waiting for confirmation, or a regime that does not match
+  them) the result carries a `note`. It replaced a projection that divided the nearest line's distance
+  by the fastest pace whichever way either score moved: on the Sep 25 read, with both scores deeper into
+  the regime, it reported a crossing within a week. That function still drives the Slack "conditions could
+  change soon" alert (§ below); see the spec, §6.9.
 
 ### From a browser
 
