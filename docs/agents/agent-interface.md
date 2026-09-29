@@ -110,6 +110,12 @@ same definitions (`lib/agent/tools.ts`), plus one that only makes sense on a loc
   servers were merged. It was one of five tools here (against twelve remote) under another server name
   (`whether-agent-interface`); both are now `whether` (`lib/mcp/serverIdentity.ts`).
 
+What a client of the old local server will see differently: `get_recent_history` answers
+`{ signal_key, history }` (it answered the bare history); `get_decision_rules` for one regime answers
+`{ "DEFENSIVE": [...] }` (it answered the array); a refusal is a plain sentence in a result with `isError`
+(it was JSON, `{ "error": ... }`) that lists what would have worked; a regime is accepted by key or by the
+site's weather word in any case; and the server's name is `whether`, not `whether-agent-interface`.
+
 ### Example MCP client config (shape)
 
 ```json
