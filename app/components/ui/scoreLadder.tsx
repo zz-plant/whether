@@ -157,7 +157,7 @@ export const describeLadderPosition = (value: number, lines: readonly LadderLine
   const phrase = nearest.line.label ? `${nearest.line.label.toLowerCase()} line` : LINE_PHRASES[nearest.line.kind];
   if (nearest.distance === 0) return `${formatPoints(value)} of 100 · at the ${phrase}`;
   const side = value > nearest.line.value ? "above" : "below";
-  return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} pts ${side} the ${phrase}`;
+  return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} ${nearest.distance === 1 ? "pt" : "pts"} ${side} the ${phrase}`;
 };
 
 export function ScoreLadder({

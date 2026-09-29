@@ -322,13 +322,13 @@ const buildReversalConditions = (
 ): string[] => {
   if (previousState === "EXPANSION" || nextState === "EXPANSION") {
     return [
-      `Funding pressure <= ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
-      `Risk appetite > ${thresholds.riskAppetiteRegime} for 2 consecutive refreshes.`,
+      `Funding pressure <= ${thresholds.tightnessRegime} for two readings in a row.`,
+      `Risk appetite > ${thresholds.riskAppetiteRegime} for two readings in a row.`,
     ];
   }
   return [
-    `Funding pressure > ${thresholds.tightnessRegime} for 2 consecutive refreshes.`,
-    `Risk appetite <= ${thresholds.riskAppetiteRegime} for 2 consecutive refreshes.`,
+    `Funding pressure > ${thresholds.tightnessRegime} for two readings in a row.`,
+    `Risk appetite <= ${thresholds.riskAppetiteRegime} for two readings in a row.`,
   ];
 };
 

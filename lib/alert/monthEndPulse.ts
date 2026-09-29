@@ -108,7 +108,7 @@ const buildBlock = (
 ): string => {
   const parts = buildInvestorUpdateSnippetParts({
     assessment: snapshot.assessment,
-    recordDate: snapshot.recordDate,
+    record: snapshot.treasury,
     weeklyCall,
     monthlyHistory: getMonthlyRegimeHistory(),
     sourceLabel: snapshot.provenance.sourceLabel,

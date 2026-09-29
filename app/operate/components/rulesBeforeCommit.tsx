@@ -87,7 +87,7 @@ export function RulesBeforeCommit({
         <p className="type-label text-slate-400">Rules for this week</p>
         <h3 className="type-section text-slate-100">{playbook?.title ?? "Rules for new commitments"}</h3>
         <p className="mt-2 text-sm text-slate-200">
-          {playbook ? playbook.insight : "Playbook data unavailable. Use operating guardrails until data recovers."}
+          {playbook ? playbook.insight : "This week's rules did not load. Hold new commitments until they do."}
         </p>
       </div>
       <div id={rulesId} className="grid gap-4 lg:grid-cols-3">
@@ -107,7 +107,7 @@ export function RulesBeforeCommit({
       {playbook ? (
         <details className="weather-auto-chevron">
           <summary className="text-xs font-semibold text-slate-300">
-            Leadership signals (phrases to use or avoid)
+            Phrases to use, and to avoid, in this week&apos;s meetings
           </summary>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>

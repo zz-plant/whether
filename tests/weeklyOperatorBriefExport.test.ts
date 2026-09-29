@@ -42,7 +42,6 @@ describe("weekly operator brief export adapters", () => {
       assessment,
       treasury,
       postureWithStageLabel: "Defensive · Late Cycle",
-      confidenceLabel: "HIGH",
       weeklyLeadershipSummary: {
         boldnessScore: 42,
         boldnessDelta: -3,
@@ -57,7 +56,9 @@ describe("weekly operator brief export adapters", () => {
       delta: -3,
       line: "The call moved slightly more defensive this week.",
     });
-    assert.equal(payload.confidence, "High confidence");
+    // Two points above the tightness line: the published band is Low, whatever
+    // the fixture's engine code says.
+    assert.equal(payload.confidence, "Low confidence");
     // The paste line adds what the weather means; the contract field stays the modeled label.
     assert.match(payload.conditions, /^Defensive · Late Cycle \(money is [a-z ]+\)$/);
     assert.ok(payload.doNowBullets.length > 0);
@@ -69,7 +70,6 @@ describe("weekly operator brief export adapters", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
-      confidenceLabel: "MED",
       weeklyLeadershipSummary: {
         boldnessScore: 58,
         boldnessDelta: 4,
@@ -82,8 +82,8 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     // The number never travels without what it measures.
     assert.match(text, /Operating latitude: 58\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: \+4 points/);
-    assert.match(text, /^Medium confidence$/m);
-    assert.doesNotMatch(text, /\bMED\b|Boldness/);
+    assert.match(text, /^Low confidence$/m);
+    assert.doesNotMatch(text, /\bLOW\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);
     assert.match(text, /Guidance:/);
@@ -102,7 +102,6 @@ describe("weekly operator brief export adapters", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
-      confidenceLabel: "MED",
     });
 
     assert.ok(payload.flipWatchLine, "the assessment fixture has a reachable crossing");
@@ -123,7 +122,6 @@ describe("weekly operator brief export adapters", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
-      confidenceLabel: "LOW",
       weeklyLeadershipSummary: {
         boldnessScore: 58,
         boldnessDelta: 0,
@@ -143,7 +141,6 @@ describe("weekly operator brief export adapters", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
-      confidenceLabel: "MED",
       flipConditionLabels: ["Tightness < 65", "Risk appetite > 50"],
     });
 
@@ -156,7 +153,6 @@ describe("weekly operator brief export adapters", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
-      confidenceLabel: "MED",
       canonicalDecisionCopy: {
         currentRegimeLabel: "Cloudy",
         operatingCall: "Protect runway.",
@@ -175,7 +171,6 @@ describe("weekly operator brief export adapters", () => {
     const payload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
-      confidenceLabel: "HIGH",
       customTeamNote: "All-hands update: hold Q3 designer headcount open until Sep 15.",
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);

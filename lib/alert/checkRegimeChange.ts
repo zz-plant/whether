@@ -11,6 +11,7 @@ import { siteUrl } from "../siteUrl";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
 import { formatExportConfidenceWord } from "../export/exportTerms";
+import { resolvePublishedConfidence } from "../report/confidence";
 
 type CheckRegimeChangeResult = {
   ok: boolean;
@@ -105,17 +106,21 @@ export const checkRegimeChange = async (options?: {
   if (!kv) return { ok: false, error: "KV not available" };
 
   let assessment;
+  let record;
   let reportDynamics;
 
   if (options?.snapshot) {
     assessment = options.snapshot.assessment;
+    record = options.snapshot.treasury;
   } else {
     const stored = await getOperatingSnapshotStore().readLatest();
     if (stored) {
       assessment = stored.assessment;
+      record = stored.treasury;
     } else {
       const data = await loadReportData({});
       assessment = data.assessment;
+      record = data.treasury;
       reportDynamics = data.reportDynamics;
     }
   }
@@ -185,12 +190,15 @@ export const checkRegimeChange = async (options?: {
     }
   }
 
-  /* 3. Confidence drop — alert when the data is getting noisier */
+  /* 3. Confidence drop — the published band leaving High, the band every page
+     and export prints. This read the engine's own label, which ranks the raw
+     gap and so could drop to Medium while the site still said High, and the
+     alert gave "sources disagreed" as the reason, which is not what it measures. */
   const prevConfidence = await kv.get("regime:confidence");
-  const currentConfidence = assessment.diagnostics?.confidence ?? "HIGH";
+  const currentConfidence = resolvePublishedConfidence({ assessment, record }).label;
   if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
     alerts.push(
-      `Confidence dropped from ${formatExportConfidenceWord(prevConfidence).toLowerCase()} to ${formatExportConfidenceWord(currentConfidence).toLowerCase()}. Sources disagreed this week. Read the guidance before acting on it.`,
+      `Confidence dropped from ${formatExportConfidenceWord(prevConfidence).toLowerCase()} to ${formatExportConfidenceWord(currentConfidence).toLowerCase()}. Read the guidance before acting on it.`,
     );
   }
 

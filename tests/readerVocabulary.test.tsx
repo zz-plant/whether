@@ -202,7 +202,7 @@ const artifactSurfaces: Surface[] = [
   { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros) },
   {
     name: "weekly operator brief",
-    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, confidenceLabel: "MED" })),
+    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury })),
   },
   { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(extractMeetingSlidePayload(snapshot)) },
   { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(extractMeetingSlidePayload(snapshot))) },
@@ -212,7 +212,7 @@ const artifactSurfaces: Surface[] = [
     text: () => {
       const parts = buildInvestorUpdateSnippetParts({
         assessment,
-        recordDate: treasury.record_date,
+        record: treasury,
         weeklyCall: snapshot.weeklyCall,
         monthlyHistory: [],
         sourceLabel: treasury.source,

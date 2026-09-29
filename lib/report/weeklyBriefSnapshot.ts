@@ -182,7 +182,8 @@ export const loadWeeklyBriefSnapshot = async (
   const reportResult = await loadReportDataSafe(searchParams, context, options);
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const postureState = await buildPostureState({
-    recordDate: reportData.treasury.record_date,
+    record: reportData.treasury,
+    historical: Boolean(reportData.historicalSelection),
     assessment: reportData.assessment,
     reportDynamics: reportData.reportDynamics,
   });

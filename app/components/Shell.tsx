@@ -22,7 +22,7 @@ export function Shell({
        and the two cards under it, so the resolved page lands where the
        placeholder was (suspenseFallbacks.tsx has the argument). */
     return (
-      <div className="min-h-screen bg-[var(--bg-body)] text-[var(--app-text)]">
+      <div className="flex-1 bg-[var(--bg-body)] text-[var(--app-text)]">
         <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-4 sm:py-5">
           <output aria-busy="true" aria-label="Loading the weekly brief" className="block">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
@@ -64,8 +64,13 @@ export function Shell({
   return (
     // The atmosphere resolves from data-regime (tokens.css), so the brief and
     // the report routes paint the same wash from the same table.
+    //
+    // flex-1, not min-h-screen: the body is already a min-h-screen column, so a
+    // shell a full viewport tall *under* the header put the footer a header's
+    // height below the fold on every short page — the first-visit brief ended
+    // in a band of empty ground before the footer. PageShell grows the same way.
     <div
-      className="weather-regime-ground min-h-screen bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
+      className="weather-regime-ground flex-1 bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
       data-regime={regimeDataAttribute(regime)}
       style={regimeAccentStyle(regime)}
     >

@@ -67,7 +67,7 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
     weeklyRecordDateLabel,
   } = reportData;
   const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
+    record: treasury,
     assessment,
     reportDynamics,
   });

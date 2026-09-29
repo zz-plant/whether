@@ -16,7 +16,7 @@ export async function GET() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/weekly-digest" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const postureState = await buildPostureState({
-    recordDate: reportData.treasury.record_date,
+    record: reportData.treasury,
     assessment: reportData.assessment,
     reportDynamics: reportData.reportDynamics,
   });

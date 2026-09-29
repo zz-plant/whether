@@ -46,11 +46,11 @@ export function FrameworkSection() {
           <div className="grid gap-4">
             <div className="weather-surface px-4 py-4 space-y-2">
               <p className={slotLabelClass("action")}>{DECISION_CONTRACT_LABELS.slot.action}</p>
-              <p className="text-sm text-slate-200">What you will do now, given current conditions. Not what you hope to do — what the evidence supports doing right now.</p>
+              <p className="text-sm text-slate-200">What you will do now, given current conditions: the move the readings support this week.</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-2">
               <p className={slotLabelClass("threshold")}>{DECISION_CONTRACT_LABELS.slot.threshold}</p>
-              <p className="text-sm text-slate-200">The specific, measurable condition that would cause you to pause the action. Not a feeling — a number. &ldquo;Pause if funding pressure exceeds 76.&rdquo;</p>
+              <p className="text-sm text-slate-200">The measurable condition that would make you pause, written as a number: &ldquo;Pause if funding pressure exceeds 76.&rdquo;</p>
             </div>
             <div className="weather-surface px-4 py-4 space-y-2">
               <p className={slotLabelClass("reversal")}>{DECISION_CONTRACT_LABELS.slot.reversal}</p>

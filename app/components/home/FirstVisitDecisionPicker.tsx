@@ -141,6 +141,7 @@ export function FirstVisitDecisionPicker({
         value={selected}
         onSelect={handleSelect}
         ariaLabel="What are you deciding this week?"
+        layout="choices"
       />
 
       {active ? (

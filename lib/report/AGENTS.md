@@ -57,7 +57,7 @@ Typical downstream renderers:
   | The pause/resume threshold pair | "the pause line", "the resume line"; slot labels "Pause if" / "Resume when"; a decision category is an "area" | `reportCopy.ts` `DECISION_CONTRACT_LABELS`, `boundedDecisionRules.ts` `decisionAreaLabel` | corridor, lane, rail, watch line, Change course if, Re-open when |
   | The 0–100 room-to-act score | "Operating latitude", with `OPERATING_LATITUDE_GLOSS` beside the number | `reportCopy.ts` `OPERATING_LATITUDE_LABEL` | Boldness, latitude signal |
   | A 0–100 score in prose | name, number and meaning together: `formatSignalReading` / `SignalReading` | `signalTranslations.ts` | a bare "74/100" |
-  | How settled the guidance is | "High / Medium / Low confidence" (the word only) | `reportFormatting.ts` `formatConfidenceChipLabel` | HIGH/MED/LOW codes, a percent, "confidence" for data freshness |
+  | How settled the guidance is | "High / Medium / Low confidence" (the word only) | wording: `reportFormatting.ts` `formatConfidenceChipLabel`; value: `confidence.ts` `resolvePublishedConfidence`, on every surface | HIGH/MED/LOW codes, a percent, "confidence" for data freshness, the engine's `diagnostics.confidence` |
   | The pressure score | "Funding pressure" | `boundedDecisionRules.ts` `ruleMetricLabel`, `signalTranslations.ts` | tightness, credit conditions |
   | The curve number | "Recession warning gauge (10-year minus 2-year rate)" on first use | `signalTranslations.ts` `regimeSignalLabel` | 10Y−2Y alone, curve slope, curve signal |
   | Conditions changing | "what would change this guidance", "conditions change if" | `DECISION_CONTRACT_LABELS.watch` | flip, flip watch, "the call changes" |

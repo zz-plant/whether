@@ -102,7 +102,6 @@ describe("canonical decision copy contract", () => {
       assessment,
       treasury,
       postureWithStageLabel: "Defensive — Watchful",
-      confidenceLabel: "MED",
       postureState,
       canonicalDecisionCopy: canonical,
     });

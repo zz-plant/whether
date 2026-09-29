@@ -25,17 +25,16 @@ const featuredStakeholderSlugs = [
   "founders-ceos",
   "heads-of-product",
   "finance-leaders",
-  "operations-leaders",
 ] as const;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Resolve a Decision — By Role, Situation, or Toolkit",
+  title: "Resolve a decision by role, situation or toolkit",
   description: "One focused path per open decision: route by role, company stage, single answer, or a reusable toolkit.",
   path: "/resolve",
   imageAlt: "Whether decision tools",
   imageParams: {
     template: "solutions",
-    title: "Resolve a Decision",
+    title: "Resolve a decision",
     subtitle: "One focused path per open decision: by role, company stage, single answer, or a reusable toolkit.",
   },
 });
@@ -69,7 +68,7 @@ export default async function DecidePage({
   const recommendedStageGuides = stageGuides.slice(0, 2);
   const sectionLinks = [
     { href: "#direct-answers", label: "Direct answers" },
-    { href: "#decide-secondary-paths", label: "Browse the library" },
+    { href: "#decide-secondary-paths", label: "Browse by role or stage" },
   ];
 
   return (
@@ -95,7 +94,8 @@ export default async function DecidePage({
         actions: {
           nextStep: {
             href: "/operate",
-            description: "Return to Planning next",
+            description: "Set this week's rules for the rest of the plan.",
+            label: "Open the plan",
           },
         },
         payloads: {
@@ -143,7 +143,7 @@ export default async function DecidePage({
       </ReportSection>
 
       <Details id="decide-secondary-paths" className="weather-panel px-6 max-sm:px-0 py-6"
-        summary={<span className="text-sm font-semibold text-sky-200">Browse the library — by role, stage, situation, or toolkit</span>}
+        summary={<span className="text-sm font-semibold text-sky-200">Browse by role, company stage, situation or toolkit</span>}
       >
           <section className="grid gap-4 lg:grid-cols-2">
             <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">

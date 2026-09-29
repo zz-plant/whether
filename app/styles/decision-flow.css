@@ -70,6 +70,29 @@ summary:focus-visible {
   text-decoration: none;
 }
 
+/* With a mouse, the "#" waits until the reader is in the section. Printed
+   beside every heading at all times it was the most repeated mark on the page
+   and read as stray punctuation. A touch screen has no hover to reveal it, and
+   sharing a link is likelier there, so it stays visible (faint) without one.
+   Keyboard focus always shows it. */
+@media (hover: hover) and (pointer: fine) {
+  a.weather-section-anchor {
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  [data-page-section]:hover a.weather-section-anchor,
+  a.weather-section-anchor:focus-visible {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.weather-section-anchor {
+    transition: none;
+  }
+}
+
 :where(details) {
   border-radius: var(--radius-md);
 }

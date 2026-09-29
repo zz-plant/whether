@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury } = reportData;
   const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
+    record: treasury,
     assessment,
     reportDynamics: reportData.reportDynamics,
   });

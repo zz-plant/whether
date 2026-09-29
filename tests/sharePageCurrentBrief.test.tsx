@@ -37,7 +37,7 @@ describe("/share current weekly artifact", () => {
   it("renders real weekly brief exports instead of placeholder marketing copy", async () => {
     const html = renderToStaticMarkup(await SharePage());
 
-    assert.match(html, /Current weekly artifact/);
+    assert.match(html, /Week of /);
     // The exports lead with the conditions label; "Posture" was the export header before the
     // 2026-09-22 copy pass renamed it, and is no longer a word the page prints.
     assert.match(html, /Conditions:/);

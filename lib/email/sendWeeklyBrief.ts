@@ -9,6 +9,7 @@ import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } fr
 import { signalReadingMeaning } from "../report/signalTranslations";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
+import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
 
 /**
  * How far a reading sits from the line that would change the call, and which
@@ -53,13 +54,11 @@ const distanceFromLine = (
    assignable, and a test can build these five without asserting its way past
    the thirty it does not touch. */
 type WeeklyEmailReadingSource = {
-  assessment: {
-    scores: Pick<OperatingSnapshot["assessment"]["scores"], "tightness" | "riskAppetite">;
-    diagnostics: Pick<
-      OperatingSnapshot["assessment"]["diagnostics"],
-      "tightnessVsThreshold" | "riskAppetiteVsThreshold" | "confidence"
-    >;
+  assessment: ConfidenceInputs & {
+    diagnostics: Pick<OperatingSnapshot["assessment"]["diagnostics"], "tightnessVsThreshold" | "riskAppetiteVsThreshold">;
   };
+  /** The record the scores were read from, which decides whether they have gone stale. */
+  treasury?: ConfidenceRecord;
 };
 
 export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | undefined) => {
@@ -82,7 +81,12 @@ export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | un
       /* The risk line is a floor: below it is risk-off. */
       distance: distanceFromLine(diagnostics.riskAppetiteVsThreshold, "below"),
     },
-    { label: "Confidence", value: formatExportConfidenceWord(diagnostics.confidence), meaning: null, distance: null },
+    {
+      label: "Confidence",
+      value: formatExportConfidenceWord(resolvePublishedConfidence({ assessment: snapshot.assessment, record: snapshot.treasury }).label),
+      meaning: null,
+      distance: null,
+    },
   ];
 };
 

@@ -25,10 +25,14 @@ export const BriefFormatPicker = ({
   onSelect: (id: BriefFormatId) => void;
   onCopy: () => void;
 }) => (
-  <>
+  /* A container, not a viewport breakpoint: the same picker sits in the narrow
+     share drawer and across the full width of /share. At full width the 2×2
+     grid drew four buttons each half the page wide, and the copy button ran
+     edge to edge under a preview a third of that width. */
+  <div className="@container">
     <fieldset className="mt-2">
       <legend className="sr-only">Format</legend>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5 @xl:max-w-xl @xl:grid-cols-4">
         {BRIEF_FORMATS.map((option) => (
           <button
             key={option.id}
@@ -64,9 +68,9 @@ export const BriefFormatPicker = ({
       data-premium-intent="export_brief"
       data-premium-cta="share_rail_copy_brief"
       data-testid="share-rail-copy-brief"
-      className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
+      className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold @xl:w-auto @xl:px-5"
     >
       {copiedTarget === "brief" ? "Copied!" : `Copy ${activeFormat.label} format`}
     </button>
-  </>
+  </div>
 );

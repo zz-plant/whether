@@ -1,6 +1,7 @@
 import type { RegimeAssessment } from "./regimeEngine";
 import type { TreasuryData } from "./types";
 import type { PostureStateContract } from "./report/postureStateContract";
+import { resolvePublishedConfidence } from "./report/confidence";
 import { getRegimePublicLabel } from "./regimePresentation";
 import { formatSignalReading } from "./report/signalTranslations";
 import { DECISION_CONTRACT_LABELS } from "./report/reportCopy";
@@ -31,28 +32,31 @@ type WeeklyMandateEnvelope = {
 const buildFallbackPostureState = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
-): PostureStateContract => ({
-  currentState: {
-    regime: assessment.regime,
-    postureLabel: getRegimePublicLabel(assessment.regime),
-    confidenceLabel: "MED",
-    confidencePercent: 55,
-    transitionWatch: "OFF",
-    recordDate: treasury.record_date,
-  },
-  lastCommittedChangeEvent: {
-    timestamp: null,
-    fromState: null,
-    toState: assessment.regime,
-    reason: "No record of the last change in conditions; this is the current reading.",
-    source: "state-machine",
-  },
-  whatFlipsNext: {
-    flipTrigger: "Check again after the next update.",
-    thresholds: ["Check again after the next update."],
-    reversalConditions: [],
-  },
-});
+): PostureStateContract => {
+  const confidence = resolvePublishedConfidence({ assessment, record: treasury });
+  return {
+    currentState: {
+      regime: assessment.regime,
+      postureLabel: getRegimePublicLabel(assessment.regime),
+      confidenceLabel: confidence.label,
+      confidencePercent: confidence.percent,
+      transitionWatch: "OFF",
+      recordDate: treasury.record_date,
+    },
+    lastCommittedChangeEvent: {
+      timestamp: null,
+      fromState: null,
+      toState: assessment.regime,
+      reason: "No record of the last change in conditions; this is the current reading.",
+      source: "state-machine",
+    },
+    whatFlipsNext: {
+      flipTrigger: "Check again after the next update.",
+      thresholds: ["Check again after the next update."],
+      reversalConditions: [],
+    },
+  };
+};
 
 const resolvePostureState = (
   postureState: PostureStateContract | null | undefined,

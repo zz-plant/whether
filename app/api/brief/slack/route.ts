@@ -13,7 +13,7 @@ export async function GET() {
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury, sensors, macroSeries } = reportData;
   const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
+    record: treasury,
     assessment,
     reportDynamics: reportData.reportDynamics,
   });

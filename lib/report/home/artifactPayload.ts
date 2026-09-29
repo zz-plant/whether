@@ -108,7 +108,6 @@ export const buildLeadershipArtifactPayload = async ({
       historicalAnalogs: homeBriefModel.historicalAnalogs,
       failureModes: homeBriefModel.failureModes,
       actionStripItems: homeBriefModel.actionStripItems,
-      confidenceLabel: homeBriefModel.confidenceLabel,
       freshnessLabel,
       postureState,
     };
@@ -127,7 +126,6 @@ export const buildLeadershipArtifactPayload = async ({
       treasury,
       date: weeklyRecordDate,
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-      confidenceLabel: homeBriefModel.confidenceLabel,
       actionStripItems: homeBriefModel.actionStripItems,
       flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
       postureState,

@@ -98,15 +98,15 @@ export function SignalInversionPreview({
       <header className="space-y-2">
         <p className="type-eyebrow type-eyebrow-section">Curve context</p>
         <h2 id="signals-inversion-preview-title" className="text-lg font-semibold text-slate-100">
-          Inversion timeline before you open the deeper evidence.
+          Has the yield curve inverted in the last year?
         </h2>
         {/* The chart is labelled in bond-desk shorthand. This says what it is
             before the reader has to decode the axes. */}
         <p className="text-sm text-slate-300">
           Each line is the gap between what the U.S. government pays to borrow long-term and what it
           pays short-term. When a line drops below zero, short-term borrowing costs more than
-          long-term &mdash; the pattern that has run ahead of most U.S. recessions. Last 12 monthly
-          reads, so you can see whether the pressure is easing or deepening.
+          long-term, the pattern that has run ahead of most U.S. recessions. The last 12 month-end
+          readings show whether that pressure is easing or deepening.
         </p>
       </header>
       <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">

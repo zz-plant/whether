@@ -133,8 +133,10 @@ describe("buildSlackBrief", () => {
     assert.ok(brief.indexOf("• Pause if: Tightness > 70") < brief.indexOf("• Resume when: Tightness < 64"));
     assert.ok(brief.indexOf("• Resume when: Tightness < 64") < brief.indexOf("• Conditions change if: "));
     assert.match(brief, /Why this could be wrong:/);
-    // The engine's code ("MEDIUM") never reaches a paste; the band reads as a word.
-    assert.match(brief, /^• Medium confidence$/m);
+    // The published band, as a word: 58 and 18 points out (81 on the tightness
+    // scale) is High. The fixture's engine code says MEDIUM, and neither that
+    // code nor its band reaches a paste any more.
+    assert.match(brief, /^• High confidence$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
     assert.match(brief, /• The scores sit near a line; a small move could change conditions\./);
     assert.match(brief, /• If it is: see "Conditions change if" above/);
@@ -247,13 +249,14 @@ describe("buildSlackBrief", () => {
   });
 
   it("adds compact weekly call artifact lines when operating stance context is provided", () => {
-    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+    // Two points under the risk line: nine on the tightness scale, so Medium.
+    const nearLine = { ...assessment, scores: { ...assessment.scores, riskAppetite: 48 } };
+    const brief = buildSlackBrief(nearLine, treasury, sensors, macros, {
       postureWithStageLabel: "Guarded Expansion — Late",
       operatingStanceLine: "Stage decisions. Avoid irreversible spend.",
       trendLabel: "Deteriorating",
       transitionWatch: "ON",
       regimeDistancePoints: 2,
-      confidenceLabel: "MED",
       freshnessLabel: "Unavailable",
       actionStripItems: [
         {

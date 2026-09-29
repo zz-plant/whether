@@ -16,7 +16,7 @@ import {
   buildSignalReferenceRows,
   buildTrustStripProps,
 } from "../../lib/report/evidenceReaderModel";
-import { resolvePublishedConfidenceLabel } from "../../lib/report/confidence";
+import { resolvePublishedConfidence } from "../../lib/report/confidence";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
@@ -196,21 +196,20 @@ const deriveSignalsPageModel = (
     isFallback,
     isHistorical: Boolean(historicalSelection),
     degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
-    confidenceLabel: resolvePublishedConfidenceLabel({
-      scores: assessment.scores,
-      thresholds: assessment.thresholds,
-      isFallbackData: isFallback && !historicalSelection,
-      recordDate: treasury.record_date,
-    }),
+    confidenceLabel: resolvePublishedConfidence({
+      assessment,
+      record: treasury,
+      historical: Boolean(historicalSelection),
+    }).label,
     assessment,
   });
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
     : `${FALLBACK_PAUSE_THRESHOLD}.`;
-  // The resume trigger, symmetric with the pause trigger in "Wrong if" above.
+  // The resume trigger, symmetric with the pause trigger in "Pause if" above.
   // This rendered `flipThreshold` — the condition that BREAKS the call, which
   // /trust labels "Call changes if". Printing it under
-  // "Safe again when" told an operator the opposite of what it means.
+  // "Resume when" (then "Safe again when") told an operator the opposite of what it means.
   const resumeTrigger = actionStripItems?.[0]?.reversalCondition;
   const reversalCondition = resumeTrigger?.trim().length
     ? resumeTrigger

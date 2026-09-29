@@ -240,7 +240,8 @@ export const assembleHomePage = async ({
   const buildEnrichedHomePageModel = () => (async () => {
     try {
       const postureState = await resolvedDependencies.buildPostureState({
-        recordDate: treasury.record_date,
+        record: treasury,
+        historical: Boolean(historicalSelection),
         assessment,
         reportDynamics,
       });

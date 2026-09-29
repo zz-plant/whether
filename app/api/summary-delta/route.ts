@@ -24,7 +24,7 @@ export async function GET() {
   });
   const delta = buildSummaryDelta(weeklySummary, monthlySummary);
   const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
+    record: treasury,
     assessment,
     reportDynamics: reportData.reportDynamics,
   });

@@ -1,6 +1,7 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { PostureDecisionEvent } from "../storage/postureDecisionEventRepository";
+import { resolvePublishedConfidence, type ConfidenceRecord } from "./confidence";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import { type RuleCondition } from "./boundedDecisionRules";
 
@@ -43,29 +44,33 @@ export type PostureStateContract = {
   } | null;
 };
 
-const resolveConfidence = (assessment: RegimeAssessment) => {
-  const nearestThresholdGap = assessment.diagnostics.nearestThresholdDelta;
-  const confidenceLabel: PostureStateContract["currentState"]["confidenceLabel"] = nearestThresholdGap <= 5
-    ? "LOW"
-    : nearestThresholdGap <= 12
-      ? "MED"
-      : "HIGH";
-  const confidencePercent = Math.max(35, Math.min(92, Math.round(55 + nearestThresholdGap * 3)));
-  return { confidenceLabel, confidencePercent };
-};
-
+/*
+ * The confidence is the published one, from the record as well as the scores.
+ * This contract used to rank the raw nearest gap itself, with the percent at 3
+ * per point — the calibration from before the risk gap was put on the
+ * tightness scale — so the APIs serving it, and every route whose brief model
+ * preferred it, said Medium on a week the homepage said High.
+ */
 export const buildPostureStateContract = ({
   assessment,
-  recordDate,
+  record,
+  historical = false,
   postureLabel,
   decisionEventStore,
 }: {
   assessment: RegimeAssessment;
-  recordDate: string;
+  /** The record the assessment was read from: its date, and whether it is a fallback. */
+  record: ConfidenceRecord & { record_date: string };
+  historical?: boolean;
   postureLabel: string;
   decisionEventStore: PostureDecisionEvent[];
 }): PostureStateContract => {
-  const { confidenceLabel, confidencePercent } = resolveConfidence(assessment);
+  const recordDate = record.record_date;
+  const { label: confidenceLabel, percent: confidencePercent } = resolvePublishedConfidence({
+    assessment,
+    record,
+    historical,
+  });
   const lockCommitment = buildWeeklyLockCommitment({
     regime: assessment.regime,
     tightnessRegime: assessment.thresholds.tightnessRegime,

@@ -105,11 +105,13 @@ const rawForKey = (reportData: ReportData, key: "tightness" | "riskAppetite" | "
 const describeTrend = (directionLabel: ReportDynamics["directionLabel"]) =>
   directionLabel === "unavailable" ? "Not compared" : titleCase(directionLabel);
 
-const deriveCyclePhaseLabel = (reportData: ReportData) => {
+/* The phase reads the confidence the contract itself publishes, beside it, rather
+   than the engine's raw-gap label, which could call a phase fragile under High. */
+const deriveCyclePhaseLabel = (reportData: ReportData, postureState: PostureStateContract) => {
   const stage = deriveRegimeStage({
     regime: reportData.assessment.regime,
     momentum: reportData.reportDynamics.directionLabel,
-    confidence: reportData.assessment.diagnostics.confidence === "MEDIUM" ? "MED" : reportData.assessment.diagnostics.confidence,
+    confidence: postureState.currentState.confidenceLabel,
     distanceToFlip: reportData.assessment.diagnostics.nearestThresholdDelta,
   });
   return stage.displayLabel;
@@ -164,7 +166,7 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
   updatedAt: reportData.treasury.fetched_at,
   freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
   regime: postureState.currentState.postureLabel,
-  cyclePhase: deriveCyclePhaseLabel(reportData),
+  cyclePhase: deriveCyclePhaseLabel(reportData, postureState),
   confidence: {
     label: postureState.currentState.confidenceLabel,
     score: postureState.currentState.confidencePercent,
@@ -233,7 +235,7 @@ export const buildCliRegimeContract = ({ reportData, postureState, degraded }: {
   version: "v1",
   generatedAt: new Date().toISOString(),
   regime: postureState.currentState.postureLabel,
-  phase: deriveCyclePhaseLabel(reportData),
+  phase: deriveCyclePhaseLabel(reportData, postureState),
   confidence: postureState.currentState.confidenceLabel,
   trend: describeTrend(reportData.reportDynamics.directionLabel),
   interpretation: reportData.playbook?.insight ?? reportData.assessment.description,
@@ -251,6 +253,6 @@ export const buildScenarioContract = ({ postureBefore, postureAfter, inputs }: {
   },
   implication:
     postureBefore !== postureAfter
-      ? "Increase willingness to commit only after two consecutive refreshes confirm this shift."
+      ? "Increase willingness to commit only after two readings in a row confirm this shift."
       : "No posture shift. Keep current pacing and monitor the flip thresholds.",
 });

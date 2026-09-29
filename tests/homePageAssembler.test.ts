@@ -12,7 +12,7 @@ const reportData = buildReportDataFixture();
 
 const postureState = buildPostureStateContract({
   assessment,
-  recordDate: treasury.record_date,
+  record: treasury,
   postureLabel: "Contraction",
   decisionEventStore: [],
 });
@@ -105,7 +105,6 @@ describe("assembleHomePage streaming contract", () => {
       treasury: reportDataForCopy.treasury,
       date: reportDataForCopy.weeklyRecordDate,
       postureWithStageLabel: homepage.weeklyDecisionCardModel.status.postureWithStageLabel,
-      confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
       actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
       flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
       weeklyCall: homepage.weeklyCall,

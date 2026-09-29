@@ -44,7 +44,7 @@ describe("investor update snippet", () => {
     const assessment = evaluateRegime(treasury);
     const parts = buildInvestorUpdateSnippetParts({
       assessment,
-      recordDate: treasury.record_date,
+      record: treasury,
       weeklyCall,
       monthlyHistory: history,
       sourceLabel: treasury.source,
@@ -74,7 +74,7 @@ describe("investor update snippet", () => {
     );
     const parts = buildInvestorUpdateSnippetParts({
       assessment,
-      recordDate: treasury.record_date,
+      record: treasury,
       weeklyCall,
       monthlyHistory: priorDiffers,
       sourceLabel: treasury.source,
@@ -86,7 +86,7 @@ describe("investor update snippet", () => {
     const assessment = evaluateRegime(treasury);
     const scoreless = buildInvestorUpdateSnippetParts({
       assessment,
-      recordDate: treasury.record_date,
+      record: treasury,
       weeklyCall,
       monthlyHistory: [{ record_date: "2026-08-31", regime: assessment.regime }],
       sourceLabel: treasury.source,
@@ -96,7 +96,7 @@ describe("investor update snippet", () => {
 
     const first = buildInvestorUpdateSnippetParts({
       assessment,
-      recordDate: treasury.record_date,
+      record: treasury,
       weeklyCall,
       monthlyHistory: [],
       sourceLabel: treasury.source,
@@ -127,7 +127,7 @@ describe("investor update snippet", () => {
   it("stamps a cached reading as one", () => {
     const parts = buildInvestorUpdateSnippetParts({
       assessment: evaluateRegime(treasury),
-      recordDate: treasury.record_date,
+      record: treasury,
       weeklyCall,
       monthlyHistory: history,
       sourceLabel: treasury.source,
