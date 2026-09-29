@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
+import { buildScoreReadings } from "../lib/export/scoreReference";
 import { renderBriefImage } from "../lib/image/briefImageTemplate";
 import { getRegimeDisplayLabel, getRegimePublicLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
 
@@ -41,16 +42,17 @@ describe("regime presentation labels", () => {
     const image = renderBriefImage({
       decision: "Hold reversible bets",
       regime: "VOLATILE",
-      postureLabel: "Stormy — Mid",
-      tightness: 64,
-      tightnessDelta: 0,
+      readings: buildScoreReadings({ scores: { tightness: 64, riskAppetite: 48 } }),
       confidenceLabel: "MED",
       recordDate: "June 7, 2026",
     });
+    const text = collectText(image);
 
     assert.equal(getRegimePublicLabel("VOLATILE"), "Stormy");
-    assert.match(collectText(image), /Stormy · Stormy — Mid/);
-    assert.doesNotMatch(collectText(image), /Uncertain · Stormy/);
+    /* The stamp names the weather once; it used to print it twice ("Stormy · Stormy — Mid"). */
+    assert.equal(text.match(/stormy/gi)?.length, 1);
+    assert.match(text, /STORMY/);
+    assert.doesNotMatch(text, /Uncertain/i);
   });
 
 

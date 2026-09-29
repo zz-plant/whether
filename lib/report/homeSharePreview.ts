@@ -43,13 +43,38 @@ const defaultDependencies: HomeSharePreviewDependencies = {
 };
 
 /* "Canonical ingestion (FRED)" names our pipeline; a reader wants the publisher.
-   Every treasury source resolves to one of these two. */
-const readerSourceLabel = (sourceLabel: string) =>
+   Every treasury source resolves to one of these two. The brief card
+   (`/api/image/brief`) reads the same label, so both cards name one source. */
+export const readerSourceLabel = (sourceLabel: string) =>
   /FRED/i.test(sourceLabel)
     ? "US Treasury rates, via the St. Louis Fed (FRED)"
     : /treasury/i.test(sourceLabel)
       ? "US Treasury daily yield curve"
       : sourceLabel;
+
+/**
+ * Why a card is not simply this week's live reading, or null when it is. The
+ * provenance strip's status ("Canonical snapshot (high confidence)") is the
+ * pipeline's word for where a reading came from; on a card the only thing a
+ * reader needs is whether this is *not* this week's live reading, and why.
+ * Both cards (`/api/og`, `/api/image/brief`) print this one answer.
+ */
+export const notLiveReadingLabel = ({
+  historicalBanner,
+  monthRequested,
+  isFallback,
+}: {
+  historicalBanner: string | null;
+  monthRequested: boolean;
+  isFallback: boolean;
+}) =>
+  historicalBanner
+    ? historicalBanner
+    : monthRequested
+      ? "That month is not on record"
+      : isFallback
+        ? "Saved reading, not live"
+        : null;
 
 const normalizeWhitespace = (value: string) => value.trim().replace(/\s+/g, " ");
 
@@ -127,16 +152,11 @@ export const loadHomeSharePreview = async (
   const imageUrl = buildOgImageUrl(buildImageParams(searchParams));
   const weekLabel = reportData.weeklyRecordDateLabel;
   const statusLabel = weeklyDecisionCardModel.status.statusLabel;
-  /* The provenance strip's status ("Canonical snapshot (high confidence)") is the
-     pipeline's word for where a reading came from. On the card, the only thing a
-     reader needs is whether this is *not* this week's live reading, and why. */
-  const contextLabel = reportData.historicalSelection
-    ? reportData.historicalSelection.banner
-    : searchParams?.month || searchParams?.year
-      ? "That month is not on record"
-      : isFallback
-        ? "Saved reading, not live"
-        : null;
+  const contextLabel = notLiveReadingLabel({
+    historicalBanner: reportData.historicalSelection?.banner ?? null,
+    monthRequested: Boolean(searchParams?.month || searchParams?.year),
+    isFallback,
+  });
   const operatingStanceLine = clampText(weeklyDecisionCardModel.decision.operatingStanceLine, 120);
   const immediateDecision = clampText(
     normalizeSentence(weeklyDecisionCardModel.decision.immediateDecision),
