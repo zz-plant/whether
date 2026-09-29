@@ -70,7 +70,7 @@ export default function robots(): MetadataRoute.Robots {
        an RSS feed: it names the newest weeks, the URLs a crawler most needs to
        find quickly. It used to sit inside sitemap.xml as a <url> entry, where it
        is not a page and was crawled as one. */
-    sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/feed.xml`],
+    sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/news-sitemap.xml`, `${siteUrl}/feed.xml`],
     host: siteUrl,
   };
 }
