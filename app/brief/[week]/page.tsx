@@ -10,14 +10,16 @@ import { BoundedValue } from "../../components/ui/boundedValue";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import {
   buildCanonicalUrl,
-  buildOgImageUrl,
   buildPageMetadata,
   organizationName,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
 import {
   buildPublishedBriefEmailUpdate,
+  buildPublishedBriefImageParams,
+  buildPublishedBriefImageUrl,
   buildPublishedBriefPath,
+  buildPublishedBriefTitle,
   buildPublishedBriefSlackUpdate,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
@@ -66,8 +68,7 @@ export function generateStaticParams() {
   return publishedBriefStaticParams;
 }
 
-const briefTitle = (brief: PublishedBrief) =>
-  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
+const briefTitle = buildPublishedBriefTitle;
 
 /* The call, then what moved if it fits a snippet. Both published weeks ran
    190–204 characters, so the part a search result cut was the one that said
@@ -77,18 +78,6 @@ const briefDescription = (brief: PublishedBrief) => {
   const full = `${brief.summary} What changed: ${brief.whatChanged}`;
   return full.length <= BRIEF_DESCRIPTION_LIMIT ? full : brief.summary;
 };
-
-/* The card reads like the page: the conditions in the weather words (the stored
-   label on early records is "Guarded Expansion — Late") and the week as a date,
-   not the archive's "2026-w38" slug. */
-const briefImageParams = (brief: PublishedBrief) => ({
-  template: "brief-chart",
-  week: brief.recordDateLabel,
-  posture: publishedBriefDisplay(brief).conditions,
-  regime: brief.regime,
-});
-
-const briefImageUrl = (brief: PublishedBrief) => buildOgImageUrl(briefImageParams(brief));
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { week } = await params;
@@ -101,7 +90,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: briefDescription(brief),
     path: buildPublishedBriefPath(brief.slug),
     imageAlt: `Whether's guidance for the week of ${brief.recordDateLabel}`,
-    imageParams: briefImageParams(brief),
+    imageParams: buildPublishedBriefImageParams(brief),
   });
 
   metadata.authors = [{ name: publisherAuthor.name, url: buildCanonicalUrl("/about") }];
@@ -162,7 +151,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         dateModified: brief.publishedAt,
         author: buildAuthorSchema(),
         publisher: buildPublisherSchema(organizationName),
-        image: [briefImageUrl(brief)],
+        image: [buildPublishedBriefImageUrl(brief)],
         url: canonicalUrl,
         mainEntityOfPage: canonicalUrl,
         isAccessibleForFree: true,
