@@ -1,4 +1,5 @@
 import { ReportCta } from "../reportCta";
+import { ScreenshotCaption } from "../screenshotCaption";
 import { ShareRailButton } from "./ShareRailButton";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import { OperatingLoopGlyph, type OperatingLoopStep } from "../illustrations/OperatingLoopGlyph";
@@ -104,8 +105,7 @@ export function CommandCenterNavBlock({
           </p>
         </div>
 
-        {activeStep || showStamp || showActions ? (
-          <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
+        <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
             {activeStep ? (
               /* Phone: hidden. The loop the glyph draws is the bottom bar's
                  row of tabs there, and under the intro it was a second
@@ -115,8 +115,11 @@ export function CommandCenterNavBlock({
               </div>
             ) : null}
 
-            {showStamp ? (
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right">
+            {/* The stamp row also carries the caption: the intro is the block a
+                phone screenshot of a report route catches, and a crop of it
+                should still say whose page it came from. It shares the row
+                rather than adding one, so the first task block does not move. */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right">
                 {/* "Signals refreshed", not "Updated": two dates print inside
                     one viewport (this and "As of" above), and the reader has
                     to be able to tell the pipeline's fetch from the reading's
@@ -125,8 +128,8 @@ export function CommandCenterNavBlock({
                 {resolvedNextRefreshLabel ? (
                   <span>{resolvedNextRefreshLabel}</span>
                 ) : null}
+                <ScreenshotCaption className={showStamp ? "ml-auto lg:ml-0" : undefined} />
               </div>
-            ) : null}
 
             {showActions ? (
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">
@@ -157,8 +160,7 @@ export function CommandCenterNavBlock({
                 ) : null}
               </div>
             ) : null}
-          </div>
-        ) : null}
+        </div>
       </div>
     </section>
   );

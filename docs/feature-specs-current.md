@@ -847,6 +847,13 @@ viewport. Report routes stacked up to six chrome bands before the first task blo
 three, and every one of them computed hero props the shell never read. Each removal names the
 restatement it resolved; the measured result is in the table at the end.
 
+**Screenshot-ready blocks (2026-09-29).** The homepage card and every report intro end in a
+`ScreenshotCaption` (name and host, inside the border), because a phone screenshot is cropped to the
+box before it is pasted. On phones, `FirstVisitExplainer` is hidden for a browser that has rendered
+the brief before (`data-home-returning`, set pre-paint), which puts the call in the top quarter of
+the first screen; the bottom tab bar hides on scroll down. Mobile UI captures render at 3x and save
+the first screen on its own (`*-screen.png`).
+
 **Homepage `/`.** Above the call: `FirstVisitExplainer` keeps its sentence and Dismiss and loses
 its two links (Trust and History are header tabs) and its stage fieldset (the header pill covers
 phones, the hero's tablist covers `sm` and up); the meta row loses the "Data through … ·

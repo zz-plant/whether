@@ -58,21 +58,20 @@
    (controls.css, layout-shells.css). */
 
 /* Hero card. The one surface whose colour is allowed to say something: its
-   wash, border and top-edge light all come from --regime-accent, which the
+   fill, border and top-edge light all come from --regime-accent, which the
    hero sets on itself from the week's regime (data-regime), so the card is
    emerald in a Sunny week, rose in a Freezing one, and cannot disagree with
    the stamp inside it. Before this it was fixed teal — the stripe's colour
-   for Sunny — under every call. The wash sits high and right, where the
-   score is, and fades before it reaches the text; no outer glow, since a box
+   for Sunny — under every call. No outer glow, since a box
    that glows lifts off its page, and the depth ladder below already gives
    the hero the only elevation on the brief. */
 .weather-hero-card {
   position: relative;
-  background:
-    radial-gradient(ellipse 70% 55% at 88% 0%, color-mix(in srgb, var(--regime-accent) 15%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--regime-accent) 4%, transparent) 0%, transparent 45%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%),
-    color-mix(in srgb, var(--bg-panel) 94%, var(--regime-accent) 6%);
+  /* A flat fill, not a wash. This card is the block people screenshot, and
+     every channel it lands in re-encodes the image: a soft gradient on a dark
+     ground comes back as visible bands. The hue carries on the fill, the
+     border and the top edge, which survive any encoder. */
+  background: color-mix(in srgb, var(--bg-panel) 91%, var(--regime-accent) 9%);
   border-color: color-mix(in srgb, var(--regime-accent) 34%, var(--border-strong));
   box-shadow:
     var(--elev-3),
@@ -80,10 +79,7 @@
 }
 
 html[data-theme="light"] .weather-hero-card {
-  background:
-    radial-gradient(ellipse 70% 55% at 88% 0%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--regime-accent) 4%, transparent) 0%, transparent 45%),
-    var(--bg-panel, #ffffff);
+  background: color-mix(in srgb, var(--bg-panel, #ffffff) 95%, var(--regime-accent) 5%);
   border-color: color-mix(in srgb, var(--regime-accent) 30%, var(--border-strong));
   box-shadow:
     var(--elev-2),
@@ -102,14 +98,11 @@ html[data-theme="light"] .weather-hero-card {
 /* Report-page intro. The hero card above is the brief's; this is every other
    route's, and until 2026-09-16 it was plain slate under a status line that
    named the week — a reader on /operate got no colour cue the hero gives on /.
-   Same treatment as the hero at lower weight: the wash sits top-left, behind
-   the title rather than a score, and the border and top edge take the hue at
-   about two thirds of the hero's mix. */
+   Same treatment as the hero at lower weight, flat for the same reason (it is
+   what a screenshot of a report route catches); the border and top edge take
+   the hue at about two thirds of the hero's mix. */
 .weather-page-intro {
-  background:
-    radial-gradient(ellipse 60% 70% at 0% 0%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 70%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008)),
-    color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
+  background: color-mix(in srgb, var(--bg-raised) 93%, var(--regime-accent) 7%);
   border-color: color-mix(in srgb, var(--regime-accent) 24%, var(--border-default));
   box-shadow:
     var(--elev-2),
@@ -117,9 +110,7 @@ html[data-theme="light"] .weather-hero-card {
 }
 
 html[data-theme="light"] .weather-page-intro {
-  background:
-    radial-gradient(ellipse 60% 70% at 0% 0%, color-mix(in srgb, var(--regime-accent) 10%, transparent), transparent 70%),
-    var(--bg-raised);
+  background: color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
   border-color: color-mix(in srgb, var(--regime-accent) 22%, var(--border-default));
   box-shadow:
     var(--elev-2),

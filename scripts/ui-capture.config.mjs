@@ -35,6 +35,13 @@ const liveTargets = liveRoutes.flatMap(({ slug, label, path }) => [
     path,
     viewport: MOBILE,
     fullPage: true,
+    // A phone screenshot is a 3x image of one screen, and that is the picture
+    // of this route that travels. The full page at 1x cannot show either: type
+    // that reads fine at 1x blurs at the size a channel shows it, and what the
+    // top of the page holds is lost in a 7,000px strip. So mobile captures
+    // render at 3x and also save the first screen on its own.
+    deviceScaleFactor: 3,
+    firstScreen: true,
   },
   {
     id: `${slug}-desktop`,

@@ -18,3 +18,14 @@ html:not([data-home-first-visit="true"]) [data-first-visit-only="true"] {
 html[data-home-first-visit="true"] [data-first-visit-collapsible="true"] {
   display: none !important;
 }
+
+/* The explainer, on a phone, for a browser that has rendered the brief before.
+   It costs about 150px above the call there, on every visit, which pushes the
+   card a reader screenshots out of the top of the screen; someone returning has
+   read the line. Wider screens keep it until dismissed, because it costs them
+   nothing the call needs. */
+@media (max-width: 639.98px) {
+  html[data-home-returning="true"] [data-weather-first-run-orientation="true"] {
+    display: none !important;
+  }
+}

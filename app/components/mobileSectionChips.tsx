@@ -24,7 +24,10 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
   const activeSectionId = useActiveSectionId(sectionLinks);
   const navRef = useRef<HTMLElement>(null);
   const activeChipRef = useRef<HTMLAnchorElement>(null);
-  const [hiddenEdges, setHiddenEdges] = useState({ left: false, right: false });
+  /* Right starts hidden: the row is wider than a phone on every route that
+     renders it, and the server's frame is also what a capture taken before
+     hydration shows. The first sync corrects it where the row fits. */
+  const [hiddenEdges, setHiddenEdges] = useState({ left: false, right: true });
 
   useEffect(() => {
     const nav = navRef.current;
@@ -55,47 +58,53 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
   if (sectionLinks.length < 2) return null;
 
   return (
-    <nav
-      ref={navRef}
-      aria-label="Page sections"
-      className="sticky top-0 z-20 -mx-4 overflow-x-auto border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 backdrop-blur [scrollbar-width:none] lg:hidden"
-    >
-      {/* Text tabs with an underline, the register the header and the /operate
-          workstream row use. They were bordered boxes, so a phone met a row of
-          five outlined buttons, clipped at the edge, before the page's title. */}
-      <ul className="flex min-w-max items-center gap-0.5">
-        {sectionLinks.map((section) => {
-          const isActive = section.href === `#${activeSectionId}`;
-          return (
-            <li key={section.href}>
-              <a
-                ref={isActive ? activeChipRef : undefined}
-                href={section.href}
-                aria-current={isActive ? "location" : undefined}
-                className={`-mb-px inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-2.5 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
-                  isActive
-                    ? "border-[color:var(--regime-accent)] text-slate-100 font-semibold"
-                    : "border-transparent text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                {section.label}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
+    /* The fades sit on this wrapper, outside the scroller. Positioned inside
+       it, they scrolled with the chips, so the right fade slid off the edge it
+       marks on the first swipe. The wrapper carries `sticky` too, since a
+       sticky element sticks within its parent. */
+    <div className="sticky top-0 z-20 -mx-4 border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 backdrop-blur lg:hidden">
+      <nav
+        ref={navRef}
+        aria-label="Page sections"
+        className="overflow-x-auto px-2 [scrollbar-width:none]"
+      >
+        {/* Text tabs with an underline, the register the header and the /operate
+            workstream row use. They were bordered boxes, so a phone met a row of
+            five outlined buttons, clipped at the edge, before the page's title. */}
+        <ul className="flex min-w-max items-center gap-0.5">
+          {sectionLinks.map((section) => {
+            const isActive = section.href === `#${activeSectionId}`;
+            return (
+              <li key={section.href}>
+                <a
+                  ref={isActive ? activeChipRef : undefined}
+                  href={section.href}
+                  aria-current={isActive ? "location" : undefined}
+                  className={`-mb-px inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-2.5 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
+                    isActive
+                      ? "border-[color:var(--regime-accent)] text-slate-100 font-semibold"
+                      : "border-transparent text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {section.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
       {hiddenEdges.left ? (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-5 bg-gradient-to-r from-[color:var(--bg-body)] to-transparent"
+          className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[color:var(--bg-body)] from-25% to-transparent"
         />
       ) : null}
       {hiddenEdges.right ? (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[color:var(--bg-body)] to-transparent"
+          className="pointer-events-none absolute inset-y-0 right-0 w-14 bg-gradient-to-l from-[color:var(--bg-body)] from-25% to-transparent"
         />
       ) : null}
-    </nav>
+    </div>
   );
 }

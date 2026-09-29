@@ -58,7 +58,7 @@ const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) :
 
 /*
  * Label collision is a pixel question asked of a percentage track. The labels
- * are centred on their ticks at 10px type, so two neighbours need half of each
+ * are centred on their ticks at 11px type, so two neighbours need half of each
  * label's width between them.
  *
  * A tick carries its number only; the key under the track names the lines, in
@@ -74,8 +74,12 @@ const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) :
  * full-width desktop ladder stacked labels that had room to spare.)
  */
 const LADDER_TRACK_WIDTHS = { narrow: 224, wide: 448 } as const;
-const LABEL_CHAR_PX = 5.6;
-const LABEL_GAP_PX = 6;
+/* 11px ticks and a 12px key, not the 10px both were: a ladder is what a
+   screenshot of /trust or /signals is taken to show, and a channel re-encoding
+   a phone capture takes 10px numbers past reading. The ticks stop at 11px so
+   the common 66/70/76 lines still share one row on a wide track. */
+const LABEL_CHAR_PX = 6.2;
+const LABEL_GAP_PX = 5;
 
 type TrackStyle = CSSProperties & { "--ladder-rows": number; "--ladder-rows-wide": number };
 type MarkStyle = CSSProperties & { "--row": number; "--row-wide": number };
@@ -191,7 +195,7 @@ export function ScoreLadder({
         <span className="tabular-nums text-slate-400">{caption}</span>
       </figcaption>
       <div
-        className="relative h-[calc(34px+var(--ladder-rows)*11px)] @[28rem]:h-[calc(34px+var(--ladder-rows-wide)*11px)]"
+        className="relative h-[calc(38px+var(--ladder-rows)*13px)] @[28rem]:h-[calc(38px+var(--ladder-rows-wide)*13px)]"
         style={trackStyle}
         aria-hidden="true"
       >
@@ -205,7 +209,7 @@ export function ScoreLadder({
           <span
             key={`tick-${line.kind}-${line.value}`}
             data-ladder-tick
-            className={`absolute top-1.5 h-[calc(18px+var(--row)*11px)] w-0.5 -translate-x-1/2 @[28rem]:h-[calc(18px+var(--row-wide)*11px)] ${LINE_CLASS[line.kind].split(" ")[0]}`}
+            className={`absolute top-1.5 h-[calc(18px+var(--row)*13px)] w-0.5 -translate-x-1/2 @[28rem]:h-[calc(18px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[0]}`}
             style={markStyle(clampPercent(line.value, max), row, wideRow)}
           />
         ))}
@@ -214,7 +218,7 @@ export function ScoreLadder({
             key={`label-${line.kind}-${line.value}`}
             data-ladder-row={row}
             data-ladder-row-wide={wideRow}
-            className={`absolute top-[calc(26px+var(--row)*11px)] -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-[var(--bg-body)] px-0.5 text-[10px] leading-none tabular-nums @[28rem]:top-[calc(26px+var(--row-wide)*11px)] ${LINE_CLASS[line.kind].split(" ")[1]}`}
+            className={`absolute top-[calc(26px+var(--row)*13px)] -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-[var(--bg-body)] px-0.5 text-[11px] leading-none tabular-nums @[28rem]:top-[calc(26px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[1]}`}
             style={markStyle(clampPercent(line.value, max), row, wideRow)}
           >
             {tickText(line)}
@@ -234,7 +238,7 @@ export function ScoreLadder({
       </div>
       {/* The lines' key, left to right in the order the ticks sit, so a line
           can be matched by position as well as by colour. */}
-      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] leading-none text-slate-400" data-ladder-key>
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] leading-none text-slate-400" data-ladder-key>
         {narrow.map(({ line }) => (
           <span key={`key-${line.kind}-${line.value}`} className="inline-flex items-center gap-1">
             <span aria-hidden="true" className={`inline-block h-2 w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} />
@@ -246,7 +250,7 @@ export function ScoreLadder({
       {/* The hollow dot's key. It was a tooltip inside an aria-hidden track, so
           a sighted reader had nothing saying which dot was which. */}
       {hasPrevious ? (
-        <p className="flex items-center gap-1.5 text-[10px] leading-none text-slate-400">
+        <p className="flex items-center gap-1.5 text-[12px] leading-none text-slate-400">
           <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-2 border-slate-300" />
           {previousLabel} {formatPoints(previous)}
         </p>

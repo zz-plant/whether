@@ -4,6 +4,7 @@ import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import type { RegimeKey } from "../../lib/types";
 import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
 import { TrustStrip, type TrustStripProps } from "./trustStrip";
+import { ScreenshotCaption } from "./screenshotCaption";
 import { Sun, Cloud, Zap, Snowflake } from "lucide-react";
 
 type Props = {
@@ -21,6 +22,12 @@ type Props = {
    * document outline.
    */
   titleLevel?: "h1" | "h2";
+  /**
+   * Which reading this is, for the caption at the foot of the card. Only an
+   * archived week passes one: a live card dates itself in the trust strip, and
+   * an archived card has no strip, so a crop of it would otherwise carry no date.
+   */
+  captionDetail?: string;
 };
 
 const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
@@ -52,6 +59,7 @@ export function DecisionHero({
   regime,
   trust,
   titleLevel = "h1",
+  captionDetail,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -115,7 +123,7 @@ export function DecisionHero({
         </TitleTag>
 
         {detail ? (
-          <p className="max-w-xl text-xs leading-relaxed text-slate-300 sm:text-sm">{detail}</p>
+          <p className="max-w-xl text-sm leading-relaxed text-slate-300">{detail}</p>
         ) : null}
 
         {/* Freshness and confidence, once, where every reading route puts them:
@@ -123,6 +131,13 @@ export function DecisionHero({
             trust line at the foot of the card both said this; neither said it
             where a reader deciding whether to act would look first. */}
         {trust ? <TrustStrip {...trust} href="/trust" className="pt-1" /> : null}
+
+        {/* The card is the block people screenshot and crop, so it names its
+            own source inside its border. */}
+        <ScreenshotCaption
+          detail={captionDetail}
+          className="mt-1 border-t border-[color:var(--border-faint)] pt-2.5"
+        />
       </div>
     </section>
   );
