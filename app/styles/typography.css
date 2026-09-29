@@ -47,7 +47,7 @@
   /* An eyebrow is a label, whatever element carries it. Without this, the
      `:where(h1, h2)` display-face rule below set every h2 eyebrow in the serif
      while the p eyebrows beside them stayed sans — "SIGNAL WATCHES" in
-     Fraunces above "CURVE CONTEXT" in Plex, on the same page, in the same
+     the serif above "CURVE CONTEXT" in Plex, on the same page, in the same
      colour. Same trap .text-display documents. */
   font-family: var(--font-sans);
 }

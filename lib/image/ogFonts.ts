@@ -13,7 +13,7 @@
  * font loader for any glyph outside its default face, and that download failing
  * aborts the render mid-stream (a 200 with an empty body, not an error).
  */
-export const OG_FONT_DISPLAY = "Fraunces";
+export const OG_FONT_DISPLAY = "IBM Plex Serif";
 export const OG_FONT_BODY = "IBM Plex Sans";
 
 /**
@@ -57,7 +57,7 @@ type OgFont = {
 };
 
 const FACES: ReadonlyArray<{ path: string; name: string; weight: 400 | 600 }> = [
-  { path: "/fonts/og/fraunces-600.ttf", name: OG_FONT_DISPLAY, weight: 600 },
+  { path: "/fonts/og/ibm-plex-serif-600.ttf", name: OG_FONT_DISPLAY, weight: 600 },
   { path: "/fonts/og/ibm-plex-sans-400.ttf", name: OG_FONT_BODY, weight: 400 },
   { path: "/fonts/og/ibm-plex-sans-600.ttf", name: OG_FONT_BODY, weight: 600 },
 ];

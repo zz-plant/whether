@@ -102,7 +102,7 @@ export function ScenarioDeltas({
         </div>
 
         {simulatedPlaybook.playbook && (
-          <div className="weather-surface p-4 border-l-4 border-sky-400">
+          <div className="weather-surface p-4 !border-l-4 !border-l-sky-400">
             <p className="type-eyebrow text-sky-200">Guidance in this scenario</p>
             <p className="mt-1 text-base font-semibold text-slate-100">
               &quot;{simulatedPlaybook.playbook.mandate}&quot;

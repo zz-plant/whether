@@ -102,7 +102,7 @@ export const SignalsWhatChangedSection = ({
               variant="pill"
               href={toRoute(buildSignalsFocusHref(searchParams, focus))}
               aria-current={isActive ? "page" : undefined}
-              className={isActive ? "border-sky-300/80" : "text-slate-300"}
+              className={isActive ? undefined : "text-slate-300"}
             >
               {focusLabelByTab[focus]}
             </ActionLink>

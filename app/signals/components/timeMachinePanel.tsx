@@ -362,7 +362,7 @@ export const TimeMachinePanel = ({
           {statusMessages.length > 0 ? (
             <output
               id={statusMessages.some((message) => message.includeId) ? errorId : undefined}
-              className="weather-surface block space-y-2 border border-amber-400/20 bg-amber-500/8 p-4 text-sm text-amber-100"
+              className="weather-surface block space-y-2 !border-amber-400/30 !bg-amber-500/8 p-4 text-sm text-amber-100"
               aria-live="polite"
             >
               {statusMessages.map((message) => (
