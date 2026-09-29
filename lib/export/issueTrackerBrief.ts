@@ -18,6 +18,7 @@ import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, buil
 import { describeBaseRateSource, describeConditions, formatExportConfidenceWord } from "./exportTerms";
 import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { resolvePublishedConfidence } from "../report/confidence";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { formatDecisionReversal, formatDecisionThreshold } from "../report/reportFormatting";
 import { buildSharedCorridorRails, type ActionStripItem } from "../report/operatingCalls";
@@ -27,7 +28,6 @@ import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 type IssueTrackerFormat = "markdown" | "wiki";
 
 type ExportDecisionModel = ModeledExportDecisionPayload & {
-  confidenceLabel?: "HIGH" | "MED" | "LOW";
   confidencePercent?: number;
   compactFlipConditionLabels?: string[];
   canonicalDecisionCopy?: CanonicalDecisionCopy;
@@ -104,7 +104,7 @@ export const buildIssueTrackerMarkdownBrief = (
     "",
     ...buildExportStamp(
       treasury,
-      `${formatExportConfidenceWord(decisionModel?.confidenceLabel ?? assessment.diagnostics.confidence)} (how far the scores sit from the line where conditions change)`,
+      `${formatExportConfidenceWord(resolvePublishedConfidence({ assessment, record: treasury }).label)} (how far the scores sit from the line where conditions change)`,
     ),
   ].join("\n");
 };

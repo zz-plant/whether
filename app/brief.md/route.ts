@@ -85,7 +85,6 @@ export function buildBriefMarkdown(homepage: HomePage): string {
     treasury: reportData.treasury,
     date: reportData.weeklyRecordDate,
     postureWithStageLabel: postureLabel,
-    confidenceLabel,
     actionStripItems: actionItems,
     flipConditionLabels,
     canonicalDecisionCopy: homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy,

@@ -10,7 +10,7 @@ import {
   buildRoleAwareOperatingTemplates,
   buildThresholdBusinessConsequence,
 } from "../operatingCalls";
-import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolveConfidencePercent, resolvePublishedConfidenceLabel } from "../confidence";
+import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { formatThresholdNumber } from "../../formatters";
@@ -19,7 +19,6 @@ import {
   REGIME_SEVERITY_RANK,
   getRegimeDisplayLabel,
   getRegimePublicLabel,
-  type RegimeConfidenceLabel,
   type RegimeMomentum,
 } from "../../regimePresentation";
 import {
@@ -273,14 +272,12 @@ export const buildHomeBriefModelInternal = (
   const recordDateAgeHours = isFallbackData && treasury?.record_date
     ? Math.max(0, (Date.now() - Date.parse(`${treasury.record_date}T00:00:00.000Z`)) / 3_600_000)
     : 0;
-  const confidenceLabel: RegimeConfidenceLabel = resolvePublishedConfidenceLabel({
-    scores: assessment.scores,
-    thresholds: assessment.thresholds,
-    isFallbackData,
-    recordDate: treasury?.record_date,
+  const { label: confidenceLabel, percent: confidencePercent } = resolvePublishedConfidence({
+    assessment,
+    record: treasury,
+    historical: Boolean(historicalSelection),
   });
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
-  const confidencePercent = resolveConfidencePercent(assessment);
   const signalConfidenceReason = buildSignalConfidenceReason({
     confidenceLabel,
     nearestThresholdGap,
@@ -337,10 +334,6 @@ export const buildHomeBriefModelInternal = (
   const weeklyLeadershipSummary = buildWeeklyLeadershipBriefModel({
     assessment,
     previousAssessment,
-    treasury: {
-      ...treasury,
-      isLive: !(treasury?.fallback_at || treasury?.fallback_reason),
-    },
     last4Boldness: [],
     hiringTrendDelta: (weeklyDeltaBySignal.get("riskAppetite") ?? 0) - (weeklyDeltaBySignal.get("tightness") ?? 0),
     stabilityWeeks: transitionWatch === "ON" ? 1 : 2,
@@ -557,8 +550,10 @@ export const buildHomeBriefModelInternal = (
       regimeSeries,
       historicalSelection,
     }),
-    confidenceLabel: postureState?.currentState.confidenceLabel ?? confidenceLabel,
-    confidencePercent: postureState?.currentState.confidencePercent ?? confidencePercent,
+    /* Never the posture state's own: that contract reads the same function, and
+       preferring it is how /operate and /trust said Medium where / said High. */
+    confidenceLabel,
+    confidencePercent,
     signalConfidenceReason: policyOverrideActive
       ? joinSentences(
           signalConfidenceReason,

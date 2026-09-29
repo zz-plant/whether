@@ -9,6 +9,7 @@ import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import { buildFlipThreshold } from "../report/reportEvidence";
 import type { PostureStateContract } from "../report/postureStateContract";
+import { resolvePublishedConfidence } from "../report/confidence";
 import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
@@ -43,6 +44,8 @@ const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
     confidence,
   });
 
+type PublishedConfidenceLabel = ReturnType<typeof resolvePublishedConfidence>["label"];
+
 type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
   postureWithStageLabel?: string;
@@ -53,7 +56,6 @@ type ExportLayerOptions = {
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
   failureModes?: Array<{ warning: string; mitigationCheck: string }>;
   actionStripItems?: ActionStripItem[];
-  confidenceLabel?: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
   postureState?: PostureStateContract;
   modeledDecision?: ModeledExportDecisionPayload;
@@ -209,15 +211,22 @@ export const buildReadingLines = (assessment: RegimeAssessment, options?: Export
   });
 };
 
-const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+const buildViralArtifactBlock = (
+  assessment: RegimeAssessment,
+  confidenceLabel: PublishedConfidenceLabel,
+  options?: ExportLayerOptions,
+) => {
   const modeled = resolveModeledDecisionPayload(options);
 
   if (!modeled.operatingStanceLine) {
     return [];
   }
 
+  /* This read the posture state's label, and every caller but one passed no
+     posture state, so "confidence is not high" printed on every /share paste
+     whatever the reading. */
   const trustMarkers = [
-    options?.postureState?.currentState.confidenceLabel !== "HIGH" ? "confidence is not high" : "",
+    confidenceLabel !== "HIGH" ? "confidence is not high" : "",
     !options?.freshnessLabel || options.freshnessLabel === "Unavailable" ? "no live reading this week" : "",
   ].filter((marker) => marker.length > 0);
   const actionStripItems = modeled.actionStripItems ?? [];
@@ -293,9 +302,9 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
  * twice under two headers; the mitigation check now sits under the warning it
  * belongs to.
  */
-const buildWhyThisCouldBeWrongBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+const buildWhyThisCouldBeWrongBlock = (confidenceLabel: PublishedConfidenceLabel, options?: ExportLayerOptions) => {
   const mode = options?.failureModes?.[0];
-  const confidenceLine = formatExportConfidence(options?.confidenceLabel ?? assessment.diagnostics.confidence);
+  const confidenceLine = formatExportConfidence(confidenceLabel);
   const whyCouldBeWrong = mode?.warning
     ?? "The scores sit near a line; a small move could change conditions. Hold anything you can't undo.";
 
@@ -362,6 +371,7 @@ export const buildSlackBrief = (
   const citations = buildCitationLines(treasury, macros);
   const conditionsLabel = describeConditions(assessment.regime, modeled.postureWithStageLabel);
   const areaRows = buildAreaRowLines(options);
+  const confidenceLabel = resolvePublishedConfidence({ assessment, record: treasury }).label;
 
   /*
    * The page's order: the call, what changed, what that changes for you, what
@@ -384,8 +394,8 @@ export const buildSlackBrief = (
     "",
     "What to hold:",
     ...assessment.constraints.map((item) => `• ${item}`),
-    ...buildWhyThisCouldBeWrongBlock(assessment, options),
-    ...buildViralArtifactBlock(assessment, options),
+    ...buildWhyThisCouldBeWrongBlock(confidenceLabel, options),
+    ...buildViralArtifactBlock(assessment, confidenceLabel, options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),
     "",
@@ -417,7 +427,7 @@ export const buildCallCitation = (
 ) => [
   `Whether Weekly Brief — ${treasury.record_date}`,
   `Conditions: ${describeConditions(assessment.regime, options?.postureWithStageLabel)}`,
-  `${formatExportConfidence(assessment.diagnostics.confidence)} (how far the scores sit from the line where conditions change)`,
+  `${formatExportConfidence(resolvePublishedConfidence({ assessment, record: treasury }).label)} (how far the scores sit from the line where conditions change)`,
   `Source note: ${treasury.source}`,
   buildBriefPermalinkLine(treasury.record_date),
   ...buildInterpretationLayerBlock(options),

@@ -1167,6 +1167,26 @@ of them, which is less obvious.
 
   Still true: the scale tops out for most months. 51% of them report the 92% ceiling, and only 14
   distinct values have ever been produced.
+
+  **One reading had three confidences until 2026-09-28, and now has one.** On the week of Sep 22,
+  `/` and `/signals` said High while `/operate` and `/trust` said Medium ("Live · reduced
+  confidence") and every `/share` paste said Medium and "Confidence is not high". The trust strip
+  builder was already shared; what callers handed it was not. The engine's `diagnostics.confidence`
+  and a copy of it in the posture-state contract both ranked the raw gap, where a risk-appetite
+  point is a 4.5x larger move than a funding-pressure point: the defect the normalisation above
+  fixed, still live in two places. That week sat 20 points from the nearest line and 7 raw points
+  from the risk line, so the rules disagreed, and the brief model preferred the contract's label on
+  every route that built one. Every surface that prints the word or the percent (pages, the posture
+  state the APIs serve, every export, the email, the confidence-drop alert, the CLI) now reads
+  `resolvePublishedConfidence` in `lib/report/confidence.ts`, which also decides once what counts as
+  a stale fallback. `tests/trustStripAgreement.test.tsx` runs `/`, `/signals`, `/operate`, `/trust`,
+  the posture state and every `/share` paste through the real loader against that week's reading.
+
+  The engine's label stays: it is the state machine's confirmation gate, and a gate is not a
+  published fact. Its other readers are the alert-rule gate in `lib/signalOps.ts`, the band stored
+  on transition events, and `lib/summary/*`. The last one still prints it, in the `summary` block
+  of `/api/weekly` and `/api/monthly` and in the generated monthly archive; moving it rewrites
+  archived text on the next regeneration, so it is its own change.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.

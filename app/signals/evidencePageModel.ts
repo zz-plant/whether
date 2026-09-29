@@ -16,7 +16,7 @@ import {
   buildSignalReferenceRows,
   buildTrustStripProps,
 } from "../../lib/report/evidenceReaderModel";
-import { resolvePublishedConfidenceLabel } from "../../lib/report/confidence";
+import { resolvePublishedConfidence } from "../../lib/report/confidence";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
@@ -196,12 +196,11 @@ const deriveSignalsPageModel = (
     isFallback,
     isHistorical: Boolean(historicalSelection),
     degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
-    confidenceLabel: resolvePublishedConfidenceLabel({
-      scores: assessment.scores,
-      thresholds: assessment.thresholds,
-      isFallbackData: isFallback && !historicalSelection,
-      recordDate: treasury.record_date,
-    }),
+    confidenceLabel: resolvePublishedConfidence({
+      assessment,
+      record: treasury,
+      historical: Boolean(historicalSelection),
+    }).label,
     assessment,
   });
   const triggerCondition = guardrailThreshold?.trim().length

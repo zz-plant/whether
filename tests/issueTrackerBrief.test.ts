@@ -56,7 +56,6 @@ describe("buildIssueTrackerMarkdownBrief", () => {
   it("prints the modeled label and never the engine key beside it", () => {
     const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros, {
       postureWithStageLabel: "Sunny — Late",
-      confidenceLabel: "HIGH",
     });
 
     assert.match(brief, /\*\*Conditions:\*\* Sunny — Late \(money is cheap and available\)/);
@@ -65,12 +64,17 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     assert.match(brief, /Confidence: High \(how far the scores sit/);
   });
 
-  it("stamps what confidence measures when no confidence label is modeled", () => {
-    const brief = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
+  it("stamps the reading's published confidence, not the engine's code", () => {
+    // The fixture's engine code says MEDIUM; its scores are 58 and 18 points
+    // out (81 on the tightness scale), which publishes as High.
+    const far = buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros);
+    assert.match(far, /Confidence: High \(how far the scores sit from the line where conditions change\)/);
+    assert.doesNotMatch(far, /MEDIUM/);
 
-    // With no modeled label the stamp still prints a value, from the reading itself.
-    assert.match(brief, /Confidence: Medium \(how far the scores sit from the line where conditions change\)/);
-    assert.doesNotMatch(brief, /MEDIUM/);
+    // Two points under the risk line is nine on the tightness scale: Medium.
+    const nearLine = { ...assessment, scores: { ...assessment.scores, riskAppetite: 48 } };
+    const near = buildIssueTrackerMarkdownBrief(nearLine, treasury, sensors, macros);
+    assert.match(near, /Confidence: Medium \(how far the scores sit/);
   });
 
   it("produces identical bytes for Jira and Linear, which both consume markdown", () => {

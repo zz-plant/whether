@@ -19,7 +19,7 @@ export async function GET() {
     buildExtraPayload: async ({ reportData, summary }) => {
       const { assessment, treasury, sensors, macroSeries, reportDynamics, actionNowShort, startItems, stopItems } = reportData;
       const postureState = await buildPostureState({
-        recordDate: treasury.record_date,
+        record: treasury,
         assessment,
         reportDynamics,
       });

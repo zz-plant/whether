@@ -18,6 +18,7 @@ import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import type { MonthlyRegimeHistoryEntry } from "../summary/monthlyRegimeHistory";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
+import { resolvePublishedConfidence, type ConfidenceRecord } from "../report/confidence";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { pauseConditionOnly, SAVED_COPY_NOTE } from "./exportTerms";
 import { signalReadingMeaning } from "../report/signalTranslations";
@@ -53,9 +54,9 @@ const RUNWAY_IMPLICATIONS: Record<RunwayBand, string> = {
     "With more than two years of runway we are [what the cushion is going on], without loosening the payback bar.",
 };
 
-const CONFIDENCE_PHRASES: Record<RegimeAssessment["diagnostics"]["confidence"], string> = {
+const CONFIDENCE_PHRASES: Record<ReturnType<typeof resolvePublishedConfidence>["label"], string> = {
   HIGH: "well clear of the line where they would change",
-  MEDIUM: "within reach of the line where they would change",
+  MED: "within reach of the line where they would change",
   LOW: "close to the line where they would change",
 };
 
@@ -88,14 +89,15 @@ const describeMove = (current: number, previous: number | undefined) => {
 
 export const buildInvestorUpdateSnippetParts = ({
   assessment,
-  recordDate,
+  record,
   weeklyCall,
   monthlyHistory,
   sourceLabel,
   isFallback = false,
 }: {
   assessment: RegimeAssessment;
-  recordDate: string;
+  /** The treasury record the assessment was read from. */
+  record: ConfidenceRecord & { record_date: string };
   weeklyCall: Pick<WeeklyCallContract, "actionNow" | "pauseIf" | "callChangesIf" | "resumeWhen">;
   monthlyHistory: readonly MonthlyRegimeHistoryEntry[];
   sourceLabel: string;
@@ -103,8 +105,9 @@ export const buildInvestorUpdateSnippetParts = ({
 }): InvestorUpdateSnippetParts => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
   const { tightness, riskAppetite } = assessment.scores;
+  const recordDate = record.record_date;
   const prior = findPriorMonthEnd(monthlyHistory, recordDate);
-  const confidence = CONFIDENCE_PHRASES[assessment.diagnostics.confidence];
+  const confidence = CONFIDENCE_PHRASES[resolvePublishedConfidence({ assessment, record }).label];
 
   const regimeSentence = prior
     ? prior.regime === assessment.regime

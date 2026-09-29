@@ -39,7 +39,7 @@ mockAny.module("next/navigation", () => ({
 const reportData = buildReportDataFixture({ fetchedAtLabel: "2026-03-01T00:00:00Z" });
 const postureState = buildPostureStateContract({
   assessment: reportData.assessment,
-  recordDate: reportData.treasury.record_date,
+  record: reportData.treasury,
   postureLabel: "Cloudy",
   decisionEventStore: [],
 });

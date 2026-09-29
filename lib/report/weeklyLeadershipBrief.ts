@@ -1,5 +1,4 @@
 import type { RegimeAssessment } from "../regimeEngine";
-import type { TreasuryData } from "../types";
 
 type TrendLabel = "Strengthening" | "Flat" | "Cooling";
 
@@ -17,12 +16,9 @@ type WeeklyLeadershipAssessment = Pick<RegimeAssessment, "regime"> & {
   inputs?: RegimeAssessment["inputs"];
 };
 
-type WeeklyLeadershipTreasury = Pick<TreasuryData, "isLive">;
-
 type WeeklyLeadershipBriefInputs = {
   assessment: WeeklyLeadershipAssessment;
   previousAssessment: WeeklyLeadershipAssessment | null;
-  treasury: WeeklyLeadershipTreasury;
   last4Boldness: number[];
   hiringTrendDelta: number;
   stabilityWeeks: number;
@@ -79,7 +75,6 @@ export const getNetDeltaLabel = (delta: number) => {
 export const buildWeeklyLeadershipBriefModel = ({
   assessment,
   previousAssessment,
-  treasury,
   hiringTrendDelta,
   stabilityWeeks,
 }: WeeklyLeadershipBriefInputs) => {
@@ -139,7 +134,6 @@ export const buildWeeklyLeadershipBriefModel = ({
     riskDelta,
     curveDelta,
     hiringTrend,
-    confidenceLabel: treasury.isLive ? "High" : "Medium",
     inputsComplete: assessment.inputs?.every((input) => input.value !== null) ?? true,
     // Keep `steadyWeek` and `notchShiftLabel` derived from the same threshold so
     // the "nothing moved" copy and the notch counter can never disagree.

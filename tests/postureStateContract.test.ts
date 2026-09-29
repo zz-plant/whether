@@ -74,7 +74,7 @@ describe("posture state contract consumers", () => {
   it("keeps homepage, exports, and integration envelope aligned", () => {
     const postureState = buildPostureStateContract({
       assessment,
-      recordDate: treasury.record_date,
+      record: treasury,
       postureLabel: "Contraction",
       decisionEventStore: [
         buildPostureTransitionEvent({
@@ -106,7 +106,6 @@ describe("posture state contract consumers", () => {
       treasury,
       postureState,
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-      confidenceLabel: homeBriefModel.confidenceLabel,
       actionStripItems: homeBriefModel.actionStripItems,
       flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
     });
@@ -151,7 +150,7 @@ describe("posture state contract under a held call", () => {
 
     const postureState = buildPostureStateContract({
       assessment: held,
-      recordDate: "2026-09-11",
+      record: { record_date: "2026-09-11" },
       postureLabel: "Sunny",
       decisionEventStore: [],
     });
@@ -169,7 +168,7 @@ describe("posture state contract under a held call", () => {
   it("reports null when the readings agree with the call", () => {
     const postureState = buildPostureStateContract({
       assessment,
-      recordDate: "2026-03-01",
+      record: { record_date: "2026-03-01" },
       postureLabel: "Cloudy",
       decisionEventStore: [],
     });

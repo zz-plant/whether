@@ -5,6 +5,7 @@ import { decisionAreaLabel } from "../boundedDecisionRules";
 import { getRegimePublicLabel } from "../../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../publishedBriefs";
+import { resolvePublishedConfidence, type ConfidenceInputs } from "../confidence";
 
 type HomePageAssembly = Awaited<ReturnType<typeof assembleHomePage>>;
 type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
@@ -135,17 +136,14 @@ export const buildBriefArtifactFromSnapshot = ({
 }: {
   reportData: {
     recordDateLabel: string;
-    assessment: {
-      regime: string;
-      scores: { tightness: number; riskAppetite: number };
-      diagnostics: { confidence: string };
-    };
+    assessment: ConfidenceInputs & { regime: string };
     treasury: {
       record_date: string;
       source?: string;
       fallback_at?: string | null;
       fallback_reason?: string | null;
     };
+    historicalSelection?: unknown;
   };
   weeklyCall: WeeklyCallContract;
   title: string;
@@ -169,7 +167,14 @@ export const buildBriefArtifactFromSnapshot = ({
     postureLabel: weeklyCall.regimeStage,
     tightness: reportData.assessment.scores.tightness,
     riskAppetite: reportData.assessment.scores.riskAppetite,
-    confidenceLabel: reportData.assessment.diagnostics.confidence,
+    /* The published label, as the homepage adapter above gets it from the
+       card. This was the engine's, so the copy on /share and /operate said
+       "medium" on a week the homepage's said "high". */
+    confidenceLabel: resolvePublishedConfidence({
+      assessment: reportData.assessment,
+      record: reportData.treasury,
+      historical: Boolean(reportData.historicalSelection),
+    }).label,
     source: source?.startsWith("http") ? "FRED" : source ?? "FRED",
     permalinkPath: citableBrief ? buildPublishedBriefPath(citableBrief.slug) : undefined,
     isFallback: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),

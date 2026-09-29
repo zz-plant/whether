@@ -32,7 +32,6 @@ describe("weeklyLeadershipBrief helpers", () => {
     const model = buildWeeklyLeadershipBriefModel({
       assessment,
       previousAssessment: null,
-      treasury: snapshotData,
       last4Boldness: [58, 61, 59, 63],
       hiringTrendDelta: 4,
       stabilityWeeks: 3,

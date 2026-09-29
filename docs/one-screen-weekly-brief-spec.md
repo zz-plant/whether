@@ -148,6 +148,8 @@ nowhere rather than invented.
 
 **Rules:**
 - Keep to one row.
+- The confidence band is `resolvePublishedConfidence` (`lib/report/confidence.ts`) on every route
+  and export; no surface prints the engine's `diagnostics.confidence`.
 - Do not append methodological footnotes here.
 
 ---

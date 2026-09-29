@@ -11,9 +11,7 @@ import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCop
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { buildFlipProximity } from "../report/flipProximity";
-
-/** The confidence line when no label was modeled: what the number measures rather than a grade. */
-const CONFIDENCE_FROM_DISTANCE = "Confidence from how far the scores sit from the line where conditions change";
+import { resolvePublishedConfidence } from "../report/confidence";
 
 type WeeklyOperatorBriefPayload = {
   date: string;
@@ -79,7 +77,6 @@ export const buildWeeklyOperatorBriefPayload = ({
   treasury,
   date,
   postureWithStageLabel,
-  confidenceLabel,
   actionStripItems = [],
   flipConditionLabels = [],
   postureState,
@@ -92,7 +89,6 @@ export const buildWeeklyOperatorBriefPayload = ({
   treasury: TreasuryData;
   date?: string;
   postureWithStageLabel?: string;
-  confidenceLabel?: "HIGH" | "MED" | "LOW";
   actionStripItems?: ActionStripItem[];
   flipConditionLabels?: string[];
   postureState?: PostureStateContract;
@@ -112,6 +108,9 @@ export const buildWeeklyOperatorBriefPayload = ({
         line: weeklyLeadershipSummary.shorthandLine,
       }
     : undefined;
+  /* From the reading, not from a caller. This took an optional label and fell
+     back to a sentence with no band in it, and the /share caller passed none. */
+  const confidenceLabel = resolvePublishedConfidence({ assessment, record: treasury }).label;
 
   if (weeklyCall) {
     return {
@@ -119,7 +118,7 @@ export const buildWeeklyOperatorBriefPayload = ({
       boldnessBudget,
       regimeStage: weeklyCall.regimeStage,
       conditions: describeConditions(assessment.regime, weeklyCall.regimeStage),
-      confidence: confidenceLabel ? formatExportConfidence(confidenceLabel) : CONFIDENCE_FROM_DISTANCE,
+      confidence: formatExportConfidence(confidenceLabel),
       currentCall: weeklyCall.currentCall,
       actionNow: weeklyCall.actionNow,
       pauseIf: weeklyCall.pauseIf,
@@ -145,7 +144,6 @@ export const buildWeeklyOperatorBriefPayload = ({
 
   const canonicalDoNowLines = canonicalDecisionCopy?.doNowLines ?? [];
   const canonicalFlipConditions = canonicalDecisionCopy?.flipConditions ?? [];
-  const postureConfidenceLabel = postureState?.currentState?.confidenceLabel ?? confidenceLabel;
   const postureFlipTrigger = postureState?.whatFlipsNext?.flipTrigger;
   const postureFlipConditions = [...(postureState?.whatFlipsNext?.thresholds ?? [])];
   const resolvedFlipTrigger =
@@ -184,7 +182,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     boldnessBudget,
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? getRegimePublicLabel(assessment.regime),
     conditions: describeConditions(assessment.regime, canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel),
-    confidence: confidenceLabel ? formatExportConfidence(confidenceLabel) : CONFIDENCE_FROM_DISTANCE,
+    confidence: formatExportConfidence(confidenceLabel),
     currentCall,
     actionNow,
     pauseIf,
@@ -192,7 +190,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     callChangesIf: resolvedFlipTrigger,
     doNowBullets: canonicalDoNowLines.length > 0 ? canonicalDoNowLines : doNowBullets,
     whyCouldBeWrong:
-      postureConfidenceLabel === "HIGH"
+      confidenceLabel === "HIGH"
         ? "The sources agree this week and can stop agreeing before next Monday. Hold anything you can't undo until then."
         : "Confidence is not high: a score sits near a line, and a small move could change conditions.",
     flipTrigger: resolvedFlipTrigger,
