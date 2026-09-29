@@ -1218,8 +1218,10 @@ week any more.
   toward tighter money since Aug 31.") and both ladders' hollow dot; `/signals` (table head, each row's move,
   score cells, call-line ladders); `/trust` ladders; `/share`, Slack and every paste ("… · 14 pts above ·
   was 63 on Aug 31 · resume line 66 (24 pts away)"), the "• vs Aug 31: worse" direction line and the
-  Operating latitude line; the `/api/posture/current` summary; the home brief's own labels (posture delta,
-  indicator deltas, net delta, and the weekly-movement sentence the published-brief record freezes).
+  Operating latitude line; the `/api/posture/current` summary; the agent payload's `decision_delta`
+  (`compared_with: { record_date, label }` beside `from` and `delta`, and a summary that says "since Aug 31");
+  the home brief's own labels (posture delta, indicator deltas, net delta, and the weekly-movement sentence the
+  published-brief record freezes).
 - **The brief card has the earlier reading back.** `pause line 76 · 14 pts above · was 63 on Aug 31` is
   one row at the card's 24px type; `tests/briefImageRoute.test.ts` holds the longest dated detail line
   ("Dec 31, 2025") to one row, because a wrapped row is a fourth line and the 800px budget (769px with

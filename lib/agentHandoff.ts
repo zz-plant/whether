@@ -5,6 +5,7 @@
 import { buildCanonicalBoundedDecisionRules, decisionAreaLabel } from "./report/boundedDecisionRules";
 import type { PostureStateContract } from "./report/postureStateContract";
 import type { ReportDynamics } from "./report/reportData";
+import { comparisonBasis } from "./report/comparisonBasis";
 import type { RegimeAssessment } from "./regimeEngine";
 import { agentSkills } from "./agentSkills";
 import { getRegimePublicLabel } from "./regimePresentation";
@@ -40,7 +41,7 @@ const buildSignals = (
 };
 
 type AgentDecisionSupport = {
-  reportDynamics: Pick<ReportDynamics, "changedSignals" | "directionLabel" | "regimeChanged">;
+  reportDynamics: Pick<ReportDynamics, "changedSignals" | "directionLabel" | "regimeChanged" | "comparedWith">;
   actionNowShort: string;
   startItems: string[];
   stopItems: string[];
@@ -113,19 +114,28 @@ const buildDecisionDelta = (assessment: RegimeAssessment, support: AgentDecision
     };
   });
 
+  /* The moves are against the previous monthly snapshot, so a week that records
+     its date says "since Aug 31" where these sentences said "this week" or
+     "weekly" (`comparisonBasis`); a week that does not keeps the old words. An
+     agent that acts on `from` and `delta` needs to know what `from` is. */
+  const basis = comparisonBasis(support.reportDynamics.comparedWith);
   /* "No material weekly signal delta" is a finding; an agent reading it will
      report it as one. Without a previous reading there is no finding to pass
      on, only the current call. */
   const summary = support.reportDynamics.directionLabel === "unavailable"
     ? `No previous reading to compare this week against. ${support.actionNowShort}`
     : support.reportDynamics.regimeChanged
-      ? `Regime changed this week. ${support.actionNowShort}`
+      ? `Regime changed ${basis.date ? basis.since : "this week"}. ${support.actionNowShort}`
       : changedSignals.length === 0
-        ? `No material weekly signal delta. ${support.actionNowShort}`
-        : `${titleCase(support.reportDynamics.directionLabel)} weekly signal move. ${support.actionNowShort}`;
+        ? `No material ${basis.date ? `signal delta ${basis.since}` : "weekly signal delta"}. ${support.actionNowShort}`
+        : `${titleCase(support.reportDynamics.directionLabel)} ${basis.date ? `signal move ${basis.since}` : "weekly signal move"}. ${support.actionNowShort}`;
 
   return {
     summary,
+    /** The earlier reading `from` and `delta` are measured against; null where the source did not date it. */
+    compared_with: support.reportDynamics.comparedWith
+      ? { record_date: support.reportDynamics.comparedWith.recordDate, label: support.reportDynamics.comparedWith.label }
+      : null,
     regime_changed: support.reportDynamics.regimeChanged,
     direction_label: support.reportDynamics.directionLabel,
     decision_now: support.actionNowShort,

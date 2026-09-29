@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildAgentPayload, buildAgentPrompt } from "../lib/agentHandoff";
-import type { RegimeAssessment } from "../lib/regimeEngine";
+import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
+import { buildPostureStateContract } from "../lib/report/postureStateContract";
+import { buildSensorReadings } from "../lib/sensors";
+import { snapshotData } from "../lib/snapshot";
 import type { TreasuryData } from "../lib/types";
 
 const assessment = {
@@ -135,6 +138,39 @@ describe("agent handoff contract", () => {
     assert.equal(payload.flip_watch?.two_weak_reads_warning, true);
     assert.ok(payload.decision_rules.some((rule) => rule.area === "burn-discipline"));
     assert.ok(payload.decision_rules.every((rule) => typeof rule.pause_trigger === "string"));
+  });
+
+  it("names the reading its moves are measured against, so an agent knows what `from` is", () => {
+    const realAssessment = evaluateRegime(snapshotData);
+    const build = (comparedWith?: { recordDate: string; label: string }) =>
+      buildAgentPayload(realAssessment, snapshotData, buildSensorReadings(snapshotData), [], {
+        decisionSupport: {
+          reportDynamics: {
+            changedSignals: [{ key: "tightness", label: "Funding pressure", delta: 2 }],
+            directionLabel: "deteriorating",
+            regimeChanged: false,
+            ...(comparedWith ? { comparedWith } : {}),
+          },
+          actionNowShort: "Tighten approvals now.",
+          startItems: [],
+          stopItems: [],
+          postureState: buildPostureStateContract({
+            assessment: realAssessment,
+            record: snapshotData,
+            postureLabel: "Cloudy",
+            decisionEventStore: [],
+          }),
+        },
+      });
+
+    const dated = build({ recordDate: "2026-08-31", label: "Aug 31" });
+    assert.deepEqual(dated.decision_delta?.compared_with, { record_date: "2026-08-31", label: "Aug 31" });
+    assert.equal(dated.decision_delta?.summary, "Deteriorating signal move since Aug 31. Tighten approvals now.");
+
+    // A week that does not date its comparison keeps the sentence it always had, and says so with null.
+    const undated = build();
+    assert.equal(undated.decision_delta?.compared_with, null);
+    assert.equal(undated.decision_delta?.summary, "Deteriorating weekly signal move. Tighten approvals now.");
   });
 
   it("updates the prompt to request decision delta and flip watch outputs", () => {
