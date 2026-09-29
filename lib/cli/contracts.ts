@@ -251,6 +251,6 @@ export const buildScenarioContract = ({ postureBefore, postureAfter, inputs }: {
   },
   implication:
     postureBefore !== postureAfter
-      ? "Increase willingness to commit only after two consecutive refreshes confirm this shift."
+      ? "Increase willingness to commit only after two readings in a row confirm this shift."
       : "No posture shift. Keep current pacing and monitor the flip thresholds.",
 });

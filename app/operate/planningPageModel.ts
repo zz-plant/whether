@@ -180,7 +180,8 @@ export async function buildPlanningPageModel(
         // page.
         nextStep: {
           href: "/resolve",
-          description: "One question still open? Resolve it",
+          description: "Still stuck on one decision? Get a yes or no for it.",
+          label: "Resolve a decision",
         },
       },
       payloads: {
@@ -252,8 +253,6 @@ export async function buildPlanningPageModel(
               h(BoundedCorridorRails, {
                 items: actionStripItems,
                 scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
-                idPrefix: "plan-corridor",
-                viewBoxWidth: 420,
               }),
               h("section", { className: "space-y-4" },
                 /* The call, as a plain list. It was three bordered cards under
@@ -380,7 +379,7 @@ export async function buildPlanningPageModel(
             id: "ops-decision-shield",
             label: "Test",
             title: "Test a decision",
-            description: "Check if a specific move is safe right now — hiring, pricing, roadmap, M&A.",
+            description: "Check whether one move is safe right now: a hire, a price change, a roadmap bet or an acquisition.",
             hashAliases: ["ops-decision-shield-panel"],
             // The question this header used to ask now heads DecisionShieldPanel itself, so the
             // step reads "Test a decision" → "Is this move safe right now?" with nothing between.

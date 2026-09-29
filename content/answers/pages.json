@@ -2,7 +2,7 @@
   {
     "slug": "startup-funding-climate-this-week",
     "keyword": "startup funding climate this week",
-    "title": "Startup Funding Climate This Week",
+    "title": "Startup funding climate this week",
     "category": "climate",
     "shortAnswer": "Funding is tighter when short-term rates sit above about 3.5%, which is where the pause line is drawn.",
     "directAnswer": "Decide the worst terms you would accept before you start a raise, and tighten them while funding pressure is above its line.",
@@ -17,7 +17,7 @@
   {
     "slug": "is-it-risk-on-or-risk-off-for-startups",
     "keyword": "is it risk-on or risk-off for startups",
-    "title": "Is It Risk-On or Risk-Off for Startups?",
+    "title": "Is it risk-on or risk-off for startups?",
     "category": "climate",
     "shortAnswer": "Speed up when risk appetite is above its line, slow down when it is below; the yield curve moves risk appetite and funding pressure together.",
     "directAnswer": "Move faster on the bets you can stop, and write the stop condition down first.",
@@ -33,7 +33,7 @@
   {
     "slug": "should-startups-hire-engineers-right-now",
     "keyword": "should startups hire engineers right now",
-    "title": "Should Startups Hire Engineers Right Now?",
+    "title": "Should startups hire engineers right now?",
     "category": "decision",
     "shortAnswer": "Only for roles that pay back inside 12 months; hold the rest.",
     "directAnswer": "Approve only roles tied to delivery reliability or near-term revenue impact.",
@@ -49,7 +49,7 @@
   {
     "slug": "should-startups-slow-roadmap-expansion",
     "keyword": "should startups slow roadmap expansion",
-    "title": "Should Startups Slow Roadmap Expansion?",
+    "title": "Should startups slow roadmap expansion?",
     "category": "decision",
     "shortAnswer": "Yes: slow the new scope, not the work you have already promised.",
     "directAnswer": "Keep the roadmap work that moves retention or revenue within the quarter; pause new platform bets until the scores are back across their resume lines.",
@@ -65,7 +65,7 @@
   {
     "slug": "should-startups-raise-capital-now",
     "keyword": "should startups raise capital now",
-    "title": "Should Startups Raise Capital Now?",
+    "title": "Should startups raise capital now?",
     "category": "decision",
     "shortAnswer": "Raise now if you have under 12 months of cash or the round would take you past 24; otherwise wait for terms you would keep.",
     "directAnswer": "If your plan for the next 12 months needs the money, start now, while you can still say no to bad terms.",
@@ -80,7 +80,7 @@
   {
     "slug": "when-should-startups-cut-burn",
     "keyword": "when should startups cut burn",
-    "title": "When Should Startups Cut Burn?",
+    "title": "When should startups cut burn?",
     "category": "decision",
     "shortAnswer": "Cut burn when funding pressure crosses its pause line and risk appetite is falling at the same time.",
     "directAnswer": "Decide now which spend you would cut, so the cut is ready before funding pressure crosses its line.",
@@ -95,7 +95,7 @@
   {
     "slug": "should-we-freeze-or-selectively-hire",
     "keyword": "should we freeze hiring or selectively hire",
-    "title": "Should We Freeze Hiring or Selectively Hire?",
+    "title": "Should we freeze hiring or hire selectively?",
     "category": "decision",
     "shortAnswer": "Hire selectively, with the stop condition written before the first offer.",
     "directAnswer": "Approve only reliability and revenue roles, each with its own payback window and pause condition.",
@@ -110,7 +110,7 @@
   {
     "slug": "should-we-expand-sales-headcount-now",
     "keyword": "should we expand sales headcount now",
-    "title": "Should We Expand Sales Headcount Now?",
+    "title": "Should we expand sales headcount now?",
     "category": "decision",
     "shortAnswer": "Only where win rates are holding and each rep pays back inside 12 months.",
     "directAnswer": "Add reps in small groups, each group only after the previous one's win rate has held and cash allows it.",
@@ -125,7 +125,7 @@
   {
     "slug": "should-we-delay-new-product-lines",
     "keyword": "should we delay new product lines",
-    "title": "Should We Delay New Product Lines?",
+    "title": "Should we delay new product lines?",
     "category": "decision",
     "shortAnswer": "Delay a new product line unless customers are already asking for it.",
     "directAnswer": "Keep the core roadmap shipping; start a new line only after an adoption milestone and a payback figure.",
@@ -140,7 +140,7 @@
   {
     "slug": "how-fast-should-we-scale-go-to-market",
     "keyword": "how fast should we scale go to market",
-    "title": "How Fast Should We Scale Go-To-Market?",
+    "title": "How fast should we scale go-to-market?",
     "category": "decision",
     "shortAnswer": "Add sales and marketing spend in steps, not all at once.",
     "directAnswer": "Raise spend and hiring one step per milestone, and pull the step back the moment conversion or payback slips.",
@@ -155,7 +155,7 @@
   {
     "slug": "how-to-brief-executives-on-market-conditions",
     "keyword": "how to brief executives on market conditions",
-    "title": "How to Brief Executives on Market Conditions",
+    "title": "How to brief executives on market conditions",
     "category": "explanation",
     "shortAnswer": "Lead with what changed, the rule it changes, and what would change the guidance.",
     "directAnswer": "Keep it to one screen: the reading, the one rule it changes, and the number that would change the guidance again.",

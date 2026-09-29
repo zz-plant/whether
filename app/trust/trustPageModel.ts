@@ -170,7 +170,8 @@ export async function buildTrustPageModel() {
     sidebarVariant: "full",
     nextStep: {
       href: "/signals",
-      description: "Check evidence",
+      description: "See which readings moved this week, and by how much.",
+      label: "Open the evidence",
     },
     structuredData: breadcrumbStructuredData,
   } satisfies ReportShellProps;

@@ -47,8 +47,8 @@ describe("first-visit decision picker", () => {
 
   it("offers the alerts-only signup beside the condition it watches", () => {
     assert.match(html, /Tell me when this changes/);
-    assert.match(html, /Watching: Funding pressure falls to or below 70\./);
-    assert.match(html, /No weekly email/);
+    assert.match(html, /Next change to watch: Funding pressure falls to or below 70\./);
+    assert.match(html, /No weekly newsletter/);
   });
 
   it("links the turning points into the time machine and offers the full brief", () => {

@@ -148,7 +148,11 @@ export const SignalsWhatChangedSection = ({
                   {row.value === null ? (
                     <span className="text-slate-500">—</span>
                   ) : (
-                    <ScoreCell label={row.label} value={row.value} line={row.line} previous={row.previous} units={row.units} />
+                    /* "This week", not the signal's name: the row header one
+                       column over already says it, so every row printed
+                       "Funding pressure" twice and on a phone the two sat
+                       two lines apart. It pairs with "Last week" below it. */
+                    <ScoreCell label="This week" value={row.value} line={row.line} previous={row.previous} units={row.units} />
                   )}
                 </td>
                 {showNotes ? (
@@ -207,11 +211,14 @@ export const SignalsCallLinesSection = ({
           the label rather than on a box around it. */}
       <dl className="space-y-1.5 text-sm text-slate-200">
         <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-semantic-caution-fg">Wrong if:</dt>
+          {/* The slot labels every other surface prints. "Wrong if" and "Safe
+              again when" were a third pair of names for the pause and resume
+              lines, on the page a reader opens to check the other two. */}
+          <dt className="shrink-0 font-semibold text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
           <dd className="min-w-0">{renderCondition(triggerCondition)}</dd>
         </div>
         <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-semantic-easing-fg">Safe again when:</dt>
+          <dt className="shrink-0 font-semibold text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</dt>
           <dd className="min-w-0">{renderCondition(reversalCondition)}</dd>
         </div>
       </dl>

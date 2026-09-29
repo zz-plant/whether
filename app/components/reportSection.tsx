@@ -31,9 +31,10 @@ type ReportSectionProps = {
  * hand-edit the URL bar. Section XII makes the case directly: this product's job
  * includes handing someone an artifact.
  *
- * Always visible rather than hover-revealed. Hover-reveal is the docs-site
- * convention, but it hides the affordance entirely on touch, where sharing a
- * link is more likely, not less.
+ * Visible on touch, revealed on hover with a mouse (decision-flow.css). Pure
+ * hover-reveal hides the affordance entirely on touch, where sharing a link is
+ * more likely, not less; always-on printed a "#" beside every heading on a
+ * desktop page, where it read as stray punctuation.
  */
 const SectionAnchor = ({ id, title }: { id: string; title: string }) => (
   <a

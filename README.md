@@ -65,7 +65,7 @@ Generic advice says *"be cautious."* Whether delivers **bounded decisions** — 
 
 | Decision Area | Do now (Action) | Stop / tighten if (Threshold) | Open back up when (Reversal) |
 | :--- | :--- | :--- | :--- |
-| **Engineering & Product** | Fund initiatives with &lt;6-month payback | Yield curve inversion deepens &gt; 15 bps | 2 consecutive refreshes with stable spreads |
+| **Engineering & Product** | Fund initiatives with &lt;6-month payback | Yield curve inversion deepens &gt; 15 bps | Two readings in a row with stable spreads |
 | **Hiring & Headcount** | Backfill revenue-critical roles only | BBB spreads widen &gt; 220 bps | Cash availability index returns above 65 |
 | **Fundraising & Runway** | Maintain 18+ months forward runway | VIX stays &gt; 28 for &gt; 10 trading days | Volatility subsides and rate cuts materialize |
 

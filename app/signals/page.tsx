@@ -62,7 +62,8 @@ export default async function SignalsPage({
       activeStep="signals"
       nextStep={{
         href: "/operate",
-        description: "Set guardrails for this week's plan",
+        description: "Turn this week's guidance into rules for hiring, spend and the roadmap.",
+        label: "Open the plan",
       }}
       structuredData={model.structuredData}
       historicalBanner={

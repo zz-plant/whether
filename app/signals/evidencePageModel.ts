@@ -218,10 +218,10 @@ const deriveSignalsPageModel = (
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
     : `${FALLBACK_PAUSE_THRESHOLD}.`;
-  // The resume trigger, symmetric with the pause trigger in "Wrong if" above.
+  // The resume trigger, symmetric with the pause trigger in "Pause if" above.
   // This rendered `flipThreshold` — the condition that BREAKS the call, which
   // /trust labels "Call changes if". Printing it under
-  // "Safe again when" told an operator the opposite of what it means.
+  // "Resume when" (then "Safe again when") told an operator the opposite of what it means.
   const resumeTrigger = actionStripItems?.[0]?.reversalCondition;
   const reversalCondition = resumeTrigger?.trim().length
     ? resumeTrigger

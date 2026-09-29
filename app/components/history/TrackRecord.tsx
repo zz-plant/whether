@@ -129,8 +129,8 @@ export function TrackRecordTiles({
       <div>
         <h2 className="type-eyebrow type-eyebrow-section" id="track-record-heading">Track record</h2>
         <p className="text-sm text-slate-300">
-          Every reading Whether has made, from the same published formula. Not a forecast — a record
-          you can audit.
+          Every month-end reading Whether has made, scored with the same published formula, so
+          you can check each one against what happened next.
         </p>
       </div>
 

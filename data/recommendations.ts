@@ -68,7 +68,7 @@ export const insightDatabase = {
         tone: "High rates + risk off",
         mandate: "Don't die.",
         insight:
-          "Time is your binding constraint. Survival is about shortening every payback window.",
+          "Money is scarce and slow to come back. Favour work that pays back in weeks, not quarters.",
         leadershipPhrases: {
           more: [
             "We need payback in 90 days or less.",
@@ -98,7 +98,7 @@ export const insightDatabase = {
         tone: "High rates + moderate risk",
         mandate: "Efficiency first.",
         insight:
-          "Growth is expensive, so extract more value from the customers you already have.",
+          "New customers cost more to win now. Get more from the ones you already have.",
         leadershipPhrases: {
           more: [
             "Protect margin and retention before chasing new logos.",
@@ -128,7 +128,7 @@ export const insightDatabase = {
         tone: "Low rates + risk off",
         mandate: "Safety first.",
         insight:
-          "Capital is cheap, but customers are anxious. They buy insurance, not experimentation.",
+          "Money is cheap, but buyers are nervous. They pay for reliability, not for experiments.",
         leadershipPhrases: {
           more: [
             "Trust and reliability beat novelty.",
@@ -158,12 +158,12 @@ export const insightDatabase = {
         tone: "Low rates + risk on",
         mandate: "Land grab.",
         insight:
-          "The market rewards speed over accuracy. Some waste is the price of momentum.",
+          "Money is cheap and investors want growth. Moving fast is worth some waste.",
         leadershipPhrases: {
           more: [
-            "Move fast and capture share.",
-            "Invest ahead of demand; speed beats perfection.",
-            "Momentum is the strategy.",
+            "Take share while money is cheap.",
+            "Hire ahead of demand where the pipeline is already there.",
+            "Ship and measure; don't wait for perfect data.",
           ],
           less: [
             "Wait for certainty before we hire.",
