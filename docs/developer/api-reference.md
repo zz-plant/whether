@@ -90,7 +90,7 @@ Invalid cadence returns `400` with `allowedCadences`.
 The nested `agentHandoff.payload` now exposes:
 
 - `decision_rules` for bounded operating rules by area
-- `decision_delta` for weekly change interpretation
+- `decision_delta` for change interpretation: `changed_signals` carry `from`, `to` and `delta`, and `compared_with` (`{ record_date, label }`, or `null` where a source did not date it) names the reading `from` is: the previous month-end snapshot, not last week. Its `summary` says "since Aug 31" where it used to say "this week"
 - `flip_watch` for primary trigger, reversal conditions, and boundary pressure
 - `skills` for deterministic downstream output ordering
 

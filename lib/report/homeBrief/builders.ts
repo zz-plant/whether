@@ -13,6 +13,7 @@ import {
 import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
+import { comparisonBasis } from "../comparisonBasis";
 import { formatThresholdNumber } from "../../formatters";
 import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "../reportCopy";
 import {
@@ -250,15 +251,20 @@ export const buildHomeBriefModelInternal = (
   /* "No worse than last week" needs a last week. The severity delta is 0 both
      when the regime held and when there is nothing to compare it to, and this
      rendered the comparative sentence for both — including onto the OG share
-     card, which is the version of this line that travels furthest. */
+     card, which is the version of this line that travels furthest.
+     The comparison is the previous monthly snapshot, so a week that records
+     its date says "since Aug 31" (`comparisonBasis`) and one that does not
+     keeps "than last week". */
+  const basis = comparisonBasis(reportDynamics?.comparedWith);
+  const againstPrevious = basis.date ? basis.since : "than last week";
   const postureDeltaLabel =
     reportDynamics?.directionLabel === "unavailable"
       ? "No previous week to compare"
       : severityDelta > 0
-        ? "Worse than last week"
+        ? `Worse ${againstPrevious}`
         : severityDelta < 0
-          ? "Better than last week"
-          : "No worse than last week";
+          ? `Better ${againstPrevious}`
+          : `No worse ${againstPrevious}`;
 
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
@@ -337,6 +343,7 @@ export const buildHomeBriefModelInternal = (
     last4Boldness: [],
     hiringTrendDelta: (weeklyDeltaBySignal.get("riskAppetite") ?? 0) - (weeklyDeltaBySignal.get("tightness") ?? 0),
     stabilityWeeks: transitionWatch === "ON" ? 1 : 2,
+    basis,
   });
   const operatingStanceLine = buildOperatingStanceLine({
     severityDelta,
@@ -507,6 +514,7 @@ export const buildHomeBriefModelInternal = (
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
     directionLabel: reportDynamics?.directionLabel,
+    basis,
   });
   const revisitQueue = buildRevisitQueue({
     revisitDecisions,
@@ -625,6 +633,7 @@ export const buildHomeBriefModelInternal = (
       expansionWindow: weeklyLeadershipSummary.expansionWindow,
       raiseWindow: weeklyLeadershipSummary.raiseWindow,
       netDeltaLabel: weeklyLeadershipSummary.netDeltaLabel,
+      ...(reportDynamics?.comparedWith ? { comparedWith: reportDynamics.comparedWith } : {}),
     },
     guardrail,
     actionNowShort: conciseActionNow,

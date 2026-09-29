@@ -12,6 +12,8 @@ import { publicDecisionLabels } from "../report/reportFormatting";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { buildFlipProximity } from "../report/flipProximity";
 import { resolvePublishedConfidence } from "../report/confidence";
+import { comparisonBasis } from "../report/comparisonBasis";
+import type { ComparedWith } from "../report/reportDataTypes";
 
 type WeeklyOperatorBriefPayload = {
   date: string;
@@ -19,6 +21,8 @@ type WeeklyOperatorBriefPayload = {
     score: number;
     delta: number;
     line: string;
+    /** The earlier reading `delta` is measured against; the paste says "vs last week" without one. */
+    comparedWith?: ComparedWith;
   };
   regimeStage: string;
   /** `regimeStage` with what the weather means for money, as the paste prints it. */
@@ -98,6 +102,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     boldnessScore: number;
     boldnessDelta: number;
     shorthandLine: string;
+    comparedWith?: ComparedWith;
   };
   customTeamNote?: string;
 }): WeeklyOperatorBriefPayload => {
@@ -106,6 +111,7 @@ export const buildWeeklyOperatorBriefPayload = ({
         score: weeklyLeadershipSummary.boldnessScore,
         delta: weeklyLeadershipSummary.boldnessDelta,
         line: weeklyLeadershipSummary.shorthandLine,
+        ...(weeklyLeadershipSummary.comparedWith ? { comparedWith: weeklyLeadershipSummary.comparedWith } : {}),
       }
     : undefined;
   /* From the reading, not from a caller. This took an optional label and fell
@@ -215,7 +221,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     /* The number never travels without what it measures: a paste is read by
        people who have not seen the hero that explains it. */
     payload.boldnessBudget
-      ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${OPERATING_LATITUDE_GLOSS}) · vs last week: ${boldnessDeltaLabel}`
+      ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${OPERATING_LATITUDE_GLOSS}) · ${comparisonBasis(payload.boldnessBudget.comparedWith).versus}: ${boldnessDeltaLabel}`
       : null,
     payload.boldnessBudget?.line ?? null,
     `Conditions: ${payload.conditions}`,

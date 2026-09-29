@@ -284,6 +284,21 @@ describe("buildSlackBrief", () => {
     assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
   });
 
+  it("names the reading the direction is measured against, where the caller carries one", () => {
+    const options = {
+      operatingStanceLine: "Stage decisions. Avoid irreversible spend.",
+      trendLabel: "Deteriorating",
+      previousScores: { tightness: 63, riskAppetite: 56, comparedWith: { recordDate: "2026-08-31", label: "Aug 31" } },
+    };
+    const dated = buildSlackBrief(assessment, treasury, sensors, macros, options);
+
+    assert.match(dated, /• vs Aug 31: worse/);
+    assert.doesNotMatch(dated, /vs last week/);
+    // The two readings a paste prints for each score carry the same date.
+    assert.match(dated, /was 63 on Aug 31/);
+    assert.match(dated, /was 56 on Aug 31/);
+  });
+
   it("keeps citation-ready source lines in exported briefs", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
     assert.match(brief, /Citations:/);

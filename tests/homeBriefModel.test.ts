@@ -169,6 +169,40 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
 
+  it("names the reading its delta labels are measured against, where the week records one", () => {
+    const build = (comparedWith?: { recordDate: string; label: string }) =>
+      buildHomeBriefModel({
+        assessment: {
+          regime: "DEFENSIVE",
+          thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+          scores: { tightness: 57, riskAppetite: 54 },
+        },
+        regimeAlert: { previousRegime: "VOLATILE" },
+        stopItems: ["Guardrail"],
+        reportDynamics: {
+          directionLabel: "deteriorating",
+          changedSignals: [{ key: "tightness", delta: 2 }],
+          anomalySignals: [],
+          ...(comparedWith ? { comparedWith } : {}),
+        },
+      });
+
+    const dated = build({ recordDate: "2026-08-31", label: "Aug 31" });
+    assert.match(dated.postureDeltaLabel, / since Aug 31$/);
+    assert.equal(dated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs Aug 31");
+    assert.equal(dated.weeklyLeadershipSummary.comparedWith?.label, "Aug 31");
+    assert.match(dated.weeklyLeadershipSummary.netDeltaLabel, /since Aug 31\.$|where it was on Aug 31\.$/);
+    assert.match(dated.weeklyMovement.summary, /^(Pressure (increased by \+|eased by -)\d\.\d|Conditions held steady) since Aug 31\./);
+
+    // A week that does not date its comparison reads as it always did.
+    const undated = build();
+    assert.match(undated.postureDeltaLabel, /than last week$/);
+    assert.equal(undated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs last week");
+    assert.equal(undated.weeklyLeadershipSummary.comparedWith, undefined);
+    assert.match(undated.weeklyLeadershipSummary.netDeltaLabel, /than last week\.$|where it was last week\.$/);
+    assert.match(undated.weeklyMovement.summary, / this week\./);
+  });
+
   it("preserves all normalized evidence items including curve-slope", () => {
     const model = buildHomeBriefModel({
       assessment: {

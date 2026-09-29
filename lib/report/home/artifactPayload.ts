@@ -8,6 +8,7 @@ import {
 import { buildCanonicalDecisionCopy } from "../canonicalDecisionCopy";
 import { DECISION_CONTRACT_LABELS, OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../reportCopy";
 import { formatDecisionReversal } from "../reportFormatting";
+import { comparisonBasis } from "../comparisonBasis";
 import { resolveDataStatusGuidance } from "../trustStatus";
 import { describeConditions, formatExportConfidence, pauseConditionOnly } from "../../export/exportTerms";
 import { buildInterpretationLayer, type InterpretationView } from "../interpretationLayer";
@@ -162,7 +163,7 @@ export const buildLeadershipArtifactPayload = async ({
       dataLine: isSavedCopy
         ? `DATA: Saved copy from ${freshnessLabel}. ${resolveDataStatusGuidance({ isFallbackSnapshot: true })}`
         : `DATA: Live, as of ${freshnessLabel}`,
-      latitudeLine: `${OPERATING_LATITUDE_LABEL.toUpperCase()}: ${latitude.boldnessScore}/100 (${OPERATING_LATITUDE_GLOSS}) · vs last week: ${latitudeDelta}`,
+      latitudeLine: `${OPERATING_LATITUDE_LABEL.toUpperCase()}: ${latitude.boldnessScore}/100 (${OPERATING_LATITUDE_GLOSS}) · ${comparisonBasis(latitude.comparedWith).versus}: ${latitudeDelta}`,
       conditionsLine: `CONDITIONS: ${describeConditions(assessment.regime, canonicalDecisionCopy.currentRegimeLabel)} · ${formatExportConfidence(homeBriefModel.confidenceLabel)}`,
       changedLine: `CHANGED: ${homeBriefModel.decisionShiftHeadline}`,
       pauseLine: `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toUpperCase()}: ${pauseConditionOnly(weeklyCall.pauseIf)}`,

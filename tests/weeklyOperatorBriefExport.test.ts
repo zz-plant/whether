@@ -95,6 +95,24 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(cardText, text);
   });
 
+  it("names the reading the latitude move is measured against, where the week records one", () => {
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      weeklyLeadershipSummary: {
+        boldnessScore: 33,
+        boldnessDelta: -17,
+        shorthandLine: "This week's guidance is sharply more defensive.",
+        comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
+      },
+    });
+    const text = buildWeeklyOperatorBriefPlainText(payload);
+
+    assert.deepEqual(payload.boldnessBudget?.comparedWith, { recordDate: "2026-08-31", label: "Aug 31" });
+    assert.match(text, /higher means more room\) · vs Aug 31: -17 points/);
+    assert.doesNotMatch(text, /vs last week/);
+  });
+
   it("states the flip distance in the market's units, not score points", () => {
     // The hero's flip watch says what has to happen on the curve or the bill;
     // the pasted artifact carries the same sentence so a reader in Slack can

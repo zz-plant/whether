@@ -18,6 +18,7 @@ import {
 } from "../../lib/report/evidenceReaderModel";
 import { resolvePublishedConfidence } from "../../lib/report/confidence";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
+import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 
@@ -254,6 +255,8 @@ const deriveSignalsPageModel = (
     focusInstruments: focusFilter.instruments,
     changedSignalRows,
     callLineLadders,
+    /* What the "since" column compares with; the rows and ladders carry the same label. */
+    basis: comparisonBasis(reportDynamics.comparedWith),
     sectionLinks: signalsSectionLinks,
   };
 };

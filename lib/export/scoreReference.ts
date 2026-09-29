@@ -2,26 +2,44 @@ import { scoreReferenceParts } from "../../app/components/ui/scoreCell";
 import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "../regimeEngineCore";
 import { ruleMetricLabel, type RuleConditionMetric } from "../report/boundedDecisionRules";
 import { buildSharedCorridorRails, formatPointsToLine } from "../report/operatingCalls";
-import type { ReportDynamics } from "../report/reportDataTypes";
+import type { ComparedWith, ReportDynamics } from "../report/reportDataTypes";
 import { findSignalDelta } from "../report/evidenceReaderModel";
+import { comparisonBasis } from "../report/comparisonBasis";
+import { describeScoreMovementLine } from "../report/scoreMovement";
 import { signalReadingMeaning } from "../report/signalTranslations";
 
 /**
  * The two scores as every export prints them: value, the line each is judged
- * against, the distance to it, and last week — in that order, through the
+ * against, the distance to it, and the earlier reading — in that order, through the
  * same `scoreReferenceParts` the page's `ScoreCell` is drawn from. Before this each
  * builder printed its own shape ("Funding pressure 12 / Risk appetite 68",
  * "Signals: Funding pressure 83 · Risk Appetite 40", "79/100 (9 pts above the
- * line…)"), and none of them carried last week even where the inputs had it.
+ * line…)"), and none of them carried the earlier reading even where the inputs had it.
  *
  * The line is the pause line when the export knows one (a rule's rails), else
- * the line where the call itself changes. Last week prints only when the
- * caller's inputs carry it; nothing here invents a comparison.
+ * the line where the call itself changes. The earlier reading prints only when
+ * the caller's inputs carry it, under the date they say it is from; nothing
+ * here invents a comparison.
  */
-export type ScorePair = Record<RuleConditionMetric, number>;
+type ScorePair = Record<RuleConditionMetric, number>;
 
-/** Last week's readings, per metric; null where the surface has no previous week for that metric. */
-type PreviousScores = Partial<Record<RuleConditionMetric, number | null>>;
+/**
+ * The earlier reading, per metric, and which reading it is (`comparedWith`,
+ * from `ReportDynamics`). A metric is null where the surface has no earlier
+ * reading for it; no `comparedWith` means the source did not date it, and the
+ * paste says "last week" as it always did.
+ */
+type PreviousScores = Partial<Record<RuleConditionMetric, number | null>> & {
+  comparedWith?: ComparedWith | null;
+  /** What each score's move is made of, where the loader could split it (`ReportDynamics.movement`). */
+  movement?: ReportDynamics["movement"];
+};
+
+/** `PreviousScores` with both scores present, as `previousScoresFromDynamics` returns it. */
+export type PreviousReading = ScorePair & {
+  comparedWith?: ComparedWith | null;
+  movement?: ReportDynamics["movement"];
+};
 
 /** What each of the three lines is called in a paste. */
 const SCORE_LINE_LABELS = {
@@ -40,28 +58,43 @@ const callChangeLine = (thresholds: Pick<RegimeThresholds, "tightnessRegime" | "
 const roundToTenth = (value: number) => Math.round(value * 10) / 10;
 
 /**
- * Last week's scores from the week's dynamics, or null when no comparison was
+ * The earlier scores from the week's dynamics, or null when no comparison was
  * made. `directionLabel: "unavailable"` is the loader saying there was no
  * previous reading, which is a different fact from "nothing moved"
  * (`tests/noComparisonHonesty.test.ts`); a signal absent from both lists moved
- * under the reporting floor, so last week equals this week for it.
+ * under the reporting floor, so the earlier reading equals this week's for it.
  *
- * Caution: the comparison behind the dynamics is `getPreviousTimeMachineSnapshot`,
- * and that cache is monthly, so "last week" is the last month-end reading today
- * (Aug 31 for both the Sep 18 and the Sep 25 reads). The brief card leaves it
- * off for that reason; `docs/feature-specs-current.md` §1.1.25 has the evidence.
+ * The comparison behind the dynamics is `getPreviousTimeMachineSnapshot`, and
+ * that cache is monthly: today the earlier reading is the last month-end (Aug 31
+ * for both the Sep 18 and the Sep 25 reads), not last week. The date rides along
+ * as `comparedWith` so every surface that prints these scores can say so
+ * (`lib/report/comparisonBasis.ts`); `docs/feature-specs-current.md` §1.1.25
+ * has the evidence.
  */
 export const previousScoresFromDynamics = (
-  dynamics: Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals"> | null | undefined,
+  dynamics:
+    | Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith" | "movement">
+    | null
+    | undefined,
   current: ScorePair,
-): ScorePair | null => {
+): PreviousReading | null => {
   if (!dynamics || dynamics.directionLabel === "unavailable") return null;
   const deltaFor = (metric: RuleConditionMetric) => findSignalDelta(dynamics, metric) ?? 0;
   return {
     tightness: roundToTenth(current.tightness - deltaFor("tightness")),
     riskAppetite: roundToTenth(current.riskAppetite - deltaFor("riskAppetite")),
+    ...(dynamics.comparedWith ? { comparedWith: dynamics.comparedWith } : {}),
+    ...(dynamics.movement ? { movement: dynamics.movement } : {}),
   };
 };
+
+/**
+ * The line every paste carries under the two readings: what each score's move
+ * is made of. Null when the week has no split to print (no comparison, or a
+ * score the loader could not rebuild), so a paste never claims one.
+ */
+export const buildScoreMovementLine = (previous: PreviousScores | null | undefined): string | null =>
+  describeScoreMovementLine(previous?.movement, comparisonBasis(previous?.comparedWith));
 
 type ScoreReferenceInput = {
   scores: ScorePair;
@@ -90,8 +123,8 @@ export type ScoreReadingParts = {
   line: string;
   /** "14 pts above" */
   distance: string;
-  /** "last week 63"; null without a previous week. */
-  lastWeek: string | null;
+  /** "was 63 on Aug 31", or "last week 63" where the source has no date; null without an earlier reading. */
+  previous: string | null;
   /** "resume line 66 (24 pts away)"; null without a rail that carries one. */
   resume: string | null;
 };
@@ -115,6 +148,7 @@ export const buildScoreReadings = ({
       value: scores[metric],
       line,
       previous: previous?.[metric] ?? null,
+      previousDate: previous?.comparedWith?.label ?? null,
     });
     return {
       metric,
@@ -124,7 +158,7 @@ export const buildScoreReadings = ({
       reading: `${parts.reading} (${meaning})`,
       line: parts.line,
       distance: parts.distance,
-      lastWeek: parts.previous,
+      previous: parts.previous,
       resume:
         rail && rail.clearsAt !== undefined
           ? `${SCORE_LINE_LABELS.resume} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
@@ -135,7 +169,7 @@ export const buildScoreReadings = ({
 /**
  * One line per score.
  *
- * `Funding pressure 12 of 100 (money is easy to raise) · pause line 76 · 64 pts below · last week 15 · resume line 66 (already met)`
+ * `Funding pressure 12 of 100 (money is easy to raise) · pause line 76 · 64 pts below · was 15 on Aug 31 · resume line 66 (already met)`
  *
  * With a rail the reference line is the pause line and the resume line follows
  * with its own distance, because "how close to re-opening" is the second thing
@@ -144,5 +178,5 @@ export const buildScoreReadings = ({
  */
 export const buildScoreReferenceLines = (input: ScoreReferenceInput): string[] =>
   buildScoreReadings(input).map((parts) =>
-    [parts.reading, parts.line, parts.distance, parts.lastWeek, parts.resume].filter((part) => part !== null).join(" · "),
+    [parts.reading, parts.line, parts.distance, parts.previous, parts.resume].filter((part) => part !== null).join(" · "),
   );

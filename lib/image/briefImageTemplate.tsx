@@ -12,7 +12,7 @@ export type BriefImageProps = {
   decision: string;
   /** The engine key; it picks the weather word and its colour. */
   regime: string;
-  /** Both scores with the line each is judged against and last week (`buildScoreReadings`). */
+  /** Both scores with the line each is judged against and the earlier reading, dated (`buildScoreReadings`). */
   readings: readonly ScoreReadingParts[];
   confidenceLabel: string;
   recordDate: string;
@@ -88,8 +88,8 @@ const layoutCall = (decision: string): { size: number; text: string } => {
  * string here instead of several adjacent JSX children.
  */
 const readingRow = (reading: ScoreReadingParts, valueWidth: number) => {
-  /* The order every surface prints: the line, how far from it, then last week. */
-  const detail = [reading.line, reading.distance, reading.lastWeek].filter((part) => part !== null).join(" \u00b7 ");
+  /* The order every surface prints: the line, how far from it, then the earlier reading. */
+  const detail = [reading.line, reading.distance, reading.previous].filter((part) => part !== null).join(" \u00b7 ");
   return (
     <div
       key={reading.metric}
@@ -139,7 +139,7 @@ const toImageSafeReading = (reading: ScoreReadingParts): ScoreReadingParts => ({
   reading: toImageSafeText(reading.reading),
   line: toImageSafeText(reading.line),
   distance: toImageSafeText(reading.distance),
-  lastWeek: reading.lastWeek === null ? null : toImageSafeText(reading.lastWeek),
+  previous: reading.previous === null ? null : toImageSafeText(reading.previous),
   resume: reading.resume === null ? null : toImageSafeText(reading.resume),
 });
 

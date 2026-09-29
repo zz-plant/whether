@@ -1,6 +1,7 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import type { ReportData } from "./reportData";
 import { isSignalsClusterSlug } from "../../app/signals/clusterRoutes";
+import { comparisonBasis, type ComparisonBasis } from "./comparisonBasis";
 
 /**
  * What a signal cluster page is actually about.
@@ -35,7 +36,7 @@ type SignalReadingInput = { label: string; value: string };
  */
 export type SignalReadingSource = {
   assessment: Pick<RegimeAssessment, "scores" | "thresholds" | "inputs">;
-  reportDynamics: Pick<ReportData["reportDynamics"], "changedSignals" | "anomalySignals">;
+  reportDynamics: Pick<ReportData["reportDynamics"], "changedSignals" | "anomalySignals" | "comparedWith">;
 };
 
 export type SignalClusterReading = {
@@ -110,6 +111,9 @@ const findDelta = (reportData: SignalReadingSource, key: "tightness" | "riskAppe
   ?? reportData.reportDynamics.anomalySignals.find((signal) => signal.key === key)?.delta
   ?? null;
 
+/** What the move is measured against, named by its date where the week records one. */
+const basisOf = (reportData: SignalReadingSource) => comparisonBasis(reportData.reportDynamics.comparedWith);
+
 const findInputValue = (reportData: SignalReadingSource, id: string) =>
   reportData.assessment.inputs.find((input) => input.id === id);
 
@@ -132,6 +136,7 @@ export const describeSignalDirection = (
   betterWhen: "higher" | "lower",
   unitWord: string,
   formatter: Intl.NumberFormat,
+  basis: ComparisonBasis = comparisonBasis(),
 ): { label: string; tone: SignalClusterReading["directionTone"] } => {
   if (delta === null) {
     /*
@@ -144,13 +149,15 @@ export const describeSignalDirection = (
     return { label: "No material move recorded this week.", tone: "unchanged" };
   }
   if (delta === 0) {
-    return { label: `Unchanged from last week.`, tone: "unchanged" };
+    /* "Unchanged from last week." where the week is undated, and the date
+       where it is: the comparison is the previous monthly snapshot. */
+    return { label: basis.date ? `Unchanged ${basis.since}.` : `Unchanged from last week.`, tone: "unchanged" };
   }
 
   const moved = `${formatter.format(delta)}${unitWord}`;
   const towardComfort = betterWhen === "higher" ? delta > 0 : delta < 0;
   return {
-    label: `${moved} since last week.`,
+    label: `${moved} ${basis.since}.`,
     tone: towardComfort ? "easing" : "tightening",
   };
 };
@@ -195,7 +202,7 @@ export const buildSignalClusterReading = (
 
   if (cluster === "capital-tightness-watch") {
     const delta = findDelta(reportData, "tightness");
-    const direction = describeSignalDirection(delta, "lower", " points", SIGNED_WHOLE);
+    const direction = describeSignalDirection(delta, "lower", " points", SIGNED_WHOLE, basisOf(reportData));
 
     return {
       measure: "Funding pressure",
@@ -237,7 +244,7 @@ export const buildSignalClusterReading = (
 
   if (cluster === "risk-appetite-watch") {
     const delta = findDelta(reportData, "riskAppetite");
-    const direction = describeSignalDirection(delta, "higher", " points", SIGNED_WHOLE);
+    const direction = describeSignalDirection(delta, "higher", " points", SIGNED_WHOLE, basisOf(reportData));
 
     return {
       measure: "Risk appetite",
@@ -290,7 +297,7 @@ export const buildSignalClusterReading = (
    * distance measured on it is in percentage points, written out. "pp" and "bp" are
    * desk shorthand; this page has no key to expand them (the charts on /signals do).
    */
-  const direction = describeSignalDirection(delta, "higher", " percentage points", SIGNED_TWO);
+  const direction = describeSignalDirection(delta, "higher", " percentage points", SIGNED_TWO, basisOf(reportData));
 
   return {
     measure: "Recession warning gauge",

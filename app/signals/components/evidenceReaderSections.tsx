@@ -8,6 +8,7 @@ import { ActionLink } from "../../components/ui/actionLink";
 import { toRoute } from "../../../lib/navigation/routeType";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { CallLineLadder, SignalReferenceRow } from "../../../lib/report/evidenceReaderModel";
+import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQueryState";
 
 /**
@@ -81,12 +82,15 @@ export const SignalsWhatChangedSection = ({
   focusLabelByTab,
   focusInstruments,
   searchParams,
+  basis = comparisonBasis(),
 }: {
   rows: ChangedSignalRow[];
   activeFocus: FocusTab;
   focusLabelByTab: Record<FocusTab, string>;
   focusInstruments: Array<{ label: string; why: string; href: string }>;
   searchParams?: Record<string, string | undefined>;
+  /** The earlier reading the moves are measured against; "last week" when the week does not date it. */
+  basis?: ComparisonBasis;
 }) => {
   const showNotes = rows.some((row) => row.note);
   return (
@@ -114,11 +118,11 @@ export const SignalsWhatChangedSection = ({
           three columns clipped the score cells off a phone's right edge. */}
       <div className="sm:overflow-x-auto">
         <table className="w-full border-collapse text-left text-sm max-sm:block sm:min-w-[36rem]">
-          <caption className="sr-only">Every signal this week, against its line and last week</caption>
+          <caption className="sr-only">{`Every signal this week, against its line and ${basis.reference}`}</caption>
           <thead className="max-sm:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
-              <th scope="col" className="py-2 pr-3 font-medium">Since last week</th>
+              <th scope="col" className="py-2 pr-3 font-medium">{`Since ${basis.reference}`}</th>
               <th scope="col" className="py-2 pr-3 font-medium">Against its line</th>
               {showNotes ? <th scope="col" className="py-2 pr-3 font-medium">Why it matters</th> : null}
             </tr>
@@ -143,6 +147,14 @@ export const SignalsWhatChangedSection = ({
                 </th>
                 <td className="py-2.5 pr-3 max-sm:p-0">
                   <DeltaChip row={row} />
+                  {/* What the score's move is made of. The chip says how far it
+                      went; this says which inputs took it there, and that the
+                      earlier score was built from rates alone. */}
+                  {row.movement ? (
+                    <p className="mt-1.5 max-w-[18rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
+                      {row.movement}
+                    </p>
+                  ) : null}
                 </td>
                 <td className="py-2.5 pr-3 max-sm:col-span-2 max-sm:p-0">
                   {row.value === null ? (
@@ -151,8 +163,15 @@ export const SignalsWhatChangedSection = ({
                     /* "This week", not the signal's name: the row header one
                        column over already says it, so every row printed
                        "Funding pressure" twice and on a phone the two sat
-                       two lines apart. It pairs with "Last week" below it. */
-                    <ScoreCell label="This week" value={row.value} line={row.line} previous={row.previous} units={row.units} />
+                       two lines apart. It pairs with the earlier reading's date below it. */
+                    <ScoreCell
+                      label="This week"
+                      value={row.value}
+                      line={row.line}
+                      previous={row.previous}
+                      previousLabel={row.previousLabel}
+                      units={row.units}
+                    />
                   )}
                 </td>
                 {showNotes ? (
@@ -202,7 +221,14 @@ export const SignalsCallLinesSection = ({
     <ReportSection id="call-lines" title={DECISION_CONTRACT_LABELS.watch.flipWatch}>
       <div className="grid gap-6 md:grid-cols-2">
         {ladders.map((ladder) => (
-          <ScoreLadder key={ladder.key} label={ladder.label} value={ladder.value} previous={ladder.previous} lines={ladder.lines} />
+          <ScoreLadder
+            key={ladder.key}
+            label={ladder.label}
+            value={ladder.value}
+            previous={ladder.previous}
+            previousLabel={ladder.previousLabel}
+            lines={ladder.lines}
+          />
         ))}
       </div>
       {/* Was two tinted cards nested inside this card, inside the section

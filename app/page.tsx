@@ -24,6 +24,7 @@ import {
   type SignalDirection,
 } from "./viewModel";
 import { formatDateUTC } from "../lib/formatters";
+import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildQuietDayRead } from "../lib/report/flipProximity";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -202,6 +203,9 @@ async function PageContent({
     homepage.weeklyDecisionCardModel.decision.reportDynamics,
     { tightness: reportData.assessment.scores.tightness, riskAppetite: reportData.assessment.scores.riskAppetite },
   );
+  /* What that earlier reading is: the previous monthly snapshot, named by its
+     date wherever this page used to say "last week". */
+  const basis = comparisonBasis(homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith);
   const tightnessDelta = previousScores ? reportData.assessment.scores.tightness - previousScores.tightness : 0;
   const riskAppetiteDelta = previousScores ? reportData.assessment.scores.riskAppetite - previousScores.riskAppetite : 0;
 
@@ -343,7 +347,7 @@ async function PageContent({
     revisitQueue,
     scores: { tightness, riskAppetite },
   });
-  const movementSentence = describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable });
+  const movementSentence = describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis });
   const scoreLadders = [
     {
       metric: "tightness" as const,
@@ -570,13 +574,14 @@ async function PageContent({
                 `contents` keeps each section a flex item of the column, so the
                 phone and desktop `order-*` classes below still apply. */}
             <div data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined} className="contents">
-            {/* 2. What changed. One table, every signal, each against last week
-                and against its own lines — the four signals used to be drawn
-                twice on this page, in the hero and again beside the actions. */}
+            {/* 2. What changed. One table, every signal, each against the earlier
+                reading and against its own lines — the four signals used to be
+                drawn twice on this page, in the hero and again beside the actions. */}
             <WhatChangedSection
               rows={signalChangeRows}
               lead={quietDayLine ?? movementSentence}
               comparisonUnavailable={comparisonUnavailable}
+              basis={basis}
             />
 
             {/* 3. What that changes, by area. On a phone this renders before the
@@ -592,7 +597,7 @@ async function PageContent({
             />
 
             {/* 4. What would change the call: the two ladders with their three
-                lines and last week’s dot, the flip watch under the axis each
+                lines and the earlier reading’s dot, the flip watch under the axis each
                 sentence describes, and — only on a week the call moved — what
                 happened the last time it moved this way. */}
             <WhatWouldChangeSection
@@ -605,6 +610,7 @@ async function PageContent({
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
+              basis={basis}
             />
 
             {/* 5. Do and share, including the one conversion on the page. */}

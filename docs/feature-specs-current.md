@@ -1179,17 +1179,15 @@ Also fixed on the card:
 - **A saved or historical reading looked live.** The card gave no sign that a fallback snapshot or `?month=`
   was behind it. It prints the weekly card's label for that (`notLiveReadingLabel`, one function for both).
 
-**Deliberately left off: "last week."** Every export prints `last week 63` beside the funding-pressure
-reading, and the homepage says "rose 27 since last week to 90". The comparison behind both is
+**Found: "last week" was not last week.** Every export printed `last week 63` beside the funding-pressure
+reading, and the homepage said "rose 27 since last week to 90". The comparison behind both is
 `reportDynamics`, built against `getPreviousTimeMachineSnapshot(record_date)`, the latest snapshot
 strictly before the record date, and the bundled Time Machine cache is monthly (176 month-end rows, the
 last 2026-08-31). The reads of Sep 18 and Sep 25 both compare with Aug 31, and 63 and 56 are that
 snapshot's scores. So the figure is the change since the last month-end, up to five weeks, under a
-one-week label — on the page, on `/share`, in the Slack post and in every paste. The card leaves it off,
-and `tests/briefImageRoute.test.ts` pins the precondition (both dates compare with Aug 31) and says what
-to do when it stops being true. Fixing it at the source means labelling the figure with the snapshot's
-date or comparing against a weekly previous reading, which is a product call, so it is recorded here and
-not changed.
+one-week label — on the page, on `/share`, in the Slack post and in every paste. This change left the
+card without it, and `tests/briefImageRoute.test.ts` pinned the precondition. §1.1.26 names the date
+instead, everywhere, and the card prints it again.
 
 **Found, not changed: "Conditions change if" has three answers for one week.** The homepage prints the
 regime lines ("Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 7 pts to
@@ -1199,6 +1197,101 @@ the confirmation rule ("Funding pressure at or below 66 for two readings in a ro
 same label. Each is defended where it is written, and `tests/stageResumeLineIsNotTheCallChange.test.tsx`
 pins the second, so which of them is the line where the call changes is the owner's decision. The brief
 card prints none of them.
+
+### 1.1.26 Every comparison names what it is against (2026-09-29)
+
+§1.1.25 found that "last week" is the previous Time Machine snapshot, which is the last month-end. The
+weekly comparison itself is a product call and is unchanged; what changed is that no surface calls it a
+week any more.
+
+- **The loader records the date.** `ReportDynamics.comparedWith` is `{ recordDate, label }`, set in
+  `reportDataLoader.ts` from `previousSnapshot.record_date` by `buildComparedWith`
+  (`lib/report/comparisonBasis.ts`). The label is "Aug 31", with the year when the earlier reading is from
+  another calendar year ("Dec 31, 2025"), so a January read never prints a date that reads as this year's.
+  It is absent when there was no comparison, and where a source did not say which reading it compared with.
+- **One function names it.** `comparisonBasis(comparedWith)` returns the phrase each place needs: the
+  column head ("Aug 31 → this week"), "since Aug 31", "vs Aug 31", "on Aug 31". Given no date it returns
+  the wording each surface always had, so a source that cannot name its reading does not invent one. The
+  date rides on `PreviousReading` (`previousScoresFromDynamics`, `lib/export/scoreReference.ts`), the one
+  object every export and page already receives its earlier scores in.
+- **Where it prints.** The homepage table's column head, caption, the sentence over it ("The scores moved
+  toward tighter money since Aug 31.") and both ladders' hollow dot; `/signals` (table head, each row's move,
+  score cells, call-line ladders); `/trust` ladders; `/share`, Slack and every paste ("… · 14 pts above ·
+  was 63 on Aug 31 · resume line 66 (24 pts away)"), the "• vs Aug 31: worse" direction line and the
+  Operating latitude line; the `/api/posture/current` summary; the agent payload's `decision_delta`
+  (`compared_with: { record_date, label }` beside `from` and `delta`, and a summary that says "since Aug 31");
+  the home brief's own labels (posture delta, indicator deltas, net delta, and the weekly-movement sentence the
+  published-brief record freezes).
+- **The brief card has the earlier reading back.** `pause line 76 · 14 pts above · was 63 on Aug 31` is
+  one row at the card's 24px type; `tests/briefImageRoute.test.ts` holds the longest dated detail line
+  ("Dec 31, 2025") to one row, because a wrapped row is a fourth line and the 800px budget (769px with
+  three) has no room for one.
+- **A date reads as a date.** In text the earlier reading is "was 63 on Aug 31" rather than "aug 31 63",
+  which reads as two numbers. A ladder's hollow-dot caption gained a colon for the same reason ("Aug 31: 63";
+  "Last week: 63" undated; "Period B: 61" on `/history/compare`).
+
+Deliberately not renamed: "last week's plan", "last week's approvals" and the like, which are about the
+plan the reader is running rather than a comparison; the two market inputs' "vs last week", which move
+against their own previous observation; and the published archive's "vs prior week" on `/brief/[week]`,
+which prints deltas frozen into append-only records that do not say what they were measured against. The
+follow-up for that is to freeze `comparedWith` into newly published records.
+
+**Found, not changed: Operating latitude's move is zero on any week that crossed no line.**
+`buildHomeBriefModel` builds the previous assessment behind `weeklyLeadershipSummary` only when a regime
+alert exists, which needs a regime change or a crossed line. With the same movement (funding pressure +12,
+risk appetite −6) it reports −8, "More defensive since Aug 31.", and `steadyWeek: false` when a line was
+crossed, and `0`, "The guidance is holding where it was on Aug 31.", `steadyWeek: true` when none was, so the
+exports' "Operating latitude … · vs Aug 31: no change" can be printed over a week the scores moved. The
+guidance is the same on that week, which is what the sentence claims; the number is the open question.
+Building the previous assessment from the dynamics whenever a comparison exists would change `steadyWeek`,
+and with it the quiet-day line, so it is recorded here and not changed.
+
+### 1.1.27 Say what moved the score (2026-09-29)
+
+The page said funding pressure went from 63 to 90 and never said which inputs account for the 27.
+
+**Found: the two readings are not built from the same inputs.** `reportDataLoader.ts` scores the earlier
+reading with `evaluateRegime(previousSnapshot, thresholds)`, which is rates alone: no market series and no
+rate-speed history. Today's reading carries both. On the Sep 25 read the earlier scores are 63 and 56; today's
+inputs score 90 and 54 from rates alone, 90 and 54 with the rate-speed history (its term is 0), and 90 and 43
+in full. So funding pressure's +27 is all interest rates, and risk appetite's −13 is −2 from the yield curve
+and −11 from the startup-market inputs (the VC funding slowdown and tech layoff pressure), which the Aug 31
+score was never built from. The risk-appetite "pause line crossed" (43 against 44) is caused entirely by
+those inputs. The Time Machine's monthly walk is not like-for-like either: it scores months with volatility
+and rate speed but no other market series (`buildThreadedRegimeWalk`).
+
+**What ships.** `ReportDynamics.movement` says what each score's move is made of, built by
+`explainScoreMovement` (`lib/report/scoreMovement.ts`), which scores today's inputs in stages through the
+engine itself (the loader's `evaluateRegime`, not a second copy of its arithmetic): rates alone, with the
+rate-speed history, with the market inputs except volatility, and in full. The parts are the differences
+between stages, so they add up to the move exactly (every stage's score is a whole number):
+
+| Score | Parts, in the order they are named |
+| --- | --- |
+| Funding pressure | interest rates · the recent pace of rate rises · credit-market and financial-conditions stress |
+| Risk appetite | the yield curve · startup-market inputs · stock-market volatility |
+
+Startup inputs count as if volatility were absent, and volatility for what it adds on top, because the
+volatility veto caps the score and the two do not add on their own
+(`tests/scoreMovement.test.ts` holds it). Nothing is printed unless the stages rebuild the score the page
+shows, so a replay or a stored snapshot the loader cannot rebuild carries no split instead of one that does
+not add up (`tests/comparisonBasis.test.ts` holds the sum against the real loader).
+
+**Where it prints.** Under each score on the homepage table ("What moved it: -2 from the yield curve and -11
+from startup-market inputs. The Aug 31 score was built from interest rates alone."), under the move on
+`/signals`, and as one line under the two readings in every paste: `What moved the scores since Aug 31:
+funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from
+startup-market inputs). The Aug 31 scores were built from interest rates alone.` (`/share`, Slack, the board
+and issue-tracker forms). The caveat sentence is the point of stating the split: a −11 that is an input the
+earlier score never had is not the market moving, and a reader told only the total takes it for that. It is
+left off when every part is rates or the curve. Not on the brief card, which is at 769px of its 800 with three
+lines to a reading, so a fourth line in each would run off the bottom (`lib/image/briefImageTemplate.tsx`).
+
+**Found, not changed: the earlier reading is scored without the inputs today's has.** Making the comparison
+like-for-like means scoring the earlier reading with the market series as they stood on its date
+(`alignMacroSeriesToAsOf` exists for replays) or leaving the inputs out of the delta. Either changes every
+published delta, the regime alert, and comparability with the archive, so it is a product call and is
+recorded here, with the real numbers, rather than made.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:

@@ -2,6 +2,7 @@ import type { RegimeConfidenceLabel } from "../../regimePresentation";
 import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
 import type { ReportDynamics } from "../reportDataTypes";
+import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 
 const regimeShiftTargets = {
@@ -57,11 +58,17 @@ export const buildWeeklyMovementMetric = ({
   severityDelta,
   changedSignals,
   directionLabel,
+  basis = comparisonBasis(),
 }: {
   severityDelta: number;
   changedSignals: SignalChange[];
   directionLabel: ReportDynamics["directionLabel"] | undefined;
+  /** What the moves are measured against; "this week" wording when the week does not date it. */
+  basis?: ComparisonBasis;
 }) => {
+  /* The comparison is the previous monthly snapshot, so a week that records its
+     date says "since Aug 31" where these sentences used to say "this week". */
+  const window = basis.date ? basis.since : "this week";
   /* Absence of a comparison scores nothing. Without this the inputs of "no
      previous reading" and "a week that moved nothing" are identical — both are
      a zero severity delta and an empty signal list — and this function reported
@@ -95,7 +102,7 @@ export const buildWeeklyMovementMetric = ({
     return {
       score,
       direction: "tightening" as const,
-      summary: `Pressure increased by +${score.toFixed(1)} this week. Slow new commitments until conditions stabilize.`,
+      summary: `Pressure increased by +${score.toFixed(1)} ${window}. Slow new commitments until conditions stabilize.`,
     };
   }
 
@@ -103,14 +110,14 @@ export const buildWeeklyMovementMetric = ({
     return {
       score,
       direction: "easing" as const,
-      summary: `Pressure eased by ${score.toFixed(1)} this week. Move faster on what's already working.`,
+      summary: `Pressure eased by ${score.toFixed(1)} ${window}. Move faster on what's already working.`,
     };
   }
 
   return {
     score,
     direction: "stable" as const,
-    summary: "Conditions held steady this week. Last week's guidance stands.",
+    summary: `Conditions held steady ${window}. Last week's guidance stands.`,
   };
 };
 

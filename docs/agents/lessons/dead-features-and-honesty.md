@@ -326,3 +326,16 @@ illustrative, while the template and the checklist stay blank forms, because tha
 A memo full of real-looking figures without that label is a live claim, and this repo already keeps
 those out of static content.
 
+
+## A period word in a label is a claim about the record's dates (2026-09-29)
+
+"Last week" sat over the change since the previous Time Machine snapshot for as long as the comparison
+existed, on the page, in `/share`, in Slack and in every paste. That snapshot is the last month-end: the
+Sep 18 and Sep 25 reads both compare with Aug 31, so "last week 63" was a number from four weeks back. The
+cache is monthly, the label was written for a weekly one, and nothing tied the two together.
+
+A word for a period ("last week", "this month", "since Monday") is only as true as the dates behind the
+figure, so it comes from them: `ReportDynamics.comparedWith` carries the earlier reading's date and
+`comparisonBasis` (`lib/report/comparisonBasis.ts`) is the one place it becomes words. A new surface that
+prints a comparison takes its label from there. Where a source has no date the wording stays "last week"
+rather than inventing one, which is also how a test can tell the two paths apart. Full account: `docs/feature-specs-current.md` §1.1.26.

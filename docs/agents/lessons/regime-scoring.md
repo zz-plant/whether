@@ -96,3 +96,14 @@ of them, which is less obvious.
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.
 
+
+## A delta is a move only if both readings were scored from the same inputs (2026-09-29)
+
+The weekly change on every surface is today's assessment minus the previous Time Machine snapshot scored
+by `evaluateRegime(snapshot, thresholds)`, which is rates alone. Today's assessment also carries the
+rate-speed term and the curated market series. On the Sep 25 read risk appetite fell 13: 2 from the curve
+and 11 from startup-market inputs the earlier score never had, and the "pause line crossed" it triggered
+(43 against 44) was those inputs, not the market moving. Before printing or acting on a difference between two
+readings, ask whether the readings share their inputs; if they do not, say which part of the difference is
+the inputs. `explainScoreMovement` (`lib/report/scoreMovement.ts`) does that for the two scores, and
+`docs/feature-specs-current.md` §1.1.27 has the numbers and the like-for-like question it leaves open.

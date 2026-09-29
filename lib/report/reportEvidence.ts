@@ -8,6 +8,7 @@ import { regimeSignalLabel } from "./signalTranslations";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildActionStripItems } from "./operatingCalls";
 import type {
+  ComparedWith,
   ReportDynamics,
   ReportEvidenceItem,
 } from "./reportDataTypes";
@@ -304,9 +305,15 @@ export const buildReportEvidenceItems = ({
 export const buildReportDynamics = ({
   current,
   previous,
+  comparedWith,
+  movement,
 }: {
   current: ReturnType<typeof evaluateRegime>;
   previous: ReturnType<typeof evaluateRegime> | null;
+  /** Which reading `previous` is, so the moves can be named against it. */
+  comparedWith?: ComparedWith;
+  /** What each score's move is made of, from `buildScoreMovement`. */
+  movement?: ReportDynamics["movement"];
 }): ReportDynamics => {
   if (!previous) {
     /* No previous reading is not a quiet week. Reporting "stable" here made the
@@ -389,6 +396,8 @@ export const buildReportDynamics = ({
     totalSignalChanges: sortedChanges.length,
     regimeChanged: current.regime !== previous.regime,
     directionLabel,
+    ...(comparedWith ? { comparedWith } : {}),
+    ...(movement ? { movement } : {}),
     signalContributions: resolveSignalInfluence(current),
   };
 };
