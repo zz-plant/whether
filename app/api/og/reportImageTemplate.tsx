@@ -3,6 +3,7 @@ import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { formatConfidenceChipLabel } from "../../../lib/report/reportFormatting";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
+import { SANS_EM, SERIF_EM, fitLines, wrappedLines } from "../../../lib/image/textFit";
 import {
   GlyphMotif,
   OG_BG,
@@ -48,16 +49,11 @@ const frameStyle: CSSProperties = {
  * runway.") set it at 62px, where it takes three lines, and its third line
  * sat on top of the sentence under it.
  *
- * So each variable block is sized by estimating its wrap. The estimate is a
- * greedy word wrap at a per-character width a little above what the faces
- * measure (Plex Serif 600 averages 0.51em on this copy, Plex Sans 0.47em), so
- * it over-counts lines rather than under-counts them: a card that leaves a
- * little air is fine, one that overlaps is not.
+ * So each variable block is sized by estimating its wrap, with the estimate
+ * the brief card shares (`lib/image/textFit.ts`, which says why it errs high).
  */
 const CONTENT_WIDTH = 1200 - 56 * 2;
 const BOX_TEXT_WIDTH = (CONTENT_WIDTH - 16) / 2 - 22 * 2 - 2;
-const SERIF_EM = 0.54;
-const SANS_EM = 0.5;
 /* The least air between the sentence under the headline and the boxes; the
    spacer between them takes whatever the budget leaves over. */
 const BOX_ROW_GAP = 12;
@@ -71,33 +67,6 @@ const BOX_VALUE_SIZES = [25, 22] as const;
 const WHY_SIZE = 27;
 const MAX_BOX_LINES = 3;
 const MAX_WHY_LINES = 2;
-
-/** How many lines `text` wraps to at `fontSize` in `width`, by greedy word wrap. */
-const wrappedLines = (text: string, fontSize: number, width: number, em: number): string[] => {
-  const perLine = Math.max(1, Math.floor(width / (fontSize * em)));
-  const lines: string[] = [];
-  let current = "";
-  for (const word of text.split(/\s+/).filter(Boolean)) {
-    const next = current ? `${current} ${word}` : word;
-    if (next.length <= perLine || !current) {
-      current = next;
-    } else {
-      lines.push(current);
-      current = word;
-    }
-  }
-  if (current) lines.push(current);
-  return lines;
-};
-
-/** `text` cut to `maxLines` at a word, with an ellipsis when anything was cut. */
-const fitLines = (text: string, fontSize: number, width: number, em: number, maxLines: number): string => {
-  const lines = wrappedLines(text, fontSize, width, em);
-  if (lines.length <= maxLines) return text;
-  const kept = lines.slice(0, maxLines);
-  kept[maxLines - 1] = `${kept[maxLines - 1].replace(/[\s.,;:\u2014-]+$/, "")}\u2026`;
-  return kept.join(" ");
-};
 
 type ReportCardLayout = {
   headlineSize: number;

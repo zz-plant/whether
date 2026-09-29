@@ -2,8 +2,10 @@ import { ImageResponse } from "next/og";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
 import { renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
 import { loadOgFonts } from "../../../../lib/image/ogFonts";
-import type { SignalChange } from "../../../../lib/report/homeBriefModel";
+import { buildScoreReadings } from "../../../../lib/export/scoreReference";
+import { notLiveReadingLabel, readerSourceLabel } from "../../../../lib/report/homeSharePreview";
 import { parseImageBriefRequestContext } from "../../../../lib/report/imageBriefSearchParams";
+import { buildSharedCorridorRails } from "../../../../lib/report/operatingCalls";
 import { SECTOR_TAXONOMY, type SectorKey } from "../../../../lib/report/sectorSensitivity";
 import { operatorStageLabel } from "../../../../lib/report/operatorStage";
 
@@ -16,8 +18,20 @@ const cadenceLabel: Record<string, string> = {
   yearly: "Yearly Brief",
 };
 
-const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBriefRequestContext>) => {
+type BriefImageHomepage = Awaited<ReturnType<typeof assembleHomePage>>;
+
+const buildImageContextLabel = (
+  requestContext: ReturnType<typeof parseImageBriefRequestContext>,
+  shell: Pick<BriefImageHomepage["reportShell"], "historicalBanner" | "showOfflineBadge">,
+) => {
+  /* Why this is not simply this week's live reading, in the words the weekly card uses. */
+  const notLive = notLiveReadingLabel({
+    historicalBanner: shell.historicalBanner?.banner ?? null,
+    monthRequested: Boolean(requestContext.searchParams?.month || requestContext.searchParams?.year),
+    isFallback: shell.showOfflineBadge,
+  });
   const labels = [
+    notLive,
     requestContext.searchParams?.sector
       ? SECTOR_TAXONOMY[requestContext.searchParams.sector as SectorKey]?.label
       : null,
@@ -30,11 +44,12 @@ const buildImageContextLabel = (requestContext: ReturnType<typeof parseImageBrie
   return labels.length ? labels.join(" · ") : undefined;
 };
 
-type BriefImageHomepage = Awaited<ReturnType<typeof assembleHomePage>>;
-
 type BuildBriefImagePayloadInput = {
   weeklyDecisionCardModel: BriefImageHomepage["weeklyDecisionCardModel"];
-  reportShell: Pick<BriefImageHomepage["reportShell"], "regime" | "recordDateLabel">;
+  reportShell: Pick<
+    BriefImageHomepage["reportShell"],
+    "regime" | "recordDateLabel" | "provenance" | "historicalBanner" | "showOfflineBadge"
+  >;
 };
 
 export const buildBriefImagePayload = (
@@ -43,6 +58,11 @@ export const buildBriefImagePayload = (
 ): BriefImageProps => {
   const model = homepage.weeklyDecisionCardModel;
   const shell = homepage.reportShell;
+  const scores = {
+    tightness: model.diagnostics.currentScores.tightness,
+    riskAppetite: model.diagnostics.currentScores.riskAppetite,
+  };
+  const callChangeLines = model.diagnostics.postureTrajectory?.thresholds;
 
   return {
     decision:
@@ -50,24 +70,24 @@ export const buildBriefImagePayload = (
       model.decision.actionNowShort ??
       model.decision.immediateDecision,
     regime: shell.regime,
-    postureLabel:
-      model.status.postureWithStageLabel ?? model.status.postureLabel,
-    tightness: model.diagnostics.currentScores.tightness,
-    tightnessDelta:
-      model.decision.reportDynamics.changedSignals.find(
-        (s: SignalChange) => s.key === "tightness",
-      )?.delta ?? 0,
+    /* The derivation `/share` and every paste print: the lines the scores are
+       judged against and how far from each. No `previous`, on purpose: the
+       reading behind "last week" is the previous time-machine snapshot, which
+       is the last month-end (Aug 31 for both the Sep 18 and Sep 25 reads), so
+       the card would print a four-week-old number under a one-week label.
+       `tightnessDelta` used to ride along here and was never drawn. */
+    readings: buildScoreReadings({
+      scores,
+      ...(callChangeLines
+        ? { thresholds: { tightnessRegime: callChangeLines.tightness, riskAppetiteRegime: callChangeLines.riskAppetite } }
+        : {}),
+      rails: buildSharedCorridorRails(model.decision.actionStripItems ?? [], scores),
+    }),
     confidenceLabel: model.status.confidenceLabel,
     recordDate: shell.recordDateLabel,
     briefLabel: cadenceLabel[requestContext.searchParams?.cadence ?? "weekly"] ?? "Weekly Brief",
-    contextLabel: buildImageContextLabel(requestContext),
-    guardrail: model.decision.guardrailThreshold,
-    pauseThreshold:
-      model.diagnostics.postureTrajectory?.thresholds.tightness ??
-      model.diagnostics.regimeDistance.thresholdValue,
-    flipConditions: model.decision.compactFlipConditionLabels?.length
-      ? model.decision.compactFlipConditionLabels
-      : undefined,
+    contextLabel: buildImageContextLabel(requestContext, shell),
+    sourceLabel: readerSourceLabel(shell.provenance.sourceLabel),
   };
 };
 
@@ -79,8 +99,8 @@ export async function GET(request: Request) {
   ]);
 
   // Without registered faces satori falls back to its default font and fetches a
-  // Google font for every glyph that font lacks -- the brief carries at least one
-  // (the U+2264 in the flip-condition copy). That fetch failing aborts the render
+  // Google font for every glyph that font lacks -- report copy carries some (the
+  // U+2264 in a flip condition, an arrow). That fetch failing aborts the render
   // after the headers are already sent, so the card downloads as an empty file.
   const image = new ImageResponse(
     renderBriefImage(buildBriefImagePayload(homepage, requestContext)),

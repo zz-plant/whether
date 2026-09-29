@@ -1,5 +1,12 @@
 # One-screen weekly leadership brief spec (v2, decision-complete)
 
+> **Status (2026-09-29).** Blocks A–H below are the v2 design intent. The rendered homepage carries none of
+> their required labels ("THIS WEEK", "Operating latitude", "Revisit decisions", "Window velocity", "Memory
+> rail", "Confidence strip", "What changes if wrong"); its sections are the week and the call, "What are you
+> deciding this week?", "What changed this week", "What that changes for you", "What would change this
+> guidance" and "Do and share". Read "Current implementation contract" below and `docs/feature-specs-current.md`
+> §1.1 for what ships; do not build to the block labels.
+
 ## Product job to be done
 Whether must reduce uncertainty faster than leadership debate does, in under 30 seconds.
 

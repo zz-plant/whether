@@ -1150,6 +1150,56 @@ deadlock" on every request where the quote source declined, because `lib/saasMul
 early without reading the refused responses' bodies while fetching the basket in parallel. They are
 released now.
 
+### 1.1.25 The brief card says what the exports say (2026-09-29)
+
+`/api/image/brief` — the PNG `/share` lists and the card a Slack channel or link unfurl shows — set its
+confidence chip and its data line at 12–13px (about 5px in a feed) and spent its middle on one of the
+two scores, beside a gauge whose end labels were bare numbers. It never said where either score sat
+against the line that changes the call, so the number could not be acted on. It now draws both readings
+the way `/share` and every paste print them: the value, the pause line and the distance to it, the resume
+line and the distance to that. `buildScoreReadings` (`lib/export/scoreReference.ts`) returns those parts
+and `buildScoreReferenceLines` joins the same parts, so the card and the paste share one derivation;
+`tests/briefImageRoute.test.ts` fails if they drift. Nothing on the card is under 22px (the weekly card's
+floor), and the call is sized by the wrap estimate the weekly card uses (`lib/image/textFit.ts`, shared by
+both now) instead of being cut at 80 characters.
+
+Also fixed on the card:
+
+- **The weather word printed twice** ("FREEZING · FREEZING"): the regime's weather label and the posture
+  label, which is the same word, both printed. It is one stamp in the regime's own colour now, as on the
+  weekly card.
+- **A direction arrow picked by substring.** "tighten" drew an up arrow and "ease" a down arrow, and
+  "increase" contains "ease". Gone; the top bar and the stamp carry the tone.
+- **"Data: FRED · Treasury · Yahoo Finance".** Yahoo Finance feeds only the SaaS comps and contributes
+  nothing to either score (§1.1.9 corrected the same credit on `/state`). The line now names what the
+  scores are built from, through one label both share (`readerSourceLabel`): Treasury rates and FRED
+  (credit spreads, volatility, financial conditions), plus the curated startup-market snapshot that
+  `/about` says every surface using it should disclose. The weekly card's line said "US Treasury rates"
+  alone, which reads as rates-only; a review of this change caught that, and the shared label fixes both.
+- **A saved or historical reading looked live.** The card gave no sign that a fallback snapshot or `?month=`
+  was behind it. It prints the weekly card's label for that (`notLiveReadingLabel`, one function for both).
+
+**Deliberately left off: "last week."** Every export prints `last week 63` beside the funding-pressure
+reading, and the homepage says "rose 27 since last week to 90". The comparison behind both is
+`reportDynamics`, built against `getPreviousTimeMachineSnapshot(record_date)`, the latest snapshot
+strictly before the record date, and the bundled Time Machine cache is monthly (176 month-end rows, the
+last 2026-08-31). The reads of Sep 18 and Sep 25 both compare with Aug 31, and 63 and 56 are that
+snapshot's scores. So the figure is the change since the last month-end, up to five weeks, under a
+one-week label — on the page, on `/share`, in the Slack post and in every paste. The card leaves it off,
+and `tests/briefImageRoute.test.ts` pins the precondition (both dates compare with Aug 31) and says what
+to do when it stops being true. Fixing it at the source means labelling the figure with the snapshot's
+date or comparing against a weekly previous reading, which is a product call, so it is recorded here and
+not changed.
+
+**Found, not changed: "Conditions change if" has three answers for one week.** The homepage prints the
+regime lines ("Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 7 pts to
+clear 50", `buildFlipThreshold`). The weekly card and the `/share` paste print `weeklyCall.callChangesIf`,
+the confirmation rule ("Funding pressure at or below 66 for two readings in a row",
+`buildWeeklyLockCommitment().flipConditions[0]`). The `/share` panel lists two rate conditions under the
+same label. Each is defended where it is written, and `tests/stageResumeLineIsNotTheCallChange.test.tsx`
+pins the second, so which of them is the line where the call changes is the owner's decision. The brief
+card prints none of them.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -1566,7 +1616,8 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   mandate export payload.
 
 ### 6.6 Open Graph
-- `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).
+- `GET /api/og` — PNG Open Graph image with regime metadata (supports Time Machine selection); `template=report` is the weekly card.
+- `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and resume lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
 
 ### 6.7 Agent access (MCP)
 - `POST /api/mcp` (no `?tool` param) — **MCP streamable-HTTP transport** (JSON-RPC 2.0,
