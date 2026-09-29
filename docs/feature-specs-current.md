@@ -1713,13 +1713,44 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 - `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and resume lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
 
 ### 6.7 Agent access (MCP)
+- `GET /api/agent?view=state` — the compact state to decide from (§6.9); `?view=full` (the default) is the whole brief.
 - `POST /api/mcp` (no `?tool` param) — **MCP streamable-HTTP transport** (JSON-RPC 2.0,
   protocol 2025-06-18): `initialize`, `ping`, `tools/list`, `tools/call` over
-  `application/json` responses. Tool registry lives in `lib/mcp/httpMcpServer.ts`
-  (get_brief, get_context, get_projection, get_comps, get_signals). Standard MCP clients
-  can mount `https://whether.work/api/mcp` directly.
-- `GET/POST /api/mcp?tool=…` — legacy REST tool API, kept for existing integrations.
-- `bun run mcp:whether` — local stdio MCP server (separate tool set, official SDK).
+  `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
+  directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
+- `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
+- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/stdioServer.ts`): the same tools, plus
+  `pull_recent_site_info`.
+
+### 6.9 One state, one tool registry (2026-09-29)
+Agents met the product through four surfaces that disagreed about what Whether says and how to ask.
+Changes, all additive except where noted:
+
+- **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
+  MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
+  carry the published confidence now. `/api/weekly` and `/api/monthly` still return the engine's label in
+  `summary.confidence` (their archive regenerates from the same builders, and `summary.summary` prose there
+  can still disagree with the published label); a decision for the owner, not made here.
+- **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
+  first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
+  Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.
+- **One registry** (`lib/agent/tools.ts`) for the remote server, the local server and the GET shim: five
+  tools on the local server against twelve remote, under two names, is one list of 13 (plus the local-only
+  `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
+  in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
+  and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
+- **Inputs** (`lib/agent/inputs.ts`): a regime by key or by the site's weather word in any case; empty
+  arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
+  with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
+  an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became
+  weekly (now refused). `get_context` and `get_projection` fill what is left out from today's reading and
+  say so in `inputs`.
+- **Discovery from the registry**: the manifest lists `mcp.tools`, `start` pointers, `views` and the
+  `automation` check (it promised "MCP tools" and listed none); `/llms.txt` and `/api-docs` name every tool;
+  `tests/agentDiscoveryParity.test.ts` holds each place that names a tool to the registry.
+- **`get_context` counts months.** Its counts came from the Time Machine's regime series, one entry per month-end, and were named `weeksActive` / `historicalAvgWeeks`: "8 weeks" was 8 months (§1.1.26, the same period-word defect). They are `monthsActive` / `historicalAvgMonths` now (**breaking** for a caller reading the old names; its only caller in the repo is the tool), with the `latestSnapshot` they run to, and a `note` when the count is 0 because the regime is newer than the last month-end.
+- **Browsers.** `/api/mcp` answers its CORS preflight and carries `Access-Control-Allow-Origin: *` on the JSON-RPC transport and the reads; `?tool=subscribe` stays closed.
+- **CLI**: `whether state` (and `--require-ready`, which exits 8 when the data is not live and current); a mistyped command is refused as one (it was answered "too many arguments for 'status'"); `changes` names the dated reading it compares with, uses reader names and says what moved a score.
 
 ### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
 Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls

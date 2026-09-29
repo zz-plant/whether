@@ -1,9 +1,43 @@
 # Agent interface: MCP + skill-aligned handoff
 
-This repo now exposes a dedicated interface for agentic LLM workflows, with two complementary paths:
+This repo exposes a dedicated interface for agentic LLM workflows, with these paths:
 
-1. **HTTP endpoint** for generic tool-calling agents.
-2. **MCP server** for Model Context Protocol-compatible runtimes.
+1. **The state** (`GET /api/agent?view=state`, MCP `get_state`, CLI `whether state`) — the small answer to decide from.
+2. **HTTP endpoint** for generic tool-calling agents (the full brief).
+3. **MCP server**, remote (`/api/mcp`) and local (`bun run mcp:whether`), for Model Context Protocol-compatible runtimes.
+4. **A plain-GET shim** on `/api/mcp?tool=<name>` for an agent with no MCP client.
+
+## Start here: the state
+
+The full brief answers "everything Whether says this week" in about 22KB (twice that over MCP, which
+returns the object as text and as structured content), of which the part an agent acts on is under 2KB.
+`GET /api/agent?view=state` is that part, in about 3KB, built by `lib/agentState.ts` from the same context
+as the full brief:
+
+| Field | What it is |
+| --- | --- |
+| `headline` | The state in one sentence, for an agent that only quotes. |
+| `automation` | `{ ready, refusal }`: whether the data is live and current. **Check `ready` before acting without a person looking.** False for a saved copy, a record older than 10 days, or failed assembly; `refusal` says which. It says nothing about what the guidance is. This is `publishReadiness`, not `degraded`. |
+| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`. |
+| `conditions` / `confidence` | The weather word and its stable `key`; the published confidence (`HIGH`/`MED`/`LOW`, percent) — the same one the page, `/api/scores` and the CLI carry. |
+| `scores.tightness` / `scores.riskAppetite` | `value`, `meaning`, and against each line: `pause`, `resume` (each `{ line, distance, side, met }`; `met` on the pause line means the pause applies) and `change` (where the conditions themselves change). Then `previous`, `delta`, `perWeek` (the pace to hand a projection) and `moved` (what the delta is made of, signed, adding up to it). |
+| `change` | `direction`, `regimeChanged`, `comparedWith` (the earlier reading, dated: the previous month-end snapshot, **not last week**), `days` and a `note` where part of `moved` is an input the earlier score never had. |
+| `guidance` | `call`, `doNow`, `avoidNow`, `flipConditions`. |
+| `use` / `links` | The use limits every guidance-carrying response carries; where to read more. |
+
+Its shape is a zod schema (`agentStateSchema`) published as the `outputSchema` of the MCP tool `get_state`,
+so a client can read the contract without making a call, and `tests/agentState.test.ts` holds the numbers in
+it to the page's own. It takes no cadence other than weekly (`?view=state&cadence=monthly` is a 400, not the
+weekly state under another name) and cannot be combined with `format=jev`.
+
+## One confidence
+
+`/api/agent`'s root `confidence` (`{ label, percent }`), the legacy `?tool=get_brief` answer and the RSS item
+all carry the published confidence. `summary.confidence` and the prose sentence beside it on this route are
+set to it too. They read the engine's own label (its confirmation gate, not a published fact) until
+2026-09-29, and said MEDIUM on a week the page called High (`tests/agentConfidenceAgreement.test.ts`).
+`/api/weekly` and `/api/monthly` still return the engine's label in `summary.confidence`, and the archive is
+regenerated from the same builders; use `/api/scores` or `/api/agent` when the number is what you gate on.
 
 ## Why this approach
 
@@ -23,7 +57,9 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Defaults to `weekly`.
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
 - The payload now includes `decision_rules`, `decision_delta`, and `flip_watch` so agents can explain what changed, what should change now, and what would flip the call without reconstructing their own regime logic.
-- Returns HTTP 400 for invalid cadence values.
+- Returns HTTP 400 for invalid cadence values, and for an unknown `view` (`allowedViews`).
+- `?view=state` answers the compact state above instead of the full brief (default view: `full`).
+- The payload's `confidence` is the published confidence; `decision_delta.compared_with` names the reading the changes are measured against.
 - Includes read-only CORS headers for browser-based tool clients.
 - Supports `OPTIONS /api/agent` preflight with `204`.
 - Returns `publishReadiness` — the judgment the Monday Slack post and email refuse on
@@ -57,7 +93,7 @@ Machine-discovery routes:
 curl "http://localhost:3000/api/agent?cadence=weekly"
 ```
 
-## Option B: MCP interface
+## Option B: local MCP interface (stdio)
 
 Script entrypoint:
 
@@ -65,14 +101,14 @@ Script entrypoint:
 bun run mcp:whether
 ```
 
-This starts a stdio MCP server with tools:
+This starts a stdio MCP server (`lib/mcp/stdioServer.ts`) with the **same tools as `/api/mcp`**, from the
+same definitions (`lib/agent/tools.ts`), plus one that only makes sense on a local checkout:
 
-- `get_agent_brief(cadence?)`
-  - returns the same structured agent brief as `/api/agent`
-- `list_agent_skills()`
-  - returns the current Whether skill contract used in payloads
 - `pull_recent_site_info(cadence?, siteUrl?)`
   - fetches the latest `/api/agent` payload from the site so an agent can pull recent live context
+- `get_agent_brief` still answers, as an alias of `get_brief`, for clients configured before the two
+  servers were merged. It was one of five tools here (against twelve remote) under another server name
+  (`whether-agent-interface`); both are now `whether` (`lib/mcp/serverIdentity.ts`).
 
 ### Example MCP client config (shape)
 
@@ -91,12 +127,18 @@ This starts a stdio MCP server with tools:
 
 `https://whether.work/api/mcp` is an MCP streamable-HTTP server (JSON-RPC 2.0; `initialize`,
 `ping`, `tools/list`, `tools/call`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
-key. Implementation: `lib/mcp/httpMcpServer.ts`; transport tests:
-`tests/mcpStreamableTransport.test.ts`.
+key. Transport: `lib/mcp/httpMcpServer.ts`; transport tests: `tests/mcpStreamableTransport.test.ts`.
+The `initialize` result carries instructions that say where to start (`lib/mcp/serverIdentity.ts`).
 
-Tools: `get_brief`, `get_context`, `get_projection`, `get_comps`, `get_signals`,
-`stress_test_plan`, `lint_commitment`, `get_analog_playbook`, and — the same surface the stdio
-server had — `get_decision_rules`, `get_recent_history`, `list_agent_skills`.
+Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
+
+- `get_state` — **start here.** The compact state above; publishes an `outputSchema`.
+- `get_brief` — the full brief for a cadence (about 22KB). Alias: `get_agent_brief`.
+- `get_decision_rules` — the bounded rules by regime. Keyed by regime, one key for one regime.
+- `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
+- `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
+- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `get_analog_playbook` — a plan checked against today's conditions.
+- `list_agent_skills` — the skill contract.
 
 Client config (shape):
 
@@ -107,6 +149,53 @@ Client config (shape):
   }
 }
 ```
+
+### Results
+
+`tools/call` answers `content[0].text` as **compact** JSON (no indentation: a quarter shorter) and the
+same object as `structuredContent`, which is always an object (`get_decision_rules` for one regime used
+to answer an array, which the SDK client rejects). A refusal or a failure is a result with `isError`
+and plain words; it carries no `structuredContent`, which a client validating against an `outputSchema`
+would reject. Only an unknown tool is a protocol error (`-32602`), and it lists the tools there are.
+
+### Inputs
+
+Every tool takes named arguments from `lib/agent/inputs.ts`, and refuses what it cannot take with the
+values that would have worked:
+
+- A **regime** is accepted by key (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`) or by the word
+  the site prints (`Freezing`, `Cloudy`, `Stormy`, `Sunny`), in any case, and answered on the key.
+  `get_context` with `SUNNY` used to answer zero weeks and no history, as a success.
+- An argument that is `null`, empty or whitespace is an argument not sent.
+- A number may be sent as text, and zero is a value (`riskAppetite=0` was refused as missing).
+- A cadence, lifecycle stage or signal key is matched in any case; an unknown one is refused rather than
+  becoming weekly.
+- An argument the tool does not take is **named**, not ignored: with defaults, `regim` would otherwise
+  be a plausible answer to a question nobody asked.
+- `get_context` and `get_projection` fill what is left out from today's reading, and their `inputs`
+  says which of `given`, `today` or `assumed` each value was. A what-if (any score given) assumes 0
+  pace rather than borrowing today's for other scores. `tightnessDelta`/`riskAppetiteDelta` are
+  points **per week**; `get_state`'s `perWeek` is that number.
+
+### From a browser
+
+CORS is open on `/api/mcp` (`lib/agentApiCors.ts`): the preflight a JSON-RPC POST triggers is answered, and the reads and the transport carry `Access-Control-Allow-Origin: *`, as `/api/agent` always has. Before, a page could not call the remote server at all. `?tool=subscribe` stays closed (it sends an email): its preflight is unanswered, so a page's POST is never sent.
+
+### Plain GET
+
+Every tool also answers `GET /api/mcp?tool=<name>&<argument>=<value>` for an agent without an MCP client
+(`tool=get_actions` lists them with their arguments and a working call). Four keep the answer shape they
+had before the registry (`get_context` under `context`, `get_projection` under `projection`, `get_comps`,
+`get_signals`); `get_brief` answers a summary (regime, action, confidence) and says so; any other tool
+answers `{ ok, tool, result, use }`. An unknown tool, or a wrong argument, is a 400 with `available` or
+`problems[].allowed`. It was a 200 with the brief.
+
+### Adding a tool
+
+Add one `defineTool` in `lib/agent/tools.ts`: name, description, a zod input shape, a `run`. The remote
+server, the local one, the GET shim and its catalogue, `/.well-known/whether-agent.json` (`mcp.tools`),
+`/llms.txt` and the `/api-docs` page pick it up. `tests/agentDiscoveryParity.test.ts` fails if a place
+that names the tools is missing one, and requires this guide to name it.
 
 ## Skills contract alignment
 
@@ -126,10 +215,11 @@ Current app-level skills in the payload:
 
 ## Recommended usage pattern for agent builders
 
-1. Call `list_agent_skills` once per session (or cache by commit hash).
-2. Call `get_agent_brief` per cadence needed.
-3. Generate outputs in the order declared by `skills`, using `decision_delta` for “what changed / what changes now” and `flip_watch` for bounded reversal monitoring.
-4. Keep provenance and source URLs attached in any user-facing response.
+1. Call `get_state`. If `automation.ready` is false, say so and stop; the reading is a saved copy or too old to name this week.
+2. Decide from `scores.*.pause` / `resume` / `change` and `guidance`; use `moved` and `change.comparedWith` when explaining why a number moved.
+3. Call `get_brief` only for the wording, the record, or a cadence other than weekly; call `list_agent_skills` once per session (or cache by commit hash) when working from it.
+4. Generate outputs in the order declared by `skills`, using `decision_delta` for “what changed / what changes now” and `flip_watch` for bounded reversal monitoring.
+5. Keep provenance and source URLs attached in any user-facing response.
 
 ## Production monitoring endpoints
 

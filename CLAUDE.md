@@ -135,6 +135,10 @@ Canonical modules — extend these before creating new ones:
   `alertDelivery` mails subscribers
 - **Trust / continuity** — `lib/report/trustStatus.ts`, `lib/report/reportFormatting.ts`,
   `lib/timeMachine/*`
+- **Agent surfaces** — the state (`lib/agentState.ts`, served at `/api/agent?view=state`), and every tool an
+  agent can call in `lib/agent/tools.ts`: the two MCP transports (`lib/mcp/`), the `/api/mcp?tool=` shim, the
+  manifest and `/llms.txt` all read it, and `tests/agentDiscoveryParity.test.ts` holds them to it. Add a tool
+  there, once. Inputs and refusals: `lib/agent/inputs.ts`.
 - **Operator-domain catalog** — `lib/decisionDomainCatalog.ts`
 - **Navigation IA** — `lib/navigation/informationArchitecture.ts`
 
