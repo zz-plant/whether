@@ -44,10 +44,14 @@ const defaultDependencies: HomeSharePreviewDependencies = {
 
 /* "Canonical ingestion (FRED)" names our pipeline; a reader wants the publisher.
    Every treasury source resolves to one of these two. The brief card
-   (`/api/image/brief`) reads the same label, so both cards name one source. */
+   (`/api/image/brief`) reads the same label, so both cards name one source.
+   The scores start from Treasury rates, then credit spreads, volatility and
+   financial conditions (all FRED) and the curated startup-market snapshot
+   adjust them (`/about`, spec 3.1). The label used to say "US Treasury rates"
+   alone, which reads as rates-only, so it names all three. */
 export const readerSourceLabel = (sourceLabel: string) =>
   /FRED/i.test(sourceLabel)
-    ? "US Treasury rates, via the St. Louis Fed (FRED)"
+    ? "US Treasury and the St. Louis Fed (FRED), plus a curated startup-market snapshot"
     : /treasury/i.test(sourceLabel)
       ? "US Treasury daily yield curve"
       : sourceLabel;

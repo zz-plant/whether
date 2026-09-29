@@ -38,9 +38,9 @@ export type BriefImageProps = {
  * Satori cannot measure text, so the one block that varies in length, the
  * call, is sized by estimating its wrap (`lib/image/textFit.ts`). Worst case on
  * the 800px canvas, measured off a render: padding (44 + 38), the header (30),
- * the stamp and its margin (26 + 54), a three-line call at 56px (18 + 185), the
- * least air (20), two readings of three lines each (2 x 135 + 12 between) and
- * the footer and its margin (16 + 40) come to 753px.
+ * the stamp and its margin (22 + 54), a three-line call at 56px (14 + 185), the
+ * least air (20), two readings of three lines each (2 x 131 + 10 between) and
+ * the footer, chip row then source line (14 + 40 + 8 + 28) come to 769px.
  */
 const WIDTH = 1200;
 const HEIGHT = 800;
@@ -52,8 +52,9 @@ const MAX_CALL_LINES = 3;
    one column, sized for the longer value, so their labels start on one edge. */
 const VALUE_SIZE = 84;
 const VALUE_GLYPH_WIDTH = 52;
-/* The footer's source line shares its row with the confidence chip and the site name. */
-const SOURCE_WIDTH = 560;
+/* The source has a line of its own under the chip: the label names three inputs, and
+   "Source: " takes about 90px of the row. */
+const SOURCE_WIDTH = CONTENT_WIDTH - 90;
 /* The weather stamp takes about 190px of its row; the scope beside it gets the rest, on one line. */
 const CONTEXT_WIDTH = CONTENT_WIDTH - 230;
 
@@ -96,7 +97,7 @@ const readingRow = (reading: ScoreReadingParts, valueWidth: number) => {
         display: "flex",
         alignItems: "center",
         gap: 28,
-        padding: "14px 24px",
+        padding: "12px 24px",
         borderRadius: 8,
         background: OG_PANEL,
         border: `1px solid ${OG_BORDER}`,
@@ -175,7 +176,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
         <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{`Data as of ${recordDate}`}</div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 26 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 22 }}>
         <div
           style={{
             display: "flex",
@@ -196,7 +197,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
       <div
         style={{
           display: "flex",
-          marginTop: 18,
+          marginTop: 14,
           fontSize: call.size,
           lineHeight: 1.1,
           fontWeight: 600,
@@ -209,12 +210,12 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
 
       <div style={{ display: "flex", flex: 1, minHeight: 20 }} />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {readings.map((reading) => readingRow(reading, valueWidth))}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div
             style={{
               display: "flex",
@@ -230,9 +231,9 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
           >
             {confidenceBadge}
           </div>
-          {source ? <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{source}</div> : null}
+          <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: OG_TEXT_SECONDARY }}>whether.work</div>
         </div>
-        <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: OG_TEXT_SECONDARY }}>whether.work</div>
+        {source ? <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{source}</div> : null}
       </div>
     </div>
   );

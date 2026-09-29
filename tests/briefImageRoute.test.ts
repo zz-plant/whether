@@ -151,7 +151,10 @@ describe("buildBriefImagePayload", () => {
   });
 
   it("names the source in a reader's words, and says when it is not this week's live reading", () => {
-    assert.equal(buildBriefImagePayload(buildHomepage()).sourceLabel, "US Treasury rates, via the St. Louis Fed (FRED)");
+    assert.equal(
+      buildBriefImagePayload(buildHomepage()).sourceLabel,
+      "US Treasury and the St. Louis Fed (FRED), plus a curated startup-market snapshot",
+    );
     assert.equal(buildBriefImagePayload(buildHomepage()).contextLabel, undefined);
     assert.equal(buildBriefImagePayload(buildHomepage({ showOfflineBadge: true })).contextLabel, "Saved reading, not live");
 
@@ -219,7 +222,7 @@ const fullCardProps: BriefImageProps = {
   decision:
     "Hold net-new hiring and freeze discretionary spend until funding pressure falls back under the resume line and stays there for two readings in a row.",
   contextLabel: "Historical mode active · March 2026 · Fintech · Series B",
-  sourceLabel: "US Treasury rates, via the St. Louis Fed (FRED)",
+  sourceLabel: "US Treasury and the St. Louis Fed (FRED), plus a curated startup-market snapshot",
   readings: buildBriefImagePayload(buildHomepage()).readings.map((reading) => ({ ...reading, value: "100" })),
 };
 
@@ -247,7 +250,7 @@ describe("brief decision card render", () => {
     const text = collectText(renderBriefImage(briefImageProps));
 
     assert.equal(text.match(/freezing/gi)?.length, 1, "the weather word printed twice on the old card");
-    assert.match(text, /Source: US Treasury rates, via the St\. Louis Fed \(FRED\)/);
+    assert.match(text, /Source: US Treasury and the St\. Louis Fed \(FRED\), plus a curated startup-market snapshot/);
     // Yahoo Finance feeds the SaaS comps only and contributes nothing to either score.
     assert.doesNotMatch(text, /yahoo/i);
     assert.match(text, /MEDIUM CONFIDENCE/);

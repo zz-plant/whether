@@ -1171,8 +1171,11 @@ Also fixed on the card:
 - **A direction arrow picked by substring.** "tighten" drew an up arrow and "ease" a down arrow, and
   "increase" contains "ease". Gone; the top bar and the stamp carry the tone.
 - **"Data: FRED · Treasury · Yahoo Finance".** Yahoo Finance feeds only the SaaS comps and contributes
-  nothing to either score (§1.1.9 corrected the same credit on `/state`). The line is the reading's own
-  source in the words the weekly card uses (`readerSourceLabel`).
+  nothing to either score (§1.1.9 corrected the same credit on `/state`). The line now names what the
+  scores are built from, through one label both share (`readerSourceLabel`): Treasury rates and FRED
+  (credit spreads, volatility, financial conditions), plus the curated startup-market snapshot that
+  `/about` says every surface using it should disclose. The weekly card's line said "US Treasury rates"
+  alone, which reads as rates-only; a review of this change caught that, and the shared label fixes both.
 - **A saved or historical reading looked live.** The card gave no sign that a fallback snapshot or `?month=`
   was behind it. It prints the weekly card's label for that (`notLiveReadingLabel`, one function for both).
 
