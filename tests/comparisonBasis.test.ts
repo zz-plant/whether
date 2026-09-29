@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { DEFAULT_THRESHOLDS, evaluateRegime } from "../lib/regimeEngine";
 import { buildComparedWith, comparisonBasis } from "../lib/report/comparisonBasis";
+import { findSignalDelta } from "../lib/report/evidenceReaderModel";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { buildReportDynamics } from "../lib/report/reportEvidence";
 import { getPreviousTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
@@ -79,5 +80,22 @@ describe("what the report's dynamics record", () => {
     assert.ok(previous, "a comparison was made, so a snapshot sits before this record date");
     assert.equal(reportDynamics.comparedWith?.recordDate, previous.record_date);
     assert.match(reportDynamics.comparedWith?.label ?? "", /^[A-Z][a-z]{2} \d{1,2}(, \d{4})?$/);
+  });
+
+  it("splits each score's move so the parts add up to the move the page shows, or splits nothing", async () => {
+    const result = await loadReportDataSafe({}, { route: "/" });
+    const { reportDynamics } = result.ok ? result.data : result.fallback;
+    const movement = reportDynamics.movement;
+
+    if (reportDynamics.directionLabel === "unavailable") {
+      assert.equal(movement, undefined, "no comparison, nothing to split");
+      return;
+    }
+    // A replay or a stored snapshot the loader cannot rebuild carries no split; a split it does carry is exact.
+    if (!movement) return;
+    for (const key of ["tightness", "riskAppetite"] as const) {
+      const total = (movement[key]?.parts ?? []).reduce((sum, part) => sum + part.points, 0);
+      assert.ok(Math.abs(total - (findSignalDelta(reportDynamics, key) ?? 0)) < 1e-9, `${key}: the parts add up to the move`);
+    }
   });
 });

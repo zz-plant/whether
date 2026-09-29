@@ -15,7 +15,7 @@ import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels }
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
-import { buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
+import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { describeBaseRateSource, describeConditions, describeWeeklyDirection, formatExportConfidence } from "./exportTerms";
 
 /*
@@ -193,9 +193,11 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
 
 /**
  * The readings against their lines, one line per score, in the shape every
- * export and the page's `ScoreCell` share (`lib/export/scoreReference.ts`).
- * The sentences elsewhere in the brief say the rule; this says where the
- * reading sits against it, so nobody pastes a paragraph to answer "how close".
+ * export and the page's `ScoreCell` share (`lib/export/scoreReference.ts`),
+ * then one line saying what the scores' moves are made of when the week has a
+ * split to print. The sentences elsewhere in the brief say the rule; this says
+ * where the reading sits against it, so nobody pastes a paragraph to answer
+ * "how close".
  *
  * "Last week" prints only from `options.previousScores`. An earlier version
  * read `diagnostics.tightnessDelta` as a weekly move, and that field was a
@@ -204,12 +206,16 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
 export const buildReadingLines = (assessment: RegimeAssessment, options?: ExportLayerOptions): string[] => {
   const items = resolveModeledDecisionPayload(options).actionStripItems ?? [];
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
-  return buildScoreReferenceLines({
-    scores,
-    thresholds: assessment.thresholds,
-    rails: buildSharedCorridorRails(items, scores),
-    previous: options?.previousScores ?? null,
-  });
+  const movementLine = buildScoreMovementLine(options?.previousScores);
+  return [
+    ...buildScoreReferenceLines({
+      scores,
+      thresholds: assessment.thresholds,
+      rails: buildSharedCorridorRails(items, scores),
+      previous: options?.previousScores ?? null,
+    }),
+    ...(movementLine ? [movementLine] : []),
+  ];
 };
 
 const buildViralArtifactBlock = (

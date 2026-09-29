@@ -41,6 +41,19 @@ export type ComparedWith = {
   label: string;
 };
 
+/**
+ * What a score's move is made of (`lib/report/scoreMovement.ts`). The earlier
+ * reading is scored from interest rates alone; today's also carries the
+ * rate-speed term and the market inputs, so a move is not only the market
+ * moving.
+ */
+export type ScoreMovementSource = "rates" | "curve" | "rateSpeed" | "credit" | "startupMarket" | "marketStress";
+
+export type ScoreMovement = {
+  /** Points each source added to the score, signed, in the order they are named. Zeros are left out. */
+  parts: Array<{ source: ScoreMovementSource; points: number }>;
+};
+
 export type ReportDynamics = {
   changedSignals: Array<{
     key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
@@ -75,6 +88,13 @@ export type ReportDynamics = {
    * comparison, and where a source did not say which reading it compared with.
    */
   comparedWith?: ComparedWith;
+  /**
+   * What the move in each score is made of, where the loader could reproduce
+   * the score it shows from its inputs. Absent when there was no comparison,
+   * and on a replay or a stored snapshot whose score cannot be rebuilt here:
+   * a split that does not add up to the number on the page is not printed.
+   */
+  movement?: Partial<Record<"tightness" | "riskAppetite", ScoreMovement>>;
   signalContributions?: NormalizedSignalContribution[];
 };
 

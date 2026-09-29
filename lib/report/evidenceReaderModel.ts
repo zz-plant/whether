@@ -7,6 +7,7 @@ import type { ActionStripItem } from "./operatingCalls";
 import { buildSharedCorridorRails } from "./operatingCalls";
 import { describeSignalDirection } from "./signalClusterReading";
 import { comparisonBasis } from "./comparisonBasis";
+import { describeScoreMovement } from "./scoreMovement";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
@@ -36,7 +37,7 @@ import { resolveDataStatusLabel } from "./trustStatus";
 
 export const SIGNAL_KEYS: readonly RegimeSignalKey[] = ["tightness", "riskAppetite", "baseRate", "curveSlope"];
 
-type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith">;
+type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith" | "movement">;
 
 
 export type SignalReferenceRow = {
@@ -57,6 +58,8 @@ export type SignalReferenceRow = {
   betterWhen: "higher" | "lower";
   /** One sentence for the move, in the reader's terms. */
   direction: { label: string; tone: "easing" | "tightening" | "unchanged" };
+  /** What a score's move is made of, in a sentence; null for an input, and for a score the loader could not split. */
+  movement: string | null;
   /** The watch page for this signal, where one exists. */
   watchHref: string | null;
 };
@@ -136,6 +139,7 @@ const rowFor = (
     units,
     betterWhen: BETTER_WHEN[key],
     direction,
+    movement: isScore ? describeScoreMovement(key, dynamics.movement?.[key], basis) : null,
     watchHref: WATCH_HREF_BY_KEY[key],
   };
 };

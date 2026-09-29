@@ -126,6 +126,20 @@ export function WhatChangedSection({
                       className="mt-1 whitespace-normal font-normal text-slate-300/80"
                     />
                   ) : null}
+                  {/* Which inputs took the score from the earlier reading to
+                      this one. The chip says how far it went; without this a
+                      27-point move reads as the market having moved 27 points,
+                      when part of a score's move can be an input the earlier
+                      score never had. */}
+                  {row.movement ? (
+                    <p
+                      className="mt-1 whitespace-normal text-pretty text-fluid-nano font-normal leading-5 text-slate-400"
+                      data-movement={row.key}
+                    >
+                      <span className="font-medium text-slate-300">What moved it: </span>
+                      {row.movement}
+                    </p>
+                  ) : null}
                 </th>
                 <td className="whitespace-nowrap py-2.5 pr-3 text-xs max-sm:p-0">
                   {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}

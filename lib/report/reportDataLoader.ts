@@ -21,6 +21,7 @@ import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
 import { buildComparedWith } from "./comparisonBasis";
+import { explainScoreMovement } from "./scoreMovement";
 import type {
   ComparedWith,
   ConfidenceTrendFraming,
@@ -114,6 +115,7 @@ type ReportDataLoaderDependencies = {
     current: RegimeAssessment;
     previous: RegimeAssessment | null;
     comparedWith?: ComparedWith;
+    movement?: ReportDynamics["movement"];
   }) => ReportDynamics;
   buildForecastModel: (args: {
     assessment: RegimeAssessment;
@@ -491,6 +493,20 @@ export const loadReportDataUncachedInternal = async ({
        naming its date is what stops them reading as a week's. */
     comparedWith: previousSnapshot
       ? buildComparedWith(previousSnapshot.record_date, treasury.record_date)
+      : undefined,
+    /* What the moves are made of. The earlier reading is scored from rates
+       alone (above), so today's inputs are scored in stages to say which part
+       of each move is rates and which is an input the earlier score never had.
+       No split is printed unless the stages rebuild the assessment on the page. */
+    movement: previousAssessment
+      ? explainScoreMovement({
+          previous: previousAssessment.scores,
+          current: assessment.scores,
+          treasury,
+          thresholds,
+          macroSeries: assessmentMacroSeries,
+          evaluate: deps.evaluateRegime,
+        })
       : undefined,
   });
   const regimeTrend = deps.deriveRegimeTrend(previousAssessment, assessment);

@@ -1244,6 +1244,53 @@ guidance is the same on that week, which is what the sentence claims; the number
 Building the previous assessment from the dynamics whenever a comparison exists would change `steadyWeek`,
 and with it the quiet-day line, so it is recorded here and not changed.
 
+### 1.1.27 Say what moved the score (2026-09-29)
+
+The page said funding pressure went from 63 to 90 and never said which inputs account for the 27.
+
+**Found: the two readings are not built from the same inputs.** `reportDataLoader.ts` scores the earlier
+reading with `evaluateRegime(previousSnapshot, thresholds)`, which is rates alone: no market series and no
+rate-speed history. Today's reading carries both. On the Sep 25 read the earlier scores are 63 and 56; today's
+inputs score 90 and 54 from rates alone, 90 and 54 with the rate-speed history (its term is 0), and 90 and 43
+in full. So funding pressure's +27 is all interest rates, and risk appetite's −13 is −2 from the yield curve
+and −11 from the startup-market inputs (the VC funding slowdown and tech layoff pressure), which the Aug 31
+score was never built from. The risk-appetite "pause line crossed" (43 against 44) is caused entirely by
+those inputs. The Time Machine's monthly walk is not like-for-like either: it scores months with volatility
+and rate speed but no other market series (`buildThreadedRegimeWalk`).
+
+**What ships.** `ReportDynamics.movement` says what each score's move is made of, built by
+`explainScoreMovement` (`lib/report/scoreMovement.ts`), which scores today's inputs in stages through the
+engine itself (the loader's `evaluateRegime`, not a second copy of its arithmetic): rates alone, with the
+rate-speed history, with the market inputs except volatility, and in full. The parts are the differences
+between stages, so they add up to the move exactly (every stage's score is a whole number):
+
+| Score | Parts, in the order they are named |
+| --- | --- |
+| Funding pressure | interest rates · the recent pace of rate rises · credit-market and financial-conditions stress |
+| Risk appetite | the yield curve · startup-market inputs · stock-market volatility |
+
+Startup inputs count as if volatility were absent, and volatility for what it adds on top, because the
+volatility veto caps the score and the two do not add on their own
+(`tests/scoreMovement.test.ts` holds it). Nothing is printed unless the stages rebuild the score the page
+shows, so a replay or a stored snapshot the loader cannot rebuild carries no split instead of one that does
+not add up (`tests/comparisonBasis.test.ts` holds the sum against the real loader).
+
+**Where it prints.** Under each score on the homepage table ("What moved it: -2 from the yield curve and -11
+from startup-market inputs. The Aug 31 score was built from interest rates alone."), under the move on
+`/signals`, and as one line under the two readings in every paste: `What moved the scores since Aug 31:
+funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from
+startup-market inputs). The Aug 31 scores were built from interest rates alone.` (`/share`, Slack, the board
+and issue-tracker forms). The caveat sentence is the point of stating the split: a −11 that is an input the
+earlier score never had is not the market moving, and a reader told only the total takes it for that. It is
+left off when every part is rates or the curve. Not on the brief card, which is at 769px of its 800 with three
+lines to a reading, so a fourth line in each would run off the bottom (`lib/image/briefImageTemplate.tsx`).
+
+**Found, not changed: the earlier reading is scored without the inputs today's has.** Making the comparison
+like-for-like means scoring the earlier reading with the market series as they stood on its date
+(`alignMacroSeriesToAsOf` exists for replays) or leaving the inputs out of the delta. Either changes every
+published delta, the regime alert, and comparability with the archive, so it is a product call and is
+recorded here, with the real numbers, rather than made.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

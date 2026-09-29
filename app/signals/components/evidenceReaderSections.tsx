@@ -147,6 +147,14 @@ export const SignalsWhatChangedSection = ({
                 </th>
                 <td className="py-2.5 pr-3 max-sm:p-0">
                   <DeltaChip row={row} />
+                  {/* What the score's move is made of. The chip says how far it
+                      went; this says which inputs took it there, and that the
+                      earlier score was built from rates alone. */}
+                  {row.movement ? (
+                    <p className="mt-1.5 max-w-[18rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
+                      {row.movement}
+                    </p>
+                  ) : null}
                 </td>
                 <td className="py-2.5 pr-3 max-sm:col-span-2 max-sm:p-0">
                   {row.value === null ? (

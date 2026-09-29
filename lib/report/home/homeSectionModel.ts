@@ -8,6 +8,7 @@ import type { BoundedDecisionRule, DecisionArea } from "../boundedDecisionRules"
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../homeBriefModel";
 import { findSignalDelta } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
+import { describeScoreMovement } from "../scoreMovement";
 
 /**
  * The homepage as five sections in the reader's order: the call, what changed,
@@ -36,6 +37,8 @@ export type SignalChangeRow = {
   previous: number | null;
   previousLabel: string | null;
   delta: number | null;
+  /** What the move is made of, in a sentence; absent for an input, and where the loader could not split the score. */
+  movement?: string | null;
   /** Which way "up" counts: funding pressure and the base rate worsen as they rise. */
   increaseIsPositive: boolean;
   /** Where on its 0–100 scale a composite score sits, in the scale's words. */
@@ -92,6 +95,7 @@ export const buildSignalChangeRows = ({
       previous,
       previousLabel: previous === null ? null : formatRegimeSignalValue(previous, key),
       delta,
+      movement: isScore ? describeScoreMovement(key, dynamics.movement?.[key], comparisonBasis(dynamics.comparedWith)) : null,
       increaseIsPositive: INCREASE_IS_POSITIVE[key],
       scaleLabel: isScore && typeof value === "number" ? scoreBandScaleLabel(classifyScoreBand(value)) : undefined,
       lines: metricLines

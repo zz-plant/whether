@@ -16,7 +16,7 @@ import { formatNumberWithUnit } from "../formatters";
 import { buildComplianceStamp } from "../exportNotices";
 import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, buildCallLines, type ModeledExportDecisionPayload } from "./briefBuilders";
 import { describeBaseRateSource, describeConditions, formatExportConfidenceWord } from "./exportTerms";
-import { buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
+import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { resolvePublishedConfidence } from "../report/confidence";
 import { regimeSignalLabel } from "../report/signalTranslations";
@@ -75,7 +75,9 @@ export const buildIssueTrackerMarkdownBrief = (
     thresholds: assessment.thresholds,
     rails: buildSharedCorridorRails(decisionModel?.actionStripItems ?? [], scores),
     previous: decisionModel?.previousScores ?? null,
-  }).map((line) => `${bullet} ${line}`);
+  })
+    .concat(buildScoreMovementLine(decisionModel?.previousScores) ?? [])
+    .map((line) => `${bullet} ${line}`);
   /* The stamp below carries the source in plain text for every format; the
      wiki form adds a linked one because its stamp URL is not clickable. */
   const sourceLine = isWiki ? `Source: [${treasury.source}|${treasury.source}]` : null;

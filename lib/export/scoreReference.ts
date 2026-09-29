@@ -4,6 +4,8 @@ import { ruleMetricLabel, type RuleConditionMetric } from "../report/boundedDeci
 import { buildSharedCorridorRails, formatPointsToLine } from "../report/operatingCalls";
 import type { ComparedWith, ReportDynamics } from "../report/reportDataTypes";
 import { findSignalDelta } from "../report/evidenceReaderModel";
+import { comparisonBasis } from "../report/comparisonBasis";
+import { describeScoreMovementLine } from "../report/scoreMovement";
 import { signalReadingMeaning } from "../report/signalTranslations";
 
 /**
@@ -27,10 +29,17 @@ type ScorePair = Record<RuleConditionMetric, number>;
  * reading for it; no `comparedWith` means the source did not date it, and the
  * paste says "last week" as it always did.
  */
-type PreviousScores = Partial<Record<RuleConditionMetric, number | null>> & { comparedWith?: ComparedWith | null };
+type PreviousScores = Partial<Record<RuleConditionMetric, number | null>> & {
+  comparedWith?: ComparedWith | null;
+  /** What each score's move is made of, where the loader could split it (`ReportDynamics.movement`). */
+  movement?: ReportDynamics["movement"];
+};
 
 /** `PreviousScores` with both scores present, as `previousScoresFromDynamics` returns it. */
-export type PreviousReading = ScorePair & { comparedWith?: ComparedWith | null };
+export type PreviousReading = ScorePair & {
+  comparedWith?: ComparedWith | null;
+  movement?: ReportDynamics["movement"];
+};
 
 /** What each of the three lines is called in a paste. */
 const SCORE_LINE_LABELS = {
@@ -63,7 +72,10 @@ const roundToTenth = (value: number) => Math.round(value * 10) / 10;
  * has the evidence.
  */
 export const previousScoresFromDynamics = (
-  dynamics: Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith"> | null | undefined,
+  dynamics:
+    | Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith" | "movement">
+    | null
+    | undefined,
   current: ScorePair,
 ): PreviousReading | null => {
   if (!dynamics || dynamics.directionLabel === "unavailable") return null;
@@ -72,8 +84,17 @@ export const previousScoresFromDynamics = (
     tightness: roundToTenth(current.tightness - deltaFor("tightness")),
     riskAppetite: roundToTenth(current.riskAppetite - deltaFor("riskAppetite")),
     ...(dynamics.comparedWith ? { comparedWith: dynamics.comparedWith } : {}),
+    ...(dynamics.movement ? { movement: dynamics.movement } : {}),
   };
 };
+
+/**
+ * The line every paste carries under the two readings: what each score's move
+ * is made of. Null when the week has no split to print (no comparison, or a
+ * score the loader could not rebuild), so a paste never claims one.
+ */
+export const buildScoreMovementLine = (previous: PreviousScores | null | undefined): string | null =>
+  describeScoreMovementLine(previous?.movement, comparisonBasis(previous?.comparedWith));
 
 type ScoreReferenceInput = {
   scores: ScorePair;
