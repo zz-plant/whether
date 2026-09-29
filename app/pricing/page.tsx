@@ -13,12 +13,6 @@ import {
   type PricingPlan,
 } from "../../lib/pricing";
 
-import {
-  FreeTierGlyph,
-  ProTierGlyph,
-  TeamTierGlyph,
-} from "../components/illustrations/PricingTierGlyphs";
-
 export const runtime = "edge";
 
 /* Through the shared builder, like every other page. The hand-written block set
@@ -50,18 +44,12 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
         isFree ? "border-sky-500/30" : ""
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h2 className="text-fluid-sm font-semibold text-white">{plan.name}</h2>
-          <p className="text-fluid-xs text-slate-400">{plan.audience}</p>
-        </div>
-        {plan.id === "free" ? (
-          <FreeTierGlyph size={32} />
-        ) : plan.id === "pro" ? (
-          <ProTierGlyph size={32} />
-        ) : (
-          <TeamTierGlyph size={32} />
-        )}
+      {/* No tier icon. Each card carried a stock glyph in a ring (a code
+          bracket, a chart, a person) that said nothing the plan name did not,
+          and three decorative icons in a row is the look of a template. */}
+      <div className="space-y-1">
+        <h2 className="text-fluid-sm font-semibold text-white">{plan.name}</h2>
+        <p className="text-fluid-xs text-slate-400">{plan.audience}</p>
       </div>
 
       <p className="text-2xl font-bold text-white">{formatMonthlyPrice(plan)}</p>
@@ -89,7 +77,7 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
             data-premium-cta={`pricing-${plan.id}`}
             data-premium-detail={plan.id}
           >
-            {plan.id === "team" ? "Activate Team Workspace" : "Request Pro Access"}
+            {plan.id === "team" ? "Request Team access" : "Request Pro access"}
           </ActionLink>
         )}
       </div>
@@ -105,7 +93,7 @@ export default function PricingPage() {
     >
       <div className="mx-auto max-w-[64rem] space-y-5 sm:space-y-8 px-4 py-4 sm:py-8">
         <header className="space-y-2.5 sm:space-y-3">
-          <h1 className="text-fluid-lg font-semibold text-white">Pricing</h1>
+          <h1 className="text-fluid-2xl font-semibold text-white">Pricing</h1>
           <p className="max-w-2xl text-fluid-sm text-slate-300">{FREE_FOREVER_PROMISE}</p>
           {/* The promise above is the strongest data claim this site makes, and
               until /privacy existed there was nowhere to check it. A claim a
@@ -114,8 +102,8 @@ export default function PricingPage() {
           <p className="max-w-2xl text-fluid-xs text-slate-400">
             <Link href="/privacy" className="text-sky-300 underline-offset-2 hover:underline">
               What that means in practice
-            </Link>{" "}
-            — every store, cookie, and measurement, itemised.
+            </Link>
+            : every store, cookie and measurement, listed.
           </p>
         </header>
 
@@ -144,9 +132,9 @@ export default function PricingPage() {
             </p>
           )}
           <p className="max-w-2xl text-fluid-xs text-slate-400">
-            Questions about custom enterprise models or multi-team rollouts?{" "}
+            Buying for several teams, or need something the plans don&apos;t cover?{" "}
             <Link href="/contact" className="underline decoration-slate-600 underline-offset-4 hover:text-white">
-              Contact us
+              Get in touch
             </Link>
             .
           </p>

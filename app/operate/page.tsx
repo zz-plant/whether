@@ -14,14 +14,14 @@ export { buildActionsExpansionHref } from "./planningPageModel";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Plan — Rules, Runway, and the Brief",
+  title: "Plan: rules, runway and the brief",
   description:
     "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
   path: "/operate",
   imageAlt: "Whether planning view",
   imageParams: {
     template: "operations",
-    title: "Plan — Rules, Runway, and the Brief",
+    title: "Plan: rules, runway and the brief",
     subtitle: "Turn this week's guidance into a plan.",
   },
 });

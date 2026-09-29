@@ -189,7 +189,8 @@ export async function buildTrustPageModel() {
     actions: {
       nextStep: {
         href: "/signals",
-        description: "Check evidence",
+        description: "See which readings moved this week, and by how much.",
+        label: "Open the evidence",
       },
     },
     payloads: {

@@ -19,26 +19,31 @@ type WeeklyTone = "tightening" | "easing" | "holding";
 // to ignore the regime, so a Sunny week that softened a little read "freeze new
 // commitments" above a card that said scale proven bets — the two surfaces
 // disagreed about the same call. Direction picks the row; regime picks the verb.
+//
+// Two sentences, not a fragment and a dash. "Conditions tightening — freeze…"
+// is the page's h1 and the first line of every Slack post, and a noun phrase
+// hinged on an em dash is the shape a reader has learned to recognise as
+// machine copy. The first sentence says what happened, the second what to do.
 const ACTION_NOW_BY_REGIME: Record<RegimeKey, Record<WeeklyTone, string>> = {
   EXPANSION: {
-    tightening: "Conditions tightening — keep what is working. Don't start anything new this week.",
-    easing: "Conditions easing — grow what is working, one milestone at a time.",
-    holding: "Conditions holding — keep growing what is working at the current pace.",
+    tightening: "Conditions are tightening. Keep what is working, and don't start anything new this week.",
+    easing: "Conditions are easing. Grow what is working, one milestone at a time.",
+    holding: "Conditions are holding. Keep growing what is working at the current pace.",
   },
   VOLATILE: {
-    tightening: "Conditions tightening — keep only the bets you can stop, and run fewer experiments at once.",
-    easing: "Conditions easing — restart paused work one item at a time.",
-    holding: "Conditions holding — only start things one person can stop.",
+    tightening: "Conditions are tightening. Keep only the bets you can stop, and run fewer experiments at once.",
+    easing: "Conditions are easing. Restart paused work one item at a time.",
+    holding: "Conditions are holding. Only start things one person can stop.",
   },
   DEFENSIVE: {
-    tightening: "Conditions tightening — freeze new commitments and keep spend flexible.",
-    easing: "Conditions easing — resume paused work with clear milestones.",
-    holding: "Conditions holding — continue at the current pace, with a number on each outcome.",
+    tightening: "Conditions are tightening. Freeze new commitments and keep spend flexible.",
+    easing: "Conditions are easing. Resume paused work with clear milestones.",
+    holding: "Conditions are holding. Continue at the current pace, with a number on each outcome.",
   },
   SCARCITY: {
-    tightening: "Conditions tightening — freeze new commitments and protect runway.",
-    easing: "Conditions easing — resume paused work with clear milestones.",
-    holding: "Conditions holding — hold spend flat and require paybacks inside 6 months.",
+    tightening: "Conditions are tightening. Freeze new commitments and protect runway.",
+    easing: "Conditions are easing. Resume paused work with clear milestones.",
+    holding: "Conditions are holding. Keep spend flat and require paybacks inside 6 months.",
   },
 };
 
@@ -136,9 +141,10 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     // boundary, reaching 50 does not flip an "above" one, so that side says
     // "clear".
     const distance = Math.max(1, Math.round(Math.abs(threshold - now)));
+    const unit = distance === 1 ? "pt" : "pts";
     const move = direction === "riseAbove"
-      ? `rises ${distance} pts to clear ${formatScoreValue(threshold)}`
-      : `falls ${distance} pts to ${formatScoreValue(threshold)} or below`;
+      ? `rises ${distance} ${unit} to clear ${formatScoreValue(threshold)}`
+      : `falls ${distance} ${unit} to ${formatScoreValue(threshold)} or below`;
     return { text: `${label} ${move} (${formatScoreValue(now)} today)`, tripped };
   };
 

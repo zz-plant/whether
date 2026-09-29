@@ -37,7 +37,7 @@ import type { RegimeIconType } from "./pageShell";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 import type { OperatingLoopStep } from "./illustrations/OperatingLoopGlyph";
-import { NextStepCard } from "./report-shell/NextStepCard";
+import { NextStepCard, type NextStep } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
 
@@ -70,7 +70,7 @@ export type ReportShellModel = {
     primaryCta?: ReportCtaProps;
     exportCta?: ExportCtaProps | null;
     showShare?: boolean;
-    nextStep?: { description: string; href: string };
+    nextStep?: NextStep;
     nextRefreshLabel?: string;
   };
   payloads?: {
@@ -146,12 +146,10 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             carried no more weight than item boundaries. On phones the outer
             gap stays tighter than the desktop one: 40px between the chips
             row, the notice and the intro was unused space above the first
-            task block, not separation. */}
-        <div className={`order-1 min-w-0 space-y-6 sm:space-y-8 lg:space-y-12 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
-          {/* The outline, in chip form, where the rail is hidden. Renders
-              nothing on a page with fewer than two sections. */}
-          <MobileSectionChips sectionLinks={sectionLinks} />
-
+            task block, not separation. Desktop stops at 32px: at 48px, on top
+            of the first section's own padding, ~90px of empty ground sat
+            between the intro and the page's first heading. */}
+        <div className={`order-1 min-w-0 space-y-6 sm:space-y-8 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
           {/* Every page built on this shell renders a reading, and the service
               worker serves the last copy of any of them when the network is
               gone. `/` carried this notice alone, so /trust — the page the IA
@@ -177,6 +175,13 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             activeStep={activeStep}
           />
 
+          {/* The outline, as a row of tabs, where the rail is hidden. Under the
+              intro rather than above it: a phone read the index before it had
+              read which page it was on. Sticky, so it still follows the reader
+              down once they pass it. Renders nothing on a page with fewer than
+              two sections. */}
+          <MobileSectionChips sectionLinks={sectionLinks} />
+
           {/* The section rule was white/[0.04] — below the visible threshold
               by this repo's own measure (see the border-alpha note in
               tokens.css, which raised the floor to 0.10 for exactly this
@@ -189,7 +194,13 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               invisible on the light theme's near-white ground, and 0.10 is
               not one of the four alphas the light escape-hatch block
               remaps. */}
-          <div className="divide-y divide-[color:var(--border-default)]">
+          {/* Every section row pads both sides, and the column pulls itself up
+              by one row's padding instead. Deciding "first" by index gave the
+              top row no top padding — but the first child is often a tracker
+              that renders nothing (/resolve, /operate), so the real first
+              section took the full padding and sat ~32px lower than on pages
+              without one. */}
+          <div className="-mt-5 divide-y divide-[color:var(--border-default)] lg:-mt-8">
             {contentSections.map((section, index) => {
               const sectionKey =
                 isValidElement(section) && section.key != null
@@ -204,7 +215,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
                 // divider: an empty ~64px band between two rules on a first visit.
                 <div
                   key={sectionKey}
-                  className={`empty:hidden ${index === 0 ? "pb-5 lg:pb-8" : "py-5 lg:py-8"}`}
+                  className="empty:hidden py-5 lg:py-8"
                 >
                   {section}
                 </div>

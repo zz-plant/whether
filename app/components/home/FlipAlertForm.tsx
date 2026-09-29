@@ -63,8 +63,8 @@ export function FlipAlertForm({ condition }: { condition?: string }) {
         Tell me when this changes
       </p>
       <p className="max-w-[64ch] text-fluid-xs text-slate-400">
-        {condition ? <>Watching: {condition} </> : null}
-        No weekly email. One note the day the guidance changes or a score crosses its line.
+        {condition ? <>Next change to watch: {condition} </> : null}
+        One email, on the day the guidance changes or a score crosses its line. No weekly newsletter.
       </p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <label htmlFor="flip-alert-email" className="sr-only">Email address</label>

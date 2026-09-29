@@ -259,7 +259,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
         <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-12">
           <FlatPanel className="lg:col-span-12">
-            <PanelTitle title="1) Recession warning gauge over time" subtitle="One block per period. Green = normal, Amber = flattening, Red = inverted (recession warning)." />
+            <PanelTitle title="Recession warning gauge over time" subtitle="One block per period: green is normal, amber is flattening, red is inverted." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.curveSignal)}`} title={`${point.label}: ${formatPercent(point.curveSignal)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
@@ -268,7 +268,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
 
           <FlatPanel className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <PanelTitle title="2) Rates by term" subtitle="What the government pays to borrow, by how long it is borrowing for." />
+              <PanelTitle title="Rates by term" subtitle="What the government pays to borrow, by how long it is borrowing for." />
               <SegmentedControl
                 options={CADENCE_OPTIONS}
                 value={cadence}
@@ -317,9 +317,10 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
-            {/* Numbered to match DOM order, which is also the screen-reader and
-                mobile reading order. The titles used to run 1, 2, 4, 3, 5. */}
-            <PanelTitle title="3) Steepness vs level" subtitle="Each dot is one month: across = the two-year rate, up = the 10Y−2Y spread. Always monthly, regardless of the cadence toggle." />
+            {/* Unnumbered. The titles were "1)" to "5)" to match DOM order, but a
+                numbered list of charts reads as a report template, and nothing
+                on the page refers to a chart by its number. */}
+            <PanelTitle title="Steepness against level" subtitle="Each dot is one month: across is the two-year rate, up is the gap between the ten-year and two-year rates. Monthly whichever period you pick above." />
             <svg
               viewBox="-3 -3 106 78"
               className="weather-data-plot mx-auto h-auto w-full max-w-[24rem]"
@@ -400,7 +401,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">
-            <PanelTitle title="4) Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
+            <PanelTitle title="Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread; dashed line marks zero">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
@@ -424,7 +425,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
-            <PanelTitle title="5) Biggest weekly rate moves" subtitle="The weeks the two-year and ten-year rates moved most, largest first." />
+            <PanelTitle title="Biggest weekly rate moves" subtitle="The weeks the two-year and ten-year rates moved most, largest first." />
             <ul className="space-y-1 text-xs text-slate-200">
               {topShocks.length ? (
                 topShocks.map((shock) => (

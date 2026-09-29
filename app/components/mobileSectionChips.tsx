@@ -58,9 +58,12 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
     <nav
       ref={navRef}
       aria-label="Page sections"
-      className="sticky top-0 z-20 -mx-4 overflow-x-auto border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-4 py-1.5 backdrop-blur [scrollbar-width:none] lg:hidden"
+      className="sticky top-0 z-20 -mx-4 overflow-x-auto border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 backdrop-blur [scrollbar-width:none] lg:hidden"
     >
-      <ul className="flex min-w-max items-center gap-1.5 pb-0.5">
+      {/* Text tabs with an underline, the register the header and the /operate
+          workstream row use. They were bordered boxes, so a phone met a row of
+          five outlined buttons, clipped at the edge, before the page's title. */}
+      <ul className="flex min-w-max items-center gap-0.5">
         {sectionLinks.map((section) => {
           const isActive = section.href === `#${activeSectionId}`;
           return (
@@ -69,10 +72,10 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
                 ref={isActive ? activeChipRef : undefined}
                 href={section.href}
                 aria-current={isActive ? "location" : undefined}
-                className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-md border px-3 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
+                className={`-mb-px inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-2.5 text-fluid-nano font-medium no-underline transition-colors weather-focus-ring ${
                   isActive
-                    ? "border-[color:var(--regime-accent)] bg-[color:var(--regime-accent)]/15 text-slate-100 font-semibold"
-                    : "border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                    ? "border-[color:var(--regime-accent)] text-slate-100 font-semibold"
+                    : "border-transparent text-slate-400 hover:text-slate-200"
                 }`}
               >
                 {section.label}

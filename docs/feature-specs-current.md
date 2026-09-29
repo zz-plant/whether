@@ -1700,6 +1700,8 @@ surfaces do not reintroduce the old words.
   the condition that *breaks* the call, which `/trust` correctly labels "This recommendation
   breaks if" — so the same string appeared under opposite meanings on two pages. It now reads
   `actionStripItems[0].reversalCondition`, symmetric with the pause trigger in "Wrong if" above it.
+  (2026-09-29: both rows now print the canonical slot labels, "Pause if" and "Resume when";
+  "Wrong if" / "Safe again when" were a third name for the pair.)
 - **The hero's resume row is labeled `clearsWhen`, not `flipWatch`.** That row holds the resume
   thresholds (66 / 54), and sat directly under the reversal row (70 / 50) as a near-synonym
   carrying different numbers, leaving three unexplained pairs stacked in one box.

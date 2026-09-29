@@ -159,40 +159,45 @@ export const buildOperatingStanceLine = ({
   directionLabel: ReportDynamics["directionLabel"] | undefined;
   currentRegime: Regime;
 }) => {
+  // Plain instructions: who gets approved, what waits. These read "Tighten to
+  // survival mode:", "Operate for proof:" and "Press proven growth lanes" — a
+  // label, a colon and a list of three, with "lanes" standing in for whatever
+  // the reader actually sells. The share formats print this line as the
+  // guidance, so it is the sentence most often pasted into someone's channel.
   if (severityDelta > 0 || directionLabel === "deteriorating") {
     if (currentRegime === "SCARCITY") {
-      return "Tighten to survival mode: approve only renewals, core delivery, and revenue-backed roles.";
+      return "Approve only renewals, work already promised to customers, and hires that bring in revenue.";
     }
     if (currentRegime === "DEFENSIVE") {
-      return "Tighten approvals around retention, margin, and revenue-linked work.";
+      return "Tighten approvals to work that protects retention, margin or revenue.";
     }
     if (currentRegime === "VOLATILE") {
-      return "De-risk this week: ship reliability, trust, and short-payback releases.";
+      return "Ship fixes and releases that pay back quickly; hold anything you could not reverse.";
     }
-    return "Keep expansion selective: add capacity only in proven demand lanes and keep rollback criteria explicit.";
+    return "Keep growing, but add people only where demand is already proven, and write down when you would stop.";
   }
 
   if ((severityDelta < 0 || directionLabel === "improving") && currentRegime === "EXPANSION") {
-    return "Press proven growth lanes and add capacity where demand is already converting.";
+    return "Put more behind what is already selling, and hire where demand is already converting.";
   }
 
   if (currentRegime === "SCARCITY") {
-    return "Operate for cash survival: approve only renewals, core delivery, and revenue-backed roles.";
+    return "Spend only on renewals, work already promised to customers, and hires that bring in revenue.";
   }
   if (currentRegime === "DEFENSIVE") {
-    return "Hold approvals steady around retention, margin, and revenue-linked work.";
+    return "Hold approvals steady for work that protects retention, margin or revenue.";
   }
   if (currentRegime === "VOLATILE") {
-    return "Operate for proof: ship reliability, trust, and short-payback releases.";
+    return "Favour releases that pay back quickly and can be rolled back.";
   }
-  return "Press proven growth lanes and add capacity where demand is already converting.";
+  return "Put more behind what is already selling, and hire where demand is already converting.";
 };
 
 const trendMemoLines: Record<string, string> = {
   Stable: "No material signal shift this week.",
   Improving: "Conditions loosened this week.",
   Deteriorating: "Conditions tightened this week.",
-  Mixed: "Signals split this week — some loosened, some tightened.",
+  Mixed: "Signals split this week: some loosened, some tightened.",
 };
 
 export const buildWeeklyMemoLines = ({
