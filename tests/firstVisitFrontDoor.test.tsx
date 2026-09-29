@@ -1,12 +1,25 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FirstVisitDecisionPicker, type DecisionPickerOption } from "../app/components/home/FirstVisitDecisionPicker";
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import * as nextNavigation from "next/navigation";
+
+const mockAny: any = mock;
+
+/* The picker reads the app router; renderToStaticMarkup mounts none. Installed
+   here so the file answers for its own dependencies rather than passing on
+   another suite's ordering luck. */
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+}));
 
 /**
  * The first-visit front door on `/`: the brief below the call folds away for a

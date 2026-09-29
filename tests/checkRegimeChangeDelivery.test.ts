@@ -99,10 +99,8 @@ describe("checkRegimeChange Slack delivery", () => {
 
     await checkRegimeChange({ snapshot });
 
-    /* Deactivation is detached by design (a slow KV write must not fail the
-       check's state write), so give the microtask a beat to land before reading. */
-    await new Promise((resolve) => setTimeout(resolve, 5));
-
+    /* The deactivation is awaited inside the poster now, so the store read
+       here happens after the bookkeeping, not racing it. */
     const active = await store.listActiveWebhooks();
     assert.equal(active.includes("https://hooks.slack.com/services/T0/B0/revoked"), false);
   });

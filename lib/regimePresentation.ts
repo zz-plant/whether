@@ -24,15 +24,21 @@ export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 
 /**
- * One fact about money and one instruction per weather word. The metaphor is
- * cashed out here rather than extended: "protect heat" and "move only with
- * shelter" told a reader what the weather was like, not what to do about it.
+ * One fact about money per weather word — the condition, not the advice.
+ *
+ * The instruction half these sentences used to carry ("Move faster", "Fund
+ * what is already working") belongs to the call, which is computed from the
+ * week's scores, the stage and the runway. Beside a call it can contradict —
+ * a Sunny stamp that said "Move faster" under a call that said to cap new
+ * experiments read as two recommendations disagreeing, when the truth is one
+ * condition and one constraint. The stamp states the condition; the heading
+ * owns the instruction.
  */
 export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
-  SCARCITY: "Money is expensive and hard to raise. Conserve cash and avoid commitments you can't undo.",
-  DEFENSIVE: "Money is available but pricey. Fund what is already working; hold the rest.",
-  VOLATILE: "Conditions are changing week to week. Only commit where you can reverse.",
-  EXPANSION: "Money is cheap and available. Move faster, and keep the pause line in view.",
+  SCARCITY: "Money is expensive and hard to raise.",
+  DEFENSIVE: "Money is available but pricey.",
+  VOLATILE: "Conditions are changing week to week.",
+  EXPANSION: "Money is cheap and available.",
 };
 
 /* The same sentence, led by the weather word, for the legend's screen-reader label. */

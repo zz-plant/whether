@@ -15,6 +15,7 @@ import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord"
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
+import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
 
 export const runtime = "edge";
@@ -45,7 +46,8 @@ export default async function MethodPage({
     trustStrip,
     scorePositions,
     runHistory,
-    reportShellProps,
+    readerReturns,
+    reportShellModel,
   } = await buildTrustPageModel();
 
   const secondaryContent = (
@@ -114,7 +116,7 @@ export default async function MethodPage({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              <li><span className="text-slate-400">Resume fixed-cost commitments when:</span> confidence is back to high and conditions have held for a second reading.</li>
+              <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> confidence is back to high and conditions have held for a second reading.</li>
             </ul>
           </article>
           <article className="weather-hub-card space-y-3 px-4 py-4">
@@ -184,7 +186,7 @@ export default async function MethodPage({
   );
 
   return (
-    <ReportShell {...reportShellProps}>
+    <ReportShell model={reportShellModel}>
       {/* The strip, directly under the h1, in the slot every reading route
           gives it: record date, sources, confidence, could the call change.
           This was a five-cell "System status" card — data, freshness, sources,
@@ -212,6 +214,8 @@ export default async function MethodPage({
       </section>
 
       <RunHistorySection runHistory={runHistory} />
+
+      {readerReturns ? <ReaderReturnsSection line={readerReturns.line} generatedAt={readerReturns.generatedAt} /> : null}
 
       <FormulaReference positions={scorePositions} />
 

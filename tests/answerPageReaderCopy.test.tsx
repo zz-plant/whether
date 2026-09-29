@@ -45,6 +45,21 @@ const renderAnswer = async (slug: string) => {
 const ENGINE_VOCABULARY = /\b(tightness|noindex|riskAppetite)\b/i;
 
 describe("answer page reader copy", () => {
+  it("keeps each enduring answer visible beside dated market guidance", async () => {
+    for (const slug of ["when-should-startups-cut-burn", "should-startups-hire-engineers-right-now", "should-startups-raise-capital-now"]) {
+      const page = answerPages.find((entry) => entry.slug === slug)!;
+      const html = await renderAnswer(slug);
+      const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
+      assert.ok(visible.includes(page.shortAnswer), `${slug} lost its question-specific answer`);
+      assert.ok(visible.includes("Company inputs to check"));
+      assert.ok(visible.includes("Decision note to complete"));
+      assert.ok(visible.includes("Market guidance as of"));
+      assert.ok(visible.includes('href="/"'));
+      const faqScript = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+      assert.ok(faqScript?.includes(page.shortAnswer), "structured answer must retain the same enduring answer");
+    }
+  });
+
   it("gives every bare score a name, a scale, and a reading", async () => {
     const html = await renderAnswer(answerPages[0]?.slug ?? "");
 

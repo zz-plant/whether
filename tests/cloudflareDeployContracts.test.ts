@@ -7,6 +7,7 @@ describe("Cloudflare deploy contracts", () => {
   const source = readFileSync(new URL("../scripts/cloudflare-run.mjs", import.meta.url), "utf8");
   const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
   const prePush = readFileSync(new URL("../.husky/pre-push", import.meta.url), "utf8");
+  const preCommit = readFileSync(new URL("../.husky/pre-commit", import.meta.url), "utf8");
   const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
   it("uses the dedicated Cloudflare adapter instead of the deprecated vinext deploy shim", () => {
@@ -117,5 +118,34 @@ describe("Cloudflare deploy contracts", () => {
 
   it("does not run a deploy when imported", () => {
     assert.match(source, /import\.meta\.url === pathToFileURL\(process\.argv\[1\]\)\.href/);
+  });
+
+  /**
+   * The gate silently did not run from a linked git worktree. core.hooksPath pointed at
+   * husky's generated `.husky/_`, which is gitignored and therefore exists only where
+   * `bun install` has run — never in a fresh worktree. Git skips a missing hooks
+   * directory without a word, so a push from a worktree was unverified and looked
+   * identical to a verified one. That happened on 2026-09-01 while pushing from a
+   * worktree specifically to avoid moving HEAD under a concurrent session, which puts
+   * "isolate work in worktrees" and "the pre-push hook is the only gate left" in direct
+   * conflict unless the hooks are tracked.
+   */
+  it("runs hooks from a tracked directory, so linked worktrees get them too", () => {
+    const pkg: { scripts?: Record<string, string> } = JSON.parse(packageJson);
+    const prepare = pkg.scripts?.prepare ?? "";
+    // husky rewrites core.hooksPath to .husky/_ on every install, so prepare has to put
+    // it back or the fix silently reverts the next time anyone installs.
+    assert.match(prepare, /^husky\b/, "prepare should still run husky");
+    assert.match(
+      prepare,
+      /git config core\.hooksPath \.husky(?!\/_)/,
+      "prepare must re-point core.hooksPath at the tracked .husky, not husky's gitignored .husky/_",
+    );
+  });
+
+  it("keeps the hooks directly executable, since git invokes them without husky's shim", () => {
+    // With hooksPath at .husky there is no `_/pre-push` wrapper to exec these under sh.
+    assert.match(prePush, /^#!\/usr\/bin\/env sh\n/, "pre-push needs a shebang");
+    assert.match(preCommit, /^#!\/usr\/bin\/env sh\n/, "pre-commit needs a shebang");
   });
 });

@@ -47,7 +47,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 ### Sprint ceremonies — weekly execution commitments
 - [x] **Grooming guardrail tags** — Shipped: `buildGuardrailTagBlocks` (`lib/export/issueTrackerBrief.ts`) builds one paste-ready block per business area (posture, `Action now` / `Pause if` / `Change course if`, flip watch, week stamp), copyable from `/share` (`GuardrailTagControls`); no tokens, no tracker integration (2026-09-18).
 - [x] **Commitment lint in planning** — Shipped: MCP `lint_sprint_goal` (`lib/mcp/httpMcpServer.ts`) takes a sprint goal or story plan and returns `holds | pauses | needs_reversal_guardrail` with the bounded rule's pause trigger and reversal, reusing `stressTestDecisionPlan` (2026-09-18).
-- [ ] **Standup flip line** — a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change") reusing the daily cron + `flipProximity.ts`.
+- [x] **Standup flip line** — Shipped: `buildStandupFlipLine` (`lib/report/flipProximity.ts`) produces a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change"), copyable from `/share` (`ShareCopyControls`) for daily and sprint ceremonies (2026-09-26).
 - [ ] **Sprint-posture recap + retro violation report** — compare the sprint's logged decisions (`lib/events/decisionEventStore.ts`) against the regime's bounded rules and surface the mismatches ("committed to a speculative build in a DEFENSIVE regime").
 
 **Non-goal for sprint presence**: do not become a sprint tool (scrum dashboards, burndown, velocity). Presence stays decision-shaped — the macro guardrail attached to commitments, not a project manager.
@@ -180,7 +180,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - [x] Dynamic runway-scaled guardrails (<6m, 12m, 24m+ cash bands) scaling stop/start/fence rules. Shipped: `lib/report/operatorRunway.ts` and `scaleAdjustmentToRunway` in `boundedDecisionRules.ts` (2026-09-17).
 - [x] Stage profile presets (Seed vs. Series A vs. Growth) adjusting hiring speed and burn tolerance. Shipped: `lib/report/operatorStage.ts` and the per-stage adjustments in `boundedDecisionRules.ts` (see `docs/feature-specs-current.md` §1.1.7, 2026-09-06).
 - [ ] Sector overlays (B2B SaaS vs. Consumer vs. DeepTech / AI Infrastructure).
-- [ ] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin).
+- [x] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin). Shipped: decoupled investor assumptions in Decision Shield, added gross margin calibration and buffer checks (2026-09-26).
 - [ ] ARR-per-employee and burn multiple efficiency benchmark thresholds.
 - [ ] Tech talent heat index integration (WARN notices and layoffs tracking) to calibrate hiring pacing.
 

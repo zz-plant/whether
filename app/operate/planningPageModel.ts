@@ -15,10 +15,6 @@ import {
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
-import {
-  buildTimeMachineHref,
-  getAdjacentTimeMachineRequest,
-} from "../../lib/timeMachine/timeMachineSelection";
 import { HistoricalBanner } from "../components/historicalBanner";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
@@ -26,7 +22,7 @@ import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
-import { ReportShell } from "../components/reportShell";
+import type { ReportShellModel } from "../components/reportShell";
 import { TrustStrip } from "../components/trustStrip";
 import { AreaTable } from "../components/ui/areaTable";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
@@ -47,11 +43,6 @@ export type PlanningSearchParams = {
   [key: string]: string | undefined;
 };
 
-type ReportShellModel = Parameters<typeof ReportShell>[0] extends infer Props
-  ? Props extends { model: infer Model }
-    ? Model
-    : never
-  : never;
 
 type PlanningPageModel = {
   reportShellModel: ReportShellModel;
@@ -125,13 +116,6 @@ export async function buildPlanningPageModel(
     treasury,
     treasuryProvenance,
   } = reportData;
-  const previousHistoricalSelection = historicalSelection
-    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
-    : null;
-  const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/operate", previousHistoricalSelection)
-    : undefined;
-  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const { trustStatusTone } = snapshot.trustStatus;
 
@@ -170,10 +154,10 @@ export async function buildPlanningPageModel(
         showOfflineBadge: isFallback && !historicalSelection,
       },
       actions: {
-        // Share is the one hero action: it opens the global rail. The "Review
-        // the weekly plan" button scrolled to the step directly beneath the
-        // hero, and "Return to Weekly Brief" duplicated the header's Brief tab.
-        showShare: true,
+        // No hero Share. The Share step further down the same page owns
+        // sharing here — on a phone the hero button and the step it opens were
+        // two "Share the brief" actions in one viewport. The header's Brief tab
+        // already covers the route the hero's neighbours used to point at.
         // The handoff to Resolve, in the shell's one predictable place. It used
         // to be a "Decision help" section of its own at the tail — a sentence,
         // this link, and a "Back to sharing options" link to a step on the same
@@ -192,8 +176,6 @@ export async function buildPlanningPageModel(
             month: historicalSelection.month,
             asOfLabel: formatDateUTC(historicalSelection.asOf),
             liveHref: "/operate",
-            previousHref: previousHistoricalHref,
-            timeMachineHref: historicalTimeMachineHref,
           })
           : null,
       },
@@ -355,13 +337,6 @@ export async function buildPlanningPageModel(
               id: "ops-playbook-panel",
               title: "Rules before you commit",
               children: h(Fragment, null,
-              h("div", { className: "flex flex-wrap items-center justify-between gap-3" },
-                h("p", { className: "text-xs text-slate-300" }, showAllActionLanes ? "Full rule list." : "Top 3 rules per area."),
-                h("a", {
-                  href: buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes),
-                  className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100",
-                }, showAllActionLanes ? "Show top 3 only" : "Show all rules"),
-              ),
               /* The per-area rows are the weekly plan step's AreaTable now — the
                  consequence tier, in the one order every surface uses. What is
                  left here is what to read before committing. */
@@ -439,25 +414,21 @@ export async function buildPlanningPageModel(
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
         ),
       ),
-      h("details", { className: "weather-panel weather-auto-chevron space-y-3 px-5 py-5" },
-        h("summary", { className: "cursor-pointer list-none text-sm font-semibold text-sky-200" }, "Templates"),
-        h("div", { className: "mt-4 space-y-4 rounded-lg border border-slate-800/80 bg-slate-950/40 px-4 py-4" },
-          h("div", { className: "space-y-1" },
-            h("p", { className: "type-eyebrow" }, "Resources"),
-            h("h2", { className: "text-lg font-semibold text-slate-100" }, "Templates"),
-            h("p", { className: "text-sm text-slate-300" }, "Templates you can fill in and share."),
-          ),
+      h("details", { className: "weather-panel weather-auto-chevron space-y-4 px-5 py-5" },
+        h("summary", { className: "cursor-pointer list-none text-sm font-semibold text-sky-200" }, "Resource templates and guides"),
+        h("div", { className: "mt-3 space-y-4" },
+          h("p", { className: "text-sm text-slate-300" }, "Templates and operating guides you can fill in and share."),
           h("div", { className: "grid gap-3 md:grid-cols-3" },
             resourcePillarPages.map((pillar) => h(Link, {
               key: pillar.slug,
               href: `/resources/${pillar.slug}` as Route,
               className: "weather-surface border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
             },
-              h("p", { className: "mt-2 font-semibold text-slate-100" }, pillar.h1),
-              h("p", { className: "mt-2 text-sm text-slate-300" }, pillar.description),
+              h("p", { className: "font-semibold text-slate-100" }, pillar.h1),
+              h("p", { className: "mt-1.5 text-sm text-slate-300" }, pillar.description),
             )),
           ),
-          h("div", { className: "flex flex-wrap gap-2" },
+          h("div", { className: "flex flex-wrap gap-2 pt-1" },
             operationsResourceLibrary.map((resource) => h(Link, {
               key: resource.path,
               href: resource.path,

@@ -1,4 +1,6 @@
 import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCatalog";
+import { answerPageContent } from "../answerContentSource";
+import { isIndexableAnswerSlug } from "../seo/indexationPolicy";
 
 type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
@@ -152,6 +154,21 @@ const keyDocs: SearchEntity[] = [
 ];
 
 export const buildSearchIndex = (): SearchEntity[] => {
+  const answerEntities: SearchEntity[] = answerPageContent
+    .filter((page) => isIndexableAnswerSlug(page.slug))
+    .map((page) => ({
+      id: `answer-${page.slug}`,
+      type: "doc",
+      job: "resolve",
+      routePriority: 2,
+      recommendedHubHref: "/resolve",
+      recommendedHubLabel: "Decision Tools",
+      title: page.title,
+      href: `/answers/${page.slug}`,
+      summary: page.shortAnswer,
+      intentLabel: "Apply this answer to your company",
+      keywords: [page.keyword, page.audience, page.contextHeading, page.context, ...page.companyInputs],
+    }));
   const toolkitEntities: SearchEntity[] = toolkitDefinitions.map((toolkit) => ({
     id: `toolkit-${toolkit.slug}`,
     type: "toolkit",
@@ -188,7 +205,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
     keywords: ["failure mode", failureMode.trigger, ...failureMode.symptoms, ...failureMode.firstMoves],
   }));
 
-  return [...toolkitEntities, ...failureModeEntities, ...keyDocs];
+  return [...answerEntities, ...toolkitEntities, ...failureModeEntities, ...keyDocs];
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();

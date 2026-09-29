@@ -294,7 +294,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   }
 
   const lower = text.toLowerCase();
-  if (/\b(hire|hiring|headcount|recruiting|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
+  if (/\b(hire|hiring|headcount|recruiting|poach|principal|architect|lead|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
     return { category: "HIRING", action: "HIRE", confidence: "MATCHED" };
   }
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
@@ -303,13 +303,13 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: "MATCHED" };
   }
-  if (/\b(discount|pricing|price|deal|contract discount|payment term)\b/.test(lower)) {
+  if (/\b(discount|pricing|price|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contract)\b/.test(lower)) {
     return { category: "PRICING", action: "DISCOUNT", confidence: "MATCHED" };
   }
   if (/\b(acquire|acquisition|merger|m&a|buy company)\b/.test(lower)) {
     return { category: "M_AND_A", action: "ACQUIRE", confidence: "MATCHED" };
   }
-  if (/\b(rewrite|refactor|architecture|rebuild|v2 migration)\b/.test(lower)) {
+  if (/\b(rewrite|refactor|architecture|rebuild|v2 migration|tech debt)\b/.test(lower)) {
     return { category: "ROADMAP", action: "REWRITE", confidence: "MATCHED" };
   }
   if (/\b(expand|international|europe|asia|new market|geo)\b/.test(lower)) {
@@ -381,7 +381,9 @@ export const stressTestDecisionPlan = (
       verdict = "DANGEROUS";
       verdictDriver = "RUNWAY";
       fragileAssumptions.push(
-        `With under ${RUNWAY_CRITICAL_MONTHS} months of cash, raising in ${regimeLabel} conditions is hard.`
+        profile.businessModel === "BOOTSTRAPPED"
+          ? `With under ${RUNWAY_CRITICAL_MONTHS} months of cash reserve, navigating ${regimeLabel} conditions leaves little room for operating losses.`
+          : `With under ${RUNWAY_CRITICAL_MONTHS} months of cash, raising in ${regimeLabel} conditions is hard.`
       );
       financialImpactSummary = `Runway of ${profile.runwayMonths} months is under the ${RUNWAY_CRITICAL_MONTHS}-month line this rule uses for ${regimeLabel} conditions.`;
     } else if (profile.businessModel === "BOOTSTRAPPED" && profile.grossMarginPct && profile.grossMarginPct >= 70) {
@@ -425,7 +427,9 @@ export const stressTestDecisionPlan = (
       verdictDriver = "SIZE";
       sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis} — at or over the ${Math.round(COMMITMENT_SHARE_SEVERE * 100)}% line, so this is graded dangerous on size alone.`;
       fragileAssumptions.push(
-        `Assumes the raise or revenue that refills ${pct}% of available cash arrives before this commitment ends.`
+        profile?.businessModel === "BOOTSTRAPPED"
+          ? `Assumes customer revenue that refills ${pct}% of available cash arrives before this commitment ends.`
+          : `Assumes the raise or revenue that refills ${pct}% of available cash arrives before this commitment ends.`
       );
     } else if (runwayShare.share >= COMMITMENT_SHARE_ELEVATED) {
       verdict = adjustVerdict(verdict, "up");
@@ -450,9 +454,13 @@ export const stressTestDecisionPlan = (
       `Assumes customers keep buying at the same pace with the yield curve inverted (${curveSlope.toFixed(2)}%), which has stretched sales cycles before.`
     );
   }
-  if (riskAppetite < 50) {
+  if (riskAppetite < 50 && profile?.businessModel !== "BOOTSTRAPPED") {
     fragileAssumptions.push(
       `Assumes investors will fund fast burn while risk appetite is low (${riskAppetite}/100).`
+    );
+  } else if (profile?.businessModel === "BOOTSTRAPPED" && profile.grossMarginPct !== undefined && profile.grossMarginPct < 50) {
+    fragileAssumptions.push(
+      `Gross margin (${profile.grossMarginPct}%) provides limited buffer if customer demand slows.`
     );
   }
   if (fragileAssumptions.length === 0) {

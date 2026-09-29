@@ -20,7 +20,8 @@ export type OperatorProfileNumberKey =
   | "runwayMonths"
   | "monthlyBurnUsd"
   | "monthlyRevenueUsd"
-  | "monthlyGrowthPct";
+  | "monthlyGrowthPct"
+  | "grossMarginPct";
 
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
@@ -29,6 +30,8 @@ export type OperatorProfile = {
   monthlyRevenueUsd?: number;
   /** Month-over-month revenue growth, in percent. */
   monthlyGrowthPct?: number;
+  /** Gross margin percentage (0 to 100). */
+  grossMarginPct?: number;
   sector?: PlannerSector;
   updatedAt?: string;
 };
@@ -41,6 +44,7 @@ export const OPERATOR_PROFILE_LIMITS: Record<OperatorProfileNumberKey, { min: nu
   monthlyBurnUsd: { min: 0, max: 1e10 },
   monthlyRevenueUsd: { min: 0, max: 1e10 },
   monthlyGrowthPct: { min: -100, max: 300 },
+  grossMarginPct: { min: 0, max: 100 },
 };
 
 const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
@@ -48,6 +52,7 @@ const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
   "monthlyBurnUsd",
   "monthlyRevenueUsd",
   "monthlyGrowthPct",
+  "grossMarginPct",
 ];
 
 const PLANNER_SECTORS: ReadonlySet<string> = new Set(["b2b-saas", "consumer", "infrastructure"]);

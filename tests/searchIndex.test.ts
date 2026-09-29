@@ -3,6 +3,18 @@ import { describe, it } from "bun:test";
 import { buildSearchIndex, groupSearchResultsByJob, searchIndex } from "../lib/search/searchIndex";
 
 describe("search index", () => {
+  it("finds decision answers from the company problem, not only toolkit names", () => {
+    for (const [query, slug] of [
+      ["runway", "when-should-startups-cut-burn"],
+      ["engineering hiring", "should-startups-hire-engineers-right-now"],
+      ["fundraising", "should-startups-raise-capital-now"],
+      ["CAC payback", "how-fast-should-we-scale-go-to-market"],
+      ["Fed rate cut", "startup-funding-climate-this-week"],
+    ]) {
+      assert.ok(searchIndex(query).some((entry) => entry.href === `/answers/${slug}`), `${query} must find its answer`);
+    }
+  });
+
   it("aggregates toolkit, failure-mode, and doc entities", () => {
     const entities = buildSearchIndex();
 

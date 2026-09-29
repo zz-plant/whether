@@ -3,6 +3,7 @@ import {
   confidenceCalibration,
   confidenceCalibrationTotals,
 } from "../../../lib/report/confidenceCalibration";
+import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift";
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
 import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
 
@@ -30,6 +31,12 @@ const percentFormat = (value: number) => `${Math.round(value)}%`;
 
 const bandLabel = (from: number, to: number | null) =>
   to === null ? `${from} or more` : `${from} to ${to}`;
+
+/** "2 of 2", "8 of 9" — with "and" before the last item when there is more than one. */
+const listClauses = (clauses: string[]) => {
+  if (clauses.length === 1) return clauses[0] ?? "";
+  return `${clauses.slice(0, -1).join(", ")}, and ${clauses.at(-1) ?? ""}`;
+};
 
 /** The bands and the base rate, or null when the archive holds nothing to grade. */
 const loadRecord = () => {
@@ -89,12 +96,45 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
         </tbody>
       </table>
 
+      <RecentYearParagraph />
+
       <p className="text-fluid-xs text-slate-400">
         Derived from the month-end archive each time this page is built, so it improves as the
         record grows. A held month means conditions did not change.
         {includeCallChangeRule ? <> {CALL_CHANGE_RULE}</> : null}
       </p>
     </div>
+  );
+}
+
+/**
+ * The recent year, graded under the same rule as the table, so the finding cannot quietly
+ * become an old average. Unmeasured renders nothing: a year too thin to grade is a gap, not
+ * a guess — the same rule the scheduled-runs section holds itself to.
+ */
+function RecentYearParagraph() {
+  const drift = calculateCalibrationDrift();
+  if (drift.status === "unmeasured") return null;
+
+  const clause = (band: (typeof drift.bands)[number]) =>
+    `${band.held} of ${band.months} in the ${bandLabel(band.from, band.to)} band against a published ${band.publishedPercent}%`;
+
+  if (drift.status === "stable") {
+    return (
+      <p className="text-sm text-slate-200">
+        And the finding is current, not just archival: across the most recent twelve month-end
+        readings, every band with a comparison still held more often than the percent said —{" "}
+        {listClauses(drift.bands.map(clause))}.
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-sm text-slate-200">
+      The most recent twelve month-end readings break the pattern above:{" "}
+      {listClauses(drift.bands.filter((band) => !band.percentUnderstates).map(clause))} — the
+      finding describes the archive, not this year.
+    </p>
   );
 }
 

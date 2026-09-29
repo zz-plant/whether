@@ -54,9 +54,9 @@ export function WhatChangedSection({
       id={HOME_SECTIONS.changed.id}
       heading={HOME_SECTIONS.changed.heading}
       lead={lead}
-      /* On a phone the consequences come first: the Monday reader is checking
-         whether to act, not why. From `md` up the evidence reads first again. */
-      className="order-3 md:order-2"
+      /* In the reader's order: first what moved (the evidence), then what
+         that changes (the consequences by area). Keeps DOM and visual order aligned. */
+      className="order-2"
     >
       {/* A table from sm up. Below it each row restacks — the signal and its
           move on one line, its ladder across the full width under them —
@@ -91,12 +91,21 @@ export function WhatChangedSection({
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-sm:p-0">
-                  {row.label}
-                  {row.scaleLabel ? <span className="block text-xs font-normal text-slate-500">{row.scaleLabel}</span> : null}
+                  <span className="text-sm font-semibold text-slate-100">{row.label}</span>
                   {/* Which end of the scale is which. A composite score is the one
                       number on this page with no unit, and a first-time reader has
                       no way to tell 0 from 100 without it. */}
-                  {isCompositeSignalKey(row.key) ? <SignalScaleNote signalKey={row.key} className="font-normal" /> : null}
+                  {row.scaleLabel || isCompositeSignalKey(row.key) ? (
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-fluid-nano font-normal text-slate-400">
+                      {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
+                      {row.scaleLabel && isCompositeSignalKey(row.key) ? (
+                        <span aria-hidden="true" className="text-slate-600">·</span>
+                      ) : null}
+                      {isCompositeSignalKey(row.key) ? (
+                        <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
+                      ) : null}
+                    </div>
+                  ) : null}
                   {/* What the score means at the level it is actually at. The
                       band label above says where it sits; this says what that
                       is like to operate in. */}
@@ -104,7 +113,7 @@ export function WhatChangedSection({
                     <PlainEnglishScoreNote
                       signalKey={row.key}
                       score={row.value}
-                      className="mt-1 whitespace-normal font-normal"
+                      className="mt-1 whitespace-normal font-normal text-slate-300/80"
                     />
                   ) : null}
                 </th>

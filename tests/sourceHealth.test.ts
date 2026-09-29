@@ -229,6 +229,18 @@ describe("stale source disclosure states its age", () => {
 });
 
 describe("degraded sources", () => {
+  it("keeps stale and unknown live Treasury rows visible at the W39 freeze", () => {
+    for (const fetched_at of ["2026-09-22T13:07:00Z", "unreadable"]) {
+      const treasury = buildSourceHealthRows({
+        treasury: buildTreasury({ record_date: "2026-09-22", fetched_at }),
+        macroSeries: [],
+        now: new Date("2026-09-24T13:07:00Z"),
+      })[0];
+      assert.equal(treasury.mode, "live");
+      assert.notEqual(treasury.freshnessStatus, "fresh");
+      assert.equal(buildDegradedSourceRows([treasury]).length, 1);
+    }
+  });
   /*
    * "Startup/private markets" is a curated snapshot by design and is never
    * live. Counting it as degraded put "Partly cached" on every page, on every

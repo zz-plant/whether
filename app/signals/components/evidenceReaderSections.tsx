@@ -211,9 +211,6 @@ export const SignalsCallLinesSection = ({
           the label rather than on a box around it. */}
       <dl className="space-y-1.5 text-sm text-slate-200">
         <div className="flex flex-wrap gap-x-2">
-          {/* The slot labels every other surface prints. "Wrong if" and "Safe
-              again when" were a third pair of names for the pause and resume
-              lines, on the page a reader opens to check the other two. */}
           <dt className="shrink-0 font-semibold text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
           <dd className="min-w-0">{renderCondition(triggerCondition)}</dd>
         </div>

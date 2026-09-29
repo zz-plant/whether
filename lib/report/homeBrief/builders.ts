@@ -10,7 +10,7 @@ import {
   buildRoleAwareOperatingTemplates,
   buildThresholdBusinessConsequence,
 } from "../operatingCalls";
-import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolveConfidencePercentFromDistance, resolvePublishedConfidenceLabel } from "../confidence";
+import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolveConfidencePercent, resolvePublishedConfidenceLabel } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { formatThresholdNumber } from "../../formatters";
@@ -280,7 +280,7 @@ export const buildHomeBriefModelInternal = (
     recordDate: treasury?.record_date,
   });
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
-  const confidencePercent = resolveConfidencePercentFromDistance(nearestThresholdGap);
+  const confidencePercent = resolveConfidencePercent(assessment);
   const signalConfidenceReason = buildSignalConfidenceReason({
     confidenceLabel,
     nearestThresholdGap,

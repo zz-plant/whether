@@ -14,7 +14,7 @@ import { buildBoardSlideBullets, buildCallCitation, buildReadingLines, buildSlac
 import { buildAreaRows } from "../operate/areaRows";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
 import { describeConditions } from "../../lib/export/exportTerms";
-import { buildFlipProximity } from "../../lib/report/flipProximity";
+import { buildFlipProximity, buildStandupFlipLine } from "../../lib/report/flipProximity";
 import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
 import { buildWipGuidance } from "../../lib/report/wipPolicy";
 import {
@@ -103,11 +103,17 @@ const buildCurrentShareArtifact = async () => {
      the hero and Slack brief print. No tokens, no tracker integration — the
      operator pastes the block into the work item description and the card
      carries posture + pause trigger + flip condition. */
+  const proximity = buildFlipProximity(assessment);
   const guardrailTagBlocks = buildGuardrailTagBlocks({
     actionStripItems,
     postureLabel: describeConditions(assessment.regime, snapshot.weeklyCall.regimeStage),
     recordDate: treasury.record_date,
-    flipWatchSentence: buildFlipProximity(assessment).map((entry) => entry.sentence)[0],
+    flipWatchSentence: proximity.map((entry) => entry.sentence)[0],
+  });
+  const standupLine = buildStandupFlipLine({
+    regime: assessment.regime,
+    steadyWeek: snapshot.homeBriefModel.weeklyLeadershipSummary?.steadyWeek ?? true,
+    proximity,
   });
   /* Kanban pull policies: the same pause/resume conditions re-verbed for a
      pull system, copyable for a board header or wiki. */
@@ -177,6 +183,7 @@ const buildCurrentShareArtifact = async () => {
       "",
       buildBriefPermalinkLine(treasury.record_date),
     ].join("\n"),
+    standupLine,
     meetingPack,
     issueTrackerBrief,
     investorUpdate,
@@ -240,6 +247,7 @@ export default async function SharePage() {
             recordDate={artifact.recordDate}
             slackBrief={artifact.slackBrief}
             emailBrief={artifact.emailBrief}
+            standupLine={artifact.standupLine}
             meetingPack={artifact.meetingPack}
             issueTrackerBrief={artifact.issueTrackerBrief}
             investorUpdate={artifact.investorUpdate}

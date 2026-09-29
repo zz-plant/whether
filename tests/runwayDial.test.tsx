@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { RunwayConditionedNotes } from "../app/components/RunwayConditionedNotes";
+import * as nextNavigation from "next/navigation";
+
+const mockAny: any = mock;
+
+/* The notes read the app router; renderToStaticMarkup mounts none. Installed
+   here so the file answers for its own dependencies rather than passing on
+   another suite's ordering luck. */
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+}));
 
 /*
  * Server-rendered, so no band and no figure: what every reader sees before

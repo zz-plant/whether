@@ -60,7 +60,7 @@ const MONEY_PATTERN =
   /\$\s?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*([kKmMbB])?|\b(\d+(?:\.\d+)?)\s*([kKmMbB])\b/g;
 
 const PEOPLE_NOUNS =
-  "engineers?|developers?|designers?|hires?|reps?|sdrs?|aes?|contractors?|managers?|analysts?|people|persons?|heads?|ftes?|roles?|seats?|headcount";
+  "engineers?|developers?|designers?|architects?|leads?|principals?|hires?|reps?|sdrs?|aes?|contractors?|managers?|analysts?|people|persons?|heads?|ftes?|roles?|seats?|headcount";
 
 /*
  * A count that belongs to people, not to money or to time. Up to three
@@ -68,7 +68,7 @@ const PEOPLE_NOUNS =
  * and the quantifier is lazy so the nearest noun wins.
  */
 const HEADCOUNT_BEFORE_NOUN = new RegExp(`\\b(\\d{1,4})\\s+(?:[a-z][a-z-]*\\s+){0,3}?(?:${PEOPLE_NOUNS})\\b`, "i");
-const HEADCOUNT_AFTER_VERB = /\b(?:hire|hiring|add|adding|recruit|recruiting|open)\s+(\d{1,4})\b/i;
+const HEADCOUNT_AFTER_VERB = /\b(?:hire|hiring|add|adding|recruit|recruiting|open|poach)\s+(\d{1,4})\b/i;
 
 /*
  * Only an explicit per-unit marker licenses multiplying the amount by the
@@ -76,7 +76,7 @@ const HEADCOUNT_AFTER_VERB = /\b(?:hire|hiring|add|adding|recruit|recruiting|ope
  * $540k budgeted" is not, and multiplying it would treble a number the operator
  * had already totalled.
  */
-const PER_UNIT_MARKER = /(@|\beach\b|\bapiece\b|\bper\s+(?:head|hire|person|seat|engineer|rep|role)\b)/i;
+const PER_UNIT_MARKER = /(@|\beach\b|\bapiece\b|\bper\s+(?:head|hire|person|seat|engineer|rep|role|lead|architect)\b)/i;
 
 const MONTHLY_MARKER = /(\bper\s+month\b|\/\s?mo\b|\bmonthly\b|\ba\s+month\b|\bpcm\b)/i;
 const ANNUAL_MARKER = /(\bper\s+year\b|\/\s?yr\b|\bannual(?:ly)?\b|\ba\s+year\b|\bper\s+annum\b|\bp\.?a\.?\b)/i;

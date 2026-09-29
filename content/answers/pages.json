@@ -4,23 +4,41 @@
     "keyword": "startup funding climate this week",
     "title": "Startup funding climate this week",
     "category": "climate",
-    "shortAnswer": "Funding is tighter when short-term rates sit above about 3.5%, which is where the pause line is drawn.",
-    "directAnswer": "Decide the worst terms you would accept before you start a raise, and tighten them while funding pressure is above its line.",
-    "audience": "Founders, CFO, board operators",
+    "shortAnswer": "Read startup funding conditions through rates and credit alongside your runway, investor conversations and the milestone a round must fund.",
+    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; a broad funding score cannot tell you whether a particular round will close.",
+    "audience": "Founders, finance leaders and board operators",
     "mappedDecisionAreas": [
       "capital-raising",
       "burn-discipline"
     ],
     "thresholdFocus": "both",
-    "featuredOrder": 4
+    "featuredOrder": 10,
+    "contextHeading": "How interest rates and credit affect startup funding",
+    "context": "Interest-rate changes can affect borrowing costs, asset prices and spending. A Fed rate cut alone does not establish easier financing for your company. Check loan terms and investor conversations, then review hiring, discretionary spend and fundraising assumptions against the cash plan.",
+    "companyInputs": [
+      "Exposure to borrowing rates, debt repayment dates and financing terms.",
+      "Investor response and the milestone that would justify a new round.",
+      "Downside runway if customer payments or a financing close are delayed."
+    ],
+    "decisionNote": "After [rate or credit change], review [financing assumption]. Keep [cash buffer] funded and change [commitment] only after [company evidence]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Federal Reserve: how monetary policy works",
+        "href": "https://www.federalreserve.gov/monetarypolicy/monetary-policy-what-are-its-goals-how-does-it-work.htm"
+      },
+      {
+        "label": "Evidence behind the market reading",
+        "href": "/signals"
+      }
+    ]
   },
   {
     "slug": "is-it-risk-on-or-risk-off-for-startups",
     "keyword": "is it risk-on or risk-off for startups",
     "title": "Is it risk-on or risk-off for startups?",
     "category": "climate",
-    "shortAnswer": "Speed up when risk appetite is above its line, slow down when it is below; the yield curve moves risk appetite and funding pressure together.",
-    "directAnswer": "Move faster on the bets you can stop, and write the stop condition down first.",
+    "shortAnswer": "Use risk appetite to review how much uncertainty new commitments carry; validate demand and cash capacity before increasing exposure.",
+    "directAnswer": "Compare the current risk reading with the commitments you are considering. Better market conditions can support a review of expansion, but each bet still needs customer evidence, a spending limit and a way to stop.",
     "audience": "Leadership teams",
     "mappedDecisionAreas": [
       "expansion-bets",
@@ -28,31 +46,63 @@
       "burn-discipline"
     ],
     "thresholdFocus": "both",
-    "featuredOrder": 3
+    "featuredOrder": 11,
+    "contextHeading": "Turn market changes into an operating review",
+    "context": "Whether’s forecast concerns movement between operating conditions, not an exact recession date, company revenue or investment return. After a rate or credit event, inspect the dated evidence before changing a plan. Historical comparisons show how the model reads past conditions, not how your company would have performed.",
+    "companyInputs": [
+      "The commitments that become harder to reverse as spending or hiring increases.",
+      "Customer demand, available cash and the next evidence milestone for each bet.",
+      "The market change and company result that would justify another review."
+    ],
+    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [company threshold] fails; resume after [demand and cash evidence]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Compare historical conditions",
+        "href": "/history/compare"
+      },
+      {
+        "label": "How the signals are interpreted",
+        "href": "/trust"
+      }
+    ]
   },
   {
     "slug": "should-startups-hire-engineers-right-now",
     "keyword": "should startups hire engineers right now",
     "title": "Should startups hire engineers right now?",
     "category": "decision",
-    "shortAnswer": "Only for roles that pay back inside 12 months; hold the rest.",
-    "directAnswer": "Approve only roles tied to delivery reliability or near-term revenue impact.",
-    "audience": "VP Engineering and founders",
+    "shortAnswer": "Hire when a specific delivery, reliability or revenue bottleneck justifies the full cost and the downside cash plan can fund the role.",
+    "directAnswer": "Name the work an additional engineer unlocks and compare hiring with reducing scope or reassigning capacity. Approve the role only with a funded ramp period and a measurable outcome; a market score cannot establish that need.",
+    "audience": "Engineering leaders and founders",
     "mappedDecisionAreas": [
       "hiring",
       "product-tempo",
       "burn-discipline"
     ],
     "thresholdFocus": "both",
-    "featuredOrder": 1
+    "featuredOrder": 2,
+    "contextHeading": "Make the engineering hiring case",
+    "context": "A reliability hire may protect existing revenue without a directly attributable payback period. A growth hire needs evidence that capacity, rather than weak demand, limits results. Use different evidence for those cases instead of applying one payback cutoff to every engineering role.",
+    "companyInputs": [
+      "The delivery backlog, incident load or customer commitment this role would address.",
+      "Salary, benefits, recruiting and onboarding costs, including management capacity during ramp.",
+      "Cash remaining after the hire in a downside plan and a dated outcome review."
+    ],
+    "decisionNote": "Approve [role] to address [bottleneck] within [cost envelope]. Hold further hiring if [cash or outcome limit] is breached. Reopen after [funding and delivery evidence]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Hiring freeze or selective hiring?",
+        "href": "/answers/should-we-freeze-or-selectively-hire"
+      }
+    ]
   },
   {
     "slug": "should-startups-slow-roadmap-expansion",
     "keyword": "should startups slow roadmap expansion",
     "title": "Should startups slow roadmap expansion?",
     "category": "decision",
-    "shortAnswer": "Yes: slow the new scope, not the work you have already promised.",
-    "directAnswer": "Keep the roadmap work that moves retention or revenue within the quarter; pause new platform bets until the scores are back across their resume lines.",
+    "shortAnswer": "Reduce new scope when it displaces funded customer commitments or exceeds available capacity; protect work with clear delivery or retention value.",
+    "directAnswer": "Separate committed delivery from optional expansion. Stage new scope behind customer evidence and a capacity check, then revisit it when the cash plan and team can support the next milestone.",
     "audience": "Product and engineering leadership",
     "mappedDecisionAreas": [
       "product-tempo",
@@ -60,111 +110,244 @@
       "burn-discipline"
     ],
     "thresholdFocus": "both",
-    "featuredOrder": 2
+    "featuredOrder": 7,
+    "contextHeading": "Prioritize the roadmap during a downturn",
+    "context": "A tighter budget should change the amount of work committed, not quietly lower the reliability of work already promised. Compare initiatives by customer consequence, remaining cost and time to evidence. Market guidance informs the review; it does not rank your backlog.",
+    "companyInputs": [
+      "Customer commitments, retention risks and reliability work already funded.",
+      "Remaining cost and capacity for each initiative, including maintenance after launch.",
+      "The next customer validation milestone and which work would be displaced."
+    ],
+    "decisionNote": "Keep [core commitments] and defer [new scope]. Pause expansion if [capacity or cash limit] is crossed. Resume at [customer milestone] with [funded capacity]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Roadmap focus toolkit",
+        "href": "/toolkits/focus"
+      }
+    ]
   },
   {
     "slug": "should-startups-raise-capital-now",
     "keyword": "should startups raise capital now",
     "title": "Should startups raise capital now?",
     "category": "decision",
-    "shortAnswer": "Raise now if you have under 12 months of cash or the round would take you past 24; otherwise wait for terms you would keep.",
-    "directAnswer": "If your plan for the next 12 months needs the money, start now, while you can still say no to bad terms.",
-    "audience": "CEO/CFO",
+    "shortAnswer": "Start fundraising preparation before your downside runway falls inside the time needed to reach investors, close a round and absorb delays.",
+    "directAnswer": "Work backward from the date cash would reach your minimum buffer. Include preparation, investor conversations, diligence and a delayed close; do not wait for better market conditions if that leaves the company unable to fund its plan.",
+    "audience": "Founders, CEOs and CFOs",
     "mappedDecisionAreas": [
       "capital-raising",
       "burn-discipline"
     ],
     "thresholdFocus": "both",
-    "featuredOrder": 5
+    "featuredOrder": 3,
+    "contextHeading": "Raise now or extend runway?",
+    "context": "Separate preparing a raise from accepting its terms. Compare an equity raise with a smaller operating plan using the same milestone and cash assumptions. Better public-market conditions do not establish investor demand for your round, and public SaaS multiples do not set a private valuation.",
+    "companyInputs": [
+      "Downside cash runway and the minimum cash buffer you have committed to hold.",
+      "Time and cost to a fundable milestone, plus the expected fundraising process and delay allowance.",
+      "Investor conversations, acceptable dilution and terms, and a plan if the round does not close."
+    ],
+    "decisionNote": "Begin [preparation or investor outreach] by [date] to fund [milestone]. Revisit the plan if [cash date or investor evidence] slips. Accept terms within [agreed limits]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Public SaaS valuation context",
+        "href": "/comps"
+      },
+      {
+        "label": "Carta: preparing a startup fundraise",
+        "href": "https://carta.com/learn/startups/fundraising/"
+      }
+    ]
   },
   {
     "slug": "when-should-startups-cut-burn",
     "keyword": "when should startups cut burn",
     "title": "When should startups cut burn?",
     "category": "decision",
-    "shortAnswer": "Cut burn when funding pressure crosses its pause line and risk appetite is falling at the same time.",
-    "directAnswer": "Decide now which spend you would cut, so the cut is ready before funding pressure crosses its line.",
-    "audience": "Finance and operations leaders",
+    "shortAnswer": "Review burn when your cash plan no longer funds the next milestone with a contingency buffer; tighter funding conditions make that review more urgent.",
+    "directAnswer": "Model a slower revenue or fundraising case before approving more recurring spend. Reduce commitments that do not protect delivery, retention or the next milestone, and set a cash buffer for restoring them.",
+    "audience": "Founders, CFOs, fractional CFOs and operations leaders",
     "mappedDecisionAreas": [
       "burn-discipline",
       "capital-raising"
     ],
     "thresholdFocus": "tightness",
-    "featuredOrder": 6
+    "featuredOrder": 1,
+    "contextHeading": "Extend runway without an automatic hiring freeze",
+    "context": "Cash runway is available cash divided by monthly net burn when burn is positive and stable. Use a cash-flow forecast when collections, renewals or one-off payments vary. Compare savings after cancellation costs and lost revenue; a cut that weakens retention can leave less cash than the headline saving suggests.",
+    "companyInputs": [
+      "Available cash, monthly net burn and payment dates in a downside case.",
+      "Cost and time to the next revenue or financing milestone, including a contingency buffer.",
+      "Spend that can be stopped or renegotiated, its exit costs and the delivery or retention it protects."
+    ],
+    "decisionNote": "We will reduce [spend] by [amount] to fund [milestone]. Protect [delivery or retention commitment]. Restore spend when [cash buffer and business result] hold. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Runway planning guide",
+        "href": "/resources/how-much-runway-do-we-need-tightening-market"
+      },
+      {
+        "label": "Stress-test the cash plan",
+        "href": "/operate/financial"
+      }
+    ]
   },
   {
     "slug": "should-we-freeze-or-selectively-hire",
     "keyword": "should we freeze hiring or selectively hire",
     "title": "Should we freeze hiring or hire selectively?",
     "category": "decision",
-    "shortAnswer": "Hire selectively, with the stop condition written before the first offer.",
-    "directAnswer": "Approve only reliability and revenue roles, each with its own payback window and pause condition.",
+    "shortAnswer": "Use a hiring freeze when the cash plan cannot support new commitments; assess essential backfills and critical roles individually.",
+    "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence needed to reopen hiring.",
     "audience": "Founders, VP Engineering, CFO",
     "mappedDecisionAreas": [
       "hiring",
       "burn-discipline",
       "product-tempo"
     ],
-    "thresholdFocus": "both"
+    "thresholdFocus": "both",
+    "featuredOrder": 4,
+    "contextHeading": "Set hiring freeze and reopening criteria",
+    "context": "A freeze controls new commitments; it does not resolve workload or determine which work can stop. Pair it with a scope review so the remaining team can meet the commitments you keep. Reopening should depend on affordable capacity needs as well as improving market conditions.",
+    "companyInputs": [
+      "Cash impact of approved offers, open requisitions and essential backfills.",
+      "Work to stop or defer if vacancies remain unfilled.",
+      "The cash buffer, workload evidence and approver required to reopen a role."
+    ],
+    "decisionNote": "Hold [requisitions] and allow exceptions for [specific need]. Defer [work] to match capacity. Reopen when [cash and workload criteria] hold. Approver: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Hiring in a high-rate environment",
+        "href": "/resources/should-we-freeze-hiring-high-interest-rate-environment"
+      }
+    ]
   },
   {
     "slug": "should-we-expand-sales-headcount-now",
     "keyword": "should we expand sales headcount now",
     "title": "Should we expand sales headcount now?",
     "category": "decision",
-    "shortAnswer": "Only where win rates are holding and each rep pays back inside 12 months.",
-    "directAnswer": "Add reps in small groups, each group only after the previous one's win rate has held and cash allows it.",
+    "shortAnswer": "Add sales capacity when qualified demand exceeds current coverage and the cash plan can fund recruiting, ramp and the sales cycle.",
+    "directAnswer": "Check whether the bottleneck is sales capacity or insufficient qualified demand. Add a small cohort of reps only after the existing team demonstrates repeatable conversion and the downside plan funds their ramp.",
     "audience": "CRO, CEO, finance leaders",
     "mappedDecisionAreas": [
       "hiring",
       "expansion-bets",
       "burn-discipline"
     ],
-    "thresholdFocus": "both"
+    "thresholdFocus": "both",
+    "featuredOrder": 6,
+    "contextHeading": "Separate sales capacity from demand quality",
+    "context": "Hiring more reps cannot by itself repair weak demand or poor retention. Compare performance by tenure and territory so a few productive reps do not hide a weak ramp process. Set a company-specific payback limit against gross margin and available cash.",
+    "companyInputs": [
+      "Qualified demand, win rate and coverage per fully ramped rep.",
+      "Recruiting cost, compensation, ramp duration and sales-cycle length.",
+      "Gross margin, collections and cash remaining if the new cohort ramps slowly."
+    ],
+    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp threshold] is missed. Resume after [conversion and cash evidence]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Set the next growth spending step",
+        "href": "/answers/how-fast-should-we-scale-go-to-market"
+      }
+    ]
   },
   {
     "slug": "should-we-delay-new-product-lines",
     "keyword": "should we delay new product lines",
     "title": "Should we delay new product lines?",
     "category": "decision",
-    "shortAnswer": "Delay a new product line unless customers are already asking for it.",
-    "directAnswer": "Keep the core roadmap shipping; start a new line only after an adoption milestone and a payback figure.",
+    "shortAnswer": "Delay a new product line when demand is unproven or its build and support costs would put the core business at risk.",
+    "directAnswer": "Fund the smallest test that can establish demand before committing to a full product line. Set a customer milestone, a spending limit and an exit condition, including the ongoing support the product would require.",
     "audience": "VP Product, CTO, strategy",
     "mappedDecisionAreas": [
       "product-tempo",
       "expansion-bets",
       "burn-discipline"
     ],
-    "thresholdFocus": "both"
+    "thresholdFocus": "both",
+    "featuredOrder": 8,
+    "contextHeading": "Compare a new product with investing in the core",
+    "context": "Customer requests are a starting point, not proof of willingness to pay or sustained use. Compare the new line with the best use of the same capacity in the existing product. Keep discovery reversible until customers and the cash plan justify a larger commitment.",
+    "companyInputs": [
+      "Evidence of paid demand or repeated use from the intended customer segment.",
+      "Build, launch and ongoing support costs alongside the opportunity cost to the core product.",
+      "Experiment budget, success milestone and the condition for stopping the test."
+    ],
+    "decisionNote": "Test [product hypothesis] with [customer group] inside [budget]. Stop if [evidence threshold] is missed. Expand only after [demand proof and funded support]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Launch gates toolkit",
+        "href": "/toolkits/launch-gates"
+      }
+    ]
   },
   {
     "slug": "how-fast-should-we-scale-go-to-market",
     "keyword": "how fast should we scale go to market",
     "title": "How fast should we scale go-to-market?",
     "category": "decision",
-    "shortAnswer": "Add sales and marketing spend in steps, not all at once.",
-    "directAnswer": "Raise spend and hiring one step per milestone, and pull the step back the moment conversion or payback slips.",
-    "audience": "Growth and sales operators",
+    "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
+    "directAnswer": "Set the next spending increment against a proven customer segment or channel. Pause further increases when conversion, retention or payback misses the agreed range; resume after new cohort evidence supports the cash plan.",
+    "audience": "Growth leaders, CROs and finance partners",
     "mappedDecisionAreas": [
       "expansion-bets",
       "burn-discipline",
       "product-tempo"
     ],
-    "thresholdFocus": "both"
+    "thresholdFocus": "both",
+    "featuredOrder": 5,
+    "contextHeading": "Connect CAC payback to available runway",
+    "context": "CAC payback estimates how long customer gross profit takes to recover acquisition cost. A blended average can hide an expensive channel or weak cohort. Compare incremental acquisition cost, cash collection timing and retention before treating efficient past growth as evidence for a larger budget.",
+    "companyInputs": [
+      "Acquisition cost and gross-margin-adjusted payback by channel and customer cohort.",
+      "Retention, conversion and cash collection timing for the customers being added.",
+      "The spending increment, test duration and cash buffer if results arrive late."
+    ],
+    "decisionNote": "Increase [channel] spend by [amount] for [test period]. Pause the next increase if [conversion, retention or payback limit] is missed. Resume after [cohort evidence]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Sales headcount approval",
+        "href": "/answers/should-we-expand-sales-headcount-now"
+      },
+      {
+        "label": "Bessemer: cloud growth and efficiency metrics",
+        "href": "https://www.bvp.com/atlas/scaling-to-100-million"
+      }
+    ]
   },
   {
     "slug": "how-to-brief-executives-on-market-conditions",
     "keyword": "how to brief executives on market conditions",
     "title": "How to brief executives on market conditions",
     "category": "explanation",
-    "shortAnswer": "Lead with what changed, the rule it changes, and what would change the guidance.",
-    "directAnswer": "Keep it to one screen: the reading, the one rule it changes, and the number that would change the guidance again.",
-    "audience": "Chief of staff, strategy, and ops",
+    "shortAnswer": "Brief executives on the dated change, the decision it affects, the company evidence and the trigger for revisiting it.",
+    "directAnswer": "Keep the briefing to one decision note with a source date and an owner. State what changed externally, whether it changes the company plan, and the business evidence required before acting.",
+    "audience": "Chiefs of staff, CFOs, executive teams and VC operating partners",
     "mappedDecisionAreas": [
       "burn-discipline",
       "capital-raising",
       "product-tempo"
     ],
-    "thresholdFocus": "both"
+    "thresholdFocus": "both",
+    "featuredOrder": 9,
+    "contextHeading": "A market-conditions note for an executive meeting",
+    "context": "Separate the external market reading from the cash, customer and delivery evidence behind management decisions. For a portfolio review, use the same questions across companies but keep each company’s runway and commitments separate. Historical reconstructions provide context; published weekly briefs document what was actually recorded.",
+    "companyInputs": [
+      "The source date, the previous reading and any missing or fallback data.",
+      "The company decision affected, its owner and the internal evidence supporting a change.",
+      "The approval requested, review date and condition that would reverse the decision."
+    ],
+    "decisionNote": "As of [date], [external change] affects [decision]. Our company evidence is [cash, customer or delivery result]. We propose [action] within [limit]. Revisit if [trigger]. Owner: [name]. Source: [dated link].",
+    "supportingLinks": [
+      {
+        "label": "Published briefs and historical context",
+        "href": "/history"
+      },
+      {
+        "label": "Copy or share the weekly brief",
+        "href": "/share"
+      }
+    ]
   }
 ]

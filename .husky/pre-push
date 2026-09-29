@@ -1,3 +1,9 @@
+#!/usr/bin/env sh
+# core.hooksPath points at `.husky`, not husky's generated `.husky/_`, so this file is
+# what git executes directly — hence the shebang. `.husky/_` is gitignored, so it exists
+# only where `bun install` has run; a linked worktree got no hooks at all and pushed
+# unverified in silence (2026-09-01). `.husky/pre-push` is tracked, so every worktree has
+# it. `bun run prepare` re-points hooksPath after husky resets it on install.
 # The check gate. Not a mirror of CI any more: as of 2026-08-22 the GitHub
 # workflows are manual-only, because this private repo's Actions minutes are
 # billed and the account stopped paying for them. Nothing else runs lint,

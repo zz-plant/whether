@@ -281,7 +281,17 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Popup className="fixed z-50 top-[12vh] left-1/2 -translate-x-1/2 w-full max-w-lg mx-auto rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--bg-panel)]/95 shadow-2xl backdrop-blur-2xl overflow-hidden" aria-label="Command palette">
+        {/* A bottom sheet below md, the centered dialog above it. The palette's
+            only phone entry points are the Search tab and the header's button,
+            and a keyboard-driven menu pinned at 12vh with C/F/ESC badges is a
+            desktop pattern occupying a phone's width. On a sheet the rows are
+            the controls: touch-height, no shortcut badges, and no pre-selected
+            highlight — with no hardware keyboard, index 0 never moves, and a
+            permanent first-row highlight only competes with the field above. */}
+        <Dialog.Popup
+          className="fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-hidden rounded-t-2xl border-t border-[color:var(--border-strong)] bg-[color:var(--bg-panel)]/95 shadow-2xl backdrop-blur-2xl md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[12vh] md:w-full md:max-w-lg md:-translate-x-1/2 md:rounded-2xl md:border"
+          aria-label="Command palette"
+        >
           <div className="flex items-center gap-3 border-b border-[color:var(--border-default)] px-4 py-3.5 bg-[color:var(--bg-raised)]/40">
             <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
             <input
@@ -289,13 +299,18 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search or jump to… e Evidence · p Plan · h History"
+              placeholder="Search or jump to…"
               className="flex-1 bg-transparent text-base sm:text-sm text-slate-100 placeholder-slate-500 outline-none font-medium"
               aria-label="Search commands"
             />
-            <kbd className="weather-kbd shrink-0">ESC</kbd>
+            {/* The ESC badge is a desktop affordance; `.weather-kbd` is
+                unlayered CSS, so the breakpoint hides a wrapper span — the
+                utility cannot override the class directly. */}
+            <span className="shrink-0 hidden md:inline-flex">
+              <kbd className="weather-kbd">ESC</kbd>
+            </span>
           </div>
-          <nav aria-label="Command results" className="max-h-80 overflow-y-auto overscroll-contain py-2">
+          <nav aria-label="Command results" className="max-h-[60dvh] overflow-y-auto overscroll-contain py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:max-h-80 md:pb-2">
             {filtered.length === 0 ? (
               <p className="px-4 py-8 text-center text-sm text-slate-500 font-medium">No matching commands</p>
             ) : (
@@ -308,9 +323,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                       <button
                         type="button"
                         onClick={cmd.action}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-left transition-colors duration-150 ${
+                        className={`w-full flex min-h-11 items-center gap-3 px-3.5 py-2.5 rounded-lg text-left transition-colors duration-150 ${
                           isSelected
-                            ? "bg-sky-500/15 text-sky-100 font-semibold"
+                            ? "text-slate-100 md:bg-sky-500/15 md:text-sky-100 md:font-semibold"
                             : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
                         }`}
                         aria-current={isSelected ? "true" : undefined}
@@ -323,7 +338,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                           ) : null}
                         </span>
                         {cmd.shortcut ? (
-                          <kbd className="weather-kbd shrink-0">{cmd.shortcut}</kbd>
+                          <span className="shrink-0 hidden md:inline-flex">
+                            <kbd className="weather-kbd">{cmd.shortcut}</kbd>
+                          </span>
                         ) : null}
                       </button>
                     </li>
@@ -332,7 +349,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               </ul>
             )}
           </nav>
-          <div className="border-t border-[color:var(--border-default)] px-4 py-2.5 bg-[color:var(--bg-raised)]/40 flex items-center gap-4 text-[10px] text-slate-400 font-medium">
+          <div className="hidden md:flex border-t border-[color:var(--border-default)] px-4 py-2.5 bg-[color:var(--bg-raised)]/40 items-center gap-4 text-[10px] text-slate-400 font-medium">
             <span className="flex items-center gap-1.5"><kbd className="weather-kbd">↑↓</kbd> navigate</span>
             <span className="flex items-center gap-1.5"><kbd className="weather-kbd">↵</kbd> select</span>
             <span className="flex items-center gap-1.5"><kbd className="weather-kbd">esc</kbd> close</span>

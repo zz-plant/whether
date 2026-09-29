@@ -43,9 +43,11 @@ const postSlackAlert = async (webhook: string, header: string, body: string) => 
     }),
   });
   /* A webhook Slack has revoked reads 404/410; drop it so the weekly step stops
-     counting it as a target. Same rule the weekly deliverer applies. */
+     counting it as a target. Same rule the weekly deliverer applies. Awaited,
+     not floated: a Worker can drop a floating promise at request end, and this
+     is the only thing that retires a dead target. */
   if (response.status === 404 || response.status === 410) {
-    getSlackWebhookStore().deactivateByUrl(webhook).catch(() => undefined);
+    await getSlackWebhookStore().deactivateByUrl(webhook).catch(() => undefined);
   }
   return response;
 };

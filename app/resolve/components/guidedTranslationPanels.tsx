@@ -181,7 +181,7 @@ export function GuidedTranslationPanels({
                   <p className="mt-1">{guide.guidance}</p>
                   <Link
                     href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage.slug })}
-                    className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
                   >
                     Open {guide.title} view
                   </Link>
@@ -199,7 +199,7 @@ export function GuidedTranslationPanels({
             <p className="text-sm text-slate-300">{guide.tagline}</p>
             <Link
               href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage?.slug })}
-              className="inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+              className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
             >
               Open {guide.title} view
             </Link>
@@ -208,7 +208,7 @@ export function GuidedTranslationPanels({
       </div>
 
       <details className="weather-panel weather-auto-chevron space-y-3 px-5 py-5">
-        <summary data-chevron className="cursor-pointer list-none text-sm type-eyebrow text-sky-200">
+        <summary data-chevron className="cursor-pointer list-none text-sm font-semibold text-sky-200">
           {showStageLibrary ? "Browse the other stages" : `Open the other stages (${stageGuides.length})`}
         </summary>
         <div className="mt-4 space-y-4">
@@ -242,7 +242,7 @@ export function GuidedTranslationPanels({
                 <p className="text-xs text-slate-300">{stage.primaryValue}</p>
                 <Link
                   href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: selectedStakeholder?.slug })}
-                  className="inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                  className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
                 >
                   Open stage view
                 </Link>

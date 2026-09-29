@@ -69,13 +69,17 @@ describe("regime presentation labels", () => {
     assert.equal(legend[3]?.weather, "Sunny");
   });
 
-  it("gives each weather word one fact about money and one instruction, not more weather", () => {
+  it("gives each weather word one fact about money — the condition, never the instruction", () => {
     assert.match(getRegimeWeatherRationale("SCARCITY"), /expensive and hard to raise/i);
-    assert.match(getRegimeWeatherRationale("DEFENSIVE"), /already working/i);
+    assert.match(getRegimeWeatherRationale("DEFENSIVE"), /available but pricey/i);
     assert.match(getRegimeWeatherRationale("VOLATILE"), /changing week to week/i);
-    assert.match(getRegimeWeatherRationale("EXPANSION"), /move faster/i);
+    assert.match(getRegimeWeatherRationale("EXPANSION"), /cheap and available/i);
+    // The instruction half ("Move faster", "Conserve cash") moved to the call
+    // alone: beside a cautionary call it read as two recommendations
+    // disagreeing, when the truth is one condition and one constraint.
     for (const { weatherRationale, ariaLabel, weather } of getOrderedRegimeLegend()) {
       assert.doesNotMatch(weatherRationale, /heat|shelter|footing|layers|visibility|windows/i, "the metaphor is cashed out, not extended");
+      assert.doesNotMatch(weatherRationale, /\b(move faster|conserve cash|fund what|hold the rest|commit|pause line)\b/i, "the rationale states conditions, not advice");
       assert.ok(ariaLabel.startsWith(`${weather}: `), "the legend's screen-reader label leads with the weather word");
       assert.ok(ariaLabel.endsWith(weatherRationale), "and carries the same sentence");
     }

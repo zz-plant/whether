@@ -447,7 +447,7 @@ export const getTimeMachineYieldCurveSeries = (
         : null;
     const curveSignal =
       typeof spread10Y2Y === "number" && typeof spread2Y3M === "number"
-        ? 0.7 * spread10Y2Y - 0.3 * spread2Y3M
+        ? 0.7 * spread10Y2Y + 0.3 * spread2Y3M
         : null;
 
     return {

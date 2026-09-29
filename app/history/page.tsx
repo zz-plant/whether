@@ -124,7 +124,7 @@ export default async function HistoryPage({
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },
-        page: { pageTitle: "History", pageSummary: "Past guidance, as it was published.", sectionLinks: historySectionLinks },
+        page: { pageTitle: "History", pageSummary: "Historical conditions and the weekly briefs published on the record.", sectionLinks: historySectionLinks },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },
@@ -152,6 +152,17 @@ export default async function HistoryPage({
         >
           <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">Conditions by month</h2>
           <MonthStrip entries={fullSeries} />
+          <p className="text-sm text-slate-300">
+            For founders, finance teams and boards comparing funding environments: use the monthly record
+            to examine how the model reads past conditions. Historical readings are not evidence that a
+            forecast was published at the time, or that a company would have achieved a particular result.
+            Use the dated published briefs below when citing what Whether actually recorded.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <ActionLink href="/history/compare" variant="inline">Compare funding conditions across periods</ActionLink>
+            <ActionLink href="/answers/how-to-brief-executives-on-market-conditions" variant="inline">Prepare a board decision note</ActionLink>
+            <ActionLink href="/" variant="inline">Read the current weekly brief</ActionLink>
+          </div>
         </section>
       ) : null}
 
@@ -267,7 +278,7 @@ export default async function HistoryPage({
         initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
         className="weather-auto-chevron weather-panel px-5 py-4"
         summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
-        summary={<span>Every month&rsquo;s readings</span>}
+        summary={<span>Explore past months and signal trends</span>}
       >
         <div className="mt-4 space-y-5">
           {/* The whole record, not the trailing 24 months `regimeSeries` holds

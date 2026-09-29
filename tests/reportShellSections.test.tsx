@@ -43,15 +43,18 @@ describe("ReportShell extracted sections", () => {
       />,
     );
 
-    // One kicker on every report route. "Weekly operating brief" used to appear
-    // on whichever routes forgot to ask for the compact variant.
-    assert.match(html, /Weekly brief/);
-    assert.doesNotMatch(html, /Weekly operating brief/);
-    // The status word is the route's stamp: it prints in the regime ink, and
-    // the rest of the line stays neutral after it.
-    assert.match(html, /text-\[color:var\(--regime-ink\)\][^>]*>DEFENSIVE<\/span> • HIGH • As of Mar 5/);
+    // No kicker. "Weekly brief" above every H1 restated the route the header
+    // tab and the bottom bar already name; the status word leads instead.
+    assert.doesNotMatch(html, />Weekly brief</);
+    // The status word is the route's stamp: it prints first, in the regime
+    // ink, at the reading's own size; the trust headline and the record date
+    // follow it in the meta half of the same line.
+    assert.match(html, /text-\[color:var\(--regime-ink\)\]">DEFENSIVE<\/span>/);
+    assert.match(html, /HIGH • As of Mar 5/);
     assert.match(html, /Decision summary/);
-    assert.match(html, /Updated Mar 6/);
+    // The refresh stamp is labelled for what it is — the pipeline's fetch,
+    // distinct from the reading's record date in the status line above.
+    assert.match(html, /Signals refreshed Mar 6/);
     assert.match(html, /Start/);
     assert.match(html, /Export/);
   });
@@ -81,16 +84,24 @@ describe("ReportShell extracted sections", () => {
     // an anchor no route renders, so /history shipped a dead button.
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Signals"
-        pageSummary="Deep evidence appendix."
-        sectionLinks={[
-          { href: "#current-scores", label: "Current scores" },
-          { href: "#thresholds", label: "Thresholds" },
-        ]}
-        trustStatusTone="stable"
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Signals",
+            pageSummary: "Deep evidence appendix.",
+            sectionLinks: [
+              { href: "#current-scores", label: "Current scores" },
+              { href: "#thresholds", label: "Thresholds" },
+            ],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+        }}
       >
         <section>Body</section>
       </ReportShell>,
@@ -108,14 +119,24 @@ describe("ReportShell extracted sections", () => {
   it("keeps a hero action a real link when a route passes one", () => {
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Signals"
-        pageSummary="Deep evidence appendix."
-        sectionLinks={[{ href: "#current-scores", label: "Current scores" }]}
-        trustStatusTone="stable"
-        primaryCta={{ href: "/history/compare", label: "Compare periods" }}
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Signals",
+            pageSummary: "Deep evidence appendix.",
+            sectionLinks: [{ href: "#current-scores", label: "Current scores" }],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+          actions: {
+            primaryCta: { href: "/history/compare", label: "Compare periods" },
+          },
+        }}
       >
         <section>Body</section>
       </ReportShell>,
@@ -129,18 +150,28 @@ describe("ReportShell extracted sections", () => {
   it("renders the home brief share action in the header and keeps the body CTA rail quiet", () => {
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Weekly Brief"
-        pageSummary="This week's call and the share-ready path."
-        sectionLinks={[]}
-        trustStatusTone="stable"
-        exportCta={{
-          href: "#share-ready-artifact",
-          label: "Copy weekly brief",
-          copyText: "WEEKLY BRIEF\nAction: Hold posture.",
-          copyTarget: "Weekly brief",
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Weekly Brief",
+            pageSummary: "This week's call and the share-ready path.",
+            sectionLinks: [],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+          actions: {
+            exportCta: {
+              href: "#share-ready-artifact",
+              label: "Copy weekly brief",
+              copyText: "WEEKLY BRIEF\nAction: Hold posture.",
+              copyTarget: "Weekly brief",
+            },
+          },
         }}
       >
         <section>Body</section>
@@ -160,14 +191,24 @@ describe("ReportShell extracted sections", () => {
   it("puts the next-step card at the end of the page, once", () => {
     const html = renderToStaticMarkup(
       <ReportShell
-        statusLabel="DEFENSIVE"
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        pageTitle="Plan"
-        pageSummary="Prepare for this week's conditions."
-        sectionLinks={[]}
-        trustStatusTone="stable"
-        nextStep={{ href: "/resolve", description: "Still stuck on one decision? Get a yes or no for it.", label: "Resolve a decision" }}
+        model={{
+          status: {
+            statusLabel: "DEFENSIVE",
+            recordDateLabel: "Mar 5, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+          page: {
+            pageTitle: "Plan",
+            pageSummary: "Prepare for this week's conditions.",
+            sectionLinks: [],
+          },
+          trust: {
+            trustStatusTone: "stable",
+          },
+          actions: {
+            nextStep: { href: "/resolve", description: "Still stuck on one decision? Get a yes or no for it.", label: "Resolve a decision" },
+          },
+        }}
       >
         <section>Body</section>
       </ReportShell>,

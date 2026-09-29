@@ -7,6 +7,8 @@ import {
   type DecisionCategory,
   type DecisionOutput,
   type LifecycleStage,
+  type PlanStressTestResult,
+  type PlanComparisonResult,
 } from "../../../lib/decisionShield";
 
 export const lifecycleOptions: { value: LifecycleStage; label: string }[] = [
@@ -65,13 +67,72 @@ export const formatOptionLabel = <T extends string>(
   options: { value: T; label: string }[]
 ) => options.find((option) => option.value === value)?.label ?? value;
 
+
+type BuildShareTextOptions = {
+  planMode?: "dropdown" | "natural_language" | "compare";
+  planText?: string;
+  planBText?: string;
+  stressTestResult?: PlanStressTestResult;
+  comparisonResult?: PlanComparisonResult;
+  businessModel?: "VC_BACKED" | "BOOTSTRAPPED";
+  grossMarginPct?: number;
+};
+
 export const buildShareText = (
   assessment: RegimeAssessment,
   lifecycle: LifecycleStage,
   category: DecisionCategory,
   action: DecisionAction,
-  output: DecisionOutput
+  output: DecisionOutput,
+  options?: BuildShareTextOptions
 ) => {
+  if (options?.planMode === "natural_language" && options.planText?.trim() && options.stressTestResult) {
+    const res = options.stressTestResult;
+    const modelLine = options.businessModel === "BOOTSTRAPPED"
+      ? `Model: Bootstrapped${options.grossMarginPct !== undefined ? ` (${options.grossMarginPct}% gross margin)` : ""}`
+      : "Model: VC-Backed";
+
+    const lines = [
+      "Decision Shield — Plan Stress Test",
+      `This week's conditions: ${getRegimePublicLabel(assessment.regime)}`,
+      modelLine,
+      `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
+      "",
+      `Plan: "${options.planText.trim()}"`,
+      `Decision verdict: ${res.verdict}`,
+      `Summary: ${res.headline}`,
+      ...(res.sizingNote ? ["", `Sizing: ${res.sizingNote}`] : []),
+      ...(res.fragileAssumptions.length > 0
+        ? ["", "What this plan assumes:", ...res.fragileAssumptions.map((a) => `- ${a}`)]
+        : []),
+      "",
+      `${publicDecisionLabels.threshold}: ${res.boundedGuardrail}`,
+      ...(res.reversibleAlternative ? [`A more reversible version: ${res.reversibleAlternative}`] : []),
+      `${publicDecisionLabels.reversal}: ${res.reversalTrigger}`,
+    ];
+
+    return lines.join("\n");
+  }
+
+  if (options?.planMode === "compare" && options.planText?.trim() && options.planBText?.trim() && options.comparisonResult) {
+    const cmp = options.comparisonResult;
+    const lines = [
+      "Decision Shield — Plan Comparison",
+      `This week's conditions: ${getRegimePublicLabel(assessment.regime)}`,
+      `Recommendation: ${cmp.comparativeRecommendation}`,
+      "",
+      `Plan A: "${options.planText.trim()}"`,
+      `- Decision verdict: ${cmp.planA.verdict}`,
+      `- ${publicDecisionLabels.threshold}: ${cmp.planA.boundedGuardrail}`,
+      "",
+      `Plan B: "${options.planBText.trim()}"`,
+      `- Decision verdict: ${cmp.planB.verdict}`,
+      `- ${publicDecisionLabels.threshold}: ${cmp.planB.boundedGuardrail}`,
+    ];
+
+    return lines.join("\n");
+  }
+
   const lines = [
     "Decision Shield — Whether Weekly Brief",
     `This week's conditions: ${getRegimePublicLabel(assessment.regime)}`,

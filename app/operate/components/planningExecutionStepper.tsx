@@ -357,8 +357,15 @@ export function OperationsExecutionStepper({
           the page's second index — a third, counting the card grid that used to
           close the page. The `aria-current="step"` state lives on the panels. */}
       {recordDate ? (
-        <p className="text-xs text-slate-400" aria-live="polite" data-week-progress>
-          <span className="font-semibold tabular-nums text-slate-200">
+        <p
+          className="text-sm text-slate-300"
+          aria-live="polite"
+          data-week-progress
+        >
+          {/* The week's progress is the most actionable fact under the intro,
+              and it printed in the same micro size as the trust metadata above
+              it. Same encoding — a count in tabular figures — one step louder. */}
+          <span className="font-semibold tabular-nums text-slate-100">
             {doneCount} of {steps.length}
           </span>{" "}
           done this week

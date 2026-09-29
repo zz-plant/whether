@@ -281,7 +281,7 @@ const buildGroupedRow = ({
  * data.
  */
 const isDegradedSource = (row: SourceHealthRow) =>
-  row.expectsLive ? row.mode !== "live" : row.freshnessStatus !== "fresh";
+  row.freshnessStatus !== "fresh" || (row.expectsLive && row.mode !== "live");
 
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows

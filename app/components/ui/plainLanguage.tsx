@@ -73,13 +73,15 @@ export function SignalReading({
 export function SignalScaleNote({
   signalKey,
   className,
+  as: Component = "p",
 }: {
   signalKey: CompositeSignalKey;
   className?: string;
+  as?: "span" | "p";
 }) {
   return (
-    <p className={joinClasses("text-fluid-nano text-white/40", className)}>
+    <Component className={joinClasses("text-fluid-nano text-white/40", className)}>
       {compositeSignalScales[signalKey].directionLabel}
-    </p>
+    </Component>
   );
 }

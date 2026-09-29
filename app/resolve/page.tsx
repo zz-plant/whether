@@ -73,22 +73,36 @@ export default async function DecidePage({
 
   return (
     <ReportShell
-      statusLabel={reportData.statusLabel}
-      regime={reportData.assessment.regime}
-      recordDateLabel={reportData.recordDateLabel}
-      fetchedAtLabel={reportData.fetchedAtLabel}
-      trustStatusTone={snapshot.isFallback ? "warning" : "stable"}
-      pageTitle="Resolve one open decision"
-      pageSummary="One yes-or-no answer per open decision, under this week's guidance."
-      sectionLinks={sectionLinks.slice(0, 2)}
-      sidebarVariant="hidden"
-      nextStep={{
-        href: "/operate",
-        description: "Set this week's rules for the rest of the plan.",
-        label: "Open the plan",
+      model={{
+        status: {
+          statusLabel: reportData.statusLabel,
+          regime: reportData.assessment.regime,
+          recordDateLabel: reportData.recordDateLabel,
+          fetchedAtLabel: reportData.fetchedAtLabel,
+        },
+        page: {
+          pageTitle: "Resolve one open decision",
+          pageSummary: "One yes-or-no answer per open decision, under this week's guidance.",
+          sectionLinks: sectionLinks.slice(0, 2),
+        },
+        trust: {
+          trustStatusTone: snapshot.isFallback ? "warning" : "stable",
+        },
+        chrome: {
+          sidebarVariant: "hidden",
+        },
+        actions: {
+          nextStep: {
+            href: "/operate",
+            description: "Set this week's rules for the rest of the plan.",
+            label: "Open the plan",
+          },
+        },
+        payloads: {
+          structuredData: breadcrumbStructuredData,
+        },
       }}
-      structuredData={breadcrumbStructuredData}
-      >
+    >
         <OperatorWorkflowRouteTracker />
       {/* The page is the answers. The old router asked "which decision is still
           open?" and offered a recommended path, two answers, two roles, two
@@ -121,11 +135,15 @@ export default async function DecidePage({
             </li>
           ))}
         </ul>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
+          <Link href="/comps" className="weather-hub-chip">Public SaaS valuation context</Link>
+          <Link href="/history/compare" className="weather-hub-chip">Compare historical funding conditions</Link>
+        </div>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />
       </ReportSection>
 
       <Details id="decide-secondary-paths" className="weather-panel px-6 max-sm:px-0 py-6"
-        summary={<span className="text-sm type-eyebrow text-sky-200">Browse by role, company stage, situation or toolkit</span>}
+        summary={<span className="text-sm font-semibold text-sky-200">Browse by role, company stage, situation or toolkit</span>}
       >
           <section className="grid gap-4 lg:grid-cols-2">
             <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
