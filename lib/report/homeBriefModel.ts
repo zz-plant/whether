@@ -1,5 +1,6 @@
 import type { MacroSeriesReading, TreasuryMetadata } from "../types";
 import type { RegimeStateTransition } from "./regimeStateMachine";
+import type { ComparedWith } from "./reportDataTypes";
 import type {
   DecisionTransmission,
   HistoricalAnalog,
@@ -93,6 +94,8 @@ export type HomeReportData = {
     anomalySignals?: Array<{
       reason: string;
     }>;
+    /** What the moves are measured against, so the model's labels can name it. */
+    comparedWith?: ComparedWith;
   };
   reportEvidenceItems?: ReportEvidenceItem[];
   macroSeries?: MacroSeriesReading[];
@@ -283,6 +286,8 @@ type WeeklyLeadershipSummary = {
   expansionWindow: string;
   raiseWindow: string;
   netDeltaLabel: string;
+  /** The earlier reading `boldnessDelta` is measured against; absent where the week does not date it. */
+  comparedWith?: ComparedWith;
 };
 
 export type RevisitQueueItem = {

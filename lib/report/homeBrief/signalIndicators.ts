@@ -5,6 +5,7 @@ import {
   regimeSignalLabelByKey,
   type RegimeSignalKey,
 } from "../reportFormatting";
+import { comparisonBasis } from "../comparisonBasis";
 import { normalizeSignalContributions } from "../signalFormatting";
 import type { NormalizedSignalContribution } from "../signalFormatting";
 import type {
@@ -51,6 +52,11 @@ export const buildRegimeSignalIndicators = ({
   macroSeries: HomeReportData["macroSeries"];
 }): RegimeSignalIndicator[] => {
   const changedSignals = reportDynamics?.changedSignals ?? [];
+  /* The composite scores, the base rate and the curve are moved against the
+     previous monthly snapshot, and say so by its date. The two market inputs
+     below move against their own previous observation, which is a different
+     comparison, so they keep "vs last week". */
+  const versusPrevious = comparisonBasis(reportDynamics?.comparedWith).versus;
 
   const resolveSparkline = (key: RegimeSignalKey): number[] => {
     if (key === "tightness") {
@@ -92,7 +98,7 @@ export const buildRegimeSignalIndicators = ({
         valueLabel: formatRegimeSignalValue(rawValue, key),
         rawValue,
         trendArrow: formatTrendArrow(delta),
-        trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`,
+        trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} ${versusPrevious}`,
         sparkline: resolveSparkline(key),
         isFallback: delta === null,
       };
@@ -115,7 +121,7 @@ export const buildRegimeSignalIndicators = ({
         valueLabel: formatRegimeSignalValue(rawValue, key),
         rawValue,
         trendArrow: formatTrendArrow(delta),
-        trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`,
+        trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} ${versusPrevious}`,
         sparkline: resolveSparkline(key),
         isFallback: rawValue === null || delta === null,
       };

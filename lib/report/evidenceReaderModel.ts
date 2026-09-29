@@ -6,6 +6,7 @@ import type { ReportDynamics } from "./reportDataTypes";
 import type { ActionStripItem } from "./operatingCalls";
 import { buildSharedCorridorRails } from "./operatingCalls";
 import { describeSignalDirection } from "./signalClusterReading";
+import { comparisonBasis } from "./comparisonBasis";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
@@ -13,13 +14,15 @@ import { resolveDataStatusLabel } from "./trustStatus";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
- * reader's order: the four signals against their lines with last week beside
- * them, the two composite scores against the three lines that govern the call,
- * and the four trust facts. One derivation, so a ScoreCell on /signals, a
+ * reader's order: the four signals against their lines with the earlier reading
+ * beside them, the two composite scores against the three lines that govern the
+ * call, and the four trust facts. One derivation, so a ScoreCell on /signals, a
  * ladder on a scenario page and a paste from an answer page agree on the
  * previous value, the line and the distance.
  *
- * "Last week" is a fact only when a comparison happened. `buildReportDynamics`
+ * The earlier reading is the previous monthly snapshot, and each row names it by
+ * date (`previousLabel`, from `comparisonBasis`) instead of calling it last week.
+ * A comparison is a fact only when one happened. `buildReportDynamics`
  * records a signal's move in `changedSignals` (or `anomalySignals` when it
  * moved past the sanity bound), and says `directionLabel: "unavailable"` when
  * there was no previous reading at all — so a signal absent from both lists
@@ -33,7 +36,7 @@ import { resolveDataStatusLabel } from "./trustStatus";
 
 export const SIGNAL_KEYS: readonly RegimeSignalKey[] = ["tightness", "riskAppetite", "baseRate", "curveSlope"];
 
-type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel">;
+type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith">;
 
 
 export type SignalReferenceRow = {
@@ -44,6 +47,8 @@ export type SignalReferenceRow = {
   /** Null when the series did not resolve this week. */
   value: number | null;
   previous: number | null;
+  /** What `previous` is: the date of the reading it is from ("Aug 31"), or "Last week" where the week does not date it. */
+  previousLabel: string;
   /** The signed move, when one was recorded. */
   delta: number | null;
   line: { value: number; label: string };
@@ -111,11 +116,13 @@ const rowFor = (
 ): SignalReferenceRow => {
   const delta = value === null ? null : findSignalDelta(dynamics, key);
   const isScore = key === "tightness" || key === "riskAppetite";
+  const basis = comparisonBasis(dynamics.comparedWith);
   const direction = describeSignalDirection(
     delta,
     BETTER_WHEN[key],
     isScore ? " points" : key === "baseRate" ? "%" : "pp",
     isScore ? SIGNED_WHOLE : SIGNED_TWO,
+    basis,
   );
   return {
     key,
@@ -123,6 +130,7 @@ const rowFor = (
     kindLabel: indicatorKindLabel(key),
     value,
     previous: previousFrom(value, delta),
+    previousLabel: basis.label,
     delta,
     line,
     units,
@@ -151,6 +159,8 @@ export type CallLineLadder = {
   label: string;
   value: number;
   previous: number | null;
+  /** What `previous` is, as `SignalReferenceRow.previousLabel` names it. */
+  previousLabel: string;
   lines: LadderLine[];
 };
 
@@ -180,6 +190,7 @@ export const buildCallLineLadders = (
       label: regimeSignalLabelByKey[key],
       value,
       previous: previousFrom(value, findSignalDelta(dynamics, key)),
+      previousLabel: comparisonBasis(dynamics.comparedWith).label,
       lines,
     };
   };

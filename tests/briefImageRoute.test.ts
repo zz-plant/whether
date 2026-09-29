@@ -7,6 +7,7 @@ import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { buildScoreReadings, buildScoreReferenceLines, type ScoreReadingParts } from "../lib/export/scoreReference";
 import { renderBriefImage, type BriefImageProps } from "../lib/image/briefImageTemplate";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, toImageSafeText } from "../lib/image/ogFonts";
+import { SANS_EM, wrappedLines } from "../lib/image/textFit";
 import { buildRuleCondition } from "../lib/report/boundedDecisionRules";
 import { parseImageBriefRequestContext } from "../lib/report/imageBriefSearchParams";
 import { buildSharedCorridorRails, type ActionStripItem } from "../lib/report/operatingCalls";
@@ -33,8 +34,8 @@ const collectText = (node: ReactNode): string => {
 
 /**
  * This week as the card is asked to draw it: both scores against a pause and a
- * resume line, and a week whose signals moved (so the model does carry a
- * previous reading; see "prints no last week" below for why the card ignores it).
+ * resume line, and a week whose signals moved against the Aug 31 snapshot (the
+ * last month-end, which is what the loader compares a Sep 25 read with).
  */
 const scores = { tightness: 90, riskAppetite: 43 };
 const pauseAndResumeLines: ActionStripItem[] = [
@@ -48,6 +49,7 @@ const pauseAndResumeLines: ActionStripItem[] = [
     resumeConditions: [buildRuleCondition("tightness", "<", 66), buildRuleCondition("riskAppetite", ">", 54)],
   },
 ];
+const comparedWithAug31 = { recordDate: "2026-08-31", label: "Aug 31" };
 const movedWeek: ReportDynamics = {
   directionLabel: "deteriorating",
   totalSignalChanges: 2,
@@ -57,6 +59,7 @@ const movedWeek: ReportDynamics = {
     { key: "riskAppetite", label: "Risk appetite", delta: -13 },
   ],
   anomalySignals: [],
+  comparedWith: comparedWithAug31,
 };
 
 const buildHomepage = ({
@@ -104,17 +107,17 @@ const buildHomepage = ({
 
 /** The paste's own shape: the parts in print order, joined. */
 const asPasted = (reading: ScoreReadingParts) =>
-  [reading.reading, reading.line, reading.distance, reading.lastWeek, reading.resume]
+  [reading.reading, reading.line, reading.distance, reading.previous, reading.resume]
     .filter((part) => part !== null)
     .join(" · ");
 
 describe("buildBriefImagePayload", () => {
-  it("prints both scores against the lines that change the call, as the pastes do", () => {
+  it("prints both scores against the lines that change the call, and the earlier reading under its date", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 
     assert.deepEqual(payload.readings.map(asPasted), [
-      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · 14 pts above · resume line 66 (24 pts away)",
-      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · 1 pt below · resume line 54 (11 pts away)",
+      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · 14 pts above · was 63 on Aug 31 · resume line 66 (24 pts away)",
+      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · 1 pt below · was 56 on Aug 31 · resume line 54 (11 pts away)",
     ]);
   });
 
@@ -123,23 +126,50 @@ describe("buildBriefImagePayload", () => {
 
     assert.deepEqual(
       payload.readings.map(asPasted),
-      buildScoreReferenceLines({ scores, rails: buildSharedCorridorRails(pauseAndResumeLines, scores) }),
+      buildScoreReferenceLines({
+        scores,
+        rails: buildSharedCorridorRails(pauseAndResumeLines, scores),
+        previous: { tightness: 63, riskAppetite: 56, comparedWith: comparedWithAug31 },
+      }),
     );
   });
 
-  it("prints no last week, because the reading behind that label is the last month-end", () => {
-    // The week's dynamics carry a move (27 points), and every export prints it as "last week".
-    // It is the change since the previous time-machine snapshot, and that cache is monthly: a
-    // read on Sep 18 and one on Sep 25 are both compared with Aug 31. A card that printed
-    // "last week 63" would put a four-week-old number under a one-week label. If the cache
-    // ever carries weekly snapshots, pass `previous` in the route and this test should flip.
+  it("dates the earlier reading instead of calling it last week, because it is the last month-end", () => {
+    // The week's dynamics carry a move (27 points). It is the change since the previous
+    // time-machine snapshot, and that cache is monthly: a read on Sep 18 and one on Sep 25 are
+    // both compared with Aug 31. "last week 63" would put a four-week-old number under a
+    // one-week label, so the card names the date the loader recorded. If the cache ever carries
+    // weekly snapshots the date the loader records changes with it and this card follows.
     assert.equal(getPreviousTimeMachineSnapshot("2026-09-18")?.record_date, "2026-08-31");
     assert.equal(getPreviousTimeMachineSnapshot("2026-09-25")?.record_date, "2026-08-31");
 
     const payload = buildBriefImagePayload(buildHomepage());
+    const text = collectText(renderBriefImage(payload));
 
-    assert.deepEqual(payload.readings.map((reading) => reading.lastWeek), [null, null]);
-    assert.doesNotMatch(collectText(renderBriefImage(payload)), /last week/i);
+    assert.deepEqual(payload.readings.map((reading) => reading.previous), ["was 63 on Aug 31", "was 56 on Aug 31"]);
+    assert.match(text, /was 63 on Aug 31/);
+    assert.doesNotMatch(text, /last week/i);
+  });
+
+  it("prints no earlier reading on a week with no comparison, rather than a flat one", () => {
+    const noComparison: ReportDynamics = {
+      directionLabel: "unavailable",
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      changedSignals: [],
+      anomalySignals: [],
+    };
+    const payload = buildBriefImagePayload(buildHomepage({ dynamics: noComparison }));
+
+    assert.deepEqual(payload.readings.map((reading) => reading.previous), [null, null]);
+    assert.doesNotMatch(collectText(renderBriefImage(payload)), /last week|was \d+ on/i);
+  });
+
+  it("says last week only for a comparison whose source did not date it", () => {
+    const undated: ReportDynamics = { ...movedWeek, comparedWith: undefined };
+    const payload = buildBriefImagePayload(buildHomepage({ dynamics: undated }));
+
+    assert.deepEqual(payload.readings.map((reading) => reading.previous), ["last week 63", "last week 56"]);
   });
 
   it("falls back to the line the call itself changes at when no lever states a pause line", () => {
@@ -238,12 +268,35 @@ describe("brief decision card render", () => {
     }
   });
 
-  it("prints last week when a reading carries one, in the position every paste puts it", () => {
-    const readings = buildScoreReadings({ scores, previous: { tightness: 63, riskAppetite: 56 } });
+  it("prints the earlier reading when a reading carries one, in the position every paste puts it", () => {
+    const readings = buildScoreReadings({
+      scores,
+      previous: { tightness: 63, riskAppetite: 56, comparedWith: comparedWithAug31 },
+    });
     const text = collectText(renderBriefImage({ ...briefImageProps, readings }));
 
-    assert.match(text, /change line 70 · 20 pts above · last week 63/);
-    assert.match(text, /change line 50 · 7 pts below · last week 56/);
+    assert.match(text, /change line 70 · 20 pts above · was 63 on Aug 31/);
+    assert.match(text, /change line 50 · 7 pts below · was 56 on Aug 31/);
+  });
+
+  it("keeps the longest dated detail line on one row, which is what the 800px budget assumes", () => {
+    // A detail line that wraps is a fourth line in a reading, and the card has no room for one
+    // (`briefImageTemplate.tsx` measures 769px with three). The text column is the content width
+    // less the reading's padding, the widest value column (three digits) and the gap.
+    const columnWidth = 1088 - 48 - 3 * 52 - 28;
+    const longest = buildScoreReadings({
+      scores: { tightness: 100, riskAppetite: 100 },
+      previous: {
+        tightness: 100,
+        riskAppetite: 100,
+        comparedWith: { recordDate: "2025-12-31", label: "Dec 31, 2025" },
+      },
+    });
+
+    for (const reading of longest) {
+      const detail = [reading.line, reading.distance, reading.previous].filter((part) => part !== null).join(" \u00b7 ");
+      assert.equal(wrappedLines(detail, 24, columnWidth, SANS_EM).length, 1, `"${detail}" wraps`);
+    }
   });
 
   it("names the weather once, and only a source the scores actually come from", () => {

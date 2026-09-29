@@ -7,6 +7,7 @@ import {
   getWindowState,
   toTrendLabel,
 } from "../lib/report/weeklyLeadershipBrief";
+import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { snapshotData } from "../lib/snapshot";
 
@@ -43,5 +44,16 @@ describe("weeklyLeadershipBrief helpers", () => {
     assert.equal(model.hiringTrend, "Strengthening");
     assert.equal(model.inputsComplete, true);
     assert.equal(getNetDeltaLabel(2), "Slightly more aggressive than last week.");
+  });
+
+  it("names the earlier reading by its date when the week records one", () => {
+    const aug31 = comparisonBasis({ label: "Aug 31" });
+
+    assert.equal(getNetDeltaLabel(-17, aug31), "Materially more defensive since Aug 31.");
+    assert.equal(getNetDeltaLabel(5, aug31), "More aggressive since Aug 31.");
+    assert.equal(getNetDeltaLabel(0, aug31), "The guidance is holding where it was on Aug 31.");
+    // Without a date the sentences are the ones the site always printed.
+    assert.equal(getNetDeltaLabel(-17), "Materially more defensive than last week.");
+    assert.equal(getNetDeltaLabel(0), "The guidance is holding where it was last week.");
   });
 });

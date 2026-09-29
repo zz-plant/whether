@@ -37,6 +37,7 @@ export const SignalsEvidenceBody = ({
       focusLabelByTab={focusLabelByTab}
       focusInstruments={model.focusInstruments}
       searchParams={searchParams}
+      basis={model.basis}
     />
     <SignalsCallLinesSection
       ladders={model.callLineLadders}

@@ -10,11 +10,12 @@ import { NO_LIVE_READING_CALL } from "../report/reportCopy";
 import { buildFlipThreshold } from "../report/reportEvidence";
 import type { PostureStateContract } from "../report/postureStateContract";
 import { resolvePublishedConfidence } from "../report/confidence";
+import { comparisonBasis } from "../report/comparisonBasis";
 import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
-import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
+import { buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { describeBaseRateSource, describeConditions, describeWeeklyDirection, formatExportConfidence } from "./exportTerms";
 
 /*
@@ -60,11 +61,11 @@ type ExportLayerOptions = {
   postureState?: PostureStateContract;
   modeledDecision?: ModeledExportDecisionPayload;
   /**
-   * Last week's two scores, when the caller's read carries a previous week
-   * (`previousScoresFromDynamics` off `reportDynamics`). Null or absent prints
-   * no "last week" part rather than a stand-in for one.
+   * The earlier two scores and the date they are from, when the caller's read
+   * carries a comparison (`previousScoresFromDynamics` off `reportDynamics`).
+   * Null or absent prints no earlier-reading part rather than a stand-in for one.
    */
-  previousScores?: ScorePair | null;
+  previousScores?: PreviousReading | null;
 };
 
 const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExportDecisionPayload => {
@@ -251,7 +252,9 @@ const buildViralArtifactBlock = (
     "",
     "This week's guidance:",
     `• Conditions: ${describeConditions(assessment.regime, modeled.postureWithStageLabel)}`,
-    ...(options?.trendLabel ? [`• vs last week: ${describeWeeklyDirection(options.trendLabel)}`] : []),
+    ...(options?.trendLabel
+      ? [`• ${comparisonBasis(options.previousScores?.comparedWith).versus}: ${describeWeeklyDirection(options.trendLabel)}`]
+      : []),
     `• Points from the change line: ${(options?.regimeDistancePoints ?? 0).toFixed(1)}`,
     `• Could conditions change next week: ${options?.transitionWatch === "ON" ? "yes" : "no"}`,
     `• ${publicDecisionLabels.call}: ${currentCall}`,

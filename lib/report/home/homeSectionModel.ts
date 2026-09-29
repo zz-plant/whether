@@ -7,6 +7,7 @@ import { operatingLeverToDecisionArea } from "../businessAreaMap";
 import type { BoundedDecisionRule, DecisionArea } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator, RevisitQueueItem } from "../homeBriefModel";
 import { findSignalDelta } from "../evidenceReaderModel";
+import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 
 /**
  * The homepage as five sections in the reader's order: the call, what changed,
@@ -31,7 +32,7 @@ export type SignalChangeRow = {
   label: string;
   value: number | null;
   valueLabel: string;
-  /** Last week's reading, or null when no comparison was made — never an invented flat one. */
+  /** The earlier reading, or null when no comparison was made — never an invented flat one. */
   previous: number | null;
   previousLabel: string | null;
   delta: number | null;
@@ -111,26 +112,37 @@ export const buildSignalChangeRows = ({
  * the rows print. A degraded read hands the page zero deltas, and saying
  * "neither score moved" on one would be the manufactured-stable claim
  * tests/noComparisonHonesty.test.ts exists to keep off the page.
+ *
+ * The move is measured against the earlier reading the week's dynamics name
+ * (`comparisonBasis`), so it says "since Aug 31" where it used to say "this
+ * week": the reading behind these deltas is the last month-end. A caller
+ * with no date keeps "this week".
  */
 const NO_COMPARISON_SENTENCE = "No previous week to compare the scores against.";
 
-const INPUT_MOVEMENT_SENTENCE: Record<ReturnType<typeof describeInputMovement>, string> = {
-  "steady inputs": "Neither score moved much this week.",
-  "tightening inputs": "The scores moved toward tighter money this week.",
-  "easing inputs": "The scores moved toward easier money this week.",
-  "mixed inputs": "The two scores moved in opposite directions this week.",
+const INPUT_MOVEMENT_SENTENCE: Record<ReturnType<typeof describeInputMovement>, (window: string) => string> = {
+  "steady inputs": (window) => `Neither score moved much ${window}.`,
+  "tightening inputs": (window) => `The scores moved toward tighter money ${window}.`,
+  "easing inputs": (window) => `The scores moved toward easier money ${window}.`,
+  "mixed inputs": (window) => `The two scores moved in opposite directions ${window}.`,
 };
 
 export const describeWeeklyMovement = ({
   tightnessDelta,
   riskAppetiteDelta,
   comparisonUnavailable,
+  basis = comparisonBasis(),
 }: {
   tightnessDelta: number;
   riskAppetiteDelta: number;
   comparisonUnavailable: boolean;
+  basis?: ComparisonBasis;
 }) =>
-  comparisonUnavailable ? NO_COMPARISON_SENTENCE : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)];
+  comparisonUnavailable
+    ? NO_COMPARISON_SENTENCE
+    : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)](
+        basis.date ? basis.since : "this week",
+      );
 
 export type HomeAreaRow = {
   area: DecisionArea;

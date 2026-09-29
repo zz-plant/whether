@@ -4,6 +4,7 @@ import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
 import { compositeSignalScales } from "../../../lib/report/signalTranslations";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
+import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 
 /**
  * Movement: one row per signal, each a from → to chip and, for the two
@@ -16,8 +17,12 @@ import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/ho
  * Every term defines itself in its row (the scale note, what the score means
  * at its level, the line names on the ladder), so the section no longer ends
  * by sending a reader to a glossary.
+ *
+ * The column and the ladders' hollow dot name the reading they compare with
+ * ("Aug 31 → this week"): it is the previous monthly snapshot, and the column
+ * used to say "Last week" over it.
  */
-const DeltaChip = ({ row }: { row: SignalChangeRow }) => {
+const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasis }) => {
   if (row.previous === null || row.delta === null) {
     return <span className="text-slate-500">—</span>;
   }
@@ -26,7 +31,7 @@ const DeltaChip = ({ row }: { row: SignalChangeRow }) => {
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-sm border border-current/30 px-1.5 py-0.5 tabular-nums ${tone}`}>
       <span className="sr-only">
-        {describeTrend({ label: row.label, delta: row.delta, current: row.value ?? undefined })}
+        {describeTrend({ label: row.label, delta: row.delta, current: row.value ?? undefined, period: basis.since })}
       </span>
       <span aria-hidden="true" className="text-slate-400">{row.previousLabel}</span>
       <span aria-hidden="true">→</span>
@@ -43,11 +48,14 @@ export function WhatChangedSection({
   rows,
   lead,
   comparisonUnavailable,
+  basis = comparisonBasis(),
 }: {
   rows: readonly SignalChangeRow[];
   /** The movement sentence, or the quiet-day line on a week the call held. */
   lead: string;
   comparisonUnavailable: boolean;
+  /** The earlier reading the rows are compared with; "last week" when the week does not date it. */
+  basis?: ComparisonBasis;
 }) {
   return (
     <HomeSection
@@ -75,11 +83,13 @@ export function WhatChangedSection({
             <col className="w-[11rem]" />
             <col />
           </colgroup>
-          <caption className="sr-only">Each signal this week against last week and against its lines</caption>
+          <caption className="sr-only">
+            {`Each signal this week against ${basis.reference} and against its lines`}
+          </caption>
           <thead className="max-sm:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
-              <th scope="col" className="py-2 pr-3 font-medium">Last week → this week</th>
+              <th scope="col" className="py-2 pr-3 font-medium">{`${basis.label} → this week`}</th>
               <th scope="col" className="py-2 font-medium">Against its lines</th>
             </tr>
           </thead>
@@ -118,7 +128,7 @@ export function WhatChangedSection({
                   ) : null}
                 </th>
                 <td className="whitespace-nowrap py-2.5 pr-3 text-xs max-sm:p-0">
-                  {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} />}
+                  {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
                   {row.saturatedPressure !== undefined ? (
                     /* A clipped score cannot move, so the chip reads flat at the
                        moment conditions are most extreme. Say it. The raw
@@ -136,6 +146,7 @@ export function WhatChangedSection({
                       label={<span className="sr-only">{row.label}</span>}
                       value={row.value}
                       previous={comparisonUnavailable ? null : row.previous}
+                      previousLabel={basis.label}
                       lines={row.lines}
                     />
                   ) : (

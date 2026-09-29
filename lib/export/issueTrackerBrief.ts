@@ -16,7 +16,7 @@ import { formatNumberWithUnit } from "../formatters";
 import { buildComplianceStamp } from "../exportNotices";
 import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, buildCallLines, type ModeledExportDecisionPayload } from "./briefBuilders";
 import { describeBaseRateSource, describeConditions, formatExportConfidenceWord } from "./exportTerms";
-import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
+import { buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { resolvePublishedConfidence } from "../report/confidence";
 import { regimeSignalLabel } from "../report/signalTranslations";
@@ -33,8 +33,8 @@ type ExportDecisionModel = ModeledExportDecisionPayload & {
   canonicalDecisionCopy?: CanonicalDecisionCopy;
   decisionShiftSummary?: string;
   trendLabel?: string;
-  /** Last week's scores, when the caller's read carries a previous week; never invented. */
-  previousScores?: ScorePair | null;
+  /** The earlier scores and the date they are from, when the caller's read carries a comparison; never invented. */
+  previousScores?: PreviousReading | null;
 };
 
 export const buildExportStamp = (treasury: TreasuryData, confidence: string) =>

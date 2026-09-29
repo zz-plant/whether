@@ -27,7 +27,13 @@ import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
 import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
 
 /** One score against its lines, this week and last, as the ladder draws it. */
-type ScorePosition = { value: number; previous: number | null; lines: readonly LadderLine[] };
+type ScorePosition = {
+  value: number;
+  previous: number | null;
+  /** What the hollow dot is: the date of the reading it is drawn from, or "Last week" where the week does not date it. */
+  previousLabel?: string;
+  lines: readonly LadderLine[];
+};
 export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosition };
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
@@ -179,8 +185,20 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           two scores on this page, and it draws the rule, not the reading. */}
       {positions ? (
         <div className="weather-surface mb-3 grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2">
-          <ScoreLadder label={ruleMetricLabel.tightness} value={positions.tightness.value} previous={positions.tightness.previous} lines={positions.tightness.lines} />
-          <ScoreLadder label={ruleMetricLabel.riskAppetite} value={positions.riskAppetite.value} previous={positions.riskAppetite.previous} lines={positions.riskAppetite.lines} />
+          <ScoreLadder
+            label={ruleMetricLabel.tightness}
+            value={positions.tightness.value}
+            previous={positions.tightness.previous}
+            previousLabel={positions.tightness.previousLabel}
+            lines={positions.tightness.lines}
+          />
+          <ScoreLadder
+            label={ruleMetricLabel.riskAppetite}
+            value={positions.riskAppetite.value}
+            previous={positions.riskAppetite.previous}
+            previousLabel={positions.riskAppetite.previousLabel}
+            lines={positions.riskAppetite.lines}
+          />
         </div>
       ) : null}
 

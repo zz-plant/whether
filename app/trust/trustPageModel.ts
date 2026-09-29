@@ -1,4 +1,5 @@
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
+import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
@@ -68,10 +69,11 @@ export async function buildTrustPageModel() {
     assessment: reportData.assessment,
   });
   /* Where the two scores sit against their lines, for the ladders that open
-     "How the score is built". Last week comes from `previousScoresFromDynamics`,
+     "How the score is built". The earlier reading comes from `previousScoresFromDynamics`,
      the derivation the homepage and every export use: no previous reading at
      all is `"unavailable"`, which draws no hollow dot rather than a dot claiming
-     a comparison nobody made, and a move past the weekly sanity limit counts. */
+     a comparison nobody made, and a move past the weekly sanity limit counts.
+     The dot is named by the date of that reading, not "last week". */
   const scores = reportData.assessment.scores;
   const thresholds = reportData.assessment.thresholds;
   const rails = buildSharedCorridorRails(reportData.actionStripItems ?? [], scores);
@@ -81,6 +83,7 @@ export async function buildTrustPageModel() {
     return {
       value: scores[key],
       previous: previousScores?.[key] ?? null,
+      previousLabel: comparisonBasis(previousScores?.comparedWith).label,
       lines: buildLadderLines({ pause: rail?.guardrail, resume: rail?.clearsAt, callChange }),
     };
   };

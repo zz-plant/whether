@@ -6,6 +6,7 @@ import type { PostureApiResponse } from "../../../../lib/types";
 import { POSTURE_API_VERSION } from "../../../../lib/types";
 import { describeConditions, describeWeeklyDirection } from "../../../../lib/export/exportTerms";
 import { formatSignalReading } from "../../../../lib/report/signalTranslations";
+import { comparisonBasis } from "../../../../lib/report/comparisonBasis";
 
 export const runtime = "edge";
 
@@ -51,7 +52,7 @@ export async function GET() {
    */
   const summary = [
     `Conditions: ${describeConditions(regime)}.`,
-    `vs last week: ${describeWeeklyDirection(direction)}.`,
+    `${comparisonBasis(reportData.reportDynamics.comparedWith).versus}: ${describeWeeklyDirection(direction)}.`,
     `${formatSignalReading("tightness", reportData.assessment.scores.tightness)}.`,
   ].join(" ");
 

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
 import { renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
 import { loadOgFonts } from "../../../../lib/image/ogFonts";
-import { buildScoreReadings } from "../../../../lib/export/scoreReference";
+import { buildScoreReadings, previousScoresFromDynamics } from "../../../../lib/export/scoreReference";
 import { notLiveReadingLabel, readerSourceLabel } from "../../../../lib/report/homeSharePreview";
 import { parseImageBriefRequestContext } from "../../../../lib/report/imageBriefSearchParams";
 import { buildSharedCorridorRails } from "../../../../lib/report/operatingCalls";
@@ -71,17 +71,20 @@ export const buildBriefImagePayload = (
       model.decision.immediateDecision,
     regime: shell.regime,
     /* The derivation `/share` and every paste print: the lines the scores are
-       judged against and how far from each. No `previous`, on purpose: the
-       reading behind "last week" is the previous time-machine snapshot, which
-       is the last month-end (Aug 31 for both the Sep 18 and Sep 25 reads), so
-       the card would print a four-week-old number under a one-week label.
-       `tightnessDelta` used to ride along here and was never drawn. */
+       judged against, how far from each, and the earlier reading under its
+       date. The card left the earlier reading off while it could only say
+       "last week": the reading behind it is the previous time-machine
+       snapshot, the last month-end (Aug 31 for both the Sep 18 and Sep 25
+       reads). It prints "was 63 on Aug 31" now, and nothing when the week has
+       no comparison. `tightnessDelta` used to ride along here and was never
+       drawn. */
     readings: buildScoreReadings({
       scores,
       ...(callChangeLines
         ? { thresholds: { tightnessRegime: callChangeLines.tightness, riskAppetiteRegime: callChangeLines.riskAppetite } }
         : {}),
       rails: buildSharedCorridorRails(model.decision.actionStripItems ?? [], scores),
+      previous: previousScoresFromDynamics(model.decision.reportDynamics, scores),
     }),
     confidenceLabel: model.status.confidenceLabel,
     recordDate: shell.recordDateLabel,

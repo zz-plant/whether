@@ -20,7 +20,9 @@ import { loadRegimeMachineSnapshot } from "../storage/regimeMachineSnapshotStore
 import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
+import { buildComparedWith } from "./comparisonBasis";
 import type {
+  ComparedWith,
   ConfidenceTrendFraming,
   HistoricalAnalog,
   LastYearComparison,
@@ -111,6 +113,7 @@ type ReportDataLoaderDependencies = {
   buildReportDynamics: (args: {
     current: RegimeAssessment;
     previous: RegimeAssessment | null;
+    comparedWith?: ComparedWith;
   }) => ReportDynamics;
   buildForecastModel: (args: {
     assessment: RegimeAssessment;
@@ -484,6 +487,11 @@ export const loadReportDataUncachedInternal = async ({
   const reportDynamics = deps.buildReportDynamics({
     current: assessment,
     previous: previousAssessment,
+    /* The moves are against this snapshot, and the cache behind it is monthly:
+       naming its date is what stops them reading as a week's. */
+    comparedWith: previousSnapshot
+      ? buildComparedWith(previousSnapshot.record_date, treasury.record_date)
+      : undefined,
   });
   const regimeTrend = deps.deriveRegimeTrend(previousAssessment, assessment);
   const forecast = deps.buildForecastModel({
