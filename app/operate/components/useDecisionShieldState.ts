@@ -36,6 +36,9 @@ import type { CurrentSelection } from "./useDecisionShieldPresets";
 
 export type PlanMode = "dropdown" | "natural_language" | "compare";
 
+const parsePlanMode = (value: string | null): PlanMode | null =>
+  value === "dropdown" || value === "natural_language" || value === "compare" ? value : null;
+
 const decisionShieldFieldConfigs = {
   lifecycle: {
     queryParam: "lifecycle",
@@ -89,10 +92,17 @@ export const useDecisionShieldState = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [planMode, setPlanMode] = useState<PlanMode>("natural_language");
-  const [planText, setPlanText] = useState("");
-  const [planBText, setPlanBText] = useState("");
-  const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">("VC_BACKED");
+  /* A copied plan link (`copyLink` below) opens on the plan it was copied
+     from: mode, both plans and the business model come off the address once,
+     at mount, and are the reader's to edit from there. */
+  const [planMode, setPlanMode] = useState<PlanMode>(
+    () => parsePlanMode(searchParams.get("planMode")) ?? (searchParams.get("planB") ? "compare" : "natural_language"),
+  );
+  const [planText, setPlanText] = useState(() => searchParams.get("plan") ?? "");
+  const [planBText, setPlanBText] = useState(() => searchParams.get("planB") ?? "");
+  const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">(() =>
+    searchParams.get("model") === "BOOTSTRAPPED" ? "BOOTSTRAPPED" : "VC_BACKED",
+  );
   const { profile, setProfileField } = useOperatorProfile();
   const { stage, setStage } = useOperatorStage();
   const initialUrlLifecycle = useRef(searchParams.get("lifecycle"));
@@ -238,8 +248,8 @@ export const useDecisionShieldState = ({
       }
       if (copiedTarget === "link") {
         add({
-          title: "Link copied",
-          description: "The link opens this decision with these settings.",
+          title: "Plan link copied",
+          description: "It opens this plan with these settings, graded against the week it is opened.",
           type: "success",
         });
       }
@@ -274,10 +284,37 @@ export const useDecisionShieldState = ({
     if (status === "copying") {
       return;
     }
-    const link = `${window.location.origin}${pathname}?${searchParams.toString()}`;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("lifecycle", lifecycle);
+    params.set("category", category);
+    params.set("action", action);
+    params.set("planMode", planMode);
+    /* Only the text being graded travels: a plan typed and then abandoned for
+       the dropdowns stays on this screen rather than going out in a link. */
+    const setOrDelete = (key: string, value: string | null) => {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    };
+    setOrDelete("plan", planMode === "dropdown" ? null : planText.trim() || null);
+    setOrDelete("planB", planMode === "compare" ? planBText.trim() || null : null);
+    setOrDelete("model", businessModel === "BOOTSTRAPPED" ? "BOOTSTRAPPED" : null);
+
+    const link = `${window.location.origin}${pathname}?${params.toString()}#ops-decision-shield`;
     setLastAttemptedTarget("link");
     await copyToClipboard(link, "link");
-  }, [copyToClipboard, pathname, searchParams, status]);
+  }, [
+    action,
+    businessModel,
+    category,
+    copyToClipboard,
+    lifecycle,
+    pathname,
+    planBText,
+    planMode,
+    planText,
+    searchParams,
+    status,
+  ]);
 
   return {
     lifecycle,

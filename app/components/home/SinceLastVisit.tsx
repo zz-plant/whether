@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { classifyReturnGap, weeksBetweenSlugs } from "../../../lib/activationFunnel";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../../../lib/isoWeek";
+import { CloseIcon } from "../uiIcons";
 
 type SeenCall = {
   recordDate: string;
@@ -64,18 +65,22 @@ const weekSlugOf = (recordDate: string): string | null => {
   return formatIsoWeekSlug(getIsoWeekInfo(new Date(parsed)));
 };
 
-/**
- * The gap between the last-seen call and now, bucketed the way the activation
- * funnel buckets it. The bucket is what decides whether a returning reader is
- * in the weekly ritual (`next_week`) or a lapsed user the product is trying to
- * win back (`within_month`, `lapsed`).
- */
-const returnGapOf = (previousRecordDate: string, currentRecordDate: string) => {
+const weeksBetweenRecordDates = (previousRecordDate: string, currentRecordDate: string) => {
   const from = weekSlugOf(previousRecordDate);
   const to = weekSlugOf(currentRecordDate);
-  if (!from || !to) return null;
-  const weeks = weeksBetweenSlugs(from, to);
-  return weeks === null ? null : classifyReturnGap(weeks);
+  return from && to ? weeksBetweenSlugs(from, to) : null;
+};
+
+const weeksAgo = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+/**
+ * " (3 weeks ago)" after the date, once the gap is more than a week. A one-week
+ * gap is the Monday ritual and the date alone says it; a longer one is the
+ * reader the delta panel is for, and the count is what they are missing.
+ */
+export const elapsedWeeksSuffix = (previousRecordDate: string, currentRecordDate: string) => {
+  const weeks = weeksBetweenRecordDates(previousRecordDate, currentRecordDate);
+  return weeks !== null && weeks > 1 ? ` (${weeksAgo.format(-weeks, "week")})` : "";
 };
 
 /**
@@ -87,8 +92,8 @@ const returnGapOf = (previousRecordDate: string, currentRecordDate: string) => {
  * last saw, so that is all this stores — written on every visit, read on the
  * next — and the comparison is computed against what the call is now.
  *
- * Renders `fallback` (nothing, on the homepage) on a first visit and when the
- * call the reader last saw is this week's. The homepage mounts its standfirst
+ * Renders `fallback` (nothing, on the homepage) on a first visit, when the
+ * call the reader last saw is this week's, and once the note is dismissed. The homepage mounts its standfirst
  * (`FirstVisitExplainer`) separately at the top, where it stays until
  * dismissed; this line sits under the call and appears only once there is a
  * previous call to compare against. An archived week shows neither.
@@ -115,34 +120,57 @@ export function SinceLastVisit({
   fallback?: ReactNode;
 }) {
   const seen = useBrowserSource(lastSeenCallSource);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
     rememberSeenCall(current);
   }, [current]);
 
   const previous = seen && seen.recordDate !== current.recordDate ? seen : null;
-  if (!previous) return fallback;
+  if (!previous || isDismissed) return fallback;
 
   const regimeChanged = previous.regimeLabel !== current.regimeLabel;
   const callChanged = previous.call !== current.call;
-  const gap = returnGapOf(previous.recordDate, current.recordDate);
+  /* Bucketed the way the activation funnel buckets it: the weekly ritual
+     (`next_week`) keeps the compact line, a lapsed reader the product is
+     trying to win back (`within_month`, `lapsed`) gets the delta panel. */
+  const weeks = weeksBetweenRecordDates(previous.recordDate, current.recordDate);
+  const gap = weeks === null ? null : classifyReturnGap(weeks);
   const isLapsedReturn = gap === "within_month" || gap === "lapsed";
+  const elapsedLabel = elapsedWeeksSuffix(previous.recordDate, current.recordDate);
+
+  /* For this page load only. The visit has already recorded this week's call,
+     so the next one compares against it and the note does not come back. The
+     44px target overhangs the padding rather than growing the line. */
+  const dismissButton = (
+    <button
+      type="button"
+      onClick={() => setIsDismissed(true)}
+      aria-label="Dismiss"
+      className="-my-2.5 -mr-3 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:text-slate-200 weather-focus-ring"
+    >
+      <CloseIcon className="size-3.5" />
+    </button>
+  );
 
   const compact = (
-    <p
+    <div
       data-testid="since-last-visit"
-      className="rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
+      className="flex items-center justify-between gap-3 rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
     >
-      <span className="font-semibold text-white">Since you were here on {previous.recordDateLabel}:</span>{" "}
-      {regimeChanged
-        ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
-        : callChanged
-          ? `still ${current.regimeLabel}, but the guidance changed.`
-          : `the guidance held, ${current.regimeLabel} and the same do-now line.`}
-      {callChanged ? (
-        <span className="block text-white/60">Then: “{previous.call}”</span>
-      ) : null}
-    </p>
+      <div>
+        <span className="font-semibold text-white">Since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+        {regimeChanged
+          ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
+          : callChanged
+            ? `still ${current.regimeLabel}, but the guidance changed.`
+            : `the guidance held, ${current.regimeLabel} and the same do-now line.`}
+        {callChanged ? (
+          <span className="block text-white/60">Then: “{previous.call}”</span>
+        ) : null}
+      </div>
+      {dismissButton}
+    </div>
   );
 
   if (!isLapsedReturn) return compact;
@@ -151,12 +179,15 @@ export function SinceLastVisit({
      the one-slide summary one click away — the QAU conversion surface. */
   return (
     <div data-testid="lapsed-return" className="rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-3 space-y-2">
-      <p className="text-fluid-xs leading-5 text-slate-200">
-        <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}:</span>{" "}
-        {regimeChanged
-          ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
-          : `still ${current.regimeLabel}${callChanged ? ", but the guidance changed" : ""}.`}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-fluid-xs leading-5 text-slate-200">
+          <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+          {regimeChanged
+            ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
+            : `still ${current.regimeLabel}${callChanged ? ", but the guidance changed" : ""}.`}
+        </p>
+        {dismissButton}
+      </div>
       <p className="text-fluid-xs leading-5 text-white/60">
         {callChanged ? <>Then: “{previous.call}” · Now: “{current.call}”</> : <>The guidance holds: “{current.call}”</>}
         {flipProximitySentence ? <span className="block text-sky-200/80">{flipProximitySentence}</span> : null}
