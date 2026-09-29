@@ -12,6 +12,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether --version`
 - `whether ping`
 - `whether agent [weekly|monthly|quarterly|yearly] [--json] [--compact|--payload-only|--prompt-only|--skills-only]`
+- `whether state [--json] [--require-ready]`
 - `whether status [--compact]`
 - `whether call [show|copy|diff]`
 - `whether regime`
@@ -63,7 +64,7 @@ Notes:
 
 - Default text output is optimized for terminal reading and meeting handoff. It can add local context lines and rendered brief variants.
 - `--json` on parity commands is optimized for agents, CI, and scripts. It returns the backend payload without local CLI wrappers.
-- Current parity commands are `agent`, `status`, `call`, `changes`, `regime`, `diagnostics`, `history`, `brief`, and `scenario`.
+- Current parity commands are `agent`, `state`, `status`, `call`, `changes`, `regime`, `diagnostics`, `history`, `brief`, and `scenario`.
 - Derived commands such as `export`, `share`, and filtered `diagnostics evidence|provenance` intentionally compose or transform backend data.
 
 Agent shortcuts:
@@ -74,6 +75,9 @@ Agent shortcuts:
 
 Shell shortcuts:
 - `whether status --compact` prints a one-screen status snapshot that is easier to scan in a terminal or pipe into shell tools.
+- `whether state` prints the state an agent decides from (`GET /api/agent?view=state`, `lib/agentState.ts`): the conditions, the published confidence, whether the data is live and current (`automation.ready`), each score against its pause, resume and change lines, what moved it since the dated earlier reading, and the guidance. `--json` prints the payload as served, for an agent; without it, a page for a person. It is the same answer as the MCP tool `get_state`. `--require-ready` exits `8` when `automation.ready` is false, so a script can gate on the exit code instead of parsing the payload.
+- `whether changes` heads its report with the reading it is measured against ("What changed since Aug 31": the previous month-end snapshot, not the last refresh), names each signal as the page does, says what a score's move is made of, and prints a line already crossed as "1 past the line" and not as "-1 away". An older server that does not name the basis prints "since the last refresh".
+- A word that is no command is refused as one (`error: unknown command 'stat' (did you mean 'status'?)`, exit 1, with the list of commands). `status` remains what runs when no command is given; it was Commander's default command, which used to answer a mistyped command with "too many arguments for 'status'". The completion scripts list the registered commands rather than a copy of them.
 - If the configured local URL is unreachable and you are using the default local setup, the CLI probes common local dev ports and reuses the first healthy Whether API it finds. Use `--no-local-discovery` to force strict URL behavior.
 
 ## Install contract (automation-safe)
@@ -111,6 +115,7 @@ Local dev note:
 - `5` invalid scenario input
 - `6` network reachability failure
 - `7` server/rate-limit failure
+- `8` the reading is not live and current (`whether state --require-ready`; the state is still printed)
 
 ## Export behavior
 
