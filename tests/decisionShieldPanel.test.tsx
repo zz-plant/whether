@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
-import { describe, it, mock } from "bun:test";
+import { afterEach, describe, it, mock } from "bun:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
+let mockSearchParams = new URLSearchParams();
 mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
   usePathname: () => "/operate",
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => mockSearchParams,
   useRouter: () => ({
     push: () => {},
     replace: () => {},
@@ -176,6 +179,43 @@ describe("DecisionShieldPanel markup", () => {
     assert.ok(markup.includes("Pick from a list"));
     assert.ok(markup.includes("Decision verdict"));
     assert.ok(!markup.includes("Saved scenarios"), "dropdown presets section should not render in plan mode");
+  });
+
+  describe("opened from a copied plan link", () => {
+    afterEach(() => {
+      mockSearchParams = new URLSearchParams();
+    });
+
+    const renderPanel = () =>
+      renderToStaticMarkup(
+        createElement(
+          Toast.Provider,
+          null,
+          createElement(DecisionShieldPanel, {
+            assessment: sampleAssessment,
+            provenance: sampleProvenance,
+            recordDate: "2026-09-25",
+          })
+        )
+      );
+
+    it("opens on the plan text and mode the link carries", () => {
+      mockSearchParams = new URLSearchParams({
+        planMode: "natural_language",
+        plan: "Hire 2 staff engineers at $250k salary",
+      });
+
+      const markup = renderPanel();
+      assert.ok(markup.includes("Hire 2 staff engineers at $250k salary"));
+      assert.ok(markup.includes("Decision verdict"));
+    });
+
+    it("opens a dropdown link in dropdown mode rather than the plan box", () => {
+      mockSearchParams = new URLSearchParams({ planMode: "dropdown" });
+
+      const markup = renderPanel();
+      assert.ok(markup.includes("Saved scenarios"), "dropdown presets render in dropdown mode");
+    });
   });
 });
 
