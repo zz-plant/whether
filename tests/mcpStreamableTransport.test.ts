@@ -1,11 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import {
-  handleMcpRequest,
-  isMcpStreamOpenRequest,
-  listMcpTools,
-  MCP_PROTOCOL_VERSIONS,
-} from "../lib/mcp/httpMcpServer";
+import { listAgentTools } from "../lib/agent/tools";
+import { handleMcpRequest, isMcpStreamOpenRequest } from "../lib/mcp/httpMcpServer";
+import { MCP_PROTOCOL_VERSIONS } from "../lib/mcp/serverIdentity";
 
 const postMcp = (body: unknown) =>
   handleMcpRequest(
@@ -61,6 +58,7 @@ describe("MCP streamable HTTP transport", () => {
     const payload = await response.json();
     const names = payload.result.tools.map((tool: { name: string }) => tool.name);
     for (const expected of [
+      "get_state",
       "get_brief",
       "get_context",
       "get_projection",
@@ -76,7 +74,8 @@ describe("MCP streamable HTTP transport", () => {
       assert.equal(tool.inputSchema.type, "object", `${tool.name} has an object schema`);
       assert.ok(tool.description, `${tool.name} has a description`);
     }
-    assert.deepEqual(names, listMcpTools().map((tool) => tool.name));
+    assert.deepEqual(names, listAgentTools("http").map((tool) => tool.name));
+    assert.ok(!names.includes("pull_recent_site_info"), "the local-only tool is not offered over HTTP");
   });
 
   it("executes an offline tool via tools/call with structuredContent", async () => {
@@ -104,18 +103,22 @@ describe("MCP streamable HTTP transport", () => {
       params: { name: "get_decision_rules", arguments: { regime: "defensive" } },
     });
     const onePayload = await one.json();
-    assert.ok(Array.isArray(onePayload.result.structuredContent), "a single regime returns its rule list");
-    assert.ok(onePayload.result.structuredContent.length > 0);
-    assert.ok("area" in onePayload.result.structuredContent[0]);
+    /* An object, like the all-regimes answer: `structuredContent` must be one, and the SDK
+       client rejects a result whose structured content is an array. */
+    assert.deepEqual(Object.keys(onePayload.result.structuredContent), ["DEFENSIVE"], "a single regime is a one-key object, lowercase accepted");
+    assert.ok(onePayload.result.structuredContent.DEFENSIVE.length > 0);
+    assert.ok("area" in onePayload.result.structuredContent.DEFENSIVE[0]);
 
     const bad = await postMcp({
       jsonrpc: "2.0",
       id: 42,
       method: "tools/call",
-      params: { name: "get_decision_rules", arguments: { regime: "SUNNY" } },
+      params: { name: "get_decision_rules", arguments: { regime: "RAINY" } },
     });
     const badPayload = await bad.json();
     assert.equal(badPayload.result.isError, true);
+    assert.match(badPayload.result.content[0].text, /Unknown regime "RAINY"\. Use one of: SCARCITY \(Freezing\), DEFENSIVE \(Cloudy\), VOLATILE \(Stormy\), EXPANSION \(Sunny\)\./);
+    assert.equal(badPayload.result.structuredContent, undefined, "a refusal carries no structured content to validate");
   });
 
   it("lists the agent skills contract remotely", async () => {
@@ -130,12 +133,12 @@ describe("MCP streamable HTTP transport", () => {
       jsonrpc: "2.0",
       id: 6,
       method: "tools/call",
-      params: { name: "get_context", arguments: {} },
+      params: { name: "get_recent_history", arguments: {} },
     });
     const payload = await response.json();
     assert.ok(!payload.error, "protocol layer stays clean");
     assert.equal(payload.result.isError, true);
-    assert.match(payload.result.content[0].text, /regime/);
+    assert.match(payload.result.content[0].text, /Missing required argument: signal_key\. Use one of: TREASURY_1M/);
   });
 
   it("rejects unknown tools with invalid params", async () => {

@@ -157,6 +157,30 @@ const earlierScore = (basis: ComparisonBasis, plural: boolean) =>
   `${basis.date ? `The ${basis.date}` : "The earlier"} ${plural ? "scores were" : "score was"} built from interest rates alone.`;
 
 /**
+ * One score's parts as data: each source with its reader name and its signed
+ * points, for a consumer that wants the split rather than the sentence.
+ */
+export const listScoreMovementParts = (metric: ScoreMovementMetric, movement: ScoreMovement | undefined) =>
+  (movement?.parts ?? []).map((part) => ({
+    source: part.source,
+    label: SOURCE_LABEL[metric][part.source] ?? "other inputs",
+    points: part.points,
+  }));
+
+/**
+ * The sentence that keeps a split honest: a part the earlier score never had
+ * is not the market moving. Null when every part is rates or the curve, and
+ * when there is no split to caveat.
+ */
+export const describeScoreMovementCaveat = (
+  movement: Partial<Record<ScoreMovementMetric, ScoreMovement>> | undefined,
+  basis: ComparisonBasis = comparisonBasis(),
+): string | null => {
+  const parts = [movement?.tightness, movement?.riskAppetite].flatMap((score) => score?.parts ?? []);
+  return parts.some((part) => isMissingFromEarlierScore(part.source)) ? earlierScore(basis, true) : null;
+};
+
+/**
  * One score's move as the row under it says it: "All from interest rates.",
  * or the parts with their signs and, where a part is one the earlier score
  * did not have, the sentence that says so. Null when nothing moved.

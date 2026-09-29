@@ -2,10 +2,22 @@ import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 
 type RegimeContext = {
   currentRegime: string;
-  weeksActive: number;
-  historicalAvgWeeks: number | null;
+  /**
+   * Consecutive month-end snapshots, counting back from `latestSnapshot`, that were in
+   * this regime. Months, not weeks: the record this reads is monthly. It was named
+   * `weeksActive`, and an agent told "8 weeks" was being told 8 months.
+   */
+  monthsActive: number;
+  /** How long this regime's earlier runs lasted on average, in months. */
+  historicalAvgMonths: number | null;
   commonOutcome: string | null;
   outcomeProbability: number | null;
+  /**
+   * The last month-end snapshot every count above runs to, and the regime it was in. A regime
+   * that began after it has `monthsActive` 0, which is a fact about the record and not a
+   * finding that the regime is not the current one.
+   */
+  latestSnapshot: { recordDate: string; regime: string } | null;
 };
 
 type RegimeProjection = {
@@ -22,10 +34,10 @@ export function getRegimeContext(currentRegime: string): RegimeContext {
   const series = getTimeMachineRegimeSeries();
 
   /* Find how long the current regime has been active */
-  let weeksActive = 0;
+  let monthsActive = 0;
   for (let i = series.length - 1; i >= 0; i--) {
     if (series[i].regime === currentRegime) {
-      weeksActive++;
+      monthsActive++;
     } else {
       break;
     }
@@ -46,9 +58,9 @@ export function getRegimeContext(currentRegime: string): RegimeContext {
   }
 
   /* Exclude the current occurrence */
-  const pastOccurrences = occurrences.filter((o) => o.end < series.length - weeksActive);
+  const pastOccurrences = occurrences.filter((o) => o.end < series.length - monthsActive);
   const historicalDurations = pastOccurrences.map((o) => o.end - o.start + 1);
-  const avgWeeks = historicalDurations.length > 0
+  const avgMonths = historicalDurations.length > 0
     ? Math.round(historicalDurations.reduce((a, b) => a + b, 0) / historicalDurations.length)
     : null;
 
@@ -71,7 +83,15 @@ export function getRegimeContext(currentRegime: string): RegimeContext {
     ? Math.round((outcomes[commonOutcome] / total) * 100)
     : null;
 
-  return { currentRegime, weeksActive, historicalAvgWeeks: avgWeeks, commonOutcome, outcomeProbability };
+  const latest = series.at(-1);
+  return {
+    currentRegime,
+    monthsActive,
+    historicalAvgMonths: avgMonths,
+    commonOutcome,
+    outcomeProbability,
+    latestSnapshot: latest ? { recordDate: latest.recordDate, regime: latest.regime } : null,
+  };
 }
 
 /**
