@@ -99,7 +99,7 @@ const buildSlackBriefPayload = async (
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury, sensors, macroSeries } = reportData;
   const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
+    record: treasury,
     assessment,
     reportDynamics: reportData.reportDynamics,
   });
@@ -157,7 +157,7 @@ const buildSlackBriefPayloadFromSnapshot = async (
   const { assessment, treasury, macroSeries } = snapshot;
   const sensors = buildSensorReadings(treasury);
   const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
+    record: treasury,
     assessment,
     reportDynamics: buildReportDynamics({ current: assessment, previous: null }),
   });

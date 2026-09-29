@@ -9,6 +9,7 @@ import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { resolvePublishedConfidence } from "../report/confidence";
 import { buildScoreReferenceLines } from "./scoreReference";
 import { describeConditions, formatExportConfidence, pauseConditionOnly, SAVED_COPY_NOTE } from "./exportTerms";
 
@@ -105,7 +106,7 @@ export function extractMeetingSlidePayload(
       tightness: snapshot.assessment.thresholds.tightnessRegime,
       riskAppetite: snapshot.assessment.thresholds.riskAppetiteRegime,
     },
-    confidence: snapshot.assessment.diagnostics.confidence,
+    confidence: resolvePublishedConfidence({ assessment: snapshot.assessment, record: snapshot.treasury }).label,
     provenance: snapshot.provenance.sourceLabel || "U.S. Treasury",
   };
 }

@@ -48,6 +48,7 @@ describe("the weekly email labels what it shows", () => {
   const snapshot = {
     assessment: {
       scores: { tightness: 79, riskAppetite: 53 },
+      thresholds: DEFAULT_THRESHOLDS,
       diagnostics: computeDiagnostics(79, 53, DEFAULT_THRESHOLDS),
     },
   };

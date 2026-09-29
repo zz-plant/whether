@@ -136,7 +136,7 @@ const buildCurrentShareArtifact = async () => {
   // is composed in the browser: this page is cached and cannot read the cookie.
   const investorUpdate = buildInvestorUpdateSnippetParts({
     assessment,
-    recordDate: treasury.record_date,
+    record: treasury,
     weeklyCall: snapshot.weeklyCall,
     monthlyHistory: getMonthlyRegimeHistory(),
     // The provenance label, not `treasury.source`, which is a FRED series URL on a live read.

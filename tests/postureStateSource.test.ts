@@ -71,7 +71,7 @@ describe("posture state source", () => {
   it("builds posture state without mutating events", async () => {
     const before = (await repository.list({ limit: 64 })).events.length;
     const posture = await buildPostureState({
-      recordDate: "2026-03-08",
+      record: { record_date: "2026-03-08" },
       assessment: committedAssessment,
       reportDynamics: { directionLabel: "deteriorating" },
       repository,
@@ -96,7 +96,7 @@ describe("posture state source", () => {
     };
 
     const posture = await buildPostureState({
-      recordDate: "2026-03-08",
+      record: { record_date: "2026-03-08" },
       assessment: committedAssessment,
       reportDynamics: { directionLabel: "deteriorating" },
       repository: failing,

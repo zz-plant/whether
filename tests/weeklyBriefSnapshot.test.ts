@@ -32,7 +32,7 @@ describe("buildWeeklyBriefSnapshot", () => {
   it("enriches the snapshot when posture state is provided", () => {
     const postureState = buildPostureStateContract({
       assessment,
-      recordDate: treasury.record_date,
+      record: treasury,
       postureLabel: "Cloudy",
       decisionEventStore: [],
     });

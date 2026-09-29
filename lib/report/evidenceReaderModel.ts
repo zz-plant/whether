@@ -202,7 +202,7 @@ type CallChangeSource = {
  *
  * - sources: `resolveDataStatusLabel`, the phrase table /trust and the homepage
  *   banner already share (historical, cached snapshot, partly cached, live);
- * - confidence: the published label (`resolvePublishedConfidenceLabel`, which
+ * - confidence: the published label (`resolvePublishedConfidence`, which
  *   drops a step on a stale fallback), passed in by the caller that holds it;
  * - could change: near a line, or a change held back for its confirming read.
  */

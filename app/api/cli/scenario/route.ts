@@ -4,6 +4,7 @@ import { buildScenarioContract } from "../../../../lib/cli/contracts";
 import { applyScenarioOverridesToTreasury } from "../../../../lib/cli/scenarioInputs";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { getRegimeDisplayLabel } from "../../../../lib/regimePresentation";
+import { resolvePublishedConfidence } from "../../../../lib/report/confidence";
 import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT } from "../../../../lib/cli/queryContracts";
 import { parseCliRouteRequest } from "../../../../lib/api/cliRoute";
 
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   const beforeLabel = getRegimeDisplayLabel({
     regime: reportData.assessment.regime,
-    confidence: reportData.assessment.diagnostics.confidence,
+    confidence: resolvePublishedConfidence({ assessment: reportData.assessment, record: reportData.treasury }).label,
     momentum: reportData.reportDynamics.directionLabel,
     transitionWatch: reportData.assessment.diagnostics.transitionWatch,
   }).label;
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
 
   const afterLabel = getRegimeDisplayLabel({
     regime: scenarioAssessment.regime,
-    confidence: scenarioAssessment.diagnostics.confidence,
+    confidence: resolvePublishedConfidence({ assessment: scenarioAssessment, record: scenarioTreasury }).label,
     momentum: reportData.reportDynamics.directionLabel,
     transitionWatch: scenarioAssessment.diagnostics.transitionWatch,
   }).label;

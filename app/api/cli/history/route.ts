@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseWeeksSearchParam } from "../../../../lib/cli/queryContracts";
 import { formatConfidencePlainLabel } from "../../../../lib/report/reportFormatting";
+import { resolvePublishedConfidence } from "../../../../lib/report/confidence";
 import { parseCliRouteRequest } from "../../../../lib/api/cliRoute";
 
 export const runtime = "edge";
@@ -31,7 +32,11 @@ export async function GET(request: NextRequest) {
   const reportResult = await loadReportDataSafe(searchParams, { route: "/api/cli/history" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const confidenceLabel = formatConfidencePlainLabel(
-    reportData.assessment.diagnostics.confidence === "MEDIUM" ? "MED" : reportData.assessment.diagnostics.confidence,
+    resolvePublishedConfidence({
+      assessment: reportData.assessment,
+      record: reportData.treasury,
+      historical: Boolean(reportData.historicalSelection),
+    }).label,
   );
   const trend = reportData.reportDynamics.directionLabel;
 

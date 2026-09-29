@@ -5,6 +5,7 @@ import {
   type PostureDecisionEvent,
   type PostureDecisionEventRepository,
 } from "../storage/postureDecisionEventRepository";
+import { resolvePublishedConfidence, type ConfidenceRecord } from "./confidence";
 import { buildPostureStateContract, type PostureStateContract } from "./postureStateContract";
 import type { ReportDynamics } from "./reportData";
 
@@ -39,22 +40,27 @@ const readDecisionEvents = async (
 };
 
 export const buildPostureState = async ({
-  recordDate,
+  record,
+  historical = false,
   assessment,
   reportDynamics,
   decisionEvents,
   repository = getPostureDecisionEventRepository(),
 }: {
-  recordDate: string;
+  /** The treasury record the assessment was read from. */
+  record: ConfidenceRecord & { record_date: string };
+  historical?: boolean;
   assessment: RegimeAssessment;
   reportDynamics: Pick<ReportDynamics, "directionLabel">;
   decisionEvents?: PostureDecisionEvent[];
   repository?: PostureDecisionEventRepository;
 }) => {
+  /* The published confidence, as the brief's own display label reads it, so
+     the two labels cannot disagree about "Guarded". */
   const displayRegime = getRegimeDisplayLabel({
     regime: assessment.regime,
     momentum: reportDynamics.directionLabel,
-    confidence: assessment.diagnostics.confidence,
+    confidence: resolvePublishedConfidence({ assessment, record, historical }).label,
     transitionWatch: assessment.diagnostics.transitionWatch,
   });
 
@@ -62,7 +68,8 @@ export const buildPostureState = async ({
 
   const postureState: PostureStateContract = buildPostureStateContract({
     assessment,
-    recordDate,
+    record,
+    historical,
     postureLabel: displayRegime.label,
     decisionEventStore: listedEvents,
   });

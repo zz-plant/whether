@@ -9,7 +9,8 @@ import {
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
 } from "../regimeEngineCore";
 
-type ConfidenceInputs = {
+/** The scores and lines a confidence is measured from; a `RegimeAssessment` is one. */
+export type ConfidenceInputs = {
   scores: {
     tightness: number;
     riskAppetite: number;
@@ -85,14 +86,11 @@ export const FRESH_FALLBACK_HOURS = 48;
 const STALE_FALLBACK_HOURS = 120;
 
 /**
- * The confidence label every surface publishes: distance from the nearest
- * boundary, lowered one step when the reading is a bundled fallback older than
- * 48 hours and two past 120. The brief model, and through it every route's
- * trust strip, read this; /signals, which builds no brief model, reads it
- * directly, so the strip cannot say High there and Medium on /trust for one
- * reading.
+ * Distance from the nearest boundary, lowered one step when the reading is a
+ * bundled fallback older than 48 hours and two past 120. Reached only through
+ * `resolvePublishedConfidence`, which decides what counts as a fallback once.
  */
-export const resolvePublishedConfidenceLabel = ({
+const resolvePublishedConfidenceLabel = ({
   scores,
   thresholds,
   isFallbackData,
@@ -114,3 +112,47 @@ export const resolvePublishedConfidenceLabel = ({
   if (ageHours > STALE_FALLBACK_HOURS) return geometric === "HIGH" ? "MED" : "LOW";
   return geometric === "HIGH" ? "MED" : geometric;
 };
+
+/** The record a reading was taken from: its date, and whether it is a fallback. */
+export type ConfidenceRecord = {
+  record_date?: string | null;
+  fallback_at?: string | null;
+  fallback_reason?: string | null;
+};
+
+/**
+ * The confidence a reading publishes, as the word and the percent. Every
+ * surface that prints either one reads it here: the brief model (and through it
+ * every route's trust strip), /signals, the posture-state contract the APIs
+ * serve, and every export, email and alert.
+ *
+ * It is one function because three used to answer the question. The engine's
+ * `diagnostics.confidence` and the posture-state contract both took the nearest
+ * raw gap, where a risk-appetite point is a 4.5x larger move than a tightness
+ * point, so on the week of Sep 22, 2026 (tightness 20 from its line, risk
+ * appetite 7) they said Medium where this said High — and /operate, /trust and
+ * the /share paste printed theirs while / and /signals printed this. The
+ * engine's label is its confirmation gate and stays its own; it is not a
+ * published fact.
+ */
+export const resolvePublishedConfidence = ({
+  assessment,
+  record,
+  historical = false,
+  now,
+}: {
+  assessment: ConfidenceInputs;
+  record?: ConfidenceRecord | null;
+  /** An archived period is old by design, so its age says nothing about the reading. */
+  historical?: boolean;
+  now?: number;
+}): { label: "HIGH" | "MED" | "LOW"; percent: number } => ({
+  label: resolvePublishedConfidenceLabel({
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+    isFallbackData: Boolean(record?.fallback_at || record?.fallback_reason) && !historical,
+    recordDate: record?.record_date,
+    now,
+  }),
+  percent: resolveConfidencePercent(assessment),
+});
