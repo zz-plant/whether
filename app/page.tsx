@@ -554,6 +554,7 @@ async function PageContent({
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
                 trust={historicalSelection ? null : trustStripProps}
+                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}` : undefined}
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the

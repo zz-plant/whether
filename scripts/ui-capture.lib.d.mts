@@ -11,6 +11,8 @@ export function resolveCaptureTargets(onlyIds?: string[]): Array<{
   path: string;
   viewport: { width: number; height: number };
   fullPage?: boolean;
+  deviceScaleFactor?: number;
+  firstScreen?: boolean;
 }>;
 export function listCaptureTargets(): string[];
 export type CaptureTheme = "dark" | "light";
@@ -58,6 +60,7 @@ export function captureTargets(options: {
   theme: CaptureTheme;
   outputPath: string;
   outputFileName: string;
+  screenFileName?: string | null;
   url: string;
 }>>;
 export function buildCaptureGalleryHtml(options: {

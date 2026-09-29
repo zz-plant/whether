@@ -337,6 +337,10 @@ const THEME_STORAGE_KEY = "whether-theme";
 export const captureFileName = (targetId, theme = "dark") =>
   theme === "light" ? `${targetId}-light.png` : `${targetId}.png`;
 
+/** The first screen of a target, as a phone screenshot would frame it. */
+const firstScreenFileName = (targetId, theme = "dark") =>
+  captureFileName(`${targetId}-screen`, theme);
+
 export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" }) => {
   await mkdir(outDir, { recursive: true });
 
@@ -345,7 +349,10 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" 
 
   try {
     for (const target of targets) {
-      const page = await browser.newPage({ viewport: target.viewport });
+      const page = await browser.newPage({
+        viewport: target.viewport,
+        deviceScaleFactor: target.deviceScaleFactor ?? 1,
+      });
       if (theme === "light") {
         await page.addInitScript(
           ([key, value]) => window.localStorage.setItem(key, value),
@@ -376,6 +383,15 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" 
         path: outputPath,
         fullPage: target.fullPage ?? true,
       });
+      let screenFileName = null;
+      if (target.firstScreen) {
+        screenFileName = firstScreenFileName(target.id, theme);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.screenshot({
+          path: path.resolve(process.cwd(), outDir, screenFileName),
+          fullPage: false,
+        });
+      }
 
       page.off("console", onConsole);
       page.off("pageerror", onPageError);
@@ -390,6 +406,7 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" 
         theme,
         outputPath,
         outputFileName,
+        screenFileName,
         url,
         consoleErrors,
       });
@@ -422,6 +439,13 @@ export const buildCaptureGalleryHtml = ({ baseUrl, captures, generatedAt }) => {
             <p><strong>Viewport:</strong> ${escapeHtml(viewportLabel)}</p>
             <p><strong>URL:</strong> <a href="${escapeHtml(capture.url)}">${escapeHtml(capture.url)}</a></p>
           </div>
+          ${
+            capture.screenFileName
+              ? `<a class="capture-image-link" href="${escapeHtml(capture.screenFileName)}">
+            <img src="${escapeHtml(capture.screenFileName)}" alt="${escapeHtml(capture.label)} first screen" loading="lazy" />
+          </a>`
+              : ""
+          }
           <a class="capture-image-link" href="${escapeHtml(capture.outputFileName)}">
             <img src="${escapeHtml(capture.outputFileName)}" alt="${escapeHtml(capture.label)} screenshot" loading="lazy" />
           </a>

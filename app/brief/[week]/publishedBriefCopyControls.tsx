@@ -90,7 +90,10 @@ export function PublishedBriefCopyControls({
           onClick={() =>
             void handleCopy(activeText, activeFormat === "slack" ? "Slack update" : "Email update")
           }
-          className="weather-button-primary"
+          /* On the button, not the row: the row is a wrapper around the
+             button and its status line, so styling it drew a second, larger
+             primary button around the first. */
+          buttonClassName="weather-button-primary"
         />
         <ClipboardActionRow
           label={
