@@ -31,7 +31,7 @@ describe("ScoreLadder", () => {
 
   it("draws last week hollow only when there is a last week", () => {
     const withPrevious = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={72} previous={68} lines={lines} />);
-    assert.match(withPrevious, /Last week 68/);
+    assert.match(withPrevious, /Last week: 68/);
     const without = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={72} previous={null} lines={lines} />);
     assert.doesNotMatch(without, /Last week/);
     assert.doesNotMatch(without, /role="img"/);
@@ -54,7 +54,17 @@ describe("ScoreLadder", () => {
     const html = renderToStaticMarkup(
       <ScoreLadder label="Funding pressure" value={72} previous={61} previousLabel="Period B" lines={lines} />,
     );
-    assert.match(html, /Period B 61/);
+    assert.match(html, /Period B: 61/);
+    assert.doesNotMatch(html, /Last week/);
+  });
+
+  it("names the hollow dot by the date of the reading it is drawn from", () => {
+    /* The reading routes compare with the previous monthly snapshot, so the
+       dot is "Aug 31", not "Last week" (`lib/report/comparisonBasis.ts`). */
+    const html = renderToStaticMarkup(
+      <ScoreLadder label="Funding pressure" value={72} previous={61} previousLabel="Aug 31" lines={lines} />,
+    );
+    assert.match(html, /Aug 31: 61/);
     assert.doesNotMatch(html, /Last week/);
   });
 
@@ -103,6 +113,25 @@ describe("ScoreCell", () => {
     const html = renderToStaticMarkup(<ScoreCell label="Risk appetite" value={68} line={{ value: 44, label: "Pause line" }} previous={64} />);
     assert.ok(html.indexOf("68") < html.indexOf("Pause line"));
     assert.ok(html.indexOf("Pause line") < html.indexOf("Last week"));
+  });
+
+  it("prints a dated earlier reading as \"was 63 on Aug 31\", not as a second number", () => {
+    /* "aug 31 63" reads as two numbers, so the text form changes its words when it has a date. */
+    assert.equal(
+      formatScoreReference({
+        label: "Funding pressure",
+        value: 90,
+        line: { value: 76, label: "pause line" },
+        previous: 63,
+        previousDate: "Aug 31",
+      }),
+      "Funding pressure 90 of 100 · pause line 76 · 14 pts above · was 63 on Aug 31",
+    );
+    const html = renderToStaticMarkup(
+      <ScoreCell label="Funding pressure" value={90} line={{ value: 76, label: "Pause line" }} previous={63} previousLabel="Aug 31" />,
+    );
+    assert.match(html, /Aug 31/);
+    assert.doesNotMatch(html, /Last week/);
   });
 
   it("carries a reading that is not a score in its own units", () => {

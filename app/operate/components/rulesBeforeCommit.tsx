@@ -61,10 +61,16 @@ export function RulesBeforeCommit({
     }
   };
 
+  /* A coloured left rule and a faint tint per list, so Stop and Start read as
+     opposites before a word of either is read. These were drawn on
+     `.weather-surface` until 2026-09-29, whose border and background are
+     unlayered and beat every utility here, so all three rendered as the same
+     grey card at the surface radius — rounder than the step card holding them.
+     They are rule segments inside a card, which is the data tier (§XIV). */
   const lists = [
-    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), className: "border-rose-500/50 bg-rose-500/10", labelClassName: "text-rose-100" },
-    { key: "start", label: "Start", items: visible(startItems, isExpanded), className: "border-emerald-400/50 bg-emerald-500/10", labelClassName: "text-emerald-100" },
-    { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), className: "border-sky-400/50", labelClassName: "text-slate-400" },
+    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), className: "border-rose-500/30 border-l-rose-400/80 bg-rose-500/8", labelClassName: "text-rose-200" },
+    { key: "start", label: "Start", items: visible(startItems, isExpanded), className: "border-emerald-500/30 border-l-emerald-400/80 bg-emerald-500/8", labelClassName: "text-emerald-200" },
+    { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), className: "border-sky-500/25 border-l-sky-400/70", labelClassName: "text-slate-300" },
   ];
 
   return (
@@ -92,7 +98,7 @@ export function RulesBeforeCommit({
       </div>
       <div id={rulesId} className="grid gap-4 lg:grid-cols-3">
         {lists.map((list) => (
-          <div key={list.key} className={`weather-surface border-l-4 p-4 ${list.className}`}>
+          <div key={list.key} className={`rounded-md border border-l-4 p-4 ${list.className}`}>
             <p className={`text-xs font-semibold ${list.labelClassName}`}>{list.label}</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {list.items.map((item) => (

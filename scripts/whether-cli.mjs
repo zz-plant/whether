@@ -19,6 +19,7 @@ import { Command } from "commander";
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
 EXIT.NETWORK = 6;
 EXIT.SERVER = 7;
+EXIT.NOT_READY = 8;
 const CONFIG_PATH = path.join(os.homedir(), ".config", "whether", "config.yaml");
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PACKAGE_JSON_PATH = path.join(SCRIPT_DIR, "..", "package.json");
@@ -501,10 +502,10 @@ const inferShell = (requestedShell) => {
   return "bash";
 };
 
-const renderBashCompletion = () => `# whether bash completion
+const renderBashCompletion = (commandNames) => `# whether bash completion
 _whether_completion() {
   local cur="\${COMP_WORDS[COMP_CWORD]}"
-  local commands="ping status call changes regime diagnostics history brief export share explain scenario company watch config install auth raw doctor completion version"
+  local commands="${commandNames.join(" ")}"
   local global_flags="--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only"
   local subcommands=""
 
@@ -532,10 +533,10 @@ _whether_completion() {
 complete -F _whether_completion whether
 `;
 
-const renderZshCompletion = () => `#compdef whether
+const renderZshCompletion = (commandNames) => `#compdef whether
 _whether_completion() {
   local -a commands global_flags subcommands
-  commands=(ping status call changes regime diagnostics history brief export share explain scenario company watch config install auth raw doctor completion version)
+  commands=(${commandNames.join(" ")})
   global_flags=(--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only)
 
   if (( CURRENT == 2 )); then
@@ -878,8 +879,58 @@ const statusText = (body) => `Whether — Current Status\n\nRegime:             
 
 const callText = (body) => `Call: ${body.call}
 Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
-const changesText = (body) => `What Changed Since Last Refresh
-Freshness: ${freshnessText(body)}\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
+/* "-2 from the yield curve, -11 from startup-market inputs": what a score's move is made of. */
+const movedText = (moved) =>
+  (moved ?? []).map((part) => `${part.points > 0 ? "+" : ""}${part.points} from ${part.label}`).join(", ");
+
+/* The distance to a line is signed: positive while the line is ahead, negative once crossed. */
+const distanceText = (distance) =>
+  typeof distance !== "number" ? "" : distance < 0 ? ` (${-distance} past the line)` : distance === 0 ? " (at the line)" : ` (${distance} away)`;
+
+const changesText = (body) => {
+  // The comparison is with a dated earlier reading, and the server names it; an older server does not.
+  const basis = body.basis ?? "since the last refresh";
+  const changed = body.changed.map((item) => {
+    const split = movedText(item.moved);
+    return `- ${item.label ?? item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})${split ? `\n    made of: ${split}` : ""}`;
+  });
+  return `What changed ${basis}
+Freshness: ${freshnessText(body)}${body.decision ? `\n\nDECISIONS\n${body.decision}` : ""}\n\nCHANGED\n${changed.join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${distanceText(item.distance)}`).join("\n")}`;
+};
+const signed = (value) => (value > 0 ? `+${value}` : String(value));
+
+/* Where a score sits against a line: "pause 76 (14 above, applies)". `metWord` says what it means when the line's condition holds. */
+const lineText = (name, line, metWord) =>
+  line ? `${name} ${line.line} (${line.distance === 0 ? "at the line" : `${line.distance} ${line.side}`}${metWord && line.met ? `, ${metWord}` : ""})` : null;
+
+const stateScoreText = (score, comparedWith) => {
+  const lines = [
+    `${score.label.padEnd(16)} ${String(score.value).padEnd(4)} ${[lineText("pause", score.pause, "applies"), lineText("resume", score.resume, "met"), lineText("change", score.change)].filter(Boolean).join(" · ")}`,
+  ];
+  if (score.delta !== null) {
+    const parts = movedText(score.moved);
+    lines.push(`${" ".repeat(22)}since ${comparedWith?.label ?? "the earlier reading"}: ${signed(score.delta)}${score.perWeek === null ? "" : ` (${signed(score.perWeek)}/week)`}${parts ? `, made of ${parts}` : ""}`);
+  }
+  return lines.join("\n");
+};
+
+const stateText = (body) => `Whether — State, reading of ${body.recordDate}
+
+${body.headline}
+
+${stateScoreText(body.scores.tightness, body.change.comparedWith)}
+${stateScoreText(body.scores.riskAppetite, body.change.comparedWith)}${body.change.note ? `\n${body.change.note}` : ""}${body.change.summary ? `\n\n${body.change.summary}` : ""}
+
+Call: ${body.guidance.call}
+
+Do:\n${body.guidance.doNow.map((item) => `- ${item}`).join("\n")}
+
+Avoid:\n${body.guidance.avoidNow.map((item) => `- ${item}`).join("\n")}
+
+Flips when:\n${body.guidance.flipConditions.map((item) => `- ${item}`).join("\n")}
+
+${body.use.summary}`;
+
 const diagnosticsText = (body) => `Diagnostics
 
 Top drivers:
@@ -1053,6 +1104,20 @@ ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.directio
   const payload = compact ?? body;
   await writeFileIfRequested(flags, isTextOutput(settings) ? rendered : payload, settings);
   writeOutput(isTextOutput(settings) ? rendered : payload, settings);
+};
+
+const cmdState = async (settings, flags) => {
+  const body = await getJson(settings, "/api/agent?view=state");
+  // Rendered only for a person: a script asking for JSON gets what was served, whatever it holds.
+  const rendered = isTextOutput(settings) ? stateText(body) : body;
+  await writeFileIfRequested(flags, rendered, settings);
+  writeOutput(rendered, settings);
+  /* A script that acts on the reading asks for this instead of parsing the payload: the state is
+     printed either way, and the exit code says whether the data was fit to act on. */
+  if (flags["require-ready"] && body.automation?.ready !== true) {
+    if (!settings.quiet) console.error(`not ready: ${body.automation?.refusal ?? "the state did not say the data is live and current"}`);
+    process.exitCode = EXIT.NOT_READY;
+  }
 };
 
 const cmdCall = async (settings, subcommand, flags) => {
@@ -1375,13 +1440,13 @@ const cmdDoctor = async (settings) => {
   writeOutput(checks, settings);
 };
 
-const cmdCompletion = async (settings, flags) => {
+const cmdCompletion = async (settings, flags, commandNames) => {
   if (flags.help) return writeOutput(SUB_HELP.completion, settings);
   const shell = inferShell(flags.shell);
   if (shell === "zsh") {
-    return writeOutput(renderZshCompletion(), { ...settings, output: "text" });
+    return writeOutput(renderZshCompletion(commandNames), { ...settings, output: "text" });
   }
-  return writeOutput(renderBashCompletion(), { ...settings, output: "text" });
+  return writeOutput(renderBashCompletion(commandNames), { ...settings, output: "text" });
 };
 
 const cmdInstall = async (settings, flags) => {
@@ -1510,6 +1575,39 @@ const cmdWatch = async (settings, flags) => {
   }
 };
 
+/* The first word that is not an option or an option's value: the command, if one was given. */
+const firstOperand = (argv, options) => {
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--") return argv[index + 1];
+    if (!arg.startsWith("-")) return arg;
+    const option = options.find((candidate) => candidate.is(arg.split("=")[0]));
+    if (option && (option.required || option.optional) && !arg.includes("=")) index += 1;
+  }
+  return undefined;
+};
+
+const editDistance = (left, right) => {
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let row = 1; row <= left.length; row += 1) {
+    const current = [row];
+    for (let column = 1; column <= right.length; column += 1) {
+      current[column] = Math.min(
+        previous[column] + 1,
+        current[column - 1] + 1,
+        previous[column - 1] + (left[row - 1] === right[column - 1] ? 0 : 1),
+      );
+    }
+    previous = current;
+  }
+  return previous[right.length];
+};
+
+/* A command the mistyped word is a prefix of, or within two edits of. */
+const closestCommand = (word, names) =>
+  names.find((name) => name.startsWith(word) && word.length >= 2)
+  ?? names.map((name) => ({ name, distance: editDistance(word, name) })).filter(({ distance }) => distance <= 2).sort((a, b) => a.distance - b.distance)[0]?.name;
+
 const run = async () => {
   const version = await readCliVersion();
   const program = new Command();
@@ -1551,7 +1649,8 @@ const run = async () => {
     .option("--to <ref>", "Comparison end")
     .option("--metric <key>", "Filter by metric")
     .option("--plot", "Plot regime history")
-    .option("--cadence <cadence>", "Agent cadence override");
+    .option("--cadence <cadence>", "Agent cadence override")
+    .option("--require-ready", "state: exit 8 when the data is not live and current");
 
   const withSettings = (action) => async (...args) => {
     const opts = args.at(-1);
@@ -1570,9 +1669,14 @@ const run = async () => {
     .action(withSettings(async (settings, flags) => cmdPing(settings, flags)));
 
   program
-    .command("status", { isDefault: true })
+    .command("status")
     .description("Show current operating environment and call")
     .action(withSettings(async (settings, flags) => cmdStatus(settings, flags)));
+
+  program
+    .command("state")
+    .description("Show the state an agent decides from: conditions, confidence, whether the data is live and current, and each score against its lines")
+    .action(withSettings(async (settings, flags) => cmdState(settings, flags)));
 
   program
     .command("agent")
@@ -1685,15 +1789,29 @@ const run = async () => {
   program
     .command("completion")
     .description("Print shell completion script")
-    .action(withSettings(async (settings, flags) => cmdCompletion(settings, flags)));
+    .action(withSettings(async (settings, flags) => cmdCompletion(settings, flags, program.commands.map((command) => command.name()))));
 
   program
     .command("version")
     .description("Print CLI version")
     .action(withSettings(async (settings) => cmdVersion(settings)));
 
+  /* A word that is no command is said to be no command. `status` used to be Commander's default
+     command, which sent a mistyped one there too and answered "too many arguments for 'status'",
+     so an agent that typed `whether stat` was told it had misused a command it never called. */
+  program.on("command:*", ([word]) => {
+    const names = program.commands.map((command) => command.name());
+    const closest = closestCommand(word, names);
+    console.error(`error: unknown command '${word}'${closest ? ` (did you mean '${closest}'?)` : ""}\nCommands: ${names.join(", ")}`);
+    process.exit(EXIT.ERROR);
+  });
+
   try {
-    await program.parseAsync(process.argv);
+    // With no command, `whether` shows the status, as it always has.
+    const args = process.argv.slice(2);
+    const asksForHelp = args.some((arg) => ["-h", "--help", "-V", "--version"].includes(arg));
+    const hasCommand = asksForHelp || firstOperand(args, program.options) !== undefined;
+    await program.parseAsync(hasCommand ? process.argv : [...process.argv, "status"]);
   } catch (error) {
     const knownError = error instanceof Error ? error : new Error(String(error));
     console.error(knownError.message);

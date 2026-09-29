@@ -8,6 +8,7 @@ import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
+import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
@@ -24,8 +25,10 @@ import {
   type SignalDirection,
 } from "./viewModel";
 import { formatDateUTC } from "../lib/formatters";
+import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildQuietDayRead } from "../lib/report/flipProximity";
+import { buildChangedLead } from "../lib/report/decisionMovement";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
@@ -202,6 +205,9 @@ async function PageContent({
     homepage.weeklyDecisionCardModel.decision.reportDynamics,
     { tightness: reportData.assessment.scores.tightness, riskAppetite: reportData.assessment.scores.riskAppetite },
   );
+  /* What that earlier reading is: the previous monthly snapshot, named by its
+     date wherever this page used to say "last week". */
+  const basis = comparisonBasis(homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith);
   const tightnessDelta = previousScores ? reportData.assessment.scores.tightness - previousScores.tightness : 0;
   const riskAppetiteDelta = previousScores ? reportData.assessment.scores.riskAppetite - previousScores.riskAppetite : 0;
 
@@ -240,7 +246,6 @@ async function PageContent({
   const {
     primaryCall,
     flipConditionLabels,
-    revisitQueue,
     guardrailLabel,
     parsedGuardrailThreshold,
     reversalTriggerLabel,
@@ -337,13 +342,22 @@ async function PageContent({
     tightnessPressure,
     tightnessSaturated,
   });
+  const decisionMovement = homepage.weeklyDecisionCardModel.decision.decisionMovement;
   const homeAreaRows = buildHomeAreaRows({
     actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
     decisionRules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
-    revisitQueue,
+    movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
-  const movementSentence = describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable });
+  /* The section's lead is what the week did to the decisions: which areas' lines
+     were crossed, or that none were. The score-direction sentence is what remains
+     where no lines could be read. */
+  const movementSentence = buildChangedLead({
+    movement: decisionMovement,
+    quietDayLine,
+    nearestLine: v2HeroSignalData.flipProximity[0],
+    fallback: describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }),
+  });
   const scoreLadders = [
     {
       metric: "tightness" as const,
@@ -374,6 +388,7 @@ async function PageContent({
         series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
         currentRegime: regime,
         previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
+        currentScores: { tightness, riskAppetite },
       });
   /* The first-visit fold applies to the live weekly brief only. An archived
      month or a monthly horizon was reached by choosing it, which is not a
@@ -556,6 +571,9 @@ async function PageContent({
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
                 />
               ) : null}
+              {/* The reader's own decisions against this week's reading, for a browser
+                  that has recorded some: one line, and nothing at all for the rest. */}
+              {!historicalSelection ? <YourRecordNote tightness={tightness} riskAppetite={riskAppetite} /> : null}
             </div>
 
             {offersFirstVisitFold ? (
@@ -571,13 +589,14 @@ async function PageContent({
                 `contents` keeps each section a flex item of the column, so the
                 phone and desktop `order-*` classes below still apply. */}
             <div data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined} className="contents">
-            {/* 2. What changed. One table, every signal, each against last week
-                and against its own lines — the four signals used to be drawn
-                twice on this page, in the hero and again beside the actions. */}
+            {/* 2. What changed. One table, every signal, each against the earlier
+                reading and against its own lines — the four signals used to be
+                drawn twice on this page, in the hero and again beside the actions. */}
             <WhatChangedSection
               rows={signalChangeRows}
-              lead={quietDayLine ?? movementSentence}
+              lead={movementSentence}
               comparisonUnavailable={comparisonUnavailable}
+              basis={basis}
             />
 
             {/* 3. What that changes, by area. On a phone this renders before the
@@ -593,7 +612,7 @@ async function PageContent({
             />
 
             {/* 4. What would change the call: the two ladders with their three
-                lines and last week’s dot, the flip watch under the axis each
+                lines and the earlier reading’s dot, the flip watch under the axis each
                 sentence describes, and — only on a week the call moved — what
                 happened the last time it moved this way. */}
             <WhatWouldChangeSection
@@ -606,6 +625,7 @@ async function PageContent({
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
+              basis={basis}
             />
 
             {/* 5. Do and share, including the one conversion on the page. */}

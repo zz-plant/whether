@@ -5,8 +5,11 @@ import { describeInputMovement } from "../inputMovement";
 import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type RuleThresholdDistance } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
 import type { BoundedDecisionRule, DecisionArea } from "../boundedDecisionRules";
-import type { RegimeSignalIndicator, RevisitQueueItem } from "../homeBriefModel";
-import { findSignalDelta } from "../evidenceReaderModel";
+import type { RegimeSignalIndicator } from "../homeBriefModel";
+import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
+import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
+import { describeScoreMovement } from "../scoreMovement";
+import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
  * The homepage as five sections in the reader's order: the call, what changed,
@@ -31,10 +34,12 @@ export type SignalChangeRow = {
   label: string;
   value: number | null;
   valueLabel: string;
-  /** Last week's reading, or null when no comparison was made — never an invented flat one. */
+  /** The earlier reading, or null when no comparison was made — never an invented flat one. */
   previous: number | null;
   previousLabel: string | null;
   delta: number | null;
+  /** What the move is made of, in a sentence; absent for an input, and where the loader could not split the score. */
+  movement?: string | null;
   /** Which way "up" counts: funding pressure and the base rate worsen as they rise. */
   increaseIsPositive: boolean;
   /** Where on its 0–100 scale a composite score sits, in the scale's words. */
@@ -65,7 +70,7 @@ export const buildSignalChangeRows = ({
 }: {
   indicators: readonly RegimeSignalIndicator[];
   /** The week's comparison. Last week comes from here, not from the indicator's label. */
-  dynamics: Parameters<typeof findSignalDelta>[0];
+  dynamics: SignalDynamicsSource;
   lines: MetricLines;
   tightnessPressure?: number;
   tightnessSaturated?: boolean;
@@ -91,6 +96,7 @@ export const buildSignalChangeRows = ({
       previous,
       previousLabel: previous === null ? null : formatRegimeSignalValue(previous, key),
       delta,
+      movement: isScore ? describeScoreMovement(key, dynamics.movement?.[key], comparisonBasis(dynamics.comparedWith)) : null,
       increaseIsPositive: INCREASE_IS_POSITIVE[key],
       scaleLabel: isScore && typeof value === "number" ? scoreBandScaleLabel(classifyScoreBand(value)) : undefined,
       lines: metricLines
@@ -111,34 +117,52 @@ export const buildSignalChangeRows = ({
  * the rows print. A degraded read hands the page zero deltas, and saying
  * "neither score moved" on one would be the manufactured-stable claim
  * tests/noComparisonHonesty.test.ts exists to keep off the page.
+ *
+ * The move is measured against the earlier reading the week's dynamics name
+ * (`comparisonBasis`), so it says "since Aug 31" where it used to say "this
+ * week": the reading behind these deltas is the last month-end. A caller
+ * with no date keeps "this week".
  */
 const NO_COMPARISON_SENTENCE = "No previous week to compare the scores against.";
 
-const INPUT_MOVEMENT_SENTENCE: Record<ReturnType<typeof describeInputMovement>, string> = {
-  "steady inputs": "Neither score moved much this week.",
-  "tightening inputs": "The scores moved toward tighter money this week.",
-  "easing inputs": "The scores moved toward easier money this week.",
-  "mixed inputs": "The two scores moved in opposite directions this week.",
+const INPUT_MOVEMENT_SENTENCE: Record<ReturnType<typeof describeInputMovement>, (window: string) => string> = {
+  "steady inputs": (window) => `Neither score moved much ${window}.`,
+  "tightening inputs": (window) => `The scores moved toward tighter money ${window}.`,
+  "easing inputs": (window) => `The scores moved toward easier money ${window}.`,
+  "mixed inputs": (window) => `The two scores moved in opposite directions ${window}.`,
 };
 
 export const describeWeeklyMovement = ({
   tightnessDelta,
   riskAppetiteDelta,
   comparisonUnavailable,
+  basis = comparisonBasis(),
 }: {
   tightnessDelta: number;
   riskAppetiteDelta: number;
   comparisonUnavailable: boolean;
+  basis?: ComparisonBasis;
 }) =>
-  comparisonUnavailable ? NO_COMPARISON_SENTENCE : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)];
+  comparisonUnavailable
+    ? NO_COMPARISON_SENTENCE
+    : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)](
+        basis.date ? basis.since : "this week",
+      );
 
 export type HomeAreaRow = {
   area: DecisionArea;
   rule: string;
   pause?: { line: string; distance: string };
   resume?: { line: string; distance: string };
-  /** The area-specific re-check the week's move put on it, if any. */
+  /**
+   * What the week's move did to this area's own lines ("Pause now applies:
+   * funding pressure rose through 76."). Absent when nothing was compared, and
+   * on a week no area's lines were crossed: that is said once over the table,
+   * not once per row.
+   */
   changed?: string;
+  /** Which movement `changed` describes; "held" is the area that did not move while another did. */
+  changedKind?: AreaMovementKind;
   /** Non-numeric conditions the rule states beside its lines. */
   pauseQualifier?: string;
   resumeQualifier?: string;
@@ -159,15 +183,25 @@ const nearest = (distances: RuleThresholdDistance[]) =>
 export const buildHomeAreaRows = ({
   actionStripItems,
   decisionRules,
-  revisitQueue,
+  movement,
   scores,
 }: {
   actionStripItems?: readonly ActionStripItem[];
   decisionRules: readonly BoundedDecisionRule[];
-  revisitQueue: readonly RevisitQueueItem[];
+  /** What the week did to each area's lines; null when nothing was compared. */
+  movement: Pick<DecisionMovement, "areas" | "moved"> | null;
   scores: { tightness: number; riskAppetite: number };
 }): HomeAreaRow[] => {
-  const recheckByArea = new Map(revisitQueue.map((item) => [item.id, item.recheck]));
+  /* The column says what the week's move did to the area's own lines. It used to
+     carry a fixed re-check sentence per area for whichever three the largest signal
+     moves pointed at, whether or not the area's rule had anything to re-check; and on
+     a week no line was crossed it says nothing, because the section's lead already
+     says so once. */
+  const changedFor = (area: DecisionArea): Pick<HomeAreaRow, "changed" | "changedKind"> => {
+    if (!movement || movement.moved.length === 0) return {};
+    const entry = movement.areas.find((candidate) => candidate.area === area);
+    return entry ? { changed: entry.text, changedKind: entry.kind } : {};
+  };
 
   if (actionStripItems && actionStripItems.length > 0) {
     return actionStripItems.map((item) => {
@@ -177,7 +211,7 @@ export const buildHomeAreaRows = ({
         rule: item.areaActionNow,
         pause: lineSlot(item.nearestPause, "pause"),
         resume: lineSlot(item.nearestResume, "resume"),
-        changed: recheckByArea.get(area),
+        ...changedFor(area),
         pauseQualifier: item.pauseQualifier,
         resumeQualifier: item.resumeQualifier,
       };
@@ -189,7 +223,7 @@ export const buildHomeAreaRows = ({
     rule: rule.doNow[0] ?? rule.recommendation,
     pause: lineSlot(nearest(rule.pause.conditions.map((condition) => toThresholdDistance(condition, scores))), "pause"),
     resume: lineSlot(nearest(rule.resume.conditions.map((condition) => toThresholdDistance(condition, scores))), "resume"),
-    changed: recheckByArea.get(rule.area),
+    ...changedFor(rule.area),
     pauseQualifier: rule.pause.qualifier,
     resumeQualifier: rule.resume.qualifier,
   }));

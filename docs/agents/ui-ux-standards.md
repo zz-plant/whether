@@ -240,6 +240,15 @@ take the other's job.
 - MUST: keep `app/styles/tokens.css` the only place a radius is a number. Stylesheets reference
   `var(--radius-*)` (`inherit` and `50%` excepted). `tests/shapeRegister.test.ts` checks the
   three NEVERs above and keeps the `:root` scale and the `@theme inline` scale in lockstep.
+- NEVER: a plain border or background utility beside a `weather-*` class that paints the same
+  property. The stylesheets are unlayered and the utilities are in `@layer utilities`, so the class
+  wins whatever the utility says, and the markup reads as styled while the page draws the default.
+  Until 2026-09-29 that is how the cached-data warning drew grey instead of amber, `/operate`'s
+  Stop and Start lists drew as one grey card each, and the selected `/signals` filter looked
+  unselected. A utility that must win takes the important modifier (`!border-amber-500/40`); one
+  that repeats the class is deleted; a selected state that belongs to the class is written on the
+  class (`.weather-pill[aria-current="page"]`). `tests/unlayeredClassUtilities.test.ts` reads
+  which properties each class paints from the stylesheets and holds this.
 - Uppercase eyebrows (`.type-eyebrow`), tracked badges (`.type-badge`), and tabular or mono
   numerals stay sharp on purpose: they are tag-class labels and figures. Sentence-casing every
   eyebrow was considered for this register and rejected — it stacks near-duplicates (`Plan` over

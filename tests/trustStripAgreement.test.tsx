@@ -16,7 +16,7 @@ import type { KvNamespace } from "../lib/runtime/kv";
 const mockAny: any = mock;
 
 /* Spread the real module and override only the hook: `mock.module` is
-   process-wide, and a narrower stub breaks other suites (CLAUDE.md). */
+   process-wide, and a narrower stub breaks other suites (docs/agents/lessons/automation-and-deploy-gate.md). */
 mockAny.module("next/navigation", () => ({
   ...nextNavigation,
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),

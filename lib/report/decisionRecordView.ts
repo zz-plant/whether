@@ -56,7 +56,7 @@ export type CurrentConditions = {
 /*
  * The verdict word is the product's own vocabulary and stays. What it cannot do
  * is stand alone: "WATCH" tells a reader the shape of the answer and not the
- * answer, which is the failure CLAUDE.md records for the scores on the cold
+ * answer, which is the failure docs/agents/lessons/tests-and-copy-rules.md records for the scores on the cold
  * pages. Each badge carries a sentence a first-time reader can act on.
  */
 const VERDICT_SENTENCES: Record<StalenessVerdict, string> = {
@@ -129,7 +129,7 @@ const buildDecisionRecordRow = (
  *
  * An empty ledger gets no headline at all — the page's empty state is the
  * message there, and a "0 decisions need attention" banner is the warning about
- * data that is fine which CLAUDE.md records teaches a reader to ignore the next
+ * data that is fine which docs/agents/lessons/tests-and-copy-rules.md records teaches a reader to ignore the next
  * one.
  */
 const buildHeadline = (counts: DecisionRecordView["counts"], total: number): string => {

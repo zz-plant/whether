@@ -14,14 +14,14 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 import { formatNumberWithUnit } from "../formatters";
 import { buildComplianceStamp } from "../exportNotices";
-import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, buildCallLines, type ModeledExportDecisionPayload } from "./briefBuilders";
+import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, buildCallLines, buildReadingLines, type ModeledExportDecisionPayload } from "./briefBuilders";
 import { describeBaseRateSource, describeConditions, formatExportConfidenceWord } from "./exportTerms";
-import { buildScoreReferenceLines, type ScorePair } from "./scoreReference";
+import type { PreviousReading } from "./scoreReference";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { resolvePublishedConfidence } from "../report/confidence";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { formatDecisionReversal, formatDecisionThreshold } from "../report/reportFormatting";
-import { buildSharedCorridorRails, type ActionStripItem } from "../report/operatingCalls";
+import type { ActionStripItem } from "../report/operatingCalls";
 import { decisionAreaLabel } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 
@@ -33,8 +33,8 @@ type ExportDecisionModel = ModeledExportDecisionPayload & {
   canonicalDecisionCopy?: CanonicalDecisionCopy;
   decisionShiftSummary?: string;
   trendLabel?: string;
-  /** Last week's scores, when the caller's read carries a previous week; never invented. */
-  previousScores?: ScorePair | null;
+  /** The earlier scores and the date they are from, when the caller's read carries a comparison; never invented. */
+  previousScores?: PreviousReading | null;
 };
 
 export const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
@@ -69,13 +69,10 @@ export const buildIssueTrackerMarkdownBrief = (
     lines.map((line) => (line.startsWith("•") ? `${bullet} ${line.replace(/^•\s*/, "")}` : `  ${bullet} ${line.trim()}`));
   const callLines = asBullets(buildCallLines(assessment, exportOptions));
   const areaRows = asBullets(buildAreaRowLines(exportOptions));
-  const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
-  const readingLines = buildScoreReferenceLines({
-    scores,
-    thresholds: assessment.thresholds,
-    rails: buildSharedCorridorRails(decisionModel?.actionStripItems ?? [], scores),
-    previous: decisionModel?.previousScores ?? null,
-  }).map((line) => `${bullet} ${line}`);
+  /* The readings every paste carries, through the one builder they share: this was a
+     private copy of it, and a line added to the paste's "what changed" would not have
+     reached the wiki form. */
+  const readingLines = buildReadingLines(assessment, exportOptions).map((line) => `${bullet} ${line}`);
   /* The stamp below carries the source in plain text for every format; the
      wiki form adds a linked one because its stamp URL is not clickable. */
   const sourceLine = isWiki ? `Source: [${treasury.source}|${treasury.source}]` : null;

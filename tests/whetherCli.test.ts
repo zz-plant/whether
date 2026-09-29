@@ -1372,4 +1372,184 @@ describe("whether cli", () => {
     assert.equal(parsed.ok, true);
   });
 
+  /*
+   * An agent that mistypes a command was told "too many arguments for 'status'": `status` was
+   * Commander's default command, and the default swallowed the unknown word. Now a word that
+   * is no command is said to be none, with the nearest command and the list.
+   */
+  it("says an unknown command is unknown, and names the command it may have meant", () => {
+    const typo = spawnSync(NODE_BIN, [CLI_PATH, "stat", "--no-local-discovery"], { encoding: "utf8" });
+    assert.equal(typo.status, 1);
+    assert.match(typo.stderr, /error: unknown command 'stat' \(did you mean 'status'\?\)/);
+    assert.match(typo.stderr, /Commands: ping, status, state, agent,/);
+    assert.equal(typo.stdout, "");
+
+    const nonsense = spawnSync(NODE_BIN, [CLI_PATH, "frobnicate", "--no-local-discovery"], { encoding: "utf8" });
+    assert.equal(nonsense.status, 1);
+    assert.match(nonsense.stderr, /error: unknown command 'frobnicate'\n/);
+    assert.doesNotMatch(nonsense.stderr, /did you mean/);
+  });
+
+  it("still shows the status when no command is given, with options before it or none at all", async () => {
+    const requests: string[] = [];
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(
+        JSON.stringify({
+          version: "v1",
+          regime: "Stormy",
+          cyclePhase: "Mid",
+          confidence: { label: "HIGH", score: 92 },
+          trend: "Stable",
+          decisionStability: "stable",
+          call: { summary: "Hold.", do: ["Hold spend"], avoid: ["Rebrands"], flipConditions: ["Funding pressure <= 66"] },
+        }),
+      );
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const base = `http://127.0.0.1:${resolveServerPort(server)}`;
+    const bare = await runCli(["--no-local-discovery", "--api-base-url", base, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(bare.status, 0);
+    assert.equal(JSON.parse(bare.stdout).regime, "Stormy");
+    assert.ok(requests.every((url) => url.startsWith("/api/cli/status")), "the status route, and nothing else");
+  });
+
+  it("lists every command in its completion scripts, from the commands it has", () => {
+    const help = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+    const listed = [...help.stdout.matchAll(/^ {2}([a-z]+)(?:\s|\|)/gm)].map((match) => match[1]).filter((name) => name !== "help");
+    const bash = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "bash"], { encoding: "utf8" });
+    const zsh = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "zsh"], { encoding: "utf8" });
+
+    assert.ok(listed.includes("state") && listed.includes("agent"), "the commands an agent reaches for are commands");
+    for (const name of listed) {
+      assert.match(bash.stdout, new RegExp(`local commands="[^"]*\\b${name}\\b`), `bash completes ${name}`);
+      assert.match(zsh.stdout, new RegExp(`commands=\\([^)]*\\b${name}\\b`), `zsh completes ${name}`);
+    }
+  });
+
+  it("state reads the compact state and prints it for a person, or as it is with --json", async () => {
+    const requests: string[] = [];
+    const state = {
+      version: "v1",
+      recordDate: "2026-09-25",
+      headline: "Freezing (money is expensive and hard to raise), high confidence, reading of 2026-09-25. The data is live and current.",
+      automation: { ready: true, refusal: null },
+      scores: {
+        tightness: {
+          label: "Funding pressure", value: 90, delta: 27, perWeek: 7.6,
+          pause: { line: 76, distance: 14, side: "above", met: true },
+          resume: { line: 66, distance: 24, side: "above", met: false },
+          change: { line: 70, distance: 20, side: "above" },
+          moved: [{ source: "rates", label: "interest rates", points: 27 }],
+        },
+        riskAppetite: {
+          label: "Risk appetite", value: 43, delta: -13, perWeek: -3.6,
+          pause: { line: 44, distance: 1, side: "below", met: true },
+          resume: { line: 54, distance: 11, side: "below", met: false },
+          change: { line: 50, distance: 7, side: "below" },
+          moved: [{ source: "curve", label: "the yield curve", points: -2 }, { source: "startupMarket", label: "startup-market inputs", points: -11 }],
+        },
+      },
+      change: { comparedWith: { recordDate: "2026-08-31", label: "Aug 31" }, note: "The Aug 31 scores were built from interest rates alone." },
+      guidance: { call: "Conditions are tightening.", doNow: ["Hold spend"], avoidNow: ["Rebrands"], flipConditions: ["Funding pressure <= 66"] },
+      use: { summary: "Informational only." },
+    };
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify(state));
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const base = `http://127.0.0.1:${resolveServerPort(server)}`;
+    const text = await runCli(["state", "--no-local-discovery", "--api-base-url", base]);
+    const json = await runCli(["state", "--no-local-discovery", "--api-base-url", base, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.deepEqual([...new Set(requests)], ["/api/agent?view=state"]);
+    assert.equal(text.status, 0);
+    assert.match(text.stdout, /Whether — State, reading of 2026-09-25/);
+    assert.match(text.stdout, /The data is live and current\./);
+    assert.match(text.stdout, /Funding pressure\s+90\s+pause 76 \(14 above, applies\) · resume 66 \(24 above\) · change 70 \(20 above\)/);
+    assert.match(text.stdout, /since Aug 31: \+27 \(\+7\.6\/week\), made of \+27 from interest rates/);
+    assert.match(text.stdout, /since Aug 31: -13 \(-3\.6\/week\), made of -2 from the yield curve, -11 from startup-market inputs/);
+    assert.match(text.stdout, /The Aug 31 scores were built from interest rates alone\./);
+    assert.equal(json.status, 0);
+    assert.deepEqual(JSON.parse(json.stdout), state);
+  });
+
+  /*
+   * A script that acts on the reading should not have to parse the payload to learn the data was a
+   * saved copy: `--require-ready` makes that the exit code, and still prints the state.
+   */
+  it("state --require-ready exits 8 when the data is not live and current, and 0 when it is", async () => {
+    const respond = (automation: { ready: boolean; refusal: string | null }) => {
+      const server = http.createServer((_req, res) => {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ version: "v1", automation, headline: "A state.", recordDate: "2026-06-17" }));
+      });
+      return server;
+    };
+    const run = async (automation: { ready: boolean; refusal: string | null }, extra: string[]) => {
+      const server = respond(automation);
+      await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+      const result = await runCli(["state", "--json", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${resolveServerPort(server)}`, ...extra]);
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      return result;
+    };
+
+    const stale = await run({ ready: false, refusal: "Data is a fallback snapshot, not a live reading." }, ["--require-ready"]);
+    assert.equal(stale.status, 8);
+    assert.equal(JSON.parse(stale.stdout).automation.ready, false, "the state is printed either way");
+    assert.match(stale.stderr, /not ready: Data is a fallback snapshot/);
+
+    const staleWithoutTheFlag = await run({ ready: false, refusal: "Data is a fallback snapshot, not a live reading." }, []);
+    assert.equal(staleWithoutTheFlag.status, 0, "without the flag the exit code is about the request, not the reading");
+
+    const fresh = await run({ ready: true, refusal: null }, ["--require-ready"]);
+    assert.equal(fresh.status, 0);
+    assert.equal(fresh.stderr, "");
+  });
+
+  it("changes names the reading it is measured against, the signals by their names, and what a score's move is made of", async () => {
+    const server = http.createServer((_req, res) => {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(
+        JSON.stringify({
+          version: "v1",
+          freshness: { line: "Updated 2026-09-29 · live" },
+          basis: "since Aug 31",
+          comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
+          changed: [
+            { metric: "tightness", label: "Funding pressure", from: 63, to: 90, direction: "up", impact: "negative", moved: [{ source: "rates", label: "interest rates", points: 27 }] },
+            { metric: "base_rate", label: "Base rate", from: 3.85, to: 4.04, direction: "up", impact: "negative", moved: [] },
+          ],
+          revisit: ["Hiring ahead of revenue"],
+          flip: [
+            { condition: "Funding pressure <= 66 for two readings in a row", distance: 24 },
+            { condition: "Funding pressure > 76: tighten again", distance: -1 },
+            { condition: "Risk appetite < 44", distance: 0 },
+            { condition: "No numeric line", distance: null },
+          ],
+        }),
+      );
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const result = await runCli(["changes", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${resolveServerPort(server)}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /^What changed since Aug 31\n/);
+    assert.doesNotMatch(result.stdout, /Last Refresh/);
+    assert.match(result.stdout, /- Funding pressure 63 → 90 \(up, negative\)\n {4}made of: \+27 from interest rates\n- Base rate 3\.85 → 4\.04/);
+    assert.doesNotMatch(result.stdout, /tightness|base_rate/, "no engine keys in what a person reads");
+    assert.match(result.stdout, /\(24 away\)/);
+    assert.match(result.stdout, /tighten again \(1 past the line\)/, "a crossed line is not a negative distance");
+    assert.doesNotMatch(result.stdout, /-1 away/);
+    assert.match(result.stdout, /Risk appetite < 44 \(at the line\)/);
+    assert.match(result.stdout, /- No numeric line\n?$/);
+  });
+
 });

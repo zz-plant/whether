@@ -160,7 +160,7 @@ export const DecisionShieldPresetsSection = ({
                 <button
                   type="button"
                   onClick={() => handlePresetDelete(preset.id)}
-                  className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
+                  className="weather-pill inline-flex min-h-[44px] items-center justify-center !border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-200 transition-colors hover:!border-rose-300/70 hover:text-rose-100"
                 >
                   Remove
                 </button>

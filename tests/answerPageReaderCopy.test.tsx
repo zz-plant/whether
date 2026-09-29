@@ -31,7 +31,7 @@ mockAny.module("next/navigation", () => ({
  * already knows their way around. The FAQ answer, which is the text a rich
  * result shows, carried the same bare comparison.
  *
- * Rendered, per the rule in CLAUDE.md. The page reads through
+ * Rendered, per the rule in docs/agents/lessons/tests-and-copy-rules.md. The page reads through
  * `loadWeeklyBriefSnapshot`, which falls back to the bundled snapshot offline,
  * so the markup is available here without serving an upstream.
  */

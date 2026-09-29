@@ -57,6 +57,10 @@ that matches the primary ICP; the four enterprise rows serve the secondary, unva
 | BI + internal ops dashboards (Looker / Tableau / Mode + custom stack) | Data/ops leaders, analytics | Customizable internal metrics and visibility | High maintenance, lower portability for screenshot-ready/citeable leadership artifacts | Decision-complete brief in 30 seconds, screenshot-ready. |
 | Newsletter + staff synthesis stack (manual substitute) | Chief of Staff, VP Product/Eng, operations | Flexible and low-cost narrative updates | Inconsistent thresholds and provenance; hard to sustain repeatable weekly ritual quality | Codified weekly call with thresholds and reversal conditions. |
 
+*Checked 2026-09-29: `mosaic.tech` redirects to `hibob.com/platform/finance` ("Strategic planning with modern
+FP&A software | HiBob"), so "Mosaic" in the planning row now points at HiBob's finance product. Confirm the
+name before quoting it to a buyer.*
+
 ## Objection handling
 
 ### "We already use Bloomberg/FactSet."

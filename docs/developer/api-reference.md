@@ -19,6 +19,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
 | `/api/agent?cadence=<weekly|monthly|quarterly|yearly>` | GET | Agent-focused summary + handoff payload/prompt. |
+| `/api/agent?view=state` | GET | The compact state to decide from (about 3KB, weekly only): conditions, published confidence, `automation.ready`, each score against its pause / resume / change lines, `perWeek` pace, what moved it, guidance. Shape: `agentStateSchema` in `lib/agentState.ts`. |
 | `/api/weekly` | GET | Weekly summary copy + structured fields + summary hash. |
 | `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
 | `/api/image/slide?stage=<seed|series-a|series-b|growth>` | GET | The call as a 16:9 meeting slide, hand-written SVG. |
@@ -65,8 +66,10 @@ This is backend substrate for the pre-reveal premium flow. It supports checkout 
 
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
-| `/llms.txt` | GET | Plain-text machine onboarding + endpoint discovery. |
-| `/.well-known/whether-agent.json` | GET | JSON discovery manifest for agent/tool clients. |
+| `/llms.txt` | GET | Plain-text machine onboarding + endpoint discovery; its tool section is written from the tool registry. |
+| `/.well-known/whether-agent.json` | GET | JSON discovery manifest for agent/tool clients: where to `start` per surface, the `views`, how to tell whether a reading is live and current (`automation`), and the MCP endpoint with every tool and its arguments (`mcp.tools`). |
+| `/api/mcp` | POST | MCP streamable-HTTP server (JSON-RPC 2.0). Tools are defined once in `lib/agent/tools.ts`; see `docs/agents/agent-interface.md`. CORS is open for the transport and the reads, so a browser-based client can call it; `?tool=subscribe` stays closed. |
+| `/api/mcp?tool=<name>` | GET | The same tools as a plain GET for an agent with no MCP client; `tool=get_actions` lists them with their arguments and a call that works. A wrong tool or argument is a 400 with what would have worked. |
 
 ## Additional cadence endpoints
 
@@ -85,12 +88,23 @@ curl -s "http://localhost:3000/api/agent?cadence=weekly" \
   | jq '{cadence, supportedCadences, generatedAt, decisionDelta: .agentHandoff.payload.decision_delta.summary, flipTrigger: .agentHandoff.payload.flip_watch.flip_trigger}'
 ```
 
-Invalid cadence returns `400` with `allowedCadences`.
+Invalid cadence returns `400` with `allowedCadences`; an invalid `view` returns `400` with `allowedViews`.
+
+### The compact state
+
+```bash
+curl -s "http://localhost:3000/api/agent?view=state" \
+  | jq '{headline, automation, confidence, pause: {tightness: .scores.tightness.pause, riskAppetite: .scores.riskAppetite.pause}}'
+```
+
+Check `automation.ready` before acting on it without a person looking. Every `previous`, `delta` and `perWeek` is measured against `change.comparedWith`, the previous month-end snapshot, not last week.
+
+`confidence` at the root of the full response is the published confidence, the one the page and `/api/scores` carry, and `summary.confidence` matches it on this route. `/api/weekly` and `/api/monthly` still return the engine's own label in `summary.confidence`.
 
 The nested `agentHandoff.payload` now exposes:
 
 - `decision_rules` for bounded operating rules by area
-- `decision_delta` for weekly change interpretation
+- `decision_delta` for change interpretation: `changed_signals` carry `from`, `to` and `delta`, and `compared_with` (`{ record_date, label }`, or `null` where a source did not date it) names the reading `from` is: the previous month-end snapshot, not last week. Its `summary` says "since Aug 31" where it used to say "this week"
 - `flip_watch` for primary trigger, reversal conditions, and boundary pressure
 - `skills` for deterministic downstream output ordering
 

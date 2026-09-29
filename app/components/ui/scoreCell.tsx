@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
  * is not something a reader can act on: the line it is judged against, how
  * far it sits from that line, and where it was last week are what turn it
  * into a decision. The four parts always print in this order, on the page and
- * in every paste (`formatScoreReference` is the text form the exports use).
+ * in every paste: `scoreReferenceParts` returns the parts, `formatScoreReference` is the
+ * plain-text join of them, and the exports and the brief card draw the same parts.
  */
 type ScoreReference = {
   label: string;
@@ -13,9 +14,13 @@ type ScoreReference = {
   line: { value: number; label: string };
   previous?: number | null;
   /**
-   * What `previous` is. "Last week" everywhere but the one cell that compares
-   * against something else (the month a past call changed), where printing
-   * "last week" over a years-old reading needed a footnote to take it back.
+   * What `previous` is. The reading routes pass the date it is from ("Aug 31",
+   * `comparisonBasis(...).label`): the comparison behind them is the previous
+   * monthly snapshot, and "last week" over it was a wrong number of days.
+   * "Last week" is the default for a caller that has no date. The one cell
+   * that compares against something else (the month a past call changed)
+   * passes its own, where "last week" over a years-old reading needed a
+   * footnote to take it back.
    */
   previousLabel?: string;
   /**
@@ -25,6 +30,14 @@ type ScoreReference = {
    */
   units?: ScoreUnits;
 };
+
+/**
+ * A reference as text. `previousDate` is the date `previous` is from ("Aug 31")
+ * when the caller knows it, and it changes the words, not only the label: a
+ * date after a bare number reads as a second number ("aug 31 63"), so a dated
+ * reading prints "was 63 on Aug 31" and an undated one keeps "last week 63".
+ */
+type TextScoreReference = ScoreReference & { previousDate?: string | null };
 
 export type ScoreUnits = {
   /** Printed after the value and after the line, e.g. "%" or "pp". */
@@ -47,17 +60,47 @@ const formatDistance = (distance: number, units: Required<ScoreUnits>) =>
 
 const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
 
-export const formatScoreReference = ({ label, value, line, previous, previousLabel = "Last week", units }: ScoreReference) => {
+/**
+ * The four parts of a score's reference, separately. A surface that sets the
+ * number in its own type size (the brief card) draws these; `formatScoreReference`
+ * is these joined, so the words on the card and in the paste are one derivation.
+ */
+export const scoreReferenceParts = ({
+  label,
+  value,
+  line,
+  previous,
+  previousLabel = "Last week",
+  previousDate = null,
+  units,
+}: TextScoreReference) => {
   const resolved = resolveUnits(units);
   const distance = Math.abs(value - line.value);
   const side = distance === 0 ? "at" : value > line.value ? "above" : "below";
-  const parts = [
-    `${label} ${formatPoints(value)}${resolved.suffix}${resolved.scale ? ` ${resolved.scale}` : ""}`,
-    `${line.label} ${formatPoints(line.value)}${resolved.suffix}`,
-    distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${side}`,
-  ];
-  if (typeof previous === "number" && Number.isFinite(previous)) parts.push(`${previousLabel.toLowerCase()} ${formatPoints(previous)}${resolved.suffix}`);
-  return parts.join(" · ");
+  const previousValue =
+    typeof previous === "number" && Number.isFinite(previous) ? `${formatPoints(previous)}${resolved.suffix}` : null;
+  return {
+    /** "Funding pressure 90 of 100" */
+    reading: `${label} ${formatPoints(value)}${resolved.suffix}${resolved.scale ? ` ${resolved.scale}` : ""}`,
+    /** "90": the number alone, as it prints beside its label. */
+    value: `${formatPoints(value)}${resolved.suffix}`,
+    /** "pause line 76" */
+    line: `${line.label} ${formatPoints(line.value)}${resolved.suffix}`,
+    /** "14 pts above", or "at the line" */
+    distance: distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${side}`,
+    /** "was 63 on Aug 31", or "last week 63" with no date; null when there is no previous reading to compare. */
+    previous:
+      previousValue === null
+        ? null
+        : previousDate
+          ? `was ${previousValue} on ${previousDate}`
+          : `${previousLabel.toLowerCase()} ${previousValue}`,
+  };
+};
+
+export const formatScoreReference = (reference: TextScoreReference) => {
+  const { reading, line, distance, previous } = scoreReferenceParts(reference);
+  return [reading, line, distance, previous].filter((part) => part !== null).join(" · ");
 };
 
 type ScoreCellProps = ScoreReference & { className?: string; children?: ReactNode };

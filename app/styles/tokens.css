@@ -102,7 +102,7 @@
      bounded to headings. A `className="font-display"` is a silent no-op; if a
      non-heading needs the serif, set font-family in CSS rather than minting the
      utility. See the --text-display note above for why serif is rationed. */
-  --font-display: var(--font-display-google, "Fraunces", Georgia, serif);
+  --font-display: var(--font-display-google, "IBM Plex Serif", Georgia, serif);
   /* Figure register — which face a number is set in, assigned by role rather
      than by taste, the same way the radius scale below is.
 
@@ -791,6 +791,12 @@ html[data-theme="light"] .weather-pill-muted {
   background-color: var(--bg-panel);
   background-image: none;
   box-shadow: var(--shadow-light);
+}
+/* The selected pill (controls.css), which the rule above would otherwise
+   repaint as an unselected one. */
+html[data-theme="light"] .weather-pill[aria-current="page"] {
+  border-color: rgba(3, 105, 161, 0.55);
+  background-color: rgba(14, 165, 233, 0.12);
 }
 /* Dark nested surfaces (bg-slate-800/900/950 at any alpha) inverted to a light
    tint. Enumerating single alphas missed bg-slate-950/45, which composited to a

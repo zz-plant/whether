@@ -1,4 +1,5 @@
 import type { RegimeAssessment } from "../regimeEngine";
+import { comparisonBasis, type ComparisonBasis } from "./comparisonBasis";
 
 type TrendLabel = "Strengthening" | "Flat" | "Cooling";
 
@@ -22,6 +23,8 @@ type WeeklyLeadershipBriefInputs = {
   last4Boldness: number[];
   hiringTrendDelta: number;
   stabilityWeeks: number;
+  /** What `previousAssessment` is; "last week" wording when the week does not date it. */
+  basis?: ComparisonBasis;
 };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -50,26 +53,32 @@ export const getWindowState = (value: number, thresholds: WindowThresholds) => {
   return "Constrained";
 };
 
-export const getNetDeltaLabel = (delta: number) => {
+/**
+ * How much more or less room the guidance gives than at the earlier reading.
+ * The earlier reading is named by its date where the week records one
+ * (`comparisonBasis`): "more aggressive since Aug 31", not "than last week".
+ */
+export const getNetDeltaLabel = (delta: number, basis: ComparisonBasis = comparisonBasis()) => {
+  const against = basis.date ? basis.since : "than last week";
   if (delta >= 12) {
-    return "Materially more aggressive than last week.";
+    return `Materially more aggressive ${against}.`;
   }
   if (delta >= 4) {
-    return "More aggressive than last week.";
+    return `More aggressive ${against}.`;
   }
   if (delta > 0) {
-    return "Slightly more aggressive than last week.";
+    return `Slightly more aggressive ${against}.`;
   }
   if (delta <= -12) {
-    return "Materially more defensive than last week.";
+    return `Materially more defensive ${against}.`;
   }
   if (delta <= -4) {
-    return "More defensive than last week.";
+    return `More defensive ${against}.`;
   }
   if (delta < 0) {
-    return "Slightly more defensive than last week.";
+    return `Slightly more defensive ${against}.`;
   }
-  return "The guidance is holding where it was last week.";
+  return `The guidance is holding where it was ${basis.when}.`;
 };
 
 export const buildWeeklyLeadershipBriefModel = ({
@@ -77,6 +86,7 @@ export const buildWeeklyLeadershipBriefModel = ({
   previousAssessment,
   hiringTrendDelta,
   stabilityWeeks,
+  basis,
 }: WeeklyLeadershipBriefInputs) => {
   const boldnessScore = buildBoldnessScore(
     assessment.scores.tightness,
@@ -144,7 +154,7 @@ export const buildWeeklyLeadershipBriefModel = ({
         : boldnessDelta < -1
           ? `${Math.min(-1, Math.round(boldnessDelta / 3))} notch`
           : "+0 notch",
-    netDeltaLabel: getNetDeltaLabel(boldnessDelta),
+    netDeltaLabel: getNetDeltaLabel(boldnessDelta, basis),
     macroLabel:
       assessment.regime === "EXPANSION" ? "Money cheap and available" : "Money expensive or scarce",
   };

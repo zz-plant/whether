@@ -1127,7 +1127,7 @@ now claims and reports a copy only after a write resolves.
 
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
-The runway unification itself landed on `main` separately (7f264a26, recorded in CLAUDE.md, "One
+The runway unification itself landed on `main` separately (7f264a26, recorded in docs/agents/lessons/dead-features-and-honesty.md, "One
 runway setting"): the band is the setting, the notes branch on its boundaries, and an exact figure
 moves the band. This branch adds one thing on top.
 
@@ -1156,6 +1156,219 @@ Found in the same production tail: `/comps` logged "a stalled HTTP response was 
 deadlock" on every request where the quote source declined, because `lib/saasMultiples.ts` returned
 early without reading the refused responses' bodies while fetching the basket in parallel. They are
 released now.
+
+### 1.1.25 The brief card says what the exports say (2026-09-29)
+
+`/api/image/brief` — the PNG `/share` lists and the card a Slack channel or link unfurl shows — set its
+confidence chip and its data line at 12–13px (about 5px in a feed) and spent its middle on one of the
+two scores, beside a gauge whose end labels were bare numbers. It never said where either score sat
+against the line that changes the call, so the number could not be acted on. It now draws both readings
+the way `/share` and every paste print them: the value, the pause line and the distance to it, the resume
+line and the distance to that. `buildScoreReadings` (`lib/export/scoreReference.ts`) returns those parts
+and `buildScoreReferenceLines` joins the same parts, so the card and the paste share one derivation;
+`tests/briefImageRoute.test.ts` fails if they drift. Nothing on the card is under 22px (the weekly card's
+floor), and the call is sized by the wrap estimate the weekly card uses (`lib/image/textFit.ts`, shared by
+both now) instead of being cut at 80 characters.
+
+Also fixed on the card:
+
+- **The weather word printed twice** ("FREEZING · FREEZING"): the regime's weather label and the posture
+  label, which is the same word, both printed. It is one stamp in the regime's own colour now, as on the
+  weekly card.
+- **A direction arrow picked by substring.** "tighten" drew an up arrow and "ease" a down arrow, and
+  "increase" contains "ease". Gone; the top bar and the stamp carry the tone.
+- **"Data: FRED · Treasury · Yahoo Finance".** Yahoo Finance feeds only the SaaS comps and contributes
+  nothing to either score (§1.1.9 corrected the same credit on `/state`). The line now names what the
+  scores are built from, through one label both share (`readerSourceLabel`): Treasury rates and FRED
+  (credit spreads, volatility, financial conditions), plus the curated startup-market snapshot that
+  `/about` says every surface using it should disclose. The weekly card's line said "US Treasury rates"
+  alone, which reads as rates-only; a review of this change caught that, and the shared label fixes both.
+- **A saved or historical reading looked live.** The card gave no sign that a fallback snapshot or `?month=`
+  was behind it. It prints the weekly card's label for that (`notLiveReadingLabel`, one function for both).
+
+**Found: "last week" was not last week.** Every export printed `last week 63` beside the funding-pressure
+reading, and the homepage said "rose 27 since last week to 90". The comparison behind both is
+`reportDynamics`, built against `getPreviousTimeMachineSnapshot(record_date)`, the latest snapshot
+strictly before the record date, and the bundled Time Machine cache is monthly (176 month-end rows, the
+last 2026-08-31). The reads of Sep 18 and Sep 25 both compare with Aug 31, and 63 and 56 are that
+snapshot's scores. So the figure is the change since the last month-end, up to five weeks, under a
+one-week label — on the page, on `/share`, in the Slack post and in every paste. This change left the
+card without it, and `tests/briefImageRoute.test.ts` pinned the precondition. §1.1.26 names the date
+instead, everywhere, and the card prints it again.
+
+**Found, not changed: "Conditions change if" has three answers for one week.** The homepage prints the
+regime lines ("Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 7 pts to
+clear 50", `buildFlipThreshold`). The weekly card and the `/share` paste print `weeklyCall.callChangesIf`,
+the confirmation rule ("Funding pressure at or below 66 for two readings in a row",
+`buildWeeklyLockCommitment().flipConditions[0]`). The `/share` panel lists two rate conditions under the
+same label. Each is defended where it is written, and `tests/stageResumeLineIsNotTheCallChange.test.tsx`
+pins the second, so which of them is the line where the call changes is the owner's decision. The brief
+card prints none of them.
+
+### 1.1.26 Every comparison names what it is against (2026-09-29)
+
+§1.1.25 found that "last week" is the previous Time Machine snapshot, which is the last month-end. The
+weekly comparison itself is a product call and is unchanged; what changed is that no surface calls it a
+week any more.
+
+- **The loader records the date.** `ReportDynamics.comparedWith` is `{ recordDate, label }`, set in
+  `reportDataLoader.ts` from `previousSnapshot.record_date` by `buildComparedWith`
+  (`lib/report/comparisonBasis.ts`). The label is "Aug 31", with the year when the earlier reading is from
+  another calendar year ("Dec 31, 2025"), so a January read never prints a date that reads as this year's.
+  It is absent when there was no comparison, and where a source did not say which reading it compared with.
+- **One function names it.** `comparisonBasis(comparedWith)` returns the phrase each place needs: the
+  column head ("Aug 31 → this week"), "since Aug 31", "vs Aug 31", "on Aug 31". Given no date it returns
+  the wording each surface always had, so a source that cannot name its reading does not invent one. The
+  date rides on `PreviousReading` (`previousScoresFromDynamics`, `lib/export/scoreReference.ts`), the one
+  object every export and page already receives its earlier scores in.
+- **Where it prints.** The homepage table's column head, caption, the sentence over it ("The scores moved
+  toward tighter money since Aug 31.") and both ladders' hollow dot; `/signals` (table head, each row's move,
+  score cells, call-line ladders); `/trust` ladders; `/share`, Slack and every paste ("… · 14 pts above ·
+  was 63 on Aug 31 · resume line 66 (24 pts away)"), the "• vs Aug 31: worse" direction line and the
+  Operating latitude line; the `/api/posture/current` summary; the agent payload's `decision_delta`
+  (`compared_with: { record_date, label }` beside `from` and `delta`, and a summary that says "since Aug 31");
+  the home brief's own labels (posture delta, indicator deltas, net delta, and the weekly-movement sentence the
+  published-brief record freezes).
+- **The brief card has the earlier reading back.** `pause line 76 · 14 pts above · was 63 on Aug 31` is
+  one row at the card's 24px type; `tests/briefImageRoute.test.ts` holds the longest dated detail line
+  ("Dec 31, 2025") to one row, because a wrapped row is a fourth line and the 800px budget (769px with
+  three) has no room for one.
+- **A date reads as a date.** In text the earlier reading is "was 63 on Aug 31" rather than "aug 31 63",
+  which reads as two numbers. A ladder's hollow-dot caption gained a colon for the same reason ("Aug 31: 63";
+  "Last week: 63" undated; "Period B: 61" on `/history/compare`).
+
+Deliberately not renamed: "last week's plan", "last week's approvals" and the like, which are about the
+plan the reader is running rather than a comparison; the two market inputs' "vs last week", which move
+against their own previous observation; and the published archive's "vs prior week" on `/brief/[week]`,
+which prints deltas frozen into append-only records that do not say what they were measured against. The
+follow-up for that is to freeze `comparedWith` into newly published records.
+
+**Found, not changed: Operating latitude's move is zero on any week that crossed no line.**
+`buildHomeBriefModel` builds the previous assessment behind `weeklyLeadershipSummary` only when a regime
+alert exists, which needs a regime change or a crossed line. With the same movement (funding pressure +12,
+risk appetite −6) it reports −8, "More defensive since Aug 31.", and `steadyWeek: false` when a line was
+crossed, and `0`, "The guidance is holding where it was on Aug 31.", `steadyWeek: true` when none was, so the
+exports' "Operating latitude … · vs Aug 31: no change" can be printed over a week the scores moved. The
+guidance is the same on that week, which is what the sentence claims; the number is the open question.
+Building the previous assessment from the dynamics whenever a comparison exists would change `steadyWeek`,
+and with it the quiet-day line, so it is recorded here and not changed.
+
+### 1.1.27 Say what moved the score (2026-09-29)
+
+The page said funding pressure went from 63 to 90 and never said which inputs account for the 27.
+
+**Found: the two readings are not built from the same inputs.** `reportDataLoader.ts` scores the earlier
+reading with `evaluateRegime(previousSnapshot, thresholds)`, which is rates alone: no market series and no
+rate-speed history. Today's reading carries both. On the Sep 25 read the earlier scores are 63 and 56; today's
+inputs score 90 and 54 from rates alone, 90 and 54 with the rate-speed history (its term is 0), and 90 and 43
+in full. So funding pressure's +27 is all interest rates, and risk appetite's −13 is −2 from the yield curve
+and −11 from the startup-market inputs (the VC funding slowdown and tech layoff pressure), which the Aug 31
+score was never built from. The risk-appetite "pause line crossed" (43 against 44) is caused entirely by
+those inputs. The Time Machine's monthly walk is not like-for-like either: it scores months with volatility
+and rate speed but no other market series (`buildThreadedRegimeWalk`).
+
+**What ships.** `ReportDynamics.movement` says what each score's move is made of, built by
+`explainScoreMovement` (`lib/report/scoreMovement.ts`), which scores today's inputs in stages through the
+engine itself (the loader's `evaluateRegime`, not a second copy of its arithmetic): rates alone, with the
+rate-speed history, with the market inputs except volatility, and in full. The parts are the differences
+between stages, so they add up to the move exactly (every stage's score is a whole number):
+
+| Score | Parts, in the order they are named |
+| --- | --- |
+| Funding pressure | interest rates · the recent pace of rate rises · credit-market and financial-conditions stress |
+| Risk appetite | the yield curve · startup-market inputs · stock-market volatility |
+
+Startup inputs count as if volatility were absent, and volatility for what it adds on top, because the
+volatility veto caps the score and the two do not add on their own
+(`tests/scoreMovement.test.ts` holds it). Nothing is printed unless the stages rebuild the score the page
+shows, so a replay or a stored snapshot the loader cannot rebuild carries no split instead of one that does
+not add up (`tests/comparisonBasis.test.ts` holds the sum against the real loader).
+
+**Where it prints.** Under each score on the homepage table ("What moved it: -2 from the yield curve and -11
+from startup-market inputs. The Aug 31 score was built from interest rates alone."), under the move on
+`/signals`, and as one line under the two readings in every paste: `What moved the scores since Aug 31:
+funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from
+startup-market inputs). The Aug 31 scores were built from interest rates alone.` (`/share`, Slack, the board
+and issue-tracker forms). The caveat sentence is the point of stating the split: a −11 that is an input the
+earlier score never had is not the market moving, and a reader told only the total takes it for that. It is
+left off when every part is rates or the curve. Not on the brief card, which is at 769px of its 800 with three
+lines to a reading, so a fourth line in each would run off the bottom (`lib/image/briefImageTemplate.tsx`).
+
+**Found, not changed: the earlier reading is scored without the inputs today's has.** Making the comparison
+like-for-like means scoring the earlier reading with the market series as they stood on its date
+(`alignMacroSeriesToAsOf` exists for replays) or leaving the inputs out of the delta. Either changes every
+published delta, the regime alert, and comparability with the archive, so it is a product call and is
+recorded here, with the real numbers, rather than made.
+
+### 1.1.28 Say what the move did to the decisions (2026-09-29)
+
+The archive's account of two consecutive weeks was the same sentence: `data/published_briefs.json` w38 and
+w39 both say "Pressure increased by +3.0 this week. Slow new commitments until conditions stabilize.",
+beside the guidance "freeze new commitments". Three things were wrong with it. "+3.0" is a figure in a unit
+nothing else uses (`buildWeeklyMovementMetric` sums a regime step and per-signal moves and clips them at ±3).
+"Slow new commitments" is an instruction of its own, printed whenever pressure rose, over guidance that had
+already said something stronger. And "this week" was not the comparison: both weeks were measured against
+Aug 31 (§1.1.26). Nothing said what a reader who acts on lines needs to know, which is whether anything
+*crossed* one. Against Aug 31 (63 and 56) both weeks did, and against each other (w38 77 and 42, w39 85 and
+39) neither did.
+
+**What ships.** One derivation, `buildDecisionMovement` (`lib/report/decisionMovement.ts`), read by every
+surface below. Each area is a small state against its own lines, taken from the same conditions the rules
+table prints through the same `isRuleConditionMet`: *paused* when any pause line holds, *resumable* when
+every numeric resume line holds, *holding* otherwise. It compares the state at the earlier reading with the
+state now and names the lines that decided it. Five movements: `paused`, `lifted`, `resumable`,
+`resumeLost`, `held`. Coming out of a pause into resumable names the resume line, the further one a score
+has passed. The sentence, for the Sep 25 read:
+
+> Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding
+> pressure rose through 76 and risk appetite fell through 44.
+
+A week nothing crossed says so and stops: `Conditions held steady since Sep 15; no pause or resume line was
+crossed. Last week's guidance stands.` A change of conditions with no line crossed says that
+(`tests/decisionMovement.test.ts` holds the shapes). It claims nothing without an earlier reading, nothing
+about the market state when the assessed state is not what the scores classify into (a change waiting on
+confirmation), and reads "this week" where the source did not date the earlier reading.
+
+**Where it prints.** The lead over "What changed this week" (followed by the nearest line on a quiet week,
+`buildChangedLead`); the by-area table's **Changed** column, which used to carry a fixed re-check sentence for
+whichever three areas the largest moves pointed at whether or not the rule had anything to re-check, and now
+says what happened to that area's own lines ("Pause now applies: risk appetite fell through 44."), says
+"No line crossed since Aug 31." for an area a move did not touch, and draws no column on a week nothing
+crossed; the first-visit picker's amber note for the chosen area; `weeklyMovement.summary`, and so the frozen
+record's `whatChanged` (new freezes only: the archive is append-only, and w38 and w39 keep the sentence they
+were frozen with); `decisionShiftSummary` and `decisionShiftHeadline`, which are the "Changed:" line in the
+share artifact, `/api/decision` and the read-this card; the lead line of "What changed this week" in every
+paste (`buildReadingLines`, which the issue-tracker form now shares instead of keeping a private copy); the
+agent state (`change.summary`, and `change.crossed`, grouped by how the areas moved with the lines that
+decided it); and `whether changes` (`decision`). `weeklyMovement.score` and `.direction` are unchanged.
+**Not on the brief card**, which is at 769px of its 800 in the worst case (§1.1.27); it already prints each
+score against the line and the earlier reading.
+
+**Your record, on the brief.** `/decisions` was reachable from the footer, the command palette and the confirmation under the Decision Shield's record button, and nothing in the brief connected the two halves of one question (which of my commitments rest on what moved?). A
+browser that has recorded a decision now gets one line under the returning-visitor strip, in the record's own
+headline ("1 decision rests on conditions that have moved since it was recorded." / "All 3 decisions on this
+browser still rest on conditions that hold.") and a link to the rows (`YourRecordNote`,
+`app/components/home/YourRecordNote.tsx`). Nothing renders for a browser with no record, on a failed read, or
+on an archived week. Nearly every browser on `/` has an id (the alert toggle mints one), so the page asks
+the server only when the browser remembers having recorded something: `whether.decisionMemory:<id>` (a key
+the registry already accounted for and nothing used) holds the count, kept by `fetchDecisionLedger` and
+`logDecisionToLedger`. A browser that recorded before this shipped sees the note after it next opens
+`/decisions`. `/privacy` 2.4 says so.
+
+**The analogue says how it differed.** "The last time conditions moved this way" printed Sep 2022 and where the
+scores stood three months on, which reads as a forecast to anyone who is not told where that month started.
+On the Sep 25 read it found Stormy to Freezing at funding pressure 79 and risk appetite 7; this week is Sunny
+to Freezing at 90 and 43. The card now adds `Against this week:` (`describeAgainstToday`): the change it was
+and this week's when they differ, each score then and now with what it means (`signalReadingMeaning`), and
+"It is one earlier outcome, not a forecast." unless it is the same change with both scores within 5 points.
+
+**Found, not changed.** The comparison is the previous month-end snapshot (§1.1.26), so every brief in a month
+restates the same crossing: w40 would say what w38 said. A weekly basis for the archive is the previous
+*published record* (its `scores` and `decisions[].pause/resume` are enough to run the same derivation), which
+means both freeze writers (`scripts/freezeWeeklyBrief.ts`, `worker/workflows/weeklyBriefFreeze.ts`) supply
+the earlier record to `buildPublishedBriefRecord`, and the archive page would then name a different basis
+from the live one. Not done: it is a change to what the archive says about a week, which is an owner
+decision.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
@@ -1573,16 +1786,62 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   mandate export payload.
 
 ### 6.6 Open Graph
-- `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).
+- `GET /api/og` — PNG Open Graph image with regime metadata (supports Time Machine selection); `template=report` is the weekly card.
+- `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and resume lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
 
 ### 6.7 Agent access (MCP)
+- `GET /api/agent?view=state` — the compact state to decide from (§6.9); `?view=full` (the default) is the whole brief.
 - `POST /api/mcp` (no `?tool` param) — **MCP streamable-HTTP transport** (JSON-RPC 2.0,
   protocol 2025-06-18): `initialize`, `ping`, `tools/list`, `tools/call` over
-  `application/json` responses. Tool registry lives in `lib/mcp/httpMcpServer.ts`
-  (get_brief, get_context, get_projection, get_comps, get_signals). Standard MCP clients
-  can mount `https://whether.work/api/mcp` directly.
-- `GET/POST /api/mcp?tool=…` — legacy REST tool API, kept for existing integrations.
-- `bun run mcp:whether` — local stdio MCP server (separate tool set, official SDK).
+  `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
+  directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
+- `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
+- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/stdioServer.ts`): the same tools, plus
+  `pull_recent_site_info`.
+
+### 6.9 One state, one tool registry (2026-09-29)
+Agents met the product through four surfaces that disagreed about what Whether says and how to ask.
+Changes, all additive except where noted:
+
+- **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
+  MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
+  carry the published confidence now. `/api/weekly` and `/api/monthly` still return the engine's label in
+  `summary.confidence` (their archive regenerates from the same builders, and `summary.summary` prose there
+  can still disagree with the published label); a decision for the owner, not made here.
+- **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
+  first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
+  Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.
+- **One registry** (`lib/agent/tools.ts`) for the remote server, the local server and the GET shim: five
+  tools on the local server against twelve remote, under two names, is one list of 13 (plus the local-only
+  `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
+  in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
+  and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
+- **Inputs** (`lib/agent/inputs.ts`): a regime by key or by the site's weather word in any case; empty
+  arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
+  with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
+  an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became
+  weekly (now refused). `get_context` and `get_projection` fill what is left out from today's reading and
+  say so in `inputs`.
+- **Discovery from the registry**: the manifest lists `mcp.tools`, `start` pointers, `views` and the
+  `automation` check (it promised "MCP tools" and listed none); `/llms.txt` and `/api-docs` name every tool;
+  `tests/agentDiscoveryParity.test.ts` holds each place that names a tool to the registry.
+- **`get_context` counts months.** Its counts came from the Time Machine's regime series, one entry per month-end, and were named `weeksActive` / `historicalAvgWeeks`: "8 weeks" was 8 months (§1.1.26, the same period-word defect). They are `monthsActive` / `historicalAvgMonths` now (**breaking** for a caller reading the old names; its only caller in the repo is the tool), with the `latestSnapshot` they run to, and a `note` when the count is 0 because the regime is newer than the last month-end.
+- **`get_projection` is direction-aware** (`projectRegimeFromPace`, `lib/report/regimeContext.ts`): it steps
+  the scores by their weekly pace and classifies each step with the engine's own quadrant table, so a score
+  moving away from its line does not cross it and the regime it lands in is the table's, not a guess. Called
+  with no arguments (today's scores at today's pace) the old function reported a crossing within a week
+  on the Sep 25 read, when both scores were moving deeper into the regime.
+  **Found, not changed:** `getRegimeProjection`, the function it replaced for the tool, still drives the
+  alert path (`lib/alert/checkRegimeChange.ts`, "Conditions could change soon" to Slack, and the
+  `regime:weeks-to-flip` state), and that path has two defects of its own. The function divides the nearest
+  line's distance by the fastest pace whichever way either score moves, and the caller passes it
+  `reportDynamics.changedSignals[].delta`, which is the change since the previous *month-end* snapshot
+  (§1.1.26), as if it were a weekly pace. Both make the alert early or spurious. What Slack subscribers are
+  sent is an owner decision; the fix is to call `projectRegimeFromPace` with the pace `get_state` publishes
+  as `perWeek`.
+- **Browsers.** `/api/mcp` answers its CORS preflight and carries `Access-Control-Allow-Origin: *` on the JSON-RPC transport and the reads; `?tool=subscribe` stays closed.
+- **CLI**: `whether state` (and `--require-ready`, which exits 8 when the data is not live and current); a mistyped command is refused as one (it was answered "too many arguments for 'status'"); `changes` names the dated reading it compares with, uses reader names and says what moved a score.
+- **What the change did to the decisions** (§1.1.28): the state carries `change.summary` (one sentence) and `change.crossed` (the areas whose pause or resume state changed since `comparedWith`, grouped by how they moved, with the lines that decided it; empty when none did); `whether changes` prints the same sentence under `DECISIONS`, and the changes contract carries it as `decision`. Additive.
 
 ### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
 Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
@@ -1626,6 +1885,7 @@ surfaces.
 
 The one system of record for "what did we decide and when": server-backed entries keyed by
 client id, saved from the hero, browsed on `/operate/memory`, and checked for staleness on `/`.
+The brief says how many of a browser's decisions rest on conditions that moved (`YourRecordNote`, §1.1.28); the rows are on `/decisions`.
 
 Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
 a spec update, and with it the only writer of the `whether_decision_history` localStorage key.

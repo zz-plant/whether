@@ -27,7 +27,13 @@ import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
 import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
 
 /** One score against its lines, this week and last, as the ladder draws it. */
-type ScorePosition = { value: number; previous: number | null; lines: readonly LadderLine[] };
+type ScorePosition = {
+  value: number;
+  previous: number | null;
+  /** What the hollow dot is: the date of the reading it is drawn from, or "Last week" where the week does not date it. */
+  previousLabel?: string;
+  lines: readonly LadderLine[];
+};
 export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosition };
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
@@ -179,8 +185,20 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           two scores on this page, and it draws the rule, not the reading. */}
       {positions ? (
         <div className="weather-surface mb-3 grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2">
-          <ScoreLadder label={ruleMetricLabel.tightness} value={positions.tightness.value} previous={positions.tightness.previous} lines={positions.tightness.lines} />
-          <ScoreLadder label={ruleMetricLabel.riskAppetite} value={positions.riskAppetite.value} previous={positions.riskAppetite.previous} lines={positions.riskAppetite.lines} />
+          <ScoreLadder
+            label={ruleMetricLabel.tightness}
+            value={positions.tightness.value}
+            previous={positions.tightness.previous}
+            previousLabel={positions.tightness.previousLabel}
+            lines={positions.tightness.lines}
+          />
+          <ScoreLadder
+            label={ruleMetricLabel.riskAppetite}
+            value={positions.riskAppetite.value}
+            previous={positions.riskAppetite.previous}
+            previousLabel={positions.riskAppetite.previousLabel}
+            lines={positions.riskAppetite.lines}
+          />
         </div>
       ) : null}
 
@@ -367,6 +385,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         </FormulaCard>
       </div>
 
+      {/* The two links sit inside the sentence, so they are inline with vertical
+          padding rather than 44px inline-flex boxes: padding on an inline box
+          widens what a finger can hit without raising the line it sits on (§II,
+          "expand invisible hitboxes"). As boxes, each one set its own line to
+          44px and the paragraph read with a gap under its first line. */}
       <p className="mt-3 text-xs leading-5 text-slate-400">
         Every constant above is imported from the scoring engine, not retyped — if the engine
         changes, this page changes with it.{" "}
@@ -374,12 +397,12 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           href={ENGINE_SOURCE_URL}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex min-h-[44px] items-center font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           Read the engine source →
         </a>{" "}
         For the act / pause / reverse method the thresholds feed, see{" "}
-        <a href="#framework" className="inline-flex min-h-[44px] items-center font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+        <a href="#framework" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
           how to use the thresholds ↓
         </a>
       </p>

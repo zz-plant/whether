@@ -31,6 +31,15 @@ describe("feed.xml", () => {
     assert.ok(homepageItems.length <= 1, "at most one item points at the live homepage");
   });
 
+  it("gives every item a byline and a lead image, for readers and Apple News", async () => {
+    const xml = await (await GET()).text();
+    assert.match(xml, /xmlns:media="http:\/\/search\.yahoo\.com\/mrss\/"/);
+    for (const entry of items(xml)) {
+      assert.match(entry, /<dc:creator>Kanav Jain<\/dc:creator>/);
+      assert.match(entry, /<media:content url="[^"]+\/api\/og[^"]*" medium="image" width="1200" height="630" \/>/);
+    }
+  });
+
   it("declares itself and links the site from the configured URL, not a literal", async () => {
     const xml = await (await GET()).text();
     assert.match(xml, new RegExp(`<atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss\\+xml" />`));

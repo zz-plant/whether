@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
 
 import { renderOgElement } from "../app/api/og/renderOgElement";
+import { layoutReportCard } from "../app/api/og/reportImageTemplate";
 import { generateMetadata as periodMetadata } from "../app/history/[period]/page";
 import { buildSignalDecisionScenarioMetadata } from "../app/signals/[cluster]/[decision-scenario]/page";
 
@@ -71,6 +72,40 @@ describe("the weekly card", () => {
     assert.match(text, /Conditions change if/);
     assert.match(text, /What changed/);
     assert.doesNotMatch(text, /For operators this week|Short-term borrowing rate|Recession warning gauge|Trust/);
+  });
+
+  /* The canvas is fixed and satori cannot measure, so a block that wraps further
+     than planned draws over the one below it. On 2026-09-29 a 69-character call
+     was set at 62px, took three lines, and overlapped the sentence under it. */
+  it("sets a headline at a size it fits in, and shortens nothing that already fits", () => {
+    const week = {
+      headline: "Conditions are tightening. Freeze new commitments and protect runway.",
+      whyItMatters: "Approve only renewals, work already promised to customers, and hires that bring in revenue.",
+      changeSummary: "Conditions tightened. Slow new commitments and focus on what's already in motion.",
+      flipCondition: "Funding pressure at or below 66 for two readings in a row",
+    };
+    const layout = layoutReportCard(week);
+    assert.ok(layout.headlineSize < 62, `the overlapping week is set at ${layout.headlineSize}px`);
+    assert.equal(layout.whyItMatters, week.whyItMatters);
+    assert.equal(layout.changeSummary, week.changeSummary);
+    assert.equal(layout.flipCondition, week.flipCondition);
+
+    const short = layoutReportCard({ ...week, headline: "Hold steady. Keep the plan." });
+    assert.equal(short.headlineSize, 62, "a short call keeps the largest size");
+  });
+
+  it("fits the longest text the preview allows, cutting at a word with an ellipsis", () => {
+    const words = (length: number) => "Funding pressure rose again as credit spreads widened ".repeat(4).slice(0, length).trim();
+    const layout = layoutReportCard({
+      headline: words(96),
+      whyItMatters: words(140),
+      changeSummary: words(140),
+      flipCondition: words(130),
+    });
+    assert.ok(layout.boxValueSize >= 20, "the boxes stay above the feed's reading floor");
+    for (const text of [layout.whyItMatters, layout.changeSummary, layout.flipCondition]) {
+      if (text.endsWith("\u2026")) assert.doesNotMatch(text, /\s\u2026$/, "an ellipsis sits on the last word, not after a space");
+    }
   });
 });
 

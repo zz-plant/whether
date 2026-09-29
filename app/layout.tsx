@@ -187,11 +187,11 @@ export default function RootLayout({
         {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
             so there is no fonts.googleapis.com stylesheet in the critical path
             and no preconnect to a third-party host. Only the two faces that
-            render above the fold are preloaded. Fraunces 600, not 700: the hero
+            render above the fold are preloaded. Plex Serif 600, not 700: the hero
             headline is font-semibold, so 700 is never requested on first paint
             and preloading it just burned a round-trip. The remaining weights
             load from the same origin when the stylesheet asks for them. */}
-        <link rel="preload" href="/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link rel="preload" href="/fonts/ibm-plex-serif-600.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="preload" href="/fonts/ibm-plex-sans-400.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
@@ -265,8 +265,11 @@ export default function RootLayout({
                   {/* Wraps horizontally on mobile, stacks on `sm`. A vertical list
                       gives every link its own 44px row, which on a phone turned a
                       ~400px footer into a ~1000px one; the labelled groups are the
-                      part worth keeping, not the column shape at every width. */}
-                  <ul className="flex flex-wrap gap-x-5 sm:block">
+                      part worth keeping, not the column shape at every width.
+                      Two columns from `sm`, like the list beside it: seven links
+                      at 44px each made this the tallest thing in the footer and
+                      set the footer's height on every page. */}
+                  <ul className="flex flex-wrap gap-x-5 sm:block sm:columns-2">
                     {navigationLayers.map((layer) => (
                       <li key={layer.href} className="break-inside-avoid">
                         <Link

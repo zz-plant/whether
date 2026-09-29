@@ -4,7 +4,7 @@
  * `data/published_briefs.json` is the product's proof of cadence: one record per week the
  * call was published, append-only, citable. The scheduled routine meant to append to it ran
  * in a sandbox whose egress proxy denies FRED, so every run failed before it had a week to
- * write and the archive stayed at one entry (CLAUDE.md, "Scheduled automation"). This module
+ * write and the archive stayed at one entry (docs/agents/lessons/automation-and-deploy-gate.md, "Scheduled automation"). This module
  * lands the record from inside Cloudflare, where the data is reachable, behind a pull request
  * so a person still confirms the snapshot before it becomes permanent.
  *

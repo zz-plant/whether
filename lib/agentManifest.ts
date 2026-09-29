@@ -1,5 +1,8 @@
 import { resolveSiteUrl } from "./siteUrl";
+import { describeAgentTools, describeToolParams } from "./agent/tools";
 import { supportedAgentCadences } from "./agentInterface";
+import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./mcp/serverIdentity";
+import { PUBLISH_MAX_RECORD_AGE_DAYS } from "./report/briefPublishGuard";
 import {
   REVISABLE_DELEGATION_RECORD_SCHEMA_VERSION,
   REVISABLE_DELEGATION_SCHEMA_URL,
@@ -37,8 +40,19 @@ const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
   baseUrl,
   defaultCadence: "weekly",
   supportedCadences: [...supportedAgentCadences],
+  /* Where to begin, by surface. The state is a tenth the size of the full brief and is what to
+     decide from; each of these reads `automation.ready` first. */
+  start: {
+    http: `GET ${baseUrl}/api/agent?view=state`,
+    mcp: "tools/call get_state",
+    cli: "bun run cli:whether -- state --json",
+    markdown: `GET ${baseUrl}/brief.md`,
+  },
   endpoints: {
     agent: `${baseUrl}/api/agent`,
+    state: `${baseUrl}/api/agent?view=state`,
+    mcp: `${baseUrl}/api/mcp`,
+    brief: `${baseUrl}/brief.md`,
     llms: `${baseUrl}/llms.txt`,
     weekly: `${baseUrl}/api/weekly`,
     monthly: `${baseUrl}/api/monthly`,
@@ -50,11 +64,44 @@ const buildAgentManifest = (baseUrl = resolveSiteUrl()) => ({
   },
   examples: {
     weekly: `${baseUrl}/api/agent?cadence=weekly`,
+    state: `${baseUrl}/api/agent?view=state`,
     // This week's call as a typesafe/jev request, with a slot for the caller's plan.
     jev: `${baseUrl}/api/agent?format=jev`,
   },
   agent: {
     invalidCadenceStatus: 400,
+    /* `full` is the default. `state` is the compact answer (`lib/agentState.ts`); its shape is the
+       `outputSchema` of the MCP tool `get_state`. It takes no cadence other than weekly. */
+    views: ["full", "state"],
+    defaultView: "full",
+    invalidViewStatus: 400,
+  },
+  /* Whether it is sound to act on a reading without a person looking first. Not `degraded`,
+     which only says report assembly failed: a total outage serves the bundled snapshot and
+     leaves `degraded` false. */
+  automation: {
+    check: "automation.ready in view=state; publishReadiness.ok in the full brief",
+    refusesWhen: ["the data is a saved copy, not a live reading", `the record is more than ${PUBLISH_MAX_RECORD_AGE_DAYS} days old`, "report assembly failed"],
+  },
+  /* The tools an MCP client lists at `tools/list`, with the same arguments, so an agent can plan
+     its calls from this document without connecting first. Read from the definitions the server
+     runs (`lib/agent/tools.ts`), so a tool cannot be served and missing here. */
+  mcp: {
+    endpoint: `${baseUrl}/api/mcp`,
+    transport: "streamable-http",
+    protocolVersions: [...MCP_PROTOCOL_VERSIONS],
+    server: MCP_SERVER_INFO,
+    instructions: MCP_SERVER_INSTRUCTIONS,
+    local: "bun run mcp:whether (stdio, from a checkout of the repository: the same tools, plus pull_recent_site_info)",
+    plainGet: `${baseUrl}/api/mcp?tool=get_actions`,
+    tools: describeAgentTools("http").map(({ name, title, description, aliases, readOnly, arguments: args }) => ({
+      name,
+      title,
+      description,
+      ...(aliases.length > 0 ? { aliases } : {}),
+      readOnly,
+      arguments: describeToolParams(args),
+    })),
   },
   /* What a caller may and may not do with any of the above. The manifest is the
      documented entry point for an agent, so it is the first place a constraint

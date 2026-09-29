@@ -6,12 +6,13 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
 import type { ThresholdBusinessConsequence } from "../../../lib/report/operatingCalls";
 import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 
 type HomeScoreLadder = {
   metric: "tightness" | "riskAppetite";
   label: string;
   value: number;
-  /** Last week's reading; null when there is nothing to compare against. */
+  /** The earlier reading; null when there is nothing to compare against. */
   previous: number | null;
   lines: HomeLadderLine[];
 };
@@ -20,7 +21,7 @@ type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string 
 
 /**
  * Confidence and distance: the two scores on their ladders with the three
- * lines and last week's dot, the market move that would cross each line under
+ * lines and the earlier reading's dot, the market move that would cross each line under
  * the ladder it describes, and — on a week the call changed — the last time
  * it did. This was the bounded-conditions box inside the hero; the box is
  * gone and its content is a section, because "how close are we" is the
@@ -37,6 +38,7 @@ export function WhatWouldChangeSection({
   thresholdBusinessConsequence,
   lastTime,
   callChangeLines,
+  basis = comparisonBasis(),
 }: {
   ladders: readonly HomeScoreLadder[];
   flipProximity: readonly FlipProximityLine[];
@@ -48,6 +50,8 @@ export function WhatWouldChangeSection({
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
   lastTime: LastTimeCallChanged | null;
   callChangeLines: { tightness: number; riskAppetite: number };
+  /** The earlier reading the hollow dot is drawn from; "last week" when the week does not date it. */
+  basis?: ComparisonBasis;
 }) {
   const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
   const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10
@@ -74,7 +78,13 @@ export function WhatWouldChangeSection({
         <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
           {ladders.map((ladder) => (
             <div key={ladder.metric} className="min-w-0 space-y-1.5" data-ladder={ladder.metric}>
-              <ScoreLadder label={ladder.label} value={ladder.value} previous={ladder.previous} lines={ladder.lines} />
+              <ScoreLadder
+                label={ladder.label}
+                value={ladder.value}
+                previous={ladder.previous}
+                previousLabel={basis.label}
+                lines={ladder.lines}
+              />
               {/* The market move that crosses the line, in the market's units:
                   the ladder says how far the score sits; this says what has to
                   happen on the curve or the bill for that line to be crossed. */}

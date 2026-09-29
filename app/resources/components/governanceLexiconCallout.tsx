@@ -9,7 +9,7 @@ export function GovernanceLexiconCallout({
   if (!term) return null;
 
   return (
-    <aside className="weather-surface border border-sky-400/40 bg-sky-500/10 px-4 py-4">
+    <aside className="weather-surface !border-sky-400/40 !bg-sky-500/10 px-4 py-4">
       <p className="type-eyebrow text-sky-200">Governance lexicon</p>
       <h3 className="mt-1 text-base font-semibold text-slate-100">{term.term}</h3>
       <p className="mt-2 text-sm text-slate-200">{term.definition}</p>

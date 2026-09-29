@@ -16,7 +16,7 @@ import { createGuardedFetch, isLocalTarget, redactTarget, targetUrl } from "../s
  * on where it runs, and this repo has already paid for it: Invariant 1 ("reading
  * performs zero writes") passed in a sandbox that reaches nothing and failed every
  * Cloudflare build from 2026-08-30 to 2026-09-02, where FRED answers and the read path
- * therefore ingested and took the refresh lock. CLAUDE.md draws the rule from that —
+ * therefore ingested and took the refresh lock. docs/agents/lessons/automation-and-deploy-gate.md draws the rule from that —
  * "a test about writes has to serve its own upstreams" — and the guard makes it the
  * default rather than something each test has to remember.
  *

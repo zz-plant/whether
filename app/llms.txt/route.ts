@@ -1,79 +1,15 @@
+import { buildLlmsTxt } from "../../lib/seo/llmsTxt";
 import { resolveSiteUrl } from "../../lib/siteUrl";
 
 export const runtime = "edge";
 export const revalidate = 3600;
 
+/**
+ * Transport only: the document is built in `lib/seo/llmsTxt.ts`, from the same tool
+ * definitions the MCP servers run, so what is listed here is what is served.
+ */
 export async function GET() {
-  const baseUrl = resolveSiteUrl();
-
-  const content = [
-    "# Whether — Agent Interface",
-    "",
-    "Whether turns public macro signals into a weekly operating posture for startup and product leaders.",
-    "",
-    "## Tools (for AI agents)",
-    "",
-    "### GET /api/mcp?tool=get_actions",
-    "- Returns: full discoverable tool catalog with parameter descriptions.",
-    "",
-    "### GET /api/mcp?tool=get_brief",
-    "- Optional: `&cadence=weekly|monthly|quarterly|yearly`",
-    "- Returns: current regime, action, confidence, record date. This is the primary tool.",
-    "",
-    "### GET /api/mcp?tool=get_projection",
-    "- Required: `&regime=DEFENSIVE&tightness=74&riskAppetite=32`",
-    "- Optional: `&tightnessDelta=4&riskAppetiteDelta=-2`",
-    "- Returns: weeks until threshold crossing at current velocity, projected next regime. Use to answer 'what if current trend continues.'",
-    "",
-    "### GET /api/mcp?tool=get_context&regime=DEFENSIVE",
-    "- Returns: how long this regime has been active, historical average duration, most common next regime. Use to answer 'how does this compare to history.'",
-    "",
-    "### GET /api/mcp?tool=get_comps",
-    "- Returns: median SaaS EV/Revenue multiple from 15 public companies. Use to answer 'what are SaaS companies worth right now.'",
-    "",
-    "### GET /api/mcp?tool=get_signals",
-    "- Returns: available historical data coverage (years and months).",
-    "",
-    "### POST /api/mcp?tool=subscribe",
-    "- Body: `{ \"email\": \"user@company.com\" }`",
-    "- Subscribes an email to the weekly brief. Returns confirmation.",
-    "",
-    "## Machine-readable endpoints",
-    "",
-    "### Markdown brief (recommended for browser/reading agents)",
-    `- GET ${baseUrl}/brief.md`,
-    "- Returns: Structured Markdown with posture, decisions, revisit triggers, provenance, and copy-paste-ready operator brief",
-    "- Content-Type: text/markdown; charset=utf-8",
-    "- Cache: 900s",
-    "",
-    "### JSON agent API",
-    `- GET ${baseUrl}/api/agent?cadence=<weekly|monthly|quarterly|yearly>`,
-    "- Default cadence: weekly",
-    "- Response: JSON with summary, posture, decision delta, flip watch, agent handoff payload + prompt, provenance",
-    "- Invalid cadence: HTTP 400 with allowedCadences",
-    "",
-    "### Jev decision request",
-    `- GET ${baseUrl}/api/agent?format=jev`,
-    "- Returns: this week's guidance as a ready-to-send request for TypeSafe's Jev decision model (typesafe/jev): typed state with a `plan` slot, plus questions (does the plan conflict with the guidance, which decision area, how reversible, is it safer after conditions change)",
-    "- Fill `request.state.plan` and send `request` to Jev yourself; Whether never receives the plan",
-    "- Check `automationReady` first: false means the reading is not live or not current",
-    "",
-    "## Guidance for agents",
-    "- Prefer /brief.md for reading and summarization tasks — it's Markdown, structured, and instant",
-    "- Use /api/agent for structured data processing, integration, or when you need specific cadence windows",
-    "- Use /api/mcp?tool=get_brief for a quick structured summary (faster than /api/agent for simple queries)",
-    "- The homepage (/) includes JSON-LD structured data (schema.org/Report) with decision artifacts",
-    "- All endpoints include provenance metadata — preserve it in downstream outputs",
-    "",
-    "## Discovery",
-    `- Manifest: ${baseUrl}/.well-known/whether-agent.json`,
-    `- Homepage: ${baseUrl}/`,
-    `- Brief (Markdown): ${baseUrl}/brief.md`,
-    `- Agent API: ${baseUrl}/api/agent`,
-    `- MCP tools: ${baseUrl}/api/mcp`,
-  ].join("\n");
-
-  return new Response(content, {
+  return new Response(buildLlmsTxt(resolveSiteUrl()), {
     headers: {
       "content-type": "text/plain; charset=utf-8",
       "cache-control": "public, max-age=3600",

@@ -12,6 +12,8 @@
  */
 import { CLIENT_ID_HEADER } from "../../lib/api/clientIdHeader";
 import { parseDecisionMemoryEntry, type DecisionMemoryEntry, type DecisionMemoryPayload } from "../../lib/decisionMemory";
+import { buildDecisionRecordView, type CurrentConditions, type DecisionRecordView } from "../../lib/report/decisionRecordView";
+import { STORAGE_KEYS } from "../../lib/storage/keys";
 
 const LEDGER_ENDPOINT = "/api/decision-memory";
 
@@ -23,6 +25,46 @@ type LedgerFetchResult =
 type LedgerWriteResult = { ok: true } | { ok: false; reason: string };
 
 type FetchLike = typeof globalThis.fetch;
+
+type LedgerStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+/** Storage can be absent (no window) or throw on access (blocked); either way there is no hint, and nothing else changes. */
+const browserStorage = (): LedgerStorage | null => {
+  try {
+    return typeof window === "undefined" ? null : window.localStorage;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * How many decisions this browser last knew its record to hold; 0 when it has never
+ * recorded one, or cannot say.
+ *
+ * The brief is the busiest route on the site and nearly every browser on it has an id
+ * (the alert toggle mints one) and no decisions. Asking the server for an empty ledger on
+ * every one of those visits would cost a request each to learn nothing, so the homepage
+ * asks this first. It is a hint, not the record: `fetchDecisionLedger` and
+ * `logDecisionToLedger` keep it current, and a browser whose hint is missing just does not
+ * see the note until it next opens its record.
+ */
+const readKnownLedgerSize = (clientId: string, storage: LedgerStorage | null = browserStorage()): number => {
+  try {
+    const stored = Number(storage?.getItem(STORAGE_KEYS.decisionMemory(clientId)));
+    return Number.isInteger(stored) && stored > 0 ? stored : 0;
+  } catch {
+    return 0;
+  }
+};
+
+const rememberLedgerSize = (clientId: string, size: number, storage: LedgerStorage | null = browserStorage()) => {
+  try {
+    if (size > 0) storage?.setItem(STORAGE_KEYS.decisionMemory(clientId), String(size));
+    else storage?.removeItem(STORAGE_KEYS.decisionMemory(clientId));
+  } catch {
+    // Storage blocked: the record is unaffected, and the homepage note waits for a browser that keeps it.
+  }
+};
 
 /*
  * A malformed row is dropped rather than failing the whole read.
@@ -48,6 +90,7 @@ const parseEntries = (value: unknown): DecisionMemoryEntry[] => {
 export const fetchDecisionLedger = async (
   clientId: string,
   fetchImpl: FetchLike = globalThis.fetch,
+  storage: LedgerStorage | null = browserStorage(),
 ): Promise<LedgerFetchResult> => {
   try {
     const response = await fetchImpl(LEDGER_ENDPOINT, {
@@ -59,7 +102,9 @@ export const fetchDecisionLedger = async (
       return { ok: false, reason: "The record could not be read just now. Try again in a moment." };
     }
 
-    return { ok: true, entries: parseEntries(await response.json()) };
+    const entries = parseEntries(await response.json());
+    rememberLedgerSize(clientId, entries.length, storage);
+    return { ok: true, entries };
   } catch {
     return { ok: false, reason: "The record could not be read just now. Try again in a moment." };
   }
@@ -69,6 +114,7 @@ export const logDecisionToLedger = async (
   clientId: string,
   payload: DecisionMemoryPayload,
   fetchImpl: FetchLike = globalThis.fetch,
+  storage: LedgerStorage | null = browserStorage(),
 ): Promise<LedgerWriteResult> => {
   try {
     const response = await fetchImpl(LEDGER_ENDPOINT, {
@@ -81,10 +127,32 @@ export const logDecisionToLedger = async (
       return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
     }
 
+    rememberLedgerSize(clientId, readKnownLedgerSize(clientId, storage) + 1, storage);
     return { ok: true };
   } catch {
     return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
   }
+};
+
+/**
+ * The reader's record against this week's reading, for the homepage: null unless this
+ * browser has recorded something, the read worked, and there is at least one row.
+ *
+ * Every "nothing to say" case is the same null, because the homepage note is an addition
+ * to the brief and not part of it: an unreachable ledger must not put an error under the
+ * call, and an empty one is not news (`buildDecisionRecordView` says nothing for it).
+ */
+export const loadRecordNoteView = async (
+  clientId: string,
+  current: CurrentConditions,
+  fetchImpl: FetchLike = globalThis.fetch,
+  storage: LedgerStorage | null = browserStorage(),
+): Promise<DecisionRecordView | null> => {
+  if (readKnownLedgerSize(clientId, storage) === 0) return null;
+  const result = await fetchDecisionLedger(clientId, fetchImpl, storage);
+  if (!result.ok) return null;
+  const view = buildDecisionRecordView(result.entries, current);
+  return view.rows.length > 0 ? view : null;
 };
 
 export type LedgerDownloadFormat = "csv" | "records";

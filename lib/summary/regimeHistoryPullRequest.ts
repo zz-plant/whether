@@ -5,7 +5,7 @@
  * (refreshMonthlyRegimeHistory.ts); the read path merges that over the bundled snapshot. What
  * never happened without a person was getting that month *into the repository*, where the
  * bundled snapshot lives — the scheduled routine meant to do it kept failing at its PR step
- * while reporting success (CLAUDE.md). This module turns the KV copy into a pull request.
+ * while reporting success (docs/agents/lessons/automation-and-deploy-gate.md). This module turns the KV copy into a pull request.
  *
  * Deliberately narrow: it adds or rewrites the months KV knows about and nothing else. The
  * canonical month-end regeneration from FRED history stays with scripts/generateMonthlySummaries.ts.

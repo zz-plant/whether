@@ -24,7 +24,7 @@ const sourceDir = path.join(root, "public", "fonts");
 const outDir = path.join(root, "public", "fonts", "og");
 
 const faces = [
-  { file: "fraunces-600.woff2", weight: 600 },
+  { file: "ibm-plex-serif-600.woff2", weight: 600 },
   { file: "ibm-plex-sans-400.woff2", weight: 400 },
   { file: "ibm-plex-sans-600.woff2", weight: 600 },
 ];

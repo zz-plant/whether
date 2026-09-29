@@ -29,10 +29,12 @@ type ScoreLadderProps = {
   /** The comparison reading; drawn hollow. Null when there is nothing to compare against. */
   previous?: number | null;
   /**
-   * What the hollow dot is. "Last week" on every reading route; /history/compare
-   * draws period B against period A and /history draws the month before the
-   * last completed one, and a hollow dot captioned "last week" there would be
-   * a claim about a comparison nobody made.
+   * What the hollow dot is. The reading routes pass the date of the reading it
+   * is drawn from ("Aug 31", `comparisonBasis(...).label`) and "Last week" is
+   * the default for a caller with no date; /history/compare draws period B
+   * against period A and /history draws the month before the last completed
+   * one, and a hollow dot captioned "last week" there would be a claim about a
+   * comparison nobody made.
    */
   previousLabel?: string;
   lines: readonly LadderLine[];
@@ -252,7 +254,7 @@ export function ScoreLadder({
       {hasPrevious ? (
         <p className="flex items-center gap-1.5 text-[12px] leading-none text-slate-400">
           <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-2 border-slate-300" />
-          {previousLabel} {formatPoints(previous)}
+          {`${previousLabel}: ${formatPoints(previous)}`}
         </p>
       ) : null}
     </figure>

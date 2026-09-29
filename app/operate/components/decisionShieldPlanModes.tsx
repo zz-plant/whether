@@ -121,7 +121,7 @@ export function PlanStressTestMode({
                 value={planText}
                 onChange={(e) => setPlanText(e.target.value)}
                 rows={3}
-                className="weather-input w-full p-3 text-xs text-slate-100 placeholder-slate-500 border border-slate-700 bg-slate-950/80"
+                className="weather-input w-full p-3 text-xs text-slate-100 placeholder-slate-500"
                 placeholder="e.g. We want to hire 4 engineers and sign a 2-year cloud commitment with AWS..."
               />
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
@@ -289,7 +289,7 @@ export function ComparePlansMode({
                   onChange={(e) => setPlanText(e.target.value)}
                   rows={3}
                   placeholder="e.g. Hire 3 senior engineers @ $180k and sign a 2-year cloud reservation"
-                  className="weather-input w-full p-2.5 text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
+                  className="weather-input w-full p-2.5 text-xs text-slate-100"
                 />
                 {planReady ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
@@ -315,7 +315,7 @@ export function ComparePlansMode({
                   onChange={(e) => setPlanBText(e.target.value)}
                   rows={3}
                   placeholder="e.g. Hire 2 contractors for 6 months on milestones and use monthly rolling compute"
-                  className="weather-input w-full p-2.5 text-xs text-slate-100 border border-slate-700 bg-slate-950/80"
+                  className="weather-input w-full p-2.5 text-xs text-slate-100"
                 />
                 {planBText.trim() ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">

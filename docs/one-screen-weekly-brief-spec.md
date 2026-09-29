@@ -1,5 +1,12 @@
 # One-screen weekly leadership brief spec (v2, decision-complete)
 
+> **Status (2026-09-29).** Blocks A–H below are the v2 design intent. The rendered homepage carries none of
+> their required labels ("THIS WEEK", "Operating latitude", "Revisit decisions", "Window velocity", "Memory
+> rail", "Confidence strip", "What changes if wrong"); its sections are the week and the call, "What are you
+> deciding this week?", "What changed this week", "What that changes for you", "What would change this
+> guidance" and "Do and share". Read "Current implementation contract" below and `docs/feature-specs-current.md`
+> §1.1 for what ships; do not build to the block labels.
+
 ## Product job to be done
 Whether must reduce uncertainty faster than leadership debate does, in under 30 seconds.
 
@@ -206,7 +213,7 @@ Implementation guardrails:
   - **Reversal** (displayed as “Flip condition” in some surfaces): what must recover/hold before loosening or re-opening.
   - Prefix normalization (`Pause ...`, `Resume ...`) is handled centrally; consumers should pass raw rule text and avoid custom string assembly.
 - Dynamic fallback copy must remain decision-complete. Do not emit placeholders such as `Stay the course`, `current track`, `standard guardrails`, or `trigger confirmation` without naming the held decision, measurable threshold, and reversal condition.
-- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition.
+- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition. Since 2026-09-29 the sentence is derived, not fixed: `Conditions held steady since <date>; no pause or resume line was crossed. Last week's guidance stands.` (`lib/report/decisionMovement.ts`, `docs/feature-specs-current.md` §1.1.28), followed on a quiet week by the nearest line. A week that crossed a line says which areas it moved and through which line, and never a figure in a unit of its own or an instruction the guidance does not carry.
 - Boundary commentary must name the signal, current distance, threshold direction, and decision consequence. Qualitative watch language alone (`worth watching`, `next release`) does not satisfy the bounded-decision contract.
 - Trust readiness describes whether the current read can support this week's approvals; it must point operators back to the thresholds in the current call rather than independently declaring decisions safe.
 - Decision readiness and trust must use structured freshness state, not display copy. Consumers should gate on machine-readable staleness (`fresh`, `stale`, `unknown`) and source mode (`live`, `cached`, `historical`) rather than inferring trust from a rendered timestamp string.

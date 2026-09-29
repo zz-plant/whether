@@ -102,7 +102,7 @@ describe("derived summary history artifacts", () => {
           "The weekly regime-history routine has not delivered. Regenerate with " +
           "`bun scripts/generateMonthlySummaries.ts && bun scripts/generateQuarterlyYearlySummaries.ts`; " +
           "if that fails on a FRED 403 (`connect_rejected`), the routine's egress allowlist is the " +
-          "real problem — see CLAUDE.md, \"Scheduled automation\".",
+          "real problem — see docs/agents/lessons/automation-and-deploy-gate.md, \"Scheduled automation\".",
       );
     }
   });

@@ -11,7 +11,7 @@ import type { CronRunHistory } from "../lib/telemetry/runHistory";
  * crons, printed the internal reason a read failed, and rendered a raw error
  * message under a column header promising a time.
  *
- * Rendered rather than read off the source, per the rule in CLAUDE.md: this is a
+ * Rendered rather than read off the source, per the rule in docs/agents/lessons/tests-and-copy-rules.md: this is a
  * plain server component over a prop, so the markup is available here and the
  * claim is about what the markup says.
  */

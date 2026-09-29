@@ -113,7 +113,7 @@ export const DecisionRecordPanel = ({ current }: { current: CurrentConditions })
 
   /*
    * A network read, which is what an effect is actually for — unlike the eleven
-   * conversions CLAUDE.md records, there is no browser value here to read
+   * conversions docs/agents/lessons/toolchain-and-gates.md records, there is no browser value here to read
    * synchronously through a store. `clientId` is null until hydration, so the
    * first pass does nothing and the second one fetches.
    */

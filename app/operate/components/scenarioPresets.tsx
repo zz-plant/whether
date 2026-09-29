@@ -56,10 +56,13 @@ export function ScenarioPresets({
               type="button"
               aria-pressed={isActive}
               onClick={() => onApplyPreset(preset)}
+              /* `!` throughout: `.weather-surface` sets border and background
+                 unlayered, so the plain utilities here lost and the preset
+                 that matched the sliders looked exactly like the other three. */
               className={`weather-surface flex flex-col items-start p-3.5 text-left transition-colors ${
                 isActive
-                  ? "border-sky-400 bg-sky-500/15"
-                  : "hover:border-slate-700 hover:bg-slate-900/60"
+                  ? "!border-sky-400 !bg-sky-500/15"
+                  : "hover:!border-slate-600"
               }`}
             >
               <span className="text-xs font-semibold text-slate-100">

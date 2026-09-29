@@ -42,7 +42,7 @@ describe("formula reference visuals", () => {
       />,
     );
     assert.equal((withPositions.match(/data-score-ladder/g) ?? []).length, 2);
-    assert.match(withPositions, /Last week 68/);
+    assert.match(withPositions, /Last week: 68/);
     assert.ok(
       withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions: funding pressure above"),
       "the ladders draw the reading before the quadrant explains the rule",

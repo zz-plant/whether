@@ -15,7 +15,7 @@ import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
  *
  * The plain-language layer travels with it: a composite score is the one
  * number on the page with no unit, so it keeps the scale direction and what
- * the score means at its level (CLAUDE.md, "Who the copy is written for").
+ * the score means at its level (docs/agents/lessons/tests-and-copy-rules.md, "Who the copy is written for").
  */
 const rows: SignalChangeRow[] = [
   {

@@ -38,7 +38,7 @@ const findSatoriLayoutViolations = (node: ReactNode, path = "root"): string[] =>
 };
 
 const ogFontFaces = [
-  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/fraunces-600.ttf"), weight: 600 as const, style: "normal" as const },
+  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/ibm-plex-serif-600.ttf"), weight: 600 as const, style: "normal" as const },
   { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-400.ttf"), weight: 400 as const, style: "normal" as const },
   { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-600.ttf"), weight: 600 as const, style: "normal" as const },
 ];

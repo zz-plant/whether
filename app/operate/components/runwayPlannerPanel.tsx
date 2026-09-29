@@ -316,7 +316,7 @@ export function RunwayPlannerPanel({
           Before this, "Runway analysis" did nothing until figures were entered —
           which is the visit where a reader most needs to be told what is missing. */}
       {!resolution.ready || !output ? (
-        <div id="ops-runway-risk" className="weather-surface border-dashed p-4" aria-live="polite">
+        <div id="ops-runway-risk" className="weather-surface !border-dashed p-4" aria-live="polite">
           <p className="text-sm text-slate-100">
             {resolution.ready ? "Sizing the plan…" : describeMissingRunwayInputs(resolution.missing)}
           </p>

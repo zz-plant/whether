@@ -14,7 +14,7 @@ import { describe, it } from "bun:test";
  *
  * A source read, on purpose: the report fires inside the clipboard hook's
  * success path, which only runs in a browser, and nothing in this suite
- * exercises a client effect (CLAUDE.md, "Tests that read source instead of
+ * exercises a client effect (docs/agents/lessons/tests-and-copy-rules.md, "Tests that read source instead of
  * behaviour"). What can be held here is that no caller opts out by omission.
  */
 

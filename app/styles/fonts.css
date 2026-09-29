@@ -11,30 +11,37 @@
  * Latin subset only — matching what the Google CSS served for this project.
  * Files live in public/fonts/ and are preloaded in app/layout.tsx.
  *
- * Both families are SIL Open Font License 1.1:
- *   Fraunces      — https://github.com/undercasetype/Fraunces
- *   IBM Plex Sans — https://github.com/IBM/plex
+ * Both families are SIL Open Font License 1.1, from the same superfamily as
+ * the IBM Plex Mono the figures use (https://github.com/IBM/plex):
+ *   IBM Plex Serif — headings (h1, h2, .type-section)
+ *   IBM Plex Sans  — everything else
+ *
+ * The heading face was Fraunces until 2026-09-29. It is an old-style display
+ * serif, and beside Plex body text it read as archaic. Plex Serif keeps a
+ * serif for headings against the sans body, drawn on the same skeleton as the
+ * rest of the page. It is static per weight, so 600 and 700 are two files
+ * (Fraunces shipped one variable file under both names).
  */
 
 @font-face {
-  font-family: "Fraunces";
+  font-family: "IBM Plex Serif";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("/fonts/fraunces-600.woff2") format("woff2");
+  src: url("/fonts/ibm-plex-serif-600.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
     U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: "Fraunces";
+  font-family: "IBM Plex Serif";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/fonts/fraunces-700.woff2") format("woff2");
+  src: url("/fonts/ibm-plex-serif-700.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
     U+2215, U+FEFF, U+FFFD;
 }
 

@@ -1,6 +1,9 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
+import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildSocialImageUrl, organizationName } from "../../lib/seo";
+import { publisherAuthor } from "../../lib/publisher";
 import { siteUrl } from "../../lib/siteUrl";
 
 export const runtime = "edge";
@@ -32,13 +35,21 @@ type FeedItem = {
   pubDate: string;
   description: string;
   html: string;
+  /** The card the item's page declares; readers and Apple News take it as the lead image. */
+  imageUrl: string;
 };
+
+/* The size /api/og draws at, and the size Discover's large-image rule needs. */
+const IMAGE_WIDTH = 1200;
+const IMAGE_HEIGHT = 630;
 
 const renderItem = (item: FeedItem) => `    <item>
       <title>${escapeXml(item.title)}</title>
       <link>${escapeXml(item.link)}</link>
       <guid isPermaLink="${item.isPermaLink ? "true" : "false"}">${escapeXml(item.guid)}</guid>
       <pubDate>${item.pubDate}</pubDate>
+      <dc:creator>${escapeXml(publisherAuthor.name)}</dc:creator>
+      <media:content url="${escapeXml(item.imageUrl)}" medium="image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}" />
       <description>${escapeXml(item.description)}</description>
       <content:encoded><![CDATA[
 ${item.html}
@@ -46,13 +57,18 @@ ${item.html}
     </item>`;
 
 const renderChannel = (items: FeedItem[], lastBuildDate: string) => `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>${CHANNEL_TITLE}</title>
     <link>${siteUrl}</link>
     <atom:link href="${siteUrl}${FEED_PATH}" rel="self" type="application/rss+xml" />
     <description>${escapeXml(CHANNEL_DESCRIPTION)}</description>
     <language>en</language>
+    <image>
+      <url>${siteUrl}/icon.svg</url>
+      <title>${escapeXml(organizationName)}</title>
+      <link>${siteUrl}</link>
+    </image>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
 ${items.map(renderItem).join("\n")}
   </channel>
@@ -77,6 +93,7 @@ const publishedItems = (): FeedItem[] =>
       isPermaLink: true,
       pubDate: toRfc822(brief.publishedAt),
       description: brief.summary,
+      imageUrl: buildPublishedBriefImageUrl(brief),
       html: [
         `        <p><strong>Conditions:</strong> ${escapeXml(display.conditions)}</p>`,
         `        <p>${escapeXml(brief.summary)}</p>`,
@@ -98,7 +115,10 @@ export async function GET() {
     const action = summary.guidance;
     const recordDateIso = brief.agentHandoff.payload.report_date;
     const recordDateLabel = summary.recordDateLabel ?? recordDateIso;
-    const confidence = String(summary.confidence);
+    /* The published confidence, worded as the archive items below word theirs. This
+       printed `summary.confidence`, the engine's own label, as a raw code ("MEDIUM")
+       while the page said "High confidence". */
+    const confidence = formatConfidenceChipLabel(brief.confidence.label);
 
     /*
      * The current week, until it is frozen. Once the archive holds a record for
@@ -114,6 +134,7 @@ export async function GET() {
           guid: `whether-brief-live-${recordDateIso}`,
           isPermaLink: false,
           pubDate: toRfc822(recordDateIso),
+          imageUrl: buildSocialImageUrl(),
           description: `Conditions: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.`,
           html: [
             `        <p><strong>Conditions:</strong> ${escapeXml(regime)}</p>`,

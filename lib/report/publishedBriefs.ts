@@ -12,7 +12,7 @@
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug } from "../isoWeek";
-import { buildCanonicalUrl } from "../seo";
+import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatConfidenceChipLabel, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
@@ -175,6 +175,26 @@ const briefBySlug = new Map(briefs.map((brief) => [brief.slug, brief]));
 
 /** Newest first. */
 export const getPublishedBriefs = () => briefs;
+
+/** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
+export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
+  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
+
+/**
+ * The week's card, as its page, its feed item and its news sitemap entry all
+ * name it: the conditions in the weather words and the week as a date, not the
+ * archive's slug. One builder, so the image a feed reader or Discover shows is
+ * the one the page declares.
+ */
+export const buildPublishedBriefImageParams = (brief: PublishedBrief) => ({
+  template: "brief-chart",
+  week: brief.recordDateLabel,
+  posture: publishedBriefDisplay(brief).conditions,
+  regime: brief.regime,
+});
+
+export const buildPublishedBriefImageUrl = (brief: PublishedBrief) =>
+  buildOgImageUrl(buildPublishedBriefImageParams(brief));
 
 export const findPublishedBrief = (slug: string) => briefBySlug.get(slug);
 
