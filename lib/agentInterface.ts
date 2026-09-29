@@ -1,7 +1,10 @@
 import { buildAgentPayload, buildAgentPrompt } from "./agentHandoff";
 import { loadReportRouteContext } from "./api/reportRoute";
+import type { RegimeAssessment } from "./regimeEngine";
 import { assessPublishReadiness } from "./report/briefPublishGuard";
+import type { PostureStateContract } from "./report/postureStateContract";
 import { buildPostureState } from "./report/postureStateSource";
+import type { ReportData, ReportDataFallback } from "./report/reportData";
 import { buildSummaryHash } from "./summary/summaryHash";
 import { buildMonthlySummary } from "./summary/monthlySummary";
 import { buildQuarterlySummary, getQuarterLabel } from "./summary/quarterlySummary";
@@ -11,7 +14,7 @@ import { resolveSiteUrl } from "./siteUrl";
 
 export const supportedAgentCadences = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
-export type AgentCadence = (typeof supportedAgentCadences)[number];
+type AgentCadence = (typeof supportedAgentCadences)[number];
 
 export const isAgentCadence = (value: string): value is AgentCadence =>
   (supportedAgentCadences as readonly string[]).includes(value);
@@ -48,11 +51,46 @@ type SummaryByCadence = {
    `publishReadiness` is that judgment, returned so a consumer that automates on the call
    (the Jev handoff, `?format=jev`) can refuse a fallback or stale week the same way the
    Slack and email sends do, instead of reading `degraded` as a freshness signal. */
+export type AgentInterfaceContext = {
+  reportData: ReportData | ReportDataFallback;
+  degraded: boolean;
+  postureState: PostureStateContract;
+};
+
+/**
+ * What every agent-facing answer is built from, loaded once: the week's report
+ * data and the posture state that publishes its confidence. Split from the
+ * builders so a test (or a second view of the same week) can hand them a
+ * crafted context instead of going through the loader.
+ */
+export const loadAgentInterfaceContext = async (route = "agent-interface"): Promise<AgentInterfaceContext> => {
+  const { reportData, degraded } = await loadReportRouteContext({ route });
+  const postureState = await buildPostureState({
+    record: reportData.treasury,
+    assessment: reportData.assessment,
+    reportDynamics: reportData.reportDynamics,
+  });
+  return { reportData, degraded, postureState };
+};
+
+/* The summary builders speak the engine's vocabulary (LOW / MEDIUM / HIGH); the
+   published label is HIGH / MED / LOW. */
+const ENGINE_CONFIDENCE = {
+  HIGH: "HIGH",
+  MED: "MEDIUM",
+  LOW: "LOW",
+} as const satisfies Record<PostureStateContract["currentState"]["confidenceLabel"], RegimeAssessment["diagnostics"]["confidence"]>;
+
 export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
   cadence: Cadence,
   { route = "agent-interface" }: { route?: string } = {},
+) => buildAgentInterfaceFromContext(cadence, await loadAgentInterfaceContext(route));
+
+export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
+  cadence: Cadence,
+  { reportData, degraded, postureState }: AgentInterfaceContext,
+  now = new Date(),
 ) => {
-  const { reportData, degraded } = await loadReportRouteContext({ route });
   const {
     assessment,
     actionNowShort,
@@ -66,11 +104,23 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
     recordDateLabel,
     weeklyRecordDateLabel,
   } = reportData;
-  const postureState = await buildPostureState({
-    record: treasury,
-    assessment,
-    reportDynamics,
-  });
+
+  /* One confidence, the one every page and every other route publishes
+     (`resolvePublishedConfidence`, through the posture state). `summary.confidence`
+     used to be the engine's own label, which is its confirmation gate and not a
+     published fact: on the Sep 25 read it said MEDIUM here and in the RSS item
+     while the page, `/api/scores` and the CLI said HIGH, so an agent gating on
+     confidence got a different answer from each endpoint it asked. The summary
+     builders read the label twice, in the field and in the prose sentence, so they
+     are handed a view of the assessment that carries the published one. */
+  const confidence = {
+    label: postureState.currentState.confidenceLabel,
+    percent: postureState.currentState.confidencePercent,
+  };
+  const summarizedAssessment: RegimeAssessment = {
+    ...assessment,
+    diagnostics: { ...assessment.diagnostics, confidence: ENGINE_CONFIDENCE[confidence.label] },
+  };
 
   /* A record of thunks rather than a conditional chain. Indexing a mapped type
      with the generic cadence preserves the key/value relationship, so the call
@@ -79,26 +129,26 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
   const summaryBuilders: { [C in AgentCadence]: () => SummaryByCadence[C] } = {
     weekly: () =>
       buildWeeklySummary({
-        assessment,
+        assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel: weeklyRecordDateLabel,
       }),
     monthly: () =>
       buildMonthlySummary({
-        assessment,
+        assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel,
       }),
     quarterly: () =>
       buildQuarterlySummary({
-        assessment,
+        assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel,
         periodLabel: getQuarterLabel(treasury.record_date) ?? recordDateLabel,
       }),
     yearly: () =>
       buildYearlySummary({
-        assessment,
+        assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel,
         periodLabel: getYearLabel(treasury.record_date) ?? recordDateLabel,
@@ -123,6 +173,8 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
     defaultCadence: "weekly" as const,
     supportedCadences: [...supportedAgentCadences],
     summary,
+    /** The published confidence: the same word and percent the page, `/api/scores` and the CLI carry. */
+    confidence,
     copy: summary.copy,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
@@ -133,7 +185,7 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
       isLive: treasury.isLive,
       fallbackReason: treasury.fallback_reason,
       recordDate: treasury.record_date ?? treasury.fetched_at,
-      now: new Date(),
+      now,
     }),
     agentHandoff: {
       payload: agentPayload,
@@ -145,7 +197,7 @@ export const buildAgentInterfaceResponse = async <Cadence extends AgentCadence>(
       llms: "/llms.txt",
       discovery: "/.well-known/whether-agent.json",
     },
-    generatedAt: new Date().toISOString(),
+    generatedAt: now.toISOString(),
     version: "v1",
   };
 };

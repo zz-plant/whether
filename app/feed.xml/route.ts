@@ -1,5 +1,6 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { buildSocialImageUrl, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
@@ -114,7 +115,10 @@ export async function GET() {
     const action = summary.guidance;
     const recordDateIso = brief.agentHandoff.payload.report_date;
     const recordDateLabel = summary.recordDateLabel ?? recordDateIso;
-    const confidence = String(summary.confidence);
+    /* The published confidence, worded as the archive items below word theirs. This
+       printed `summary.confidence`, the engine's own label, as a raw code ("MEDIUM")
+       while the page said "High confidence". */
+    const confidence = formatConfidenceChipLabel(brief.confidence.label);
 
     /*
      * The current week, until it is frozen. Once the archive holds a record for

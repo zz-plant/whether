@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { buildAgentInterfaceResponse, isAgentCadence } from "../../../lib/agentInterface";
-import { getRegimeContext, getRegimeProjection } from "../../../lib/report/regimeContext";
+import { AgentInputError } from "../../../lib/agent/inputs";
+import { checkAgentToolArguments, describeAgentTools, describeToolParams, runAgentTool } from "../../../lib/agent/tools";
+import { mcpApiCorsHeaders } from "../../../lib/agentApiCors";
+import { buildAgentInterfaceResponse, supportedAgentCadences } from "../../../lib/agentInterface";
 import { subscribeAndSendVerification } from "../../../lib/email/subscriptionFlow";
-import { getTimeMachineMonthsByYear } from "../../../lib/timeMachine/timeMachineCache";
-import { fetchSaaSValuations, QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../../../lib/mcp/httpMcpServer";
 import { RateLimitedError, rateLimitedResponse } from "../../../lib/runtime/rateLimit";
 import { siteUrl } from "../../../lib/siteUrl";
+import { QuoteSourceUnavailableError } from "../../../lib/saasMultiples";
 import { buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
@@ -17,17 +18,52 @@ export const runtime = "edge";
       `tools/list` / `tools/call` message — standard MCP clients connect here.
       See lib/mcp/httpMcpServer.ts.
 
-   2. Legacy `?tool=` REST API, kept for existing integrations:
-   GET /api/mcp?tool=get_brief[&cadence=weekly] — current brief
-   GET /api/mcp?tool=get_context&regime=DEFENSIVE — regime duration + trajectory
-   GET /api/mcp?tool=get_projection&regime=DEFENSIVE&tightness=74&riskAppetite=32&tightnessDelta=4&riskAppetiteDelta=-2 — scenario projection
-   GET /api/mcp?tool=get_comps — SaaS valuation multiples
-   GET /api/mcp?tool=get_signals — available data coverage
-   GET /api/mcp?tool=get_actions — discoverable action catalog
+   2. A plain-GET shim, for an agent with no MCP client: every MCP tool answers
+      GET /api/mcp?tool=<name>&<argument>=<value>, and GET /api/mcp?tool=get_actions lists
+      them with their arguments. The tools are lib/agent/tools.ts, the same definitions the
+      MCP transports serve, so a tool added there is here without touching this file.
+      Four keep the answer shape they had before there was a registry (`context`,
+      `projection`, a bare `coverage`, the comps): callers depend on those.
    POST /api/mcp?tool=subscribe (body: { email }) — subscribe to weekly brief
 */
 
+const wrapLegacy = (tool: string, result: Record<string, unknown>) => {
+  switch (tool) {
+    case "get_context":
+      return { ok: true, context: result };
+    case "get_projection":
+      return { ok: true, projection: result };
+    case "get_comps":
+    case "get_signals":
+      return { ok: true, ...result };
+    default:
+      // Any other tool carries its answer under `result`, with the use limits it would carry anywhere.
+      return { ok: true, tool, result, use: buildUseConstraint() };
+  }
+};
+
+const refusalResponse = (error: AgentInputError) =>
+  NextResponse.json(
+    {
+      ok: false,
+      error: error.code,
+      message: error.message,
+      problems: error.problems,
+      ...(error.code === "unknown_tool" ? { available: error.problems[0]?.allowed ?? [] } : {}),
+    },
+    { status: 400 },
+  );
+
+const withMcpCors = (response: Response) => {
+  for (const [name, value] of Object.entries(mcpApiCorsHeaders)) response.headers.set(name, value);
+  return response;
+};
+
 export async function GET(request: Request) {
+  return withMcpCors(await handleGet(request));
+}
+
+async function handleGet(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const tool = searchParams.get("tool");
@@ -42,11 +78,12 @@ export async function GET(request: Request) {
       return NextResponse.json({
         ok: true,
         tools: [
-          { name: "get_brief", params: "cadence (optional: weekly/monthly/quarterly/yearly)", description: "Current regime, action, confidence" },
-          { name: "get_context", params: "regime (required)", description: "How long this regime has been active, historical average, common next regime" },
-          { name: "get_projection", params: "regime, tightness, riskAppetite, tightnessDelta, riskAppetiteDelta", description: "Weeks until threshold crossing at current velocity" },
-          { name: "get_comps", params: "none", description: "Median SaaS EV/Revenue multiple from 15 public companies" },
-          { name: "get_signals", params: "none", description: "Available historical data coverage by year/month" },
+          ...describeAgentTools("http").map((entry) => ({
+            name: entry.name,
+            params: describeToolParams(entry.arguments),
+            description: entry.plainGetNote ? `${entry.description} ${entry.plainGetNote}` : entry.description,
+            example: `${siteUrl}/api/mcp?${new URLSearchParams({ tool: entry.name, ...Object.fromEntries(Object.entries(entry.example).map(([key, value]) => [key, String(value)])) })}`,
+          })),
           { name: "subscribe", params: "email (POST body)", description: "Subscribe an email to the weekly brief" },
         ],
         /* On the catalogue, so a caller wiring up the tools meets the
@@ -65,54 +102,33 @@ export async function GET(request: Request) {
       });
     }
 
-    if (tool === "get_context") {
-      const regimeKey = searchParams.get("regime");
-      if (!regimeKey) {
-        return NextResponse.json({ error: "Missing regime parameter" }, { status: 400 });
-      }
-      return NextResponse.json({ ok: true, context: getRegimeContext(regimeKey.toUpperCase()) });
-    }
-
-    if (tool === "get_projection") {
-      const regime = searchParams.get("regime");
-      const tightness = Number(searchParams.get("tightness"));
-      const riskAppetite = Number(searchParams.get("riskAppetite"));
-      const tightnessDelta = Number(searchParams.get("tightnessDelta") ?? 0);
-      const riskAppetiteDelta = Number(searchParams.get("riskAppetiteDelta") ?? 0);
-      if (!regime || !tightness || !riskAppetite) {
-        return NextResponse.json({ error: "Missing required parameters: regime, tightness, riskAppetite" }, { status: 400 });
-      }
-      const projection = getRegimeProjection(
-        regime.toUpperCase(), tightness, riskAppetite,
-        tightnessDelta, riskAppetiteDelta
+    if (tool === "subscribe") {
+      return NextResponse.json(
+        { ok: false, error: "method_not_allowed", message: 'subscribe takes a POST with a JSON body: { "email": "you@example.com" }.' },
+        { status: 405, headers: { allow: "POST" } },
       );
-      return NextResponse.json({ ok: true, projection });
     }
 
-    if (tool === "get_comps") {
-      const comps = await fetchSaaSValuations();
-      return NextResponse.json({ ok: true, ...comps });
-    }
-
-    if (tool === "get_signals") {
-      return NextResponse.json({
-        ok: true,
-        coverage: getTimeMachineMonthsByYear(),
-      });
+    if (tool && tool !== "get_brief") {
+      const args = Object.fromEntries([...searchParams].filter(([key]) => key !== "tool"));
+      return NextResponse.json(wrapLegacy(tool, await runAgentTool(tool, args, "http")));
     }
 
     /* Default: get the brief */
     /* The cadence arrived from the query string and was cast straight into the
        union, so `?cadence=bogus` fell through every branch of the builder to the
-       yearly summary and came back labelled with whatever the caller sent. Use
-       the same guard `/api/agent` and the stdio MCP server already use.
+       yearly summary and came back labelled with whatever the caller sent. It is
+       checked by the same definition the MCP tool uses, so it is refused the same
+       way, with the cadences there are.
 
        Fields are then read with `in` narrowing rather than `as any`: only the
        weekly and monthly summaries carry an action or a record date, and the
        cast was reporting them as null for the cadences that do have them under
        a different name. */
-    const requestedCadence = searchParams.get("cadence") ?? "weekly";
-    const cadence = isAgentCadence(requestedCadence) ? requestedCadence : "weekly";
+    const args = Object.fromEntries([...searchParams].filter(([key]) => key !== "tool"));
+    checkAgentToolArguments("get_brief", args, "http");
+    const requestedCadence = (searchParams.get("cadence") ?? "weekly").trim().toLowerCase();
+    const cadence = supportedAgentCadences.find((candidate) => candidate === requestedCadence) ?? "weekly";
     const brief = await buildAgentInterfaceResponse(cadence);
     const summary = brief.summary;
 
@@ -123,7 +139,11 @@ export async function GET(request: Request) {
       regime: "regime" in summary ? summary.regime : null,
       action: "guidance" in summary ? summary.guidance : null,
       recordDate: "recordDateLabel" in summary ? summary.recordDateLabel : null,
-      confidence: "confidence" in summary ? summary.confidence : null,
+      /* The published confidence, the one the page and `/api/scores` carry: this read the
+         summary's `confidence`, the engine's own label, and said MEDIUM against a page that
+         said High. `confidencePercent` beside it is the same reading as a number. */
+      confidence: brief.confidence.label,
+      confidencePercent: brief.confidence.percent,
       posture: "regimeLabel" in summary ? summary.regimeLabel : null,
       /* This is the response that carries an action against a decision area
          named `hiring`, returned to a caller with no person in the loop. */
@@ -136,6 +156,11 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
+    /* A caller's wrong tool or argument is theirs to fix and is told how, not a 500. */
+    if (error instanceof AgentInputError) {
+      return refusalResponse(error);
+    }
+
     /* An unreachable quote source is not a fault in this server. `/api/comps` has
        answered 503 for exactly this since the "not an empty basket" fix; the MCP tool
        wrapping the same call fell through to the generic catch and answered 500, so an
@@ -157,6 +182,17 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const response = await handlePost(request);
+  // Only the JSON-RPC transport is open to a browser; `?tool=subscribe` sends an email.
+  return new URL(request.url).searchParams.get("tool") ? response : withMcpCors(response);
+}
+
+export async function OPTIONS(request: Request) {
+  const preflight = new Response(null, { status: 204 });
+  return new URL(request.url).searchParams.get("tool") === "subscribe" ? preflight : withMcpCors(preflight);
+}
+
+async function handlePost(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const tool = searchParams.get("tool");

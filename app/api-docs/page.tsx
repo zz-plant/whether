@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { PageShell } from "../components/pageShell";
+import { describeAgentTools } from "../../lib/agent/tools";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildPageMetadata } from "../../lib/seo";
@@ -58,6 +60,8 @@ const embedSnippet = `<div data-whether-embed="brief"></div>
 <script async src="${siteUrl}/embed.js"></script>`;
 
 export default function ApiDocsPage() {
+  // Named from the definitions the servers run, so a tool cannot be served and missing from this page.
+  const toolNames = describeAgentTools("http").map((tool) => tool.name);
   return (
     <PageShell backdropVariant="default" structuredData={buildApiDocsStructuredData()}>
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
@@ -85,13 +89,21 @@ export default function ApiDocsPage() {
             </pre>
           </div>
           <p className="text-xs text-slate-300">
-            Five production tools are exposed over HTTP: <span className="text-sky-200 font-mono">get_brief</span>,{" "}
-            <span className="text-sky-200 font-mono">get_context</span>,{" "}
-            <span className="text-sky-200 font-mono">get_projection</span>,{" "}
-            <span className="text-sky-200 font-mono">get_comps</span>, and{" "}
-            <span className="text-sky-200 font-mono">get_signals</span>. For local agents or CI pipelines,{" "}
-            <span className="text-sky-200 font-mono">bun run mcp:whether</span> starts the same interface over
-            stdio, with additional tools for the decision rules and 15-year trailing history.
+            Start with <span className="text-sky-200 font-mono">get_state</span>: one small answer with the
+            conditions, how sure Whether is, whether the data is live and current, where each
+            score sits against its lines, what moved it, and the guidance. Every tool only reads:{" "}
+            {toolNames.map((name, index) => (
+              <Fragment key={name}>
+                {index > 0 ? ", " : ""}
+                <span className="text-sky-200 font-mono">{name}</span>
+              </Fragment>
+            ))}
+            . For local agents or CI pipelines, <span className="text-sky-200 font-mono">bun run mcp:whether</span>{" "}
+            starts the same tools over stdio.
+          </p>
+          <p className="text-xs text-slate-300">
+            A weather word works wherever a tool takes conditions: Freezing, Cloudy, Stormy or Sunny, in any case. A
+            wrong argument is refused with the values that would have worked.
           </p>
         </section>
 
@@ -109,14 +121,20 @@ export default function ApiDocsPage() {
             >
               Discovery. Lists every available tool with its parameters.
             </Endpoint>
+            <Endpoint signature="GET /api/mcp?tool=get_state">
+              The compact state to decide from: the answer <code className="font-mono">/api/agent?view=state</code> gives.
+            </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_brief">
-              Current conditions, action, confidence, record date. Optional weekly, monthly or quarterly view.
+              A summary: current conditions, action, confidence, record date. Optional weekly, monthly, quarterly or
+              yearly view. The MCP tool of the same name returns the full brief.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_context&amp;regime=DEFENSIVE">
-              How long these conditions have held, the historical average, and what usually comes next.
+              How long these conditions have held, the historical average, and what usually comes next. With no
+              conditions given it uses today&apos;s.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_projection&amp;regime=DEFENSIVE&amp;tightness=74&amp;riskAppetite=32">
-              Weeks until threshold crossing at current velocity. Scenario modeling for agents.
+              Weeks until threshold crossing at a pace you give, or, with no arguments, at today&apos;s scores and pace.
+              Scenario modeling for agents.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_comps">
               Median SaaS EV/Revenue multiple from 15 public companies.
@@ -125,6 +143,10 @@ export default function ApiDocsPage() {
               Coverage map of which months have signal history available.
             </Endpoint>
           </div>
+          <p className="text-xs text-slate-300">
+            The rest (the rules behind the guidance, one signal&apos;s trailing history, plan checks) take the same
+            form; <code className="font-mono">get_actions</code> lists each with its arguments and a call that works.
+          </p>
         </section>
 
         <section className="space-y-4">
@@ -148,6 +170,17 @@ export default function ApiDocsPage() {
             >
               Stable JSON endpoint for the current guidance. Returns the conditions, funding pressure, direction,
               confidence, week, summary, url, and version. Type contract at lib/types.ts.
+            </Endpoint>
+            <Endpoint
+              signature="GET /api/agent?view=state"
+              tryHref="/api/agent?view=state"
+              tryLabel="Try it"
+              tryCta="try_agent_state"
+            >
+              The state to decide from, about a tenth the size of the full brief: the conditions, how sure, whether
+              the data is live and current (<code className="font-mono">automation.ready</code>), each score against its
+              pause, resume and change lines, what moved it, and the guidance. Weekly only. Check{" "}
+              <code className="font-mono">automation.ready</code> before acting without a person looking.
             </Endpoint>
             <Endpoint
               signature="GET /api/agent?cadence=weekly"
@@ -329,6 +362,10 @@ export default function ApiDocsPage() {
             <Endpoint signature="whether status">
               This week&apos;s guidance and the numbers behind it. Add{" "}
               <span className="text-sky-200">--as-of 2026-03</span> to read any past month.
+            </Endpoint>
+            <Endpoint signature="whether state --json">
+              The state an agent decides from, in JSON: the answer{" "}
+              <code className="font-mono">/api/agent?view=state</code> gives.
             </Endpoint>
             <Endpoint signature="whether brief slack | exec | board | investor">
               The same week rewritten for a specific audience.

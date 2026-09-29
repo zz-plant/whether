@@ -78,6 +78,45 @@ describe("cli contracts", () => {
     assert.ok(expanded.boundedDecision.flipConditionsCompact.length >= 1);
   });
 
+  /*
+   * The changes were headed "Since Last Refresh" while measuring against the previous month-end
+   * snapshot, and named the signals by engine key. The contract carries the reading it compared
+   * with, the name a reader sees, and what each score's move is made of.
+   */
+  it("names the reading the changes are measured against, what each signal is called, and what a score's move is made of", () => {
+    const dated = {
+      ...reportData,
+      reportDynamics: {
+        ...reportData.reportDynamics,
+        comparedWith: { recordDate: "2026-02-28", label: "Feb 28" },
+        changedSignals: [
+          { key: "tightness", label: "Funding pressure", delta: -6 },
+          { key: "riskAppetite", label: "Risk appetite", delta: -13 },
+          { key: "baseRate", label: "Base rate", delta: 0.25 },
+        ],
+        movement: {
+          riskAppetite: { parts: [{ source: "curve", points: -2 }, { source: "startupMarket", points: -11 }] },
+        },
+      },
+    };
+    const changes = buildCliChangesContract({ reportData: dated, postureState, degraded: false });
+
+    assert.equal(changes.basis, "since Feb 28");
+    assert.deepEqual(changes.comparedWith, { recordDate: "2026-02-28", label: "Feb 28" });
+    assert.deepEqual(changes.changed.map((item) => item.label), ["Funding pressure", "Risk appetite", "Base rate"]);
+    assert.deepEqual(changes.changed[1].moved, [
+      { source: "curve", label: "the yield curve", points: -2 },
+      { source: "startupMarket", label: "startup-market inputs", points: -11 },
+    ]);
+    assert.deepEqual(changes.changed[0].moved, [], "a score whose split is not available says nothing rather than inventing one");
+    assert.deepEqual(changes.changed[2].moved, [], "and a signal that is not a score has none");
+
+    // A source that names no date keeps the old wording rather than inventing one.
+    const undated = buildCliChangesContract({ reportData, postureState, degraded: false });
+    assert.equal(undated.basis, "since last week");
+    assert.equal(undated.comparedWith, null);
+  });
+
   it("builds scenario contract", () => {
     const scenario = buildScenarioContract({
       postureBefore: "Guarded Expansion",

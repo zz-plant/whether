@@ -339,3 +339,38 @@ figure, so it comes from them: `ReportDynamics.comparedWith` carries the earlier
 `comparisonBasis` (`lib/report/comparisonBasis.ts`) is the one place it becomes words. A new surface that
 prints a comparison takes its label from there. Where a source has no date the wording stays "last week"
 rather than inventing one, which is also how a test can tell the two paths apart. Full account: `docs/feature-specs-current.md` §1.1.26.
+
+## A list written five times drifts, and a set an endpoint does not know is not an empty one (2026-09-29)
+
+Driving the site as an agent (every surface, from a cold start) found the tool list in five places, no two
+alike: the remote MCP server had twelve tools, the local one five under another server name, the GET
+catalogue six, `/api-docs` five, and the discovery manifest, which the guide said listed "MCP tools", listed
+none. Each was written by hand when it was added. A tool added to one was missing from the rest and nothing
+said so, and `/api-docs` claimed "every MCP tool also answers a plain GET" while five did.
+
+Same family, found the same way: `get_context` with `SUNNY` (the page's own word) answered zero weeks active
+as a success, an unknown `?tool=` answered the brief with a 200, an unknown cadence became weekly, and a
+score of `0` was refused as missing because it was tested for truth. Each returned something plausible for
+input the server had not understood, which is worse than an error: it reads as a finding.
+
+- **A set of names a caller can use is generated from the thing that serves it** (`lib/agent/tools.ts`, one
+  definition per tool: the transports, the GET shim, the manifest, `/llms.txt` and `/api-docs` all read it),
+  and `tests/agentDiscoveryParity.test.ts` holds every place that must name one to it. The same went for the
+  CLI's completion scripts, which listed the commands by hand and had lost `agent`.
+- **Refuse what you did not understand, and say what would have worked.** `lib/agent/inputs.ts` accepts a
+  regime by key or by the site's own word in any case, treats empty as absent, and answers anything else
+  with the allowed values. An argument the tool does not take is named, because a tool with defaults turns a
+  typo into a plausible answer to a question nobody asked.
+- **A default that fills what the caller left out says so.** `get_context` and `get_projection` return
+  `inputs` with `given`, `today` or `assumed` against each value.
+- **Making a call easy makes its answer the one that gets read, so audit what it returns first.**
+  `get_projection` with no arguments (today's scores at today's pace: "if the trend continues, when do
+  conditions change?") was the one call defaults made trivial, and it reported a crossing within a week on a
+  read where both scores were moving deeper into their regime. The function behind it ignores direction and
+  also drives a Slack alert; the tool now asks a direction-aware one (`projectRegimeFromPace`), and the alert
+  is left for the owner (`docs/feature-specs-current.md` §6.9).
+- **A field that reads the wrong thing under the right name stays wrong on every surface that copies it.**
+  `summary.confidence` was the engine's confirmation gate, not the published confidence, and three routes
+  carried it. `/api/weekly` and `/api/monthly` still do (their archive regenerates from the same builders);
+  a decision for the owner, recorded in `docs/feature-specs-current.md` §6.9.
+

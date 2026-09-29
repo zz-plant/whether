@@ -1,8 +1,10 @@
 import { deriveRegimeStage } from "../regimePresentation";
 import type { RuleCondition } from "../report/boundedDecisionRules";
+import { comparisonBasis } from "../report/comparisonBasis";
 import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData, ReportDynamics } from "../report/reportData";
 import { buildCompactFreshnessMeta } from "../report/reportFormatting";
+import { listScoreMovementParts } from "../report/scoreMovement";
 
 type CliFreshnessContract = {
   updatedAt: string;
@@ -55,12 +57,20 @@ type CliChangesContract = {
   version: "v1";
   generatedAt: string;
   freshness: CliFreshnessContract;
+  /** What every `from` is measured against, as a phrase: "since Aug 31", or "since last week" where the source names no date. */
+  basis: string;
+  /** The earlier reading itself, when the loader recorded it; null when it did not. */
+  comparedWith: { recordDate: string; label: string } | null;
   changed: Array<{
     metric: "tightness" | "risk_appetite" | "base_rate" | "curve_slope";
+    /** What a reader sees this signal called; `metric` is the stable key. */
+    label: string;
     from: number;
     to: number;
     direction: "up" | "down";
     impact: "positive" | "negative";
+    /** What a score's move is made of, signed, adding up to `to - from`; empty for a signal with no split. */
+    moved: Array<{ source: string; label: string; points: number }>;
   }>;
   revisit: string[];
   flip: Array<{
@@ -211,16 +221,23 @@ export const buildCliChangesContract = ({ reportData, postureState, degraded }: 
   version: "v1",
   generatedAt: new Date().toISOString(),
   freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
+  basis: comparisonBasis(reportData.reportDynamics.comparedWith).since,
+  comparedWith: reportData.reportDynamics.comparedWith ?? null,
   changed: reportData.reportDynamics.changedSignals.map((signal) => {
     const raw = rawForKey(reportData, signal.key);
     const to = Number((typeof raw === "number" ? raw : signal.delta).toFixed(2));
     const from = Number((to - signal.delta).toFixed(2));
     return {
       metric: metricLabel[signal.key],
+      label: signal.label,
       from,
       to,
       direction: signal.delta >= 0 ? ("up" as const) : ("down" as const),
       impact: impactFromSignal(signal.key, signal.delta),
+      moved:
+        signal.key === "tightness" || signal.key === "riskAppetite"
+          ? listScoreMovementParts(signal.key, reportData.reportDynamics.movement?.[signal.key])
+          : [],
     };
   }),
   revisit: reportData.stopItems,

@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { handleMcpRequest, listMcpTools } from "../lib/mcp/httpMcpServer";
+import { listAgentTools } from "../lib/agent/tools";
+import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
 
 describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("lists the new AI capability tools", () => {
-    const tools = listMcpTools();
+    const tools = listAgentTools("http");
     const names = tools.map((t) => t.name);
 
     assert.ok(names.includes("stress_test_plan"));
