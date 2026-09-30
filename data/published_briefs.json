@@ -77,7 +77,7 @@
     "sourceLabel": "Canonical snapshot (high confidence)",
     "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
     "freshnessLabel": "Aug 1, 2026 at 1:51 PM UTC",
-    "correction": null
+    "correction": "Corrected Sep 30, 2026. The Do now line was written for Cloudy conditions, not the Sunny call this week carried. It should have read: Conditions are tightening. Keep what is working, and don't start anything new this week. The call, the scores and the area rules are unchanged."
   },
   {
     "slug": "2026-w38",

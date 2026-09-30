@@ -25,6 +25,10 @@ export function PublishedBriefCopyControls({
   permanentUrl,
 }: PublishedBriefCopyControlsProps) {
   const [activeFormat, setActiveFormat] = useState<ActiveFormat>("slack");
+  /* The preview opens at a few lines: the copy button is the action, the
+     preview is a check on what it copies. At full height it filled the first
+     screen of the page every shared link lands on. */
+  const [previewOpen, setPreviewOpen] = useState(false);
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: (target) => (target === "Slack update" ? "copied_slack" : target === "Email update" ? "copied_email" : "copied_brief") });
 
   const activeText = activeFormat === "slack" ? slackUpdate : emailUpdate;
@@ -55,7 +59,8 @@ export function PublishedBriefCopyControls({
           <button
             type="button"
             onClick={() => setActiveFormat("slack")}
-            className={`rounded px-3 py-1 text-xs font-semibold transition-colors ${
+            aria-pressed={activeFormat === "slack"}
+            className={`inline-flex min-h-11 items-center rounded px-3 text-xs font-semibold transition-colors ${
               activeFormat === "slack"
                 ? "bg-sky-500/20 text-sky-300 border border-sky-500/40"
                 : "text-slate-400 hover:text-slate-200"
@@ -66,7 +71,8 @@ export function PublishedBriefCopyControls({
           <button
             type="button"
             onClick={() => setActiveFormat("email")}
-            className={`rounded px-3 py-1 text-xs font-semibold transition-colors ${
+            aria-pressed={activeFormat === "email"}
+            className={`inline-flex min-h-11 items-center rounded px-3 text-xs font-semibold transition-colors ${
               activeFormat === "email"
                 ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
                 : "text-slate-400 hover:text-slate-200"
@@ -90,10 +96,7 @@ export function PublishedBriefCopyControls({
           onClick={() =>
             void handleCopy(activeText, activeFormat === "slack" ? "Slack update" : "Email update")
           }
-          /* On the button, not the row: the row is a wrapper around the
-             button and its status line, so styling it drew a second, larger
-             primary button around the first. */
-          buttonClassName="weather-button-primary"
+          buttonVariant="primary"
         />
         <ClipboardActionRow
           label={
@@ -124,14 +127,28 @@ export function PublishedBriefCopyControls({
           {/* The block and its fade share one token so the fade is the block's
               own colour on both themes; a slate-950 gradient stayed black on
               the light theme while the remap turned the block near-white. */}
-          <pre className="max-h-64 overflow-auto overscroll-contain whitespace-pre-wrap rounded-md border border-slate-800/80 bg-[color:var(--bg-nested)] p-3 text-xs leading-relaxed text-slate-200 font-mono">
+          <pre
+            id="published-brief-preview"
+            className={`${previewOpen ? "max-h-96 overflow-auto overscroll-contain" : "max-h-24 overflow-hidden"} whitespace-pre-wrap rounded-md border border-slate-800/80 bg-[color:var(--bg-nested)] p-3 text-xs leading-relaxed text-slate-200 font-mono`}
+          >
             {activeText}
           </pre>
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-px bottom-px h-10 rounded-b-md bg-gradient-to-t from-[color:var(--bg-nested)] to-transparent"
-          />
+          {previewOpen ? null : (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-px bottom-px h-10 rounded-b-md bg-gradient-to-t from-[color:var(--bg-nested)] to-transparent"
+            />
+          )}
         </div>
+        <button
+          type="button"
+          onClick={() => setPreviewOpen((open) => !open)}
+          aria-expanded={previewOpen}
+          aria-controls="published-brief-preview"
+          className="weather-focus-ring inline-flex min-h-11 items-center text-xs font-semibold text-sky-300 hover:text-sky-200"
+        >
+          {previewOpen ? "Show less" : "Show the whole preview"}
+        </button>
       </div>
     </section>
   );

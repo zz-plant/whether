@@ -83,7 +83,7 @@ describe("home route render contract", () => {
   });
 
   it("keeps one canonical copy action in the homepage body", () => {
-    // `DecisionHero` owns the one-tap `Copy Brief`. The header `Export` menu is the format picker and
+    // One one-tap `Copy Brief`, under `DecisionHero`. The header `Export` menu is the format picker and
     // `StickyCallStrip` is its on-scroll persistence — no third in-body copy button.
     //
     // This used to assert against `ThreeWhethersCard`, which 69221739 stopped rendering and
@@ -92,11 +92,20 @@ describe("home route render contract", () => {
     const actSource = readFileSync("app/components/home/DoAndShareSection.tsx", "utf8");
     const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
 
-    // The act tier owns it now — the hero is the state tier and carries no
-    // controls — but it is still one button, in one place, in the page body.
-    assert.ok(actSource.includes("<ShareBriefButton"), "the act section owns the canonical copy action");
+    // It sits directly under the call card (2026-09-30): on the first screen,
+    // outside the card people screenshot. The hero is the state tier and carries
+    // no controls, and the act section no longer repeats it — one button, one place.
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    assert.equal(routeSource.split("<ShareBriefButton").length - 1, 1, "one canonical copy action on the route");
+    const heroIndex = routeSource.indexOf("<DecisionHero");
+    const copyIndex = routeSource.indexOf("<ShareBriefButton");
+    assert.ok(heroIndex > -1 && copyIndex > heroIndex, "Copy Brief follows the call card");
+    // It folds with the brief on a first visit, where the decision picker takes its place.
+    const copyRow = routeSource.slice(routeSource.lastIndexOf("<div", copyIndex), copyIndex);
+    assert.match(copyRow, /data-first-visit-collapsible=\{offersFirstVisitFold/, "Copy Brief folds on a first visit");
+    assert.ok(!actSource.includes("<ShareBriefButton"), "the act section does not repeat it");
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
-    assert.ok(!heroSource.includes("<ShareBriefButton"), "no second copy action in the hero");
+    assert.ok(!heroSource.includes("<ShareBriefButton"), "no copy action inside the screenshot card");
     // The cadence lead copies a different artifact — the month's or quarter's call, not the
     // week's — so it earns its own control. What DD-005 rules out is a second button under
     // the hero's name, which is why this one has to pass its own label.

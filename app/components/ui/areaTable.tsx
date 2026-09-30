@@ -91,7 +91,7 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
             >
               <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-sm:col-span-2 max-sm:p-0">
                 {row.href ? (
-                  <Link href={row.href} className="underline decoration-slate-600 underline-offset-4 hover:text-white">
+                  <Link href={row.href} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
                     {row.hrefLabel ?? decisionAreaLabel(row.area)}
                   </Link>
                 ) : (

@@ -46,6 +46,7 @@ import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhatItChangesSection } from "./components/home/WhatItChangesSection";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { DoAndShareSection } from "./components/home/DoAndShareSection";
+import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   buildHomeAreaRows,
   buildSignalChangeRows,
@@ -475,7 +476,7 @@ async function PageContent({
                   <Link
                     href={prevWeekHref}
                     aria-label="Previous week"
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
+                    className="weather-hit-box flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
                   >
                     <ChevronLeft size={16} />
                   </Link>
@@ -498,7 +499,7 @@ async function PageContent({
                   <Link
                     href={nextWeekHref}
                     aria-label="Next week"
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
+                    className="weather-hit-box flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
                   >
                     <ChevronRight size={16} />
                   </Link>
@@ -574,6 +575,22 @@ async function PageContent({
               {/* The reader's own decisions against this week's reading, for a browser
                   that has recorded some: one line, and nothing at all for the rest. */}
               {!historicalSelection ? <YourRecordNote tightness={tightness} riskAppetite={riskAppetite} /> : null}
+              {/* The one Copy Brief (DD-005), under the card and its two reader
+                  notes (which render nothing for most visits) rather than in it:
+                  the card is what people screenshot, so a button inside it would
+                  be in every picture. It lived in "Do and share" at the foot of
+                  the page — about 2,560px down on desktop for a returning reader,
+                  and folded away entirely on a first visit — which left the
+                  page's canonical artifact action off the first screen. On a
+                  first visit it folds with the brief: on a phone it pushed the
+                  decision picker under the tab bar, and that question is the
+                  one thing a first visit is asked. */}
+              <div
+                data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined}
+                className="mt-3 flex flex-wrap items-center gap-2"
+              >
+                <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
+              </div>
             </div>
 
             {offersFirstVisitFold ? (
@@ -630,8 +647,6 @@ async function PageContent({
 
             {/* 5. Do and share, including the one conversion on the page. */}
             <DoAndShareSection
-              call={primaryCall}
-              shareLines={briefShareLines}
               operateHref={operateHref}
               planLabel={cadenceCall?.planLabel}
               currentRecordDate={reportData.treasury.record_date}

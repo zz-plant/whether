@@ -236,8 +236,8 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         {/* No link out for the market terms: each card below says what its own terms
             mean where they first appear, so the arithmetic can be read without leaving it. */}
         <p className="text-xs text-slate-400">
-          The cards below give the exact arithmetic. Each one says what its market terms mean
-          where they first appear.
+          The exact arithmetic is below. Each card says what its market terms mean where they
+          first appear.
         </p>
       </div>
 
@@ -246,7 +246,16 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           level and deeper — so spacing and type are what separate them, and
           a 12px gap sized for bordered cards left four unframed blocks
           reading as one run of text. */}
-      <div className="grid gap-x-10 gap-y-8 lg:grid-cols-2">
+      {/* Folded since 2026-09-30. Open, the four cards were most of this page
+          on a phone (9.2 screens) and the formula lines drew the eye ahead of the
+          status strip a reader comes here to check. The ladders and the plain
+          steps above stay open; the arithmetic is one tap away and still
+          server-rendered, so a search engine and a find-in-page both reach it. */}
+      <details className="weather-auto-chevron group mb-3">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
+          Show the exact arithmetic
+        </summary>
+      <div className="mt-4 grid gap-x-10 gap-y-8 lg:grid-cols-2">
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
@@ -384,6 +393,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           </ul>
         </FormulaCard>
       </div>
+      </details>
 
       {/* The two links sit inside the sentence, so they are inline with vertical
           padding rather than 44px inline-flex boxes: padding on an inline box

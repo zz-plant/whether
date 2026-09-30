@@ -190,7 +190,7 @@ export function FirstVisitDecisionPicker({
           {turningPoints.map((point, index) => (
             <span key={point.href}>
               {index > 0 ? " · " : null}
-              <Link href={point.href} className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+              <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
                 {point.label}
               </Link>
             </span>
