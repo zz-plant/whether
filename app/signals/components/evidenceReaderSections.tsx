@@ -96,8 +96,15 @@ export const SignalsWhatChangedSection = ({
   return (
     <ReportSection id="what-changed" title="What changed">
       {/* Filters on the table below, carried in the URL so a shared link shows
-          the same rows. They used to open a section of their own. */}
-      <nav aria-label="Start with these checks" className="flex flex-wrap gap-2">
+          the same rows. They used to open a section of their own. On a phone
+          they are hidden while nothing is filtered: five pills over a four-row
+          table drew about an eighth of the predicted taps on the page
+          (2026-09-30 attention pass). A phone that arrives on a filtered link
+          still sees them, so it can get back to every row. */}
+      <nav
+        aria-label="Start with these checks"
+        className={`flex flex-wrap gap-2 ${activeFocus === "all" ? "max-sm:hidden" : ""}`}
+      >
         {focusTabs.map((focus) => {
           const isActive = focus === activeFocus;
           return (
@@ -137,7 +144,7 @@ export const SignalsWhatChangedSection = ({
               >
                 <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-sm:p-0">
                   {row.watchHref ? (
-                    <Link href={toRoute(row.watchHref)} className="underline decoration-slate-600 underline-offset-4 hover:text-white">
+                    <Link href={toRoute(row.watchHref)} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
                       {row.label}
                     </Link>
                   ) : (

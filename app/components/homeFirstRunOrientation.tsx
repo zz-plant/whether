@@ -119,7 +119,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
           type="button"
           onClick={handleDismiss}
           aria-label="Dismiss introduction"
-          className="shrink-0 -mr-2 -mt-2 inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+          className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
         >
           Dismiss
         </button>

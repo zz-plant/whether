@@ -35,6 +35,21 @@ export const metadata: Metadata = buildPageMetadata({
  * registers interest and carries `data-premium-intent`, which the global
  * PremiumFunnelTracker turns into a `premium_intent` event tagged with the plan.
  */
+const FEATURE_PREVIEW = 4;
+
+function FeatureList({ features }: { features: string[] }) {
+  return (
+    <ul className="space-y-2 text-fluid-xs text-slate-300">
+      {features.map((feature) => (
+        <li key={feature} className="flex gap-2">
+          <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-400" aria-hidden="true" />
+          <span>{feature}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function PlanCard({ plan }: { plan: PricingPlan }) {
   const isFree = plan.monthlyPriceUsd === null;
 
@@ -53,16 +68,25 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
       </div>
 
       <p className="text-2xl font-bold text-white">{formatMonthlyPrice(plan)}</p>
+      {/* Beside the price, not under the cards. It sat in a section after all
+          three buttons, so a reader clicked "Request Pro access" before
+          learning there was nothing to buy. */}
+      {!isFree && !PAID_PLANS_ON_SALE ? (
+        <p className="-mt-2 text-fluid-xs font-medium text-amber-200">Cannot be bought yet. A request records that you want it.</p>
+      ) : null}
       <p className="text-fluid-xs text-slate-300">{plan.tagline}</p>
 
-      <ul className="space-y-2 text-fluid-xs text-slate-300">
-        {plan.features.map((feature) => (
-          <li key={feature} className="flex gap-2">
-            <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-400" aria-hidden="true" />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
+      <FeatureList features={plan.features.slice(0, FEATURE_PREVIEW)} />
+      {/* The free list ran to nine lines, which set the height of all three
+          cards and put every plan button under a 900px desktop fold. */}
+      {plan.features.length > FEATURE_PREVIEW ? (
+        <details className="weather-auto-chevron group">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-fluid-xs font-medium text-sky-300 hover:text-sky-200">
+            {plan.features.length - FEATURE_PREVIEW} more included
+          </summary>
+          <FeatureList features={plan.features.slice(FEATURE_PREVIEW)} />
+        </details>
+      ) : null}
 
       <div className="mt-auto pt-2">
         {isFree ? (
@@ -118,7 +142,7 @@ export default function PricingPage() {
             reserved rate and an onboarding schedule, which only exist once checkout is
             wired, so it renders only when the plans are on sale. */}
         <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5">
-          <h2 className="type-eyebrow">{PAID_PLANS_ON_SALE ? "Priority onboarding" : "Not on sale yet"}</h2>
+          <h2 className="type-eyebrow">{PAID_PLANS_ON_SALE ? "Priority onboarding" : "What a request does"}</h2>
           {PAID_PLANS_ON_SALE ? (
             <p className="max-w-2xl text-fluid-xs text-slate-300">
               Pro and Team are onboarding in staged cohorts. Requesting access reserves your tier rate
@@ -127,13 +151,13 @@ export default function PricingPage() {
             </p>
           ) : (
             <p className="max-w-2xl text-fluid-xs text-slate-300">
-              Pro and Team cannot be bought yet. Requesting access records that you want one, and
-              nothing else; the weekly guidance, the API, and embeds stay free either way.
+              It records that you want Pro or Team, and nothing else. No card is taken, and the
+              weekly guidance, the API, and embeds stay free either way.
             </p>
           )}
           <p className="max-w-2xl text-fluid-xs text-slate-400">
             Buying for several teams, or need something the plans don&apos;t cover?{" "}
-            <Link href="/contact" className="underline decoration-slate-600 underline-offset-4 hover:text-white">
+            <Link href="/contact" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
               Get in touch
             </Link>
             .

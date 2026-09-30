@@ -213,6 +213,30 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           </p>
         </header>
 
+        {/* The call and its delta lead, then the share tool. The copy panel used
+            to sit directly under the header, so a cold reader arriving from a
+            pasted link met a monospace Slack preview before "What changed", which
+            sat on the desktop fold (2026-09-30 attention pass). */}
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+          <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
+          <p className="text-sm text-slate-300">{brief.whatChanged}</p>
+          <p className="text-sm text-slate-300">
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {brief.actionNow}
+          </p>
+        </section>
+
+        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+          <h2 className="text-lg font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.flipWatch}</h2>
+          <p className="text-sm text-slate-300">
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
+            <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
+          </p>
+          <p className="text-sm text-slate-300">
+            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span>{" "}
+            <BoundedValue>{brief.flipThreshold}</BoundedValue>
+          </p>
+        </section>
+
         <PublishedBriefCopyControls
           recordDateLabel={brief.recordDateLabel}
           slackUpdate={slackUpdate}
@@ -287,26 +311,6 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             </dl>
           </section>
         ) : null}
-
-        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
-          <p className="text-sm text-slate-300">{brief.whatChanged}</p>
-          <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {brief.actionNow}
-          </p>
-        </section>
-
-        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.flipWatch}</h2>
-          <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
-            <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
-          </p>
-          <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span>{" "}
-            <BoundedValue>{brief.flipThreshold}</BoundedValue>
-          </p>
-        </section>
 
         {brief.decisions.length ? (
           <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">

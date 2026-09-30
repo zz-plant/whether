@@ -73,7 +73,7 @@ export function TrustStrip({
         ))}
       </dl>
       {href ? (
-        <Link href={href} className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+        <Link href={href} className="weather-hit text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
           How this is judged
         </Link>
       ) : null}

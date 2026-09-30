@@ -1,6 +1,5 @@
 import { HomeSection } from "./HomeSection";
 import { ActionLink } from "../ui/actionLink";
-import { ShareBriefButton } from "../shareBriefButton";
 import { CopyMeetingSlideButton } from "../CopyMeetingSlideButton";
 import { CopyImageCardButton } from "../CopyImageCardButton";
 import { SubscribeForm } from "../SubscribeForm";
@@ -35,21 +34,16 @@ function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: stri
 }
 
 /**
- * Act and share: the copy actions, the plan and evidence links, the subscribe
- * row and the citable permalink. One row of controls, one register — the three
- * copy controls are the shared clipboard row, the plan link is the one `pill`
- * on the page (DD-005 settled Copy Brief as the canonical primary action), and
- * the rest are inline links.
+ * Act and share: the slide and image copies, the plan and evidence links, the
+ * subscribe row and the citable permalink. Copy Brief, DD-005's canonical
+ * primary action, sits under the call card in `app/page.tsx` since 2026-09-30;
+ * the plan link is the one `pill` on the page, and the rest are inline links.
  */
 export function DoAndShareSection({
-  call,
-  shareLines,
   operateHref,
   planLabel,
   currentRecordDate,
 }: {
-  call: string;
-  shareLines: string[];
   operateHref: string;
   /** Named for the selected cadence, so the one plan CTA matches the horizon on screen. */
   planLabel?: string;
@@ -58,7 +52,6 @@ export function DoAndShareSection({
   return (
     <HomeSection id={HOME_SECTIONS.act.id} heading={HOME_SECTIONS.act.heading} className="order-5">
       <div className="flex flex-wrap items-center gap-2">
-        <ShareBriefButton text={call} lines={shareLines} showLabel />
         {/* Neither takes a payload: the slide reads the same published
             artifact the share panel and the presentation frames read, and the
             image is the brief card `/share` lists, for the reading on screen. */}

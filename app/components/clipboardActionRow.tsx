@@ -11,7 +11,7 @@ type ClipboardActionRowProps = {
   disabled?: boolean;
   className?: string;
   buttonClassName?: string;
-  buttonVariant?: "button" | "pill";
+  buttonVariant?: "button" | "primary" | "pill";
   compact?: boolean;
   statusClassName?: string;
   showStatus?: boolean;
@@ -22,8 +22,13 @@ type ClipboardActionRowProps = {
   };
 };
 
-const BUTTON_VARIANT_CLASS: Record<"button" | "pill", string> = {
+/* `primary` is its own class, never added on top of `weather-button`: the light
+   theme gives `.weather-button` a panel background and `.weather-button-primary`
+   white text, so the pair rendered white on white — the published brief's
+   "Copy Slack update", its primary action, read as an empty box until 2026-09-30. */
+const BUTTON_VARIANT_CLASS: Record<"button" | "primary" | "pill", string> = {
   button: "weather-button",
+  primary: "weather-button-primary",
   pill: "weather-pill text-slate-200",
 };
 

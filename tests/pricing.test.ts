@@ -68,7 +68,9 @@ describe("pricing offer", () => {
       assert.match(html, /reserves your tier rate/);
     } else {
       assert.doesNotMatch(html, /reserves your tier rate|pilot organizations|priority onboarding/i);
-      assert.match(html, /cannot be bought yet/);
+      // Said on each paid card, beside its price (2026-09-30), rather than after the buttons.
+      assert.equal(html.split("Cannot be bought yet").length - 1, 2, "once per paid plan");
+      assert.ok(html.indexOf("Cannot be bought yet") < html.indexOf("Request Pro access"), "before the first request button");
     }
   });
 });

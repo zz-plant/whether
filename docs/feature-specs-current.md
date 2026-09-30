@@ -1370,6 +1370,43 @@ the earlier record to `buildPublishedBriefRecord`, and the archive page would th
 from the live one. Not done: it is a change to what the archive says about a week, which is an owner
 decision.
 
+### 1.1.29 Put the call where the eye lands first (2026-09-30)
+
+A predicted-attention pass (DOM saliency: type size, weight, contrast, numbers, depth and F-pattern
+reading, scored per element at 1440×900 and 390×844; no real sessions) over eight routes ranked twelve
+changes. What shipped:
+
+- **`/brief/[week]`** leads with *What changed* and *What would change this guidance*; the share panel
+  follows, its preview folded to a few lines behind "Show the whole preview". Every shared paste links here,
+  and the Slack preview used to fill the first desktop screen with the delta on the fold. The panel's primary
+  "Copy Slack update" also rendered white on white in the light theme: `ClipboardActionRow` stacked
+  `weather-button` and `weather-button-primary`, and the light `.weather-button` background won. It has a
+  `primary` variant now. Slack/Email toggles are 44px.
+- **2026-w31 correction.** The record carries a correction: its Do-now line was the Cloudy "freeze new
+  commitments" line on a Sunny week, from before `buildActionNowShort` keyed on the state.
+  `tests/publishedBriefCallAgreement.test.ts` fails any record whose Do-now line its own state could not print
+  unless it carries a correction.
+- **Home.** The explainer is hidden for returning readers at every width (it was phone-only). Copy Brief
+  (DD-005's one primary action) moved from *Do and share* to directly under the call card, outside the
+  screenshot; on a first visit it folds with the brief, because on a phone it pushed the decision picker under
+  the tab bar.
+- **`/pricing`.** "Cannot be bought yet" sits under each paid price instead of after the buttons; the free list
+  shows four items and folds the rest, which brings every plan button above a 900px fold. The closing section
+  says what a request does.
+- **`/history`** names the newest published week above the month strip when it is newer than the strip, so the
+  month-end "Sunny, held 9 months" no longer reads as a contradiction of the week's call.
+- **`/trust`** folds the four formula cards behind "Show the exact arithmetic"; the ladders and the plain steps
+  stay open. Phone length 9.2 → 6.4 screens.
+- **`/signals`** hides the unfiltered focus pills on phones; a filtered link still shows them.
+- **Touch targets.** `.weather-hit` (and `.weather-hit-box`) grow an inline link's hit area to 44px with a
+  pseudo-element: "How this is judged", area names in the rules table, the turning-point links, the week
+  chevrons, and small inline links on `/pricing` and `/history`. The explainer's Dismiss is 44px.
+
+Not changed, on purpose: the `/operate` done counter (its heat is the model's bias toward digits, and it was
+enlarged deliberately), the `/operate` workstream tabs (a different axis from the section rail, not a second
+index), and the header search box (no click data to judge it by). The first-visit phone picker's second row
+still sits under the tab bar at 844px.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

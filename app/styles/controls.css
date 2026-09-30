@@ -311,3 +311,27 @@ details[open] > summary[data-chevron]::after,
   line-height: 1.4;
   justify-content: center;
 }
+
+/* An inline link's touch target, grown to 44px without moving the line it sits
+   on (ui-ux-standards §II: "expand invisible hitboxes"). For links set in a
+   sentence or a table cell, where padding would open the line and inline-flex
+   would break it. The 2026-09-30 attention pass measured these at 15–18px tall
+   on phones: "How this is judged", the area names in the rules table, the
+   turning-point links under the first-visit picker. */
+.weather-hit {
+  position: relative;
+}
+.weather-hit::after {
+  content: "";
+  position: absolute;
+  inset: -14px -4px;
+}
+/* The same, for a small square control (the week chevrons) that is a box already. */
+.weather-hit-box {
+  position: relative;
+}
+.weather-hit-box::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}

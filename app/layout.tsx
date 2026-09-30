@@ -69,7 +69,7 @@ const buildOrientationBootstrapScript = () => `
     // homepage folds everything below the call behind one question for it.
     const seenBefore = window.localStorage.getItem(${JSON.stringify(activationLastWeekStorageKey)}) !== null;
     root.dataset.homeFirstVisit = dismissed || seenBefore ? "false" : "true";
-    // Set once per page load and never flipped mid-session: the phone rule in
+    // Set once per page load and never flipped mid-session: the rule in
     // home-flow.css hides the explainer on it, and the explainer sits above the
     // call, so changing it after paint would move the call.
     root.dataset.homeReturning = seenBefore ? "true" : "false";

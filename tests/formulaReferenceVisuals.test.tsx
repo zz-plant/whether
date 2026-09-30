@@ -19,6 +19,16 @@ describe("formula reference visuals", () => {
     assert.doesNotMatch(html, /quadrant of funding pressure vs/, "the prose form is gone");
   });
 
+  it("folds the exact arithmetic under the plain-language steps", () => {
+    /* Open, the four formula cards were most of /trust on a phone and drew the
+       eye ahead of the status strip (2026-09-30). Still server-rendered. */
+    const plain = html.indexOf("In plain language");
+    const fold = html.indexOf("Show the exact arithmetic");
+    assert.ok(plain !== -1 && fold > plain, "plain steps first, then the fold");
+    assert.ok(html.lastIndexOf("<details", fold) > plain, "the arithmetic sits in a disclosure");
+    assert.ok(html.indexOf("Inputs — all public") > fold, "the cards are inside it");
+  });
+
   it("draws confidence as a three-band ladder, named in words", () => {
     assert.match(html, />Low</);
     assert.match(html, />Medium</);

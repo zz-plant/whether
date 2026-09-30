@@ -71,6 +71,17 @@ export default async function HistoryPage({
   const trackRecord = buildTrackRecord(fullSeries);
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
+  /* The month strip ends at the last month-end, and its "held since" line was
+     where a predicted-attention pass (2026-09-30) put the eye first, while every
+     other route showed the week's call — Sunny here, Freezing there, with
+     nothing saying why. The newest published week bridges the two, from the
+     record rather than a live read, and only when it is newer than the strip. */
+  const latestWeek = publishedBriefs.reduce<(typeof publishedBriefs)[number] | undefined>(
+    (latest, brief) => (!latest || brief.recordDate > latest.recordDate ? brief : latest),
+    undefined,
+  );
+  const weekAfterRecord =
+    latestWeek && trackRecord && latestWeek.recordDate > trackRecord.latestRecordDate ? latestWeek : undefined;
 
   /* The reader's order, not the mechanism's: the record's answer first (the
      month strip, then the tiles), the method second (the phase map), then the
@@ -156,6 +167,15 @@ export default async function HistoryPage({
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">Conditions by month</h2>
+          {weekAfterRecord ? (
+            <p className="text-sm text-slate-300">
+              Since the last month-end, the week of {weekAfterRecord.recordDateLabel} was published as{" "}
+              <span className="font-semibold text-white">{publishedBriefDisplay(weekAfterRecord).conditions}</span>.{" "}
+              <ActionLink href={buildPublishedBriefPath(weekAfterRecord.slug)} variant="inline">
+                Read that week
+              </ActionLink>
+            </p>
+          ) : null}
           <MonthStrip entries={fullSeries} />
           <p className="text-sm text-slate-300">
             For founders, finance teams and boards comparing funding environments: use the monthly record
@@ -182,11 +202,11 @@ export default async function HistoryPage({
               <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
               <ConfidenceRecordBody />
               <p className="text-fluid-xs text-slate-400">
-                <Link href="/calibration" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
                 </Link>
                 {" · "}
-                <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                <Link href="/concepts" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Product writing on the same record
                 </Link>
               </p>

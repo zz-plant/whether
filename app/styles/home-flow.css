@@ -19,13 +19,13 @@ html[data-home-first-visit="true"] [data-first-visit-collapsible="true"] {
   display: none !important;
 }
 
-/* The explainer, on a phone, for a browser that has rendered the brief before.
-   It costs about 150px above the call there, on every visit, which pushes the
-   card a reader screenshots out of the top of the screen; someone returning has
-   read the line. Wider screens keep it until dismissed, because it costs them
-   nothing the call needs. */
-@media (max-width: 639.98px) {
-  html[data-home-returning="true"] [data-weather-first-run-orientation="true"] {
-    display: none !important;
-  }
+/* The explainer, for a browser that has rendered the brief before. It costs
+   about 150px above the call on every visit, which pushes the card a reader
+   screenshots down the screen; someone returning has read the line. This was
+   phone-only until 2026-09-30, on the view that wider screens could spare the
+   room. The attention pass that day ranked its "How to read this page" row as
+   the most likely click on the desktop homepage for a returning reader, ahead
+   of the call's own controls, so it goes at every width. */
+html[data-home-returning="true"] [data-weather-first-run-orientation="true"] {
+  display: none !important;
 }
