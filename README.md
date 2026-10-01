@@ -57,7 +57,7 @@ Through the Aug 2026 month-end, conditions changed 6 times in 176 months, and a 
 | Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year contract, the runway to hold before the next raise | A single hire or purchase: the lines are a policy for a kind of decision, not a verdict on one |
 | Plans a group approves once and should not re-argue each month: a budget whose second half is released when a line is crossed, or an agreed floor on runway | Under six months of runway: cash decides before markets do |
 | Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital costs | A company whose funding does not follow U.S. rates: outside the U.S., or in a sector raising on a boom of its own |
-| | Which product work matters most: rates bear on how much long-payback work a team can carry, not on what to build |
+| Investors and accelerators sending one reading to every company they back: the portfolio note on `/share` says what the week means at each runway | Which product work matters most: rates bear on how much long-payback work a team can carry, not on what to build |
 
 ---
 

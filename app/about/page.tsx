@@ -118,6 +118,13 @@ export default function AboutPage() {
             Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital
             costs.
           </li>
+          <li>
+            Investors and accelerators sending one reading to every company they back: the{" "}
+            <Link href="/share" className={inlineLinkClass}>
+              portfolio note
+            </Link>{" "}
+            says what the week means at each runway.
+          </li>
         </ul>
         <p className="text-sm font-semibold text-slate-100">It does not fit</p>
         <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">

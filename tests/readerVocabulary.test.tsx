@@ -16,6 +16,7 @@ import {
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
 import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
+import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
 import { publishedScoreLines } from "../lib/alert/alertEvaluator";
@@ -222,6 +223,16 @@ const artifactSurfaces: Surface[] = [
       const bands: RunwayBand[] = ["critical", "tight", "balanced", "abundant"];
       return bands.map((band) => formatInvestorUpdateSnippet(parts, band)).join("\n");
     },
+  },
+  {
+    name: "portfolio note",
+    text: () =>
+      buildPortfolioNote({
+        assessment,
+        record: treasury,
+        areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
+        sourceLabel: treasury.source,
+      }),
   },
   { name: "published brief (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },
   { name: "published brief (email)", text: () => (latestPublishedBrief ? buildPublishedBriefEmailUpdate(latestPublishedBrief) : "") },

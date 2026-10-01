@@ -10,6 +10,7 @@ import {
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
 import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
+import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import { buildTrustStatus } from "../lib/report/trustStatus";
@@ -67,6 +68,16 @@ describe("artifacts that leave the site carry no facts about a company the site 
     for (const band of ["critical", "tight", "balanced", "abundant", null] as const) {
       assert.doesNotMatch(formatInvestorUpdateSnippet(parts, band), FIXTURE_COMPANY);
     }
+  });
+
+  it("portfolio note speaks to every runway band and to no one company", () => {
+    const note = buildPortfolioNote({
+      assessment,
+      record: treasury,
+      areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
+      sourceLabel: treasury.source,
+    });
+    assert.doesNotMatch(note, FIXTURE_COMPANY);
   });
 
   it("record summary names only what the archive holds, and needs a record to exist", () => {

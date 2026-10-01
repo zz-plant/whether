@@ -982,6 +982,16 @@ the reversal rather than saying "band not set", and the card tells the reader wh
 The stamp uses the provenance label, not `treasury.source`, which is a FRED series URL on a live
 read.
 
+**The portfolio note (2026-10-01).** "Portfolio note" on `/share` (`lib/export/portfolioNote.ts`)
+runs the other way from the investor update: one investor platform team or accelerator writing to
+the companies it backs. Their runways differ, so it carries no runway sentence of its own reader;
+it prints the conditions and confidence, each area's rule with its pause and resume lines (the
+same `buildAreaRows` strings as the plan page), and what the week means at all four runway bands
+from `buildRunwayConditionedNotes`, with the band named once rather than in every note. It ends
+with the link to `/operate#ops-plan-lines`, where each company can move the lines for its own plan
+(§1.1.31), the source stamp (with the saved-copy note on a fallback) and the dated permalink. Built
+on the server; nothing from the reader's browser.
+
 **Flash alerts.** `lib/alert/flashMoves.ts` judges two raw inputs between *consecutive* reads: a
 move of 0.25 points or more in the short rate (a cut between meetings, a bill-market
 dislocation) or 0.20 points or more in 10Y−2Y (a spread blowout) fires the day it lands, whether
