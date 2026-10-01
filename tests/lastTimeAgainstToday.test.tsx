@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LastTimeCallChangedCard } from "../app/components/home/LastTimeCallChangedCard";
 import type { RegimeKey } from "../lib/regimeEngine";
-import { describeAgainstToday, findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { describeAgainstToday, findLastTimeCallChanged, summarizeLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { getTimeMachineRegimeSeries, type TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
 
 /*
@@ -42,6 +42,24 @@ describe("the last time conditions moved this way, against this week", () => {
         + "Then, funding pressure was 79 (money is hard to raise) and risk appetite 7 (investors are avoiding risk); "
         + "now they are 90 (money is hard to raise) and 43 (investors are selective about risk). "
         + "It is one earlier outcome, not a forecast.",
+    );
+  });
+
+  it("says it in one sentence for a first visit, with where each score started", () => {
+    const record = findLastTimeCallChanged({
+      series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+      currentRegime: "SCARCITY",
+      previousRegime: "EXPANSION",
+      currentScores: { tightness: 90, riskAppetite: 43 },
+    });
+
+    assert.ok(record);
+    assert.equal(
+      summarizeLastTimeCallChanged(record),
+      "The last time conditions moved this way was Sep 2022 (Stormy to Freezing). "
+        + "By Dec 2022, funding pressure had gone from 79 to 100 (money is hard to raise) "
+        + "and risk appetite from 7 to 16 (investors are avoiding risk). "
+        + "One earlier outcome, not a forecast.",
     );
   });
 

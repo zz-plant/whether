@@ -40,8 +40,9 @@ measuring interest in an article, not demand for a subscription. For a weekly-ri
 week-2 return rate is the denominator that makes every intent number interpretable, and until this
 existed nothing recorded it.
 
-- **Instrumented at:** `ActivationTracker` on `/` (visited, returned), the first-run explainer's
-  dismiss (oriented), `ShareCopyControls` and `SubscribeForm` (committed).
+- **Instrumented at:** `ActivationTracker` on `/` (visited, returned, and oriented on the first
+  control pressed, section opened or link followed in a visit), `ShareCopyControls` and
+  `SubscribeForm` (committed).
 - **Sink:** `POST /api/telemetry/activation` → the `activation` analytics stream.
 - **Identity:** none. Return detection reads one localStorage key holding an ISO week slug and
   reports a bucketed gap (`same_week` / `next_week` / `within_month` / `lapsed`). No id, no cookie,

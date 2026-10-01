@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sendTelemetry } from "./telemetry/sendTelemetry";
 export type ContentCluster = "authority" | "pain" | "tool" | "vc";
 export type ContentIntent = "cfo" | "board" | "vp-product" | "vc-partner";
 type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conversion";
@@ -203,25 +204,7 @@ export const isContentMeasurementEvent = (input: unknown): input is ContentMeasu
   contentMeasurementEventSchema.safeParse(input).success;
 
 const trackContentMeasurementEvent = (payload: ContentMeasurementEvent) => {
-  const body = JSON.stringify(payload);
-
-  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const beaconBody = new Blob([body], { type: "application/json" });
-    const queued = navigator.sendBeacon(CONTENT_MEASUREMENT_ENDPOINT, beaconBody);
-    if (queued) {
-      return;
-    }
-  }
-
-  void fetch(CONTENT_MEASUREMENT_ENDPOINT, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    keepalive: true,
-    priority: "low",
-  }).catch(() => {
-    // Ignore telemetry network failures to keep the client console clean.
-  });
+  sendTelemetry(CONTENT_MEASUREMENT_ENDPOINT, payload);
 };
 
 export const trackContentOrganicEntrance = (

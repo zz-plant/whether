@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { trackActivationEvent } from "../../lib/activationFunnel";
 import {
   FIRST_TIME_GUIDE_HIGHLIGHTS,
   FIRST_TIME_GUIDE_NEXT_LINKS,
@@ -72,13 +71,10 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
     return null;
   }
 
+  // `ActivationTracker` records the click as `oriented`, like any other control on `/`.
   const handleDismiss = () => {
     markOrientationDismissed();
     dismissedSource.refresh();
-    // Dismissing is the cheapest available proof that someone read the line and
-    // knew what they were looking at, which is the step between arriving and
-    // doing anything deliberate.
-    trackActivationEvent({ step: "oriented", path: "/" });
   };
 
   return (

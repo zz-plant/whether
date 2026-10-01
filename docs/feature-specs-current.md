@@ -1417,6 +1417,41 @@ enlarged deliberately), the `/operate` workstream tabs (a different axis from th
 index), and the header search box (no click data to judge it by). The first-visit phone picker's second row
 still sits under the tab bar at 844px.
 
+### 1.1.30 A visit that touched nothing can be counted, and a first visit sees its question (2026-09-30)
+
+Thirty days of the `activation` stream read 603 visits to `/`, 3 `oriented`, 0 `committed` and 8
+`returned`. Of the 85 visits that carried an arrival bucket, 81 were returning browsers arriving
+direct, and 89 of the 147 web-vitals rows for `/` were reloads. Most of what looked like readers
+leaving was the measurement and the owner's own checks:
+
+- **`oriented` is the first deliberate act of a visit**, recorded once per `visited` by
+  `ActivationTracker`: any control pressed, section opened or link followed, on any visit. It came
+  only from the first-visit picker and the explainer's Dismiss, both hidden from a returning browser,
+  so a returning reader could only ever count as leaving. `visited` minus `oriented` is the visits
+  that touched nothing. The picker and the explainer no longer send it themselves.
+- **`/` mounts `OperatorWorkflowRouteTracker`.** `/` was always an accepted route and the tracker was
+  never on it, so a move from the brief to `/signals`, `/operate` or `/resolve` went unrecorded.
+- **A browser can turn measurement off** from `/privacy` section 5. Every browser emitter goes through
+  `lib/telemetry/sendTelemetry.ts`, which sends nothing while `whether.measurement.off` holds "1";
+  `tests/sendTelemetry.test.ts` fails if anything in `app/` or `lib/` queues a beacon around it.
+  `/privacy` 2.6 now also lists what a visit to the brief reports about itself.
+- **The first-visit fold takes two more rows off a phone.** The horizon switcher and the confidence
+  chip fold with the brief (the call card's trust line already carries confidence), and the phone
+  header's stage and runway pills hide on a first visit to a page that offers the fold
+  (`html[data-home-first-visit="true"]:has([data-first-visit-only="true"])`). At 375×812 the
+  question's heading moved from y=744 to y=617 and its first row of answers (681–725) now clears the
+  tab bar at 759. Above `sm` the same stage and runway choices sat in a folded section already, so the
+  two widths now agree; "Show the full brief" brings everything back.
+- **The first-visit question says what its numbers mean.** Under the choices, both scores print through
+  `SignalReading` ("Funding pressure 90/100: money is hard to raise"), above every line that quotes a
+  score: the answer's pause and resume lines and the alert box's "(90 today)". What 100 meant was
+  printed only in the folded *What changed* table.
+- **"Has this happened before" is answered on the page.** On a week the guidance changed, one sentence
+  from `summarizeLastTimeCallChanged` sits above the turning-point links: the month it last moved this
+  way, where both scores started and stood three months on, and the card's "One earlier outcome, not a
+  forecast" on the same condition. Other weeks print nothing, as the card does, rather than reach for the
+  nearest analogue.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

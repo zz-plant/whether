@@ -42,7 +42,9 @@ describe("first-visit decision picker", () => {
     <FirstVisitDecisionPicker
       options={OPTIONS}
       regime="SCARCITY"
+      scores={{ tightness: 90, riskAppetite: 44 }}
       flipCondition="Funding pressure falls to or below 70."
+      lastTime="The last time conditions moved this way was Sep 2022 (Stormy to Freezing)."
       turningPoints={[{ label: "Sep 2022, Stormy to Freezing", href: "/?month=9&year=2022" }]}
     />,
   );
@@ -62,6 +64,26 @@ describe("first-visit decision picker", () => {
     assert.match(html, /Tell me when this changes/);
     assert.match(html, /Next change to watch: Funding pressure falls to or below 70\./);
     assert.match(html, /No weekly newsletter/);
+  });
+
+  it("says what each score means before any line quotes one", () => {
+    const scores = html.indexOf("Funding pressure 90/100: money is hard to raise");
+    assert.ok(scores > 0, "funding pressure printed without its meaning");
+    assert.match(html, /Risk appetite 44\/100: investors are selective about risk/);
+    assert.ok(scores < html.indexOf("Next change to watch"), "the alert box quotes a score before the page says what it means");
+  });
+
+  it("answers whether this has happened before on the page, and only when the week has an answer", () => {
+    assert.match(html, /The last time conditions moved this way was Sep 2022 \(Stormy to Freezing\)\./);
+    const quietWeek = renderToStaticMarkup(
+      <FirstVisitDecisionPicker
+        options={OPTIONS}
+        regime="SCARCITY"
+        scores={{ tightness: 90, riskAppetite: 44 }}
+        turningPoints={[]}
+      />,
+    );
+    assert.doesNotMatch(quietWeek, /The last time conditions moved/);
   });
 
   it("links the turning points into the time machine and offers the full brief", () => {
@@ -105,6 +127,15 @@ describe("the fold is configuration, and defaults to the full brief", () => {
   it("hides the picker unless the bootstrap marked a first visit", () => {
     assert.match(css, /html:not\(\[data-home-first-visit="true"\]\) \[data-first-visit-only="true"\]\s*\{\s*display: none !important;/);
     assert.match(css, /html\[data-home-first-visit="true"\] \[data-first-visit-collapsible="true"\]\s*\{\s*display: none !important;/);
+  });
+
+  it("hides the phone header's stage and runway only on a page that offers the fold", () => {
+    const header = readFileSync(new URL("../app/components/globalHeaderRouteGate.tsx", import.meta.url), "utf8");
+    assert.match(
+      css,
+      /html\[data-home-first-visit="true"\]:has\(\[data-first-visit-only="true"\]\) \[data-first-visit-header-choices="true"\]\s*\{\s*display: none !important;/,
+    );
+    assert.match(header, /data-first-visit-header-choices="true"/);
   });
 
   it("decides first visit from the key the activation tracker writes on every visit", () => {

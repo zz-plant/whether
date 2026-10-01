@@ -11,8 +11,11 @@
  * The steps, in order:
  *
  *   visited    — a brief was rendered for someone
- *   oriented   — they got far enough to dismiss the first-run explainer or open
- *                the signal breakdown, i.e. they understood what they were looking at
+ *   oriented   — they did one deliberate thing on the page: pressed a control,
+ *                opened a section or followed a link (`ActivationTracker`). At most
+ *                once per `visited`, so `visited` minus `oriented` is the visits that
+ *                touched nothing. Until 2026-09-30 only the first-visit picker and the
+ *                explainer's Dismiss sent it, and a returning browser sees neither
  *   committed  — they copied an artifact or subscribed; the first act with intent
  *   returned   — they came back in a later ISO week
  *
@@ -26,6 +29,7 @@
  * than to be maximally informative.
  */
 import { formatIsoWeekSlug, getIsoWeekInfo } from "./isoWeek";
+import { sendTelemetry } from "./telemetry/sendTelemetry";
 
 const ACTIVATION_TELEMETRY_ENDPOINT = "/api/telemetry/activation";
 
@@ -208,22 +212,5 @@ export const resolveReturnVisit = (storedSlug: string | null, now: Date) => {
 };
 
 export const trackActivationEvent = (event: ActivationEvent) => {
-  const body = JSON.stringify(event);
-
-  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const beaconBody = new Blob([body], { type: "application/json" });
-    if (navigator.sendBeacon(ACTIVATION_TELEMETRY_ENDPOINT, beaconBody)) {
-      return;
-    }
-  }
-
-  void fetch(ACTIVATION_TELEMETRY_ENDPOINT, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    keepalive: true,
-    priority: "low",
-  }).catch(() => {
-    // Telemetry must never surface in the console of a product that claims to be quiet.
-  });
+  sendTelemetry(ACTIVATION_TELEMETRY_ENDPOINT, event);
 };

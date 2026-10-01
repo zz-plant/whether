@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { LegalPageShell } from "../components/legalPageShell";
+import { MeasurementChoice } from "./MeasurementChoice";
 import { publisherAuthor, publisherContactPath } from "../../lib/publisher";
 
 /**
@@ -37,7 +38,7 @@ const subheading = "text-base font-semibold text-slate-100 sm:text-lg";
 
 export default function PrivacyPage() {
   return (
-    <LegalPageShell title="Privacy" effectiveDate="9/17/2026">
+    <LegalPageShell title="Privacy" effectiveDate="9/30/2026">
       <section className="space-y-4">
         <p className={paragraph}>
           Whether is weekly operating guidance built on public macroeconomic data. The guidance itself, the
@@ -148,10 +149,13 @@ export default function PrivacyPage() {
           <div className="space-y-2">
             <h3 className={subheading}>2.6 Usage measurement</h3>
             <p className={paragraph}>
-              Pages report how fast they loaded, which route was moved to from which, a coarse bucket
-              for where a visit arrived from (a search engine, a link, typed directly — never the
-              referring URL) and whether this browser had opened the brief before, the steps of the checkout funnel, and the shape of a search as
-              described above. These go to Cloudflare Analytics Engine.
+              Pages report how fast they loaded, which route was moved to from which, whether the brief
+              was copied (and in which format) or a subscription made, the steps of the checkout funnel,
+              and the shape of a search, described above. A visit to the brief also reports a coarse
+              bucket for where it arrived from (a search engine, a link, typed directly — never the
+              referring URL), whether this browser had opened the brief before, and whether the visit
+              used any control on the page (not which one). These go to Cloudflare Analytics Engine, and
+              section 5 turns them off for one browser.
             </p>
             <p className={paragraph}>
               What is written is the event and nothing around it: no IP address, no user-agent
@@ -237,6 +241,9 @@ export default function PrivacyPage() {
         <h2 className={heading}>5. Your choices</h2>
         <ul className={`list-disc space-y-2 pl-5 ${paragraph}`}>
           <li>Stop the emails with the unsubscribe link in any of them. No reply or account needed.</li>
+          <li>
+            <MeasurementChoice />
+          </li>
           <li>
             Remove everything held in your browser — the identifier, presets, drafts, the stage and
             runway cookies — by clearing site data for this site.

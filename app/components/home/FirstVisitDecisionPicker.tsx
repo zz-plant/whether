@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { trackActivationEvent } from "../../../lib/activationFunnel";
 import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { HOME_SECTIONS, type HomeAreaRow } from "../../../lib/report/home/homeSectionModel";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
+import { SignalReading } from "../ui/plainLanguage";
 import { FlipAlertForm } from "./FlipAlertForm";
 import { CommitmentTest } from "./CommitmentTest";
 import type { RegimeKey } from "../../../lib/regimeEngine";
@@ -67,13 +67,19 @@ const hashTargetsFoldedBrief = () => {
 export function FirstVisitDecisionPicker({
   options,
   regime,
+  scores,
   flipCondition,
+  lastTime,
   turningPoints,
 }: {
   options: readonly DecisionPickerOption[];
   /** This week's conditions, which pick the runway note the runway test quotes. */
   regime: RegimeKey;
+  /** This week's two scores, printed with what they mean before any line that quotes them. */
+  scores: { tightness: number; riskAppetite: number };
   flipCondition?: string;
+  /** `summarizeLastTimeCallChanged`, on a week the guidance changed; absent on every other week. */
+  lastTime?: string;
   turningPoints: readonly { label: string; href: string }[];
 }) {
   const router = useRouter();
@@ -108,16 +114,10 @@ export function FirstVisitDecisionPicker({
     label: QUESTION_BY_AREA[option.area],
   }));
 
-  const handleSelect = (area: DecisionArea) => {
-    // Picking a decision is the first deliberate act on the page; it is the
-    // same funnel step as dismissing the explainer, and the one this block
-    // exists to raise.
-    if (!selected) trackActivationEvent({ step: "oriented", path: "/" });
-    setSelected(area);
-  };
-
+  /* Picking a decision is the first deliberate act this block exists to raise.
+     `ActivationTracker` records it as `oriented`, the same as any other control
+     on the page, so nothing here sends it a second time. */
   const handleReveal = () => {
-    trackActivationEvent({ step: "oriented", path: "/" });
     revealFullBrief({ scroll: true });
     if (runwayBandMoved.current) router.refresh();
   };
@@ -139,10 +139,19 @@ export function FirstVisitDecisionPicker({
       <SegmentedControl
         options={segmentedOptions}
         value={selected}
-        onSelect={handleSelect}
+        onSelect={setSelected}
         ariaLabel="What are you deciding this week?"
         layout="choices"
       />
+
+      {/* What the numbers below are measured against. Every line under the
+          choices quotes a score ("Funding pressure > 76", "90 today"), and what
+          100 means was printed only in the folded "What changed" table, so a
+          first visit met numbers it had no way to read. */}
+      <ul aria-label="This week's scores" className="space-y-0.5 text-fluid-xs text-slate-400">
+        <li><SignalReading signalKey="tightness" score={scores.tightness} /></li>
+        <li><SignalReading signalKey="riskAppetite" score={scores.riskAppetite} /></li>
+      </ul>
 
       {active ? (
         <div aria-live="polite" className="space-y-2 border-l-2 border-sky-500/50 pl-4">
@@ -183,6 +192,11 @@ export function FirstVisitDecisionPicker({
       ) : null}
 
       <FlipAlertForm condition={flipCondition} />
+
+      {/* The answer to "has this happened before", on the page. The card that
+          says it at length is in the folded brief, and the turning points
+          below are links; a sceptical first visit had to leave to check. */}
+      {lastTime ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{lastTime}</p> : null}
 
       {turningPoints.length > 0 ? (
         <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">

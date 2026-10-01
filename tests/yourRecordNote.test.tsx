@@ -64,7 +64,10 @@ describe("the record note", () => {
     const mount = page.indexOf("<YourRecordNote");
 
     assert.ok(mount > page.indexOf("<SinceLastVisit"), "under the returning-visitor strip, not above the call");
-    assert.ok(mount < page.indexOf("data-first-visit-collapsible"), "in the first block, where the reader who has a record looks");
+    /* The picker, not the first fold attribute: the horizon and confidence row
+       above the call folds on a first visit too, and everything folded below
+       the call comes after the picker. */
+    assert.ok(mount < page.indexOf("<FirstVisitDecisionPicker"), "in the first block, where the reader who has a record looks");
     assert.match(page.slice(mount - 40, mount), /!historicalSelection \?/, "an archived week is not compared with today's decisions");
   });
 });

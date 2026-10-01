@@ -30,7 +30,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - [x] **Deliver to a room, not a person** — Monday fan-out into `#leadership` ships; growth is channel presence (multi-channel, bot invite) so one adopter carries a roomful of weekly readers. Reuses `lib/slack/slackWebhookStore.ts`.
 - [x] **Meeting artifact for the Monday slot** — board slide, investor memo, and `/share` formats ship; the return payoff is keeping the artifact calendar-timed so the brief is pulled into recurring staff syncs.
 - [x] **Sharpen the delta so the return pays** — Shipped: the weekly operator brief (Slack/email/export) now carries the flip watch in the market's units (`lib/export/weeklyOperatorBrief.ts`, `DECISION_CONTRACT_LABELS.watch.flipWatch`), the same sentence the hero prints, so a pasted artifact states what has to happen on the curve or the bill (2026-09-18).
-- [ ] **Fix the funnel leak before adding surface** — `visited → oriented → committed → returned` is measured; the biggest WAU win is whichever step is leaking, not a new feature.
+- [ ] **Fix the funnel leak before adding surface** — `visited → oriented → committed → returned` is measured; the biggest WAU win is whichever step is leaking, not a new feature. Since 2026-09-30 `oriented` counts any deliberate act on `/` for every visit and a browser can opt out of measurement, so read the funnel from that date with the owner's browsers turned off.
 
 ### DAU — event and state only, never cadence
 - [x] **Flash days are the honest DAU spikes** — `lib/alert/flashMoves.ts` fires on real market moves, irregularly; DAU rises on those days and cannot be scheduled.

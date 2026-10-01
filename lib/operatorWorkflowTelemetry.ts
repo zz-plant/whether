@@ -1,3 +1,5 @@
+import { sendTelemetry } from "./telemetry/sendTelemetry";
+
 type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/resolve";
 
 /**
@@ -46,23 +48,5 @@ export const isOperatorWorkflowEvent = (input: unknown): input is OperatorWorkfl
 };
 
 export const trackOperatorWorkflowEvent = (event: OperatorWorkflowEvent) => {
-  const body = JSON.stringify(event);
-
-  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const beaconBody = new Blob([body], { type: "application/json" });
-    const queued = navigator.sendBeacon(OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT, beaconBody);
-    if (queued) {
-      return;
-    }
-  }
-
-  void fetch(OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    keepalive: true,
-    priority: "low",
-  }).catch(() => {
-    // Ignore telemetry network failures to keep the client console clean.
-  });
+  sendTelemetry(OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT, event);
 };

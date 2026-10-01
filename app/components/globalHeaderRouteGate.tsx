@@ -79,8 +79,14 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </Link>
           <GlobalHeaderNavClient pathname={pathname} />
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
+            {/* Hidden on a first visit to the folded brief (app/styles/home-flow.css):
+                at 375px the two pills wrapped their own labels and truncated the
+                name of the page, to offer a stage and a runway the reader had not
+                given. Above `sm` the same choices sit in a section the first visit
+                folds, so this keeps the two widths alike; "Show the full brief"
+                brings both back. */}
             {isHomeBrief ? (
-              <div className="flex items-center gap-1 sm:hidden">
+              <div data-first-visit-header-choices="true" className="flex items-center gap-1 sm:hidden">
                 <StageDropdownPill />
                 <RunwayDropdownPill />
               </div>

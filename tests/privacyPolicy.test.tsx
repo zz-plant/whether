@@ -36,6 +36,7 @@ const STORAGE_KEY_SECTIONS: Record<keyof typeof STORAGE_KEYS, string> = {
   weekChecklist: "2.4 — stays in the browser, never sent",
   entitlementToken: "2.2 — the token that tells this browser its plan is active",
   decisionMemory: "2.3 and 2.4 — keyed to the browser identifier, and stored server-side",
+  measurementOff: "5 — the reader's choice to send no 2.6 measurement from this browser",
 };
 
 /** Every `TELEMETRY_STREAMS` entry, against the section of /privacy that covers it. */
@@ -114,11 +115,12 @@ describe("privacy policy", () => {
     const html = renderPrivacyPage();
     assert.match(html, /mailto:/, "no address for a deletion request");
     assert.match(html, /clearing site data/i, "no way to clear what the browser holds");
+    assert.match(html, /Turn off measurement/, "no way to stop this browser sending usage measurement");
   });
 
   it("carries its own effective date, not the one the first two legal pages shipped with", () => {
     const html = renderPrivacyPage();
-    assert.match(html, /Effective Date: 9\/17\/2026/);
+    assert.match(html, /Effective Date: 9\/30\/2026/);
     assert.doesNotMatch(html, /Effective Date: 2\/23\/2026/);
   });
 
