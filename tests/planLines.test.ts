@@ -112,7 +112,7 @@ describe("storing plan lines", () => {
     assert.deepEqual(first.planLines, []);
     assert.deepEqual(first.pendingPlanLines, [HIRING]);
     assert.equal(first.weekly, false, "a record made only to watch lines asked for no Monday email");
-    assert.match(describeSubscription(first), /lines you set for hiring is crossed/);
+    assert.match(describeSubscription(first), /lines you set is crossed \(hiring pauses if Funding pressure > 72 or Risk appetite < 40 and resumes when/);
 
     await store.verifyEmail(first.confirmToken ?? "");
     const confirmed = await store.getSubscriberByEmail("ops@example.com");

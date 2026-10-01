@@ -116,12 +116,21 @@ const conditionLabel = (condition: PlanLineCondition) =>
 const formatPlanLineClause = (line: PlanLines, side: "pause" | "resume") =>
   (side === "pause" ? line.pause : line.resume).map(conditionLabel).join(side === "pause" ? " or " : " and ");
 
-/** "hiring and spending", for a confirmation email that says what is being confirmed. */
-export const describePlanLineAreas = (lines: readonly PlanLines[]) => {
-  const labels = lines.map((line) => decisionAreaLabel(line.area).toLowerCase());
-  if (labels.length <= 1) return labels.join("");
-  return `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
-};
+/**
+ * "hiring pauses if Funding pressure > 72 or Risk appetite < 40 and resumes when
+ * Funding pressure < 60", for a confirmation that says what is being confirmed.
+ *
+ * The numbers, not only the areas: naming the areas alone could not tell a
+ * reader's own hiring lines from different ones someone else asked for in their
+ * name, and confirming the second looked the same as confirming the first.
+ */
+export const describePlanLines = (lines: readonly PlanLines[]) =>
+  lines
+    .map(
+      (line) =>
+        `${decisionAreaLabel(line.area).toLowerCase()} pauses if ${formatPlanLineClause(line, "pause")} and resumes when ${formatPlanLineClause(line, "resume")}`,
+    )
+    .join("; ");
 
 /** The email for one crossing, in the reader's terms: their area, their line, today's scores. */
 export const describePlanLineCrossing = (crossing: PlanLineCrossing, scores: Scores) => {

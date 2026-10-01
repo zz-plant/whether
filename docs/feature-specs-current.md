@@ -1520,8 +1520,11 @@ true.
   `confirmRequestedAt`; `verifyEmail` takes only that, once. A record that never confirmed and has
   no `confirmToken` (mailed before this) still confirms with its permanent token. `GET
   /api/email/verify` shows `describeConfirmation` (each change, named as a change, for a confirmed
-  address) and a button; `POST` applies it. Unsubscribing drops the waiting request. A request that
-  asks a confirmed address for nothing new gets an email saying so, with no link. Tests:
+  address, with each area's pause and resume numbers so a reader can tell their own lines from
+  someone else's) and a button; `POST` applies it. A link is judged by the record in KV, never an
+  isolate's in-memory copy, which can predate the request or unsubscribe that retired it.
+  Unsubscribing drops the waiting request. A request that asks a confirmed address for nothing new
+  (lines included) gets an email saying so, with no link. Tests:
   `tests/subscriberWeeklyFlag.test.ts` ("who can confirm a change"), `tests/emailVerifyRoute.test.ts`.
 - **Paid plans list only what the free plan lacks.** Pro sold "Monday delivery to your inbox" and
   Team a Slack channel feed and briefs for boards and investors; the free subscribe form and `/share`

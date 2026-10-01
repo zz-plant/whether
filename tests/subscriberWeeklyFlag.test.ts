@@ -199,6 +199,23 @@ describe("who can confirm a change", () => {
     assert.equal(confirmed?.weekly, false);
   });
 
+  /* Cloudflare runs many isolates, each holding its own in-memory copy of records
+     it has seen. Confirming against that copy wrote a stale record back over KV. */
+  it("judges a link by the record in KV, not an isolate's older copy", async () => {
+    const isolateA = store;
+    const reader = await subscribeVerified("reader@example.com");
+    const request = await isolateA.subscribe("reader@example.com", { alerts: true });
+
+    const isolateB = resetSubscriberStore();
+    await isolateB.unsubscribe(reader.token);
+    assert.equal(await isolateA.verifyEmail(request.confirmToken ?? ""), null, "unsubscribing on another isolate dropped the request");
+    assert.deepEqual(await getActiveSubscriptions(), []);
+
+    const again = await isolateA.subscribe("reader@example.com", { alerts: true });
+    await resetSubscriberStore().subscribe("reader@example.com", { weekly: false });
+    assert.equal(await isolateA.verifyEmail(again.confirmToken ?? ""), null, "a newer request on another isolate retired the link");
+  });
+
   it("still confirms a record mailed its permanent token before confirmation links existed, until it has confirmed", async () => {
     kv.entries.set(
       "email:sub:early@example.com",
@@ -218,7 +235,15 @@ describe("what a confirmation says", () => {
     const confirmation = describeConfirmation(request);
     assert.equal(confirmation?.kind, "change");
     assert.match(confirmation?.text ?? "", /stop the Whether weekly brief/);
-    assert.match(confirmation?.text ?? "", /lines set for hiring/);
+    assert.match(confirmation?.text ?? "", /hiring pauses if Funding pressure > 72 and resumes when Funding pressure < 60/);
+  });
+
+  it("asks nothing when the lines requested are the lines already set", async () => {
+    await subscribeVerified("reader@example.com");
+    const set = await store.subscribe("reader@example.com", { planLines: [HIRING_LINES] });
+    await store.verifyEmail(set.confirmToken ?? "");
+    assert.equal((await store.subscribe("reader@example.com", { planLines: [HIRING_LINES] })).confirmToken, undefined);
+    assert.equal((await store.subscribe("reader@example.com", { planLines: [] })).confirmToken !== undefined, true, "clearing them is a change");
   });
 
   it("says a change is a change, so the reader can tell it from signing up", async () => {
