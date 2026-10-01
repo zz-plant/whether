@@ -223,7 +223,9 @@ export default async function SharePage() {
       <BriefArtifactScript artifact={artifact.briefArtifact} />
       {/* One panel per group, not six h2s inside one. `.weather-panel` is the
           padding tier, so each group's surfaces are the outermost boxes that
-          draw anything and own their own elevation. */}
+          draw anything and own their own elevation. Each group's h2 is a
+          heading, not an eyebrow: as the small label it was, it sat under the
+          serif titles of the cards inside it, and the page read inside out. */}
       <div className="space-y-5 sm:space-y-8">
         {/* No bottom padding: `.weather-panel` draws no frame, so its padding and
             the next panel's stacked with the gap between them into ~70px of
@@ -253,7 +255,7 @@ export default async function SharePage() {
         <SharePageFormats scoreReferences={artifact.scoreReferences} />
 
         <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="longer-formats-heading">
-          <h2 id="longer-formats-heading" className="type-eyebrow">Longer formats</h2>
+          <h2 id="longer-formats-heading" className="text-xl font-semibold text-white sm:text-2xl">Longer formats</h2>
           <ShareCopyControls
             recordDate={artifact.recordDate}
             slackBrief={artifact.slackBrief}
@@ -277,7 +279,7 @@ export default async function SharePage() {
             section of /operate, where nobody planning a week went looking for
             a CFO memo; they belong beside Slack, email and the meeting pack. */}
         <section id="role-memos" className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="role-memos-heading">
-          <h2 id="role-memos-heading" className="type-eyebrow">Brief your team by role</h2>
+          <h2 id="role-memos-heading" className="text-xl font-semibold text-white sm:text-2xl">Brief your team by role</h2>
           <ExecutiveBriefingPanel
             assessment={artifact.assessment}
             recordDateLabel={artifact.recordDateLabel}

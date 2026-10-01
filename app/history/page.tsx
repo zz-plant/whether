@@ -146,14 +146,6 @@ export default async function HistoryPage({
         payloads: { structuredData },
       }}
     >
-      {/* The shell's h1 already says History and TrackRecord names itself directly below, so a
-          second h1 here restated both; only the export action keeps this row. */}
-      {trackRecord ? (
-        <div className="flex justify-end mb-4">
-          <ExportBoardAnnexButton record={trackRecord} />
-        </div>
-      ) : null}
-
       {/* The record's answer, legible in a second: every month coloured by the
           call, the changes marked, the current run named. The page used to open
           with the phase map, which a first-time reader has to learn before it
@@ -166,7 +158,7 @@ export default async function HistoryPage({
           aria-labelledby="call-by-month-heading"
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
-          <h2 id="call-by-month-heading" className="type-eyebrow type-eyebrow-section">Conditions by month</h2>
+          <h2 id="call-by-month-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by month</h2>
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
               Since the last month-end, the week of {weekAfterRecord.recordDateLabel} was published as{" "}
@@ -195,8 +187,12 @@ export default async function HistoryPage({
           call hold" and "how often was the confidence label right" are the same
           question asked twice, and the second answer used to live on /trust. */}
       <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        {/* The export copies the track record, so it sits in that section's
+            header. It had a row of its own between the page intro and the
+            first section, belonging to neither. */}
         <TrackRecordTiles
           record={trackRecord}
+          action={trackRecord ? <ExportBoardAnnexButton record={trackRecord} /> : null}
           aside={
             <div className="space-y-3">
               <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
@@ -240,7 +236,7 @@ export default async function HistoryPage({
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <div>
-            <h2 id="published-briefs-heading" className="type-eyebrow type-eyebrow-section">Published weekly briefs</h2>
+            <h2 id="published-briefs-heading" className="text-xl font-semibold text-white sm:text-2xl">Published weekly briefs</h2>
             {/* Say what the archive holds, not what it aspires to. With one entry,
                 "permanent, immutable calls cited in board documents" promised a
                 record the page could not show. The count is the honest claim; the
@@ -282,7 +278,7 @@ export default async function HistoryPage({
         aria-labelledby="posture-by-year-heading"
         className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       >
-        <h2 id="posture-by-year-heading" className="type-eyebrow type-eyebrow-section">Conditions by year</h2>
+        <h2 id="posture-by-year-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by year</h2>
         <p className="text-sm text-slate-300">
           What conditions were in each closed year, how the months split, and where they changed mid-year.
         </p>

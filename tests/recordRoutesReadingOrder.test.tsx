@@ -137,3 +137,29 @@ describe("/history/compare draws each score against its lines", () => {
     assert.match(text, /Risk appetite\s+[A-Z][^<]*?\.\s+\d+\/100/, "risk appetite carries its meaning and scale");
   });
 });
+
+/* DD-037. The page's section titles were eyebrow labels, and the record export
+   had a row of its own between the intro and the first section. */
+describe("/history marks its sections", () => {
+  const h2Class = (html: string, id: string) => {
+    const tag = new RegExp(`<h2([^>]*)id="${id}"([^>]*)>`).exec(html);
+    if (!tag) return null;
+    return /class="([^"]*)"/.exec(`${tag[1] ?? ""}${tag[2] ?? ""}`)?.[1] ?? "";
+  };
+
+  it("heads each section with a heading, and keeps the record export in the Track record header", async () => {
+    const page = await import("../app/history/page");
+    const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
+
+    for (const id of ["call-by-month-heading", "track-record-heading", "phase-map-heading", "monthly-calls-heading", "published-briefs-heading"]) {
+      const className = h2Class(html, id);
+      assert.notEqual(className, null, `${id} renders`);
+      assert.doesNotMatch(className ?? "", /type-eyebrow/, `${id} is a heading, not a label`);
+    }
+
+    const trackRecord = /<section[^>]*aria-labelledby="track-record-heading"[^>]*>([\s\S]*?)<\/section>/.exec(html);
+    assert.ok(trackRecord, "the track record section renders");
+    assert.match(trackRecord[1] ?? "", /Copy the record summary/, "the export sits in the section it copies");
+    assert.ok(html.indexOf("Copy the record summary") > html.indexOf('id="call-by-month-heading"'), "and not above the first section");
+  });
+});

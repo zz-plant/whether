@@ -146,7 +146,10 @@ export const SignalsInstrumentsSection = ({
   monthPickerOpen: boolean;
   searchParams?: SignalsPageSearchParams;
 }) => (
-  <section id="instruments" aria-labelledby="instruments-heading" className="space-y-6">
+  /* Ruled off from "What would change this guidance": its last line ran into
+     this eyebrow closer than the gaps inside either section, so the evidence
+     appendix read as more of the guidance. */
+  <section id="instruments" aria-labelledby="instruments-heading" className="space-y-6 border-t border-[var(--border-subtle)] pt-8">
     {/* The same inset as a ReportSection's header (px-5, none on a phone), so
         this title lines up with every section title above it. */}
     <div className="px-5 max-sm:px-0">
@@ -159,63 +162,69 @@ export const SignalsInstrumentsSection = ({
     {/* Open by default: the charts are what this section is for. Which of the
         instruments a reader had open is incidental to a shared link, except
         the month picker below, whose open state other pages link into. */}
-    <details id="signal-diagnostics" open className="weather-auto-chevron weather-panel space-y-4 p-5">
-      <summary className={SUMMARY_CLASS}>Every chart behind the guidance.</summary>
-      <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
-      <SignalInversionPreview yieldCurveSeries={yieldCurveSeries} />
-      <div id="trends" className="space-y-4 border-t border-slate-800/60 pt-4">
-        <h3 className="type-eyebrow">Funding pressure and risk appetite over time</h3>
-        {/* The table above publishes *this week's* reading and this series is
-            the month-end archive, so the two disagree by design — for the same
-            two named signals. Each cell stamps its own period; this line says
-            what the block is, once. */}
-        <p className="text-fluid-xs text-slate-400">
-          Month-end readings from the archive, so the latest figure here is the last
-          completed month rather than this week&rsquo;s score above.
-        </p>
-        <SignalSparklineStrip
-          series={[
-            { key: "tightness", label: "Funding pressure", points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
-            { key: "riskAppetite", label: "Risk appetite", points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
-          ]}
+    {/* One list, one rule between items. The five were a disclosure, a heading
+        block, two bare disclosure rows and a section with its own boxed toggle,
+        so nothing said they were the same kind of thing or where one ended. A
+        box each would put the charts' own cards three frames deep (§XIII). */}
+    <div className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
+      <details id="signal-diagnostics" open className="weather-auto-chevron weather-panel space-y-4 p-5">
+        <summary className={SUMMARY_CLASS}>Every chart behind the guidance.</summary>
+        <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
+        <SignalInversionPreview yieldCurveSeries={yieldCurveSeries} />
+        <div id="trends" className="space-y-4 border-t border-slate-800/60 pt-4">
+          <h3 className="type-eyebrow">Funding pressure and risk appetite over time</h3>
+          {/* The table above publishes *this week's* reading and this series is
+              the month-end archive, so the two disagree by design — for the same
+              two named signals. Each cell stamps its own period; this line says
+              what the block is, once. */}
+          <p className="text-fluid-xs text-slate-400">
+            Month-end readings from the archive, so the latest figure here is the last
+            completed month rather than this week&rsquo;s score above.
+          </p>
+          <SignalSparklineStrip
+            series={[
+              { key: "tightness", label: "Funding pressure", points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
+              { key: "riskAppetite", label: "Risk appetite", points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
+            ]}
+          />
+        </div>
+      </details>
+
+      <AdvancedThresholdsSection currentThresholds={assessment.thresholds} />
+
+      <UrlDetails
+        id="past-months"
+        queryKey="advanced"
+        initialOpen={monthPickerOpen}
+        className="weather-auto-chevron weather-panel p-5"
+        summaryClassName={SUMMARY_CLASS}
+        summary={<span>Past months · See what the brief said in an earlier month</span>}
+      >
+        <TimeMachinePanel
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          isHistorical={isHistorical}
+          latestRecordDate={treasury.record_date}
+          cacheCoverage={cacheCoverage}
+          monthsByYear={cacheMonthsByYear}
+          invalidSelection={invalidHistoricalSelection}
+          historicalRegime={isHistorical ? assessment.regime : null}
+          historicalSummary={isHistorical ? assessment.description : null}
         />
-      </div>
-    </details>
+        <RegimeTimelinePanel
+          series={regimeSeries}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          searchParams={searchParams}
+        />
+      </UrlDetails>
 
-    <AdvancedThresholdsSection currentThresholds={assessment.thresholds} />
+      <AnalogPatternDisclosure assessment={assessment} />
 
-    <UrlDetails
-      id="past-months"
-      queryKey="advanced"
-      initialOpen={monthPickerOpen}
-      className="weather-auto-chevron weather-panel p-5"
-      summaryClassName={SUMMARY_CLASS}
-      summary={<span>Past months · See what the brief said in an earlier month</span>}
-    >
-      <TimeMachinePanel
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-        isHistorical={isHistorical}
-        latestRecordDate={treasury.record_date}
-        cacheCoverage={cacheCoverage}
-        monthsByYear={cacheMonthsByYear}
-        invalidSelection={invalidHistoricalSelection}
-        historicalRegime={isHistorical ? assessment.regime : null}
-        historicalSummary={isHistorical ? assessment.description : null}
+      <FossilRecordSection
+        regime={assessment.regime}
+        open={searchParams?.fossil === "1" || searchParams?.fossil === "open"}
       />
-      <RegimeTimelinePanel
-        series={regimeSeries}
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-        searchParams={searchParams}
-      />
-    </UrlDetails>
-
-    <AnalogPatternDisclosure assessment={assessment} />
-
-    <FossilRecordSection
-      regime={assessment.regime}
-      open={searchParams?.fossil === "1" || searchParams?.fossil === "open"}
-    />
+    </div>
   </section>
 );

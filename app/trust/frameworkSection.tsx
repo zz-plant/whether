@@ -90,7 +90,10 @@ export function FrameworkSection() {
 
         <section className="space-y-4">
           <h3 className="type-eyebrow">In practice</h3>
-          <div className="weather-surface px-4 py-4 space-y-2">
+          {/* A worked example, ruled at the left like a quoted answer, not boxed:
+              in the same surface as the three definitions above it, it read as a
+              fourth definition rather than the three filled in. */}
+          <div className="space-y-2 border-l-2 border-sky-500/50 pl-4">
             <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
             <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
             <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>

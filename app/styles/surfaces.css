@@ -36,6 +36,13 @@
   container-type: inline-size;
 }
 
+/* The format card on /share whose text the preview beside it is showing. The
+   action accent, mixed down, so it reads as "this one" without the weight of a
+   focus ring; the token keeps it legible on the light theme. */
+.weather-surface[data-previewed="true"] {
+  border-color: color-mix(in oklab, var(--accent-action) 55%, transparent);
+}
+
 /* The two homepage brief cards used to carry their own class, a literal
    rgba(10,22,26,0.85) fill with a teal hover glow — the same slab on both
    themes. They are the card tier now. */

@@ -32,6 +32,12 @@ export type AreaRowData = {
    * so a slot that resolves to nothing adds no row.
    */
   note?: ReactNode;
+  /**
+   * A control for this row — on /share, the button that copies the area's tag.
+   * Drawn in a last column so it stays with the row it acts on; the five sat in
+   * a row under the table until 2026-10-02, a table's height from their rows.
+   */
+  action?: ReactNode;
 };
 
 type AreaTableProps = {
@@ -69,6 +75,7 @@ const LineCell = ({ value }: { value?: { line: ReactNode; distance?: ReactNode }
 export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
   const ordered = [...rows].sort((a, b) => orderIndex(a.area) - orderIndex(b.area));
   const showChanged = ordered.some((row) => row.changed);
+  const showAction = ordered.some((row) => row.action);
   return (
     <div className={`sm:overflow-x-auto ${className}`.trim()}>
       <table className="w-full border-collapse text-left text-sm max-sm:block sm:min-w-[36rem]">
@@ -80,6 +87,11 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
             <th scope="col" className="py-2 pr-3 font-medium text-semantic-caution-fg">Pause line</th>
             <th scope="col" className="py-2 pr-3 font-medium text-semantic-easing-fg">Resume line</th>
             {showChanged ? <th scope="col" className="py-2 pr-3 font-medium">Changed</th> : null}
+            {showAction ? (
+              <th scope="col" className="py-2 font-medium">
+                <span className="sr-only">Copy</span>
+              </th>
+            ) : null}
           </tr>
         </thead>
         <tbody className="max-sm:block">
@@ -115,6 +127,9 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                   <CellLabel className="text-slate-400">Changed</CellLabel>
                   {row.changed ?? <span className="text-slate-500">—</span>}
                 </td>
+              ) : null}
+              {showAction ? (
+                <td className="whitespace-nowrap py-2.5 text-right max-sm:col-span-2 max-sm:p-0 max-sm:text-left">{row.action}</td>
               ) : null}
             </tr>
           ))}

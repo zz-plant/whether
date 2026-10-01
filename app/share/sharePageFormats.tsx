@@ -38,14 +38,20 @@ export function SharePageFormats({
   if (!artifact) return null;
 
   return (
-    <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="copy-call-heading">
-      <h2 id="copy-call-heading" className="type-eyebrow">Copy this week&apos;s guidance</h2>
+    <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="copy-call-heading">
+      <h2 id="copy-call-heading" className="text-xl font-semibold text-white sm:text-2xl">Copy this week&apos;s guidance</h2>
+      {/* Labelled and ruled at the left, so the four lines read as the readings
+          behind every format rather than the opening of the text the tabs
+          below copy. */}
       {scoreReferences.length > 0 ? (
-        <ul className="space-y-0.5 text-xs tabular-nums text-slate-300" aria-label="This week's scores">
-          {scoreReferences.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
+        <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
+          <p id="copy-call-scores-label" className="type-eyebrow">This week&apos;s readings</p>
+          <ul className="space-y-1 text-xs tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
+            {scoreReferences.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </div>
       ) : null}
       <BriefFormatPicker
         format={format}

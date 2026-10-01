@@ -29,7 +29,7 @@ export function PullPolicyControls({
   return (
     <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="wip-limits-heading">
       <div className="space-y-1">
-        <h2 id="wip-limits-heading" className="type-eyebrow">Work-in-progress limits</h2>
+        <h2 id="wip-limits-heading" className="text-xl font-semibold text-white sm:text-2xl">Work-in-progress limits</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           A work-in-progress limit is how many things a team runs at once. This week&apos;s guidance as
           one: what to keep starting, when to stop, when to resume, and how many bets can run in

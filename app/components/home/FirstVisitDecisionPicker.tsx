@@ -127,97 +127,111 @@ export function FirstVisitDecisionPicker({
       data-first-visit-only="true"
       data-testid="first-visit-decision-picker"
       aria-labelledby="first-visit-decision-heading"
-      className="order-1 space-y-4 border-t border-slate-800/70 pt-5"
+      className="order-1 space-y-8 border-t border-slate-800/70 pt-5"
     >
-      <div className="space-y-1">
-        <h2 id="first-visit-decision-heading" className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
-          What are you deciding?
-        </h2>
-        <p className="text-fluid-xs text-slate-400">
-          Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
-        </p>
-      </div>
-
-      <SegmentedControl
-        options={segmentedOptions}
-        value={selected}
-        onSelect={setSelected}
-        ariaLabel="What are you deciding?"
-        layout="choices"
-      />
-
-      {/* What the numbers below are measured against. Every line under the
-          choices quotes a score ("Funding pressure > 76", "90 today"), and what
-          100 means was printed only in the folded "What changed" table, so a
-          first visit met numbers it had no way to read. */}
-      <ul aria-label="This week's scores" className="space-y-0.5 text-fluid-xs text-slate-400">
-        <li><SignalReading signalKey="tightness" score={scores.tightness} /></li>
-        <li><SignalReading signalKey="riskAppetite" score={scores.riskAppetite} /></li>
-      </ul>
-
-      {active ? (
-        <div aria-live="polite" className="space-y-2 border-l-2 border-sky-500/50 pl-4">
-          <p className="type-eyebrow">{decisionAreaLabel(active.area)}</p>
-          <p className="max-w-[64ch] text-fluid-sm font-semibold leading-snug text-white">{active.rule}</p>
-          {active.changed ? (
-            /* Amber for an area the week moved, slate for one it did not: the
-               same table cell says "No line crossed" for both. */
-            <p className={`max-w-[64ch] text-fluid-xs ${active.changedKind === "held" ? "text-slate-400" : "text-amber-200/90"}`}>
-              {active.changed}
-            </p>
-          ) : null}
-          <dl className="grid max-w-[64ch] gap-1 text-fluid-xs text-slate-300 sm:grid-cols-[auto_1fr] sm:gap-x-4">
-            {active.pause ? (
-              <>
-                <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
-                <dd>
-                  {active.pause.line} <span className="text-slate-400">· {active.pause.distance}</span>
-                </dd>
-              </>
-            ) : null}
-            {active.resume ? (
-              <>
-                <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
-                <dd>
-                  {active.resume.line} <span className="text-slate-400">· {active.resume.distance}</span>
-                </dd>
-              </>
-            ) : null}
-          </dl>
-          {/* The lines above are the published ones. A plan that needs its own —
-              a hiring plan released at 60 rather than 66 — sets them once on the
-              planning page and hears the day one is crossed. */}
-          <ActionLink href="/operate#ops-plan-lines" variant="inline">
-            Move these lines for your plan →
-          </ActionLink>
-          <CommitmentTest regime={regime} area={active.area} />
-          {active.answer ? (
-            <ActionLink href={active.answer.href} variant="inline">
-              {active.answer.title} →
-            </ActionLink>
-          ) : null}
+      {/* Three groups, spaced apart more than anything inside them: the decision,
+          the alert, and the record. One even gap through all of it left the score
+          lines between the choices and the alert card belonging to neither, and
+          the record reading as more of the alert's copy. */}
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <h2 id="first-visit-decision-heading" className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
+            What are you deciding?
+          </h2>
+          <p className="text-fluid-xs text-slate-400">
+            Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
+          </p>
         </div>
-      ) : null}
+
+        <SegmentedControl
+          options={segmentedOptions}
+          value={selected}
+          onSelect={setSelected}
+          ariaLabel="What are you deciding?"
+          layout="choices"
+        />
+
+        {/* What the numbers below are measured against. Every line under the
+            choices quotes a score ("Funding pressure > 76", "90 today"), and what
+            100 means was printed only in the folded "What changed" table, so a
+            first visit met numbers it had no way to read. */}
+        <div className="space-y-1">
+          <p id="first-visit-scores-label" className="type-eyebrow">This week&apos;s scores</p>
+          <ul aria-labelledby="first-visit-scores-label" className="space-y-0.5 text-fluid-xs text-slate-400">
+            <li><SignalReading signalKey="tightness" score={scores.tightness} /></li>
+            <li><SignalReading signalKey="riskAppetite" score={scores.riskAppetite} /></li>
+          </ul>
+        </div>
+
+        {active ? (
+          <div aria-live="polite" className="space-y-2 border-l-2 border-sky-500/50 pl-4">
+            <p className="type-eyebrow">{decisionAreaLabel(active.area)}</p>
+            <p className="max-w-[64ch] text-fluid-sm font-semibold leading-snug text-white">{active.rule}</p>
+            {active.changed ? (
+              /* Amber for an area the week moved, slate for one it did not: the
+                 same table cell says "No line crossed" for both. */
+              <p className={`max-w-[64ch] text-fluid-xs ${active.changedKind === "held" ? "text-slate-400" : "text-amber-200/90"}`}>
+                {active.changed}
+              </p>
+            ) : null}
+            <dl className="grid max-w-[64ch] gap-1 text-fluid-xs text-slate-300 sm:grid-cols-[auto_1fr] sm:gap-x-4">
+              {active.pause ? (
+                <>
+                  <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
+                  <dd>
+                    {active.pause.line} <span className="text-slate-400">· {active.pause.distance}</span>
+                  </dd>
+                </>
+              ) : null}
+              {active.resume ? (
+                <>
+                  <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
+                  <dd>
+                    {active.resume.line} <span className="text-slate-400">· {active.resume.distance}</span>
+                  </dd>
+                </>
+              ) : null}
+            </dl>
+            {/* The lines above are the published ones. A plan that needs its own —
+                a hiring plan released at 60 rather than 66 — sets them once on the
+                planning page and hears the day one is crossed. */}
+            <ActionLink href="/operate#ops-plan-lines" variant="inline">
+              Move these lines for your plan →
+            </ActionLink>
+            <CommitmentTest regime={regime} area={active.area} />
+            {active.answer ? (
+              <ActionLink href={active.answer.href} variant="inline">
+                {active.answer.title} →
+              </ActionLink>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
 
       <FlipAlertForm condition={flipCondition} />
 
       {/* The answer to "has this happened before", on the page. The card that
           says it at length is in the folded brief, and the turning points
           below are links; a sceptical first visit had to leave to check. */}
-      {lastTime ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{lastTime}</p> : null}
+      {lastTime || turningPoints.length > 0 ? (
+        <div className="space-y-2">
+          <h3 className="type-eyebrow">Has this happened before?</h3>
+          {lastTime ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{lastTime}</p> : null}
 
-      {turningPoints.length > 0 ? (
-        <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
-          Check it against the record. What the guidance said at the last turns:{" "}
-          {turningPoints.map((point, index) => (
-            <span key={point.href}>
-              {index > 0 ? " · " : null}
-              <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                {point.label}
-              </Link>
-            </span>
-          ))}
-        </p>
+          {turningPoints.length > 0 ? (
+            <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
+              Check it against the record. What the guidance said at the last turns:{" "}
+              {turningPoints.map((point, index) => (
+                <span key={point.href}>
+                  {index > 0 ? " · " : null}
+                  <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+                    {point.label}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <button

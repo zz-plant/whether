@@ -138,7 +138,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
               is the second read — how the two scores decide the call — and a
               heading that said "where this month sits" made it compete with
               them for the first question. */}
-          <h2 className="type-eyebrow type-eyebrow-section" id="phase-map-heading">
+          <h2 className="text-xl font-semibold text-white sm:text-2xl" id="phase-map-heading">
             How the two scores set conditions
           </h2>
           <p className="max-w-prose text-sm text-slate-300">
