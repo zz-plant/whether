@@ -59,4 +59,25 @@ describe("expansion controls rendering", () => {
     assert.match(html, /and the weekly reading holds or improves/);
   });
 
+  it("links each area row to the answer the homepage offers for that area", () => {
+    const { buildCanonicalBoundedDecisionRules } = require("../lib/report/boundedDecisionRules");
+    const { buildActionStripItems } = require("../lib/report/operatingCalls");
+    const { buildAreaRows } = require("../app/operate/areaRows");
+    const { findLeadAnswerForArea } = require("../app/answers/decisionPages");
+    const scores = { tightness: 32, riskAppetite: 52 };
+    const rules = buildCanonicalBoundedDecisionRules({
+      regime: "EXPANSION",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores,
+    });
+    const rows = buildAreaRows(buildActionStripItems(rules, scores));
+
+    assert.equal(rows.length, 5);
+    for (const row of rows) {
+      const lead = findLeadAnswerForArea(row.area);
+      assert.ok(lead, `no lead answer for ${row.area}`);
+      assert.equal(row.href, `/answers/${lead.slug}`, `${row.area} links a different answer than the homepage`);
+    }
+  });
+
 });
