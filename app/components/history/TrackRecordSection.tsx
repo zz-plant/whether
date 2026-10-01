@@ -32,7 +32,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
       aria-labelledby="track-record-grading-heading"
     >
       <div>
-        <h2 id="track-record-grading-heading" className="type-eyebrow type-eyebrow-section">How the record held up</h2>
+        <h2 id="track-record-grading-heading" className="text-xl font-semibold text-white sm:text-2xl">How the record held up</h2>
         <p className="text-sm text-slate-300">
           How the readings held up, graded against the same data that produced them.
         </p>

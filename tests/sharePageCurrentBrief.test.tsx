@@ -6,6 +6,7 @@ import { macroSeries } from "../lib/macroSnapshot";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import { snapshotData } from "../lib/snapshot";
+import { decisionAreaLabel, decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 
 const originalFetch = globalThis.fetch;
 
@@ -66,5 +67,28 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Copy investor update/);
     assert.match(html, /Portfolio note/);
     assert.match(html, /Copy portfolio note/);
+  });
+
+  /* DD-037. Each group's h2 was an eyebrow label, smaller than the serif titles
+     of the cards inside it, and the five tag buttons sat in a row under the
+     table, a table's height from the rows they copy. */
+  it("heads each group with a heading, and puts each area's tag button in that area's row", async () => {
+    const html = renderToStaticMarkup(await SharePage());
+
+    /* "Copy this week's guidance" reads the brief from the page in the browser
+       and renders nothing on the server, so it is not in this markup. */
+    for (const id of ["longer-formats-heading", "guardrail-tags-heading", "wip-limits-heading", "role-memos-heading", "share-files-heading"]) {
+      const heading = new RegExp(`<h2 id="${id}" class="([^"]*)"`).exec(html);
+      assert.ok(heading, `${id} renders as an h2`);
+      assert.doesNotMatch(heading[1] ?? "", /type-eyebrow/, `${id} is a heading, not a label`);
+    }
+
+    const tagRows = [...html.matchAll(/<tr[^>]*data-area="([^"]+)"[^>]*>([\s\S]*?)<\/tr>/g)].filter(([, , row]) => /tag<\/button>|tag</.test(row ?? ""));
+    assert.equal(tagRows.length, decisionAreaOrder.length, "one tag row per area");
+    for (const [, area, row] of tagRows) {
+      const label = decisionAreaOrder.find((key) => key === area);
+      assert.ok(label, `known area ${area}`);
+      assert.match(row ?? "", new RegExp(`Copy ${decisionAreaLabel(label)} tag`), `${area}'s button is in its own row`);
+    }
   });
 });

@@ -111,9 +111,12 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
 export function TrackRecordTiles({
   record,
   aside,
+  action,
 }: {
   record: TrackRecordModel | null;
   aside?: ReactNode;
+  /** A control for the record as a whole — /history's "Copy the record summary" — drawn beside the heading. */
+  action?: ReactNode;
 }) {
   if (!record) {
     return null;
@@ -126,12 +129,15 @@ export function TrackRecordTiles({
 
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
-      <div>
-        <h2 className="type-eyebrow type-eyebrow-section" id="track-record-heading">Track record</h2>
-        <p className="text-sm text-slate-300">
-          Every month-end reading Whether has made, scored with the same published formula, so
-          you can check each one against what happened next.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div>
+          <h2 className="text-xl font-semibold text-white sm:text-2xl" id="track-record-heading">Track record</h2>
+          <p className="text-sm text-slate-300">
+            Every month-end reading Whether has made, scored with the same published formula, so
+            you can check each one against what happened next.
+          </p>
+        </div>
+        {action}
       </div>
 
       <div className={aside ? "grid gap-6 lg:grid-cols-2" : ""}>
@@ -189,7 +195,7 @@ export function TrackRecordTable({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
-        <h2 className="type-eyebrow type-eyebrow-section" id="monthly-calls-heading">Monthly readings</h2>
+        <h2 className="text-xl font-semibold text-white sm:text-2xl" id="monthly-calls-heading">Monthly readings</h2>
         <p className="text-sm text-slate-300">
           The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each reading, newest first. It runs
           0 to 100: {OPERATING_LATITUDE_GLOSS}.

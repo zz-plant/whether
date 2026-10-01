@@ -52,11 +52,19 @@ export function TrustStrip({
      * and lets the adjacent confidence qualify it. */
     { label: "Could change next week", value: couldChangeNextWeek ? "Yes" : "Not expected", tone: couldChangeNextWeek ? "caution" : undefined },
   ];
+  /* A phone wraps the four pairs, and a label told from a value only by its
+     shade then reads into the next pair: "Confidence High Could change next
+     week Not expected". Below `sm` each pair is a cell of a two-column grid,
+     label over value; from `sm` they run on one line, a pair kept tighter than
+     the gap between pairs. */
   return (
-    <div className={`flex flex-wrap items-center gap-x-5 gap-y-1 text-xs ${className}`.trim()} data-trust-strip>
+    <div
+      className={`grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1 ${className}`.trim()}
+      data-trust-strip
+    >
       <dl className="contents">
         {cells.map((cell) => (
-          <div key={cell.label} className="flex items-baseline gap-1.5">
+          <div key={cell.label} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-1.5">
             <dt className="text-slate-500">{cell.label}</dt>
             <dd
               className={
@@ -73,7 +81,7 @@ export function TrustStrip({
         ))}
       </dl>
       {href ? (
-        <Link href={href} className="weather-hit text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+        <Link href={href} className="weather-hit col-span-2 justify-self-start text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
           How this is judged
         </Link>
       ) : null}

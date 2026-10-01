@@ -239,7 +239,10 @@ export async function buildPlanningPageModel(
                 items: actionStripItems,
                 scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
               }),
-              h("section", { className: "space-y-4" },
+              /* Ruled off from the score bars above, and the list from the table
+                 below by more than the rows inside either: three groups sat a
+                 single gap apart, so the bars' key ran straight into the first line of the call. */
+              h("section", { className: "space-y-6 border-t border-[var(--border-subtle)] pt-5" },
                 /* The call, as a plain list. It was three bordered cards under
                    "This week's guidance · Read this first.", each headed in its
                    own colour in tracked capitals — three encodings (box, hue,
@@ -247,13 +250,17 @@ export async function buildPlanningPageModel(
                    them. Colour marks state here, not labels (ui-ux-standards
                    §XVIII); these are the one statement of the call on /operate,
                    so they stay, in the register the rest of the step reads in. */
-                h("dl", { className: "grid gap-x-6 gap-y-3 sm:grid-cols-[max-content_1fr]" },
+                /* On a phone each pair is its own block, label tight to its value:
+                   one 12px gap between every dt and dd left each label as near the
+                   line above it as the line below. From sm the pairs are rows of
+                   the two-column grid. */
+                h("dl", { className: "grid gap-x-6 gap-y-4 sm:grid-cols-[max-content_1fr] sm:gap-y-3" },
                   ...[
                     { label: DECISION_CONTRACT_LABELS.action.actionNow, value: weeklyCall.actionNow },
                     { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: weeklyCall.pauseIf },
                     ...weeklyCallChangeLines(weeklyCall),
                   ].map(({ label, value }) =>
-                    h("div", { key: label, className: "contents" },
+                    h("div", { key: label, className: "space-y-1 sm:contents sm:space-y-0" },
                       h("dt", { className: "type-eyebrow sm:pt-0.5" }, label),
                       h("dd", { className: "text-sm text-slate-100" }, value),
                     ),
@@ -416,7 +423,10 @@ export async function buildPlanningPageModel(
           },
         ],
       }),
-      h("section", { id: "ops-failure-patterns", className: "weather-panel space-y-4 px-5 py-5", "aria-labelledby": "ops-failure-patterns-title" },
+      /* Boxed like the steps above it, though it has no Done box: it was the one
+         section of the page drawn as loose text, and the disclosure after it had
+         no edge to say it was a section of its own rather than part of this one. */
+      h("section", { id: "ops-failure-patterns", className: "weather-panel mt-6 space-y-4 rounded-xl border border-[var(--border-subtle)] p-4 sm:p-5", "aria-labelledby": "ops-failure-patterns-title" },
         h("div", { className: "space-y-2" },
           h("p", { className: "type-eyebrow type-eyebrow-section" }, "Risk checks"),
           h("h2", { id: "ops-failure-patterns-title", className: "text-lg font-semibold text-slate-100" }, "Warnings to read before you approve"),
@@ -435,7 +445,7 @@ export async function buildPlanningPageModel(
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
         ),
       ),
-      h("details", { className: "weather-panel weather-auto-chevron space-y-4 px-5 py-5" },
+      h("details", { className: "weather-panel weather-auto-chevron mt-6 rounded-xl border border-[var(--border-subtle)] p-4 sm:p-5" },
         h("summary", { className: "cursor-pointer list-none text-sm font-semibold text-sky-200" }, "Resource templates and guides"),
         h("div", { className: "mt-3 space-y-4" },
           h("p", { className: "text-sm text-slate-300" }, "Templates and operating guides you can fill in and share."),

@@ -2233,7 +2233,10 @@ shell so every report route inherits them:
   `py-5 lg:py-8`): 40px between the chips row, the offline notice and the intro was unused space
   above the first task block, not separation.
 - **The week checklist count is `text-sm`.** "0 of 5 done this week" is the most actionable fact
-  under the intro and printed in the same micro size as the trust metadata above it.
+  under the intro and printed in the same micro size as the trust metadata above it. Since
+  2026-10-02 it heads the checklist ("Steps for this week", the count at the right over the Done
+  boxes, a rule under both) with 24px above, instead of sitting directly under the trust strip as
+  if it were one of its facts (DD-037).
 
 **Command palette (`Cmd+K`).** Below `md` the palette is a bottom sheet, not a centered dialog:
 touch-height rows (`min-h-11`), no keyboard-shortcut badges, no shortcut footer, no pre-selected

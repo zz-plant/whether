@@ -157,7 +157,7 @@ function StepPanel({
         id={step.id}
         aria-current={isActive ? "step" : undefined}
         data-step-done="true"
-        className="weather-step-panel space-y-4 rounded-xl border border-white/[0.04] bg-slate-950/[0.05] p-4 sm:p-5"
+        className="weather-step-panel space-y-4 rounded-xl border border-[var(--border-subtle)] bg-slate-950/[0.05] p-4 sm:p-5"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
@@ -188,7 +188,10 @@ function StepPanel({
       // drawn a second time for sighted readers only.
       aria-current={isActive ? "step" : undefined}
       className={`weather-step-panel space-y-4 rounded-xl border p-4 sm:p-5 ${
-        isOpen ? "border-sky-500/20 bg-slate-900/10" : "border-white/[0.04] bg-slate-950/[0.05]"
+        /* A closed step's edge is the subtle border token, not white at 4%: on
+           the dark ground that drew nothing, and four closed steps read as one
+           run of text with checkboxes. The token keeps it visible in light too. */
+        isOpen ? "border-sky-500/20 bg-slate-900/10" : "border-[var(--border-subtle)] bg-slate-950/[0.05]"
       }`}
     >
       {/* The rule divides the header from the step body, so a closed step
@@ -349,7 +352,7 @@ export function OperationsExecutionStepper({
   return (
     <section
       id="planning-stepper"
-      className="space-y-4"
+      className="mt-6 space-y-4"
       aria-label="Planning sections"
     >
       {/* No chip row of its own. The shell's sidebar (from lg) and mobile chips
@@ -357,19 +360,21 @@ export function OperationsExecutionStepper({
           the page's second index — a third, counting the card grid that used to
           close the page. The `aria-current="step"` state lives on the panels. */}
       {recordDate ? (
-        <p
-          className="text-sm text-slate-300"
-          aria-live="polite"
-          data-week-progress
-        >
-          {/* The week's progress is the most actionable fact under the intro,
-              and it printed in the same micro size as the trust metadata above
-              it. Same encoding — a count in tabular figures — one step louder. */}
-          <span className="font-semibold tabular-nums text-slate-100">
-            {doneCount} of {steps.length}
-          </span>{" "}
-          done this week
-        </p>
+        /* The checklist's own header: the count sits at the right, over the Done
+           boxes it counts. Printed directly under the trust strip, it read as a
+           fifth fact about the reading rather than progress through the steps. */
+        <div className="flex items-baseline justify-between gap-4 border-b border-slate-800/70 pb-2">
+          <p className="type-eyebrow">Steps for this week</p>
+          <p className="text-sm text-slate-300" aria-live="polite" data-week-progress>
+            {/* The week's progress is the most actionable fact under the intro,
+                and it printed in the same micro size as the trust metadata above
+                it. Same encoding — a count in tabular figures — one step louder. */}
+            <span className="font-semibold tabular-nums text-slate-100">
+              {doneCount} of {steps.length}
+            </span>{" "}
+            done this week
+          </p>
+        </div>
       ) : null}
       <div className="space-y-6">
         {steps.map((step) => {

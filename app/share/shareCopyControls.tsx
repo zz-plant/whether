@@ -117,19 +117,24 @@ export function ShareCopyControls({
     }
   }, [copiedTarget, emailBrief, standupLine, meetingPack, issueTrackerBrief, investorUpdateText, portfolioNote, slackBrief]);
 
+  /* The card whose text the preview is showing, marked on the card itself:
+     "Current Slack brief" in the preview's corner was the only link between
+     the two, and no card looked chosen. */
+  const previewed: CopyTarget = copiedTarget ?? "slack";
+
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       {/* content-start: the preview column beside this one is tall, and without
           it these cards stretched to match, leaving a block of empty space
           under each button. */}
       <div className="grid gap-4 sm:grid-cols-2 content-start">
-        <article className="weather-surface space-y-3 px-4 py-4">
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "slack" ? "true" : undefined}>
           {/* One colour for every peer format. These were sky / emerald / amber /
               violet, which reads as a status legend on a site where emerald and
               amber mean easing and tightening everywhere else — decoration
               spending the semantic palette on things that differ only by
               destination. */}
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Slack</h2>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Slack</h3>
           <p className="text-xs leading-relaxed text-slate-300">Copy the current weekly operator brief for channel handoff.</p>
           <ClipboardActionRow
             label="Copy Slack brief"
@@ -139,8 +144,8 @@ export function ShareCopyControls({
           />
         </article>
 
-        <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Email</h2>
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "email" ? "true" : undefined}>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Email</h3>
           <p className="text-xs leading-relaxed text-slate-300">Copy the same guidance with citation context for leadership notes.</p>
           <ClipboardActionRow
             label="Copy email brief"
@@ -150,8 +155,8 @@ export function ShareCopyControls({
           />
         </article>
 
-        <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Standup</h2>
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "standup" ? "true" : undefined}>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Standup</h3>
           <p className="text-xs leading-relaxed text-slate-300">Copy the one-sentence macro status line for daily standup.</p>
           <ClipboardActionRow
             label="Copy standup line"
@@ -161,8 +166,8 @@ export function ShareCopyControls({
           />
         </article>
 
-        <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Meeting pack</h2>
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "meeting" ? "true" : undefined}>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Meeting pack</h3>
           <p className="text-xs leading-relaxed text-slate-300">Copy the board note, guidance snapshot, weekly brief, board summary, and citation.</p>
           <ClipboardActionRow
             label="Copy meeting pack"
@@ -172,8 +177,8 @@ export function ShareCopyControls({
           />
         </article>
 
-        <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Issue tracker</h2>
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "tracker" ? "true" : undefined}>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Issue tracker</h3>
           <p className="text-xs leading-relaxed text-slate-300">Copy the guidance in Markdown for a Jira or Linear ticket, or a wiki page.</p>
           <ClipboardActionRow
             label="Copy ticket brief"
@@ -183,8 +188,8 @@ export function ShareCopyControls({
           />
         </article>
 
-        <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Investor update</h2>
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "investor" ? "true" : undefined}>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Investor update</h3>
           <p className="text-xs leading-relaxed text-slate-300">
             {runwayBand
               ? "Copy two paragraphs for the market section of a monthly letter: the conditions and how they moved since last month-end, then the guidance and what your runway band means for it."
@@ -198,8 +203,8 @@ export function ShareCopyControls({
           />
         </article>
 
-        <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Portfolio note</h2>
+        <article className="weather-surface space-y-3 px-4 py-4" data-previewed={previewed === "portfolio" ? "true" : undefined}>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Portfolio note</h3>
           <p className="text-xs leading-relaxed text-slate-300">
             For an investor or accelerator writing to the companies it backs: the conditions, each area&apos;s rule
             and lines, and what the week means at every runway, with a link for each company to set its own lines.
@@ -213,7 +218,7 @@ export function ShareCopyControls({
         </article>
 
         <article className="weather-surface space-y-3 px-4 py-4">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Calendar</h2>
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Calendar</h3>
           <p className="text-xs leading-relaxed text-slate-300">Open a Monday review invite with the current guidance in the agenda.</p>
           <a
             href={calendarHref}
@@ -226,11 +231,13 @@ export function ShareCopyControls({
         </article>
       </div>
 
-      <article className="weather-surface min-w-0 space-y-3 px-4 py-4">
+      {/* Held beside the cards while they scroll, instead of stretching to their
+          height with a block of empty panel under the text. */}
+      <article className="weather-surface min-w-0 space-y-3 self-start px-4 py-4 lg:sticky lg:top-24">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-300">
+          <h3 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-300">
             Preview
-          </h2>
+          </h3>
           <span className="text-fluid-micro text-slate-400">
             {copiedTarget ? `${copyLabels[copiedTarget]} ready` : "Current Slack brief"}
           </span>

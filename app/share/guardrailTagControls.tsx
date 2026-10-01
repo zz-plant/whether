@@ -45,26 +45,34 @@ export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlo
   return (
     <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="guardrail-tags-heading">
       <div className="space-y-1">
-        <h2 id="guardrail-tags-heading" className="type-eyebrow">Pause and resume lines for work items</h2>
+        <h2 id="guardrail-tags-heading" className="text-xl font-semibold text-white sm:text-2xl">Pause and resume lines for work items</h2>
         <p className="text-xs leading-relaxed text-slate-300">
           Copy one block per business area into a Linear or Jira card description. No integration,
           no tokens — the card carries this week&apos;s guidance, its pause line, and what would change it.
         </p>
       </div>
-      <AreaTable rows={rows} caption="This week's rule, pause line and resume line for each area, as the tags carry them" />
-      <ul className="flex flex-wrap gap-2" aria-label="Copy a tag">
-        {ordered.map(({ block, area }) => (
-          <li key={block.area}>
-            <ClipboardActionRow
-              compact
-              label={`Copy ${decisionAreaLabel(area)} tag`}
-              state={clipboardState(`guardrail-${block.area}`)}
-              onClick={() => void copyToClipboard(block.markdown, `guardrail-${block.area}`)}
-              buttonLabels={{ error: "Copy failed" }}
-            />
-          </li>
-        ))}
-      </ul>
+      {/* Each copy button in the row it copies. They were a row of five under
+          the table, so the button for a row sat a table's height from it. */}
+      <AreaTable
+        rows={rows.map((row) => {
+          const match = ordered.find(({ area }) => area === row.area);
+          return match
+            ? {
+                ...row,
+                action: (
+                  <ClipboardActionRow
+                    compact
+                    label={`Copy ${decisionAreaLabel(match.area)} tag`}
+                    state={clipboardState(`guardrail-${match.block.area}`)}
+                    onClick={() => void copyToClipboard(match.block.markdown, `guardrail-${match.block.area}`)}
+                    buttonLabels={{ error: "Copy failed" }}
+                  />
+                ),
+              }
+            : row;
+        })}
+        caption="This week's rule, pause line and resume line for each area, as the tags carry them, with a button to copy each area's tag"
+      />
     </section>
   );
 }
