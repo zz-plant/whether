@@ -3,14 +3,13 @@
 import {
   buildOperatorRunwayCookie,
   readOperatorRunwayCookie,
-  runwayBandForMonths,
-  runwayMonthsFitBand,
+  runwayBandForProfileRunway,
   type RunwayBand,
 } from "../../lib/report/operatorRunway";
 import {
   OPERATOR_PROFILE_STORAGE_KEY,
   parseOperatorProfile,
-  resolveProfileRunwayMonths,
+  resolveProfileRunway,
   setOperatorProfileField,
 } from "../../lib/operatorProfile";
 import { createBrowserSource, useBrowserSource, useHydrated } from "./browserSource";
@@ -39,7 +38,7 @@ const readInitialRunwayBand = (): RunwayBand | null => {
     const rawProfile = window.localStorage.getItem(OPERATOR_PROFILE_STORAGE_KEY);
     if (rawProfile) {
       const profile = parseOperatorProfile(JSON.parse(rawProfile));
-      return runwayBandForMonths(resolveProfileRunwayMonths(profile));
+      return runwayBandForProfileRunway(resolveProfileRunway(profile));
     }
   } catch {
     /* non-fatal */
@@ -84,9 +83,10 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
   try {
     const raw = window.localStorage.getItem(OPERATOR_PROFILE_STORAGE_KEY);
     const current = raw ? parseOperatorProfile(JSON.parse(raw)) : undefined;
-    const exact = current ? resolveProfileRunwayMonths(current) : undefined;
-    if (current && typeof exact === "number" && (!band || !runwayMonthsFitBand(exact, band))) {
-      // A runway worked out from cash goes the same way: the cash figure is what states it.
+    const implied = current ? runwayBandForProfileRunway(resolveProfileRunway(current)) : null;
+    if (current && implied && implied !== band) {
+      // A runway worked out from cash goes the same way: the cash figure is what states it. So does
+      // a cash-flow-positive one, which reads as the open-ended band.
       const updated = setOperatorProfileField(
         setOperatorProfileField(current, "runwayMonths", undefined),
         "cashUsd",
@@ -103,13 +103,13 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
 };
 
 /**
- * An exact figure was entered: move the band to the one it falls in, so the
- * header, the homepage selector and the server-calibrated rules agree with it.
- * A cleared figure leaves the band alone — clearing a number is not choosing a
- * runway.
+ * A figure was entered: move the band to the one the figures fall in, so the
+ * header, the homepage selector and the server-calibrated rules agree with
+ * them (`runwayBandForProfileEdit` decides which). Revenue that covers spending
+ * moves it too, to the open-ended band. A null band leaves the cookie alone —
+ * clearing a number is not choosing a runway.
  */
-export const syncRunwayBandToMonths = (months: number | undefined) => {
-  const band = runwayBandForMonths(months);
+export const syncRunwayBandToFigures = (band: RunwayBand | null) => {
   if (!band) return;
   const previousBand = readOperatorRunwayCookie(document.cookie);
   document.cookie = buildOperatorRunwayCookie(band);

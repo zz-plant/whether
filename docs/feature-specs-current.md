@@ -1797,7 +1797,11 @@ Slack, Notion, and Linear targets.
     cash-flow positive: no runway, and the planner says so instead of asking for one. That holds
     whichever way the runway was given: a typed runway beside revenue that covers spend used to size
     a full plan and date a cash-out month while the same company with its cash entered was told there
-    was no runway to plan against.
+    was no runway to plan against. A cash-flow-positive company sits in the open-ended band (24+ mo,
+    `runwayBandForProfileRunway`), and revenue coming to cover spend moves the band cookie there. It
+    used to leave the cookie wherever the last burning figure had put it, so cash $600k, then spend
+    $200k, then revenue $250k kept `/` saying "With less than 6 months of runway, cash is what limits
+    you" and the server scaling the rules to that band, beside "cash is not running down".
   - **One meaning of burn.** `monthlyBurnUsd` is total spend (the planner subtracts revenue from
     it, and its field now says "Monthly spend"). The commitment test, the runway notes' 10%-cut
     arithmetic and the stress test's cash estimate used it as net burn, which overstated runway
