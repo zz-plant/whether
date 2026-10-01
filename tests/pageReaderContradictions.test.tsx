@@ -219,7 +219,7 @@ describe("the site gives one account of what is new and what the scores read", (
     const html = renderToStaticMarkup(<FormulaReference />).replace(/<!-- -->/g, "");
 
     assert.doesNotMatch(html, /on the homepage/i, "the homepage does not draw operating latitude");
-    assert.match(html, new RegExp(`risk-appetite point counts as ${Number(RISK_GAP_TO_TIGHTNESS_EQUIVALENT.toFixed(1))}`));
+    assert.match(html, new RegExp(`risk-appetite point is worth ${Number(RISK_GAP_TO_TIGHTNESS_EQUIVALENT.toFixed(1))}`));
   });
 
   it("llms.txt and the full corpus lead with the category line, not a third noun", () => {

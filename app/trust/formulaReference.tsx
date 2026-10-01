@@ -397,9 +397,9 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             <li>
               <span className="text-slate-400">Confidence:</span> how far the scores sit from the
               nearest line where conditions would change, counted in funding-pressure points. A
-              risk-appetite point counts as {riskPointWorth}, because it stands for a{" "}
+              risk-appetite point is worth {riskPointWorth}, because it stands for a{" "}
               {riskPointWorth}-times larger move in rates: risk appetite {RISK_GAP_EXAMPLE_POINTS} points
-              from its line counts as {Math.round(RISK_GAP_EXAMPLE_POINTS * RISK_GAP_TO_TIGHTNESS_EQUIVALENT)}.
+              from its line is {Math.round(RISK_GAP_EXAMPLE_POINTS * RISK_GAP_TO_TIGHTNESS_EQUIVALENT)} points away.
               <div className="mt-1.5">
                 <ConfidenceLadder />
               </div>

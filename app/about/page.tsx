@@ -81,7 +81,7 @@ export default function AboutPage() {
         </p>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">A record that grades itself.</span> Every week&apos;s guidance
-          stays published as written, and the{" "}
+          stays published unedited, and the{" "}
           <Link href="/history#track-record" className={inlineLinkClass}>
             track record
           </Link>{" "}
