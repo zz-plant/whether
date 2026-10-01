@@ -1794,7 +1794,10 @@ Slack, Notion, and Linear targets.
     cookie. Cash and a typed runway replace each other (`setOperatorProfileField`), a band pick that
     excludes the runway clears whichever stated it, and a shared plan link carries `?cash=` and
     replaces both of the recipient's when it carries either. Revenue at or above spend reads as
-    cash-flow positive: no runway, and the planner says so instead of asking for one.
+    cash-flow positive: no runway, and the planner says so instead of asking for one. That holds
+    whichever way the runway was given: a typed runway beside revenue that covers spend used to size
+    a full plan and date a cash-out month while the same company with its cash entered was told there
+    was no runway to plan against.
   - **One meaning of burn.** `monthlyBurnUsd` is total spend (the planner subtracts revenue from
     it, and its field now says "Monthly spend"). The commitment test, the runway notes' 10%-cut
     arithmetic and the stress test's cash estimate used it as net burn, which overstated runway

@@ -233,4 +233,14 @@ describe("describeProfileRunway: the runway as a finance lead would say it", () 
       "Revenue covers spending, with $15k a month left over: cash is not running down.",
     );
   });
+
+  it("does not date a typed runway that revenue already covers", () => {
+    // "14 months of runway lasts to about Dec 2027" printed here, beside a planner that said there was no runway.
+    const runway = resolveProfileRunway({ version: 1, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 });
+    assert.ok(runway);
+    assert.equal(
+      describeProfileRunway(runway, now),
+      "Revenue covers spending, with $20k a month left over: cash is not running down.",
+    );
+  });
 });

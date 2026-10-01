@@ -107,6 +107,16 @@ describe("operator profile: runway from cash, burn net of revenue", () => {
     assert.equal(resolveProfileRunwayMonths(profile), undefined);
   });
 
+  it("counts no runway when revenue covers spending beside a typed runway too", () => {
+    // Typed 14 months used to size a full plan here, while the same company with its cash entered was told
+    // there was no runway to plan against.
+    const typed = { version: 1 as const, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 };
+    assert.deepEqual(resolveProfileRunway(typed), { basis: "cash-flow-positive", surplusUsd: 20_000 });
+    assert.equal(resolveProfileRunwayMonths(typed), undefined);
+    // Spend and revenue alone say nothing about cash yet, and are no runway either way.
+    assert.equal(resolveProfileRunway({ version: 1, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 }), null);
+  });
+
   it("keeps a stored cash figure through a parse and formats it as money", () => {
     assert.equal(parseOperatorProfile({ cashUsd: 2_100_000 }).cashUsd, 2_100_000);
     assert.equal(parseOperatorProfile({ cashUsd: -1 }).cashUsd, undefined);
@@ -172,6 +182,18 @@ describe("runway planner inputs: missing means missing", () => {
     if (resolution.ready) return;
     assert.equal(resolution.cashFlowPositive, true);
     assert.deepEqual(resolution.missing, []);
+  });
+
+  it("gives a typed runway the same answer as cash when revenue covers spending", () => {
+    for (const runwayGiven of [{ runwayMonths: 14 }, { cashUsd: 1_400_000 }]) {
+      const resolution = resolveRunwayPlannerRequest(
+        { version: 1, ...runwayGiven, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 },
+        null,
+      );
+      assert.equal(resolution.ready, false, JSON.stringify(runwayGiven));
+      if (resolution.ready) return;
+      assert.equal(resolution.cashFlowPositive, true);
+    }
   });
 
   it("maps the shared stage into the planner's own stage names", () => {
