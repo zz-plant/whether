@@ -77,6 +77,7 @@ describe("artifacts that leave the site carry no facts about a company the site 
       currentHoldMonths: 8,
       currentHoldStartDate: "2026-01-31",
       regimeChanges: 6,
+      lineCrossingMonths: 22,
       currentRegime: "EXPANSION",
       currentRegimeLabel: "Sunny",
       rows: [],

@@ -286,12 +286,22 @@ export const guardrailMatchesRule = (
 
 const fmt = formatThresholdNumber;
 
+/**
+ * The four lines every area's pause and resume conditions are drawn from, set
+ * apart from the change lines so a score must travel past a line, not touch it,
+ * before a rule moves. One source for the rules below and for the track record's
+ * count of months a line was crossed.
+ */
+export const sharedDecisionLines = (thresholds: RuleContext["thresholds"]) => ({
+  tightnessPause: thresholds.tightnessRegime + 6,
+  tightnessResume: Math.max(thresholds.tightnessRegime - 4, 0),
+  riskPause: Math.max(thresholds.riskAppetiteRegime - 6, 0),
+  riskResume: Math.min(thresholds.riskAppetiteRegime + 4, 100),
+});
+
 export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores }: RuleContext): BoundedDecisionRule[] => {
   const isExpansion = regime === "EXPANSION";
-  const tightnessPause = thresholds.tightnessRegime + 6;
-  const tightnessResume = Math.max(thresholds.tightnessRegime - 4, 0);
-  const riskPause = Math.max(thresholds.riskAppetiteRegime - 6, 0);
-  const riskResume = Math.min(thresholds.riskAppetiteRegime + 4, 100);
+  const { tightnessPause, tightnessResume, riskPause, riskResume } = sharedDecisionLines(thresholds);
 
   // Every lever shares one corridor: these four lines, in different pairs.
   const tightnessPauseLine = buildRuleCondition("tightness", ">", tightnessPause);

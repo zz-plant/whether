@@ -222,3 +222,23 @@ describe("the site gives one account of what is new and what the scores read", (
     }
   });
 });
+
+describe("/about says how often the guidance moves, from the record", () => {
+  /*
+   * The product is delivered weekly and moves a few times a year: 6 changes in
+   * conditions and 22 line-crossing months across 176 month-ends at the Aug 2026
+   * close. A reader deciding whether it fits their decision needs the second
+   * number, so the page derives it from the archive rather than stating it.
+   */
+  it("prints the record's own counts, not figures typed into the page", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const { getTimeMachineRegimeSeries } = await import("../lib/timeMachine/timeMachineCache");
+    const record = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
+    assert.ok(record, "expected the bundled archive to be long enough for a record");
+    const text = renderToStaticMarkup(<AboutPage />).replace(/<!-- -->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    assert.match(text, /Where it fits, and where it does not/);
+    assert.ok(text.includes(`changed ${record.regimeChanges} times in ${record.monthsCovered} months`));
+    assert.ok(text.includes(`lines in ${record.lineCrossingMonths} of them`));
+  });
+});

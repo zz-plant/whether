@@ -48,6 +48,17 @@ The same two claims as [whether.work/about](https://whether.work/about), and nei
 
 The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by hand ([`/trust#formula-reference`](https://whether.work/trust#formula-reference)). Inflation and unemployment are tracked but enter neither score.
 
+### Where it fits, and where it does not
+
+Through the Aug 2026 month-end, conditions changed 6 times in 176 months, and a month-end reading crossed one of the pause or resume lines in 22 of them (`lineCrossingMonths` in `lib/report/trackRecord.ts`; [whether.work/about](https://whether.work/about) prints the live count). Most Mondays, nothing has moved. So the use is to set the lines when a plan is made, and to hear the day one is crossed.
+
+| Fits | Does not fit |
+| :--- | :--- |
+| Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year contract, the runway to hold before the next raise | A single hire or purchase: the lines are a policy for a kind of decision, not a verdict on one |
+| Plans a group approves once and should not re-argue each month: a budget whose second half is released when a line is crossed, or an agreed floor on runway | Under six months of runway: cash decides before markets do |
+| Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital costs | A company whose funding does not follow U.S. rates: outside the U.S., or in a sector raising on a boom of its own |
+| | Which product work matters most: rates bear on how much long-payback work a team can carry, not on what to build |
+
 ---
 
 ## How it works

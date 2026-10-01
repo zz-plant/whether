@@ -19,6 +19,9 @@ import {
 } from "../../lib/publisher";
 
 import { OperatingLoopGlyph } from "../components/illustrations/OperatingLoopGlyph";
+import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
+import { buildTrackRecord } from "../../lib/report/trackRecord";
+import { describeRecordCadence } from "../../lib/report/trackRecordCopy";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
@@ -32,6 +35,7 @@ const inlineLinkClass =
   "py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100";
 
 export default function AboutPage() {
+  const record = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -92,6 +96,47 @@ export default function AboutPage() {
           The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by
           hand. It is not a macro blog, and not a forecast.
         </p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Where it fits, and where it does not</h2>
+        <p className="text-sm text-slate-300">
+          {record ? <>{describeRecordCadence(record)} </> : null}
+          So the use is to set the lines when a plan is made, and to hear the day one is crossed.
+        </p>
+        <p className="text-sm font-semibold text-slate-100">It fits</p>
+        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+          <li>
+            Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
+            contract, the runway to hold before the next raise.
+          </li>
+          <li>
+            Plans a group approves once and should not re-argue each month: a budget whose second half is released
+            when a line is crossed, or an agreed floor on runway.
+          </li>
+          <li>
+            Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital
+            costs.
+          </li>
+        </ul>
+        <p className="text-sm font-semibold text-slate-100">It does not fit</p>
+        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+          <li>
+            A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
+          </li>
+          <li>
+            Under six months of runway. Cash decides before markets do, which is why the guidance leads with cash
+            there.
+          </li>
+          <li>
+            A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
+            of its own. The scores read U.S. rates only.
+          </li>
+          <li>
+            Which product work matters most. Rates bear on how much long-payback work a team can carry, not on what
+            to build.
+          </li>
+        </ul>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

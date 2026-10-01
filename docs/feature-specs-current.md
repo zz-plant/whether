@@ -1521,6 +1521,12 @@ The About page is where the product says what it claims. Since 2026-10-01 it car
 - **What is new here**: two claims and no more — lines decided before they are needed (each area's
   action, pause line and resume line, set apart), and a record that grades itself (`/history` track
   record, `/calibration`). It says the inputs are not new.
+- **Where it fits, and where it does not**: a cadence sentence derived from the archive
+  (`describeRecordCadence` over `buildTrackRecord`: conditions changed, and months a pause or resume
+  line was crossed, `lineCrossingMonths`), then the decisions it fits (multi-quarter commitments,
+  plans a group approves once, venture-backed U.S. companies with one to two years of runway) and
+  the ones it does not (single decisions, under six months of runway, funding that does not follow
+  U.S. rates, what to build).
 - **Who writes it**, with the method's healthcare origin attributed to the editor and linked.
 - **What it is built from**, naming only what enters the two scores; inflation and unemployment are
   stated as tracked but unscored.

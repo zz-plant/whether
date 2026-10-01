@@ -188,6 +188,7 @@ const record: TrackRecord = {
   currentHoldMonths: 8,
   currentHoldStartDate: "2026-01-31",
   regimeChanges: 6,
+  lineCrossingMonths: 22,
   currentRegime: "EXPANSION",
   currentRegimeLabel: "Sunny",
   rows: [],

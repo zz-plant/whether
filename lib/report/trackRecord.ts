@@ -15,6 +15,8 @@
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildBoldnessScore } from "./weeklyLeadershipBrief";
+import { sharedDecisionLines } from "./boundedDecisionRules";
+import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../regimeEngineCore";
 
 export type TrackRecordRow = {
   recordDate: string;
@@ -38,6 +40,13 @@ export type TrackRecord = {
   currentHoldStartDate: string;
   /** Regime changes across the covered window. */
   regimeChanges: number;
+  /**
+   * Months in which a pause or resume condition started or stopped holding,
+   * against the month before. These lines move a rule, so this is how often the
+   * record gave an area's guidance a reason to change, which happens more often
+   * than the conditions change and far less often than once a week.
+   */
+  lineCrossingMonths: number;
   currentRegime: TimeMachineRegimeEntry["regime"];
   currentRegimeLabel: string;
   /** Newest first, capped by `rowLimit`. */
@@ -59,6 +68,19 @@ export const TRACK_RECORD_MIN_MONTHS = 6;
 
 const DEFAULT_ROW_LIMIT = 12;
 
+const DECISION_LINES = sharedDecisionLines({
+  tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,
+  riskAppetiteRegime: RISK_APPETITE_REGIME_THRESHOLD,
+});
+
+/** Which of the four shared pause and resume conditions a month-end reading meets. */
+const conditionsHeld = ({ tightness, riskAppetite }: TimeMachineRegimeEntry) => [
+  tightness > DECISION_LINES.tightnessPause,
+  tightness < DECISION_LINES.tightnessResume,
+  riskAppetite < DECISION_LINES.riskPause,
+  riskAppetite > DECISION_LINES.riskResume,
+];
+
 export const buildTrackRecord = (
   series: TimeMachineRegimeEntry[],
   rowLimit = DEFAULT_ROW_LIMIT,
@@ -71,12 +93,17 @@ export const buildTrackRecord = (
   const latest = ordered[ordered.length - 1];
 
   let regimeChanges = 0;
+  let lineCrossingMonths = 0;
   let currentHoldMonths = 1;
   let currentHoldStartIndex = ordered.length - 1;
 
   for (let i = 1; i < ordered.length; i += 1) {
     if (ordered[i].regime !== ordered[i - 1].regime) {
       regimeChanges += 1;
+    }
+    const before = conditionsHeld(ordered[i - 1]);
+    if (conditionsHeld(ordered[i]).some((held, index) => held !== before[index])) {
+      lineCrossingMonths += 1;
     }
   }
 
@@ -111,6 +138,7 @@ export const buildTrackRecord = (
     currentHoldMonths,
     currentHoldStartDate: ordered[currentHoldStartIndex].recordDate,
     regimeChanges,
+    lineCrossingMonths,
     currentRegime: latest.regime,
     currentRegimeLabel: getRegimePublicLabel(latest.regime),
     rows: rows.slice(-rowLimit).reverse(),
