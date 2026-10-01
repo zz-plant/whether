@@ -106,6 +106,34 @@ describe("the weekly email refuses what it cannot stand behind", () => {
     assert.equal(result.error, undefined);
   });
 
+  it("points every subscriber at their own plan's lines, in both bodies", async () => {
+    await withOneSubscriber();
+    const snapshot = liveSnapshot();
+    /* The stub logs the subject and drops the bodies, so a binding that keeps
+       them is the only way to read what a subscriber receives. */
+    const sent: Array<{ html: string; text: string }> = [];
+    const previousBinding = Reflect.get(globalThis, "EMAIL");
+    Reflect.set(globalThis, "EMAIL", {
+      send: async (message: { html: string; text: string }) => {
+        sent.push({ html: message.html, text: message.text });
+      },
+    });
+
+    try {
+      const result = await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: FRESH_NOW });
+      assert.equal(result.deliveryMode, "live");
+      assert.equal(result.sent, 1);
+    } finally {
+      if (previousBinding === undefined) Reflect.deleteProperty(globalThis, "EMAIL");
+      else Reflect.set(globalThis, "EMAIL", previousBinding);
+    }
+
+    const [message] = sent;
+    assert.ok(message, "the one subscriber was mailed");
+    assert.match(message.text, /Move these lines for your own plan, and hear the day one is crossed: \S+\/operate#ops-plan-lines/);
+    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Move these lines for your own plan<\/a>/);
+  });
+
   it("still reports no subscribers as the non-event it is", async () => {
     resetSubscriberStore();
 
