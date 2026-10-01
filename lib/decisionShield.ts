@@ -18,6 +18,7 @@ import {
   parsePlanCommitment,
   type ParsedCommitment,
 } from "./planCommitment";
+import { netMonthlyBurnUsd, resolveProfileRunwayMonths, type OperatorProfile } from "./operatorProfile";
 
 export type LifecycleStage = "DISCOVERY" | "GROWTH" | "SCALE" | "MATURE";
 export type DecisionCategory =
@@ -192,11 +193,36 @@ export interface CompanyFinancialProfile {
   runwayMonths?: number;
   cashBalanceUsd?: number;
   /** Net monthly cash burn. With `runwayMonths` this stands in for a cash
-   *  balance, which is the figure a founder is likelier to know from memory. */
+   *  balance, which is the figure a founder is likelier to know from memory.
+   *  Zero or below when revenue covers spending, which sizes nothing. */
   monthlyBurnUsd?: number;
+  /** The revenue net burn is spend less of, named beside it in the sizing line. */
+  monthlyRevenueUsd?: number;
   businessModel?: "VC_BACKED" | "BOOTSTRAPPED";
   grossMarginPct?: number;
 }
+
+/**
+ * The stress test's reading of the operator's own figures: the cash balance
+ * when one was entered (it always took one; nothing passed it), else net burn
+ * × runway. Net, not spend — `monthlyBurnUsd` on the profile is spend, and
+ * multiplying it by runway overstated the balance whenever revenue was coming
+ * in. Revenue travels with it so the sizing line can show the subtraction (the
+ * stress test's form has no revenue box), and a net burn at or below zero is
+ * passed as it is, so the test can say revenue covers spending rather than ask
+ * for figures already entered.
+ */
+export const companyFinancialProfileFor = (
+  profile: OperatorProfile,
+  businessModel: CompanyFinancialProfile["businessModel"],
+): CompanyFinancialProfile => ({
+  runwayMonths: resolveProfileRunwayMonths(profile),
+  cashBalanceUsd: profile.cashUsd,
+  monthlyBurnUsd: netMonthlyBurnUsd(profile),
+  monthlyRevenueUsd: profile.monthlyRevenueUsd,
+  grossMarginPct: profile.grossMarginPct,
+  businessModel,
+});
 
 /**
  * Runway below which a new commitment is treated as critical rather than merely
@@ -415,8 +441,13 @@ export const stressTestDecisionPlan = (
     annualUsd: commitment.annualUsd,
     cashBalanceUsd: profile?.cashBalanceUsd,
     monthlyBurnUsd: profile?.monthlyBurnUsd,
+    monthlyRevenueUsd: profile?.monthlyRevenueUsd,
     runwayMonths: profile?.runwayMonths,
   });
+  /* Revenue covers spending: runway × net burn is no balance at all, so only a
+     cash figure sizes the plan. This read "sizing it needs your cash or monthly
+     burn" with runway and spend both filled in. */
+  const revenueCoversSpend = typeof profile?.monthlyBurnUsd === "number" && profile.monthlyBurnUsd <= 0;
 
   let sizingNote: string;
   if (runwayShare) {
@@ -438,8 +469,10 @@ export const stressTestDecisionPlan = (
     } else {
       sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis}, under the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line that would move the verdict.`;
     }
+  } else if (commitment.annualUsd !== null && revenueCoversSpend) {
+    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year. Revenue covers your spending, so there is no burn to size it against: sizing it needs your cash in the bank, and without it the verdict rests on conditions alone.`;
   } else if (commitment.annualUsd !== null) {
-    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash or monthly burn — without one the verdict rests on conditions alone.`;
+    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash, or your runway and monthly spend — without them the verdict rests on conditions alone.`;
   } else {
     sizingNote = "No amount in the plan, so this is graded on conditions only. Add a figure to size it against your cash.";
   }

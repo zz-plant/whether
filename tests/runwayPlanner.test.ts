@@ -163,3 +163,39 @@ describe("runway planner in dates and dollars", () => {
     assert.match(block, /In dates and dollars:\n• Cash runs out around Aug 2027/);
   });
 });
+
+describe("runway planner: one runway, and no window after the cash", () => {
+  const now = new Date("2026-10-01T12:00:00Z");
+
+  it("closes the raise window by the month cash runs out", () => {
+    // Cash $150k, spend $200k, revenue $100k: 1.5 months. The window used to close around Dec 2026, a month
+    // after "Cash runs out around Nov 2026".
+    const request = { runway: 1.5, burn: 200_000, revenue: 100_000, growthRate: 0, sector: "b2b-saas" as const, stage: "seed" as const };
+    const plan = buildRunwayPlan({ ...request, regime: "EXPANSION", posture: "RISK_ON" });
+    assert.ok(plan.raiseTimingWindow.endMonth <= request.runway, JSON.stringify(plan.raiseTimingWindow));
+    const numbers = describeRunwayPlanInYourNumbers(plan, request, now);
+    assert.equal(numbers.raiseWindow, "Start the raise now; the window closes around Nov 2026.");
+    assert.equal(numbers.runsOut, "Cash runs out around Nov 2026 at today's net burn.");
+  });
+
+  it("opens the window now when it would otherwise open after the cash", () => {
+    for (const runway of [0.3, 1, 2.5, 4]) {
+      for (const regime of ["EXPANSION", "VOLATILE", "DEFENSIVE", "SCARCITY"] as const) {
+        const plan = buildRunwayPlan({ runway, burn: 300_000, revenue: 250_000, growthRate: 30, sector: "consumer", stage: "public", regime, posture: "RISK_ON" });
+        const { startMonth, endMonth } = plan.raiseTimingWindow;
+        assert.ok(endMonth <= runway, `${regime} at ${runway}: closes at ${endMonth}`);
+        assert.ok(startMonth === 0 || startMonth < endMonth, `${regime} at ${runway}: opens at ${startMonth}, closes at ${endMonth}`);
+      }
+    }
+  });
+
+  it("scores the runway the dated lines print, not one floored to a month", () => {
+    // 0.3 months was scored as 1 and printed as 0.3. A tenth of a month is the profile's own floor.
+    const request = { runway: 0.3, burn: 300_000, revenue: 0, growthRate: 0, sector: "b2b-saas" as const, stage: "seed" as const };
+    const plan = buildRunwayPlan({ ...request, regime: "SCARCITY", posture: "SAFETY_MODE" });
+    assert.ok(plan.raiseTimingWindow.endMonth <= 0.3, JSON.stringify(plan.raiseTimingWindow));
+    // The window and the cash-out line read the same 0.3 months, not one month and 0.3.
+    assert.equal(plan.raiseTimingWindow.timeToSafeRunwayTargetMonths, Math.round((plan.safeRunwayBand.minMonths - 0.3) * 10) / 10);
+    assert.equal(describeRunwayPlanInYourNumbers(plan, request, now).runsOut, "Cash runs out around Oct 2026 at today's net burn.");
+  });
+});

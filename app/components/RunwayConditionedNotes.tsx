@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
-import { netMonthlyBurnUsd, resolveProfileRunwayMonths } from "../../lib/operatorProfile";
+import { netMonthlyBurnUsd, resolveProfileRunway, resolveProfileRunwayMonths } from "../../lib/operatorProfile";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel } from "../../lib/report/operatorRunway";
 import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
@@ -33,7 +33,10 @@ const useRunwayNotes = (regime: RegimeKey) => {
     () => (runway ? buildRunwayConditionedNotes({ regime, ...runway, netMonthlyBurnUsd: netMonthlyBurnUsd(profile) }) : []),
     [regime, runway, profile],
   );
-  return { runway, notes };
+  // A company whose revenue covers its spending reads as the open-ended band, not as an exact figure,
+  // but its figures are entered all the same.
+  const figuresGiven = useMemo(() => resolveProfileRunway(profile) !== null, [profile]);
+  return { runway, notes, figuresGiven };
 };
 
 /** Back to no runway given: the band cookie, the `?runway` param and an entered figure all go. */
@@ -71,7 +74,7 @@ function ClearRunwayButton() {
  * (`RunwayAreaNote`); this is the heading and the invitation.
  */
 export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
-  const { runway } = useRunwayNotes(regime);
+  const { runway, figuresGiven } = useRunwayNotes(regime);
 
   if (!runway) {
     return (
@@ -99,7 +102,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         Your figures stay in this browser. These notes translate the guidance; the thresholds above are
         unchanged.{" "}
         <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-          {runway.runwayIsExact ? "Change your cash, spend and revenue" : "Enter your cash, spend and revenue"}
+          {runway.runwayIsExact || figuresGiven ? "Change your cash, spend and revenue" : "Enter your cash, spend and revenue"}
         </Link>
         .
       </p>

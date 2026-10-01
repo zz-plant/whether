@@ -13,6 +13,8 @@
  * different bands, and neither updated the other.)
  */
 
+import type { ProfileRunway } from "../operatorProfile";
+
 export type RunwayBand = "critical" | "tight" | "balanced" | "abundant";
 
 type RunwayBandOption = {
@@ -66,9 +68,32 @@ export const runwayBandForMonths = (months: number | undefined | null): RunwayBa
   );
 };
 
-/** Whether an exact figure sits inside a band. */
-export const runwayMonthsFitBand = (months: number | undefined | null, band: RunwayBand): boolean =>
-  runwayBandForMonths(months) === band;
+/**
+ * The band an operator's own figures put them in, or null when they state no
+ * runway. A company whose revenue covers its spending has no runway counting
+ * down, so it sits in the band with no ceiling — not in no band, which left the
+ * cookie wherever the last burning figure had put it: cash $600k, then spend
+ * $200k (critical), then revenue $250k kept "less than 6 months… cash is what
+ * limits you" on `/` beside "cash is not running down" (2026-10-01).
+ */
+export const runwayBandForProfileRunway = (runway: ProfileRunway | null): RunwayBand | null => {
+  if (!runway) return null;
+  if (runway.basis === "cash-flow-positive") {
+    return RUNWAY_BAND_OPTIONS.find((opt) => opt.maxMonths === null)?.key ?? null;
+  }
+  return runwayBandForMonths(runway.months);
+};
+
+/**
+ * The band an edit to the operator's figures moves the cookie to, or null to
+ * leave the cookie alone: when the runway did not move, or when it went away —
+ * clearing a figure is not choosing a runway.
+ */
+export const runwayBandForProfileEdit = (before: ProfileRunway | null, after: ProfileRunway | null): RunwayBand | null => {
+  const reading = (runway: ProfileRunway | null) =>
+    runway === null ? "none" : runway.basis === "cash-flow-positive" ? "covered" : String(runway.months);
+  return reading(before) === reading(after) ? null : runwayBandForProfileRunway(after);
+};
 
 /** A band wins over a figure; a figure alone is banded; neither is null. */
 export const resolveRunwayBand = (

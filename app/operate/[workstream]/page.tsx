@@ -86,7 +86,7 @@ export default async function OperateWorkstreamPage({
             <PremiumGate
               source="runway_planner"
               title="Runway planner"
-              description="Enter burn, revenue, and growth to see how far your runway goes in this week's conditions."
+              description="Enter cash in the bank, monthly spend and monthly revenue to see how far your runway goes in this week's conditions."
             >
               <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
             </PremiumGate>

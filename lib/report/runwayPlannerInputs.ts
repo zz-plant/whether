@@ -49,7 +49,9 @@ export const resolveRunwayPlannerRequest = (
   const revenue = profile.monthlyRevenueUsd;
   if (runwayMonths === undefined || burn === undefined || revenue === undefined) {
     const given: Record<RunwayPlannerRequiredField, boolean> = {
-      runwayMonths: runwayMonths !== undefined,
+      // Cash without spend is not a runway yet, but it is not missing either: spend is. With only
+      // cash entered the planner used to ask for "cash in the bank (or runway)" all the same.
+      runwayMonths: runwayMonths !== undefined || (profile.cashUsd !== undefined && profile.cashUsd > 0),
       monthlyBurnUsd: burn !== undefined,
       monthlyRevenueUsd: revenue !== undefined,
     };
