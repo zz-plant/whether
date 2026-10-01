@@ -94,6 +94,19 @@ describe("/pricing", () => {
     }
   });
 
+  /* The markup said "Paid plans add delivery, alerts and team ritual" after the
+     page stopped selling either, and a search result prints the markup. */
+  it("describes the offer in the page's own words, selling nothing the free plan has", async () => {
+    const { metadata } = await import("../app/pricing/page");
+    const product = one(buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: false }), "Product");
+    assert.equal(product.description, metadata.description);
+
+    const description = typeof product.description === "string" ? product.description : "";
+    const added = /Pro and Team add ([^.]+)\./.exec(description)?.[1];
+    assert.ok(added, `no "Pro and Team add …" clause in: ${description}`);
+    assert.doesNotMatch(added, /deliver|alert|monday|inbox|slack|board|investor/i);
+  });
+
   it("flips to InStock when the plans go on sale", () => {
     const graph = buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: true });
     const offers = one(graph, "Product").offers as Array<Record<string, unknown>>;

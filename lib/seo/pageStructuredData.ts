@@ -4,7 +4,7 @@ import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
 import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
-import type { PricingPlan } from "../pricing";
+import { PRICING_SUMMARY, type PricingPlan } from "../pricing";
 import type { SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 
@@ -147,8 +147,7 @@ export const buildPricingStructuredData = ({
       "@type": "Product",
       "@id": `${url}#product`,
       name: "Whether Weekly Brief",
-      description:
-        "Weekly operating guidance for startup leaders, with the API, MCP endpoint and embeds free forever. Paid plans add delivery, alerts and team ritual.",
+      description: PRICING_SUMMARY,
       /* Inlined, not referenced. An `@id` only resolves against nodes on the
          same page (see the header), and this graph carries no Organization —
          the reference dangled, which is the unresolvable entity these builders
