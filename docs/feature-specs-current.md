@@ -1518,6 +1518,9 @@ true.
 - **The picker points at plan lines.** Under a picked area's published lines, "Move these lines for
   your plan →" opens `/operate#ops-plan-lines`. The alert form names everything it sends: the
   guidance changing, a score crossing one of its lines, an outsized move in a market input.
+- **So does the Monday email.** Under the published lines, text and HTML both link "Move these lines
+  for your own plan" to `/operate#ops-plan-lines`. `tests/weeklyBriefPublishReadiness.test.ts` reads
+  the sent bodies through a fake `EMAIL` binding, since the stub keeps only the subject.
 - `/trust`'s worked example quotes the published lines (`sharedDecisionLines`): resume below 66,
   not 64, which no rule used.
 
