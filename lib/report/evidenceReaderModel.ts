@@ -11,7 +11,7 @@ import { describeScoreMovement } from "./scoreMovement";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
-import { resolveDataStatusLabel } from "./trustStatus";
+import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
@@ -216,12 +216,6 @@ export const buildCallLineLadders = (
   return [forKey("tightness", thresholds.tightnessRegime), forKey("riskAppetite", thresholds.riskAppetiteRegime)];
 };
 
-/** The two engine facts "could change next week" reads, and nothing else. */
-type CallChangeSource = {
-  diagnostics: Pick<RegimeAssessment["diagnostics"], "transitionWatch">;
-  regimeTransition?: Pick<NonNullable<RegimeAssessment["regimeTransition"]>, "pending">;
-};
-
 /**
  * The four trust facts, the one way every reading route states them.
  *
@@ -234,7 +228,8 @@ type CallChangeSource = {
  *   banner already share (historical, cached snapshot, partly cached, live);
  * - confidence: the published label (`resolvePublishedConfidence`, which
  *   drops a step on a stale fallback), passed in by the caller that holds it;
- * - could change: near a line, or a change held back for its confirming read.
+ * - could change: `couldCallChangeNextWeek`, the rule /brief.md and every
+ *   export read through the homepage model's `transitionWatch`.
  */
 export const buildTrustStripProps = ({
   recordDateLabel,
@@ -250,7 +245,7 @@ export const buildTrustStripProps = ({
   /** Sources answering from a fallback (`buildDegradedSourceRows(...).length`). */
   degradedSourceCount?: number;
   confidenceLabel: TrustStripProps["confidenceLabel"];
-  assessment: CallChangeSource;
+  assessment: Parameters<typeof couldCallChangeNextWeek>[0];
 }): Omit<TrustStripProps, "href" | "className"> => ({
   recordDateLabel,
   sourcesLive: !isHistorical && !isFallback && degradedSourceCount === 0,
@@ -262,11 +257,3 @@ export const buildTrustStripProps = ({
   confidenceLabel,
   couldChangeNextWeek: couldCallChangeNextWeek(assessment),
 });
-
-/**
- * Yes when a score sits near its line (`transitionWatch`), or when the engine
- * is holding a change back for its confirming reading — the week the call
- * changes next reading if it holds, which a distance test alone reads as No.
- */
-const couldCallChangeNextWeek = (assessment: CallChangeSource) =>
-  Boolean(assessment.diagnostics.transitionWatch || assessment.regimeTransition?.pending);

@@ -36,6 +36,7 @@ import {
 import {
   buildDecisionReadinessState,
   buildTrustWarnings,
+  couldCallChangeNextWeek,
 } from "../trustStatus";
 import {
   buildScopedVariantDecisionAdjustment,
@@ -285,7 +286,10 @@ export const buildHomeBriefModelInternal = (
     record: treasury,
     historical: Boolean(historicalSelection),
   });
-  const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
+  /* What every surface prints as "could change next week" — the brief's trust
+     line, the memo, the change-watch row, the exports — so it is the trust
+     strip's rule, not a second one (`couldCallChangeNextWeek`). */
+  const transitionWatch: "ON" | "OFF" = couldCallChangeNextWeek(assessment) ? "ON" : "OFF";
   const signalConfidenceReason = buildSignalConfidenceReason({
     confidenceLabel,
     nearestThresholdGap,

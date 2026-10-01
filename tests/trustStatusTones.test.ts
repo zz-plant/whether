@@ -9,20 +9,22 @@ import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 
 describe("buildTrustStatus trust tones", () => {
-  it("returns stable trust copy with explicit decision impact and low-confidence action", () => {
+  /* Live data adds nothing to the guidance, so the stable copy says so and no
+     more: an approval instruction here read as the week's action under
+     guidance to freeze (tests/pageReaderContradictions.test.tsx). */
+  it("returns stable trust copy that describes the data and adds no action", () => {
     const result = buildTrustStatus({
       historicalSelection: false,
       isFallback: false,
       historicalAction: "unused",
       fallbackAction: "unused",
-      stableAction: "Proceed with normal approvals.",
+      stableAction: "None.",
     });
 
     assert.equal(result.trustStatusTone, "stable");
     assert.match(result.trustStatusLabel, /Live · all sources answered/);
-    assert.equal(result.trustStatusDetail, "Every source answered and nothing here argues for holding back this week.");
-    assert.match(result.trustStatusAction, /Proceed with normal approvals\./);
-    assert.ok(result.trustStatusAction.includes("Hold back if confidence drops to low or conditions move within reach of a line"));
+    assert.equal(result.trustStatusDetail, "Every source answered, so this week's guidance rests on current data.");
+    assert.equal(result.trustStatusAction, "None.");
     assert.equal(result.outageType, "live-data");
     assert.equal(result.outageSeverity, "advisory");
     assert.equal(result.outageExitGate.metCount, 2);

@@ -3,11 +3,18 @@ import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
+import { buildBriefMarkdown } from "../app/brief.md/route";
 import { FrameworkSection } from "../app/trust/frameworkSection";
 import { TrackRecordTiles } from "../app/components/history/TrackRecord";
+import { TrustStrip } from "../app/components/trustStrip";
+import { computeDiagnostics } from "../lib/regimeEngineDiagnostics";
+import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
+import { assembleHomePage } from "../lib/report/homePageAssembler";
+import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import { TRACK_RECORD_MIN_MONTHS, buildTrackRecord } from "../lib/report/trackRecord";
 import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
 import { pricingPlans } from "../lib/pricing";
+import { buildReportDataFixture } from "./fixtures/reportFixtures";
 
 /*
  * Four surfaces told a reader something the rest of the site contradicted.
@@ -154,5 +161,120 @@ describe("a sample brief says it is one", () => {
 
     assert.ok(copyBlock, "expected the mockup to build its copyable text from a list");
     assert.match(copyBlock[1], /SAMPLE/, "the copied brief carries no marker that it is not a reading");
+  });
+});
+
+describe("/ and /brief.md agree on whether conditions could change next week", () => {
+  /*
+   * Week of Sep 29, 2026: Freezing, funding pressure 90, risk appetite 44. The
+   * homepage strip said "Could change next week: Not expected"; line 4 of
+   * /brief.md said "Conditions could change next week". The strip read the
+   * engine (a score within its near band, or a change held for its confirming
+   * reading); the brief read a second flag on the homepage model that also
+   * switched on for the whole month after any change of conditions, and drew
+   * its near band on a different scale. Risk appetite sat 6 points from 50,
+   * outside the engine's band, with nothing pending — so the strip was right.
+   *
+   * /brief.md is built from the assembled homepage and renders here. `/` itself
+   * suspends at its data boundary offline, so its strip is rendered from the
+   * same props `app/page.tsx` builds for it, from the same reading.
+   */
+  const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
+  const freezingReading = ({ riskAppetite, pending, changedSinceMonthEnd = true }: { riskAppetite: number; pending: boolean; changedSinceMonthEnd?: boolean }) =>
+    buildReportDataFixture({
+      assessment: {
+        regime: "SCARCITY",
+        scores: { tightness: 90, riskAppetite },
+        thresholds,
+        diagnostics: computeDiagnostics(90, riskAppetite, thresholds),
+        regimeTransition: {
+          nextState: "SCARCITY",
+          candidateState: pending ? "DEFENSIVE" : "SCARCITY",
+          committed: false,
+          pending,
+          snapshot: { committedState: "SCARCITY", pendingState: pending ? "DEFENSIVE" : null, pendingCount: pending ? 1 : 0 },
+        },
+      },
+      /* Conditions were Sunny at the last month-end, as they were before Sep 29. */
+      regimeAlert: changedSinceMonthEnd
+        ? {
+            changed: true,
+            currentRegime: "SCARCITY",
+            previousRegime: "EXPANSION",
+            currentRecordDate: "2026-09-29",
+            previousRecordDate: "2026-08-31",
+            reasons: ["Funding pressure moved above 70."],
+            summary: "Conditions moved from Sunny to Freezing.",
+          }
+        : null,
+    });
+
+  const surfaces = async (reportData: ReturnType<typeof buildReportDataFixture>) => {
+    const homepage = await assembleHomePage(
+      { searchParams: undefined },
+      { loadHomePageReportData: async () => ({ ok: true, data: reportData }) },
+    );
+    const strip = renderToStaticMarkup(
+      <TrustStrip
+        {...buildTrustStripProps({
+          recordDateLabel: homepage.reportShell.recordDateLabel,
+          isFallback: homepage.reportShell.showOfflineBadge,
+          confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
+          assessment: reportData.assessment,
+        })}
+      />,
+    );
+    const brief = buildBriefMarkdown(homepage);
+    const stripValue = /<dt[^>]*>Could change next week<\/dt><dd[^>]*>([^<]+)<\/dd>/.exec(strip)?.[1];
+    const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Confidence:**"));
+    assert.ok(stripValue, "expected the strip to state whether conditions could change next week");
+    assert.ok(briefTrustLine, "expected /brief.md to open with its confidence line");
+    return { stripSaysYes: stripValue === "Yes", briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
+  };
+
+  it("says not expected on the week of Sep 29, on both", async () => {
+    const { stripSaysYes, briefSaysYes, stripValue, briefTrustLine } = await surfaces(
+      freezingReading({ riskAppetite: 44, pending: false }),
+    );
+
+    assert.equal(stripSaysYes, false, `the strip said "${stripValue}" 6 points from the line with nothing pending`);
+    assert.equal(briefSaysYes, false, `/brief.md said "${briefTrustLine}" 6 points from the line with nothing pending`);
+  });
+
+  it("agrees when a score is inside the near band, and when a change waits on its confirming reading", async () => {
+    /* No change since the month-end here, so the old second flag fell back to
+       its own near band — 8 points on a scale where a risk-appetite point
+       counts 4.5 times — and said No to both. */
+    for (const reading of [
+      { riskAppetite: 47, pending: false, changedSinceMonthEnd: false, why: "risk appetite 3 points from its line" },
+      { riskAppetite: 58, pending: true, changedSinceMonthEnd: false, why: "a change held for its confirming reading" },
+    ]) {
+      const { stripSaysYes, briefSaysYes, briefTrustLine } = await surfaces(freezingReading(reading));
+
+      assert.equal(stripSaysYes, true, `${reading.why}: the strip should say Yes`);
+      assert.equal(briefSaysYes, stripSaysYes, `${reading.why}: /brief.md said "${briefTrustLine}"`);
+    }
+  });
+
+  /*
+   * The same brief's Provenance section printed "**Action:** Safe to use for
+   * near-term planning; proceed with normal approval flow." under guidance that
+   * read "Freeze new commitments and protect runway". The line describes the
+   * data, and it was labelled with the decision contract's own word for the
+   * operating action.
+   */
+  it("does not state a data-status line as the operating action", async () => {
+    const { brief } = await surfaces(freezingReading({ riskAppetite: 44, pending: false }));
+    const provenance = brief.split("## Provenance")[1]?.split("\n---")[0];
+    assert.ok(provenance, "expected /brief.md to publish a Provenance section");
+
+    for (const label of [DECISION_CONTRACT_LABELS.slot.action, DECISION_CONTRACT_LABELS.action.doNow, DECISION_CONTRACT_LABELS.action.actionNow]) {
+      assert.ok(!provenance.includes(`**${label}:**`), `Provenance labels a data-status line "${label}"`);
+    }
+    assert.doesNotMatch(
+      provenance,
+      /approval flow|proceed|holding back|hold back/i,
+      "Provenance tells a reader in a Freezing week how to approve",
+    );
   });
 });
