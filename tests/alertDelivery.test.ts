@@ -54,7 +54,7 @@ let kv: FakeKv;
 /** The product path: subscribe with the alerts box ticked, then confirm the address. */
 const subscribeVerified = async (email: string, options?: { alerts?: boolean }) => {
   const subscriber = await store.subscribe(email, options);
-  await store.verifyEmail(subscriber.token);
+  await store.verifyEmail(subscriber.confirmToken ?? "");
   return subscriber;
 };
 

@@ -114,7 +114,7 @@ describe("storing plan lines", () => {
     assert.equal(first.weekly, false, "a record made only to watch lines asked for no Monday email");
     assert.match(describeSubscription(first), /lines you set for hiring is crossed/);
 
-    await store.verifyEmail(first.token);
+    await store.verifyEmail(first.confirmToken ?? "");
     const confirmed = await store.getSubscriberByEmail("ops@example.com");
     assert.deepEqual(confirmed?.planLines, [HIRING]);
     assert.equal(confirmed?.pendingPlanLines, undefined);
@@ -130,7 +130,7 @@ describe("storing plan lines", () => {
 describe("delivering plan-line alerts", () => {
   it("mails a subscriber the day their own line is crossed, on a day no published line was, and once", async () => {
     const subscriber = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING] });
-    await store.verifyEmail(subscriber.token);
+    await store.verifyEmail(subscriber.confirmToken ?? "");
     // The published state already sits at today's scores, so nothing published fires.
     kv.entries.set("alert:state", JSON.stringify({ regime: "VOLATILE", tightness: 74, riskAppetite: 50, lastSentAt: "2026-01-01T00:00:00.000Z" }));
     const conditions = {

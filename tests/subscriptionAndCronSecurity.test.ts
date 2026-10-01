@@ -69,7 +69,7 @@ describe("subscription hardening", () => {
 
     const firstStore = getSubscriberStore();
     const subscriber = await firstStore.subscribe("reader@example.com");
-    assert.equal(await firstStore.verifyEmail(subscriber.token), true);
+    assert.ok(await firstStore.verifyEmail(subscriber.confirmToken ?? ""));
 
     resetSubscriberStore();
     (globalThis as { WHETHER_DURABLE_KV?: unknown }).WHETHER_DURABLE_KV = kv;

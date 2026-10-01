@@ -1509,6 +1509,20 @@ true.
   lines (`withPendingApplied`); the confirmation email describes the record as it will read once
   confirmed. An unverified record takes a request directly, as before: it receives nothing yet.
   `/privacy` 2.1 says so.
+- **Corrected 2026-10-02: who can confirm.** The link above carried the subscriber's permanent
+  `token`, which every brief and alert footer carries for unsubscribing, so anyone holding one
+  forwarded email could request a change and confirm it; the email described only the lines when a
+  request also turned the Monday brief off; a request that omitted a flag kept an earlier stranger's
+  pending value; held changes never expired and survived unsubscribing; and opening the link applied
+  the change, which mail filters that open every link do on their own. Now every request (for any
+  record, confirmed or not) replaces what an earlier one left waiting and issues its own
+  `confirmToken`, indexed under `email:confirm:` with a 7-day TTL and checked against
+  `confirmRequestedAt`; `verifyEmail` takes only that, once. A record that never confirmed and has
+  no `confirmToken` (mailed before this) still confirms with its permanent token. `GET
+  /api/email/verify` shows `describeConfirmation` (each change, named as a change, for a confirmed
+  address) and a button; `POST` applies it. Unsubscribing drops the waiting request. A request that
+  asks a confirmed address for nothing new gets an email saying so, with no link. Tests:
+  `tests/subscriberWeeklyFlag.test.ts` ("who can confirm a change"), `tests/emailVerifyRoute.test.ts`.
 - **Paid plans list only what the free plan lacks.** Pro sold "Monday delivery to your inbox" and
   Team a Slack channel feed and briefs for boards and investors; the free subscribe form and `/share`
   deliver all three, so the demand test priced free things. Pro now offers more than one set of plan
