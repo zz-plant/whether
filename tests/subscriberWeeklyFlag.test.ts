@@ -288,3 +288,61 @@ describe("describing a subscription", () => {
     assert.doesNotMatch(describeSubscription({ alerts: false, weekly: true }), /conditions change/);
   });
 });
+
+/* Only an IP rate limit stood between a stranger and an inbox: rotating
+   addresses, one could send a reader a confirmation every few seconds. */
+describe("how much confirmation mail one address gets", () => {
+  const request = async (sent: string[], options: { weekly?: boolean } = {}) =>
+    subscribeAndSendVerification({
+      email: "reader@example.com",
+      ...options,
+      adapter: { send: async (message) => (sent.push(message.text), { ok: true }) },
+    });
+
+  /** Moves every recorded send back by `ms`, as if that much time had passed. */
+  const age = (ms: number) => {
+    const raw: unknown = JSON.parse(kv.entries.get("email:sub:reader@example.com") ?? "{}");
+    assert.ok(typeof raw === "object" && raw !== null);
+    const times: unknown = Reflect.get(raw, "confirmMailSentAt");
+    assert.ok(Array.isArray(times));
+    const aged = times.map((at) => new Date(Date.parse(String(at)) - ms).toISOString());
+    kv.entries.set("email:sub:reader@example.com", JSON.stringify({ ...raw, confirmMailSentAt: aged }));
+  };
+
+  it("sends three in an hour, then holds the fourth without touching the record", async () => {
+    const sent: string[] = [];
+    await request(sent);
+    await request(sent, { weekly: false });
+    await request(sent, { weekly: true });
+    assert.equal(sent.length, 3);
+
+    const before = await store.getSubscriberByEmail("reader@example.com");
+    const held = await request(sent, { weekly: false });
+    assert.equal(sent.length, 3, "the fourth mail is not sent");
+    assert.equal(held.verifyUrl, null);
+    const after = await store.getSubscriberByEmail("reader@example.com");
+    assert.equal(after?.confirmToken, before?.confirmToken, "the reader's newest link still works");
+    assert.deepEqual(after?.pendingFlags, before?.pendingFlags);
+  });
+
+  it("allows more after an hour, up to six in a day", async () => {
+    const sent: string[] = [];
+    for (let i = 0; i < 3; i++) await request(sent);
+    age(61 * 60 * 1000);
+    for (let i = 0; i < 4; i++) await request(sent);
+    assert.equal(sent.length, 6);
+
+    age(25 * 60 * 60 * 1000);
+    await request(sent);
+    assert.equal(sent.length, 7, "a day later the allowance is back");
+  });
+
+  it("does not hold the reader's way out", async () => {
+    const sent: string[] = [];
+    const first = await request(sent);
+    await store.verifyEmail(first.subscriber.confirmToken ?? "");
+    for (let i = 0; i < 5; i++) await request(sent, { weekly: i % 2 === 0 });
+    assert.equal(await store.unsubscribe(first.subscriber.token), true);
+    assert.deepEqual(await getActiveSubscriptions(), []);
+  });
+});

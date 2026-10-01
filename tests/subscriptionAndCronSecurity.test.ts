@@ -36,6 +36,8 @@ afterEach(() => {
   resetSubscriberStore();
   delete (globalThis as { WHETHER_DURABLE_KV?: unknown }).WHETHER_DURABLE_KV;
   delete (globalThis as { WHETHER_CRON_SECRET?: string }).WHETHER_CRON_SECRET;
+  // The subscribe tests install a capturing mail binding; other files expect none.
+  Reflect.deleteProperty(globalThis, "EMAIL");
   mock.restore();
 });
 
@@ -49,7 +51,8 @@ describe("subscription hardening", () => {
       },
     };
 
-    const response = await legacySubscribePost(new Request("https://preview.whether.test/api/subscribe", {
+    // A preview version's own host: its subscribers live in its own KV.
+    const response = await legacySubscribePost(new Request("https://3f9c2a1b-whether.example.workers.dev/api/subscribe", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ email: "FOUNDER@EXAMPLE.COM" }),
@@ -58,7 +61,28 @@ describe("subscription hardening", () => {
     assert.equal(response.status, 200);
     assert.equal(sent.length, 1);
     assert.equal(sent[0]?.to, "founder@example.com");
-    assert.match(sent[0]?.text ?? "", /https:\/\/preview\.whether\.test\/api\/email\/verify\?token=/);
+    assert.match(sent[0]?.text ?? "", /https:\/\/3f9c2a1b-whether\.example\.workers\.dev\/api\/email\/verify\?token=/);
+  });
+
+  /* Until 2026-10-02 the link took whatever host the request named. */
+  it("points a confirmation link at the site, not at a host the request names", async () => {
+    const sent: Array<{ text: string }> = [];
+    Reflect.set(globalThis, "EMAIL", {
+      send: async (message: { text: string }) => {
+        sent.push({ text: message.text });
+        return {};
+      },
+    });
+
+    const response = await legacySubscribePost(new Request("https://attacker.example/api/subscribe", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: "founder@example.com" }),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.match(sent[0]?.text ?? "", /https:\/\/whether\.work\/api\/email\/verify\?token=/);
+    assert.doesNotMatch(sent[0]?.text ?? "", /attacker\.example/);
   });
 
 
