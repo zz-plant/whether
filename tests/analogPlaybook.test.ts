@@ -54,7 +54,12 @@ describe("analogPlaybook", () => {
     );
     assert.equal(playbook.matchBasis[0]?.live, 5.25);
     assert.doesNotMatch(playbook.consensusTrap, /^What peer startups got wrong/);
-    assert.match(playbook.consensusTrap, /Hired more enterprise salespeople/);
+    assert.match(playbook.consensusTrap, /Hired enterprise sales ahead of a fourth-quarter rebound/);
+    // Editorial notes say what was done, not a measured result: no unsourced
+    // percentage of a cash buffer, no "while competitors stalled".
+    for (const note of [playbook.consensusTrap, playbook.winningMove]) {
+      assert.doesNotMatch(note, /\d+% of the cash|competitors stalled/);
+    }
     assert.ok(playbook.reversalMarker.includes("recession warning gauge"));
   });
 

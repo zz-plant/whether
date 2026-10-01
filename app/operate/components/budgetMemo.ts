@@ -50,6 +50,7 @@ export const buildBudgetMemoMarkdown = ({
         `- **In dates**: ${[inYourNumbers.raiseWindow, inYourNumbers.runsOut].filter(Boolean).join(" ")}`,
         inYourNumbers.burnChange ? `- **In dollars**: ${inYourNumbers.burnChange}` : null,
         inYourNumbers.floorGap ? `- **Against the safe band**: ${inYourNumbers.floorGap}` : null,
+        ...inYourNumbers.ownLines.map((line) => `- **Our line**: ${line}`),
       ].filter((line): line is string => line !== null).join("\n") + "\n"
     : "";
   const sensor = (id: SensorReading["id"]) => readingValue(sensors.find((reading) => reading.id === id));

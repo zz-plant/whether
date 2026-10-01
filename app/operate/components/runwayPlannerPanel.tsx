@@ -197,8 +197,14 @@ export function RunwayPlannerPanel({
      link renders this panel on the server, whose today can be another month. */
   const hydrated = useHydrated();
   const inYourNumbers = useMemo(
-    () => (output && resolution.ready && hydrated ? describeRunwayPlanInYourNumbers(output, resolution.request, new Date()) : null),
-    [output, resolution, hydrated],
+    () =>
+      output && resolution.ready && hydrated
+        ? describeRunwayPlanInYourNumbers(output, resolution.request, new Date(), {
+            raiseAtRunwayMonths: profile.raiseAtRunwayMonths,
+            hiringPauseAtRunwayMonths: profile.hiringPauseAtRunwayMonths,
+          })
+        : null,
+    [output, resolution, hydrated, profile.raiseAtRunwayMonths, profile.hiringPauseAtRunwayMonths],
   );
 
   const shareBlock = useMemo(() => (output ? formatRunwayPlanCompactBlock(output, inYourNumbers) : ""), [output, inYourNumbers]);
@@ -241,7 +247,7 @@ export function RunwayPlannerPanel({
             How is this calculated?
           </summary>
           <p className="rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
-            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions; growth compounds monthly, and with no revenue the burn multiple is read as 4x.
+            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions; growth compounds monthly. The burn multiple is spend over revenue, read as 4x with no revenue and never above 4x, so earning something never scores worse than earning nothing.
           </p>
         </details>
       </div>
@@ -470,6 +476,44 @@ export function RunwayPlannerPanel({
               </p>
             </article>
           </div>
+
+          {/* The company's own lines on its own runway, agreed before they are
+              needed. The published lines say when the market changes the plan;
+              these say when the company's cash does, and the month that is. */}
+          <section id="ops-runway-lines" aria-labelledby="ops-runway-lines-heading" className="weather-surface space-y-3 p-4">
+            <div>
+              <p id="ops-runway-lines-heading" className="text-xs font-semibold text-slate-400">Your own runway lines</p>
+              <p className="mt-1 text-fluid-xs text-slate-400">
+                Agree them now, while nothing is urgent. Each gets the month it arrives at today&apos;s net burn, and
+                travels with the link and the memo.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <OperatorProfileNumberField
+                field="raiseAtRunwayMonths"
+                label="Start raising at (months of runway)"
+                placeholder="e.g. 12"
+                value={profile.raiseAtRunwayMonths}
+                onCommit={(value) => commitProfileField("raiseAtRunwayMonths", value)}
+                optional
+              />
+              <OperatorProfileNumberField
+                field="hiringPauseAtRunwayMonths"
+                label="Pause hiring at (months of runway)"
+                placeholder="e.g. 9"
+                value={profile.hiringPauseAtRunwayMonths}
+                onCommit={(value) => commitProfileField("hiringPauseAtRunwayMonths", value)}
+                optional
+              />
+            </div>
+            {inYourNumbers && inYourNumbers.ownLines.length > 0 ? (
+              <ul data-testid="planner-own-lines" aria-live="polite" className="space-y-1 text-sm text-slate-100">
+                {inYourNumbers.ownLines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
 
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold text-slate-400">The rules this sets</p>

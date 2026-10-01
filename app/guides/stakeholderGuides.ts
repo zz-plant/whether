@@ -165,7 +165,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Tie engineering spend to the same lines as the rest of the company, to avoid swinging between growth pushes and cuts.",
+          "Tie engineering spend to the same lines as the rest of the company, so growth pushes and cuts are judged against the same lines.",
       },
       {
         stageSlug: "series-c",
@@ -180,7 +180,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     bullets: [
       "Judge hiring pace and burn against how hard money is to raise right now.",
       "Ask management which line would change their plan, and check it next quarter.",
-      "Expect fewer surprises when conditions tighten.",
+      "Judge a tightening against lines agreed before it, not against the mood in the room.",
       "Back expansion when conditions allow it, and restraint when they don't.",
     ],
     stageSpecificContent: [

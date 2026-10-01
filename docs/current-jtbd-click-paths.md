@@ -139,8 +139,10 @@ Validation note: click labels in this document were verified from the current ro
    - `Monthly spend ($)`
    - `Monthly revenue ($)` (0 is an answer; blank is not)
    - Optional: `Monthly revenue growth (%)` (blank reads as flat), `Sector`, `Stage`
-4. Optional: click `How is this calculated?`
-5. Click `Copy financial block`.
+4. Optional: under `Your own runway lines`, enter the months of runway at which you start raising
+   and pause hiring; each line shows the month it arrives.
+5. Optional: click `How is this calculated?`
+6. Click `Copy financial block`.
 
 **Before the three required figures are entered** the panel names what is missing
 ("Enter cash in the bank (or runway), monthly spend, and monthly revenue to size the plan.";
