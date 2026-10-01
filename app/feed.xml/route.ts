@@ -2,7 +2,7 @@ import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
-import { buildSocialImageUrl, organizationName } from "../../lib/seo";
+import { buildSocialImageUrl, canonicalPositioningLine, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
 import { siteUrl } from "../../lib/siteUrl";
 
@@ -11,8 +11,7 @@ export const revalidate = 3600;
 
 const FEED_PATH = "/feed.xml";
 const CHANNEL_TITLE = "Whether Weekly Brief";
-const CHANNEL_DESCRIPTION =
-  "Each Monday: what interest rates and credit mean for a startup's hiring, spend and raise.";
+const CHANNEL_DESCRIPTION = canonicalPositioningLine;
 
 /** RSS text nodes are XML; a `&` in a call or a headline broke the document. */
 const escapeXml = (value: string) =>

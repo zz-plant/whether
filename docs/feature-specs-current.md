@@ -1084,9 +1084,12 @@ nothing connecting either to the decision they arrived with. For a browser that 
 rendered the brief, `/` now folds sections 2 to 5 away and shows `FirstVisitDecisionPicker`
 under the call:
 
-- **"What are you deciding this week?"** Five choices (hire, roadmap, raise, spend, something new),
+- **"What are you deciding?"** Five choices (hire, roadmap, raise, spend, something new),
   each answered with that area's row of the same table the full brief prints (the rule, its pause
   and resume lines, and the distance to each), plus the answer page that leads with that area.
+  Since 2026-10-01 the question drops "this week" and says the answer holds until a score crosses
+  one of its lines, which most weeks none does; the category line (`canonicalPositioningLine`)
+  leads with the lines and the crossing email rather than with Monday, for the same reason.
 - **"Test it against your runway"**, under the picked answer: runway, monthly burn and the monthly
   cost of the decision give the runway after it, whether that crosses a band, and the runway note this
   week's guidance already carries for the area at the new figure (`buildCommitmentImpact`). Runway

@@ -131,16 +131,18 @@ export function FirstVisitDecisionPicker({
     >
       <div className="space-y-1">
         <h2 id="first-visit-decision-heading" className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
-          What are you deciding this week?
+          What are you deciding?
         </h2>
-        <p className="text-fluid-xs text-slate-400">Pick one. The answer uses this week&apos;s scores.</p>
+        <p className="text-fluid-xs text-slate-400">
+          Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
+        </p>
       </div>
 
       <SegmentedControl
         options={segmentedOptions}
         value={selected}
         onSelect={setSelected}
-        ariaLabel="What are you deciding this week?"
+        ariaLabel="What are you deciding?"
         layout="choices"
       />
 

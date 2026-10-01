@@ -15,8 +15,14 @@ export const organizationName = "Whether";
  * survive the retelling. See docs/editorial-guardrails.md -> Category line.
  */
 export const websiteName = "Whether — Weekly Operating Guidance for Startup Leaders";
+/*
+ * The line leads with the lines, not the day. The record moves a few times a
+ * year (`lineCrossingMonths` in `lib/report/trackRecord.ts`), so "each Monday"
+ * as the opening promised news the weekly reading rarely has; the use that fits
+ * is a set of lines checked weekly and an email the day one is crossed.
+ */
 export const canonicalPositioningLine =
-  "Each Monday: what interest rates and credit mean for your hiring, spend and raise.";
+  "The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed.";
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 
