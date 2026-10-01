@@ -123,7 +123,7 @@ const selectClassName =
   "mt-1 min-h-[44px] w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-base text-[var(--app-text)]";
 
 /**
- * Runway, burn, revenue, and growth come from the operator profile shared with
+ * Cash (or runway), spend, revenue, and growth come from the operator profile shared with
  * the plan stress tests, and the stage from the same cookie the brief reads.
  * Nothing is pre-filled: the planner used to open on a fictional company and
  * offer to copy its board memo, and a reader could not tell those numbers from
