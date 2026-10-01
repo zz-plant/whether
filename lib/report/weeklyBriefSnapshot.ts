@@ -49,8 +49,11 @@ const defaultTrustStatusCopy = {
     "Use for retrospectives only; avoid live planning decisions until you return to current data.",
   fallbackAction:
     "Pause irreversible decisions until the live feed returns or you confirm the cache.",
-  stableAction:
-    "Safe to use for near-term planning; proceed with normal approval flow.",
+  /* Printed under `DATA_CAVEAT_LABEL`. "Safe to use for near-term planning;
+     proceed with normal approval flow" was printed under "Action" in a week
+     whose guidance was to freeze new commitments. Live data adds no caveat; the
+     guidance itself says what to do. */
+  stableAction: "None.",
 };
 
 const buildHomeBriefInput = (

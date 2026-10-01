@@ -224,3 +224,28 @@ from its line read "High" beside a ladder whose Medium band ends at 12.
 `tests/pageReaderContradictions.test.tsx` → "the site gives one account…" pins each. When a page
 describes what the scores read, check it against `/trust#formula-reference`, which imports its
 constants from the engine; prose elsewhere does not.
+
+## Two flags for one claim (2026-10-01)
+
+On the week of Sep 29, 2026 (Freezing, funding pressure 90, risk appetite 44) the homepage trust
+strip said "Could change next week: Not expected" and line 4 of `/brief.md` said "Conditions could
+change next week". Both were reading a real flag. The strip read the engine: a score inside its
+5-point near band, or a change held for its confirming reading. The brief read the homepage
+model's `transitionWatch`, a second rule: 8 points on the one-scale distance, *or any change since
+the month-end comparison*. The call had moved from Sunny to Freezing since Aug 31, so that flag stayed
+on all month, although the change had already passed its confirming reading and said nothing about
+the next one. The two rules also disagreed the other way: 3 raw points from the risk-appetite line
+is inside the engine's band and 13.5 on the scaled distance, so the strip said Yes and the brief said
+"not close to changing".
+
+`couldCallChangeNextWeek` (`lib/report/trustStatus.ts`) is the one rule now, and the home model's
+`transitionWatch` is computed from it, so the brief, the memo lines, the change-watch row and the
+exports that read the model all agree with the strip. **When two surfaces print the same claim,
+trace each to its flag before you choose a wording.** The words differed only because the flags did.
+
+The same brief's provenance section printed "**Action:** Safe to use for near-term planning; proceed
+with normal approval flow." under "Freeze new commitments and protect runway". The line described
+the data, but it carried the decision contract's own label for the operating action. It is
+`DATA_CAVEAT_LABEL` now, and on live data it reads "None."
+`tests/pageReaderContradictions.test.tsx` renders `/brief.md` and the strip for three readings, and
+checks that the provenance section uses no operating-action label.

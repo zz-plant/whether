@@ -1,5 +1,7 @@
+import type { RegimeDiagnostics } from "../regimeEngine";
 import { formatConfidenceChipLabel, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import type { RegimeStateTransition } from "./regimeStateMachine";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
 
@@ -288,6 +290,23 @@ export const buildTrustWarnings = ({
   return warnings.slice(0, 2);
 };
 
+/**
+ * Whether conditions could change at the next reading: yes when a score sits
+ * inside the engine's near band (`transitionWatch`), or when the engine is
+ * holding a change back for its confirming reading — the week conditions change
+ * next reading if it holds, which a distance test alone reads as No.
+ *
+ * The one rule. The homepage model used to keep a second one — 8 points on the
+ * one-scale distance, or any change since the month-end comparison — so on the
+ * week of Sep 29, 2026 the homepage strip said "Not expected" and /brief.md said
+ * "could change next week" about the same reading. A change since the month-end
+ * has already passed its confirming reading; it says nothing about the next one.
+ */
+export const couldCallChangeNextWeek = (assessment: {
+  diagnostics: Pick<RegimeDiagnostics, "transitionWatch">;
+  regimeTransition?: Pick<RegimeStateTransition, "pending">;
+}) => Boolean(assessment.diagnostics.transitionWatch || assessment.regimeTransition?.pending);
+
 export const buildWeeklyTrustCueLine = ({
   confidenceLabel,
   freshnessLabel,
@@ -297,7 +316,10 @@ export const buildWeeklyTrustCueLine = ({
   freshnessLabel: string;
   transitionWatch: "ON" | "OFF";
 }) => {
-  const changeWatch = transitionWatch === "ON" ? "Conditions could change next week" : "Conditions are not close to changing";
+  /* "Not expected", as the trust strip says it: a score 6 points from its line
+     is not "not close", only outside the band where the next reading could
+     change conditions. */
+  const changeWatch = transitionWatch === "ON" ? "Conditions could change next week" : "Conditions not expected to change next week";
   return `${formatConfidenceChipLabel(confidenceLabel)} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
 };
 export const buildCompactTrustSummary = ({
@@ -504,6 +526,16 @@ export const buildWeeklyCitationMetaLine = ({
 }) =>
   `Conditions: ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
 
+/**
+ * The name for `trustStatusAction` where a reader sees it: what the state of
+ * the data asks of a reader on top of the guidance. It printed as "Action",
+ * which is the decision contract's own word for the operating action
+ * (`DECISION_CONTRACT_LABELS.slot.action`), so on the week of Sep 29, 2026
+ * /brief.md's provenance section read "Action: … proceed with normal approval
+ * flow" under guidance to freeze new commitments.
+ */
+export const DATA_CAVEAT_LABEL = "Data caveat";
+
 export const buildTrustStatus = ({
   historicalSelection,
   isFallback,
@@ -557,7 +589,10 @@ export const buildTrustStatus = ({
       ? `Live data is late; this is a cached reading. Keep last week's plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
       : policyRefusalActive
         ? `Live data is in, but the two scores point in different directions, so the guidance is not changing this week. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
-      : "Every source answered and nothing here argues for holding back this week.";
+      /* About the data, not the decision: "nothing here argues for holding
+         back" read as this week's action in a week whose guidance was to
+         freeze new commitments. */
+      : "Every source answered, so this week's guidance rests on current data.";
 
   const action = historicalSelection
     ? `${historicalAction} Switch to current live data before changing spending pace.`
@@ -565,7 +600,7 @@ export const buildTrustStatus = ({
       ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
       : policyRefusalActive
         ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again.`
-      : `${stableAction} Hold back if confidence drops to low or conditions move within reach of a line.`;
+      : stableAction;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

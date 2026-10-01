@@ -33,7 +33,7 @@ import {
 } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
-import type { RegimeKey } from "../regimeEngine";
+import type { RegimeDiagnostics, RegimeKey } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { WeeklyCallContract } from "./weeklyCallContract";
 import {
@@ -66,6 +66,9 @@ export type HomeReportData = {
     /** The state machine's own transition, when the read path carried machine state.
      *  Copy that describes a pending quadrant change gates on this, not on the readings. */
     regimeTransition?: RegimeStateTransition;
+    /** Whether a score sits inside the engine's near band: half of what
+     *  `couldCallChangeNextWeek` reads, the other half being a pending transition. */
+    diagnostics: Pick<RegimeDiagnostics, "transitionWatch">;
     thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
     scores: {
       tightness: number;
