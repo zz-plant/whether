@@ -89,12 +89,15 @@ export default function PrivacyPage() {
               its line, or an outsized move in a market input), whether you want the Monday brief itself,
               the pause and resume lines you set for your own plan on the planning page, if you set any
               (numbers on the two scores, for each area you chose, held unconfirmed until you click the
-              link), and a random token that makes the confirmation and unsubscribe links work. It is held in
-              Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
-              you click the confirmation link, and once you have, a later request for your address —
-              turning alerts or the Monday brief on or off, or subscribing again after leaving — changes
-              nothing until you click the link it sends. Every email carries an unsubscribe link, and using it
-              deactivates the record immediately.
+              link), a random token for the unsubscribe link, and, while a request is waiting for you, a
+              separate one-time code for its confirmation link. It is held in Cloudflare KV and used to send
+              you those emails and nothing else. Nothing is sent until you confirm, and any later request for
+              your address — turning alerts or the Monday brief on or off, setting plan lines, or subscribing
+              again after leaving — changes nothing until you open the link it sends and press Confirm on the
+              page that link shows. The email and that page say what the request would change. A confirmation
+              link works once, for 7 days, and stops working when a newer request is made for your address.
+              Every email carries an unsubscribe link; using it deactivates the record immediately and drops
+              any request still waiting.
             </p>
           </div>
 

@@ -56,6 +56,19 @@ export type Subscriber = {
    * subscription.
    */
   pendingFlags?: PendingFlags;
+  /**
+   * The link that confirms the pending change, or for an address that never
+   * confirmed, the subscription itself. Issued fresh by every request, so a newer
+   * request retires an older email's link, and good for `CONFIRM_TTL_MS`.
+   *
+   * Until 2026-10-02 the confirmation link carried `token`, which every Monday
+   * brief and alert footer also carries for unsubscribing and which never
+   * changes: anyone holding one forwarded email could request a change for its
+   * reader and then confirm it themselves.
+   */
+  confirmToken?: string;
+  /** When `confirmToken` was issued. */
+  confirmRequestedAt?: string;
 };
 
 type PendingFlags = { alerts?: boolean; weekly?: boolean; reactivate?: boolean };
@@ -77,7 +90,13 @@ type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] 
 export interface SubscriberStore {
   subscribe(email: string, options?: SubscribeOptions): Promise<Subscriber>;
   unsubscribe(token: string): Promise<boolean>;
-  verifyEmail(token: string): Promise<boolean>;
+  /**
+   * The record a confirmation link would change, while the link still works.
+   * Changes nothing: a link scanner fetching the link must not confirm it.
+   */
+  getPendingConfirmation(token: string): Promise<Subscriber | null>;
+  /** Applies what the link confirms and returns the record as it now stands, or null for a dead link. */
+  verifyEmail(token: string): Promise<Subscriber | null>;
   getActiveSubscriptions(): Promise<string[]>;
   /** Active, verified subscribers. Carries the token, which the unsubscribe link needs. */
   listActiveSubscribers(): Promise<Subscriber[]>;
@@ -93,6 +112,10 @@ export interface SubscriberStore {
 const SUB_PREFIX = "email:sub:";
 const TOKEN_PREFIX = "email:token:";
 const ACTIVE_PREFIX = "email:active:";
+const CONFIRM_PREFIX = "email:confirm:";
+
+/** How long a confirmation link works. A held change nobody confirms in a week was not wanted. */
+const CONFIRM_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 const generateToken = (): string => crypto.randomUUID();
 
@@ -118,39 +141,58 @@ const readPendingFlags = (raw: object): Pick<Subscriber, "pendingFlags"> => {
   return Object.keys(pending).length > 0 ? { pendingFlags: pending } : {};
 };
 
+/** The record with no change waiting on its inbox. */
+const withoutPending = (sub: Subscriber): Subscriber => {
+  const { pendingFlags: _flags, pendingPlanLines: _lines, confirmToken: _token, confirmRequestedAt: _at, ...rest } = sub;
+  return rest;
+};
+
+const issueConfirmation = (now: Date): Pick<Subscriber, "confirmToken" | "confirmRequestedAt"> => ({
+  confirmToken: generateToken(),
+  confirmRequestedAt: now.toISOString(),
+});
+
 /**
- * What a request asks of a record that already exists. A confirmed address holds
- * the change until its inbox says yes; one that never confirmed has nothing to
- * protect yet, and takes it now, as it always has.
+ * What a request asks of a record that already exists, held until the inbox says
+ * yes: the endpoint takes any address, so no request changes a record on arrival,
+ * confirmed or not. Each request replaces whatever an earlier one left waiting,
+ * with a new link, so the link in an older email stops working rather than
+ * confirming a change it never described.
  */
-const applySubscribeRequest = (existing: Subscriber, options: SubscribeOptions | undefined): Subscriber => {
-  const planLines = options?.planLines ? { pendingPlanLines: options.planLines } : {};
-  if (!existing.verified) {
-    return {
-      ...existing,
-      active: true,
-      alerts: options?.alerts ?? existing.alerts,
-      weekly: options?.weekly ?? existing.weekly,
-      ...planLines,
-    };
-  }
-  // The latest request wins: a choice that matches the standing one clears an
-  // earlier pending change rather than leaving it to apply on the next confirm.
-  const pendingFlags: PendingFlags = { ...existing.pendingFlags };
+const applySubscribeRequest = (existing: Subscriber, options: SubscribeOptions | undefined, now: Date): Subscriber => {
+  const pendingFlags: PendingFlags = {};
   for (const key of ["alerts", "weekly"] as const) {
     const requested = options?.[key];
-    if (requested === undefined) continue;
-    if (requested === existing[key]) delete pendingFlags[key];
-    else pendingFlags[key] = requested;
+    if (requested !== undefined && requested !== existing[key]) pendingFlags[key] = requested;
   }
   if (!existing.active) pendingFlags.reactivate = true;
-  const { pendingFlags: _previous, ...rest } = existing;
-  return {
-    ...rest,
+  const change: Pick<Subscriber, "pendingFlags" | "pendingPlanLines"> = {
     ...(Object.keys(pendingFlags).length > 0 ? { pendingFlags } : {}),
-    ...planLines,
+    ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
   };
+  /* A confirmed address asking for what it already has gets no link: there is
+     nothing for one to confirm. */
+  const needsConfirmation = !existing.verified || Object.keys(change).length > 0;
+  return { ...withoutPending(existing), ...change, ...(needsConfirmation ? issueConfirmation(now) : {}) };
 };
+
+/**
+ * Whether `token` confirms `sub` at `now`: its current link, inside a week. A
+ * record from before confirmation links existed was mailed its permanent `token`
+ * instead, which still confirms it only if it never confirmed: once it has, that
+ * token is in the footer of every email it receives.
+ */
+const confirms = (sub: Subscriber, token: string, now: number): boolean => {
+  if (sub.confirmToken) {
+    if (sub.confirmToken !== token) return false;
+    const issued = Date.parse(sub.confirmRequestedAt ?? "");
+    return Number.isFinite(issued) && now - issued < CONFIRM_TTL_MS;
+  }
+  return !sub.verified && sub.token === token;
+};
+
+/** The record once its inbox has said yes. */
+const confirmedRecord = (sub: Subscriber): Subscriber => ({ ...withoutPending(withPendingApplied(sub)), verified: true });
 
 /** The record as it will read once the address confirms: what a confirmation email promises. */
 export const withPendingApplied = (sub: Subscriber): Subscriber => {
@@ -162,6 +204,12 @@ export const withPendingApplied = (sub: Subscriber): Subscriber => {
     weekly: pendingFlags.weekly ?? rest.weekly,
     active: pendingFlags.reactivate ? true : rest.active,
   };
+};
+
+const readConfirmation = (raw: object): Pick<Subscriber, "confirmToken" | "confirmRequestedAt"> => {
+  const confirmToken = readStoredString(raw, "confirmToken");
+  const confirmRequestedAt = readStoredString(raw, "confirmRequestedAt");
+  return confirmToken && confirmRequestedAt ? { confirmToken, confirmRequestedAt } : {};
 };
 
 const readPendingPlanLines = (raw: object): Pick<Subscriber, "pendingPlanLines"> => {
@@ -202,8 +250,23 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
     ...readPendingPlanLines(raw),
     ...readPendingFlags(raw),
+    ...readConfirmation(raw),
   };
 };
+
+/** A first request for an address: nothing is sent to it until the link this issues is clicked. */
+const newSubscriber = (email: string, options: SubscribeOptions | undefined, now: Date): Subscriber => ({
+  email,
+  verified: false,
+  subscribedAt: now.toISOString(),
+  token: generateToken(),
+  active: true,
+  alerts: options?.alerts === true,
+  weekly: options?.weekly ?? !options?.planLines,
+  planLines: [],
+  ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
+  ...issueConfirmation(now),
+});
 
 const normalizeEmail = (raw: string): string | null => {
   const trimmed = raw.trim().toLowerCase();
@@ -228,11 +291,15 @@ class KvSubscriberStore implements SubscriberStore {
       // An omitted option keeps the standing choice: re-subscribing from a form that
       // does not ask about alerts must not silently switch them off.
       const updated: Subscriber = {
-        ...applySubscribeRequest(existing, options),
+        ...applySubscribeRequest(existing, options, new Date()),
         subscribedAt: existing.subscribedAt || new Date().toISOString(),
       };
       await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
       await this.kv.put(TOKEN_PREFIX + updated.token, normalized).catch(() => { /* non-fatal: token index repaired when KV is available */ });
+      if (existing.confirmToken) {
+        await this.kv.delete?.(CONFIRM_PREFIX + existing.confirmToken).catch(() => undefined);
+      }
+      await this.indexConfirmation(updated);
       if (updated.verified && updated.active) {
         await this.kv.put(ACTIVE_PREFIX + normalized, normalized).catch(() => { /* non-fatal: active index repaired when KV is available */ });
       }
@@ -240,24 +307,21 @@ class KvSubscriberStore implements SubscriberStore {
       return updated;
     }
 
-    const token = generateToken();
-    const subscriber: Subscriber = {
-      email: normalized,
-      verified: false,
-      subscribedAt: new Date().toISOString(),
-      token,
-      active: true,
-      alerts: options?.alerts === true,
-      weekly: options?.weekly ?? !options?.planLines,
-      planLines: [],
-      ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
-    };
-
+    const subscriber = newSubscriber(normalized, options, new Date());
     await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(subscriber)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
-    await this.kv.put(TOKEN_PREFIX + token, normalized).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    await this.kv.put(TOKEN_PREFIX + subscriber.token, normalized).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    await this.indexConfirmation(subscriber);
     this.fallback.saveToMemory(subscriber);
 
     return subscriber;
+  }
+
+  /** The confirm link's index entry, which KV drops on its own once the link has expired. */
+  private async indexConfirmation(sub: Subscriber): Promise<void> {
+    if (!sub.confirmToken) return;
+    await this.kv
+      .put(CONFIRM_PREFIX + sub.confirmToken, sub.email, { expirationTtl: CONFIRM_TTL_MS / 1000 })
+      .catch(() => { /* non-fatal: in-memory fallback already saved */ });
   }
 
   async unsubscribe(token: string): Promise<boolean> {
@@ -267,31 +331,37 @@ class KvSubscriberStore implements SubscriberStore {
     const raw = await this.kv.get(SUB_PREFIX + email);
     if (!raw) return false;
 
-    const sub = hydrateSubscriber(JSON.parse(raw));
-    if (!sub) return false;
-    sub.active = false;
+    const stored = hydrateSubscriber(JSON.parse(raw));
+    if (!stored) return false;
+    // Leaving also drops anything waiting on the inbox, so no older link can undo it.
+    const sub: Subscriber = { ...withoutPending(stored), active: false };
     await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
     await this.kv.delete?.(ACTIVE_PREFIX + email).catch(() => undefined);
+    if (stored.confirmToken) {
+      await this.kv.delete?.(CONFIRM_PREFIX + stored.confirmToken).catch(() => undefined);
+    }
     this.fallback.saveToMemory(sub);
     return true;
   }
 
-  async verifyEmail(token: string): Promise<boolean> {
-    const email = await this.kv.get(TOKEN_PREFIX + token);
-    if (!email) return false;
+  async getPendingConfirmation(token: string): Promise<Subscriber | null> {
+    const email = (await this.kv.get(CONFIRM_PREFIX + token)) ?? (await this.kv.get(TOKEN_PREFIX + token));
+    const sub = email ? await this.getSubscriberByEmail(email) : this.fallback.getByAnyToken(token);
+    return sub && confirms(sub, token, Date.now()) ? sub : null;
+  }
 
-    const raw = await this.kv.get(SUB_PREFIX + email);
-    if (!raw) return false;
+  async verifyEmail(token: string): Promise<Subscriber | null> {
+    const pending = await this.getPendingConfirmation(token);
+    if (!pending) return null;
 
-    const stored = hydrateSubscriber(JSON.parse(raw));
-    if (!stored) return false;
-    const sub: Subscriber = { ...withPendingApplied(stored), verified: true };
-    await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    const sub = confirmedRecord(pending);
+    await this.kv.put(SUB_PREFIX + sub.email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    await this.kv.delete?.(CONFIRM_PREFIX + token).catch(() => undefined);
     if (sub.active) {
-      await this.kv.put(ACTIVE_PREFIX + email, email).catch(() => undefined);
+      await this.kv.put(ACTIVE_PREFIX + sub.email, sub.email).catch(() => undefined);
     }
     this.fallback.saveToMemory(sub);
-    return true;
+    return sub;
   }
 
   async getActiveSubscriptions(): Promise<string[]> {
@@ -382,10 +452,20 @@ class KvSubscriberStore implements SubscriberStore {
 class InMemorySubscriberStore implements SubscriberStore {
   private readonly byEmail = new Map<string, Subscriber>();
   private readonly byToken = new Map<string, string>();
+  /* Never pruned: `confirms` checks the record's current link, so an entry for a
+     retired one finds the record and is refused. */
+  private readonly byConfirmToken = new Map<string, string>();
 
   saveToMemory(sub: Subscriber): void {
     this.byEmail.set(sub.email, sub);
     this.byToken.set(sub.token, sub.email);
+    if (sub.confirmToken) this.byConfirmToken.set(sub.confirmToken, sub.email);
+  }
+
+  /** A record by its confirm link or its permanent token. */
+  getByAnyToken(token: string): Subscriber | null {
+    const email = this.byConfirmToken.get(token) ?? this.byToken.get(token);
+    return email ? this.byEmail.get(email) ?? null : null;
   }
 
   getByEmail(email: string): Subscriber | null {
@@ -421,24 +501,7 @@ class InMemorySubscriberStore implements SubscriberStore {
     if (!normalized) throw new Error("Invalid email address");
 
     const existing = this.byEmail.get(normalized);
-    if (existing) {
-      const updated = applySubscribeRequest(existing, options);
-      this.saveToMemory(updated);
-      return updated;
-    }
-
-    const token = generateToken();
-    const sub: Subscriber = {
-      email: normalized,
-      verified: false,
-      subscribedAt: new Date().toISOString(),
-      token,
-      active: true,
-      alerts: options?.alerts === true,
-      weekly: options?.weekly ?? !options?.planLines,
-      planLines: [],
-      ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
-    };
+    const sub = existing ? applySubscribeRequest(existing, options, new Date()) : newSubscriber(normalized, options, new Date());
     this.saveToMemory(sub);
     return sub;
   }
@@ -448,17 +511,21 @@ class InMemorySubscriberStore implements SubscriberStore {
     if (!email) return false;
     const sub = this.byEmail.get(email);
     if (!sub) return false;
-    sub.active = false;
+    this.saveToMemory({ ...withoutPending(sub), active: false });
     return true;
   }
 
-  async verifyEmail(token: string): Promise<boolean> {
-    const email = this.byToken.get(token);
-    if (!email) return false;
-    const sub = this.byEmail.get(email);
-    if (!sub) return false;
-    this.saveToMemory({ ...withPendingApplied(sub), verified: true });
-    return true;
+  async getPendingConfirmation(token: string): Promise<Subscriber | null> {
+    const sub = this.getByAnyToken(token);
+    return sub && confirms(sub, token, Date.now()) ? sub : null;
+  }
+
+  async verifyEmail(token: string): Promise<Subscriber | null> {
+    const pending = await this.getPendingConfirmation(token);
+    if (!pending) return null;
+    const sub = confirmedRecord(pending);
+    this.saveToMemory(sub);
+    return sub;
   }
 
   async getActiveSubscriptions(): Promise<string[]> {

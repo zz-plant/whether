@@ -46,7 +46,7 @@ const withOneSubscriber = async () => {
   resetSubscriberStore();
   const store = getSubscriberStore();
   const subscriber = await store.subscribe("operator@example.com");
-  await store.verifyEmail(subscriber.token);
+  await store.verifyEmail(subscriber.confirmToken ?? "");
 };
 
 describe("the weekly email refuses what it cannot stand behind", () => {
