@@ -1,6 +1,16 @@
 import Link from "next/link";
 import { publisherProfilePath } from "../../lib/publisher";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { sharedDecisionLines } from "../../lib/report/boundedDecisionRules";
+import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
+
+/* The worked example quotes the published lines, so a reader who checks it
+   against the brief finds the same numbers. It said "below 64", a line no rule
+   uses; the resume line is 66. */
+const EXAMPLE_LINES = sharedDecisionLines({
+  tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,
+  riskAppetiteRegime: RISK_APPETITE_REGIME_THRESHOLD,
+});
 import { ReportSection } from "../components/reportSection";
 import { TemplateActions } from "./templateActions";
 
@@ -82,8 +92,8 @@ export function FrameworkSection() {
           <h3 className="type-eyebrow">In practice</h3>
           <div className="weather-surface px-4 py-4 space-y-2">
             <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
-            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses 76.</p>
-            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below 64.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
           </div>
           <p className="text-sm text-slate-300 leading-relaxed">
             The threshold makes the decision concrete. The reversal makes it temporary. Together they make the decision safe to start.

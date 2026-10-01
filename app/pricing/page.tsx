@@ -21,9 +21,9 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Pricing",
   description:
-    "Weekly operating guidance, the API, MCP, and embeds are free forever. Pro and Team add Monday delivery to email and Slack.",
+    "Weekly operating guidance, the API, MCP, embeds and the Monday email are free forever. Pro and Team add more sets of plan lines, lines a team shares, and a record across devices.",
   path: "/pricing",
-  imageAlt: "Whether pricing: free forever, with Pro and Team for Monday delivery",
+  imageAlt: "Whether pricing: free forever, with Pro and Team for plans and teams",
 });
 
 /**

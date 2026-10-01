@@ -39,6 +39,18 @@ describe("pricing offer", () => {
     assert.match(free.promise ?? "", /free forever/i);
   });
 
+  /* Until 2026-10-01 Pro sold "Monday delivery to your inbox" and Team a Slack
+     channel feed and briefs for boards and investors, all of which the free
+     subscribe form and /share deliver. A demand test that prices free things
+     measures nothing. */
+  it("sells nothing on a paid plan that the free plan already delivers", () => {
+    for (const plan of pricingPlans.filter((candidate) => candidate.monthlyPriceUsd !== null)) {
+      for (const text of [plan.tagline, ...plan.features]) {
+        assert.doesNotMatch(text, /monday|inbox|slack|board|investor/i, `${plan.id} sells a free delivery: ${text}`);
+      }
+    }
+  });
+
   it("never puts the weekly call behind a paid plan", () => {
     for (const plan of pricingPlans.filter((candidate) => candidate.monthlyPriceUsd !== null)) {
       for (const feature of plan.features) {

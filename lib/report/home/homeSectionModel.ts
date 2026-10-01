@@ -4,7 +4,7 @@ import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
 import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type RuleThresholdDistance } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import type { BoundedDecisionRule, DecisionArea } from "../boundedDecisionRules";
+import type { BoundedDecisionRule, DecisionArea, RuleCondition } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -174,6 +174,31 @@ const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "
 const nearest = (distances: RuleThresholdDistance[]) =>
   [...distances].sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
 
+/*
+ * The one line a row prints for each side, chosen by what explains the state.
+ * A pause holds on any of its lines, so the line to show is one already crossed,
+ * else the nearest. A resume needs all of its lines, so the line to show is the
+ * furthest still unmet — the one actually holding it back — else any.
+ *
+ * Both used to take the nearest. On the week of Sep 29, 2026 that printed
+ * fundraising's pause as "Risk appetite < 44 · at the line" beside "Pause now
+ * applies: funding pressure rose through 76", and hiring's resume as "Risk
+ * appetite > 54 · 10 pts away" while funding pressure, 24 points from its own
+ * resume line, was what kept hiring paused.
+ */
+const pauseLineToShow = (distances: RuleThresholdDistance[]) =>
+  distances.find((distance) => distance.satisfied) ?? nearest(distances);
+
+const resumeLineToShow = (distances: RuleThresholdDistance[]) => {
+  const unmet = distances.filter((distance) => !distance.satisfied);
+  return unmet.length > 0
+    ? [...unmet].sort((left, right) => right.pointsToLine - left.pointsToLine)[0]
+    : distances[0];
+};
+
+const distancesFor = (conditions: readonly RuleCondition[] | undefined, scores: { tightness: number; riskAppetite: number }) =>
+  (conditions ?? []).map((condition) => toThresholdDistance(condition, scores));
+
 /**
  * One row per area, whichever source the week carries. The action strip is
  * the stage-scoped rule set the brief prints; the canonical rules are what it
@@ -209,8 +234,14 @@ export const buildHomeAreaRows = ({
       return {
         area,
         rule: item.areaActionNow,
-        pause: lineSlot(item.nearestPause, "pause"),
-        resume: lineSlot(item.nearestResume, "resume"),
+        pause: lineSlot(
+          item.pauseConditions?.length ? pauseLineToShow(distancesFor(item.pauseConditions, scores)) : item.nearestPause,
+          "pause",
+        ),
+        resume: lineSlot(
+          item.resumeConditions?.length ? resumeLineToShow(distancesFor(item.resumeConditions, scores)) : item.nearestResume,
+          "resume",
+        ),
         ...changedFor(area),
         pauseQualifier: item.pauseQualifier,
         resumeQualifier: item.resumeQualifier,
@@ -221,8 +252,8 @@ export const buildHomeAreaRows = ({
   return decisionRules.map((rule) => ({
     area: rule.area,
     rule: rule.doNow[0] ?? rule.recommendation,
-    pause: lineSlot(nearest(rule.pause.conditions.map((condition) => toThresholdDistance(condition, scores))), "pause"),
-    resume: lineSlot(nearest(rule.resume.conditions.map((condition) => toThresholdDistance(condition, scores))), "resume"),
+    pause: lineSlot(pauseLineToShow(distancesFor(rule.pause.conditions, scores)), "pause"),
+    resume: lineSlot(resumeLineToShow(distancesFor(rule.resume.conditions, scores)), "resume"),
     ...changedFor(rule.area),
     pauseQualifier: rule.pause.qualifier,
     resumeQualifier: rule.resume.qualifier,

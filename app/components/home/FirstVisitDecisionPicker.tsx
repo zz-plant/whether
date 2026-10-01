@@ -184,6 +184,12 @@ export function FirstVisitDecisionPicker({
               </>
             ) : null}
           </dl>
+          {/* The lines above are the published ones. A plan that needs its own —
+              a hiring plan released at 60 rather than 66 — sets them once on the
+              planning page and hears the day one is crossed. */}
+          <ActionLink href="/operate#ops-plan-lines" variant="inline">
+            Move these lines for your plan →
+          </ActionLink>
           <CommitmentTest regime={regime} area={active.area} />
           {active.answer ? (
             <ActionLink href={active.answer.href} variant="inline">

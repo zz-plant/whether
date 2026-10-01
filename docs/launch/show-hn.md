@@ -75,6 +75,9 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 >   risk), a quadrant classification with hysteresis so one noisy week can't flip the regime,
 >   and published constants: https://whether.work/trust#formula-reference. The methodology page
 >   imports its numbers from the scoring engine's constants, so it can't drift from the code.
+> - **Set your own lines.** The published pause and resume lines are a starting point. The planning
+>   page lets a team move them, say releasing more hiring only once funding pressure falls below 60,
+>   and sends one email the day one is crossed. Most weeks nothing does, which is the point.
 > - **It grades itself in public.** Every week stays published as written, and
 >   https://whether.work/history scores the archive against what happened next, including the
 >   changes in conditions it gave no warning of. https://whether.work/calibration shows the

@@ -35,13 +35,23 @@ Two consequences, both binding:
   chosen yet.
 
 **"Decision-translation layer" is internal vocabulary** and stays in this document. Outward surfaces
-use the single category line in `lib/seo.ts` — *the weekly operating call for startup leaders*. See
+use the single category line in `lib/seo.ts` — *weekly operating guidance for startup leaders*. See
 `docs/editorial-guardrails.md` -> Category line.
 
+### Distribution channel — unvalidated: investor platform teams and accelerators
+
+One platform team reaches dozens of primary-ICP companies, which is why `/share` carries a portfolio
+note (`lib/export/portfolioNote.ts`): the week at every runway band, each area's lines, and a link for
+each company to set its own. Nothing has measured demand from this channel yet. Use the note in a
+conversation; do not build seats or a portfolio tier for it until someone asks for one.
+
 ## Why now (20-second talk track)
-- Operating tempo is now macro-sensitive week to week, so static quarterly planning assumptions decay faster.
-- Leadership teams need one weekly pacing call they can align on quickly, not a fragmented set of dashboards and memos.
-- Whether converts public macro signals into a bounded weekly operating posture and a shareable decision artifact.
+- The funding climate turns a few times a year (6 changes in 176 month-ends), and each turn lands on
+  plans that were made months earlier with no rule for what to do when it came.
+- Whether writes that rule down first: for each area, the action, the line that pauses it and the line
+  that resumes it, with an email the day one is crossed. A team can move the lines to fit its own plan.
+- Every week is published and never edited, and the record grades itself, including the turns it gave
+  no warning of. Do not pitch week-to-week movement; most weeks, nothing crosses a line.
 
 ## Competitor battlecard
 

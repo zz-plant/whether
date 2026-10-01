@@ -1,5 +1,5 @@
 import { createCloudflareEmailAdapter, type EmailDeliveryAdapter } from "./emailDelivery";
-import { getSubscriberStore } from "./subscriberStore";
+import { getSubscriberStore, withPendingApplied } from "./subscriberStore";
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
 import { describePlanLineAreas, type PlanLines } from "../alert/planLines";
 
@@ -83,7 +83,9 @@ export const subscribeAndSendVerification = async ({
 
   const store = getSubscriberStore();
   const subscriber = await store.subscribe(email, { alerts, weekly, planLines });
-  const promise = describeSubscription(subscriber);
+  /* What confirming will do, which for an address that already confirmed is the
+     change it is being asked to approve, not the record as it stands. */
+  const promise = describeSubscription({ ...withPendingApplied(subscriber), pendingPlanLines: subscriber.pendingPlanLines });
   const verifyUrl = buildEmailActionUrl(
     `/api/email/verify?token=${encodeURIComponent(subscriber.token)}`,
     request,
