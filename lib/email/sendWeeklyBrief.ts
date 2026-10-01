@@ -217,6 +217,10 @@ export const sendWeeklyBrief = async (options?: {
         ? `Whether — ${regimeLabel}: ${actionNow}`
         : `Whether Brief — ${regimeLabel}`;
       const briefUrl = siteUrl;
+      /* The lines above are the published ones. The use the record fits is a plan's
+         own lines and an email the day one is crossed, and this is the one page
+         every subscriber opens each week. */
+      const planLinesUrl = `${siteUrl}/operate#ops-plan-lines`;
       const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
 
       const text = [
@@ -226,6 +230,7 @@ export const sendWeeklyBrief = async (options?: {
         `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
+        `Move these lines for your own plan, and hear the day one is crossed: ${planLinesUrl}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         `---`,
@@ -255,6 +260,7 @@ export const sendWeeklyBrief = async (options?: {
           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#10b981;margin:${index === 0 ? "0" : "12px"} 0 6px;">${label}</p>`,
           `<p style="font-size:0.9rem;margin:0;color:#cbd5e1;">${value}</p>`,
         ]),
+        `<p style="font-size:0.8rem;margin:16px 0 0;color:#94a3b8;"><a href="${planLinesUrl}" style="color:#7dd3fc;text-decoration:underline;">Move these lines for your own plan</a>, and hear the day one is crossed.</p>`,
         `</td></tr></table>`
       );
 
