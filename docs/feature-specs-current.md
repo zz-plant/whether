@@ -1793,7 +1793,9 @@ Slack, Notion, and Linear targets.
     through: the planner, the commitment test, the runway notes, the plan stress test and the band
     cookie. Cash and a typed runway replace each other (`setOperatorProfileField`), a band pick that
     excludes the runway clears whichever stated it, and a shared plan link carries `?cash=` and
-    replaces both of the recipient's when it carries either. Revenue at or above spend reads as
+    replaces both of the recipient's when it carries either. A link's figure is read whole or not at
+    all (money also takes the k/M/B shorthand): `parseFloat` read a hand-edited `?cash=2.1M` as $2.10
+    and `?runway=14months` as 14. Revenue at or above spend reads as
     cash-flow positive: no runway, and the planner says so instead of asking for one. That holds
     whichever way the runway was given: a typed runway beside revenue that covers spend used to size
     a full plan and date a cash-out month while the same company with its cash entered was told there

@@ -59,6 +59,33 @@ describe("shared runway plan link", () => {
     assert.equal(read.stage, null);
   });
 
+  it("reads the whole value or none of it, and money's own shorthand", () => {
+    // parseFloat read `cash=2.1M` as $2.10 and `runway=14months` as 14.
+    const read = readSharedRunwayPlan(new URLSearchParams("cash=2.1M&burn=150k&revenue=0&runway=14months&growth=12abc&margin=7O"));
+    assert.deepEqual(read.profile, { cashUsd: 2_100_000, monthlyBurnUsd: 150_000, monthlyRevenueUsd: 0 });
+    // A suffix means nothing on a figure that is not money.
+    assert.equal(readSharedRunwayPlan(new URLSearchParams("runway=2k")).profile.runwayMonths, undefined);
+  });
+
+  it("round-trips every figure the planner writes, decimals and negatives included", () => {
+    const full = {
+      ...EMPTY_OPERATOR_PROFILE,
+      cashUsd: 2_100_000.5,
+      monthlyBurnUsd: 220_000,
+      monthlyRevenueUsd: 0,
+      monthlyGrowthPct: -2.5,
+      grossMarginPct: 71.25,
+    };
+    const read = readSharedRunwayPlan(new URLSearchParams(buildSharedRunwayPlanQuery(full, null)));
+    assert.deepEqual(read.profile, {
+      cashUsd: 2_100_000.5,
+      monthlyBurnUsd: 220_000,
+      monthlyRevenueUsd: 0,
+      monthlyGrowthPct: -2.5,
+      grossMarginPct: 71.25,
+    });
+  });
+
   /* A half-filled planner produces a short link rather than one asserting zeros
      nobody typed — the same reason the panel refuses to size a plan until the
      three required figures are there. */
