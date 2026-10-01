@@ -8,6 +8,8 @@ import { trackActivationEvent } from "../../../lib/activationFunnel";
 import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { PlanLineCondition, PlanLines } from "../../../lib/alert/planLines";
+import { runwayBandLabel } from "../../../lib/report/operatorRunway";
+import { useOperatorRunway } from "../../components/useOperatorRunway";
 
 /**
  * "Set this plan's lines": the step where a plan's pause and resume lines are
@@ -22,6 +24,11 @@ import type { PlanLineCondition, PlanLines } from "../../../lib/alert/planLines"
  * Nothing is kept in the browser. The lines travel with the email address to the
  * subscription, where they wait for the confirmation link (`pendingPlanLines`):
  * a request can name any inbox, so lines count only once that inbox says yes.
+ *
+ * So does the reader's runway band, if they have chosen one and leave the box
+ * ticked: every company keeping the published lines is emailed on the same day,
+ * and the band is what lets that email say what the crossing means for this one
+ * (`describePlanLineCrossing`). The band, never a cash or runway figure.
  */
 
 const METRIC_LABEL: Record<PlanLineCondition["metric"], string> = {
@@ -80,6 +87,8 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
     defaults.map((line) => ({ ...line, pause: [...line.pause], resume: [...line.resume] })),
   );
   const [watched, setWatched] = useState<ReadonlySet<DecisionArea>>(() => new Set(defaults.map((line) => line.area)));
+  const { runwayBand } = useOperatorRunway();
+  const [sendBand, setSendBand] = useState(true);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -107,7 +116,11 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
     event.preventDefault();
     const planLines = lines.filter((line) => watched.has(line.area));
     setStatus("loading");
-    const result = await requestSubscription(email, { alerts: true, planLines });
+    const result = await requestSubscription(email, {
+      alerts: true,
+      planLines,
+      ...(runwayBand && sendBand ? { runwayBand } : {}),
+    });
     setStatus(result.ok ? "success" : "error");
     setMessage(result.ok ? "Check your email to confirm. Your lines count from the moment you do." : result.message);
     if (result.ok) trackActivationEvent({ step: "committed", path: "/operate", commitment: "subscribed" });
@@ -163,6 +176,22 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
         })}
       </ul>
 
+      {runwayBand ? (
+        <label className="flex min-h-11 items-start gap-2 text-xs text-slate-300">
+          <input
+            type="checkbox"
+            checked={sendBand}
+            onChange={() => setSendBand((current) => !current)}
+            disabled={status === "loading" || status === "success"}
+            className="mt-0.5 size-4 shrink-0 accent-sky-500"
+          />
+          <span>
+            Say what a crossing means at my runway ({runwayBandLabel(runwayBand)}). Every company on the published
+            lines is emailed the same day; your runway is what makes the email yours.
+          </span>
+        </label>
+      ) : null}
+
       {status === "success" ? (
         <output className="flex items-start gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2.5 text-xs text-emerald-200">
           <Check className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -203,8 +232,9 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
             <p id="plan-lines-message" role="alert" className="text-xs text-rose-300">{message}</p>
           ) : null}
           <p className="max-w-[68ch] text-xs text-slate-400">
-            Stored with your email address and nothing else: the numbers above, for the areas you tick. Sending the
-            form again replaces them once you confirm. See{" "}
+            Stored with your email address and nothing else: the numbers above, for the areas you tick, and your
+            runway band if the box above is ticked (the band, never a figure). Sending the form again replaces them
+            once you confirm. See{" "}
             <Link href="/privacy" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
               what is stored
             </Link>

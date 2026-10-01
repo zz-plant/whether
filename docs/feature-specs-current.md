@@ -1846,6 +1846,33 @@ Slack, Notion, and Linear targets.
     with a late day held at the end of a short month, and a fraction is that share of the month
     after by days. It added 30.44-day months in UTC, so Oct 1 plus one month printed "Oct 2026", a
     raise window at months 1–3 printed Oct–Dec, and Jan 30 plus one printed "Mar".
+- Own lines, a reachable test, and crossings at the reader's runway (2026-10-02):
+  - **Your own runway lines** (`#ops-runway-lines` on the planner): "start raising at" and "pause
+    hiring at" a number of months of runway (`raiseAtRunwayMonths`, `hiringPauseAtRunwayMonths` in
+    the profile, `?raiseAt=` / `?hirePauseAt=` on the link). Each prints the month it arrives at
+    today's net burn, or that it is already here, and travels in the copy block and the memo.
+    The company's lines beside the published ones, never in place of them.
+  - **The commitment test for a returning reader.** "Test a decision against your runway" is a
+    folded disclosure under the area table in "What it changes" (`CommitmentTestDisclosure`), with
+    an area select for the runway note. The section folds on a first visit and the picker hides
+    once the brief is open, so the two copies are never on screen together.
+  - **Burn multiple capped.** The planner's risk score read spend ÷ revenue uncapped, so $1k of
+    revenue against $150k of spend scored critical (150x) where the same company with no revenue
+    scored moderate (4x). It is capped at the no-revenue 4x now; earning something never scores
+    worse than earning nothing, and 20 months at $150k spend and $20k revenue reads a raise in
+    months 2–5 rather than "now".
+  - **Crossing emails at the reader's runway.** Every company on the published lines is emailed the
+    same day a line is crossed. The plan-lines form can send the reader's runway band (a checkbox,
+    on by default when a band is set; the band, never a figure), held as `pendingPlanRunway` with
+    the lines and promoted with them on confirmation. A crossing email then adds the note this
+    guidance carries for that area at that band, or the band's own stance where it has none, and
+    dates the band (`describePlanLineCrossing`). New lines without a band clear the old one; the
+    confirmation email names the band; `/privacy` 2.1 lists it.
+  - **Outcome claims removed.** The analog playbook stated two competitor outcomes with no source
+    ("burned 35% of the cash buffer", "shipped faster while competitors stalled"); the agent tool
+    description in `/llms.txt` promised "what the winners did" and listed three of the four periods;
+    two stakeholder-guide lines promised fewer surprises and avoided cuts. Each now states what was
+    done or how to judge, not a result the record cannot show.
 - Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
   pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
   and offer to copy a board memo built from it; an emptied field became zero and read as

@@ -4,6 +4,7 @@ import { AreaTable, type AreaRowData } from "../ui/areaTable";
 import { StagePersonaSelector } from "../StagePersonaSelector";
 import { RunwayPersonaSelector } from "../RunwayPersonaSelector";
 import { RunwayAreaNote, RunwayConditionedNotes } from "../RunwayConditionedNotes";
+import { CommitmentTestDisclosure } from "./CommitmentTest";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeAreaRow } from "../../../lib/report/home/homeSectionModel";
 import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRules";
@@ -81,6 +82,8 @@ export function WhatItChangesSection({
         rows={tableRows}
         caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}, by area`}
       />
+      {/* Live briefs only, like the runway notes: it reads today's cash. */}
+      {isHistorical ? null : <CommitmentTestDisclosure regime={regime} />}
     </HomeSection>
   );
 }

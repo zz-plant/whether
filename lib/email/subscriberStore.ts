@@ -1,5 +1,6 @@
 import { readKvValues, type KvNamespace } from "../runtime/kv";
-import { parsePlanLines, type PlanLines } from "../alert/planLines";
+import { parsePlanLines, parsePlanRunway, type PlanLines, type PlanRunway } from "../alert/planLines";
+import type { RunwayBand } from "../report/operatorRunway";
 /**
  * Subscriber storage using Cloudflare KV.
  * Stores individual subscriber records keyed by email
@@ -48,6 +49,16 @@ export type Subscriber = {
    */
   pendingPlanLines?: PlanLines[];
   /**
+   * The runway band the reader had chosen when they set `planLines`, and the day
+   * (`PlanRunway`): a crossing email says what the crossing means at that band, so
+   * one line crossed reads differently at six months of runway than at two years.
+   * The band only. It arrives with the lines, waits with them for the inbox, and
+   * is replaced or cleared with them.
+   */
+  planRunway?: PlanRunway;
+  /** The band sent with `pendingPlanLines`. Absent beside pending lines means they carry none. */
+  pendingPlanRunway?: PlanRunway;
+  /**
    * Choices a request made for an address that has already confirmed: alert mail,
    * the Monday brief, or reactivating a record that unsubscribed. Applied by
    * `verifyEmail`. Before 2026-10-01 they took effect on the request, so anyone who
@@ -83,7 +94,26 @@ export type SubscribeOptions = {
   weekly?: boolean;
   /** Held as `pendingPlanLines` until the address confirms; an empty list clears the lines. */
   planLines?: PlanLines[];
+  /** The reader's runway band, sent with `planLines`; kept only beside a non-empty set of lines. */
+  runwayBand?: RunwayBand;
 };
+
+/**
+ * Whether a request's lines would change what the record watches: different
+ * lines, or the same lines with a different runway band beside them. Asking for
+ * exactly what is already set issues no link, since there is nothing to confirm.
+ */
+const planLinesRequestChanges = (existing: Subscriber, planLines: PlanLines[], runwayBand: RunwayBand | undefined) => {
+  if (JSON.stringify(planLines) !== JSON.stringify(existing.planLines)) return true;
+  const requestedBand = planLines.length > 0 ? runwayBand : undefined;
+  return requestedBand !== existing.planRunway?.band;
+};
+
+/** The band to hold beside a request's lines, dated today, or nothing. */
+const pendingRunwayFor = (options: SubscribeOptions | undefined, now: Date): Pick<Subscriber, "pendingPlanRunway"> =>
+  options?.planLines && options.planLines.length > 0 && options.runwayBand
+    ? { pendingPlanRunway: { band: options.runwayBand, setOn: now.toISOString() } }
+    : {};
 
 type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
 
@@ -143,7 +173,14 @@ const readPendingFlags = (raw: object): Pick<Subscriber, "pendingFlags"> => {
 
 /** The record with no change waiting on its inbox. */
 const withoutPending = (sub: Subscriber): Subscriber => {
-  const { pendingFlags: _flags, pendingPlanLines: _lines, confirmToken: _token, confirmRequestedAt: _at, ...rest } = sub;
+  const {
+    pendingFlags: _flags,
+    pendingPlanLines: _lines,
+    pendingPlanRunway: _runway,
+    confirmToken: _token,
+    confirmRequestedAt: _at,
+    ...rest
+  } = sub;
   return rest;
 };
 
@@ -166,10 +203,10 @@ const applySubscribeRequest = (existing: Subscriber, options: SubscribeOptions |
     if (requested !== undefined && requested !== existing[key]) pendingFlags[key] = requested;
   }
   if (!existing.active) pendingFlags.reactivate = true;
-  const change: Pick<Subscriber, "pendingFlags" | "pendingPlanLines"> = {
+  const change: Pick<Subscriber, "pendingFlags" | "pendingPlanLines" | "pendingPlanRunway"> = {
     ...(Object.keys(pendingFlags).length > 0 ? { pendingFlags } : {}),
-    ...(options?.planLines && JSON.stringify(options.planLines) !== JSON.stringify(existing.planLines)
-      ? { pendingPlanLines: options.planLines }
+    ...(options?.planLines && planLinesRequestChanges(existing, options.planLines, options.runwayBand)
+      ? { pendingPlanLines: options.planLines, ...pendingRunwayFor(options, now) }
       : {}),
   };
   /* A confirmed address asking for what it already has gets no link: there is
@@ -214,16 +251,27 @@ const readConfirmation = (raw: object): Pick<Subscriber, "confirmToken" | "confi
   return confirmToken && confirmRequestedAt ? { confirmToken, confirmRequestedAt } : {};
 };
 
-const readPendingPlanLines = (raw: object): Pick<Subscriber, "pendingPlanLines"> => {
+const readPendingPlanLines = (raw: object): Pick<Subscriber, "pendingPlanLines" | "pendingPlanRunway"> => {
   const pending = parsePlanLines(Reflect.get(raw, "pendingPlanLines"));
-  return pending ? { pendingPlanLines: pending } : {};
+  if (!pending) return {};
+  const runway = parsePlanRunway(Reflect.get(raw, "pendingPlanRunway"));
+  return { pendingPlanLines: pending, ...(runway ? { pendingPlanRunway: runway } : {}) };
 };
 
-/** A confirmed address takes the lines it asked for; the pending copy is consumed. */
+/**
+ * A confirmed address takes the lines it asked for, and the band that came with
+ * them; the pending copies are consumed. A set of lines sent without a band
+ * clears the old one, which described the company when the old lines were set.
+ */
 const promotePendingPlanLines = (sub: Subscriber): Subscriber => {
   if (!sub.pendingPlanLines) return sub;
-  const { pendingPlanLines, ...rest } = sub;
-  return { ...rest, planLines: pendingPlanLines };
+  const { pendingPlanLines, pendingPlanRunway, planRunway: _replaced, ...rest } = sub;
+  return { ...rest, planLines: pendingPlanLines, ...(pendingPlanRunway ? { planRunway: pendingPlanRunway } : {}) };
+};
+
+const readPlanRunway = (raw: object): Pick<Subscriber, "planRunway"> => {
+  const runway = parsePlanRunway(Reflect.get(raw, "planRunway"));
+  return runway ? { planRunway: runway } : {};
 };
 
 /**
@@ -250,6 +298,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     alerts: readStoredFlag(raw, "alerts"),
     weekly: readStoredFlagDefaultOn(raw, "weekly"),
     planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
+    ...readPlanRunway(raw),
     ...readPendingPlanLines(raw),
     ...readPendingFlags(raw),
     ...readConfirmation(raw),
@@ -266,7 +315,7 @@ const newSubscriber = (email: string, options: SubscribeOptions | undefined, now
   alerts: options?.alerts === true,
   weekly: options?.weekly ?? !options?.planLines,
   planLines: [],
-  ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
+  ...(options?.planLines ? { pendingPlanLines: options.planLines, ...pendingRunwayFor(options, now) } : {}),
   ...issueConfirmation(now),
 });
 
