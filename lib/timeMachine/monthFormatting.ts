@@ -68,12 +68,37 @@ export const formatMonthShortLabel = (year: number, month: number) => {
   return monthShortFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 };
 
-const AVERAGE_MONTH_MS = (365.25 / 12) * 24 * 60 * 60 * 1000;
+/** `now` moved by whole calendar months on the reader's calendar, with the day held where the month has it. */
+const addCalendarMonths = (now: Date, count: number) => {
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + count + 1, 0).getDate();
+  return new Date(
+    now.getFullYear(),
+    now.getMonth() + count,
+    Math.min(now.getDate(), lastDay),
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds(),
+    now.getMilliseconds(),
+  );
+};
 
-/** The month a span of months from `now` lands in: "Dec 2027". Fractions count as part of a month. */
+/**
+ * The month a span of months from `now` lands in, on the reader's calendar: "Dec 2027".
+ *
+ * Whole months are calendar months: Oct 1 plus one is Nov 1, and Jan 30 plus one
+ * is the last day of February. A fraction is that share of the month after it,
+ * by days, so Oct 1 plus 1.5 lands mid-November. Until 2026-10-01 this added
+ * 30.44-day months in UTC: Oct 1 plus one printed "Oct 2026", months 1–3 printed
+ * Oct–Dec, Jan 30 plus one printed "Mar", and a Sep 30 evening in Chicago was
+ * already October. Every caller renders in the browser after hydration, so the
+ * local calendar is the reader's.
+ */
 export const formatMonthAfter = (now: Date, months: number) => {
-  const date = new Date(now.getTime() + months * AVERAGE_MONTH_MS);
-  return formatMonthLabel(date.getUTCFullYear(), date.getUTCMonth() + 1);
+  const whole = Math.floor(months);
+  const from = addCalendarMonths(now, whole);
+  const to = addCalendarMonths(now, whole + 1);
+  const date = new Date(from.getTime() + (months - whole) * (to.getTime() - from.getTime()));
+  return formatMonthLabel(date.getFullYear(), date.getMonth() + 1);
 };
 
 export const formatMonthLongLabel = (year: number, month: number) => {

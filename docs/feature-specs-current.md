@@ -1818,6 +1818,10 @@ Slack, Notion, and Linear targets.
     months of cash read "the window closes around Dec 2026. Cash runs out around Nov 2026."). The
     plan scores the same runway the dated lines print: its floor is a tenth of a month, the
     profile's own, where it was one month, so 0.3 months was scored as 1 and printed as 0.3.
+    Months count on the reader's calendar (`formatMonthAfter`): whole months are calendar months,
+    with a late day held at the end of a short month, and a fraction is that share of the month
+    after by days. It added 30.44-day months in UTC, so Oct 1 plus one month printed "Oct 2026", a
+    raise window at months 1–3 printed Oct–Dec, and Jan 30 plus one printed "Mar".
 - Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
   pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
   and offer to copy a board memo built from it; an emptied field became zero and read as
