@@ -131,6 +131,15 @@ It should feel less like:
 - a methodology-first product
 - a sprawling reporting platform
 
+Two framings govern anything that applies the guidance to one company:
+
+- **Shared evidence, company-specific action:** every company reads the same signals and the same
+  pause and resume lines; what it does about them depends on its own cash, stage and runway. Prefer
+  calibration to the reader's own numbers over one identical action pushed to every reader, which
+  would synchronize hiring freezes and raises across companies.
+- **A policy agreed in advance:** lines set ahead of time, so changing course is a line being
+  crossed, not a meeting.
+
 Agents should preserve and reinforce this direction in code, copy, and IA decisions.
 
 ---
