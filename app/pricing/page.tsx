@@ -8,6 +8,7 @@ import { buildPricingStructuredData } from "../../lib/seo/pageStructuredData";
 import {
   FREE_FOREVER_PROMISE,
   PAID_PLANS_ON_SALE,
+  PRICING_SUMMARY,
   formatMonthlyPrice,
   pricingPlans,
   type PricingPlan,
@@ -20,8 +21,7 @@ export const runtime = "edge";
    it, so /pricing was the one page shared with no preview image at all. */
 export const metadata: Metadata = buildPageMetadata({
   title: "Pricing",
-  description:
-    "Weekly operating guidance, the API, MCP, embeds and the Monday email are free forever. Pro and Team add more sets of plan lines, lines a team shares, and a record across devices.",
+  description: PRICING_SUMMARY,
   path: "/pricing",
   imageAlt: "Whether pricing: free forever, with Pro and Team for plans and teams",
 });

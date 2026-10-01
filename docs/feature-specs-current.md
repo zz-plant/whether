@@ -313,8 +313,8 @@ What changed for operators:
   its panel. Panel headings are plain English: "Pick a format and copy", "Briefs for each
   audience", "Decision check / Is this move safe right now?", "Compare two plans", "Memos by
   executive role", "What operators have asked for next". The escalation block's eyebrow and h2
-  swapped ("Decision help" / "Still have one open question?"); the `decision help` smoke marker
-  still renders.
+  swapped ("Decision help" / "Still have one open question?"). That block left on 2026-09-15, and
+  the production smoke now asks `/operate` for "Set this plan's lines" instead.
 - `/signals`: "Closest past cycle" with plain labels replaces the emoji-led analog block; the bare
   "Trends" eyebrow is a heading naming both series.
 - `/trust`: h1 "How much to trust this week's call" (was "Forecast confidence"); the two "Source…"

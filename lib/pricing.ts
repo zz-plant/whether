@@ -46,6 +46,15 @@ export type PricingPlan = {
  */
 export const PAID_PLANS_ON_SALE = false;
 
+/**
+ * What /pricing says it sells: the page's meta description and its `Product`
+ * markup. One string, because the markup still read "Paid plans add delivery,
+ * alerts and team ritual" after the page stopped selling delivery and alerts on
+ * 2026-10-01, and that is the sentence a search result prints.
+ */
+export const PRICING_SUMMARY =
+  "Weekly operating guidance, the API, MCP, embeds and the Monday email are free forever. Pro and Team add more sets of plan lines, lines a team shares, and a record across devices.";
+
 export const FREE_FOREVER_PROMISE =
   "The weekly operating guidance, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans add what a plan keeps between Mondays — never access to the guidance itself.";
 
