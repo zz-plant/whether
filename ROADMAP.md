@@ -182,6 +182,9 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - [ ] Sector overlays (B2B SaaS vs. Consumer vs. DeepTech / AI Infrastructure).
 - [x] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin). Shipped: decoupled investor assumptions in Decision Shield, added gross margin calibration and buffer checks (2026-09-26).
 - [ ] ARR-per-employee and burn multiple efficiency benchmark thresholds.
+- [x] Plan without a finance lead: cash in the bank, spend and revenue in place of a runway figure. Shipped: `cashUsd` and `resolveProfileRunway` in `lib/operatorProfile.ts` work runway out as cash ÷ (spend − revenue) for every surface; one net-burn definition (`netMonthlyBurnUsd`) fixes the commitment test, runway notes and stress test, which divided by spend and overstated runway whenever revenue came in; the runway planner restates its plan as the cash-out month, raise dates and cuts in dollars (`describeRunwayPlanInYourNumbers`) (#1485, 2026-10-01).
+- [ ] Testing a decision against your own cash on `/` is first-visit only: "Test it against your runway" renders inside the first-visit picker, so a returning reader has nowhere on the brief to do it (the stress test on `/operate` is the only other place).
+- [ ] Check the runway planner's raise-window calibration. Its burn multiple is spend ÷ revenue, and the penalty `(multiple − 1) × 10` dominates the risk score: 20 months of runway at $150k spend and $20k revenue scores critical and reads "start the raise now". Since #1485 that call prints as a calendar month on the card, so it is more prominent.
 - [ ] Tech talent heat index integration (WARN notices and layoffs tracking) to calibrate hiring pacing.
 
 ## Milestone 14 — Governance & Executive Artifacts (Week 14)
@@ -206,6 +209,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - As a team lead, I can receive the Monday brief directly in our `#leadership` Slack channel without logging in.
 - As a founder, I can export a 1-slide PPTX board summary that aligns investors on macro posture in under a minute.
 - As a CFO, I can enter our cash runway and see stop/fence/start rules scaled specifically to our remaining months.
+- As a founder without a finance lead, I enter cash in the bank, monthly spend and monthly revenue and see the month cash runs out, when to start raising, and any cut in dollars. (Shipped #1485, 2026-10-01.)
 - As an engineering executive, I can tag epics in Linear that violate current capital efficiency bounds.
 - As a strategy lead, I can subscribe to mid-week flash alerts when a rate shock or credit blowout threatens our posture.
 - As a VC operating partner, I can inspect a health matrix of 40 portfolio companies against current macro tightness.

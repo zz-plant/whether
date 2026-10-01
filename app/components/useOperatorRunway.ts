@@ -10,6 +10,7 @@ import {
 import {
   OPERATOR_PROFILE_STORAGE_KEY,
   parseOperatorProfile,
+  resolveProfileRunwayMonths,
   setOperatorProfileField,
 } from "../../lib/operatorProfile";
 import { createBrowserSource, useBrowserSource, useHydrated } from "./browserSource";
@@ -38,7 +39,7 @@ const readInitialRunwayBand = (): RunwayBand | null => {
     const rawProfile = window.localStorage.getItem(OPERATOR_PROFILE_STORAGE_KEY);
     if (rawProfile) {
       const profile = parseOperatorProfile(JSON.parse(rawProfile));
-      return runwayBandForMonths(profile.runwayMonths);
+      return runwayBandForMonths(resolveProfileRunwayMonths(profile));
     }
   } catch {
     /* non-fatal */
@@ -83,9 +84,14 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
   try {
     const raw = window.localStorage.getItem(OPERATOR_PROFILE_STORAGE_KEY);
     const current = raw ? parseOperatorProfile(JSON.parse(raw)) : undefined;
-    const exact = current?.runwayMonths;
+    const exact = current ? resolveProfileRunwayMonths(current) : undefined;
     if (current && typeof exact === "number" && (!band || !runwayMonthsFitBand(exact, band))) {
-      const updated = setOperatorProfileField(current, "runwayMonths", undefined);
+      // A runway worked out from cash goes the same way: the cash figure is what states it.
+      const updated = setOperatorProfileField(
+        setOperatorProfileField(current, "runwayMonths", undefined),
+        "cashUsd",
+        undefined,
+      );
       window.localStorage.setItem(OPERATOR_PROFILE_STORAGE_KEY, JSON.stringify(updated));
       window.dispatchEvent(new StorageEvent("storage", { key: OPERATOR_PROFILE_STORAGE_KEY }));
     }

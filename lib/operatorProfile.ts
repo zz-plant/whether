@@ -17,6 +17,7 @@ export const OPERATOR_PROFILE_STORAGE_KEY = "whether.operatorProfile";
 const OPERATOR_PROFILE_VERSION = 1;
 
 export type OperatorProfileNumberKey =
+  | "cashUsd"
   | "runwayMonths"
   | "monthlyBurnUsd"
   | "monthlyRevenueUsd"
@@ -25,7 +26,15 @@ export type OperatorProfileNumberKey =
 
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
+  /**
+   * Cash in the bank. The figure a founder without a finance lead can read off
+   * their bank app, where runway is one somebody has to work out: with spend in,
+   * `resolveProfileRunway` does that. It and an entered `runwayMonths` are two
+   * answers to one question, so entering either clears the other.
+   */
+  cashUsd?: number;
   runwayMonths?: number;
+  /** Total monthly spend (gross burn). What cash falls by is this less revenue: `netMonthlyBurnUsd`. */
   monthlyBurnUsd?: number;
   monthlyRevenueUsd?: number;
   /** Month-over-month revenue growth, in percent. */
@@ -40,6 +49,7 @@ export const EMPTY_OPERATOR_PROFILE: OperatorProfile = Object.freeze({ version: 
 
 /** Beyond these a value is a typo or a units mix-up, and is dropped rather than clamped. */
 export const OPERATOR_PROFILE_LIMITS: Record<OperatorProfileNumberKey, { min: number; max: number }> = {
+  cashUsd: { min: 0, max: 1e12 },
   runwayMonths: { min: 0, max: 240 },
   monthlyBurnUsd: { min: 0, max: 1e10 },
   monthlyRevenueUsd: { min: 0, max: 1e10 },
@@ -48,6 +58,7 @@ export const OPERATOR_PROFILE_LIMITS: Record<OperatorProfileNumberKey, { min: nu
 };
 
 const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
+  "cashUsd",
   "runwayMonths",
   "monthlyBurnUsd",
   "monthlyRevenueUsd",
@@ -100,8 +111,60 @@ export const setOperatorProfileField = <K extends keyof OperatorProfile>(
     delete next[key];
   } else {
     next[key] = value;
+    // One runway: a cash figure and a typed runway would disagree about the same company.
+    if (key === "cashUsd") delete next.runwayMonths;
+    if (key === "runwayMonths") delete next.cashUsd;
   }
   return next;
+};
+
+/**
+ * What the bank balance falls by each month: spend less revenue. Negative when
+ * revenue covers spending. Undefined until spend is given.
+ *
+ * `monthlyBurnUsd` is total spend — the runway planner subtracts revenue from
+ * it — and until 2026-10-01 the commitment test, the runway notes and the plan
+ * stress test divided by it as if it were already net. With 12 months of
+ * runway, $200k of spend and $150k of revenue, that put the runway left after a
+ * $20k-a-month hire at 10.9 months when it was 8.6. Revenue left blank counts
+ * as none: the cautious reading, and the one those three gave when spend was
+ * all they had.
+ */
+export const netMonthlyBurnUsd = (profile: OperatorProfile): number | undefined =>
+  profile.monthlyBurnUsd === undefined ? undefined : profile.monthlyBurnUsd - (profile.monthlyRevenueUsd ?? 0);
+
+export type ProfileRunway =
+  /** Worked out: cash divided by net burn. */
+  | { basis: "cash"; months: number; cashUsd: number; netBurnUsd: number }
+  /** Typed in as a number of months. */
+  | { basis: "entered"; months: number }
+  /** Revenue covers spending, so cash is not running down and there is no runway to count. */
+  | { basis: "cash-flow-positive"; cashUsd: number; surplusUsd: number };
+
+/**
+ * The runway every surface reads: worked out from cash and net burn when cash
+ * is given, else the figure typed in, else nothing. A cash figure without spend
+ * is not a runway yet, and never reads as one.
+ */
+export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | null => {
+  const netBurn = netMonthlyBurnUsd(profile);
+  const cash = profile.cashUsd;
+  if (cash !== undefined && cash > 0 && netBurn !== undefined) {
+    if (netBurn <= 0) return { basis: "cash-flow-positive", cashUsd: cash, surplusUsd: Math.max(0, -netBurn) };
+    // Tenths of a month, and never zero: a balance under one tenth of a month is still a runway.
+    const months = Math.max(0.1, Math.round((cash / netBurn) * 10) / 10);
+    return { basis: "cash", months, cashUsd: cash, netBurnUsd: netBurn };
+  }
+  if (profile.runwayMonths !== undefined && profile.runwayMonths > 0) {
+    return { basis: "entered", months: profile.runwayMonths };
+  }
+  return null;
+};
+
+/** The runway in months, when there is one to count. */
+export const resolveProfileRunwayMonths = (profile: OperatorProfile): number | undefined => {
+  const runway = resolveProfileRunway(profile);
+  return runway && runway.basis !== "cash-flow-positive" ? runway.months : undefined;
 };
 
 const NUMBER_PATTERN = /-?\d+(?:\.\d+)?/;
@@ -125,6 +188,6 @@ const compactUsd = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 /** The text a stored value shows in its field; money shows grouped digits, everything else as typed. */
 export const formatOperatorProfileValue = (key: OperatorProfileNumberKey, value: number | undefined): string => {
   if (value === undefined) return "";
-  if (key === "monthlyBurnUsd" || key === "monthlyRevenueUsd") return compactUsd.format(value);
+  if (key === "cashUsd" || key === "monthlyBurnUsd" || key === "monthlyRevenueUsd") return compactUsd.format(value);
   return String(value);
 };

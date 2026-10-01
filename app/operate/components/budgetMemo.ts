@@ -11,7 +11,7 @@ import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { paceLabel } from "../../../lib/report/paceLabels";
-import type { buildRunwayPlan, RunwayPlannerRequest } from "../../../lib/report/runwayPlanner";
+import type { buildRunwayPlan, describeRunwayPlanInYourNumbers, RunwayPlannerRequest } from "../../../lib/report/runwayPlanner";
 import type { MacroSeriesReading, SensorReading } from "../../../lib/types";
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -30,6 +30,7 @@ export const buildBudgetMemoMarkdown = ({
   paybackStrictness,
   stageLabel,
   sectorLabel,
+  inYourNumbers = null,
 }: {
   assessment: RegimeAssessment;
   sensors?: readonly SensorReading[];
@@ -41,7 +42,16 @@ export const buildBudgetMemoMarkdown = ({
   paybackStrictness: { level: number; label: string };
   stageLabel: string;
   sectorLabel: string;
+  /** The plan in calendar months and dollars, once the browser can date it. */
+  inYourNumbers?: ReturnType<typeof describeRunwayPlanInYourNumbers> | null;
 }) => {
+  const datedLines = inYourNumbers
+    ? [
+        `- **In dates**: ${[inYourNumbers.raiseWindow, inYourNumbers.runsOut].filter(Boolean).join(" ")}`,
+        inYourNumbers.burnChange ? `- **In dollars**: ${inYourNumbers.burnChange}` : null,
+        inYourNumbers.floorGap ? `- **Against the safe band**: ${inYourNumbers.floorGap}` : null,
+      ].filter((line): line is string => line !== null).join("\n") + "\n"
+    : "";
   const sensor = (id: SensorReading["id"]) => readingValue(sensors.find((reading) => reading.id === id));
   const macro = (id: MacroSeriesReading["id"]) => readingValue(macroSeries.find((reading) => reading.id === id));
   const conditions = getRegimePublicLabel(assessment.regime);
@@ -60,10 +70,10 @@ This memo lines the budget and spending limits up with those conditions:
 - **When to raise**: ${output.raiseTimingWindow.summary}
 - **How far burn can move**: ${output.burnAdjustmentRange.summary}
 - **Payback bar**: ${paybackStrictness.label.toLowerCase()} (${paybackStrictness.level} of 3).
-
+${datedLines}
 ## 2. Our Inputs
 - **Runway**: ${request.runway} months
-- **Monthly burn**: ${usd.format(request.burn)}
+- **Monthly spend**: ${usd.format(request.burn)}
 - **Monthly revenue**: ${usd.format(request.revenue)}
 - **Monthly revenue growth**: ${growthAssumedFlat ? "not entered; assumed flat" : `${request.growthRate}%`}
 - **Stage / sector**: ${stageLabel} · ${sectorLabel}

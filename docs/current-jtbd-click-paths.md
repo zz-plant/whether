@@ -134,15 +134,17 @@ Validation note: click labels in this document were verified from the current ro
 1. Click `Planning`.
 2. Open the `Finance strategy` section.
 3. In `Runway planner`, enter:
-   - `Runway (months)`
-   - `Monthly burn ($)`
+   - `Cash in the bank ($)`, and runway is worked out from it; or `Runway (months)` if you know it
+     (typing either replaces the other)
+   - `Monthly spend ($)`
    - `Monthly revenue ($)` (0 is an answer; blank is not)
    - Optional: `Monthly revenue growth (%)` (blank reads as flat), `Sector`, `Stage`
 4. Optional: click `How is this calculated?`
 5. Click `Copy financial block`.
 
 **Before the three required figures are entered** the panel names what is missing
-("Enter runway, monthly burn, and monthly revenue to size the plan.") and shows no risk
+("Enter cash in the bank (or runway), monthly spend, and monthly revenue to size the plan.";
+a company whose revenue covers its spending is told there is no runway to plan against) and shows no risk
 score, raise window, or memo. It no longer opens on a fictional company. Figures persist in
 the browser (`whether.operatorProfile`) and are shared with the plan stress tests on `/` and
 `/operate`; `Stage` is the same cookie the weekly call's `Calibrate stage` control writes.

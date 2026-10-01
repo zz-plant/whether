@@ -19,6 +19,7 @@ import {
   operatorStageForLifecycleStage,
 } from "../../../lib/report/operatorStage";
 import { useOperatorProfile } from "../../components/useOperatorProfile";
+import { netMonthlyBurnUsd, resolveProfileRunwayMonths } from "../../../lib/operatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
 import {
   useClipboardCopy,
@@ -124,12 +125,20 @@ export const useDecisionShieldState = ({
     setStage(operatorStageForLifecycleStage[preset.lifecycle]);
   }, [setField, setStage]);
 
-  const companyProfile = useMemo<CompanyFinancialProfile>(() => ({
-    runwayMonths: profile.runwayMonths,
-    monthlyBurnUsd: profile.monthlyBurnUsd,
-    grossMarginPct: profile.grossMarginPct,
-    businessModel,
-  }), [profile.runwayMonths, profile.monthlyBurnUsd, profile.grossMarginPct, businessModel]);
+  /* The stress test sizes a plan against cash: the balance itself when one was
+     entered (it always took one; nothing passed it), else net burn × runway.
+     Net, not spend — `monthlyBurnUsd` is spend, and multiplying it by runway
+     overstated the balance whenever revenue was coming in. */
+  const companyProfile = useMemo<CompanyFinancialProfile>(() => {
+    const netBurn = netMonthlyBurnUsd(profile);
+    return {
+      runwayMonths: resolveProfileRunwayMonths(profile),
+      cashBalanceUsd: profile.cashUsd,
+      monthlyBurnUsd: netBurn !== undefined && netBurn > 0 ? netBurn : undefined,
+      grossMarginPct: profile.grossMarginPct,
+      businessModel,
+    };
+  }, [profile, businessModel]);
 
   const planReady = planText.trim().length > 0;
   const comparisonReady = planReady && planBText.trim().length > 0;

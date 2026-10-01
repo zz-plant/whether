@@ -28,6 +28,7 @@ import { DEFAULT_OPERATOR_STAGE, isOperatorStage, type OperatorStage } from "../
 
 /** Short names, because this ends up in something a person pastes into Slack. */
 const NUMBER_PARAMS: Record<OperatorProfileNumberKey, string> = {
+  cashUsd: "cash",
   runwayMonths: "runway",
   monthlyBurnUsd: "burn",
   monthlyRevenueUsd: "revenue",
@@ -39,6 +40,7 @@ const NUMBER_PARAMS: Record<OperatorProfileNumberKey, string> = {
    cast back on every use — the kind of assertion `review:hotspot-preflight`
    exists to keep out of a parser reading a URL someone else wrote. */
 const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
+  "cashUsd",
   "runwayMonths",
   "monthlyBurnUsd",
   "monthlyRevenueUsd",
@@ -111,8 +113,18 @@ export const buildSharedRunwayPlanQuery = (profile: OperatorProfile, stage: Oper
   return params.toString();
 };
 
-/** The link's figures over the stored ones, with neither mutating the other. */
+/**
+ * The link's figures over the stored ones, with neither mutating the other.
+ *
+ * Cash and runway are one answer given two ways, so a link that speaks to
+ * either replaces both: a sender's runway beside the recipient's own cash
+ * would size the plan on the recipient's balance under the sender's name.
+ */
 export const resolveSharedRunwayProfile = (
   stored: OperatorProfile,
   shared: Partial<OperatorProfile>,
-): OperatorProfile => ({ ...stored, ...shared });
+): OperatorProfile => {
+  const linkSetsRunway = shared.cashUsd !== undefined || shared.runwayMonths !== undefined;
+  const base: OperatorProfile = linkSetsRunway ? { ...stored, cashUsd: undefined, runwayMonths: undefined } : stored;
+  return { ...base, ...shared };
+};

@@ -89,6 +89,26 @@ describe("shared runway plan link", () => {
     assert.equal(stored.runwayMonths, 30, "and the stored profile is not written by being read");
   });
 
+  it("lets a link's runway or cash replace both of the recipient's, so one company's figures are never mixed with another's", () => {
+    const storedCash = { ...EMPTY_OPERATOR_PROFILE, cashUsd: 900_000, monthlyBurnUsd: 10000 };
+    const fromRunwayLink = resolveSharedRunwayProfile(storedCash, { runwayMonths: 6 });
+    assert.equal(fromRunwayLink.runwayMonths, 6);
+    assert.equal(fromRunwayLink.cashUsd, undefined, "the recipient's cash would otherwise outrank the sender's runway");
+
+    const storedRunway = { ...EMPTY_OPERATOR_PROFILE, runwayMonths: 30 };
+    const fromCashLink = resolveSharedRunwayProfile(storedRunway, { cashUsd: 400_000 });
+    assert.equal(fromCashLink.cashUsd, 400_000);
+    assert.equal(fromCashLink.runwayMonths, undefined);
+
+    assert.equal(resolveSharedRunwayProfile(storedCash, { monthlyRevenueUsd: 5 }).cashUsd, 900_000);
+  });
+
+  it("carries cash as a short param and round-trips it", () => {
+    const query = buildSharedRunwayPlanQuery({ ...EMPTY_OPERATOR_PROFILE, cashUsd: 2_100_000 }, null);
+    assert.equal(query, "cash=2100000");
+    assert.equal(readSharedRunwayPlan(new URLSearchParams(query)).profile.cashUsd, 2_100_000);
+  });
+
   it("resolves precedence in render rather than racing effects", async () => {
     const panel = await readFile("app/operate/components/runwayPlannerPanel.tsx", "utf8");
     assert.match(panel, /const profile = useMemo\(\(\) => resolveSharedRunwayProfile\(storedProfile, shared\.profile\)/);
