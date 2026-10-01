@@ -291,7 +291,11 @@ export const deliverAlerts = async (
         skipped++;
         continue;
       }
-      const ok = await sendPlanLineEmail(sub, describePlanLineCrossing(crossing, current), adapter);
+      const ok = await sendPlanLineEmail(
+        sub,
+        describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway }),
+        adapter,
+      );
       if (ok) {
         sent++;
         await trackAlertDelivery(sub.email, key);

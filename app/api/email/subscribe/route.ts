@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { subscribeAndSendVerification } from "../../../../lib/email/subscriptionFlow";
 import { RateLimitedError, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 import { parsePlanLines } from "../../../../lib/alert/planLines";
+import { isRunwayBand } from "../../../../lib/report/operatorRunway";
 
 export const runtime = "edge";
 
@@ -31,7 +32,11 @@ export async function POST(request: Request) {
       );
     }
 
-    await subscribeAndSendVerification({ email, alerts, weekly, planLines, request });
+    // The reader's runway band, sent with plan lines so a crossing email can say
+    // what the crossing means at it. One of four bands or nothing: never a figure.
+    const runwayBand = isRunwayBand(body.runwayBand) ? body.runwayBand : undefined;
+
+    await subscribeAndSendVerification({ email, alerts, weekly, planLines, runwayBand, request });
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {

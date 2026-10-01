@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { buildCommitmentImpact, describeProfileRunway } from "../../../lib/report/runwayConditionedNotes";
 import { parseMoneyInput } from "../../../lib/planCommitment";
 import { netMonthlyBurnUsd, resolveProfileRunway } from "../../../lib/operatorProfile";
@@ -28,7 +28,16 @@ import { useOperatorProfile } from "../useOperatorProfile";
  * /operate still counts until cash replaces it. The decision's cost is not
  * stored; it belongs to one question.
  */
-export function CommitmentTest({ regime, area }: { regime: RegimeKey; area: DecisionArea }) {
+export function CommitmentTest({
+  regime,
+  area,
+  showTitle = true,
+}: {
+  regime: RegimeKey;
+  area: DecisionArea;
+  /** False where a disclosure's summary already names it. */
+  showTitle?: boolean;
+}) {
   const { profile, setProfileField } = useOperatorProfile();
   const costId = useId();
   const [costDraft, setCostDraft] = useState("");
@@ -50,7 +59,7 @@ export function CommitmentTest({ regime, area }: { regime: RegimeKey; area: Deci
 
   return (
     <div data-testid="commitment-test" className="space-y-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-3 py-3">
-      <p className="text-fluid-xs font-medium text-slate-200">Test it against your runway</p>
+      {showTitle ? <p className="text-fluid-xs font-medium text-slate-200">Test it against your runway</p> : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <OperatorProfileNumberField
           field="cashUsd"
@@ -109,5 +118,47 @@ export function CommitmentTest({ regime, area }: { regime: RegimeKey; area: Deci
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * The same test for a returning reader, under the full brief's area table.
+ *
+ * It lived only in the first-visit picker, so a founder who came back with the
+ * next hire to weigh had nowhere on the brief to weigh it: the picker is gone
+ * once the brief has been read, and the stress test is a page away on /operate.
+ * Folded by default, because the table is what this section is for; the area
+ * picks which runway note follows the result. The section folds on a first
+ * visit, so this and the picker's copy are never on screen together.
+ */
+export function CommitmentTestDisclosure({ regime }: { regime: RegimeKey }) {
+  const areaId = useId();
+  const [area, setArea] = useState<DecisionArea>("hiring");
+  return (
+    <details data-testid="commitment-test-disclosure" className="weather-auto-chevron">
+      <summary className="text-fluid-xs font-semibold text-slate-200">Test a decision against your runway</summary>
+      <div className="mt-2 space-y-2">
+        <div className="sm:max-w-xs">
+          <label htmlFor={areaId} className="block text-fluid-nano text-slate-400">
+            What it is
+          </label>
+          <select
+            id={areaId}
+            value={area}
+            onChange={(event) => {
+              if (isDecisionArea(event.target.value)) setArea(event.target.value);
+            }}
+            className="weather-control mt-1"
+          >
+            {decisionAreaOrder.map((option) => (
+              <option key={option} value={option}>
+                {decisionAreaLabel(option)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <CommitmentTest regime={regime} area={area} showTitle={false} />
+      </div>
+    </details>
   );
 }

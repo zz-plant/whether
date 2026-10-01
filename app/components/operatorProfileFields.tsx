@@ -34,6 +34,8 @@ const PARSERS: Record<OperatorProfileNumberKey, (raw: string) => number | null> 
   },
   monthlyGrowthPct: parsePlainNumberInput,
   grossMarginPct: parsePlainNumberInput,
+  raiseAtRunwayMonths: parsePlainNumberInput,
+  hiringPauseAtRunwayMonths: parsePlainNumberInput,
 };
 
 const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
@@ -43,6 +45,8 @@ const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
   monthlyRevenueUsd: "Enter dollars, like $80k, or 0 before revenue.",
   monthlyGrowthPct: "Enter a percentage, like 6.",
   grossMarginPct: "Enter a percentage, like 75.",
+  raiseAtRunwayMonths: "Enter months of runway, like 12.",
+  hiringPauseAtRunwayMonths: "Enter months of runway, like 9.",
 };
 
 const withinLimits = (field: OperatorProfileNumberKey, value: number) =>

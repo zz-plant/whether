@@ -61,7 +61,7 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     tightness: 70,
     riskAppetite: 40,
     consensusTrap:
-      "Hired more enterprise salespeople expecting a fourth-quarter rebound; burned 35% of the cash buffer without closing a deal as enterprise buying cycles doubled.",
+      "Hired enterprise sales ahead of a fourth-quarter rebound that did not come, as enterprise buying cycles lengthened.",
     winningMove:
       "Moved to annual contracts paid up front, with a 15% discount for doing so; turned open engineering roles into 6-month contract-to-hire positions.",
     reversalMarker:
@@ -78,7 +78,7 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     consensusTrap:
       "Froze product releases and cut marketing spend in a panic, right before the Federal Reserve stopped raising rates.",
     winningMove:
-      "Shipped core product faster while competitors stalled; moved annual cloud contracts to month-to-month.",
+      "Kept shipping core product while spending elsewhere was cut; moved annual cloud contracts to month-to-month.",
     reversalMarker:
       "The Federal Reserve's pause, and risk appetite rising past 55, marked the time to restart sales and marketing spending.",
   },

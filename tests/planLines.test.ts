@@ -75,6 +75,36 @@ describe("judging plan lines", () => {
   });
 });
 
+describe("a crossing at the reader's own runway", () => {
+  /* Every company on the published lines is emailed the same day. The lines are
+     shared on purpose; what a company does about a crossing is not, so the email
+     says what it means at the band the reader set, and dates the band. */
+  const [crossing] = evaluatePlanLineCrossings([HIRING], { tightness: 74, riskAppetite: 50 }, { tightness: 70, riskAppetite: 50 });
+  const today = { tightness: 74, riskAppetite: 50 };
+
+  it("adds the note this guidance carries for the area at that band", () => {
+    const { body } = describePlanLineCrossing(crossing, today, {
+      regime: "DEFENSIVE",
+      runway: { band: "critical", setOn: "2026-10-01T12:00:00.000Z" },
+    });
+    assert.match(body, /With less than 6 months of runway, the hiring pause is what protects the runway/);
+    assert.match(body, /\(Your runway band, set on Oct 1, 2026\.\)$/);
+  });
+
+  it("falls back to the band's own stance where the band has no note for the area", () => {
+    const { body } = describePlanLineCrossing(crossing, today, {
+      regime: "DEFENSIVE",
+      runway: { band: "balanced", setOn: "2026-10-01T12:00:00.000Z" },
+    });
+    assert.match(body, /With 12–24 months of runway, the band you set on Oct 1, 2026: follow the guidance\.$/);
+  });
+
+  it("says nothing about runway to a reader who set none", () => {
+    const { body } = describePlanLineCrossing(crossing, today, { regime: "DEFENSIVE" });
+    assert.doesNotMatch(body, /runway/);
+  });
+});
+
 class FakeKv implements KvNamespace {
   readonly entries = new Map<string, string>();
   async get(key: string) {
@@ -127,6 +157,46 @@ describe("storing plan lines", () => {
   });
 });
 
+describe("storing the runway band beside the lines", () => {
+  it("holds the band with the lines until the inbox confirms, and names it in the promise", async () => {
+    const first = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING], runwayBand: "tight" });
+    assert.equal(first.planRunway, undefined);
+    assert.equal(first.pendingPlanRunway?.band, "tight");
+    assert.match(describeSubscription({ ...first, pendingPlanLines: first.pendingPlanLines, planRunway: first.pendingPlanRunway }), /with what it means at 6–12 months of runway/);
+
+    await store.verifyEmail(first.confirmToken ?? "");
+    const confirmed = await store.getSubscriberByEmail("ops@example.com");
+    assert.equal(confirmed?.planRunway?.band, "tight");
+    assert.equal(confirmed?.pendingPlanRunway, undefined);
+  });
+
+  it("replaces the band with the lines, and clears it when new lines come without one", async () => {
+    const first = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING], runwayBand: "tight" });
+    await store.verifyEmail(first.confirmToken ?? "");
+    const again = await store.subscribe("ops@example.com", { planLines: [HIRING] });
+    assert.equal((await store.getSubscriberByEmail("ops@example.com"))?.planRunway?.band, "tight", "unconfirmed, nothing changes");
+    await store.verifyEmail(again.confirmToken ?? "");
+    assert.equal((await store.getSubscriberByEmail("ops@example.com"))?.planRunway, undefined, "the old band described the old lines");
+  });
+
+  it("asks to confirm the same lines with a new band, and nothing for the same lines and band", async () => {
+    const first = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING], runwayBand: "tight" });
+    await store.verifyEmail(first.confirmToken ?? "");
+    const same = await store.subscribe("ops@example.com", { planLines: [HIRING], runwayBand: "tight" });
+    assert.equal(same.pendingPlanLines, undefined, "nothing to confirm");
+    const newBand = await store.subscribe("ops@example.com", { planLines: [HIRING], runwayBand: "critical" });
+    assert.equal(newBand.pendingPlanRunway?.band, "critical", "a different band is a change to what the email says");
+  });
+
+  it("keeps no band without lines, and reads a stored band it does not know as none", async () => {
+    const bare = await store.subscribe("ops@example.com", { alerts: true, runwayBand: "critical" });
+    assert.equal(bare.pendingPlanRunway, undefined);
+    const raw = JSON.parse(kv.entries.get("email:sub:ops@example.com") ?? "{}");
+    kv.entries.set("email:sub:ops@example.com", JSON.stringify({ ...raw, planRunway: { band: "18 months", setOn: "2026-10-01" } }));
+    assert.equal((await store.getSubscriberByEmail("ops@example.com"))?.planRunway, undefined);
+  });
+});
+
 describe("delivering plan-line alerts", () => {
   it("mails a subscriber the day their own line is crossed, on a day no published line was, and once", async () => {
     const subscriber = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING] });
@@ -149,6 +219,27 @@ describe("delivering plan-line alerts", () => {
     const second = await deliverAlerts(conditions);
     assert.equal(second.sent, 0);
     assert.equal(second.skipped, 1, "one email per area and side a week");
+  });
+  it("tells a subscriber what the crossing means at the runway band they set", async () => {
+    const subscriber = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING], runwayBand: "critical" });
+    await store.verifyEmail(subscriber.confirmToken ?? "");
+    kv.entries.set("alert:state", JSON.stringify({ regime: "DEFENSIVE", tightness: 74, riskAppetite: 50, lastSentAt: "2026-01-01T00:00:00.000Z" }));
+    const sentBodies: string[] = [];
+    Object.assign(globalThis, { EMAIL: { send: async (message: { text: string }) => { sentBodies.push(message.text); } } });
+    try {
+      await deliverAlerts({
+        regime: "DEFENSIVE",
+        tightness: 74,
+        riskAppetite: 50,
+        posture: "Hold irreversible moves.",
+        recordDate: "2026-09-29",
+        previousScores: { tightness: 70, riskAppetite: 50 },
+      });
+    } finally {
+      Reflect.deleteProperty(globalThis, "EMAIL");
+    }
+    assert.equal(sentBodies.length, 1);
+    assert.match(sentBodies[0], /With less than 6 months of runway, the hiring pause is what protects the runway/);
   });
 });
 

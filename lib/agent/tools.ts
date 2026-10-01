@@ -329,7 +329,7 @@ const AGENT_TOOLS: readonly AgentTool[] = [
     name: "get_analog_playbook",
     title: "Get the historical analog playbook",
     description:
-      "Matches today's conditions against historical analogs (Q3 2007, Q4 2018, Q2 2022) and returns what peer startups got wrong and what the winners did.",
+      "Matches today's conditions against four hand-picked past periods (Q3 2007, Q4 2018, Q2 2021, Q2 2022) and returns, for the closest, a common mistake then, what held up, and what marked the turn. Editorial summaries of the public record, not a measured sample of companies.",
     input: {},
     example: {},
     run: async () => {
