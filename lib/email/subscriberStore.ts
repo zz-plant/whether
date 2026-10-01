@@ -47,7 +47,18 @@ export type Subscriber = {
    * inbox is clicked (`verifyEmail`); until then the standing lines are untouched.
    */
   pendingPlanLines?: PlanLines[];
+  /**
+   * Choices a request made for an address that has already confirmed: alert mail,
+   * the Monday brief, or reactivating a record that unsubscribed. Applied by
+   * `verifyEmail`. Before 2026-10-01 they took effect on the request, so anyone who
+   * knew an address could switch off its Monday brief or re-enroll someone who had
+   * left; consent for a change now comes from the inbox, as it does for the first
+   * subscription.
+   */
+  pendingFlags?: PendingFlags;
 };
+
+type PendingFlags = { alerts?: boolean; weekly?: boolean; reactivate?: boolean };
 
 export type SubscribeOptions = {
   /** Omitted leaves an existing subscriber's choice alone; a new record defaults to false. */
@@ -96,6 +107,63 @@ const readStoredFlag = (source: object, key: string): boolean => Reflect.get(sou
 /** `!== false`, for a field whose absence predates it and meant yes. */
 const readStoredFlagDefaultOn = (source: object, key: string): boolean => Reflect.get(source, key) !== false;
 
+const readPendingFlags = (raw: object): Pick<Subscriber, "pendingFlags"> => {
+  const stored: unknown = Reflect.get(raw, "pendingFlags");
+  if (typeof stored !== "object" || stored === null) return {};
+  const flag = (key: keyof PendingFlags) => {
+    const value: unknown = Reflect.get(stored, key);
+    return typeof value === "boolean" ? { [key]: value } : {};
+  };
+  const pending: PendingFlags = { ...flag("alerts"), ...flag("weekly"), ...flag("reactivate") };
+  return Object.keys(pending).length > 0 ? { pendingFlags: pending } : {};
+};
+
+/**
+ * What a request asks of a record that already exists. A confirmed address holds
+ * the change until its inbox says yes; one that never confirmed has nothing to
+ * protect yet, and takes it now, as it always has.
+ */
+const applySubscribeRequest = (existing: Subscriber, options: SubscribeOptions | undefined): Subscriber => {
+  const planLines = options?.planLines ? { pendingPlanLines: options.planLines } : {};
+  if (!existing.verified) {
+    return {
+      ...existing,
+      active: true,
+      alerts: options?.alerts ?? existing.alerts,
+      weekly: options?.weekly ?? existing.weekly,
+      ...planLines,
+    };
+  }
+  // The latest request wins: a choice that matches the standing one clears an
+  // earlier pending change rather than leaving it to apply on the next confirm.
+  const pendingFlags: PendingFlags = { ...existing.pendingFlags };
+  for (const key of ["alerts", "weekly"] as const) {
+    const requested = options?.[key];
+    if (requested === undefined) continue;
+    if (requested === existing[key]) delete pendingFlags[key];
+    else pendingFlags[key] = requested;
+  }
+  if (!existing.active) pendingFlags.reactivate = true;
+  const { pendingFlags: _previous, ...rest } = existing;
+  return {
+    ...rest,
+    ...(Object.keys(pendingFlags).length > 0 ? { pendingFlags } : {}),
+    ...planLines,
+  };
+};
+
+/** The record as it will read once the address confirms: what a confirmation email promises. */
+export const withPendingApplied = (sub: Subscriber): Subscriber => {
+  const { pendingFlags, ...rest } = promotePendingPlanLines(sub);
+  if (!pendingFlags) return { ...rest };
+  return {
+    ...rest,
+    alerts: pendingFlags.alerts ?? rest.alerts,
+    weekly: pendingFlags.weekly ?? rest.weekly,
+    active: pendingFlags.reactivate ? true : rest.active,
+  };
+};
+
 const readPendingPlanLines = (raw: object): Pick<Subscriber, "pendingPlanLines"> => {
   const pending = parsePlanLines(Reflect.get(raw, "pendingPlanLines"));
   return pending ? { pendingPlanLines: pending } : {};
@@ -133,6 +201,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     weekly: readStoredFlagDefaultOn(raw, "weekly"),
     planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
     ...readPendingPlanLines(raw),
+    ...readPendingFlags(raw),
   };
 };
 
@@ -156,15 +225,11 @@ class KvSubscriberStore implements SubscriberStore {
 
     const existing = await this.getSubscriberByEmail(normalized);
     if (existing) {
+      // An omitted option keeps the standing choice: re-subscribing from a form that
+      // does not ask about alerts must not silently switch them off.
       const updated: Subscriber = {
-        ...existing,
-        active: true,
+        ...applySubscribeRequest(existing, options),
         subscribedAt: existing.subscribedAt || new Date().toISOString(),
-        // An omitted option keeps the standing choice: re-subscribing from a form that
-        // does not ask about alerts must not silently switch them off.
-        alerts: options?.alerts ?? existing.alerts,
-        weekly: options?.weekly ?? existing.weekly,
-        ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
       };
       await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
       await this.kv.put(TOKEN_PREFIX + updated.token, normalized).catch(() => { /* non-fatal: token index repaired when KV is available */ });
@@ -220,7 +285,7 @@ class KvSubscriberStore implements SubscriberStore {
 
     const stored = hydrateSubscriber(JSON.parse(raw));
     if (!stored) return false;
-    const sub: Subscriber = { ...promotePendingPlanLines(stored), verified: true };
+    const sub: Subscriber = { ...withPendingApplied(stored), verified: true };
     await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
     if (sub.active) {
       await this.kv.put(ACTIVE_PREFIX + email, email).catch(() => undefined);
@@ -357,11 +422,9 @@ class InMemorySubscriberStore implements SubscriberStore {
 
     const existing = this.byEmail.get(normalized);
     if (existing) {
-      existing.active = true;
-      existing.alerts = options?.alerts ?? existing.alerts;
-      existing.weekly = options?.weekly ?? existing.weekly;
-      if (options?.planLines) existing.pendingPlanLines = options.planLines;
-      return existing;
+      const updated = applySubscribeRequest(existing, options);
+      this.saveToMemory(updated);
+      return updated;
     }
 
     const token = generateToken();
@@ -394,7 +457,7 @@ class InMemorySubscriberStore implements SubscriberStore {
     if (!email) return false;
     const sub = this.byEmail.get(email);
     if (!sub) return false;
-    this.saveToMemory({ ...promotePendingPlanLines(sub), verified: true });
+    this.saveToMemory({ ...withPendingApplied(sub), verified: true });
     return true;
   }
 

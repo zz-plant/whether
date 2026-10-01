@@ -1493,6 +1493,28 @@ true.
   line-crossing alert from Pro to Free: it was promised free on the homepage already, and a
   plan nobody can buy would have made plan lines unreachable.
 
+### 1.1.32 Consent for changes, and paid plans that sell what free does not (2026-10-01)
+
+- **A confirmed address changes only when its inbox says so.** `subscribe()` used to apply
+  `alerts`, `weekly` and reactivation on the request, and `/api/email/subscribe` takes any address,
+  so anyone could switch off someone's Monday brief or re-enroll a reader who had unsubscribed.
+  For a verified record the request is held as `pendingFlags` (latest request wins; a choice that
+  matches the standing one clears its pending change) and applied by `verifyEmail` with the plan
+  lines (`withPendingApplied`); the confirmation email describes the record as it will read once
+  confirmed. An unverified record takes a request directly, as before: it receives nothing yet.
+  `/privacy` 2.1 says so.
+- **Paid plans list only what the free plan lacks.** Pro sold "Monday delivery to your inbox" and
+  Team a Slack channel feed and briefs for boards and investors; the free subscribe form and `/share`
+  deliver all three, so the demand test priced free things. Pro now offers more than one set of plan
+  lines and cross-device decision memory; Team, plan lines a team shares and a shared decision log.
+  The free plan lists the Monday email and Slack feed. `tests/pricing.test.ts` holds paid features
+  off delivery words.
+- **The picker points at plan lines.** Under a picked area's published lines, "Move these lines for
+  your plan →" opens `/operate#ops-plan-lines`. The alert form names everything it sends: the
+  guidance changing, a score crossing one of its lines, an outsized move in a market input.
+- `/trust`'s worked example quotes the published lines (`sharedDecisionLines`): resume below 66,
+  not 64, which no rule used.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)

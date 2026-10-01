@@ -91,7 +91,9 @@ export default function PrivacyPage() {
               (numbers on the two scores, for each area you chose, held unconfirmed until you click the
               link), and a random token that makes the confirmation and unsubscribe links work. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
-              you click the confirmation link. Every email carries an unsubscribe link, and using it
+              you click the confirmation link, and once you have, a later request for your address —
+              turning alerts or the Monday brief on or off, or subscribing again after leaving — changes
+              nothing until you click the link it sends. Every email carries an unsubscribe link, and using it
               deactivates the record immediately.
             </p>
           </div>

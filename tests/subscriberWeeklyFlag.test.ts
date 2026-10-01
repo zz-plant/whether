@@ -82,13 +82,48 @@ describe("alerts-only subscription", () => {
     assert.deepEqual(weekly, ["old@example.com"]);
   });
 
-  it("leaves the choice alone when a form does not ask, and changes it when one does", async () => {
-    await subscribeVerified("reader@example.com", { alerts: true, weekly: false });
+  it("leaves the choice alone when a form does not ask, and changes it when one does and the inbox confirms", async () => {
+    const first = await subscribeVerified("reader@example.com", { alerts: true, weekly: false });
 
     await store.subscribe("reader@example.com", { alerts: true });
     assert.equal((await store.getSubscriberByEmail("reader@example.com"))?.weekly, false);
 
     await store.subscribe("reader@example.com", { alerts: true, weekly: true });
+    assert.equal((await store.getSubscriberByEmail("reader@example.com"))?.weekly, false, "held until the address confirms");
+
+    await store.verifyEmail(first.token);
+    assert.equal((await store.getSubscriberByEmail("reader@example.com"))?.weekly, true);
+  });
+
+  /* Before 2026-10-01 a request changed a confirmed record on arrival, and the
+     endpoint takes any address: anyone could switch off someone's Monday brief
+     or re-enroll a reader who had unsubscribed. */
+  it("lets no request change a confirmed address until its inbox says yes", async () => {
+    const first = await subscribeVerified("reader@example.com", { alerts: false });
+
+    await store.subscribe("reader@example.com", { weekly: false, alerts: true });
+    const held = await store.getSubscriberByEmail("reader@example.com");
+    assert.equal(held?.weekly, true);
+    assert.equal(held?.alerts, false);
+    assert.deepEqual((await getActiveSubscriptions()).map((recipient) => recipient.email), ["reader@example.com"]);
+
+    await store.unsubscribe(first.token);
+    await store.subscribe("reader@example.com");
+    assert.deepEqual(await getActiveSubscriptions(), [], "re-enrolling a reader who left waits for the inbox");
+
+    await store.verifyEmail(first.token);
+    const confirmed = await store.getSubscriberByEmail("reader@example.com");
+    assert.equal(confirmed?.active, true);
+    assert.equal(confirmed?.weekly, false);
+    assert.equal(confirmed?.alerts, true);
+    assert.equal(confirmed?.pendingFlags, undefined);
+  });
+
+  it("lets the latest request win over an earlier one still waiting", async () => {
+    const first = await subscribeVerified("reader@example.com");
+    await store.subscribe("reader@example.com", { weekly: false });
+    await store.subscribe("reader@example.com", { weekly: true });
+    await store.verifyEmail(first.token);
     assert.equal((await store.getSubscriberByEmail("reader@example.com"))?.weekly, true);
   });
 

@@ -16,7 +16,13 @@
  * embeds are free permanently, and saying so in writing is what makes the paid
  * tiers legible rather than threatening — this product's credibility with the
  * audience it launches to rests on not being a bait-and-switch. Paid plans add
- * delivery and memory, never access to the call itself.
+ * what a plan keeps between Mondays — more sets of lines, lines a team shares,
+ * a record that follows a person across devices — never access to the call.
+ *
+ * Until 2026-10-01 they sold Monday delivery to email and Slack, a Slack channel
+ * feed and briefs for boards and investors, all of which the free subscribe form
+ * and /share already deliver. A demand test whose paid column lists free things
+ * measures nothing, so the paid features are now only ones the free plan lacks.
  */
 type PricingPlanId = "free" | "pro" | "team";
 
@@ -41,7 +47,7 @@ export type PricingPlan = {
 export const PAID_PLANS_ON_SALE = false;
 
 export const FREE_FOREVER_PROMISE =
-  "The weekly operating guidance, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans add Monday delivery to email and Slack — never access to the guidance itself.";
+  "The weekly operating guidance, the API, the MCP endpoint, and embeds are free forever. No signup, no key, no trackers. Paid plans add what a plan keeps between Mondays — never access to the guidance itself.";
 
 export const pricingPlans: PricingPlan[] = [
   {
@@ -65,6 +71,7 @@ export const pricingPlans: PricingPlan[] = [
          direction that costs trust. */
       "Decisions you record, kept against this browser's identifier",
       "Week close-outs and what you have already reviewed, in this browser",
+      "The Monday guidance by email or into a Slack channel",
       "Email when conditions change between Mondays",
       /* Moved from Pro on 2026-10-01: the published-line alert ships free (and was
          promised free on the homepage), and plan lines are the use the record fits,
@@ -76,10 +83,10 @@ export const pricingPlans: PricingPlan[] = [
     id: "pro",
     name: "Pro",
     monthlyPriceUsd: 49,
-    tagline: "Monday delivery to your inbox",
-    audience: "One person who reads the guidance every Monday",
+    tagline: "More than one plan, and a record that follows you",
+    audience: "One person planning against the lines",
     features: [
-      "The guidance in your inbox every Monday morning",
+      "More than one set of plan lines: one per plan, quarter or product line",
       "Decision memory that follows you across devices and survives a cleared browser",
     ],
   },
@@ -87,13 +94,12 @@ export const pricingPlans: PricingPlan[] = [
     id: "team",
     name: "Team",
     monthlyPriceUsd: 199,
-    tagline: "The same guidance for the whole team",
-    audience: "A team that reads the same guidance each week",
+    tagline: "One set of lines for the whole team",
+    audience: "A team that plans against the same lines",
     features: [
       "Everything in Pro, for the whole team",
-      "Slack delivery into the channel where the decision happens",
+      "Plan lines the team shares: anyone can propose a change, and everyone hears the day a line is crossed",
       "Shared decision log across the team",
-      "Briefs formatted for boards and investors",
     ],
   },
 ];
