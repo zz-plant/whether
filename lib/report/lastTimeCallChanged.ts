@@ -1,6 +1,7 @@
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import { REGIME_SEVERITY_RANK, getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeKey } from "../regimeEngine";
+import { formatMonthLabel } from "../timeMachine/monthFormatting";
 import { signalReadingMeaning } from "./signalTranslations";
 
 /**
@@ -126,6 +127,30 @@ export const describeAgainstToday = (record: LastTimeCallChanged): { alike: bool
     ...(alike ? [] : ["It is one earlier outcome, not a forecast."]),
   ];
   return { alike, text: sentences.join(" ") };
+};
+
+/**
+ * The card as one sentence, for a first visit, where the card folds away with the rest of the
+ * brief and the turning points under the decision picker were links with nothing to read on the
+ * page. Where each score started and where it stood three months on, because the later number
+ * alone reads as a forecast; the meaning rides with the later number, and with the earlier one
+ * too when the two sit in different bands. The caveat is the card's, on the same condition.
+ */
+export const summarizeLastTimeCallChanged = (record: LastTimeCallChanged): string => {
+  const movement = (key: "tightness" | "riskAppetite") => {
+    const { atChange, later } = record[key];
+    const before = signalReadingMeaning(key, atChange);
+    const after = signalReadingMeaning(key, later);
+    return `${atChange}${before === after ? "" : ` (${before})`} to ${later} (${after})`;
+  };
+  const changedAt = formatMonthLabel(record.changedAt.year, record.changedAt.month);
+  const after = formatMonthLabel(record.after.year, record.after.month);
+  const sentences = [
+    `The last time conditions moved this way was ${changedAt} (${record.changedAt.fromLabel} to ${record.changedAt.toLabel}).`,
+    `By ${after}, funding pressure had gone from ${movement("tightness")} and risk appetite from ${movement("riskAppetite")}.`,
+    ...(describeAgainstToday(record).alike ? [] : ["One earlier outcome, not a forecast."]),
+  ];
+  return sentences.join(" ");
 };
 
 /** The comparison page for the change month against the month three later. */

@@ -10,6 +10,7 @@ import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
+import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
 import { CompactTrustPopover } from "./components/CompactTrustPopover";
@@ -52,7 +53,7 @@ import {
   buildSignalChangeRows,
   describeWeeklyMovement,
 } from "../lib/report/home/homeSectionModel";
-import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { findLastTimeCallChanged, summarizeLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
@@ -418,6 +419,10 @@ async function PageContent({
     <Shell regime={regime}>
       <BriefArtifactScript artifact={briefArtifact} />
       <ActivationTracker path="/" />
+      {/* `/` was always one of the routes the tracker accepts and never mounted
+          it, so a move from the brief to `/signals`, `/operate` or `/resolve`
+          went unrecorded and read the same as closing the tab. */}
+      <OperatorWorkflowRouteTracker />
       {isDegraded ? (
         <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
           {resolveDataStatusGuidance({
@@ -510,7 +515,15 @@ async function PageContent({
                 )}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0">
+            {/* Folded on a first visit. On a 375px phone these wrap onto two
+                rows of their own between the week and the call, which put the
+                first-visit question's answers under the tab bar; the call
+                card's trust line already says how confident it is, and the
+                horizon is a returning reader's control. */}
+            <div
+              data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined}
+              className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0"
+            >
               {/* The horizon sits with the other period controls, next to the
                   week it qualifies. It used to live at the foot of the page
                   while the card it swaps renders at the top, and reached back
@@ -597,7 +610,9 @@ async function PageContent({
               <FirstVisitDecisionPicker
                 options={decisionPickerOptions}
                 regime={regime}
+                scores={{ tightness, riskAppetite }}
                 flipCondition={reversalTriggerLabel}
+                lastTime={lastTimeCallChanged ? summarizeLastTimeCallChanged(lastTimeCallChanged) : undefined}
                 turningPoints={turningPoints}
               />
             ) : null}

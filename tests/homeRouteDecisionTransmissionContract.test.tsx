@@ -185,7 +185,7 @@ describe("home route render contract", () => {
     const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
     assert.match(
       headerSource,
-      /<div className="[^"]*\bsm:hidden\b[^"]*">\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
+      /<div [^>]*className="[^"]*\bsm:hidden\b[^"]*"[^>]*>\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
       "the header keeps the phone pills, and only there",
     );
     const consequencesSource = readFileSync("app/components/home/WhatItChangesSection.tsx", "utf8");

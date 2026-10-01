@@ -19,6 +19,14 @@ html[data-home-first-visit="true"] [data-first-visit-collapsible="true"] {
   display: none !important;
 }
 
+/* The phone header's stage and runway pills (globalHeaderRouteGate.tsx). The
+   header is outside the page, so it cannot carry the page's conditional
+   attribute; `:has` keys it on the picker being on the page, which is the same
+   condition (a live weekly brief). A browser without `:has` keeps the pills. */
+html[data-home-first-visit="true"]:has([data-first-visit-only="true"]) [data-first-visit-header-choices="true"] {
+  display: none !important;
+}
+
 /* The explainer, for a browser that has rendered the brief before. It costs
    about 150px above the call on every visit, which pushes the card a reader
    screenshots down the screen; someone returning has read the line. This was

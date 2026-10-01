@@ -7,6 +7,7 @@ import {
   type PremiumFunnelEvent,
   type PremiumFunnelEventType,
 } from "../../lib/premiumFunnel";
+import { sendTelemetry } from "../../lib/telemetry/sendTelemetry";
 
 const PREMIUM_DATA_ATTRIBUTE = "data-premium-intent";
 const PREMIUM_CTA_ATTRIBUTE = "data-premium-cta";
@@ -33,23 +34,7 @@ const buildPayload = (
 };
 
 const sendEvent = (payload: PremiumFunnelEvent) => {
-  const body = JSON.stringify(payload);
-
-  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const beaconBody = new Blob([body], { type: "application/json" });
-    navigator.sendBeacon(PREMIUM_EVENT_ENDPOINT, beaconBody);
-    return;
-  }
-
-  void fetch(PREMIUM_EVENT_ENDPOINT, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    keepalive: true,
-    priority: "low",
-  }).catch(() => {
-    // Ignore telemetry network failures to keep the client console clean.
-  });
+  sendTelemetry(PREMIUM_EVENT_ENDPOINT, payload);
 };
 
 export function PremiumFunnelTracker() {

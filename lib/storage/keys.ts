@@ -27,6 +27,8 @@ export const STORAGE_KEYS = {
   lastSeenCall: "whether.lastSeenCall",
   /** Which steps of the weekly plan this browser has ticked off, keyed by the record date so a new week starts clean. */
   weekChecklist: "whether.operate.weekChecklist",
+  /** Set from `/privacy` section 5; `lib/telemetry/sendTelemetry.ts` sends nothing while it holds "1". */
+  measurementOff: "whether.measurement.off",
   /* How many decisions this browser last knew its record to hold, beside the id the
      record is keyed by (`app/components/decisionLedgerClient.ts`). The record itself
      is server-side; this is only what lets the homepage skip asking about it when the

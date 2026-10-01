@@ -1,3 +1,5 @@
+import { sendTelemetry } from "./telemetry/sendTelemetry";
+
 type WebVitalMetricName =
   | "CLS"
   | "FCP"
@@ -55,22 +57,5 @@ export const isWebVitalMetric = (input: unknown): input is WebVitalMetric => {
 };
 
 export const trackWebVitalMetric = (metric: WebVitalMetric) => {
-  const body = JSON.stringify(metric);
-
-  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const beaconBody = new Blob([body], { type: "application/json" });
-    const queued = navigator.sendBeacon(WEB_VITALS_TELEMETRY_ENDPOINT, beaconBody);
-    if (queued) {
-      return;
-    }
-  }
-
-  void fetch(WEB_VITALS_TELEMETRY_ENDPOINT, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    keepalive: true,
-  }).catch(() => {
-    // Ignore telemetry network failures to keep the client console clean.
-  });
+  sendTelemetry(WEB_VITALS_TELEMETRY_ENDPOINT, metric);
 };

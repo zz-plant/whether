@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sendTelemetry } from "./telemetry/sendTelemetry";
 
 const SEARCH_TELEMETRY_ENDPOINT = "/api/telemetry/search";
 
@@ -36,20 +37,5 @@ export const isSearchTelemetryEvent = (input: unknown): input is SearchTelemetry
   searchEventSchema.safeParse(input).success;
 
 export const trackSearch = (event: Omit<SearchTelemetryEvent, "type">) => {
-  const body = JSON.stringify({ type: "search", ...event } satisfies SearchTelemetryEvent);
-
-  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const queued = navigator.sendBeacon(SEARCH_TELEMETRY_ENDPOINT, new Blob([body], { type: "application/json" }));
-    if (queued) return;
-  }
-
-  void fetch(SEARCH_TELEMETRY_ENDPOINT, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-    keepalive: true,
-    priority: "low",
-  }).catch(() => {
-    // Telemetry never surfaces in the page.
-  });
+  sendTelemetry(SEARCH_TELEMETRY_ENDPOINT, { type: "search", ...event } satisfies SearchTelemetryEvent);
 };
