@@ -15,7 +15,7 @@ const isRunwayChangedDetail = (value: unknown): value is RunwayChangedDetail =>
  *
  * The server scales the rules it renders to the band in the runway cookie.
  * Both runway writers (`persistOperatorRunway` for a picked band,
- * `syncRunwayBandToMonths` for a typed figure) announce whether the band
+ * `syncRunwayBandToFigures` for a typed figure) announce whether the band
  * changed; this is the one listener. A picked band re-renders at once; a band
  * implied by a typed figure waits (see `RunwayChangedDetail`).
  *

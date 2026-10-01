@@ -94,12 +94,20 @@ const trimDecimal = (value: number) => value.toFixed(1).replace(/\.0$/, "");
 /**
  * Compact USD for a label: `$540k`, `$1.2M`. Falls back to grouped digits below
  * a thousand, where a suffix would lose more precision than it saves.
+ *
+ * Under $10k it keeps a tenth of a thousand, because these figures sit in
+ * sentences that do arithmetic: whole thousands printed $1,400 as "$1k" in
+ * "Revenue covers spending today. At $1k more a month you would burn $400", and
+ * $1,500 as "$2k". A figure that rounds up into the next unit is written in it
+ * ("$1M", never "$1000k").
  */
 export const formatCommitmentUsd = (value: number): string => {
   const magnitude = Math.abs(value);
-  if (magnitude >= 1e9) return `$${trimDecimal(value / 1e9)}B`;
-  if (magnitude >= 1e6) return `$${trimDecimal(value / 1e6)}M`;
-  if (magnitude >= 1e3) return `$${Math.round(value / 1e3)}k`;
+  const sign = value < 0 ? "-" : "";
+  if (magnitude >= 999_950_000) return `${sign}$${trimDecimal(magnitude / 1e9)}B`;
+  if (magnitude >= 999_500) return `${sign}$${trimDecimal(magnitude / 1e6)}M`;
+  if (magnitude >= 9_950) return `${sign}$${Math.round(magnitude / 1e3)}k`;
+  if (magnitude >= 999.5) return `${sign}$${trimDecimal(magnitude / 1e3)}k`;
   return usdFormatter.format(value);
 };
 
@@ -214,16 +222,24 @@ export const parseMoneyInput = (raw: string): number | null => {
  * figure — either directly, or as a burn rate the runway can be multiplied by.
  * Nothing here estimates burn from a stage or a regime; an unsupplied balance
  * means the plan is not sized, and the surface says so.
+ *
+ * The burn is net (spend less revenue), and the basis says so with both
+ * figures: "$50k a month × 12 months" printed a net burn the stress test's form
+ * shows nowhere, beside a spend box reading $200k.
  */
 export const computeRunwayShare = ({
   annualUsd,
   cashBalanceUsd,
   monthlyBurnUsd,
+  monthlyRevenueUsd,
   runwayMonths,
 }: {
   annualUsd: number | null;
   cashBalanceUsd?: number;
+  /** Net: spend less revenue. */
   monthlyBurnUsd?: number;
+  /** The revenue net burn was taken from, so the basis can show the subtraction. */
+  monthlyRevenueUsd?: number;
   runwayMonths?: number;
 }): { share: number; cashUsd: number; cashBasis: string } | null => {
   if (annualUsd === null || annualUsd <= 0) return null;
@@ -245,10 +261,16 @@ export const computeRunwayShare = ({
     runwayMonths > 0
   ) {
     const cashUsd = monthlyBurnUsd * runwayMonths;
+    const revenue = typeof monthlyRevenueUsd === "number" && Number.isFinite(monthlyRevenueUsd) && monthlyRevenueUsd > 0
+      ? monthlyRevenueUsd
+      : undefined;
+    const netBurn = revenue === undefined
+      ? `${formatCommitmentUsd(monthlyBurnUsd)} a month of net burn`
+      : `${formatCommitmentUsd(monthlyBurnUsd)} a month of net burn (${formatCommitmentUsd(monthlyBurnUsd + revenue)} spend less ${formatCommitmentUsd(revenue)} revenue)`;
     return {
       share: annualUsd / cashUsd,
       cashUsd,
-      cashBasis: `${formatCommitmentUsd(monthlyBurnUsd)} a month × ${runwayMonths} months of runway`,
+      cashBasis: `${netBurn} × ${runwayMonths} months of runway`,
     };
   }
 

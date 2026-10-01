@@ -60,6 +60,16 @@ const CRITICAL_RUNWAY_MONTHS = bandCeiling("critical");
 const TIGHT_RUNWAY_MONTHS = bandCeiling("tight");
 const LONG_RUNWAY_MONTHS = bandCeiling("balanced");
 
+/*
+ * Past ten years a runway is no planning horizon, and a month count there reads
+ * as noise: a $1.4k commitment against a $1k monthly surplus left $500k lasting
+ * "about 1250 months", and one leaving 40 cents of burn printed "$0 a month"
+ * and 1,250,000 months. Cash divided by burn has no ceiling, so the words do.
+ */
+const DECADE_MONTHS = 120;
+const BEYOND_A_DECADE = "more than 10 years";
+const runwayInWords = (months: number) => (months > DECADE_MONTHS ? BEYOND_A_DECADE : `${months} months`);
+
 /**
  * What the notes read from: the exact figure when one was entered, else the
  * chosen band, else nothing. The band default the server calibrates to is not a
@@ -73,7 +83,7 @@ export const resolveRunwayForNotes = ({
   band: RunwayBand | null;
 }): { runwayMonths: number; runwayPhrase: string; runwayIsExact: boolean } | null => {
   if (typeof exactMonths === "number" && Number.isFinite(exactMonths) && exactMonths > 0) {
-    return { runwayMonths: exactMonths, runwayPhrase: `${exactMonths} months`, runwayIsExact: true };
+    return { runwayMonths: exactMonths, runwayPhrase: runwayInWords(exactMonths), runwayIsExact: true };
   }
   if (band) {
     return { runwayMonths: monthsForRunwayBand(band), runwayPhrase: runwayBandPhrase(band), runwayIsExact: false };
@@ -237,13 +247,14 @@ export const buildCommitmentImpact = ({
 
   if (typeof netMonthlyBurnUsd === "number" && Number.isFinite(netMonthlyBurnUsd) && netMonthlyBurnUsd <= 0 && valid(cashUsd)) {
     const netBurnAfter = netMonthlyBurnUsd + newMonthlyCostUsd;
-    if (netBurnAfter <= 0) {
+    // Under a dollar a month either way is holding level, not a burn to divide cash by.
+    if (netBurnAfter < 1) {
       const surplus = -netBurnAfter;
       return {
         runwayBefore: null,
         runwayAfter: null,
         bandChange: null,
-        summary: surplus > 0
+        summary: surplus >= 1
           ? `Revenue still covers spending at ${cost} more a month: cash keeps growing, by about ${formatCommitmentUsd(surplus)} a month.`
           : `Revenue still covers spending at ${cost} more a month, with nothing left over: cash holds level.`,
         noteAfter: null,
@@ -256,9 +267,9 @@ export const buildCommitmentImpact = ({
       bandChange: null,
       summary:
         `Revenue covers spending today. At ${cost} more a month you would burn ${formatCommitmentUsd(netBurnAfter)} a month, ` +
-        `and ${formatCommitmentUsd(cashUsd)} of cash lasts about ${runwayAfter} months.`,
+        `and ${formatCommitmentUsd(cashUsd)} of cash lasts ${runwayAfter > DECADE_MONTHS ? BEYOND_A_DECADE : `about ${runwayAfter} months`}.`,
       noteAfter:
-        buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, netMonthlyBurnUsd: netBurnAfter })
+        buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, runwayPhrase: runwayInWords(runwayAfter), netMonthlyBurnUsd: netBurnAfter })
           .find((note) => note.area === area)?.note ?? null,
     };
   }
@@ -274,13 +285,22 @@ export const buildCommitmentImpact = ({
     : null;
 
   const monthsSpent = roundMonths(runwayBefore - runwayAfter);
+  const movement = runwayAfter > DECADE_MONTHS
+    ? `runway stays ${BEYOND_A_DECADE}`
+    : runwayBefore > DECADE_MONTHS
+      ? `runway goes from ${BEYOND_A_DECADE} to ${runwayAfter} months`
+      : `runway goes from ${runwayBefore} to ${runwayAfter} months (${monthsSpent} ${monthsSpent === 1 ? "month" : "months"} spent)`;
   const summary =
-    `At ${cost} more a month, runway goes from ${runwayBefore} to ${runwayAfter} months ` +
-    `(${monthsSpent} ${monthsSpent === 1 ? "month" : "months"} spent)` +
+    `At ${cost} more a month, ${movement}` +
     (bandChange ? `, which moves you from ${bandChange.from} into ${bandChange.to}.` : ".");
 
   const noteAfter =
-    buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, netMonthlyBurnUsd: netMonthlyBurnUsd + newMonthlyCostUsd })
+    buildRunwayConditionedNotes({
+      regime,
+      runwayMonths: runwayAfter,
+      runwayPhrase: runwayInWords(runwayAfter),
+      netMonthlyBurnUsd: netMonthlyBurnUsd + newMonthlyCostUsd,
+    })
       .find((note) => note.area === area)?.note ?? null;
 
   return { runwayBefore, runwayAfter, bandChange, summary, noteAfter };
@@ -303,8 +323,6 @@ export const describeProfileRunway = (runway: ProfileRunway, now: Date): string 
   if (runway.basis === "entered") {
     return `${runway.months} months of runway lasts to about ${runsOut}.`;
   }
-  return (
-    `Net burn is ${formatCommitmentUsd(runway.netBurnUsd)} a month (spend less revenue), so ` +
-    `${formatCommitmentUsd(runway.cashUsd)} lasts about ${runway.months} months: to about ${runsOut}.`
-  );
+  const lasts = runway.months > DECADE_MONTHS ? `lasts ${BEYOND_A_DECADE}.` : `lasts about ${runway.months} months: to about ${runsOut}.`;
+  return `Net burn is ${formatCommitmentUsd(runway.netBurnUsd)} a month (spend less revenue), so ${formatCommitmentUsd(runway.cashUsd)} ${lasts}`;
 };

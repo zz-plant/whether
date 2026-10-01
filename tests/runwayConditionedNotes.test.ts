@@ -200,6 +200,38 @@ describe("buildCommitmentImpact", () => {
     assert.match(tipped?.summary ?? "", /you would burn \$20k a month, and \$400k of cash lasts about 20 months/);
   });
 
+  it("states figures whose arithmetic adds up, and words a runway past ten years", () => {
+    // $1k of surplus and a $1,400 commitment printed "At $1k more a month you would burn $400 a month, and
+    // $500k of cash lasts about 1250 months".
+    const tipped = buildCommitmentImpact({
+      regime: "DEFENSIVE", area: "hiring", netMonthlyBurnUsd: -1_000, cashUsd: 500_000, newMonthlyCostUsd: 1_400,
+    });
+    assert.equal(
+      tipped?.summary,
+      "Revenue covers spending today. At $1.4k more a month you would burn $400 a month, and $500k of cash lasts more than 10 years.",
+    );
+    // A commitment that leaves cents of burn printed "$0 a month" and 1,250,000 months: it holds level.
+    const level = buildCommitmentImpact({
+      regime: "DEFENSIVE", area: "hiring", netMonthlyBurnUsd: -1_000, cashUsd: 500_000, newMonthlyCostUsd: 1_000.4,
+    });
+    assert.match(level?.summary ?? "", /with nothing left over: cash holds level/);
+
+    // Cash $5M at $10k of net burn is 500 months.
+    const long = buildCommitmentImpact({
+      regime: "EXPANSION", area: "burn-discipline", runwayMonths: 500, netMonthlyBurnUsd: 10_000, newMonthlyCostUsd: 5_000,
+    });
+    assert.equal(long?.summary, "At $5k more a month, runway stays more than 10 years.");
+    assert.match(long?.noteAfter ?? "", /^With more than 10 years of runway/);
+    const shortened = buildCommitmentImpact({
+      regime: "EXPANSION", area: "burn-discipline", runwayMonths: 500, netMonthlyBurnUsd: 10_000, newMonthlyCostUsd: 40_000,
+    });
+    assert.equal(shortened?.summary, "At $40k more a month, runway goes from more than 10 years to 100 months.");
+    assert.equal(
+      describeProfileRunway({ basis: "cash", months: 500, cashUsd: 5_000_000, netBurnUsd: 10_000 }, new Date(2026, 9, 1, 12)),
+      "Net burn is $10k a month (spend less revenue), so $5M lasts more than 10 years.",
+    );
+  });
+
   it("returns nothing rather than a guess when a figure is missing or not positive", () => {
     assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, netMonthlyBurnUsd: 250_000 }), null);
     assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 0, netMonthlyBurnUsd: 250_000, newMonthlyCostUsd: 1 }), null);
@@ -231,6 +263,16 @@ describe("describeProfileRunway: the runway as a finance lead would say it", () 
     assert.equal(
       describeProfileRunway(runway, now),
       "Revenue covers spending, with $15k a month left over: cash is not running down.",
+    );
+  });
+
+  it("does not date a typed runway that revenue already covers", () => {
+    // "14 months of runway lasts to about Dec 2027" printed here, beside a planner that said there was no runway.
+    const runway = resolveProfileRunway({ version: 1, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 });
+    assert.ok(runway);
+    assert.equal(
+      describeProfileRunway(runway, now),
+      "Revenue covers spending, with $20k a month left over: cash is not running down.",
     );
   });
 });
