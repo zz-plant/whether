@@ -151,9 +151,19 @@ const RUNWAY_RISK_MODERATE = 45;
 
 const BURN_MULTIPLE_DEFAULT = 4;
 
+/*
+ * The runway floor is the profile's own (`resolveProfileRunway` never reports
+ * under a tenth of a month), so the plan scores the runway its dated lines
+ * print. It was 1 until 2026-10-01: 0.3 months was scored as a month and
+ * printed as 0.3, and the raise window was sized for cash that was not there.
+ * The 60-month ceiling only bounds the score; no line prints the clamped value.
+ */
+const MIN_PLANNER_RUNWAY_MONTHS = 0.1;
+const MAX_PLANNER_RUNWAY_MONTHS = 60;
+
 const sanitize = (input: RunwayPlannerInput): RunwayPlannerInput => ({
   ...input,
-  runway: clamp(Number.isFinite(input.runway) ? input.runway : 0, 1, 60),
+  runway: clamp(Number.isFinite(input.runway) ? input.runway : 0, MIN_PLANNER_RUNWAY_MONTHS, MAX_PLANNER_RUNWAY_MONTHS),
   burn: clamp(Number.isFinite(input.burn) ? input.burn : 0, 0, 100_000_000),
   revenue: clamp(Number.isFinite(input.revenue) ? input.revenue : 0, 0, 100_000_000),
   growthRate: clamp(Number.isFinite(input.growthRate) ? input.growthRate : 0, -40, 80),
@@ -237,6 +247,21 @@ const deriveRaiseWindow = (
   return { startMonth: 4, endMonth: 8 };
 };
 
+/*
+ * A window never outlasts the cash. Critical risk opened the raise at months
+ * 0–2 whatever the runway, so 1.5 months of cash printed "the window closes
+ * around Dec 2026. Cash runs out around Nov 2026." (2026-10-01). The window
+ * closes at the runway at the latest (in tenths, rounded down, so it never
+ * lands after it), and opens now when that leaves nothing before it.
+ */
+const capRaiseWindowToRunway = (
+  window: { startMonth: number; endMonth: number },
+  runwayMonths: number,
+): { startMonth: number; endMonth: number } => {
+  const endMonth = Math.min(window.endMonth, Math.floor(runwayMonths * 10) / 10);
+  return { startMonth: window.startMonth < endMonth ? window.startMonth : 0, endMonth };
+};
+
 const deriveDownsidePosture = (posture: PlannerPosture): PlannerPosture => {
   if (posture === "RISK_ON") return "TRANSITION";
   return "SAFETY_MODE";
@@ -261,7 +286,7 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   const macroRiskDownsideFlip = clamp(macroRiskBase + 8 + (input.regime === "EXPANSION" ? 4 : 0), 0, 100);
   const riskLevel = inferRiskLevel(macroRiskBase);
 
-  const raiseWindow = deriveRaiseWindow(riskLevel, runwayGap, input.runway, safeBand.minMonths);
+  const raiseWindow = capRaiseWindowToRunway(deriveRaiseWindow(riskLevel, runwayGap, input.runway, safeBand.minMonths), input.runway);
   const netBurnForTarget = Math.max(input.burn - input.revenue, 0);
   const timeToSafeRunwayTargetMonths =
     netBurnForTarget === 0

@@ -1813,6 +1813,11 @@ Slack, Notion, and Linear targets.
     the raise window as months, the burn adjustment as dollars of spend and the runway it buys, and
     the gap to the safe band's floor as cash or as a net-burn target. Arithmetic on the plan and the
     reader's figures only; dates wait for hydration so a server render cannot print another month.
+    The raise window closes by the month cash runs out at the latest, and opens now when that
+    leaves nothing before it (critical risk opened it at months 0–2 whatever the runway, so 1.5
+    months of cash read "the window closes around Dec 2026. Cash runs out around Nov 2026."). The
+    plan scores the same runway the dated lines print: its floor is a tenth of a month, the
+    profile's own, where it was one month, so 0.3 months was scored as 1 and printed as 0.3.
 - Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
   pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
   and offer to copy a board memo built from it; an emptied field became zero and read as
