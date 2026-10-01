@@ -1455,6 +1455,34 @@ leaving was the measurement and the owner's own checks:
   forecast" on the same condition. Other weeks print nothing, as the card does, rather than reach for the
   nearest analogue.
 
+
+### 1.1.31 Alerts on the lines the rules use, and a plan's own lines (2026-10-01)
+
+The record moves a few times a year (22 line-crossing months in 176), so the use that fits it
+is lines agreed when a plan is made and an email the day one is crossed. Two changes make that
+true.
+
+- **Published-line alerts watch the published lines.** `evaluateAlert` crossed fixed marks at
+  50 and 75 on both scores, which no rule uses, and the email called 75 "the pause line". It now
+  reads `publishedScoreLines(thresholds)`: pause and resume at 76 / 66 on funding pressure and
+  44 / 54 on risk appetite (`sharedDecisionLines`), and the change lines at 70 and 50. A move
+  that passes several lines sends one letter per score, naming the most significant (pause,
+  then change, then resume), and the dedupe key is per score (`threshold:<metric>`), so a
+  funding-pressure crossing no longer silences a risk-appetite one in the same week.
+- **A plan's own lines.** `/operate` has a step, "Set this plan's lines" (`ops-plan-lines`,
+  after the rules, live weeks only), that starts from the published rules
+  (`planLinesFromRules`) and lets a reader move each number and untick areas. The lines go with
+  an email address to `/api/email/subscribe` (`planLines`, parsed whole by `parsePlanLines`;
+  malformed lines are refused, not trimmed) and are held as `pendingPlanLines` until the
+  confirmation link is clicked, because a request can name any inbox. A record created only to
+  watch lines gets no Monday brief. Delivery judges each subscriber's lines reading against
+  reading (`evaluatePlanLineCrossings` over `previousSnapshot`), so it runs on a day no
+  published alert fired; a pause fires on any of its conditions, a resume on all of them, and
+  each area and side mails at most once a week (`plan:<area>:<side>`).
+- `/privacy` 2.1 lists the lines among what a subscription stores. `/pricing` moves the
+  line-crossing alert from Pro to Free: it was promised free on the homepage already, and a
+  plan nobody can buy would have made plan lines unreachable.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -1484,11 +1512,8 @@ path plus a highlighted latest point.
 
 ### 1.3 Plan overview (/operate)
 Planning is the detailed execution depth page for the home workspace. The default surface is a
-four-step progressive flow:
-- weekly plan,
-- guardrails,
-- finance strategy,
-- share brief.
+progressive flow of steps: the weekly plan, sharing the brief, the rules before committing,
+setting this plan's lines (§1.1.31; live weeks only), testing a decision, and finance strategy.
 
 Only one step is expanded at a time, while the other steps collapse into summary cards. The home
 Planning handoff also now uses a more stateful board treatment with explicit owner, approval-state,

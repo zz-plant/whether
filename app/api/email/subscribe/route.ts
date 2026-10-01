@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { subscribeAndSendVerification } from "../../../../lib/email/subscriptionFlow";
 import { RateLimitedError, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
+import { parsePlanLines } from "../../../../lib/alert/planLines";
 
 export const runtime = "edge";
 
@@ -20,7 +21,17 @@ export async function POST(request: Request) {
     // Same rule for the Monday brief: only `false` makes an alerts-only subscription.
     const weekly = typeof body.weekly === "boolean" ? body.weekly : undefined;
 
-    await subscribeAndSendVerification({ email, alerts, weekly, request });
+    // A plan's own lines, from /operate. Refused whole rather than trimmed: a line
+    // dropped in silence is one the reader believes is watched and is not.
+    const planLines = body.planLines === undefined ? undefined : parsePlanLines(body.planLines);
+    if (planLines === null) {
+      return NextResponse.json(
+        { ok: false, error: "Plan lines need, for each area, one or two pause and resume conditions between 0 and 100." },
+        { status: 400 },
+      );
+    }
+
+    await subscribeAndSendVerification({ email, alerts, weekly, planLines, request });
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {

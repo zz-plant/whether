@@ -1,6 +1,7 @@
 import { createCloudflareEmailAdapter, type EmailDeliveryAdapter } from "./emailDelivery";
 import { getSubscriberStore } from "./subscriberStore";
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
+import { describePlanLineAreas, type PlanLines } from "../alert/planLines";
 
 const DEFAULT_APP_BASE_URL = "https://whether.work";
 
@@ -31,7 +32,20 @@ const buildEmailActionUrl = (path: string, request?: Request) => {
 };
 
 /** What the confirmation promises, stated from the stored record rather than the request. */
-export const describeSubscription = ({ alerts, weekly }: { alerts: boolean; weekly: boolean }) => {
+export const describeSubscription = ({
+  alerts,
+  weekly,
+  pendingPlanLines,
+}: {
+  alerts: boolean;
+  weekly: boolean;
+  /** Lines this confirmation would set; the promise names their areas, or says they are cleared. */
+  pendingPlanLines?: readonly PlanLines[];
+}) => {
+  if (pendingPlanLines) {
+    if (pendingPlanLines.length === 0) return "to clear the lines you set for your plan on Whether";
+    return `an email from Whether the day one of the lines you set for ${describePlanLineAreas(pendingPlanLines)} is crossed`;
+  }
   if (weekly && alerts) return "the Whether weekly brief, plus an email when conditions change between Mondays";
   if (weekly) return "the Whether weekly brief";
   if (alerts) return "an email from Whether when conditions change, and no weekly brief";
@@ -44,6 +58,7 @@ export const subscribeAndSendVerification = async ({
   email,
   alerts,
   weekly,
+  planLines,
   request,
   adapter = createCloudflareEmailAdapter(),
 }: {
@@ -52,6 +67,8 @@ export const subscribeAndSendVerification = async ({
   alerts?: boolean;
   /** The Monday brief. Omitted leaves an existing choice alone; a new record gets it. */
   weekly?: boolean;
+  /** Lines for the reader's own plan; they take effect when the address confirms. */
+  planLines?: PlanLines[];
   request?: Request;
   adapter?: EmailDeliveryAdapter;
 }) => {
@@ -65,7 +82,7 @@ export const subscribeAndSendVerification = async ({
   }
 
   const store = getSubscriberStore();
-  const subscriber = await store.subscribe(email, { alerts, weekly });
+  const subscriber = await store.subscribe(email, { alerts, weekly, planLines });
   const promise = describeSubscription(subscriber);
   const verifyUrl = buildEmailActionUrl(
     `/api/email/verify?token=${encodeURIComponent(subscriber.token)}`,

@@ -17,7 +17,8 @@ import {
 } from "../lib/export/meetingSlideExport";
 import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
-import { decisionVerdictEmail, flashMoveEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
+import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
+import { publishedScoreLines } from "../lib/alert/alertEvaluator";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
@@ -229,7 +230,8 @@ const artifactSurfaces: Surface[] = [
     text: () =>
       [
         decisionVerdictEmail({ headline: "h", why: "w", actionNow: "a", reversal: "r", unsubscribeToken: null }).text,
-        thresholdCrossingEmail("credit", 76.2, 75).text,
+        thresholdCrossingEmail(publishedScoreLines()[0], 76.2, null).text,
+        planLineEmail({ headline: "Hiring: your pause line was crossed", body: "b" }, null).text,
         flashMoveEmail({ metric: "baseRate", from: 4, to: 4.3, delta: 0.3, label: "Short-term borrowing rate", headline: "moved" }).text,
       ].join("\n"),
   },

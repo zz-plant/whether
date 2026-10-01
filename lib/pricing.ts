@@ -66,6 +66,10 @@ export const pricingPlans: PricingPlan[] = [
       "Decisions you record, kept against this browser's identifier",
       "Week close-outs and what you have already reviewed, in this browser",
       "Email when conditions change between Mondays",
+      /* Moved from Pro on 2026-10-01: the published-line alert ships free (and was
+         promised free on the homepage), and plan lines are the use the record fits,
+         so gating them behind a plan nobody can buy would make them unreachable. */
+      "Email the day a score crosses a pause or resume line, or a line you set for your own plan",
     ],
   },
   {
@@ -76,7 +80,6 @@ export const pricingPlans: PricingPlan[] = [
     audience: "One person who reads the guidance every Monday",
     features: [
       "The guidance in your inbox every Monday morning",
-      "Threshold alerts — when a score crosses a pause or resume line, not only when conditions change",
       "Decision memory that follows you across devices and survives a cleared browser",
     ],
   },

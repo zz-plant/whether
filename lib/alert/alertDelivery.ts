@@ -2,7 +2,8 @@ import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
 import { loadReportData } from "../report/reportData";
 import { alertDeliveryKey, evaluateAlert } from "./alertEvaluator";
-import { decisionVerdictEmail, flashMoveEmail, thresholdCrossingEmail } from "./alertTemplates";
+import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "./alertTemplates";
+import { describePlanLineCrossing, evaluatePlanLineCrossings, planLineDeliveryKey } from "./planLines";
 import { evaluateFlashMoves, flashInputsFrom } from "./flashMoves";
 import {
   createCloudflareEmailAdapter,
@@ -133,25 +134,32 @@ export const deliverAlertToSubscriber = async (
         reversal: "The readings return to the previous conditions for two updates in a row.",
         unsubscribeToken,
       });
-    } else if (alert.metric === "credit") {
-      const threshold = alert.severity === "warning" ? 75 : 50;
-      template = thresholdCrossingEmail(
-        "credit",
-        conditions.tightness,
-        threshold,
-        unsubscribeToken,
-      );
+    } else if (alert.line) {
+      template = thresholdCrossingEmail(alert.line, conditions[alert.line.metric], unsubscribeToken);
     } else {
-      const threshold = alert.severity === "warning" ? 75 : 50;
-      template = thresholdCrossingEmail(
-        "sentiment",
-        conditions.riskAppetite,
-        threshold,
-        unsubscribeToken,
-      );
+      return false;
     }
     const result = await adapter.send({
       to: { email },
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+    return result.ok;
+  } catch {
+    return false;
+  }
+};
+
+const sendPlanLineEmail = async (
+  sub: Subscriber,
+  crossing: { headline: string; body: string },
+  adapter: EmailDeliveryAdapter,
+): Promise<boolean> => {
+  try {
+    const template = planLineEmail(crossing, sub.token);
+    const result = await adapter.send({
+      to: { email: sub.email },
       subject: template.subject,
       html: template.html,
       text: template.text,
@@ -185,8 +193,11 @@ export const runScheduledAlertDelivery = async (options?: {
   let recordDate = new Date().toISOString();
   let flashMoves: AlertConditions["flashMoves"];
 
+  let previousScores: AlertConditions["previousScores"] = null;
+
   if (options?.snapshot) {
     assessment = options.snapshot.assessment;
+    previousScores = options.previousSnapshot ? options.previousSnapshot.assessment.scores : null;
     recordDate = options.snapshot.provenance.recordDateLabel;
     flashMoves = evaluateFlashMoves(
       flashInputsFrom(options.snapshot),
@@ -210,6 +221,8 @@ export const runScheduledAlertDelivery = async (options?: {
     riskAppetite: assessment.scores.riskAppetite,
     posture: assessment.description,
     recordDate,
+    thresholds: assessment.thresholds,
+    previousScores,
     ...(flashMoves && flashMoves.length > 0 ? { flashMoves } : {}),
   };
 
@@ -222,12 +235,16 @@ export const deliverAlerts = async (
   const lastKnown = await readAlertState();
   const alerts = evaluateAlert(conditions, lastKnown);
 
-  if (alerts.length === 0) {
+  /* Plan lines are judged reading against reading, so with a previous reading
+     every run has to look at the subscribers even when no published alert fired:
+     a subscriber's own line can be crossed on a day nothing else moved. */
+  if (alerts.length === 0 && !conditions.previousScores) {
     return { sent: 0, skipped: 0, errors: 0, alerts: [] };
   }
 
   const subscribers = await listAlertSubscribers();
   if (subscribers.length === 0) {
+    if (alerts.length === 0) return { sent: 0, skipped: 0, errors: 0, alerts };
     await writeAlertState({
       regime: conditions.regime,
       tightness: conditions.tightness,
@@ -266,7 +283,27 @@ export const deliverAlerts = async (
         errors++;
       }
     }
+
+    const current = { tightness: conditions.tightness, riskAppetite: conditions.riskAppetite };
+    for (const crossing of evaluatePlanLineCrossings(sub.planLines, current, conditions.previousScores)) {
+      const key = planLineDeliveryKey(crossing);
+      if (await wasAlreadyDelivered(sub.email, key)) {
+        skipped++;
+        continue;
+      }
+      const ok = await sendPlanLineEmail(sub, describePlanLineCrossing(crossing, current), adapter);
+      if (ok) {
+        sent++;
+        await trackAlertDelivery(sub.email, key);
+      } else {
+        errors++;
+      }
+    }
   }
+
+  /* The published-line state moves only when a published alert fired, as before:
+     it is "where the scores were when we last wrote", not the previous reading. */
+  if (alerts.length === 0) return { sent, skipped, errors, alerts };
 
   await writeAlertState({
     regime: conditions.regime,

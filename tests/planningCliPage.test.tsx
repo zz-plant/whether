@@ -9,13 +9,14 @@ describe("operations navigation", () => {
   });
 
   it("indexes the plan page in page order, one entry per section", () => {
-    // The five stepper steps, then the risk-checks tail — the order a reader
+    // The six stepper steps, then the risk-checks tail — the order a reader
     // meets them. This used to be six labels in a different order, two of which
     // named panels inside other steps, and none of which named the Test step.
     assert.deepEqual(operationsSectionLinks.plan.map((link) => link.href), [
       "#ops-monthly-action-summary",
       "#ops-export-briefs",
       "#ops-playbook",
+      "#ops-plan-lines",
       "#ops-decision-shield",
       "#ops-finance-strategy",
       "#ops-failure-patterns",

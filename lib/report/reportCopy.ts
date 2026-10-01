@@ -168,8 +168,8 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Actions",
     detail:
-      "Use the planning page to turn the guidance into this week's do, don't and limit rules.",
-    example: "Example decision: focus on retention when risk appetite is cautious.",
+      "Use the planning page to set your plan's pause and resume lines, and get an email the day one is crossed.",
+    example: "Example decision: release the second half of a hiring plan only once funding pressure falls below 60.",
   },
 ];
 
