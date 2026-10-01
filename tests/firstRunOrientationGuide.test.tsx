@@ -56,7 +56,7 @@ describe("first-run orientation guide", () => {
 
   it("keeps the standfirst first and the guide collapsed behind it", () => {
     const html = markup();
-    const standfirst = html.indexOf("scored into");
+    const standfirst = html.indexOf("read each");
     const guide = html.indexOf("How to read this page");
 
     assert.ok(standfirst >= 0 && guide > standfirst, "the guide displaced the opening line");
@@ -85,13 +85,13 @@ describe("first-run orientation guide", () => {
     const shared = decode(renderToStaticMarkup(<FirstVisitExplainer arrival="share" />));
     const plain = markup();
 
-    assert.match(shared, /This is the weekly guidance: what interest rates and credit mean for hiring, spend and raising\./);
+    assert.match(shared, /This is this week's guidance from Whether\./);
     assert.ok(shared.includes(canonicalPositioningLine));
     assert.doesNotMatch(shared, /teammate|Monday hold|calendar\.google\.com|operating call/);
-    assert.ok(!shared.includes("scored into"), "the shared line replaces the standfirst rather than stacking on it");
+    assert.ok(!shared.includes("read each"), "the shared line replaces the standfirst rather than stacking on it");
     assert.equal((shared.match(/<section /g) ?? []).length, 1, "one section, not a banner above one");
 
-    assert.ok(!plain.includes("This is the weekly guidance:"));
+    assert.ok(!plain.includes("This is this week"));
     // The guide behind the line is the same either way.
     assert.ok(shared.includes("How to read this page"));
   });

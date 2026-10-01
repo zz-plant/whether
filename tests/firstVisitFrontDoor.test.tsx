@@ -54,7 +54,7 @@ describe("first-visit decision picker", () => {
   });
 
   it("asks one question with an answer for every area", () => {
-    assert.match(html, /What are you deciding this week\?/);
+    assert.match(html, /What are you deciding\?/);
     for (const question of ["Hire someone", "Change the roadmap", "Raise money", "Approve new spend", "Start something new"]) {
       assert.ok(html.includes(question), `missing option: ${question}`);
     }

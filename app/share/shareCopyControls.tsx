@@ -18,10 +18,11 @@ type ShareCopyControlsProps = {
   meetingPack: string;
   issueTrackerBrief: string;
   investorUpdate: InvestorUpdateSnippetParts;
+  portfolioNote: string;
   calendarDetails: string;
 };
 
-type CopyTarget = "slack" | "email" | "standup" | "meeting" | "tracker" | "investor";
+type CopyTarget = "slack" | "email" | "standup" | "meeting" | "tracker" | "investor" | "portfolio";
 
 const copyLabels: Record<CopyTarget, string> = {
   slack: "Slack brief",
@@ -30,6 +31,7 @@ const copyLabels: Record<CopyTarget, string> = {
   meeting: "Meeting pack",
   tracker: "Ticket brief",
   investor: "Investor update",
+  portfolio: "Portfolio note",
 };
 
 const isCopyTarget = (value: string | null): value is CopyTarget => value !== null && value in copyLabels;
@@ -45,6 +47,7 @@ const copyCommitments: Record<CopyTarget, ActivationCommitment> = {
      destination off buys a distinction nothing reads. */
   tracker: "copied_brief",
   investor: "copied_brief",
+  portfolio: "copied_brief",
 };
 
 const nextMondayIsoDate = () => {
@@ -66,6 +69,7 @@ export function ShareCopyControls({
   meetingPack,
   issueTrackerBrief,
   investorUpdate,
+  portfolioNote,
   calendarDetails,
 }: ShareCopyControlsProps) {
   const { status, error, activeTarget, copiedTarget: copiedKey, copyToClipboard } = useClipboardCopy({ commitment: shareCommitment });
@@ -106,10 +110,12 @@ export function ShareCopyControls({
         return issueTrackerBrief;
       case "investor":
         return investorUpdateText;
+      case "portfolio":
+        return portfolioNote;
       default:
         return slackBrief;
     }
-  }, [copiedTarget, emailBrief, standupLine, meetingPack, issueTrackerBrief, investorUpdateText, slackBrief]);
+  }, [copiedTarget, emailBrief, standupLine, meetingPack, issueTrackerBrief, investorUpdateText, portfolioNote, slackBrief]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
@@ -188,6 +194,20 @@ export function ShareCopyControls({
             label="Copy investor update"
             state={clipboardState("investor")}
             onClick={() => void copyText("investor", investorUpdateText)}
+            buttonLabels={{ error: "Copy failed" }}
+          />
+        </article>
+
+        <article className="weather-surface space-y-3 px-4 py-4">
+          <h2 className="text-fluid-xs font-semibold tracking-[0.04em] text-slate-100">Portfolio note</h2>
+          <p className="text-xs leading-relaxed text-slate-300">
+            For an investor or accelerator writing to the companies it backs: the conditions, each area&apos;s rule
+            and lines, and what the week means at every runway, with a link for each company to set its own lines.
+          </p>
+          <ClipboardActionRow
+            label="Copy portfolio note"
+            state={clipboardState("portfolio")}
+            onClick={() => void copyText("portfolio", portfolioNote)}
             buttonLabels={{ error: "Copy failed" }}
           />
         </article>

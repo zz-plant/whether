@@ -1,6 +1,6 @@
 # Agent Guide for Whether
 
-Whether turns public macro signals into weekly operating posture for startup and product leaders.
+Whether is weekly operating guidance for startup leaders: public macro signals turned into an action, a pause line and a resume line for each operating area.
 
 The product’s job is not to explain macroeconomics.
 It is to help an operator answer, fast:
@@ -120,8 +120,8 @@ Whether should increasingly feel like:
 - a citeable decision artifact (claims and recommendations can be traced to fresh sources)
 
 These are **internal framings for how the product should feel**, not copy. Outward surfaces use the
-one category line in `lib/seo.ts` (`canonicalPositioningLine`) — *the weekly operating call for
-startup leaders* — because a category that changes per surface does not survive being repeated by an
+one category line in `lib/seo.ts` (`websiteName` and `canonicalPositioningLine`) — *weekly operating
+guidance for startup leaders* — because a category that changes per surface does not survive being repeated by an
 operator in a Slack channel. See `docs/editorial-guardrails.md` -> Category line.
 
 It should feel less like:

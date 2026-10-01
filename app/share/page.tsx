@@ -12,6 +12,7 @@ import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { buildBoardSlideBullets, buildCallCitation, buildReadingLines, buildSlackBrief } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
+import { buildPortfolioNote } from "../../lib/export/portfolioNote";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
 import { describeConditions } from "../../lib/export/exportTerms";
 import { buildFlipProximity, buildStandupFlipLine } from "../../lib/report/flipProximity";
@@ -143,6 +144,15 @@ const buildCurrentShareArtifact = async () => {
     sourceLabel: reportData.treasuryProvenance.sourceLabel,
     isFallback: snapshot.isFallback,
   });
+  /* One sender to many companies, so every runway band rather than the reader's:
+     the investor update above runs the other way. */
+  const portfolioNote = buildPortfolioNote({
+    assessment,
+    record: treasury,
+    areas: areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
+    sourceLabel: reportData.treasuryProvenance.sourceLabel,
+    isFallback: snapshot.isFallback,
+  });
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
@@ -187,6 +197,7 @@ const buildCurrentShareArtifact = async () => {
     meetingPack,
     issueTrackerBrief,
     investorUpdate,
+    portfolioNote,
     guardrailTagBlocks,
     areaRows,
     pullPolicyBlocks,
@@ -251,6 +262,7 @@ export default async function SharePage() {
             meetingPack={artifact.meetingPack}
             issueTrackerBrief={artifact.issueTrackerBrief}
             investorUpdate={artifact.investorUpdate}
+            portfolioNote={artifact.portfolioNote}
             calendarDetails={artifact.calendarDetails}
           />
         </section>

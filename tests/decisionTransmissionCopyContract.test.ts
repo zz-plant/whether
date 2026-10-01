@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomeMetadata } from "../lib/report/homeMetadata";
 import { buildHomeStructuredData } from "../lib/report/home/structuredData";
-import { decisionTransmissionSummaryLine, homeDecisionFaqItems } from "../lib/report/decisionTransmissionCopy";
+import { homeDecisionFaqItems } from "../lib/report/decisionTransmissionCopy";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 import type { MacroSeriesReading, SensorReading } from "../lib/types";
@@ -70,15 +70,17 @@ const macros: MacroSeriesReading[] = [{
 }];
 
 describe("decision transmission copy contract", () => {
-  it("keeps homepage summary and metadata focused on action, confidence, and flip framing", async () => {
+  /* The description used to open "Weekly forecast", on a site whose /about and
+     llms.txt both say it is not a forecast. It names the three parts of a rule
+     instead, which is what a reader gets. */
+  it("keeps homepage metadata on the action and its two lines, and off forecasting", async () => {
     const metadata = await buildHomeMetadata();
+    const description = metadata.description ?? "";
 
-    assert.match(decisionTransmissionSummaryLine, /forecast/i);
-    assert.match(decisionTransmissionSummaryLine, /conditions shift/i);
-    assert.match(decisionTransmissionSummaryLine, /conditions shift/i);
-    assert.match(metadata.description ?? "", /forecast/i);
-    assert.match(metadata.description ?? "", /conditions shift/i);
-    assert.match(metadata.description ?? "", /conditions shift/i);
+    assert.match(description, /what to do now/i);
+    assert.match(description, /the line that pauses it/i);
+    assert.match(description, /the line that resumes it/i);
+    assert.doesNotMatch(description, /forecast/i);
   });
 
   it("keeps export briefs explicit about action now, confidence, and change-course conditions", () => {

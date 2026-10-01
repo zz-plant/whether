@@ -64,5 +64,7 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Download PDF/);
     assert.match(html, /Investor update/);
     assert.match(html, /Copy investor update/);
+    assert.match(html, /Portfolio note/);
+    assert.match(html, /Copy portfolio note/);
   });
 });

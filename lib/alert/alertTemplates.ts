@@ -5,6 +5,7 @@
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatPointsMove, type FlashMove } from "./flashMoves";
+import type { PublishedLine } from "./alertEvaluator";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =
@@ -138,23 +139,49 @@ export const decisionVerdictEmail = ({
   return { subject, html, text };
 };
 
+const LINE_NAME: Record<PublishedLine["kind"], string> = {
+  pause: "the pause line",
+  change: "the line where conditions change",
+  resume: "the resume line",
+};
+
 /**
- * Threshold crossing alert — sent when a key metric crosses a defined boundary.
+ * What crossing a line asks of the reader, by the line's kind and the side the
+ * score is now on. A pause or resume line matters on the side where it holds;
+ * crossing back out of it is said too, because a reader acting on last week's
+ * pause needs to know it no longer applies.
+ */
+const describeLineCrossing = (line: PublishedLine, value: number): string => {
+  const side = value > line.value ? "above" : "below";
+  if (line.kind === "change") {
+    return "Conditions change if it is still there at the next reading. Read this week's guidance before acting on last week's plan.";
+  }
+  const nowHolds = side === line.holdsWhen;
+  if (line.kind === "pause") {
+    return nowHolds
+      ? "Every area whose rule pauses on this line pauses now. Read this week's guidance before acting on last week's plan."
+      : "The pause on this line no longer holds. Held work resumes only once each area's resume line is met.";
+  }
+  return nowHolds
+    ? "Work held on this line can resume once every resume line for its area is met."
+    : "This resume line is no longer met. Read this week's guidance before resuming held work.";
+};
+
+/**
+ * Threshold crossing alert — a score crossed one of the published lines: the
+ * pause and resume lines every area's rule shares, or the line where
+ * conditions change.
  */
 export const thresholdCrossingEmail = (
-  metric: "credit" | "sentiment",
+  line: PublishedLine,
   value: number,
-  threshold: number,
   unsubscribeToken?: string | null,
 ): EmailContent => {
-  const metricLabel = metric === "credit" ? "Funding pressure" : "Risk appetite";
-  const direction = value > threshold ? "above" : "below";
-  /* 75 on funding pressure is the line the rules pause at; the rest are the
-     50 and 75 marks on a 0-100 score, and are named as marks, not as rules. */
-  const lineName = metric === "credit" && threshold === 75 ? "the pause line" : `the ${threshold} line`;
-  const reading = `${metricLabel} is ${value.toFixed(1)}; ${lineName} is ${threshold}.`;
-  const whatToDo = `It crossed ${direction} that line since the last reading. Read this week's guidance before acting on last week's plan.`;
-  const subject = `Whether Alert — ${metricLabel} crossed ${threshold}`;
+  const metricLabel = line.metric === "tightness" ? "Funding pressure" : "Risk appetite";
+  const lineName = LINE_NAME[line.kind];
+  const reading = `${metricLabel} is ${value.toFixed(1)}; ${lineName} is ${line.value}.`;
+  const whatToDo = `It crossed ${value > line.value ? "above" : "below"} that line since the last alert. ${describeLineCrossing(line, value)}`;
+  const subject = `Whether Alert — ${metricLabel} crossed ${lineName} (${line.value})`;
   const text = [
     `Whether Threshold Alert`,
     reading,
@@ -165,16 +192,49 @@ export const thresholdCrossingEmail = (
     `Whether · weekly operating brief`,
     ...unsubscribeFooterText(unsubscribeToken),
   ].join("\n");
-  const severity = threshold === 75 ? "warning" : "info";
+  const severity = line.kind === "resume" ? "info" : "warning";
   const html = baseHtml(
     "Whether Threshold Alert",
     [
       alertBanner(
         severity,
-        `<strong>${metricLabel}</strong> is <strong>${value.toFixed(1)}</strong>; ${lineName} is <strong>${threshold}</strong>. ${whatToDo}`,
+        `<strong>${metricLabel}</strong> is <strong>${value.toFixed(1)}</strong>; ${lineName} is <strong>${line.value}</strong>. ${whatToDo}`,
       ),
       `<div style="margin-top:12px;">`,
-      sectionBlock(metricLabel, `${value.toFixed(1)} / ${threshold}`, "#fbbf24", "#fde68a"),
+      sectionBlock(metricLabel, `${value.toFixed(1)} / ${line.value}`, "#fbbf24", "#fde68a"),
+      `</div>`,
+    ].join("\n"),
+    unsubscribeToken,
+  );
+  return { subject, html, text };
+};
+
+/**
+ * Plan-line alert — one of the lines a reader set for their own plan on
+ * /operate started to hold. Their area, their line and today's scores; nothing
+ * about the published lines, which have their own letter.
+ */
+export const planLineEmail = (
+  { headline, body }: { headline: string; body: string },
+  unsubscribeToken?: string | null,
+): EmailContent => {
+  const subject = `Whether Alert — ${headline}`;
+  const text = [
+    `Whether Plan Alert`,
+    headline,
+    body,
+    ``,
+    `Your lines: https://whether.work/operate#ops-plan-lines`,
+    `---`,
+    `Whether · weekly operating brief`,
+    ...unsubscribeFooterText(unsubscribeToken),
+  ].join("\n");
+  const html = baseHtml(
+    "Whether Plan Alert",
+    [
+      alertBanner("warning", `<strong>${headline}</strong>`),
+      `<div style="margin-top:12px;">`,
+      sectionBlock("What you set, and where the scores are", body),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,

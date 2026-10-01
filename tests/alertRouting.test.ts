@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import { evaluateAlert, type AlertConditions, type LastAlertState } from "../lib/alert/alertEvaluator";
+import { evaluateAlert, publishedScoreLines, type AlertConditions, type LastAlertState } from "../lib/alert/alertEvaluator";
 import { thresholdCrossingEmail } from "../lib/alert/alertTemplates";
 
 const conditions = (over: Partial<AlertConditions> = {}): AlertConditions => ({
@@ -79,13 +79,14 @@ describe("alert routing", () => {
 
 describe("alert email copy", () => {
   it("names the metrics the way every other surface does", () => {
-    const credit = thresholdCrossingEmail("credit", 78, 75);
-    assert.match(credit.subject, /Funding pressure crossed 75/);
+    const [tightnessPause, , , , riskChange] = publishedScoreLines();
+    const credit = thresholdCrossingEmail(tightnessPause, 78, null);
+    assert.match(credit.subject, /Funding pressure crossed the pause line \(76\)/);
     assert.ok(!/tightness/i.test(credit.text), "alert text still says tightness");
     assert.ok(!/tightness/i.test(credit.html), "alert html still says tightness");
 
-    const sentiment = thresholdCrossingEmail("sentiment", 42, 50);
-    assert.match(sentiment.subject, /Risk appetite crossed 50/);
+    const sentiment = thresholdCrossingEmail(riskChange, 42, null);
+    assert.match(sentiment.subject, /Risk appetite crossed the line where conditions change \(50\)/);
     assert.ok(!/investor appetite/i.test(sentiment.text));
   });
 });

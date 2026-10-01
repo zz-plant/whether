@@ -1,4 +1,5 @@
 import { readKvValues, type KvNamespace } from "../runtime/kv";
+import { parsePlanLines, type PlanLines } from "../alert/planLines";
 /**
  * Subscriber storage using Cloudflare KV.
  * Stores individual subscriber records keyed by email
@@ -35,13 +36,29 @@ export type Subscriber = {
    * subscribed to the weekly brief, so `hydrateSubscriber` reads absent as true.
    */
   weekly: boolean;
+  /**
+   * The lines this subscriber set for their own plan on /operate, alerted the day
+   * one starts to hold (`evaluatePlanLineCrossings`). Empty for everyone else.
+   */
+  planLines: PlanLines[];
+  /**
+   * Lines a subscribe request asked for, not yet confirmed. A request can name any
+   * address, so a set of lines takes effect only when the confirmation link in that
+   * inbox is clicked (`verifyEmail`); until then the standing lines are untouched.
+   */
+  pendingPlanLines?: PlanLines[];
 };
 
 export type SubscribeOptions = {
   /** Omitted leaves an existing subscriber's choice alone; a new record defaults to false. */
   alerts?: boolean;
-  /** Omitted leaves an existing subscriber's choice alone; a new record defaults to true. */
+  /**
+   * Omitted leaves an existing subscriber's choice alone; a new record defaults to true,
+   * except one created only to watch plan lines, which asked for those emails and no Monday one.
+   */
   weekly?: boolean;
+  /** Held as `pendingPlanLines` until the address confirms; an empty list clears the lines. */
+  planLines?: PlanLines[];
 };
 
 type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
@@ -79,6 +96,18 @@ const readStoredFlag = (source: object, key: string): boolean => Reflect.get(sou
 /** `!== false`, for a field whose absence predates it and meant yes. */
 const readStoredFlagDefaultOn = (source: object, key: string): boolean => Reflect.get(source, key) !== false;
 
+const readPendingPlanLines = (raw: object): Pick<Subscriber, "pendingPlanLines"> => {
+  const pending = parsePlanLines(Reflect.get(raw, "pendingPlanLines"));
+  return pending ? { pendingPlanLines: pending } : {};
+};
+
+/** A confirmed address takes the lines it asked for; the pending copy is consumed. */
+const promotePendingPlanLines = (sub: Subscriber): Subscriber => {
+  if (!sub.pendingPlanLines) return sub;
+  const { pendingPlanLines, ...rest } = sub;
+  return { ...rest, planLines: pendingPlanLines };
+};
+
 /**
  * Builds a Subscriber out of a stored record, field by field.
  *
@@ -102,6 +131,8 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     subscribedAt: readStoredString(raw, "subscribedAt") ?? new Date().toISOString(),
     alerts: readStoredFlag(raw, "alerts"),
     weekly: readStoredFlagDefaultOn(raw, "weekly"),
+    planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
+    ...readPendingPlanLines(raw),
   };
 };
 
@@ -133,6 +164,7 @@ class KvSubscriberStore implements SubscriberStore {
         // does not ask about alerts must not silently switch them off.
         alerts: options?.alerts ?? existing.alerts,
         weekly: options?.weekly ?? existing.weekly,
+        ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
       };
       await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(updated)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
       await this.kv.put(TOKEN_PREFIX + updated.token, normalized).catch(() => { /* non-fatal: token index repaired when KV is available */ });
@@ -151,7 +183,9 @@ class KvSubscriberStore implements SubscriberStore {
       token,
       active: true,
       alerts: options?.alerts === true,
-      weekly: options?.weekly !== false,
+      weekly: options?.weekly ?? !options?.planLines,
+      planLines: [],
+      ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
     };
 
     await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(subscriber)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
@@ -184,9 +218,9 @@ class KvSubscriberStore implements SubscriberStore {
     const raw = await this.kv.get(SUB_PREFIX + email);
     if (!raw) return false;
 
-    const sub = hydrateSubscriber(JSON.parse(raw));
-    if (!sub) return false;
-    sub.verified = true;
+    const stored = hydrateSubscriber(JSON.parse(raw));
+    if (!stored) return false;
+    const sub: Subscriber = { ...promotePendingPlanLines(stored), verified: true };
     await this.kv.put(SUB_PREFIX + email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
     if (sub.active) {
       await this.kv.put(ACTIVE_PREFIX + email, email).catch(() => undefined);
@@ -326,6 +360,7 @@ class InMemorySubscriberStore implements SubscriberStore {
       existing.active = true;
       existing.alerts = options?.alerts ?? existing.alerts;
       existing.weekly = options?.weekly ?? existing.weekly;
+      if (options?.planLines) existing.pendingPlanLines = options.planLines;
       return existing;
     }
 
@@ -337,7 +372,9 @@ class InMemorySubscriberStore implements SubscriberStore {
       token,
       active: true,
       alerts: options?.alerts === true,
-      weekly: options?.weekly !== false,
+      weekly: options?.weekly ?? !options?.planLines,
+      planLines: [],
+      ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
     };
     this.saveToMemory(sub);
     return sub;
@@ -357,7 +394,7 @@ class InMemorySubscriberStore implements SubscriberStore {
     if (!email) return false;
     const sub = this.byEmail.get(email);
     if (!sub) return false;
-    sub.verified = true;
+    this.saveToMemory({ ...promotePendingPlanLines(sub), verified: true });
     return true;
   }
 

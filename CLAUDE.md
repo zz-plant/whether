@@ -128,7 +128,7 @@ Canonical modules — extend these before creating new ones:
   `scaleAdjustmentToRunway` in `lib/report/boundedDecisionRules.ts`; one cookie each, read by
   `lib/report/operatorContext.ts`
 - **Share artifacts** — `/share` owns every copy, file and image format; builders in
-  `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `meetingSlideExport`,
+  `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `portfolioNote`, `meetingSlideExport`,
   `boardSlideDeck`), all reading one `exportSnapshot`
 - **Alerts between Mondays** — `lib/alert/*`: `alertEvaluator` decides, `flashMoves` judges
   raw-input moves against the previous snapshot, `checkRegimeChange` posts Slack,

@@ -87,7 +87,9 @@ export default function PrivacyPage() {
               Subscribing stores your address, the time you subscribed, whether you have confirmed
               it, whether you opted in to alerts between Mondays (conditions changing, a score crossing
               its line, or an outsized move in a market input), whether you want the Monday brief itself,
-              and a random token that makes the confirmation and unsubscribe links work. It is held in
+              the pause and resume lines you set for your own plan on the planning page, if you set any
+              (numbers on the two scores, for each area you chose, held unconfirmed until you click the
+              link), and a random token that makes the confirmation and unsubscribe links work. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until
               you click the confirmation link. Every email carries an unsubscribe link, and using it
               deactivates the record immediately.

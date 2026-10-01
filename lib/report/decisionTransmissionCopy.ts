@@ -1,8 +1,5 @@
-export const decisionTransmissionSummaryLine =
-  "This week's forecast: what to do, what to watch, and when conditions shift.";
-
 export const decisionTransmissionSearchDescription =
-  "Weekly forecast showing what to do, what to watch for, and when conditions shift across hiring, fundraising, and runway.";
+  "For hiring, fundraising, spending and runway: what to do now, the line that pauses it, and the line that resumes it.";
 
 export const homeDecisionFaqItems = [
   {

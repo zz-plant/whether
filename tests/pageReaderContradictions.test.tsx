@@ -14,6 +14,11 @@ import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import { TRACK_RECORD_MIN_MONTHS, buildTrackRecord } from "../lib/report/trackRecord";
 import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
 import { pricingPlans } from "../lib/pricing";
+import { FormulaReference } from "../app/trust/formulaReference";
+import { RISK_GAP_TO_TIGHTNESS_EQUIVALENT } from "../lib/regimeEngine";
+import { buildLlmsTxt } from "../lib/seo/llmsTxt";
+import { buildLlmsFullCorpus } from "../lib/seo/llmsFullCorpus";
+import { canonicalPositioningLine } from "../lib/seo";
 import { buildReportDataFixture } from "./fixtures/reportFixtures";
 
 /*
@@ -161,6 +166,87 @@ describe("a sample brief says it is one", () => {
 
     assert.ok(copyBlock, "expected the mockup to build its copyable text from a list");
     assert.match(copyBlock[1], /SAMPLE/, "the copied brief carries no marker that it is not a reading");
+  });
+});
+
+describe("the site gives one account of what is new and what the scores read", () => {
+  /*
+   * Found 2026-10-01 by reading the live routes for what each claimed as the
+   * product's contribution. /about named six signal families "scored into" the
+   * conditions, two of which (inflation, labor) enter neither score and a third
+   * (public software valuations) enters nothing. /trust sourced the
+   * act/pause/resume method to healthcare work without saying whose, called
+   * operating latitude "the large number on the homepage" after the homepage
+   * stopped drawing it, and defined confidence in raw points while the label
+   * counts a risk-appetite point as 4.5 — so a reader saw risk appetite 6 points
+   * from its line beside "High" and a ladder whose Medium band ends at 12.
+   */
+  const aboutText = async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    return renderToStaticMarkup(<AboutPage />).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  };
+
+  it("/about names no score input the published formula does not use", async () => {
+    const text = await aboutText();
+    const builtFrom = text.slice(text.indexOf("What it is built from"), text.indexOf("Corrections and questions"));
+
+    assert.ok(builtFrom.length > 0, "expected a 'What it is built from' section");
+    assert.doesNotMatch(builtFrom, /software valuation/i, "public software valuations enter neither score");
+    const conditionsSentence = builtFrom.split(/(?<=\.)\s/).find((sentence) => /Sunny, Cloudy, Stormy or Freezing/.test(sentence));
+    assert.ok(conditionsSentence, "expected the sentence that names the four conditions");
+    assert.doesNotMatch(conditionsSentence, /inflation|labor|unemployment/i, "inflation and labor do not set the conditions");
+    assert.match(builtFrom, /Inflation and unemployment[^.]*neither score/, "the page should say what it reads but does not score");
+  });
+
+  it("/about says what is new, and links the record that backs the second claim", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const html = renderToStaticMarkup(<AboutPage />);
+
+    assert.match(html, /What is new here/);
+    assert.match(html, /href="\/history#track-record"/);
+    assert.match(html, /href="\/calibration"/);
+  });
+
+  it("/trust ties the method's origin to someone a reader can look up", () => {
+    const html = renderToStaticMarkup(<FrameworkSection />);
+    const origin = html.split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
+
+    assert.ok(origin, "expected the paragraph that says where the method comes from");
+    assert.match(origin, /href="\/about"/, "an origin claim with no one behind it reads as invented");
+  });
+
+  it("/trust puts operating latitude where it is drawn, and defines confidence the way the label counts it", () => {
+    const html = renderToStaticMarkup(<FormulaReference />).replace(/<!-- -->/g, "");
+
+    assert.doesNotMatch(html, /on the homepage/i, "the homepage does not draw operating latitude");
+    assert.match(html, new RegExp(`risk-appetite point is worth ${Number(RISK_GAP_TO_TIGHTNESS_EQUIVALENT.toFixed(1))}`));
+  });
+
+  it("llms.txt and the full corpus lead with the category line, not a third noun", () => {
+    for (const text of [buildLlmsTxt("https://whether.work"), buildLlmsFullCorpus("https://whether.work")]) {
+      assert.ok(text.includes(`Whether is weekly operating guidance for startup leaders. ${canonicalPositioningLine}`));
+      assert.doesNotMatch(text, /weekly operating (posture|call)/i);
+    }
+  });
+});
+
+describe("/about says how often the guidance moves, from the record", () => {
+  /*
+   * The product is delivered weekly and moves a few times a year: 6 changes in
+   * conditions and 22 line-crossing months across 176 month-ends at the Aug 2026
+   * close. A reader deciding whether it fits their decision needs the second
+   * number, so the page derives it from the archive rather than stating it.
+   */
+  it("prints the record's own counts, not figures typed into the page", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const { getTimeMachineRegimeSeries } = await import("../lib/timeMachine/timeMachineCache");
+    const record = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
+    assert.ok(record, "expected the bundled archive to be long enough for a record");
+    const text = renderToStaticMarkup(<AboutPage />).replace(/<!-- -->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    assert.match(text, /Where it fits, and where it does not/);
+    assert.ok(text.includes(`changed ${record.regimeChanges} times in ${record.monthsCovered} months`));
+    assert.ok(text.includes(`lines in ${record.lineCrossingMonths} of them`));
   });
 });
 

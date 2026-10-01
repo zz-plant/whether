@@ -102,13 +102,12 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
             sits beside the subscribe form for whoever wants it. */}
         {arrival === "share" ? (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-            This is the weekly guidance: what interest rates and credit mean for hiring, spend and
-            raising. {canonicalPositioningLine}
+            This is this week&apos;s guidance from Whether. {canonicalPositioningLine}
           </p>
         ) : (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-            How hard it is to raise money right now, and how much risk investors will fund, scored into
-            operating guidance each Monday.
+            Two scores, how hard it is to raise money and how much risk investors will fund, read each
+            Monday against the lines that pause or resume hiring, spend and raising.
           </p>
         )}
         <button

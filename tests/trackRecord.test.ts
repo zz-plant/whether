@@ -17,6 +17,21 @@ const series = (regimes: TimeMachineRegimeEntry["regime"][]) =>
   regimes.map((regime, index) => entry(`2026-${String(index + 1).padStart(2, "0")}-28`, regime));
 
 describe("track record", () => {
+  it("counts the months a pause or resume line was crossed, which the conditions alone undercount", () => {
+    /* One regime throughout, so `regimeChanges` is 0, while risk appetite walks
+       through the 54 resume line (month 2), back under it (month 4), and through
+       the 44 pause line (month 5). Funding pressure stays between 66 and 76,
+       where neither of its lines holds. A move that stays above the line
+       (month 3) is not a crossing. */
+    const months = [52, 56, 55, 50, 40, 40].map((riskAppetite, index) =>
+      entry(`2026-${String(index + 1).padStart(2, "0")}-28`, "EXPANSION", 68, riskAppetite),
+    );
+    const record = buildTrackRecord(months);
+
+    assert.equal(record?.regimeChanges, 0);
+    assert.equal(record?.lineCrossingMonths, 3);
+  });
+
   it("withholds the record while the window is too short to characterize", () => {
     assert.equal(buildTrackRecord(series(Array(TRACK_RECORD_MIN_MONTHS - 1).fill("EXPANSION"))), null);
     assert.ok(buildTrackRecord(series(Array(TRACK_RECORD_MIN_MONTHS).fill("EXPANSION"))));

@@ -2,6 +2,7 @@ import { answerPageContent } from "../answerContentSource";
 import { resourceArticles } from "../resourceArticles";
 import { resourcePillarPages } from "../resourcesContent";
 import { TERM_DEFINITIONS } from "../report/reportCopy";
+import { canonicalPositioningLine } from "../seo";
 import {
   isIndexableAnswerSlug,
   isIndexableResourceArticleSlug,
@@ -41,7 +42,7 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
 
   const preamble = section([
     heading(1, "Whether — full text corpus"),
-    "Whether turns public macro signals into a weekly operating posture for startup and product leaders.",
+    `Whether is weekly operating guidance for startup leaders. ${canonicalPositioningLine}`,
     [
       "This file is the site's stable editorial content in one document. It does **not** carry this week's guidance,",
       `which changes weekly under one URL — fetch ${baseUrl}/brief.md for that, or ${baseUrl}/api/agent for JSON.`,

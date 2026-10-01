@@ -29,6 +29,9 @@ import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { buildAreaRows } from "./areaRows";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
+import { PlanLinesForm } from "./components/planLinesForm";
+import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
+import { planLinesFromRules } from "../../lib/alert/planLines";
 import { SharePageFormats } from "../share/sharePageFormats";
 import { buildReadingLines } from "../../lib/export/briefBuilders";
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
@@ -350,6 +353,24 @@ export async function buildPlanningPageModel(
               ),
             }),
           },
+          /* The use the record fits: lines agreed once, and an email the day one is
+             crossed. Live weeks only — lines started from a past month's rules
+             would watch a reading nobody is planning against. */
+          ...(historicalSelection
+            ? []
+            : [{
+              id: "ops-plan-lines",
+              label: "Lines",
+              title: "Set this plan's lines",
+              description: "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
+              children: h(PlanLinesForm, {
+                defaults: planLinesFromRules(buildCanonicalBoundedDecisionRules({
+                  regime: assessment.regime,
+                  thresholds: assessment.thresholds,
+                  scores: assessment.scores,
+                })),
+              }),
+            }]),
           {
             id: "ops-decision-shield",
             label: "Test",

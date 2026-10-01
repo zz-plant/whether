@@ -32,6 +32,8 @@ objections the kit already anticipates:
 - **Free forever, in writing.** Link `/pricing` rather than asserting it in a comment. HN reads a
   published free-tier promise very differently from a founder saying "we'll always have a free tier".
 
+The track record is in the post text below as of 2026-10-01, as the "grades itself" bullet.
+
 The remaining checklist below still applies.
 
 ## Why this can work on HN
@@ -47,11 +49,12 @@ it's radical transparency plus honest limits. Every prepared answer below leans 
 
 ## Title options (pick one, ≤80 chars, no superlatives)
 
-1. `Show HN: Whether – turns Fed data into a weekly operating call for startups`
+1. `Show HN: Whether – turns Fed data into weekly operating guidance for startups`
 2. `Show HN: A weekly operating brief for startups, with the thresholds that flip it`
 3. `Show HN: Open-source weekly macro brief for startup operators (no signup)`
 
-Option 1 is the strongest: concrete input (Fed data), concrete output (weekly operating call),
+Option 1 is the strongest: concrete input (Fed data), concrete output (weekly operating guidance, the
+category line every outward surface uses; `docs/editorial-guardrails.md` -> Category line),
 concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative signals on HN.
 
 ## Post text (the URL field takes the site; this goes in the text box or first comment)
@@ -62,7 +65,7 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 >
 > Whether automates that translation. It pulls public series from FRED (fed funds, 2Y/10Y
 > yields, high-yield spreads, Chicago Fed financial conditions, VIX) and compresses them into
-> one weekly operating call — e.g. "conditions tightening — freeze new commitments" — plus the
+> weekly operating guidance — e.g. "conditions tightening — freeze new commitments" — plus the
 > part I actually care about: the exact thresholds that would flip the call, and the reversal
 > condition for every rule.
 >
@@ -72,6 +75,10 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 >   risk), a quadrant classification with hysteresis so one noisy week can't flip the regime,
 >   and published constants: https://whether.work/trust#formula-reference. The methodology page
 >   imports its numbers from the scoring engine's constants, so it can't drift from the code.
+> - **It grades itself in public.** Every week stays published as written, and
+>   https://whether.work/history scores the archive against what happened next, including the
+>   changes in conditions it gave no warning of. https://whether.work/calibration shows the
+>   confidence figure measures distance from a line, not probability, and the page says so.
 > - **No signup, no trackers.** The whole product is on the front page.
 > - **Free API, no key**: `curl https://whether.work/api/agent?cadence=weekly`. There's also an
 >   MCP endpoint and llms.txt if you want your agent to read it instead of you.
@@ -101,7 +108,7 @@ on the exec team read that morning.
 
 **"How is the score computed?"**
 Full derivation with the engine's actual constants: /trust#formula-reference. Short version:
-tightness ramps 0→90 as the policy rate passes 3.5%→4.0% plus up to 25 for curve inversion;
+funding pressure ramps 0→90 as the one-month bill rate passes 3.5%→4.0%, plus up to 25 for curve inversion;
 risk appetite maps the 10Y−2Y slope linearly from −1% to +1.5%; stress reads (HY spreads, FCI,
 VIX, funding velocity, layoffs) apply capped adjustments; regime is a quadrant with a
 two-consecutive-reads confirmation gate near boundaries.
@@ -123,7 +130,7 @@ None right now. It's free and open source; it started as scratching my own Monda
 **"Stack?"**
 Bun, React server components on Cloudflare Workers (edge SSR, 300s revalidate), KV for
 materialized weekly read models with a 92-day history window, cron-driven ingest that never
-self-fetches over HTTP. ~670 tests. The repo's AGENTS.md/CLAUDE.md are public too if you want
+self-fetches over HTTP. ~1,900 tests. The repo's AGENTS.md/CLAUDE.md are public too if you want
 to see how the agent-assisted workflow is set up.
 
 ## Pre-launch checklist

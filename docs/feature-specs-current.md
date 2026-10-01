@@ -982,6 +982,16 @@ the reversal rather than saying "band not set", and the card tells the reader wh
 The stamp uses the provenance label, not `treasury.source`, which is a FRED series URL on a live
 read.
 
+**The portfolio note (2026-10-01).** "Portfolio note" on `/share` (`lib/export/portfolioNote.ts`)
+runs the other way from the investor update: one investor platform team or accelerator writing to
+the companies it backs. Their runways differ, so it carries no runway sentence of its own reader;
+it prints the conditions and confidence, each area's rule with its pause and resume lines (the
+same `buildAreaRows` strings as the plan page), and what the week means at all four runway bands
+from `buildRunwayConditionedNotes`, with the band named once rather than in every note. It ends
+with the link to `/operate#ops-plan-lines`, where each company can move the lines for its own plan
+(§1.1.31), the source stamp (with the saved-copy note on a fallback) and the dated permalink. Built
+on the server; nothing from the reader's browser.
+
 **Flash alerts.** `lib/alert/flashMoves.ts` judges two raw inputs between *consecutive* reads: a
 move of 0.25 points or more in the short rate (a cut between meetings, a bill-market
 dislocation) or 0.20 points or more in 10Y−2Y (a spread blowout) fires the day it lands, whether
@@ -1084,9 +1094,12 @@ nothing connecting either to the decision they arrived with. For a browser that 
 rendered the brief, `/` now folds sections 2 to 5 away and shows `FirstVisitDecisionPicker`
 under the call:
 
-- **"What are you deciding this week?"** Five choices (hire, roadmap, raise, spend, something new),
+- **"What are you deciding?"** Five choices (hire, roadmap, raise, spend, something new),
   each answered with that area's row of the same table the full brief prints (the rule, its pause
   and resume lines, and the distance to each), plus the answer page that leads with that area.
+  Since 2026-10-01 the question drops "this week" and says the answer holds until a score crosses
+  one of its lines, which most weeks none does; the category line (`canonicalPositioningLine`)
+  leads with the lines and the crossing email rather than with Monday, for the same reason.
 - **"Test it against your runway"**, under the picked answer: runway, monthly burn and the monthly
   cost of the decision give the runway after it, whether that crosses a band, and the runway note this
   week's guidance already carries for the area at the new figure (`buildCommitmentImpact`). Runway
@@ -1452,6 +1465,34 @@ leaving was the measurement and the owner's own checks:
   forecast" on the same condition. Other weeks print nothing, as the card does, rather than reach for the
   nearest analogue.
 
+
+### 1.1.31 Alerts on the lines the rules use, and a plan's own lines (2026-10-01)
+
+The record moves a few times a year (22 line-crossing months in 176), so the use that fits it
+is lines agreed when a plan is made and an email the day one is crossed. Two changes make that
+true.
+
+- **Published-line alerts watch the published lines.** `evaluateAlert` crossed fixed marks at
+  50 and 75 on both scores, which no rule uses, and the email called 75 "the pause line". It now
+  reads `publishedScoreLines(thresholds)`: pause and resume at 76 / 66 on funding pressure and
+  44 / 54 on risk appetite (`sharedDecisionLines`), and the change lines at 70 and 50. A move
+  that passes several lines sends one letter per score, naming the most significant (pause,
+  then change, then resume), and the dedupe key is per score (`threshold:<metric>`), so a
+  funding-pressure crossing no longer silences a risk-appetite one in the same week.
+- **A plan's own lines.** `/operate` has a step, "Set this plan's lines" (`ops-plan-lines`,
+  after the rules, live weeks only), that starts from the published rules
+  (`planLinesFromRules`) and lets a reader move each number and untick areas. The lines go with
+  an email address to `/api/email/subscribe` (`planLines`, parsed whole by `parsePlanLines`;
+  malformed lines are refused, not trimmed) and are held as `pendingPlanLines` until the
+  confirmation link is clicked, because a request can name any inbox. A record created only to
+  watch lines gets no Monday brief. Delivery judges each subscriber's lines reading against
+  reading (`evaluatePlanLineCrossings` over `previousSnapshot`), so it runs on a day no
+  published alert fired; a pause fires on any of its conditions, a resume on all of them, and
+  each area and side mails at most once a week (`plan:<area>:<side>`).
+- `/privacy` 2.1 lists the lines among what a subscription stores. `/pricing` moves the
+  line-crossing alert from Pro to Free: it was promised free on the homepage already, and a
+  plan nobody can buy would have made plan lines unreachable.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -1481,11 +1522,8 @@ path plus a highlighted latest point.
 
 ### 1.3 Plan overview (/operate)
 Planning is the detailed execution depth page for the home workspace. The default surface is a
-four-step progressive flow:
-- weekly plan,
-- guardrails,
-- finance strategy,
-- share brief.
+progressive flow of steps: the weekly plan, sharing the brief, the rules before committing,
+setting this plan's lines (§1.1.31; live weeks only), testing a decision, and finance strategy.
 
 Only one step is expanded at a time, while the other steps collapse into summary cards. The home
 Planning handoff also now uses a more stateful board treatment with explicit owner, approval-state,
@@ -1517,7 +1555,19 @@ old page. `llms-full.txt` keeps a Terms block (`TERM_DEFINITIONS`) for machine r
 See `docs/glossary-retirement-plan.md`.
 
 ### 1.5.1 About and identity framing (`/about`)
-The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.
+The About page is where the product says what it claims. Since 2026-10-01 it carries, in order:
+- **What is new here**: two claims and no more — lines decided before they are needed (each area's
+  action, pause line and resume line, set apart), and a record that grades itself (`/history` track
+  record, `/calibration`). It says the inputs are not new.
+- **Where it fits, and where it does not**: a cadence sentence derived from the archive
+  (`describeRecordCadence` over `buildTrackRecord`: conditions changed, and months a pause or resume
+  line was crossed, `lineCrossingMonths`), then the decisions it fits (multi-quarter commitments,
+  plans a group approves once, venture-backed U.S. companies with one to two years of runway) and
+  the ones it does not (single decisions, under six months of runway, funding that does not follow
+  U.S. rates, what to build).
+- **Who writes it**, with the method's healthcare origin attributed to the editor and linked.
+- **What it is built from**, naming only what enters the two scores; inflation and unemployment are
+  stated as tracked but unscored.
 
 ### 1.6 Trust hub (/trust) and formula reference
 `/trust` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
@@ -1531,7 +1581,7 @@ The opening trust snapshot stays trust-specific: freshness, source coverage, and
 
 `/methodology` now permanently redirects to `/trust#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, FRED CPI, FRED labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
-The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
+The methodology reference also now clarifies scope: the two scores are built from Treasury rates (the one-month bill and the 10Y−2Y slope) with capped stress adjustments (high-yield spread, Chicago Fed index, VIX, venture pace, layoffs). CPI, unemployment and the BBB spread feed the separate policy assessment, not the scores or the conditions. The operating outputs are a translation layer rather than a claim of bespoke precision.
 Failure-mode diagnostics are now handled through the Trust and Planning workflows rather than as a standalone indexable library. Planning now exposes compact false-signal checks before guardrail approval so operators can pressure-test the weekly plan without leaving the core loop.
 
 ### 1.7 Share-preview assets for canonical hubs

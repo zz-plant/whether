@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { publisherProfilePath } from "../../lib/publisher";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { ReportSection } from "../components/reportSection";
 import { TemplateActions } from "./templateActions";
@@ -68,7 +70,11 @@ export function FrameworkSection() {
             Writing the stopping condition down before the action begins is the whole method. This does not guarantee the action is right. It guarantees the action will not continue past the point where it becomes wrong without a visible signal.
           </p>
           <p className="text-sm text-slate-300 leading-relaxed">
-            This structure was developed across clinical workflows, physician financial guidance, and contested healthcare claims — environments where a decision with no stopping condition can mean patient harm, regulatory action, or fiduciary breach. It is applied here to macro uncertainty because the same logic applies: the cost of continuing past the stopping point is higher than the cost of pausing too early.
+            Whether&apos;s editor built this structure into{" "}
+            <Link href={publisherProfilePath} className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+              healthcare products
+            </Link>{" "}
+            first: clinical workflows, physician financial guidance, and contested medical claims, where a decision with no stopping condition can mean patient harm, regulatory action, or fiduciary breach. It is applied here to macro uncertainty because the same logic applies: the cost of continuing past the stopping point is higher than the cost of pausing too early.
           </p>
         </section>
 

@@ -118,9 +118,9 @@ export default function ProductCanonPage() {
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
 
       <SecondaryPageHeader
-        eyebrow="The record"
+        eyebrow="Reading list"
         title="Product writing, against the market it was written in"
-        description={`${timeline.length} widely read product management essays and books, each placed on the month-end record${recordStart && recordEnd ? ` (${recordStart} to ${recordEnd})` : ""}: the conditions the month each came out, and how long they had held.`}
+        description={`${timeline.length} widely read product management essays and books, each placed on the month-end record${recordStart && recordEnd ? ` (${recordStart} to ${recordEnd})` : ""}: the conditions the month each came out, and how long they had held. A reading list, not evidence for the guidance.`}
       />
 
       {thisWeek ? (

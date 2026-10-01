@@ -8,6 +8,8 @@
  * drift back into reporting a local write as a subscription.
  */
 
+import type { PlanLines } from "../../lib/alert/planLines";
+
 type SubscribeResult = { ok: boolean; message: string };
 
 export type SubscribeOptions = {
@@ -15,6 +17,8 @@ export type SubscribeOptions = {
   alerts?: boolean;
   /** Also send the Monday brief. `false` is the alerts-only signup. Omitted leaves a standing choice alone. */
   weekly?: boolean;
+  /** Lines for the reader's own plan, set on /operate. They count once the address confirms. */
+  planLines?: PlanLines[];
 };
 
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
@@ -43,6 +47,7 @@ export async function requestSubscription(
         email: trimmed,
         ...(typeof options?.alerts === "boolean" ? { alerts: options.alerts } : {}),
         ...(typeof options?.weekly === "boolean" ? { weekly: options.weekly } : {}),
+        ...(options?.planLines ? { planLines: options.planLines } : {}),
       }),
     });
     const data: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);

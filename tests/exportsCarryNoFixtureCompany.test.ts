@@ -10,6 +10,7 @@ import {
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
 import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
+import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import { buildTrustStatus } from "../lib/report/trustStatus";
@@ -69,6 +70,16 @@ describe("artifacts that leave the site carry no facts about a company the site 
     }
   });
 
+  it("portfolio note speaks to every runway band and to no one company", () => {
+    const note = buildPortfolioNote({
+      assessment,
+      record: treasury,
+      areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
+      sourceLabel: treasury.source,
+    });
+    assert.doesNotMatch(note, FIXTURE_COMPANY);
+  });
+
   it("record summary names only what the archive holds, and needs a record to exist", () => {
     const record: TrackRecord = {
       monthsCovered: 176,
@@ -77,6 +88,7 @@ describe("artifacts that leave the site carry no facts about a company the site 
       currentHoldMonths: 8,
       currentHoldStartDate: "2026-01-31",
       regimeChanges: 6,
+      lineCrossingMonths: 22,
       currentRegime: "EXPANSION",
       currentRegimeLabel: "Sunny",
       rows: [],

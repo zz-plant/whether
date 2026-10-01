@@ -72,7 +72,8 @@ export default function CalibrationPage() {
           </li>
           <li>
             <span className="text-slate-100">Bands.</span> Distance to the nearest line where
-            conditions change, in points of funding pressure. The cut points were chosen before the outcomes
+            conditions change, in points of funding pressure, with a risk-appetite point converted the
+            same way the published confidence converts it. The cut points were chosen before the outcomes
             were looked at — they are the distances at which the published label changes.
           </li>
         </ul>

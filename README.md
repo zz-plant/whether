@@ -4,10 +4,10 @@
   <img src="docs/assets/whether-badge.png" alt="Whether Badge" width="120" />
 </p>
 
-<h3 align="center">The weekly operating call for startup leaders</h3>
+<h3 align="center">Weekly operating guidance for startup leaders</h3>
 
 <p align="center">
-  How aggressively should your company hire, spend, raise, and expand this week?
+  The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed.
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
   <a href="#quickstart">Quickstart</a> ·
   <a href="docs/use-cases/operator-playbooks.md"><strong>Operator Playbooks</strong></a> ·
   <a href="#mcp--agent-integration">MCP &amp; Agent API</a> ·
-  <a href="#why-whether-succeeds">Core Pillars</a> ·
+  <a href="#what-is-new-here">What is new here</a> ·
   <a href="docs/README.md">Documentation</a>
 </p>
 
@@ -27,7 +27,7 @@
 
 ## The Core Operating Loop
 
-Whether turns public macro and capital-market data into a **weekly operating call** for startup and product leaders:
+Whether turns public macro and capital-market data into **weekly operating guidance** for startup and product leaders:
 
 $$\text{signals} \longrightarrow \text{posture} \longrightarrow \text{decisions} \longrightarrow \text{artifact}$$
 
@@ -39,21 +39,43 @@ Everything in this product is designed for **decision transmission** — enablin
 
 ---
 
-## Why Whether Succeeds
+## What is new here
 
-### 1. The 60-Second Operating Call & Boldness Budget
+The same two claims as [whether.work/about](https://whether.work/about), and neither is the data.
 
-Instead of raw market charts or macroeconomic commentary, Whether compresses market physics into a single stance:
+- **Lines decided before they are needed.** Hiring, spending, fundraising, the roadmap and new bets each get an action, the score that pauses it and the score that resumes it, written down before either is reached. The pause and resume lines sit apart, so one noisy week does not stop a decision and restart it.
+- **A record that grades itself.** Every week's guidance stays published unedited, and the [track record](https://whether.work/history#track-record) scores the archive against what happened next, including where it falls short: changes in conditions that came with no warning, and a confidence figure that the [calibration study](https://whether.work/calibration) shows measures distance from a line, not probability.
 
-- **Operating Regimes**: Freezing / Cloudy / Stormy / Sunny (translated into operating stances: *Contraction*, *Transitional Mixed*, *Guarded Expansion*, *Expansion*).
-- **Boldness Budget (0–100)**: A calibrated weekly score of how much operating aggressiveness current capital-market conditions support.
-  - **Higher budget** $\rightarrow$ faster approvals, more experimentation, greater willingness to hire and expand fixed costs.
-  - **Lower budget** $\rightarrow$ shorter payback requirements, greater reversibility, tighter commitments.
+The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by hand ([`/trust#formula-reference`](https://whether.work/trust#formula-reference)). Inflation and unemployment are tracked but enter neither score.
+
+### Where it fits, and where it does not
+
+Through the Aug 2026 month-end, conditions changed 6 times in 176 months, and a month-end reading crossed one of the pause or resume lines in 22 of them (`lineCrossingMonths` in `lib/report/trackRecord.ts`; [whether.work/about](https://whether.work/about) prints the live count). Most Mondays, nothing has moved. So the use is to set the lines when a plan is made, and to hear the day one is crossed.
+
+| Fits | Does not fit |
+| :--- | :--- |
+| Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year contract, the runway to hold before the next raise | A single hire or purchase: the lines are a policy for a kind of decision, not a verdict on one |
+| Plans a group approves once and should not re-argue each month: a budget whose second half is released when a line is crossed, or an agreed floor on runway | Under six months of runway: cash decides before markets do |
+| Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital costs | A company whose funding does not follow U.S. rates: outside the U.S., or in a sector raising on a boom of its own |
+| Investors and accelerators sending one reading to every company they back: the portfolio note on `/share` says what the week means at each runway | Which product work matters most: rates bear on how much long-payback work a team can carry, not on what to build |
+
+---
+
+## How it works
+
+### 1. The conditions and operating latitude
+
+Instead of raw market charts or macroeconomic commentary, Whether reduces two scores, funding pressure and risk appetite, to one of four conditions:
+
+- **Conditions**: Sunny / Cloudy / Stormy / Freezing, set by which side of 70 funding pressure sits and which side of 50 risk appetite sits.
+- **Operating latitude (0–100)**: `0.7 × risk appetite + 0.3 × (100 − funding pressure)`, the room to hire, spend and commit; higher means more room. It is a summary of the two scores, not a separate reading.
+  - **Higher latitude** $\rightarrow$ faster approvals, more experimentation, greater willingness to hire and expand fixed costs.
+  - **Lower latitude** $\rightarrow$ shorter payback requirements, greater reversibility, tighter commitments.
 
 ```
 +-----------------------------------------------------------------------------+
-|  REGIME: GUARDED EXPANSION (Sunny)                 BOLDNESS BUDGET: 62/100  |
-|  "Stage decisions. Avoid irreversible fixed-cost commitments."              |
+|  WEEK OF SEP 29, 2026 · FREEZING                OPERATING LATITUDE: 34/100  |
+|  "Conditions are tightening. Freeze new commitments and protect runway."    |
 +-----------------------------------------------------------------------------+
 ```
 
@@ -61,15 +83,15 @@ Instead of raw market charts or macroeconomic commentary, Whether compresses mar
 
 ### 2. Bounded Decisions over Generic Advice
 
-Generic advice says *"be cautious."* Whether delivers **bounded decisions** — explicit triplets containing an **Action**, a **Threshold/Trigger**, and a **Reversal Condition**:
+Generic advice says *"be cautious."* Whether delivers **bounded decisions**: an **Action**, the line that pauses it, and the line that resumes it. Three rows from the brief for the week of Sep 29, 2026:
 
-| Decision Area | Do now (Action) | Stop / tighten if (Threshold) | Open back up when (Reversal) |
+| Area | Action now | Pause if | Resume when |
 | :--- | :--- | :--- | :--- |
-| **Engineering & Product** | Fund initiatives with &lt;6-month payback | Yield curve inversion deepens &gt; 15 bps | Two readings in a row with stable spreads |
-| **Hiring & Headcount** | Backfill revenue-critical roles only | BBB spreads widen &gt; 220 bps | Cash availability index returns above 65 |
-| **Fundraising & Runway** | Maintain 18+ months forward runway | VIX stays &gt; 28 for &gt; 10 trading days | Volatility subsides and rate cuts materialize |
+| **Hiring** | Limit hiring to backfills and mission-critical roles tied to delivery risk | Funding pressure &gt; 76 | Risk appetite &gt; 54 |
+| **Spending** | Put a payback figure on every discretionary line before approving it | Funding pressure &gt; 76 | Funding pressure &lt; 66 |
+| **Fundraising** | If you plan to raise, prepare the materials now so the timing stays yours | Risk appetite &lt; 44 | Risk appetite &gt; 54 |
 
-The rules are calibrated on two axes of the reader's own company, chosen once and kept in the browser: **stage** (Seed, Series A, Series B+, Bootstrapped) and **cash runway** (under 6 months, 6–12, 12–24, 24+). Under a year of cash a cash gate leads every rule and the reversal is a cash milestone, not a macro read; past two years the corridor still binds but the brief offers the counter-cyclical move. The hero also states how far the market is from changing the call, in the market's own units — *"0.07% lower on the 1-month bill would change the call to Stormy"* — rather than in score points.
+The rules are calibrated on two axes of the reader's own company, chosen once and kept in the browser: **stage** (Seed, Series A, Series B+, Bootstrapped) and **cash runway** (under 6 months, 6–12, 12–24, 24+). Under a year of cash a cash gate leads every rule and the reversal is a cash milestone, not a macro read; past two years the pause and resume lines still bind but the brief offers the counter-cyclical move. The brief also states how far the market is from changing the conditions, in the market's own units — *"If the 1-month Treasury bill rate falls 0.15%, conditions turn Stormy"* — rather than in score points.
 
 ---
 
@@ -127,7 +149,7 @@ curl -s "https://whether.work/api/weekly" | jq '.summary'
 
 | Surface | Preview | Primary Job |
 | :--- | :--- | :--- |
-| **Weekly Brief** (`/`) | <img src="docs/assets/screens/weekly-brief-desktop.png" alt="Weekly Brief Desktop View" width="380" /> | 60-second leadership operating posture, Boldness Budget, and bounded decisions. |
+| **Weekly Brief** (`/`) | <img src="docs/assets/screens/weekly-brief-desktop.png" alt="Weekly Brief Desktop View" width="380" /> | This week's conditions, and an action, pause line and resume line for each area. |
 | **Mobile Brief** (`/` on mobile) | <img src="docs/assets/screens/weekly-brief-mobile.png" alt="Weekly Brief Mobile View" width="200" /> | Responsive, high-compression mobile layout for quick scanning before Monday standups. |
 | **Operations Hub** (`/operate`) | <img src="docs/assets/screens/operations-planning.png" alt="Operations Hub" width="380" /> | Role-based execution constraints, runway planners, and export generators. |
 | **Trust & Provenance** (`/trust`) | <img src="docs/assets/screens/trust-provenance.png" alt="Trust and Provenance Board" width="380" /> | Live feed status, freshness SLAs, formula reference, and active warning monitors. |
@@ -207,7 +229,7 @@ whether/
 │   ├── trust/            # Data provenance, freshness SLAs & formulas
 │   └── api/              # JSON API routes, MCP server & webhook handlers
 ├── lib/
-│   ├── report/           # Brief data assembly, Boldness Budget, and knobs
+│   ├── report/           # Brief data assembly, operating latitude, and knobs
 │   ├── regimeEngine.ts   # Core macro scoring & regime classification
 │   ├── macroSnapshot.ts  # Live FRED / Treasury feed ingestion & fallback
 │   ├── export/           # Slack, email, slide (SVG/PPTX/PDF) and investor-update artifacts
@@ -231,7 +253,7 @@ whether/
 
 ## Where Whether sits
 
-Whether is one of five systems that each hold a step of the loop an institution runs when it delegates consequential work to machines: believe, know what can be done, decide what authority is justified, act, detect mismatch, revise. Whether holds the **act** step. It turns changed conditions into a weekly operating call; the operator acts. It authorizes nothing and takes no action itself.
+Whether is one of five systems that each hold a step of the loop an institution runs when it delegates consequential work to machines: believe, know what can be done, decide what authority is justified, act, detect mismatch, revise. Whether holds the **act** step. It turns changed conditions into weekly operating guidance; the operator acts. It authorizes nothing and takes no action itself.
 
 - **Canonical export**: the decision memory ledger, in the [STD-07 Revisable Delegation Record](https://ethotechnics.org/standards/std-07-revisable-delegation-record) shape at `GET /api/decision-memory?format=records` (newline-delimited JSON, SHA-256 chained, oldest first). Every record is a `belief`: the regime read at the time, and the call that depended on it, with the assumption snapshot restated as the conditions that would invalidate it.
 - **Conformance**: Level 2 (append-only, hashed, chained, and every record states what would end it), measured by the [record conformance checker](https://ethotechnics.org/diagnostics/record-conformance) rather than asserted here. Declared in [`/.well-known/whether-agent.json`](https://whether.work/.well-known/whether-agent.json) under `revisableDelegation`. It stops at Level 2 because no objection ever enters the stream, which a reader can see and this sentence cannot.
