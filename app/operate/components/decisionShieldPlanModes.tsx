@@ -12,7 +12,7 @@
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { isBusinessModel, type CompanyFinancialProfile, type PlanComparisonResult, type PlanStressTestResult } from "../../../lib/decisionShield";
-import type { OperatorProfile } from "../../../lib/operatorProfile";
+import { resolveProfileRunway, resolveProfileRunwayMonths, type OperatorProfile } from "../../../lib/operatorProfile";
 
 type BusinessModel = NonNullable<CompanyFinancialProfile["businessModel"]>;
 
@@ -68,17 +68,20 @@ export function PlanStressTestMode({
             </div>
 
             <div className={`grid gap-3 sm:grid-cols-3 ${businessModel === "BOOTSTRAPPED" ? "lg:grid-cols-4" : ""}`}>
+              {/* The runway every surface reads: worked out from cash where the
+                  runway planner has one, so this box and the test below agree. */}
               <OperatorProfileNumberField
                 field="runwayMonths"
                 label="Runway (months)"
+                hint={resolveProfileRunway(profile)?.basis === "cash" ? "Worked out from your cash. Typing a figure replaces it." : undefined}
                 placeholder="e.g. 14"
-                value={profile.runwayMonths}
+                value={resolveProfileRunwayMonths(profile)}
                 onCommit={(value) => setProfileField("runwayMonths", value)}
                 optional
               />
               <OperatorProfileNumberField
                 field="monthlyBurnUsd"
-                label="Monthly burn"
+                label="Monthly spend"
                 placeholder="$150k"
                 value={profile.monthlyBurnUsd}
                 onCommit={(value) => setProfileField("monthlyBurnUsd", value)}

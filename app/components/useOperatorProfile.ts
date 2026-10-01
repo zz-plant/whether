@@ -6,6 +6,7 @@ import {
   EMPTY_OPERATOR_PROFILE,
   OPERATOR_PROFILE_STORAGE_KEY,
   parseOperatorProfile,
+  resolveProfileRunwayMonths,
   setOperatorProfileField,
   type OperatorProfile,
 } from "../../lib/operatorProfile";
@@ -28,9 +29,18 @@ export const useOperatorProfile = () => {
 
   const setProfileField = useCallback(
     <K extends keyof OperatorProfile>(key: K, value: OperatorProfile[K] | undefined) => {
-      setStored((previous) => setOperatorProfileField(previous, key, value));
-      // One runway setting: an exact figure moves the band with it.
-      if (key === "runwayMonths") syncRunwayBandToMonths(typeof value === "number" ? value : undefined);
+      // The setter runs the updater synchronously, so the runway on either side
+      // of this edit is known here without reading storage again.
+      const runway: { before?: number; after?: number } = {};
+      setStored((previous) => {
+        const next = setOperatorProfileField(previous, key, value);
+        runway.before = resolveProfileRunwayMonths(parseOperatorProfile(previous));
+        runway.after = resolveProfileRunwayMonths(next);
+        return next;
+      });
+      // One runway setting: an exact figure moves the band with it, and so does
+      // one worked out from cash, which a change to spend or revenue moves too.
+      if (runway.after !== runway.before) syncRunwayBandToMonths(runway.after);
     },
     [setStored],
   );

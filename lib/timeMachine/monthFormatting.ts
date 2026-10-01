@@ -68,6 +68,14 @@ export const formatMonthShortLabel = (year: number, month: number) => {
   return monthShortFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 };
 
+const AVERAGE_MONTH_MS = (365.25 / 12) * 24 * 60 * 60 * 1000;
+
+/** The month a span of months from `now` lands in: "Dec 2027". Fractions count as part of a month. */
+export const formatMonthAfter = (now: Date, months: number) => {
+  const date = new Date(now.getTime() + months * AVERAGE_MONTH_MS);
+  return formatMonthLabel(date.getUTCFullYear(), date.getUTCMonth() + 1);
+};
+
 export const formatMonthLongLabel = (year: number, month: number) => {
   return monthLongFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 };

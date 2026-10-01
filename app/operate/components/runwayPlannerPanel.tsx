@@ -6,7 +6,8 @@ import { OperatorProfileNumberField } from "../../components/operatorProfileFiel
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 import { useOperatorProfile } from "../../components/useOperatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
-import { isPlannerSector } from "../../../lib/operatorProfile";
+import { useHydrated } from "../../components/browserSource";
+import { isPlannerSector, resolveProfileRunway, setOperatorProfileField } from "../../../lib/operatorProfile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   buildSharedRunwayPlanQuery,
@@ -18,11 +19,13 @@ import { toRoute } from "../../../lib/navigation/routeType";
 import { isOperatorStage, OPERATOR_STAGE_OPTIONS, operatorStageLabel } from "../../../lib/report/operatorStage";
 import {
   buildRunwayPlan,
+  describeRunwayPlanInYourNumbers,
   formatRunwayPlanCompactBlock,
   type PlannerPosture,
   type PlannerSector,
 } from "../../../lib/report/runwayPlanner";
 import {
+  CASH_FLOW_POSITIVE_PLANNER_NOTE,
   describeMissingRunwayInputs,
   resolveRunwayPlannerRequest,
 } from "../../../lib/report/runwayPlannerInputs";
@@ -167,12 +170,14 @@ export function RunwayPlannerPanel({
   const commitProfileField = useCallback(
     <K extends keyof typeof profile>(key: K, value: (typeof profile)[K] | undefined) => {
       setProfileField(key, value);
-      syncPlanLink({ ...profile, [key]: value }, stage);
+      // Through the profile's own setter, so cash and a typed runway replace each other in the link too.
+      syncPlanLink(setOperatorProfileField(profile, key, value), stage);
     },
     [profile, setProfileField, stage, syncPlanLink],
   );
 
   const resolution = useMemo(() => resolveRunwayPlannerRequest(profile, stage), [profile, stage]);
+  const runway = useMemo(() => resolveProfileRunway(profile), [profile]);
 
   const output = useMemo(
     () =>
@@ -188,7 +193,15 @@ export function RunwayPlannerPanel({
     [assessment.policyAssessment.posture, assessment.regime, assessment.scores.tightness, assessment.scores.riskAppetite, resolution],
   );
 
-  const shareBlock = useMemo(() => (output ? formatRunwayPlanCompactBlock(output) : ""), [output]);
+  /* Dates count forward from today, so they wait for the browser: a shared
+     link renders this panel on the server, whose today can be another month. */
+  const hydrated = useHydrated();
+  const inYourNumbers = useMemo(
+    () => (output && resolution.ready && hydrated ? describeRunwayPlanInYourNumbers(output, resolution.request, new Date()) : null),
+    [output, resolution, hydrated],
+  );
+
+  const shareBlock = useMemo(() => (output ? formatRunwayPlanCompactBlock(output, inYourNumbers) : ""), [output, inYourNumbers]);
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = getClipboardUiState("runway-plan", { status, error, activeTarget, copiedTarget });
   const memoClipboardState = getClipboardUiState("budget-memo", { status, error, activeTarget, copiedTarget });
@@ -209,8 +222,9 @@ export function RunwayPlannerPanel({
       paybackStrictness: { level: paybackStrictnessLevel, label: paybackStrictnessState.label },
       stageLabel: stage ? operatorStageLabel(stage) : "Series A (default)",
       sectorLabel: sectorOptions.find((option) => option.value === request.sector)?.label ?? request.sector,
+      inYourNumbers,
     });
-  }, [assessment, sensors, macroSeries, recordDateLabel, output, paybackStrictnessLevel, paybackStrictnessState.label, resolution, stage]);
+  }, [assessment, sensors, macroSeries, recordDateLabel, output, paybackStrictnessLevel, paybackStrictnessState.label, resolution, stage, inYourNumbers]);
 
   return (
     <section className="weather-panel-static mt-6 space-y-4 p-6" aria-label="Runway planner">
@@ -232,19 +246,38 @@ export function RunwayPlannerPanel({
         </details>
       </div>
 
+      {/* Cash first: it is the figure a founder can read off a bank app, and
+          runway is worked out from it. A runway typed in still works, and
+          typing either replaces the other (`setOperatorProfileField`). */}
       <div id="ops-runway-inputs" className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <OperatorProfileNumberField
+          field="cashUsd"
+          label="Cash in the bank ($)"
+          hint="Your balance today. Runway is worked out from it."
+          placeholder="e.g. $2.1M"
+          value={profile.cashUsd}
+          onCommit={(value) => commitProfileField("cashUsd", value)}
+          className="weather-surface p-3"
+          labelClassName="block text-sm text-slate-200"
+        />
         <OperatorProfileNumberField
           field="runwayMonths"
           label="Runway (months)"
+          hint={
+            runway?.basis === "cash"
+              ? "Worked out: cash over spend less revenue. Typing a figure replaces the cash."
+              : "Or leave blank and enter cash: it is worked out for you."
+          }
           placeholder="e.g. 14"
-          value={profile.runwayMonths}
+          value={runway && runway.basis !== "cash-flow-positive" ? runway.months : undefined}
           onCommit={(value) => commitProfileField("runwayMonths", value)}
           className="weather-surface p-3"
           labelClassName="block text-sm text-slate-200"
         />
         <OperatorProfileNumberField
           field="monthlyBurnUsd"
-          label="Monthly burn ($)"
+          label="Monthly spend ($)"
+          hint="Everything going out a month, before revenue."
           placeholder="e.g. $450k"
           value={profile.monthlyBurnUsd}
           onCommit={(value) => commitProfileField("monthlyBurnUsd", value)}
@@ -318,7 +351,11 @@ export function RunwayPlannerPanel({
       {!resolution.ready || !output ? (
         <div id="ops-runway-risk" className="weather-surface !border-dashed p-4" aria-live="polite">
           <p className="text-sm text-slate-100">
-            {resolution.ready ? "Sizing the plan…" : describeMissingRunwayInputs(resolution.missing)}
+            {resolution.ready
+              ? "Sizing the plan…"
+              : resolution.cashFlowPositive
+                ? CASH_FLOW_POSITIVE_PLANNER_NOTE
+                : describeMissingRunwayInputs(resolution.missing)}
           </p>
           <p className="mt-1 text-fluid-xs text-slate-400">
             Your figures stay in this browser and are shared with the plan stress test. Nothing is sized until you enter them.
@@ -369,6 +406,9 @@ export function RunwayPlannerPanel({
                 label="Safe runway band against your runway"
               />
               <p className="mt-2 text-fluid-xs text-slate-400">{output.safeRunwayBand.summary}</p>
+              {inYourNumbers?.floorGap ? (
+                <p data-testid="planner-floor-gap" className="mt-2 text-fluid-xs text-semantic-caution-fg">{inYourNumbers.floorGap}</p>
+              ) : null}
             </article>
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold text-slate-400">Raise timing window</p>
@@ -390,6 +430,12 @@ export function RunwayPlannerPanel({
                 tone="sky"
                 label="Raise window against runway"
               />
+              {inYourNumbers ? (
+                <p data-testid="planner-raise-dates" className="mt-2 text-sm text-slate-100">
+                  {inYourNumbers.raiseWindow}
+                  {inYourNumbers.runsOut ? ` ${inYourNumbers.runsOut}` : null}
+                </p>
+              ) : null}
               <p className="mt-2 text-fluid-xs text-slate-400">{output.raiseTimingWindow.summary}</p>
             </article>
             <article className="weather-surface p-4">
@@ -413,6 +459,9 @@ export function RunwayPlannerPanel({
                 tone={output.burnAdjustmentRange.recommendedDeltaPercent < 0 ? "amber" : "sky"}
                 label="Recommended burn change inside its range"
               />
+              {inYourNumbers?.burnChange ? (
+                <p data-testid="planner-burn-dollars" className="mt-2 text-sm text-slate-100">{inYourNumbers.burnChange}</p>
+              ) : null}
               <p className="mt-2 text-fluid-xs text-slate-400">{output.burnAdjustmentRange.summary}</p>
               <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold ${paybackStrictnessState.tone}`}>
                 Payback bar: {paybackStrictnessState.label.toLowerCase()}

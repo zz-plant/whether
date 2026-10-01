@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { RUNWAY_BAND_OPTIONS } from "../lib/report/operatorRunway";
 import {
-  buildCommitmentImpact, buildRunwayConditionedNotes, resolveRunwayForNotes } from "../lib/report/runwayConditionedNotes";
+  buildCommitmentImpact, buildRunwayConditionedNotes, describeProfileRunway, resolveRunwayForNotes } from "../lib/report/runwayConditionedNotes";
+import { netMonthlyBurnUsd, resolveProfileRunway, resolveProfileRunwayMonths } from "../lib/operatorProfile";
 
 describe("runway-conditioned notes", () => {
   it("renders nothing when no runway is given", () => {
@@ -23,16 +24,21 @@ describe("runway-conditioned notes", () => {
     assert.match(notes[0].note, /With 5 months of runway/);
   });
 
-  it("computes the burn-cut extension from the operator's own months", () => {
+  it("computes the burn-cut extension from the operator's own months, and names the dollars", () => {
     const notes = buildRunwayConditionedNotes({
       regime: "SCARCITY",
       runwayMonths: 9,
-      monthlyBurnUsd: 150_000,
+      netMonthlyBurnUsd: 150_000,
     });
     const burnNote = notes.find((note) => note.area === "burn-discipline");
     assert.ok(burnNote);
-    assert.match(burnNote.note, /\$150K\/month/);
-    assert.match(burnNote.note, /adds about 1\.0 months of cushion/);
+    assert.match(burnNote.note, /\$150k\/month of net burn/);
+    assert.match(burnNote.note, /10% cut in net burn \(\$15k\/month\) adds about 1\.0 months of cushion/);
+  });
+
+  it("does no burn arithmetic when revenue covers spending", () => {
+    const notes = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 9, netMonthlyBurnUsd: -20_000 });
+    assert.doesNotMatch(notes.map((note) => note.note).join(" "), /adds about/);
   });
 
   it("adds the favorable-window clause to the raise note only in EXPANSION", () => {
@@ -66,7 +72,7 @@ describe("runway-conditioned notes", () => {
     const notes = buildRunwayConditionedNotes({
       regime: "SCARCITY",
       runwayMonths: 4,
-      monthlyBurnUsd: 80_000,
+      netMonthlyBurnUsd: 80_000,
     });
     assert.ok(notes.length <= 3);
   });
@@ -82,7 +88,7 @@ describe("runway-conditioned notes", () => {
         const notes = buildRunwayConditionedNotes({
           regime,
           runwayMonths,
-          monthlyBurnUsd: 100_000,
+          netMonthlyBurnUsd: 100_000,
         });
         for (const note of notes) {
           assert.doesNotMatch(
@@ -117,12 +123,12 @@ describe("runway-conditioned notes", () => {
   it("states a band as its range and never invents a figure or burn arithmetic for it", () => {
     const band = resolveRunwayForNotes({ band: "balanced" });
     assert.deepEqual(band, { runwayMonths: 18, runwayPhrase: "12–24 months", runwayIsExact: false });
-    const notes = buildRunwayConditionedNotes({ regime: "SCARCITY", ...band!, monthlyBurnUsd: 200_000 });
+    const notes = buildRunwayConditionedNotes({ regime: "SCARCITY", ...band!, netMonthlyBurnUsd: 200_000 });
     const text = notes.map((note) => note.note).join(" ");
     assert.match(text, /With 12–24 months of runway/);
     assert.doesNotMatch(text, /18 months|burn cut adds|cut adds about/);
 
-    const critical = buildRunwayConditionedNotes({ regime: "SCARCITY", ...resolveRunwayForNotes({ band: "critical" })!, monthlyBurnUsd: 200_000 });
+    const critical = buildRunwayConditionedNotes({ regime: "SCARCITY", ...resolveRunwayForNotes({ band: "critical" })!, netMonthlyBurnUsd: 200_000 });
     assert.doesNotMatch(critical.map((note) => note.note).join(" "), /adds about/, "burn math needs a real figure");
   });
 
@@ -138,9 +144,9 @@ describe("runway-conditioned notes", () => {
 });
 
 describe("buildCommitmentImpact", () => {
-  it("holds cash constant: runway after is runway times burn over burn plus cost", () => {
+  it("holds cash constant: runway after is runway times net burn over net burn plus cost", () => {
     const impact = buildCommitmentImpact({
-      regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
+      regime: "SCARCITY", area: "hiring", runwayMonths: 13, netMonthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
     });
     assert.ok(impact);
     assert.equal(impact.runwayAfter, 11.2);
@@ -148,26 +154,83 @@ describe("buildCommitmentImpact", () => {
     assert.match(impact.summary, /from 13 to 11\.2 months/);
   });
 
+  it("counts against spend less revenue, not spend: the 2026-10-01 overstatement", () => {
+    /* 12 months, $200k spend, $150k revenue: $600k of cash burning $50k a month.
+       A $20k-a-month hire leaves 600 / 70 = 8.6 months. Dividing by spend, as
+       the commitment test did, printed 10.9. */
+    const profile = { version: 1 as const, runwayMonths: 12, monthlyBurnUsd: 200_000, monthlyRevenueUsd: 150_000 };
+    const impact = buildCommitmentImpact({
+      regime: "DEFENSIVE",
+      area: "hiring",
+      runwayMonths: resolveProfileRunwayMonths(profile),
+      netMonthlyBurnUsd: netMonthlyBurnUsd(profile),
+      newMonthlyCostUsd: 20_000,
+    });
+    assert.equal(impact?.runwayAfter, 8.6);
+  });
+
   it("quotes the note the guidance already carries at the runway after, for that area", () => {
     const impact = buildCommitmentImpact({
-      regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
+      regime: "SCARCITY", area: "hiring", runwayMonths: 13, netMonthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,
     });
-    const expected = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 11.2, monthlyBurnUsd: 290_000 })
+    const expected = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 11.2, netMonthlyBurnUsd: 290_000 })
       .find((note) => note.area === "hiring")?.note;
     assert.equal(impact?.noteAfter, expected);
   });
 
   it("names no band change when the runway stays in its band", () => {
     const impact = buildCommitmentImpact({
-      regime: "EXPANSION", area: "burn-discipline", runwayMonths: 30, monthlyBurnUsd: 100_000, newMonthlyCostUsd: 10_000,
+      regime: "EXPANSION", area: "burn-discipline", runwayMonths: 30, netMonthlyBurnUsd: 100_000, newMonthlyCostUsd: 10_000,
     });
     assert.equal(impact?.bandChange, null);
     assert.doesNotMatch(impact?.summary ?? "", /moves you/);
   });
 
+  it("answers a company whose revenue covers spending from its cash", () => {
+    const covered = buildCommitmentImpact({
+      regime: "VOLATILE", area: "hiring", netMonthlyBurnUsd: -30_000, cashUsd: 400_000, newMonthlyCostUsd: 20_000,
+    });
+    assert.equal(covered?.runwayAfter, null);
+    assert.match(covered?.summary ?? "", /still covers spending at \$20k more a month: cash keeps growing, by about \$10k a month/);
+
+    const tipped = buildCommitmentImpact({
+      regime: "VOLATILE", area: "hiring", netMonthlyBurnUsd: -30_000, cashUsd: 400_000, newMonthlyCostUsd: 50_000,
+    });
+    assert.equal(tipped?.runwayAfter, 20);
+    assert.match(tipped?.summary ?? "", /you would burn \$20k a month, and \$400k of cash lasts about 20 months/);
+  });
+
   it("returns nothing rather than a guess when a figure is missing or not positive", () => {
-    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: 250_000 }), null);
-    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 0, monthlyBurnUsd: 250_000, newMonthlyCostUsd: 1 }), null);
-    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, monthlyBurnUsd: Number.NaN, newMonthlyCostUsd: 1 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, netMonthlyBurnUsd: 250_000 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 0, netMonthlyBurnUsd: 250_000, newMonthlyCostUsd: 1 }), null);
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", runwayMonths: 13, netMonthlyBurnUsd: Number.NaN, newMonthlyCostUsd: 1 }), null);
+    // Revenue covers spending but no cash was given: there is nothing to count.
+    assert.equal(buildCommitmentImpact({ regime: "SCARCITY", area: "hiring", netMonthlyBurnUsd: -5_000, newMonthlyCostUsd: 1 }), null);
+  });
+});
+
+describe("describeProfileRunway: the runway as a finance lead would say it", () => {
+  const now = new Date("2026-10-01T12:00:00Z");
+
+  it("works runway out from cash and net burn, and dates the month it runs out", () => {
+    const runway = resolveProfileRunway({ version: 1, cashUsd: 2_100_000, monthlyBurnUsd: 200_000, monthlyRevenueUsd: 50_000 });
+    assert.ok(runway);
+    assert.equal(
+      describeProfileRunway(runway, now),
+      "Net burn is $150k a month (spend less revenue), so $2.1M lasts about 14 months: to about Dec 2027.",
+    );
+  });
+
+  it("dates a typed runway without claiming to know the cash", () => {
+    assert.equal(describeProfileRunway({ basis: "entered", months: 9 }, now), "9 months of runway lasts to about Jul 2027.");
+  });
+
+  it("says cash is not running down when revenue covers spending", () => {
+    const runway = resolveProfileRunway({ version: 1, cashUsd: 300_000, monthlyBurnUsd: 80_000, monthlyRevenueUsd: 95_000 });
+    assert.ok(runway);
+    assert.equal(
+      describeProfileRunway(runway, now),
+      "Revenue covers spending, with $15k a month left over: cash is not running down.",
+    );
   });
 });
