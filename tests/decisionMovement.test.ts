@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
-import { areaLinesFromRules, buildDecisionMovement } from "../lib/report/decisionMovement";
+import { areaLinesFromRules, buildDecisionMovement, fitMovementHeadline } from "../lib/report/decisionMovement";
 import type { RegimeKey } from "../lib/regimeEngine";
+import { REGIME_ORDER } from "../lib/regimePresentation";
 
 /*
  * What the week's move did to the decisions. The archive's w38 and w39 both printed "Pressure
@@ -211,5 +212,60 @@ describe("buildDecisionMovement", () => {
     assert.ok(result);
     assert.equal(result.areas[0]?.kind, "lifted");
     assert.equal(result.areas[0]?.state, "hold");
+  });
+});
+
+/*
+ * The share card's "What changed" box holds 140 characters. The reading of Oct 1 (90 and 44,
+ * against Aug 31's 63 and 56) changed conditions and moved areas two ways, and its headline
+ * ran to 174: the card printed "…Spending and New bets; the…".
+ */
+describe("fitMovementHeadline", () => {
+  it("fits the card whole on the week conditions changed and areas moved two ways", () => {
+    const result = movement({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 44 }, regime: "SCARCITY" });
+    assert.ok(result);
+    assert.equal(
+      result.headline,
+      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to Hiring, Fundraising, Spending and New bets; the resume line is no longer met for Roadmap.",
+    );
+
+    // The card prints the conditions now in its own label, so that clause goes first.
+    assert.equal(
+      fitMovementHeadline(result, 140),
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets; the resume line is no longer met for Roadmap.",
+    );
+    // Then the areas go to a count, still a whole sentence.
+    assert.equal(
+      fitMovementHeadline(result, 110),
+      "Since Aug 31, conditions changed from Sunny to Freezing and every area crossed a pause or resume line.",
+    );
+    // Room for all of it, all of it.
+    assert.equal(fitMovementHeadline(result, 210), result.headline);
+  });
+
+  it("fits every reading in a card's box as a whole sentence", () => {
+    const steps = [0, 20, 40, 44, 50, 54, 60, 70, 76, 80, 100];
+    const readings = steps.flatMap((tightness) => steps.map((riskAppetite) => ({ tightness, riskAppetite })));
+    let checked = 0;
+
+    for (const regime of REGIME_ORDER) {
+      for (const from of readings) {
+        for (const to of [readings[0], readings[60], readings[120]]) {
+          if (!to) continue;
+          for (const label of ["Aug 31", null]) {
+            const result = movement({ from, to, regime, label });
+            if (!result) continue;
+            const fitted = fitMovementHeadline(result, 140);
+            assert.ok(fitted.length <= 140, `${fitted.length} characters: ${fitted}`);
+            assert.match(fitted, /\.$/, `not a whole sentence: ${fitted}`);
+            assert.ok(result.headlines.includes(fitted));
+            assert.equal(result.headlines[0], result.headline);
+            checked += 1;
+          }
+        }
+      }
+    }
+
+    assert.ok(checked > 1000);
   });
 });
