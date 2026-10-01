@@ -1,10 +1,9 @@
 import { createCloudflareEmailAdapter, type EmailDeliveryAdapter } from "./emailDelivery";
-import { getSubscriberStore, withPendingApplied, type Subscriber } from "./subscriberStore";
+import { confirmationMailCapped, getSubscriberStore, withPendingApplied, type Subscriber } from "./subscriberStore";
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
 import { describePlanLines, type PlanLines, type PlanRunway } from "../alert/planLines";
 import { runwayBandPhrase, type RunwayBand } from "../report/operatorRunway";
-
-const DEFAULT_APP_BASE_URL = "https://whether.work";
+import { siteUrl } from "../siteUrl";
 
 const normalizeBaseUrl = (value: string | null | undefined) => {
   if (!value) return null;
@@ -15,16 +14,36 @@ const normalizeBaseUrl = (value: string | null | undefined) => {
   }
 };
 
+/* Hosts a confirmation link may point at: the site, this worker on workers.dev
+   (production, or a preview version's "<id>-whether.<account>.workers.dev"),
+   and a developer's machine. A preview keeps its own host because its
+   subscribers live in its own KV, where a whether.work link could not find them. */
+const siteHost = new URL(siteUrl).hostname;
+const isTrustedLinkHost = (hostname: string) =>
+  hostname === siteHost
+  || hostname === `www.${siteHost}`
+  || /^(?:[a-z0-9-]+-)?whether\.[a-z0-9-]+\.workers\.dev$/.test(hostname)
+  || hostname === "localhost"
+  || hostname === "127.0.0.1"
+  || hostname === "[::1]";
+
+/**
+ * Where a confirmation link points. Configured explicitly, that; otherwise the
+ * host the request came in on, but only one of ours. Until 2026-10-02 any
+ * request host was taken as given, so a request that reached the worker under a
+ * forged Host header would mail a reader a confirm link to someone else's site,
+ * and a link-scanning mail filter would hand that site the token.
+ */
 const resolvePublicAppBaseUrl = (request?: Request) => {
   const configured = normalizeBaseUrl(process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL);
   if (configured) return configured;
 
   if (request) {
-    const origin = normalizeBaseUrl(new URL(request.url).origin);
-    if (origin) return origin;
+    const url = new URL(request.url);
+    if (isTrustedLinkHost(url.hostname)) return url.origin;
   }
 
-  return DEFAULT_APP_BASE_URL;
+  return siteUrl;
 };
 
 const buildEmailActionUrl = (path: string, request?: Request) => {
@@ -176,6 +195,15 @@ export const subscribeAndSendVerification = async ({
   }
 
   const store = getSubscriberStore();
+  /* Past the address's allowance the request changes nothing and sends nothing:
+     changing the record without a mail would retire the link in the reader's
+     newest email. The caller cannot tell, because every route answers the same. */
+  const now = new Date();
+  const existing = await store.getSubscriberByEmail(email);
+  if (existing && confirmationMailCapped(existing, now)) {
+    return { subscriber: existing, verifyUrl: null };
+  }
+
   const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand });
   /* The request's own link, never the permanent token: that one is in the footer
      of every email this address has been sent. The caller's response is the same
@@ -188,6 +216,7 @@ export const subscribeAndSendVerification = async ({
   const result = await adapter.send({ to: { email: subscriber.email }, ...confirmationEmail(subscriber, verifyUrl) });
 
   if (!result.ok) throw new Error(result.error);
+  await store.recordConfirmationMail(subscriber.email, now);
 
   return { subscriber, verifyUrl };
 };

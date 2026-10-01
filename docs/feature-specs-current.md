@@ -1526,6 +1526,18 @@ true.
   Unsubscribing drops the waiting request. A request that asks a confirmed address for nothing new
   (lines included) gets an email saying so, with no link. Tests:
   `tests/subscriberWeeklyFlag.test.ts` ("who can confirm a change"), `tests/emailVerifyRoute.test.ts`.
+- **The rest of the review, 2026-10-02.** `GET /api/email/unsubscribe` unsubscribed on open, and
+  every brief and alert carries it, so a link-scanning mail filter could stop a reader's brief on
+  delivery; it now shows what stops and a button, and `POST` acts, taking the token from the form or,
+  for a mail client's RFC 8058 one-click, from the query. The two pages share `lib/email/actionPage.ts`.
+  Confirmation mail had only an IP rate limit; the record now keeps `confirmMailSentAt` (the last
+  day's sends) and `confirmationMailCapped` holds a request past three an hour or six a day without
+  changing the record or sending, answering the caller the same. Confirm links took the request's
+  host as given; they now use it only when it is the site, this worker's own `workers.dev` host
+  (production or a preview version, whose subscribers live in its own KV) or localhost, and fall
+  back to `siteUrl`. Tests: `tests/emailUnsubscribeRoute.test.ts`, "how much confirmation mail one
+  address gets" in `tests/subscriberWeeklyFlag.test.ts`, and the host cases in
+  `tests/subscriptionAndCronSecurity.test.ts`. `/privacy` 2.1 says so.
 - **Paid plans list only what the free plan lacks.** Pro sold "Monday delivery to your inbox" and
   Team a Slack channel feed and briefs for boards and investors; the free subscribe form and `/share`
   deliver all three, so the demand test priced free things. Pro now offers more than one set of plan

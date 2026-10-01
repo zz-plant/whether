@@ -80,6 +80,13 @@ export type Subscriber = {
   confirmToken?: string;
   /** When `confirmToken` was issued. */
   confirmRequestedAt?: string;
+  /**
+   * When this address was last sent a confirmation email (or a "nothing to
+   * confirm" note), within the last day. Bounds how much mail a stranger can
+   * point at an inbox: the IP rate limit alone let anyone rotating addresses
+   * send one inbox a confirmation every few seconds.
+   */
+  confirmMailSentAt?: string[];
 };
 
 type PendingFlags = { alerts?: boolean; weekly?: boolean; reactivate?: boolean };
@@ -127,6 +134,8 @@ export interface SubscriberStore {
   getPendingConfirmation(token: string): Promise<Subscriber | null>;
   /** Applies what the link confirms and returns the record as it now stands, or null for a dead link. */
   verifyEmail(token: string): Promise<Subscriber | null>;
+  /** Notes that a confirmation email went to this address at `at`. */
+  recordConfirmationMail(email: string, at: Date): Promise<void>;
   getActiveSubscriptions(): Promise<string[]>;
   /** Active, verified subscribers. Carries the token, which the unsubscribe link needs. */
   listActiveSubscribers(): Promise<Subscriber[]>;
@@ -146,6 +155,37 @@ const CONFIRM_PREFIX = "email:confirm:";
 
 /** How long a confirmation link works. A held change nobody confirms in a week was not wanted. */
 const CONFIRM_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+/* A reader fixing a typo sends two or three in a row; a day's worth covers a
+   reader who changes their mind twice. Past that it is someone else's mail. */
+const CONFIRM_MAILS_PER_HOUR = 3;
+const CONFIRM_MAILS_PER_DAY = 6;
+
+const recentConfirmMails = (sub: Pick<Subscriber, "confirmMailSentAt">, now: Date) =>
+  (sub.confirmMailSentAt ?? []).filter((at) => {
+    const sent = Date.parse(at);
+    return Number.isFinite(sent) && now.getTime() - sent < DAY_MS;
+  });
+
+/**
+ * Whether this address has had as much confirmation mail as it gets for now.
+ * A request over the cap changes nothing and sends nothing, and the caller is
+ * answered exactly as if it had, so the cap says nothing about the address.
+ * The cost: someone can spend an address's allowance and hold its own changes
+ * for a day. Its unsubscribe link is not limited.
+ */
+export const confirmationMailCapped = (sub: Pick<Subscriber, "confirmMailSentAt">, now: Date): boolean => {
+  const recent = recentConfirmMails(sub, now);
+  const lastHour = recent.filter((at) => now.getTime() - Date.parse(at) < HOUR_MS);
+  return recent.length >= CONFIRM_MAILS_PER_DAY || lastHour.length >= CONFIRM_MAILS_PER_HOUR;
+};
+
+const withConfirmationMail = (sub: Subscriber, at: Date): Subscriber => ({
+  ...sub,
+  confirmMailSentAt: [...recentConfirmMails(sub, at), at.toISOString()],
+});
 
 const generateToken = (): string => crypto.randomUUID();
 
@@ -245,6 +285,13 @@ export const withPendingApplied = (sub: Subscriber): Subscriber => {
   };
 };
 
+const readConfirmMails = (raw: object): Pick<Subscriber, "confirmMailSentAt"> => {
+  const stored: unknown = Reflect.get(raw, "confirmMailSentAt");
+  if (!Array.isArray(stored)) return {};
+  const times = stored.filter((value): value is string => typeof value === "string");
+  return times.length > 0 ? { confirmMailSentAt: times } : {};
+};
+
 const readConfirmation = (raw: object): Pick<Subscriber, "confirmToken" | "confirmRequestedAt"> => {
   const confirmToken = readStoredString(raw, "confirmToken");
   const confirmRequestedAt = readStoredString(raw, "confirmRequestedAt");
@@ -302,6 +349,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     ...readPendingPlanLines(raw),
     ...readPendingFlags(raw),
     ...readConfirmation(raw),
+    ...readConfirmMails(raw),
   };
 };
 
@@ -427,6 +475,14 @@ class KvSubscriberStore implements SubscriberStore {
     }
     this.fallback.saveToMemory(sub);
     return sub;
+  }
+
+  async recordConfirmationMail(email: string, at: Date): Promise<void> {
+    const current = await this.getSubscriberByEmail(email);
+    if (!current) return;
+    const sub = withConfirmationMail(current, at);
+    await this.kv.put(SUB_PREFIX + sub.email, JSON.stringify(sub)).catch(() => { /* non-fatal: in-memory fallback already saved */ });
+    this.fallback.saveToMemory(sub);
   }
 
   async getActiveSubscriptions(): Promise<string[]> {
@@ -591,6 +647,11 @@ class InMemorySubscriberStore implements SubscriberStore {
     const sub = confirmedRecord(pending);
     this.saveToMemory(sub);
     return sub;
+  }
+
+  async recordConfirmationMail(email: string, at: Date): Promise<void> {
+    const current = this.byEmail.get(email);
+    if (current) this.saveToMemory(withConfirmationMail(current, at));
   }
 
   async getActiveSubscriptions(): Promise<string[]> {
