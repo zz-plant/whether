@@ -204,3 +204,24 @@ export const formatOperatorProfileValue = (key: OperatorProfileNumberKey, value:
   if (key === "cashUsd" || key === "monthlyBurnUsd" || key === "monthlyRevenueUsd") return compactUsd.format(value);
   return String(value);
 };
+
+/**
+ * What a field shows when it loses focus, if its text is not a new figure to
+ * check: the value it is showing, or null when the text must be validated.
+ *
+ * Two cases a validator gets wrong. A box can show a value the profile works
+ * out rather than stores — a runway from cash — so emptying it clears no stored
+ * figure and the plan stays sized on that runway: the box shows it again rather
+ * than reading blank. And such a value can sit outside what a person may type
+ * (cash $5M at $10k of net burn is 500 months, over the 240 limit), so the box
+ * showing it is not an error.
+ */
+export const profileFieldTextOnBlur = (
+  key: OperatorProfileNumberKey,
+  draft: string,
+  value: number | undefined,
+): string | null => {
+  const shown = formatOperatorProfileValue(key, value);
+  if (draft.trim() === "" || draft === shown) return shown;
+  return null;
+};

@@ -6,6 +6,7 @@ import {
   netMonthlyBurnUsd,
   parseOperatorProfile,
   parsePlainNumberInput,
+  profileFieldTextOnBlur,
   resolveProfileRunway,
   resolveProfileRunwayMonths,
   setOperatorProfileField,
@@ -115,6 +116,21 @@ describe("operator profile: runway from cash, burn net of revenue", () => {
     assert.equal(resolveProfileRunwayMonths(typed), undefined);
     // Spend and revenue alone say nothing about cash yet, and are no runway either way.
     assert.equal(resolveProfileRunway({ version: 1, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 }), null);
+  });
+
+  it("shows a worked-out runway again when its box is emptied, and does not call it invalid when it is long", () => {
+    // Cash $600k at $200k: the box shows 3. Emptying it clears no stored figure, so the plan stays sized on 3
+    // months; the box used to sit blank.
+    assert.equal(profileFieldTextOnBlur("runwayMonths", "", 3), "3");
+    // Cash $5M at $10k of net burn is 500 months, past the 240 a person may type; showing it is not an error.
+    const long = resolveProfileRunwayMonths({ version: 1, cashUsd: 5_000_000, monthlyBurnUsd: 10_000 });
+    assert.equal(long, 500);
+    assert.equal(profileFieldTextOnBlur("runwayMonths", "500", long), "500");
+    // A box emptied over nothing stays empty; a new figure is still checked.
+    assert.equal(profileFieldTextOnBlur("runwayMonths", "", undefined), "");
+    assert.equal(profileFieldTextOnBlur("runwayMonths", "300", long), null);
+    assert.equal(profileFieldTextOnBlur("cashUsd", "2,100,000", 2_100_000), "2,100,000");
+    assert.equal(profileFieldTextOnBlur("cashUsd", "$2.1M", 2_100_000), null);
   });
 
   it("keeps a stored cash figure through a parse and formats it as money", () => {
