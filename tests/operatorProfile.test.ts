@@ -166,11 +166,17 @@ describe("runway planner inputs: missing means missing", () => {
     assert.equal(resolution.request.burn, 250_000);
   });
 
-  it("counts cash without spend as runway still missing", () => {
+  it("asks for spend, not for the cash already entered, when cash has no spend to divide by", () => {
     const resolution = resolveRunwayPlannerRequest({ version: 1, cashUsd: 1_800_000, monthlyRevenueUsd: 0 }, null);
     assert.equal(resolution.ready, false);
     if (resolution.ready) return;
-    assert.deepEqual(resolution.missing, ["runwayMonths", "monthlyBurnUsd"]);
+    assert.deepEqual(resolution.missing, ["monthlyBurnUsd"]);
+
+    // Only cash: it used to say "Enter cash in the bank (or runway), monthly spend, and monthly revenue".
+    const cashOnly = resolveRunwayPlannerRequest({ version: 1, cashUsd: 2_000_000 }, null);
+    assert.equal(cashOnly.ready, false);
+    if (cashOnly.ready) return;
+    assert.equal(describeMissingRunwayInputs(cashOnly.missing), "Enter monthly spend and monthly revenue to size the plan.");
   });
 
   it("says there is no runway to plan when revenue covers spending, rather than asking for one", () => {
