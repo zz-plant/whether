@@ -84,6 +84,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 57, riskAppetite: 54 },
       },
@@ -174,6 +175,7 @@ describe("buildHomeBriefModel", () => {
       buildHomeBriefModel({
         assessment: {
           regime: "DEFENSIVE",
+          diagnostics: { transitionWatch: true },
           thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
           scores: { tightness: 57, riskAppetite: 54 },
         },
@@ -220,6 +222,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "SCARCITY",
+        diagnostics: { transitionWatch: false },
         thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
         scores: { tightness: 90, riskAppetite: 43 },
       },
@@ -248,6 +251,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 48, riskAppetite: 52 },
       },
@@ -269,6 +273,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 50, riskAppetite: 50 },
       },
@@ -309,6 +314,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 54, riskAppetite: 55 },
       },
@@ -334,6 +340,7 @@ describe("buildHomeBriefModel", () => {
       fetchedAtLabel: "Updated 2h ago",
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: false },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 25, riskAppetite: 80 },
       },
@@ -354,6 +361,7 @@ describe("buildHomeBriefModel", () => {
       fetchedAtLabel: "Updated 2h ago",
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: false },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 25, riskAppetite: 70 },
       },
@@ -373,6 +381,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "EXPANSION",
+        diagnostics: { transitionWatch: false },
         thresholds: { tightnessRegime: 40, riskAppetiteRegime: 50 },
         scores: { tightness: 10, riskAppetite: 56 },
       },
@@ -395,6 +404,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "EXPANSION",
+        diagnostics: { transitionWatch: false },
         thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
         scores: { tightness: 40, riskAppetite: 64 },
       },
@@ -416,6 +426,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 54, riskAppetite: 55 },
       },
@@ -456,6 +467,7 @@ describe("buildHomeBriefModel", () => {
       buildHomeBriefModel({
         assessment: {
           regime: "SCARCITY",
+          diagnostics: { transitionWatch: false },
           thresholds: { tightnessRegime: 55, riskAppetiteRegime: 45 },
           scores: { tightness: 75, riskAppetite: 30 },
         },
@@ -480,6 +492,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: false },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 60, riskAppetite: 62 },
       },
@@ -502,6 +515,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "VOLATILE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
         scores: { tightness: 69, riskAppetite: 52 },
       },
@@ -527,6 +541,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 58, riskAppetite: 45 },
       },
@@ -551,6 +566,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 58, riskAppetite: 45, baseRate: 5.4, curveSlope: -0.3 },
       },
@@ -584,6 +600,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 58, riskAppetite: 45 },
       },
@@ -673,6 +690,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 56, riskAppetite: 46 },
       },
@@ -708,6 +726,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
         scores: { tightness: 50, riskAppetite: 50 },
       },
@@ -734,6 +753,7 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "VOLATILE",
+        diagnostics: { transitionWatch: true },
         thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
         scores: { tightness: 64, riskAppetite: 52 },
       },

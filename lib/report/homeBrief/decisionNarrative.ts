@@ -241,7 +241,7 @@ export const buildWeeklyMemoLines = ({
   // condition instead of restating it.
   transitionWatch === "ON"
     ? `Conditions could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `Conditions are not close to changing, so this week's guidance holds. ${CALL_CHANGES_IF}: ${callChangesIf}`,
+    : `Conditions are not expected to change next week, so this week's guidance holds. ${CALL_CHANGES_IF}: ${callChangesIf}`,
 ];
 
 export const buildWhyItMattersLine = ({

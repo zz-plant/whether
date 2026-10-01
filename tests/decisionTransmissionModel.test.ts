@@ -6,6 +6,7 @@ const buildBaseInput = () => ({
   fetchedAtLabel: "2026-04-01T12:00:00.000Z",
   assessment: {
     regime: "DEFENSIVE" as const,
+    diagnostics: { transitionWatch: true },
     thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
     scores: { tightness: 55, riskAppetite: 45 },
   },

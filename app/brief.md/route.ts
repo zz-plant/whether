@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../lib/report/homePageAssembler";
 import { buildWeeklyOperatorBriefCopyText } from "../../lib/report/home/artifactPayload";
-import { buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
+import { DATA_CAVEAT_LABEL, buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
@@ -42,7 +42,8 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const trustCue = buildWeeklyTrustCueLine({
     confidenceLabel,
     freshnessLabel: homepage.reportShell.fetchedAtLabel,
-    /* The model's own flag: a hardcoded "OFF" told every reader the call was not close to changing. */
+    /* The model's own flag: a hardcoded "OFF" told every reader the call was not close to changing.
+       It is `couldCallChangeNextWeek`, the rule the homepage trust strip reads, so the two agree. */
     transitionWatch: homepage.weeklyDecisionCardModel.status.transitionWatch,
   });
 
@@ -139,7 +140,7 @@ ${operatorCopy}
 - **Data status:** ${homepage.reportShell.trustStatusLabel}
 - **Conditions:** ${getRegimePublicLabel(homepage.reportShell.regime)}
 ${homepage.reportShell.trustStatusDetail ? `- **Detail:** ${homepage.reportShell.trustStatusDetail}` : ""}
-${homepage.reportShell.trustStatusAction ? `- **Action:** ${homepage.reportShell.trustStatusAction}` : ""}
+${homepage.reportShell.trustStatusAction ? `- **${DATA_CAVEAT_LABEL}:** ${homepage.reportShell.trustStatusAction}` : ""}
 
 ---
 
