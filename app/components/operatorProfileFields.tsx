@@ -23,6 +23,7 @@ type ProfileNumberFieldProps = {
 };
 
 const PARSERS: Record<OperatorProfileNumberKey, (raw: string) => number | null> = {
+  cashUsd: parseMoneyInput,
   runwayMonths: parsePlainNumberInput,
   monthlyBurnUsd: parseMoneyInput,
   monthlyRevenueUsd: (raw) => {
@@ -35,6 +36,7 @@ const PARSERS: Record<OperatorProfileNumberKey, (raw: string) => number | null> 
 };
 
 const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
+  cashUsd: "Enter dollars, like $1.2M or 1200000.",
   runwayMonths: "Enter months, like 14.",
   monthlyBurnUsd: "Enter dollars, like $150k or 150000.",
   monthlyRevenueUsd: "Enter dollars, like $80k, or 0 before revenue.",

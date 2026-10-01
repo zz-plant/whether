@@ -1100,10 +1100,16 @@ under the call:
   Since 2026-10-01 the question drops "this week" and says the answer holds until a score crosses
   one of its lines, which most weeks none does; the category line (`canonicalPositioningLine`)
   leads with the lines and the crossing email rather than with Monday, for the same reason.
-- **"Test it against your runway"**, under the picked answer: runway, monthly burn and the monthly
-  cost of the decision give the runway after it, whether that crosses a band, and the runway note this
-  week's guidance already carries for the area at the new figure (`buildCommitmentImpact`). Runway
-  and burn are the shared browser-only operator profile; the decision's cost is not stored.
+- **"Test it against your runway"**, under the picked answer: cash in the bank, monthly spend,
+  monthly revenue (optional; blank counts as none) and the monthly cost of the decision. The box
+  states net burn, how long the cash lasts and the month it runs out (`describeProfileRunway`), then
+  the runway after the decision, whether that crosses a band, and the runway note this week's
+  guidance already carries for the area at the new figure (`buildCommitmentImpact`). A company
+  whose revenue covers its spending is told whether the decision still leaves it covered, and if
+  not, how long its cash lasts at the burn it starts. Cash, spend and revenue are the shared
+  browser-only operator profile; a runway typed on `/operate` still counts until cash replaces it.
+  The decision's cost is not stored. It asked for runway and burn until 2026-10-01, which assumed
+  a finance lead to work runway out, and divided by spend as if it were net burn (below).
 - **"Tell me when this changes"**, an alerts-only signup (`weekly: false` on the subscriber record)
   beside the condition that would change the call. No Monday email; one note when the guidance
   changes or a score crosses its line. Records written before the flag read as weekly subscribers.
@@ -1781,11 +1787,30 @@ Slack, Notion, and Linear targets.
   - risk score is clamped to 0–100 with labels `low|moderate|high|critical`,
   - recommendations include explicit raise window, burn adjustment range, and reversal language,
   - posture/regime flips should change urgency and guardrail strictness, not just copy tone.
+- Cash, net burn and dates (2026-10-01), for a founder without a finance lead:
+  - **Cash in the bank** is a profile figure (`cashUsd`). With spend in, runway is worked out as
+    cash ÷ (spend − revenue) by `resolveProfileRunway`, which every reader of runway now goes
+    through: the planner, the commitment test, the runway notes, the plan stress test and the band
+    cookie. Cash and a typed runway replace each other (`setOperatorProfileField`), a band pick that
+    excludes the runway clears whichever stated it, and a shared plan link carries `?cash=` and
+    replaces both of the recipient's when it carries either. Revenue at or above spend reads as
+    cash-flow positive: no runway, and the planner says so instead of asking for one.
+  - **One meaning of burn.** `monthlyBurnUsd` is total spend (the planner subtracts revenue from
+    it, and its field now says "Monthly spend"). The commitment test, the runway notes' 10%-cut
+    arithmetic and the stress test's cash estimate used it as net burn, which overstated runway
+    whenever revenue was coming in: 12 months, $200k spend, $150k revenue and a $20k hire printed
+    10.9 months left for 8.6. They read `netMonthlyBurnUsd` now, and the stress test receives the
+    cash balance it always accepted and was never given.
+  - **Dates and dollars.** `describeRunwayPlanInYourNumbers` restates the plan in calendar months
+    and dollars on the planner's cards, its copy block and the budget memo: the month cash runs out,
+    the raise window as months, the burn adjustment as dollars of spend and the runway it buys, and
+    the gap to the safe band's floor as cash or as a net-burn target. Arithmetic on the plan and the
+    reader's figures only; dates wait for hydration so a server render cannot print another month.
 - Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
   pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
   and offer to copy a board memo built from it; an emptied field became zero and read as
   "critical". Now `lib/report/runwayPlannerInputs.ts` resolves the request from the shared
-  operator profile and reports which of runway, monthly burn, and monthly revenue is missing;
+  operator profile and reports which of runway (or cash), monthly spend, and monthly revenue is missing;
   the panel shows that sentence instead of a verdict until all three are entered. Growth is
   optional and blank reads as flat, which the output says. The memo lists its inputs and no
   longer claims to be "safe for board presentation".

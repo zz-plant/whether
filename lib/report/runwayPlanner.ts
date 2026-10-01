@@ -1,4 +1,6 @@
 import { getPlaybookGuidance } from "../playbook";
+import { formatCommitmentUsd } from "../planCommitment";
+import { formatMonthAfter } from "../timeMachine/monthFormatting";
 import type { RegimeKey } from "../regimeEngine";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { deriveDecisionKnobs } from "./decisionKnobs";
@@ -354,7 +356,73 @@ export const buildRunwayPlanFromRequest = (
   };
 };
 
-export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput) =>
+type RunwayPlanInYourNumbers = {
+  /** "Cash runs out around Dec 2027 at today's net burn." Null when nothing is being spent down. */
+  runsOut: string | null;
+  /** The raise window as calendar months. */
+  raiseWindow: string;
+  /** The burn adjustment as dollars a month, and what it does to runway. Null when it holds spend. */
+  burnChange: string | null;
+  /** How far below the safe band's floor, in cash and in net burn. Null at or above the floor. */
+  floorGap: string | null;
+};
+
+const roundTenth = (value: number) => Math.round(value * 10) / 10;
+
+/**
+ * The plan in the units a founder plans in: calendar months and dollars.
+ *
+ * The planner speaks in "month 2 to 5" and "-12%", which leaves the reader to
+ * do the step a finance lead would — count months forward from today, take a
+ * percentage of spend, divide cash by the new burn. This does that arithmetic
+ * and nothing else: every figure comes from the plan or the reader's own
+ * inputs, with cash held constant at runway × net burn. `now` is passed in so
+ * a server render and the browser cannot print different months.
+ */
+export const describeRunwayPlanInYourNumbers = (
+  plan: RunwayPlannerOutput,
+  request: RunwayPlannerRequest,
+  now: Date,
+): RunwayPlanInYourNumbers => {
+  const netBurn = Math.max(request.burn - request.revenue, 0);
+  const cash = request.runway * netBurn;
+  const month = (months: number) => formatMonthAfter(now, months);
+
+  const { startMonth, endMonth } = plan.raiseTimingWindow;
+  const raiseWindow = startMonth <= 0
+    ? `Start the raise now; the window closes around ${month(endMonth)}.`
+    : `Start the raise between ${month(startMonth)} and ${month(endMonth)}.`;
+
+  const runsOut = netBurn > 0 ? `Cash runs out around ${month(request.runway)} at today's net burn.` : null;
+
+  const deltaUsd = (request.burn * plan.burnAdjustmentRange.recommendedDeltaPercent) / 100;
+  let burnChange: string | null = null;
+  if (Math.abs(deltaUsd) >= 1) {
+    const spendAfter = request.burn + deltaUsd;
+    const dollars = deltaUsd < 0
+      ? `About ${formatCommitmentUsd(-deltaUsd)} a month off spend, to ${formatCommitmentUsd(spendAfter)}`
+      : `About ${formatCommitmentUsd(deltaUsd)} a month more spend, to ${formatCommitmentUsd(spendAfter)}`;
+    const netBurnAfter = spendAfter - request.revenue;
+    if (netBurn <= 0) {
+      burnChange = `${dollars}.`;
+    } else if (netBurnAfter <= 0) {
+      burnChange = `${dollars}, which revenue would then cover.`;
+    } else {
+      burnChange = `${dollars}: runway goes from ${roundTenth(request.runway)} to ${roundTenth(cash / netBurnAfter)} months.`;
+    }
+  }
+
+  const floor = plan.safeRunwayBand.minMonths;
+  const floorGap = netBurn > 0 && request.runway < floor
+    ? `${roundTenth(floor - request.runway)} months under the ${floor}-month floor. About ` +
+      `${formatCommitmentUsd((floor - request.runway) * netBurn)} more cash closes it at today's net burn, or net burn of ` +
+      `${formatCommitmentUsd(cash / floor)} a month stretches what you have to ${floor} months.`
+    : null;
+
+  return { runsOut, raiseWindow, burnChange, floorGap };
+};
+
+export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput, inYourNumbers?: RunwayPlanInYourNumbers | null) =>
   [
     "Financial implications:",
     `• Runway risk: ${plan.runwayRisk.level} at ${plan.runwayRisk.score}/100, rising to ${plan.runwayRisk.macroRiskDownsideFlip}/100 on a downside flip.`,
@@ -363,4 +431,12 @@ export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput) =>
     `• Burn adjustment: ${plan.burnAdjustmentRange.recommendedDeltaPercent}%, anywhere between ${plan.burnAdjustmentRange.floorPercent}% and ${plan.burnAdjustmentRange.ceilingPercent}%.`,
     `• Capital-raising guardrail: ${plan.boundedRules.capitalRaising}`,
     `• Burn-discipline guardrail: ${plan.boundedRules.burnDiscipline}`,
+    ...(inYourNumbers
+      ? [
+          "In dates and dollars:",
+          ...[inYourNumbers.runsOut, inYourNumbers.raiseWindow, inYourNumbers.burnChange, inYourNumbers.floorGap]
+            .filter((line): line is string => line !== null)
+            .map((line) => `• ${line}`),
+        ]
+      : []),
   ].join("\n");

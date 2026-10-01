@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
+import { netMonthlyBurnUsd, resolveProfileRunwayMonths } from "../../lib/operatorProfile";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel } from "../../lib/report/operatorRunway";
 import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
@@ -25,12 +26,12 @@ const useRunwayNotes = (regime: RegimeKey) => {
   const { profile } = useOperatorProfile();
   const { runwayBand } = useOperatorRunway();
   const runway = useMemo(
-    () => resolveRunwayForNotes({ exactMonths: profile.runwayMonths, band: runwayBand }),
-    [profile.runwayMonths, runwayBand],
+    () => resolveRunwayForNotes({ exactMonths: resolveProfileRunwayMonths(profile), band: runwayBand }),
+    [profile, runwayBand],
   );
   const notes = useMemo(
-    () => (runway ? buildRunwayConditionedNotes({ regime, ...runway, monthlyBurnUsd: profile.monthlyBurnUsd }) : []),
-    [regime, runway, profile.monthlyBurnUsd],
+    () => (runway ? buildRunwayConditionedNotes({ regime, ...runway, netMonthlyBurnUsd: netMonthlyBurnUsd(profile) }) : []),
+    [regime, runway, profile],
   );
   return { runway, notes };
 };
@@ -45,6 +46,7 @@ function ClearRunwayButton() {
     <button
       type="button"
       onClick={() => {
+        // Clears a cash figure too: with no band, any runway it implies goes.
         persistOperatorRunway(null);
         setProfileField("runwayMonths", undefined);
         const params = new URLSearchParams(searchParams?.toString() ?? "");
@@ -97,7 +99,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         Your figures stay in this browser. These notes translate the guidance; the thresholds above are
         unchanged.{" "}
         <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-          {runway.runwayIsExact ? "Change the exact runway and burn" : "Enter the exact runway and burn"}
+          {runway.runwayIsExact ? "Change your cash, spend and revenue" : "Enter your cash, spend and revenue"}
         </Link>
         .
       </p>

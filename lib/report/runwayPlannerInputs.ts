@@ -8,7 +8,7 @@
  * of a verdict about nobody's company. Growth is the one optional figure: a
  * blank means flat, and the output says so.
  */
-import type { OperatorProfile } from "../operatorProfile";
+import { resolveProfileRunway, type OperatorProfile } from "../operatorProfile";
 import { plannerStageForOperatorStage, type OperatorStage } from "./operatorStage";
 import type { RunwayPlannerRequest } from "./runwayPlanner";
 
@@ -21,31 +21,48 @@ const RUNWAY_PLANNER_REQUIRED_FIELDS: readonly RunwayPlannerRequiredField[] = [
 ];
 
 const FIELD_LABELS: Record<RunwayPlannerRequiredField, string> = {
-  runwayMonths: "runway",
-  monthlyBurnUsd: "monthly burn",
+  runwayMonths: "cash in the bank (or runway)",
+  monthlyBurnUsd: "monthly spend",
   monthlyRevenueUsd: "monthly revenue",
 };
 
 type RunwayPlannerInputResolution =
   | { ready: true; request: RunwayPlannerRequest; growthAssumedFlat: boolean }
-  | { ready: false; missing: RunwayPlannerRequiredField[] };
+  /** `cashFlowPositive`: revenue covers spending, so there is no runway to plan against. */
+  | { ready: false; missing: RunwayPlannerRequiredField[]; cashFlowPositive?: boolean };
 
+/**
+ * Runway is the one figure the planner can work out rather than ask for: cash
+ * in the bank over spend less revenue (`resolveProfileRunway`). It counts as
+ * missing until either that or a typed runway is there.
+ */
 export const resolveRunwayPlannerRequest = (
   profile: OperatorProfile,
   stage: OperatorStage | null,
 ): RunwayPlannerInputResolution => {
-  const missing = RUNWAY_PLANNER_REQUIRED_FIELDS.filter((field) => profile[field] === undefined);
-  if (missing.length > 0) {
-    return { ready: false, missing };
+  const runway = resolveProfileRunway(profile);
+  if (runway?.basis === "cash-flow-positive") {
+    return { ready: false, missing: [], cashFlowPositive: true };
+  }
+  const runwayMonths = runway?.months;
+  const burn = profile.monthlyBurnUsd;
+  const revenue = profile.monthlyRevenueUsd;
+  if (runwayMonths === undefined || burn === undefined || revenue === undefined) {
+    const given: Record<RunwayPlannerRequiredField, boolean> = {
+      runwayMonths: runwayMonths !== undefined,
+      monthlyBurnUsd: burn !== undefined,
+      monthlyRevenueUsd: revenue !== undefined,
+    };
+    return { ready: false, missing: RUNWAY_PLANNER_REQUIRED_FIELDS.filter((field) => !given[field]) };
   }
 
   return {
     ready: true,
     growthAssumedFlat: profile.monthlyGrowthPct === undefined,
     request: {
-      runway: profile.runwayMonths!,
-      burn: profile.monthlyBurnUsd!,
-      revenue: profile.monthlyRevenueUsd!,
+      runway: runwayMonths,
+      burn,
+      revenue,
       growthRate: profile.monthlyGrowthPct ?? 0,
       sector: profile.sector ?? "b2b-saas",
       stage: plannerStageForOperatorStage[stage ?? "series-a"],
@@ -59,6 +76,10 @@ const joinNaturally = (items: string[]) => {
   return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 };
 
-/** "Enter runway, monthly burn, and monthly revenue to size the plan." */
+/** "Enter cash in the bank (or runway), monthly spend, and monthly revenue to size the plan." */
 export const describeMissingRunwayInputs = (missing: RunwayPlannerRequiredField[]): string =>
   `Enter ${joinNaturally(missing.map((field) => FIELD_LABELS[field]))} to size the plan.`;
+
+/** What the planner says instead of a plan when no cash is being spent down. */
+export const CASH_FLOW_POSITIVE_PLANNER_NOTE =
+  "Revenue covers your spending, so cash is not running down and there is no runway to size a raise or a cut against. The rules on the brief still apply to new commitments.";

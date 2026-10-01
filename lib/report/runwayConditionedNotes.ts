@@ -15,6 +15,9 @@
  */
 import type { DecisionArea } from "./boundedDecisionRules";
 import type { RegimeKey } from "../regimeEngine";
+import type { ProfileRunway } from "../operatorProfile";
+import { formatCommitmentUsd } from "../planCommitment";
+import { formatMonthAfter } from "../timeMachine/monthFormatting";
 import {
   RUNWAY_BAND_OPTIONS,
   monthsForRunwayBand,
@@ -35,7 +38,8 @@ type RunwayConditionedNoteInput = {
   runwayPhrase?: string;
   /** False when `runwayMonths` stands for a band. The burn arithmetic needs a real figure. */
   runwayIsExact?: boolean;
-  monthlyBurnUsd?: number;
+  /** Spend less revenue (`netMonthlyBurnUsd`): what the runway is counted against. */
+  netMonthlyBurnUsd?: number;
 };
 
 type RunwayConditionedNote = {
@@ -77,12 +81,12 @@ export const resolveRunwayForNotes = ({
   return null;
 };
 
-const compactUsd = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 0 });
-
 /**
- * Extending runway by cutting burn: cutting spend by a tenth stretches the
- * remaining runway by roughly a ninth of it (cash is unchanged, burn is 90%),
- * so the honest number comes from the operator's own months, not a flat claim.
+ * Extending runway by cutting net burn: cutting it by a tenth stretches the
+ * remaining runway by a ninth of it (cash is unchanged, net burn is 90%), so
+ * the honest number comes from the operator's own months, not a flat claim. It
+ * is net burn, not spend: with revenue coming in, a tenth off spend is more
+ * than a tenth off net burn, and the sentence names the dollars it means.
  */
 const monthsBoughtByTenPercentCut = (runwayMonths: number) =>
   (runwayMonths / 9).toFixed(1);
@@ -92,7 +96,7 @@ export const buildRunwayConditionedNotes = ({
   runwayMonths,
   runwayPhrase,
   runwayIsExact = true,
-  monthlyBurnUsd,
+  netMonthlyBurnUsd,
 }: RunwayConditionedNoteInput): RunwayConditionedNote[] => {
   if (typeof runwayMonths !== "number" || !Number.isFinite(runwayMonths) || runwayMonths <= 0) {
     return [];
@@ -101,14 +105,16 @@ export const buildRunwayConditionedNotes = ({
   const isExpansion = regime === "EXPANSION";
   const isTightening = regime === "SCARCITY" || regime === "DEFENSIVE";
   const runway = runwayPhrase ?? `${runwayMonths} months`;
-  const burn = runwayIsExact ? monthlyBurnUsd : undefined;
+  const burn = runwayIsExact && typeof netMonthlyBurnUsd === "number" && netMonthlyBurnUsd > 0 ? netMonthlyBurnUsd : undefined;
+  const burnCut = (netBurn: number) =>
+    `every 10% cut in net burn (${formatCommitmentUsd(netBurn / 10)}/month) adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months`;
 
   if (runwayMonths < CRITICAL_RUNWAY_MONTHS) {
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
         note: burn
-          ? `With ${runway} of runway and $${compactUsd.format(burn)}/month, every 10% burn cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months. Burn is the lever that moves runway fastest this week.`
+          ? `With ${runway} of runway and ${formatCommitmentUsd(burn)}/month of net burn, ${burnCut(burn)}. Burn is the lever that moves runway fastest this week.`
           : `With ${runway} of runway, cash is what limits you this week, and burn is the lever that moves it fastest.`,
       },
       {
@@ -137,7 +143,7 @@ export const buildRunwayConditionedNotes = ({
     if (burn) {
       notes.push({
         area: "burn-discipline",
-        note: `At $${compactUsd.format(burn)}/month, a 10% cut adds about ${monthsBoughtByTenPercentCut(runwayMonths)} months of cushion.`,
+        note: `At ${formatCommitmentUsd(burn)}/month of net burn, ${burnCut(burn)} of cushion.`,
       });
     }
     return notes;
@@ -175,8 +181,10 @@ export const buildRunwayConditionedNotes = ({
 };
 
 type CommitmentImpact = {
-  runwayBefore: number;
-  runwayAfter: number;
+  /** Null when revenue covers spending, so there is no runway to count down. */
+  runwayBefore: number | null;
+  /** Null when revenue still covers spending with the commitment added. */
+  runwayAfter: number | null;
   /** Set only when the commitment moves the runway into a different band. */
   bandChange: { from: string; to: string } | null;
   /** One sentence: what the commitment does to runway, in the reader's own figures. */
@@ -187,6 +195,9 @@ type CommitmentImpact = {
 
 const roundMonths = (months: number) => Math.round(months * 10) / 10;
 
+const valid = (value: number | undefined): value is number =>
+  typeof value === "number" && Number.isFinite(value) && value > 0;
+
 /**
  * What one new monthly commitment does to the operator's runway, and what this
  * week's guidance says about the area at the runway it leaves them with.
@@ -195,28 +206,67 @@ const roundMonths = (months: number) => Math.round(months * 10) / 10;
  * plus the note the band already carries. It adds no threshold, no action and
  * no directive — "the two hires take you under a year" is a fact about their
  * cash, and what the guidance says at under a year is already written above.
- * Cash is held constant, so runway after is runway × burn ÷ (burn + cost).
- * Anything missing or non-positive returns null rather than a guess.
+ * Cash is held constant, so runway after is runway × net burn ÷ (net burn +
+ * cost). Net burn, not spend: dividing by spend overstated the runway left
+ * whenever revenue was coming in (`netMonthlyBurnUsd`).
+ *
+ * A company whose revenue covers its spending has no runway to divide, and is
+ * the one asking this most often — so with its cash it gets the answer too:
+ * whether the commitment still leaves it covered, and if not, how long the
+ * cash lasts at the burn it starts. Anything missing or non-positive returns
+ * null rather than a guess.
  */
 export const buildCommitmentImpact = ({
   regime,
   area,
   runwayMonths,
-  monthlyBurnUsd,
+  netMonthlyBurnUsd,
+  cashUsd,
   newMonthlyCostUsd,
 }: {
   regime: RegimeKey;
   area: DecisionArea;
   runwayMonths?: number;
-  monthlyBurnUsd?: number;
+  netMonthlyBurnUsd?: number;
+  /** Read only when revenue covers spending, where runway cannot carry the balance. */
+  cashUsd?: number;
   newMonthlyCostUsd?: number;
 }): CommitmentImpact | null => {
-  const valid = (value: number | undefined): value is number =>
-    typeof value === "number" && Number.isFinite(value) && value > 0;
-  if (!valid(runwayMonths) || !valid(monthlyBurnUsd) || !valid(newMonthlyCostUsd)) return null;
+  if (!valid(newMonthlyCostUsd)) return null;
+  const cost = formatCommitmentUsd(newMonthlyCostUsd);
+
+  if (typeof netMonthlyBurnUsd === "number" && Number.isFinite(netMonthlyBurnUsd) && netMonthlyBurnUsd <= 0 && valid(cashUsd)) {
+    const netBurnAfter = netMonthlyBurnUsd + newMonthlyCostUsd;
+    if (netBurnAfter <= 0) {
+      const surplus = -netBurnAfter;
+      return {
+        runwayBefore: null,
+        runwayAfter: null,
+        bandChange: null,
+        summary: surplus > 0
+          ? `Revenue still covers spending at ${cost} more a month: cash keeps growing, by about ${formatCommitmentUsd(surplus)} a month.`
+          : `Revenue still covers spending at ${cost} more a month, with nothing left over: cash holds level.`,
+        noteAfter: null,
+      };
+    }
+    const runwayAfter = roundMonths(cashUsd / netBurnAfter);
+    return {
+      runwayBefore: null,
+      runwayAfter,
+      bandChange: null,
+      summary:
+        `Revenue covers spending today. At ${cost} more a month you would burn ${formatCommitmentUsd(netBurnAfter)} a month, ` +
+        `and ${formatCommitmentUsd(cashUsd)} of cash lasts about ${runwayAfter} months.`,
+      noteAfter:
+        buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, netMonthlyBurnUsd: netBurnAfter })
+          .find((note) => note.area === area)?.note ?? null,
+    };
+  }
+
+  if (!valid(runwayMonths) || !valid(netMonthlyBurnUsd)) return null;
 
   const runwayBefore = roundMonths(runwayMonths);
-  const runwayAfter = roundMonths((runwayMonths * monthlyBurnUsd) / (monthlyBurnUsd + newMonthlyCostUsd));
+  const runwayAfter = roundMonths((runwayMonths * netMonthlyBurnUsd) / (netMonthlyBurnUsd + newMonthlyCostUsd));
   const bandBefore = runwayBandForMonths(runwayBefore);
   const bandAfter = runwayBandForMonths(runwayAfter);
   const bandChange = bandBefore && bandAfter && bandBefore !== bandAfter
@@ -225,13 +275,36 @@ export const buildCommitmentImpact = ({
 
   const monthsSpent = roundMonths(runwayBefore - runwayAfter);
   const summary =
-    `At $${compactUsd.format(newMonthlyCostUsd)} more a month, runway goes from ${runwayBefore} to ${runwayAfter} months ` +
+    `At ${cost} more a month, runway goes from ${runwayBefore} to ${runwayAfter} months ` +
     `(${monthsSpent} ${monthsSpent === 1 ? "month" : "months"} spent)` +
     (bandChange ? `, which moves you from ${bandChange.from} into ${bandChange.to}.` : ".");
 
   const noteAfter =
-    buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, monthlyBurnUsd: monthlyBurnUsd + newMonthlyCostUsd })
+    buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, netMonthlyBurnUsd: netMonthlyBurnUsd + newMonthlyCostUsd })
       .find((note) => note.area === area)?.note ?? null;
 
   return { runwayBefore, runwayAfter, bandChange, summary, noteAfter };
+};
+
+/**
+ * The runway in one sentence, as a finance lead would say it: what cash falls
+ * by each month, how long it lasts, and the month it runs out. The month needs
+ * today's date, so the caller passes one it can render without a hydration
+ * mismatch. Arithmetic only — no verdict on whether the runway is enough; the
+ * guidance and the notes above carry that.
+ */
+export const describeProfileRunway = (runway: ProfileRunway, now: Date): string => {
+  if (runway.basis === "cash-flow-positive") {
+    return runway.surplusUsd > 0
+      ? `Revenue covers spending, with ${formatCommitmentUsd(runway.surplusUsd)} a month left over: cash is not running down.`
+      : "Revenue covers spending exactly: cash is holding level, not running down.";
+  }
+  const runsOut = formatMonthAfter(now, runway.months);
+  if (runway.basis === "entered") {
+    return `${runway.months} months of runway lasts to about ${runsOut}.`;
+  }
+  return (
+    `Net burn is ${formatCommitmentUsd(runway.netBurnUsd)} a month (spend less revenue), so ` +
+    `${formatCommitmentUsd(runway.cashUsd)} lasts about ${runway.months} months: to about ${runsOut}.`
+  );
 };

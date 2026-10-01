@@ -94,6 +94,25 @@ Finance needs objective, non-emotional criteria to determine when runway buffers
 5. For the board pack, downloads the **Board slide** from `/share` as a native PPTX (editable) or
    a one-page PDF (`/api/export/board-slide?format=pptx|pdf&stage=series-a`).
 
+### Without a finance lead (Founder / CEO)
+A founder with no CFO has three numbers, not a runway figure: the bank balance, what goes out each
+month, and what comes in.
+
+1. On `/operate/financial`, enter **Cash in the bank**, **Monthly spend** and **Monthly revenue**
+   (0 before revenue). Runway is worked out as cash ÷ (spend − revenue) and reaches every surface
+   that reads runway. Revenue at or above spend reads as cash-flow positive: the planner says there
+   is no runway to plan against rather than asking for one.
+2. Read the cards in dates and dollars: the month cash runs out at today's net burn, when to start
+   the raise, the burn adjustment as dollars a month and the runway it buys, and, below the safe
+   band, how much more cash or what net burn closes the gap.
+3. Before a hire or a contract, test it against the same figures. **Test it against your runway**
+   (under "What are you deciding?" on a first visit to `/`) takes the decision's monthly cost and
+   gives the runway after it, with the note this week's guidance carries at that runway. The plan
+   stress test on `/operate` takes a pasted plan and sizes it against your cash.
+4. Copy the block or the **Budget memo** (both carry the dated lines) into the investor update or
+   board pre-read. The planner's link carries the figures, so a co-founder or investor opens the
+   same plan. The figures otherwise stay in the browser.
+
 ### Exemplary FP&A Rule
 - **Baseline Rule:** If **BBB Spreads $\ge 2.20\%$** or **Cash Availability Index $\le 45$**, capital markets are pricing significant credit distress.
 - **Immediate Budget Adjustment:**
@@ -173,6 +192,7 @@ During quarterly Board meetings, investors and directors may question past hirin
 | :--- | :--- | :--- | :--- |
 | **Founder / CEO** | Monday Standup | `whether brief slack` | 60-second Slack Posture Call |
 | **VP Engineering** | Sprint Planning & Debt Review | `whether scenario` / Decision Shield | Payback-Bounded Tech Debt Rules |
+| **Founder without a finance lead** | Before a hire, a cut or a raise | `/operate/financial` runway planner; "Test it against your runway" on `/` | Runway, cash-out month and raise dates from cash, spend and revenue; budget memo |
 | **CFO / VP Finance** | Monthly FP&A Review | `GET /api/cli/status?view=expanded`, `/share` (investor update, board slide) | Runway-calibrated call; letter and board-pack artifacts |
 | **AI Agents** | Automated Ticket Triage | MCP (`/api/mcp`) / `GET /api/agent` | Policy-Constrained Ticket Tagging |
 | **Board / Directors** | Quarterly Governance | `GET /api/decision-memory` / `/history` | Auditable Capital Discipline Log |
