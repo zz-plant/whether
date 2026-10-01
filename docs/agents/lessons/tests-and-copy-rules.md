@@ -202,3 +202,25 @@ marked `defaultOpen`, and the comment above it records why the page moved *away*
 everything. Rendering a page tells you what a reader sees; it does not tell you whether someone
 already decided that on purpose. Read the component before calling a default a defect.
 
+
+## What the site says is new, said once (2026-10-01)
+
+Asked whether the site knew its own contribution, a read of the live routes found five candidates,
+each presented as the core on its own page: the act / pause / resume format (`/about`), "the whole
+method" with an unattributed healthcare origin (`/trust`), the self-graded record (`/history`,
+`/calibration`), a product-essay index under the eyebrow "The record" (`/concepts`), and agent
+guardrails (`/llms.txt`). The answer the site now gives everywhere, starting from `/about` → "What is
+new here": **lines decided before they are needed**, and **a record that grades itself**. The inputs
+are explicitly *not* the contribution.
+
+The same read found claims about the model that its own formula page contradicted, which is the
+reason the novelty question was hard to answer: `/about` said six signal families were "scored into"
+the conditions, but inflation and unemployment enter neither score (they feed the policy layer and
+the `/signals` tabs) and public software valuations enter nothing. `/trust` placed operating
+latitude on a homepage that stopped drawing it, and defined confidence in raw points while
+`resolveDistanceToFlip` counts a risk-appetite point as 4.5 — so a week with risk appetite 6 points
+from its line read "High" beside a ladder whose Medium band ends at 12.
+
+`tests/pageReaderContradictions.test.tsx` → "the site gives one account…" pins each. When a page
+describes what the scores read, check it against `/trust#formula-reference`, which imports its
+constants from the engine; prose elsewhere does not.

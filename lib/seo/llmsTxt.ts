@@ -1,6 +1,7 @@
 import { describeAgentTools, describeToolParams } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
 import { PUBLISH_MAX_RECORD_AGE_DAYS } from "../report/briefPublishGuard";
+import { canonicalPositioningLine } from "../seo";
 
 /**
  * `/llms.txt`: what an agent reads before it calls anything.
@@ -26,7 +27,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
   return [
     "# Whether — Agent Interface",
     "",
-    "Whether turns public macro signals into a weekly operating posture for startup and product leaders.",
+    `Whether is weekly operating guidance for startup leaders. ${canonicalPositioningLine}`,
     "",
     "## Start here",
     "",

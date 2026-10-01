@@ -1517,7 +1517,13 @@ old page. `llms-full.txt` keeps a Terms block (`TERM_DEFINITIONS`) for machine r
 See `docs/glossary-retirement-plan.md`.
 
 ### 1.5.1 About and identity framing (`/about`)
-The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.
+The About page is where the product says what it claims. Since 2026-10-01 it carries, in order:
+- **What is new here**: two claims and no more — lines decided before they are needed (each area's
+  action, pause line and resume line, set apart), and a record that grades itself (`/history` track
+  record, `/calibration`). It says the inputs are not new.
+- **Who writes it**, with the method's healthcare origin attributed to the editor and linked.
+- **What it is built from**, naming only what enters the two scores; inflation and unemployment are
+  stated as tracked but unscored.
 
 ### 1.6 Trust hub (/trust) and formula reference
 `/trust` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
@@ -1531,7 +1537,7 @@ The opening trust snapshot stays trust-specific: freshness, source coverage, and
 
 `/methodology` now permanently redirects to `/trust#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, FRED CPI, FRED labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
-The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
+The methodology reference also now clarifies scope: the two scores are built from Treasury rates (the one-month bill and the 10Y−2Y slope) with capped stress adjustments (high-yield spread, Chicago Fed index, VIX, venture pace, layoffs). CPI, unemployment and the BBB spread feed the separate policy assessment, not the scores or the conditions. The operating outputs are a translation layer rather than a claim of bespoke precision.
 Failure-mode diagnostics are now handled through the Trust and Planning workflows rather than as a standalone indexable library. Planning now exposes compact false-signal checks before guardrail approval so operators can pressure-test the weekly plan without leaving the core loop.
 
 ### 1.7 Share-preview assets for canonical hubs

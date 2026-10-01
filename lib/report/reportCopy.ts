@@ -52,9 +52,9 @@ export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
 /**
  * The one display name for the 0-100 composite scalar (`boldnessScore`:
  * risk appetite × 0.7 + (100 − funding pressure) × 0.3) that the brief
- * headlines. Every surface that names the score — the hero, the sticky call
- * strip, the glossary, exports, pricing copy, history compare — reads this
- * constant. Renamed from "Boldness Budget": the budget metaphor was memorable
+ * headlines. Every surface that names the score — the copied and Slack
+ * briefs, /trust, /history and its compare view — reads this constant. The
+ * homepage no longer draws it. Renamed from "Boldness Budget": the budget metaphor was memorable
  * but not immediately interpretable, and two names for one scalar let surfaces
  * drift into describing different verdicts.
  */

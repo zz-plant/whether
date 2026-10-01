@@ -15,6 +15,7 @@ import {
   RISK_APPETITE_MAX_SLOPE,
   RISK_APPETITE_MIN_SLOPE,
   RISK_APPETITE_REGIME_THRESHOLD,
+  RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
   TIGHTNESS_BASE_RATE_POINTS,
   TIGHTNESS_INVERSION_POINTS,
   TIGHTNESS_REGIME_THRESHOLD,
@@ -46,6 +47,15 @@ const baseRateSaturation =
 const inversionSaturation = TIGHTNESS_INVERSION_POINTS / CURVE_INVERSION_TIGHTNESS_MULTIPLIER;
 
 const adj = MACRO_ADJUSTMENT_CONSTANTS;
+
+/**
+ * What one risk-appetite point is worth in the funding-pressure points that
+ * confidence counts (`resolveDistanceToFlip`). Without it a reader who sees risk
+ * appetite 6 points from its line and a ladder whose Medium band ends at 12
+ * reads "High" as a contradiction.
+ */
+const riskPointWorth = Number(RISK_GAP_TO_TIGHTNESS_EQUIVALENT.toFixed(1));
+const RISK_GAP_EXAMPLE_POINTS = 6;
 
 /**
  * The regime rule is a 2x2: which quadrant the two scores land in. Stated in
@@ -380,12 +390,16 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               <span className="text-slate-400">{OPERATING_LATITUDE_LABEL}:</span>{" "}
               <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
               <span className="mt-1 block text-xs text-slate-400">
-                The large number on the homepage: {OPERATING_LATITUDE_GLOSS}.
+                The 0–100 score in the copied and Slack briefs and beside each month on the history
+                page: {OPERATING_LATITUDE_GLOSS}.
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Confidence:</span> how far the scores sit, in points,
-              from the nearest line where conditions would change.
+              <span className="text-slate-400">Confidence:</span> how far the scores sit from the
+              nearest line where conditions would change, counted in funding-pressure points. A
+              risk-appetite point counts as {riskPointWorth}, because it stands for a{" "}
+              {riskPointWorth}-times larger move in rates: risk appetite {RISK_GAP_EXAMPLE_POINTS} points
+              from its line counts as {Math.round(RISK_GAP_EXAMPLE_POINTS * RISK_GAP_TO_TIGHTNESS_EQUIVALENT)}.
               <div className="mt-1.5">
                 <ConfidenceLadder />
               </div>

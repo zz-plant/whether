@@ -25,7 +25,7 @@ lead with founder decisions before methodology.
 - Preferred framing:
   - "weekly answer for hiring, fundraising, and runway"
   - "startup market weather"
-  - "weekly operating posture for founders"
+  - "weekly operating guidance for startup leaders" (the category line; see below)
 - Disallowed framing on primary surfaces:
   - "macro dashboard"
   - "startup data platform"
