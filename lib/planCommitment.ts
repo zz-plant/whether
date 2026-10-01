@@ -94,12 +94,20 @@ const trimDecimal = (value: number) => value.toFixed(1).replace(/\.0$/, "");
 /**
  * Compact USD for a label: `$540k`, `$1.2M`. Falls back to grouped digits below
  * a thousand, where a suffix would lose more precision than it saves.
+ *
+ * Under $10k it keeps a tenth of a thousand, because these figures sit in
+ * sentences that do arithmetic: whole thousands printed $1,400 as "$1k" in
+ * "Revenue covers spending today. At $1k more a month you would burn $400", and
+ * $1,500 as "$2k". A figure that rounds up into the next unit is written in it
+ * ("$1M", never "$1000k").
  */
 export const formatCommitmentUsd = (value: number): string => {
   const magnitude = Math.abs(value);
-  if (magnitude >= 1e9) return `$${trimDecimal(value / 1e9)}B`;
-  if (magnitude >= 1e6) return `$${trimDecimal(value / 1e6)}M`;
-  if (magnitude >= 1e3) return `$${Math.round(value / 1e3)}k`;
+  const sign = value < 0 ? "-" : "";
+  if (magnitude >= 999_950_000) return `${sign}$${trimDecimal(magnitude / 1e9)}B`;
+  if (magnitude >= 999_500) return `${sign}$${trimDecimal(magnitude / 1e6)}M`;
+  if (magnitude >= 9_950) return `${sign}$${Math.round(magnitude / 1e3)}k`;
+  if (magnitude >= 999.5) return `${sign}$${trimDecimal(magnitude / 1e3)}k`;
   return usdFormatter.format(value);
 };
 
