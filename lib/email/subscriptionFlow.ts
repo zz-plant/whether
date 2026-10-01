@@ -1,7 +1,7 @@
 import { createCloudflareEmailAdapter, type EmailDeliveryAdapter } from "./emailDelivery";
 import { getSubscriberStore, withPendingApplied, type Subscriber } from "./subscriberStore";
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
-import { describePlanLineAreas, type PlanLines } from "../alert/planLines";
+import { describePlanLines, type PlanLines } from "../alert/planLines";
 
 const DEFAULT_APP_BASE_URL = "https://whether.work";
 
@@ -50,7 +50,7 @@ export const describeSubscription = ({
   const emails = [
     ...(alerts ? ["when conditions change between Mondays"] : []),
     ...(pendingPlanLines && pendingPlanLines.length > 0
-      ? [`the day one of the lines you set for ${describePlanLineAreas(pendingPlanLines)} is crossed`]
+      ? [`the day one of the lines you set is crossed (${describePlanLines(pendingPlanLines)})`]
       : []),
   ];
   if (weekly) return emails.length > 0 ? `the Whether weekly brief, plus an email ${joinClauses(emails)}` : "the Whether weekly brief";
@@ -74,7 +74,7 @@ const describeChanges = (sub: Subscriber): string[] => {
     changes.push(
       sub.pendingPlanLines.length === 0
         ? "clear the plan lines this address watches"
-        : `email this address the day one of the lines set for ${describePlanLineAreas(sub.pendingPlanLines)} is crossed, replacing any lines it watched before`,
+        : `email this address the day one of these lines is crossed, replacing any it watched before: ${describePlanLines(sub.pendingPlanLines)}`,
     );
   }
   return changes;

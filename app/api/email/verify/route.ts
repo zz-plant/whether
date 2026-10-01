@@ -16,8 +16,10 @@ export const runtime = "edge";
  * a reader who never saw it, which defeats holding a change for the inbox at all.
  */
 
+/* It does not say "use the newest email": the request that retired this link may
+   be someone else's, and the newest email describes theirs. */
 const DEAD_LINK =
-  "This link has expired, was already used, or was replaced by a newer request for this address. Ask again from whether.work and use the newest email.";
+  "This link has expired, was already used, or was replaced by a newer request for this address. If a newer email arrived, check it describes what you asked for before confirming; if you still want this change, ask again from whether.work.";
 
 const page = (title: string, body: string, status = 200) =>
   new Response(

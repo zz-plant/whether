@@ -168,7 +168,9 @@ const applySubscribeRequest = (existing: Subscriber, options: SubscribeOptions |
   if (!existing.active) pendingFlags.reactivate = true;
   const change: Pick<Subscriber, "pendingFlags" | "pendingPlanLines"> = {
     ...(Object.keys(pendingFlags).length > 0 ? { pendingFlags } : {}),
-    ...(options?.planLines ? { pendingPlanLines: options.planLines } : {}),
+    ...(options?.planLines && JSON.stringify(options.planLines) !== JSON.stringify(existing.planLines)
+      ? { pendingPlanLines: options.planLines }
+      : {}),
   };
   /* A confirmed address asking for what it already has gets no link: there is
      nothing for one to confirm. */
@@ -344,9 +346,23 @@ class KvSubscriberStore implements SubscriberStore {
     return true;
   }
 
+  /*
+   * From KV only, never the in-memory copy. That copy is this isolate's last sight
+   * of the record, which can predate the newer request that retired a link or the
+   * unsubscribe that dropped it; confirming against it wrote the stale record back
+   * over the real one, so an old link could re-enroll a reader who had left.
+   */
   async getPendingConfirmation(token: string): Promise<Subscriber | null> {
     const email = (await this.kv.get(CONFIRM_PREFIX + token)) ?? (await this.kv.get(TOKEN_PREFIX + token));
-    const sub = email ? await this.getSubscriberByEmail(email) : this.fallback.getByAnyToken(token);
+    if (!email) return null;
+    const raw = await this.kv.get(SUB_PREFIX + email);
+    if (!raw) return null;
+    let sub: Subscriber | null = null;
+    try {
+      sub = hydrateSubscriber(JSON.parse(raw));
+    } catch {
+      return null;
+    }
     return sub && confirms(sub, token, Date.now()) ? sub : null;
   }
 
