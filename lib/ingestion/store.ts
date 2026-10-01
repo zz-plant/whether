@@ -29,11 +29,18 @@ export interface IngestionStore {
   acquireRefreshLock?(ttlSeconds: number): Promise<boolean>;
 }
 
-const DEFAULT_DIR = path.join(process.cwd(), ".cache", "ingestion");
+/* `WHETHER_INGESTION_DIR` moves the file store, and the test preload
+   (scripts/test-network-guard.ts) points it at a fresh directory for every run. The suite
+   blocked the network but still read whatever an earlier online run in the checkout had
+   ingested here, so one `bun run seo:answers:launch-readiness` turned the tests about the
+   offline snapshot red until someone deleted .cache/ingestion. Resolved per store rather
+   than at module load, so the preload's setting holds whatever imported this first. */
+const resolveFileStoreDir = () =>
+  process.env.WHETHER_INGESTION_DIR || path.join(process.cwd(), ".cache", "ingestion");
 
 class FileIngestionStore implements IngestionStore {
   constructor(
-    private readonly baseDir = DEFAULT_DIR,
+    private readonly baseDir = resolveFileStoreDir(),
     private readonly snapshotsFile = path.join(baseDir, "snapshots.ndjson"),
     private readonly materializedFile = path.join(baseDir, "latest.materialized.json"),
   ) {}

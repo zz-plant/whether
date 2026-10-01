@@ -113,6 +113,8 @@ export type DecisionMovement = {
   sentence: string;
   /** `sentence` without the lines that did it, for a surface with room for the consequence and not the evidence (a link preview, a card). */
   headline: string;
+  /** `headline`, then whole sentences that say less, in the order to try them: for a box of fixed size, through `fitMovementHeadline`. */
+  headlines: string[];
 };
 
 const stateAt = (lines: AreaLines, scores: Scores): AreaState => {
@@ -204,6 +206,13 @@ const moveOf = (
 const listAreas = (areas: readonly DecisionArea[], total: number) =>
   total > 1 && areas.length === total ? "every area" : joinAnd(areas.map(decisionAreaLabel));
 
+const AREA_COUNT_WORDS = ["no", "one", "two", "three", "four", "five"] as const;
+
+const countAreas = (count: number, total: number) =>
+  total > 1 && count === total
+    ? "every area"
+    : `${AREA_COUNT_WORDS[count] ?? String(count)} ${count === 1 ? "area" : "areas"}`;
+
 const uniqueLines = (lines: readonly CrossedLine[]) =>
   lines.filter(
     (line, index) =>
@@ -262,23 +271,44 @@ export const buildDecisionMovement = ({
       : [];
   });
 
-  const { sentence, headline } = ((): { sentence: string; headline: string } => {
+  const { sentence, headline, headlines } = ((): { sentence: string; headline: string; headlines: string[] } => {
     if (moved.length === 0) {
       const nothing = conditions
         ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or resume line was crossed.`
         : `Conditions held steady ${window}; no pause or resume line was crossed. Last week's guidance stands.`;
-      return { sentence: nothing, headline: nothing };
+      return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
     const causes = uniqueLines(groups.flatMap((group) => group.crossed)).map(describeCrossing);
     const lead = conditions
       ? `${upperFirst(window)}, conditions changed from ${conditions.from} to ${conditions.to} and `
       : `${upperFirst(window)}, `;
-    return { sentence: `${lead}${clauses.join("; ")}: ${joinAnd(causes)}.`, headline: `${lead}${clauses.join("; ")}.` };
+    const full = `${lead}${clauses.join("; ")}.`;
+    /* The share card's "What changed" box holds 140 characters, and a week that changed
+       conditions and moved areas two ways ran to 174, so the card printed "…New bets; the…".
+       Each shorter form is a whole sentence that says less, never one cut through. The
+       conditions clause goes first, because the card prints the conditions now in its own
+       label; then the areas go to a count. */
+    const withoutConditions = `${upperFirst(window)}, ${clauses.join("; ")}.`;
+    const counted = `${lead}${countAreas(moved.length, movements.length)} crossed a pause or resume line.`;
+    return {
+      sentence: `${lead}${clauses.join("; ")}: ${joinAnd(causes)}.`,
+      headline: full,
+      headlines: [...new Set([full, withoutConditions, counted])],
+    };
   })();
 
-  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, sentence, headline };
+  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, sentence, headline, headlines };
 };
+
+/**
+ * The first form of the headline that fits `maxLength`, so the most it can say whole. When
+ * none does (an earlier reading with an unusually long label), the shortest, for the
+ * caller's own clamp to finish: it cuts less of a sentence than it would of the full one.
+ */
+export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>
+  movement.headlines.find((line) => line.length <= maxLength)
+  ?? movement.headlines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest), movement.headline);
 
 /**
  * The same movement for a loaded report, for the surfaces that hold the whole thing (the

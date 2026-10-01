@@ -3,7 +3,7 @@ import { formatPointsToLine } from "../../lib/report/operatingCalls";
 import { operatingLeverToDecisionArea } from "../../lib/report/businessAreaMap";
 import type { DecisionArea, RuleCondition } from "../../lib/report/boundedDecisionRules";
 import type { Route } from "../../lib/navigation/routeType";
-import { answerPages } from "../answers/decisionPages";
+import { findLeadAnswerForArea } from "../answers/decisionPages";
 
 /**
  * The action strip as area rows, in the shape `AreaTable` draws.
@@ -28,11 +28,15 @@ export type AreaRowText = {
   href?: Route;
 };
 
-/* The page a searcher lands on for this area's question: the first answer page
-   whose primary area is this one. There is no per-area toolkit; the answer
-   page is the surface that opens with the area's own reading. */
+/* The page a searcher lands on for this area's question. There is no per-area
+   toolkit; the answer page is the surface that opens with the area's own
+   reading. The same selector as the homepage's first-visit picker: this took
+   the first page of any category whose primary area matched, so the order of
+   `content/answers/pages.json` decided it, and raising money and expansion
+   linked the climate reads here while the homepage linked the decision
+   answers. */
 const answerHrefForArea = (area: DecisionArea): Route | undefined => {
-  const page = answerPages.find((entry) => entry.mappedDecisionAreas[0] === area);
+  const page = findLeadAnswerForArea(area);
   return page ? `/answers/${page.slug}` : undefined;
 };
 

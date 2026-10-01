@@ -119,6 +119,6 @@ Enforce the retrieved payback and reversal triggers strictly in your output.
 ## 6) Deployment & Persistence Notes
 
 - Alert/posture primitives use repository abstractions with durable KV bindings when available (`lib/storage/regimeAlertRepository.ts`, `lib/storage/postureDecisionEventRepository.ts`).
-- Ingestion snapshots/materialized read models use the same pattern (`lib/ingestion/store.ts`) and automatically fall back to local file-backed storage in `.cache/ingestion` when durable KV is unavailable.
+- Ingestion snapshots/materialized read models use the same pattern (`lib/ingestion/store.ts`) and automatically fall back to local file-backed storage in `.cache/ingestion` when durable KV is unavailable. `WHETHER_INGESTION_DIR` moves that directory; the test preload sets it to a fresh one per run, so a reading an earlier online run left in the checkout never reaches the suite.
 - If durable KV bindings are unavailable or failing, repositories degrade to local fallback and report backend status (`durable` vs `local-fallback`) in API responses where relevant.
 - See [`docs/cloudflare-deployment-runbook.md`](../cloudflare-deployment-runbook.md) for Wrangler KV provisioning steps.

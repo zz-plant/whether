@@ -12,6 +12,7 @@ declare module "bun:test" {
   export function it(name: string, callback: TestCallback): void;
   export function beforeEach(callback: TestCallback): void;
   export function afterEach(callback: TestCallback): void;
+  export function afterAll(callback: TestCallback): void;
   export function spyOn<T extends object, K extends keyof T>(
     target: T,
     method: K,

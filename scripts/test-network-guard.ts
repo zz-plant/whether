@@ -40,7 +40,20 @@
  *
  * Escape hatch, for deliberately exercising a real upstream:
  *   WHETHER_TEST_ALLOW_NETWORK=1 bun run test <path>
+ *
+ * The ingestion file store is an upstream too, and the guard alone did not cover it:
+ * an online run in the same checkout (`bun run seo:answers:launch-readiness`, a dev
+ * server) leaves a live reading under .cache/ingestion, and the read path served it
+ * back to a suite that had no network. `tests/jev.test.ts` and
+ * `tests/homeMetadata.test.ts` went red on a clean diff until the directory was
+ * deleted. So every run gets its own empty store, the state a fresh clone starts in,
+ * whatever the shell exports and whether or not the network is allowed.
  */
+import { afterAll } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 const ALLOW_NETWORK = process.env.WHETHER_TEST_ALLOW_NETWORK === "1";
 
 /**
@@ -142,3 +155,8 @@ export function createGuardedFetch(passThrough: typeof fetch, explain: (text: st
 if (!ALLOW_NETWORK) {
   globalThis.fetch = createGuardedFetch(globalThis.fetch, (text) => process.stderr.write(text));
 }
+
+const ingestionDir = mkdtempSync(join(tmpdir(), "whether-test-ingestion-"));
+process.env.WHETHER_INGESTION_DIR = ingestionDir;
+// A preload's afterAll runs once, after the last file; bun test never fires process "exit".
+afterAll(() => rmSync(ingestionDir, { recursive: true, force: true }));

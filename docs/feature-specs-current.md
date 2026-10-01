@@ -1344,6 +1344,16 @@ decided it); and `whether changes` (`decision`). `weeklyMovement.score` and `.di
 **Not on the brief card**, which is at 769px of its 800 in the worst case (§1.1.27); it already prints each
 score against the line and the earlier reading.
 
+**On the share card, whole (2026-10-01).** The weekly share card's "What changed" box and the link preview
+print `headline`, the sentence without its evidence, and the box holds 140 characters. The Oct 1 reading
+(90 and 44 against Aug 31's 63 and 56) changed conditions and moved areas two ways, and its headline ran to
+174, so the card printed "…Spending and New bets; the…". `headlines` now carries the headline and then
+whole sentences that say less, and `fitMovementHeadline` takes the first that fits: the conditions clause
+goes first, because the card prints the conditions now in its own label ("Since Aug 31, the pause now
+applies to Hiring, Fundraising, Spending and New bets; the resume line is no longer met for Roadmap."),
+then the areas go to a count ("…and every area crossed a pause or resume line."). `tests/decisionMovement.test.ts`
+holds every reading on a grid to the box.
+
 **Your record, on the brief.** `/decisions` was reachable from the footer, the command palette and the confirmation under the Decision Shield's record button, and nothing in the brief connected the two halves of one question (which of my commitments rest on what moved?). A
 browser that has recorded a decision now gets one line under the returning-visitor strip, in the record's own
 headline ("1 decision rests on conditions that have moved since it was recorded." / "All 3 decisions on this

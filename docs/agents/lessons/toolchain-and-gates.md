@@ -180,6 +180,11 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   4.8s → 0.4s), every second of it spent on FRED reads nothing asserted against. Serve an upstream
   with a fixture fetcher (`fixtureFetch` in `tests/architectureInvariants.test.ts`) or by assigning
   `globalThis.fetch`; to exercise a real one on purpose, `WHETHER_TEST_ALLOW_NETWORK=1`.
+  The ingestion file store is an upstream too, and until 2026-10-01 the guard missed it: an online
+  `bun run seo:answers:launch-readiness` left a live reading under `.cache/ingestion`, the offline
+  suite read it back, and `tests/jev.test.ts` and `tests/homeMetadata.test.ts` failed on a clean diff
+  until the directory was deleted. The preload now points `WHETHER_INGESTION_DIR` at a fresh
+  directory for every run (removed in a preload `afterAll`; bun test never fires process `exit`).
 - **`--max-concurrency` was never a worker count.** The runner used to pass 8 locally and 2 in the
   gate and call it "fewer workers". It bounds `test.concurrent` tests, this suite declares none,
   and bun runs every file in one process regardless: the same 20 files took 8.26s at 1 and 8.10s

@@ -2,6 +2,9 @@ import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import { getDefaultIngestionStore } from "../lib/ingestion/store";
 import { createGuardedFetch, isLocalTarget, redactTarget, targetUrl } from "../scripts/test-network-guard";
 
 /**
@@ -137,5 +140,35 @@ describe("test network guard", () => {
     const guard = await readFile("scripts/test-network-guard.ts", "utf8");
     assert.match(guard, /process\.env\.WHETHER_TEST_ALLOW_NETWORK === "1"/);
     assert.match(guard, /if \(!ALLOW_NETWORK\)/);
+  });
+});
+
+/*
+ * The ingestion file store is the upstream the guard did not cover. An online run in the
+ * checkout left a live reading under .cache/ingestion and the offline suite read it back,
+ * so tests about the bundled snapshot failed on a clean diff. The preload gives every run
+ * its own directory; this holds the store to it.
+ */
+describe("test ingestion directory", () => {
+  it("keeps the file store out of the checkout", async () => {
+    const dir = process.env.WHETHER_INGESTION_DIR;
+    assert.ok(dir, "the preload sets WHETHER_INGESTION_DIR");
+    assert.ok(!path.resolve(dir).startsWith(`${process.cwd()}${path.sep}`), `${dir} is inside the checkout`);
+
+    const store = getDefaultIngestionStore();
+    assert.equal(store.backendStatus?.(), "local-fallback", "no binding in the suite, so the file store");
+
+    /* Another file in this process may already have materialized a model here; put it
+       back afterwards so the shuffled order cannot change what that file reads. */
+    const file = path.join(dir, "latest.materialized.json");
+    const previous = existsSync(file) ? readFileSync(file, "utf8") : null;
+    try {
+      await store.writeLatestMaterialized({ asOf: "2026-10-01T00:00:00.000Z", signals: {} });
+      assert.ok(existsSync(file), "the store wrote outside the per-run directory");
+      assert.equal((await store.readLatestMaterialized())?.asOf, "2026-10-01T00:00:00.000Z");
+    } finally {
+      if (previous === null) rmSync(file, { force: true });
+      else writeFileSync(file, previous, "utf8");
+    }
   });
 });
