@@ -107,7 +107,7 @@ describe("DecisionShieldPresetsSection markup", () => {
 
 import { Toast } from "@base-ui/react/toast";
 import { PlanStressTestMode, ComparePlansMode } from "../app/operate/components/decisionShieldPlanModes";
-import { stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
+import { companyFinancialProfileFor, stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
 import { EMPTY_OPERATOR_PROFILE } from "../lib/operatorProfile";
 
 describe("DecisionShieldPlanModes markup", () => {
@@ -132,6 +132,33 @@ describe("DecisionShieldPlanModes markup", () => {
     assert.ok(markup.includes("Senior talent sniping"));
     assert.ok(markup.includes("Sprint tech debt refactor"));
     assert.ok(markup.includes("Flexible contract terms"));
+    // The empty state names the spend box by its label, and says what revenue does to the sizing.
+    assert.ok(markup.includes("Runway and monthly spend are optional"));
+    assert.ok(!markup.includes("Runway and burn"));
+  });
+
+  it("says revenue covers spending, in the box and the sizing line, when runway and spend are both filled", () => {
+    const profile = { version: 1 as const, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 };
+    const planText = "Hire 3 senior engineers @ $180k";
+    const stressResult = stressTestDecisionPlan(sampleAssessment, {
+      planText,
+      companyProfile: companyFinancialProfileFor(profile, "VC_BACKED"),
+    });
+    const markup = renderToStaticMarkup(
+      createElement(PlanStressTestMode, {
+        planText,
+        setPlanText: () => {},
+        planReady: true,
+        profile,
+        setProfileField: () => {},
+        businessModel: "VC_BACKED",
+        setBusinessModel: () => {},
+        stressTestResult: stressResult,
+      })
+    );
+    assert.ok(markup.includes("Revenue covers your spending, so no runway is counting down."));
+    assert.ok(markup.includes("Revenue covers your spending, so there is no burn to size it against"));
+    assert.ok(!markup.includes("needs your cash or monthly burn"));
   });
 
   it("renders comparison templates in ComparePlansMode", () => {

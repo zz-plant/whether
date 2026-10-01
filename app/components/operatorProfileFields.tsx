@@ -5,6 +5,7 @@ import {
   formatOperatorProfileValue,
   OPERATOR_PROFILE_LIMITS,
   parsePlainNumberInput,
+  profileFieldTextOnBlur,
   type OperatorProfileNumberKey,
 } from "../../lib/operatorProfile";
 import { parseMoneyInput } from "../../lib/planCommitment";
@@ -103,7 +104,13 @@ export function OperatorProfileNumberField({
   };
 
   const handleBlur = () => {
-    if (draft.trim() === "") return;
+    // Emptied over a value the profile still works out, or showing one: nothing typed to check.
+    const settled = profileFieldTextOnBlur(field, draft, value);
+    if (settled !== null) {
+      lastCommitted.current = value;
+      setDraft(settled);
+      return;
+    }
     const parsed = PARSERS[field](draft);
     if (parsed === null || !withinLimits(field, parsed)) {
       setError(UNIT_HINTS[field]);

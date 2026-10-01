@@ -1520,8 +1520,11 @@ true.
   `confirmRequestedAt`; `verifyEmail` takes only that, once. A record that never confirmed and has
   no `confirmToken` (mailed before this) still confirms with its permanent token. `GET
   /api/email/verify` shows `describeConfirmation` (each change, named as a change, for a confirmed
-  address) and a button; `POST` applies it. Unsubscribing drops the waiting request. A request that
-  asks a confirmed address for nothing new gets an email saying so, with no link. Tests:
+  address, with each area's pause and resume numbers so a reader can tell their own lines from
+  someone else's) and a button; `POST` applies it. A link is judged by the record in KV, never an
+  isolate's in-memory copy, which can predate the request or unsubscribe that retired it.
+  Unsubscribing drops the waiting request. A request that asks a confirmed address for nothing new
+  (lines included) gets an email saying so, with no link. Tests:
   `tests/subscriberWeeklyFlag.test.ts` ("who can confirm a change"), `tests/emailVerifyRoute.test.ts`.
 - **Paid plans list only what the free plan lacks.** Pro sold "Monday delivery to your inbox" and
   Team a Slack channel feed and briefs for boards and investors; the free subscribe form and `/share`
@@ -1807,19 +1810,42 @@ Slack, Notion, and Linear targets.
     through: the planner, the commitment test, the runway notes, the plan stress test and the band
     cookie. Cash and a typed runway replace each other (`setOperatorProfileField`), a band pick that
     excludes the runway clears whichever stated it, and a shared plan link carries `?cash=` and
-    replaces both of the recipient's when it carries either. Revenue at or above spend reads as
-    cash-flow positive: no runway, and the planner says so instead of asking for one.
+    replaces both of the recipient's when it carries either. A link's figure is read whole or not at
+    all (money also takes the k/M/B shorthand): `parseFloat` read a hand-edited `?cash=2.1M` as $2.10
+    and `?runway=14months` as 14. Revenue at or above spend reads as
+    cash-flow positive: no runway, and the planner says so instead of asking for one. That holds
+    whichever way the runway was given: a typed runway beside revenue that covers spend used to size
+    a full plan and date a cash-out month while the same company with its cash entered was told there
+    was no runway to plan against. A cash-flow-positive company sits in the open-ended band (24+ mo,
+    `runwayBandForProfileRunway`), and revenue coming to cover spend moves the band cookie there. It
+    used to leave the cookie wherever the last burning figure had put it, so cash $600k, then spend
+    $200k, then revenue $250k kept `/` saying "With less than 6 months of runway, cash is what limits
+    you" and the server scaling the rules to that band, beside "cash is not running down".
   - **One meaning of burn.** `monthlyBurnUsd` is total spend (the planner subtracts revenue from
     it, and its field now says "Monthly spend"). The commitment test, the runway notes' 10%-cut
     arithmetic and the stress test's cash estimate used it as net burn, which overstated runway
     whenever revenue was coming in: 12 months, $200k spend, $150k revenue and a $20k hire printed
     10.9 months left for 8.6. They read `netMonthlyBurnUsd` now, and the stress test receives the
-    cash balance it always accepted and was never given.
+    cash balance it always accepted and was never given. The stress test's form has no revenue box,
+    so its sizing line names net burn with both figures ("$50k a month of net burn ($200k spend less
+    $150k revenue) × 12 months of runway"); it printed "$50k a month" with $50k on no screen. When
+    revenue covers spending it says so and asks for cash in the bank (`companyFinancialProfileFor`
+    passes a net burn at or below zero through), where it said "sizing it needs your cash or monthly
+    burn" with runway and spend both filled.
   - **Dates and dollars.** `describeRunwayPlanInYourNumbers` restates the plan in calendar months
     and dollars on the planner's cards, its copy block and the budget memo: the month cash runs out,
     the raise window as months, the burn adjustment as dollars of spend and the runway it buys, and
     the gap to the safe band's floor as cash or as a net-burn target. Arithmetic on the plan and the
     reader's figures only; dates wait for hydration so a server render cannot print another month.
+    The raise window closes by the month cash runs out at the latest, and opens now when that
+    leaves nothing before it (critical risk opened it at months 0–2 whatever the runway, so 1.5
+    months of cash read "the window closes around Dec 2026. Cash runs out around Nov 2026."). The
+    plan scores the same runway the dated lines print: its floor is a tenth of a month, the
+    profile's own, where it was one month, so 0.3 months was scored as 1 and printed as 0.3.
+    Months count on the reader's calendar (`formatMonthAfter`): whole months are calendar months,
+    with a late day held at the end of a short month, and a fraction is that share of the month
+    after by days. It added 30.44-day months in UTC, so Oct 1 plus one month printed "Oct 2026", a
+    raise window at months 1–3 printed Oct–Dec, and Jan 30 plus one printed "Mar".
 - Own lines, a reachable test, and crossings at the reader's runway (2026-10-02):
   - **Your own runway lines** (`#ops-runway-lines` on the planner): "start raising at" and "pause
     hiring at" a number of months of runway (`raiseAtRunwayMonths`, `hiringPauseAtRunwayMonths` in

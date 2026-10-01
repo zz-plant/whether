@@ -11,9 +11,16 @@ import {
   runwayBandLabel,
   runwayBandSublabel,
   runwayBandPhrase,
-  runwayMonthsFitBand,
+  runwayBandForProfileEdit,
+  runwayBandForProfileRunway,
   RUNWAY_BAND_OPTIONS,
 } from "../lib/report/operatorRunway";
+import {
+  EMPTY_OPERATOR_PROFILE,
+  resolveProfileRunway,
+  setOperatorProfileField,
+  type OperatorProfile,
+} from "../lib/operatorProfile";
 
 describe("operatorRunway", () => {
   it("maps month durations to the canonical runway bands, with the lower edge inclusive", () => {
@@ -96,13 +103,43 @@ describe("one runway setting", () => {
     for (let months = 0.5; months <= 60; months += 0.5) {
       const band = runwayBandForMonths(months);
       assert.ok(band, `${months} months has no band`);
-      assert.ok(runwayMonthsFitBand(months, band));
     }
     for (const option of RUNWAY_BAND_OPTIONS) {
       assert.equal(runwayBandForMonths(option.months), option.key);
     }
     assert.equal(runwayBandForMonths(0), null);
     assert.equal(runwayBandForMonths(undefined), null);
+  });
+
+  it("puts a company whose revenue covers its spending in the open-ended band, not in no band", () => {
+    const covered = resolveProfileRunway({ version: 1, cashUsd: 600_000, monthlyBurnUsd: 200_000, monthlyRevenueUsd: 250_000 });
+    assert.equal(runwayBandForProfileRunway(covered), "abundant");
+    assert.equal(runwayBandForProfileRunway(null), null);
+    assert.equal(runwayBandForProfileRunway({ basis: "entered", months: 9 }), "tight");
+  });
+
+  it("moves the band with each figure, including revenue that comes to cover spending", () => {
+    // The commitment test's order: cash, then spend, then revenue. The band used to stay critical after the
+    // last step, so `/` said cash was what limited a company whose cash was growing.
+    const steps: Array<[keyof OperatorProfile, number | undefined]> = [
+      ["cashUsd", 600_000],
+      ["monthlyBurnUsd", 200_000],
+      ["monthlyRevenueUsd", 250_000],
+      ["monthlyRevenueUsd", undefined],
+      ["monthlyBurnUsd", undefined],
+    ];
+    let profile: OperatorProfile = EMPTY_OPERATOR_PROFILE;
+    const written: Array<string | null> = [];
+    for (const [key, value] of steps) {
+      const next = setOperatorProfileField(profile, key, value);
+      written.push(runwayBandForProfileEdit(resolveProfileRunway(profile), resolveProfileRunway(next)));
+      profile = next;
+    }
+    // Cash alone is no runway; 3 months is critical; covered is open-ended; revenue cleared is 3 months again;
+    // spend cleared leaves no runway, which leaves the band alone.
+    assert.deepEqual(written, [null, "critical", "abundant", "critical", null]);
+    // An edit that does not move the runway does not rewrite the band.
+    assert.equal(runwayBandForProfileEdit({ basis: "entered", months: 9 }, { basis: "entered", months: 9 }), null);
   });
 
   it("says each band in a sentence by its range", () => {

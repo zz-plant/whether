@@ -12,7 +12,7 @@
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { isBusinessModel, type CompanyFinancialProfile, type PlanComparisonResult, type PlanStressTestResult } from "../../../lib/decisionShield";
-import { resolveProfileRunway, resolveProfileRunwayMonths, type OperatorProfile } from "../../../lib/operatorProfile";
+import { resolveProfileRunway, resolveProfileRunwayMonths, type OperatorProfile, type ProfileRunway } from "../../../lib/operatorProfile";
 
 type BusinessModel = NonNullable<CompanyFinancialProfile["businessModel"]>;
 
@@ -25,6 +25,14 @@ type PlanStressTestModeProps = {
   businessModel: BusinessModel;
   setBusinessModel: (value: BusinessModel) => void;
   stressTestResult: PlanStressTestResult;
+};
+
+/* Revenue that covers spending blanks the runway box, a typed figure included,
+   so the box says why rather than looking unfilled. */
+const runwayHint = (basis: ProfileRunway["basis"] | undefined): string | undefined => {
+  if (basis === "cash") return "Worked out from your cash. Typing a figure replaces it.";
+  if (basis === "cash-flow-positive") return "Revenue covers your spending, so no runway is counting down.";
+  return undefined;
 };
 
 const STARTER_PLANS = [
@@ -73,7 +81,7 @@ export function PlanStressTestMode({
               <OperatorProfileNumberField
                 field="runwayMonths"
                 label="Runway (months)"
-                hint={resolveProfileRunway(profile)?.basis === "cash" ? "Worked out from your cash. Typing a figure replaces it." : undefined}
+                hint={runwayHint(resolveProfileRunway(profile)?.basis)}
                 placeholder="e.g. 14"
                 value={resolveProfileRunwayMonths(profile)}
                 onCommit={(value) => setProfileField("runwayMonths", value)}
@@ -148,7 +156,8 @@ export function PlanStressTestMode({
                 <p className="type-label text-slate-400">Decision verdict</p>
                 <p className="mt-1.5 text-sm text-slate-200 font-medium">Describe a plan or choose an example above to grade it.</p>
                 <p className="mt-1 text-fluid-xs text-slate-400">
-                  Name the commitment and its size. Runway and burn are optional; with both, the verdict is sized against your cash.
+                  Name the commitment and its size. Runway and monthly spend are optional; with both, the verdict is sized against
+                  the cash they imply, at spend less any revenue you entered on the runway planner.
                 </p>
               </div>
             ) : (

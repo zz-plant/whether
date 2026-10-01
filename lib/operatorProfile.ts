@@ -152,25 +152,38 @@ export type ProfileRunway =
   | { basis: "cash"; months: number; cashUsd: number; netBurnUsd: number }
   /** Typed in as a number of months. */
   | { basis: "entered"; months: number }
-  /** Revenue covers spending, so cash is not running down and there is no runway to count. */
-  | { basis: "cash-flow-positive"; cashUsd: number; surplusUsd: number };
+  /**
+   * Revenue covers spending, so cash is not running down and there is no runway
+   * to count. `cashUsd` is absent when the runway was typed rather than worked out.
+   */
+  | { basis: "cash-flow-positive"; cashUsd?: number; surplusUsd: number };
 
 /**
  * The runway every surface reads: worked out from cash and net burn when cash
  * is given, else the figure typed in, else nothing. A cash figure without spend
  * is not a runway yet, and never reads as one.
+ *
+ * Revenue at or above spend is cash-flow positive whichever way the runway was
+ * given. Until 2026-10-01 only a cash figure was checked, so a typed 14 months
+ * beside $100k of spend and $120k of revenue sized a full plan and dated a
+ * cash-out month, while the same company with its cash entered was told there
+ * was no runway to plan against.
  */
 export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | null => {
   const netBurn = netMonthlyBurnUsd(profile);
-  const cash = profile.cashUsd;
-  if (cash !== undefined && cash > 0 && netBurn !== undefined) {
-    if (netBurn <= 0) return { basis: "cash-flow-positive", cashUsd: cash, surplusUsd: Math.max(0, -netBurn) };
+  const cash = profile.cashUsd !== undefined && profile.cashUsd > 0 ? profile.cashUsd : undefined;
+  const typedMonths = profile.runwayMonths !== undefined && profile.runwayMonths > 0 ? profile.runwayMonths : undefined;
+  if (netBurn !== undefined && netBurn <= 0 && (cash !== undefined || typedMonths !== undefined)) {
+    const surplusUsd = Math.max(0, -netBurn);
+    return cash !== undefined ? { basis: "cash-flow-positive", cashUsd: cash, surplusUsd } : { basis: "cash-flow-positive", surplusUsd };
+  }
+  if (cash !== undefined && netBurn !== undefined) {
     // Tenths of a month, and never zero: a balance under one tenth of a month is still a runway.
     const months = Math.max(0.1, Math.round((cash / netBurn) * 10) / 10);
     return { basis: "cash", months, cashUsd: cash, netBurnUsd: netBurn };
   }
-  if (profile.runwayMonths !== undefined && profile.runwayMonths > 0) {
-    return { basis: "entered", months: profile.runwayMonths };
+  if (typedMonths !== undefined) {
+    return { basis: "entered", months: typedMonths };
   }
   return null;
 };
@@ -204,4 +217,25 @@ export const formatOperatorProfileValue = (key: OperatorProfileNumberKey, value:
   if (value === undefined) return "";
   if (key === "cashUsd" || key === "monthlyBurnUsd" || key === "monthlyRevenueUsd") return compactUsd.format(value);
   return String(value);
+};
+
+/**
+ * What a field shows when it loses focus, if its text is not a new figure to
+ * check: the value it is showing, or null when the text must be validated.
+ *
+ * Two cases a validator gets wrong. A box can show a value the profile works
+ * out rather than stores — a runway from cash — so emptying it clears no stored
+ * figure and the plan stays sized on that runway: the box shows it again rather
+ * than reading blank. And such a value can sit outside what a person may type
+ * (cash $5M at $10k of net burn is 500 months, over the 240 limit), so the box
+ * showing it is not an error.
+ */
+export const profileFieldTextOnBlur = (
+  key: OperatorProfileNumberKey,
+  draft: string,
+  value: number | undefined,
+): string | null => {
+  const shown = formatOperatorProfileValue(key, value);
+  if (draft.trim() === "" || draft === shown) return shown;
+  return null;
 };

@@ -121,7 +121,14 @@ describe("computeRunwayShare", () => {
     const result = computeRunwayShare({ annualUsd: 600_000, monthlyBurnUsd: 100_000, runwayMonths: 12 })!;
     assert.equal(result.share, 0.5);
     assert.equal(result.cashUsd, 1_200_000);
-    assert.equal(result.cashBasis, "$100k a month × 12 months of runway");
+    assert.equal(result.cashBasis, "$100k a month of net burn × 12 months of runway");
+  });
+
+  it("names net burn as spend less revenue, with both figures, when revenue came off it", () => {
+    // "$50k a month × 12 months" printed a net burn shown nowhere, beside a spend box reading $200k.
+    const result = computeRunwayShare({ annualUsd: 540_000, monthlyBurnUsd: 50_000, monthlyRevenueUsd: 150_000, runwayMonths: 12 })!;
+    assert.equal(result.cashUsd, 600_000);
+    assert.equal(result.cashBasis, "$50k a month of net burn ($200k spend less $150k revenue) × 12 months of runway");
   });
 
   it("returns null rather than estimating burn the caller never supplied", () => {
@@ -145,6 +152,23 @@ describe("formatCommitmentUsd", () => {
     assert.equal(formatCommitmentUsd(2_000_000), "$2M");
     assert.equal(formatCommitmentUsd(2_500_000_000), "$2.5B");
     assert.equal(formatCommitmentUsd(750), "$750");
+  });
+
+  it("keeps a tenth of a thousand under $10k, so the sentences that do arithmetic add up", () => {
+    // $1,500 printed "$2k", and $1,400 "$1k" in "At $1k more a month you would burn $400".
+    assert.equal(formatCommitmentUsd(1_500), "$1.5k");
+    assert.equal(formatCommitmentUsd(1_400), "$1.4k");
+    assert.equal(formatCommitmentUsd(2_000), "$2k");
+    assert.equal(formatCommitmentUsd(9_500), "$9.5k");
+    assert.equal(formatCommitmentUsd(9_960), "$10k");
+    assert.equal(formatCommitmentUsd(12_345), "$12k");
+  });
+
+  it("writes a figure that rounds into the next unit in that unit", () => {
+    assert.equal(formatCommitmentUsd(999_999), "$1M");
+    assert.equal(formatCommitmentUsd(999_400), "$999k");
+    assert.equal(formatCommitmentUsd(999.6), "$1k");
+    assert.equal(formatCommitmentUsd(999_960_000), "$1B");
   });
 });
 

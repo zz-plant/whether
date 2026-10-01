@@ -59,6 +59,26 @@ const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
 const SECTOR_PARAM = "sector";
 const STAGE_PARAM = "stage";
 
+/*
+ * The whole value is the number, or it is not one. `parseFloat` read the digits
+ * off the front and dropped the rest, so a hand-edited `?cash=2.1M` was $2.10 of
+ * cash and `?runway=14months` passed as 14. A link the app builds is a plain
+ * `String(value)`, which this always reads back; money also takes the k/M/B
+ * shorthand the money boxes accept, since that is how a person edits one.
+ */
+const PLAIN_NUMBER = /^-?\d+(?:\.\d+)?(?:e[+-]?\d+)?$/i;
+const SUFFIXED_MONEY = /^(\d+(?:\.\d+)?)([kmb])$/i;
+const MONEY_KEYS: ReadonlySet<OperatorProfileNumberKey> = new Set(["cashUsd", "monthlyBurnUsd", "monthlyRevenueUsd"]);
+const MONEY_SUFFIXES: Record<string, number> = { k: 1e3, m: 1e6, b: 1e9 };
+
+const readLinkNumber = (key: OperatorProfileNumberKey, raw: string): number | null => {
+  const text = raw.trim();
+  if (PLAIN_NUMBER.test(text)) return Number(text);
+  const suffixed = MONEY_KEYS.has(key) ? SUFFIXED_MONEY.exec(text) : null;
+  const multiplier = suffixed?.[2] ? MONEY_SUFFIXES[suffixed[2].toLowerCase()] : undefined;
+  return suffixed?.[1] && multiplier !== undefined ? Number(suffixed[1]) * multiplier : null;
+};
+
 type SharedRunwayPlan = {
   profile: Partial<OperatorProfile>;
   stage: OperatorStage | null;
@@ -80,8 +100,8 @@ export const readSharedRunwayPlan = (params: URLSearchParams | null): SharedRunw
     const raw = params.get(NUMBER_PARAMS[numberKey]);
     if (raw === null) continue;
 
-    const parsed = Number.parseFloat(raw);
-    if (!Number.isFinite(parsed)) continue;
+    const parsed = readLinkNumber(numberKey, raw);
+    if (parsed === null || !Number.isFinite(parsed)) continue;
     const limits = OPERATOR_PROFILE_LIMITS[numberKey];
     if (parsed < limits.min || parsed > limits.max) continue;
     profile[numberKey] = parsed;

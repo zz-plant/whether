@@ -303,7 +303,7 @@ crossed the notes' long-runway line: "runway is not what limits you this week".
 
 Now: the band (cookie) is the setting, and the notes branch on the band table's own boundaries.
 Choosing a band writes no figure, and clears an entered one it excludes. An exact figure entered
-on `/operate` moves the band (`syncRunwayBandToMonths` in `useOperatorProfile`). A band reads as
+on `/operate` moves the band (`syncRunwayBandToFigures` in `useOperatorProfile`). A band reads as
 its range in the notes ("With 12–24 months of runway"), never as a number the reader did not give,
 and burn arithmetic runs only on a real figure. The server-rendered default band produces no note:
 it is shown as a default ("It shows 12–24 mo until you choose"), not as an answer.

@@ -142,7 +142,7 @@ describe("storing plan lines", () => {
     assert.deepEqual(first.planLines, []);
     assert.deepEqual(first.pendingPlanLines, [HIRING]);
     assert.equal(first.weekly, false, "a record made only to watch lines asked for no Monday email");
-    assert.match(describeSubscription(first), /lines you set for hiring is crossed/);
+    assert.match(describeSubscription(first), /lines you set is crossed \(hiring pauses if Funding pressure > 72 or Risk appetite < 40 and resumes when/);
 
     await store.verifyEmail(first.confirmToken ?? "");
     const confirmed = await store.getSubscriberByEmail("ops@example.com");
@@ -177,6 +177,15 @@ describe("storing the runway band beside the lines", () => {
     assert.equal((await store.getSubscriberByEmail("ops@example.com"))?.planRunway?.band, "tight", "unconfirmed, nothing changes");
     await store.verifyEmail(again.confirmToken ?? "");
     assert.equal((await store.getSubscriberByEmail("ops@example.com"))?.planRunway, undefined, "the old band described the old lines");
+  });
+
+  it("asks to confirm the same lines with a new band, and nothing for the same lines and band", async () => {
+    const first = await store.subscribe("ops@example.com", { alerts: true, planLines: [HIRING], runwayBand: "tight" });
+    await store.verifyEmail(first.confirmToken ?? "");
+    const same = await store.subscribe("ops@example.com", { planLines: [HIRING], runwayBand: "tight" });
+    assert.equal(same.pendingPlanLines, undefined, "nothing to confirm");
+    const newBand = await store.subscribe("ops@example.com", { planLines: [HIRING], runwayBand: "critical" });
+    assert.equal(newBand.pendingPlanRunway?.band, "critical", "a different band is a change to what the email says");
   });
 
   it("keeps no band without lines, and reads a stored band it does not know as none", async () => {
