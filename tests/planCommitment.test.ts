@@ -121,7 +121,14 @@ describe("computeRunwayShare", () => {
     const result = computeRunwayShare({ annualUsd: 600_000, monthlyBurnUsd: 100_000, runwayMonths: 12 })!;
     assert.equal(result.share, 0.5);
     assert.equal(result.cashUsd, 1_200_000);
-    assert.equal(result.cashBasis, "$100k a month × 12 months of runway");
+    assert.equal(result.cashBasis, "$100k a month of net burn × 12 months of runway");
+  });
+
+  it("names net burn as spend less revenue, with both figures, when revenue came off it", () => {
+    // "$50k a month × 12 months" printed a net burn shown nowhere, beside a spend box reading $200k.
+    const result = computeRunwayShare({ annualUsd: 540_000, monthlyBurnUsd: 50_000, monthlyRevenueUsd: 150_000, runwayMonths: 12 })!;
+    assert.equal(result.cashUsd, 600_000);
+    assert.equal(result.cashBasis, "$50k a month of net burn ($200k spend less $150k revenue) × 12 months of runway");
   });
 
   it("returns null rather than estimating burn the caller never supplied", () => {

@@ -266,7 +266,9 @@ export function RunwayPlannerPanel({
           hint={
             runway?.basis === "cash"
               ? "Worked out: cash over spend less revenue. Typing a figure replaces the cash."
-              : "Or leave blank and enter cash: it is worked out for you."
+              : runway?.basis === "cash-flow-positive"
+                ? "Revenue covers your spending, so no runway is counting down."
+                : "Or leave blank and enter cash: it is worked out for you."
           }
           placeholder="e.g. 14"
           value={runway && runway.basis !== "cash-flow-positive" ? runway.months : undefined}

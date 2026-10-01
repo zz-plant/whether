@@ -214,16 +214,24 @@ export const parseMoneyInput = (raw: string): number | null => {
  * figure — either directly, or as a burn rate the runway can be multiplied by.
  * Nothing here estimates burn from a stage or a regime; an unsupplied balance
  * means the plan is not sized, and the surface says so.
+ *
+ * The burn is net (spend less revenue), and the basis says so with both
+ * figures: "$50k a month × 12 months" printed a net burn the stress test's form
+ * shows nowhere, beside a spend box reading $200k.
  */
 export const computeRunwayShare = ({
   annualUsd,
   cashBalanceUsd,
   monthlyBurnUsd,
+  monthlyRevenueUsd,
   runwayMonths,
 }: {
   annualUsd: number | null;
   cashBalanceUsd?: number;
+  /** Net: spend less revenue. */
   monthlyBurnUsd?: number;
+  /** The revenue net burn was taken from, so the basis can show the subtraction. */
+  monthlyRevenueUsd?: number;
   runwayMonths?: number;
 }): { share: number; cashUsd: number; cashBasis: string } | null => {
   if (annualUsd === null || annualUsd <= 0) return null;
@@ -245,10 +253,16 @@ export const computeRunwayShare = ({
     runwayMonths > 0
   ) {
     const cashUsd = monthlyBurnUsd * runwayMonths;
+    const revenue = typeof monthlyRevenueUsd === "number" && Number.isFinite(monthlyRevenueUsd) && monthlyRevenueUsd > 0
+      ? monthlyRevenueUsd
+      : undefined;
+    const netBurn = revenue === undefined
+      ? `${formatCommitmentUsd(monthlyBurnUsd)} a month of net burn`
+      : `${formatCommitmentUsd(monthlyBurnUsd)} a month of net burn (${formatCommitmentUsd(monthlyBurnUsd + revenue)} spend less ${formatCommitmentUsd(revenue)} revenue)`;
     return {
       share: annualUsd / cashUsd,
       cashUsd,
-      cashBasis: `${formatCommitmentUsd(monthlyBurnUsd)} a month × ${runwayMonths} months of runway`,
+      cashBasis: `${netBurn} × ${runwayMonths} months of runway`,
     };
   }
 

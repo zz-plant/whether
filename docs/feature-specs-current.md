@@ -1807,7 +1807,12 @@ Slack, Notion, and Linear targets.
     arithmetic and the stress test's cash estimate used it as net burn, which overstated runway
     whenever revenue was coming in: 12 months, $200k spend, $150k revenue and a $20k hire printed
     10.9 months left for 8.6. They read `netMonthlyBurnUsd` now, and the stress test receives the
-    cash balance it always accepted and was never given.
+    cash balance it always accepted and was never given. The stress test's form has no revenue box,
+    so its sizing line names net burn with both figures ("$50k a month of net burn ($200k spend less
+    $150k revenue) × 12 months of runway"); it printed "$50k a month" with $50k on no screen. When
+    revenue covers spending it says so and asks for cash in the bank (`companyFinancialProfileFor`
+    passes a net burn at or below zero through), where it said "sizing it needs your cash or monthly
+    burn" with runway and spend both filled.
   - **Dates and dollars.** `describeRunwayPlanInYourNumbers` restates the plan in calendar months
     and dollars on the planner's cards, its copy block and the budget memo: the month cash runs out,
     the raise window as months, the burn adjustment as dollars of spend and the runway it buys, and

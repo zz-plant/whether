@@ -3,7 +3,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { evaluateDecision, stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
+import { companyFinancialProfileFor, evaluateDecision, stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
 import { buildShareText } from "../app/operate/components/decisionShieldUtils";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 
@@ -395,7 +395,7 @@ describe("stress test — sizing the plan against available cash", () => {
       companyProfile: cashProfile,
     });
     assert.equal(result.commitment.annualUsd, 540_000);
-    assert.match(result.sizingNote, /\$540k in the first year is 20% of \$150k a month × 18 months of runway/);
+    assert.match(result.sizingNote, /\$540k in the first year is 20% of \$150k a month of net burn × 18 months of runway/);
   });
 
   it("refuses to size the plan when no cash figure was supplied, rather than guessing burn", () => {
@@ -405,7 +405,33 @@ describe("stress test — sizing the plan against available cash", () => {
     });
     assert.equal(result.runwayShare, null);
     assert.equal(result.verdict, "SAFE");
-    assert.match(result.sizingNote, /sizing it needs your cash or monthly burn/);
+    assert.match(result.sizingNote, /sizing it needs your cash, or your runway and monthly spend/);
+  });
+
+  it("shows net burn as spend less revenue when the operator's revenue went into it", () => {
+    // Runway 12, spend $200k, revenue $150k: this printed "90% of $50k a month × 12 months", and $50k was on no screen.
+    const companyProfile = companyFinancialProfileFor(
+      { version: 1, runwayMonths: 12, monthlyBurnUsd: 200_000, monthlyRevenueUsd: 150_000 },
+      "VC_BACKED",
+    );
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Hire 3 senior engineers @ $180k", companyProfile });
+    assert.match(result.sizingNote, /is 90% of \$50k a month of net burn \(\$200k spend less \$150k revenue\) × 12 months of runway/);
+  });
+
+  it("says revenue covers spending instead of asking for runway and spend already entered", () => {
+    // Runway 14, spend $100k, revenue $120k: this said "sizing it needs your cash or monthly burn" with both filled.
+    const typed = companyFinancialProfileFor({ version: 1, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 }, "VC_BACKED");
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Hire 3 senior engineers @ $180k", companyProfile: typed });
+    assert.equal(result.runwayShare, null);
+    assert.equal(
+      result.sizingNote,
+      "Read $540k for the first year. Revenue covers your spending, so there is no burn to size it against: sizing it needs your cash in the bank, and without it the verdict rests on conditions alone.",
+    );
+
+    // With the cash in, it is sized against the cash.
+    const withCash = companyFinancialProfileFor({ version: 1, cashUsd: 1_400_000, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 }, "VC_BACKED");
+    const sized = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Hire 3 senior engineers @ $180k", companyProfile: withCash });
+    assert.match(sized.sizingNote, /is 39% of \$1\.4M cash on hand/);
   });
 
   it("says the plan carried no amount instead of treating it as free", () => {
