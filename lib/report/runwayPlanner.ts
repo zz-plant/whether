@@ -186,7 +186,10 @@ const projectRunwayTrajectory = (input: RunwayPlannerInput) => {
     netBurnNow,
     netBurnInSixMonths,
     burnImprovementPct,
-    burnMultiple: input.revenue > 0 ? input.burn / input.revenue : BURN_MULTIPLE_DEFAULT,
+    /* Capped at the no-revenue reading. Uncapped, $1k of revenue against $150k of
+       spend read as a 150x multiple and scored critical, where the same company
+       with no revenue scored moderate: earning anything made the plan riskier. */
+    burnMultiple: input.revenue > 0 ? Math.min(input.burn / input.revenue, BURN_MULTIPLE_DEFAULT) : BURN_MULTIPLE_DEFAULT,
   };
 };
 
@@ -365,7 +368,20 @@ type RunwayPlanInYourNumbers = {
   burnChange: string | null;
   /** How far below the safe band's floor, in cash and in net burn. Null at or above the floor. */
   floorGap: string | null;
+  /** The company's own runway lines, each with the month it arrives. Empty when none are set. */
+  ownLines: string[];
 };
+
+/** The company's own lines on its own runway (`OperatorProfile`), set before they are needed. */
+type OwnRunwayLines = {
+  raiseAtRunwayMonths?: number;
+  hiringPauseAtRunwayMonths?: number;
+};
+
+const OWN_RUNWAY_LINES: ReadonlyArray<{ key: keyof OwnRunwayLines; action: string }> = [
+  { key: "raiseAtRunwayMonths", action: "Start raising" },
+  { key: "hiringPauseAtRunwayMonths", action: "Pause hiring" },
+];
 
 const roundTenth = (value: number) => Math.round(value * 10) / 10;
 
@@ -378,11 +394,17 @@ const roundTenth = (value: number) => Math.round(value * 10) / 10;
  * and nothing else: every figure comes from the plan or the reader's own
  * inputs, with cash held constant at runway × net burn. `now` is passed in so
  * a server render and the browser cannot print different months.
+ *
+ * The company's own lines ("start raising at 12 months of runway") get the same
+ * treatment: runway falls a month a month at today's net burn, so the month a
+ * line arrives is runway minus the line, counted from today. That is the step
+ * that turns a line agreed in a meeting into a date on a calendar.
  */
 export const describeRunwayPlanInYourNumbers = (
   plan: RunwayPlannerOutput,
   request: RunwayPlannerRequest,
   now: Date,
+  lines: OwnRunwayLines = {},
 ): RunwayPlanInYourNumbers => {
   const netBurn = Math.max(request.burn - request.revenue, 0);
   const cash = request.runway * netBurn;
@@ -419,7 +441,19 @@ export const describeRunwayPlanInYourNumbers = (
       `${formatCommitmentUsd(cash / floor)} a month stretches what you have to ${floor} months.`
     : null;
 
-  return { runsOut, raiseWindow, burnChange, floorGap };
+  const ownLines = netBurn > 0
+    ? OWN_RUNWAY_LINES.flatMap(({ key, action }) => {
+        const at = lines[key];
+        if (at === undefined) return [];
+        return [
+          request.runway <= at
+            ? `${action} at ${at} months of runway: that line is here now, with ${roundTenth(request.runway)} months left.`
+            : `${action} at ${at} months of runway: around ${month(request.runway - at)}.`,
+        ];
+      })
+    : [];
+
+  return { runsOut, raiseWindow, burnChange, floorGap, ownLines };
 };
 
 export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput, inYourNumbers?: RunwayPlanInYourNumbers | null) =>
@@ -437,6 +471,9 @@ export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput, inYourNu
           ...[inYourNumbers.runsOut, inYourNumbers.raiseWindow, inYourNumbers.burnChange, inYourNumbers.floorGap]
             .filter((line): line is string => line !== null)
             .map((line) => `• ${line}`),
+          ...(inYourNumbers.ownLines.length > 0
+            ? ["Our own runway lines:", ...inYourNumbers.ownLines.map((line) => `• ${line}`)]
+            : []),
         ]
       : []),
   ].join("\n");

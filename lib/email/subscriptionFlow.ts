@@ -1,7 +1,8 @@
 import { createCloudflareEmailAdapter, type EmailDeliveryAdapter } from "./emailDelivery";
 import { getSubscriberStore, withPendingApplied, type Subscriber } from "./subscriberStore";
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
-import { describePlanLineAreas, type PlanLines } from "../alert/planLines";
+import { describePlanLineAreas, type PlanLines, type PlanRunway } from "../alert/planLines";
+import { runwayBandPhrase, type RunwayBand } from "../report/operatorRunway";
 
 const DEFAULT_APP_BASE_URL = "https://whether.work";
 
@@ -34,23 +35,30 @@ const buildEmailActionUrl = (path: string, request?: Request) => {
 const joinClauses = (clauses: readonly string[]) =>
   clauses.length <= 1 ? (clauses[0] ?? "") : `${clauses.slice(0, -1).join(", ")} and ${clauses[clauses.length - 1]}`;
 
+/** ", with what it means at 12–24 months of runway": the band the lines carry, named in the promise. */
+const atRunwayClause = (runway: PlanRunway | undefined) =>
+  runway ? `, with what it means at ${runwayBandPhrase(runway.band)} of runway` : "";
+
 /** What a subscription delivers, from the record as it will stand once confirmed. */
 export const describeSubscription = ({
   alerts,
   weekly,
   pendingPlanLines,
+  planRunway,
 }: {
   alerts: boolean;
   weekly: boolean;
   /** Lines the subscription watches; the promise names their areas. */
   pendingPlanLines?: readonly PlanLines[];
+  /** The runway band stored beside those lines, which the promise names too: it is stored. */
+  planRunway?: PlanRunway;
 }) => {
   /* Every part of it, so a confirmation that sets lines still says what it does
      to the Monday brief: the lines clause used to return on its own. */
   const emails = [
     ...(alerts ? ["when conditions change between Mondays"] : []),
     ...(pendingPlanLines && pendingPlanLines.length > 0
-      ? [`the day one of the lines you set for ${describePlanLineAreas(pendingPlanLines)} is crossed`]
+      ? [`the day one of the lines you set for ${describePlanLineAreas(pendingPlanLines)} is crossed${atRunwayClause(planRunway)}`]
       : []),
   ];
   if (weekly) return emails.length > 0 ? `the Whether weekly brief, plus an email ${joinClauses(emails)}` : "the Whether weekly brief";
@@ -74,7 +82,7 @@ const describeChanges = (sub: Subscriber): string[] => {
     changes.push(
       sub.pendingPlanLines.length === 0
         ? "clear the plan lines this address watches"
-        : `email this address the day one of the lines set for ${describePlanLineAreas(sub.pendingPlanLines)} is crossed, replacing any lines it watched before`,
+        : `email this address the day one of the lines set for ${describePlanLineAreas(sub.pendingPlanLines)} is crossed${atRunwayClause(sub.pendingPlanRunway)}, replacing any lines it watched before`,
     );
   }
   return changes;
@@ -142,6 +150,7 @@ export const subscribeAndSendVerification = async ({
   alerts,
   weekly,
   planLines,
+  runwayBand,
   request,
   adapter = createCloudflareEmailAdapter(),
 }: {
@@ -152,6 +161,8 @@ export const subscribeAndSendVerification = async ({
   weekly?: boolean;
   /** Lines for the reader's own plan; they take effect when the address confirms. */
   planLines?: PlanLines[];
+  /** The reader's runway band, held beside `planLines` and confirmed with them. */
+  runwayBand?: RunwayBand;
   request?: Request;
   adapter?: EmailDeliveryAdapter;
 }) => {
@@ -165,7 +176,7 @@ export const subscribeAndSendVerification = async ({
   }
 
   const store = getSubscriberStore();
-  const subscriber = await store.subscribe(email, { alerts, weekly, planLines });
+  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand });
   /* The request's own link, never the permanent token: that one is in the footer
      of every email this address has been sent. The caller's response is the same
      whichever email goes out, so it says nothing about whether the address is

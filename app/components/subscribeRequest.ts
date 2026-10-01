@@ -9,6 +9,7 @@
  */
 
 import type { PlanLines } from "../../lib/alert/planLines";
+import type { RunwayBand } from "../../lib/report/operatorRunway";
 
 type SubscribeResult = { ok: boolean; message: string };
 
@@ -19,6 +20,8 @@ export type SubscribeOptions = {
   weekly?: boolean;
   /** Lines for the reader's own plan, set on /operate. They count once the address confirms. */
   planLines?: PlanLines[];
+  /** The reader's runway band, sent with `planLines` so a crossing email can say what it means at it. */
+  runwayBand?: RunwayBand;
 };
 
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
@@ -48,6 +51,7 @@ export async function requestSubscription(
         ...(typeof options?.alerts === "boolean" ? { alerts: options.alerts } : {}),
         ...(typeof options?.weekly === "boolean" ? { weekly: options.weekly } : {}),
         ...(options?.planLines ? { planLines: options.planLines } : {}),
+        ...(options?.planLines && options.runwayBand ? { runwayBand: options.runwayBand } : {}),
       }),
     });
     const data: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);

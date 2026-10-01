@@ -105,13 +105,19 @@ month, and what comes in.
 2. Read the cards in dates and dollars: the month cash runs out at today's net burn, when to start
    the raise, the burn adjustment as dollars a month and the runway it buys, and, below the safe
    band, how much more cash or what net burn closes the gap.
-3. Before a hire or a contract, test it against the same figures. **Test it against your runway**
-   (under "What are you deciding?" on a first visit to `/`) takes the decision's monthly cost and
-   gives the runway after it, with the note this week's guidance carries at that runway. The plan
-   stress test on `/operate` takes a pasted plan and sizes it against your cash.
-4. Copy the block or the **Budget memo** (both carry the dated lines) into the investor update or
-   board pre-read. The planner's link carries the figures, so a co-founder or investor opens the
-   same plan. The figures otherwise stay in the browser.
+3. Agree your own runway lines while nothing is urgent: under **Your own runway lines**, the months of
+   runway at which you start raising and pause hiring. Each gets the month it arrives at today's
+   net burn.
+4. Before a hire or a contract, test it against the same figures. **Test a decision against your
+   runway** (under the area table in "What it changes" on `/`, or "What are you deciding?" on a
+   first visit) takes the decision's monthly cost and gives the runway after it, with the note this
+   week's guidance carries at that runway. The plan stress test on `/operate` takes a pasted plan
+   and sizes it against your cash.
+5. Copy the block or the **Budget memo** (both carry the dated lines and your own lines) into the
+   investor update or board pre-read. The planner's link carries the figures and the lines, so a
+   co-founder or investor opens the same plan. The figures otherwise stay in the browser.
+6. Under **Set this plan's lines** on `/operate`, leave "Say what a crossing means at my runway"
+   ticked: the email the day a market line is crossed then says what it means at your runway band.
 
 ### Exemplary FP&A Rule
 - **Baseline Rule:** If **BBB Spreads $\ge 2.20\%$** or **Cash Availability Index $\le 45$**, capital markets are pricing significant credit distress.

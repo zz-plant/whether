@@ -111,6 +111,19 @@ describe("runway planner", () => {
   });
 });
 
+describe("runway planner burn multiple", () => {
+  it("never scores a company with some revenue as riskier than the same company with none", () => {
+    const plan = (revenue: number) =>
+      buildRunwayPlan({ runway: 20, burn: 150_000, revenue, growthRate: 10, sector: "b2b-saas", stage: "series-a", regime: "EXPANSION", posture: "RISK_ON" });
+    const none = plan(0).runwayRisk.score;
+    for (const revenue of [1_000, 10_000, 20_000, 37_500]) {
+      assert.ok(plan(revenue).runwayRisk.score <= none, `$${revenue} of revenue scored above $0`);
+    }
+    // The case that read "start the raise now" at 20 months of runway.
+    assert.equal(plan(20_000).raiseTimingWindow.startMonth, 2);
+  });
+});
+
 describe("runway planner in dates and dollars", () => {
   const now = new Date("2026-10-01T12:00:00Z");
   const request = {
@@ -155,6 +168,25 @@ describe("runway planner in dates and dollars", () => {
     const coveredNumbers = describeRunwayPlanInYourNumbers(coveredPlan, covered, now);
     assert.equal(coveredNumbers.runsOut, null);
     assert.equal(coveredNumbers.floorGap, null);
+  });
+
+  it("dates the company's own runway lines, and says when one is already here", () => {
+    const own = describeRunwayPlanInYourNumbers(plan, request, now, { raiseAtRunwayMonths: 6, hiringPauseAtRunwayMonths: 12 });
+    // 10 months now, falling a month a month: 6 months arrives 4 months out.
+    assert.deepEqual(own.ownLines, [
+      "Start raising at 6 months of runway: around Jan 2027.",
+      "Pause hiring at 12 months of runway: that line is here now, with 10 months left.",
+    ]);
+    assert.deepEqual(numbers.ownLines, [], "no lines set, none printed");
+    assert.match(formatRunwayPlanCompactBlock(plan, own), /Our own runway lines:\n• Start raising at 6 months of runway: around Jan 2027\./);
+
+    const covered = { ...request, revenue: 300_000 };
+    const coveredPlan = buildRunwayPlan({ ...covered, regime: "DEFENSIVE", posture: "SAFETY_MODE" });
+    assert.deepEqual(
+      describeRunwayPlanInYourNumbers(coveredPlan, covered, now, { raiseAtRunwayMonths: 6 }).ownLines,
+      [],
+      "with nothing spent down, a runway line never arrives",
+    );
   });
 
   it("adds the dated lines to the copy block only when it has them", () => {

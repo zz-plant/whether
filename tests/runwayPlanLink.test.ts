@@ -103,6 +103,15 @@ describe("shared runway plan link", () => {
     assert.equal(resolveSharedRunwayProfile(storedCash, { monthlyRevenueUsd: 5 }).cashUsd, 900_000);
   });
 
+  it("carries the company's own runway lines, so the people it is sent to see the lines agreed", () => {
+    const query = buildSharedRunwayPlanQuery({ ...EMPTY_OPERATOR_PROFILE, raiseAtRunwayMonths: 12, hiringPauseAtRunwayMonths: 9 }, null);
+    assert.equal(query, "raiseAt=12&hirePauseAt=9");
+    const read = readSharedRunwayPlan(new URLSearchParams(query)).profile;
+    assert.equal(read.raiseAtRunwayMonths, 12);
+    assert.equal(read.hiringPauseAtRunwayMonths, 9);
+    assert.equal(readSharedRunwayPlan(new URLSearchParams("raiseAt=0")).profile.raiseAtRunwayMonths, undefined);
+  });
+
   it("carries cash as a short param and round-trips it", () => {
     const query = buildSharedRunwayPlanQuery({ ...EMPTY_OPERATOR_PROFILE, cashUsd: 2_100_000 }, null);
     assert.equal(query, "cash=2100000");

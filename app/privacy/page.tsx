@@ -89,7 +89,9 @@ export default function PrivacyPage() {
               its line, or an outsized move in a market input), whether you want the Monday brief itself,
               the pause and resume lines you set for your own plan on the planning page, if you set any
               (numbers on the two scores, for each area you chose, held unconfirmed until you click the
-              link), a random token for the unsubscribe link, and, while a request is waiting for you, a
+              link), the runway band you had chosen when you set those lines and the date, if you left that
+              box ticked (one of four bands such as 12–24 months, never a cash or runway figure; replaced or
+              cleared with the lines), a random token for the unsubscribe link, and, while a request is waiting for you, a
               separate one-time code for its confirmation link. It is held in Cloudflare KV and used to send
               you those emails and nothing else. Nothing is sent until you confirm, and any later request for
               your address — turning alerts or the Monday brief on or off, setting plan lines, or subscribing

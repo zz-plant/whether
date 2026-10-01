@@ -22,7 +22,9 @@ export type OperatorProfileNumberKey =
   | "monthlyBurnUsd"
   | "monthlyRevenueUsd"
   | "monthlyGrowthPct"
-  | "grossMarginPct";
+  | "grossMarginPct"
+  | "raiseAtRunwayMonths"
+  | "hiringPauseAtRunwayMonths";
 
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
@@ -41,6 +43,14 @@ export type OperatorProfile = {
   monthlyGrowthPct?: number;
   /** Gross margin percentage (0 to 100). */
   grossMarginPct?: number;
+  /**
+   * The company's own lines on its own runway, agreed before they are needed:
+   * start raising when runway reaches this many months, and pause hiring at
+   * this many. The planner says the month each arrives at today's net burn.
+   * They are the company's, beside the published lines, never in place of them.
+   */
+  raiseAtRunwayMonths?: number;
+  hiringPauseAtRunwayMonths?: number;
   sector?: PlannerSector;
   updatedAt?: string;
 };
@@ -55,6 +65,8 @@ export const OPERATOR_PROFILE_LIMITS: Record<OperatorProfileNumberKey, { min: nu
   monthlyRevenueUsd: { min: 0, max: 1e10 },
   monthlyGrowthPct: { min: -100, max: 300 },
   grossMarginPct: { min: 0, max: 100 },
+  raiseAtRunwayMonths: { min: 1, max: 60 },
+  hiringPauseAtRunwayMonths: { min: 1, max: 60 },
 };
 
 const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
@@ -64,6 +76,8 @@ const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
   "monthlyRevenueUsd",
   "monthlyGrowthPct",
   "grossMarginPct",
+  "raiseAtRunwayMonths",
+  "hiringPauseAtRunwayMonths",
 ];
 
 const PLANNER_SECTORS: ReadonlySet<string> = new Set(["b2b-saas", "consumer", "infrastructure"]);
