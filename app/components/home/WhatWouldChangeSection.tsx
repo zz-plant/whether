@@ -102,7 +102,7 @@ export function WhatWouldChangeSection({
             riskAppetiteThreshold={callChangeLines.riskAppetite}
             currentRegime={activeRegime}
             pointsToPause={pointsToPause}
-            className="shrink-0"
+            className="w-full max-w-[240px] mx-auto md:mx-0 shrink-0"
           />
           <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
             {ladders.map((ladder) => (
