@@ -226,3 +226,23 @@ describe("MonthStrip", () => {
     assert.match(visible, /Sunny\s+2 months/, "the legend names each colour and its months");
   });
 });
+
+describe("BriefFormatPicker preview framing", () => {
+  it("renders a channel format header bar with readiness indicator", () => {
+    const { BriefFormatPicker } = require("../app/components/briefFormatPicker");
+    const { BRIEF_FORMATS } = require("../lib/report/briefArtifact");
+    const html = renderToStaticMarkup(
+      <BriefFormatPicker
+        format="slack"
+        activeFormat={BRIEF_FORMATS[0]}
+        briefText="*Whether Weekly Brief*"
+        copiedTarget={null}
+        onSelect={() => {}}
+        onCopy={() => {}}
+      />,
+    );
+    assert.match(html, /Slack format/);
+    assert.match(html, /Ready to paste/);
+    assert.match(html, /<pre[^>]*>\*Whether Weekly Brief\*<\/pre>/);
+  });
+});

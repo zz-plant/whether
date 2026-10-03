@@ -84,7 +84,7 @@ export function DecisionHero({
     >
       <div className="relative z-10 min-w-0 space-y-2.5">
         {/* The regime stamp and its meaning, grouped on the eyebrow line so the eye path flows directly into the call. */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <span
             className="inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
             style={{
@@ -104,9 +104,9 @@ export function DecisionHero({
           </span>
 
           {regimeKey ? (
-            <p className="text-xs leading-relaxed text-slate-400">
+            <span className="text-xs leading-relaxed text-slate-400">
               {REGIME_WEATHER_RATIONALES[regimeKey]}
-            </p>
+            </span>
           ) : null}
         </div>
 
@@ -123,7 +123,9 @@ export function DecisionHero({
         </TitleTag>
 
         {detail ? (
-          <p className="max-w-xl text-sm leading-relaxed text-slate-300">{detail}</p>
+          <div className="max-w-xl border-l-2 border-slate-700/80 pl-3 py-0.5">
+            <p className="text-sm leading-relaxed text-slate-300">{detail}</p>
+          </div>
         ) : null}
 
         {/* Freshness and confidence, once, where every reading route puts them:

@@ -110,81 +110,85 @@ export function WhatChangedSection({
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-sm:p-0">
-                  <span className="text-sm font-semibold text-slate-100">{row.label}</span>
-                  {row.key === "tightness" ? (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Governs:{" "}
-                      <a href="#area-hiring" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Hiring</a>,{" "}
-                      <a href="#area-burn-discipline" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Spending</a>,{" "}
-                      <a href="#area-capital-raising" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
-                    </span>
-                  ) : row.key === "riskAppetite" ? (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Governs:{" "}
-                      <a href="#area-product-tempo" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Roadmap</a>,{" "}
-                      <a href="#area-expansion-bets" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">New bets</a>,{" "}
-                      <a href="#area-capital-raising" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
-                    </span>
-                  ) : row.key === "baseRate" ? (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
-                    </span>
-                  ) : row.key === "curveSlope" ? (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>
-                    </span>
-                  ) : null}
-                  {/* Which end of the scale is which. A composite score is the one
-                      number on this page with no unit, and a first-time reader has
-                      no way to tell 0 from 100 without it. */}
-                  {row.scaleLabel || isCompositeSignalKey(row.key) ? (
-                    <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-fluid-nano font-normal text-slate-400">
-                      {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
-                      {row.scaleLabel && isCompositeSignalKey(row.key) ? (
-                        <span aria-hidden="true" className="text-slate-600">·</span>
-                      ) : null}
-                      {isCompositeSignalKey(row.key) ? (
-                        <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
-                      ) : null}
-                    </div>
-                  ) : null}
-                  {/* What the score means at the level it is actually at. The
-                      band label above says where it sits; this says what that
-                      is like to operate in. */}
-                  {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
-                    <PlainEnglishScoreNote
-                      signalKey={row.key}
-                      score={row.value}
-                      className="mt-1 whitespace-normal font-normal text-slate-300/80"
-                    />
-                  ) : null}
-                  {/* Which inputs took the score from the earlier reading to
-                      this one. The chip says how far it went; without this a
-                      27-point move reads as the market having moved 27 points,
-                      when part of a score's move can be an input the earlier
-                      score never had. */}
-                  {row.movement ? (
-                    <p
-                      className="mt-1 whitespace-normal text-pretty text-fluid-nano font-normal leading-5 text-slate-400"
-                      data-movement={row.key}
-                    >
-                      <span className="font-medium text-slate-300">What moved it: </span>
-                      {row.movement}
-                    </p>
-                  ) : null}
+                  <div className="space-y-1">
+                    <span className="text-sm font-semibold text-slate-100">{row.label}</span>
+                    {row.key === "tightness" ? (
+                      <span className="block text-fluid-nano font-normal text-slate-400">
+                        Governs:{" "}
+                        <a href="#area-hiring" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Hiring</a>,{" "}
+                        <a href="#area-burn-discipline" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Spending</a>,{" "}
+                        <a href="#area-capital-raising" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
+                      </span>
+                    ) : row.key === "riskAppetite" ? (
+                      <span className="block text-fluid-nano font-normal text-slate-400">
+                        Governs:{" "}
+                        <a href="#area-product-tempo" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Roadmap</a>,{" "}
+                        <a href="#area-expansion-bets" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">New bets</a>,{" "}
+                        <a href="#area-capital-raising" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
+                      </span>
+                    ) : row.key === "baseRate" ? (
+                      <span className="block text-fluid-nano font-normal text-slate-400">
+                        Feeds into <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
+                      </span>
+                    ) : row.key === "curveSlope" ? (
+                      <span className="block text-fluid-nano font-normal text-slate-400">
+                        Feeds into <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>
+                      </span>
+                    ) : null}
+                    {/* Which end of the scale is which. A composite score is the one
+                        number on this page with no unit, and a first-time reader has
+                        no way to tell 0 from 100 without it. */}
+                    {row.scaleLabel || isCompositeSignalKey(row.key) ? (
+                      <div className="flex flex-wrap items-center gap-x-1.5 text-fluid-nano font-normal text-slate-400">
+                        {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
+                        {row.scaleLabel && isCompositeSignalKey(row.key) ? (
+                          <span aria-hidden="true" className="text-slate-600">·</span>
+                        ) : null}
+                        {isCompositeSignalKey(row.key) ? (
+                          <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {/* What the score means at the level it is actually at. The
+                        band label above says where it sits; this says what that
+                        is like to operate in. */}
+                    {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
+                      <PlainEnglishScoreNote
+                        signalKey={row.key}
+                        score={row.value}
+                        className="whitespace-normal font-normal text-slate-300/80"
+                      />
+                    ) : null}
+                    {/* Which inputs took the score from the earlier reading to
+                        this one. The chip says how far it went; without this a
+                        27-point move reads as the market having moved 27 points,
+                        when part of a score's move can be an input the earlier
+                        score never had. */}
+                    {row.movement ? (
+                      <div
+                        className="mt-1 rounded-md border border-slate-800/80 bg-slate-900/40 p-2 text-fluid-nano font-normal leading-relaxed text-slate-300"
+                        data-movement={row.key}
+                      >
+                        <span className="font-semibold text-slate-200">What moved it: </span>
+                        {row.movement}
+                      </div>
+                    ) : null}
+                  </div>
                 </th>
-                <td className="whitespace-nowrap py-2.5 pr-3 text-xs max-sm:p-0">
-                  {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
-                  {row.saturatedPressure !== undefined ? (
-                    /* A clipped score cannot move, so the chip reads flat at the
-                       moment conditions are most extreme. Say it. The raw
-                       pressure is what is missing from a score that has
-                       stopped being able to report a move. */
-                    <span className="mt-1 block max-w-[18rem] whitespace-normal text-amber-300/80">
-                      Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
-                      {" "}It would read {row.saturatedPressure.toFixed(0)}.
-                    </span>
-                  ) : null}
+                <td className="whitespace-nowrap py-2.5 pr-3 text-xs align-top max-sm:p-0">
+                  <div className="flex flex-col gap-1">
+                    {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
+                    {row.saturatedPressure !== undefined ? (
+                      /* A clipped score cannot move, so the chip reads flat at the
+                         moment conditions are most extreme. Say it. The raw
+                         pressure is what is missing from a score that has
+                         stopped being able to report a move. */
+                      <span className="mt-1 block max-w-[18rem] whitespace-normal text-amber-300/80">
+                        Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
+                        {" "}It would read {row.saturatedPressure.toFixed(0)}.
+                      </span>
+                    ) : null}
+                  </div>
                 </td>
                 <td className="py-2.5 max-sm:col-span-2 max-sm:p-0 sm:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (

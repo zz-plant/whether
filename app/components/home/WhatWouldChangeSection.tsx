@@ -128,36 +128,41 @@ export function WhatWouldChangeSection({
         </div>
       ) : null}
 
-      <dl className="space-y-1.5 text-fluid-xs">
-        {/* The sentences print only where no ladder could be drawn for them;
-            otherwise the ladders carry the numbers and the sentences would
-            restate them. The regime line is the exception: the call itself
-            changes there, which is a different claim from a rule tripping. */}
-        {guardrail && ladders.length === 0 ? (
-          <div className="flex gap-2">
-            <dt className="shrink-0 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
-            <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
-          </div>
-        ) : null}
-        {reversalTrigger ? (
-          <div className="flex gap-2">
-            <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</dt>
-            <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
-          </div>
-        ) : null}
-        {resumeWhen ? (
-          <div className="flex gap-2">
-            <dt className="shrink-0 font-medium text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</dt>
-            <dd className="text-slate-300"><BoundedValue>{resumeWhen}</BoundedValue></dd>
-          </div>
-        ) : null}
-        {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
-          <div className="flex gap-2">
-            <dt className="shrink-0 font-medium text-slate-400">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}:</dt>
-            <dd className="text-slate-300"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
-          </div>
-        ) : null}
-      </dl>
+      {(guardrail && ladders.length === 0) || reversalTrigger || resumeWhen || (flipConditions && flipConditions.length > 0 && ladders.length === 0) ? (
+        <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3.5 sm:p-4">
+          <p className="type-eyebrow mb-2.5">Operating boundary rules</p>
+          <dl className="grid gap-3 sm:grid-cols-2 text-fluid-xs">
+            {/* The sentences print only where no ladder could be drawn for them;
+                otherwise the ladders carry the numbers and the sentences would
+                restate them. The regime line is the exception: the call itself
+                changes there, which is a different claim from a rule tripping. */}
+            {guardrail && ladders.length === 0 ? (
+              <div className="flex flex-col gap-1 border-l-2 border-amber-400/80 pl-2.5">
+                <dt className="font-semibold text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
+                <dd className="text-slate-200"><BoundedValue>{guardrail}</BoundedValue></dd>
+              </div>
+            ) : null}
+            {reversalTrigger ? (
+              <div className="flex flex-col gap-1 border-l-2 border-violet-400/80 pl-2.5">
+                <dt className="font-semibold text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</dt>
+                <dd className="text-slate-200"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
+              </div>
+            ) : null}
+            {resumeWhen ? (
+              <div className="flex flex-col gap-1 border-l-2 border-sky-400/80 pl-2.5">
+                <dt className="font-semibold text-semantic-reversal-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</dt>
+                <dd className="text-slate-200"><BoundedValue>{resumeWhen}</BoundedValue></dd>
+              </div>
+            ) : null}
+            {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
+              <div className="flex flex-col gap-1 border-l-2 border-slate-700 pl-2.5 sm:col-span-2">
+                <dt className="font-semibold text-slate-400">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}:</dt>
+                <dd className="text-slate-200"><BoundedValue>{flipConditions.join(" · ")}</BoundedValue></dd>
+              </div>
+            ) : null}
+          </dl>
+        </div>
+      ) : null}
 
       {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
     </HomeSection>
