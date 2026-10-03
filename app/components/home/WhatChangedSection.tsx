@@ -97,11 +97,43 @@ export function WhatChangedSection({
             {rows.map((row) => (
               <tr
                 key={row.key}
+                id={
+                  row.key === "tightness"
+                    ? "signal-funding-pressure"
+                    : row.key === "riskAppetite"
+                      ? "signal-risk-appetite"
+                      : row.key === "baseRate"
+                        ? "signal-base-rate"
+                        : "signal-curve-slope"
+                }
                 className="border-b border-slate-800/50 align-top max-sm:grid max-sm:grid-cols-[1fr_auto] max-sm:gap-x-3 max-sm:gap-y-2 max-sm:py-3"
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-sm:p-0">
                   <span className="text-sm font-semibold text-slate-100">{row.label}</span>
+                  {row.key === "tightness" ? (
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Governs:{" "}
+                      <a href="#area-hiring" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Hiring</a>,{" "}
+                      <a href="#area-burn-discipline" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Spending</a>,{" "}
+                      <a href="#area-capital-raising" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
+                    </span>
+                  ) : row.key === "riskAppetite" ? (
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Governs:{" "}
+                      <a href="#area-product-tempo" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Roadmap</a>,{" "}
+                      <a href="#area-expansion-bets" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">New bets</a>,{" "}
+                      <a href="#area-capital-raising" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
+                    </span>
+                  ) : row.key === "baseRate" ? (
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Feeds into <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
+                    </span>
+                  ) : row.key === "curveSlope" ? (
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Feeds into <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>
+                    </span>
+                  ) : null}
                   {/* Which end of the scale is which. A composite score is the one
                       number on this page with no unit, and a first-time reader has
                       no way to tell 0 from 100 without it. */}

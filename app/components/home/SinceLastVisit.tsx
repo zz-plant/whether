@@ -109,6 +109,7 @@ export function SinceLastVisit({
   current,
   flipProximitySentence,
   boardDeckHref,
+  linesCrossedLead,
   fallback = null,
 }: {
   current: SeenCall;
@@ -116,6 +117,8 @@ export function SinceLastVisit({
   flipProximitySentence?: string;
   /** One-click board deck download for the lapsed return path. */
   boardDeckHref?: string;
+  /** The lead sentence describing whether any operating lines were crossed. */
+  linesCrossedLead?: string;
   /** What a reader with nothing to compare against sees in this slot instead. */
   fallback?: ReactNode;
 }) {
@@ -168,6 +171,9 @@ export function SinceLastVisit({
         {callChanged ? (
           <span className="block text-white/60">Then: “{previous.call}”</span>
         ) : null}
+        {linesCrossedLead ? (
+          <span className="block pt-0.5 text-fluid-nano text-slate-300">{linesCrossedLead}</span>
+        ) : null}
       </div>
       {dismissButton}
     </div>
@@ -191,6 +197,7 @@ export function SinceLastVisit({
       <p className="text-fluid-xs leading-5 text-white/60">
         {callChanged ? <>Then: “{previous.call}” · Now: “{current.call}”</> : <>The guidance holds: “{current.call}”</>}
         {flipProximitySentence ? <span className="block text-sky-200/80">{flipProximitySentence}</span> : null}
+        {linesCrossedLead ? <span className="block text-slate-300">{linesCrossedLead}</span> : null}
       </p>
       {boardDeckHref ? (
         <a

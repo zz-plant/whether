@@ -583,6 +583,7 @@ async function PageContent({
                   }}
                   flipProximitySentence={v2HeroSignalData.flipProximity[0]}
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
+                  linesCrossedLead={movementSentence}
                 />
               ) : null}
               {/* The reader's own decisions against this week's reading, for a browser
@@ -641,6 +642,8 @@ async function PageContent({
               runwayEmphasis={runwayEmphasis}
               planHref={isRoute(operateHref) ? operateHref : "/operate"}
               isHistorical={Boolean(historicalSelection)}
+              actionStripItems={homepage.weeklyDecisionCardModel.decision.actionStripItems}
+              scores={{ tightness, riskAppetite }}
             />
 
             {/* 4. What would change the call: the two ladders with their three
@@ -658,6 +661,7 @@ async function PageContent({
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
               basis={basis}
+              regime={regime}
             />
 
             {/* 5. Do and share, including the one conversion on the page. */}

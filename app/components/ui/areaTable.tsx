@@ -55,15 +55,43 @@ const CellLabel = ({ children, className = "" }: { children: ReactNode; classNam
   <span className={`mb-0.5 block text-[11px] font-medium sm:hidden ${className}`.trim()}>{children}</span>
 );
 
-const LineCell = ({ value }: { value?: { line: ReactNode; distance?: ReactNode } }) =>
-  value ? (
+const LineCell = ({
+  value,
+  kind,
+}: {
+  value?: { line: ReactNode; distance?: ReactNode };
+  kind?: "pause" | "resume";
+}) => {
+  if (!value) return <span className="text-slate-500">—</span>;
+
+  const distanceText = typeof value.distance === "string" ? value.distance : "";
+  const isCrossed =
+    distanceText.includes("already applies") ||
+    distanceText.includes("at the line") ||
+    distanceText.includes("already met") ||
+    distanceText.includes("crossed");
+  const isNear =
+    !isCrossed &&
+    Boolean(distanceText.match(/\b([0-4](\.\d+)?|5(\.0+)?)\s+pts\b/));
+
+  const distanceClass =
+    kind === "pause" && isCrossed
+      ? "text-rose-300 font-medium"
+      : kind === "pause" && isNear
+        ? "text-amber-300 font-medium"
+        : kind === "resume" && isCrossed
+          ? "text-emerald-300 font-medium"
+          : "text-slate-400";
+
+  return (
     <>
       {value.line}
-      {value.distance ? <span className="block text-xs text-slate-400">{value.distance}</span> : null}
+      {value.distance ? (
+        <span className={`block text-xs ${distanceClass}`.trim()}>{value.distance}</span>
+      ) : null}
     </>
-  ) : (
-    <span className="text-slate-500">—</span>
   );
+};
 
 /**
  * A table from sm up. Below it the four columns do not fit a phone — the
@@ -98,6 +126,7 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
           {ordered.map((row) => (
             <tr
               key={row.area}
+              id={`area-${row.area}`}
               className="border-b border-slate-800/50 align-top max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-4 max-sm:gap-y-2 max-sm:py-3"
               data-area={row.area}
             >
@@ -109,6 +138,15 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 ) : (
                   decisionAreaLabel(row.area)
                 )}
+                <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                  {row.area === "hiring" || row.area === "burn-discipline" ? (
+                    <>Line set by <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a></>
+                  ) : row.area === "product-tempo" || row.area === "expansion-bets" ? (
+                    <>Line set by <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
+                  ) : row.area === "capital-raising" ? (
+                    <>Lines set by <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> &amp; <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
+                  ) : null}
+                </span>
               </th>
               <td className="py-2.5 pr-3 text-slate-200 max-sm:col-span-2 max-sm:p-0">
                 {row.rule}
@@ -116,11 +154,11 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
               </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-sm:p-0">
                 <CellLabel className="text-semantic-caution-fg">Pause line</CellLabel>
-                <LineCell value={row.pause} />
+                <LineCell value={row.pause} kind="pause" />
               </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-sm:p-0">
                 <CellLabel className="text-semantic-easing-fg">Resume line</CellLabel>
-                <LineCell value={row.resume} />
+                <LineCell value={row.resume} kind="resume" />
               </td>
               {showChanged ? (
                 <td className={`py-2.5 pr-3 text-slate-300 max-sm:col-span-2 max-sm:p-0 ${row.changed ? "" : "max-sm:hidden"}`.trim()}>

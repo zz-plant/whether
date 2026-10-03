@@ -11,6 +11,8 @@ import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRule
 import type { RunwayBand } from "../../../lib/report/operatorRunway";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import type { Route } from "../../../lib/navigation/routeType";
+import type { ActionStripItem } from "../../../lib/report/operatingCalls";
+import { BoundedCorridorRails } from "../boundedCorridorRails";
 
 /**
  * Consequence, by area: the five areas in their fixed order, each with this
@@ -28,6 +30,8 @@ export function WhatItChangesSection({
   runwayEmphasis,
   planHref,
   isHistorical,
+  actionStripItems,
+  scores,
 }: {
   rows: readonly HomeAreaRow[];
   regime: RegimeKey;
@@ -38,6 +42,8 @@ export function WhatItChangesSection({
   planHref: Route;
   /** Live briefs only carry the operator's runway: it dates a company's cash position to today. */
   isHistorical: boolean;
+  actionStripItems?: readonly Pick<ActionStripItem, "pauseConditions" | "resumeConditions">[];
+  scores?: { tightness: number; riskAppetite: number };
 }) {
   const tableRows: AreaRowData[] = rows.map((row) => ({
     area: row.area,
@@ -71,6 +77,11 @@ export function WhatItChangesSection({
         <StagePersonaSelector activeStage={activeStage} />
         <RunwayPersonaSelector activeRunway={activeRunway} />
       </div>
+      {actionStripItems && actionStripItems.length > 0 ? (
+        <div className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-3.5">
+          <BoundedCorridorRails items={actionStripItems} scores={scores} />
+        </div>
+      ) : null}
       {runwayEmphasis ? (
         <p data-testid="runway-emphasis" className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90">
           <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />

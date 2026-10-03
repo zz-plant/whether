@@ -25,19 +25,36 @@ export function RecordNote({ view }: { view: DecisionRecordView }) {
   if (view.rows.length === 0) return null;
   const needsAttention = view.counts.watch + view.counts.reconsider > 0;
   return (
-    <p
+    <div
       data-testid="your-record-note"
       data-needs-attention={needsAttention ? "true" : "false"}
-      className={`mt-3 text-fluid-xs leading-5 ${needsAttention ? "text-amber-200/90" : "text-slate-400"}`}
+      className={`mt-3 flex flex-wrap items-center justify-between gap-2.5 rounded-lg border px-3.5 py-2 text-fluid-xs leading-5 ${
+        needsAttention
+          ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+          : "border-slate-800 bg-slate-900/40 text-slate-300"
+      }`}
     >
-      <span className="font-semibold text-slate-100">Your record:</span> {view.headline}{" "}
+      <div className="flex flex-wrap items-center gap-2">
+        {view.counts.reconsider > 0 ? (
+          <span className="inline-flex items-center rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-300 border border-rose-500/30">
+            Reconsider ({view.counts.reconsider})
+          </span>
+        ) : view.counts.watch > 0 ? (
+          <span className="inline-flex items-center rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-amber-500/30">
+            Watch ({view.counts.watch})
+          </span>
+        ) : null}
+        <span>
+          <span className="font-semibold text-slate-100">Your record:</span> {view.headline}
+        </span>
+      </div>
       <Link
         href="/decisions"
-        className="whitespace-nowrap text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
+        className="shrink-0 whitespace-nowrap text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
       >
         See your decision record
       </Link>
-    </p>
+    </div>
   );
 }
 

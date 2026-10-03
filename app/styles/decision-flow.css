@@ -13,6 +13,13 @@
   transform: translateY(-1px);
 }
 
+/* Connected causal anchor target highlighting */
+tr:target {
+  background-color: rgba(56, 189, 248, 0.08);
+  outline: 1px solid rgba(56, 189, 248, 0.35);
+  transition: background-color 300ms ease, outline 300ms ease;
+}
+
 .weather-step-panel {
   animation: weather-panel-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

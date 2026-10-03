@@ -7,6 +7,9 @@ import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/hom
 import type { ThresholdBusinessConsequence } from "../../../lib/report/operatingCalls";
 import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
+import { RegimeRadar } from "./RegimeRadar";
+import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
+import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
 
 type HomeScoreLadder = {
   metric: "tightness" | "riskAppetite";
@@ -39,6 +42,7 @@ export function WhatWouldChangeSection({
   lastTime,
   callChangeLines,
   basis = comparisonBasis(),
+  regime,
 }: {
   ladders: readonly HomeScoreLadder[];
   flipProximity: readonly FlipProximityLine[];
@@ -52,6 +56,7 @@ export function WhatWouldChangeSection({
   callChangeLines: { tightness: number; riskAppetite: number };
   /** The earlier reading the hollow dot is drawn from; "last week" when the week does not date it. */
   basis?: ComparisonBasis;
+  regime?: string;
 }) {
   const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
   const counterColor = typeof pointsToPause === "number" && pointsToPause <= 10
@@ -67,6 +72,18 @@ export function WhatWouldChangeSection({
     </span>
   ) : undefined;
 
+  const tightnessLadder = ladders.find((ladder) => ladder.metric === "tightness");
+  const riskAppetiteLadder = ladders.find((ladder) => ladder.metric === "riskAppetite");
+  const tightnessVal = tightnessLadder?.value ?? 50;
+  const riskAppetiteVal = riskAppetiteLadder?.value ?? 50;
+  const activeRegime =
+    regime ??
+    regimeAtCoordinates(tightnessVal, riskAppetiteVal, {
+      ...DEFAULT_THRESHOLDS,
+      tightnessRegime: callChangeLines.tightness,
+      riskAppetiteRegime: callChangeLines.riskAppetite,
+    });
+
   return (
     <HomeSection
       id={HOME_SECTIONS.watch.id}
@@ -75,26 +92,39 @@ export function WhatWouldChangeSection({
       className="order-4"
     >
       {ladders.length > 0 ? (
-        <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-          {ladders.map((ladder) => (
-            <div key={ladder.metric} className="min-w-0 space-y-1.5" data-ladder={ladder.metric}>
-              <ScoreLadder
-                label={ladder.label}
-                value={ladder.value}
-                previous={ladder.previous}
-                previousLabel={basis.label}
-                lines={ladder.lines}
-              />
-              {/* The market move that crosses the line, in the market's units:
-                  the ladder says how far the score sits; this says what has to
-                  happen on the curve or the bill for that line to be crossed. */}
-              {flipProximity
-                .filter((line) => line.axis === ladder.metric)
-                .map((line) => (
-                  <p key={line.sentence} className="text-fluid-xs leading-5 text-slate-300">{line.sentence}</p>
-                ))}
-            </div>
-          ))}
+        <div className="grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-start">
+          <RegimeRadar
+            tightness={tightnessVal}
+            riskAppetite={riskAppetiteVal}
+            previousTightness={tightnessLadder?.previous}
+            previousRiskAppetite={riskAppetiteLadder?.previous}
+            tightnessThreshold={callChangeLines.tightness}
+            riskAppetiteThreshold={callChangeLines.riskAppetite}
+            currentRegime={activeRegime}
+            pointsToPause={pointsToPause}
+            className="shrink-0"
+          />
+          <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+            {ladders.map((ladder) => (
+              <div key={ladder.metric} className="min-w-0 space-y-1.5" data-ladder={ladder.metric}>
+                <ScoreLadder
+                  label={ladder.label}
+                  value={ladder.value}
+                  previous={ladder.previous}
+                  previousLabel={basis.label}
+                  lines={ladder.lines}
+                />
+                {/* The market move that crosses the line, in the market's units:
+                    the ladder says how far the score sits; this says what has to
+                    happen on the curve or the bill for that line to be crossed. */}
+                {flipProximity
+                  .filter((line) => line.axis === ladder.metric)
+                  .map((line) => (
+                    <p key={line.sentence} className="text-fluid-xs leading-5 text-slate-300">{line.sentence}</p>
+                  ))}
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
 
