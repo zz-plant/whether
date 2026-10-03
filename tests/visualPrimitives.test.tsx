@@ -246,3 +246,76 @@ describe("BriefFormatPicker preview framing", () => {
     assert.match(html, /<pre[^>]*>\*Whether Weekly Brief\*<\/pre>/);
   });
 });
+
+describe("Wayfinding shortcuts and deep-links", () => {
+  it("links signal rows on homepage to evidence anchors on /signals", () => {
+    const { WhatChangedSection } = require("../app/components/home/WhatChangedSection");
+    const html = renderToStaticMarkup(
+      <WhatChangedSection
+        rows={[
+          {
+            key: "tightness",
+            label: "Funding pressure",
+            previous: 68,
+            value: 72,
+            delta: 4,
+            previousLabel: "68",
+            valueLabel: "72",
+            increaseIsPositive: false,
+          },
+        ]}
+        lead="Funding pressure rose this week."
+        comparisonUnavailable={false}
+      />,
+    );
+    assert.match(html, /href="\/signals#tightness"/);
+    assert.match(html, /Funding pressure/);
+  });
+
+  it("provides a direct jump to #subscribe from operating boundary rules", () => {
+    const { WhatWouldChangeSection } = require("../app/components/home/WhatWouldChangeSection");
+    const html = renderToStaticMarkup(
+      <WhatWouldChangeSection
+        ladders={[]}
+        flipProximity={[]}
+        reversalTrigger="Risk appetite crossing 50"
+        callChangeLines={{ tightness: 70, riskAppetite: 50 }}
+      />,
+    );
+    assert.match(html, /href="#subscribe"/);
+    assert.match(html, /Get notified when lines cross/);
+  });
+
+  it("exposes decision record discovery in DoAndShareSection action links", () => {
+    const { DoAndShareSection } = require("../app/components/home/DoAndShareSection");
+    const html = renderToStaticMarkup(
+      <DoAndShareSection
+        operateHref="/operate"
+        currentRecordDate="2026-09-28"
+      />,
+    );
+    assert.match(html, /href="\/decisions"/);
+    assert.match(html, /Track your decision record/);
+  });
+
+  it("deep-links AreaTable consequence rows to #ops-monthly-action-summary on /operate", () => {
+    const { toRoute } = require("../lib/navigation/routeType");
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[
+          {
+            area: "hiring",
+            rule: "Backfills only.",
+            pause: { line: "Funding pressure > 76", distance: "4 pts to line" },
+            resume: { line: "Risk appetite > 54", distance: "6 pts to line" },
+            changed: null,
+            href: toRoute("/operate#ops-monthly-action-summary"),
+          },
+        ]}
+      />,
+    );
+    assert.match(html, /href="\/operate#ops-monthly-action-summary"/);
+  });
+});
+

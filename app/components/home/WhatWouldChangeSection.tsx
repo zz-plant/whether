@@ -130,7 +130,15 @@ export function WhatWouldChangeSection({
 
       {(guardrail && ladders.length === 0) || reversalTrigger || resumeWhen || (flipConditions && flipConditions.length > 0 && ladders.length === 0) ? (
         <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3.5 sm:p-4">
-          <p className="type-eyebrow mb-2.5">Operating boundary rules</p>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <p className="type-eyebrow">Operating boundary rules</p>
+            <a
+              href="#subscribe"
+              className="text-fluid-nano text-sky-400 hover:text-sky-300 underline decoration-sky-500/40 underline-offset-2 transition-colors"
+            >
+              Get notified when lines cross →
+            </a>
+          </div>
           <dl className="grid gap-3 sm:grid-cols-2 text-fluid-xs">
             {/* The sentences print only where no ladder could be drawn for them;
                 otherwise the ladders carry the numbers and the sentences would

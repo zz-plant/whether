@@ -11,7 +11,9 @@ import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import Link from "next/link";
 import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
+import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
@@ -176,6 +178,14 @@ export async function DecisionAnswerPageContent({
       <JsonLdScript data={faqData} />
 
       <div data-content-measurement-root={pagePath}>
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Decision Tools", href: "/resolve" },
+            { label: page.title },
+          ]}
+          className="mb-4"
+        />
         <SecondaryPageHeader
           eyebrow="Direct answer"
           title={page.title}
@@ -211,6 +221,21 @@ export async function DecisionAnswerPageContent({
             </div>
           )}
         />
+
+        {relatedPages.length > 0 ? (
+          <nav aria-label="Related operator questions" className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-slate-400 font-medium">Related:</span>
+            {relatedPages.slice(0, 3).map((related) => (
+              <Link
+                key={related.slug}
+                href={`/answers/${related.slug}`}
+                className="rounded-md border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
+              >
+                {related.title} →
+              </Link>
+            ))}
+          </nav>
+        ) : null}
 
         {/* `degraded` is assembly failing outright; a read that fell back to
             the bundled snapshot succeeds, so it said "Live" over a snapshot

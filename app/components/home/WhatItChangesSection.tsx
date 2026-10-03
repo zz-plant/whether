@@ -10,7 +10,7 @@ import { HOME_SECTIONS, type HomeAreaRow } from "../../../lib/report/home/homeSe
 import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRules";
 import type { RunwayBand } from "../../../lib/report/operatorRunway";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import type { Route } from "../../../lib/navigation/routeType";
+import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { ActionStripItem } from "../../../lib/report/operatingCalls";
 import { BoundedCorridorRails } from "../boundedCorridorRails";
 
@@ -61,7 +61,7 @@ export function WhatItChangesSection({
         }
       : undefined,
     changed: row.changed,
-    href: planHref,
+    href: toRoute(`${planHref}#ops-monthly-action-summary`),
     note: isHistorical ? undefined : <RunwayAreaNote regime={regime} area={row.area} />,
   }));
 

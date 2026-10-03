@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { ScoreLadder } from "../ui/scoreLadder";
 import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
@@ -111,7 +112,13 @@ export function WhatChangedSection({
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-sm:p-0">
                   <div className="space-y-1">
-                    <span className="text-sm font-semibold text-slate-100">{row.label}</span>
+                    <Link
+                      href={`/signals#${row.key}`}
+                      className="text-sm font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 underline-offset-2 transition-colors"
+                      title={`View ${row.label} evidence and historical charts`}
+                    >
+                      {row.label}
+                    </Link>
                     {row.key === "tightness" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
                         Governs:{" "}
