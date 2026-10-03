@@ -91,4 +91,22 @@ describe("/share current weekly artifact", () => {
       assert.match(row ?? "", new RegExp(`Copy ${decisionAreaLabel(label)} tag`), `${area}'s button is in its own row`);
     }
   });
+
+  it("provides quick destination jump links that target matching section containers", async () => {
+    const html = renderToStaticMarkup(await SharePage());
+
+    const expectedAnchors = [
+      { href: "#meeting-slack", label: "Meeting &amp; Slack formats" },
+      { href: "#tickets-kanban", label: "Tickets &amp; Kanban" },
+      { href: "#role-memos", label: "Team role memos" },
+      { href: "#image-artifacts", label: "Slide images" },
+    ];
+
+    for (const { href, label } of expectedAnchors) {
+      assert.match(html, new RegExp(`href="${href}"`));
+      assert.match(html, new RegExp(label));
+      const targetId = href.replace(/^#/, "");
+      assert.match(html, new RegExp(`id="${targetId}"`));
+    }
+  });
 });
