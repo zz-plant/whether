@@ -70,4 +70,12 @@ describe("RegimeRadar", () => {
     assert.doesNotMatch(far, /text-rose-300/);
     assert.doesNotMatch(none, /<figcaption/);
   });
+
+  it("carries accessible title tooltips for threshold boundaries and current position", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} />);
+
+    assert.match(html, /<title>Funding pressure boundary at 60<\/title>/);
+    assert.match(html, /<title>Risk appetite boundary at 45<\/title>/);
+    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+  });
 });

@@ -151,7 +151,9 @@ export function RegimeRadar({
           stroke="rgba(148, 163, 184, 0.35)"
           strokeDasharray="3 3"
           strokeWidth="1"
-        />
+        >
+          <title>{`Funding pressure boundary at ${tightnessThreshold}`}</title>
+        </line>
         <line
           x1={boundaryX}
           y1={PLOT_Y}
@@ -160,7 +162,9 @@ export function RegimeRadar({
           stroke="rgba(148, 163, 184, 0.35)"
           strokeDasharray="3 3"
           strokeWidth="1"
-        />
+        >
+          <title>{`Risk appetite boundary at ${riskAppetiteThreshold}`}</title>
+        </line>
 
         {/* Boundary outer frame */}
         <rect
@@ -224,21 +228,24 @@ export function RegimeRadar({
         ) : null}
 
         {/* Current reading marker */}
-        <circle
-          cx={currentX}
-          cy={currentY}
-          r="6.5"
-          fill="none"
-          stroke="var(--regime-accent, #38bdf8)"
-          strokeWidth="1.5"
-          strokeOpacity="0.6"
-        />
-        <circle
-          cx={currentX}
-          cy={currentY}
-          r="3.5"
-          fill="var(--regime-accent, #38bdf8)"
-        />
+        <g>
+          <title>{`Current reading: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
+          <circle
+            cx={currentX}
+            cy={currentY}
+            r="6.5"
+            fill="none"
+            stroke="var(--regime-accent, #38bdf8)"
+            strokeWidth="1.5"
+            strokeOpacity="0.6"
+          />
+          <circle
+            cx={currentX}
+            cy={currentY}
+            r="3.5"
+            fill="var(--regime-accent, #38bdf8)"
+          />
+        </g>
 
         {/* Axes guides */}
         <text

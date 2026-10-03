@@ -2321,3 +2321,12 @@ noise promoted to a claim. The published check is a direction, not a threshold. 
 `/history`, so the two cannot say different things); "unmeasured" renders nothing — a year too
 thin to grade is a gap, not a guess. `tests/calibrationDrift.test.ts` pins the real archive's
 current "stable" verdict, so the sentence and the data fail together.
+
+### 1.1.30 Visual relationship and causal navigation across weekly brief sections (2026-10-02)
+
+Visual navigation upgrades across the five homepage sections to sharpen decision transmission without adding framework bloat or novel taxonomies:
+1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines (50, 50). Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary.
+2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails. Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
+3. **High-Contrast Monday Delta & Decision Staleness Badges:** Upgraded `SinceLastVisit.tsx` to surface `linesCrossedLead` (`movementSentence`) for returning operators. Upgraded `YourRecordNote.tsx` with high-visibility badges (`Reconsider` in rose, `Watch` in amber) when an operator's active assumptions in `/decisions` have had their macro conditions breached.
+4. **Interlinked Causal Navigation & Target Highlighting:** Added anchor targets (`#signal-funding-pressure`, `#signal-risk-appetite`) and direct links from each signal to the operating areas it governs in Section 2 (`WhatChangedSection.tsx`). Added row IDs (`id="area-${row.area}"`) and reverse citation anchor links in `AreaTable.tsx`. Added CSS `:target` styling (`tr:target`) to illuminate rows when jumped to via anchor links.
+
