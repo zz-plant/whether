@@ -14,7 +14,7 @@ Additional requirements:
 - Add/update tests when changing scoring, classification, or decision behavior.
 - Validate deterministic fallback behavior for data-path changes.
 - Capture command outcomes in your PR summary.
-- `bun run review:hotspot-preflight` now runs inside `bun run check` and should be run early while developing logic changes.
+- `bun run review:hotspot-preflight` now runs inside `bun run check` and should be run early while developing logic changes. On pre-push it is scoped to the commits the push sends, so the range it reviews there is exactly what lands on the remote.
 
 ## Commit quality
 - Keep commits coherent, reviewable, and intentionally scoped.

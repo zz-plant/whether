@@ -29,4 +29,22 @@
 # wrong index. Both pass standalone and failed only here, which is the tell.
 unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX GIT_QUARANTINE_PATH GIT_REFLOG_ACTION
 
+# Scope the review preflight to what this push actually sends. Git writes one
+# "<local ref> <local sha> <remote ref> <remote sha>" line per ref to stdin; the
+# preflight reads that range as REVIEW_HOTSPOT_BASE/HEAD instead of its default
+# ("last commit plus every uncommitted edit"), which is wrong for a push on both
+# ends: it fails on other sessions' in-flight work this push does not contain,
+# and it never sees commits 2..n of a multi-commit push, which the deploy gate
+# does not re-check either — those commits were reviewed nowhere. A new branch
+# (no remote sha), a deletion (nothing sent), or a manual run keeps the default
+# range; scripts/pre-push-range.mjs prints nothing in exactly those cases.
+if [ ! -t 0 ]; then
+  push_range=$(bun scripts/pre-push-range.mjs)
+  if [ -n "$push_range" ]; then
+    REVIEW_HOTSPOT_BASE="${push_range% *}"
+    REVIEW_HOTSPOT_HEAD="${push_range#* }"
+    export REVIEW_HOTSPOT_BASE REVIEW_HOTSPOT_HEAD
+  fi
+fi
+
 bun scripts/run-checks.mjs lint lint:types typecheck test assets suppressions dead-exports hotspot-preflight landmarks

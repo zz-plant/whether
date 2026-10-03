@@ -195,6 +195,21 @@ a failing test or a dead export, and the suite was green through all of them.
   the message). The comment there states the reason — `${...}` can hold real code — and blanking the
   literal text without blanking interpolations is a change to a matcher, not to a range.
 
+- **The pre-push preflight reviewed the wrong range (2026-10-02).** Its default — last commit plus
+  every uncommitted edit — is right for a working `bun run check` and wrong for a push, on both
+  ends. The push may carry several commits, and the preflight is not part of the deploy gate
+  (`check:vinext` omits it), so commits 2..n of a multi-commit push were reviewed nowhere: a risky
+  file change or an `as` cast buried one commit back sailed through both gates. And on this repo's
+  shared working tree, the uncommitted half of that range belongs to whatever concurrent session is
+  editing at push time, so the gate failed on work the push did not contain — the same failure the
+  hook's own caveat warns about, now removed for the check that can be scoped precisely.
+  `.husky/pre-push` reads git's stdin plan (`<local ref> <local sha> <remote ref> <remote sha>` per
+  ref) through `scripts/pre-push-range.mjs` and exports the pair as `REVIEW_HOTSPOT_BASE`/`HEAD`,
+  which the preflight already accepted from CI. A new branch, a deletion, and a manual run print
+  nothing and keep the default range; a remote sha the local repo has never fetched fails
+  `sanitizeBaseRef`'s verification and falls back the same way, so every way the scoping can fail
+  costs a wider scan rather than a skipped one.
+
 **Two findings from that audit were wrong and are recorded here as such.** The mockup route being
 publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
 four of six sections collapsed: `resolveInitialOpenStepIds` opens the first step plus anything

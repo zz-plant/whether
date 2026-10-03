@@ -108,7 +108,7 @@ recapture correctly.
 
 | Command | What it does |
 | --- | --- |
-| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. Default range is the last commit **plus** uncommitted changes; `--base <sha>` is commit-to-commit and sees no dirty tree; `--working-tree` is uncommitted only. The printed range says which. |
+| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. Default range is the last commit **plus** uncommitted changes; `--base <sha>` is commit-to-commit and sees no dirty tree; `--working-tree` is uncommitted only. The printed range says which. On pre-push, `.husky/pre-push` scopes it to the commits the push actually sends (`scripts/pre-push-range.mjs` reads git's stdin plan), so it neither judges other sessions' uncommitted work nor misses commits 2..n of a multi-commit push. |
 | `bun run audit:jev-copy` | Advisory, needs a running server and Workers AI credentials: asks Jev (`typesafe/jev`) the 2026-09-22 copy audit's four questions of every sentence on the reader routes; `-- --mode brief` asks whether the generated brief contradicts the latest published call. Exits non-zero if any Jev call failed. Not in the gate — the suite is offline and a model's answer is not a check. Jev is never used for the call itself. |
 | `bun run telemetry:streams` | Rows per Analytics Engine stream over a window, with each stream's consumer. A stream at zero is dead code or a broken emitter. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
