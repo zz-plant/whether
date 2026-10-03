@@ -73,22 +73,26 @@ export function WhatItChangesSection({
     >
       {/* Stage and runway: the sm+ tablists. The header carries the phone pills,
           so one control per axis at every width. */}
-      <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-3">
-        <StagePersonaSelector activeStage={activeStage} />
-        <RunwayPersonaSelector activeRunway={activeRunway} />
+      <div className="space-y-2">
+        <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+          <StagePersonaSelector activeStage={activeStage} />
+          <RunwayPersonaSelector activeRunway={activeRunway} />
+        </div>
+        {runwayEmphasis ? (
+          <p data-testid="runway-emphasis" className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90">
+            <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
+            <span>{runwayEmphasis}</span>
+          </p>
+        ) : null}
+        {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
       </div>
+
       {actionStripItems && actionStripItems.length > 0 ? (
         <div className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-3.5">
           <BoundedCorridorRails items={actionStripItems} scores={scores} />
         </div>
       ) : null}
-      {runwayEmphasis ? (
-        <p data-testid="runway-emphasis" className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90">
-          <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
-          <span>{runwayEmphasis}</span>
-        </p>
-      ) : null}
-      {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
+
       <AreaTable
         rows={tableRows}
         caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}, by area`}

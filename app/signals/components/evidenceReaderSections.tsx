@@ -151,6 +151,15 @@ export const SignalsWhatChangedSection = ({
                     row.label
                   )}
                   {row.kindLabel ? <span className="block text-xs font-normal text-slate-500">{row.kindLabel}</span> : null}
+                  {row.key === "baseRate" || row.key === "curveSlope" ? (
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
+                    </span>
+                  ) : (
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Sets operating boundary lines
+                    </span>
+                  )}
                 </th>
                 <td className="py-2.5 pr-3 max-sm:p-0">
                   <DeltaChip row={row} />

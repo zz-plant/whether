@@ -119,6 +119,21 @@ describe("the evidence page", () => {
     assert.match(html, /All from interest rates\./);
     assert.match(html, /The Aug 31 score was built from interest rates alone\./);
   });
+
+  it("prints rollup indicators bridging instruments to composite score ladders", () => {
+    const html = renderToStaticMarkup(
+      <SignalsWhatChangedSection
+        rows={buildSignalReferenceRows(assessment, week).map((row) => ({ ...row, note: null }))}
+        activeFocus="all"
+        focusLabelByTab={{ all: "All signals", growth: "Growth", inflation: "Inflation", labor: "Labor", financial: "Financial" }}
+        focusInstruments={[]}
+        basis={comparisonBasis(comparedWith)}
+      />,
+    );
+
+    assert.match(html, /Feeds into <a href="#call-lines"[^>]*>Funding pressure<\/a>/);
+    assert.match(html, /Sets operating boundary lines/);
+  });
 });
 
 describe("the pastes", () => {

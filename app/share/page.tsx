@@ -250,30 +250,48 @@ export default async function SharePage() {
               </p>
             </div>
           </div>
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/60">
+            <ActionLink href="#meeting-slack" variant="pill">
+              Meeting &amp; Slack formats ↓
+            </ActionLink>
+            <ActionLink href="#tickets-kanban" variant="pill">
+              Tickets &amp; Kanban ↓
+            </ActionLink>
+            <ActionLink href="#role-memos" variant="pill">
+              Team role memos ↓
+            </ActionLink>
+            <ActionLink href="#image-artifacts" variant="pill">
+              Slide images ↓
+            </ActionLink>
+          </div>
         </section>
 
-        <SharePageFormats scoreReferences={artifact.scoreReferences} />
+        <div id="meeting-slack" className="space-y-5 sm:space-y-8">
+          <SharePageFormats scoreReferences={artifact.scoreReferences} />
 
-        <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="longer-formats-heading">
-          <h2 id="longer-formats-heading" className="text-xl font-semibold text-white sm:text-2xl">Longer formats</h2>
-          <ShareCopyControls
-            recordDate={artifact.recordDate}
-            slackBrief={artifact.slackBrief}
-            emailBrief={artifact.emailBrief}
-            standupLine={artifact.standupLine}
-            meetingPack={artifact.meetingPack}
-            issueTrackerBrief={artifact.issueTrackerBrief}
-            investorUpdate={artifact.investorUpdate}
-            portfolioNote={artifact.portfolioNote}
-            calendarDetails={artifact.calendarDetails}
-          />
-        </section>
+          <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="longer-formats-heading">
+            <h2 id="longer-formats-heading" className="text-xl font-semibold text-white sm:text-2xl">Longer formats</h2>
+            <ShareCopyControls
+              recordDate={artifact.recordDate}
+              slackBrief={artifact.slackBrief}
+              emailBrief={artifact.emailBrief}
+              standupLine={artifact.standupLine}
+              meetingPack={artifact.meetingPack}
+              issueTrackerBrief={artifact.issueTrackerBrief}
+              investorUpdate={artifact.investorUpdate}
+              portfolioNote={artifact.portfolioNote}
+              calendarDetails={artifact.calendarDetails}
+            />
+          </section>
+        </div>
 
         {/* The credential-free slice of the Linear/Jira sync, beside the ticket
             brief it extends. One paste-ready block per business area. Each
             renders its own panel, or nothing when it has no blocks. */}
-        <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />
-        <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
+        <div id="tickets-kanban" className="space-y-5 sm:space-y-8">
+          <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />
+          <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
+        </div>
 
         {/* Role memos are share formats. They sat under the sixth collapsed
             section of /operate, where nobody planning a week went looking for
