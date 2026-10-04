@@ -171,7 +171,7 @@ export const RegimeAlertToggle = () => {
       <p className="text-sm leading-6 text-slate-400">
         {state.subscribed
           ? "This browser will be notified when conditions change — not every week, only when they do."
-          : "One notification when the posture changes, which is a handful of times a year. Nothing weekly, and nothing that needs an email address."}
+          : "One notification when conditions change, which is a handful of times a year. Nothing weekly, and nothing that needs an email address."}
       </p>
     </div>
   );

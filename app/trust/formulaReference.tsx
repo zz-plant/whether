@@ -187,7 +187,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
   return (
     <ReportSection
       id="formula-reference"
-      title="How the score is built"
+      title="How the scores are built"
       description="The full derivation, from public data series to the weekly guidance."
     >
       {/* Where the score sits, first, and in the one drawing every route uses

@@ -24,7 +24,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "How much to trust this week's guidance",
   description:
-    "Check how fresh the sources are, how sure the reading is, and how the score is built, before acting on anything you can't undo.",
+    "Check how fresh the sources are, how sure the reading is, and how the scores are built, before acting on anything you can't undo.",
   path: "/trust",
   imageAlt: "Whether trust hub",
   imageParams: { template: "method", eyebrow: "Trust" },

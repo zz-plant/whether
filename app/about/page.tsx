@@ -75,9 +75,9 @@ export default function AboutPage() {
         <h2 className="text-lg font-semibold text-slate-100">What is new here</h2>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">Lines decided before they are needed.</span> Hiring, spending,
-          fundraising, the roadmap and new bets each get an action, the score that pauses it and the score that resumes
-          it, written down before either is reached. The pause and resume lines sit apart, so one noisy week does not
-          stop a decision and restart it, and nobody re-argues the reasoning on Monday.
+          fundraising, the roadmap and new bets each get an action, a pause line and a resume line, written down before
+          either is reached. The pause and resume lines sit apart, so one noisy week does not stop a decision and
+          restart it, and nobody re-argues the reasoning on Monday.
         </p>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">A record that grades itself.</span> Every week&apos;s guidance

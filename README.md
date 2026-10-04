@@ -43,7 +43,7 @@ Everything in this product is designed for **decision transmission** — enablin
 
 The same two claims as [whether.work/about](https://whether.work/about), and neither is the data.
 
-- **Lines decided before they are needed.** Hiring, spending, fundraising, the roadmap and new bets each get an action, the score that pauses it and the score that resumes it, written down before either is reached. The pause and resume lines sit apart, so one noisy week does not stop a decision and restart it.
+- **Lines decided before they are needed.** Hiring, spending, fundraising, the roadmap and new bets each get an action, a pause line and a resume line, written down before either is reached. The pause and resume lines sit apart, so one noisy week does not stop a decision and restart it.
 - **A record that grades itself.** Every week's guidance stays published unedited, and the [track record](https://whether.work/history#track-record) scores the archive against what happened next, including where it falls short: changes in conditions that came with no warning, and a confidence figure that the [calibration study](https://whether.work/calibration) shows measures distance from a line, not probability.
 
 The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by hand ([`/trust#formula-reference`](https://whether.work/trust#formula-reference)). Inflation and unemployment are tracked but enter neither score.

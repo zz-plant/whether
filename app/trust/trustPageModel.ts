@@ -69,7 +69,7 @@ export async function buildTrustPageModel() {
     assessment: reportData.assessment,
   });
   /* Where the two scores sit against their lines, for the ladders that open
-     "How the score is built". The earlier reading comes from `previousScoresFromDynamics`,
+     "How the scores are built". The earlier reading comes from `previousScoresFromDynamics`,
      the derivation the homepage and every export use: no previous reading at
      all is `"unavailable"`, which draws no hollow dot rather than a dot claiming
      a comparison nobody made, and a move past the weekly sanity limit counts.
