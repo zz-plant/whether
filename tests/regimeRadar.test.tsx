@@ -59,16 +59,18 @@ describe("RegimeRadar", () => {
     assert.doesNotMatch(withoutPrevious, /stroke="#94a3b8"/);
   });
 
-  it("prints the distance to the boundary line only when it has one", () => {
-    const close = renderToStaticMarkup(<RegimeRadar {...base} pointsToPause={8} />);
-    const far = renderToStaticMarkup(<RegimeRadar {...base} pointsToPause={25} />);
-    const none = renderToStaticMarkup(<RegimeRadar {...base} />);
+  it("measures the nearest plotted call-change line, independently of operating pause rules", () => {
+    const current = renderToStaticMarkup(
+      <RegimeRadar {...base} tightness={90} riskAppetite={47} tightnessThreshold={70} riskAppetiteThreshold={50} />,
+    );
+    assert.match(current, /3 points to nearest change line/);
+    assert.doesNotMatch(current, /0 points to/);
 
-    assert.match(close, /8 points to boundary line/);
-    assert.match(close, /text-rose-300/, "a close call reads as emphasized");
-    assert.match(far, /25 points to boundary line/);
-    assert.doesNotMatch(far, /text-rose-300/);
-    assert.doesNotMatch(none, /<figcaption/);
+    const horizontal = renderToStaticMarkup(<RegimeRadar {...base} tightness={62} />);
+    assert.match(horizontal, /2 points to nearest change line/);
+
+    const onLine = renderToStaticMarkup(<RegimeRadar {...base} riskAppetite={45} />);
+    assert.match(onLine, /0 points to nearest change line/);
   });
 
   it("carries accessible title tooltips for threshold boundaries and current position", () => {

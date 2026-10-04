@@ -25,9 +25,80 @@
 
 .weather-page-shell {
   @apply mx-auto flex w-full flex-col;
-  gap: clamp(1rem, 0.85rem + 1.5vw, 2.5rem);
-  padding-inline: clamp(0.65rem, 0.5rem + 1.5vw, 2rem);
-  padding-block: clamp(1rem, 1rem + 2vw, 3rem);
+  gap: var(--layout-section-gap);
+  padding-inline: var(--weather-shell-pad-inline);
+  padding-block: var(--layout-section-gap);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --layout-section-gap: 32px;
+    --layout-content-gap: 24px;
+    --layout-card-padding: 24px;
+  }
+}
+
+/* One owner for each distance. A page separates sections; a section groups
+   its heading and body; a framed card owns its inset. Hidden children take
+   no space, unlike margins applied to the next visible sibling. */
+.weather-page-stack,
+.weather-section-stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.weather-page-stack { gap: var(--layout-section-gap); }
+.weather-section-stack { gap: var(--layout-content-gap); }
+.weather-section-stack > * {
+  margin-block: 0;
+}
+.weather-inset { padding: var(--layout-card-padding); }
+
+.weather-brief-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.weather-home-section {
+  margin-top: 16px;
+  padding-top: var(--layout-content-gap);
+}
+
+/* Four company choices form equal cells instead of wrapping three then one.
+   Native radio inputs and their existing focus treatment stay in place. */
+@media (min-width: 640px) {
+  .weather-company-options fieldset {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+  .weather-company-options label {
+    display: flex;
+    min-width: 0;
+  }
+  .weather-company-options .weather-segment-option {
+    width: 100%;
+    text-align: center;
+  }
+}
+@media (min-width: 1280px) {
+  .weather-company-options fieldset {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.weather-report-sections {
+  margin-block: calc(-1 * var(--layout-content-gap));
+}
+.weather-report-section-row {
+  padding-block: var(--layout-content-gap);
+}
+/* Unboxed sections align with the column. The row owns their outer space;
+   nested framed cards still keep their own padding. */
+.weather-report-section-row > .weather-panel,
+.weather-page-stack > .weather-panel {
+  padding: 0;
 }
 
 /* Presentation focus mode narrows the brief's measure, and only that. The
@@ -233,18 +304,18 @@ a.weather-hub-link-card:hover {
 
 .weather-secondary-header {
   display: grid;
-  gap: clamp(0.9rem, 0.75rem + 0.75vw, 1.5rem);
-  padding: clamp(1.15rem, 0.85rem + 1.25vw, 2rem);
+  gap: var(--layout-content-gap);
+  padding: 0;
 }
 
 .weather-secondary-header-layout {
   display: grid;
-  gap: 1rem;
+  gap: var(--layout-content-gap);
 }
 
 .weather-secondary-heading {
   display: grid;
-  gap: 0.75rem;
+  gap: 16px;
 }
 
  .weather-secondary-eyebrow {
@@ -283,8 +354,11 @@ a.weather-hub-link-card:hover {
 
 .weather-secondary-section {
   display: grid;
-  gap: 0.95rem;
-  padding: clamp(1rem, 0.86rem + 0.7vw, 1.55rem);
+  gap: var(--layout-content-gap);
+  padding: 0;
+}
+.weather-secondary-section > * {
+  margin-block: 0;
 }
 
 /* Unboxed on every width, so on a phone their inline padding only narrowed the
@@ -301,7 +375,7 @@ a.weather-hub-link-card:hover {
 .weather-secondary-section-header {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 8px;
 }
 
 .weather-secondary-section-title {

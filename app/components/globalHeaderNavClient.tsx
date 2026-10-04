@@ -132,14 +132,14 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
      were invisible until a chevron was clicked. Six short words fit in a
      header at any desktop width. Below md the bottom tab bar carries them. */
   return (
-    <nav aria-label="Primary" className="hidden md:flex items-center gap-0.5">
+    <nav aria-label="Primary" className="hidden shrink-0 md:flex items-center gap-0.5">
       {loopLinks.map((link) => (
         <Link
           key={link.href}
           href={link.href}
           aria-current={link.isActive ? "page" : undefined}
           title={link.shortcut ? `${link.navLabel ?? link.label} — press ${link.shortcut}` : undefined}
-          className={`group relative flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
+          className={`group relative flex min-h-11 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
             link.isActive
               ? "text-white font-semibold"
               : "text-slate-400 font-medium hover:text-slate-100"
@@ -181,7 +181,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       <details ref={detailsRef} className="group relative">
         <summary
           tabIndex={0}
-          className="list-none cursor-pointer rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center gap-1 text-slate-400 font-medium hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 [&::-webkit-details-marker]:hidden"
+          className="min-h-11 list-none cursor-pointer rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center gap-1 text-slate-400 font-medium hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 [&::-webkit-details-marker]:hidden"
         >
           <span>More</span>
           <span aria-hidden="true" className="text-slate-500 transition-transform group-open:rotate-180">▾</span>

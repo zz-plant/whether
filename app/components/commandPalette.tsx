@@ -349,7 +349,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               </ul>
             )}
           </nav>
-          <div className="hidden md:flex border-t border-[color:var(--border-default)] px-4 py-2.5 bg-[color:var(--bg-raised)]/40 items-center gap-4 text-[10px] text-slate-400 font-medium">
+          <div className="hidden md:flex border-t border-[color:var(--border-default)] px-4 py-2.5 bg-[color:var(--bg-raised)]/40 items-center gap-4 text-fluid-nano text-slate-400 font-medium">
             <span className="flex items-center gap-1.5"><kbd className="weather-kbd">↑↓</kbd> navigate</span>
             <span className="flex items-center gap-1.5"><kbd className="weather-kbd">↵</kbd> select</span>
             <span className="flex items-center gap-1.5"><kbd className="weather-kbd">esc</kbd> close</span>

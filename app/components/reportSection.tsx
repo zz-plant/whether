@@ -65,8 +65,8 @@ export function ReportSection({
   if (variant === "split") {
     // space-y-2, not -4: the header and the body below it are one section drawn
     // as two boxes, so they have to sit closer to each other than the items
-    // inside the body (space-y-6) and far closer than the gap between whole
-    // sections (reportShell's space-y-10). Previously all three were 16-24px,
+    // inside the body (space-y-6) and closer than the report row's boundary
+    // spacing (layout-shells.css). Previously all three were 16-24px,
     // which is why nothing on these pages chunked.
     return (
       <section
@@ -134,7 +134,7 @@ export function ReportSection({
       data-page-section={id}
       tabIndex={-1}
       aria-labelledby={headingId}
-      className="weather-panel space-y-5 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      className="weather-panel weather-section-stack p-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">

@@ -10,7 +10,7 @@ import { HOME_SECTIONS, type HomeAreaRow } from "../../../lib/report/home/homeSe
 import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRules";
 import type { RunwayBand } from "../../../lib/report/operatorRunway";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import type { Route } from "../../../lib/navigation/routeType";
+import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { ActionStripItem } from "../../../lib/report/operatingCalls";
 import { BoundedCorridorRails } from "../boundedCorridorRails";
 
@@ -61,7 +61,7 @@ export function WhatItChangesSection({
         }
       : undefined,
     changed: row.changed,
-    href: planHref,
+    href: toRoute(`${planHref}#ops-monthly-action-summary`),
     note: isHistorical ? undefined : <RunwayAreaNote regime={regime} area={row.area} />,
   }));
 
@@ -73,22 +73,30 @@ export function WhatItChangesSection({
     >
       {/* Stage and runway: the sm+ tablists. The header carries the phone pills,
           so one control per axis at every width. */}
-      <div className="space-y-2">
-        <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-3">
-          <StagePersonaSelector activeStage={activeStage} />
-          <RunwayPersonaSelector activeRunway={activeRunway} />
+      <div className={isHistorical && !runwayEmphasis ? "hidden sm:grid sm:gap-6" : "weather-section-stack"}>
+        <div className={`${runwayEmphasis ? "" : "hidden sm:block"} rounded-xl border border-slate-800/80 bg-slate-950/40 weather-inset space-y-4`.trim()}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800/60 pb-4">
+            <p className="type-eyebrow">Company calibration</p>
+            <p className="text-fluid-nano text-slate-400">
+              Calibrates pause and resume lines to your stage and cash runway
+            </p>
+          </div>
+          <div className="hidden sm:grid sm:gap-4 weather-company-options">
+            <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
+            <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
+          </div>
+          {runwayEmphasis ? (
+            <p data-testid="runway-emphasis" className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90 border-t border-slate-800/40 pt-2">
+              <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
+              <span>{runwayEmphasis}</span>
+            </p>
+          ) : null}
         </div>
-        {runwayEmphasis ? (
-          <p data-testid="runway-emphasis" className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90">
-            <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
-            <span>{runwayEmphasis}</span>
-          </p>
-        ) : null}
         {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
       </div>
 
       {actionStripItems && actionStripItems.length > 0 ? (
-        <div className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-3.5">
+        <div className="rounded-lg border border-slate-800/80 bg-slate-900/40 weather-inset">
           <BoundedCorridorRails items={actionStripItems} scores={scores} />
         </div>
       ) : null}

@@ -142,7 +142,7 @@ export function TimeMachineCalendarPicker({
                         <span className="font-semibold tabular-nums">{MONTH_YEAR_LABEL.format(periodDate)}</span>
                         {isSelected && <CheckIcon className="h-3 w-3 text-sky-400" />}
                       </span>
-                      <span className="w-full truncate text-[10px] text-slate-400">
+                      <span className="w-full truncate text-fluid-nano text-slate-400">
                         {period.label}
                         {entry ? ` · ${getRegimePublicLabel(entry.regime)}` : ""}
                       </span>
@@ -182,7 +182,7 @@ export function TimeMachineCalendarPicker({
                               <span className="font-semibold">{monthName}</span>
                               {isSelected && <CheckIcon className="h-3 w-3 text-sky-400" />}
                             </span>
-                            <span className="w-full truncate text-[10px] text-slate-400">
+                            <span className="w-full truncate text-fluid-nano text-slate-400">
                               {publicLabel}
                             </span>
                           </button>

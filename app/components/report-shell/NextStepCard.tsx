@@ -28,7 +28,7 @@ export function NextStepCard({ nextStep }: { nextStep?: NextStep }) {
     <section
       aria-label="Next step"
       data-testid="next-step-card"
-      className="rounded-xl border border-sky-500/25 bg-sky-500/[0.06] px-5 py-5"
+      className="rounded-xl border border-sky-500/25 bg-sky-500/[0.06] weather-inset"
     >
       <p className="type-eyebrow text-sky-200/80">Next</p>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">

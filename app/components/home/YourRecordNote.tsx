@@ -36,11 +36,11 @@ export function RecordNote({ view }: { view: DecisionRecordView }) {
     >
       <div className="flex flex-wrap items-center gap-2">
         {view.counts.reconsider > 0 ? (
-          <span className="inline-flex items-center rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-300 border border-rose-500/30">
+          <span className="inline-flex items-center rounded bg-rose-500/20 px-1.5 py-0.5 text-fluid-nano font-bold uppercase tracking-wider text-rose-300 border border-rose-500/30">
             Reconsider ({view.counts.reconsider})
           </span>
         ) : view.counts.watch > 0 ? (
-          <span className="inline-flex items-center rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-amber-500/30">
+          <span className="inline-flex items-center rounded bg-amber-500/20 px-1.5 py-0.5 text-fluid-nano font-bold uppercase tracking-wider text-amber-300 border border-amber-500/30">
             Watch ({view.counts.watch})
           </span>
         ) : null}

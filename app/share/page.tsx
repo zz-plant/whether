@@ -226,11 +226,11 @@ export default async function SharePage() {
           draw anything and own their own elevation. Each group's h2 is a
           heading, not an eyebrow: as the small label it was, it sat under the
           serif titles of the cards inside it, and the page read inside out. */}
-      <div className="space-y-5 sm:space-y-8">
+      <div className="weather-page-stack mx-auto max-w-6xl">
         {/* No bottom padding: `.weather-panel` draws no frame, so its padding and
             the next panel's stacked with the gap between them into ~70px of
             empty ground under a three-line intro. */}
-        <section className="weather-panel space-y-5 px-5 max-sm:px-0 pt-5 pb-0" aria-labelledby="share-page-title">
+        <section className="weather-panel weather-section-stack p-0" aria-labelledby="share-page-title">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-2xl space-y-2">
               {/* The week, where the kicker read "Current weekly artifact" — the
@@ -250,26 +250,26 @@ export default async function SharePage() {
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/60">
-            <ActionLink href="#meeting-slack" variant="pill">
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60 sm:flex sm:flex-wrap">
+            <ActionLink href="#meeting-slack" variant="pill" className="justify-center text-center">
               Meeting &amp; Slack formats ↓
             </ActionLink>
-            <ActionLink href="#tickets-kanban" variant="pill">
+            <ActionLink href="#tickets-kanban" variant="pill" className="justify-center text-center">
               Tickets &amp; Kanban ↓
             </ActionLink>
-            <ActionLink href="#role-memos" variant="pill">
+            <ActionLink href="#role-memos" variant="pill" className="justify-center text-center">
               Team role memos ↓
             </ActionLink>
-            <ActionLink href="#image-artifacts" variant="pill">
+            <ActionLink href="#image-artifacts" variant="pill" className="justify-center text-center">
               Slide images ↓
             </ActionLink>
           </div>
         </section>
 
-        <div id="meeting-slack" className="space-y-5 sm:space-y-8">
+        <div id="meeting-slack" className="weather-page-stack">
           <SharePageFormats scoreReferences={artifact.scoreReferences} />
 
-          <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="longer-formats-heading">
+          <section className="weather-panel weather-section-stack p-0" aria-labelledby="longer-formats-heading">
             <h2 id="longer-formats-heading" className="text-xl font-semibold text-white sm:text-2xl">Longer formats</h2>
             <ShareCopyControls
               recordDate={artifact.recordDate}
@@ -288,7 +288,7 @@ export default async function SharePage() {
         {/* The credential-free slice of the Linear/Jira sync, beside the ticket
             brief it extends. One paste-ready block per business area. Each
             renders its own panel, or nothing when it has no blocks. */}
-        <div id="tickets-kanban" className="space-y-5 sm:space-y-8">
+        <div id="tickets-kanban" className="weather-page-stack">
           <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />
           <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
         </div>
@@ -296,7 +296,7 @@ export default async function SharePage() {
         {/* Role memos are share formats. They sat under the sixth collapsed
             section of /operate, where nobody planning a week went looking for
             a CFO memo; they belong beside Slack, email and the meeting pack. */}
-        <section id="role-memos" className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="role-memos-heading">
+        <section id="role-memos" className="weather-panel weather-section-stack p-0" aria-labelledby="role-memos-heading">
           <h2 id="role-memos-heading" className="text-xl font-semibold text-white sm:text-2xl">Brief your team by role</h2>
           <ExecutiveBriefingPanel
             assessment={artifact.assessment}
@@ -307,19 +307,18 @@ export default async function SharePage() {
         {/* Text formats first, then the same call as a picture. */}
         <ShareImageArtifacts />
 
-        <div className="px-5">
+        <div>
           <ActionLink href="/" variant="pill">
             Return to weekly brief
           </ActionLink>
         </div>
 
         {/* Anchored so the retired /embed route lands on it. */}
-        <section id="embed" className="weather-panel px-5 max-sm:px-0 py-5">
+        <section id="embed" className="weather-panel weather-section-stack p-0">
           <EmbedBuilder />
         </section>
+        <SubscribeForm />
       </div>
-
-      <SubscribeForm />
     </PageShell>
   );
 }

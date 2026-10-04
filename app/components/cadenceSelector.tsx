@@ -40,9 +40,9 @@ function buildHref(
  *
  * It used to sit at the foot of the page while the card it controls renders at
  * the top, and compensated with a `scrollIntoView` back up — so operating the
- * control correctly required an involuntary scroll. It now sits in the meta row
- * beside the week switcher, where the page's other period controls are, and
- * needs no reveal.
+ * control correctly required an involuntary scroll. It now sits directly under
+ * the call beside Copy Brief: adjacent to its target without pushing the call
+ * down on a phone. It needs no reveal.
  */
 export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => void } = {}) {
   const router = useRouter();

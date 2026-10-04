@@ -110,6 +110,8 @@ These documents describe earlier architectures, retired routes, or proposals tha
 
 ## Evidence and research docs
 
+- [Responsive page design review](evidence/responsive-page-design-2026-10-04.md) — local mobile/desktop screenshots and verification for the spacing, reading-width and control refinements.
+
 Use these to explain why a decision was made or to support a new proposal:
 
 - `research/*.md`

@@ -56,6 +56,10 @@
 - MUST: Prevent zoom-on-focus. All inputs on mobile must have font-size: 16px. If the design calls for smaller text, use `transform: scale()` to shrink it visually while keeping the computed font size at 16px.
 - MUST: Touch action manipulation. Add `touch-action: manipulation` to all interactive elements to eliminate the 300ms tap delay on legacy WebKit.
 - MUST: Overscroll containment. Any element with its own scrollbar (modals, sidebars) MUST have `overscroll-behavior: contain` to prevent the body from scrolling when the element hits the edge.
+- Compact shared controls (36px) require both a fine pointer and hover support; a wide touch screen keeps the 44px floor. Native text fields keep at least 16px text on coarse pointers, including tablets and landscape phones.
+- The desktop header keeps all six loop tabs from `md`; Search stays an icon until `xl` to leave room for the wordmark and navigation. Below `md`, the bottom bar owns Search.
+- Section names remain readable: the desktop outline wraps long names; the mobile index uses the shared `text-fluid-xs` size and contains horizontal overscroll.
+- User-facing metadata uses `text-fluid-nano`, which bottoms at 11px on phones; explanatory text and copy previews use `text-fluid-xs` or larger. All-caps labels inside an aria-hidden graphic may go to 10px (`RegimeRadar` quadrants); text inside a viewBox-scaled SVG is judged at rendered size, not `font-size`.
 
 ## VII. Zero-tolerance metrics
 - CLS (Cumulative Layout Shift) MUST be 0. Content does not jump. Ever.
@@ -419,3 +423,12 @@ Added 2026-09-24 with DD-033 (`docs/design-debt-prioritized.md`).
 - **Comprehension precedes the export artifact.** On direct answer and explanation pages (`/answers/*`), a reader arriving from search or a deep link must see the direct answer, the operational rules, and the threshold lines before encountering a full-width block asking them to copy the brief into a meeting note. Asking a first-time reader to copy an answer they have not yet evaluated creates cognitive dissonance.
 - **Quick-action parity for returning operators.** To preserve under-60-second decision transmission for power users who already know what they want, expose a compact copy CTA in `SecondaryPageHeader`'s `actions` slot. Power users copy at the top; evaluators read the evidence and copy at the bottom.
 
+## XXI. Spacing ownership
+
+- Use 8px for closely related labels, 16px for compact groups, and the layout-role tokens for page composition. `--layout-section-gap` is 24px on phones and 32px from `sm`; `--layout-content-gap` and `--layout-card-padding` are 16px / 24px.
+- `weather-page-stack` separates sections; `weather-section-stack` separates a section's heading and content and resets direct-child block margins so they cannot double the gap. `weather-inset` supplies framed-card padding.
+- Unboxed report and secondary-page sections align with the page column. The report row owns boundary padding; do not add another inset on its top-level `weather-panel`. Nested cards retain their insets.
+- A control shelf aligns label columns and option groups. On phones, omit a shelf whose controls already live in the header unless it has a current constraint to show.
+- Check rendered section edges and distances on mobile and desktop. A uniform search-and-replace of every gap loses the distinction between a label, a content group and a new section.
+- Share groups use a centered 72rem column; the shared format picker caps its preview at 48rem and aligns the tab grid to that width. Keep the subscription and return link on the same page edge.
+- Timeline month and zoom buttons and the draggable track keep 44px touch targets. Compact sizes apply only from `sm` with a fine pointer and hover support.

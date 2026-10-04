@@ -247,7 +247,7 @@ export default function RootLayout({
                 on the second-most-common surface a reader checks for exactly
                 that. The line is `canonicalPositioningLine`, so it cannot drift
                 from the one the metadata already ships. */}
-            <div className="grid gap-8 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] sm:gap-12">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-12">
               <div className="space-y-2">
                 <p className="text-sm font-semibold tracking-[0.08em] text-white">Whether</p>
                 <p className="max-w-[32ch] text-fluid-micro leading-relaxed text-[var(--footer-legal)]">
@@ -335,7 +335,7 @@ export default function RootLayout({
                 <a href="https://github.com/zz-plant/whether" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]" target="_blank" rel="noreferrer">GitHub</a>
                 <span className="inline-flex min-h-[44px] items-center">
                   Built by
-                  <a href="https://kanav.net" className="ml-1 no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Kanav Jain</a>
+                  <a href="https://kanav.net" className="ml-1 inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Kanav Jain</a>
                 </span>
                 <a href="https://nextconsensus.com" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">NextConsensus</a>
                 <span className="inline-flex min-h-[44px] items-center">© 2026 Whether</span>

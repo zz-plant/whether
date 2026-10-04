@@ -65,6 +65,9 @@ export function DoAndShareSection({
         <ActionLink href="/operate#ops-decision-shield" variant="inline">
           Stress-test a plan →
         </ActionLink>
+        <ActionLink href="/decisions" variant="inline">
+          Track your decision record →
+        </ActionLink>
         <ActionLink href="/resolve#direct-answers" variant="inline">
           Answers to common questions →
         </ActionLink>

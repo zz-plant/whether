@@ -150,6 +150,10 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
+  /* Layout roles: page sections, content groups, and framed card insets. */
+  --layout-section-gap: 24px;
+  --layout-content-gap: 16px;
+  --layout-card-padding: 16px;
 
   /* Border radius — two registers, assigned by role rather than by taste.
      Sharp asserts: anything that states a fact or a call — status and verdict

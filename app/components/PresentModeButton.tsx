@@ -37,7 +37,7 @@ export function PresentModeButton({ className = "" }: Props) {
       type="button"
       onClick={handleToggle}
       title="Presentation focus mode (F)"
-      className={`inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 transition-all duration-150 hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 ${className}`}
+      className={`weather-header-action inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 transition-colors duration-150 hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 ${className}`}
       aria-label="Toggle presentation focus mode"
     >
       <Maximize2 aria-hidden="true" size={16} strokeWidth={1.8} />

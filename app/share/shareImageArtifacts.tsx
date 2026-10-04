@@ -58,7 +58,7 @@ const IMAGE_ARTIFACTS = [
 
 export function ShareImageArtifacts() {
   return (
-    <section id="image-artifacts" className="weather-panel space-y-3 px-5 max-sm:px-0 py-5" aria-labelledby="share-files-heading">
+    <section id="image-artifacts" className="weather-panel weather-section-stack p-0" aria-labelledby="share-files-heading">
       <h2 id="share-files-heading" className="text-xl font-semibold text-white sm:text-2xl">Files and images for a deck or a thread</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {IMAGE_ARTIFACTS.map((artifact) => (

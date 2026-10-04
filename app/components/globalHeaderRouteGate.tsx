@@ -63,22 +63,22 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           listener lives here rather than beside any one control. */}
       <RunwayServerSync />
       <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
-        <div className="flex items-center justify-between gap-2 px-3 py-2 sm:gap-3">
-          <Link href="/" className="flex min-w-0 items-center gap-2.5 no-underline">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0">
+        <div className="flex items-center justify-between gap-2 px-3 py-2 max-[360px]:flex-wrap sm:gap-3">
+          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 no-underline">
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0">
               <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
               <circle cx="5" cy="11" r="1.5" fill="currentColor" />
               <circle cx="19" cy="11" r="1.5" fill="currentColor" />
             </svg>
             <div className="flex min-w-0 flex-col leading-tight">
               <span className="text-sm font-bold tracking-tight text-white">Whether</span>
-              <span className={`truncate text-[10.5px] font-medium text-slate-400 ${fallbackRouteLabel ? "" : "md:hidden"}`}>
+              <span className={`truncate text-fluid-nano font-medium text-slate-400 ${fallbackRouteLabel ? "" : "md:hidden"}`}>
                 {sublabel}
               </span>
             </div>
           </Link>
           <GlobalHeaderNavClient pathname={pathname} />
-          <div className="flex items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
+          <div className="flex shrink-0 items-center justify-end gap-1.5 max-[360px]:w-full sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
             {/* Hidden on a first visit to the folded brief (app/styles/home-flow.css):
                 at 375px the two pills wrapped their own labels and truncated the
                 name of the page, to offer a stage and a runway the reader had not
@@ -86,7 +86,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
                 folds, so this keeps the two widths alike; "Show the full brief"
                 brings both back. */}
             {isHomeBrief ? (
-              <div data-first-visit-header-choices="true" className="flex items-center gap-1 sm:hidden">
+              <div data-first-visit-header-choices="true" className="flex flex-wrap items-center justify-end gap-1 sm:hidden">
                 <StageDropdownPill />
                 <RunwayDropdownPill />
               </div>
