@@ -114,6 +114,10 @@
   (e.g. step "Test a decision" → section "Is this move safe right now?").
 - NEVER: repeat a section's full description in both a checklist/index entry and that section's own
   header. The index carries titles; the section carries the description.
+- NEVER: let the intro block's one-sentence summary enumerate the sections the page index already
+  lists. The summary states the page's job; the index names the sections ("The evidence behind
+  this week's guidance", not "What moved, why it matters, and what would change the guidance" —
+  found 2026-10-04).
 - MUST: keep one in-page index per page, derived from the shell's `sectionLinks`, in page order and
   under the sections' own names. Until 2026-09-15 `/operate` carried three — the sidebar list, the
   stepper's own sticky chip row, and a card grid at the tail — with three vocabularies for the same

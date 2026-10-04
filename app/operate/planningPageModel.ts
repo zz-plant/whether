@@ -148,7 +148,7 @@ export async function buildPlanningPageModel(
            most repeated inconsistency in this IA. The <title> keeps its longer
            descriptive form; only the on-page heading is the section's name. */
         pageTitle: "Plan",
-        pageSummary: "Set the rules, check runway, and share the brief for this week's conditions.",
+        pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap.",
         sectionLinks: operationsSectionLinks.plan,
         activeStep: "plan",
       },

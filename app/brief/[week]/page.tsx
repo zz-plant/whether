@@ -322,7 +322,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                  corridor. */
               <div className="overflow-x-auto">
                 <table className="weather-stack-table w-full border-collapse text-left text-sm text-slate-300">
-                  <caption className="sr-only">Action, pause line and re-open line for each area</caption>
+                  <caption className="sr-only">Action, pause line and resume line for each area</caption>
                   <thead>
                     <tr className="border-b border-slate-800/80 text-fluid-nano text-slate-400">
                       <th scope="col" className="py-1.5 pr-3 font-medium">Area</th>

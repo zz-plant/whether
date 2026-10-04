@@ -144,6 +144,13 @@ inventory of every heading in `app/`:
 - **A nested section does not restate its host.** Inside a stepper step or a panel that already
   names it, pass `hideHeader` (`docs/agents/ui-ux-standards.md` → XI) or give it a strictly
   more specific title. Four "share" headings on one `/operate` step was the failure case.
+- **A page does not narrate what its structure already says.** The "On this page" index names the
+  sections, a table caption names the table, a heading names the section; a summary or intro line
+  that lists the same things is the outline read aloud. The intro summary states the page's job
+  instead — `/signals` says "The evidence behind this week's guidance", not "What moved, why it
+  matters, and what would change the guidance", which was the index as a sentence (found
+  2026-10-04). Same rule for a caption narrating controls the rows already show: the `/share` tag
+  table's caption pointed at its own copy buttons.
 - **Sentence case everywhere.** Capitals only for proper nouns: Whether, Operating latitude, the
   weather regime names, FRED. No all-caps in source — `.type-eyebrow` uppercases in CSS — and no
   emoji in a heading or label.
