@@ -59,7 +59,9 @@ export default async function SignalsPage({
         },
         page: {
           pageTitle: "Why the weekly brief changed",
-          pageSummary: "What moved, why it matters, and what would change the guidance.",
+          // States the page's job; the index below already names the sections
+          // (editorial-guardrails.md -> Headings).
+          pageSummary: "The evidence behind this week's guidance.",
           sectionLinks: model.sectionLinks,
           activeStep: "signals",
         },

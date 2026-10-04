@@ -140,7 +140,7 @@ export default async function HistoryPage({
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },
-        page: { pageTitle: "History", pageSummary: "Historical conditions and the weekly briefs published on the record.", sectionLinks: historySectionLinks },
+        page: { pageTitle: "History", pageSummary: "Look up what the guidance said in any past month, and how it held up.", sectionLinks: historySectionLinks },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },

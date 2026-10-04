@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -220,5 +221,29 @@ describe("ReportShell extracted sections", () => {
     // The button names where it goes; it said "Continue →" on every page.
     assert.match(html, />Resolve a decision</);
     assert.doesNotMatch(html, /Continue →/);
+  });
+});
+
+/*
+ * The intro summary states the page's job; the "On this page" index beneath it
+ * names the sections (editorial-guardrails.md -> Headings, ui-ux-standards XI).
+ * The 2026-10-04 audit found three summaries that were the index read aloud;
+ * these pins keep them from sliding back to enumeration.
+ */
+describe("report route page summaries", () => {
+  it("state the page's job, not the outline beneath them", async () => {
+    const signals = await readFile("app/signals/page.tsx", "utf8");
+    assert.match(signals, /pageSummary: "The evidence behind this week's guidance."/);
+    // The meta description and OG subtitle keep the enumeration: in a search
+    // result or social card there is no outline beneath the sentence.
+    assert.doesNotMatch(signals, /pageSummary: "What moved/);
+
+    const history = await readFile("app/history/page.tsx", "utf8");
+    assert.match(history, /pageSummary: "Look up what the guidance said in any past month, and how it held up."/);
+    assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);
+
+    const plan = await readFile("app/operate/planningPageModel.ts", "utf8");
+    assert.match(plan, /pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap."/);
+    assert.doesNotMatch(plan, /Set the rules, check runway/);
   });
 });
