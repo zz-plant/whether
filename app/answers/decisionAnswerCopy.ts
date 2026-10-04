@@ -1,5 +1,6 @@
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { RegimeKey } from "../../lib/regimeEngine";
+import { revisitDecisionPhrase } from "../../lib/report/decisionTransmissionCopy";
 
 /*
  * This used to render as a key:value line — "Operating posture: Cloudy ·
@@ -31,7 +32,7 @@ export const buildDecisionAnswerContextSummary = ({
     ? `Underneath, the scores read ${canonicalLabel}.`
     : null;
   const movement = MOVEMENT_PHRASES[momentumLabel] ?? "";
-  const standing = revisitDecisions ? "revisit last week's decisions." : "last week's decisions stand.";
+  const standing = `${revisitDecisionPhrase(revisitDecisions)}.`;
 
   return {
     summaryLine: movement

@@ -8,6 +8,7 @@ import {
   organizationName,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
+import { revisitDecisionPhrase } from "../../../lib/report/decisionTransmissionCopy";
 import {
   canonicalCapitalDisciplinePath,
   findResourcePillarBySlug,
@@ -168,7 +169,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           article={article}
           decisionArtifact={{
             decisionShiftSummary: homeBriefModel.decisionShiftSummary,
-            postureSummary: `Conditions are ${displayRegime.label}${reportData.reportDynamics.directionLabel === "unavailable" ? ", with no comparison to last week available" : ` and ${reportData.reportDynamics.directionLabel} this week`}; ${homeBriefModel.revisitDecisions ? "recheck last week's approvals" : "last week's approvals stand"}.`,
+            postureSummary: `Conditions are ${displayRegime.label}${reportData.reportDynamics.directionLabel === "unavailable" ? ", with no comparison to last week available" : ` and ${reportData.reportDynamics.directionLabel} this week`}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions)}.`,
             mappedRules,
             freshnessLabel: reportData.fetchedAtLabel,
             citation: callCitation,

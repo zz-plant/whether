@@ -95,13 +95,17 @@ const BANNED: { name: string; pattern: RegExp }[] = [
  * script islands removed, so a JSON-LD block or an id does not count as a sentence.
  */
 const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
-  { name: "posture", pattern: /\bposture\b/gi, baseline: 7 },
-  { name: "regime", pattern: /\bregime\b/gi, baseline: 1 },
+  /* 2026-10-04: baselines tightened to the totals the report flag prints after
+     the merged copy work (posture 4, regime 0, bounded 0, stance 0). The
+     homepage and its components are not rendered here, so a wording fix there
+     does not move these numbers — only work on the counted surfaces does. */
+  { name: "posture", pattern: /\bposture\b/gi, baseline: 4 },
+  { name: "regime", pattern: /\bregime\b/gi, baseline: 0 },
   { name: "corridor", pattern: /\bcorridor\b/gi, baseline: 0 },
   { name: "cadence", pattern: /\bcadence\b/gi, baseline: 0 },
   { name: "discipline", pattern: /\bdiscipline\b/gi, baseline: 5 },
-  { name: "bounded", pattern: /\bbounded\b/gi, baseline: 3 },
-  { name: "stance", pattern: /\bstance\b/gi, baseline: 1 },
+  { name: "bounded", pattern: /\bbounded\b/gi, baseline: 0 },
+  { name: "stance", pattern: /\bstance\b/gi, baseline: 0 },
   { name: "flip", pattern: /\bflips?\b/gi, baseline: 0 },
   { name: "board", pattern: /\bboard\b/gi, baseline: 10 },
   /* "The call" did three jobs — the recommendation, the market state and the line between
