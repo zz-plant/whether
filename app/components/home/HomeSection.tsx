@@ -35,7 +35,7 @@ export function HomeSection({
       data-page-section={id}
       tabIndex={-1}
       aria-labelledby={headingId}
-      className={`space-y-3 border-t border-slate-800/70 pt-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400 ${className}`.trim()}
+      className={`weather-section-stack weather-home-section border-t border-slate-800/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400 ${className}`.trim()}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
         <h2 id={headingId} className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">

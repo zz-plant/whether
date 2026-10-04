@@ -4,25 +4,17 @@ import { describe, it } from "bun:test";
 
 describe("home route render contract", () => {
   it("keeps the horizon control beside the card it changes", () => {
-    /* It used to sit under `BelowTheFoldEvidence`, roughly 1,500px below the
-       card it swaps, and reached back up with a `scrollIntoView` — so the only
-       way to use it correctly was to be scrolled somewhere you had not asked to
-       go, and the only way to discover it was to have already scrolled past
-       everything it affects. It now sits in the meta row with the week
-       switcher, which is where this page keeps its other period controls.
-
-       A source read, and it has to be: the claim is about where in the document
-       the control sits relative to another element, and this page suspends at
-       its data boundary in this suite, so a render gives a shell. */
+    // The horizon stays adjacent to the card it changes, after the call so
+    // wrapping secondary controls cannot take the phone's first viewport.
     const source = readFileSync("app/page.tsx", "utf8");
     assert.equal(source.split("<CadenceSelector").length - 1, 1);
     assert.ok(
-      source.indexOf("<CadenceSelector") < source.indexOf("<DecisionHero"),
-      "the horizon control must sit above the call it restates",
+      source.indexOf("<CadenceSelector") > source.indexOf("<DecisionHero"),
+      "the call must precede its secondary horizon control",
     );
     assert.ok(
-      source.indexOf("<CadenceSelector") < source.indexOf("<DoAndShareSection"),
-      "the horizon control must not be below the fold again",
+      source.indexOf("<CadenceSelector") < source.indexOf("<WhatChangedSection"),
+      "the horizon stays beside the call, before the evidence sections",
     );
     const header = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
     assert.ok(!header.includes("<CadenceSelector"));
@@ -191,7 +183,7 @@ describe("home route render contract", () => {
     const consequencesSource = readFileSync("app/components/home/WhatItChangesSection.tsx", "utf8");
     assert.match(
       consequencesSource,
-      /<div className="hidden sm:flex[^"]*">\s*<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      /<div className="hidden sm:(?:flex|grid)[^"]*">\s*<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
       "the sm+ tablists sit with the rules they reshape",
     );
     assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");

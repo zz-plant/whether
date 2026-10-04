@@ -58,6 +58,8 @@ describe("DecisionLedgerView status filters", () => {
     assert.match(html, /Watch \(1\)/);
     assert.match(html, /Stand \(1\)/);
     assert.match(html, /aria-label="Filter decisions by status"/);
+    assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 1);
+    assert.equal((html.match(/aria-pressed="false"/g) ?? []).length, 3);
   });
 
   it("omits filter chips for statuses with count 0", () => {

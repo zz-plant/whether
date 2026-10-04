@@ -96,7 +96,7 @@ export function ScenarioSliders({
             onChange={(e) => onBaseRateChange(Number.parseFloat(e.target.value))}
             className="w-full h-2 rounded-lg bg-slate-800 appearance-none cursor-pointer accent-sky-400"
           />
-          <div className="flex justify-between text-[10px] text-slate-500 tabular-nums">
+          <div className="flex justify-between text-fluid-nano text-slate-500 tabular-nums">
             <span>0.00% (zero rates)</span>
             <span>2.50% (neutral)</span>
             <span>5.00% (tight)</span>
@@ -129,7 +129,7 @@ export function ScenarioSliders({
             onChange={(e) => onCurveSlopeChange(Number.parseFloat(e.target.value))}
             className="w-full h-2 rounded-lg bg-slate-800 appearance-none cursor-pointer accent-sky-400"
           />
-          <div className="flex justify-between text-[10px] text-slate-500 tabular-nums">
+          <div className="flex justify-between text-fluid-nano text-slate-500 tabular-nums">
             <span>-1.50% (deeply inverted)</span>
             <span>0.00% (flat)</span>
             <span>+1.00% (normal)</span>

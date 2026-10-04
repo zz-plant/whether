@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { X } from "lucide-react";
 import {
   FIRST_TIME_GUIDE_HIGHLIGHTS,
   FIRST_TIME_GUIDE_NEXT_LINKS,
   FIRST_TIME_GUIDE_STEPS,
 } from "../../lib/report/reportCopy";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
-import { canonicalPositioningLine } from "../../lib/seo";
+import { canonicalPositioningLine, websiteName } from "../../lib/seo";
 import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
@@ -106,8 +107,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
           </p>
         ) : (
           <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-            Two scores, how hard it is to raise money and how much risk investors will fund, read each
-            Monday against the lines that pause or resume hiring, spend and raising.
+            {websiteName}
           </p>
         )}
         <button
@@ -116,7 +116,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
           aria-label="Dismiss introduction"
           className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
         >
-          Dismiss
+          <X size={16} aria-hidden="true" />
         </button>
       </div>
 
@@ -147,6 +147,13 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
             <span className="text-slate-500">{FIRST_TIME_GUIDE_STEPS.length} steps</span>
           </span>
         </summary>
+
+        {arrival !== "share" ? (
+          <p className="mt-2 max-w-[64ch] leading-relaxed text-slate-300">
+            Two scores, how hard it is to raise money and how much risk investors will fund, read each
+            Monday against the lines that pause or resume hiring, spend and raising.
+          </p>
+        ) : null}
 
         <ol className="mt-2 space-y-2">
           {FIRST_TIME_GUIDE_STEPS.map((step, index) => (

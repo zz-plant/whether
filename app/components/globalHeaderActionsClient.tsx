@@ -34,7 +34,7 @@ type GlobalHeaderActionsClientProps = {
  * removes the clip, so a child added later cannot silently lose its ring.
  */
 const CELL =
-  "inline-flex min-h-11 sm:min-h-9 min-w-11 items-center justify-center text-slate-400 transition-colors duration-150 hover:bg-slate-800/70 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sky-400";
+  "weather-header-action inline-flex min-h-11 min-w-11 items-center justify-center text-slate-400 transition-colors duration-150 hover:bg-slate-800/70 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sky-400";
 
 export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHeaderActionsClientProps = {}) {
   return (
@@ -45,13 +45,13 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
       <button
         type="button"
         onClick={() => document.dispatchEvent(new CustomEvent("whether-open-command-palette"))}
-        className={`${CELL} max-sm:hidden sm:px-2.5 md:min-w-[13rem] md:justify-start md:gap-2 md:px-3 md:text-fluid-xs md:text-slate-400`}
+        className={`${CELL} max-md:hidden xl:min-w-[13rem] xl:justify-start xl:gap-2 xl:px-3 xl:text-fluid-xs`}
         aria-label="Search"
         title="Search or jump to… ⌘K"
       >
         <Search aria-hidden="true" size={16} strokeWidth={1.8} />
-        <span className="hidden md:inline flex-1 text-left">Search or jump to…</span>
-        <span className="hidden md:inline"><kbd aria-hidden="true" className="weather-kbd">⌘K</kbd></span>
+        <span className="hidden xl:inline flex-1 text-left">Search or jump to…</span>
+        <span className="hidden xl:inline"><kbd aria-hidden="true" className="weather-kbd">⌘K</kbd></span>
       </button>
       {/* The light theme has a full token set in tokens.css and layout.tsx
           restores the saved choice pre-paint, but nothing rendered the control,
@@ -64,4 +64,3 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
     </div>
   );
 }
-

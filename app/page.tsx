@@ -442,7 +442,7 @@ async function PageContent({
         </div>
       ) : null}
       <div className="mx-auto max-w-[64rem] space-y-4 sm:space-y-8">
-        <div className="flex flex-col gap-4 sm:gap-8 min-w-0">
+        <div className="weather-brief-flow">
           {/* Above the brief, not after it. This is the orientation line for a
               first-time visitor, and it sat below the hero, all three operating
               levers, and the compare strip — roughly 2,800px down on mobile,
@@ -463,17 +463,9 @@ async function PageContent({
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
           <FirstVisitExplainer arrival={arrivedFromShare ? "share" : undefined} />
-          {/* Meta row: week switcher and the confidence popover. The "Data through …
-              · refreshed …" line that sat under the switcher restated the hero's
-              trust line and the popover's timestamp; the stage pill that sat beside
-              the popover overlapped the hero's own stage control at every width
-              above `sm` (the header carries the phone-only pill).
-
-              The row wraps rather than stacking below `sm`: on a 430px phone the
-              week title and the confidence chip fit on one line, and stacking
-              them put a fifth row between the top of the page and the call on a
-              first visit. Where they do not fit, the chip wraps under the
-              title, which is the row the stack gave every phone. */}
+          {/* Browse the week before the call. Horizon and confidence details
+              follow the call beside Copy Brief, so wrapping controls cannot
+              push the reading below the first phone viewport. */}
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
             <div>
               <div className="flex items-center gap-2">
@@ -514,35 +506,6 @@ async function PageContent({
                   </span>
                 )}
               </div>
-            </div>
-            {/* Folded on a first visit. On a 375px phone these wrap onto two
-                rows of their own between the week and the call, which put the
-                first-visit question's answers under the tab bar; the call
-                card's trust line already says how confident it is, and the
-                horizon is a returning reader's control. */}
-            <div
-              data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined}
-              className="flex flex-wrap items-center gap-2 self-start sm:self-auto mt-1 sm:mt-0"
-            >
-              {/* The horizon sits with the other period controls, next to the
-                  week it qualifies. It used to live at the foot of the page
-                  while the card it swaps renders at the top, and reached back
-                  up with a `scrollIntoView` — so using it correctly meant
-                  being scrolled somewhere you had not asked to go, and not
-                  using it meant never learning the card could change. */}
-              <CadenceSelector />
-              <CompactTrustPopover
-                /* The fallback is a code like the real value, not the phrase it
-                   used to be — the popover formats both the same way now. */
-                confidenceLabel={confidenceLabel ?? "HIGH"}
-                isHistorical={Boolean(historicalSelection)}
-                fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
-                recordDateLabel={homepage.reportShell.recordDateLabel}
-                treasurySource={homepage.reportShell.treasurySource}
-                degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-                record={trackRecord}
-                regime={regime}
-              />
             </div>
           </div>
           {/* No timeline scrubber above the call any more. The meta row's chevrons
@@ -601,9 +564,22 @@ async function PageContent({
                   one thing a first visit is asked. */}
               <div
                 data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined}
-                className="mt-3 flex flex-wrap items-center gap-2"
+                className="mt-4 flex flex-wrap items-center gap-2"
               >
                 <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
+                <CompactTrustPopover
+                  /* The fallback is a code like the real value, not the phrase it
+                     used to be — the popover formats both the same way now. */
+                  confidenceLabel={confidenceLabel ?? "HIGH"}
+                  isHistorical={Boolean(historicalSelection)}
+                  fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
+                  recordDateLabel={homepage.reportShell.recordDateLabel}
+                  treasurySource={homepage.reportShell.treasurySource}
+                  degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
+                  record={trackRecord}
+                  regime={regime}
+                />
+                <CadenceSelector />
               </div>
             </div>
 

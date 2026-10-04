@@ -149,7 +149,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             task block, not separation. Desktop stops at 32px: at 48px, on top
             of the first section's own padding, ~90px of empty ground sat
             between the intro and the page's first heading. */}
-        <div className={`order-1 min-w-0 space-y-6 sm:space-y-8 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
           {/* Every page built on this shell renders a reading, and the service
               worker serves the last copy of any of them when the network is
               gone. `/` carried this notice alone, so /trust — the page the IA
@@ -194,13 +194,13 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               invisible on the light theme's near-white ground, and 0.10 is
               not one of the four alphas the light escape-hatch block
               remaps. */}
-          {/* Every section row pads both sides, and the column pulls itself up
-              by one row's padding instead. Deciding "first" by index gave the
+          {/* Every section row owns its boundary padding; unboxed panels add no
+              second inset. The group cancels its first and last outer padding. Deciding "first" by index gave the
               top row no top padding — but the first child is often a tracker
               that renders nothing (/resolve, /operate), so the real first
               section took the full padding and sat ~32px lower than on pages
               without one. */}
-          <div className="-mt-5 divide-y divide-[color:var(--border-default)] lg:-mt-8">
+          <div className="weather-report-sections divide-y divide-[color:var(--border-default)]">
             {contentSections.map((section, index) => {
               const sectionKey =
                 isValidElement(section) && section.key != null
@@ -215,7 +215,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
                 // divider: an empty ~64px band between two rules on a first visit.
                 <div
                   key={sectionKey}
-                  className="empty:hidden py-5 lg:py-8"
+                  className="weather-report-section-row empty:hidden"
                 >
                   {section}
                 </div>

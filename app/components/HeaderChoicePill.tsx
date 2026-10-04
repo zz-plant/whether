@@ -70,7 +70,7 @@ export function HeaderChoicePill<Key extends string>({
             is. Two lines inside the same 44px target, so the header does not
             widen at phone width. */}
         <span className="flex flex-col items-start leading-none">
-          <span aria-hidden="true" className="text-[10px] font-medium text-slate-400">{label}</span>
+          <span aria-hidden="true" className="text-fluid-nano font-medium text-slate-400">{label}</span>
           <Select.Value className="mt-0.5">{selected?.label}</Select.Value>
         </span>
         <Select.Icon>
@@ -89,7 +89,7 @@ export function HeaderChoicePill<Key extends string>({
                 >
                   <div>
                     <Select.ItemText>{option.label}</Select.ItemText>
-                    <div className="text-[10px] font-normal text-slate-400">{option.sublabel}</div>
+                    <div className="text-fluid-nano font-normal text-slate-400">{option.sublabel}</div>
                   </div>
                   <Select.ItemIndicator>
                     <CheckIcon className="h-3.5 w-3.5 text-sky-400" />

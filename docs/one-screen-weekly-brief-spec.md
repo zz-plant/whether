@@ -506,7 +506,13 @@ same thing, the earlier one keeps it.
 
 ### Home cadence placement (2026-09-12)
 
-The weekly call precedes horizon selection on mobile and desktop. Weekly / Monthly / Quarterly stays available under the lower plan-and-evidence handoff, using the existing selector. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header. This completes the home-fold work deferred in PR #1351.
+The weekly call precedes horizon selection on mobile and desktop. As of 2026-10-03, Weekly / Monthly / Quarterly sits directly under the call beside Copy Brief and confidence details, before the evidence sections. This keeps the selector adjacent to the card it changes without letting wrapped controls push the call down on a phone. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header.
+
+### Responsive readability (2026-10-03)
+
+- On a first visit, the opening line uses `websiteName` from `lib/seo.ts`; the longer explanation of the two scores stays inside the existing reading guide. The dismiss icon retains its accessible name and 44px target.
+- The shared area-rule table and homepage signal-change table remain stacked below `md`, so landscape phones can read pause/resume lines and ladders without horizontal scrolling. Each phone signal row gives its description, movement and ladder the full column width; a clipped-score explanation cannot squeeze the signal label into one word per line. Desktop retains the table columns and their semantic headers.
+- Shared navigation and control sizing follow `docs/agents/ui-ux-standards.md` §VI; touch sizing depends on pointer capability as well as viewport width.
 
 ### Declutter pass (2026-09-15)
 

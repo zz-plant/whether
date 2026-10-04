@@ -38,7 +38,7 @@ export function SharePageFormats({
   if (!artifact) return null;
 
   return (
-    <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="copy-call-heading">
+    <section className="weather-panel weather-section-stack p-0" aria-labelledby="copy-call-heading">
       <h2 id="copy-call-heading" className="text-xl font-semibold text-white sm:text-2xl">Copy this week&apos;s guidance</h2>
       {/* Labelled and ruled at the left, so the four lines read as the readings
           behind every format rather than the opening of the text the tabs

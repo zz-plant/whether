@@ -67,7 +67,7 @@ export function ScenarioDeltas({
                   {formatScenarioDelta(tightnessDelta, " pts")} vs this week
                 </span>
                 {simulatedAssessment.scores.tightnessSaturated ? (
-                  <span className="text-[10px] text-amber-300"> · at the top of the scale</span>
+                  <span className="text-fluid-nano text-amber-300"> · at the top of the scale</span>
                 ) : null}
               </>
             }

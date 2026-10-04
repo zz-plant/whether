@@ -225,16 +225,37 @@ input:not([type="range"]) {
   transform: translateY(0);
 }
 
-/* Pointer-width viewports. The 44/46px floors above exist for touch targets;
-   past the sm breakpoint the repo already opts individual controls down to
-   36px (the header's primary action does this inline), so apply it once to
-   the shared control classes instead of per call site. Mobile keeps 44px. */
-@media (min-width: 640px) {
+/* Compact controls are for a mouse, not a screen width. Tablets and landscape
+   phones still need the touch floor even when they cross the sm breakpoint. */
+.weather-timeline-control {
+  min-height: 44px;
+  min-width: 44px;
+}
+.weather-timeline-track { min-height: 44px; }
+
+@media (min-width: 640px) and (hover: hover) and (pointer: fine) {
   .weather-pill,
   .weather-cta,
   .weather-button,
-  .weather-button-primary {
+  .weather-button-primary,
+  .weather-header-action,
+  .weather-segment-option {
     min-height: 36px;
+  }
+  .weather-timeline-control {
+    min-height: 32px;
+    min-width: 32px;
+  }
+  .weather-timeline-track { min-height: 36px; }
+}
+
+/* iOS zooms a focused field below 16px. A tablet can match sm:text-xs, so
+   protect native fields by input capability as well as their mobile layout. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea {
+    font-size: max(16px, 1em);
   }
 }
 

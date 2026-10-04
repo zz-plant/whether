@@ -123,7 +123,7 @@ export function RunwayAreaNote({ regime, area }: { regime: RegimeKey; area: Deci
       data-testid="runway-area-note"
       className="mt-1.5 flex items-start gap-1.5 rounded border border-amber-500/25 bg-amber-500/10 px-2 py-1 text-xs leading-snug text-amber-200/95"
     >
-      <span className="shrink-0 mt-0.5 rounded bg-amber-400/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">
+      <span className="shrink-0 rounded bg-amber-400/20 px-1 py-0.5 text-fluid-nano font-bold uppercase tracking-wider text-amber-300">
         Runway
       </span>
       <span>{note.note}</span>

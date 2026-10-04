@@ -445,13 +445,13 @@ export function TimelineBar({
     >
       {/* Top Header Row: Step buttons, Active Readout, Zoom Presets, Jump to Live */}
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={goToPrevious}
             disabled={!canGoPrevious}
             aria-label="Previous month"
-            className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+            className="weather-timeline-control inline-flex items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 weather-focus-ring"
           >
             <ChevronLeft className="size-3.5" aria-hidden="true" />
           </button>
@@ -461,7 +461,7 @@ export function TimelineBar({
             onClick={goToNext}
             disabled={!canGoNext}
             aria-label="Next month"
-            className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+            className="weather-timeline-control inline-flex items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 weather-focus-ring"
           >
             <ChevronRight className="size-3.5" aria-hidden="true" />
           </button>
@@ -469,7 +469,7 @@ export function TimelineBar({
           {/* Current Period Badge. This answers "where am I", so it tracks the
               selection and any commit in flight — never the hover, which is a
               question about where you *would* land and belongs in the tooltip. */}
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-fluid-micro">
+          <div className="flex flex-wrap items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-fluid-micro">
             <span
               className={`size-2 rounded-full ${
                 selected.entry ? REGIME_COLORS[selected.entry.regime] : "bg-slate-400"
@@ -486,14 +486,14 @@ export function TimelineBar({
             <span className="text-slate-400 font-normal">· {selected.regime}</span>
             {isLive ? (
               <span
-                className="ml-1 rounded px-1 py-0.2 bg-emerald-500/20 text-emerald-300 font-mono text-[10px] uppercase tracking-wider"
+                className="ml-1 rounded px-1 py-0.5 bg-emerald-500/20 text-emerald-300 font-mono text-fluid-nano uppercase tracking-wider"
                 title="Newest month on record. The weekly guidance above is more recent."
               >
                 Latest
               </span>
             ) : null}
             {isPending ? (
-              <span className="ml-1 text-slate-500 font-mono text-[10px] uppercase tracking-wider">
+              <span className="ml-1 text-slate-500 font-mono text-fluid-nano uppercase tracking-wider">
                 Loading
               </span>
             ) : null}
@@ -503,7 +503,7 @@ export function TimelineBar({
             <button
               type="button"
               onClick={goToLatest}
-              className="rounded-md border border-sky-500/30 bg-sky-500/10 px-2 py-1 text-fluid-micro font-medium text-sky-300 transition-colors hover:bg-sky-500/20"
+              className="weather-timeline-control rounded-md border border-sky-500/30 bg-sky-500/10 px-2 py-1 text-fluid-micro font-medium text-sky-300 transition-colors hover:bg-sky-500/20 weather-focus-ring"
             >
               Jump to latest
             </button>
@@ -534,7 +534,7 @@ export function TimelineBar({
                     setZoom(preset);
                     setWindowStart(null);
                   }}
-                  className={`px-2 py-0.5 rounded-md font-mono transition-all ${
+                  className={`weather-timeline-control px-2 py-0.5 rounded-md font-mono transition-colors weather-focus-ring ${
                     isActive
                       ? "bg-sky-500/25 text-sky-200 font-semibold border border-sky-400/40 shadow-sm"
                       : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
@@ -565,7 +565,7 @@ export function TimelineBar({
         aria-valuenow={handleIndex}
         aria-valuetext={`${selected.period}, ${selected.regime}`}
         aria-busy={isPending}
-        className="relative group cursor-pointer h-9 w-full rounded-md border border-slate-700/60 bg-slate-950/80 p-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 touch-none"
+        className="weather-timeline-track relative group cursor-pointer h-9 w-full rounded-md border border-slate-700/60 bg-slate-950/80 p-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400 touch-none"
       >
         {/* Continuous Regime Color Strip Segments */}
         <div className="relative flex h-full w-full overflow-hidden rounded-[4px]">

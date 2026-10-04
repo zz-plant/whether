@@ -8,7 +8,6 @@ type RegimeRadarProps = {
   tightnessThreshold: number;
   riskAppetiteThreshold: number;
   currentRegime: string;
-  pointsToPause?: number | null;
   className?: string;
 };
 
@@ -34,7 +33,6 @@ export function RegimeRadar({
   tightnessThreshold,
   riskAppetiteThreshold,
   currentRegime,
-  pointsToPause,
   className = "",
 }: RegimeRadarProps) {
   const boundaryX = xFor(riskAppetiteThreshold);
@@ -52,6 +50,8 @@ export function RegimeRadar({
   const distY = Math.abs(currentY - boundaryY);
   const distX = Math.abs(currentX - boundaryX);
   const nearestIsY = distY <= distX;
+  // The projection reaches a regime boundary, not a company's pause line.
+  const pointsToBoundary = Math.round((Math.min(distX, distY) / PLOT_SIZE) * 100);
 
   // Any string: a known regime maps to its weather word, anything else passes
   // through, so an unmodelled label still reads instead of rendering blank.
@@ -62,8 +62,8 @@ export function RegimeRadar({
       className={`relative m-0 flex flex-col items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/50 p-3 ${className}`.trim()}
       aria-label={`Conditions radar: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}`}
     >
-      <div className="mb-1.5 flex w-full items-center justify-between text-[11px] text-slate-300">
-        <span className="font-semibold text-slate-100">Climate plane</span>
+      <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
+        <span className="font-semibold text-slate-100">Conditions</span>
         <span className="tabular-nums text-slate-400">
           Pressure {tightness} · Appetite {riskAppetite}
         </span>
@@ -114,7 +114,8 @@ export function RegimeRadar({
         <text
           x={PLOT_X + 6}
           y={PLOT_Y + 12}
-          className="fill-rose-300/50 text-[8px] font-bold uppercase tracking-wider"
+          className="text-[10px] font-bold uppercase tracking-wider"
+          fill="var(--color-semantic-reversal-fg)"
         >
           Freezing
         </text>
@@ -122,14 +123,16 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_Y + 12}
           textAnchor="end"
-          className="fill-amber-300/50 text-[8px] font-bold uppercase tracking-wider"
+          className="text-[10px] font-bold uppercase tracking-wider"
+          fill="var(--color-semantic-caution-fg)"
         >
           Cloudy
         </text>
         <text
           x={PLOT_X + 6}
           y={PLOT_BOTTOM - 6}
-          className="fill-purple-300/50 text-[8px] font-bold uppercase tracking-wider"
+          className="text-[10px] font-bold uppercase tracking-wider"
+          fill="var(--color-semantic-stormy-fg)"
         >
           Stormy
         </text>
@@ -137,7 +140,8 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_BOTTOM - 6}
           textAnchor="end"
-          className="fill-emerald-300/50 text-[8px] font-bold uppercase tracking-wider"
+          className="text-[10px] font-bold uppercase tracking-wider"
+          fill="var(--color-semantic-easing-fg)"
         >
           Sunny
         </text>
@@ -252,7 +256,7 @@ export function RegimeRadar({
           x={PLOT_X + PLOT_SIZE / 2}
           y={PLOT_BOTTOM + 14}
           textAnchor="middle"
-          className="fill-slate-400 text-[8.5px]"
+          className="fill-slate-400 text-[11px]"
         >
           Risk appetite →
         </text>
@@ -261,21 +265,15 @@ export function RegimeRadar({
           y={PLOT_Y + PLOT_SIZE / 2}
           textAnchor="middle"
           transform={`rotate(-90, ${PLOT_X - 8}, ${PLOT_Y + PLOT_SIZE / 2})`}
-          className="fill-slate-400 text-[8.5px]"
+          className="fill-slate-400 text-[11px]"
         >
           Pressure ↑
         </text>
       </svg>
 
-      {typeof pointsToPause === "number" ? (
-        <figcaption className="mt-1 text-center text-fluid-nano text-slate-400">
-          {pointsToPause <= 10 ? (
-            <span className="font-medium text-rose-300">{pointsToPause} points to boundary line</span>
-          ) : (
-            <span>{pointsToPause} points to boundary line</span>
-          )}
-        </figcaption>
-      ) : null}
+      <figcaption className="mt-1 text-center text-fluid-nano text-slate-400">
+        {pointsToBoundary} points to nearest change line
+      </figcaption>
     </figure>
   );
 }

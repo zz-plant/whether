@@ -74,7 +74,7 @@ const CONTAINER = {
   choices: "flex flex-wrap items-center gap-2",
 } as const;
 
-/* 44px on touch, dropping to the 36px pointer size the header already uses.
+/* 44px on touch, dropping to 36px only for a fine pointer (controls.css).
    The focus ring is drawn on the painted span from the input's own
    `:focus-visible`, so keyboard focus stays visible with the input clipped.
 
@@ -82,7 +82,7 @@ const CONTAINER = {
    pointer is always over the input and a plain `hover:` on this span never
    matched. Every segmented control on the site had no hover state at all. */
 const OPTION_BASE =
-  "flex min-h-[44px] sm:min-h-9 min-w-[2.75rem] cursor-pointer items-center justify-center px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] peer-hover:text-slate-200 peer-checked:bg-sky-500/15 peer-checked:text-[color:var(--app-text)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
+  "weather-segment-option flex min-h-[44px] min-w-[2.75rem] cursor-pointer items-center justify-center px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] peer-hover:text-slate-200 peer-checked:bg-sky-500/15 peer-checked:text-[color:var(--app-text)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
 
 const OPTION = {
   segmented: `${OPTION_BASE} rounded-sm text-slate-400 peer-hover:bg-slate-800/50`,

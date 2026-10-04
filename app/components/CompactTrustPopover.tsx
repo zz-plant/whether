@@ -26,7 +26,7 @@ const SERIES_CITATIONS = {
 
 function SeriesCitations({ series }: { series: ReadonlyArray<{ name: string; code: string }> }) {
   return (
-    <ul className="space-y-0.5 text-right text-[10px] text-slate-500">
+    <ul className="space-y-0.5 text-right text-fluid-nano text-slate-500">
       {series.map((entry) => (
         <li key={entry.code}>
           {entry.name} · <span className="font-mono">FRED {entry.code}</span>
@@ -188,7 +188,7 @@ export function CompactTrustPopover({
             ) : null}
 
             <div className="mt-3 flex items-center justify-between border-t border-white/[0.08] pt-2">
-              <span className="text-[10px] text-slate-500">Same rule every week</span>
+              <span className="text-fluid-nano text-slate-500">Same rule every week</span>
               <Link href="/trust" className={POPOVER_LINK_CLASS}>
                 How the score is built
               </Link>

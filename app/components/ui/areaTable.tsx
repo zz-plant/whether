@@ -50,9 +50,9 @@ type AreaTableProps = {
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
 
 /* The column names, repeated inside each cell for the stacked phone layout,
-   where the header row is not drawn. Hidden from sm up, where the header is. */
+   where the header row is not drawn. Hidden from md up, where the header is. */
 const CellLabel = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
-  <span className={`mb-0.5 block text-[11px] font-medium sm:hidden ${className}`.trim()}>{children}</span>
+  <span className={`mb-0.5 block text-xs font-medium md:hidden ${className}`.trim()}>{children}</span>
 );
 
 const LineCell = ({
@@ -94,7 +94,7 @@ const LineCell = ({
 };
 
 /**
- * A table from sm up. Below it the four columns do not fit a phone — the
+ * A table from md up. Below it the four columns do not fit a phone — the
  * resume line sat off the right edge behind a sideways scroll — so each row
  * restacks as a block: the area, the rule across the full width, then the
  * pause and resume lines side by side, each labelled in its cell. One DOM for
@@ -105,10 +105,10 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
   const showChanged = ordered.some((row) => row.changed);
   const showAction = ordered.some((row) => row.action);
   return (
-    <div className={`sm:overflow-x-auto ${className}`.trim()}>
-      <table className="w-full border-collapse text-left text-sm max-sm:block sm:min-w-[36rem]">
+    <div className={`md:overflow-x-auto overscroll-x-contain ${className}`.trim()}>
+      <table className="w-full border-collapse text-left text-sm max-md:block md:min-w-[36rem]">
         <caption className="sr-only">{caption}</caption>
-        <thead className="max-sm:hidden">
+        <thead className="max-md:hidden">
           <tr className="border-b border-slate-800/80 text-xs text-slate-400">
             <th scope="col" className="py-2 pr-3 font-medium">Area</th>
             <th scope="col" className="py-2 pr-3 font-medium">This week</th>
@@ -122,15 +122,15 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
             ) : null}
           </tr>
         </thead>
-        <tbody className="max-sm:block">
+        <tbody className="max-md:block">
           {ordered.map((row) => (
             <tr
               key={row.area}
               id={`area-${row.area}`}
-              className="border-b border-slate-800/50 align-top max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-4 max-sm:gap-y-2 max-sm:py-3"
+              className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3"
               data-area={row.area}
             >
-              <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-sm:col-span-2 max-sm:p-0">
+              <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:col-span-2 max-md:p-0">
                 {row.href ? (
                   <Link href={row.href} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
                     {row.hrefLabel ?? decisionAreaLabel(row.area)}
@@ -140,34 +140,34 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 )}
                 <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
                   {row.area === "hiring" || row.area === "burn-discipline" ? (
-                    <>Line set by <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a></>
+                    <>Line set by <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a></>
                   ) : row.area === "product-tempo" || row.area === "expansion-bets" ? (
-                    <>Line set by <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
+                    <>Line set by <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
                   ) : row.area === "capital-raising" ? (
-                    <>Lines set by <a href="#signal-funding-pressure" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> &amp; <a href="#signal-risk-appetite" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
+                    <>Lines set by <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> &amp; <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
                   ) : null}
                 </span>
               </th>
-              <td className="py-2.5 pr-3 text-slate-200 max-sm:col-span-2 max-sm:p-0">
+              <td className="py-2.5 pr-3 text-slate-200 max-md:col-span-2 max-md:p-0">
                 {row.rule}
                 {row.note}
               </td>
-              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-sm:p-0">
+              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
                 <CellLabel className="text-semantic-caution-fg">Pause line</CellLabel>
                 <LineCell value={row.pause} kind="pause" />
               </td>
-              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-sm:p-0">
+              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
                 <CellLabel className="text-semantic-easing-fg">Resume line</CellLabel>
                 <LineCell value={row.resume} kind="resume" />
               </td>
               {showChanged ? (
-                <td className={`py-2.5 pr-3 text-slate-300 max-sm:col-span-2 max-sm:p-0 ${row.changed ? "" : "max-sm:hidden"}`.trim()}>
+                <td className={`py-2.5 pr-3 text-slate-300 max-md:col-span-2 max-md:p-0 ${row.changed ? "" : "max-md:hidden"}`.trim()}>
                   <CellLabel className="text-slate-400">Changed</CellLabel>
                   {row.changed ?? <span className="text-slate-500">—</span>}
                 </td>
               ) : null}
               {showAction ? (
-                <td className="whitespace-nowrap py-2.5 text-right max-sm:col-span-2 max-sm:p-0 max-sm:text-left">{row.action}</td>
+                <td className="whitespace-nowrap py-2.5 text-right max-md:col-span-2 max-md:p-0 max-md:text-left">{row.action}</td>
               ) : null}
             </tr>
           ))}

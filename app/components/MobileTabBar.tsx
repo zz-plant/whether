@@ -51,7 +51,7 @@ const startsInHorizontalOwner = (target: EventTarget | null): boolean => {
 };
 
 const TAB_CLASS =
-  "flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[0.68rem] font-medium leading-none no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400";
+  "flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-fluid-nano font-medium leading-none no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400";
 
 /**
  * The loop, one thumb-tap away on a phone.

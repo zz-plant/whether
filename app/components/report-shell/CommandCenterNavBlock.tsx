@@ -66,7 +66,7 @@ export function CommandCenterNavBlock({
 
   return (
     <section
-      className="weather-surface-secondary weather-page-intro relative min-w-0 px-4 py-3 sm:px-5 sm:py-4"
+      className="weather-surface-secondary weather-page-intro weather-inset relative min-w-0"
       aria-label="Page introduction"
     >
       {/* Two columns from lg up: the reading block keeps its measure on the

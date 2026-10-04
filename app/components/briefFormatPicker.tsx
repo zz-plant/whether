@@ -25,14 +25,12 @@ export const BriefFormatPicker = ({
   onSelect: (id: BriefFormatId) => void;
   onCopy: () => void;
 }) => (
-  /* A container, not a viewport breakpoint: the same picker sits in the narrow
-     share drawer and across the full width of /share. At full width the 2×2
-     grid drew four buttons each half the page wide, and the copy button ran
-     edge to edge under a preview a third of that width. */
-  <div className="@container">
+  /* The drawer and share page use the same reading width. Container queries
+     keep four equal tabs beside the wide preview and two per row in a drawer. */
+  <div className="@container w-full max-w-3xl">
     <fieldset className="mt-2">
       <legend className="sr-only">Format</legend>
-      <div className="grid grid-cols-2 gap-1.5 @xl:max-w-xl @xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 @xl:grid-cols-4">
         {BRIEF_FORMATS.map((option) => (
           <button
             key={option.id}
@@ -51,17 +49,22 @@ export const BriefFormatPicker = ({
       </div>
     </fieldset>
     <p className="mt-1.5 text-xs text-slate-400">{activeFormat.hint}</p>
-    {/* The preview is the copy payload itself, not a rendering of it. A picker
-        that describes three formats and copies a fourth thing is the failure the
-        share panel used to have. No scroll container of its own: the host
-        scrolls, and a nested scroller would need its own tab stop to stay
-        keyboard-reachable. */}
-    <pre
-      aria-label={`Preview of the ${activeFormat.label} format`}
-      className="mt-2 whitespace-pre-wrap break-words rounded-md border border-slate-800/70 bg-slate-950/60 p-2.5 text-[11px] leading-5 text-slate-300"
-    >
-      {briefText}
-    </pre>
+    {/* The preview is the copy payload itself, with realistic channel context. */}
+    <div className="mt-2 overflow-hidden rounded-md border border-slate-800/80 bg-slate-950/80">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-slate-800/60 bg-slate-900/60 px-3 py-1.5 text-fluid-nano text-slate-400">
+        <span className="flex items-center gap-1.5 font-medium text-slate-300">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-sky-400/80" aria-hidden="true" />
+          {activeFormat.label} format
+        </span>
+        <span className="text-slate-500 tabular-nums">Ready to paste</span>
+      </div>
+      <pre
+        aria-label={`Preview of the ${activeFormat.label} format`}
+        className="whitespace-pre-wrap break-words p-3 text-fluid-xs leading-5 text-slate-300"
+      >
+        {briefText}
+      </pre>
+    </div>
     <button
       type="button"
       onClick={onCopy}

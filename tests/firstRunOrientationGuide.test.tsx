@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FirstVisitExplainer } from "../app/components/homeFirstRunOrientation";
-import { canonicalPositioningLine } from "../lib/seo";
+import { canonicalPositioningLine, websiteName } from "../lib/seo";
 import {
   FIRST_TIME_GUIDE_HIGHLIGHTS,
   FIRST_TIME_GUIDE_NEXT_LINKS,
@@ -56,11 +56,13 @@ describe("first-run orientation guide", () => {
 
   it("keeps the standfirst first and the guide collapsed behind it", () => {
     const html = markup();
-    const standfirst = html.indexOf("read each");
+    const standfirst = html.indexOf(websiteName);
     const guide = html.indexOf("How to read this page");
 
     assert.ok(standfirst >= 0 && guide > standfirst, "the guide displaced the opening line");
     assert.ok(html.includes("<details"), "the guide is not collapsed");
+    assert.ok(html.indexOf("read each") > guide, "the longer explanation belongs inside the guide");
+    assert.match(html, /aria-label="Dismiss introduction"/, "the compact dismiss control keeps its name");
   });
 
   /*

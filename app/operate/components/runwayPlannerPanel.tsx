@@ -531,7 +531,7 @@ export function RunwayPlannerPanel({
               Budget memo
             </summary>
             <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
                 <p className="text-fluid-xs text-slate-400">Built from the figures above. Check them before you send it.</p>
                 <ClipboardActionRow
                   label="Copy memo"
@@ -542,7 +542,7 @@ export function RunwayPlannerPanel({
                   compact
                 />
               </div>
-              <pre className="max-h-72 overflow-y-auto overscroll-contain whitespace-pre-wrap rounded bg-slate-950/90 p-3 font-mono text-[11px] leading-relaxed text-slate-300 border border-slate-900">
+              <pre className="max-h-72 overflow-y-auto overscroll-contain whitespace-pre-wrap break-words rounded bg-slate-950/90 p-3 font-mono text-fluid-xs leading-relaxed text-slate-300 border border-slate-900">
                 {memoMarkdown}
               </pre>
             </div>
