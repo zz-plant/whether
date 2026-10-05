@@ -89,7 +89,9 @@ export const publishedScoreLines = (
 
 const LINE_WEIGHT: Record<PublishedLine["kind"], number> = { pause: 3, change: 2, resume: 1 };
 
-export const checkRegimeChange = (
+/* Internal only: the regime flip test for evaluateAlert. The cron's own regime-change
+   check is lib/alert/checkRegimeChange.ts, a different function with the same name. */
+const checkRegimeChange = (
   currentRegime: string,
   lastRegime: string,
 ): boolean => currentRegime !== lastRegime;
