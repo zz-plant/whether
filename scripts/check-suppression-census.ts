@@ -241,16 +241,13 @@ export function takeCensus(files: string[] = collectFiles()): Census {
  */
 const BASELINE: Record<string, number> = {
   /*
-   * 7 -> 8 on 2026-09-16, traded against `disabledLintRules` 2 -> 1. This is the
-   * one direction a rise is allowed: `react/no-danger` was off for the whole
-   * repo because fourteen surfaces embedded structured data by hand, and every
-   * one was a `<script>` holding JSON — the case the rule cannot tell from an
-   * HTML injection and the one React gives no other API for. Those uses are now
-   * a single `app/components/jsonLdScript.tsx`, so what was a rule disabled
-   * everywhere is a disable on one line someone has read. This file makes that
-   * argument itself two entries down, about scoped overrides; it applies here.
+   * 8 -> 4 on 2026-10-05, when `--report-unused-disable-directives` joined the lint
+   * script: four of the eight directives silenced rules oxlint never reports
+   * (no-constant-condition, ban-ts-comment, a file-level no-console block), so they
+   * were suppressing nothing and are gone. The flag now makes this class of staleness
+   * a lint failure directly, so what remains here is the count of live suppressions.
    */
-  lintSuppressions: 8,
+  lintSuppressions: 4,
   typeSuppressions: 3,
   skippedTests: 0,
   /*

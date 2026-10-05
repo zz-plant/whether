@@ -1560,7 +1560,6 @@ const cmdWatch = async (settings, flags) => {
   const intervalMs = Number(flags.interval ?? 60) * 1000;
   const changesOnly = Boolean(flags["changes-only"]);
   let previousFrame = null;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const body = await getJson(settings, changesOnly ? "/api/cli/changes" : "/api/cli/status");
     const frame = changesOnly ? changesText(body) : statusText(body);

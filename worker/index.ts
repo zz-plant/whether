@@ -67,7 +67,6 @@ interface Env {
   CF_VERSION_METADATA?: { id: string; tag: string; timestamp: string };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ScheduledEvent = { cron: string; scheduledTime: number; type: "scheduled" };
 type ExecutionContext = { waitUntil(promise: Promise<unknown>): void; passThroughOnException(): void };
 
