@@ -9,7 +9,7 @@ import {
   type SignalAlertInputPayload,
 } from "../lib/signalOps";
 import { DEFAULT_THRESHOLDS, type RegimeAssessment } from "../lib/regimeEngine";
-import { buildDecisionVerdictHeadline } from "../lib/alerts/decisionDeltaRules";
+import { buildDecisionVerdictHeadline } from "../lib/alert/decisionDeltaRules";
 
 const assessment = (
   regime: RegimeAssessment["regime"],

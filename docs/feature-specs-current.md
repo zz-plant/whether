@@ -1982,7 +1982,7 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   reason messages.
 - Alert headlines now name the decision the alert affects rather than the raw signal move:
   `RECONSIDER HIRING` / `WATCH SPENDING` / `RECONSIDER OPERATING POSTURE`, from
-  `buildDecisionVerdictHeadline` (`lib/alerts/decisionDeltaRules.ts`). Slack blocks
+  `buildDecisionVerdictHeadline` (`lib/alert/decisionDeltaRules.ts`). Slack blocks
   (`/api/check-regime-change`) and email templates (`lib/alert/alertTemplates.ts`) lead with the
   verdict and keep the raw regime/signal detail as support.
 

@@ -1,5 +1,5 @@
 import type { RegimeAssessment, RegimeChangeReason } from "./regimeEngine";
-import { applyConfidenceGate, buildDecisionDeltaRules, buildDecisionVerdictHeadline } from "./alerts/decisionDeltaRules";
+import { applyConfidenceGate, buildDecisionDeltaRules, buildDecisionVerdictHeadline } from "./alert/decisionDeltaRules";
 
 type AlertChannel = "slack" | "email" | "webhook";
 

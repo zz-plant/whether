@@ -58,7 +58,7 @@ MAKE THE PRODUCT
 - **Decision Memory** exists (`lib/decisionMemory.ts`, `/operate/memory`,
   `DecisionMemoryButton`) but nothing compares recorded decision-time conditions against
   current conditions to produce RECONSIDER / WATCH verdicts. This is the flagship gap.
-- **Decision-area delta rules** already exist (`lib/alerts/decisionDeltaRules.ts`,
+- **Decision-area delta rules** already exist (`lib/alert/decisionDeltaRules.ts`,
   `lib/signalOps.ts`) but alert headlines are still generic ("Regime change",
   "Flip window narrowing") — see `app/api/check-regime-change/route.ts`.
 - **Startup Climate Index** is computed (`lib/report/homeBrief/scoring.ts`) but never
@@ -130,7 +130,7 @@ no-change   all assumptions inside the recorded range
 
 Reframe alerts from signal events to decision verdicts.
 
-- Reuse `lib/alerts/decisionDeltaRules.ts` + `lib/signalOps.ts` decision-area deltas.
+- Reuse `lib/alert/decisionDeltaRules.ts` + `lib/signalOps.ts` decision-area deltas.
 - Headline shape: `RECONSIDER Q4 HIRING — two supporting assumptions weakened` instead of
   `Regime changed to X` / `10Y yield crossed 4.2%`.
 - Update `app/api/check-regime-change/route.ts` Slack blocks and
