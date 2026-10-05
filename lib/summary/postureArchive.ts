@@ -6,7 +6,7 @@
 import rawIndex from "../../data/posture_archive_index.json";
 import { PostureArchiveIndexSchema, type PostureArchivePeriod } from "./postureArchiveTypes";
 
-export type { PostureArchivePeriod, PostureArchiveRegimeShare } from "./postureArchiveTypes";
+export type { PostureArchivePeriod } from "./postureArchiveTypes";
 
 export const parsePostureArchiveIndex = (input: unknown): PostureArchivePeriod[] => {
   const parsed = PostureArchiveIndexSchema.safeParse(input);

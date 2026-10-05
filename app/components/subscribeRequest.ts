@@ -13,7 +13,7 @@ import type { RunwayBand } from "../../lib/report/operatorRunway";
 
 type SubscribeResult = { ok: boolean; message: string };
 
-export type SubscribeOptions = {
+type SubscribeOptions = {
   /** Also send regime-change alerts between Mondays. Omitted leaves a standing choice alone. */
   alerts?: boolean;
   /** Also send the Monday brief. `false` is the alerts-only signup. Omitted leaves a standing choice alone. */

@@ -35,7 +35,6 @@ import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
  * prints the same way on every surface.
  */
 
-export const SIGNAL_KEYS: readonly RegimeSignalKey[] = ["tightness", "riskAppetite", "baseRate", "curveSlope"];
 
 type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith" | "movement">;
 

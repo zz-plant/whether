@@ -34,7 +34,7 @@ export const SIGNAL_KEYS = [
   "VIX_INDEX",
 ] as const satisfies readonly SignalKey[];
 
-export const LIFECYCLE_STAGES = ["DISCOVERY", "GROWTH", "SCALE", "MATURE"] as const satisfies readonly LifecycleStage[];
+const LIFECYCLE_STAGES = ["DISCOVERY", "GROWTH", "SCALE", "MATURE"] as const satisfies readonly LifecycleStage[];
 
 const upperCased = (value: unknown) => (typeof value === "string" ? value.trim().toUpperCase() : value);
 

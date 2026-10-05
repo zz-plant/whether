@@ -2,7 +2,7 @@ import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
 import type { RegimeKey } from "../../lib/types";
-import { REGIME_WEATHER_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
+import { REGIME_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
 import { TrustStrip, type TrustStripProps } from "./trustStrip";
 import { ScreenshotCaption } from "./screenshotCaption";
 import { Sun, Cloud, Zap, Snowflake } from "lucide-react";
@@ -65,7 +65,7 @@ export function DecisionHero({
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
   const WeatherIcon = regimeKey ? weatherIconMap[regimeKey] : Sun;
   const TitleTag = titleLevel;
-  const regimeWeatherLabel = (regimeKey ? REGIME_WEATHER_LABELS[regimeKey] : regimeDisplay).toUpperCase();
+  const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
   const detail = callDetail && callDetail.trim() !== call.trim() ? callDetail : undefined;
 

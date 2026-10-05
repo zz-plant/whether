@@ -1,5 +1,5 @@
 import { getWeeklyPostureHistory } from "../../summary/weeklyPostureHistory";
-import { REGIME_SHORT_LABELS } from "../../regimePresentation";
+import { REGIME_LABELS } from "../../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY } from "../sectorSensitivity";
 import { formatBoundaryDistance, joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
 import { isImprovingSignalDelta } from "../reportData";
@@ -25,14 +25,14 @@ export const buildMemoryRail = (
     .slice(-3)
     .map((entry) => ({
       label: entry.record_date,
-      posture: REGIME_SHORT_LABELS[entry.regime],
+      posture: REGIME_LABELS[entry.regime],
     }));
 
   return [
     ...priorEntries,
     {
       label: recordDateLabel ?? "Current",
-      posture: REGIME_SHORT_LABELS[currentRegime],
+      posture: REGIME_LABELS[currentRegime],
     },
   ].slice(-4);
 };
@@ -49,7 +49,7 @@ export const buildHistoricalTimeline = ({
   const selectedYear = historicalSelection?.year;
   const selectedMonth = historicalSelection?.month;
   const fallback = [
-    { label: "Current", posture: REGIME_SHORT_LABELS[currentRegime], isCurrent: true },
+    { label: "Current", posture: REGIME_LABELS[currentRegime], isCurrent: true },
   ];
 
   if (!regimeSeries || regimeSeries.length === 0) {
@@ -93,7 +93,7 @@ export const buildHistoricalTimeline = ({
 
     return {
       label,
-      posture: REGIME_SHORT_LABELS[entry.regime],
+      posture: REGIME_LABELS[entry.regime],
       month: entry.month,
       year: entry.year,
       recordDate: entry.recordDate,
@@ -413,7 +413,7 @@ export const buildStartRouteDeltaBlock = ({
     items.push({
       id: "posture-shift" as const,
       label: "Conditions changed",
-      detail: `Conditions moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check this week's guidance before committing anything you can't undo.`,
+      detail: `Conditions moved from ${REGIME_LABELS[regimeAlert.previousRegime]} to ${REGIME_LABELS[currentRegime]}. Re-check this week's guidance before committing anything you can't undo.`,
       href: "/resolve" as const,
     });
   }

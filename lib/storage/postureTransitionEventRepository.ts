@@ -30,11 +30,9 @@ export type PostureTransitionEvent = DurableLineage & {
   reversalConditions?: string[];
 };
 
-export type PostureDecisionEvent = PostureTransitionEvent;
-export type RegimeDecisionEvent = PostureTransitionEvent;
 type PostureDecisionCursor = string | null;
 
-interface PostureTransitionEventRepository {
+export interface PostureTransitionEventRepository {
   append(event: PostureTransitionEvent): Promise<void>;
   list(options?: { cursor?: PostureDecisionCursor; limit?: number }): Promise<{ events: PostureTransitionEvent[]; nextCursor: PostureDecisionCursor }>;
   listSince(cursor?: string | null, limit?: number): Promise<{ events: PostureTransitionEvent[]; cursor: string | null }>;
@@ -45,7 +43,6 @@ interface PostureTransitionEventRepository {
   clear?(): Promise<void>;
 }
 
-export type PostureDecisionEventRepository = PostureTransitionEventRepository;
 
 const IDEMPOTENCY_PREFIX = "posture-event:idempotency:";
 const EVENT_PREFIX = "posture-event:entry:";
@@ -301,35 +298,9 @@ export const getPostureTransitionEventRepository = (): PostureTransitionEventRep
   return sharedRepository;
 };
 
-const resetPostureTransitionEventRepository = (): PostureTransitionEventRepository => {
+export const resetPostureTransitionEventRepository = (): PostureTransitionEventRepository => {
   sharedRepository = new InMemoryPostureTransitionEventRepository();
   return sharedRepository;
-};
-
-export const getPostureDecisionEventRepository = getPostureTransitionEventRepository;
-export const resetPostureDecisionEventRepository = resetPostureTransitionEventRepository;
-
-const confidenceScoreMap: Record<RegimeDiagnostics["confidence"], number> = {
-  HIGH: 0.9,
-  MEDIUM: 0.7,
-  LOW: 0.4,
-};
-
-const buildReversalConditions = (
-  previousState: RegimeKey,
-  nextState: RegimeKey,
-  thresholds: RegimeThresholds,
-): string[] => {
-  if (previousState === "EXPANSION" || nextState === "EXPANSION") {
-    return [
-      `Funding pressure <= ${thresholds.tightnessRegime} for two readings in a row.`,
-      `Risk appetite > ${thresholds.riskAppetiteRegime} for two readings in a row.`,
-    ];
-  }
-  return [
-    `Funding pressure > ${thresholds.tightnessRegime} for two readings in a row.`,
-    `Risk appetite <= ${thresholds.riskAppetiteRegime} for two readings in a row.`,
-  ];
 };
 
 export const buildPostureTransitionEvent = ({
@@ -380,44 +351,3 @@ export const buildPostureTransitionEvent = ({
   };
 };
 
-export const buildRegimeDecisionEvent = ({
-  previousState,
-  nextState,
-  tightness,
-  riskAppetite,
-  thresholds,
-  diagnostics,
-  pendingCount,
-  transitionReason,
-}: {
-  previousState: RegimeKey;
-  nextState: RegimeKey;
-  tightness: number;
-  riskAppetite: number;
-  thresholds: RegimeThresholds;
-  diagnostics: Pick<RegimeDiagnostics, "confidence" | "nearestThresholdDelta" | "transitionWatch">;
-  pendingCount: number;
-  transitionReason: string;
-}): PostureTransitionEvent => {
-  const now = new Date().toISOString();
-  const recordDate = now.slice(0, 10);
-  return buildPostureTransitionEvent({
-    effectiveRecordDate: recordDate,
-    fromState: previousState,
-    toState: nextState,
-    reason: transitionReason,
-    triggerMetrics: {
-      tightness,
-      riskAppetite,
-      thresholds,
-      nearestThresholdDelta: diagnostics.nearestThresholdDelta,
-      transitionWatch: diagnostics.transitionWatch,
-      pendingCount,
-    },
-    confidence: {
-      score: confidenceScoreMap[diagnostics.confidence],
-      band: diagnostics.confidence,
-    },
-    reversalConditions: buildReversalConditions(previousState, nextState, thresholds),
-  });
-};

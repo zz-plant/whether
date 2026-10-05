@@ -41,7 +41,7 @@ export const resolveFredApiKey = (): string | null => {
 };
 
 /** A key must never travel in an error message or a log line. */
-export const redactFredApiKey = (text: string) => text.replace(/api_key=[^&\s"']+/g, "api_key=REDACTED");
+const redactFredApiKey = (text: string) => text.replace(/api_key=[^&\s"']+/g, "api_key=REDACTED");
 
 /** Thrown when a caller asks for a vintage and only the CSV export is available. */
 export class FredVintageUnavailableError extends Error {

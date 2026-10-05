@@ -1,6 +1,6 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
-import type { PostureDecisionEvent } from "../storage/postureDecisionEventRepository";
+import type { PostureTransitionEvent } from "../storage/postureTransitionEventRepository";
 import { resolvePublishedConfidence, type ConfidenceRecord } from "./confidence";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import { type RuleCondition } from "./boundedDecisionRules";
@@ -63,7 +63,7 @@ export const buildPostureStateContract = ({
   record: ConfidenceRecord & { record_date: string };
   historical?: boolean;
   postureLabel: string;
-  decisionEventStore: PostureDecisionEvent[];
+  decisionEventStore: PostureTransitionEvent[];
 }): PostureStateContract => {
   const recordDate = record.record_date;
   const { label: confidenceLabel, percent: confidencePercent } = resolvePublishedConfidence({

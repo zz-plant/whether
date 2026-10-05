@@ -8,7 +8,7 @@
  * Everything here answers the same question truthfully in both states: what
  * the readings classify as, what holds the call, and which line matters next.
  */
-import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
+import type { RegimeAssessment } from "../regimeEngine";
 import { classifyRegimeQuadrant } from "./regimeStateMachine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { formatThresholdNumber } from "../formatters";
@@ -243,4 +243,3 @@ export const buildRegimeFlipState = ({
   return { pendingCandidate: candidate, text, watch };
 };
 
-export type { RegimeKey };

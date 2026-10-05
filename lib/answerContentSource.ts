@@ -1,5 +1,4 @@
 import { z } from "zod";
-import answerMetaData from "../content/answers/meta.json";
 import answerPagesData from "../content/answers/pages.json";
 
 const decisionAreaSchema = z.enum([
@@ -31,16 +30,7 @@ const answerPageSchema = z.object({
   featuredOrder: z.number().int().positive().optional(),
 });
 
-const answerMetaSchema = z.object({
-  answerCategories: z.array(
-    z.object({
-      key: z.enum(["climate", "decision", "explanation"]),
-      label: z.string().min(1),
-    }),
-  ).min(1),
-});
 
 export type AnswerPageData = z.infer<typeof answerPageSchema>;
 
 export const answerPageContent = z.array(answerPageSchema).parse(answerPagesData);
-export const answerMetaContent = answerMetaSchema.parse(answerMetaData);

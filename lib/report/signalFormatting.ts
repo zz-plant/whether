@@ -12,12 +12,6 @@ export type NormalizedSignalContribution = SignalContribution & {
   normalizedPercentLabel: string;
 };
 
-export const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
-  const delta = nowValue - thenValue;
-  const sign = delta > 0 ? "+" : "";
-  return `${sign}${delta.toFixed(2)}${unit}`;
-};
-
 export const normalizeSignalContributions = (
   contributions: SignalContribution[]
 ): NormalizedSignalContribution[] => {

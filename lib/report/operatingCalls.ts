@@ -437,7 +437,7 @@ const formatDistanceLabel = (distance: RuleThresholdDistance | undefined, kind: 
 const sortThresholdDistance = (left: RuleThresholdDistance, right: RuleThresholdDistance) =>
   left.pointsToLine - right.pointsToLine;
 
-export const resolveDecisionLaneState = ({
+const resolveDecisionLaneState = ({
   rule,
   scores,
 }: {

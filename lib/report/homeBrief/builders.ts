@@ -82,7 +82,7 @@ import type {
 import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
 
-export { extractExecutiveOperationalStance, buildMemoryRail };
+export { buildMemoryRail };
 
 type RevisitDriverSignal = {
   key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";

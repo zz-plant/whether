@@ -10,7 +10,7 @@ import {
 import { getMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading } from "../types";
-import { REGIME_WEATHER_LABELS } from "../regimePresentation";
+import { REGIME_LABELS } from "../regimePresentation";
 import type { ReportDynamics } from "./reportData";
 
 export type ForecastRegimeLabel =
@@ -18,7 +18,7 @@ export type ForecastRegimeLabel =
   | "Mixed"
   | "Scarcity"
   | "Defensive";
-export type SignalDirection = "up" | "down" | "flat";
+type SignalDirection = "up" | "down" | "flat";
 type SignalTrajectoryLabel = "improving" | "deteriorating" | "stable";
 type CrossingRiskLabel = "low" | "medium" | "high";
 type BoundaryMomentum =
@@ -90,10 +90,10 @@ const regimeKeyToForecastLabel: Record<RegimeKey, ForecastRegimeLabel> = {
  * already learned. Anything that prints an outcome prints this.
  */
 export const forecastWeatherLabel: Record<ForecastRegimeLabel, string> = {
-  Expansion: REGIME_WEATHER_LABELS.EXPANSION,
-  Mixed: REGIME_WEATHER_LABELS.VOLATILE,
-  Scarcity: REGIME_WEATHER_LABELS.SCARCITY,
-  Defensive: REGIME_WEATHER_LABELS.DEFENSIVE,
+  Expansion: REGIME_LABELS.EXPANSION,
+  Mixed: REGIME_LABELS.VOLATILE,
+  Scarcity: REGIME_LABELS.SCARCITY,
+  Defensive: REGIME_LABELS.DEFENSIVE,
 };
 
 const parseDate = (value: string) => {

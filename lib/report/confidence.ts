@@ -37,7 +37,7 @@ export type ConfidenceInputs = {
  * percent below rewards — so before this check, a payload with no data at all
  * scored the ceiling. See `resolveConfidencePercent`.
  */
-export const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
+const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
   scores.baseRateUsed === "MISSING" || scores.curveSlope === null;
 
 /**
