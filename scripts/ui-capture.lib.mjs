@@ -9,8 +9,8 @@ export const DEFAULT_UI_CAPTURE_BASE_URL =
   process.env.UI_CAPTURE_BASE_URL ?? "http://127.0.0.1:3000";
 export const DEFAULT_UI_CAPTURE_OUT_DIR = "artifacts/ui";
 const HTML_ASSET_PATTERN = /<(?:link|script)\b[^>]+(?:href|src)="([^"]+)"/gi;
-export const STREAMED_CONTENT_READY_SELECTOR = "#share-ready-artifact";
-export const STREAMED_CONTENT_READY_TIMEOUT_MS = 15000;
+const STREAMED_CONTENT_READY_SELECTOR = "#share-ready-artifact";
+const STREAMED_CONTENT_READY_TIMEOUT_MS = 15000;
 
 export const readArgValue = (args, flag, fallback) => {
   const index = args.indexOf(flag);
@@ -21,7 +21,7 @@ export const readArgValue = (args, flag, fallback) => {
 
 export const hasFlag = (args, flag) => args.includes(flag);
 
-export const parseOnlyIds = (value) =>
+const parseOnlyIds = (value) =>
   value
     .split(",")
     .map((item) => item.trim())
@@ -275,7 +275,7 @@ const LAYOUT_SETTLE_POLL_MS = 150;
  * captures ~2.7x taller than the page any user sees. Wait for the document to
  * stop changing height so the screenshot matches the hydrated layout.
  */
-export const waitForLayoutSettled = async (page, timeoutMs = LAYOUT_SETTLE_TIMEOUT_MS) => {
+const waitForLayoutSettled = async (page, timeoutMs = LAYOUT_SETTLE_TIMEOUT_MS) => {
   const deadline = Date.now() + timeoutMs;
 
   try {

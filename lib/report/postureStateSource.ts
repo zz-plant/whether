@@ -1,10 +1,10 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeDisplayLabel } from "../regimePresentation";
 import {
-  getPostureDecisionEventRepository,
-  type PostureDecisionEvent,
-  type PostureDecisionEventRepository,
-} from "../storage/postureDecisionEventRepository";
+  getPostureTransitionEventRepository,
+  type PostureTransitionEvent,
+  type PostureTransitionEventRepository,
+} from "../storage/postureTransitionEventRepository";
 import { resolvePublishedConfidence, type ConfidenceRecord } from "./confidence";
 import { buildPostureStateContract, type PostureStateContract } from "./postureStateContract";
 import type { ReportDynamics } from "./reportData";
@@ -25,8 +25,8 @@ import type { ReportDynamics } from "./reportData";
  * the same "previous snapshot names a different regime" condition.
  */
 const readDecisionEvents = async (
-  repository: PostureDecisionEventRepository,
-): Promise<PostureDecisionEvent[]> => {
+  repository: PostureTransitionEventRepository,
+): Promise<PostureTransitionEvent[]> => {
   try {
     return (await repository.list({ limit: 64 })).events;
   } catch (error) {
@@ -45,15 +45,15 @@ export const buildPostureState = async ({
   assessment,
   reportDynamics,
   decisionEvents,
-  repository = getPostureDecisionEventRepository(),
+  repository = getPostureTransitionEventRepository(),
 }: {
   /** The treasury record the assessment was read from. */
   record: ConfidenceRecord & { record_date: string };
   historical?: boolean;
   assessment: RegimeAssessment;
   reportDynamics: Pick<ReportDynamics, "directionLabel">;
-  decisionEvents?: PostureDecisionEvent[];
-  repository?: PostureDecisionEventRepository;
+  decisionEvents?: PostureTransitionEvent[];
+  repository?: PostureTransitionEventRepository;
 }) => {
   /* The published confidence, as the brief's own display label reads it, so
      the two labels cannot disagree about "Guarded". */

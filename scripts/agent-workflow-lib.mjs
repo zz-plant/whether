@@ -303,7 +303,7 @@ function countMatches(text, keyword) {
   return text.includes(normalizedKeyword) ? 1 : 0;
 }
 
-export function listTaskProfiles() {
+function listTaskProfiles() {
   return TASK_PROFILES.map((profile) => ({
     id: profile.id,
     label: profile.label,
@@ -389,7 +389,7 @@ function resolveInputPaths(repoRoot, values) {
   }).filter(Boolean);
 }
 
-export function findRelevantAgentFiles(repoRoot, inputPaths = []) {
+function findRelevantAgentFiles(repoRoot, inputPaths = []) {
   const resolvedPaths = resolveInputPaths(repoRoot, inputPaths);
   const discovered = new Set();
 

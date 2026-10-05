@@ -1,7 +1,7 @@
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
 import type { ContentCluster, ContentIntent } from "../../lib/contentMeasurement";
 import type { AnswerPageData } from "../../lib/answerContentSource";
-import { answerMetaContent, answerPageContent } from "../../lib/answerContentSource";
+import { answerPageContent } from "../../lib/answerContentSource";
 
 type AnswerCategory = "climate" | "decision" | "explanation";
 
@@ -70,7 +70,6 @@ const retiredAnswerSlugSet = new Set<string>(retiredAnswerSlugs);
 
 export const isRetiredAnswerSlug = (slug: string) => retiredAnswerSlugSet.has(slug);
 
-export const answerCategories = answerMetaContent.answerCategories;
 
 const HIGH_VALUE_STATIC_CATEGORIES: readonly AnswerCategory[] = ["decision", "climate"] as const;
 
@@ -82,7 +81,6 @@ export const highValueAnswerStaticParams = highValueStaticAnswerPages.map((page)
 
 const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
 
-export const tierOneDecisionPages = answerPages;
 
 export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);
 

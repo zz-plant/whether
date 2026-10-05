@@ -179,7 +179,7 @@ export const formatTrendArrow = (delta: number | null): "↑" | "↓" | "→" =>
  * sentence — lowercasing a clause and gluing it after "so …" produces
  * ungrammatical output whenever the fragment is itself a full sentence.
  */
-export const toSentence = (value: string | undefined | null): string => {
+const toSentence = (value: string | undefined | null): string => {
   const normalized = (value ?? "").replace(/\s+/g, " ").trim();
   if (!normalized) {
     return "";

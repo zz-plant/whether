@@ -1,5 +1,5 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
-import { REGIME_SHORT_LABELS } from "../regimePresentation";
+import { REGIME_LABELS } from "../regimePresentation";
 import { formatThresholdNumber } from "../formatters";
 
 export type SectorKey = "b2b-saas" | "consumer" | "infrastructure" | "fintech" | "healthcare" | "ai-platforms";
@@ -78,7 +78,7 @@ type SectorAdjustedPosture = {
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-const resolveBasePostureLabel = (regime: RegimeKey) => REGIME_SHORT_LABELS[regime];
+const resolveBasePostureLabel = (regime: RegimeKey) => REGIME_LABELS[regime];
 
 const resolveSignalBias = (assessment: Pick<SectorAssessment, "scores" | "thresholds">) => {
   const tightnessBias = clamp((assessment.thresholds.tightnessRegime - assessment.scores.tightness) / 25, -1.5, 1.5);

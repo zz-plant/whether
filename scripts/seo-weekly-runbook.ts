@@ -1,7 +1,6 @@
 import { generateProgrammaticPayloadArtifacts } from "../lib/seo/programmaticPayloadBuilder";
 import { describeRefreshPageMetrics, refreshPageMetrics, refreshQueueOptionsFor } from "./seo-page-metrics";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - mjs helper is intentionally JS for script portability.
+// @ts-expect-error - mjs helper is intentionally JS for script portability.
 import { runSeoRefreshQueue } from "./seo-refresh-queue.mjs";
 
 const payloadResult = await generateProgrammaticPayloadArtifacts();

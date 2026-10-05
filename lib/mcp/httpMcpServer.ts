@@ -1,123 +1,78 @@
 /**
- * Minimal MCP streamable-HTTP server for /api/mcp (JSON-RPC 2.0).
+ * MCP streamable-HTTP transport for /api/mcp, on the official SDK.
  *
- * Implements the request subset real MCP clients need to connect over HTTP —
- * initialize / ping / tools/list / tools/call — targeting protocol revision
- * 2025-06-18 (single-message transport; batching was removed from the spec).
- * Responses use `application/json`, which the streamable-HTTP transport
- * permits in place of an SSE stream for single-response requests.
+ * Before 2026-10 this file was ~120 lines of hand-written JSON-RPC 2.0 —
+ * request shapes, error codes, protocol negotiation, batch rejection — the
+ * exact details the SDK exists to own and that drift from the spec. The SDK
+ * was already a dependency for the stdio server; this module now delegates to
+ * its web-standard streamable-HTTP transport and keeps only the two decisions
+ * that are ours: stateless mode (a fresh transport and `Server` per request,
+ * as the SDK requires for serverless) and the refusal of batched requests,
+ * which protocol revision 2025-06-18 removed.
  *
- * The tools themselves are `lib/agent/tools.ts`, the same definitions the local
- * stdio server (`bun run mcp:whether`) and the plain-GET shim in
+ * The tools themselves are `lib/agent/tools.ts`, the same definitions the
+ * local stdio server (`bun run mcp:whether`) and the plain-GET shim in
  * app/api/mcp/route.ts read; this module is only the transport.
  */
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError, ToolSchema } from "@modelcontextprotocol/sdk/types.js";
 import { AgentInputError } from "../agent/inputs";
 import { callAgentTool, listAgentTools } from "../agent/tools";
-import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./serverIdentity";
+import { MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./serverIdentity";
 
-type JsonValue = unknown;
-
-type JsonRpcId = string | number | null;
-
-type JsonRpcMessage = {
-  jsonrpc?: string;
-  id?: JsonRpcId;
-  method?: string;
-  params?: Record<string, JsonValue>;
-};
-
-const JSON_RPC_ERRORS = {
-  parseError: { code: -32700, message: "Parse error" },
-  invalidRequest: { code: -32600, message: "Invalid Request" },
-  methodNotFound: { code: -32601, message: "Method not found" },
-  invalidParams: { code: -32602, message: "Invalid params" },
-} as const;
-
-const jsonResponse = (body: JsonValue, status = 200) =>
-  new Response(JSON.stringify(body), {
+const jsonErrorResponse = (status: number, code: number, message: string) =>
+  new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code, message } }), {
     status,
     headers: { "content-type": "application/json" },
   });
 
-const errorResponse = (
-  id: JsonRpcId,
-  error: { code: number; message: string },
-  data?: string,
-  status = 200,
-) =>
-  jsonResponse(
-    { jsonrpc: "2.0", id, error: data ? { ...error, data } : error },
-    status,
-  );
-
-const resultResponse = (id: JsonRpcId, result: JsonValue) =>
-  jsonResponse({ jsonrpc: "2.0", id, result });
-
-const negotiateProtocolVersion = (requested: JsonValue): string =>
-  MCP_PROTOCOL_VERSIONS.find((version) => version === requested) ?? MCP_PROTOCOL_VERSIONS[0];
-
 /** Handle one MCP streamable-HTTP POST. */
 export const handleMcpRequest = async (request: Request): Promise<Response> => {
-  let message: JsonRpcMessage;
+  // The body is parsed here so a batched request can be refused before the
+  // transport parses and processes it: the SDK still accepts arrays, which
+  // clients of the negotiated revisions no longer send, and a 2026 protocol
+  // caller that batches is buggy rather than old.
+  let message: unknown;
   try {
-    message = await request.json();
+    message = JSON.parse(await request.text());
   } catch {
-    return errorResponse(null, JSON_RPC_ERRORS.parseError, undefined, 400);
+    return jsonErrorResponse(400, -32700, "Parse error: Invalid JSON");
   }
-
   if (Array.isArray(message)) {
     // JSON-RPC batching was removed in protocol revision 2025-06-18.
-    return errorResponse(
-      null,
-      JSON_RPC_ERRORS.invalidRequest,
-      "Batch requests are not supported; send one message per POST.",
-      400,
-    );
+    return jsonErrorResponse(400, -32600, "Batch requests are not supported; send one message per POST.");
   }
 
-  if (!message || message.jsonrpc !== "2.0" || typeof message.method !== "string") {
-    return errorResponse(message?.id ?? null, JSON_RPC_ERRORS.invalidRequest, undefined, 400);
-  }
+  // Stateless mode: no session id is issued and each request gets a fresh
+  // transport, which the SDK requires for serverless handlers (reusing one
+  // collides message ids between concurrent clients).
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+    enableJsonResponse: true,
+  });
+  const server = new Server(MCP_SERVER_INFO, {
+    capabilities: { tools: { listChanged: false } },
+    instructions: MCP_SERVER_INSTRUCTIONS,
+  });
 
-  // Notifications (no id) are accepted and produce no body.
-  if (message.id === undefined) {
-    return new Response(null, { status: 202 });
-  }
+  // The SDK's own schema is the check that what is listed is what a client can read.
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: listAgentTools("http").map((tool) => ToolSchema.parse(tool)),
+  }));
 
-  const id = message.id;
-  const params = message.params ?? {};
-
-  switch (message.method) {
-    case "initialize":
-      return resultResponse(id, {
-        protocolVersion: negotiateProtocolVersion(params.protocolVersion),
-        capabilities: { tools: { listChanged: false } },
-        serverInfo: MCP_SERVER_INFO,
-        instructions: MCP_SERVER_INSTRUCTIONS,
-      });
-
-    case "ping":
-      return resultResponse(id, {});
-
-    case "tools/list":
-      return resultResponse(id, { tools: listAgentTools("http") });
-
-    case "tools/call": {
-      try {
-        // Tool failures, including a caller's wrong arguments, are results with isError, not protocol errors.
-        return resultResponse(id, await callAgentTool(typeof params.name === "string" ? params.name : "", params.arguments, "http"));
-      } catch (error) {
-        // An unknown tool is the one refusal that is the protocol's: the name is what `tools/call` is for.
-        if (error instanceof AgentInputError) {
-          return errorResponse(id, JSON_RPC_ERRORS.invalidParams, error.message);
-        }
-        throw error;
-      }
+  server.setRequestHandler(CallToolRequestSchema, async ({ params }) => {
+    try {
+      return await callAgentTool(params.name, params.arguments, "http");
+    } catch (error) {
+      // An unknown tool is the protocol's refusal; a wrong argument to a known one is a tool result.
+      if (error instanceof AgentInputError) throw new McpError(ErrorCode.InvalidParams, error.message);
+      throw error;
     }
+  });
 
-    default:
-      return errorResponse(id, JSON_RPC_ERRORS.methodNotFound, message.method);
-  }
+  await server.connect(transport);
+  return transport.handleRequest(request, { parsedBody: message });
 };
 
 /** True when a request reads as an MCP client opening an SSE stream (GET + Accept: text/event-stream). */

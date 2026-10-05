@@ -1,7 +1,7 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
 
-export type DecisionArea = "posture" | "hiring" | "spend" | "risk";
+type DecisionArea = "posture" | "hiring" | "spend" | "risk";
 type ConfidenceLevel = RegimeAssessment["diagnostics"]["confidence"];
 
 type DecisionDeltaRule = {

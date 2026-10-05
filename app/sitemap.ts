@@ -4,7 +4,7 @@ import { snapshotData } from "../lib/snapshot";
 import { resourcePillarPages } from "../lib/resourcesContent";
 import { resourceArticles } from "../lib/resourceArticles";
 import { buildResourceHubEntries } from "../lib/resourceHub";
-import { tierOneDecisionPages } from "./answers/decisionPages";
+import { answerPages } from "./answers/decisionPages";
 import { signalScenarioRoutes } from "./seoRouteClusters";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
@@ -242,7 +242,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       priority: 0.59,
     }));
 
-  const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? tierOneDecisionPages : [])
+  const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? answerPages : [])
     .filter((page) => isIndexableAnswerSlug(page.slug))
     .map((page) => ({
       path: `/answers/${page.slug}`,

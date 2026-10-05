@@ -30,7 +30,7 @@
  * scales into one number is the entire argument for plotting them at all.
  */
 import type { RegimeKey } from "./types";
-import { REGIME_ORDER, REGIME_PUBLIC_LABELS } from "./regimePresentation";
+import { REGIME_ORDER, REGIME_LABELS } from "./regimePresentation";
 import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "./regimeEngineCore";
 
 /**
@@ -180,7 +180,7 @@ const buildGap = (
     distance: Math.abs(delta),
     side: delta > 0 ? "above" : delta < 0 ? "below" : "on",
     flipsTo,
-    flipsToLabel: REGIME_PUBLIC_LABELS[flipsTo],
+    flipsToLabel: REGIME_LABELS[flipsTo],
   };
 };
 
@@ -211,7 +211,7 @@ export const buildRegimePhaseModel = (
     tightness: entry.tightness,
     riskAppetite: entry.riskAppetite,
     regime: entry.regime,
-    regimeLabel: REGIME_PUBLIC_LABELS[entry.regime],
+    regimeLabel: REGIME_LABELS[entry.regime],
     changed: index > 0 && series[index - 1]!.regime !== entry.regime,
     saturated: entry.tightness >= TIGHTNESS_SCORE_CEILING,
   }));
@@ -229,7 +229,7 @@ export const buildRegimePhaseModel = (
      someone reorders the literal. */
   const occupancy: PhaseOccupancy[] = REGIME_ORDER.map((regime) => ({
     regime,
-    regimeLabel: REGIME_PUBLIC_LABELS[regime],
+    regimeLabel: REGIME_LABELS[regime],
     months: counts[regime] ?? 0,
     share: (counts[regime] ?? 0) / points.length,
   })).sort((a, b) => b.months - a.months || REGIME_ORDER.indexOf(a.regime) - REGIME_ORDER.indexOf(b.regime));

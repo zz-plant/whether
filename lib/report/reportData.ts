@@ -76,7 +76,6 @@ import { withDeadline } from "../withDeadline";
 import { primeMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 export type {
-  AnalogScoreDimensions,
   ConfidenceTrendFraming,
   HistoricalAnalog,
   LastYearComparison,
@@ -89,12 +88,10 @@ export {
   classifyConfidenceTrend,
 } from "./reportConfidence";
 export {
-  buildActionNowShort,
   buildFlipThreshold,
   buildReportDynamics,
   buildReportEvidenceItems,
   isImprovingSignalDelta,
-  signalDeltaImprovesWhen,
 } from "./reportEvidence";
 export {
   buildHistoricalAnalogs,

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildDecisionMatrixPayload, buildHomeBriefModel, buildMemoryRail } from "../lib/report/homeBriefModel";
 import { getWeeklyPostureHistory } from "../lib/summary/weeklyPostureHistory";
-import { REGIME_SHORT_LABELS } from "../lib/regimePresentation";
+import { REGIME_LABELS } from "../lib/regimePresentation";
 import { buildThresholdBusinessConsequence, type ActionStripItem } from "../lib/report/operatingCalls";
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -72,7 +72,7 @@ describe("buildHomeBriefModel", () => {
       .slice(-3)
       .map((entry) => ({
         label: entry.record_date,
-        posture: REGIME_SHORT_LABELS[entry.regime],
+        posture: REGIME_LABELS[entry.regime],
       }));
 
     assert.deepEqual(memoryRail, [

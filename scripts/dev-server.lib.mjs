@@ -23,9 +23,9 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const normalizeHostname = (hostname) =>
   hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
 
-export const isLocalHostname = (hostname) => LOCAL_HOSTNAMES.has(normalizeHostname(hostname));
+const isLocalHostname = (hostname) => LOCAL_HOSTNAMES.has(normalizeHostname(hostname));
 
-export const canBindPort = async ({ host, port }) =>
+const canBindPort = async ({ host, port }) =>
   new Promise((resolve) => {
     const server = createServer();
     server.unref();
@@ -40,7 +40,7 @@ export const canBindPort = async ({ host, port }) =>
  * used as-is; a local one whose port is taken walks up to five ports forward, so
  * a dev server someone left running does not fail the run.
  */
-export const resolveAutoStartBaseUrl = async ({ baseUrl, initialProbe }) => {
+const resolveAutoStartBaseUrl = async ({ baseUrl, initialProbe }) => {
   const parsedBaseUrl = new URL(baseUrl);
   const hostname = normalizeHostname(parsedBaseUrl.hostname);
 
@@ -80,7 +80,7 @@ export const resolveAutoStartBaseUrl = async ({ baseUrl, initialProbe }) => {
  * that dies on a build error fails in a second with a pointer to its log,
  * instead of burning the whole timeout.
  */
-export const waitForBaseUrl = async ({ baseUrl, timeoutMs, child, logPath, probe }) => {
+const waitForBaseUrl = async ({ baseUrl, timeoutMs, child, logPath, probe }) => {
   const startedAt = Date.now();
   let lastProbe = null;
 
@@ -128,7 +128,7 @@ const signalGroup = (child, signal) => {
   }
 };
 
-export const stopDevServer = async (child) => {
+const stopDevServer = async (child) => {
   if (!child) {
     return;
   }
@@ -160,7 +160,7 @@ export const stopDevServer = async (child) => {
  * under `outDir` rather than the console, so the caller's own report stays
  * readable and a failure still has the server's side of the story.
  */
-export const startDevServer = async ({ baseUrl, outDir, devScript, logName }) => {
+const startDevServer = async ({ baseUrl, outDir, devScript, logName }) => {
   const parsedBaseUrl = new URL(baseUrl);
   const host = parsedBaseUrl.hostname;
   const port = parsedBaseUrl.port || (parsedBaseUrl.protocol === "https:" ? "443" : "80");

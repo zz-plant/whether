@@ -1,24 +1,11 @@
 import {
   failureModes,
-  postureKeys,
   rawDecisionDomainCatalog,
   situationUseCaseSlugs,
-  startSituations,
   toolkitSlugs,
 } from "./decisionDomainCatalogContent";
 import { parseDecisionDomainCatalog } from "./decisionDomainCatalogSchema";
 
-type PostureKey = (typeof postureKeys)[number];
-
-type PostureDefinition = {
-  slug: PostureKey;
-  title: string;
-  summary: string;
-  trigger: string;
-  defaults: string[];
-};
-
-export { failureModes, startSituations };
 
 type ToolkitSlug = (typeof toolkitSlugs)[number];
 
@@ -80,7 +67,6 @@ type FailureModeDefinition = {
 
 const decisionDomainCatalog = parseDecisionDomainCatalog(rawDecisionDomainCatalog);
 
-export const postureDefinitions: PostureDefinition[] = decisionDomainCatalog.postureDefinitions;
 export const useCaseRoles: UseCaseRole[] = decisionDomainCatalog.useCaseRoles;
 export const situationUseCaseDefinitions: SituationUseCase[] =
   decisionDomainCatalog.situationUseCaseDefinitions;
@@ -88,8 +74,6 @@ const situationUseCases = [...situationUseCaseSlugs] as [
   SituationUseCaseSlug,
   ...SituationUseCaseSlug[],
 ];
-export const situationRouting: Record<(typeof startSituations)[number], SituationUseCaseSlug> =
-  decisionDomainCatalog.situationRouting;
 export const toolkitDefinitions: ToolkitDefinition[] = decisionDomainCatalog.toolkitDefinitions;
 export const failureModeDefinitions: FailureModeDefinition[] =
   decisionDomainCatalog.failureModeDefinitions;

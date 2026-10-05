@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "bun:test";
 import { buildPostureState } from "../lib/report/postureStateSource";
 import {
-  resetPostureDecisionEventRepository,
-  type PostureDecisionEventRepository,
-} from "../lib/storage/postureDecisionEventRepository";
+  resetPostureTransitionEventRepository,
+  type PostureTransitionEventRepository,
+} from "../lib/storage/postureTransitionEventRepository";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 
 const committedAssessment: RegimeAssessment = {
@@ -62,10 +62,10 @@ const committedAssessment: RegimeAssessment = {
 };
 
 describe("posture state source", () => {
-  let repository: PostureDecisionEventRepository;
+  let repository: PostureTransitionEventRepository;
 
   beforeEach(() => {
-    repository = resetPostureDecisionEventRepository();
+    repository = resetPostureTransitionEventRepository();
   });
 
   it("builds posture state without mutating events", async () => {
@@ -88,7 +88,7 @@ describe("posture state source", () => {
    * depend on it.
    */
   it("still builds posture state when the event store cannot be read", async () => {
-    const failing: PostureDecisionEventRepository = {
+    const failing: PostureTransitionEventRepository = {
       ...repository,
       list: async () => {
         throw new Error("internal error; reference = kv-outage");

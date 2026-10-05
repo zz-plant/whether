@@ -32,10 +32,7 @@ import type {
 } from "./home/contracts";
 
 export type {
-  ArtifactPayload,
   HomePageAssembly,
-  HomePageDiagnosticsLane,
-  HomePageWorkspaceModel,
 } from "./home/contracts";
 
 type HomePageAssemblerDependencies = {

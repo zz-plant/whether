@@ -16,12 +16,9 @@ export const REGIME_LABELS: Record<RegimeKey, string> = {
 
 // One table. SHORT, LEGEND, WEATHER and PUBLIC were four byte-identical literals
 // of the same four words; readers picked one at random and nothing stopped them
-// drifting. They are aliases now, kept as names so no import breaks, and the
-// only literal is REGIME_LABELS above.
-export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
+// drifting. As of 2026-10 the alias exports are gone — every caller reads
+// REGIME_LABELS directly, and only the internal legend reader keeps a local alias.
 const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
-export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
-export const REGIME_PUBLIC_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 
 /**
  * One fact about money per weather word — the condition, not the advice.
@@ -52,18 +49,18 @@ const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
 export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
   regime,
   label: REGIME_LEGEND_LABELS[regime],
-  weather: REGIME_WEATHER_LABELS[regime],
+  weather: REGIME_LABELS[regime],
   weatherRationale: REGIME_WEATHER_RATIONALES[regime],
   ariaLabel: REGIME_LEGEND_ARIA_LABELS[regime],
 }));
 
 
 export const isRegimeKey = (regime: string): regime is RegimeKey =>
-  Object.prototype.hasOwnProperty.call(REGIME_PUBLIC_LABELS, regime);
+  Object.prototype.hasOwnProperty.call(REGIME_LABELS, regime);
 
 /** Takes any string: a known key maps to its label, anything else passes through. */
 export const getRegimePublicLabel = (regime: string) =>
-  isRegimeKey(regime) ? REGIME_PUBLIC_LABELS[regime] : regime;
+  isRegimeKey(regime) ? REGIME_LABELS[regime] : regime;
 
 export const getRegimeWeatherRationale = (regime: RegimeKey) => REGIME_WEATHER_RATIONALES[regime];
 
@@ -156,7 +153,7 @@ export const getRegimeDisplayLabel = ({
     return {
       canonicalRegime: regime,
       modifier: "Transitional" as const,
-      label: REGIME_WEATHER_LABELS[regime],
+      label: REGIME_LABELS[regime],
     };
   }
 
@@ -164,7 +161,7 @@ export const getRegimeDisplayLabel = ({
     return {
       canonicalRegime: regime,
       modifier: null,
-      label: REGIME_WEATHER_LABELS[regime],
+      label: REGIME_LABELS[regime],
     };
   }
 
@@ -181,7 +178,7 @@ export const getRegimeDisplayLabel = ({
   return {
     canonicalRegime: regime,
     modifier: guardedExpansion ? ("Guarded" as const) : null,
-    label: REGIME_WEATHER_LABELS[regime],
+    label: REGIME_LABELS[regime],
   };
 };
 

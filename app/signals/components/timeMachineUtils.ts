@@ -1,7 +1,7 @@
-import { formatDateLabel, formatDelta } from "../../../lib/report/signalFormatting";
+import { formatDateLabel } from "../../../lib/report/signalFormatting";
 import { formatMonthInput, parseMonthInput } from "../../../lib/timeMachine/monthFormatting";
 
-export { formatDateLabel, formatDelta, formatMonthInput, parseMonthInput };
+export { formatDateLabel, formatMonthInput, parseMonthInput };
 
 export const monthOptions = [
   { value: 1, label: "January" },
@@ -19,6 +19,3 @@ export const monthOptions = [
 ];
 
 
-export const formatPercent = (value: number) => `${value.toFixed(2)}%`;
-
-export const formatScore = (value: number) => value.toFixed(0);

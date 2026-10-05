@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "../ui/dialog";
 import { shortcutNavigationLayers } from "../../../lib/navigation/informationArchitecture";
 
 type HelpModalProps = {

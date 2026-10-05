@@ -93,7 +93,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   `lib/report/decisionStaleness.ts`). These label recorded decisions whose supporting
   assumptions have moved: RECONSIDER when two assumptions moved outside the recorded range,
   WATCH when one did, No change when all hold. Alert headlines reuse the same vocabulary
-  (`buildDecisionVerdictHeadline` in `lib/alerts/decisionDeltaRules.ts`: RECONSIDER / WATCH
+  (`buildDecisionVerdictHeadline` in `lib/alert/decisionDeltaRules.ts`: RECONSIDER / WATCH
   + decision area). Do not mint synonyms like "attention needed" or "review now" for these
   verdict labels.
 - **The category line has one source: `canonicalPositioningLine` / `websiteName` in

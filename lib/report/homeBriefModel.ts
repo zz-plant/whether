@@ -41,7 +41,6 @@ import {
   buildHomeBriefModelInternal,
   buildMemoryRail,
   buildWeeklyDecisionCardViewModelInternal,
-  extractExecutiveOperationalStance,
 } from "./homeBrief/builders";
 
 /**
@@ -54,7 +53,7 @@ import {
  */
 
 export { buildDecisionMatrixPayload } from "./homeBrief/decisionMatrix";
-export { buildFlipRiskMeterState, buildMemoryRail, extractExecutiveOperationalStance };
+export { buildFlipRiskMeterState, buildMemoryRail };
 
 export type Regime = RegimeKey;
 

@@ -6,7 +6,6 @@
  */
 export const OG_BG = "#08090b";
 export const OG_PANEL = "#111316";
-export const OG_RAISED = "#1a1d22";
 export const OG_BORDER = "rgba(226, 232, 240, 0.10)";
 export const OG_BORDER_STRONG = "rgba(226, 232, 240, 0.16)";
 export const OG_TEXT = "#f4f7fb";

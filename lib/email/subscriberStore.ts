@@ -91,7 +91,7 @@ export type Subscriber = {
 
 type PendingFlags = { alerts?: boolean; weekly?: boolean; reactivate?: boolean };
 
-export type SubscribeOptions = {
+type SubscribeOptions = {
   /** Omitted leaves an existing subscriber's choice alone; a new record defaults to false. */
   alerts?: boolean;
   /**

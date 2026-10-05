@@ -178,7 +178,7 @@ const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["
   curveSlope: 1,
 };
 
-export const signalDeltaImprovesWhen: Record<ReportDynamics["changedSignals"][number]["key"], "positive" | "negative"> = {
+const signalDeltaImprovesWhen: Record<ReportDynamics["changedSignals"][number]["key"], "positive" | "negative"> = {
   tightness: "negative",
   riskAppetite: "positive",
   baseRate: "negative",

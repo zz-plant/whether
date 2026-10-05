@@ -6,7 +6,12 @@
  * twelve. A client configured against one learned nothing true about the other.
  */
 
-export const MCP_PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26"] as const;
+/**
+ * What /api/mcp and the local stdio server can negotiate. Since the HTTP transport
+ * moved onto the SDK (2026-10), this mirrors its SUPPORTED_PROTOCOL_VERSIONS minus
+ * the legacy 2024 revisions, which are accepted by the transport but not advertised.
+ */
+export const MCP_PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26"] as const;
 
 export const MCP_SERVER_INFO = {
   name: "whether",

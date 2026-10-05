@@ -46,7 +46,7 @@ export const isRetiredResourceArticleSlug = (slug: string) =>
 export const findResourceArticleBySlug = (slug: string) =>
   resourceArticles.find((article) => article.slug === slug);
 
-export const generateStaticParams = () => resourceArticles.map((article) => ({ slug: article.slug }));
+
 
 const resourceDecisionAreasByIntent: Record<ResourceArticle["intent"], DecisionArea[]> = {
   cfo: ["burn-discipline", "capital-raising", "hiring"],

@@ -262,7 +262,7 @@ const regimeOrder: RegimeKey[] = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSIO
 const isTightening = (previousState: RegimeKey, nextState: RegimeKey) =>
   regimeOrder.indexOf(nextState) < regimeOrder.indexOf(previousState);
 
-export const buildReversalConditions = (
+const buildReversalConditions = (
   previousState: RegimeKey,
   nextState: RegimeKey,
   thresholds: RegimeThresholds,

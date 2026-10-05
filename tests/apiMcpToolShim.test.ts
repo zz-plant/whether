@@ -159,7 +159,7 @@ describe("/api/mcp GET tool shim, on the shared tools", () => {
  */
 describe("/api/mcp from a browser", () => {
   const rpc = (body: unknown) =>
-    new Request("https://whether.work/api/mcp", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    new Request("https://whether.work/api/mcp", { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" }, body: JSON.stringify(body) });
 
   it("answers the preflight a JSON-RPC POST triggers", async () => {
     const response = await optionsMcp(new Request("https://whether.work/api/mcp", { method: "OPTIONS" }));

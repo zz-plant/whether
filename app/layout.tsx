@@ -14,7 +14,7 @@ import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { ServiceWorkerRegistrar } from "./components/serviceWorkerRegistrar";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";

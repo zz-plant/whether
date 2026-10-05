@@ -30,4 +30,4 @@ export function ActionLink({ children, className, variant = "pill", ...linkProps
   );
 }
 
-export type { ActionLinkVariant };
+

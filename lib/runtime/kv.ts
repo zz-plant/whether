@@ -11,7 +11,7 @@
  * - put expirationTtl (min 60s): server-side retention; lets logs age out instead of
  *   being read around forever.
  */
-export type KvListResult = {
+type KvListResult = {
   keys: Array<{ name: string; metadata?: unknown }>;
   list_complete: boolean;
   cursor?: string;
