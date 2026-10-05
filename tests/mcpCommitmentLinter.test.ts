@@ -17,7 +17,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("handles tools/call for stress_test_plan via MCP JSON-RPC", async () => {
     const request = new Request("http://localhost/api/mcp", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 101,
@@ -46,7 +46,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("handles tools/call for lint_commitment on PRD/RFC text", async () => {
     const request = new Request("http://localhost/api/mcp", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 102,
@@ -73,7 +73,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("handles tools/call for get_analog_playbook", async () => {
     const request = new Request("http://localhost/api/mcp", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 103,
@@ -99,7 +99,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("lints a sprint goal to holds/pauses/needs_reversal_guardrail with the bounded rule's trigger", async () => {
     const request = new Request("http://localhost/api/mcp", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 104,

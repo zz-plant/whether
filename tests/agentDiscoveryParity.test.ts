@@ -27,7 +27,7 @@ describe("every place an agent learns what to call", () => {
   it("names the same tools the remote server lists", async () => {
     const rpc = await (
       await handleMcpRequest(
-        new Request("https://whether.work/api/mcp", { method: "POST", body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }) }),
+        new Request("https://whether.work/api/mcp", { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }) }),
       )
     ).json();
     const served: string[] = rpc.result.tools.map((tool: { name: string }) => tool.name);

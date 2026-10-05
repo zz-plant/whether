@@ -8,7 +8,12 @@ const postMcp = (body: unknown) =>
   handleMcpRequest(
     new Request("https://whether.work/api/mcp", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      // The SDK transport enforces the spec's Accept requirement: a client must accept
+      // both media types, even though this server answers JSON only.
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+      },
       body: typeof body === "string" ? body : JSON.stringify(body),
     }),
   );
@@ -35,7 +40,9 @@ describe("MCP streamable HTTP transport", () => {
       jsonrpc: "2.0",
       id: 2,
       method: "initialize",
-      params: { protocolVersion: "1999-01-01" },
+      // The SDK validates initialize params against the spec, which requires
+      // capabilities and clientInfo; the bogus version is the point here.
+      params: { protocolVersion: "1999-01-01", capabilities: {}, clientInfo: { name: "test", version: "0" } },
     });
     const payload = await response.json();
     assert.equal(payload.result.protocolVersion, MCP_PROTOCOL_VERSIONS[0]);
