@@ -27,7 +27,7 @@ source. Keep the styling system split explicit:
 - Put durable, multi-property interaction primitives in the existing
   `app/styles/*.css` modules under a `weather-*` class. This includes controls,
   panels, screenshot behavior, pseudo-elements, and accessibility contracts.
-- Compose conditional component classes with `cn()` from `src/lib/utils.ts` so
+- Compose conditional component classes with `cn()` from `lib/utils.ts` so
   `clsx` and `tailwind-merge` remain the single conflict-resolution path.
 - Keep shadcn pointed at `app/styles/tokens.css`; do not add a parallel Tailwind
   config or a second styling runtime.

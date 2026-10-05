@@ -15,7 +15,7 @@ describe("styling system contract", () => {
   const components = JSON.parse(readRepoFile("components.json")) as {
     tailwind: { config: string; css: string; cssVariables: boolean };
   };
-  const classUtility = readRepoFile("src/lib/utils.ts");
+  const classUtility = readRepoFile("lib/utils.ts");
 
   it("pins Tailwind core and its PostCSS adapter to the same v4 release", () => {
     const tailwindVersion = packageJson.devDependencies.tailwindcss;
