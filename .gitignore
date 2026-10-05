@@ -10,12 +10,9 @@ out
 # macOS Finder duplicate files (creates "filename 2.ext")
 * 2.*
 * 3.*
-artifacts/ui
-artifacts/seo-payloads
-artifacts/seo-refresh
-artifacts/agent
-artifacts/landmarks
-artifacts/jev
+# Generated artifacts (screenshots, smoke output, briefs). One-off local artifacts,
+# never inputs: write new scratch output to a temp dir, not here.
+artifacts/
 
 *.tsbuildinfo
 # Environment files
