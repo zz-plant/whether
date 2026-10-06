@@ -34,7 +34,7 @@ Create a delegation packet that a Whether subagent can execute without rediscove
 - `AGENTS.md`
 - `docs/agents/README.md`
 - `docs/agents/mcp-and-skills-playbook.md`
-- `.claude/skills/README.md` (mirrored at `.codex/skills/README.md`)
+- `.claude/skills/README.md` (generated into `.codex/skills/README.md`)
 
 ## Workflow
 

@@ -69,7 +69,8 @@ Subagents should not invent new product surfaces, reinterpret core semantics, or
 
 ## Current first-party skills
 
-See [../../.codex/skills/README.md](../../.codex/skills/README.md) for the current index.
+See [../../.claude/skills/README.md](../../.claude/skills/README.md) for the current index. It is
+canonical; `.codex/skills/` is generated from it by `bun run skills:sync`.
 
 Core roles:
 
@@ -172,7 +173,7 @@ Bad:
 Better:
 
 - “Tighten `docs/agents/README.md` so a new agent can find the right guide in under a minute; do not add new docs; verify links manually and report changed files plus risks.”
-- “Update `.codex/skills/README.md` to clarify overlap between `feature-audit` and `research-brief`; do not change any `SKILL.md`; return the exact wording changes and any remaining ambiguity.”
+- “Update `.claude/skills/README.md` to clarify overlap between `feature-audit` and `research-brief`; do not change any `SKILL.md`; return the exact wording changes and any remaining ambiguity.”
 
 ## Skill design rules for Whether
 
@@ -228,7 +229,8 @@ Review first-party skills when:
 
 When you update a skill, also update:
 
-- [../../.codex/skills/README.md](../../.codex/skills/README.md) if discovery guidance changed
+- [../../.claude/skills/README.md](../../.claude/skills/README.md) if discovery guidance changed
+- `.codex/skills/`, by running `bun run skills:sync` (never by hand)
 - [README.md](README.md) if the recommended read path changed
 - [documentation.md](documentation.md) if doc ownership or update triggers changed
 
