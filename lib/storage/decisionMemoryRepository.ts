@@ -129,7 +129,7 @@ export class KvDecisionMemoryRepository implements DecisionMemoryRepository {
 }
 
 const getKvBinding = (): KvNamespace | null => {
-  return getWhetherKv("DECISION_MEMORY_KV");
+  return getWhetherKv();
 };
 
 let sharedRepository: DecisionMemoryRepository | null = null;
