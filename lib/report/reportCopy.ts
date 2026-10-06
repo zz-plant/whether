@@ -228,7 +228,7 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
     value: "curve-slope",
     term: "Recession warning gauge",
     summary:
-      "The ten-year Treasury rate minus the two-year rate. Below zero, short-term borrowing costs more than long-term, which has preceded most U.S. recessions.",
+      "The ten-year Treasury rate minus the two-year rate. Below zero, short-term borrowing costs more than long-term. That has preceded most U.S. recessions.",
   },
   {
     value: "base-rate",

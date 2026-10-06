@@ -358,7 +358,7 @@ const buildInputInfluenceDescription = ({
   if (rawValue > 0.1) {
     return {
       pressureLabel: "Expansion confidence",
-      effectDetail: "The curve is positive, which supports looser guidance if funding pressure also eases.",
+      effectDetail: "A positive curve supports looser guidance if funding pressure also eases.",
       watchLabel: "Below 0.0% = inversion",
       watchValue: threshold,
       watchDistanceLabel: `${Math.abs(rawValue - threshold).toFixed(2)}% above the change line`,

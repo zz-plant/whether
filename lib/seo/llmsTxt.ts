@@ -32,7 +32,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "## Start here",
     "",
     `- Decide from the state: GET ${baseUrl}/api/agent?view=state`,
-    "  - The current reading in about 3KB: the conditions and how sure, whether the data is live and current, where each score sits against its pause, resume and change lines, what moved each score, and the guidance.",
+    "  - The current reading in about 3KB: the conditions and the confidence in them, the data's freshness, each score against its pause, resume and change lines, the moves behind each score, and the guidance.",
     "  - Check `automation.ready` first. False means the reading is a saved copy, or older than " +
       `${PUBLISH_MAX_RECORD_AGE_DAYS} days, or assembly failed: say so, and do not act on it without a person looking.`,
     `- MCP client: ${baseUrl}/api/mcp (streamable HTTP, JSON-RPC 2.0, protocol ${MCP_PROTOCOL_VERSIONS.join(" or ")}). Call get_state first.`,

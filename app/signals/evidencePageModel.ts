@@ -83,7 +83,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
     signals: ["tightness", "riskAppetite"],
     notes: {
       tightness: "How hard money is to raise or borrow right now",
-      riskAppetite: "How willing investors are to fund risk, which moves with conditions",
+      riskAppetite: "How willing investors are to fund risk right now",
     },
     instruments: [
       { label: "Raw source data", why: "Check the inputs at their source before a move that depends on rates", href: "#signal-diagnostics" },

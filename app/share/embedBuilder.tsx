@@ -65,8 +65,7 @@ export function EmbedBuilder() {
             Add a live brief to a newsletter, wiki or dashboard
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
-            A snippet that shows this week&apos;s guidance, what to do now and what would change it,
-            updated every week.
+            A snippet that shows what to do this week and what would change it, updated weekly.
           </p>
         </div>
       </summary>

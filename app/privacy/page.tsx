@@ -139,9 +139,7 @@ export default function PrivacyPage() {
               Decisions you record are stored in Cloudflare KV against the identifier above, with the
               reading at the time so a later week can be compared against the decision&apos;s
               own assumptions. Everything else you set stays in your browser and is never sent: your
-              operator profile, Decision Shield presets, threshold drafts, the last guidance this browser
-              saw, how many decisions you
-              last recorded (so the brief only asks for your record when there is one), the theme, and
+              operator profile, Decision Shield presets, threshold drafts, the last guidance this browser saw, the number of decisions you last recorded (so the brief only asks for your record when there is one), the theme, and
               which one-time explainers you have dismissed. A Decision Shield link you copy is the exception:
               the plan you typed is written into the link, so whoever opens it sends that text to this
               site, where it can appear in the request logs described in 2.7.
@@ -193,9 +191,7 @@ export default function PrivacyPage() {
               If you ask this browser to notify you when conditions change, your browser generates a
               subscription — an address its own push service assigned, and two keys it made — and we store
               those three things against the random identifier above. That is the whole record: no email
-              address, no reading, and no history of what was sent. It is used to wake this browser when
-              conditions change, which is a handful of times a year, and for
-              nothing else.
+              address, no reading, and no history of what was sent. It is used to wake this browser when conditions change (a handful of times a year), and for nothing else.
             </p>
             <p className={paragraph}>
               The notification itself carries no content. What it says is fetched by your browser when it is

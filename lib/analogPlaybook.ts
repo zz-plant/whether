@@ -107,7 +107,7 @@ const HISTORICAL_CYCLES: HistoricalCycle[] = [
     tightness: 25,
     riskAppetite: 85,
     consensusTrap:
-      "Hired fast without the onboarding to support it, which cut output per person and swelled fixed costs.",
+      "Hired fast without the onboarding to support it; output per person fell and fixed costs swelled.",
     winningMove:
       "Raised enough for several years while borrowing cost almost nothing; signed long-term contracts with large anchor customers.",
     reversalMarker:

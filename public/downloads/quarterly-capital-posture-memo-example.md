@@ -17,8 +17,7 @@
 - **Why now:** Funding pressure sat 10 points above the line that changes the
   call for the whole quarter, driven by the front end rather than by spreads.
   Risk appetite stayed below its line on a flat-to-inverted curve. Neither axis
-  came close to reversing, which is why nothing in the plan below was re-opened
-  mid-quarter.
+  came close to reversing, so nothing in the plan below was re-opened mid-quarter.
 - **Key risks:** Two of our three largest commitments are annual and renew in
   Q4, so the cost of being wrong about the posture rises in November, not now.
 
@@ -34,7 +33,7 @@
 
 The classification is the decision's reversibility, not its size. The compute
 reservation was the cheapest line on this list per unit and the only one with no
-way back, which is why it is the one we did not do.
+way back, so it is the one we did not do.
 
 ## Reversal trigger logic
 

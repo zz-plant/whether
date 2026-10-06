@@ -34,7 +34,7 @@ import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 export const metadata: Metadata = buildPageMetadata({
   title: "History and Track Record",
   description:
-    "Every month-end reading on record, when conditions changed, how long each spell held, and the published weekly briefs behind the track record.",
+    "Every month-end reading on record, each change in conditions, the length of each spell, and the published weekly briefs behind the track record.",
   path: "/history",
   imageAlt: "Whether history and track record",
   imageParams: { template: "record", eyebrow: "History" },
