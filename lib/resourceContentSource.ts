@@ -7,6 +7,9 @@ type ResourcePillarSectionData = {
   heading: string;
   paragraphs: string[];
   subsections?: ResourcePillarSectionData[];
+  /** Reference material (checklists, agendas, appendices) rather than the
+   *  guide's argument: rendered folded, after the argument. */
+  reference?: boolean;
 };
 
 const resourcePillarSectionSchema: z.ZodType<ResourcePillarSectionData> = z.lazy(() =>
@@ -14,6 +17,7 @@ const resourcePillarSectionSchema: z.ZodType<ResourcePillarSectionData> = z.lazy
     heading: z.string().min(1),
     paragraphs: z.array(z.string().min(1)).min(1),
     subsections: z.array(resourcePillarSectionSchema).optional(),
+    reference: z.boolean().optional(),
   }),
 );
 

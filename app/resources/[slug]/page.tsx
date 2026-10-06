@@ -41,6 +41,7 @@ import {
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { ActionLink } from "../../components/ui/actionLink";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
 type Params = { slug: string };
@@ -73,15 +74,22 @@ const buildSectionAnchor = (heading: string) =>
     .trim()
     .replace(/\s+/g, "-");
 
-const splitParagraphForReadability = (paragraph: string) => {
-  const sentences = paragraph.match(/[^.!?]+[.!?]+|[^.!?]+$/g) ?? [paragraph];
-  const chunks: string[] = [];
-
-  for (let index = 0; index < sentences.length; index += 2) {
-    chunks.push(sentences.slice(index, index + 2).join(" ").trim());
-  }
-
-  return chunks;
+/* This week's conditions and direction in one sentence, for a page that is not
+   the brief: the articles' live-guidance block and the pillars' header both
+   print it, so a reader arriving from search meets the current posture before
+   the essay (AGENTS.md, "Thin SEO page"). */
+const loadPostureLine = async (route: string) => {
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
+  const { homeBriefModel, displayRegime } = snapshot;
+  const direction =
+    reportData.reportDynamics.directionLabel === "unavailable"
+      ? ", with no comparison to last week available"
+      : ` and ${reportData.reportDynamics.directionLabel} this week`;
+  return {
+    reportData,
+    snapshot,
+    postureSummary: `Conditions are ${displayRegime.label}${direction}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions)}.`,
+  };
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -147,8 +155,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
 
   const article = findResourceArticleBySlug(slug);
   if (article) {
-    const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: `/resources/${article.slug}` });
-    const { homeBriefModel, displayRegime, callCitation } = snapshot;
+    const { reportData, snapshot, postureSummary } = await loadPostureLine(`/resources/${article.slug}`);
+    const { homeBriefModel, callCitation } = snapshot;
     const decisionAreas = getResourceArticleDecisionAreas(article);
     const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
 
@@ -169,7 +177,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           article={article}
           decisionArtifact={{
             decisionShiftSummary: homeBriefModel.decisionShiftSummary,
-            postureSummary: `Conditions are ${displayRegime.label}${reportData.reportDynamics.directionLabel === "unavailable" ? ", with no comparison to last week available" : ` and ${reportData.reportDynamics.directionLabel} this week`}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions)}.`,
+            postureSummary,
             mappedRules,
             freshnessLabel: reportData.fetchedAtLabel,
             citation: callCitation,
@@ -200,7 +208,24 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   };
 
 
-  const midpointIndex = Math.floor(page.sections.length / 2);
+  const { reportData, postureSummary } = await loadPostureLine(`/resources/${page.slug}`);
+  /* The guide's argument reads straight through; its reference material
+     (checklists, agendas, appendices) follows, folded. Open, the reference ran
+     to two-thirds of the page, and four of those sections were the same text
+     on all three guides, 945 words printed on three URLs. They live on the
+     parent guide now, and the other two link to them. */
+  const argumentSections = page.sections.filter((section) => !section.reference);
+  const referenceSections = page.sections.filter((section) => section.reference);
+  const isParentGuide = `/resources/${page.slug}` === canonicalCapitalDisciplinePath;
+  const relatedPages = [
+    { href: canonicalCapitalDisciplinePath, label: "Capital discipline for venture-backed companies" },
+    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital posture framework" },
+    { href: "/resources/reversibility-as-governance", label: "Reversibility as governance" },
+    { href: resourceSupportingPages.decisionShieldOverview.path, label: "Decision Shield overview" },
+    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Posture Template" },
+  ].filter((link) => link.href !== `/resources/${page.slug}`);
+  const linkClass = "text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100";
+  const lexiconByIndex = ["capital-regime", "escalation-thresholds", "reversibility", "30-day-confirmation-logic"] as const;
 
   return (
     <ContentPageShell data-content-measurement-root={`/resources/${page.slug}`}>
@@ -210,7 +235,6 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         intent={page.intent}
       />
       <JsonLdScript data={articleSchema} />
-
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -220,97 +244,116 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       />
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <div className="flex flex-wrap gap-2">
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-            Start from Weekly Brief
-          </Link>
-          <Link
-            href={RESOURCES_RETURN_HREF}
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100"
-          >
-            {RESOURCES_RETURN_LABEL}
-          </Link>
-        </div>
         <p className="type-eyebrow">Governance guide</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.h1}</h1>
         <p className="text-sm text-slate-200">{page.description}</p>
         <p className="text-sm text-slate-300">{page.boardPackContext}</p>
+        {/* The week the guide is being read in. Two pill buttons ("Start from
+            Weekly Brief", "Return to Planning") sat above the title instead,
+            and the page never said what conditions were. */}
+        <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
+          <p className="type-eyebrow">This week</p>
+          <p className="text-sm text-slate-200">{postureSummary}</p>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
+            <span>As of {reportData.recordDateLabel}</span>
+            <ActionLink href="/" variant="inline">Open this week&apos;s brief</ActionLink>
+          </p>
+        </div>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">On this page</h2>
+      <nav aria-labelledby="pillar-index-heading" className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+        <h2 id="pillar-index-heading" className="text-lg font-semibold text-slate-100">On this page</h2>
         <ol className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
-          {page.sections.map((section) => {
-            const anchor = buildSectionAnchor(section.heading);
-            return (
-              <li key={section.heading}>
-                <Link href={`#${anchor}`} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
-                  {section.heading}
-                </Link>
-              </li>
-            );
-          })}
+          {argumentSections.map((section) => (
+            <li key={section.heading}>
+              <Link href={`#${buildSectionAnchor(section.heading)}`} className={linkClass}>
+                {section.heading}
+              </Link>
+            </li>
+          ))}
         </ol>
-      </section>
+        {referenceSections.length > 0 ? (
+          <p className="text-sm text-slate-300">
+            <Link href="#reference" className={linkClass}>Reference</Link>: {referenceSections.map((section) => section.heading).join(" · ")}
+          </p>
+        ) : null}
+      </nav>
+
+      {argumentSections.map((section, index) => {
+        const anchor = buildSectionAnchor(section.heading);
+        const lexicon = lexiconByIndex[index];
+        return (
+          <section id={anchor} key={section.heading} className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
+            <h2 className="text-xl font-semibold text-slate-100">{section.heading}</h2>
+            {/* As written. A splitter re-cut every paragraph into two-sentence
+                chunks on ".", "!" and "?", which broke quoted questions and
+                printed a lone "," or "'" as a paragraph of its own. */}
+            {section.paragraphs.map((paragraph) => (
+              <p key={paragraph} className="text-sm leading-7 text-slate-200">
+                {paragraph}
+              </p>
+            ))}
+            {lexicon ? <GovernanceLexiconCallout termSlug={lexicon} /> : null}
+            {section.subsections?.map((subsection) => (
+              <div key={subsection.heading} className="space-y-3 rounded-lg border border-slate-800/70 bg-slate-900/50 px-4 py-4">
+                <h3 className="text-lg font-semibold text-slate-100">{subsection.heading.replace(/^H3:\s*/, "")}</h3>
+                {subsection.paragraphs.map((paragraph) => (
+                  <p key={paragraph} className="text-sm leading-7 text-slate-200">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </section>
+        );
+      })}
+
+      {/* After the argument, where a reader who finished it decides. It sat
+          mid-page, which on the parent guide put it inside the reference. */}
+      <PillarCtaBlock
+        title="Use the board-ready template in your next operating review"
+        body="Turn these standards into one document: reviewed weekly by the team, read monthly by the board."
+        keyword={page.keyword}
+        sourceSlug={page.slug}
+        downloadLabel={page.midpointCtaLabel}
+      />
+
+      {referenceSections.length > 0 ? (
+        <section id="reference" aria-labelledby="reference-heading" className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+          <h2 id="reference-heading" className="text-xl font-semibold text-slate-100">Reference</h2>
+          <div className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
+            {referenceSections.map((section) => (
+              <details id={buildSectionAnchor(section.heading)} key={section.heading} className="weather-auto-chevron py-3">
+                <summary className="cursor-pointer select-none text-base font-semibold text-slate-100">{section.heading}</summary>
+                <div className="space-y-4">
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph} className="text-sm leading-7 text-slate-200">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+          {isParentGuide ? null : (
+            <p className="text-sm text-slate-300">
+              The board Q&amp;A, the anti-patterns, the 12-month cadence and the director checklist are in{" "}
+              <Link href={`${canonicalCapitalDisciplinePath}#reference`} className={linkClass}>the parent guide</Link>.
+            </p>
+          )}
+        </section>
+      ) : null}
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Related pages</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li><Link href={canonicalCapitalDisciplinePath} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital discipline for venture-backed companies</Link></li>
-          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Board-level capital posture framework{page.slug === "board-level-capital-posture-framework" ? " (this page)" : ""}</Link></li>
-          <li><Link href={resourceSupportingPages.decisionShieldOverview.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Decision Shield overview</Link></li>
-          <li><Link href={resourceSupportingPages.capitalPostureTemplate.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Posture Template</Link></li>
+          {relatedPages.map((link) => (
+            <li key={link.href}>
+              <Link href={link.href} className={linkClass}>{link.label}</Link>
+            </li>
+          ))}
         </ul>
       </section>
-
-      {page.sections.map((section, index) => {
-        const anchor = buildSectionAnchor(section.heading);
-
-        return (
-          <section id={anchor} key={section.heading} className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-            <h2 className="text-xl font-semibold text-slate-100">{section.heading}</h2>
-            {section.paragraphs.flatMap((paragraph) => splitParagraphForReadability(paragraph)).map((paragraphChunk, paragraphIndex) => (
-              <p key={`${section.heading}-p-${paragraphIndex}`} className="text-sm leading-7 text-slate-200">
-                {paragraphChunk}
-              </p>
-            ))}
-
-            {index === 0 ? <GovernanceLexiconCallout termSlug="capital-regime" /> : null}
-            {index === 1 ? <GovernanceLexiconCallout termSlug="escalation-thresholds" /> : null}
-            {index === 2 ? <GovernanceLexiconCallout termSlug="reversibility" /> : null}
-            {index === 3 ? <GovernanceLexiconCallout termSlug="30-day-confirmation-logic" /> : null}
-
-            {section.subsections?.map((subsection) => (
-              <div key={subsection.heading} className="space-y-3 rounded-lg border border-slate-800/70 bg-slate-900/50 px-4 py-4">
-                <h3 className="text-lg font-semibold text-slate-100">{subsection.heading.replace(/^H3:\s*/, "")}</h3>
-                {subsection.paragraphs
-                  .flatMap((paragraph) => splitParagraphForReadability(paragraph))
-                  .map((paragraphChunk, paragraphIndex) => (
-                    <p key={`${subsection.heading}-p-${paragraphIndex}`} className="text-sm leading-7 text-slate-200">
-                      {paragraphChunk}
-                    </p>
-                  ))}
-              </div>
-            ))}
-
-            {index === midpointIndex ? (
-              <PillarCtaBlock
-                title="Use the board-ready template in your next operating review"
-                body="Turn these standards into one document: reviewed weekly by the team, read monthly by the board."
-                keyword={page.keyword}
-                sourceSlug={page.slug}
-                downloadLabel={page.midpointCtaLabel}
-              />
-            ) : null}
-
-            <p className="pt-1 type-eyebrow">
-              <Link href="#main-content" className="text-slate-300 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-100">
-                Back to top
-              </Link>
-            </p>
-          </section>
-        );
-      })}
 
       <PillarCtaBlock
         title="Need the board pack itself?"
