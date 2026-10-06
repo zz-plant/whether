@@ -13,18 +13,20 @@
  *
  * "Referenced" is deliberately cheap: the export's name appears as an
  * identifier in any other scanned file, across every source, config and
- * workflow extension this repo uses. That mostly over-counts — a comment or an
+ * workflow extension the repo uses. That mostly over-counts — a comment or an
  * unrelated symbol with the same name keeps an export alive — so a reported
  * orphan is nearly always real. It is not a proof: a symbol named only from a
- * file type outside `REFERENCE_EXTENSIONS`, or reached only through a runtime
+ * file type outside `referenceExtensions`, or reached only through a runtime
  * string, reads as dead. When this check fails on an export you believe is
  * live, say where it is consumed from; that is a gap in the scan, not a
- * verdict. Names Next.js and the Workers runtime consume by convention
- * (`metadata`, `GET`, `scheduled`, ...) are exempt because the framework is
- * the reference.
+ * verdict. Names the framework and runtime consume by convention
+ * (`frameworkExports`) are exempt because the framework is the reference.
  *
- * Like the suppression census, the baseline is inline: lowering it is an edit
- * to this file that lands with the work that earned it.
+ * This file is the mechanism and names nothing about the repository it scans.
+ * What it scans — the roots, the extensions, the framework's convention names,
+ * the data directories, the baseline — is `deadExportsConfig` in
+ * `scripts/census.config.ts`, and lowering the baseline is an edit there that
+ * lands with the work that earned it.
  *
  * Usage:
  *   bun run scripts/check-dead-exports.ts
@@ -32,91 +34,56 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
+import { deadExportsConfig } from "./census.config";
+import { walkFiles } from "./walk-files.mjs";
+
 const REPO_ROOT = join(import.meta.dirname ?? __dirname, "..");
 
-/** Exported declarations in these roots are the population being measured. */
-const DECLARATION_ROOTS = ["app", "lib", "worker"];
-const DECLARATION_EXTENSIONS = new Set([".ts", ".tsx"]);
-
-/**
- * Files whose identifiers count as references. Wider than the declaration
- * roots on purpose: a script, a test, or `wrangler.toml` naming a Durable
- * Object class is a real consumer.
- *
- * `packages` was in this list for `@whether/decision-engine`, whose entire
- * content was `export * from "../../../lib/report/index"` and which nothing
- * imported. A star re-export names no identifiers, so it inflated nothing —
- * but the pair it formed with `lib/report/index.ts` is the shape this scan
- * structurally cannot see, and is why both are gone: a namespace re-export
- * (`export * as decisionKnobs from "./decisionKnobs"`) always spells its own
- * filename, so every other file that imports that module reads as a reference
- * to the barrel's export. A barrel is referenced by construction.
- */
-const REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests", ".github"];
-/*
- * Wider than the declaration set on purpose. A symbol can be named from a
- * `.jsx` file, an ambient `.d.ts`, a nested `wrangler.toml` naming a Durable
- * Object class, or a workflow YAML — and each one that the scan cannot see
- * turns a live export into a reported orphan.
- */
-const REFERENCE_EXTENSIONS = new Set([
-  ".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs", ".jsx",
-  ".json", ".jsonc", ".toml", ".yml", ".yaml",
-]);
-const ROOT_CONFIG_EXTENSIONS = new Set([".ts", ".js", ".mjs", ".toml", ".jsonc", ".json"]);
-
-const IGNORED_DIRECTORIES = new Set([".next", ".open-next", ".wrangler", "artifacts", "coverage", "dist", "node_modules", "out"]);
-
-/** Names the framework or runtime consumes without importing them. */
-const FRAMEWORK_EXPORTS = new Set([
-  "metadata",
-  "generateMetadata",
-  "generateStaticParams",
-  "generateViewport",
-  "viewport",
-  "dynamic",
-  "dynamicParams",
-  "revalidate",
-  "runtime",
-  "fetchCache",
-  "preferredRegion",
-  "maxDuration",
-  "GET",
-  "POST",
-  "PUT",
-  "PATCH",
-  "DELETE",
-  "HEAD",
-  "OPTIONS",
-  "alt",
-  "size",
-  "contentType",
-  "config",
-  "scheduled",
-  "fetch",
-  "queue",
-  "email",
-  "tail",
-]);
+/** What the census measures in one repository. `scripts/census.config.ts` holds this one's. */
+export type DeadExportsConfig = {
+  /** Exported declarations under these roots are the population being measured. */
+  declarationRoots: string[];
+  declarationExtensions: string[];
+  /** Files whose identifiers count as references to a declaration. */
+  referenceRoots: string[];
+  referenceExtensions: string[];
+  /** Files directly at the repository root that also count as references. */
+  rootConfigExtensions: string[];
+  /** Reference roots a complete checkout always has; an empty one refuses the scan. */
+  requiredReferenceRoots: string[];
+  /** Names never read, wherever they sit. */
+  ignoredDirectories: string[];
+  /** Export names a framework or runtime consumes without importing them. */
+  frameworkExports: string[];
+  /** Module basenames (no extension) a framework loads by convention. */
+  conventionModules: RegExp;
+  /** Committed data the product reads, judged by filename. */
+  dataRoots: string[];
+  dataExtensions: string[];
+  /** Where a data file's name counts as a reference to it. */
+  dataReferenceRoots: string[];
+  dataReferenceExtensions: string[];
+  /** Importers that make a module shipped rather than test-only. */
+  consumerRoots: string[];
+  /** Importers that do not. */
+  testRoots: string[];
+  baseline: number;
+};
 
 const DECLARATION_PATTERN =
   /^export (?:declare )?(?:const|let|function|async function|class|abstract class|enum|type|interface) ([A-Za-z_$][A-Za-z0-9_$]*)/gm;
 
 const IDENTIFIER_PATTERN = /[A-Za-z_$][A-Za-z0-9_$]*/g;
 
-/**
- * Zero. The sweep that introduced this check left nothing behind, and an
- * export nothing references has no reason to exist, so the baseline is not a
- * budget to spend. Raising it is a policy change and belongs in its own PR.
- */
-export const DEAD_EXPORT_BASELINE = 0;
+/** The ceiling the CLI enforces. Not a budget: see `baseline` in `scripts/census.config.ts`. */
+export const DEAD_EXPORT_BASELINE = deadExportsConfig.baseline;
 
 export type DeadExport = { file: string; name: string; kind: "runtime" | "type" };
 
 /**
- * `statSync` throws on a dangling symlink and on a path that disappears between
- * the `readdirSync` and the stat. Neither is hypothetical in a build container,
- * and either one crashed the whole census rather than skipping one entry.
+ * Guarded for the same reason the walk is: a dangling symlink, or a path that
+ * disappears between the `readdirSync` and the stat, must cost one entry rather
+ * than crash the whole census.
  */
 const isDirectory = (path: string): boolean | null => {
   try {
@@ -126,39 +93,29 @@ const isDirectory = (path: string): boolean | null => {
   }
 };
 
-const walk = (directory: string, extensions: Set<string>, into: string[]) => {
-  let entries: string[];
-  try {
-    entries = readdirSync(directory);
-  } catch {
-    return;
-  }
-  for (const entry of entries) {
-    if (IGNORED_DIRECTORIES.has(entry)) continue;
-    const path = join(directory, entry);
-    const directoryEntry = isDirectory(path);
-    if (directoryEntry === null) continue;
-    if (directoryEntry) {
-      walk(path, extensions, into);
-    } else if (extensions.has(extname(entry))) {
-      into.push(path);
-    }
-  }
-};
-
 const collect = (
   root: string,
+  config: DeadExportsConfig,
   roots: string[],
-  extensions: Set<string>,
+  extensions: string[],
   includeRootConfig: boolean,
   { skipAmbient = false }: { skipAmbient?: boolean } = {},
 ) => {
+  const wanted = new Set(extensions);
+  const ignored = new Set(config.ignoredDirectories);
+  const skip = (name: string) => ignored.has(name);
+
   const paths: string[] = [];
-  for (const name of roots) walk(join(root, name), extensions, paths);
+  for (const name of roots) {
+    for (const path of walkFiles(join(root, name), { skip })) {
+      if (wanted.has(extname(path))) paths.push(path);
+    }
+  }
   if (includeRootConfig) {
+    const rootConfig = new Set(config.rootConfigExtensions);
     for (const entry of readdirSync(root)) {
       const path = join(root, entry);
-      if (isDirectory(path) === false && ROOT_CONFIG_EXTENSIONS.has(extname(entry)) && !entry.endsWith(".d.ts")) {
+      if (isDirectory(path) === false && rootConfig.has(extname(entry)) && !entry.endsWith(".d.ts")) {
         paths.push(path);
       }
     }
@@ -174,13 +131,6 @@ const collect = (
   }
   return files;
 };
-
-/**
- * Roots a healthy checkout always has. `packages` and `.github` are excluded:
- * either can be legitimately absent, and a missing one costs precision, not
- * soundness.
- */
-const REQUIRED_REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests"];
 
 const countByRoot = (files: Map<string, string>): Map<string, number> => {
   const counts = new Map<string, number>();
@@ -205,9 +155,9 @@ const countByRoot = (files: Map<string, string>): Map<string, number> => {
  * scaffold two-file trees on purpose, and a partial tree is exactly what they
  * are measuring.
  */
-const assertScanIsPlausible = (references: Map<string, string>) => {
+const assertScanIsPlausible = (references: Map<string, string>, config: DeadExportsConfig) => {
   const counts = countByRoot(references);
-  const empty = REQUIRED_REFERENCE_ROOTS.filter((root) => (counts.get(root) ?? 0) === 0);
+  const empty = config.requiredReferenceRoots.filter((root) => (counts.get(root) ?? 0) === 0);
   if (empty.length === 0) return;
   throw new Error(
     `[dead-exports] refusing to report: no files found under ${empty.join(", ")}. ` +
@@ -222,11 +172,17 @@ const assertScanIsPlausible = (references: Map<string, string>) => {
  */
 export const censusDeadExports = (
   root = REPO_ROOT,
-  { requireCompleteTree = false }: { requireCompleteTree?: boolean } = {},
+  {
+    requireCompleteTree = false,
+    config = deadExportsConfig,
+  }: { requireCompleteTree?: boolean; config?: DeadExportsConfig } = {},
 ): DeadExport[] => {
-  const references = collect(root, REFERENCE_ROOTS, REFERENCE_EXTENSIONS, true);
-  if (requireCompleteTree) assertScanIsPlausible(references);
-  const declarations = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false, { skipAmbient: true });
+  const references = collect(root, config, config.referenceRoots, config.referenceExtensions, true);
+  if (requireCompleteTree) assertScanIsPlausible(references, config);
+  const declarations = collect(root, config, config.declarationRoots, config.declarationExtensions, false, {
+    skipAmbient: true,
+  });
+  const frameworkExports = new Set(config.frameworkExports);
 
   const identifiersByFile = new Map<string, Set<string>>();
   for (const [path, source] of references) {
@@ -237,7 +193,7 @@ export const censusDeadExports = (
   for (const [path, source] of declarations) {
     for (const match of source.matchAll(DECLARATION_PATTERN)) {
       const name = match[1];
-      if (FRAMEWORK_EXPORTS.has(name)) continue;
+      if (frameworkExports.has(name)) continue;
       let referenced = false;
       for (const [otherPath, identifiers] of identifiersByFile) {
         if (otherPath === path) continue;
@@ -255,10 +211,6 @@ export const censusDeadExports = (
   return dead.sort((left, right) => left.file.localeCompare(right.file) || left.name.localeCompare(right.name));
 };
 
-/** Committed data the product reads. Judged by filename, the way an import names it. */
-const DATA_ROOTS = ["data", "content"];
-const DATA_EXTENSIONS = new Set([".json", ".csv", ".md", ".txt", ".yaml", ".yml"]);
-
 /**
  * Data files nothing reads.
  *
@@ -272,26 +224,15 @@ const DATA_EXTENSIONS = new Set([".json", ".csv", ".md", ".txt", ".yaml", ".yml"
  *
  * Matched on the filename with and without its extension, which is how an import
  * names one, so this over-matches rather than under-matches: a file mentioned
- * anywhere at all passes. A reported orphan is therefore close to certain.
+ * anywhere at all passes. A reported orphan is therefore close to certain. Which
+ * roots count as a mention — and why a test does not — is `dataReferenceRoots`
+ * in the config.
  */
-export const censusOrphanedDataFiles = (root = REPO_ROOT): string[] => {
-  const dataFiles = collect(root, DATA_ROOTS, DATA_EXTENSIONS, false);
+export const censusOrphanedDataFiles = (root = REPO_ROOT, config: DeadExportsConfig = deadExportsConfig): string[] => {
+  const dataFiles = collect(root, config, config.dataRoots, config.dataExtensions, false);
   if (dataFiles.size === 0) return [];
 
-  /* Prose counts here, unlike in the export census: a dataset a runbook or a
-     routine names by filename has a consumer, it is just not a compiler. */
-  const dataReferenceExtensions = new Set([...REFERENCE_EXTENSIONS, ".md", ".mdx", ".csv", ".txt"]);
-  /*
-   * And a test does not count, unlike in the export census, which is the whole
-   * reason this scan finds anything. `data/` is what the product ships and
-   * reads; a file there whose only consumer is a suite is not product data. The
-   * cohort dataset was exactly that — its one reader was the test for a script
-   * nothing ran — and with `tests/` counted it would have passed this check the
-   * same way it passed every other one. A genuine fixture belongs in
-   * `tests/fixtures/`, where this scan never looks.
-   */
-  const dataReferenceRoots = [...REFERENCE_ROOTS.filter((entry) => entry !== "tests"), "docs"];
-  const references = collect(root, dataReferenceRoots, dataReferenceExtensions, true);
+  const references = collect(root, config, config.dataReferenceRoots, config.dataReferenceExtensions, true);
   const haystack = [...references.values()].join("\n");
 
   const orphans: string[] = [];
@@ -304,10 +245,6 @@ export const censusOrphanedDataFiles = (root = REPO_ROOT): string[] => {
 
   return orphans.sort();
 };
-
-/** Files Next.js and the Workers runtime load by convention; nothing imports them. */
-const CONVENTION_MODULES =
-  /^(page|layout|route|loading|error|not-found|template|default|sitemap|robots|manifest|icon|apple-icon|opengraph-image|twitter-image|global-error|middleware|instrumentation)$/;
 
 const IMPORT_PATTERN = /(?:from|import)\s*\(?\s*["']((?:\.|\.\.)\/[^"']+)["']/g;
 
@@ -325,13 +262,13 @@ const IMPORT_PATTERN = /(?:from|import)\s*\(?\s*["']((?:\.|\.\.)\/[^"']+)["']/g;
  *
  * Judged per module rather than per symbol, which is what makes it precise:
  * `driverDecisionViews.ts` has four exports only its test names and is imported
- * by the homepage, so it is a seam and passes. A `scripts/` importer counts —
- * a CLI is a consumer.
+ * by the homepage, so it is a seam and passes. Who counts as a consumer is
+ * `consumerRoots` in the config.
  */
-export const censusTestOnlyModules = (root = REPO_ROOT): string[] => {
-  const shipped = collect(root, DECLARATION_ROOTS, DECLARATION_EXTENSIONS, false);
-  const consumers = collect(root, [...DECLARATION_ROOTS, "scripts"], REFERENCE_EXTENSIONS, true);
-  const tests = collect(root, ["tests"], REFERENCE_EXTENSIONS, false);
+export const censusTestOnlyModules = (root = REPO_ROOT, config: DeadExportsConfig = deadExportsConfig): string[] => {
+  const shipped = collect(root, config, config.declarationRoots, config.declarationExtensions, false);
+  const consumers = collect(root, config, config.consumerRoots, config.referenceExtensions, true);
+  const tests = collect(root, config, config.testRoots, config.referenceExtensions, false);
 
   /** Every module path an importing file resolves to, relative to the repo root. */
   const importedBy = (files: Map<string, string>): Set<string> => {
@@ -356,7 +293,7 @@ export const censusTestOnlyModules = (root = REPO_ROOT): string[] => {
   const orphans: string[] = [];
   for (const path of shipped.keys()) {
     const base = path.slice(path.lastIndexOf("/") + 1).replace(/\.(ts|tsx)$/, "");
-    if (CONVENTION_MODULES.test(base)) continue;
+    if (config.conventionModules.test(base)) continue;
     if (shippedImports.has(path)) continue;
     if (testImports.has(path)) orphans.push(path);
   }
@@ -365,7 +302,8 @@ export const censusTestOnlyModules = (root = REPO_ROOT): string[] => {
 };
 
 const main = () => {
-  const testOnly = censusTestOnlyModules(REPO_ROOT);
+  const config = deadExportsConfig;
+  const testOnly = censusTestOnlyModules(REPO_ROOT, config);
   process.stdout.write(`[dead-exports] ${testOnly.length} module(s) imported only by tests\n`);
   if (testOnly.length > 0) {
     for (const file of testOnly) process.stdout.write(`  ${file}\n`);
@@ -375,8 +313,10 @@ const main = () => {
     process.exit(1);
   }
 
-  const orphanedData = censusOrphanedDataFiles(REPO_ROOT);
-  process.stdout.write(`[dead-exports] ${orphanedData.length} unreferenced data file(s) under ${DATA_ROOTS.join("/, ")}/\n`);
+  const orphanedData = censusOrphanedDataFiles(REPO_ROOT, config);
+  process.stdout.write(
+    `[dead-exports] ${orphanedData.length} unreferenced data file(s) under ${config.dataRoots.join("/, ")}/\n`,
+  );
   if (orphanedData.length > 0) {
     for (const file of orphanedData) process.stdout.write(`  ${file}\n`);
     process.stdout.write(
@@ -385,7 +325,7 @@ const main = () => {
     process.exit(1);
   }
 
-  const dead = censusDeadExports(REPO_ROOT, { requireCompleteTree: true });
+  const dead = censusDeadExports(REPO_ROOT, { requireCompleteTree: true, config });
   const runtime = dead.filter((entry) => entry.kind === "runtime").length;
   const types = dead.length - runtime;
 

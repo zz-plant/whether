@@ -16,10 +16,12 @@
  * moves one number down and this one up, and the gate rejects it — which is the
  * whole point: it makes the shortcut cost more than the fix.
  *
- * The baseline is deliberately inline rather than in a generated file. Lowering
- * it is a real edit to this script, so it lands in the same diff as the work that
- * earned it and is visible in review, instead of being a regenerated artifact
- * nobody reads.
+ * This file is the mechanism and names nothing about the repository it scans.
+ * The roots, the lint config, the self-exclusions, the baseline and the test-file
+ * floor are `suppressionCensusConfig` in `scripts/census.config.ts`. The baseline
+ * is a hand-edited value there rather than a generated file: lowering it is a real
+ * edit, so it lands in the same diff as the work that earned it and is visible in
+ * review, instead of being a regenerated artifact nobody reads.
  *
  * On a decrease the check passes and prints the replacement baseline. It does not
  * fail on an improvement: the gate's job is stopping regressions, and failing a
@@ -29,36 +31,32 @@
  * Usage:
  *   bun run scripts/check-suppression-census.ts
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+
+import { suppressionCensusConfig } from './census.config';
+import { walkFiles } from './walk-files.mjs';
 
 const REPO_ROOT = join(import.meta.dirname ?? __dirname, '..');
 
-/** Roots that hold code a check could be told to ignore. */
-const SCAN_ROOTS = ['app', 'lib', 'scripts', 'tests', 'worker'];
-
-const SCAN_EXTENSIONS = ['.ts', '.tsx', '.mts', '.js', '.mjs', '.jsx'];
-
-const IGNORED_DIRECTORIES = new Set([
-  '.next',
-  '.vercel',
-  '.wrangler',
-  'artifacts',
-  'coverage',
-  'dist',
-  'node_modules',
-  'out',
-]);
-
-/**
- * This file and its test both contain every pattern below as literals, so a scan
- * that included them would count the meter as debt and rise every time the
- * census gained a category.
- */
-const SELF_EXCLUDED = new Set([
-  'scripts/check-suppression-census.ts',
-  'tests/suppressionCensus.test.ts',
-]);
+/** What the census scans and allows in one repository. `scripts/census.config.ts` holds this one's. */
+export type SuppressionCensusConfig = {
+  /** Roots that hold code a check could be told to ignore. */
+  scanRoots: string[];
+  scanExtensions: string[];
+  /** Names never read, wherever they sit. */
+  ignoredDirectories: string[];
+  /** Repo-relative files that spell the patterns out as literals: the meter, not debt. */
+  selfExcluded: string[];
+  /** The oxlint config whose disabled and override-disabled rules are counted. */
+  lintConfig: string;
+  /** What makes a scanned file a test file, for the floor. */
+  testFileSuffixes: string[];
+  /** Ceilings, keyed by count. */
+  baseline: Record<string, number>;
+  /** A floor on test files: deleting tests is the other way to make a suite green. */
+  minimumTestFiles: number;
+};
 
 type Category = {
   key: string;
@@ -91,11 +89,10 @@ const CATEGORIES: Category[] = [
 ];
 
 /**
- * Rules switched off in `.oxlintrc.json` without a scoped override that turns
+ * Rules switched off in the lint config without a scoped override that turns
  * them back on. A rule that is globally off only so an `overrides` block can
- * apply it where it matters — `max-lines` for the two file-size budgets,
- * `no-restricted-imports` for the `lib/report/home` fence — is configuration,
- * not debt, and is reported separately rather than counted.
+ * apply it where it matters — a file-size budget, an import fence — is
+ * configuration, not debt, and is reported separately rather than counted.
  */
 type RuleAudit = { disabled: string[]; scoped: string[]; overrideDisabled: string[] };
 
@@ -109,26 +106,26 @@ const isEnabled = (value: unknown): boolean =>
   value === 2 ||
   (Array.isArray(value) && value[0] !== 'off' && value[0] !== 0);
 
-export /**
+/**
  * Narrow a parsed JSON value to a plain object. Asserting the config's shape
  * instead would let a malformed file report zero disabled rules — a meter that
- * lies clean is worse than one that fails, so `readConfig` throws instead.
+ * lies clean is worse than one that fails, so `auditLintRules` throws instead.
  */
-function toRecord(value: unknown): Record<string, unknown> {
+export function toRecord(value: unknown): Record<string, unknown> {
   const record: Record<string, unknown> = {};
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return record;
   for (const [key, entry] of Object.entries(value)) record[key] = entry;
   return record;
 }
 
-export function auditLintRules(): RuleAudit {
-  const parsed: unknown = JSON.parse(readFileSync(join(REPO_ROOT, '.oxlintrc.json'), 'utf8'));
+export function auditLintRules(config: SuppressionCensusConfig = suppressionCensusConfig): RuleAudit {
+  const parsed: unknown = JSON.parse(readFileSync(join(REPO_ROOT, config.lintConfig), 'utf8'));
   if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('.oxlintrc.json did not parse to an object; the rule census cannot be trusted');
+    throw new Error(`${config.lintConfig} did not parse to an object; the rule census cannot be trusted`);
   }
 
-  const config = toRecord(parsed);
-  const overrides = Array.isArray(config.overrides) ? config.overrides : [];
+  const lintConfig = toRecord(parsed);
+  const overrides = Array.isArray(lintConfig.overrides) ? lintConfig.overrides : [];
 
   const overridden = new Set<string>();
   const silenced = new Set<string>();
@@ -139,7 +136,7 @@ export function auditLintRules(): RuleAudit {
     }
   }
 
-  const topLevel = toRecord(config.rules);
+  const topLevel = toRecord(lintConfig.rules);
 
   const disabled: string[] = [];
   const scoped: string[] = [];
@@ -163,31 +160,20 @@ export function auditLintRules(): RuleAudit {
   };
 }
 
-function collectFiles(): string[] {
+function collectFiles(config: SuppressionCensusConfig): string[] {
+  const ignored = new Set(config.ignoredDirectories);
+  const selfExcluded = new Set(config.selfExcluded);
   const files: string[] = [];
 
-  const walk = (absolute: string) => {
-    for (const entry of readdirSync(absolute)) {
-      if (IGNORED_DIRECTORIES.has(entry)) continue;
-      const child = join(absolute, entry);
-      if (statSync(child).isDirectory()) {
-        walk(child);
-        continue;
-      }
-      if (!SCAN_EXTENSIONS.some((extension) => entry.endsWith(extension))) continue;
-      if (entry.endsWith('.d.ts') || entry.endsWith('.d.mts')) continue;
-      const repoPath = relative(REPO_ROOT, child);
-      if (SELF_EXCLUDED.has(repoPath)) continue;
+  // A root that does not exist is not a failure; the repo layout may change. The walk
+  // returns nothing for it, and skips any entry it cannot stat rather than crashing.
+  for (const root of config.scanRoots) {
+    for (const path of walkFiles(join(REPO_ROOT, root), { skip: (name) => ignored.has(name) })) {
+      if (!config.scanExtensions.some((extension) => path.endsWith(extension))) continue;
+      if (path.endsWith('.d.ts') || path.endsWith('.d.mts')) continue;
+      const repoPath = relative(REPO_ROOT, path);
+      if (selfExcluded.has(repoPath)) continue;
       files.push(repoPath);
-    }
-  };
-
-  for (const root of SCAN_ROOTS) {
-    const absolute = join(REPO_ROOT, root);
-    try {
-      if (statSync(absolute).isDirectory()) walk(absolute);
-    } catch {
-      // A root that does not exist is not a failure; the repo layout may change.
     }
   }
 
@@ -202,7 +188,10 @@ export type Census = {
   testFiles: number;
 };
 
-export function takeCensus(files: string[] = collectFiles()): Census {
+export function takeCensus(
+  files: string[] = collectFiles(suppressionCensusConfig),
+  config: SuppressionCensusConfig = suppressionCensusConfig,
+): Census {
   const hits: Record<string, CensusHit[]> = {};
   for (const category of CATEGORIES) hits[category.key] = [];
 
@@ -220,7 +209,7 @@ export function takeCensus(files: string[] = collectFiles()): Census {
     });
   }
 
-  const lintRules = auditLintRules();
+  const lintRules = auditLintRules(config);
 
   return {
     counts: {
@@ -230,66 +219,19 @@ export function takeCensus(files: string[] = collectFiles()): Census {
     },
     hits,
     lintRules,
-    testFiles: files.filter((file) => file.endsWith('.test.ts') || file.endsWith('.test.tsx')).length,
+    testFiles: files.filter((file) => config.testFileSuffixes.some((suffix) => file.endsWith(suffix))).length,
   };
 }
 
-/**
- * Measured on 2026-09-03. Every entry is a ceiling: lower it when the work earns
- * it, never raise it. Raising one is a policy change and belongs in its own PR
- * with the reason, not folded into the change that needed the suppression.
- */
-const BASELINE: Record<string, number> = {
-  /*
-   * 8 -> 4 on 2026-10-05, when `--report-unused-disable-directives` joined the lint
-   * script: four of the eight directives silenced rules oxlint never reports
-   * (no-constant-condition, ban-ts-comment, a file-level no-console block), so they
-   * were suppressing nothing and are gone. The flag now makes this class of staleness
-   * a lint failure directly, so what remains here is the count of live suppressions.
-   */
-  lintSuppressions: 4,
-  typeSuppressions: 3,
-  skippedTests: 0,
-  /*
-   * 1 -> 0 on 2026-09-17. `react/set-state-in-effect` was the last rule off,
-   * with 22 findings across 19 files, and they were not one problem: about half
-   * read a browser-only source on mount, three mirrored a prop into state, the
-   * rest were an animation and a reset-on-condition.
-   *
-   * What made it "not something to flip blind" was that nothing in this suite
-   * exercises a client effect, and adding a DOM to get that is a far larger
-   * change than the fix. The browser reads went to `useSyncExternalStore`
-   * through `app/components/browserSource.ts`, which puts the one part that can
-   * fail catastrophically — a `getSnapshot` that allocates, and so never settles
-   * — in a pure module `tests/browserSource.test.ts` pins without a DOM. The
-   * rest needed no new machinery: a value mirrored back through an effect is a
-   * value the render already had, and an edit that has to survive until a prop
-   * moves is an edit stamped with the prop it was made against.
-   */
-  disabledLintRules: 0,
-  // Two rules are enforced everywhere but one small set of files:
-  // nextjs/no-html-link-for-pages is off for app/layout.tsx, where /feed.xml is a
-  // route handler serving a file that <Link> would client-navigate to; and
-  // jsx-a11y/prefer-tag-over-role is off for TimelineBar and scrollProgressBar,
-  // whose role="region"/"progressbar" wrappers would cost a landmark or a UA-styled
-  // <progress> to satisfy. Counted, because a scoped `off` is still a suppression.
-  overrideDisabledRules: 2,
-};
-
-/**
- * A floor rather than a ceiling. Deleting tests is the other way to make the
- * suite green, and it moves no number above.
- */
-const MINIMUM_TEST_FILES = 212;
-
 function main() {
-  const census = takeCensus();
+  const config = suppressionCensusConfig;
+  const census = takeCensus(collectFiles(config), config);
   const errors: string[] = [];
   const improvements: string[] = [];
 
-  for (const key of Object.keys(BASELINE)) {
+  for (const key of Object.keys(config.baseline)) {
     const actual = census.counts[key] ?? 0;
-    const allowed = BASELINE[key];
+    const allowed = config.baseline[key];
     const label =
       CATEGORIES.find((category) => category.key === key)?.label ??
       (key === 'overrideDisabledRules' ? 'lint rules disabled by an override' : 'disabled lint rules');
@@ -298,7 +240,7 @@ function main() {
       errors.push(
         `${label}: ${actual} (baseline ${allowed}, +${actual - allowed}) — ${
           CATEGORIES.find((category) => category.key === key)?.remedy ??
-          'enforce the rule in .oxlintrc.json instead of leaving it off'
+          `enforce the rule in ${config.lintConfig} instead of leaving it off`
         }`,
       );
       for (const hit of (census.hits[key] ?? []).slice(0, 10)) {
@@ -317,18 +259,18 @@ function main() {
     }
   }
 
-  if (census.testFiles < MINIMUM_TEST_FILES) {
+  if (census.testFiles < config.minimumTestFiles) {
     errors.push(
-      `test files: ${census.testFiles} (floor ${MINIMUM_TEST_FILES}) — a suite that shrinks is a suite that got easier to pass`,
+      `test files: ${census.testFiles} (floor ${config.minimumTestFiles}) — a suite that shrinks is a suite that got easier to pass`,
     );
   }
 
   const summary = Object.entries(census.counts)
-    .map(([key, value]) => `${key} ${value}/${BASELINE[key]}`)
+    .map(([key, value]) => `${key} ${value}/${config.baseline[key]}`)
     .join(', ');
 
   if (improvements.length > 0) {
-    console.log('\n⚠ BASELINE IS LOOSE — tighten it in scripts/check-suppression-census.ts:');
+    console.log('\n⚠ BASELINE IS LOOSE — tighten it in scripts/census.config.ts:');
     for (const improvement of improvements) console.log(`  ⚠ ${improvement}`);
   }
 

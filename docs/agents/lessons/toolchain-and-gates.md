@@ -77,8 +77,8 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
 - **Suppressions are themselves a gated metric.** `bun run check:suppressions`
   (`scripts/check-suppression-census.ts`) counts inline lint disables, `@ts-*` comments, skipped
-  tests, lint rules disabled globally, and lint rules an `overrides` block turns off, against an
-  inline baseline — and fails when any of them rises. It exists because every other ratchet here —
+  tests, lint rules disabled globally, and lint rules an `overrides` block turns off, against a
+  hand-edited baseline — and fails when any of them rises. It exists because every other ratchet here —
   the rule burn-down, `lint:types`, the suite — can be turned green by suppressing the finding
   rather than fixing it, and nothing else in the gate notices. A change that trades a lint finding
   for a disable comment now moves one number down and this one up, and is rejected.
@@ -87,8 +87,15 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   for a handful of files is a suppression with a wider blast radius than a disable comment, and
   before this it moved no number at all. Baseline as of 2026-09-03: 7 lint suppressions, 3 type
   suppressions, 0 skipped tests, 2 disabled rules, 2 override-disabled rules, and a floor of 212
-  test files. Lower it in the script when work earns it; raising one is a policy change and belongs
-  in its own PR with the reason.
+  test files. Lower it in `scripts/census.config.ts` when work earns it; raising one is a policy
+  change and belongs in its own PR with the reason.
+
+  **Both census scripts are mechanism only (2026-10-06).** Everything that names this repo — the
+  scanned roots, the framework's convention names, the data directories, the self-exclusions, both
+  baselines and the test-file floor — is in `scripts/census.config.ts`, and both walk the tree
+  through one shared `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for
+  its discovery guards. One walk, because two copies had already drifted: the guarded `statSync`
+  below existed in the dead-export scan and not in this one.
 - **An unused export is a gated metric too (2026-09-15).** `bun run check:dead-exports`
   (`scripts/check-dead-exports.ts`) counts exported declarations under `app/`, `lib/` and
   `worker/` that no other scanned file mentions, against a baseline of **zero**. A sweep that
@@ -109,8 +116,9 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   would read as a real finding. That is the landmark audit's trap from the other side, where a
   container reaching no route at all would have reported zero violations and gone green. So the CLI
   names any required reference root that comes back empty and exits without a count, and `statSync`
-  is guarded in both scans — a dangling symlink, or a path that vanishes between the `readdirSync`
-  and the stat, used to crash the census instead of skipping one entry. Unit scaffolds are exempt
+  is guarded in the shared walk both scans use — a dangling symlink, or a path that vanishes between
+  the `readdirSync` and the stat, used to crash the census instead of skipping one entry (the
+  suppression census still could, until 2026-10-06). Unit scaffolds are exempt
   by design (`requireCompleteTree`): a two-file tree is what they measure.
 
   **It now counts orphaned data files too, and a test does not count there (2026-09-16).** A JSON

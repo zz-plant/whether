@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+
+import { walkFiles } from './walk-files.mjs';
 
 const TEST_ROOT_ARG = './tests';
 const TEST_ROOT = path.resolve(TEST_ROOT_ARG);
@@ -29,33 +30,17 @@ const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
 const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1';
 const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? (inDeployGate ? "120000" : "60000");
 
-async function hasDiscoveredTestFiles(dir) {
-  let entries;
+/*
+ * Every walk below is the shared one (scripts/walk-files.mjs) with symlinks left out,
+ * which is what the `Dirent` loops it replaced did: a link is neither a file nor a
+ * directory to `readdir`. An unreadable directory contributes nothing, as before.
+ */
+const isTestFile = (file) => TEST_FILE_PATTERN.test(path.basename(file));
 
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return false;
-  }
+/** Every test file under ./tests, in directory order. */
+const collectTestFiles = () => walkFiles(TEST_ROOT, { followSymlinks: false }).filter(isTestFile);
 
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (await hasDiscoveredTestFiles(fullPath)) {
-        return true;
-      }
-      continue;
-    }
-
-    if (entry.isFile() && TEST_FILE_PATTERN.test(entry.name)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-if (!(await hasDiscoveredTestFiles(TEST_ROOT))) {
+if (collectTestFiles().length === 0) {
   console.error('[test-guard] No test files found under ./tests matching Bun test patterns (*.test|*.spec.[jt]s[x]).');
   process.exit(1);
 }
@@ -85,33 +70,13 @@ const SKIP_DIRECTORIES = new Set([
   'public',
 ]);
 
-async function collectStrayTestFiles(dir, found = []) {
-  let entries;
-
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return found;
-  }
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      // Dot-directories are tooling and caches (.next, .wrangler, .git, .husky).
-      if (entry.name.startsWith('.') || SKIP_DIRECTORIES.has(entry.name)) continue;
-      await collectStrayTestFiles(fullPath, found);
-      continue;
-    }
-
-    if (entry.isFile() && TEST_FILE_PATTERN.test(entry.name)) {
-      found.push(path.relative(process.cwd(), fullPath));
-    }
-  }
-
-  return found;
-}
-
-const strayTestFiles = await collectStrayTestFiles(process.cwd());
+const strayTestFiles = walkFiles(process.cwd(), {
+  followSymlinks: false,
+  // Dot-directories are tooling and caches (.next, .wrangler, .git, .husky).
+  skip: (name, isDirectory) => isDirectory && (name.startsWith('.') || SKIP_DIRECTORIES.has(name)),
+})
+  .filter(isTestFile)
+  .map((file) => path.relative(process.cwd(), file));
 
 if (strayTestFiles.length > 0) {
   console.error(
@@ -164,36 +129,13 @@ function hasPathFilter(args) {
  */
 const TOOL_TEST_DIRECTORY = path.join(TEST_ROOT, 'tools');
 
-async function collectTestFiles(dir, found = []) {
-  let entries;
-
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return found;
-  }
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      await collectTestFiles(fullPath, found);
-      continue;
-    }
-    if (entry.isFile() && TEST_FILE_PATTERN.test(entry.name)) {
-      found.push(fullPath);
-    }
-  }
-
-  return found;
-}
-
 const extraArgs = process.argv.slice(2);
 const excludeToolTests = inDeployGate && !hasPathFilter(extraArgs);
 
 let defaultTargets = [TEST_ROOT_ARG];
 
 if (excludeToolTests) {
-  const allTests = await collectTestFiles(TEST_ROOT);
+  const allTests = collectTestFiles();
   const kept = allTests.filter((file) => !file.startsWith(`${TOOL_TEST_DIRECTORY}${path.sep}`));
   const excluded = allTests.length - kept.length;
 
