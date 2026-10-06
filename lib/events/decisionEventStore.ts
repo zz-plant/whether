@@ -1,4 +1,4 @@
-import { readKvValues, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 
 export type RegimeDecisionEvent = {
@@ -321,23 +321,7 @@ export const buildRegimeDecisionEvent = ({
   transitionReason,
 });
 
-const getCloudflareKvBinding = () => {
-  const maybeBinding = (globalThis as { WHETHER_DURABLE_KV?: CloudflareKvNamespaceLike; DECISION_EVENTS_KV?: CloudflareKvNamespaceLike }).WHETHER_DURABLE_KV
-    ?? (globalThis as { DECISION_EVENTS_KV?: CloudflareKvNamespaceLike }).DECISION_EVENTS_KV;
-  if (!maybeBinding) {
-    return null;
-  }
-
-  if (
-    typeof maybeBinding.get !== "function" ||
-    typeof maybeBinding.put !== "function" ||
-    typeof maybeBinding.list !== "function"
-  ) {
-    return null;
-  }
-
-  return maybeBinding;
-};
+const getCloudflareKvBinding = (): CloudflareKvNamespaceLike | null => getWhetherKv();
 
 let sharedDecisionEventStore: DecisionEventStore | null = null;
 

@@ -172,8 +172,8 @@ Weekly cadence note:
 
 ## Data durability note
 
-- Decision transition events (`/api/decision-events`) support durable persistence on Cloudflare when the `DECISION_EVENTS_KV` binding is configured; otherwise they fall back to process-memory semantics.
-- Alert preferences, decision memory, alerts, and delivery events return stable contracts in all environments and automatically degrade to in-process fallback storage when durable KV bindings are unavailable (`backend: "local-fallback"`, `degraded: true`). Configure `WHETHER_DURABLE_KV` or route-specific bindings (`DECISION_MEMORY_KV`, `ALERT_PREFERENCES_KV`, `REGIME_ALERTS_KV`) for durable history.
+- Decision transition events (`/api/decision-events`) persist durably on Cloudflare through the `WHETHER_DURABLE_KV` binding; without it they fall back to process-memory semantics.
+- Alert preferences, decision memory, alerts, and delivery events return stable contracts in all environments and automatically degrade to in-process fallback storage when durable KV bindings are unavailable (`backend: "local-fallback"`, `degraded: true`). `WHETHER_DURABLE_KV` is the one binding that makes that history durable.
 
 ## Regime and posture taxonomy
 

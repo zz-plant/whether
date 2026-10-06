@@ -1,4 +1,5 @@
 import type { AlertDeliveryEvent, RegimeAlertEvent } from "../signalOps";
+import { getWhetherKv } from "../runtime/kv";
 import { DurableEventLog, type KvNamespaceLike } from "./eventLog";
 
 type Cursor = string | null;
@@ -87,15 +88,7 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
   }
 }
 
-const getKvBinding = (): KvNamespaceLike | null => {
-  const binding = (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike; REGIME_ALERTS_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV
-    ?? (globalThis as { REGIME_ALERTS_KV?: KvNamespaceLike }).REGIME_ALERTS_KV;
-
-  if (!binding || typeof binding.get !== "function" || typeof binding.put !== "function" || typeof binding.list !== "function") {
-    return null;
-  }
-  return binding;
-};
+const getKvBinding = (): KvNamespaceLike | null => getWhetherKv();
 
 let sharedRepository: RegimeAlertRepository | null = null;
 
