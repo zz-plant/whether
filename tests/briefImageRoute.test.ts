@@ -6,8 +6,8 @@ import { isValidElement, type ReactNode } from "react";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { buildScoreReadings, buildScoreReferenceLines, type ScoreReadingParts } from "../lib/export/scoreReference";
 import { renderBriefImage, type BriefImageProps } from "../lib/image/briefImageTemplate";
-import { OG_FONT_BODY, OG_FONT_DISPLAY, toImageSafeText } from "../lib/image/ogFonts";
-import { SANS_EM, wrappedLines } from "../lib/image/textFit";
+import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "../lib/image/ogFonts";
+import { DISPLAY_EM, SANS_EM, wrappedLines } from "../lib/image/textFit";
 import { buildRuleCondition } from "../lib/report/boundedDecisionRules";
 import { parseImageBriefRequestContext } from "../lib/report/imageBriefSearchParams";
 import { buildSharedCorridorRails, type ActionStripItem } from "../lib/report/operatingCalls";
@@ -239,9 +239,10 @@ const fontSizes = (node: ReactNode): number[] => {
 };
 
 const ogFontFaces = [
-  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/ibm-plex-serif-600.ttf"), weight: 600 as const, style: "normal" as const },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-400.ttf"), weight: 400 as const, style: "normal" as const },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-600.ttf"), weight: 600 as const, style: "normal" as const },
+  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/archivo-semicondensed-700.ttf"), weight: 700 as const, style: "normal" as const },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-400.ttf"), weight: 400 as const, style: "normal" as const },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-600.ttf"), weight: 600 as const, style: "normal" as const },
+  { name: OG_FONT_STAMP, data: readFileSync("public/fonts/og/archivo-expanded-700.ttf"), weight: 700 as const, style: "normal" as const },
 ];
 
 const briefImageProps: BriefImageProps = buildBriefImagePayload(buildHomepage());
@@ -322,8 +323,10 @@ describe("brief decision card render", () => {
     const start = text.indexOf("Hold hiring");
     const end = text.indexOf("\u2026");
     assert.ok(end > start, "a call that does not fit ends in an ellipsis");
-    // Three lines at the smallest call size (42px serif across 1088px) hold about 47 characters each.
-    assert.ok(end - start + 1 <= 3 * 47, `the call ran to ${end - start + 1} characters`);
+    // Three lines at the smallest call size (42px across the 1088px content width), at the
+    // per-character width the wrap estimate uses for the call's face.
+    const perLine = Math.floor(1088 / (42 * DISPLAY_EM));
+    assert.ok(end - start + 1 <= 3 * perLine, `the call ran to ${end - start + 1} characters`);
   });
 
   it("keeps a long scope to the stamp's row instead of wrapping it onto the call", () => {

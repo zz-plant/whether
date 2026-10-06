@@ -45,6 +45,9 @@ import type { TrustStripProps } from "./trustStrip";
 export type ReportShellModel = {
   status: {
     statusLabel: string;
+    /** A qualifier printed small before the status word, e.g. "Last completed
+     *  month" on /history, so the word itself can keep the stamp's shape. */
+    statusPrefix?: string;
     regime?: RegimeIconType;
     recordDateLabel: string;
     fetchedAtLabel?: string;
@@ -93,7 +96,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
-    status: { statusLabel, regime, recordDateLabel, fetchedAtLabel = "" },
+    status: { statusLabel, statusPrefix, regime, recordDateLabel, fetchedAtLabel = "" },
     page: { pageTitle, pageSummary, sectionLinks, activeStep },
     trust: {
       trustStatusTone,
@@ -173,6 +176,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             exportCta={exportCta}
             showShare={showShare}
             statusLabel={statusLabel}
+            statusPrefix={statusPrefix}
             trustStatusLabel={trustReadiness.headline}
             fetchedAtLabel={fetchedAtLabel}
             resolvedNextRefreshLabel={resolvedNextRefreshLabel}

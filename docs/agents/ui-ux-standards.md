@@ -214,8 +214,8 @@ chip, control, or container under `app/`.
 Whether runs two shape registers at once, and the balance between them is a role assignment, not
 a slider. **Sharp asserts**: anything that states a fact or a call — a status or verdict stamp, a
 data tile, a rule segment, a control the operator presses. **Soft holds**: the furniture around
-it — cards, surfaces, sheets, dialogs — together with the voice (the serif display face, the
-shadow ladder, the ease-out motion). Sharpness carries information only while it is the
+it — cards, surfaces, sheets, dialogs — together with the voice (the semi-condensed display
+width, the shadow ladder, the ease-out motion). Sharpness carries information only while it is the
 exception, so the soft tier must be visibly softer than the sharp one, and neither register may
 take the other's job.
 
@@ -382,6 +382,18 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
 
 Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 
+- **One family, three widths** (since 2026-10-05; `app/styles/fonts.css`). Archivo sets every
+  word. Width is what separates the voices, through the tokens and never by hand:
+  normal width for text, tables and controls; `--font-stretch-display` (semi-condensed) for the
+  call, `h1`/`h2`, `.type-section` and the secondary titles; `--font-stretch-stamp` (expanded)
+  for `.type-stamp`, which is the regime word and nothing else — the hero's tag, a report
+  route's status word, the sticky strip, the cards' chip. A width the role does not assign
+  (`font-stretch` or `font-variation-settings` at a call site) is a fourth voice. NEVER: add a
+  serif or a second sans; the serif headings were the stronger voice set on the weaker lines.
+- **Chivo Mono is the one monospace** (`--font-mono`), from the same foundry, for the figures
+  §XV assigns it and for the paste previews. Satori's cards use static instances of the same
+  widths (`scripts/generate-og-fonts.mjs`, `lib/image/ogFonts.ts`); re-measure
+  `lib/image/textFit.ts` when a face changes.
 - **Capitals are for stamps.** A stamp is a short, fixed status mark that is not read as a sentence:
   `.type-badge`, the regime tag in the hero, the sticky strip's call, timeline badges, the
   historical banner, a `<kbd>`. Every other label — section eyebrows, field names, table headers,

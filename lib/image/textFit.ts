@@ -7,12 +7,14 @@
  * `app/api/og/reportImageTemplate.tsx`, the brief card in `briefImageTemplate`).
  *
  * The estimate is a greedy word wrap at a per-character width a little above
- * what the faces measure (Plex Serif 600 averages 0.51em on this copy, Plex
- * Sans 0.47em), so it over-counts lines rather than under-counts them: a card
- * that leaves a little air is fine, one that overlaps is not.
+ * what the faces measure on this copy (Archivo semi-condensed 700, the call's
+ * face, averages 0.42em; Archivo 400 and 600 average 0.44 and 0.45em), so it
+ * over-counts lines rather than under-counts them: a card that leaves a little
+ * air is fine, one that overlaps is not. Re-measure when a face changes:
+ * scripts/generate-og-fonts.mjs writes the instances these were taken from.
  */
-export const SERIF_EM = 0.54;
-export const SANS_EM = 0.5;
+export const DISPLAY_EM = 0.45;
+export const SANS_EM = 0.49;
 
 /** The lines `text` wraps to at `fontSize` in `width`, by greedy word wrap. */
 export const wrappedLines = (text: string, fontSize: number, width: number, em: number): string[] => {

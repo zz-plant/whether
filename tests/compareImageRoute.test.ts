@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 import { isValidElement, type ReactNode } from "react";
 import { renderCompareOgImage, type CompareOgImageProps } from "../app/api/og/compareTemplate";
 import { loadComparePreview } from "../lib/image/compareImagePayload";
-import { OG_FONT_BODY, OG_FONT_DISPLAY, toImageSafeText } from "../lib/image/ogFonts";
+import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "../lib/image/ogFonts";
 
 const collectText = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === "boolean") return "";
@@ -38,9 +38,10 @@ const findSatoriLayoutViolations = (node: ReactNode, path = "root"): string[] =>
 };
 
 const ogFontFaces = [
-  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/ibm-plex-serif-600.ttf"), weight: 600 as const, style: "normal" as const },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-400.ttf"), weight: 400 as const, style: "normal" as const },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/ibm-plex-sans-600.ttf"), weight: 600 as const, style: "normal" as const },
+  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/archivo-semicondensed-700.ttf"), weight: 700 as const, style: "normal" as const },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-400.ttf"), weight: 400 as const, style: "normal" as const },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-600.ttf"), weight: 600 as const, style: "normal" as const },
+  { name: OG_FONT_STAMP, data: readFileSync("public/fonts/og/archivo-expanded-700.ttf"), weight: 700 as const, style: "normal" as const },
 ];
 
 const baseProps: CompareOgImageProps = {

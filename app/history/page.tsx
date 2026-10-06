@@ -128,7 +128,8 @@ export default async function HistoryPage({
              catches. A bare "Sunny" there, with "As of Aug 31" in small print
              beside it, reads as the current call on a week the brief may be
              calling something else. */
-          statusLabel: trackRecord ? `Last completed month: ${trackRecord.currentRegimeLabel}` : "Historical",
+          statusLabel: trackRecord ? trackRecord.currentRegimeLabel : "Historical",
+          statusPrefix: trackRecord ? "Last completed month" : undefined,
           /* Deliberately no regime. This field is only the page accent — the hue
              the whole chrome, every section rule and the mobile outline draw in
              — and it is the site saying "this is the weather". Fed the month-end

@@ -78,7 +78,7 @@ export const renderBriefChartOgImage = ({
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: 24 }}>
-        <div style={{ display: "flex", fontSize: 62, fontWeight: 600, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, color: accent, lineHeight: 1.05 }}>
+        <div style={{ display: "flex", fontSize: 62, fontWeight: 700, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: accent, lineHeight: 1.05 }}>
           {posture}
         </div>
         <div style={{ display: "flex", fontSize: 30, color: "#cbd5e1", marginTop: 10 }}>{weekLabel ? `Week of ${weekLabel}` : "This week's guidance"}</div>

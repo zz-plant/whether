@@ -328,6 +328,8 @@ a.weather-hub-link-card:hover {
 
 .weather-secondary-title {
   font-family: var(--font-display);
+  font-stretch: var(--font-stretch-display);
+  font-weight: 600;
   font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
   line-height: 0.98;
   letter-spacing: 0;
@@ -380,6 +382,7 @@ a.weather-hub-link-card:hover {
 
 .weather-secondary-section-title {
   font-family: var(--font-display);
+  font-stretch: var(--font-stretch-display);
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 0;

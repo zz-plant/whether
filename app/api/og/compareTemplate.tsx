@@ -129,7 +129,7 @@ export const renderCompareOgImage = ({
           </div>
         </div>
 
-        <div style={{ display: "flex", fontSize: 40, lineHeight: 1.14, fontWeight: 600, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, letterSpacing: "-0.01em", marginTop: 16 }}>
+        <div style={{ display: "flex", fontSize: 40, lineHeight: 1.14, fontWeight: 700, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, letterSpacing: "-0.01em", marginTop: 16 }}>
           {headline}
         </div>
 

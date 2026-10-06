@@ -3,9 +3,9 @@ import type { ScoreReadingParts } from "../export/scoreReference";
 import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import { formatConfidenceChipLabel } from "../report/reportFormatting";
-import { OG_FONT_BODY, OG_FONT_DISPLAY, toImageSafeText } from "./ogFonts";
+import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "./ogFonts";
 import { OG_ACCENT, OG_BG, OG_BORDER, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
-import { SANS_EM, SERIF_EM, fitLines, wrappedLines } from "./textFit";
+import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "./textFit";
 
 export type BriefImageProps = {
   /** The call: this week's do-now line. */
@@ -76,9 +76,9 @@ const frameStyle: CSSProperties = {
 /** The largest call size that keeps to three lines, and the call cut to fit at the smallest. */
 const layoutCall = (decision: string): { size: number; text: string } => {
   const size =
-    CALL_SIZES.find((candidate) => wrappedLines(decision, candidate, CONTENT_WIDTH, SERIF_EM).length <= MAX_CALL_LINES) ??
+    CALL_SIZES.find((candidate) => wrappedLines(decision, candidate, CONTENT_WIDTH, DISPLAY_EM).length <= MAX_CALL_LINES) ??
     CALL_SIZES[CALL_SIZES.length - 1];
-  return { size, text: fitLines(decision, size, CONTENT_WIDTH, SERIF_EM, MAX_CALL_LINES) };
+  return { size, text: fitLines(decision, size, CONTENT_WIDTH, DISPLAY_EM, MAX_CALL_LINES) };
 };
 
 /*
@@ -185,8 +185,9 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
             border: `2px solid ${regimeColor}`,
             color: regimeColor,
             fontSize: 26,
-            fontWeight: 600,
-            letterSpacing: "0.1em",
+            fontWeight: 700,
+            fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
+            letterSpacing: "0.06em",
           }}
         >
           {weather}
@@ -200,8 +201,8 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
           marginTop: 14,
           fontSize: call.size,
           lineHeight: 1.1,
-          fontWeight: 600,
-          fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`,
+          fontWeight: 700,
+          fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`,
           letterSpacing: "-0.01em",
         }}
       >

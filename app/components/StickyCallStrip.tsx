@@ -142,7 +142,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
           }`}
         >
           <p className="flex items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 text-fluid-xs leading-tight text-slate-100 shadow-[var(--elev-4)] backdrop-blur-xl">
-            <span className="shrink-0 font-bold uppercase tracking-wider" style={{ color: "var(--regime-ink)" }}>
+            <span className="type-stamp shrink-0" style={{ color: "var(--regime-ink)" }}>
               {weatherWord}
             </span>
             <span className="min-w-0 flex-1 truncate font-medium text-white">{call}</span>
@@ -175,7 +175,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
                   print: the page no longer shows that number anywhere, and a
                   strip that restates the call should restate it in the words
                   the hero uses. */}
-              <span className="shrink-0 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--regime-ink)" }}>
+              <span className="type-stamp shrink-0 text-xs" style={{ color: "var(--regime-ink)" }}>
                 {weatherWord}
               </span>
               <span className="min-w-0 truncate font-medium text-white">{call}</span>
