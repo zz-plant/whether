@@ -243,6 +243,11 @@ Current app-level skills in the payload:
 - `flip-watch`
 - `pm-questions`
 
+Each skill is written once in `lib/agentSkills.ts` together with its step in the briefing: the action
+`pm_handoff.briefing_actions` lists and the numbered ask in `agentHandoff.prompt`. Both lists are read
+from it, in the skills' order, so the three cannot drift apart (`tests/agentHandoff.test.ts` pins the
+words).
+
 ## Recommended usage pattern for agent builders
 
 1. Call `get_state`. If `automation.ready` is false, say so and stop; the reading is a saved copy or too old to name this week.

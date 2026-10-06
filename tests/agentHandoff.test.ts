@@ -180,6 +180,40 @@ describe("agent handoff contract", () => {
     assert.match(prompt, /flip watchlist/i);
     assert.match(prompt, /5\) A short list of questions/);
   });
+
+  /* The five briefing steps are written once, beside the skill each one is (`lib/agentSkills.ts`),
+     and the PM handoff's list and the prompt's numbered asks are read from them. These are the
+     words both said when each was its own copy, in the skills' order. */
+  it("lists the briefing steps and asks for them in the skills' order, in the words they always had", () => {
+    const payload = buildAgentPayload(assessment as any, treasury as any, sensors, macroSignals);
+
+    assert.deepEqual(payload.pm_handoff, {
+      decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
+      briefing_actions: [
+        "Summarize the regime in plain English.",
+        "State what changed this week and what decisions should change now.",
+        "Call out constraints that block or enable new initiatives.",
+        "Track flip triggers before making irreversible commitments.",
+        "List open questions for the product manager.",
+      ],
+    });
+    assert.equal(
+      buildAgentPrompt(assessment as any, treasury as any),
+      [
+        "You are an autonomous PM assistant.",
+        "Follow the skills list in the JSON payload and deliver outputs in the same order.",
+        "Use the JSON payload to draft:",
+        "1) A 3-bullet summary of the capital posture.",
+        "2) A concise decision delta: what changed this week and what changes now.",
+        "3) The top 3 constraints that should shape roadmap decisions.",
+        "4) A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
+        "5) A short list of questions to confirm with the PM before acting.",
+        "",
+        "Context: Whether Weekly Brief for 2026-03-01 (DEFENSIVE).",
+      ].join("\n"),
+    );
+    assert.equal(payload.skills.length, payload.pm_handoff.briefing_actions.length, "one step per skill");
+  });
 });
 
 describe("flip watch under a held call", () => {
