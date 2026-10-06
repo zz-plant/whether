@@ -23,6 +23,7 @@ import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexBu
 import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
+import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 
 /*
  * /history had no `metadata` export at all, so it inherited the root layout's
@@ -312,8 +313,8 @@ export default async function HistoryPage({
             regimeSeries={fullSeries}
           />
           <div className="grid gap-6 sm:grid-cols-2">
-            <HistoricalTrendChart label="Funding pressure" color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
-            <HistoricalTrendChart label="Risk appetite" color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
+            <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
+            <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
           </div>
         </div>
       </UrlDetails>

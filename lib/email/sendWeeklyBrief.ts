@@ -6,7 +6,7 @@ import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
 import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } from "../export/exportTerms";
-import { signalReadingMeaning } from "../report/signalTranslations";
+import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
@@ -68,14 +68,14 @@ export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | un
      to say which end of the scale is bad. */
   return [
     {
-      label: "Funding pressure",
+      label: regimeSignalLabel.tightness,
       value: `${scores.tightness}/100`,
       meaning: signalReadingMeaning("tightness", scores.tightness),
       /* Above the line is the tighter regime, so above is the worse side here. */
       distance: distanceFromLine(diagnostics.tightnessVsThreshold, "above"),
     },
     {
-      label: "Risk appetite",
+      label: regimeSignalLabel.riskAppetite,
       value: `${scores.riskAppetite}/100`,
       meaning: signalReadingMeaning("riskAppetite", scores.riskAppetite),
       /* The risk line is a floor: below it is risk-off. */

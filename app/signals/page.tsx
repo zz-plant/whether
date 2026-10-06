@@ -98,8 +98,8 @@ export default async function SignalsPage({
         assessment={model.assessment}
         recordDate={model.treasury.record_date}
         impactLinks={[
-          { label: "Funding pressure", href: rowHref("tightness"), metric: "tightness" },
-          { label: "Risk appetite", href: rowHref("riskAppetite"), metric: "riskAppetite" },
+          { label: regimeSignalLabel.tightness, href: rowHref("tightness"), metric: "tightness" },
+          { label: regimeSignalLabel.riskAppetite, href: rowHref("riskAppetite"), metric: "riskAppetite" },
           { label: regimeSignalLabel.baseRate, href: rowHref("baseRate"), metric: "baseRate" },
         ]}
         openPanelHref="#what-changed"

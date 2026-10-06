@@ -118,7 +118,7 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     threshold,
     direction,
   }: {
-    label: "Funding pressure" | "Risk appetite";
+    label: string;
     now: number;
     threshold: number;
     direction: "riseAbove" | "fallToOrBelow";
@@ -155,8 +155,8 @@ export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>
     assessment.regime === "SCARCITY" || assessment.regime === "VOLATILE" ? "riseAbove" : "fallToOrBelow";
 
   const conditions = [
-    conditionText({ label: "Funding pressure", now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
-    conditionText({ label: "Risk appetite", now: riskNow, threshold: riskThreshold, direction: riskDirection }),
+    conditionText({ label: regimeSignalLabel.tightness, now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
+    conditionText({ label: regimeSignalLabel.riskAppetite, now: riskNow, threshold: riskThreshold, direction: riskDirection }),
   ];
 
   // Stable sort: a crossed boundary leads, otherwise the declared order holds.

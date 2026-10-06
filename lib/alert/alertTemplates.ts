@@ -6,6 +6,7 @@
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatPointsMove, type FlashMove } from "./flashMoves";
 import type { PublishedLine } from "./alertEvaluator";
+import { regimeSignalLabel } from "../report/signalTranslations";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =
@@ -177,7 +178,7 @@ export const thresholdCrossingEmail = (
   value: number,
   unsubscribeToken?: string | null,
 ): EmailContent => {
-  const metricLabel = line.metric === "tightness" ? "Funding pressure" : "Risk appetite";
+  const metricLabel = regimeSignalLabel[line.metric];
   const lineName = LINE_NAME[line.kind];
   const reading = `${metricLabel} is ${value.toFixed(1)}; ${lineName} is ${line.value}.`;
   const whatToDo = `It crossed ${value > line.value ? "above" : "below"} that line since the last alert. ${describeLineCrossing(line, value)}`;

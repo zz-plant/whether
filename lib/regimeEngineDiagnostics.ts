@@ -8,6 +8,7 @@ import {
   type RegimeThresholds,
   type RegimeTrend,
 } from "./regimeEngineCore";
+import { regimeSignalLabel } from "./report/signalTranslations";
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;
@@ -299,13 +300,13 @@ export const buildSignalInfluence = ({
 }): RegimeSignalInfluence[] => [
   {
     key: "tightness",
-    label: "Funding pressure",
+    label: regimeSignalLabel.tightness,
     influence: Math.abs(tightness - thresholds.tightnessRegime),
     unavailable: false,
   },
   {
     key: "riskAppetite",
-    label: "Risk appetite",
+    label: regimeSignalLabel.riskAppetite,
     influence: Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
     unavailable: false,
   },
