@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { passedChecks } from "./check-gate-marker.mjs";
 import { presetTasks } from "./check-tasks.mjs";
 import { withDeployGate } from "./deploy-gate.mjs";
+import { execText } from "./exec.mjs";
 
 /** The branch whose builds ship to production. */
 const PRODUCTION_BRANCH = "main";
@@ -48,11 +49,11 @@ export function outstandingChecks(alreadyPassed = passedChecks()) {
  */
 export function resolveBranchFromGit() {
   try {
-    const result = spawnSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], { encoding: "utf8" });
-    const branch = (result.stdout ?? "").trim();
+    const branch = execText("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
     // A CI checkout is often detached, where this answers "HEAD" and tells us nothing.
     return branch && branch !== "HEAD" ? branch : "";
   } catch {
+    // No git, no repository, or no commit yet: no branch anyone can name.
     return "";
   }
 }

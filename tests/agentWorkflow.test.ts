@@ -89,6 +89,40 @@ describe("agent workflow helpers", () => {
     }
   });
 
+  /*
+   * `git status` starts an unstaged change with a space. The doctor used to trim the whole
+   * output before splitting it, which shifted the first line's columns: ` M a.txt` was
+   * reported as status "M " for a file called ".txt", and the AGENTS.md lookup walked from
+   * a path that does not exist.
+   */
+  it("reads the first changed file's status and path intact", () => {
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-doctor-"));
+    const env = { ...process.env };
+    for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];
+    const git = (...args: string[]) => spawnSync("git", args, { cwd: temporaryRoot, encoding: "utf8", env });
+
+    try {
+      git("init", "--quiet");
+      git("config", "user.email", "test@example.com");
+      git("config", "user.name", "test");
+      fs.writeFileSync(path.join(temporaryRoot, "a.txt"), "committed\n");
+      git("add", "a.txt");
+      git("commit", "--quiet", "-m", "initial");
+      fs.writeFileSync(path.join(temporaryRoot, "a.txt"), "changed, not staged\n");
+      fs.writeFileSync(path.join(temporaryRoot, "b.txt"), "new\n");
+
+      const report = buildDoctorReport({ repoRoot: temporaryRoot });
+
+      assert.deepEqual(report.changedFiles, [
+        { status: " M", file: "a.txt" },
+        { status: "??", file: "b.txt" },
+      ]);
+      assert.equal(report.clean, false);
+    } finally {
+      fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    }
+  });
+
   it("includes repo AGENTS guidance in doctor reports", () => {
     const report = buildDoctorReport({
       repoRoot: process.cwd(),

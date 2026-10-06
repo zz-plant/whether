@@ -4,7 +4,6 @@
  * repository — the task profiles, the core surfaces, where the skills live — is
  * `scripts/agent-workflow.config.mjs`.
  */
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -15,6 +14,7 @@ import {
   SKILLS_DIRECTORY,
   TASK_PROFILES,
 } from "./agent-workflow.config.mjs";
+import { execOutput, execText, parseGitStatus } from "./exec.mjs";
 import { walkFiles } from "./walk-files.mjs";
 
 // Explicit so the order is code-unit order on every runtime, not the default's string coercion.
@@ -112,14 +112,6 @@ export function classifyTask(task) {
   };
 }
 
-function shell(command, commandArgs, cwd) {
-  return execFileSync(command, commandArgs, {
-    cwd,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  }).trim();
-}
-
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
@@ -170,25 +162,16 @@ function findRelevantAgentFiles(repoRoot, inputPaths = []) {
   return [...discovered].sort(byCodeUnit);
 }
 
-function parseGitStatusShort(output) {
-  if (!output) return [];
-
-  return output.split("\n").filter(Boolean).map((line) => {
-    const status = line.slice(0, 2);
-    const file = line.slice(3).trim();
-    return { status, file };
-  });
-}
-
 export function buildDoctorReport({
   repoRoot,
   task = "",
   inputPaths = [],
 } = {}) {
   const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
-  const branch = safeShell(() => shell("git", ["rev-parse", "--abbrev-ref", "HEAD"], cwd), "unknown");
-  const statusOutput = safeShell(() => shell("git", ["status", "--short"], cwd), "");
-  const changedFiles = parseGitStatusShort(statusOutput);
+  const branch = safeShell(() => execText("git", ["rev-parse", "--abbrev-ref", "HEAD"], cwd), "unknown");
+  // Untrimmed: the first entry's leading space is its status column (see scripts/exec.mjs).
+  const statusOutput = safeShell(() => execOutput("git", ["status", "--porcelain"], cwd), "");
+  const changedFiles = parseGitStatus(statusOutput).map(({ code, path: file }) => ({ status: code, file: file.trim() }));
   const route = classifyTask(task);
   const relevantPaths = inputPaths.length > 0 ? inputPaths : changedFiles.map((entry) => entry.file);
   const agentFiles = findRelevantAgentFiles(cwd, relevantPaths);
@@ -581,7 +564,7 @@ function buildLocalRoutePrompt(task, compactIndex) {
 
 function commandExists(command) {
   try {
-    shell("which", [command], process.cwd());
+    execText("which", [command], process.cwd());
     return true;
   } catch {
     return false;
@@ -601,7 +584,7 @@ export function buildPrewarmReport({
   outDir,
   skipIndex = false,
   modelRole = "fast",
-  commandRunner = shell,
+  commandRunner = execText,
   commandProbe = commandExists,
 } = {}) {
   const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
