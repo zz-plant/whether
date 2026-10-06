@@ -83,7 +83,13 @@ const fixtures: Fixture[] = [
   },
   {
     name: "saved-copy week",
-    snapshot: () => buildOperatingSnapshot({ treasury: snapshotData, macroSeries, now: new Date("2026-08-31T12:00:00.000Z") }),
+    /* What a total outage serves: the bundled reading, stamped by the treasury client as a fallback. */
+    snapshot: () =>
+      buildOperatingSnapshot({
+        treasury: { ...snapshotData, fallback_at: "2026-08-31T06:00:00.000Z", fallback_reason: "FRED unreachable; serving the bundled snapshot." },
+        macroSeries,
+        now: new Date("2026-08-31T12:00:00.000Z"),
+      }),
     now: new Date("2026-08-31T12:00:00.000Z"),
     publishes: false,
   },
