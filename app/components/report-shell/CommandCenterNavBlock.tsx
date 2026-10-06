@@ -21,6 +21,7 @@ export function CommandCenterNavBlock({
   exportCta,
   showShare = false,
   statusLabel,
+  statusPrefix,
   trustStatusLabel,
   fetchedAtLabel,
   resolvedNextRefreshLabel,
@@ -42,6 +43,7 @@ export function CommandCenterNavBlock({
   /** Opens the one global share rail — the same formats, the same island, as / and /share. */
   showShare?: boolean;
   statusLabel: string;
+  statusPrefix?: string;
   trustStatusLabel: string;
   fetchedAtLabel: string;
   resolvedNextRefreshLabel?: string;
@@ -93,10 +95,15 @@ export function CommandCenterNavBlock({
               prints in the regime ink at the reading's own size; the trust
               headline and the record date stay micro under it. */}
           {statusLabel ? (
-            <p className="text-fluid-lg font-bold leading-tight">
-              <span className="text-[color:var(--regime-ink)]">{statusLabel}</span>
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
+              {statusPrefix ? (
+                <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
+              ) : null}
+              {/* The week's word in the stamp's shape, the same placard the
+                  hero's tag and the sticky strip print. */}
+              <span className="type-stamp text-fluid-base text-[color:var(--regime-ink)]">{statusLabel}</span>
               {introMetaRest ? (
-                <span className="ml-2 text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
+                <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
               ) : null}
             </p>
           ) : introMetaRest ? (

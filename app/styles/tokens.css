@@ -6,8 +6,8 @@
 
 @theme {
   --color-slate-950: #101114;
-  /* Mirrors the --fs-* ladder in :root. The .text-fluid-* classes in
-     typography.css shadow these utilities, so the two must stay in step. */
+  /* The text-fluid-* utilities. --fs-* in :root carries the same values for
+     plain CSS rules (.type-label, .type-badge); keep the two in step. */
   --text-fluid-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
   --text-fluid-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
   --text-fluid-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
@@ -34,15 +34,13 @@
   --color-semantic-stormy-fg: #c4b5fd;
 
   /* Text role tokens */
-  /* Display sizes the weekly-call headline (its only consumer, DecisionHero).
-     It was 54px in the serif display face, which set a machine-composed
-     sentence as a magazine cover line and put it in direct competition with
-     the boldness score beside it — two competing focal points, neither
-     winning. The score is the hero now; the call is the sentence that explains
-     it, so this steps down to a size that reads decisive at 2 lines without
-     shouting. Kept as a token because the earlier 7vw/6.5rem ceiling wrapped
-     it to seven lines and pushed the brief below the fold — the cap matters. */
-  --text-display: clamp(1.5rem, 1.2rem + 1.35vw, 2.25rem);
+  /* Display sizes the weekly-call headline (its only consumer, DecisionHero),
+     set semi-condensed bold (--font-stretch-display). The narrow width is what
+     lets it grow past the old 36px cap and still hold two lines on a phone and
+     on desktop. It was 54px in a serif once, a magazine cover line; the cap
+     stays because a 7vw ceiling wrapped it to seven lines and pushed the brief
+     below the fold. */
+  --text-display: clamp(1.625rem, 1.25rem + 1.6vw, 2.5rem);
   --color-app-text-secondary: var(--app-text-secondary);
 }
 
@@ -64,14 +62,20 @@
 :root {
   --weather-shell-pad-inline: 1rem;
   color-scheme: dark;
-  --font-sans: var(--font-sans-google, "IBM Plex Sans", system-ui, sans-serif);
-  /* Deliberately outside @theme: there is no `font-display` utility, and adding
-     the key here would mint one. The serif reaches the page through real rules
-     only — :where(h1, h2) and .type-section — which keeps its use
-     bounded to headings. A `className="font-display"` is a silent no-op; if a
-     non-heading needs the serif, set font-family in CSS rather than minting the
-     utility. See the --text-display note above for why serif is rationed. */
-  --font-display: var(--font-display-google, "IBM Plex Serif", Georgia, serif);
+  --font-sans: "Archivo", system-ui, sans-serif;
+  /* The display voice is the same family set narrower, not a second face
+     (fonts.css). Deliberately outside @theme: there is no `font-display`
+     utility, and adding the key here would mint one. The display voice
+     reaches the page through real rules only — :where(h1, h2), .type-section,
+     .text-display — which keeps it bounded to headings and the call. */
+  --font-display: var(--font-sans);
+  /* Width is the axis that separates the voices. Semi-condensed for the call
+     and headings: the long weekly call holds two lines at a size that reads
+     as a bulletin, not a paragraph. Expanded for the regime stamp, the one
+     wide element on the page, so the week's word is a placard wherever it
+     prints. Text stays at the face's normal width. */
+  --font-stretch-display: 87.5%;
+  --font-stretch-stamp: 125%;
   /* Figure register — which face a number is set in, assigned by role rather
      than by taste, the same way the radius scale below is.
 
@@ -89,7 +93,7 @@
      rendered mono in the sticky strip and sans in the hero, which read as two
      different quantities on one screen. If a figure appears on more than one
      surface, it is the same figure everywhere. */
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-mono: "Chivo Mono", ui-monospace, monospace;
   --text-primary: var(--app-text);
   --footer-link: #cbd5e1;
   --footer-link-hover: #ffffff;

@@ -186,13 +186,11 @@ export default function RootLayout({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0284c7" />
         {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
             so there is no fonts.googleapis.com stylesheet in the critical path
-            and no preconnect to a third-party host. Only the two faces that
-            render above the fold are preloaded. Plex Serif 600, not 700: the hero
-            headline is font-semibold, so 700 is never requested on first paint
-            and preloading it just burned a round-trip. The remaining weights
-            load from the same origin when the stylesheet asks for them. */}
-        <link rel="preload" href="/fonts/ibm-plex-serif-600.woff2" as="font" type="font/woff2" crossOrigin="" />
-        <link rel="preload" href="/fonts/ibm-plex-sans-400.woff2" as="font" type="font/woff2" crossOrigin="" />
+            and no preconnect to a third-party host. Archivo is one variable file
+            that sets every line above the fold — text, the call, the stamp — so it
+            is the one preload. Chivo Mono sets aligned figures and paste previews,
+            all below the fold; it loads when the stylesheet first asks for it. */}
+        <link rel="preload" href="/fonts/archivo-variable.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/operate" />

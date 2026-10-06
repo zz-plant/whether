@@ -86,7 +86,7 @@ export function DecisionHero({
         {/* The regime stamp and its meaning, grouped on the eyebrow line so the eye path flows directly into the call. */}
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <span
-            className="inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
+            className="type-stamp inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs"
             style={{
               color: "var(--regime-ink)",
               borderColor: "color-mix(in srgb, var(--regime-accent) 40%, transparent)",
@@ -117,7 +117,7 @@ export function DecisionHero({
         <TitleTag
           id="weekly-call-title"
           style={{ viewTransitionName: "page-title" }}
-          className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.2] tracking-[-0.012em] text-white"
+          className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white"
         >
           {call}
         </TitleTag>

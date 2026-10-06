@@ -54,7 +54,7 @@ export const renderAnswerOgImage = ({
 
     <div style={{ display: "flex", flex: 1, gap: 40, marginTop: 36 }}>
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <div style={{ display: "flex", fontSize: 54, fontWeight: 600, lineHeight: 1.08, fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`, color: OG_TEXT }}>
+        <div style={{ display: "flex", fontSize: 54, fontWeight: 700, lineHeight: 1.08, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: OG_TEXT }}>
           {question}
         </div>
         <div style={{ display: "flex", fontSize: 27, lineHeight: 1.35, color: "#cbd5e1", marginTop: 22 }}>

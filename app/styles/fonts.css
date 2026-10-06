@@ -1,90 +1,48 @@
 /*
- * Self-hosted web fonts.
+ * Self-hosted web fonts: two variable files, Latin subset, preloaded in
+ * app/layout.tsx. Both are SIL Open Font License 1.1, from Omnibus-Type:
+ *   Archivo     — Copyright 2020 The Archivo Project Authors (github.com/Omnibus-Type/Archivo)
+ *   Chivo Mono  — Copyright 2018 The Chivo Project Authors (github.com/Omnibus-Type/Chivo)
+ * License: https://openfontlicense.org. Files from Fontsource 5.3.0.
  *
- * These were previously fetched from fonts.googleapis.com via a render-blocking
- * <link> in app/layout.tsx, which put a third-party host in the critical path
- * and swapped the display face on every cold load. next/font/google is not the
- * route here: Vinext marks that adapter only partially supported and still
- * serves from the CDN rather than self-hosting at build time, and this repo
- * removed it once already for that reason.
+ * Why these (2026-10-05). The site read as a forecast in IBM's design-system
+ * face: Plex Sans for text, Plex Serif 600 for every h1 and h2, and the one
+ * line that matters — the weekly call — in the sans, so the lesser headings
+ * spoke in the stronger voice. One grotesque now carries every voice, and
+ * width is what changes between them (tokens.css, --font-stretch-*):
+ *   normal width        text, tables, controls, labels
+ *   semi-condensed      the call, page titles, section headings
+ *   expanded caps       the regime word, as a stamp (.type-stamp)
+ * Chivo Mono, the same foundry's monospace, sets figures that have to line up
+ * and the paste previews, which used to fall back to whatever monospace the
+ * reader's OS had (Plex Mono was declared but never shipped).
  *
- * Latin subset only — matching what the Google CSS served for this project.
- * Files live in public/fonts/ and are preloaded in app/layout.tsx.
- *
- * Both families are SIL Open Font License 1.1, from the same superfamily as
- * the IBM Plex Mono the figures use (https://github.com/IBM/plex):
- *   IBM Plex Serif — headings (h1, h2, .type-section)
- *   IBM Plex Sans  — everything else
- *
- * The heading face was Fraunces until 2026-09-29. It is an old-style display
- * serif, and beside Plex body text it read as archaic. Plex Serif keeps a
- * serif for headings against the sans body, drawn on the same skeleton as the
- * rest of the page. It is static per weight, so 600 and 700 are two files
- * (Fraunces shipped one variable file under both names).
+ * Weight is a range, not one file per weight: the four Plex Sans "weights"
+ * were byte-identical copies of one variable file, fetched four times.
+ * Neither face draws "→", "≤" or "≥"; those fall to system-ui, as they did
+ * under Plex.
  */
 
 @font-face {
-  font-family: "IBM Plex Serif";
+  font-family: "Archivo";
   font-style: normal;
-  font-weight: 600;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
   font-display: swap;
-  src: url("/fonts/ibm-plex-serif-600.woff2") format("woff2");
+  src: url("/fonts/archivo-variable.woff2") format("woff2-variations"),
+    url("/fonts/archivo-variable.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
     U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
     U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: "IBM Plex Serif";
+  font-family: "Chivo Mono";
   font-style: normal;
-  font-weight: 700;
+  font-weight: 100 900;
   font-display: swap;
-  src: url("/fonts/ibm-plex-serif-700.woff2") format("woff2");
+  src: url("/fonts/chivo-mono-variable.woff2") format("woff2-variations"),
+    url("/fonts/chivo-mono-variable.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-sans-400.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-sans-500.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-sans-600.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "IBM Plex Sans";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-sans-700.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2212, U+2215, U+FEFF, U+FFFD;
 }

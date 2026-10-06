@@ -3,13 +3,14 @@ import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { formatConfidenceChipLabel } from "../../../lib/report/reportFormatting";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
-import { SANS_EM, SERIF_EM, fitLines, wrappedLines } from "../../../lib/image/textFit";
+import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "../../../lib/image/textFit";
 import {
   GlyphMotif,
   OG_BG,
   OG_BORDER,
   OG_FONT_BODY,
   OG_FONT_DISPLAY,
+  OG_FONT_STAMP,
   OG_PANEL,
   OG_TEXT,
   OG_TEXT_MUTED,
@@ -101,7 +102,7 @@ export const layoutReportCard = (
   const room = VARIABLE_HEIGHT - boxHeight - whyHeight;
   const headlineSize =
     HEADLINE_SIZES.find((size) => {
-      const lines = wrappedLines(preview.headline, size, CONTENT_WIDTH, SERIF_EM).length;
+      const lines = wrappedLines(preview.headline, size, CONTENT_WIDTH, DISPLAY_EM).length;
       return lines <= 3 && 18 + lines * size * 1.06 <= room;
     }) ?? HEADLINE_SIZES[HEADLINE_SIZES.length - 1];
 
@@ -162,7 +163,8 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
             color: regimeColor,
             fontSize: 26,
             fontWeight: 700,
-            letterSpacing: "0.1em",
+            fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
+            letterSpacing: "0.06em",
           }}
         >
           {preview.statusLabel.toUpperCase()}
@@ -180,8 +182,8 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
           marginTop: 18,
           fontSize: layout.headlineSize,
           lineHeight: 1.06,
-          fontWeight: 600,
-          fontFamily: `${OG_FONT_DISPLAY}, Georgia, serif`,
+          fontWeight: 700,
+          fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`,
           letterSpacing: "-0.01em",
         }}
       >

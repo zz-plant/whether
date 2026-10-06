@@ -8,7 +8,7 @@ import type { ReactElement } from "react";
  * than generic system type. Fonts and their family names both come from
  * lib/image/ogFonts.ts, which every generated image route shares.
  */
-export { OG_FONT_BODY, OG_FONT_DISPLAY } from "../../../lib/image/ogFonts";
+export { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP } from "../../../lib/image/ogFonts";
 
 export {
   OG_BG, OG_PANEL, OG_BORDER, OG_TEXT, OG_TEXT_SECONDARY, OG_TEXT_MUTED,

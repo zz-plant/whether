@@ -1,8 +1,7 @@
 
 
 .mono {
-  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -10,7 +9,8 @@
   @apply font-semibold leading-snug;
   font-size: clamp(1.5rem, 1.125rem + 1.5vw, 1.875rem);
   font-family: var(--font-display);
-  letter-spacing: 0;
+  font-stretch: var(--font-stretch-display);
+  letter-spacing: -0.005em;
 }
 
 /* Unified label primitive — use for all section/section-header metadata labels.
@@ -48,8 +48,10 @@
      `:where(h1, h2)` display-face rule below set every h2 eyebrow in the serif
      while the p eyebrows beside them stayed sans — "SIGNAL WATCHES" in
      the serif above "CURVE CONTEXT" in Plex, on the same page, in the same
-     colour. Same trap .text-display documents. */
+     colour. Same trap .text-display documents. Width too: the display rule
+     narrows h1 and h2, and an eyebrow on an h2 is still a label. */
   font-family: var(--font-sans);
+  font-stretch: 100%;
 }
 
 /* Section-level eyebrow: the mark above a page section's title, in the week's
@@ -79,7 +81,21 @@ svg :where(.type-eyebrow, .type-badge) {
 .type-badge {
   @apply font-semibold uppercase;
   font-size: var(--fs-micro);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+}
+
+/* The regime stamp: the week's word (Freezing, Sunny, Stormy, Cloudy) set in
+   expanded capitals wherever it prints — the hero's tag, a report route's
+   status word, the sticky strip. It is the only expanded text on the page, so
+   the word reads as a placard rather than a label, and a reader learns to find
+   it in the same shape on every surface and in every screenshot. Typography
+   only; the regime ink comes from the caller. */
+.type-stamp {
+  font-family: var(--font-sans);
+  font-stretch: var(--font-stretch-stamp);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .type-data {
@@ -87,14 +103,10 @@ svg :where(.type-eyebrow, .type-badge) {
   font-size: var(--fs-base);
 }
 
- .text-fluid-nano { font-size: var(--fs-nano); }
-.text-fluid-micro { font-size: var(--fs-micro); }
-.text-fluid-xs { font-size: var(--fs-xs); }
-.text-fluid-sm { font-size: var(--fs-sm); }
-.text-fluid-base { font-size: var(--fs-base); }
-.text-fluid-lg { font-size: var(--fs-lg); }
- .text-fluid-xl { font-size: var(--fs-xl); }
- .text-fluid-2xl { font-size: var(--fs-2xl); }
+/* No .text-fluid-* classes here. The utilities come from the @theme scale in
+   tokens.css; unlayered copies of them outranked every responsive variant, so
+   `lg:text-fluid-2xl` on the report title never applied and the h1 stayed at
+   body size on desktop. */
 /* The weekly-call headline. Sets the family here rather than via a `font-sans`
    utility on the element: this stylesheet is unlayered, so the `:where(h1, h2)`
    display-face rule below outranks any layered Tailwind family utility and the
@@ -102,7 +114,8 @@ svg :where(.type-eyebrow, .type-badge) {
    describes. */
 .text-display {
   font-size: var(--text-display);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
+  font-stretch: var(--font-stretch-display);
 }
 
  :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
@@ -124,6 +137,7 @@ svg :where(.type-eyebrow, .type-badge) {
 
 :where(h1, h2) {
   font-family: var(--font-display);
+  font-stretch: var(--font-stretch-display);
 }
 
 /* In the base layer, so a utility on the element wins. Unlayered, this rule
@@ -142,6 +156,13 @@ svg :where(.type-eyebrow, .type-badge) {
      parent constrains the width. Explicit h-* utilities still win. */
   svg[viewBox][width][height] {
     height: auto;
+  }
+  /* The display voice's default weight. Plex Serif shipped only 600 and 700,
+     so a heading with no weight class snapped to 600; the variable face honours
+     the 400 Tailwind's preflight leaves, which set those titles thin. In the
+     base layer so a font-* utility on the element still wins. */
+  :where(h1, h2) {
+    font-weight: 600;
   }
 }
 

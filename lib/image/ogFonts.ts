@@ -13,8 +13,10 @@
  * font loader for any glyph outside its default face, and that download failing
  * aborts the render mid-stream (a 200 with an empty body, not an error).
  */
-export const OG_FONT_DISPLAY = "IBM Plex Serif";
-export const OG_FONT_BODY = "IBM Plex Sans";
+export const OG_FONT_DISPLAY = "Archivo SemiCondensed";
+export const OG_FONT_BODY = "Archivo";
+/** The regime word's face, expanded like the site's stamp (.type-stamp). */
+export const OG_FONT_STAMP = "Archivo Expanded";
 
 /**
  * The self-hosted faces are Latin subsets (232 codepoints), so a handful of
@@ -52,14 +54,18 @@ export const toImageSafeProps = <T extends object>(props: T): T => {
 type OgFont = {
   name: string;
   data: ArrayBuffer;
-  weight: 400 | 600;
+  weight: 400 | 600 | 700;
   style: "normal";
 };
 
-const FACES: ReadonlyArray<{ path: string; name: string; weight: 400 | 600 }> = [
-  { path: "/fonts/og/ibm-plex-serif-600.ttf", name: OG_FONT_DISPLAY, weight: 600 },
-  { path: "/fonts/og/ibm-plex-sans-400.ttf", name: OG_FONT_BODY, weight: 400 },
-  { path: "/fonts/og/ibm-plex-sans-600.ttf", name: OG_FONT_BODY, weight: 600 },
+/* Static instances of the one variable file the site serves, written by
+   scripts/generate-og-fonts.mjs: the call semi-condensed, text at normal
+   width, the regime word expanded — the same three voices as the pages. */
+const FACES: ReadonlyArray<{ path: string; name: string; weight: 400 | 600 | 700 }> = [
+  { path: "/fonts/og/archivo-semicondensed-700.ttf", name: OG_FONT_DISPLAY, weight: 700 },
+  { path: "/fonts/og/archivo-400.ttf", name: OG_FONT_BODY, weight: 400 },
+  { path: "/fonts/og/archivo-600.ttf", name: OG_FONT_BODY, weight: 600 },
+  { path: "/fonts/og/archivo-expanded-700.ttf", name: OG_FONT_STAMP, weight: 700 },
 ];
 
 let cache: Promise<OgFont[] | undefined> | null = null;

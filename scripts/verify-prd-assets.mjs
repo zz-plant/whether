@@ -21,17 +21,14 @@ const assets = [
   { path: "/whether-logo.svg", expectedType: /image\/svg\+xml/ },
 
   // Web Fonts
-  { path: "/fonts/ibm-plex-serif-600.woff2", expectedType: /font\/woff2/ },
-  { path: "/fonts/ibm-plex-serif-700.woff2", expectedType: /font\/woff2/ },
-  { path: "/fonts/ibm-plex-sans-400.woff2", expectedType: /font\/woff2/ },
-  { path: "/fonts/ibm-plex-sans-500.woff2", expectedType: /font\/woff2/ },
-  { path: "/fonts/ibm-plex-sans-600.woff2", expectedType: /font\/woff2/ },
-  { path: "/fonts/ibm-plex-sans-700.woff2", expectedType: /font\/woff2/ },
+  { path: "/fonts/archivo-variable.woff2", expectedType: /font\/woff2/ },
+  { path: "/fonts/chivo-mono-variable.woff2", expectedType: /font\/woff2/ },
 
   // Satori / OG Fonts
-  { path: "/fonts/og/ibm-plex-serif-600.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
-  { path: "/fonts/og/ibm-plex-sans-400.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
-  { path: "/fonts/og/ibm-plex-sans-600.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/archivo-semicondensed-700.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/archivo-400.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/archivo-600.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/archivo-expanded-700.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
 
   // Scripts & Downloads
   { path: "/embed.js", expectedType: /(application|text)\/(javascript|x-javascript)/ },
