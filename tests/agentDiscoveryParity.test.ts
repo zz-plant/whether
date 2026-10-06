@@ -6,10 +6,12 @@ import { describe, it } from "bun:test";
 import { GET as getAgent } from "../app/api/agent/route";
 import { GET as getLlms } from "../app/llms.txt/route";
 import ApiDocsPage from "../app/api-docs/page";
+import robots from "../app/robots";
+import { AGENT_START_TOOL, WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { describeAgentTools, listAgentTools } from "../lib/agent/tools";
 import { agentManifestResponse } from "../lib/agentManifest";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
-import { MCP_PROTOCOL_VERSIONS } from "../lib/mcp/serverIdentity";
+import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INSTRUCTIONS } from "../lib/mcp/serverIdentity";
 
 /*
  * A tool that is served and not listed is one an agent never learns to call, and a tool that is
@@ -57,6 +59,21 @@ describe("every place an agent learns what to call", () => {
     }
   });
 
+  it("names in the server's instructions only tools it serves, and leaves out only the ones chosen to be", () => {
+    /* The instructions are prose a client puts in the model's context at `initialize`: where to
+       start and what to check before acting, grouped by what a tool is for. They are not a
+       catalogue (tools/list is), so these three reference reads are left to their descriptions:
+       they change neither where an agent starts nor what it checks before acting. A tool added to
+       the registry fails here until someone decides whether the instructions should name it. */
+    const leftToToolsList = ["get_signals", "get_analog_playbook", "list_agent_skills"];
+    const names = httpTools.map((tool) => tool.name);
+    const named = [...new Set(MCP_SERVER_INSTRUCTIONS.match(/\b[a-z]+(?:_[a-z]+)+\b/g) ?? [])];
+
+    assert.deepEqual(named.filter((name) => !names.includes(name)), [], "every tool the instructions name is served");
+    assert.deepEqual(names.filter((name) => !named.includes(name)).sort(), [...leftToToolsList].sort(), "every served tool is named or left out on purpose");
+    assert.ok(MCP_SERVER_INSTRUCTIONS.includes(`Call ${AGENT_START_TOOL} first`));
+  });
+
   it("points to the state where an agent begins, and the route answers it", async () => {
     const manifest = await agentManifestResponse().json();
     const llms = await (await getLlms()).text();
@@ -68,6 +85,42 @@ describe("every place an agent learns what to call", () => {
     assert.match(llms, /Call get_state first\./);
     assert.equal(manifest.endpoints.state, "https://whether.work/api/agent?view=state");
     assert.equal((await getAgent(new Request(manifest.endpoints.state))).status, 200);
+  });
+
+  it("sends an agent to the same places from the manifest and /llms.txt, each one a route that answers", async () => {
+    const manifest = await agentManifestResponse().json();
+    const llms = await (await getLlms()).text();
+
+    // The start pointers, word for word, where /llms.txt says where to start.
+    const startHere = llms.slice(llms.indexOf("## Start here"), llms.indexOf("## MCP tools"));
+    for (const pointer of [manifest.start.http, manifest.start.markdown, manifest.start.cli]) {
+      assert.ok(startHere.includes(pointer), `/llms.txt starts an agent at ${pointer}`);
+    }
+    assert.equal(manifest.start.mcp, `tools/call ${AGENT_START_TOOL}`);
+    assert.ok(startHere.includes(`${manifest.mcp.endpoint} (`) && startHere.includes(`Call ${AGENT_START_TOOL} first.`));
+
+    // Every place /llms.txt's discovery list names is the manifest, the homepage, or a manifest endpoint.
+    const discovery = [...llms.slice(llms.indexOf("## Discovery")).matchAll(/^- [^:]+: (\S+)$/gm)].map((match) => match[1]);
+    assert.deepEqual(discovery, [
+      `https://whether.work${WHETHER_AGENT_MANIFEST_PATH}`,
+      "https://whether.work/",
+      manifest.endpoints.brief,
+      manifest.endpoints.agent,
+      manifest.endpoints.mcp,
+    ]);
+
+    // Every endpoint the manifest advertises is a route the app serves, and robots.txt lets an agent fetch the manifest.
+    for (const [name, url] of Object.entries<string>(manifest.endpoints)) {
+      const { pathname, origin } = new URL(url);
+      assert.equal(origin, "https://whether.work", name);
+      const route = await import(`../app${pathname}/route`);
+      assert.equal(typeof route.GET, "function", `${name} (${pathname}) is served`);
+    }
+    const allowed = robots().rules;
+    for (const group of Array.isArray(allowed) ? allowed : [allowed]) {
+      assert.ok([group.allow ?? []].flat().includes(WHETHER_AGENT_MANIFEST_PATH), "robots.txt allows the manifest");
+    }
+    assert.equal(manifest.mcp.plainGet, `${manifest.endpoints.mcp}?tool=get_actions`);
   });
 
   it("lists the views the agent route has, and no others", async () => {

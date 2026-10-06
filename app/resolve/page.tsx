@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
+import { graph } from "../../lib/seo/pageStructuredData";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
   situationUseCaseDefinitions,
@@ -44,15 +45,7 @@ export default async function DecidePage({
 }: {
   searchParams?: Promise<GuidedTranslationSearchParams & { toolkitQuery?: string }>;
 }) {
-  const breadcrumbStructuredData = {
-    "@context": "https://schema.org",
-    ...buildBreadcrumbList(
-      createBreadcrumbTrail([
-        { path: "/" },
-        { path: "/resolve" },
-      ]),
-    ),
-  };
+  const breadcrumbStructuredData = graph([buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/resolve" }]))]);
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
   const { homeBriefModel } = snapshot;

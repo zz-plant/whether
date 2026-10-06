@@ -2061,7 +2061,7 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
   directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
 - `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
-- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/stdioServer.ts`): the same tools, plus
+- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/server.ts`, the one `/api/mcp` runs): the same tools, plus
   `pull_recent_site_info`.
 
 ### 6.9 One state, one tool registry (2026-09-29)
@@ -2081,7 +2081,7 @@ Changes, all additive except where noted:
   `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
   in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
   and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
-- **Inputs** (`lib/agent/inputs.ts`): a regime by key or by the site's weather word in any case; empty
+- **Inputs** (`lib/agent/inputs.ts`, parsed and refused by the generic `lib/agent/registry.ts`): a regime by key or by the site's weather word in any case; empty
   arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
   with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
   an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became

@@ -12,6 +12,7 @@ import {
   buildPageMetadata,
   organizationName,
 } from "../../../lib/seo";
+import { graph } from "../../../lib/seo/pageStructuredData";
 import {
   buildAuthorSchema,
   buildPublisherSchema,
@@ -166,20 +167,21 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const canonicalUrl = buildCanonicalUrl(buildPostureArchivePath(period.slug));
 
 
-  const articleStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: `${period.title} conditions — ${toWeatherLabel(period.operatorLabel)}`,
-    description: describePeriod(period),
-    datePublished: period.asOf,
-    dateModified: period.asOf,
-    author: buildAuthorSchema(),
-    publisher: buildPublisherSchema(organizationName),
-    url: canonicalUrl,
-    mainEntityOfPage: canonicalUrl,
-    isPartOf: buildCanonicalUrl("/history"),
-    temporalCoverage: period.kind === "year" ? String(period.year) : period.asOf,
-  };
+  const articleStructuredData = graph([
+    {
+      "@type": "Article",
+      headline: `${period.title} conditions — ${toWeatherLabel(period.operatorLabel)}`,
+      description: describePeriod(period),
+      datePublished: period.asOf,
+      dateModified: period.asOf,
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      isPartOf: buildCanonicalUrl("/history"),
+      temporalCoverage: period.kind === "year" ? String(period.year) : period.asOf,
+    },
+  ]);
 
   return (
     <ContentPageShell>

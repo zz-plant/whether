@@ -7,7 +7,9 @@ import {
   buildCanonicalUrl,
   buildPageMetadata,
   organizationName,
+  websiteId,
 } from "../../lib/seo";
+import { graph } from "../../lib/seo/pageStructuredData";
 import {
   buildPublisherSchema,
   publisherAuthor,
@@ -25,18 +27,16 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function ContactPage() {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "ContactPage",
-        url: buildCanonicalUrl(publisherContactPath),
-        name: "Contact Whether",
-      },
-      buildPublisherSchema(organizationName),
-      buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherContactPath, label: "Contact" }])),
-    ],
-  };
+  const structuredData = graph([
+    {
+      "@type": "ContactPage",
+      url: buildCanonicalUrl(publisherContactPath),
+      name: "Contact Whether",
+      isPartOf: { "@id": websiteId },
+    },
+    buildPublisherSchema(organizationName),
+    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherContactPath, label: "Contact" }])),
+  ]);
 
   return (
     <ContentPageShell measure="prose">

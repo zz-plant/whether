@@ -5,35 +5,19 @@ import { applyScenarioOverridesToTreasury } from "../../../../lib/cli/scenarioIn
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { getRegimeDisplayLabel } from "../../../../lib/regimePresentation";
 import { resolvePublishedConfidence } from "../../../../lib/report/confidence";
-import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT } from "../../../../lib/cli/queryContracts";
-import { parseCliRouteRequest } from "../../../../lib/api/cliRoute";
+import { CLI_QUERIES, parseCliQuery } from "../../../../lib/cli/queryContracts";
 
 export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
-const parseNumber = (value: string | null) => {
-  if (!value) {
-    return null;
-  }
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-
 export async function GET(request: NextRequest) {
-  const parsedRequest = parseCliRouteRequest(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.scenario);
-  if (parsedRequest instanceof NextResponse) return parsedRequest;
+  // The scores are read as the agent tools read them (`numberInput`): finite, zero included.
+  const query = parseCliQuery(request, CLI_QUERIES.scenario);
+  if (query instanceof NextResponse) return query;
 
-  const tightness = parseNumber(request.nextUrl.searchParams.get("tightness"));
-  const riskAppetite = parseNumber(request.nextUrl.searchParams.get("risk-appetite"));
-
-  if (request.nextUrl.searchParams.has("tightness") && tightness === null) {
-    return NextResponse.json({ error: "Invalid tightness input." }, { status: 400 });
-  }
-  if (request.nextUrl.searchParams.has("risk-appetite") && riskAppetite === null) {
-    return NextResponse.json({ error: "Invalid risk-appetite input." }, { status: 400 });
-  }
+  const tightness = query.tightness ?? null;
+  const riskAppetite = query["risk-appetite"] ?? null;
 
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/cli/scenario" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;

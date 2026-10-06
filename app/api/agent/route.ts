@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { AGENT_VIEWS, DEFAULT_AGENT_VIEW } from "../../../lib/agent/discovery";
 import {
   buildAgentInterfaceResponse,
   isAgentCadence,
@@ -13,15 +14,12 @@ export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
-/* `full` is the whole brief and stays the default; `state` is the compact answer an agent
-   decides from (`lib/agentState.ts`), about a tenth the size. */
-const AGENT_VIEWS = ["full", "state"] as const;
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const requestedCadence = searchParams.get("cadence") ?? "weekly";
   const format = searchParams.get("format");
-  const view = searchParams.get("view") ?? "full";
+  // The views are the manifest's (`lib/agent/discovery.ts`), so it cannot list one this refuses.
+  const view = searchParams.get("view") ?? DEFAULT_AGENT_VIEW;
 
   if (format !== null && format !== "jev") {
     return NextResponse.json(

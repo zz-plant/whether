@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildCliStatusContract, buildCliStatusExpandedContract } from "../lib/cli/contracts";
-import { parseAsOfSearchParam } from "../lib/cli/queryContracts";
+import { NextRequest } from "next/server";
+import { CLI_QUERIES, parseCliQuery } from "../lib/cli/queryContracts";
 
 const reportData = {
   treasury: {
@@ -64,6 +65,8 @@ describe("cli fallback contract", () => {
   });
 
   it("accepts historical asOf query format used by fallback docs", () => {
-    assert.deepEqual(parseAsOfSearchParam("2024-07"), { month: "7", year: "2024" });
+    assert.deepEqual(parseCliQuery(new NextRequest("http://localhost:3000/api/cli/status?asOf=2024-07"), CLI_QUERIES.status), {
+      asOf: { month: "7", year: "2024" },
+    });
   });
 });

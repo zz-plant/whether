@@ -1,3 +1,4 @@
+import { WHETHER_AGENT_MANIFEST_PATH } from "../agent/discovery";
 import { answerPageContent } from "../answerContentSource";
 import { resourceArticles } from "../resourceArticles";
 import { resourcePillarPages } from "../resourcesContent";
@@ -48,7 +49,7 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
       `which changes weekly under one URL — fetch ${baseUrl}/brief.md for that, or ${baseUrl}/api/agent for JSON.`,
       `A dated, citable copy of a past week lives at ${baseUrl}/brief/<year>-w<week>.`,
     ].join(" "),
-    `Endpoint map: ${baseUrl}/llms.txt · Agent manifest: ${baseUrl}/.well-known/whether-agent.json`,
+    `Endpoint map: ${baseUrl}/llms.txt · Agent manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,
   ]);
 
   const answerBlock = answers.length === 0 ? null : section([

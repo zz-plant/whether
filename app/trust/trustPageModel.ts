@@ -3,6 +3,7 @@ import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
+import { graph } from "../../lib/seo/pageStructuredData";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
@@ -24,15 +25,7 @@ import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivation
 
 
 export async function buildTrustPageModel() {
-  const breadcrumbStructuredData = {
-    "@context": "https://schema.org",
-    ...buildBreadcrumbList(
-      createBreadcrumbTrail([
-        { path: "/" },
-        { path: "/trust" },
-      ]),
-    ),
-  };
+  const breadcrumbStructuredData = graph([buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }]))]);
   /* Read alongside the brief, not after it: the run history has its own deadline and
      fails soft, so it never lengthens the page past the report path's own bound. The
      funnel is a KV get of a record the Monday cron already wrote, so it costs one read

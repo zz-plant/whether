@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv-provider.js";
-import { AgentInputError, REGIME_KEYS } from "../lib/agent/inputs";
-import { callAgentTool, describeAgentTools, describeToolParams, listAgentTools, runAgentTool } from "../lib/agent/tools";
+import { REGIME_KEYS } from "../lib/agent/inputs";
+import { z } from "zod";
+import { AgentInputError, createAgentToolRegistry, defineTool, describeToolParams, labelChoices } from "../lib/agent/registry";
+import { callAgentTool, describeAgentTools, listAgentTools, runAgentTool } from "../lib/agent/tools";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
 import { buildAgentState } from "../lib/agentState";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
@@ -245,5 +247,39 @@ describe("the catalogue rows", () => {
     assert.match(describeToolParams(history.arguments), /^signal_key \(required: TREASURY_1M\/TREASURY_3M/);
     assert.match(describeToolParams(projection.arguments), /tightness \(optional number\), riskAppetite \(optional number\)/);
     assert.deepEqual(brief.aliases, ["get_agent_brief"]);
+  });
+});
+
+/*
+ * The mechanism under the tools knows nothing about Whether: an input says how its own choices
+ * read in a refusal (the regime input lists each key with its weather word), and a tool is
+ * read-only unless its definition says otherwise.
+ */
+describe("the registry mechanism", () => {
+  const registry = createAgentToolRegistry([
+    defineTool({
+      name: "labelled",
+      title: "t",
+      description: "d",
+      input: { pick: labelChoices(z.preprocess((value) => value, z.enum(["A", "B"])), (choice) => `${choice} (the ${choice.toLowerCase()} one)`).optional() },
+      run: async () => ({}),
+    }),
+    defineTool({ name: "plain", title: "t", description: "d", input: { pick: z.enum(["A", "B"]).optional() }, run: async () => ({}) }),
+    defineTool({ name: "writes", title: "t", description: "d", readOnly: false, input: {}, run: async () => ({}) }),
+  ]);
+
+  it("lists an input's choices in the words the input gives them, and as themselves otherwise", () => {
+    assert.throws(() => registry.checkAgentToolArguments("labelled", { pick: "C" }, "http"), {
+      message: 'Unknown pick "C". Use one of: A (the a one), B (the b one).',
+    });
+    assert.throws(() => registry.checkAgentToolArguments("plain", { pick: "C" }, "http"), { message: 'Unknown pick "C". Use one of: A, B.' });
+  });
+
+  it("annotates a tool as read-only unless its definition says it writes", () => {
+    const [labelled, , writes] = registry.listAgentTools("http");
+
+    assert.deepEqual(labelled.annotations, { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
+    assert.deepEqual(writes.annotations, { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false });
+    assert.equal(registry.describeAgentTools("http")[2].readOnly, false);
   });
 });

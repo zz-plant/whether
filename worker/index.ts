@@ -12,7 +12,8 @@ import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
-import { WHETHER_AGENT_MANIFEST_PATH, agentManifestResponse } from "../lib/agentManifest";
+import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { agentManifestResponse } from "../lib/agentManifest";
 import { installBindings } from "./bindings";
 
 /* Durable Object and Workflow classes must be exported from the Worker entry to exist. All

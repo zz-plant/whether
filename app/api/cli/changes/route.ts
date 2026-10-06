@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildCliChangesContract } from "../../../../lib/cli/contracts";
-import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT } from "../../../../lib/cli/queryContracts";
-import { loadCliRouteContext, parseCliRouteRequest } from "../../../../lib/api/cliRoute";
+import { CLI_QUERIES, parseCliQuery } from "../../../../lib/cli/queryContracts";
+import { loadCliRouteContext } from "../../../../lib/api/cliRoute";
 
 export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const parsedRequest = parseCliRouteRequest(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.changes);
-  if (parsedRequest instanceof NextResponse) return parsedRequest;
-
-  const searchParams = parsedRequest.asOf
-    ? { year: String(parsedRequest.asOf.year), month: String(parsedRequest.asOf.month) }
-    : undefined;
+  const query = parseCliQuery(request, CLI_QUERIES.changes);
+  if (query instanceof NextResponse) return query;
 
   const { reportData, degraded, postureState } = await loadCliRouteContext({
     route: "/api/cli/changes",
-    searchParams: searchParams ?? undefined,
+    searchParams: query.asOf,
   });
 
   return NextResponse.json(

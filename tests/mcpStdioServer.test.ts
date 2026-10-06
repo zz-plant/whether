@@ -6,7 +6,7 @@ import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { listAgentTools } from "../lib/agent/tools";
 import { MCP_SERVER_INFO } from "../lib/mcp/serverIdentity";
-import { createWhetherMcpServer } from "../lib/mcp/stdioServer";
+import { createWhetherMcpServer } from "../lib/mcp/server";
 
 /*
  * The local server (`bun run mcp:whether`) and the remote one (`/api/mcp`) read one registry,
@@ -23,7 +23,7 @@ const structuredOf = (result: unknown) => z.object({ structuredContent: z.record
 const connect = async () => {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: "test", version: "0" });
-  await Promise.all([createWhetherMcpServer().connect(serverTransport), client.connect(clientTransport)]);
+  await Promise.all([createWhetherMcpServer("stdio").connect(serverTransport), client.connect(clientTransport)]);
   open.push(client);
   return client;
 };

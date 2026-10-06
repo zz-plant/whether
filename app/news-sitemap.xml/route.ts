@@ -1,5 +1,5 @@
 import { buildPublishedBriefPath, buildPublishedBriefTitle, getPublishedBriefs } from "../../lib/report/publishedBriefs";
-import { organizationName } from "../../lib/seo";
+import { escapeXml, organizationName } from "../../lib/seo";
 import { siteUrl } from "../../lib/siteUrl";
 
 export const runtime = "edge";
@@ -7,13 +7,6 @@ export const revalidate = 3600;
 
 /** Google News reads only articles published in the last two days from this file. */
 const NEWS_WINDOW_MS = 2 * 24 * 60 * 60 * 1000;
-
-const escapeXml = (value: string) =>
-  value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 
 /**
  * Published weeks inside Google News's two-day window, as a news sitemap.

@@ -8,6 +8,7 @@ import {
   organizationName,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
+import { graph } from "../../../lib/seo/pageStructuredData";
 import { revisitDecisionPhrase } from "../../../lib/report/decisionTransmissionCopy";
 import {
   canonicalCapitalDisciplinePath,
@@ -179,21 +180,22 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   if (!page) notFound();
 
   const canonicalUrl = buildCanonicalUrl(`/resources/${page.slug}`);
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: page.h1,
-    description: page.description,
-    keywords: [page.keyword, "board governance", "capital discipline"],
-    author: buildAuthorSchema(),
-    publisher: buildPublisherSchema(organizationName),
-    url: canonicalUrl,
-    mainEntityOfPage: canonicalUrl,
-    isPartOf: buildCanonicalUrl(page.canonicalPath),
-    datePublished: page.publishedAt,
-    dateModified: page.updatedAt,
-    image: [buildPageImageUrl(page.title, page.description, { template: "guides", title: page.h1 })],
-  };
+  const articleSchema = graph([
+    {
+      "@type": "Article",
+      headline: page.h1,
+      description: page.description,
+      keywords: [page.keyword, "board governance", "capital discipline"],
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      isPartOf: buildCanonicalUrl(page.canonicalPath),
+      datePublished: page.publishedAt,
+      dateModified: page.updatedAt,
+      image: [buildPageImageUrl(page.title, page.description, { template: "guides", title: page.h1 })],
+    },
+  ]);
 
 
   const { reportData, postureSummary } = await loadPostureLine(`/resources/${page.slug}`);
