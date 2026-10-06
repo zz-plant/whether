@@ -291,7 +291,7 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 ### Durable KV (`WHETHER_DURABLE_KV`)
 
-All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`.
+All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`, and the subscriber, Slack-webhook, alert and entitlement stores) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`, which refuses a binding without `list()`. Stored JSON is read back through `getJson` / `parseStoredJson` in the same module, narrowed by a zod schema or the store's own parser; an unparseable or non-matching record reads as no record.
 
 The consolidated state architecture operates around `refreshOperatingState()`, which executes the single authoritative signal refresh, pure regime evaluation, `OperatingSnapshot` persistence, state machine update, and transition recording. Current brief reads project the latest committed `OperatingSnapshot`; explicit historical reads continue to reconstruct the requested period. Read paths perform zero writes while the materialized signal store is current; a cold store ingests inline, and a stale one takes the refresh lock and refreshes off the request (Invariants 1, 1b, 1c in `tests/architectureInvariants.test.ts`).
 

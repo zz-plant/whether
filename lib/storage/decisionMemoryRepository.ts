@@ -1,5 +1,5 @@
 import { parseDecisionMemoryEntry, type DecisionMemoryEntry } from "../decisionMemory";
-import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, parseStoredJson, type KvNamespace } from "../runtime/kv";
 
 type Cursor = string | null;
 
@@ -102,13 +102,8 @@ export class KvDecisionMemoryRepository implements DecisionMemoryRepository {
       );
 
       for (const raw of rawEntries) {
-        if (!raw) continue;
-        try {
-          const entry = parseDecisionMemoryEntry(JSON.parse(raw));
-          if (entry) entries.push(entry);
-        } catch {
-          // ignore corrupted json
-        }
+        const entry = parseStoredJson(raw, parseDecisionMemoryEntry);
+        if (entry) entries.push(entry);
       }
     }
 

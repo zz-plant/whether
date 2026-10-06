@@ -1,4 +1,4 @@
-import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
+import { getJson, getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
 import { parsePlanLines, parsePlanRunway, type PlanLines, type PlanRunway } from "../alert/planLines";
 import type { RunwayBand } from "../report/operatorRunway";
 /**
@@ -450,14 +450,7 @@ class KvSubscriberStore implements SubscriberStore {
   async getPendingConfirmation(token: string): Promise<Subscriber | null> {
     const email = (await this.kv.get(CONFIRM_PREFIX + token)) ?? (await this.kv.get(TOKEN_PREFIX + token));
     if (!email) return null;
-    const raw = await this.kv.get(SUB_PREFIX + email);
-    if (!raw) return null;
-    let sub: Subscriber | null = null;
-    try {
-      sub = hydrateSubscriber(JSON.parse(raw));
-    } catch {
-      return null;
-    }
+    const sub = await getJson(this.kv, SUB_PREFIX + email, hydrateSubscriber);
     return sub && confirms(sub, token, Date.now()) ? sub : null;
   }
 
@@ -514,13 +507,7 @@ class KvSubscriberStore implements SubscriberStore {
       const raws = await readKvValues(this.kv, candidateEmails.map((email) => SUB_PREFIX + email));
 
       for (const raw of raws) {
-        if (!raw) continue;
-        let sub: Subscriber | null = null;
-        try {
-          sub = hydrateSubscriber(JSON.parse(raw));
-        } catch {
-          continue;
-        }
+        const sub = parseStoredJson(raw, hydrateSubscriber);
         if (sub?.active && sub.verified) {
           this.fallback.saveToMemory(sub);
           subscribers.push(sub);

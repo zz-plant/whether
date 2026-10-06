@@ -1,4 +1,4 @@
-import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
 import { isSlackWebhookUrl } from "./deliverSlackBrief";
 
 type SlackSubscription = {
@@ -160,13 +160,7 @@ class KvSlackWebhookStore implements SlackWebhookStore {
       const raws = await readKvValues(this.kv, candidateKeys.map((k) => SUB_PREFIX + k));
 
       for (const raw of raws) {
-        if (!raw) continue;
-        let sub: SlackSubscription | null = null;
-        try {
-          sub = hydrateSubscription(JSON.parse(raw));
-        } catch {
-          continue;
-        }
+        const sub = parseStoredJson(raw, hydrateSubscription);
         if (sub?.active) {
           this.fallback.saveToMemory(sub);
           subscriptions.push(sub);

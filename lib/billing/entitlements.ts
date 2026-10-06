@@ -1,4 +1,5 @@
-import { getWhetherKv } from "../runtime/kv";
+import { z } from "zod";
+import { getWhetherKv, parseStoredJson } from "../runtime/kv";
 import type { PremiumPlan } from "../billingStripe";
 
 /**
@@ -18,16 +19,30 @@ import type { PremiumPlan } from "../billingStripe";
  * verifying both refuse loudly rather than minting unverifiable proofs.
  */
 
+/* The optional fields come straight off the Stripe event, which sends null for an absent
+   customer or email, so a stored record can carry null where nothing was known. */
 type EntitlementRecord = {
   plan: PremiumPlan;
   sessionId: string;
-  customerEmail?: string;
-  stripeCustomerId?: string;
-  seatBand?: string;
+  customerEmail?: string | null;
+  stripeCustomerId?: string | null;
+  seatBand?: string | null;
   status: "active" | "cancelled";
   activatedAt: string;
   cancelledAt?: string;
 };
+
+/* Loose, so a field a later deploy adds survives being read and written back by a cancel. */
+const entitlementRecordSchema: z.ZodType<EntitlementRecord> = z.object({
+  plan: z.enum(["pro", "team"]),
+  sessionId: z.string(),
+  customerEmail: z.string().nullish(),
+  stripeCustomerId: z.string().nullish(),
+  seatBand: z.string().nullish(),
+  status: z.enum(["active", "cancelled"]),
+  activatedAt: z.string(),
+  cancelledAt: z.string().optional(),
+}).loose();
 
 const sessionKey = (sessionId: string) => `billing:entitlement:session:${sessionId}`;
 const emailKey = (email: string) => `billing:entitlement:email:${email.trim().toLowerCase()}`;
@@ -46,12 +61,7 @@ const memoryStore = new Map<string, string>();
 const readKey = async (key: string): Promise<EntitlementRecord | null> => {
   const kv = getWhetherKv();
   const raw = kv ? await kv.get(key) : memoryStore.get(key) ?? null;
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as EntitlementRecord;
-  } catch {
-    return null;
-  }
+  return parseStoredJson(raw, entitlementRecordSchema);
 };
 
 const writeRecord = async (record: EntitlementRecord): Promise<void> => {

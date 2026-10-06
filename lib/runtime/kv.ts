@@ -1,3 +1,5 @@
+import type { z } from "zod";
+
 /**
  * Single structural type for the Workers KV binding, replacing the per-file hand-rolled
  * shapes that omitted the option bags (and therefore made cacheTtl / expirationTtl
@@ -117,6 +119,42 @@ export const readKvValues = async (
 
   return values;
 };
+
+/**
+ * How a stored value is narrowed on the way out: a zod schema, or a parser that answers null
+ * for a record it cannot use (the hand-written `hydrate…` / `parse…` functions the stores
+ * already had).
+ */
+type StoredValueReader<T> = z.ZodType<T> | ((value: unknown) => T | null);
+
+/**
+ * JSON that this app wrote to KV, read back narrowed rather than asserted.
+ *
+ * Null for an absent value, text that is not JSON, and a value the reader refuses: a record an
+ * older deploy wrote in another shape is unusable in the same way unparseable text is, and every
+ * caller already treated that as "no record". A reader that throws counts as a refusal too, as it
+ * did inside the try blocks this replaced. Before this, about a dozen reads parsed by hand and four
+ * of them asserted the result's type with `as`.
+ */
+export const parseStoredJson = <T>(raw: string | null | undefined, reader: StoredValueReader<T>): T | null => {
+  if (!raw) return null;
+  try {
+    const value: unknown = JSON.parse(raw);
+    if (typeof reader === "function") return reader(value);
+    const parsed = reader.safeParse(value);
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+};
+
+/** One key read through `parseStoredJson`. A failing `get` still rejects: an outage is not a missing record. */
+export const getJson = async <T>(
+  kv: Pick<KvNamespace, "get">,
+  key: string,
+  reader: StoredValueReader<T>,
+  options?: { cacheTtl?: number },
+): Promise<T | null> => parseStoredJson(await kv.get(key, options), reader);
 
 const isKvNamespace = (value: unknown): value is KvNamespace =>
   typeof value === "object"
