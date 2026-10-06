@@ -13,9 +13,8 @@
  * than the writer. The ZIP stores its entries uncompressed, which the format
  * allows and every reader accepts; the whole file is under 20 KB.
  */
-import { slideReadingLines, slideResumeLine, type MeetingSlidePayload } from "./meetingSlideExport";
+import { slideConditions, slideFooterLine, slideReadingLines, slideResumeLine, type MeetingSlidePayload } from "./meetingSlideExport";
 import { getRegimePublicLabel } from "../regimePresentation";
-import { describeConditions, formatExportConfidence, SAVED_COPY_NOTE } from "./exportTerms";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
 // ---------------------------------------------------------------------------
@@ -79,19 +78,20 @@ const buildCards = (payload: MeetingSlidePayload): SlideCard[] => [
 
 /**
  * Three footer lines: each score against its line (the same text the SVG
- * slide and the pasted block print), then conditions, confidence and the saved-copy marker.
- * Stated from the top in SVG pixels; both writers draw them 18px apart.
+ * slide and the pasted block print), then confidence and the one provenance
+ * footer every slide format closes with. Stated from the top in SVG pixels;
+ * both writers draw them 18px apart.
  */
 const FOOTER_TOP = 570;
 const FOOTER_LINE_HEIGHT = 18;
 const footerLines = (payload: MeetingSlidePayload): string[] => [
   ...slideReadingLines(payload),
-  /* The badge carries only the weather word; its meaning rides here, where the line has room. */
-  `${describeConditions(payload.regime)}  ·  ${formatExportConfidence(payload.confidence)}${payload.isFallback ? `  ·  ${SAVED_COPY_NOTE}` : ""}`,
+  slideFooterLine(payload),
 ];
 
 const titleLine = (payload: MeetingSlidePayload) => `This week's guidance${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;
-const subtitleLine = (payload: MeetingSlidePayload) => `${payload.recordDate} · Source: ${payload.provenance}`;
+/* The badge carries only the weather word; its meaning rides in the subtitle, as on the SVG slide. */
+const subtitleLine = (payload: MeetingSlidePayload) => `${payload.recordDate} · ${slideConditions(payload)}`;
 const EYEBROW = "WHETHER · WEEKLY OPERATING GUIDANCE";
 
 // ---------------------------------------------------------------------------
@@ -210,7 +210,7 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
         name: `Footer line ${index + 1}`,
         x: 80,
         y: FOOTER_TOP + index * FOOTER_LINE_HEIGHT,
-        width: 860,
+        width: 1040,
         height: FOOTER_LINE_HEIGHT,
         text: line,
         style: { sizePx: 13, bold: true, color: index === footerLines(payload).length - 1 ? COLORS.inkSoft : COLORS.inkMuted },
@@ -219,15 +219,13 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
   });
   const resumeLine = slideResumeLine(payload);
   if (resumeLine) {
-    // Below confidence rather than above it, so "whether.work" stays level with
-    // the confidence line and a long resume sentence has the slide's foot to wrap into.
+    // Below the provenance footer, so a long resume sentence has the slide's foot
+    // to wrap into. The footer names the site ("via whether.work"), so the
+    // right-aligned "whether.work" that sat level with it is gone.
     shapes.push(
       textBox({ name: "Footer resume", x: 80, y: FOOTER_TOP + footerLines(payload).length * FOOTER_LINE_HEIGHT, width: 1040, height: FOOTER_LINE_HEIGHT * 2, text: resumeLine, style: { sizePx: 13, bold: true, color: COLORS.inkMuted } }),
     );
   }
-  shapes.push(
-    textBox({ name: "Footer site", x: 940, y: FOOTER_TOP + 2 * FOOTER_LINE_HEIGHT, width: 180, height: FOOTER_LINE_HEIGHT, text: "whether.work", style: { sizePx: 13, bold: true, color: "475569" }, align: "r" }),
-  );
 
   return (
     `${XML_HEADER}<p:sld ${NS_A} ${NS_R} ${NS_P}><p:cSld>` +
@@ -611,14 +609,13 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
       sizePx: 13,
       font: bold,
       fill: index === footer.length - 1 ? COLORS.inkSoft : COLORS.inkMuted,
-      maxWidthPx: 860,
+      maxWidthPx: 1040,
     });
   });
   const resumeLine = slideResumeLine(payload);
   if (resumeLine) {
     drawText(resumeLine, { x: 80, y: FOOTER_TOP + 2 + footer.length * FOOTER_LINE_HEIGHT, sizePx: 13, font: bold, fill: COLORS.inkMuted, maxWidthPx: 1040 });
   }
-  drawText("whether.work", { x: 940, y: FOOTER_TOP + 2 + 2 * FOOTER_LINE_HEIGHT, sizePx: 13, font: bold, fill: "475569", maxWidthPx: 180, align: "right" });
 
   return doc.save();
 };

@@ -10,11 +10,11 @@ import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../l
 import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import {
-  extractMeetingSlidePayload,
   formatMeetingSlideHtml,
   formatMeetingSlideMarkdown,
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
@@ -195,6 +195,8 @@ const fixtureWeeklyCall = buildWeeklyCallContract({
   assessment,
   homeBriefModel: buildHomeBriefModel({ assessment, stopItems: assessment.constraints, regimeAlert: null }),
 });
+/* The slide routes draw the stored snapshot; this one carries the same reading and call. */
+const fixtureSnapshot = { ...snapshot, assessment, weeklyCall: fixtureWeeklyCall };
 const record: TrackRecord = {
   monthsCovered: 176,
   firstRecordDate: "2012-01-31",
@@ -218,9 +220,9 @@ const artifactSurfaces: Surface[] = [
     name: "weekly operator brief",
     text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall: fixtureWeeklyCall })),
   },
-  { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(extractMeetingSlidePayload(snapshot)) },
-  { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(extractMeetingSlidePayload(snapshot))) },
-  { name: "meeting slide (svg)", text: () => visibleText(formatMeetingSlideSvg(extractMeetingSlidePayload(snapshot))) },
+  { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(buildExportSlidePayload(fixtureSnapshot, null)) },
+  { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(buildExportSlidePayload(fixtureSnapshot, null))) },
+  { name: "meeting slide (svg)", text: () => visibleText(formatMeetingSlideSvg(buildExportSlidePayload(fixtureSnapshot, null))) },
   {
     name: "investor update",
     text: () => {

@@ -4,11 +4,11 @@ import { describe, it } from "bun:test";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import {
-  extractMeetingSlidePayload,
   formatMeetingSlideHtml,
   formatMeetingSlideMarkdown,
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
@@ -54,12 +54,12 @@ describe("artifacts that leave the site carry no facts about a company the site 
 
   it("meeting slide in every format, with and without a chosen stage", () => {
     for (const stage of [null, "seed", "series-a"] as const) {
-      const payload = extractMeetingSlidePayload(snapshot, stage);
+      const payload = buildExportSlidePayload(snapshot, stage);
       for (const text of [formatMeetingSlideMarkdown(payload), formatMeetingSlideHtml(payload), formatMeetingSlideSvg(payload)]) {
         assert.doesNotMatch(text, FIXTURE_COMPANY);
       }
     }
-    assert.equal(extractMeetingSlidePayload(snapshot).stageLabel, "", "an unchosen stage must not default to one");
+    assert.equal(buildExportSlidePayload(snapshot, null).stageLabel, "", "an unchosen stage must not default to one");
   });
 
   it("investor snippet leaves the company's policy to the author", () => {

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loadExportSnapshot } from "../../../../lib/export/exportSnapshot";
-import {
-  extractMeetingSlidePayload,
-  formatMeetingSlideSvg,
-} from "../../../../lib/export/meetingSlideExport";
+import { buildExportSlidePayload, loadExportSnapshot } from "../../../../lib/export/exportSnapshot";
+import { formatMeetingSlideSvg } from "../../../../lib/export/meetingSlideExport";
 import {
   isStartupVariantMode,
   type StartupVariantMode,
@@ -22,7 +19,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Operating snapshot unavailable", { status: 503 });
   }
 
-  const payload = extractMeetingSlidePayload(snapshot, stage);
+  const payload = buildExportSlidePayload(snapshot, stage);
   const svg = formatMeetingSlideSvg(payload);
 
   return new NextResponse(svg, {

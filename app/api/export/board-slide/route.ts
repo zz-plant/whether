@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loadExportSnapshot } from "../../../../lib/export/exportSnapshot";
-import { extractMeetingSlidePayload } from "../../../../lib/export/meetingSlideExport";
+import { buildExportSlidePayload, loadExportSnapshot } from "../../../../lib/export/exportSnapshot";
 import {
   BOARD_SLIDE_FORMATS,
   boardSlideFileName,
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Operating snapshot unavailable", { status: 503 });
   }
 
-  const payload = extractMeetingSlidePayload(snapshot, stage);
+  const payload = buildExportSlidePayload(snapshot, stage);
   const bytes = format === "pdf" ? await buildBoardSlidePdf(payload) : buildBoardSlidePptx(payload);
   // Copied into a fresh buffer: the builders return a view over `ArrayBufferLike`,
   // which `BodyInit` does not accept, and a copy costs a few tens of kilobytes.

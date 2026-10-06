@@ -16,10 +16,10 @@ import { GET as getSlackBriefRoute } from "../app/api/brief/slack/route";
 import { BRIEF_FORMATS, briefArtifactToSlidePayload, formatBriefArtifact } from "../lib/report/briefArtifact";
 import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import {
-  extractMeetingSlidePayload,
   formatMeetingSlideHtml,
   formatMeetingSlideMarkdown,
 } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
@@ -171,7 +171,7 @@ const collectSlides = async (out: Record<string, string>, snapshot: OperatingSna
   out[`deck route: pptx sha256${query}`] = sha256(await pptx.arrayBuffer());
   out[`deck route: pptx filename${query}`] = pptx.headers.get("Content-Disposition") ?? "";
   /* The PDF stamps its own creation time, so its bytes are not stable; the payload it draws is. */
-  const payload = extractMeetingSlidePayload(snapshot, stage ?? null);
+  const payload = buildExportSlidePayload(snapshot, stage ?? null);
   out[`slide payload${query}`] = JSON.stringify(payload);
   out[`slide markdown${query}`] = formatMeetingSlideMarkdown(payload);
   out[`slide html${query}`] = formatMeetingSlideHtml(payload);

@@ -499,6 +499,8 @@ merged is the part with no such constraint:
   button's carried neither. Both now compose `formatMeetingSlideMarkdown` through
   `briefArtifactToSlidePayload`, so the meeting slide gained the clears-when line it was missing
   and the snapshot marker. `tests/briefArtifactFormats.test.ts` asserts the two are byte-identical.
+  (2026-10-06: the "clears-when line" was the flip conditions, printed as the resume line; it prints
+  as "Watch this week" now, and the slide routes go through the same adapter. §5.3.1.)
 - The slide model had no field for the call, only `actionNow`. Mapping one onto the other dropped
   the headline whenever they differed, so the payload gained a `call` that renders as a stance line
   above the action — and is omitted when the two hold the same sentence.
@@ -2008,6 +2010,49 @@ Every format's output is pinned on four weeks (ordinary, saved copy, held, a sta
 reader) through its production entry point in `tests/briefFormatsPinned.test.ts`; a change that
 means to move a string regenerates `tests/fixtures/briefFormats.golden.json` with
 `WHETHER_UPDATE_BRIEF_GOLDEN=1` in the same commit.
+
+**`BriefDocument`** (`lib/report/briefArtifact.ts`) is the week as one object, built once by
+`buildBriefDocument(source, weeklyCall, { stage? })` (`lib/report/briefDocument.ts`) from a reading
+(`briefSourceFromSnapshot` for the cron's `OperatingSnapshot`, `briefSourceFromReportData` for the
+read path) and its `WeeklyCallContract`. It extends `BriefArtifact`, the share rail's object, rather
+than sitting beside it; the island a page publishes is its artifact half (`briefArtifactOf`), and
+`buildBriefArtifactFromSnapshot` is that half, so /share and /operate publish one derivation. It
+carries:
+
+- the call slots from the contract, the pause line as its condition only (`pauseConditionOnly`),
+  `resumeWhen` and `callChangesIf` apart, and the policy-override flag;
+- the conditions under one label, the contract's `regimeStage` (the weather word, with how long it
+  has held when the read path knows);
+- the published confidence, resolved once (`resolvePublishedConfidence`);
+- provenance: the source as a reader names it, the record date, whether it is a saved copy, and the
+  permalink. "Canonical snapshot (FRED)" and "Canonical ingestion (FRED)" name the pipeline; the
+  document names the publisher (`publisherSourceLabel`), and the saved-copy marker says the rest;
+- the readings, the area rows as the page derives them (each line with its distance), the operating
+  limits, and the every-band runway framing the portfolio note prints. The reader's own band is a
+  cookie, which a cached page cannot read, so the investor update composes it in the browser.
+
+A `stage` lays that stage over the call as the homepage does (`applyStageToWeeklyCall`), so a held
+call stays held whatever the stage.
+
+**The slide is built one way.** It was built from the island in the browser (the share panel's
+"Slide" format and "Copy as a slide") and from the operating snapshot on the server (the SVG, PPTX
+and PDF routes). The browser's way stood 50 in for a missing risk appetite and "MED" for a missing
+confidence, printed the conditions label as the reader's stage ("Stage: Stormy"), handed the weather
+word to the badge as if it were the engine key (so a Freezing slide wore Sunny's colour), judged
+the scores against the engine's default lines, and printed the flip conditions as the resume line,
+which on a held week put "why the guidance is held" under "Resume when". The server's way never
+said a reading was a saved copy, and printed a stage's action over a held call. Both now go through
+`briefArtifactToSlidePayload`; the routes pass a `BriefDocument` (`buildExportSlidePayload`), and
+the island carries the fields the slide reads (`regime`, `recordDate`, `lines`, `stageLabel`,
+`sourceLabel`). The island's two scores and its confidence are required: a malformed island
+yields no slide rather than a stand-in. The flip conditions print as "Watch this week". §1.1.12's
+reading of them as "the resume thresholds" was the mislabel.
+
+**One provenance footer.** `formatSourceFooter` (`lib/export/exportTerms.ts`) prints "Source:
+{publisher}, {date}, via whether.work" and "(saved copy, not a live reading)" when it is one. Every
+slide format closes with confidence and that footer; the SVG and the deck carry the conditions in
+the subtitle instead of the source, and the right-aligned "whether.work" went, since the footer
+names it.
 
 ### 5.6 Signal Ops (live)
 - Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
