@@ -1,12 +1,17 @@
 /**
- * Alert email templates — dark-themed HTML emails matching the send-weekly style.
- * Each template returns { subject, html, text } for use with the email adapter.
+ * Alert email templates, in the one shell every Whether email uses
+ * (`lib/email/emailShell.ts`). Each template returns { subject, html, text }
+ * for use with the email adapter. Links resolve through `lib/siteUrl`, like the
+ * weekly brief's: these wrote the production origin until the shell stopped
+ * being a copy.
  */
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatPointsMove, type FlashMove } from "./flashMoves";
 import type { PublishedLine } from "./alertEvaluator";
 import { regimeSignalLabel } from "../report/signalTranslations";
+import { emailTextFooter, renderEmailShell } from "../email/emailShell";
+import { siteUrl } from "../siteUrl";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =
@@ -17,53 +22,6 @@ type EmailContent = {
   html: string;
   text: string;
 };
-
-const UNSUBSCRIBE_BASE_URL = "https://whether.work/api/email/unsubscribe";
-
-/**
- * The one-click unsubscribe URL for a subscriber token, or null without one.
- *
- * `/api/email/unsubscribe` has always worked and nothing has ever linked to it: no
- * template in this repo carried the link, on either mail stream. That was tolerable
- * while alert mail reached nobody; it is not, now that an opt-in actually enrolls
- * someone. A missing token yields no link rather than a broken one.
- */
-const buildUnsubscribeUrl = (token: string | null | undefined): string | null =>
-  token ? `${UNSUBSCRIBE_BASE_URL}?token=${encodeURIComponent(token)}` : null;
-
-export const unsubscribeFooterHtml = (token: string | null | undefined): string => {
-  const url = buildUnsubscribeUrl(token);
-  return url
-    ? ` · <a href="${url}" style="color:#64748b;text-decoration:underline;">Unsubscribe</a>`
-    : "";
-};
-
-export const unsubscribeFooterText = (token: string | null | undefined): string[] => {
-  const url = buildUnsubscribeUrl(token);
-  return url ? [`Unsubscribe: ${url}`] : [];
-};
-
-const baseHtml = (title: string, body: string, unsubscribeToken?: string | null): string =>
-  [
-    `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#e2e8f0;">`,
-    `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#f1f5f9;">${title}</h1>`,
-    body,
-    `<div style="margin-top:24px;">`,
-    `<a href="https://whether.work" style="display:inline-block;padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,rgba(56,189,248,0.9),rgba(14,116,144,0.85));color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
-    `</div>`,
-    `<p style="margin-top:32px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
-    `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.15);margin-top:24px;" />`,
-    `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
-    `<td style="font-size:0.7rem;color:#64748b;padding-top:12px;">`,
-    `<a href="https://whether.work/trust" style="color:#64748b;text-decoration:underline;">Methodology</a>`,
-    ` · `,
-    `<a href="https://whether.work/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
-    ` · `,
-    `<a href="https://whether.work" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
-    unsubscribeFooterHtml(unsubscribeToken),
-    `</td></tr></table>`,
-    `</body></html>`,
-  ].join("\n");
 
 const sectionBlock = (label: string, value: string, labelColor = "#94a3b8", valueColor = "#f1f5f9"): string =>
   [
@@ -116,14 +74,12 @@ export const decisionVerdictEmail = ({
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
     `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reversal}`,
     ``,
-    `View full brief: https://whether.work`,
-    `---`,
-    `Whether · weekly operating brief`,
-    ...unsubscribeFooterText(unsubscribeToken),
+    `View full brief: ${siteUrl}`,
+    ...emailTextFooter(unsubscribeToken),
   ].join("\n");
-  const html = baseHtml(
-    "Whether Decision Alert",
-    [
+  const html = renderEmailShell({
+    title: "Whether Decision Alert",
+    body: [
       alertBanner("critical", `<strong>${headline}</strong> — conditions have moved outside the range recorded when this decision was made.`),
       `<div style="margin-top:12px;">`,
       sectionBlock("Why", why),
@@ -136,7 +92,7 @@ export const decisionVerdictEmail = ({
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
-  );
+  });
   return { subject, html, text };
 };
 
@@ -188,15 +144,13 @@ export const thresholdCrossingEmail = (
     reading,
     whatToDo,
     ``,
-    `View full brief: https://whether.work`,
-    `---`,
-    `Whether · weekly operating brief`,
-    ...unsubscribeFooterText(unsubscribeToken),
+    `View full brief: ${siteUrl}`,
+    ...emailTextFooter(unsubscribeToken),
   ].join("\n");
   const severity = line.kind === "resume" ? "info" : "warning";
-  const html = baseHtml(
-    "Whether Threshold Alert",
-    [
+  const html = renderEmailShell({
+    title: "Whether Threshold Alert",
+    body: [
       alertBanner(
         severity,
         `<strong>${metricLabel}</strong> is <strong>${value.toFixed(1)}</strong>; ${lineName} is <strong>${line.value}</strong>. ${whatToDo}`,
@@ -206,7 +160,7 @@ export const thresholdCrossingEmail = (
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
-  );
+  });
   return { subject, html, text };
 };
 
@@ -225,21 +179,19 @@ export const planLineEmail = (
     headline,
     body,
     ``,
-    `Your lines: https://whether.work/operate#ops-plan-lines`,
-    `---`,
-    `Whether · weekly operating brief`,
-    ...unsubscribeFooterText(unsubscribeToken),
+    `Your lines: ${siteUrl}/operate#ops-plan-lines`,
+    ...emailTextFooter(unsubscribeToken),
   ].join("\n");
-  const html = baseHtml(
-    "Whether Plan Alert",
-    [
+  const html = renderEmailShell({
+    title: "Whether Plan Alert",
+    body: [
       alertBanner("warning", `<strong>${headline}</strong>`),
       `<div style="margin-top:12px;">`,
       sectionBlock("What you set, and where the scores are", body),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
-  );
+  });
   return { subject, html, text };
 };
 
@@ -262,14 +214,12 @@ export const flashMoveEmail = (
     move.headline,
     FLASH_GUIDANCE,
     ``,
-    `View full brief: https://whether.work`,
-    `---`,
-    `Whether · weekly operating brief`,
-    ...unsubscribeFooterText(unsubscribeToken),
+    `View full brief: ${siteUrl}`,
+    ...emailTextFooter(unsubscribeToken),
   ].join("\n");
-  const html = baseHtml(
-    "Whether Flash Alert",
-    [
+  const html = renderEmailShell({
+    title: "Whether Flash Alert",
+    body: [
       alertBanner("critical", `<strong>${move.headline}</strong>`),
       `<div style="margin-top:12px;">`,
       sectionBlock(move.label, `${move.from.toFixed(2)}% → ${move.to.toFixed(2)}% (${direction === "rose" ? "up" : "down"} ${size})`, "#fbbf24", "#fde68a"),
@@ -282,6 +232,6 @@ export const flashMoveEmail = (
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
-  );
+  });
   return { subject, html, text };
 };

@@ -16,6 +16,7 @@
  */
 import { buildVapidAuthorization, resolveVapidConfig, type VapidConfig } from "./vapid";
 import { deletePushSubscription, listPushSubscriptions, type StoredPushSubscription } from "./pushSubscriptions";
+import { fanOut, type DeliveryOutcome } from "../delivery/fanOut";
 
 type RegimePushResult = {
   ok: boolean;
@@ -35,7 +36,7 @@ const sendOne = async (
   config: VapidConfig,
   subscription: StoredPushSubscription,
   fetchImpl: typeof globalThis.fetch,
-): Promise<"sent" | "gone" | "failed"> => {
+): Promise<DeliveryOutcome> => {
   try {
     const response = await fetchImpl(subscription.endpoint, {
       method: "POST",
@@ -73,23 +74,13 @@ export const sendRegimeChangePush = async (
   const subscriptions = await listPushSubscriptions();
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
 
-  let sent = 0;
-  let pruned = 0;
-  let failed = 0;
+  /* One at a time, as before: a Worker holds six outgoing connections, and the
+     list is every subscribed browser. A gone subscription is deleted rather than
+     retried — "pruned" in this result is the fan-out's "retired". */
+  const tally = await fanOut(subscriptions, (subscription) => sendOne(config, subscription, fetchImpl), {
+    retire: (subscription) => deletePushSubscription(subscription.clientId),
+    sequential: true,
+  });
 
-  for (const subscription of subscriptions) {
-    const outcome = await sendOne(config, subscription, fetchImpl);
-    if (outcome === "sent") {
-      sent += 1;
-      continue;
-    }
-    if (outcome === "gone") {
-      await deletePushSubscription(subscription.clientId);
-      pruned += 1;
-      continue;
-    }
-    failed += 1;
-  }
-
-  return { ok: true, sent, pruned, failed };
+  return { ok: true, sent: tally.sent, pruned: tally.retired, failed: tally.failed };
 };

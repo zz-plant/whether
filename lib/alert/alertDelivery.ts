@@ -1,6 +1,5 @@
 import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
-import { loadReportData } from "../report/reportData";
 import { alertDeliveryKey, evaluateAlert } from "./alertEvaluator";
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "./alertTemplates";
 import { describePlanLineCrossing, evaluatePlanLineCrossings, planLineDeliveryKey } from "./planLines";
@@ -12,8 +11,9 @@ import {
 import { getSubscriberStore, type Subscriber } from "../email/subscriberStore";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
-import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { sentMarkers } from "../delivery/onceFor";
 import { describeConditions } from "../export/exportTerms";
 
 const ALERT_STATE_KEY = "alert:state";
@@ -73,44 +73,31 @@ const listAlertSubscribers = async (): Promise<Subscriber[]> => {
   }
 };
 
-const wasAlreadyDelivered = async (
-  email: string,
-  alertType: string,
-): Promise<boolean> => {
-  const kv = getKv();
-  if (!kv) return false;
-  try {
-    const raw = await kv.get(`${ALERT_DELIVERED_PREFIX}${email}:${alertType}`);
-    if (!raw) return false;
-    const deliveredMs = Date.parse(raw);
-    if (Number.isNaN(deliveredMs)) return false;
-    return Date.now() - deliveredMs < 7 * 24 * 60 * 60 * 1000;
-  } catch {
-    return false;
-  }
-};
+/** The same alert reaches an inbox at most once in this window. */
+const ALERT_REDELIVERY_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-const recordDelivery = async (
-  email: string,
-  alertType: string,
-): Promise<void> => {
-  const kv = getKv();
-  if (!kv) return;
-  try {
-    await kv.put(
-      `${ALERT_DELIVERED_PREFIX}${email}:${alertType}`,
-      new Date().toISOString(),
-    );
-  } catch {
-    /* non-fatal */
-  }
-};
+/* The shared sent-marker store (`lib/delivery/onceFor.ts`) with a rolling
+   window instead of a period, under the keys these markers have always had. */
+const deliveredMarkers = () =>
+  sentMarkers({
+    kv: getKv(),
+    keyFor: (key) => `${ALERT_DELIVERED_PREFIX}${key}`,
+    withinMs: ALERT_REDELIVERY_WINDOW_MS,
+  });
+
+const wasAlreadyDelivered = (email: string, alertType: string): Promise<boolean> =>
+  deliveredMarkers().wasSent(`${email}:${alertType}`);
+
+const recordDelivery = (email: string, alertType: string): Promise<void> =>
+  deliveredMarkers().markSent(`${email}:${alertType}`);
 
 type DeliveryResult = {
   sent: number;
   skipped: number;
   errors: number;
   alerts: AlertDecision[];
+  /** Set when the only reading available was not one to act on; nothing was judged or sent. */
+  refused?: string;
 };
 
 export const deliverAlertToSubscriber = async (
@@ -188,31 +175,38 @@ export const runScheduledAlertDelivery = async (options?: {
   /** The read before `snapshot`, so a flash can be judged on consecutive reads. */
   previousSnapshot?: OperatingSnapshot | null;
 }): Promise<DeliveryResult> => {
-  let assessment;
+  /* The cron's snapshot, else the stored one, else a report read — the manual
+     route's path when nothing is stored. */
+  const reading = await resolveOperatingSnapshot({
+    given: { snapshot: options?.snapshot, weeklyCall: options?.weeklyCall },
+    onMiss: "report",
+    route: "alert-deliveries",
+  });
 
-  let recordDate = new Date().toISOString();
-  let flashMoves: AlertConditions["flashMoves"];
-
-  let previousScores: AlertConditions["previousScores"] = null;
-
-  if (options?.snapshot) {
-    assessment = options.snapshot.assessment;
-    previousScores = options.previousSnapshot ? options.previousSnapshot.assessment.scores : null;
-    recordDate = options.snapshot.provenance.recordDateLabel;
-    flashMoves = evaluateFlashMoves(
-      flashInputsFrom(options.snapshot),
-      options.previousSnapshot ? flashInputsFrom(options.previousSnapshot) : null,
-    );
-  } else {
-    const stored = await getOperatingSnapshotStore().readLatest();
-    if (stored) {
-      assessment = stored.assessment;
-      recordDate = stored.provenance.recordDateLabel;
-    } else {
-      const reportResult = await loadReportData();
-      assessment = reportResult.assessment;
-      recordDate = reportResult.recordDateLabel;
+  /* A report read serves the bundled copy on an outage. Judged as a reading, a
+     first run mailed every opted-in subscriber a regime change and wrote
+     `alert:state` from the copy; the regime check refuses the same reading for
+     the same reason (lib/alert/checkRegimeChange.ts). */
+  if (reading.source === "report") {
+    const readiness = assessReadingReadiness(reading, new Date());
+    if (!readiness.ok) {
+      return { sent: 0, skipped: 0, errors: 0, alerts: [], refused: `refused_unpublishable: ${readiness.reason}` };
     }
+  }
+
+  const assessment = reading.source === "report" ? reading.report.assessment : reading.snapshot.assessment;
+  const recordDate =
+    reading.source === "report" ? reading.report.recordDateLabel : reading.snapshot.provenance.recordDateLabel;
+
+  /* Consecutive reads exist only when the cron handed both over. */
+  let flashMoves: AlertConditions["flashMoves"];
+  let previousScores: AlertConditions["previousScores"] = null;
+  if (reading.source === "given") {
+    previousScores = options?.previousSnapshot ? options.previousSnapshot.assessment.scores : null;
+    flashMoves = evaluateFlashMoves(
+      flashInputsFrom(reading.snapshot),
+      options?.previousSnapshot ? flashInputsFrom(options.previousSnapshot) : null,
+    );
   }
 
   const conditions: AlertConditions = {

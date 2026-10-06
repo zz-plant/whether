@@ -4,6 +4,7 @@ import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateL
 import { describePlanLines, type PlanLines, type PlanRunway } from "../alert/planLines";
 import { runwayBandPhrase, type RunwayBand } from "../report/operatorRunway";
 import { siteUrl } from "../siteUrl";
+import { escapeHtml } from "./emailShell";
 
 const normalizeBaseUrl = (value: string | null | undefined) => {
   if (!value) return null;
@@ -160,9 +161,6 @@ const confirmationEmail = (sub: Subscriber, verifyUrl: string | null) => {
     text: `${lead}\n\n${button}: ${verifyUrl}\n\n${expiry}`,
   };
 };
-
-export const escapeHtml = (value: string) =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
 export const subscribeAndSendVerification = async ({
   email,
