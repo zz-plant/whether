@@ -1,9 +1,3 @@
-.weather-delta-card[data-emphasis="true"] {
-  border-color: var(--accent-border);
-  background-color: color-mix(in srgb, var(--accent-action) 7%, var(--bg-surface));
-  box-shadow: var(--elev-1);
-}
-
 
 
 /* The first-visit fold (FirstVisitDecisionPicker.tsx). The layout bootstrap

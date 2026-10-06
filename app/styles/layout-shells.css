@@ -245,7 +245,7 @@ html[data-theme="light"] .weather-secondary-shell-backdrop {
   padding: 1rem;
   text-decoration: none;
   color: inherit;
-  background: var(--bg-surface-raised);
+  background: var(--bg-raised);
   box-shadow: var(--elev-2);
   transition:
     transform var(--transition-base) var(--ease-out),

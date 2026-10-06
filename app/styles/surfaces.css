@@ -124,26 +124,11 @@ html[data-theme="light"] .weather-page-intro {
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* Lever decision micro-card for visual rhythm */
-
-/* Glow aura for key scores and metric accents */
-
 /* New surface system: typographic hierarchy over container hierarchy.
    Sections replace stacked cards — pure spacing + optional top border.
    Labels replace uppercase kickers with sentence case.
    Dots replace rounded-full badge pills.
    Bars replace verdict badges with left color bars. */
-
-.weather-section {
-  @apply w-full;
-}
-
-/* Matches the between-section rhythm the report shell uses (space-y-10/12), so
-   a page built from .weather-section chunks the same way as one built from
-   ReportSection. */
-.weather-section + .weather-section {
-  @apply mt-12;
-}
 
 .weather-section-border {
   @apply w-full border-t;
@@ -356,8 +341,7 @@ button .weather-chip:active,
   button,
   input,
   select,
-  details summary,
-  .no-print {
+  details summary {
     display: none !important;
   }
 
