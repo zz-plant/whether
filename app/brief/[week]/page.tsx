@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
-import { Tag } from "../../components/ui/tag";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import {
@@ -31,7 +30,7 @@ import {
 } from "../../../lib/report/publishedBriefs";
 import { PublishedBriefCopyControls } from "./publishedBriefCopyControls";
 import { ThresholdLadder } from "../../components/illustrations/ThresholdLadder";
-import { RegimeGlyph } from "../../components/illustrations/RegimeGlyph";
+import { DecisionHero } from "../../components/DecisionHero";
 import { RuleLines } from "../../components/boundedRuleLines";
 import {
   buildBoundedConditionRails,
@@ -173,17 +172,30 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       />
 
       <article className="flex flex-col gap-6">
-        <header className="weather-panel space-y-4 px-6 py-6 max-sm:px-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Tag tone="sky">{display.conditions}</Tag>
-              <Tag tone="slate">{display.confidence}</Tag>
-              <span className="text-fluid-micro font-mono text-slate-400">Permanent Record</span>
-            </div>
-            <RegimeGlyph idPrefix={`brief-${brief.slug}`} regime={brief.regime} className="w-6 shrink-0" />
-          </div>
-          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{briefTitle(brief)}</h1>
-          <p className="text-sm text-slate-300">{brief.summary}</p>
+        {/* The record in the card the live brief and its share image use:
+            stamp, call, lines, date, source. It used to be a panel of tags with
+            the call as body text under a generic title, so a screenshot of a
+            cited week looked like nothing the reader had seen on Monday. */}
+        <DecisionHero
+          question={briefTitle(brief)}
+          weeklyCall={brief.summary}
+          /* A correction rides inside the card, under the lines it corrects: the
+             card is the block people crop, and a crop that dropped the note
+             would carry the uncorrected line on its own. */
+          callDetail={brief.correction ? `Correction: ${brief.correction}` : undefined}
+          regime={brief.regime}
+          lines={[
+            ...(brief.actionNow.trim() !== brief.summary.trim()
+              ? [{ label: DECISION_CONTRACT_LABELS.action.doNow, value: brief.actionNow }]
+              : []),
+            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: brief.guardrailThreshold },
+            { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: brief.flipThreshold },
+          ]}
+          trust={null}
+          captionDetail={`Week of ${brief.recordDateLabel} · ${display.confidence}`}
+        />
+
+        <header className="space-y-3">
           <p className="text-xs text-slate-400">
             By{" "}
             <Link
@@ -196,16 +208,11 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             ·{" "}
             <time dateTime={brief.publishedAt}>Published {brief.recordDateLabel}</time>
           </p>
-          {brief.correction ? (
-            <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
-              <span className="font-semibold">Correction:</span> {brief.correction}
-            </p>
-          ) : null}
           {/* Every shared artifact links here, so most arrivals are cold and land
               on a frozen week rather than the live call. The route onward existed
               only at the foot of the page, past the full brief. A visitor should
               not have to scroll a dated record to find out it is dated. */}
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-800/60 pt-3 text-xs text-slate-400">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
             <span>This is a frozen record of one week.</span>
             <ActionLink href="/" variant="inline">
               Read this week&apos;s guidance
@@ -213,28 +220,15 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           </p>
         </header>
 
-        {/* The call and its delta lead, then the share tool. The copy panel used
+        {/* The delta follows the card, then the share tool. The copy panel used
             to sit directly under the header, so a cold reader arriving from a
             pasted link met a monospace Slack preview before "What changed", which
-            sat on the desktop fold (2026-09-30 attention pass). */}
+            sat on the desktop fold (2026-09-30 attention pass). The action and
+            both lines are on the card now, so this section carries only the
+            delta. */}
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
           <p className="text-sm text-slate-300">{brief.whatChanged}</p>
-          <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {brief.actionNow}
-          </p>
-        </section>
-
-        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.flipWatch}</h2>
-          <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
-            <BoundedValue>{brief.guardrailThreshold}</BoundedValue>
-          </p>
-          <p className="text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span>{" "}
-            <BoundedValue>{brief.flipThreshold}</BoundedValue>
-          </p>
         </section>
 
         <PublishedBriefCopyControls
