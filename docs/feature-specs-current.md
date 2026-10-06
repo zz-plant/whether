@@ -2454,6 +2454,26 @@ under an area's resume label.
   button-shaped pills and capitalised badges they used for plain facts (freshness, trust, time,
   participants), and toolkit pages lose the back link that repeated the breadcrumb.
 
+### 1.1.38 A published week opens on the brief's card (2026-10-06)
+
+Every shared paste links to `/brief/[week]`, so the record is the page a stranger cites. It opened on
+a panel of tags (conditions, confidence, "Permanent Record") above a generic title, with the call as
+body text, then gave the action and its two lines a section each. A screenshot of a cited week looked
+like nothing the reader had seen on Monday.
+
+- **The card.** The record opens on `DecisionHero`: the week's stamp, its title as `question`, the
+  call, then Do now (when it differs from the call), Pause if and Conditions change if as `lines`.
+  `captionDetail` puts the week and the confidence in the card's own caption, so a crop carries its
+  date; there is no trust strip, because the record is not live.
+- **Corrections ride inside it.** A record's correction prints as the card's detail, under the lines
+  it corrects, so a crop cannot carry an uncorrected line without its note. The Slack and email
+  texts carry the correction on their own.
+- **One statement each.** "What changed this week" carries only the delta; the separate Do now line
+  and the flip-watch section are gone, since the card states both. The share panel is titled for the
+  record's week ("Share the week of Jul 30, 2026"), not "this week's guidance".
+- Tests: `tests/publishedBriefPageOrder.test.tsx` (the card, one `h1`, one call-change label, the
+  correction inside the card).
+
 ### Shared page spacing (2026-10-04)
 
 The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.

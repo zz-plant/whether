@@ -48,6 +48,7 @@ Scope clicked: `/`, `/evidence`, `/planning`, `/resolve`, `/toolkits`, `/learn`,
 | DD-045 | P3 | Planning state board | Product + Frontend | Partial (2026-10-06, `docs/feature-specs-current.md` §1.1.36): `/operate` opens on Test a decision, drops the restated brief and the reading checklist. Owner and status cues are still open. Originally — carried from the retired design-improvements tracker: on `/operate`, lean on owner, status and reopen cues before adding explanatory copy. |
 | DD-046 | P3 | Named page measures, the unfinished half | Frontend | Open — carried from the retired layout plan: `/about` and `/contact` hand-roll a bare `<main className="… max-w-3xl">` instead of using `ContentPageShell`, there is no `wide` measure, and `/` and `/pricing` still use `max-w-[64rem]`. |
 | DD-047 | P1 | Pages reached from search each used their own frame and led with explanation | Product + Frontend | Shipped (2026-10-06, `docs/feature-specs-current.md` §1.1.37): answer and signal watch pages open on the brief's card (`DecisionHero` with `question` and `lines`); scenario and toolkit pages lose their button-shaped fact pills. |
+| DD-048 | P1 | The published record (`/brief/[week]`) did not look like the brief it records | Product + Frontend | Shipped (2026-10-06, `docs/feature-specs-current.md` §1.1.38): the record opens on the brief's card with its week in the caption and any correction inside the card; the duplicate Do now line and flip-watch section are gone. |
 
 ## Priority 1 — High leverage
 
