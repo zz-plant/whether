@@ -48,112 +48,36 @@
  * `tests/homeMetadata.test.ts` went red on a clean diff until the directory was
  * deleted. So every run gets its own empty store, the state a fresh clone starts in,
  * whatever the shell exports and whether or not the network is allowed.
+ *
+ * The guard itself — what counts as local, how a blocked target is named — is
+ * `scripts/network-guard.lib.ts`. This file is the suite's side of it: the escape
+ * hatch, the guidance a blocked test prints, and the ingestion store. The blocked
+ * target is named by origin alone because this repo's webhook URLs are credentials
+ * in their entirety: `SLACK_WEBHOOK_URL` and `PREMIUM_FUNNEL_WEBHOOK_URL` hold their
+ * secret in the path, and `lib/premiumFunnel.ts` hands one straight to the global
+ * `fetch` this wraps.
  */
 import { afterAll } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { createGuardedFetch, type NetworkGuardOptions } from "./network-guard.lib";
+
 const ALLOW_NETWORK = process.env.WHETHER_TEST_ALLOW_NETWORK === "1";
 
-/**
- * Loopback and relative URLs — a server the suite itself started, so serving it is
- * the suite owning its upstream rather than reaching for someone else's.
- */
-export const isLocalTarget = (url: string): boolean => {
-  if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) return true; // relative: never leaves the process
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return true; // not a URL we can judge; let fetch report it
-  }
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return true;
-  const host = parsed.hostname.replace(/^\[|\]$/g, "");
-  if (host === "localhost" || host === "::1") return true;
-  // RFC 6761 reserves .localhost for loopback.
-  if (host.endsWith(".localhost")) return true;
-  /*
-   * 127.0.0.0/8, matched as an address rather than as a prefix. `/^127\./` also
-   * accepts `127.0.0.1.example.com`, which is a perfectly ordinary remote host that
-   * anyone can register — the check has to see four octets and nothing else.
-   */
-  const octets = host.split(".");
-  return (
-    octets.length === 4 &&
-    octets[0] === "127" &&
-    octets.every((octet) => /^\d{1,3}$/.test(octet) && Number(octet) <= 255)
-  );
+/** What a blocked call in this suite is called, and how to serve the upstream instead. */
+export const suiteNetworkGuard: NetworkGuardOptions = {
+  label: "test-network-guard",
+  guidance:
+    "[test-network-guard] This suite serves its own upstreams so a run means the same thing on every box.\n" +
+    "  Serve one: pass a fixture fetcher into the code under test (see fixtureFetch in\n" +
+    "  tests/architectureInvariants.test.ts), or assign globalThis.fetch in the test and restore it after.\n" +
+    "  To exercise the real upstream on purpose: WHETHER_TEST_ALLOW_NETWORK=1.\n",
 };
-
-/** The request target, whatever shape `fetch` was handed. */
-export const targetUrl = (input: Parameters<typeof fetch>[0]): string => {
-  if (typeof input === "string") return input;
-  if (input instanceof URL) return input.href;
-  if (typeof input === "object" && input !== null && "url" in input) return String(input.url);
-  return String(input);
-};
-
-/**
- * What a blocked request may safely be called in an error: its origin, and nothing after.
- *
- * The message goes to test output and, in the deploy gate, to a build log — so it must not
- * carry a credential. Plenty of URLs here are credentials in their entirety:
- * `SLACK_WEBHOOK_URL` and `PREMIUM_FUNNEL_WEBHOOK_URL` hold their secret in the *path*
- * (`hooks.slack.com/services/T…/B…/…`), and `lib/premiumFunnel.ts` hands that value
- * straight to the global `fetch` this guard wraps. Query strings are no safer — the repo
- * already carries `redactFredApiKey` and `redactAlphaVantageKey` for exactly that.
- *
- * The origin is kept and everything else dropped, rather than the path being scrubbed by
- * pattern. A heuristic has to be right about every shape of secret anyone adds later; the
- * origin is right by construction, and it is the whole of what the message needs to be
- * useful — it names the upstream to serve, which is the decision the reader has to make.
- * `URL.origin` also drops any `user:pass@` userinfo.
- */
-export const redactTarget = (url: string): string => {
-  try {
-    return new URL(url).origin;
-  } catch {
-    return "an unparseable URL";
-  }
-};
-
-/**
- * Wraps `passThrough` so anything but a local target throws instead of leaving the box.
- *
- * The thrown message is one line on purpose. Code under test catches these and logs
- * them (`[families] Ingest error for family ...`), so a multi-line message is
- * reprinted for every blocked call and buries the run. The guidance is worth having
- * once per process, the first time a run is blocked, and never again.
- */
-export function createGuardedFetch(passThrough: typeof fetch, explain: (text: string) => void): typeof fetch {
-  let explained = false;
-
-  // Annotated as the return type rather than asserted onto one: the parameters are
-  // then contextually typed from `fetch` itself, so this stays honest about the
-  // signature instead of asking the compiler to take its word for it.
-  const guardedFetch: typeof fetch = async (input, init) => {
-    const url = targetUrl(input);
-    if (isLocalTarget(url)) return passThrough(input, init);
-
-    if (!explained) {
-      explained = true;
-      explain(
-        "[test-network-guard] This suite serves its own upstreams so a run means the same thing on every box.\n" +
-          "  Serve one: pass a fixture fetcher into the code under test (see fixtureFetch in\n" +
-          "  tests/architectureInvariants.test.ts), or assign globalThis.fetch in the test and restore it after.\n" +
-          "  To exercise the real upstream on purpose: WHETHER_TEST_ALLOW_NETWORK=1.\n",
-      );
-    }
-
-    throw new Error(`[test-network-guard] blocked outbound fetch to ${redactTarget(url)}`);
-  };
-
-  return guardedFetch;
-}
 
 if (!ALLOW_NETWORK) {
-  globalThis.fetch = createGuardedFetch(globalThis.fetch, (text) => process.stderr.write(text));
+  globalThis.fetch = createGuardedFetch(globalThis.fetch, (text) => process.stderr.write(text), suiteNetworkGuard);
 }
 
 const ingestionDir = mkdtempSync(join(tmpdir(), "whether-test-ingestion-"));

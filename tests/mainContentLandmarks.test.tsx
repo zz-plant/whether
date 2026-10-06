@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
+import { presetTasks, resolveCheckPlan } from "../scripts/check-tasks.mjs";
 import { GATE_TASKS } from "../scripts/vinext-run.mjs";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -115,19 +116,22 @@ describe("fetch-based main-content guard", () => {
 
   it("runs from every local and preview check gate", () => {
     const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
-    const runChecks = readFileSync(new URL("../scripts/run-checks.mjs", import.meta.url), "utf8");
-    const prePush = readFileSync(new URL("../.husky/pre-push", import.meta.url), "utf8");
     const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
 
     assert.match(packageJson, /"check:landmarks":\s*"node scripts\/check-main-content-landmarks\.mjs"/);
-    assert.match(runChecks, /name: "landmarks", script: "check:landmarks"/);
-    assert.match(prePush, /run-checks\.mjs[^\n]*\blandmarks\b/);
+    assert.deepEqual(
+      resolveCheckPlan(["landmarks"], {}).stages,
+      [[{ name: "landmarks", script: "check:landmarks" }]],
+    );
+    // The hook runs the pre-push preset and `check:vinext` (what Workers Builds runs on
+    // every push, main included) runs the deploy preset; tests/deployGateTestScope.test.ts
+    // holds each consumer to its preset. Both presets carry the audit.
+    assert.ok(presetTasks("pre-push").includes("landmarks"), "the pre-push gate no longer runs landmarks");
+    assert.ok(presetTasks("deploy").includes("landmarks"), "the deploy gate no longer runs landmarks");
     assert.match(workflow, /run-checks\.mjs[^\n]*\blandmarks\b/);
     // The preview build names its checks in GATE_TASKS rather than in the spawn call:
     // it runs whichever of them `check:vinext` has not already proved for this commit.
     assert.ok(GATE_TASKS.includes("landmarks"), "the preview build gate no longer requires landmarks");
-    // The command Workers Builds is configured to run, on every push including main.
-    assert.match(packageJson, /"check:vinext":\s*"[^"]*run-checks\.mjs[^"]*\blandmarks\b[^"]*"/);
   });
 
   /*

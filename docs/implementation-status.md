@@ -9,7 +9,7 @@ This document consolidates delivery status across product roadmap audits, known 
 - Summary-system follow-ups are mostly complete; monthly `planningLanguage` parity is now shipped, while broader monthly section expansion remains open.
 - Community backlog (2026-09-17): runway joins stage as a second calibration axis on the weekly call (`?runway=`, cookie, hero and header controls); the board slide ships as a native PPTX and a PDF from `/share` and `/api/export/board-slide`; `/share` copies a monthly investor update; the daily cron pushes a flash alert on an emergency-sized move in the short rate or the curve; the hero states the market move that would change the call. Linear/Jira guardrail sync is deferred on the stored-token decision (see `ROADMAP.md`).
 - Operator workflow enhancements (2026-08-29): 1-click Slack copy, present mode, threshold proximity bar, developer quick-access, role lens filters, board annex export, command palette actions, calendar ritual integration, and keyboard shortcuts.
-- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane now runs on `0.0.41` with a repo-local install repair.
+- Stack modernization cut over to Vinext on Cloudflare Workers; Tailwind v4 and the safe support-dependency slice are complete, the root-layout font path is Vinext-compatible, and the active Vinext lane runs on `0.2.1`. The repo-local install repair added for `0.0.38` was retired on 2026-10-06, when cold installs of `0.2.1` proved complete on every Bun in use (see `docs/cloudflare-deployment-runbook.md`).
 
 ## Product roadmap (milestones 5–8)
 

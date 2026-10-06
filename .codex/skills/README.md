@@ -2,10 +2,18 @@
 
 Use this index to decide whether a first-party Whether skill should be loaded before you open individual `SKILL.md` files.
 
-This index and its skill directories are mirrored at `.claude/skills/` for Claude Code (which only
-discovers skills under `.claude/skills/`, not `.codex/skills/`). `web-design-guidelines` is the one
-exception — Claude Code already gets that skill from a global plugin, so it isn't mirrored. When you
-add, remove, or materially change a skill here, make the same change under `.claude/skills/`.
+`.claude/skills/` is the canonical source: Claude Code discovers skills only there, and the repo's
+agent helpers (`bun run agent:handoff -- --skill <name>`, `bun run agent:index`) read it.
+`.codex/skills/` is generated from it for the Codex runtime by `bun run skills:sync`, plus a
+per-runtime overlay in `.codex/skills-overlay/` for the files that deliberately differ:
+
+- `system-skill-router` — the Codex version routes to Codex's built-in `skill-installer` and
+  `skill-creator`; the canonical one is rewritten for Claude Code, which has no installer.
+- `web-design-guidelines` — Codex only; Claude Code already gets it from a global plugin.
+
+Add, remove, or change a skill under `.claude/skills/` (or the overlay), then run
+`bun run skills:sync`. Never edit `.codex/skills/` by hand: `tests/skillsMirror.test.ts` fails when
+it differs from what the sync would write, and when a skill directory is missing from the map below.
 
 ## When to use this index
 
@@ -27,6 +35,8 @@ add, remove, or materially change a skill here, make the same change under `.cla
 | `subagent-handoff` | Bounded subagent delegation packets with repo anchors and verification | Early ambiguity shaping or broad implementation work | Handoff packet, return contract, open risks |
 | `system-skill-router` | Routing skill-management requests (list/install vs create/update) | General task work unrelated to skill management | Routing decision, next tool call |
 | `vercel-react-best-practices` | React/Next.js performance review or authoring (rendering, bundling, server, async) | Non-React/Next.js code | Rule-referenced findings and fixes |
+| `whether-ui-loop` | Screenshot-driven UI iteration: capture with `bun run ui:iterate`, look, critique, fix, recapture | Logic-only changes, or UI rules without needing to see the page | Before/after captures, critique, recapture |
+| `whether-ui-standards` | UI/UX rules for anything that renders under `app/` — interaction, accessibility, semantics, theming, motion | Non-UI code; seeing the result (pair with `whether-ui-loop`) | Rule-referenced findings and fixes |
 
 ## Selection rules
 

@@ -27,6 +27,7 @@ import {
   collectMainContentRouteSamples,
   collectUnresolvedAnchors,
 } from "./main-content-landmarks.mjs";
+import { isDeployGate } from "./deploy-gate.mjs";
 import { withDevServer } from "./dev-server.lib.mjs";
 
 const args = process.argv.slice(2);
@@ -49,7 +50,7 @@ const baseUrl = readArgValue("--base-url", DEFAULT_BASE_URL);
  * must still fail the gate — but they get room a workstation never needs, so a slow
  * container reads as slow rather than as broken. Both remain overridable by flag.
  */
-const inDeployGate = process.env.WHETHER_DEPLOY_GATE === "1";
+const inDeployGate = isDeployGate();
 const timeoutMs = Number.parseInt(readArgValue("--timeout-ms", inDeployGate ? "180000" : "90000"), 10);
 /*
  * Route fetches are mostly waiting: the dev server compiles each route on demand and

@@ -1,8 +1,16 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { afterEach, describe, it } from "bun:test";
 import { spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { presetTasks, resolveCheckPlan } from "../scripts/check-tasks.mjs";
+import { isDeployGate, withDeployGate } from "../scripts/deploy-gate.mjs";
 import { GATE_TASKS, outstandingChecks } from "../scripts/vinext-run.mjs";
+
+const stageNames = (args: string[], env: Record<string, string | undefined> = {}) =>
+  resolveCheckPlan(args, env).stages.map((stage) => stage.map((task) => task.name));
 
 /**
  * What the deploy gate is allowed to run.
@@ -30,35 +38,51 @@ describe("deploy gate test scope", () => {
   it("keeps the exclusion tied to the tests/tools directory, not a filename", async () => {
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
     assert.ok(runner.includes("TOOL_TEST_DIRECTORY"), "runner no longer scopes by directory");
-    assert.ok(
-      runner.includes("WHETHER_DEPLOY_GATE"),
-      "runner no longer honours the deploy-gate signal",
-    );
+    assert.ok(runner.includes("isDeployGate()"), "runner no longer honours the deploy-gate signal");
   });
 
-  it("has the gate actually set the signal, or the exclusion never applies", async () => {
+  /*
+   * One reader for the signal. It used to be spelled out in each script that reads it,
+   * so "exactly '1'" was a convention four files had to keep agreeing on.
+   */
+  it("reads the signal as exactly \"1\", and sets it the same way", () => {
+    assert.equal(isDeployGate({ WHETHER_DEPLOY_GATE: "1" }), true);
+    for (const value of [undefined, "", "0", "true", " 1"]) {
+      assert.equal(isDeployGate({ WHETHER_DEPLOY_GATE: value }), false, `${JSON.stringify(value)} is not the gate`);
+    }
+    const env = { PATH: "/bin" };
+    assert.deepEqual(withDeployGate(env), { PATH: "/bin", WHETHER_DEPLOY_GATE: "1" });
+    assert.deepEqual(env, { PATH: "/bin" }, "the caller's environment is not mutated");
+  });
+
+  it("has the inner gate actually set the signal, or the exclusion never applies", async () => {
     const gate = await readFile("scripts/vinext-run.mjs", "utf8");
-    assert.match(gate, /WHETHER_DEPLOY_GATE:\s*"1"/);
+    assert.match(gate, /env: withDeployGate\(process\.env\)/);
   });
 
   it("still runs the tool suite outside the gate", async () => {
     /*
      * The rule this protects: tests/tools/ is excluded from the deploy path, not from
-     * the repo. The exclusion keys off WHETHER_DEPLOY_GATE in the *spawned* runner, so
-     * what must never happen is `bun run check` putting that variable into a child's
-     * environment. This used to assert the file never mentions the name at all, which
-     * is a different and larger claim: run-checks.mjs now reads the variable to decide
-     * whether to record what passed, and reading it cannot rescope anything.
+     * the repo. The exclusion keys off the signal in the *spawned* runner, so what must
+     * never happen is `bun run check`, or the pre-push hook, putting it into a child's
+     * environment. Only the deploy preset does — and a caller that already runs under
+     * the signal (vinext-run's inner gate) keeps it.
      */
+    assert.equal(resolveCheckPlan([], {}).deployGate, false, "bun run check");
+    assert.equal(resolveCheckPlan(["test"], {}).deployGate, false, "a named task");
+    assert.equal(resolveCheckPlan(["--preset", "pre-push"], {}).deployGate, false, "the pre-push hook");
+    assert.equal(resolveCheckPlan(["--preset", "deploy"], {}).deployGate, true, "the deploy gate");
+    assert.equal(resolveCheckPlan(["lint"], { WHETHER_DEPLOY_GATE: "1" }).deployGate, true, "vinext-run's inner gate");
+
     const checks = await readFile("scripts/run-checks.mjs", "utf8");
     assert.doesNotMatch(
       checks,
       /WHETHER_DEPLOY_GATE\s*[:=]\s*["'`]?1/,
-      "bun run check must not set the gate signal for the children it spawns",
+      "run-checks must not set the gate signal for the children it spawns except through the plan",
     );
     assert.ok(
-      checks.includes('process.env.WHETHER_DEPLOY_GATE === "1"'),
-      "reading the signal is how the marker stays scoped to the deploy path",
+      checks.includes("const childEnv = plan.deployGate ? withDeployGate(baseEnv) : baseEnv;"),
+      "the children get the signal exactly when the plan is the deploy gate",
     );
   });
 
@@ -74,30 +98,64 @@ describe("deploy gate test scope", () => {
    */
   it("is what the configured Workers Builds command runs", async () => {
     const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
-    const command = packageJson.scripts?.["check:vinext"] ?? "";
+    assert.equal(packageJson.scripts?.["check:vinext"], "bun scripts/run-checks.mjs --preset deploy");
 
-    assert.match(command, /^WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs\b/);
-    for (const task of ["lint", "typecheck", "test", "assets", "suppressions", "dead-exports", "landmarks"]) {
-      assert.match(command, new RegExp(`\\b${task}\\b`), `check:vinext no longer runs ${task}`);
+    const plan = resolveCheckPlan(["--preset", "deploy"], {});
+    assert.equal(plan.deployGate, true, "the deploy preset runs under the deploy-gate signal");
+
+    const stages = stageNames(["--preset", "deploy"]);
+    assert.deepEqual(stages, [["lint", "typecheck", "test", "assets", "suppressions", "dead-exports"], ["landmarks"]]);
+    // Network and git-history checks stay on pre-push and `bun run check`, where they can
+    // run; type-aware lint stays where someone is watching.
+    for (const absent of ["audit", "hotspot-preflight", "lint:types"]) {
+      assert.ok(!stages.flat().includes(absent), `the deploy gate must not run ${absent}`);
     }
-    // Network and git-history checks stay on pre-push and `bun run check`, where they can run.
-    assert.doesNotMatch(command, /\baudit\b|hotspot-preflight/);
     // The landmark audit spawns a dev server and compiles every route against it. Run
     // alongside lint, tsc, and the suite on a small box, that server competes for the same
     // cores and memory, and a route that compiles slowly reads as a route that never
-    // answered. It runs by itself, after the four cheaper tasks have passed.
-    assert.match(command, / && WHETHER_DEPLOY_GATE=1 bun scripts\/run-checks\.mjs landmarks$/);
-    assert.doesNotMatch(command, /landmarks.*&&/, "landmarks must be the last command, run by itself");
+    // answered. It runs by itself, after the cheaper tasks have passed.
+    assert.deepEqual(stages.at(-1), ["landmarks"], "landmarks must be the last stage, run by itself");
   });
 
-  it("requires the same tasks as the configured build command", async () => {
-    const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
-    const outer = (packageJson.scripts?.["check:vinext"] ?? "")
-      .split(/\s+/)
-      .filter((word) => /^[a-z-]+$/.test(word) && word !== "bun")
-      .sort();
+  it("requires the same tasks as the configured build command", () => {
+    assert.deepEqual(GATE_TASKS, stageNames(["--preset", "deploy"]).flat());
+    assert.deepEqual(GATE_TASKS, presetTasks("deploy"));
+  });
 
-    assert.deepEqual(outer, [...GATE_TASKS].sort());
+  /*
+   * The lists used to be written out in four places — run-checks itself, this hook,
+   * check:vinext, and vinext-run's GATE_TASKS — and only the last two were compared.
+   * Every consumer now names a preset from scripts/check-tasks.mjs, so the test holds
+   * each one to naming it rather than spelling the list out again.
+   */
+  it("runs the pre-push preset from the hook, and lists no task inline", async () => {
+    const hook = await readFile(".husky/pre-push", "utf8");
+    const invocations = hook.split("\n").filter((line) => /^\s*bun scripts\/run-checks\.mjs\b/.test(line));
+    assert.deepEqual(invocations, ["bun scripts/run-checks.mjs --preset pre-push"]);
+
+    assert.deepEqual(stageNames(["--preset", "pre-push"]), [
+      ["lint", "lint:types", "typecheck", "test", "assets", "suppressions", "dead-exports", "hotspot-preflight", "landmarks"],
+    ]);
+    assert.equal(resolveCheckPlan(["--preset", "pre-push"], {}).deployGate, false);
+  });
+
+  it("keeps `bun run check` as every task, in one stage", async () => {
+    const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
+    assert.equal(packageJson.scripts?.check, "bun scripts/run-checks.mjs");
+
+    const [all, ...rest] = stageNames([]);
+    assert.deepEqual(rest, []);
+    for (const task of new Set([...presetTasks("pre-push"), ...presetTasks("deploy"), "audit", "curated-freshness"])) {
+      assert.ok(all.includes(task), `bun run check no longer runs ${task}`);
+    }
+  });
+
+  it("runs named tasks in declaration order, and refuses what it does not know", () => {
+    assert.deepEqual(stageNames(["test", "lint"]), [["lint", "test"]]);
+    assert.throws(() => resolveCheckPlan(["lnit"], {}), /Unknown check\(s\): lnit/);
+    assert.throws(() => resolveCheckPlan(["--preset", "deploi"], {}), /Unknown preset: deploi/);
+    assert.throws(() => resolveCheckPlan(["--preset", "deploy", "lint"], {}), /preset or check names, not both/);
+    assert.deepEqual(stageNames(["--preset=deploy"]), stageNames(["--preset", "deploy"]));
   });
 
   /*
@@ -114,6 +172,79 @@ describe("deploy gate test scope", () => {
     assert.deepEqual(outstandingChecks(GATE_TASKS), []);
     assert.deepEqual(outstandingChecks([]), GATE_TASKS);
     assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "dead-exports", "landmarks"]);
+  });
+});
+
+/*
+ * The deploy preset is two stages because `check:vinext` used to be two commands joined
+ * by `&&`. These run the real runner against a fixture package whose scripts only log
+ * that they ran, so the ordering and the signal are observed rather than read.
+ */
+describe("deploy preset stages", () => {
+  const roots: string[] = [];
+
+  afterEach(() => {
+    for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  });
+
+  const runDeployPreset = (failStep = "") => {
+    const root = mkdtempSync(join(tmpdir(), "run-checks-stages-"));
+    roots.push(root);
+    const log = join(root, "ran.log");
+    writeFileSync(
+      join(root, "step.mjs"),
+      [
+        'import { appendFileSync } from "node:fs";',
+        "const name = process.argv[2];",
+        `appendFileSync(${JSON.stringify(log)}, \`\${name}:\${process.env.WHETHER_DEPLOY_GATE ?? ""}\\n\`);`,
+        `process.exit(name === ${JSON.stringify(failStep)} ? 1 : 0);`,
+      ].join("\n"),
+    );
+    const scripts = Object.fromEntries(
+      [
+        ["lint", "lint"],
+        ["typecheck", "typecheck"],
+        ["test", "test"],
+        ["assets:check", "assets"],
+        ["check:suppressions", "suppressions"],
+        ["check:dead-exports", "dead-exports"],
+        ["check:landmarks", "landmarks"],
+      ].map(([script, name]) => [script, `node step.mjs ${name}`]),
+    );
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "run-checks-stages", scripts }, null, 2));
+
+    // Git exports GIT_DIR and friends to a hook; a child git would read the pushing repo.
+    const env = { ...process.env };
+    for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];
+    delete env.WHETHER_DEPLOY_GATE;
+
+    const result = spawnSync("bun", [join(process.cwd(), "scripts/run-checks.mjs"), "--preset", "deploy"], {
+      cwd: root,
+      encoding: "utf8",
+      env,
+    });
+    const ran = readFileSync(log, "utf8").trim().split("\n").sort();
+    return { result, ran };
+  };
+
+  it("runs the landmark audit after the rest pass, every task under the deploy-gate signal", () => {
+    const { result, ran } = runDeployPreset();
+
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.deepEqual(
+      ran,
+      ["assets", "dead-exports", "landmarks", "lint", "suppressions", "test", "typecheck"].map((name) => `${name}:1`),
+    );
+    assert.equal(result.stdout.match(/All checks passed/g)?.length, 2, "one summary per stage");
+  });
+
+  it("never reaches the landmark stage when an earlier task fails", () => {
+    const { result, ran } = runDeployPreset("typecheck");
+
+    assert.equal(result.status, 1);
+    assert.ok(!ran.some((line) => line.startsWith("landmarks:")), `landmarks ran after a failure: ${ran.join(", ")}`);
+    assert.equal(ran.length, 6, "every task in the failing stage still runs and reports");
+    assert.match(result.stdout, /1 check\(s\) failed: typecheck/);
   });
 });
 
@@ -151,7 +282,7 @@ describe("deploy gate resource defaults", () => {
   it("does not change a local run", async () => {
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
     // The gate signal is the only thing that shifts the defaults.
-    assert.ok(runner.includes("const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1'"));
+    assert.ok(runner.includes("const inDeployGate = isDeployGate();"));
   });
 
   it("pins NODE_ENV to test for the spawned suite", async () => {
@@ -195,7 +326,7 @@ describe("deploy gate resource defaults", () => {
      * it — and it did so in the one log a sandbox cannot read.
      */
     const audit = await readFile("scripts/check-main-content-landmarks.mjs", "utf8");
-    assert.match(audit, /const inDeployGate = process\.env\.WHETHER_DEPLOY_GATE === "1"/);
+    assert.match(audit, /const inDeployGate = isDeployGate\(\)/);
     assert.match(audit, /inDeployGate \? "180000" : "90000"/);
     assert.match(audit, /inDeployGate \? "120000" : "30000"/);
   });

@@ -118,9 +118,8 @@ Read:
 - `documentation.md`
 
 Usually also inspect:
-- `../../.claude/skills/README.md` if you are Claude Code (skills live under `.claude/skills/`, not
-  `.codex/skills/`, for that runtime)
-- `../../.codex/skills/README.md` for the Codex-runtime index — keep both in sync when a skill changes
+- `../../.claude/skills/README.md` — the canonical skill index; `.codex/skills/` is generated from
+  `.claude/skills/` for the Codex runtime by `bun run skills:sync` (edit only the canonical side)
 - `../../.roomodes` if you are using Roo workspace modes
 
 ### If you plan to delegate

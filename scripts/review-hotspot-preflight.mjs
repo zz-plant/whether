@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+
+import { execText } from "./exec.mjs";
 
 const args = process.argv.slice(2);
 
@@ -16,13 +17,6 @@ function hasFlag(name) {
   return args.includes(name);
 }
 
-function sh(cmd, cmdArgs) {
-  return execFileSync(cmd, cmdArgs, {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  }).trim();
-}
-
 function isAllZeroSha(value) {
   return /^0{40}$/.test(value);
 }
@@ -31,7 +25,7 @@ function sanitizeBaseRef(base) {
   if (!base || isAllZeroSha(base)) return "";
 
   try {
-    return sh("git", ["rev-parse", "--verify", base]) ? base : "";
+    return execText("git", ["rev-parse", "--verify", base]) ? base : "";
   } catch {
     return "";
   }
@@ -87,7 +81,7 @@ export function resolveDefaultDiffRange({ hasHeadParent, parentCount }) {
 }
 
 function countHeadParents() {
-  const line = sh("git", ["rev-list", "--parents", "-n", "1", "HEAD"]);
+  const line = execText("git", ["rev-list", "--parents", "-n", "1", "HEAD"]);
   if (!line) return 0;
   /* "<commit> <parent>..." — every field after the commit itself is a parent. */
   return line.trim().split(/\s+/).length - 1;
@@ -107,7 +101,7 @@ function getDiffRanges() {
   }
 
   try {
-    const hasHeadParent = Boolean(sh("git", ["rev-parse", "--verify", "HEAD~1"]));
+    const hasHeadParent = Boolean(execText("git", ["rev-parse", "--verify", "HEAD~1"]));
     return resolveDefaultDiffRange({ hasHeadParent, parentCount: countHeadParents() });
   } catch {
     return ["HEAD"];
@@ -135,7 +129,7 @@ export function describeDiffRange(diffRange) {
 function changedFiles(diffRanges) {
   const files = new Set();
   for (const range of diffRanges) {
-    const output = sh("git", ["diff", "--name-only", range]);
+    const output = execText("git", ["diff", "--name-only", range]);
     if (!output) continue;
     for (const file of output.split("\n")) {
       const trimmed = file.trim();
@@ -217,7 +211,7 @@ function addedTypeAssertions(diffRanges) {
 }
 
 function addedTypeAssertionsForRange(diffRange) {
-  const diff = sh("git", ["diff", "--unified=0", diffRange, "--", "*.ts", "*.tsx"]);
+  const diff = execText("git", ["diff", "--unified=0", diffRange, "--", "*.ts", "*.tsx"]);
   if (!diff) return [];
 
   // Comment state comes from the file, not from the added lines. Tracking `/* */` across

@@ -30,6 +30,8 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
+import { parseGitStatus } from "./exec.mjs";
+
 const MARKER_DIRECTORY = join(".cache", "check-gate");
 
 /** Six hours: far longer than any build, far shorter than a container's useful life. */
@@ -61,10 +63,7 @@ export function worktreeDrift(cwd = process.cwd()) {
 
     const tracked = [];
     const untracked = [];
-    for (const line of (status.stdout ?? "").split("\n")) {
-      if (line.trim() === "") continue;
-      const code = line.slice(0, 2);
-      const path = line.slice(3);
+    for (const { code, path } of parseGitStatus(status.stdout)) {
       if (code === "??") untracked.push(path);
       else tracked.push({ code: code.trim(), path });
     }

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
+import { resolveCheckPlan } from "../scripts/check-tasks.mjs";
 import { findPublishedVersionId } from "../scripts/cloudflare-run.mjs";
 
 describe("Cloudflare deploy contracts", () => {
@@ -49,8 +50,11 @@ describe("Cloudflare deploy contracts", () => {
   // The local hook is the only thing running the check list now, so it has to cover at
   // least what the workflow would have. A task dropped here is a task nobody runs.
   it("runs at least the workflow's check tasks in the local gate", () => {
-    const taskList = (source: string) =>
-      source.match(/bun scripts\/run-checks\.mjs ([^\n]+)/)?.[1].trim().split(/\s+/) ?? [];
+    /* The workflow names its tasks; the hook names a preset from scripts/check-tasks.mjs. */
+    const taskList = (source: string) => {
+      const args = source.match(/bun scripts\/run-checks\.mjs ([^\n]+)/)?.[1].trim().split(/\s+/) ?? [];
+      return args.length > 0 ? resolveCheckPlan(args, {}).stages.flat().map((task) => task.name) : [];
+    };
 
     const workflowTasks = taskList(workflow);
     const hookTasks = taskList(prePush);
