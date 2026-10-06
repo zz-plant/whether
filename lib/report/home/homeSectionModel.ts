@@ -149,11 +149,14 @@ export const describeWeeklyMovement = ({
         basis.date ? basis.since : "this week",
       );
 
+/** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
+type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean };
+
 export type HomeAreaRow = {
   area: DecisionArea;
   rule: string;
-  pause?: { line: string; distance: string };
-  resume?: { line: string; distance: string };
+  pause?: HomeAreaLineSlot;
+  resume?: HomeAreaLineSlot;
   /**
    * What the week's move did to this area's own lines ("Pause now applies:
    * funding pressure rose through 76."). Absent when nothing was compared, and
@@ -168,8 +171,80 @@ export type HomeAreaRow = {
   resumeQualifier?: string;
 };
 
-const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "resume") =>
-  distance ? { line: distance.label, distance: formatPointsToLine(distance.pointsToLine, kind, distance.satisfied) } : undefined;
+const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "resume"): HomeAreaLineSlot | undefined =>
+  distance
+    ? {
+        line: distance.label,
+        distance: formatPointsToLine(distance.pointsToLine, kind, distance.satisfied),
+        points: distance.pointsToLine,
+        met: distance.satisfied,
+      }
+    : undefined;
+
+const formatPoints = (points: number) =>
+  `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"}`;
+
+/**
+ * Where an area stands against its pause line, short enough to sit under the
+ * decision's name in the picker: the answer before the click. "Pause line
+ * crossed", or how far the reading is from it. Undefined for an area whose rule
+ * states no pause line.
+ */
+export const describeAreaPauseStatus = (row: Pick<HomeAreaRow, "pause">): { text: string; crossed: boolean } | undefined => {
+  if (!row.pause) return undefined;
+  if (row.pause.met) return { text: "Pause line crossed", crossed: true };
+  if (row.pause.points === 0) return { text: "At its pause line", crossed: false };
+  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false };
+};
+
+/**
+ * How many areas' pause lines this reading has crossed, said once over the
+ * picker: the count a reader would otherwise assemble by opening five answers.
+ */
+export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">[]): string | null => {
+  const ruled = rows.filter((row) => row.pause);
+  if (ruled.length === 0) return null;
+  const crossed = ruled.filter((row) => row.pause?.met).length;
+  if (crossed === 0) return "No area's pause line is crossed this week.";
+  return `Pause ${crossed === 1 ? "line" : "lines"} crossed in ${crossed} of ${ruled.length} areas this week.`;
+};
+
+/**
+ * What conditions were at the earlier reading, for the card's stamp line on a
+ * reading whose conditions differ from it: "Was Sunny on Aug 31". Dated by the
+ * comparison's own basis, because the earlier reading is a month-end snapshot
+ * and "this week" would claim a change the reading cannot date.
+ */
+export const describeEarlierConditions = ({
+  previousLabel,
+  basis = comparisonBasis(),
+}: {
+  previousLabel: string;
+  basis?: ComparisonBasis;
+}) => `Was ${previousLabel} ${basis.when}`;
+
+const MONTH_SHORT = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" });
+const MONTH_YEAR = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+
+/**
+ * The domain of the conditions map's path, stated beside it (UI standards
+ * §XV): which month-end readings the dots are, so the path is read as months,
+ * not weeks. Null when there is no path to describe.
+ */
+export const describeConditionsTrail = (recordDates: readonly string[]): string | null => {
+  const first = recordDates[0];
+  const last = recordDates[recordDates.length - 1];
+  if (!first || !last) return null;
+  const firstDate = new Date(`${first.slice(0, 10)}T00:00:00Z`);
+  const lastDate = new Date(`${last.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(firstDate.getTime()) || Number.isNaN(lastDate.getTime())) return null;
+  if (recordDates.length === 1) return `Path: the ${MONTH_YEAR.format(lastDate)} month-end, then now.`;
+  const range =
+    firstDate.getUTCFullYear() === lastDate.getUTCFullYear()
+      ? `${MONTH_SHORT.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`
+      : `${MONTH_YEAR.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`;
+  return `Path: month-ends ${range}, then now.`;
+};
 
 const nearest = (distances: RuleThresholdDistance[]) =>
   [...distances].sort((left, right) => left.pointsToLine - right.pointsToLine)[0];

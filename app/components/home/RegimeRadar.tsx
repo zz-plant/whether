@@ -8,6 +8,21 @@ type RegimeRadarProps = {
   tightnessThreshold: number;
   riskAppetiteThreshold: number;
   currentRegime: string;
+  /**
+   * Earlier readings, oldest first, drawn as the path that led to the current
+   * point. Month-ends on the brief; the domain is stated in `trailCaption`.
+   * When present it replaces the single earlier dot, which is its last point.
+   */
+  trail?: ReadonlyArray<{ tightness: number; riskAppetite: number }>;
+  /** What the path's dots are (UI standards §XV: state the domain of a graphic). */
+  trailCaption?: string | null;
+  /** The like-for-like note when the earlier readings were scored from fewer inputs. */
+  caveat?: string | null;
+  /**
+   * The distance-to-the-line caption. Off where the surface already states it
+   * beside the map (the hero's trust row says "2 pts from its line").
+   */
+  showDistance?: boolean;
   className?: string;
 };
 
@@ -33,6 +48,10 @@ export function RegimeRadar({
   tightnessThreshold,
   riskAppetiteThreshold,
   currentRegime,
+  trail,
+  trailCaption,
+  caveat,
+  showDistance = true,
   className = "",
 }: RegimeRadarProps) {
   const boundaryX = xFor(riskAppetiteThreshold);
@@ -40,7 +59,10 @@ export function RegimeRadar({
   const currentX = xFor(riskAppetite);
   const currentY = yFor(tightness);
 
+  const trailPoints = (trail ?? []).map((point) => ({ x: xFor(point.riskAppetite), y: yFor(point.tightness) }));
+  const hasTrail = trailPoints.length > 0;
   const hasPrevious =
+    !hasTrail &&
     typeof previousTightness === "number" &&
     typeof previousRiskAppetite === "number";
   const prevX = hasPrevious ? xFor(previousRiskAppetite!) : null;
@@ -206,6 +228,31 @@ export function RegimeRadar({
           />
         )}
 
+        {/* The path: earlier readings joined to the current one, older dots
+            fainter, so the direction of travel reads before any number does. */}
+        {hasTrail ? (
+          <g>
+            <polyline
+              points={[...trailPoints, { x: currentX, y: currentY }].map((point) => `${point.x},${point.y}`).join(" ")}
+              fill="none"
+              stroke="var(--app-text-muted)"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+              strokeOpacity="0.55"
+            />
+            {trailPoints.map((point, index) => (
+              <circle
+                key={`${point.x}-${point.y}-${index}`}
+                cx={point.x}
+                cy={point.y}
+                r="2.4"
+                fill="var(--app-text-muted)"
+                fillOpacity={0.3 + (0.6 * (index + 1)) / trailPoints.length}
+              />
+            ))}
+          </g>
+        ) : null}
+
         {/* Previous reading with dashed trail */}
         {hasPrevious && prevX !== null && prevY !== null ? (
           <g>
@@ -271,9 +318,13 @@ export function RegimeRadar({
         </text>
       </svg>
 
-      <figcaption className="mt-1 text-center text-fluid-nano text-slate-400">
-        {pointsToBoundary} points to nearest change line
-      </figcaption>
+      {showDistance || (hasTrail && (trailCaption || caveat)) ? (
+        <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
+          {showDistance ? <span className="block">{pointsToBoundary} points to nearest change line</span> : null}
+          {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
+          {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
+        </figcaption>
+      ) : null}
     </figure>
   );
 }

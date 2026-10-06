@@ -36,6 +36,11 @@ type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string 
  * the same lines in points. One sentence in points now sits beside the
  * quadrant, and the market move folds under it for the reader who wants it in
  * the market's units.
+ *
+ * From `md` up the quadrant is drawn in the card at the top of the page, with
+ * its month-end path, so this section stops drawing it there: one picture of
+ * where the reading sits per screen. Below `md` the card has no room for it and
+ * it stays here.
  */
 export function WhatWouldChangeSection({
   ladders,
@@ -47,6 +52,7 @@ export function WhatWouldChangeSection({
   lastTime,
   callChangeLines,
   regime,
+  conditionsTrail,
 }: {
   ladders: readonly HomeScoreLadder[];
   flipProximity: readonly FlipProximityLine[];
@@ -58,6 +64,12 @@ export function WhatWouldChangeSection({
   lastTime: LastTimeCallChanged | null;
   callChangeLines: { tightness: number; riskAppetite: number };
   regime?: string;
+  /** The month-end path, its domain and its like-for-like note; when passed, the card above draws the quadrant from `md` up. */
+  conditionsTrail?: {
+    points: ReadonlyArray<{ tightness: number; riskAppetite: number }>;
+    caption: string | null;
+    caveat: string | null;
+  };
 }) {
   const tightnessLadder = ladders.find((ladder) => ladder.metric === "tightness");
   const riskAppetiteLadder = ladders.find((ladder) => ladder.metric === "riskAppetite");
@@ -86,7 +98,15 @@ export function WhatWouldChangeSection({
 
   return (
     <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} className="order-4">
-      <div className={ladders.length > 0 ? "grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-start" : "space-y-4"}>
+      <div
+        className={
+          ladders.length === 0
+            ? "space-y-4"
+            : conditionsTrail
+              ? "grid gap-6"
+              : "grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-start"
+        }
+      >
         {ladders.length > 0 ? (
           <RegimeRadar
             tightness={tightnessVal}
@@ -96,7 +116,10 @@ export function WhatWouldChangeSection({
             tightnessThreshold={callChangeLines.tightness}
             riskAppetiteThreshold={callChangeLines.riskAppetite}
             currentRegime={activeRegime}
-            className="w-full max-w-[240px] mx-auto md:mx-0 shrink-0"
+            trail={conditionsTrail?.points}
+            trailCaption={conditionsTrail?.caption}
+            caveat={conditionsTrail?.caveat}
+            className={`w-full max-w-[240px] mx-auto md:mx-0 shrink-0${conditionsTrail ? " md:hidden" : ""}`}
           />
         ) : null}
         <div className="min-w-0 space-y-4">

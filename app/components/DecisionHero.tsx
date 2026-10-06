@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
 import { RegimeGlyph } from "./illustrations/RegimeGlyph";
@@ -15,6 +16,25 @@ type Props = {
   regime: string;
   /** The week's direction ("Tightening this week"), printed after what the regime means. */
   direction?: string;
+  /**
+   * What conditions were at the earlier reading, on a reading whose conditions
+   * differ from it ("Was Sunny on Aug 31"). The change is the week's news, so it
+   * sits on the stamp line in the regime ink rather than in a section below.
+   */
+  earlier?: string;
+  /**
+   * A graphic for the card's right-hand column from `md` up: on the brief, the
+   * conditions map. The card is what people screenshot, so a picture of where
+   * the reading sits travels with the call. Hidden below `md`, where the card
+   * must leave the decision picker on the first phone screen.
+   */
+  aside?: ReactNode;
+  /**
+   * What the aside's marks are, under the trust row from `md` up: the map's
+   * path domain and its like-for-like note. Set here rather than under the map
+   * so the graphic stays compact and the left column carries the words.
+   */
+  asideNote?: ReadonlyArray<string>;
   /** Freshness and confidence, drawn once under the call. Absent on an archived week, which the banner above marks. */
   trust?: Omit<TrustStripProps, "href" | "className"> | null;
   /**
@@ -63,12 +83,20 @@ const weatherIconMap: Record<RegimeKey, typeof Sun> = {
  * The card names its own regime so the surface and the stamp take their
  * colour from `data-regime` (tokens.css) — the same source as the copy, so
  * they cannot disagree with it.
+ *
+ * Two things the brief adds, because the card is what people screenshot: what
+ * conditions were at the earlier reading, on the stamp line, and from `md` up a
+ * graphic beside the call (the conditions map and its month-end path). Neither
+ * renders unless passed, so the answer pages draw the card as before.
  */
 export function DecisionHero({
   weeklyCall,
   callDetail,
   regime,
   direction,
+  earlier,
+  aside,
+  asideNote,
   trust,
   titleLevel = "h1",
   captionDetail,
@@ -97,6 +125,11 @@ export function DecisionHero({
       data-regime={regimeKey ?? undefined}
     >
       <div className="relative z-10 min-w-0 space-y-3">
+        {/* With a graphic beside it, the left column stretches to the graphic's
+            height and the trust row sits at its foot, so the call is not left
+            floating over an empty band. */}
+        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)] md:gap-6" : undefined}>
+        <div className="flex min-w-0 flex-col gap-3">
         {/* The regime stamp and its meaning, grouped on the eyebrow line so the eye path flows directly into the call. */}
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <span
@@ -121,6 +154,11 @@ export function DecisionHero({
             <span className="text-xs leading-relaxed text-slate-400">
               {REGIME_WEATHER_RATIONALES[regimeKey]}
               {direction ? <span className="text-slate-300"> · {direction}</span> : null}
+              {earlier ? (
+                <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
+                  {" "}<span className="whitespace-nowrap">· {earlier}</span>
+                </span>
+              ) : null}
             </span>
           ) : null}
         </div>
@@ -175,7 +213,15 @@ export function DecisionHero({
             directly under the call. The chip-and-popover in the meta row and the
             trust line at the foot of the card both said this; neither said it
             where a reader deciding whether to act would look first. */}
-        {trust ? <TrustStrip {...trust} href="/trust" className="pt-1" /> : null}
+        {trust ? <TrustStrip {...trust} href="/trust" className="pt-1 md:mt-auto" /> : null}
+        {aside && asideNote && asideNote.length > 0 ? (
+          <p className={`text-fluid-nano text-slate-400 max-md:hidden${trust ? "" : " md:mt-auto"}`} data-aside-note>
+            {asideNote.join(" ")}
+          </p>
+        ) : null}
+        </div>
+        {aside ? <div className="max-md:hidden">{aside}</div> : null}
+        </div>
 
         {/* The card is the block people screenshot and crop, so it names its
             own source inside its border. */}
