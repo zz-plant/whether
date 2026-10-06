@@ -1,6 +1,6 @@
 import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
 
-import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
+import { getWhetherKv } from "../runtime/kv";
 
 const SNAPSHOT_KV_KEY = "regime:machine-snapshot";
 const SNAPSHOT_CACHE_TTL_MS = 5000;
@@ -8,18 +8,10 @@ const SNAPSHOT_CACHE_TTL_MS = 5000;
 let inMemorySnapshot: RegimeMachineSnapshot | null = null;
 let lastLoadedAt = 0;
 
-const getKvBinding = (): KvNamespaceLike | null => {
-  const binding = (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV;
-  if (!binding || typeof binding.get !== "function" || typeof binding.put !== "function") {
-    return null;
-  }
-  return binding;
-};
-
 export const loadRegimeMachineSnapshot = async (): Promise<RegimeMachineSnapshot | null> => {
   const now = Date.now();
   if (inMemorySnapshot && now - lastLoadedAt < SNAPSHOT_CACHE_TTL_MS) return inMemorySnapshot;
-  const kv = getKvBinding();
+  const kv = getWhetherKv();
   if (!kv) return inMemorySnapshot;
   try {
     const raw = await kv.get(SNAPSHOT_KV_KEY);
@@ -35,7 +27,7 @@ export const loadRegimeMachineSnapshot = async (): Promise<RegimeMachineSnapshot
 export const saveRegimeMachineSnapshot = async (snapshot: RegimeMachineSnapshot): Promise<void> => {
   inMemorySnapshot = snapshot;
   lastLoadedAt = Date.now();
-  const kv = getKvBinding();
+  const kv = getWhetherKv();
   if (!kv) return;
   try {
     await kv.put(SNAPSHOT_KV_KEY, JSON.stringify(snapshot));

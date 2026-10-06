@@ -1,4 +1,4 @@
-import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
+import { getWhetherKv, type KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
 import { loadReportData } from "../report/reportData";
 import { alertDeliveryKey, evaluateAlert } from "./alertEvaluator";
@@ -19,20 +19,7 @@ import { describeConditions } from "../export/exportTerms";
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
 
-const getKv = (): KvNamespaceLike | null => {
-  const binding = (globalThis as {
-    WHETHER_DURABLE_KV?: KvNamespaceLike;
-  }).WHETHER_DURABLE_KV;
-  if (
-    !binding ||
-    typeof binding.get !== "function" ||
-    typeof binding.put !== "function" ||
-    typeof binding.list !== "function"
-  ) {
-    return null;
-  }
-  return binding;
-};
+const getKv = (): KvNamespaceLike | null => getWhetherKv();
 
 const readAlertState = async (): Promise<LastAlertState | null> => {
   const kv = getKv();

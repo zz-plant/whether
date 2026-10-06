@@ -1,4 +1,4 @@
-import { readKvValues, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
 import { isSlackWebhookUrl } from "./deliverSlackBrief";
 
 type SlackSubscription = {
@@ -14,8 +14,6 @@ type SlackSubscribeOptions = {
   channelName?: string;
   teamName?: string;
 };
-
-type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
 
 export interface SlackWebhookStore {
   subscribe(webhookUrl: string, options?: SlackSubscribeOptions): Promise<SlackSubscription>;
@@ -69,7 +67,7 @@ const hydrateSubscription = (raw: unknown): SlackSubscription | null => {
 class KvSlackWebhookStore implements SlackWebhookStore {
   private readonly fallback = new InMemorySlackWebhookStore();
 
-  constructor(private readonly kv: KvNamespaceLike) {}
+  constructor(private readonly kv: KvNamespace) {}
 
   async subscribe(webhookUrl: string, options?: SlackSubscribeOptions): Promise<SlackSubscription> {
     const trimmed = webhookUrl.trim();
@@ -150,10 +148,6 @@ class KvSlackWebhookStore implements SlackWebhookStore {
   }
 
   async listActiveSubscriptions(): Promise<SlackSubscription[]> {
-    if (!this.kv.list) {
-      return this.fallback.listActiveSubscriptions();
-    }
-
     const subscriptions: SlackSubscription[] = [];
     let cursor: string | undefined;
 
@@ -301,32 +295,18 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
   }
 }
 
-const isKvNamespaceLike = (value: unknown): value is KvNamespaceLike =>
-  typeof value === "object" &&
-  value !== null &&
-  typeof Reflect.get(value, "get") === "function" &&
-  typeof Reflect.get(value, "put") === "function";
-
-const getKvBinding = (): KvNamespaceLike | null => {
-  const binding: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
-  if (!isKvNamespaceLike(binding)) {
-    return null;
-  }
-  return binding;
-};
-
 let sharedSlackStore: SlackWebhookStore | null = null;
 
 export const getSlackWebhookStore = (): SlackWebhookStore => {
   if (!sharedSlackStore) {
-    const kv = getKvBinding();
+    const kv = getWhetherKv();
     sharedSlackStore = kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore();
   }
   return sharedSlackStore;
 };
 
 export const resetSlackWebhookStore = (): SlackWebhookStore => {
-  const kv = getKvBinding();
+  const kv = getWhetherKv();
   sharedSlackStore = kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore();
   return sharedSlackStore;
 };
