@@ -1,6 +1,6 @@
 import type { MacroSeriesReading, TreasuryData } from "../types";
 import { evaluateRegime, type RegimeThresholds } from "../regimeEngine";
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import { buildWeeklyCallContract } from "../report/weeklyCallContract";
 import { buildHomeBriefModel } from "../report/homeBriefModel";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";

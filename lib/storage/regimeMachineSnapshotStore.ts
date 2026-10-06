@@ -1,4 +1,4 @@
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 
 import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
 

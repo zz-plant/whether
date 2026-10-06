@@ -7,7 +7,7 @@ import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../ty
 import { TreasuryDataSchema } from "../treasury/treasurySchema";
 import { evaluateRegime, type RegimeAssessment } from "../regimeEngine";
 import type { RegimeThresholds } from "../regimeEngine";
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import rawCache from "../../data/time_machine_cache.json";
 import { snapshotData } from "../snapshot";
 

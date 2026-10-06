@@ -1,5 +1,5 @@
 import type { GovernanceParameterSet } from "./policy/governance";
-import { classifyRegimeQuadrant, type RegimeStateTransition } from "./report/regimeStateMachine";
+import type { RegimeStateTransition } from "./regimeStateMachine";
 import type { TreasuryData, TreasuryYields, RegimeKey } from "./types";
 
 export type { RegimeKey };
@@ -675,5 +675,16 @@ export const computeRiskAppetiteScore = (curveSlope: number) => {
 export const classifyRegime = (
   tightness: number,
   riskAppetite: number,
-  thresholds: RegimeThresholds,
-): RegimeKey => classifyRegimeQuadrant({ tightness, riskAppetite, thresholds });
+  thresholds: Pick<RegimeThresholds, "tightnessRegime" | "riskAppetiteRegime">,
+): RegimeKey => {
+  if (tightness > thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
+    return "SCARCITY";
+  }
+  if (tightness > thresholds.tightnessRegime && riskAppetite > thresholds.riskAppetiteRegime) {
+    return "DEFENSIVE";
+  }
+  if (tightness <= thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
+    return "VOLATILE";
+  }
+  return "EXPANSION";
+};

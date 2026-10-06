@@ -2,7 +2,7 @@
  * Regime Engine core logic for scoring and classifying macro regimes.
  * Keeps deterministic, explainable rules close to their types.
  */
-import { advanceRegimeState, type RegimeMachineSnapshot } from "./report/regimeStateMachine";
+import { advanceRegimeState, type RegimeMachineSnapshot } from "./regimeStateMachine";
 import type { MacroSeriesReading, TreasuryData } from "./types";
 import {
   RISK_APPETITE_EXPLANATION,

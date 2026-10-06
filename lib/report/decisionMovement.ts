@@ -15,7 +15,7 @@ import {
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import { comparisonBasis } from "./comparisonBasis";
 import type { ActionStripItem } from "./operatingCalls";
-import { classifyRegimeQuadrant } from "./regimeStateMachine";
+import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import type { ComparedWith, ReportDynamics } from "./reportDataTypes";
 
 /**

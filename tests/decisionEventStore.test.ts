@@ -7,7 +7,7 @@ import {
   resetDecisionEventStore,
 } from "../lib/events/decisionEventStore";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
-import { advanceRegimeState } from "../lib/report/regimeStateMachine";
+import { advanceRegimeState } from "../lib/regimeStateMachine";
 
 describe("decision event store", () => {
   beforeEach(() => {

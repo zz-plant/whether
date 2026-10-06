@@ -12,7 +12,7 @@ import {
   resolveBaseRateVelocityDelta,
   type RegimeThresholds,
 } from "../lib/regimeEngineCore";
-import { advanceRegimeState, SHOCK_CROSSING_POINTS } from "../lib/report/regimeStateMachine";
+import { advanceRegimeState, SHOCK_CROSSING_POINTS } from "../lib/regimeStateMachine";
 import { applyMacroAdjustments } from "../lib/regimeEngineDiagnostics";
 import { buildWeeklySummary } from "../lib/summary/weeklySummary";
 import { buildMonthlySummary } from "../lib/summary/monthlySummary";

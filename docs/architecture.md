@@ -178,7 +178,7 @@ The core classification engine. It takes normalized market inputs and decides wh
 - `applyMacroAdjustments()` — Macro corroboration: HY spread, Chicago FCI, VIX haircut, and the market-stress veto (VIX 10-obs mean ≥ 30 caps the proxy at the regime line; 22–30 caps it 5 points above)
 - `classifyRegime()` — Instant quadrant read for point queries and what-if scenarios; no machine state
 
-**Flip governance (`lib/report/regimeStateMachine.ts`):**
+**Flip governance (`lib/regimeStateMachine.ts`):**
 - A flip commits after two consecutive confirming observations (one when clear of boundaries and at HIGH confidence)
 - A crossing that jumps its line by ≥ 25 points in one step, from a reading outside the 5-point near band, commits immediately and is marked `shock` — no published reversal condition could have fired — and the call publishes at LOW confidence with an explicit warning. A jump that started inside the band is not a shock, however large: the warning could have fired, so the flip confirms through the gate like any other
 - Archive and replay paths thread the same machine state the live path does, so `/history` and the weekly archive grade the same flips

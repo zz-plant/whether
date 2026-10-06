@@ -29,7 +29,7 @@ import {
   type RegimeAssessment,
   type RegimeKey,
 } from "../regimeEngineCore";
-import { classifyRegimeQuadrant } from "./regimeStateMachine";
+import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import { getRegimePublicLabel } from "../regimePresentation";
 
 type FlipProximity = {

@@ -7,7 +7,7 @@ import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
-import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../lib/regimeStateMachine";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import { resolveYearRange } from "./summaryRange";
 import {

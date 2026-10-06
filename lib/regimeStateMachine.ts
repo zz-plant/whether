@@ -1,6 +1,11 @@
-import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
-import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
-import { regimeSignalLabel } from "./signalTranslations";
+import {
+  REGIME_CONFIDENCE_NEAR_THRESHOLD,
+  classifyRegime,
+  type RegimeDiagnostics,
+  type RegimeKey,
+  type RegimeThresholds,
+} from "./regimeEngineCore";
+import { regimeSignalLabel } from "./report/signalTranslations";
 
 type RegimeState = RegimeKey;
 
@@ -62,7 +67,9 @@ export type RegimeStateTransition = {
 /**
  * The quadrant the readings classify into, ignoring any committed state. This is
  * the candidate the machine confirms or holds; exported so copy that describes
- * the flip can state it against the same table the machine uses.
+ * the flip can state it against the same table the machine uses. The table
+ * itself is `classifyRegime` in the engine core, so the core and the machine
+ * read one table without importing each other.
  */
 export const classifyRegimeQuadrant = ({
   tightness,
@@ -72,18 +79,7 @@ export const classifyRegimeQuadrant = ({
   tightness: number;
   riskAppetite: number;
   thresholds: Pick<RegimeThresholds, "tightnessRegime" | "riskAppetiteRegime">;
-}): RegimeState => {
-  if (tightness > thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
-    return "SCARCITY";
-  }
-  if (tightness > thresholds.tightnessRegime && riskAppetite > thresholds.riskAppetiteRegime) {
-    return "DEFENSIVE";
-  }
-  if (tightness <= thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
-    return "VOLATILE";
-  }
-  return "EXPANSION";
-};
+}): RegimeState => classifyRegime(tightness, riskAppetite, thresholds);
 
 const classifyFromSignals = ({ tightness, riskAppetite, thresholds }: RegimeMachineSignals): RegimeState =>
   classifyRegimeQuadrant({ tightness, riskAppetite, thresholds });

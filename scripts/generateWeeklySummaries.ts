@@ -5,7 +5,7 @@
 import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
-import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../lib/regimeStateMachine";
 import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";

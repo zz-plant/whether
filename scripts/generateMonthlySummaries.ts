@@ -5,7 +5,7 @@
 import { buildMonthlySummary, type MonthlySummary } from "../lib/summary/monthlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
-import type { RegimeMachineSnapshot } from "../lib/report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../lib/regimeStateMachine";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import { readFile, writeFile } from "node:fs/promises";
 import { writeSummaryArchive } from "./summaryArchive";

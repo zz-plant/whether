@@ -1,7 +1,7 @@
 /**
  * The regime classifier, read as a plane rather than as two rails.
  *
- * `classifyFromSignals` in `report/regimeStateMachine.ts` is a 2x2 split: funding
+ * `classifyFromSignals` in `regimeStateMachine.ts` is a 2x2 split: funding
  * pressure against `tightnessRegime`, risk appetite against `riskAppetiteRegime`.
  * Every surface so far has rendered those two comparisons as separate readouts,
  * which is a lossy projection of a two-dimensional rule — a reader holding

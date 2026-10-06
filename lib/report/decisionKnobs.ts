@@ -1,7 +1,7 @@
 import type { RegimeKey } from "../regimeEngine";
 import { buildRuleCondition, type RuleCondition } from "./boundedDecisionRules";
 import { REGIME_LABELS } from "../regimePresentation";
-import type { RegimeStateTransition } from "./regimeStateMachine";
+import type { RegimeStateTransition } from "../regimeStateMachine";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
 
 /**

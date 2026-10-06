@@ -11,7 +11,7 @@ import {
   deriveRegimeTrend,
   evaluateRegime,
 } from "../lib/regimeEngine";
-import { advanceRegimeState } from "../lib/report/regimeStateMachine";
+import { advanceRegimeState } from "../lib/regimeStateMachine";
 import type { TreasuryData } from "../lib/types";
 
 describe("regime engine scoring", () => {

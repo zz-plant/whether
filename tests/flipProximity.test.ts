@@ -4,7 +4,7 @@ import { buildFlipProximity, buildQuietDayRead, buildStandupFlipLine } from "../
 import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
-import { classifyRegimeQuadrant } from "../lib/report/regimeStateMachine";
+import { classifyRegimeQuadrant } from "../lib/regimeStateMachine";
 import type { TreasuryData } from "../lib/types";
 
 const withYields = (yields: TreasuryData["yields"]): RegimeAssessment =>

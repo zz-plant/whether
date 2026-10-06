@@ -1,5 +1,5 @@
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
-import { classifyRegimeQuadrant } from "./regimeStateMachine";
+import { classifyRegimeQuadrant } from "../regimeStateMachine";
 
 type RegimeContext = {
   currentRegime: string;
