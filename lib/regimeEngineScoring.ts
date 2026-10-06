@@ -30,7 +30,11 @@ import {
   computeDiagnostics,
   type RegimeDiagnosticsScoring,
 } from "./regimeEngineDiagnostics";
-import { computePolicyAssessment, type PolicyScoring } from "./regimeEnginePolicy";
+import {
+  computePolicyAssessment,
+  type PolicyScoring,
+  type TreasuryPolicyHistoryPoint,
+} from "./regimeEnginePolicy";
 import {
   advanceRegimeState,
   type RegimeMachineSnapshot,
@@ -61,6 +65,8 @@ export const scoreRegime = (
   macroSeries: MacroSeriesReading[],
   previousMachineState: RegimeMachineSnapshot | null,
   context: RegimeEvaluationContext,
+  /** The month-end rate history the policy composites standardize against. */
+  policyHistory: readonly TreasuryPolicyHistoryPoint[],
 ): RegimeScoring => {
   const warnings: RegimeWarning[] = [];
   const baseRate = getBaseRate(treasury.yields);
@@ -155,6 +161,6 @@ export const scoreRegime = (
     diagnostics: diagnosticsWithShock,
     warnings,
     thresholds,
-    policy: computePolicyAssessment(treasury, thresholds, macroSeries, tightness, riskAppetite),
+    policy: computePolicyAssessment(treasury, thresholds, macroSeries, tightness, riskAppetite, policyHistory),
   };
 };

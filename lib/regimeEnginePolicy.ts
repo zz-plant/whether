@@ -1,7 +1,6 @@
 import type { MacroSeriesReading, TreasuryData } from "./types";
 import { POLICY_BBB_WEIGHT_FOR_RAS, POLICY_SPEC_V1 } from "./policy/config";
 import { getGovernanceParametersForPosture } from "./policy/governance";
-import { getTreasuryPolicyHistory } from "./policy/history";
 import {
   clipZScore,
   computeCompositeScore,
@@ -33,7 +32,43 @@ type PolicyRefusalScoring = Omit<PolicyRefusalState, "reasons"> & {
 /** The engine's policy assessment: the stored shape, with refusal reasons still as codes. */
 export type PolicyScoring = Omit<PolicyAssessment, "refusal"> & { refusal: PolicyRefusalScoring };
 
+/** One month-end of the rate history the base-rate and slope composites standardize against. */
+export type TreasuryPolicyHistoryPoint = {
+  recordDate: string;
+  baseRate: number | null;
+  curveSlope: number | null;
+};
+
 const POLICY_HISTORY_WINDOW_MONTHS = POLICY_SPEC_V1.rollingWindowYears * 12;
+
+const parseRecordDate = (value: string) => {
+  const timestamp = Date.parse(`${value}T00:00:00.000Z`);
+  return Number.isFinite(timestamp) ? timestamp : null;
+};
+
+/**
+ * The trailing window of the history strictly before the reading's own date,
+ * at most `months` points. The history arrives as an argument: the engine
+ * imports no data, so a replay or a test can say exactly which history scored
+ * a reading, and the bundled default is supplied by `evaluateRegime`.
+ */
+const selectPolicyHistoryWindow = (
+  history: readonly TreasuryPolicyHistoryPoint[],
+  asOf: string,
+  months: number,
+): TreasuryPolicyHistoryPoint[] => {
+  const asOfTimestamp = parseRecordDate(asOf);
+  if (asOfTimestamp === null) {
+    return [];
+  }
+
+  const historicalPoints = history.filter((point) => {
+    const pointTimestamp = parseRecordDate(point.recordDate);
+    return pointTimestamp !== null && pointTimestamp < asOfTimestamp;
+  });
+
+  return historicalPoints.slice(-Math.max(months, 1));
+};
 const POLICY_FALLBACK_STD_DEV = {
   BASE_RATE: 1,
   CURVE_SLOPE: 0.75,
@@ -106,16 +141,18 @@ export const computePolicyAssessment = (
   macroSeries: MacroSeriesReading[],
   legacyTightness: number,
   legacyRiskAppetite: number,
+  policyHistory: readonly TreasuryPolicyHistoryPoint[],
 ): PolicyScoring => {
   const baseRate = getBaseRate(treasury.yields);
   const slope = computeCurveSlope(treasury.yields);
   const bbb = getSignalById(macroSeries, "BBB_CREDIT_SPREAD");
   const cpi = getSignalById(macroSeries, "CPI_YOY");
   const unemployment = getSignalById(macroSeries, "UNEMPLOYMENT_RATE");
-  const treasuryHistory = getTreasuryPolicyHistory({
-    asOf: treasury.record_date,
-    months: POLICY_HISTORY_WINDOW_MONTHS,
-  });
+  const treasuryHistory = selectPolicyHistoryWindow(
+    policyHistory,
+    treasury.record_date,
+    POLICY_HISTORY_WINDOW_MONTHS,
+  );
 
   const normalizations: PolicySignalNormalization[] = [];
 

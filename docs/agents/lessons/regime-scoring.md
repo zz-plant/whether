@@ -163,3 +163,14 @@ monthly archive's record dates, regimes and both scores for all 176 months, and 
 for entry, apart from the fetch timestamp. `tests/regimeArchiveReplay.test.ts` holds the generators' own code
 to that, so a change that moves an archived month fails offline instead of surfacing at the next
 regeneration.
+
+## The scorer reads no data (2026-10-06)
+
+`computePolicyAssessment` standardizes the base rate and the curve slope against a ten-year month-end
+history, and it used to fetch that history itself: `regimeEnginePolicy.ts` imported `getTreasuryPolicyHistory`,
+which imported the 1.2MB `data/time_machine_cache.json`. So every reading's policy composites depended on a
+file nothing at the call site named. The history is an argument now — `scoreRegime(…, policyHistory)` and
+`computePolicyAssessment(…, policyHistory)`, with the window selection in the engine — and `evaluateRegime`
+supplies the bundled series (`TREASURY_POLICY_HISTORY`, `lib/policy/history.ts`). `lib/regimeEngine.ts` and
+`lib/policy/history.ts` are the only engine-layer files that import bundled data or `lib/report/`;
+`tests/architectureInvariants.test.ts` holds the rest to that.

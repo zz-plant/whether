@@ -1,4 +1,5 @@
 import rawTimeMachineCache from "../../data/time_machine_cache.json";
+import type { TreasuryPolicyHistoryPoint } from "../regimeEnginePolicy";
 
 type TimeMachineLikeSnapshot = {
   record_date?: string;
@@ -8,12 +9,6 @@ type TimeMachineLikeSnapshot = {
     twoYear?: number | null;
     tenYear?: number | null;
   };
-};
-
-type TreasuryPolicyHistoryPoint = {
-  recordDate: string;
-  baseRate: number | null;
-  curveSlope: number | null;
 };
 
 const parseRecordDate = (value: string) => {
@@ -44,22 +39,10 @@ const treasuryPolicyHistory = (rawTimeMachineCache as TimeMachineLikeSnapshot[])
       (parseRecordDate(right.recordDate) ?? Number.NEGATIVE_INFINITY),
   );
 
-export const getTreasuryPolicyHistory = ({
-  asOf,
-  months,
-}: {
-  asOf: string;
-  months: number;
-}) => {
-  const asOfTimestamp = parseRecordDate(asOf);
-  if (asOfTimestamp === null) {
-    return [];
-  }
-
-  const historicalPoints = treasuryPolicyHistory.filter((point) => {
-    const pointTimestamp = parseRecordDate(point.recordDate);
-    return pointTimestamp !== null && pointTimestamp < asOfTimestamp;
-  });
-
-  return historicalPoints.slice(-Math.max(months, 1));
-};
+/**
+ * The month-end rate history the policy composites standardize against, from
+ * the bundled Time Machine cache: the default the engine's composition layer
+ * (`evaluateRegime`) hands the scorer. The scorer itself takes the history as
+ * an argument and imports no data, so what it reads is visible at the call.
+ */
+export const TREASURY_POLICY_HISTORY: readonly TreasuryPolicyHistoryPoint[] = treasuryPolicyHistory;
