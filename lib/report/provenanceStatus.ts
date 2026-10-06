@@ -1,3 +1,5 @@
+import type { TreasuryMetadata } from "../types";
+
 /**
  * How confident the provenance strip is allowed to sound.
  *
@@ -79,3 +81,12 @@ export type ReportProvenance = {
   ageLabel: string;
   statusLabel: ProvenanceStripStatus;
 };
+
+/**
+ * Whether a reading is a saved copy rather than a live one. The treasury client stamps
+ * `fallback_at` and `fallback_reason` when it serves the bundled or stored copy, and either
+ * alone marks it. Seventeen call sites spelled this test out by hand.
+ */
+export const isSavedCopy = (
+  record: Pick<TreasuryMetadata, "fallback_at" | "fallback_reason"> | null | undefined,
+): boolean => Boolean(record?.fallback_at || record?.fallback_reason);

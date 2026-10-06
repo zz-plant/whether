@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
-import { buildWeeklyOperatorBriefCopyText } from "../lib/report/home/artifactPayload";
+import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
+import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
 import { buildPostureStateContract, type PostureStateContract } from "../lib/report/postureStateContract";
 import type { LoadReportDataSafeResult } from "../lib/report/reportData";
 import { buildAssessmentFixture, buildReportDataFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
@@ -55,13 +56,9 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(homepage.fallbackActive, false);
 
     let diagnosticsSettled = false;
-    let artifactSettled = false;
     let workspaceSettled = false;
     void homepage.diagnosticsLanePromise.then(() => {
       diagnosticsSettled = true;
-    });
-    void homepage.leadershipArtifactPayloadPromise.then(() => {
-      artifactSettled = true;
     });
     void homepage.workspaceModelPromise.then(() => {
       workspaceSettled = true;
@@ -71,45 +68,21 @@ describe("assembleHomePage streaming contract", () => {
     await Promise.resolve();
 
     assert.equal(diagnosticsSettled, false);
-    assert.equal(artifactSettled, false);
     assert.equal(workspaceSettled, false);
 
     releasePostureState?.(postureState);
 
     const diagnosticsLane = await homepage.diagnosticsLanePromise;
-    const artifactPayload = await homepage.leadershipArtifactPayloadPromise;
     const workspaceModel = await homepage.workspaceModelPromise;
     const reportDataForCopy = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
-    assert.ok(artifactPayload);
-    assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /PAUSE IF: /);
-    assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /DELTA-ONLY BRIEF/);
-    assert.match(artifactPayload?.deltaOnlyBriefText ?? "", /Revisit now/);
-    /* The board note is read cold. Every slot uses the page's name and carries
-       its meaning; the retired names and a percent confidence must not return. */
-    const boardNote = artifactPayload?.boardSnippetText ?? "";
-    /* The CHANGED line used to carry its own "Conditions change if" clause, naming
-       a different line from the one printed three rows below it. */
-    assert.equal(boardNote.match(/conditions change if/gi)?.length, 1);
-    assert.equal(artifactPayload?.deltaOnlyBriefText.match(/conditions change if/gi)?.length, 1);
-    assert.match(boardNote, /^DATA: (Live, as of|Saved copy from) /m);
-    assert.match(boardNote, /^OPERATING LATITUDE: \d+\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: /m);
-    assert.match(boardNote, /^CONDITIONS: (Sunny|Cloudy|Stormy|Freezing)[^\n]*\((money|conditions) [^)]+\) · (High|Medium|Low) confidence$/m);
-    assert.match(boardNote, /^PAUSE IF: /m);
-    assert.match(boardNote, /^CONDITIONS CHANGE IF: /m);
-    assert.doesNotMatch(boardNote, /BOLDNESS|FLIP:|GUARDRAIL:|POSTURE:|TRUST:|FALLBACK|SNAPSHOT|\d+% confidence|\b(HIGH|MED|LOW)\b/);
-    assert.doesNotMatch(boardNote, /PAUSE IF: Pause /);
-    assert.doesNotMatch(artifactPayload?.weeklyCallSnapshotText ?? "", /AVOID:|WATCH:|\d+%/);
-    const headerOperatorBriefCopy = buildWeeklyOperatorBriefCopyText({
-      assessment: reportDataForCopy.assessment,
-      treasury: reportDataForCopy.treasury,
-      date: reportDataForCopy.weeklyRecordDate,
-      postureWithStageLabel: homepage.weeklyDecisionCardModel.status.postureWithStageLabel,
-      actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
-      flipConditionLabels: homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels,
-      weeklyCall: homepage.weeklyCall,
-      weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
-    });
+    const headerOperatorBriefCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(
+      buildBriefDocument(briefSourceFromReportData(reportDataForCopy), homepage.weeklyCall),
+      {
+        date: reportDataForCopy.weeklyRecordDate,
+        weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
+      },
+    ));
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
     assert.match(headerOperatorBriefCopy, /Conditions:/);
@@ -117,7 +90,6 @@ describe("assembleHomePage streaming contract", () => {
     assert.match(headerOperatorBriefCopy, /Pause if:/);
     assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);
     assert.match(headerOperatorBriefCopy, /Conditions change if:/);
-    assert.equal(artifactPayload?.weeklyOperatorBriefText, headerOperatorBriefCopy);
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operate#ops-monthly-action-summary");
     assert.match(workspaceModel.translate.primaryPath.href, /^\/resolve\//);
@@ -159,15 +131,13 @@ describe("assembleHomePage streaming contract", () => {
       },
     );
 
-    const [diagnosticsLane, workspaceModel, artifactPayload] = await Promise.all([
+    const [diagnosticsLane, workspaceModel] = await Promise.all([
       homepage.diagnosticsLanePromise,
       homepage.workspaceModelPromise,
-      homepage.leadershipArtifactPayloadPromise,
     ]);
 
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(workspaceModel.workspaceActions.auditHref);
-    assert.ok(artifactPayload);
     assert.equal(postureStateCalls, 1, "enrichment ran more than once");
   });
 

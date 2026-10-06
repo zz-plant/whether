@@ -29,6 +29,7 @@ import type { TreasuryData } from "../types";
 import { getOperatingSnapshotStore } from "./snapshotStore";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { loadReportDataSafe, type ReportData } from "../report/reportData";
+import { isSavedCopy } from "../report/provenanceStatus";
 
 type SnapshotReading = {
   source: "given" | "stored";
@@ -102,7 +103,7 @@ const readinessOf = (
     /* The reading's own flag and the treasury's fallback stamp, together: the
        email read the first and the Slack post the second, so a reading marked
        one way and not the other was sendable by one and refused by the other. */
-    isFallback: isFallback || Boolean(treasury.fallback_at || treasury.fallback_reason),
+    isFallback: isFallback || isSavedCopy(treasury),
     isLive,
     fallbackReason: treasury.fallback_reason,
     recordDate: treasury.record_date,

@@ -7,6 +7,10 @@
  */
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
+import type { PreviousReading } from "../../lib/export/scoreReference";
+import { buildBriefDocument } from "../../lib/report/briefDocument";
+import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
+import { buildWeeklyCallContract, type WeeklyCallContract } from "../../lib/report/weeklyCallContract";
 
 export const assessment: RegimeAssessment = {
   regime: "EXPANSION",
@@ -125,3 +129,37 @@ export const macros: MacroSeriesReading[] = [
     isLive: true,
   },
 ];
+
+/** The weekly call for a fixture reading, through the contract every production caller passes. */
+export const fixtureWeeklyCall = (reading: RegimeAssessment = assessment): WeeklyCallContract =>
+  buildWeeklyCallContract({
+    assessment: reading,
+    homeBriefModel: buildHomeBriefModel({ assessment: reading, stopItems: reading.constraints, regimeAlert: null }),
+  });
+
+/**
+ * The fixture reading as the document every export renders. The builders took
+ * the assessment, the treasury record, the sensors and the macro series apart;
+ * the document carries them, under the call contract's slots.
+ */
+export const fixtureBriefDocument = ({
+  reading = assessment,
+  weeklyCall,
+  previousScores = null,
+}: {
+  reading?: RegimeAssessment;
+  weeklyCall?: WeeklyCallContract;
+  previousScores?: PreviousReading | null;
+} = {}) =>
+  buildBriefDocument(
+    {
+      assessment: reading,
+      treasury,
+      macroSeries: macros,
+      sensors,
+      recordDateLabel: "Mar 4, 2026",
+      sourceLabel: "Federal Reserve Economic Data (FRED)",
+      previousScores,
+    },
+    weeklyCall ?? fixtureWeeklyCall(reading),
+  );

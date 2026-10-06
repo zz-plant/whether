@@ -638,7 +638,10 @@ export const loadReportDataUncachedInternal = async ({
 export const buildFallbackReportDataInternal = ({
   searchParams,
   deps,
-}: BuildFallbackReportDataArgs) => {
+}: BuildFallbackReportDataArgs): Awaited<ReturnType<typeof loadReportDataUncachedInternal>> & {
+  stale: true;
+  lastCachedTimestamp: string;
+} => {
   const now = new Date();
   const fallbackTreasury = deps.buildSnapshotFallbackTreasury(deps.snapshotData, now);
   const historicalSelection = deps.resolveTimeMachineSelection(searchParams);

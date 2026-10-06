@@ -73,4 +73,21 @@ export const pauseConditionOnly = (value: string): string => {
 };
 
 /** The marker a paste carries when its numbers came off a saved copy rather than a live read. */
-export const SAVED_COPY_NOTE = "saved copy, not a live reading";
+const SAVED_COPY_NOTE = "saved copy, not a live reading";
+
+/**
+ * The one provenance footer: the source as a reader names it, the record's
+ * date, where it was read, and — when the numbers came off a saved copy — that
+ * they did. The investor update, the portfolio note, the slide in every format
+ * and the deck files each built their own, and the slide's and the deck's
+ * dropped the date and the site.
+ */
+export const formatSourceFooter = ({
+  sourceLabel,
+  recordDate,
+  isFallback,
+}: {
+  sourceLabel: string;
+  recordDate: string;
+  isFallback?: boolean;
+}): string => `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}`;

@@ -1,4 +1,6 @@
 import { buildCallCitation } from "../export/briefBuilders";
+import { buildBriefPermalinkUrl } from "../export/briefPermalink";
+import { describeConditions } from "../export/exportTerms";
 import { buildPostureState } from "./postureStateSource";
 import { getRegimeDisplayLabel } from "../regimePresentation";
 import { buildCanonicalDecisionCopy, type CanonicalDecisionCopy } from "./canonicalDecisionCopy";
@@ -11,6 +13,7 @@ import type { PostureStateContract } from "./postureStateContract";
 import { applyStageToWeeklyCall, buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
 import type { StartupVariantMode } from "./boundedDecisionRules";
 import type { RunwayBand } from "./operatorRunway";
+import { isSavedCopy } from "./provenanceStatus";
 
 export type WeeklyBriefSnapshot = {
   reportData: ReportData | ReportDataFallback;
@@ -92,7 +95,7 @@ export const buildWeeklyBriefSnapshot = ({
   runwayBand,
   runwayMonths,
 }: BuildWeeklyBriefSnapshotArgs): WeeklyBriefSnapshot => {
-  const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
+  const isFallback = isSavedCopy(reportData.treasury);
   const homeBriefModel = buildHomeBriefModel(
     buildHomeBriefInput(reportData, postureState),
     { overlaySector, startupVariantMode, runwayBand, runwayMonths },
@@ -142,8 +145,16 @@ export const buildWeeklyBriefSnapshot = ({
         runwayBand,
         runwayMonths,
       });
-  const callCitation = buildCallCitation(reportData.assessment, reportData.treasury, {
-    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+  /* The answer pages' citation, under the call's own conditions label and the
+     published confidence the home model already resolved for this read. */
+  const callCitation = buildCallCitation({
+    conditions: { line: describeConditions(reportData.assessment.regime, weeklyCall.regimeStage) },
+    confidence: homeBriefModel.confidenceLabel,
+    provenance: {
+      sourceUrl: reportData.treasury.source,
+      recordDate: reportData.treasury.record_date,
+      permalink: buildBriefPermalinkUrl(reportData.treasury.record_date),
+    },
   });
   const weeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
     homeBriefModel,

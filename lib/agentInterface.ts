@@ -12,6 +12,7 @@ import { buildQuarterlySummary, getQuarterLabel } from "./summary/quarterlySumma
 import { buildWeeklySummary } from "./summary/weeklySummary";
 import { buildYearlySummary, getYearLabel } from "./summary/yearlySummary";
 import { resolveSiteUrl } from "./siteUrl";
+import { isSavedCopy } from "./report/provenanceStatus";
 
 export const supportedAgentCadences = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
@@ -191,7 +192,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
     degraded,
     publishReadiness: assessPublishReadiness({
       degraded,
-      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
+      isFallback: isSavedCopy(treasury),
       isLive: treasury.isLive,
       fallbackReason: treasury.fallback_reason,
       recordDate: treasury.record_date ?? treasury.fetched_at,

@@ -13,6 +13,7 @@ import { describeScoreMovementCaveat, listScoreMovementParts } from "./report/sc
 import { signalReadingMeaning } from "./report/signalTranslations";
 import { buildUseConstraint } from "./report/useConstraint";
 import { siteUrl } from "./siteUrl";
+import { isSavedCopy } from "./report/provenanceStatus";
 
 /**
  * The compact state an agent decides from.
@@ -196,7 +197,7 @@ export const buildAgentState = (
   const basis = comparisonBasis(reportDynamics.comparedWith);
   const recordDate = treasury.record_date ?? treasury.fetched_at;
   const days = reportDynamics.comparedWith ? daysBetween(reportDynamics.comparedWith.recordDate, recordDate) : null;
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const isFallback = isSavedCopy(treasury);
   const readiness = assessPublishReadiness({
     degraded,
     isFallback,

@@ -34,6 +34,7 @@ import { signalPlainEnglish, type CompositeSignalKey } from "../../lib/report/si
 import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -206,7 +207,7 @@ export async function DecisionAnswerPageContent({
             recordDateLabel,
             // `degraded` is assembly failing outright; a read that fell back to the
             // bundled snapshot succeeds, so the fallback flags are what move under an outage.
-            isFallback: degraded || Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+            isFallback: degraded || isSavedCopy(reportData.treasury),
             degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
             confidenceLabel: homeBriefModel.confidenceLabel,
             assessment,

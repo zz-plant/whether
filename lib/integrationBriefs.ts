@@ -1,11 +1,10 @@
 import type { RegimeAssessment } from "./regimeEngine";
-import type { TreasuryData } from "./types";
 import type { PostureStateContract } from "./report/postureStateContract";
-import { resolvePublishedConfidence } from "./report/confidence";
+import type { BriefDocument } from "./report/briefArtifact";
 import { getRegimePublicLabel } from "./regimePresentation";
 import { formatSignalReading } from "./report/signalTranslations";
 import { DECISION_CONTRACT_LABELS } from "./report/reportCopy";
-import { describeConditions } from "./export/exportTerms";
+import { briefResumeLine } from "./export/briefBuilders";
 
 type IntegrationTarget = "slack" | "notion" | "linear";
 
@@ -29,67 +28,46 @@ type WeeklyMandateEnvelope = {
   nextFlip: PostureStateContract["whatFlipsNext"];
 };
 
-const buildFallbackPostureState = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-): PostureStateContract => {
-  const confidence = resolvePublishedConfidence({ assessment, record: treasury });
-  return {
-    currentState: {
-      regime: assessment.regime,
-      postureLabel: getRegimePublicLabel(assessment.regime),
-      confidenceLabel: confidence.label,
-      confidencePercent: confidence.percent,
-      transitionWatch: "OFF",
-      recordDate: treasury.record_date,
-    },
-    lastCommittedChangeEvent: {
-      timestamp: null,
-      fromState: null,
-      toState: assessment.regime,
-      reason: "No record of the last change in conditions; this is the current reading.",
-      source: "state-machine",
-    },
-    whatFlipsNext: {
-      flipTrigger: "Check again after the next update.",
-      thresholds: ["Check again after the next update."],
-      reversalConditions: [],
-    },
-  };
-};
-
-const resolvePostureState = (
-  postureState: PostureStateContract | null | undefined,
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-): PostureStateContract => postureState?.currentState
-  ? postureState
-  : buildFallbackPostureState(assessment, treasury);
-
+/**
+ * The mandate a Slack channel, a Notion database or a Linear issue receives,
+ * from the week's brief document.
+ *
+ * The conditions, the readings, the limits and the lines are the document's,
+ * so a card states the same change line as the brief. It used to print the
+ * posture state's lock-commitment line as "Conditions change if" — a different
+ * line from the brief's — and its other flip conditions, one of which ended
+ * "tighten again", under "Resume when". The posture state still supplies what
+ * the document does not carry: when conditions last changed and why, and the
+ * structured flip data the JSON keeps (`nextFlip`). A missing posture state
+ * used to be filled with "Check again after the next update."; the route
+ * always builds one, so it is required.
+ */
 export const buildWeeklyMandateEnvelope = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  postureState: PostureStateContract | null | undefined,
+  document: BriefDocument,
+  postureState: PostureStateContract,
 ): WeeklyMandateEnvelope => {
-  const resolvedPostureState = resolvePostureState(postureState, assessment, treasury);
-  const title = `Whether weekly mandate — ${treasury.record_date}`;
+  const recordDate = document.provenance.recordDate;
+  const title = `Whether weekly mandate — ${recordDate}`;
+  const { scores } = document.readings;
   /* Pasted into a channel, card or database row that has no page beside it, so
      the conditions and both scores carry their meaning in the line. */
   const summary = [
-    `Conditions: ${describeConditions(assessment.regime, resolvedPostureState.currentState.postureLabel)}.`,
-    `${formatSignalReading("tightness", assessment.scores.tightness)}.`,
-    `${formatSignalReading("riskAppetite", assessment.scores.riskAppetite)}.`,
+    `Conditions: ${document.conditions.line}.`,
+    `${formatSignalReading("tightness", scores.tightness)}.`,
+    `${formatSignalReading("riskAppetite", scores.riskAppetite)}.`,
   ].join(" ");
-  const constraints = assessment.constraints.slice(0, 3);
+  const constraints = document.constraints.slice(0, 3);
+  const resumeLine = briefResumeLine(document);
+  const { flipConditionLabels } = document.slots;
 
   return {
     title,
     summary,
-    recordDate: treasury.record_date,
-    regime: assessment.regime,
+    recordDate,
+    regime: document.conditions.regime,
     constraints,
-    lastChange: resolvedPostureState.lastCommittedChangeEvent,
-    nextFlip: resolvedPostureState.whatFlipsNext,
+    lastChange: postureState.lastCommittedChangeEvent,
+    nextFlip: postureState.whatFlipsNext,
     markdown: [
       `## ${title}`,
       summary,
@@ -97,24 +75,24 @@ export const buildWeeklyMandateEnvelope = (
       "### What to hold",
       ...constraints.map((item) => `- ${item}`),
       "",
-      `Last change in conditions: ${resolvedPostureState.lastCommittedChangeEvent.timestamp ?? "not recorded"} · ${resolvedPostureState.lastCommittedChangeEvent.reason}`,
-      `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${resolvedPostureState.whatFlipsNext.flipTrigger}`,
-      ...resolvedPostureState.whatFlipsNext.reversalConditions.map(
-        (condition) => `- ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${condition}`,
-      ),
+      `Last change in conditions: ${postureState.lastCommittedChangeEvent.timestamp ?? "not recorded"} · ${postureState.lastCommittedChangeEvent.reason}`,
+      `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${document.slots.callChangesIf}`,
+      ...(resumeLine ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeLine}`] : []),
+      ...(flipConditionLabels.length > 0
+        ? [`${DECISION_CONTRACT_LABELS.watch.watchThisWeek}: ${flipConditionLabels.join("; ")}`]
+        : []),
       "",
-      `Source: ${treasury.source}`,
+      `Source: ${document.provenance.sourceUrl}`,
     ].join("\n"),
   };
 };
 
 export const buildWeeklyMandatePayload = (
   target: IntegrationTarget,
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  postureState: PostureStateContract | null | undefined,
+  document: BriefDocument,
+  postureState: PostureStateContract,
 ) => {
-  const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
+  const envelope = buildWeeklyMandateEnvelope(document, postureState);
 
   if (target === "slack") {
     return {
@@ -137,7 +115,7 @@ export const buildWeeklyMandatePayload = (
       parent: { type: "database_id", database_id: "weekly-mandates" },
       properties: {
         Name: { title: [{ text: { content: envelope.title } }] },
-        Conditions: { select: { name: getRegimePublicLabel(assessment.regime) } },
+        Conditions: { select: { name: getRegimePublicLabel(envelope.regime) } },
         Summary: { rich_text: [{ text: { content: envelope.summary } }] },
         RecordDate: { rich_text: [{ text: { content: envelope.recordDate } }] },
       },
@@ -153,7 +131,7 @@ export const buildWeeklyMandatePayload = (
   return {
     title: envelope.title,
     description: envelope.markdown,
-    labels: ["whether", getRegimePublicLabel(assessment.regime).toLowerCase()],
+    labels: ["whether", getRegimePublicLabel(envelope.regime).toLowerCase()],
     metadata: envelope,
   };
 };

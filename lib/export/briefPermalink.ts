@@ -29,6 +29,3 @@ export const buildBriefPermalinkUrl = (recordDate: string) => {
 
   return frozen ? buildCanonicalUrl(buildPublishedBriefPath(frozen.slug)) : buildCanonicalUrl("/");
 };
-
-export const buildBriefPermalinkLine = (recordDate: string) =>
-  `Full brief: ${buildBriefPermalinkUrl(recordDate)}`;

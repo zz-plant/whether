@@ -81,6 +81,7 @@ import type {
 import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
 import { regimeSignalLabel } from "../signalTranslations";
+import { isSavedCopy } from "../provenanceStatus";
 
 export { buildMemoryRail };
 
@@ -277,7 +278,7 @@ export const buildHomeBriefModelInternal = (
     scores: assessment.scores,
     thresholds: assessment.thresholds,
   });
-  const isFallbackData = Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection;
+  const isFallbackData = isSavedCopy(treasury) && !historicalSelection;
   const recordDateAgeHours = isFallbackData && treasury?.record_date
     ? Math.max(0, (Date.now() - Date.parse(`${treasury.record_date}T00:00:00.000Z`)) / 3_600_000)
     : 0;
@@ -370,7 +371,7 @@ export const buildHomeBriefModelInternal = (
     confidenceLabel,
     transitionWatch,
     freshnessLabel: fetchedAtLabel ?? "Unavailable",
-    isFallbackSnapshot: Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection,
+    isFallbackSnapshot: isSavedCopy(treasury) && !historicalSelection,
     provenanceStatusLabel: treasuryProvenance?.statusLabel,
     changedSignals: reportDynamics?.changedSignals ?? [],
     anomalySignals: reportDynamics?.anomalySignals ?? [],
@@ -387,7 +388,7 @@ export const buildHomeBriefModelInternal = (
           : "unknown",
       mode: historicalSelection
         ? "historical"
-        : treasury?.fallback_at || treasury?.fallback_reason
+        : isSavedCopy(treasury)
           ? "cached"
           : "live",
       timestamp: treasury?.fetched_at ?? null,
@@ -395,7 +396,7 @@ export const buildHomeBriefModelInternal = (
         ? Math.max(0, (Date.now() - Date.parse(treasury.fetched_at)) / 3_600_000)
         : null,
     },
-    isFallbackSnapshot: Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection,
+    isFallbackSnapshot: isSavedCopy(treasury) && !historicalSelection,
     isHistoricalSelection: Boolean(historicalSelection),
     policyRefusalActive: policyOverrideActive,
     policyRefusalReasons: policyOverrideReasons,

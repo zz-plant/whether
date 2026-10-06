@@ -275,6 +275,7 @@ When making product-facing changes, start by checking these areas:
 - `lib/regimeEngine.ts`
 
 ### Export / transmission surfaces
+- `lib/report/briefDocument.ts` — the one brief document every export renders from
 - existing export components under `app/operate/components/`
 - shared export helpers in `lib/export*`
 - provenance / trust helpers in `lib/report/*`

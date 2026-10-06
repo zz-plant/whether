@@ -1,20 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import { buildBoardBrief, buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import {
-  extractMeetingSlidePayload,
   formatMeetingSlideHtml,
   formatMeetingSlideMarkdown,
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import { buildTrustStatus } from "../lib/report/trustStatus";
-import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
+import { fixtureBriefDocument, treasury, macros } from "./factories/exportFixtures";
 
 /**
  * Every artifact that leaves the site was audited on 2026-09-22 for facts about the reader's
@@ -42,12 +42,11 @@ const FIXTURE_COMPANY =
 const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });
 
 describe("artifacts that leave the site carry no facts about a company the site never asked about", () => {
-  it("Slack brief, board brief, citation and slide bullets", () => {
+  it("Slack brief, citation and slide bullets", () => {
     for (const text of [
-      buildSlackBrief(assessment, treasury, sensors, macros),
-      buildBoardBrief(assessment, treasury, sensors, macros),
-      buildCallCitation(assessment, treasury),
-      buildBoardSlideBullets(assessment, treasury, macros),
+      buildSlackBrief(fixtureBriefDocument()),
+      buildCallCitation(fixtureBriefDocument()),
+      buildBoardSlideBullets(fixtureBriefDocument()),
     ]) {
       assert.doesNotMatch(text, FIXTURE_COMPANY);
     }
@@ -55,12 +54,12 @@ describe("artifacts that leave the site carry no facts about a company the site 
 
   it("meeting slide in every format, with and without a chosen stage", () => {
     for (const stage of [null, "seed", "series-a"] as const) {
-      const payload = extractMeetingSlidePayload(snapshot, stage);
+      const payload = buildExportSlidePayload(snapshot, stage);
       for (const text of [formatMeetingSlideMarkdown(payload), formatMeetingSlideHtml(payload), formatMeetingSlideSvg(payload)]) {
         assert.doesNotMatch(text, FIXTURE_COMPANY);
       }
     }
-    assert.equal(extractMeetingSlidePayload(snapshot).stageLabel, "", "an unchosen stage must not default to one");
+    assert.equal(buildExportSlidePayload(snapshot, null).stageLabel, "", "an unchosen stage must not default to one");
   });
 
   it("investor snippet leaves the company's policy to the author", () => {
@@ -71,12 +70,9 @@ describe("artifacts that leave the site carry no facts about a company the site 
   });
 
   it("portfolio note speaks to every runway band and to no one company", () => {
-    const note = buildPortfolioNote({
-      assessment,
-      record: treasury,
-      areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
-      sourceLabel: treasury.source,
-    });
+    const note = buildPortfolioNote(fixtureBriefDocument(), [
+      { area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" },
+    ]);
     assert.doesNotMatch(note, FIXTURE_COMPANY);
   });
 

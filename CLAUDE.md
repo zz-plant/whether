@@ -136,7 +136,12 @@ Canonical modules — extend these before creating new ones:
   `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `portfolioNote`, `meetingSlideExport`,
   `boardSlideDeck`). The page reads `lib/report/weeklyBriefSnapshot.ts`; the slide and image
   routes read `lib/export/exportSnapshot.ts`. Both resolve the stored operating snapshot first,
-  so they draw the same week unless report assembly falls back
+  so they draw the same week unless report assembly falls back. Every format renders one
+  `BriefDocument` (`lib/report/briefArtifact.ts`), built once by `buildBriefDocument` /
+  `buildBriefDocumentFromReport` (`lib/report/briefDocument.ts`) from a reading and its
+  `WeeklyCallContract`; add a format as `(document) => text`, never from the assessment directly.
+  `tests/briefFormatsPinned.test.ts` pins every format; regenerate with
+  `WHETHER_UPDATE_BRIEF_GOLDEN=1` in the commit that means to move a string
 - **Alerts between Mondays** — `lib/alert/*`: `alertEvaluator` decides, `flashMoves` judges
   raw-input moves against the previous snapshot, `checkRegimeChange` posts Slack,
   `alertDelivery` mails subscribers

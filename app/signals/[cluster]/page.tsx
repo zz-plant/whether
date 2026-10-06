@@ -16,6 +16,7 @@ import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import Link from "next/link";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../seoRouteClusters";
 import { toRoute } from "../../../lib/navigation/routeType";
+import { isSavedCopy } from "../../../lib/report/provenanceStatus";
 
 type Params = { cluster: string };
 
@@ -125,7 +126,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
         ]}
         trust={buildTrustStripProps({
           recordDateLabel: reportData.recordDateLabel,
-          isFallback: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+          isFallback: isSavedCopy(reportData.treasury),
           degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
           confidenceLabel: resolvePublishedConfidence({ assessment: reportData.assessment, record: reportData.treasury }).label,
           assessment: reportData.assessment,

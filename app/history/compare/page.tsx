@@ -12,6 +12,7 @@ import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/b
 import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
 import { ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
+import { isSavedCopy } from "../../../lib/report/provenanceStatus";
 
 export const runtime = "edge";
 
@@ -136,7 +137,7 @@ export default async function HistoryComparePage({
     .reverse();
 
   // Combine actions for the shell
-  const isFallback = Boolean(reportA.treasury.fallback_at || reportA.treasury.fallback_reason);
+  const isFallback = isSavedCopy(reportA.treasury);
 
   const compareSectionLinks = [
     { href: "#compare-selectors", label: "Period selection" },

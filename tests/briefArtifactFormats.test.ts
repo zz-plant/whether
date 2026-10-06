@@ -26,7 +26,6 @@ const artifact: BriefArtifact = {
   reversal: "Resume staged approvals when pressure falls below 60",
   clearsWhen: ["Funding pressure at or below 58"],
   regimeLabel: "Tightening",
-  postureLabel: "Defensive",
   tightness: 64,
   riskAppetite: 55,
   confidenceLabel: "MED",
@@ -82,21 +81,29 @@ describe("brief artifact formats", () => {
   });
 
   it("omits absent fields rather than printing empty labels", () => {
+    /* Both scores and the confidence are required now: the slide stood 50 and
+       "MED" in for a missing pair, which printed a reading nobody took. */
     const sparse: BriefArtifact = {
       title: "Whether Weekly Brief",
       recordDateLabel: "2026-09-04",
       call: "Hold.",
       regimeLabel: "Tightening",
       tightness: 64,
+      riskAppetite: 55,
+      confidenceLabel: "MED",
       source: "FRED",
     };
 
-    for (const format of BRIEF_FORMATS) {
+    for (const format of BRIEF_FORMATS.filter((entry) => entry.id !== "slide")) {
       const text = formatBriefArtifact(sparse, format.id, origin);
       assert.ok(!text.includes(`${DECISION_CONTRACT_LABELS.threshold.pauseIf}:`), `${format.id} printed an empty pause line`);
       assert.ok(!text.includes("undefined"), `${format.id} leaked an undefined field`);
-      assert.ok(!text.includes("risk appetite"), `${format.id} claimed a risk appetite it lacks`);
     }
+    /* The slide draws three fixed cards, so a missing pause line says there is none rather than standing one in. */
+    const slide = formatBriefArtifact(sparse, "slide", origin);
+    assert.ok(!slide.includes("undefined"), "the slide leaked an undefined field");
+    assert.match(slide, /PAUSE IF\*\*: No pause line this week\./);
+    assert.match(slide, /CONDITIONS CHANGE IF\*\*: No change line was published with this brief\./);
   });
 
   it("gives the presentation frames the same conditions the formats print", () => {
@@ -153,6 +160,8 @@ describe("brief artifact formats", () => {
     assert.equal(parseBriefArtifact(JSON.stringify({ ...artifact, call: undefined })), null);
     assert.equal(parseBriefArtifact(JSON.stringify({ ...artifact, tightness: "64" })), null);
     assert.equal(parseBriefArtifact(JSON.stringify({ ...artifact, source: "" })), null);
+    assert.equal(parseBriefArtifact(JSON.stringify({ ...artifact, riskAppetite: undefined })), null);
+    assert.equal(parseBriefArtifact(JSON.stringify({ ...artifact, confidenceLabel: "" })), null);
   });
 
   it("accepts an island carrying only the required fields", () => {
@@ -163,6 +172,8 @@ describe("brief artifact formats", () => {
       regimeLabel: "Tightening",
       source: "FRED",
       tightness: 64,
+      riskAppetite: 55,
+      confidenceLabel: "MED",
     };
     const parsed = parseBriefArtifact(JSON.stringify(minimal));
     assert.ok(parsed);
@@ -190,7 +201,7 @@ describe("brief artifact formats", () => {
           { label: "Burn discipline" },
           "not an object",
         ],
-        riskAppetite: Number.NaN,
+        lines: { tightness: 70, riskAppetite: Number.NaN },
       }),
     );
 
@@ -198,7 +209,8 @@ describe("brief artifact formats", () => {
     assert.ok(!("smuggled" in parsed));
     assert.deepEqual(parsed.clearsWhen, ["Funding pressure at or below 58"]);
     assert.deepEqual(parsed.revisit, [{ label: "Hiring", recheck: "Recheck approvals." }]);
-    assert.equal(parsed.riskAppetite, undefined);
+    assert.equal(parsed.lines, undefined, "a half-written pair of lines is no lines");
+    assert.equal(parseBriefArtifact(JSON.stringify({ ...artifact, riskAppetite: Number.NaN })), null);
   });
 
   it("gives both slide controls the same markdown for the same week", () => {

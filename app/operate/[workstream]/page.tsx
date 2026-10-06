@@ -13,6 +13,7 @@ import { operationsSectionLinks } from "../../../lib/navigation/planningNavigati
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 
 import { WORKSTREAMS, isWorkstream, workstreamSlugs } from "../workstreams";
+import { isSavedCopy } from "../../../lib/report/provenanceStatus";
 
 export const runtime = "edge";
 
@@ -52,7 +53,7 @@ export default async function OperateWorkstreamPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
   const { assessment, sensors, macroSeries, recordDateLabel, fetchedAtLabel, statusLabel, treasury } = reportData;
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const isFallback = isSavedCopy(treasury);
   const { trustStatusTone } = snapshot.trustStatus;
 
   return (

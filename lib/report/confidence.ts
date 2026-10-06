@@ -8,6 +8,7 @@ import {
   REGIME_CONFIDENCE_NEAR_THRESHOLD,
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
 } from "../regimeEngineCore";
+import { isSavedCopy } from "./provenanceStatus";
 
 /** The scores and lines a confidence is measured from; a `RegimeAssessment` is one. */
 export type ConfidenceInputs = {
@@ -150,7 +151,7 @@ export const resolvePublishedConfidence = ({
   label: resolvePublishedConfidenceLabel({
     scores: assessment.scores,
     thresholds: assessment.thresholds,
-    isFallbackData: Boolean(record?.fallback_at || record?.fallback_reason) && !historical,
+    isFallbackData: isSavedCopy(record) && !historical,
     recordDate: record?.record_date,
     now,
   }),

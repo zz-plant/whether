@@ -21,7 +21,6 @@ import { resolveStartupVariantMode } from "./boundedDecisionRules";
 import { parseOperatorRunwayParam } from "./operatorRunway";
 import { buildDiagnosticsLanePayload } from "./home/diagnosticsLane";
 import { buildHomeWorkspaceModel } from "./home/workspaceModel";
-import { buildLeadershipArtifactPayload } from "./home/artifactPayload";
 import { buildHomeStructuredData } from "./home/structuredData";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { OperatorContext } from "./operatorContext";
@@ -159,10 +158,7 @@ export const assembleHomePage = async ({
     fetchedAtLabel,
     historicalSelection,
     recordDateLabel,
-    weeklyRecordDate,
     reportDynamics,
-    sensors,
-    macroSeries,
     forecast,
     statusLabel,
     treasury,
@@ -223,12 +219,17 @@ export const assembleHomePage = async ({
 
   // Lazy, and memoised on first access.
   //
-  // These three promises are a streaming contract: a consumer can render the
+  // These two promises are a streaming contract: a consumer can render the
   // weekly call immediately and await the enriched models behind a Suspense
   // boundary. Today nothing reads them — the homepage renders `reportResult`,
   // `reportShell`, and `weeklyDecisionCardModel` only — and the work is not
   // free: it costs a decision-events query (64 rows) plus the support-model
   // build, on every request to all eight routes that call this assembler.
+  //
+  // A third, `leadershipArtifactPayloadPromise`, built a second meeting pack,
+  // board note and guidance snapshot beside the ones `/share` serves, and only
+  // a test read it; it was deleted rather than kept for a consumer that never
+  // came, because a second build of the same week is how two artifacts drift.
   //
   // Eager, that cost was paid by everyone and used by no one. Deferred behind
   // getters, the contract stays available for whoever wires it up and costs
@@ -252,18 +253,14 @@ export const assembleHomePage = async ({
       });
 
       return {
-        postureState,
         homeBriefModel: enrichedSnapshot.homeBriefModel,
         weeklyDecisionCardModel: enrichedSnapshot.weeklyDecisionCardModel,
-        canonicalDecisionCopy: enrichedSnapshot.canonicalDecisionCopy,
       };
     } catch (error) {
       console.error("[home] deferred posture-state enrichment unavailable", error);
       return {
-        postureState: null,
         homeBriefModel: baseSnapshot.homeBriefModel,
         weeklyDecisionCardModel: baseSnapshot.weeklyDecisionCardModel,
-        canonicalDecisionCopy: null,
       };
     }
   })();
@@ -290,25 +287,6 @@ export const assembleHomePage = async ({
     reportResult,
     weeklyCall,
     weeklyDecisionCardModel,
-    get leadershipArtifactPayloadPromise() {
-      return enrichedHomePageModel().then(({ postureState, homeBriefModel: enrichedHomeBriefModel }) =>
-        postureState
-          ? buildLeadershipArtifactPayload({
-              assessment,
-              treasury,
-              weeklyRecordDate,
-              sensors,
-              macroSeries,
-              homeBriefModel: enrichedHomeBriefModel,
-              postureState,
-              interpretationView,
-              forecast,
-              freshnessLabel: freshnessMeta.updatedAtLabel,
-              weeklyCall,
-            })
-          : null,
-      );
-    },
     fallbackActive: !historicalSelection && isFallback,
     fallbackAlert,
     interpretationLayer,

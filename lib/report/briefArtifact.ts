@@ -1,10 +1,14 @@
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL } from "./reportCopy";
 import { formatConfidenceChipLabel } from "./reportFormatting";
 import { formatSignalReading } from "./signalTranslations";
 import {
   formatMeetingSlideMarkdown,
   type MeetingSlidePayload,
 } from "../export/meetingSlideExport";
+import type { RegimeAssessment } from "../regimeEngine";
+import type { MacroSeriesReading } from "../types";
+import type { ActionStripItem } from "./operatingCalls";
+import type { PreviousReading } from "../export/scoreReference";
 
 /**
  * The week's call as one structured object, so every format the reader can copy
@@ -36,10 +40,9 @@ export type BriefArtifact = {
   resumeWhen?: string;
   clearsWhen?: readonly string[];
   regimeLabel: string;
-  postureLabel?: string;
   tightness: number;
-  riskAppetite?: number;
-  confidenceLabel?: string;
+  riskAppetite: number;
+  confidenceLabel: string;
   source: string;
   /** Decisions this week's movement reopens, and the areas it leaves alone.
    *  Carried here so the presentation frames read the same call the share
@@ -50,6 +53,118 @@ export type BriefArtifact = {
   permalinkPath?: string;
   /** True when the reading came off a snapshot rather than a live fetch. */
   isFallback?: boolean;
+  /*
+   * What the slide prints and the share rail's "Copy as a slide" reads off the
+   * island. The slide was built two ways — from this object in the browser and
+   * from the operating snapshot on the server — and the browser's way had none
+   * of these, so it drew "Stage" over the conditions label, printed the weather
+   * word where the engine key belonged (so a Freezing slide wore Sunny's green
+   * badge), and judged both scores against the engine's default lines. Absent
+   * on an island published before they existed; the slide then omits what they
+   * would have said rather than standing something in.
+   */
+  /** The engine key the weather word names, for the slide's badge and conditions line. */
+  regime?: string;
+  /** The ISO record date, for a file's name and timestamp. */
+  recordDate?: string;
+  /** The two lines the scores are judged against, where conditions change. */
+  lines?: { tightness: number; riskAppetite: number };
+  /** The stage the call was calibrated to ("Seed"); absent when the reader chose none. */
+  stageLabel?: string;
+  /** Where the numbers came from, as a reader names the source. */
+  sourceLabel?: string;
+};
+
+type PublishedConfidenceLabel = "HIGH" | "MED" | "LOW";
+
+/**
+ * The week as one document every format renders from: the Slack post, the
+ * email, the operator brief, the investor update, the portfolio note, the
+ * slide and the deck files, the ticket brief, the integration payloads and the
+ * citation.
+ *
+ * It extends the artifact the share rail renders rather than sitting beside it,
+ * because a second model of the same week is how the formats came apart. There
+ * were five: the weekly call contract, the export layer's options, the posture
+ * state, this artifact, and the home model's canonical copy, each with its own
+ * fallback chain, so the Monday post and the email printed different calls and
+ * the slide was built two ways. `buildBriefDocument`
+ * (`lib/report/briefDocument.ts`) builds it once, from a reading and its
+ * `WeeklyCallContract`; a format may choose which fields to print but derives
+ * none of them.
+ */
+export type BriefDocument = BriefArtifact & {
+  /** The market state, under the one label every format prints it with. */
+  conditions: {
+    /** The engine key; a format reads it for colour, never prints it. */
+    regime: RegimeAssessment["regime"];
+    /**
+     * The contract's `regimeStage`: the weather word, with how long it has held
+     * when the reading knows. The exports passed four different labels here —
+     * the stage label, the canonical copy's, the home model's and none — so the
+     * Monday post and /share named the same week's conditions differently.
+     */
+    label: string;
+    /** The label with what it means for money: "Stormy (conditions are changing week to week)". */
+    line: string;
+  };
+  /** The published band (`resolvePublishedConfidence`), resolved once for every format. */
+  confidence: PublishedConfidenceLabel;
+  provenance: {
+    /** The source as a reader names it, never a series URL. */
+    sourceLabel: string;
+    /** The record's own source string (a FRED series URL on a live read), which citation lines print. */
+    sourceUrl: string;
+    /** ISO date of the reading. */
+    recordDate: string;
+    /** True when the numbers came off a saved copy rather than a live read. */
+    isFallback: boolean;
+    /** The most specific stable URL for the week: the frozen record when there is a current one. */
+    permalink: string;
+  };
+  /** The call's slots, from the `WeeklyCallContract`. */
+  slots: {
+    currentCall: string;
+    actionNow: string;
+    /** The condition only: every format prints it under a label that already says "Pause if". */
+    pauseIf: string;
+    /** Where the call itself changes. */
+    callChangesIf: string;
+    /** A stage's discipline for lifting its hold, printed beside `callChangesIf`, never as it. */
+    resumeWhen?: string;
+    doNowBullets: readonly string[];
+    flipConditionLabels: readonly string[];
+    whyCouldBeWrong: string;
+    /** The policy layer is holding the guidance this week (`POLICY_OVERRIDE_CALL`). */
+    policyOverrideActive: boolean;
+  };
+  readings: {
+    scores: { tightness: number; riskAppetite: number };
+    thresholds: RegimeAssessment["thresholds"];
+    /** How far each score sits from its change line, with the side folded in by the reader. */
+    vsThreshold: { tightness: number; riskAppetite: number };
+    /** The earlier two scores and their date, when the read carries a comparison; never invented. */
+    previous: PreviousReading | null;
+    baseRate: number | null;
+    baseRateUsed: RegimeAssessment["scores"]["baseRateUsed"];
+    curveSlope: number | null;
+    macros: readonly MacroSeriesReading[];
+  };
+  /** One row per area, with each line's distance, in the page's own derivation. */
+  areaRows: readonly ActionStripItem[];
+  /** The operating limits the reading sets ("What to hold"). */
+  constraints: readonly string[];
+  /**
+   * Runway, framed for a reader who sends to many companies: what the week means
+   * at every band. The other framing — one reader's own band — is the browser's
+   * to supply, because the band is a cookie and the pages that build this are
+   * cached: the investor update composes it on the client
+   * (`formatInvestorUpdateSnippet`), and the calibrated call carries it when the
+   * read path knew the band (`WeeklyCallContract.runwayBand`).
+   */
+  runway: {
+    everyBand: readonly { phrase: string; notes: readonly string[] }[];
+  };
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -109,10 +224,19 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
   const regimeLabel = readText(value, "regimeLabel");
   const source = readText(value, "source");
   const tightness = readNumber(value, "tightness");
+  const riskAppetite = readNumber(value, "riskAppetite");
+  const confidenceLabel = readText(value, "confidenceLabel");
 
-  if (!title || !recordDateLabel || !call || !regimeLabel || !source || tightness === undefined) {
+  /* Both scores and the confidence are required: the slide used to stand 50
+     and "MED" in for them, which printed a reading nobody took. */
+  if (!title || !recordDateLabel || !call || !regimeLabel || !source || tightness === undefined
+    || riskAppetite === undefined || !confidenceLabel) {
     return null;
   }
+
+  const linesValue = value.lines;
+  const lineTightness = isRecord(linesValue) ? readNumber(linesValue, "tightness") : undefined;
+  const lineRiskAppetite = isRecord(linesValue) ? readNumber(linesValue, "riskAppetite") : undefined;
 
   return {
     title,
@@ -121,18 +245,24 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
     regimeLabel,
     source,
     tightness,
+    riskAppetite,
+    confidenceLabel,
     actionNow: readText(value, "actionNow"),
     guardrail: readText(value, "guardrail"),
     reversal: readText(value, "reversal"),
     resumeWhen: readText(value, "resumeWhen"),
     clearsWhen: readTextList(value, "clearsWhen"),
-    postureLabel: readText(value, "postureLabel"),
-    riskAppetite: readNumber(value, "riskAppetite"),
-    confidenceLabel: readText(value, "confidenceLabel"),
     revisit: readRevisit(value),
     noChangeAreas: readTextList(value, "noChangeAreas"),
     permalinkPath: readText(value, "permalinkPath"),
     isFallback: value.isFallback === true,
+    regime: readText(value, "regime"),
+    recordDate: readText(value, "recordDate"),
+    lines: lineTightness !== undefined && lineRiskAppetite !== undefined
+      ? { tightness: lineTightness, riskAppetite: lineRiskAppetite }
+      : undefined,
+    stageLabel: readText(value, "stageLabel"),
+    sourceLabel: readText(value, "sourceLabel"),
   };
 };
 
@@ -313,33 +443,42 @@ const formatAgenda = (artifact: BriefArtifact, origin: string) =>
   ].join("\n");
 
 /**
- * The one adapter from the presentation model to the slide model.
+ * The one path to the slide, from the artifact the document extends.
  *
- * This format used to build its own markdown block, which meant the share
- * panel's "Slide" and `CopyMeetingSlideButton` produced two different slides
- * from the same week — the panel's carried the resume thresholds and a link,
- * the button's carried neither. One builder now serves both.
+ * The slide was built two ways: from this object in the browser (the share
+ * panel's "Slide" format and `CopyMeetingSlideButton`) and from the operating
+ * snapshot on the server (the SVG, PPTX and PDF routes). The browser's way stood
+ * 50 in for a missing risk appetite and "MED" for a missing confidence, printed
+ * the conditions label as the reader's stage, and judged both scores against
+ * the engine's default lines; the server's never said the reading was a saved
+ * copy. The routes now build a `BriefDocument` and come through here too.
+ *
+ * The flip conditions (`clearsWhen`) print under their own name, not as the
+ * resume line: they are the other things that would change the guidance, and on
+ * a held week they include why it is held.
  */
 export const briefArtifactToSlidePayload = (
   artifact: BriefArtifact,
-  origin: string,
+  origin?: string,
 ): MeetingSlidePayload => ({
   recordDate: artifact.recordDateLabel,
-  regime: artifact.regimeLabel,
-  stageLabel: artifact.postureLabel ?? "",
+  ...(artifact.recordDate ? { recordDateIso: artifact.recordDate } : {}),
+  regime: artifact.regime ?? artifact.regimeLabel,
+  stageLabel: artifact.stageLabel ?? "",
   actionNow: artifact.actionNow ?? artifact.call,
-  pauseIf: artifact.guardrail ?? "Hold irreversible commitments until threshold pressure clears.",
+  pauseIf: artifact.guardrail ?? NO_LIVE_READING_CALL.pauseIf,
   // Not a resume sentence: this slot is where the call changes, and an artifact
   // without one says so rather than borrowing a condition from another line.
   callChangesIf: artifact.reversal ?? "No change line was published with this brief.",
   ...(artifact.resumeWhen ? { resumeWhen: artifact.resumeWhen } : {}),
   tightness: artifact.tightness,
-  riskAppetite: artifact.riskAppetite ?? 50,
-  confidence: artifact.confidenceLabel ?? "MED",
-  provenance: artifact.source,
+  riskAppetite: artifact.riskAppetite,
+  ...(artifact.lines ? { lines: artifact.lines } : {}),
+  confidence: artifact.confidenceLabel,
+  provenance: artifact.sourceLabel ?? artifact.source,
   call: artifact.call,
   clearsWhen: artifact.clearsWhen,
-  url: resolveBriefUrl(artifact, origin),
+  ...(origin ? { url: resolveBriefUrl(artifact, origin) } : {}),
   isFallback: artifact.isFallback,
 });
 
