@@ -164,11 +164,29 @@ const scoreHeadline = (score: AgentState["scores"]["tightness"]) => {
   return pause.met ? `${position}, so the pause applies` : position;
 };
 
+/**
+ * The guidance, from the week's report and its posture state. `/api/cli/status` prints the same
+ * four facts as its `call`, under the names it had first (`lib/cli/contracts.ts`), so the CLI and
+ * an agent cannot be told different guidance for one reading.
+ */
+export const buildAgentGuidance = ({
+  reportData,
+  postureState,
+}: {
+  reportData: Pick<AgentInterfaceContext["reportData"], "actionNowShort" | "startItems" | "stopItems">;
+  postureState: Pick<AgentInterfaceContext["postureState"], "whatFlipsNext">;
+}): AgentState["guidance"] => ({
+  call: reportData.actionNowShort,
+  doNow: reportData.startItems,
+  avoidNow: reportData.stopItems,
+  flipConditions: [...postureState.whatFlipsNext.thresholds],
+});
+
 export const buildAgentState = (
   { reportData, degraded, postureState }: AgentInterfaceContext,
   now = new Date(),
 ): AgentState => {
-  const { assessment, treasury, reportDynamics, actionNowShort, startItems, stopItems, actionStripItems } = reportData;
+  const { assessment, treasury, reportDynamics, actionStripItems } = reportData;
   const confidence = {
     label: postureState.currentState.confidenceLabel,
     percent: postureState.currentState.confidencePercent,
@@ -250,12 +268,7 @@ export const buildAgentState = (
         because: group.crossed.map((line) => ({ score: line.metric, line: line.value, direction: line.direction })),
       })),
     },
-    guidance: {
-      call: actionNowShort,
-      doNow: startItems,
-      avoidNow: stopItems,
-      flipConditions: [...postureState.whatFlipsNext.thresholds],
-    },
+    guidance: buildAgentGuidance({ reportData, postureState }),
     use: buildUseConstraint(),
     links: {
       brief: endpoints.brief,

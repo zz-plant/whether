@@ -190,7 +190,8 @@ cannot read is a 400 whose `error` is the sentence it always was (`Unsupported q
 `Invalid tightness input.`), plus `problems`: one `{ argument, message, allowed? }` per argument, as an
 agent tool's refusal carries. A name the route does not take is refused first, then the first value it
 cannot read. `asOf=` (empty) is not sent; any other empty or blank value is refused (`tightness=%20` was
-read as 0 until 2026-10-06).
+read as 0 until 2026-10-06). `/api/cli/status`'s `call` is the agent state's `guidance`
+(`buildAgentGuidance`, `lib/agentState.ts`) under the names the CLI had first.
 
 
 ## Troubleshooting (error categories)
