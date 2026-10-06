@@ -9,7 +9,6 @@ import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules, formatBoundedDecisionTriplet } from "../report/boundedDecisionRules";
 import { getRegimeContext, projectRegimeFromPace } from "../report/regimeContext";
 import { buildUseConstraint } from "../report/useConstraint";
-import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { fetchSaaSValuations } from "../saasMultiples";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
@@ -38,7 +37,16 @@ const cadenceInput = z.preprocess(lowerCasedInput, z.enum(supportedAgentCadences
 /** Where an input came from, so an answer computed from today's reading says so instead of passing as the caller's own. */
 const used = <Value extends string | number>(value: Value, from: "given" | "today" | "assumed") => ({ value, from });
 
-const todayState = async () => buildAgentState(await loadAgentInterfaceContext("/api/mcp"));
+/* One loader for every tool that reads today's reading: the context the full brief and the state
+   are built from. The plan checks went through `loadWeeklyBriefSnapshot`, which loads the same
+   report data the same way (no search params, so never a historical reading, and the bundled
+   snapshot when assembly fails) and then builds the whole homepage model, which they discarded;
+   they read only the assessment. */
+const todayContext = () => loadAgentInterfaceContext("/api/mcp");
+
+const todayAssessment = async () => (await todayContext()).reportData.assessment;
+
+const todayState = async () => buildAgentState(await todayContext());
 
 const rulesFor = (regime: (typeof REGIME_KEYS)[number]) =>
   buildCanonicalBoundedDecisionRules({
@@ -194,8 +202,7 @@ const AGENT_TOOLS = [
     },
     example: { planText: "Sign a three-year cloud commitment" },
     run: async ({ planText, lifecycle }) => {
-      const { snapshot } = await loadWeeklyBriefSnapshot();
-      return { ...stressTestDecisionPlan(snapshot.reportData.assessment, { planText, lifecycle: lifecycle ?? "GROWTH" }) };
+      return { ...stressTestDecisionPlan(await todayAssessment(), { planText, lifecycle: lifecycle ?? "GROWTH" }) };
     },
   }),
   defineTool({
@@ -206,8 +213,7 @@ const AGENT_TOOLS = [
     input: { specText: textInput.describe("The PRD, RFC, or procurement specification text.") },
     example: { specText: "Reserve 3 years of capacity, paid upfront" },
     run: async ({ specText }) => {
-      const { snapshot } = await loadWeeklyBriefSnapshot();
-      return { ...stressTestDecisionPlan(snapshot.reportData.assessment, { planText: specText }) };
+      return { ...stressTestDecisionPlan(await todayAssessment(), { planText: specText }) };
     },
   }),
   defineTool({
@@ -221,8 +227,7 @@ const AGENT_TOOLS = [
     },
     example: { goalText: "Hire two contractors for the launch" },
     run: async ({ goalText, lifecycle }) => {
-      const { snapshot } = await loadWeeklyBriefSnapshot();
-      const plan = stressTestDecisionPlan(snapshot.reportData.assessment, { planText: goalText, lifecycle: lifecycle ?? "GROWTH" });
+      const plan = stressTestDecisionPlan(await todayAssessment(), { planText: goalText, lifecycle: lifecycle ?? "GROWTH" });
       /* The stress-test engine grades on SAFE/RISKY/DANGEROUS; a sprint goal needs a verdict an
          engineer can act on, mapped 1:1 so the source of the call stays visible: SAFE holds,
          RISKY pauses, DANGEROUS needs a reversal guardrail before it is pulled. */
@@ -249,8 +254,7 @@ const AGENT_TOOLS = [
     input: {},
     example: {},
     run: async () => {
-      const { snapshot } = await loadWeeklyBriefSnapshot();
-      return { ...getHistoricalAnalogPlaybook(snapshot.reportData.assessment) };
+      return { ...getHistoricalAnalogPlaybook(await todayAssessment()) };
     },
   }),
   defineTool({
