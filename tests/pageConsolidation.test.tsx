@@ -106,12 +106,13 @@ describe("routes folded into the surface that owned them", () => {
     assert.equal(hrefs.includes("/embed"), false);
   });
 
-  it("gives the share page the same picker as the share panel", () => {
+  it("draws the share page's preview with the share panel's component", () => {
     const share = readFileSync(appPath("/share/sharePageFormats.tsx"), "utf8");
     const rail = readFileSync(appPath("/components/shareRail.tsx"), "utf8");
-    // One component, imported by both — not a page and an overlay that build
-    // the same thing twice, which 1.1.9 of the specs left as the follow-up.
-    assert.match(share, /from "\.\.\/components\/briefFormatPicker"/);
+    // One preview, imported by both — not a page and an overlay that frame the
+    // paste two ways, which 1.1.9 of the specs left as the follow-up. The page
+    // offers more formats than the rail; the payload is drawn the same way.
+    assert.match(share, /import \{ BriefPreview \} from "\.\.\/components\/briefFormatPicker"/);
     assert.match(rail, /from "\.\/briefFormatPicker"/);
     assert.doesNotMatch(rail, /^const BriefFormatPicker/m, "the rail no longer defines its own picker");
   });

@@ -31,7 +31,7 @@ import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { PlanLinesForm } from "./components/planLinesForm";
 import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
 import { planLinesFromRules } from "../../lib/alert/planLines";
-import { SharePageFormats } from "../share/sharePageFormats";
+import { BriefIslandPicker } from "../components/briefIslandPicker";
 import { buildReadingLines } from "../../lib/export/briefBuilders";
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
@@ -308,7 +308,7 @@ export async function buildPlanningPageModel(
                 // The same picker /share and the global rail use, reading the same
                 // island — one artifact pipeline. The eleven-button export panel
                 // that sat here built the brief a second way through its own lib.
-                h(SharePageFormats, {
+                h(BriefIslandPicker, {
                   scoreReferences: buildReadingLines(reportData.assessment, {
                     actionStripItems,
                     previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),

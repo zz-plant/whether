@@ -3,6 +3,29 @@
 import { BRIEF_FORMATS, type BriefFormatId } from "../../lib/report/briefArtifact";
 
 /**
+ * The paste payload itself, with the channel context around it: the one
+ * preview the share rail and `/share` both draw, so the text a reader sees is
+ * framed the same way wherever they copy it from.
+ */
+export const BriefPreview = ({ label, text }: { label: string; text: string }) => (
+  <div className="overflow-hidden rounded-md border border-slate-800/80 bg-slate-950/80">
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-slate-800/60 bg-slate-900/60 px-3 py-1.5 text-fluid-nano text-slate-400">
+      <span className="flex items-center gap-1.5 font-medium text-slate-300">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-sky-400/80" aria-hidden="true" />
+        {label}
+      </span>
+      <span className="text-slate-500 tabular-nums">Ready to paste</span>
+    </div>
+    <pre
+      aria-label={`Preview of ${label}`}
+      className="whitespace-pre-wrap break-words p-3 text-fluid-xs leading-5 text-slate-300"
+    >
+      {text}
+    </pre>
+  </div>
+);
+
+/**
  * Pick a format, see exactly what will be copied, copy it.
  *
  * Shared by the share panel and `/share`, which is what makes the two one
@@ -49,21 +72,8 @@ export const BriefFormatPicker = ({
       </div>
     </fieldset>
     <p className="mt-1.5 text-xs text-slate-400">{activeFormat.hint}</p>
-    {/* The preview is the copy payload itself, with realistic channel context. */}
-    <div className="mt-2 overflow-hidden rounded-md border border-slate-800/80 bg-slate-950/80">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-slate-800/60 bg-slate-900/60 px-3 py-1.5 text-fluid-nano text-slate-400">
-        <span className="flex items-center gap-1.5 font-medium text-slate-300">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-sky-400/80" aria-hidden="true" />
-          {activeFormat.label} format
-        </span>
-        <span className="text-slate-500 tabular-nums">Ready to paste</span>
-      </div>
-      <pre
-        aria-label={`Preview of the ${activeFormat.label} format`}
-        className="whitespace-pre-wrap break-words p-3 text-fluid-xs leading-5 text-slate-300"
-      >
-        {briefText}
-      </pre>
+    <div className="mt-2">
+      <BriefPreview label={`${activeFormat.label} format`} text={briefText} />
     </div>
     <button
       type="button"

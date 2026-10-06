@@ -28,6 +28,7 @@ const code = (path: string) =>
 
 const COPY_SURFACES = [
   "app/components/shareBriefButton.tsx",
+  "app/share/sharePageFormats.tsx",
   "app/components/history/ExportBoardAnnexButton.tsx",
 ];
 
@@ -52,12 +53,11 @@ describe("clipboard access is centralised", () => {
   it("leaves only the deliberate exceptions hand-rolling navigator.clipboard", () => {
     // `useClipboardCopy` owns the real implementation. `CopyMeetingSlideButton`
     // writes rich HTML through `ClipboardItem`, which the hook does not cover;
-    // `/share` and `/embed` predate it and handle their own failure paths.
+    // `/embed` predates it and handles its own failure path.
     const allowed = new Set([
       "app/components/useClipboardCopy.ts",
       "app/components/CopyMeetingSlideButton.tsx",
       "app/components/reportCta.tsx",
-      "app/share/shareCopyControls.tsx",
       "app/embed/page.tsx",
     ]);
 

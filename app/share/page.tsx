@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
-import { ShareCopyControls } from "./shareCopyControls";
 import { GuardrailTagControls } from "./guardrailTagControls";
 import { PullPolicyControls } from "./pullPolicyControls";
-import { SharePageFormats } from "./sharePageFormats";
+import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
+import { formatBriefArtifact } from "../../lib/report/briefArtifact";
 import { buildBoardSlideBullets, buildCallCitation, buildReadingLines, buildSlackBrief } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
 import { buildPortfolioNote } from "../../lib/export/portfolioNote";
@@ -182,7 +182,7 @@ const buildCurrentShareArtifact = async () => {
       weeklyCall: snapshot.weeklyCall,
       title: "Whether Weekly Brief",
     }),
-    slackBrief: weeklyOperatorBrief,
+    fullBrief: weeklyOperatorBrief,
     emailBrief: [
       "Whether: this week's guidance",
       "",
@@ -215,109 +215,199 @@ const buildCurrentShareArtifact = async () => {
 import { SubscribeForm } from "../components/SubscribeForm";
 import { ExecutiveBriefingPanel } from "../operate/components/executiveBriefingPanel";
 
+/**
+ * The formats, in the picker's order. The share rail's four formats are built
+ * here against the canonical site URL rather than in the browser against the
+ * window's origin, so the brief link a reader pastes points at the brief and
+ * not at a preview host, and the server can render the preview the page opens on.
+ */
+const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShareArtifact>>): ShareFormatOption[] => {
+  const brief = (format: Parameters<typeof formatBriefArtifact>[1]) =>
+    formatBriefArtifact(artifact.briefArtifact, format, siteUrl);
+  return [
+    {
+      id: "slack-post",
+      group: "Chat",
+      label: "Slack post",
+      hint: "The call, its pause line and what would change it, as a bolded block a channel skims.",
+      kind: "text",
+      text: brief("slack"),
+      copyLabel: "Copy Slack post",
+      commitment: "copied_slack",
+    },
+    {
+      id: "full-brief",
+      group: "Chat",
+      label: "Full brief",
+      hint: "The weekly operator brief: every area's rule and lines, for a channel that wants the whole week.",
+      kind: "text",
+      text: artifact.fullBrief,
+      copyLabel: "Copy full brief",
+      commitment: "copied_slack",
+    },
+    {
+      id: "standup",
+      group: "Chat",
+      label: "Standup line",
+      hint: "One sentence for a daily standup: whether the call moved and how far it is from changing.",
+      kind: "text",
+      text: artifact.standupLine,
+      copyLabel: "Copy standup line",
+      commitment: "copied_brief",
+    },
+    {
+      id: "meeting-pack",
+      group: "Meetings",
+      label: "Meeting pack",
+      hint: "The brief, the Slack brief, the board slide's bullets and the citation, in one paste for a meeting doc.",
+      kind: "text",
+      text: artifact.meetingPack,
+      copyLabel: "Copy meeting pack",
+      commitment: "copied_meeting",
+      offersCalendar: true,
+    },
+    {
+      id: "agenda",
+      group: "Meetings",
+      label: "Monday agenda",
+      hint: "A three-minute Monday item for Notion, Docs or a meeting doc.",
+      kind: "text",
+      text: brief("agenda"),
+      copyLabel: "Copy agenda",
+      commitment: "copied_meeting",
+      offersCalendar: true,
+    },
+    {
+      id: "slide-text",
+      group: "Meetings",
+      label: "Slide text",
+      hint: "A Markdown callout for a deck, Notion or Docs. The slide as an image or a file is under Images and slides.",
+      kind: "text",
+      text: brief("slide"),
+      copyLabel: "Copy slide text",
+      commitment: "copied_brief",
+    },
+    {
+      id: "email",
+      group: "Docs and email",
+      label: "Email",
+      hint: "The full brief with its citation and permanent link, for a leadership note.",
+      kind: "text",
+      text: artifact.emailBrief,
+      copyLabel: "Copy email",
+      commitment: "copied_email",
+    },
+    {
+      id: "investor-update",
+      group: "Docs and email",
+      label: "Investor update",
+      hint: "Two paragraphs for a monthly letter: the conditions and how they moved since last month-end, then the guidance and what your runway band means for it.",
+      kind: "investor",
+      parts: artifact.investorUpdate,
+      copyLabel: "Copy investor update",
+    },
+    {
+      id: "portfolio-note",
+      group: "Docs and email",
+      label: "Portfolio note",
+      hint: "For an investor or accelerator writing to the companies it backs: each area's rule and lines, what the week means at every runway, and a link for each company to set its own lines.",
+      kind: "text",
+      text: artifact.portfolioNote,
+      copyLabel: "Copy portfolio note",
+      commitment: "copied_brief",
+    },
+    {
+      id: "citation",
+      group: "Docs and email",
+      label: "Citation",
+      hint: "A dated reference with a link to the permanent record.",
+      kind: "text",
+      text: brief("citation"),
+      copyLabel: "Copy citation",
+      commitment: "copied_brief",
+    },
+    {
+      id: "ticket-brief",
+      group: "Tickets and boards",
+      label: "Ticket brief",
+      hint: "The guidance in Markdown for a Jira or Linear ticket, or a wiki page.",
+      kind: "text",
+      text: artifact.issueTrackerBrief,
+      copyLabel: "Copy ticket brief",
+      commitment: "copied_brief",
+    },
+    {
+      id: "work-item-tags",
+      group: "Tickets and boards",
+      label: "Work-item tags",
+      hint: "One block per area for a Linear or Jira card description: this week's rule, its pause line and what would change it. No integration and no tokens; each button copies its own row.",
+      kind: "panel",
+      content: <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />,
+    },
+    {
+      id: "pull-policies",
+      group: "Tickets and boards",
+      label: "Pull policies",
+      hint: "For a kanban board or wiki: how many bets can run at once this week, then per area what to keep pulling, when to stop and when to resume. Pick a runway band on the brief to scale the cap to your cash.",
+      kind: "panel",
+      content: <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />,
+    },
+    {
+      id: "role-memos",
+      group: "Team",
+      label: "Role memos",
+      hint: "The week's summary, pause-if checks and what would change it, as a memo and a checklist to send to a team.",
+      kind: "panel",
+      content: <ExecutiveBriefingPanel assessment={artifact.assessment} recordDateLabel={artifact.recordDateLabel} />,
+    },
+  ];
+};
+
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
 
   return (
     <PageShell backdropVariant="default">
+      {/* The share rail's island: the global Share button reads it on this page too. */}
       <BriefArtifactScript artifact={artifact.briefArtifact} />
-      {/* One panel per group, not six h2s inside one. `.weather-panel` is the
-          padding tier, so each group's surfaces are the outermost boxes that
-          draw anything and own their own elevation. Each group's h2 is a
-          heading, not an eyebrow: as the small label it was, it sat under the
-          serif titles of the cards inside it, and the page read inside out. */}
       <div className="weather-page-stack mx-auto max-w-6xl">
-        {/* No bottom padding: `.weather-panel` draws no frame, so its padding and
-            the next panel's stacked with the gap between them into ~70px of
-            empty ground under a three-line intro. */}
         <section className="weather-panel weather-section-stack p-0" aria-labelledby="share-page-title">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="max-w-2xl space-y-2">
-              {/* The week, where the kicker read "Current weekly artifact" — the
-                  product's internal noun for what a reader calls the brief. */}
-              <p className="type-eyebrow type-eyebrow-section">Week of {artifact.recordDateLabel}</p>
-              <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
-              <p className="text-sm leading-relaxed text-white/60">
-                Paste it into Slack, a slide, a ticket or an email. Every format below carries the same
-                pause and resume lines and names its source.
-              </p>
+          <div className="max-w-2xl space-y-2">
+            {/* The week, where the kicker read "Current weekly artifact" — the
+                product's internal noun for what a reader calls the brief. */}
+            <p className="type-eyebrow type-eyebrow-section">Week of {artifact.recordDateLabel}</p>
+            <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
+            <p className="text-sm leading-relaxed text-white/60">
+              Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same
+              pause and resume lines and names its source:{" "}
               {/* A link named for the host, not a bare URL printed as text. */}
-              <p className="text-fluid-xs text-white/60">
-                Source:{" "}
-                <a href={artifact.sourceUrl} className="text-sky-300 underline-offset-2 hover:underline">
-                  {artifact.sourceHost}
-                </a>
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60 sm:flex sm:flex-wrap">
-            <ActionLink href="#meeting-slack" variant="pill" className="justify-center text-center">
-              Meeting &amp; Slack formats ↓
-            </ActionLink>
-            <ActionLink href="#tickets-kanban" variant="pill" className="justify-center text-center">
-              Tickets &amp; Kanban ↓
-            </ActionLink>
-            <ActionLink href="#role-memos" variant="pill" className="justify-center text-center">
-              Team role memos ↓
-            </ActionLink>
-            <ActionLink href="#image-artifacts" variant="pill" className="justify-center text-center">
-              Slide images ↓
-            </ActionLink>
+              <a href={artifact.sourceUrl} className="text-sky-300 underline-offset-2 hover:underline">
+                {artifact.sourceHost}
+              </a>
+              .
+            </p>
           </div>
         </section>
 
-        <div id="meeting-slack" className="weather-page-stack">
-          <SharePageFormats scoreReferences={artifact.scoreReferences} />
+        <SharePageFormats
+          scoreReferences={artifact.scoreReferences}
+          options={buildShareOptions(artifact)}
+          calendar={{ title: `Whether weekly brief review — ${artifact.recordDate}`, details: artifact.calendarDetails }}
+        />
 
-          <section className="weather-panel weather-section-stack p-0" aria-labelledby="longer-formats-heading">
-            <h2 id="longer-formats-heading" className="text-xl font-semibold text-white sm:text-2xl">Longer formats</h2>
-            <ShareCopyControls
-              recordDate={artifact.recordDate}
-              slackBrief={artifact.slackBrief}
-              emailBrief={artifact.emailBrief}
-              standupLine={artifact.standupLine}
-              meetingPack={artifact.meetingPack}
-              issueTrackerBrief={artifact.issueTrackerBrief}
-              investorUpdate={artifact.investorUpdate}
-              portfolioNote={artifact.portfolioNote}
-              calendarDetails={artifact.calendarDetails}
-            />
-          </section>
-        </div>
-
-        {/* The credential-free slice of the Linear/Jira sync, beside the ticket
-            brief it extends. One paste-ready block per business area. Each
-            renders its own panel, or nothing when it has no blocks. */}
-        <div id="tickets-kanban" className="weather-page-stack">
-          <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />
-          <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />
-        </div>
-
-        {/* Role memos are share formats. They sat under the sixth collapsed
-            section of /operate, where nobody planning a week went looking for
-            a CFO memo; they belong beside Slack, email and the meeting pack. */}
-        <section id="role-memos" className="weather-panel weather-section-stack p-0" aria-labelledby="role-memos-heading">
-          <h2 id="role-memos-heading" className="text-xl font-semibold text-white sm:text-2xl">Brief your team by role</h2>
-          <ExecutiveBriefingPanel
-            assessment={artifact.assessment}
-            recordDateLabel={artifact.recordDateLabel}
-          />
-        </section>
-
-        {/* Text formats first, then the same call as a picture. */}
+        {/* Text formats first, then the same call as a picture or a file. */}
         <ShareImageArtifacts />
-
-        <div>
-          <ActionLink href="/" variant="pill">
-            Return to weekly brief
-          </ActionLink>
-        </div>
 
         {/* Anchored so the retired /embed route lands on it. */}
         <section id="embed" className="weather-panel weather-section-stack p-0">
           <EmbedBuilder />
         </section>
         <SubscribeForm />
+        <div>
+          <ActionLink href="/" variant="pill">
+            Return to weekly brief
+          </ActionLink>
+        </div>
       </div>
     </PageShell>
   );
