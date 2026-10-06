@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "node scripts/repair-vinext-install.mjs",
     "dev": "node scripts/vinext-run.mjs dev",
     "build": "node scripts/vinext-run.mjs build",
     "build:fresh": "bun run clean:build && bun run build",
