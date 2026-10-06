@@ -119,7 +119,10 @@ describe("the homepage's changed-signals table", () => {
     assert.match(html, /Last week: 63/);
   });
 
-  it("names the date on the ladders that say what would change the guidance", () => {
+  it("leaves the dated ladders to What changed, and says nothing undated over the move", () => {
+    /* The section used to redraw the two ladders "What changed" draws, hollow
+       dot and all (DD-039). It keeps the radar and the market moves; the dated
+       dot is asserted on the "What changed" table above. */
     const html = renderToStaticMarkup(
       <WhatWouldChangeSection
         ladders={[
@@ -131,14 +134,14 @@ describe("the homepage's changed-signals table", () => {
             lines: [{ kind: "pause", value: 76 }, { kind: "callChange", value: 70 }],
           },
         ]}
-        flipProximity={[]}
+        flipProximity={[{ axis: "tightness", sentence: "If the 1-month bill rate falls 0.15%, conditions turn Stormy." }]}
         lastTime={null}
         callChangeLines={{ tightness: 70, riskAppetite: 50 }}
-        basis={comparisonBasis(comparedWith)}
       />,
     );
 
-    assert.match(html.replace(/<[^>]+>/g, " "), /Aug 31: 63/);
+    assert.doesNotMatch(html, /data-ladder-row=/, "no score ladder is redrawn here");
+    assert.match(html.replace(/<[^>]+>/g, " "), /Funding pressure\s+If the 1-month bill rate falls 0\.15%/);
     assert.doesNotMatch(html, noWords);
   });
 });
