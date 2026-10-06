@@ -1,4 +1,5 @@
 import { fetchWithTimeout } from "./fetchWithTimeout";
+import { readSetting } from "./runtime/settings";
 
 export const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv";
 
@@ -31,14 +32,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
  * by worker/index.ts like every other binding, or an environment variable for scripts and
  * local runs. With no key, every read stays on the CSV path it has always used.
  */
-export const resolveFredApiKey = (): string | null => {
-  const fromBinding: unknown = Reflect.get(globalThis, "FRED_API_KEY");
-  if (typeof fromBinding === "string" && fromBinding.trim() !== "") {
-    return fromBinding.trim();
-  }
-  const fromEnv = typeof process !== "undefined" ? process.env?.FRED_API_KEY : undefined;
-  return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
-};
+export const resolveFredApiKey = (): string | null => readSetting("FRED_API_KEY");
 
 /** A key must never travel in an error message or a log line. */
 const redactFredApiKey = (text: string) => text.replace(/api_key=[^&\s"']+/g, "api_key=REDACTED");

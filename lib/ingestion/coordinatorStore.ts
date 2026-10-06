@@ -17,16 +17,13 @@ import {
   type SnapshotsResponse,
 } from "./coordinatorProtocol";
 import type { IngestionStore } from "./store";
+import { readSetting } from "../runtime/settings";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "./types";
 
 const INGEST_COORDINATOR_FLAG = "WHETHER_INGEST_COORDINATOR";
 const INGEST_COORDINATOR_BINDING = "INGEST_COORDINATOR";
 
-const readFlag = (): boolean => {
-  const fromBinding: unknown = Reflect.get(globalThis, INGEST_COORDINATOR_FLAG);
-  if (typeof fromBinding === "string") return fromBinding === "1";
-  return typeof process !== "undefined" && process.env?.[INGEST_COORDINATOR_FLAG] === "1";
-};
+const readFlag = (): boolean => readSetting(INGEST_COORDINATOR_FLAG, { trim: false }) === "1";
 
 /** The namespace, when this deployment has opted in and the binding is installed; otherwise null. */
 export const resolveIngestCoordinatorNamespace = (): CoordinatorNamespace | null => {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { constantTimeCompare } from "../constantTimeCompare";
+import { readSetting } from "../runtime/settings";
 
 /**
  * Slack signs every request it sends to an app — interactive actions, slash
@@ -24,19 +25,6 @@ const toHex = (bytes: Uint8Array): string =>
   Array.from(bytes)
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
-
-/**
- * Read the way `WHETHER_CRON_SECRET` is: the Worker installs every binding on
- * `globalThis` (`worker/index.ts`), and `process.env` is the local and test path.
- */
-const readSlackSigningSecret = (): string | undefined => {
-  const fromGlobal: unknown = Reflect.get(globalThis, "SLACK_SIGNING_SECRET");
-  if (typeof fromGlobal === "string" && fromGlobal.length > 0) {
-    return fromGlobal;
-  }
-  const fromEnv = process.env.SLACK_SIGNING_SECRET;
-  return typeof fromEnv === "string" && fromEnv.length > 0 ? fromEnv : undefined;
-};
 
 const computeSlackSignature = async ({
   secret,
@@ -116,7 +104,8 @@ export const requireSlackSignature = async (
   request: Request,
   rawBody: string,
 ): Promise<NextResponse | null> => {
-  const secret = readSlackSigningSecret();
+  /* Untrimmed: the secret is an HMAC key, used byte for byte. */
+  const secret = readSetting("SLACK_SIGNING_SECRET", { trim: false });
 
   if (!secret) {
     if (process.env.NODE_ENV === "production") {

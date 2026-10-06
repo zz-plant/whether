@@ -1,4 +1,5 @@
 import { constantTimeCompare } from "../constantTimeCompare";
+import { readSetting } from "../runtime/settings";
 
 /**
  * Proof that a client id was issued by this server rather than chosen by the caller.
@@ -25,8 +26,7 @@ import { constantTimeCompare } from "../constantTimeCompare";
 export const CLIENT_TOKEN_HEADER = "x-whether-client-token";
 
 const resolveSecret = (): string | null => {
-  const secret = (globalThis as { WHETHER_LEDGER_SECRET?: string }).WHETHER_LEDGER_SECRET
-    ?? process.env.WHETHER_LEDGER_SECRET;
+  const secret = readSetting("WHETHER_LEDGER_SECRET", { trim: false });
   return secret && secret.length >= 16 ? secret : null;
 };
 

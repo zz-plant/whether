@@ -88,7 +88,9 @@ stack trace pointing into minified code.
 ## Secrets and provider keys
 
 Secrets are set per lane with `bunx wrangler secret put <NAME>` (add `--env preview` for the
-preview lane) and reach library code through `globalThis`, like every binding. The site serves
+preview lane) and reach library code through `globalThis`, like every binding; `readSetting`
+(`lib/runtime/settings.ts`) reads one by name, falling back to `process.env` for scripts and
+local runs, and treats an empty value as unset at either source. The site serves
 without any of them: each provider key switches a read from a keyless path to a keyed one, and
 the Slack signing secret gates one webhook route.
 
