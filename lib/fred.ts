@@ -1,4 +1,5 @@
 import { fetchWithTimeout } from "./fetchWithTimeout";
+import { createCircuitBreaker, isTestRuntime, withRetry } from "./runtime/retry";
 import { readSetting } from "./runtime/settings";
 
 export const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv";
@@ -7,9 +8,6 @@ const FRED_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
   "user-agent": "WhetherDataBot/1.0 (+https://whether.work)",
 } as const;
-
-const isTestRuntime = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
 /**
  * The FRED API proper, as opposed to the chart export above. It needs a free key, answers
@@ -51,9 +49,7 @@ export class FredVintageUnavailableError extends Error {
 const DEFAULT_TIMEOUT_MS = 8_000;
 const DEFAULT_REVALIDATE_SECONDS = 900;
 const DEFAULT_RETRY_ATTEMPTS = 3;
-// Backoff spaces out retries against a real upstream. Under `bun test` every
-// upstream is a stub that fails instantly, so the sleep adds pure wall clock to
-// the suite without exercising anything — the retry path itself still runs.
+// Backoff spaces out retries against a real upstream; zero under the suite (see isTestRuntime).
 const DEFAULT_RETRY_BACKOFF_MS = isTestRuntime() ? 0 : 500;
 
 /**
@@ -70,25 +66,11 @@ const DEFAULT_RETRY_BACKOFF_MS = isTestRuntime() ? 0 : 500;
  */
 const DEFAULT_RETRY_BUDGET_MS = 9_000;
 
-const CIRCUIT_BREAKER_THRESHOLD = 3;
-const CIRCUIT_BREAKER_COOLDOWN_MS = 120_000;
+const fredCircuitBreaker = createCircuitBreaker({ name: "FRED", threshold: 3, cooldownMs: 120_000 });
 
-let cbConsecutiveFailures = 0;
-let cbLastFailureAt: number | null = null;
+export const getFredCircuitBreakerState = () => fredCircuitBreaker.state();
 
-export const getFredCircuitBreakerState = () => {
-  const open = cbConsecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD;
-  return {
-    open,
-    consecutiveFailures: cbConsecutiveFailures,
-    lastFailureAt: cbLastFailureAt === null ? null : new Date(cbLastFailureAt).toISOString(),
-  };
-};
-
-export const resetFredCircuitBreaker = () => {
-  cbConsecutiveFailures = 0;
-  cbLastFailureAt = null;
-};
+export const resetFredCircuitBreaker = () => fredCircuitBreaker.reset();
 
 /**
  * Thrown when FRED answers with a status we did not accept. Carries the status so
@@ -120,65 +102,6 @@ export const isRetryableFredError = (error: unknown): boolean => {
   return true;
 };
 
-interface RetryOptions {
-  attempts?: number;
-  backoffMs?: number;
-  /** Ceiling for all attempts combined, including backoff. */
-  budgetMs?: number;
-  isRetryable?: (error: unknown) => boolean;
-  now?: () => number;
-}
-
-const pause = (durationMs: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, durationMs));
-
-/**
- * Runs `fn` with bounded retries, handing it the time still left in the budget so
- * the work it starts cannot outlive the sequence it belongs to.
- */
-export const withRetry = async <T>(
-  fn: (remainingMs: number) => Promise<T>,
-  options: RetryOptions = {},
-): Promise<T> => {
-  const attempts = options.attempts ?? DEFAULT_RETRY_ATTEMPTS;
-  const backoffMs = options.backoffMs ?? DEFAULT_RETRY_BACKOFF_MS;
-  const budgetMs = options.budgetMs ?? DEFAULT_RETRY_BUDGET_MS;
-  const isRetryable = options.isRetryable ?? isRetryableFredError;
-  const now = options.now ?? Date.now;
-
-  const startedAt = now();
-  const elapsed = () => now() - startedAt;
-  let lastError: unknown;
-
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const remainingMs = budgetMs - elapsed();
-    if (remainingMs <= 0) {
-      break;
-    }
-
-    try {
-      return await fn(remainingMs);
-    } catch (error) {
-      lastError = error;
-
-      if (attempt >= attempts - 1 || !isRetryable(error)) {
-        break;
-      }
-
-      // Only sleep when the budget can still fund an attempt afterwards;
-      // otherwise the backoff is pure delay in front of a guaranteed failure.
-      const backoff = backoffMs * (attempt + 1);
-      if (elapsed() + backoff >= budgetMs) {
-        break;
-      }
-
-      await pause(backoff);
-    }
-  }
-
-  throw lastError ?? new Error("FRED request failed before any attempt was made");
-};
-
 const buildFredSeriesUrl = (seriesId: string, observationStartDate?: string): string => {
   const base = `${FRED_BASE_URL}?id=${encodeURIComponent(seriesId)}`;
   return observationStartDate ? `${base}&cosd=${encodeURIComponent(observationStartDate)}` : base;
@@ -206,8 +129,14 @@ interface FetchFredCsvOptions {
 }
 
 /**
- * One circuit breaker and one retry budget for every FRED request, whichever endpoint
- * serves it: the breaker is about FRED being reachable, not about which URL was asked.
+ * One circuit breaker and one retry budget for every FRED request this module makes, whichever
+ * endpoint serves it: the breaker is about FRED being reachable, not about which URL was asked.
+ *
+ * `lib/treasury/treasuryClient.ts` also reads FRED's CSV export, for the yield curve, and stays
+ * outside the breaker on purpose. That read has two fallbacks behind it (Treasury's own file, then
+ * the bundled snapshot), so by the rule below its failures must not count; and consulting a
+ * process-wide breaker before it would make every yield-curve read depend on how unrelated family
+ * ingests last went.
  */
 const guardedFredRequest = async <T>(
   attempt: (remainingMs: number) => Promise<T>,
@@ -216,33 +145,18 @@ const guardedFredRequest = async <T>(
      families ingesting concurrently against a revoked key would otherwise open it before
      any of their CSV fallbacks ran, and the fallback would fail without a request. */
   recordFailure = true,
-): Promise<T> => {
-  if (cbConsecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD) {
-    const withinCooldown =
-      cbLastFailureAt !== null && Date.now() - cbLastFailureAt < CIRCUIT_BREAKER_COOLDOWN_MS;
-    if (withinCooldown) {
-      throw new Error("FRED circuit breaker open");
-    }
-  }
-
-  try {
-    const result = await withRetry(attempt, {
-      attempts: options?.attempts,
-      backoffMs: options?.backoffMs,
-      budgetMs: options?.budgetMs,
-    });
-
-    cbConsecutiveFailures = 0;
-    cbLastFailureAt = null;
-    return result;
-  } catch (error) {
-    if (recordFailure) {
-      cbConsecutiveFailures += 1;
-      cbLastFailureAt = Date.now();
-    }
-    throw error;
-  }
-};
+): Promise<T> =>
+  fredCircuitBreaker.run(
+    () =>
+      withRetry(attempt, {
+        attempts: options?.attempts ?? DEFAULT_RETRY_ATTEMPTS,
+        backoffMs: options?.backoffMs ?? DEFAULT_RETRY_BACKOFF_MS,
+        budgetMs: options?.budgetMs ?? DEFAULT_RETRY_BUDGET_MS,
+        isRetryable: isRetryableFredError,
+        label: "FRED request",
+      }),
+    { recordFailure },
+  );
 
 export const fetchFredCsv = async (
   fetcher: typeof fetch,
@@ -426,18 +340,39 @@ export const fetchFredRows = async (
   return parseFredCsvRows(await fetchFredCsv(fetcher, seriesId, options));
 };
 
+/** One CSV field: a finite number, or null for a missing observation or anything else. */
+const parseFredCsvValue = (raw: string | undefined): number | null => {
+  if (isMissingFredValue(raw)) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+};
+
 export const parseFredCsvRows = (csv: string): { date: string; value: number }[] =>
   csv
     .trim()
     .split(/\r?\n/)
     .slice(1)
-    .map((row) => row.split(","))
-    .filter((parts) => parts.length >= 2 && !isMissingFredValue(parts[1]) && !Number.isNaN(Number(parts[1])))
-    .map((parts) => ({
-      date: parts[0] ?? "",
-      value: Number(parts[1]),
-    }))
-    .filter((point) => Number.isFinite(point.value));
+    .flatMap((row) => {
+      const parts = row.split(",");
+      const value = parts.length >= 2 ? parseFredCsvValue(parts[1]) : null;
+      return value === null ? [] : [{ date: parts[0] ?? "", value }];
+    });
+
+/**
+ * Every row of a CSV export as date to value, in file order, with a missing observation kept as
+ * null rather than dropped: a caller aligning several series on a common date needs to see the
+ * dates one of them skipped.
+ */
+export const parseFredCsvSeries = (csv: string): Map<string, number | null> => {
+  const values = new Map<string, number | null>();
+  const [header, ...rows] = csv.trim().split(/\r?\n/);
+  if (!header) return values;
+  for (const row of rows) {
+    const [date, raw] = row.split(",");
+    if (date) values.set(date, parseFredCsvValue(raw));
+  }
+  return values;
+};
 
 export const latestFredObservation = (rows: FredRow[], seriesId?: string): { observedAt: string; value: number } => {
   const latest = rows[rows.length - 1];
