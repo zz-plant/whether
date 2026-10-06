@@ -16,11 +16,13 @@ export async function GET() {
     assessment,
     provenance: treasuryProvenance,
     recordDateLabel: weeklyRecordDateLabel,
+    record: treasury,
   });
   const monthlySummary = buildMonthlySummary({
     assessment,
     provenance: treasuryProvenance,
     recordDateLabel,
+    record: treasury,
   });
   const delta = buildSummaryDelta(weeklySummary, monthlySummary);
   const postureState = await buildPostureState({

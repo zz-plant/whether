@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 
 import { getWhetherKv, parseStoredJson } from "../runtime/kv";
 

@@ -7,7 +7,7 @@ import {
   resetDecisionEventStore,
 } from "../lib/events/decisionEventStore";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
-import { advanceRegimeState } from "../lib/report/regimeStateMachine";
+import { advanceRegimeState } from "../lib/regimeStateMachine";
 
 describe("decision event store", () => {
   beforeEach(() => {
@@ -122,7 +122,7 @@ describe("decision event store", () => {
           thresholds: DEFAULT_THRESHOLDS,
           diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 4, transitionWatch: true },
           pendingCount: second.transitionPendingCount ?? 2,
-          transitionReason: second.transitionReason,
+          transitionReason: "Risk appetite crossed below 50. Transition committed.",
         }),
       );
     }

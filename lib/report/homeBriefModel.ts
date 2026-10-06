@@ -1,5 +1,5 @@
 import type { MacroSeriesReading, TreasuryMetadata } from "../types";
-import type { RegimeStateTransition } from "./regimeStateMachine";
+import type { RegimeStateTransition } from "../regimeStateMachine";
 import type { DecisionMovement } from "./decisionMovement";
 import type { ComparedWith } from "./reportDataTypes";
 import type {

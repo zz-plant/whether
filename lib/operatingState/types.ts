@@ -1,7 +1,7 @@
 import type { MacroSeriesReading, TreasuryData } from "../types";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import type { PostureTransitionEvent } from "../storage/postureTransitionEventRepository";
 
 export type OperatingSnapshot = {

@@ -371,8 +371,8 @@ input the server had not understood, which is worse than an error: it reads as a
   is left for the owner (`docs/feature-specs-current.md` §6.9).
 - **A field that reads the wrong thing under the right name stays wrong on every surface that copies it.**
   `summary.confidence` was the engine's confirmation gate, not the published confidence, and three routes
-  carried it. `/api/weekly` and `/api/monthly` still do (their archive regenerates from the same builders);
-  a decision for the owner, recorded in `docs/feature-specs-current.md` §6.9.
+  carried it. `/api/weekly` and `/api/monthly` kept it until 2026-10-06, when the summary builders moved to
+  the published label; the archives follow on their next regeneration (`docs/feature-specs-current.md` §6.9).
 
 ## A "what changed" sentence is a claim about the decisions, and it needs the lines to make one (2026-09-29)
 

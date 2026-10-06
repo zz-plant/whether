@@ -8,7 +8,13 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { buildHorizonOperatingRule, buildHorizonThresholdBands } from "./horizonOperatingRules";
 import { joinSentences } from "../report/reportFormatting";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
-import { formatConfidenceSentence, formatSourceLine } from "./summaryFormatting";
+import type { ConfidenceRecord } from "../report/confidence";
+import {
+  formatConfidenceSentence,
+  formatSourceLine,
+  resolveSummaryConfidence,
+  type SummaryConfidence,
+} from "./summaryFormatting";
 
 import type { MonthlyStructured, SummaryProvenance } from "./summaryTypes";
 
@@ -21,7 +27,8 @@ export type MonthlySummary = {
   regime: RegimeAssessment["regime"];
   regimeLabel: string;
   guidance: string;
-  confidence: RegimeAssessment["diagnostics"]["confidence"];
+  /** The published confidence (`resolveSummaryConfidence`), not the engine's confirmation gate. */
+  confidence: SummaryConfidence;
   transitionWatch: boolean;
   intensity: RegimeAssessment["diagnostics"]["intensity"];
   constraints: string[];
@@ -106,7 +113,7 @@ export const buildMonthlyStructured = ({
 }: {
   regimeLabel: string;
   guidance: string;
-  confidence: RegimeAssessment["diagnostics"]["confidence"];
+  confidence: SummaryConfidence;
   intensity: RegimeAssessment["diagnostics"]["intensity"];
   transitionWatch: boolean;
   constraints: string[];
@@ -162,12 +169,16 @@ export const buildMonthlySummary = ({
   assessment,
   provenance,
   recordDateLabel,
+  record,
 }: {
   assessment: RegimeAssessment;
   provenance: MonthlySummaryProvenance;
   recordDateLabel?: string;
+  /** The record the reading came from, so a stale fallback lowers the published confidence. */
+  record?: ConfidenceRecord | null;
 }): MonthlySummary => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
+  const confidence = resolveSummaryConfidence(assessment, record);
   const financingSaturated = assessment.scores.tightnessSaturated === true;
   const guidance = getMonthlyActionGuidance(assessment.regime, { financingSaturated });
   const operatingRules = getMonthlyOperatingRules(assessment);
@@ -180,7 +191,7 @@ export const buildMonthlySummary = ({
   const summary = joinSentences(
     `${regimeLabel}: ${assessment.description}`,
     `The priority this month is to ${guidance}`,
-    formatConfidenceSentence(assessment.diagnostics.confidence, assessment.diagnostics.intensity),
+    formatConfidenceSentence(confidence, assessment.diagnostics.intensity),
     transitionCue,
     shockCue,
   );
@@ -190,7 +201,7 @@ export const buildMonthlySummary = ({
   const structured = buildMonthlyStructured({
     regimeLabel,
     guidance,
-    confidence: assessment.diagnostics.confidence,
+    confidence,
     intensity: assessment.diagnostics.intensity,
     transitionWatch: assessment.diagnostics.transitionWatch,
     constraints: assessment.constraints,
@@ -210,7 +221,7 @@ export const buildMonthlySummary = ({
     regime: assessment.regime,
     regimeLabel,
     guidance,
-    confidence: assessment.diagnostics.confidence,
+    confidence,
     transitionWatch: assessment.diagnostics.transitionWatch,
     intensity: assessment.diagnostics.intensity,
     constraints: assessment.constraints,

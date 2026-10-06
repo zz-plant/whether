@@ -61,7 +61,7 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     /*
      * Not "Fed interest rate". `getBaseRate`'s `FED` rung has never fired, so
      * this number is the 1-month Treasury bill in every published reading —
-     * `BASE_RATE_SOURCE_LABELS` in `regimeEngineCore` already corrected the
+     * `BASE_RATE_SOURCE_LABELS` in `regimeDescription` already corrected the
      * engine's own wording for exactly this reason, and the correction never
      * reached the four label tables that render it. A name that says which
      * institution set the rate is a claim; "short-term borrowing rate" is what

@@ -88,10 +88,18 @@ of them, which is less obvious.
   the posture state and every `/share` paste through the real loader against that week's reading.
 
   The engine's label stays: it is the state machine's confirmation gate, and a gate is not a
-  published fact. Its other readers are the alert-rule gate in `lib/signalOps.ts`, the band stored
-  on transition events, and `lib/summary/*`. The last one still prints it, in the `summary` block
-  of `/api/weekly` and `/api/monthly` and in the generated monthly archive; moving it rewrites
-  archived text on the next regeneration, so it is its own change.
+  published fact (the diagnostics now say so by name: `CONFIRMATION_GATE_*`, and a doc comment on
+  `RegimeDiagnostics.confidence`, which keeps its name because it is stored). Its other readers are
+  the alert-rule gate in `lib/signalOps.ts` and the band stored on transition events. `lib/summary/*`
+  printed it until 2026-10-06, in the `summary` block of `/api/weekly` and `/api/monthly` and in the
+  generated archives; the builders read `resolveSummaryConfidence` now, and the archives switch on
+  their next regeneration (55 of 176 monthly entries change; `docs/feature-specs-current.md` §6.9).
+
+  Still open, and its own change: the published confidence ignores the shock downgrade. The engine
+  sets its gate band to LOW on a shock crossing so the flip is not dressed as confirmed, but
+  `resolvePublishedConfidence` reads only the scores, so a shock week publishes its distance-based
+  label on every surface (Dec 2025, archived as a shock: HIGH). The shock sentence carries the
+  warning. Honouring it would move the published confidence on every shock week.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.
@@ -107,3 +115,88 @@ and 11 from startup-market inputs the earlier score never had, and the "pause li
 readings, ask whether the readings share their inputs; if they do not, say which part of the difference is
 the inputs. `explainScoreMovement` (`lib/report/scoreMovement.ts`) does that for the two scores, and
 `docs/feature-specs-current.md` §1.1.27 has the numbers and the like-for-like question it leaves open.
+
+## The engine decides; `lib/report/` says it (2026-10-06)
+
+Four of the last wording commits to the regime's copy (91cb0156, e9879a0f, 4bba8ebe, a244e212) were
+commits to scoring files, because the regime profiles, the axis explanations, the input labels, the data
+warnings, the contributor lines, the policy refusal reasons and the machine's transition reasons were all
+written inside `regimeEngineCore`, `regimeEngine`, `regimeEngineDiagnostics`, `regimeEnginePolicy` and the
+state machine — which imported `regimeSignalLabel` from `lib/report/` to do it, so the engine and the report
+layer imported each other.
+
+The scorer (`scoreRegime`, `lib/regimeEngineScoring.ts`) now returns codes: the regime key, contributor codes,
+warning codes, a transition `cause` (`held` / `pending` / `committed`, with the lines crossed and whether it
+was a shock), refusal codes. `describeRegimeAssessment` (`lib/report/regimeDescription.ts`) writes them into
+the same `RegimeAssessment`, field for field and in the same key order — a stored snapshot is JSON, and a
+re-read one must equal the one written. `evaluateRegime` composes the two and kept its signature. The state
+machine lives at `lib/regimeStateMachine.ts`, and `advanceRegimeState` returns the step with its `cause`;
+only the described assessment carries `transitionReason`.
+
+What did not change: the strings are still stored. The walk keeps `description` as each month's summary and
+the generators write every one of them into `data/`, so a wording edit in `regimeDescription.ts` still
+rewrites archived text on the next regeneration. The split makes that edit visibly a copy change; it does
+not make it free.
+
+## One replay walk, and the archives replayed offline (2026-10-06)
+
+The threaded walk (evaluate, hand the machine snapshot forward) existed four times: the runtime month walk in
+`timeMachineCache.ts` and one per archive generator, each with its own copy of the VIX reading literal, and
+the generators with three copies of the record-date search, the Treasury snapshot, the coverage check and the
+provenance formatters, plus a re-implementation of the engine's velocity-window search. Divergence between
+copies is what 050e9371 had to repair. Now:
+
+- `replayRegimeWalk` and `buildReplayVixReading` (`lib/timeMachine/regimeReplay.ts`) are the walk; the
+  runtime walk and `replayArchivePeriods` (`scripts/regimeArchiveContext.ts`) both call them.
+- The cadence logic each generator owned is `buildWeeklyArchive`, `buildMonthlyArchive` and
+  `buildQuarterlyYearlyArchive` in `scripts/regimeArchiveReplay.ts`; the `generate*Summaries.ts` scripts
+  fetch, call one, and write.
+- The velocity pair the cache stores comes from the engine's `resolveBaseRateVelocityPair`, the same search
+  that scores the term.
+
+The refactor was proven byte-identical by running all three generator scripts before and after it, offline,
+against FRED-shaped series rebuilt from the bundle and a frozen clock: every file they write matched.
+
+**The bundle is enough to replay the archives.** Each month-end's yields, the base-rate pair, the daily VIX
+tail and every weekly and pre-2012 quarterly input are on record, and rebuilt into series they reproduce the
+monthly archive's record dates, regimes and both scores for all 176 months, and the Time Machine cache entry
+for entry, apart from the fetch timestamp. `tests/regimeArchiveReplay.test.ts` holds the generators' own code
+to that, so a change that moves an archived month fails offline instead of surfacing at the next
+regeneration.
+
+## The scorer reads no data (2026-10-06)
+
+`computePolicyAssessment` standardizes the base rate and the curve slope against a ten-year month-end
+history, and it used to fetch that history itself: `regimeEnginePolicy.ts` imported `getTreasuryPolicyHistory`,
+which imported the 1.2MB `data/time_machine_cache.json`. So every reading's policy composites depended on a
+file nothing at the call site named. The history is an argument now — `scoreRegime(…, policyHistory)` and
+`computePolicyAssessment(…, policyHistory)`, with the window selection in the engine — and `evaluateRegime`
+supplies the bundled series (`TREASURY_POLICY_HISTORY`, `lib/policy/history.ts`). `lib/regimeEngine.ts` and
+`lib/policy/history.ts` are the only engine-layer files that import bundled data or `lib/report/`;
+`tests/architectureInvariants.test.ts` holds the rest to that.
+
+## Which calibration scored it: `ENGINE_VERSION` (2026-10-06)
+
+Nothing recorded which engine scored an archived entry or a stored snapshot, so a constant change and a data
+change looked the same in `data/`. `ENGINE_VERSION` (`lib/regimeEngineCore.ts`) names the calibration:
+
+- The generators stamp `engineVersion` on every entry they write (all four cadences in
+  `summary_archive.json`, and the weekly and monthly summary files). It is optional to readers: entries
+  written before it have none, and `lib/summary/summaryArchive.ts` does not read it.
+- `hashOperatingInputs` includes it, so a re-score of the same inputs under a new calibration is a new
+  snapshot id and KV key. That changed every hash once, which was traced before it shipped: the hash names
+  the snapshot, its per-reading KV key (no reader) and a field in the ingest-pipeline telemetry; nothing
+  compares it between runs, triggers on it, or sends anything because of it.
+- `tests/engineVersion.test.ts` fingerprints the scorer's output (codes and numbers, no copy) on a fixed
+  synthetic grid and pins the digest to the version, so a scoring change under an unchanged version fails.
+  The grid is synthetic so a regeneration of the bundled data never reads as a new calibration. Bump the
+  version and add a digest; never overwrite an old one.
+
+**The weekly, quarterly and yearly archives are pinned the same way (2026-10-06).** They store no scores, so
+`tests/regimeArchiveReplay.test.ts` holds their regime and record date: all 452 weeks inside the bundled VIX
+tails, and every quarter and year from 2012. Two limits are stated in the test rather than passed by luck:
+weeks after the last cached month-end replay without VIX (the tails end there), and 2010-2011 quarters have no
+VIX either, so they thread the walk without being compared. Weekly yields come from the weekly entries' own
+inputs, so for that cadence the test checks the engine and the walk, not the yields. A mutation of the
+machine's confirmation gate fails the monthly, weekly and quarterly replays and the version fingerprint
+together.

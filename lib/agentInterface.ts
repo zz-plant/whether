@@ -140,12 +140,14 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
         assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel: weeklyRecordDateLabel,
+        record: treasury,
       }),
     monthly: () =>
       buildMonthlySummary({
         assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel,
+        record: treasury,
       }),
     quarterly: () =>
       buildQuarterlySummary({

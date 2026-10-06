@@ -2,14 +2,14 @@
  * The regime flip, stated against the state machine.
  *
  * The machine commits a quadrant change only after the readings confirm it
- * (`regimeStateMachine.ts`), so a reading can sit past a boundary while the
+ * (`lib/regimeStateMachine.ts`), so a reading can sit past a boundary while the
  * committed call stays put — the state that made "rises above 70 (74 today),
  * which flips the call to Cloudy" read as already-true under a Sunny call.
  * Everything here answers the same question truthfully in both states: what
  * the readings classify as, what holds the call, and which line matters next.
  */
 import type { RegimeAssessment } from "../regimeEngine";
-import { classifyRegimeQuadrant } from "./regimeStateMachine";
+import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { formatThresholdNumber } from "../formatters";
 import type { BoundaryDimension, BoundaryDirection, Regime } from "./homeBriefModel";
@@ -28,7 +28,7 @@ export const boundaryDirectionForRegime = (
 
 /**
  * Which side of each regime boundary the committed call requires, per the
- * quadrant table in `regimeStateMachine.ts`.
+ * quadrant table in `lib/regimeStateMachine.ts`.
  */
 const requiresTightSide = (regime: Regime) => regime === "SCARCITY" || regime === "DEFENSIVE";
 const requiresWillingRisk = (regime: Regime) => regime === "EXPANSION" || regime === "DEFENSIVE";

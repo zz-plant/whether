@@ -1,4 +1,5 @@
-import { DEFAULT_THRESHOLDS, buildSignalInfluence, evaluateRegime } from "../regimeEngine";
+import { DEFAULT_THRESHOLDS, evaluateRegime } from "../regimeEngine";
+import { buildSignalInfluence } from "./regimeDescription";
 import { getPlaybookGuidance } from "../playbook";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { resolveSignalDirection, signalOrder } from "./briefFormatting";

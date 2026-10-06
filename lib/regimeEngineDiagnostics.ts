@@ -4,11 +4,9 @@ import {
   clamp,
   type RegimeAssessment,
   type RegimeDiagnostics,
-  type RegimeSignalInfluence,
   type RegimeThresholds,
   type RegimeTrend,
 } from "./regimeEngineCore";
-import { regimeSignalLabel } from "./report/signalTranslations";
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;
@@ -72,12 +70,21 @@ const LAYOFF_RISK_APPETITE_MULTIPLIER = 0.6;
 const LAYOFF_RISK_APPETITE_CAP = 12;
 
 /**
- * Diagnostic bands, all measured in score points of distance from the nearest
- * regime threshold. They govern how loudly the product speaks, never what the
- * regime is: confidence wording, the transition-watch flag, and intensity.
+ * Diagnostic bands, all measured in raw score points of distance from the
+ * nearest regime threshold: the transition-watch flag, intensity, and the
+ * confirmation-gate band.
+ *
+ * The gate band is what `diagnostics.confidence` holds, and it is not the
+ * confidence the product publishes. It ranks the raw gap, where a
+ * risk-appetite point is a 4.5x larger move than a funding-pressure point, and
+ * its only job is to tell the state machine how many confirming reads a flip
+ * needs (and the alert rules whether to downgrade). Every surface that prints a
+ * confidence reads `resolvePublishedConfidence` in `lib/report/confidence.ts`,
+ * which normalises the two gaps first and cuts at 5 and 12. The field keeps its
+ * name because it is stored in every operating snapshot and transition event.
  */
-const DIAGNOSTIC_CONFIDENCE_HIGH_DELTA = 13;
-const DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA = 6;
+const CONFIRMATION_GATE_HIGH_DELTA = 13;
+const CONFIRMATION_GATE_MEDIUM_DELTA = 6;
 const DIAGNOSTIC_TRANSITION_WATCH_DELTA = 5;
 const DIAGNOSTIC_INTENSITY_STRONG_DELTA = 25;
 const DIAGNOSTIC_INTENSITY_STANDARD_DELTA = 10;
@@ -107,6 +114,25 @@ export const MACRO_ADJUSTMENT_CONSTANTS = {
   layoffRiskAppetiteCap: LAYOFF_RISK_APPETITE_CAP,
 } as const;
 
+/**
+ * Which corroborating read moved a score, as a code. The engine records that a
+ * read contributed; the sentence a reader sees for each one is written in
+ * `lib/report/regimeDescription.ts`, so rewording it never touches scoring.
+ */
+export type MacroContributorCode =
+  | "high-yield-stress"
+  | "financial-conditions-tightening"
+  | "equity-volatility"
+  | "market-stress-veto"
+  | "market-stress-unwind"
+  | "vc-funding-slowdown"
+  | "tech-layoff-pressure";
+
+/** The engine's diagnostics: the stored shape, with contributors still as codes. */
+export type RegimeDiagnosticsScoring = Omit<RegimeDiagnostics, "boundaryContributors"> & {
+  boundaryContributors: MacroContributorCode[];
+};
+
 const getMacroValue = (series: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
   series.find((entry) => entry.id === id)?.value ?? null;
 
@@ -132,7 +158,7 @@ export const applyMacroAdjustments = (
 ) => {
   let adjustedTightness = tightness;
   let adjustedRiskAppetite = riskAppetite;
-  const contributors: string[] = [];
+  const contributors: MacroContributorCode[] = [];
   let weakReadCount = 0;
   let vetoApplied = false;
 
@@ -147,7 +173,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("High-yield bond market stress");
+    contributors.push("high-yield-stress");
     weakReadCount += 1;
   }
 
@@ -162,7 +188,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Financial conditions are tightening");
+    contributors.push("financial-conditions-tightening");
     weakReadCount += 1;
   }
 
@@ -177,7 +203,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Stock market volatility is high");
+    contributors.push("equity-volatility");
     weakReadCount += 1;
   }
 
@@ -190,9 +216,7 @@ export const applyMacroAdjustments = (
     if (adjustedRiskAppetite > vetoCap) {
       adjustedRiskAppetite = vetoCap;
       contributors.push(
-        vixMean >= VIX_MARKET_STRESS_VETO_MEAN
-          ? "Market stress veto — posture cannot read better than transitional"
-          : "Market stress unwinding — expansion tempo capped",
+        vixMean >= VIX_MARKET_STRESS_VETO_MEAN ? "market-stress-veto" : "market-stress-unwind",
       );
       vetoApplied = true;
     }
@@ -212,7 +236,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("VC funding slowdown");
+    contributors.push("vc-funding-slowdown");
     weakReadCount += 1;
   }
 
@@ -227,7 +251,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Tech layoff pressure");
+    contributors.push("tech-layoff-pressure");
     weakReadCount += 1;
   }
 
@@ -244,24 +268,25 @@ export const computeDiagnostics = (
   tightness: number,
   riskAppetite: number,
   thresholds: RegimeThresholds,
-  boundaryContributors: string[] = [],
+  boundaryContributors: MacroContributorCode[] = [],
   weakReadCount = 0,
   /*
    * Set when either score came from a stand-in rather than a reading. Both
    * stand-ins sit far from the regime boundaries, and distance from a boundary is
-   * what the confidence label below reads — so without this, a payload with no
-   * data at all reported HIGH.
+   * what the gate band below reads — so without this, a payload with no data at
+   * all reported HIGH.
    */
   hasImputedInputs = false,
-): RegimeDiagnostics => {
+): RegimeDiagnosticsScoring => {
   const tightnessVsThreshold = Math.round(tightness - thresholds.tightnessRegime);
   const riskAppetiteVsThreshold = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
   const nearestThresholdDelta = Math.min(Math.abs(tightnessVsThreshold), Math.abs(riskAppetiteVsThreshold));
-  const confidence: RegimeDiagnostics["confidence"] = hasImputedInputs
+  // The confirmation-gate band, stored as `confidence`; see the note on the bands above.
+  const confirmationGateBand: RegimeDiagnostics["confidence"] = hasImputedInputs
     ? "LOW"
-    : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
+    : nearestThresholdDelta >= CONFIRMATION_GATE_HIGH_DELTA
       ? "HIGH"
-      : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA
+      : nearestThresholdDelta >= CONFIRMATION_GATE_MEDIUM_DELTA
         ? "MEDIUM"
         : "LOW";
   const transitionWatch = nearestThresholdDelta <= DIAGNOSTIC_TRANSITION_WATCH_DELTA;
@@ -276,7 +301,7 @@ export const computeDiagnostics = (
     tightnessVsThreshold,
     riskAppetiteVsThreshold,
     nearestThresholdDelta,
-    confidence,
+    confidence: confirmationGateBand,
     transitionWatch,
     intensity,
     boundaryContributors,
@@ -284,51 +309,6 @@ export const computeDiagnostics = (
     twoWeakReadsWarning: weakReadCount >= TWO_WEAK_READS_WARNING_COUNT,
   };
 };
-
-export const buildSignalInfluence = ({
-  tightness,
-  riskAppetite,
-  baseRate,
-  curveSlope,
-  thresholds,
-}: {
-  tightness: number;
-  riskAppetite: number;
-  baseRate: number | null;
-  curveSlope: number | null;
-  thresholds: RegimeThresholds;
-}): RegimeSignalInfluence[] => [
-  {
-    key: "tightness",
-    label: regimeSignalLabel.tightness,
-    influence: Math.abs(tightness - thresholds.tightnessRegime),
-    unavailable: false,
-  },
-  {
-    key: "riskAppetite",
-    label: regimeSignalLabel.riskAppetite,
-    influence: Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
-    unavailable: false,
-  },
-  {
-    key: "baseRate",
-    /**
-     * Names the series actually read, matching `BASE_RATE_SOURCE_LABELS` in the
-     * engine core. This used to say "Fed interest rate" while the reading fell
-     * through to the one-month bill on every render.
-     */
-    label: "Short rate (1M bill)",
-    influence:
-      typeof baseRate === "number" ? Math.abs(baseRate - thresholds.baseRateTightness) : null,
-    unavailable: typeof baseRate !== "number",
-  },
-  {
-    key: "curveSlope",
-    label: "Recession warning gauge",
-    influence: typeof curveSlope === "number" ? Math.abs(curveSlope) : null,
-    unavailable: typeof curveSlope !== "number",
-  },
-];
 
 export const deriveRegimeTrend = (
   previous: RegimeAssessment | null,

@@ -386,7 +386,7 @@ called the reading "the Fed rate":
 - `buildRegimeInputs` labelled the input "Policy base rate (1M)" — a policy-rate claim that then
   admitted in parentheses it had read a bill.
 
-`BASE_RATE_SOURCE_LABELS` (`lib/regimeEngineCore.ts`) is now the one place that names the reading,
+`BASE_RATE_SOURCE_LABELS` (`lib/report/regimeDescription.ts`, moved from the engine core with the rest of the engine's copy) is now the one place that names the reading,
 and both surfaces use it: "The 1-month Treasury bill is 5.20%…". The `FED` entry exists so that
 wiring DFF renames the surface rather than leaving it wrong in the other direction.
 **Wiring DFF is deliberately not done here** — `treasury/treasuryClient.ts` says that is a live
@@ -1713,6 +1713,14 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
   `time-machine:update-summaries` sets to 2024) walks from the first year and
   filters only which records it writes, so a merge lands the same
   confirmations a full replay produces.
+- One walk (2026-10-06): the runtime replay and all three generators thread the
+  engine through `replayRegimeWalk` (`lib/timeMachine/regimeReplay.ts`), and the
+  generators' period logic is `scripts/regimeArchiveReplay.ts`.
+  `tests/regimeArchiveReplay.test.ts` replays every cadence offline from series
+  rebuilt out of the bundled data and holds it to the archive on record.
+- Every entry a generator writes carries `engineVersion` (`ENGINE_VERSION`, the
+  engine calibration that scored it). It is additive: entries written earlier have
+  none, and the archive reader ignores it.
 - A flip is a shock only when the one-step move is 25 points or more *and* the
   prior reading sat outside the 5-point near band; from inside the band the
   warning could have fired, so the flip confirms through the gate.
@@ -2070,9 +2078,17 @@ Changes, all additive except where noted:
 
 - **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
   MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
-  carry the published confidence now. `/api/weekly` and `/api/monthly` still return the engine's label in
-  `summary.confidence` (their archive regenerates from the same builders, and `summary.summary` prose there
-  can still disagree with the published label); a decision for the owner, not made here.
+  carry the published confidence now. `/api/weekly` and `/api/monthly` (and `/api/cadence`,
+  `/api/summary-delta`) followed on 2026-10-06: the summary builders read `resolveSummaryConfidence`
+  (`lib/summary/summaryFormatting.ts`, the published label in the stored LOW / MEDIUM / HIGH spelling) for
+  both `summary.confidence` and the prose sentence, and the routes pass the record so a stale fallback
+  lowers it as it does on the page. The archives regenerate from the same builders, so the next run rewrites
+  `summary.confidence`, the confidence sentence in `summary.summary`, `structured.posture.summary[0]`
+  (monthly) and `copy` wherever the two ladders disagree: 55 of the 176 monthly entries on record (23 LOW
+  and 25 MEDIUM to HIGH, 7 LOW to MEDIUM); the weekly count is not computable offline because weekly
+  entries store no scores. One consequence to know: the published ladder ignores the engine's shock
+  downgrade, so a shock week's summary now says what the page says (Dec 2025: HIGH, not LOW) and the shock
+  sentence beside it carries the warning.
 - **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
   first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
   Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.

@@ -7,15 +7,17 @@
  * tightening-speed term reads, and the period's VIX reading that drives the
  * shock haircut and the market-stress veto. Each generator fetches the series
  * once per run and slices per period here.
+ *
+ * Everything the three generators shared lives here once: the series fetch,
+ * the coverage check, the record-date search, the Treasury snapshot, the
+ * provenance labels and the period replay. They each carried a copy of all of
+ * it until 2026-10-06.
  */
 import { execFileSync } from "node:child_process";
-import type { MacroSeriesReading } from "../lib/types";
+import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 import { FRED_BASE_URL, isMissingFredValue } from "../lib/fred";
-import {
-  BASE_RATE_VELOCITY_LOOKBACK_DAYS,
-  BASE_RATE_VELOCITY_MAX_GAP_DAYS,
-  BASE_RATE_VELOCITY_MIN_GAP_DAYS,
-} from "../lib/regimeEngineCore";
+import { resolveBaseRateVelocityPair, type RegimeAssessment } from "../lib/regimeEngine";
+import { buildReplayVixReading, replayRegimeWalk } from "../lib/timeMachine/regimeReplay";
 
 export type SeriesPoint = { date: string; time: number; value: number | null };
 export type SeriesDataset = { points: SeriesPoint[]; map: Map<string, number> };
@@ -126,46 +128,24 @@ export type BaseRateVelocityWindow = {
  * latest base-rate print at or before the period, and the one its gap to the
  * lookback window favors. The daily series is too heavy to store per cache
  * entry, so the runtime replay carries this pair instead and evaluates the
- * same delta the archive generators compute from the full window.
+ * same delta the archive generators compute from the full window. The search
+ * is the engine's own (`resolveBaseRateVelocityPair`) over the same window the
+ * generators score with, so the pair cannot pick a different observation than
+ * the score did.
  */
 export const resolveBaseRateVelocityWindow = (
   dataset: SeriesDataset,
   asOfTime: number,
 ): BaseRateVelocityWindow | null => {
-  const cutoffMs = asOfTime - VIX_LOOKBACK_DAYS * MS_PER_DAY;
-  const observations = dataset.points.filter(
-    (point): point is SeriesPoint & { value: number } =>
-      point.time <= asOfTime && point.time >= cutoffMs && point.value !== null,
-  );
-  const latest = observations.at(-1);
-  if (!latest) {
-    return null;
-  }
-
-  let best: (SeriesPoint & { value: number }) | null = null;
-  let bestDistance = Number.POSITIVE_INFINITY;
-  for (const observation of observations) {
-    const gap = (latest.time - observation.time) / MS_PER_DAY;
-    if (Number.isNaN(gap) || gap < BASE_RATE_VELOCITY_MIN_GAP_DAYS || gap > BASE_RATE_VELOCITY_MAX_GAP_DAYS) {
-      continue;
-    }
-    const distance = Math.abs(gap - BASE_RATE_VELOCITY_LOOKBACK_DAYS);
-    if (distance < bestDistance) {
-      best = observation;
-      bestDistance = distance;
-    }
-  }
-
-  if (!best) {
-    return null;
-  }
-
-  return {
-    compareDate: best.date,
-    compareValue: best.value,
-    latestDate: latest.date,
-    latestValue: latest.value,
-  };
+  const pair = resolveBaseRateVelocityPair(resolveBaseRateWindow(dataset, "", asOfTime));
+  return pair
+    ? {
+        compareDate: pair.compare.date,
+        compareValue: pair.compare.value,
+        latestDate: pair.latest.date,
+        latestValue: pair.latest.value,
+      }
+    : null;
 };
 
 export type VixReading = MacroSeriesReading;
@@ -201,18 +181,293 @@ export const resolveVixReading = (
     .filter((point) => point.time >= asOfTime - VIX_LOOKBACK_DAYS * MS_PER_DAY)
     .map((point) => ({ date: point.date, value: point.value }));
 
+  return buildReplayVixReading({ value: latest.value, recordDate: latest.date, fetchedAt, history });
+};
+
+const SERIES_CATALOG = {
+  oneMonth: "DGS1MO",
+  threeMonth: "DGS3MO",
+  twoYear: "DGS2",
+  tenYear: "DGS10",
+} as const;
+
+const FRED_SERIES_URL = "https://fred.stlouisfed.org/series/";
+
+const SERIES_SOURCE_URLS = {
+  oneMonth: `${FRED_SERIES_URL}${SERIES_CATALOG.oneMonth}`,
+  threeMonth: `${FRED_SERIES_URL}${SERIES_CATALOG.threeMonth}`,
+  twoYear: `${FRED_SERIES_URL}${SERIES_CATALOG.twoYear}`,
+  tenYear: `${FRED_SERIES_URL}${SERIES_CATALOG.tenYear}`,
+} as const;
+
+/** The four Treasury series every archive period reads, keyed by yield. */
+export type TreasuryDatasets = Record<keyof typeof SERIES_CATALOG, SeriesDataset>;
+
+/**
+ * Fetch the four Treasury series and VIX for one run. Volatility drives the
+ * shock haircut and the market-stress veto, so the replay needs it, but it is
+ * not a yield: unavailable means the replay proceeds without it, with a
+ * warning, never a crash.
+ */
+export const fetchArchiveDatasets = async (): Promise<{
+  datasets: TreasuryDatasets;
+  vixDataset: SeriesDataset | null;
+}> => {
+  const datasets = {
+    oneMonth: await fetchSeries(SERIES_CATALOG.oneMonth),
+    threeMonth: await fetchSeries(SERIES_CATALOG.threeMonth),
+    twoYear: await fetchSeries(SERIES_CATALOG.twoYear),
+    tenYear: await fetchSeries(SERIES_CATALOG.tenYear),
+  };
+  let vixDataset: SeriesDataset | null = null;
+  try {
+    vixDataset = await fetchSeries("VIXCLS");
+  } catch (error) {
+    console.warn(
+      `VIX series unavailable (${error instanceof Error ? error.message : String(error)}); replaying without the market-stress adjustments.`,
+    );
+  }
+  return { datasets, vixDataset };
+};
+
+/**
+ * The last day every period can be scored on: the earlier of the 2Y/10Y
+ * series' last print and the later of the two bill series' last print.
+ */
+export const resolveEffectiveEndTime = (datasets: TreasuryDatasets): number => {
+  const latestRequired = [
+    getLatestValidDate(datasets.twoYear.points),
+    getLatestValidDate(datasets.tenYear.points),
+  ]
+    .filter((point) => point !== null)
+    .map((point) => point.time)
+    .reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
+  const latestFallback = [
+    getLatestValidDate(datasets.oneMonth.points),
+    getLatestValidDate(datasets.threeMonth.points),
+  ]
+    .filter((point) => point !== null)
+    .map((point) => point.time)
+    .reduce((max, value) => Math.max(max, value), 0);
+  return Math.min(latestRequired, latestFallback);
+};
+
+const MAX_WEEKLY_DATA_LAG_DAYS = 7;
+
+/**
+ * How far behind a period the series may end. A month, quarter or year must be
+ * covered through its last day; a week tolerates a series that ends up to a
+ * week before its Friday, since the week is labelled by its end even when the
+ * data stops a day or two short.
+ */
+type CoverageRule = "period-end" | "week-lag";
+
+const assertCoverageForAsOf = (
+  asOf: string,
+  asOfTime: number,
+  datasets: TreasuryDatasets,
+  rule: CoverageRule,
+) => {
+  const requiredCoverage = [
+    { key: "twoYear" as const, label: "DGS2" },
+    { key: "tenYear" as const, label: "DGS10" },
+  ];
+  const fallbackCoverage = [
+    { key: "oneMonth" as const, label: "DGS1MO" },
+    { key: "threeMonth" as const, label: "DGS3MO" },
+  ];
+  const isShort = (latest: SeriesPoint | null) =>
+    !latest ||
+    (latest.time < asOfTime &&
+      (rule === "period-end" || asOfTime - latest.time >= MAX_WEEKLY_DATA_LAG_DAYS * MS_PER_DAY));
+  const describeShortfall = (label: string, latest: SeriesPoint | null) =>
+    rule === "period-end"
+      ? `FRED coverage for ${label} ends on ${latest?.date ?? "unknown"}, which is before ${asOf}.`
+      : `FRED coverage for ${label} does not include the week ending ${asOf}; latest value is ${latest?.date ?? "unknown"}.`;
+
+  for (const series of requiredCoverage) {
+    const latest = getLatestValidDate(datasets[series.key].points);
+    if (isShort(latest)) {
+      throw new Error(describeShortfall(series.label, latest));
+    }
+  }
+
+  const fallbackLatest = fallbackCoverage
+    .map((series) => getLatestValidDate(datasets[series.key].points))
+    .filter((point) => point !== null)
+    .sort((a, b) => b.time - a.time)[0];
+
+  if (isShort(fallbackLatest ?? null)) {
+    throw new Error(describeShortfall("DGS1MO/DGS3MO", fallbackLatest ?? null));
+  }
+};
+
+/** The latest date at or before the period that carries both long yields and at least one bill. */
+const findLatestCommonDate = (asOfTime: number, datasets: TreasuryDatasets) => {
+  const basePoints = datasets.tenYear.points;
+  const requiredMaps = [datasets.twoYear, datasets.tenYear];
+  const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
+  for (let index = basePoints.length - 1; index >= 0; index -= 1) {
+    const candidate = basePoints[index];
+    if (candidate.time > asOfTime) {
+      continue;
+    }
+    const hasRequired = requiredMaps.every((series) => series.map.has(candidate.date));
+    const hasFallback = fallbackMaps.some((series) => series.map.has(candidate.date));
+    if (hasRequired && hasFallback) {
+      return candidate.date;
+    }
+  }
+  return null;
+};
+
+const buildTreasurySnapshot = (
+  recordDate: string,
+  fetched_at: string,
+  datasets: TreasuryDatasets,
+): TreasuryData => {
   return {
-    id: "VIX_INDEX",
-    label: "CBOE volatility index (VIX)",
-    value: latest.value,
-    unit: "index",
-    explanation: "Implied equity volatility used as a short-cycle shock and regime-boundary warning signal.",
-    sourceLabel: "FRED",
-    sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
-    formulaUrl: "/formulas#vix",
-    record_date: latest.date,
-    fetched_at: fetchedAt,
+    source: SERIES_SOURCE_URLS.oneMonth,
+    record_date: recordDate,
+    fetched_at,
     isLive: false,
-    history,
+    yields: {
+      oneMonth: datasets.oneMonth.map.get(recordDate) ?? null,
+      threeMonth: datasets.threeMonth.map.get(recordDate) ?? null,
+      twoYear: datasets.twoYear.map.get(recordDate) ?? null,
+      tenYear: datasets.tenYear.map.get(recordDate) ?? null,
+    },
+  };
+};
+
+/** One period of an archive replay, after its inputs were resolved and scored. */
+export type ArchivePeriodReading<Period> = {
+  period: Period;
+  asOfTime: number;
+  treasury: TreasuryData;
+  vixReading: MacroSeriesReading | null;
+  assessment: RegimeAssessment;
+};
+
+/**
+ * Resolve every period's inputs from the fetched series and score them as one
+ * threaded walk (`replayRegimeWalk`, the walk the runtime replays too).
+ *
+ * A period that cannot be scored throws before anything is written: the series
+ * must cover it (`coverage`), a common record date must exist at or before it,
+ * and `checkRecordDate` may refuse one that falls outside the period. Callers
+ * walk from the first period even when they write a later range, so a partial
+ * run lands with the confirmations a full replay would have produced.
+ */
+export const replayArchivePeriods = <Period extends { asOf: string }>({
+  periods,
+  datasets,
+  vixDataset,
+  fetchedAt,
+  coverage,
+  checkRecordDate,
+}: {
+  periods: readonly Period[];
+  datasets: TreasuryDatasets;
+  vixDataset: SeriesDataset | null;
+  fetchedAt: string;
+  coverage: CoverageRule;
+  /** Return an error message when the record date does not belong to the period. */
+  checkRecordDate?: (period: Period, recordDate: string) => string | null;
+}): ArchivePeriodReading<Period>[] => {
+  const steps = periods.map((period) => {
+    const { asOf } = period;
+    const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
+    assertCoverageForAsOf(asOf, asOfTime, datasets, coverage);
+    const recordDate = findLatestCommonDate(asOfTime, datasets);
+    if (!recordDate) {
+      throw new Error(`No yield curve data found before ${asOf}.`);
+    }
+    const refusal = checkRecordDate?.(period, recordDate) ?? null;
+    if (refusal) {
+      throw new Error(refusal);
+    }
+    const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
+    const vixReading = resolveVixReading(vixDataset, recordDate, asOfTime, fetchedAt);
+    return {
+      period,
+      asOfTime,
+      treasury,
+      vixReading,
+      macroSeries: vixReading ? [vixReading] : [],
+      baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, recordDate, asOfTime),
+    };
+  });
+
+  return replayRegimeWalk(steps).map(({ step, assessment }) => ({
+    period: step.period,
+    asOfTime: step.asOfTime,
+    treasury: step.treasury,
+    vixReading: step.vixReading,
+    assessment,
+  }));
+};
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+const timestampFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+
+export const formatArchiveDate = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
+};
+
+const formatArchiveTimestamp = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
+};
+
+const formatArchiveAge = (value: string, now: Date) => {
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.valueOf())) {
+    return "—";
+  }
+  const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / 36e5));
+  return `${hours}h.`;
+};
+
+const ARCHIVE_SOURCE_LABEL = "US Treasury Daily Treasury Yield Curve Rates (via FRED)";
+
+/** The provenance block every archived summary carries. */
+export const buildArchiveProvenance = (fetchedAt: string, now: Date) => ({
+  sourceLabel: ARCHIVE_SOURCE_LABEL,
+  sourceUrl: SERIES_SOURCE_URLS.tenYear,
+  timestampLabel: formatArchiveTimestamp(fetchedAt),
+  ageLabel: formatArchiveAge(fetchedAt, now),
+  statusLabel: "Historical (simulated)",
+});
+
+/**
+ * A summary's inputs cited to the FRED series each was read from, rather than
+ * to the live client's combined source label.
+ */
+export const withArchiveInputSources = <Summary extends { inputs: RegimeAssessment["inputs"] }>(
+  summary: Summary,
+  baseRateUsed: RegimeAssessment["scores"]["baseRateUsed"],
+): Summary => {
+  const inputSourceUrls = {
+    "base-rate": baseRateUsed === "3M" ? SERIES_SOURCE_URLS.threeMonth : SERIES_SOURCE_URLS.oneMonth,
+    "two-year": SERIES_SOURCE_URLS.twoYear,
+    "ten-year": SERIES_SOURCE_URLS.tenYear,
+    "curve-slope": SERIES_SOURCE_URLS.tenYear,
+  } as const;
+  return {
+    ...summary,
+    inputs: summary.inputs.map((input) => ({
+      ...input,
+      sourceLabel: ARCHIVE_SOURCE_LABEL,
+      sourceUrl: inputSourceUrls[input.id],
+    })),
   };
 };

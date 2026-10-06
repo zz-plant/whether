@@ -12,13 +12,19 @@ import type { YearlySummary } from "../lib/summary/yearlySummary";
 const ARCHIVE_PATH = "data/summary_archive.json";
 const CALIBRATION_MONTHS_PATH = "data/confidence_record_months.json";
 
+/** Which engine calibration scored the entry; absent on entries written before 2026-10-06. */
+type EngineStamp = { engineVersion?: string };
+
+const carryEngineStamp = ({ engineVersion }: EngineStamp): EngineStamp =>
+  engineVersion === undefined ? {} : { engineVersion };
+
 type WeeklySummaryArchiveEntry = {
   year: number;
   week: number;
   asOf: string;
   record_date: string;
   summary: WeeklySummary;
-};
+} & EngineStamp;
 
 type MonthlySummaryArchiveEntry = {
   year: number;
@@ -28,7 +34,7 @@ type MonthlySummaryArchiveEntry = {
   summary: MonthlySummary;
   tightness?: number;
   riskAppetite?: number;
-};
+} & EngineStamp;
 
 type QuarterlySummaryArchiveEntry = {
   year: number;
@@ -36,14 +42,14 @@ type QuarterlySummaryArchiveEntry = {
   asOf: string;
   record_date: string;
   summary: QuarterlySummary;
-};
+} & EngineStamp;
 
 type YearlySummaryArchiveEntry = {
   year: number;
   asOf: string;
   record_date: string;
   summary: YearlySummary;
-};
+} & EngineStamp;
 
 type SummaryArchiveEntry =
   | {
@@ -53,6 +59,7 @@ type SummaryArchiveEntry =
       asOf: string;
       record_date: string;
       summary: WeeklySummary;
+      engineVersion?: string;
     }
   | {
       cadence: "monthly";
@@ -63,6 +70,7 @@ type SummaryArchiveEntry =
       summary: MonthlySummary;
       tightness?: number;
       riskAppetite?: number;
+      engineVersion?: string;
     }
   | {
       cadence: "quarterly";
@@ -71,6 +79,7 @@ type SummaryArchiveEntry =
       asOf: string;
       record_date: string;
       summary: QuarterlySummary;
+      engineVersion?: string;
     }
   | {
       cadence: "yearly";
@@ -78,6 +87,7 @@ type SummaryArchiveEntry =
       asOf: string;
       record_date: string;
       summary: YearlySummary;
+      engineVersion?: string;
     };
 
 type SummaryArchiveMode = "replace" | "merge";
@@ -172,6 +182,7 @@ export const writeSummaryArchive = async ({
       asOf: entry.asOf,
       record_date: entry.record_date,
       summary: entry.summary,
+      ...carryEngineStamp(entry),
     }));
     nextEntries =
       mode === "merge"
@@ -189,6 +200,7 @@ export const writeSummaryArchive = async ({
       summary: entry.summary,
       tightness: entry.tightness,
       riskAppetite: entry.riskAppetite,
+      ...carryEngineStamp(entry),
     }));
     nextEntries =
       mode === "merge"
@@ -204,6 +216,7 @@ export const writeSummaryArchive = async ({
       asOf: entry.asOf,
       record_date: entry.record_date,
       summary: entry.summary,
+      ...carryEngineStamp(entry),
     }));
     nextEntries =
       mode === "merge"
@@ -218,6 +231,7 @@ export const writeSummaryArchive = async ({
       asOf: entry.asOf,
       record_date: entry.record_date,
       summary: entry.summary,
+      ...carryEngineStamp(entry),
     }));
     nextEntries =
       mode === "merge"
