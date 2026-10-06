@@ -52,6 +52,6 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
     return "/operate#ops-monthly-action-summary";
   }
 
-  return "/signals#decision-summary";
+  return "/signals#what-changed";
 };
 

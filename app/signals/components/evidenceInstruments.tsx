@@ -18,8 +18,10 @@ import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
  * The fourth section of the evidence page: the instruments. Charts, the line
  * editor, the month picker, the nearest reference cycle and the fossil record
  * are for the reader who wants to check the method, so each sits behind one
- * disclosure and the page reads to its end without them. The charts open by
- * default; they are the evidence the section is named for.
+ * disclosure titled with the question it answers, and all of them start
+ * closed. The charts used to open by default, which put about 2,000px of
+ * charts between "What would change this guidance" and the other five
+ * instruments; a reader looking for an earlier month scrolled past all of it.
  *
  * Until 2026-09-22 these were gated behind a "Reading depth" radio and then a
  * second "Show advanced filters" link, so the month picker was three clicks and
@@ -43,7 +45,13 @@ type YieldCurvePoint = {
 
 type TrendPoint = { label: string; value: number };
 
+/* No space-y here: Tailwind's space-y puts a bottom margin on every child but
+   the last, and the summary is one, so a closed row came out 13px taller than
+   its neighbours. Each body spaces itself. */
+const DISCLOSURE_CLASS = "weather-auto-chevron weather-panel p-5";
 const SUMMARY_CLASS = "cursor-pointer select-none text-base font-semibold text-slate-100";
+/* The answer's own particulars after the question, quieter than it. */
+const SUMMARY_DETAIL_CLASS = "font-normal text-slate-400";
 
 /* A score carries its scale ("72/100"); a bare "72" beside "3.50%" read as the same kind of number. */
 const formatCoordinate = (value: number, unit: "%" | "pts") =>
@@ -58,60 +66,67 @@ const formatCoordinate = (value: number, unit: "%" | "pts") =>
 const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssessment, "scores"> }) => {
   const analog = getHistoricalAnalogPlaybook(assessment);
   return (
-    <details id="analog-pattern" className="weather-auto-chevron weather-panel space-y-4 p-5">
+    <details id="analog-pattern" className={DISCLOSURE_CLASS}>
       <summary className={SUMMARY_CLASS}>
-        Nearest reference cycle · {analog.analogPeriod} · {analog.regimeType}
+        <span>
+          Which past cycle looks most like this one?{" "}
+          <span className={SUMMARY_DETAIL_CLASS}>
+            {analog.analogPeriod} · {analog.regimeType}
+          </span>
+        </span>
       </summary>
-      <p className="text-fluid-xs text-slate-400">
-        Closest of {analog.referenceCycleCount} reference cycles on the four readings below.
-        A resemblance in the inputs, not a forecast of the outcome.
-      </p>
-      {/* Without explicit column widths the label column absorbs every pixel
-          of slack, so on a wide panel the two numeric columns end up jammed
-          against the right edge. 50/25/25 keeps the pairs readable across
-          the row. */}
-      <table className="w-full max-w-2xl table-fixed border-collapse text-left text-fluid-xs">
-        <caption className="sr-only">Match coordinates, reference cycle against this week</caption>
-        <colgroup>
-          <col className="w-1/2" />
-          <col className="w-1/4" />
-          <col className="w-1/4" />
-        </colgroup>
-        <thead>
-          <tr className="border-b border-slate-800/80 text-slate-400">
-            <th scope="col" className="py-1.5 pr-3 font-medium">Reading</th>
-            <th scope="col" className="py-1.5 pr-3 text-right font-medium">{analog.analogPeriod}</th>
-            <th scope="col" className="py-1.5 text-right font-medium">This week</th>
-          </tr>
-        </thead>
-        <tbody>
-          {analog.matchBasis.map((item) => (
-            <tr key={item.key} className="border-b border-slate-800/40 last:border-0">
-              <td className="py-1.5 pr-3 text-slate-300">{item.label}</td>
-              <td className="py-1.5 pr-3 text-right font-mono text-slate-400">{formatCoordinate(item.historical, item.unit)}</td>
-              <td className="py-1.5 text-right font-mono text-slate-100">{formatCoordinate(item.live, item.unit)}</td>
+      <div className="space-y-4">
+        <p className="text-fluid-xs text-slate-400">
+          Closest of {analog.referenceCycleCount} reference cycles on the four readings below.
+          A resemblance in the inputs, not a forecast of the outcome.
+        </p>
+        {/* Without explicit column widths the label column absorbs every pixel
+            of slack, so on a wide panel the two numeric columns end up jammed
+            against the right edge. 50/25/25 keeps the pairs readable across
+            the row. */}
+        <table className="w-full max-w-2xl table-fixed border-collapse text-left text-fluid-xs">
+          <caption className="sr-only">Match coordinates, reference cycle against this week</caption>
+          <colgroup>
+            <col className="w-1/2" />
+            <col className="w-1/4" />
+            <col className="w-1/4" />
+          </colgroup>
+          <thead>
+            <tr className="border-b border-slate-800/80 text-slate-400">
+              <th scope="col" className="py-1.5 pr-3 font-medium">Reading</th>
+              <th scope="col" className="py-1.5 pr-3 text-right font-medium">{analog.analogPeriod}</th>
+              <th scope="col" className="py-1.5 text-right font-medium">This week</th>
             </tr>
+          </thead>
+          <tbody>
+            {analog.matchBasis.map((item) => (
+              <tr key={item.key} className="border-b border-slate-800/40 last:border-0">
+                <td className="py-1.5 pr-3 text-slate-300">{item.label}</td>
+                <td className="py-1.5 pr-3 text-right font-mono text-slate-400">{formatCoordinate(item.historical, item.unit)}</td>
+                <td className="py-1.5 text-right font-mono text-slate-100">{formatCoordinate(item.live, item.unit)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <dl className="grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-3">
+          {[
+            { label: "Common mistake then", value: analog.consensusTrap },
+            { label: "What held up then", value: analog.winningMove },
+            { label: "What marked the turn", value: analog.reversalMarker },
+          ].map((cell) => (
+            <div key={cell.label}>
+              <dt className="type-eyebrow">{cell.label}</dt>
+              <dd className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{cell.value}</dd>
+            </div>
           ))}
-        </tbody>
-      </table>
-      <dl className="grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-3">
-        {[
-          { label: "Common mistake then", value: analog.consensusTrap },
-          { label: "What held up then", value: analog.winningMove },
-          { label: "What marked the turn", value: analog.reversalMarker },
-        ].map((cell) => (
-          <div key={cell.label}>
-            <dt className="type-eyebrow">{cell.label}</dt>
-            <dd className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{cell.value}</dd>
-          </div>
-        ))}
-      </dl>
-      <p className="text-fluid-nano text-slate-500">
-        Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.{" "}
-        <Link href="/history/compare" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-          Compare against any past month →
-        </Link>
-      </p>
+        </dl>
+        <p className="text-fluid-nano text-slate-500">
+          Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.{" "}
+          <Link href="/history/compare" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+            Compare against any past month →
+          </Link>
+        </p>
+      </div>
     </details>
   );
 };
@@ -160,20 +175,25 @@ export const SignalsInstrumentsSection = ({
       </h2>
     </div>
 
-    {/* Open by default: the charts are what this section is for. Which of the
-        instruments a reader had open is incidental to a shared link, except
-        the month picker below, whose open state other pages link into. */}
-    {/* One list, one rule between items. The five were a disclosure, a heading
+    {/* One list, one rule between items. They used to be a disclosure, a heading
         block, two bare disclosure rows and a section with its own boxed toggle,
         so nothing said they were the same kind of thing or where one ended. A
         box each would put the charts' own cards three frames deep (§XIII). */}
     <div className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
-      <details id="signal-diagnostics" open className="weather-auto-chevron weather-panel space-y-4 p-5">
-        <summary className={SUMMARY_CLASS}>Every chart behind the guidance.</summary>
+      <details id="signal-diagnostics" className={DISCLOSURE_CLASS}>
+        <summary className={SUMMARY_CLASS}>What are interest rates doing?</summary>
         <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
-        <SignalInversionPreview yieldCurveSeries={yieldCurveSeries} />
-        <div id="trends" className="space-y-4 border-t border-slate-800/60 pt-4">
-          <h3 className="type-eyebrow">Funding pressure and risk appetite over time</h3>
+      </details>
+
+      <SignalInversionPreview
+        yieldCurveSeries={yieldCurveSeries}
+        className={DISCLOSURE_CLASS}
+        summaryClassName={SUMMARY_CLASS}
+      />
+
+      <details id="trends" className={DISCLOSURE_CLASS}>
+        <summary className={SUMMARY_CLASS}>How have the two scores moved this year?</summary>
+        <div className="space-y-4">
           {/* The table above publishes *this week's* reading and this series is
               the month-end archive, so the two disagree by design — for the same
               two named signals. Each cell stamps its own period; this line says
@@ -199,7 +219,7 @@ export const SignalsInstrumentsSection = ({
         initialOpen={monthPickerOpen}
         className="weather-auto-chevron weather-panel p-5"
         summaryClassName={SUMMARY_CLASS}
-        summary={<span>Past months · See what the brief said in an earlier month</span>}
+        summary={<span>What did the brief say in an earlier month?</span>}
       >
         <TimeMachinePanel
           selectedYear={selectedYear}
@@ -225,6 +245,8 @@ export const SignalsInstrumentsSection = ({
       <FossilRecordSection
         regime={assessment.regime}
         open={searchParams?.fossil === "1" || searchParams?.fossil === "open"}
+        className={DISCLOSURE_CLASS}
+        summaryClassName={SUMMARY_CLASS}
       />
     </div>
   </section>
