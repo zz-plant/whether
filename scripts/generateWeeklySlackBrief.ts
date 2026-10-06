@@ -15,6 +15,7 @@ import { parseArgs } from "node:util";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { loadReportData } from "../lib/report/reportData";
 import { assessPublishReadiness } from "../lib/report/briefPublishGuard";
+import { buildBriefDocumentFromReport } from "../lib/report/briefDocument";
 
 const run = async () => {
   const { values } = parseArgs({
@@ -25,7 +26,8 @@ const run = async () => {
     },
   });
 
-  const { assessment, treasury, sensors, macroSeries } = await loadReportData();
+  const reportData = await loadReportData();
+  const { treasury } = reportData;
 
   const readiness = assessPublishReadiness({
     degraded: false,
@@ -42,7 +44,10 @@ const run = async () => {
     process.exit(1);
   }
 
-  const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
+  /* The Monday post's text, under the call every page serves. With no options this
+     printed stand-ins: "Keep last week's approvals as they are; start nothing new."
+     as the action, and the assessment's description as the guidance. */
+  const brief = buildSlackBrief(await buildBriefDocumentFromReport(reportData, { degraded: false }));
   const fallbackNotice = readiness.ok
     ? null
     : `NOT LIVE DATA — ${readiness.reason}`;

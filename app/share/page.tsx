@@ -8,13 +8,12 @@ import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
-import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
+import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument } from "../../lib/report/briefDocument";
 import { formatBriefArtifact } from "../../lib/report/briefArtifact";
-import { buildBoardSlideBullets, buildCallCitation, buildReadingLines, buildSlackBrief } from "../../lib/export/briefBuilders";
+import { briefReadingLines, buildBoardSlideBullets, buildCallCitation } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
 import { buildPortfolioNote } from "../../lib/export/portfolioNote";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
-import { describeConditions } from "../../lib/export/exportTerms";
 import { buildFlipProximity, buildStandupFlipLine } from "../../lib/report/flipProximity";
 import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
 import { buildWipGuidance } from "../../lib/report/wipPolicy";
@@ -25,7 +24,6 @@ import {
 import { buildBriefPermalinkLine } from "../../lib/export/briefPermalink";
 import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdateSnippet";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
-import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
 
@@ -58,26 +56,15 @@ const describeSourceHost = (source: string) => {
 
 const buildCurrentShareArtifact = async () => {
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/share" });
-  const { assessment, treasury, sensors, macroSeries } = reportData;
-  /* The area rows and last week are what the builders' five-area section and
-     score lines are made of; without them every paste on this page dropped the
-     section and printed each score with no last week and no pause line. */
-  const actionStripItems = snapshot.homeBriefModel.actionStripItems ?? [];
-  const previousScores = previousScoresFromDynamics(reportData.reportDynamics, assessment.scores);
-  const exportOptions = {
-    postureWithStageLabel: snapshot.weeklyCall.regimeStage,
-    operatingStanceLine: snapshot.weeklyCall.currentCall,
-    actionStripItems,
-    previousScores,
-    modeledDecision: {
-      postureWithStageLabel: snapshot.weeklyCall.regimeStage,
-      currentCall: snapshot.weeklyCall.currentCall,
-      actionNow: snapshot.weeklyCall.actionNow,
-      guardrailThreshold: snapshot.weeklyCall.pauseIf,
-      reversalTrigger: snapshot.weeklyCall.callChangesIf,
-      actionStripItems,
-    },
-  };
+  const { assessment, treasury } = reportData;
+  /* The week as one document, built once from the persisted call: every text
+     format on this page renders it, and the island the share rail reads is its
+     artifact half. The area rows, the last week and the readings it carries are
+     what the formats' five-area sections and score lines are made of. */
+  const document = buildBriefDocument(briefSourceFromReportData(reportData), snapshot.weeklyCall, {
+    title: "Whether Weekly Brief",
+  });
+  const actionStripItems = document.areaRows;
   const weeklyOperatorBrief = buildWeeklyOperatorBriefPlainText(
     buildWeeklyOperatorBriefPayload({
       assessment,
@@ -85,20 +72,17 @@ const buildCurrentShareArtifact = async () => {
       weeklyCall: snapshot.weeklyCall,
     }),
   );
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportOptions);
+  /* One Slack text for the week: the post the picker offers is the one the
+     meeting pack carries. The pack used to paste the Monday post's long form
+     beside it, so the page offered two Slack texts with two different calls. */
+  const slackPost = formatBriefArtifact(document, "slack", siteUrl);
   /*
    * The issue-tracker form was extracted from `exportBriefPanel.tsx` so it could
    * be tested, and then that panel was deleted — leaving a finished, tested
-   * builder that nothing called and no reader could reach. It takes the same
-   * four inputs as the Slack brief, and this page is where the formats live.
+   * builder that nothing called and no reader could reach. This page is where
+   * the formats live.
    */
-  const issueTrackerBrief = buildIssueTrackerMarkdownBrief(
-    assessment,
-    treasury,
-    sensors,
-    macroSeries,
-    { ...exportOptions.modeledDecision, previousScores },
-  );
+  const issueTrackerBrief = buildIssueTrackerMarkdownBrief(document);
   /* The credential-free slice of the Linear/Jira sync: one paste-ready
      guardrail block per business area, built from the same bounded-rule fields
      the hero and Slack brief print. No tokens, no tracker integration — the
@@ -107,7 +91,7 @@ const buildCurrentShareArtifact = async () => {
   const proximity = buildFlipProximity(assessment);
   const guardrailTagBlocks = buildGuardrailTagBlocks({
     actionStripItems,
-    postureLabel: describeConditions(assessment.regime, snapshot.weeklyCall.regimeStage),
+    postureLabel: document.conditions.line,
     recordDate: treasury.record_date,
     flipWatchSentence: proximity.map((entry) => entry.sentence)[0],
   });
@@ -131,7 +115,7 @@ const buildCurrentShareArtifact = async () => {
   });
   // The slide bullets rather than the board brief, which is the Slack brief
   // with the bullets appended: this pack used to paste the same block twice.
-  const boardSlideBullets = buildBoardSlideBullets(assessment, treasury, macroSeries, exportOptions);
+  const boardSlideBullets = buildBoardSlideBullets(document);
   // Monthly, against the prior month-end in the regime history, because that
   // is the cadence an investor letter compares itself on. The runway sentence
   // is composed in the browser: this page is cached and cannot read the cookie.
@@ -157,8 +141,8 @@ const buildCurrentShareArtifact = async () => {
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
     "",
-    "SLACK BRIEF",
-    slackBrief,
+    "SLACK POST",
+    slackPost,
     "",
     "BOARD SLIDE",
     boardSlideBullets,
@@ -175,13 +159,10 @@ const buildCurrentShareArtifact = async () => {
     sourceHost: describeSourceHost(treasury.source),
     // The score lines the pastes below print, shown above the picker so the
     // reader sees what they are about to copy.
-    scoreReferences: buildReadingLines(assessment, exportOptions),
-    // The picker's object, from the same snapshot the long-form builders read.
-    briefArtifact: buildBriefArtifactFromSnapshot({
-      reportData,
-      weeklyCall: snapshot.weeklyCall,
-      title: "Whether Weekly Brief",
-    }),
+    scoreReferences: briefReadingLines(document),
+    document,
+    // The island the share rail reads: the document's artifact half.
+    briefArtifact: briefArtifactOf(document),
     fullBrief: weeklyOperatorBrief,
     emailBrief: [
       "Whether: this week's guidance",
@@ -223,7 +204,7 @@ import { ExecutiveBriefingPanel } from "../operate/components/executiveBriefingP
  */
 const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShareArtifact>>): ShareFormatOption[] => {
   const brief = (format: Parameters<typeof formatBriefArtifact>[1]) =>
-    formatBriefArtifact(artifact.briefArtifact, format, siteUrl);
+    formatBriefArtifact(artifact.document, format, siteUrl);
   return [
     {
       id: "slack-post",
@@ -259,7 +240,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "meeting-pack",
       group: "Meetings",
       label: "Meeting pack",
-      hint: "The brief, the Slack brief, the board slide's bullets and the citation, in one paste for a meeting doc.",
+      hint: "The brief, the Slack post, the board slide's bullets and the citation, in one paste for a meeting doc.",
       kind: "text",
       text: artifact.meetingPack,
       copyLabel: "Copy meeting pack",

@@ -97,7 +97,7 @@ export type BriefDocument = BriefArtifact & {
   /** The market state, under the one label every format prints it with. */
   conditions: {
     /** The engine key; a format reads it for colour, never prints it. */
-    regime: string;
+    regime: RegimeAssessment["regime"];
     /**
      * The contract's `regimeStage`: the weather word, with how long it has held
      * when the reading knows. The exports passed four different labels here —

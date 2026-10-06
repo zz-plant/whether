@@ -15,6 +15,9 @@ import { buildSensorReadings } from "../sensors";
 import { describeConditions, pauseConditionOnly } from "../export/exportTerms";
 import { buildBriefPermalinkUrl } from "../export/briefPermalink";
 import { previousScoresFromDynamics, type PreviousReading } from "../export/scoreReference";
+import { buildPostureState } from "./postureStateSource";
+import type { PostureStateContract } from "./postureStateContract";
+import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 
 /**
  * What a brief document is built from: one reading, wherever it was read.
@@ -190,6 +193,35 @@ export const buildBriefDocument = (
     constraints: assessment.constraints,
     runway: { everyBand: buildEveryBandRunway(assessment.regime) },
   };
+};
+
+/**
+ * The document for a report read, under the call the read path serves every
+ * page: the stored contract when the read projects the operating snapshot, else
+ * one built from this read with the canonical copy the posture state adds — the
+ * call /share, the homepage and the email print. The Slack routes and the
+ * weekly artifact script each re-derived the call from the lead area row and
+ * the assessment's description instead.
+ */
+export const buildBriefDocumentFromReport = async (
+  reportData: ReportData | ReportDataFallback,
+  {
+    degraded,
+    postureState: providedPostureState,
+  }: {
+    degraded: boolean;
+    /** The caller's own, when it already built one for this read; one decision-events read is enough. */
+    postureState?: PostureStateContract;
+  },
+): Promise<BriefDocument> => {
+  const postureState = providedPostureState ?? await buildPostureState({
+    record: reportData.treasury,
+    historical: Boolean(reportData.historicalSelection),
+    assessment: reportData.assessment,
+    reportDynamics: reportData.reportDynamics,
+  });
+  const { weeklyCall } = buildWeeklyBriefSnapshot({ reportData, degraded, postureState });
+  return buildBriefDocument(briefSourceFromReportData(reportData), weeklyCall);
 };
 
 /**

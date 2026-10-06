@@ -1970,11 +1970,10 @@ macro context embedded for leadership consumption. `/share` owns the copy format
 meeting pack, issue tracker, investor update) and the file and image artifacts (board slide as
 PPTX and PDF, meeting slide as SVG, brief card as PNG); see §1.1.18.
 
-Interpretation-context transmission contract (homepage-selected `?view=` only):
-- Slack/board/call-citation builders include an optional interpretation context block when the selected layer is non-default.
-- Context block includes: selected layer label + key (`default|sector|company|financial|forecast`), interpretation summary, compact bounded bullets (max 3), and an explicit trust line: translation-layer only (canonical posture/confidence/thresholds unchanged).
-- Financial view may append compact runway action lines (runway risk, raise timing, burn adjustment) so the selected lens is transmissible in copy/paste artifacts.
-- Fallback behavior: default view omits interpretation context entirely; invalid/missing view resolves to default and exports remain canonical.
+Interpretation context (homepage-selected `?view=`) no longer travels into the exports. The
+Slack, board and citation builders took an optional interpretation block, and the only caller that
+passed one was the home assembly's `leadershipArtifactPayloadPromise`, which nothing rendered; the
+block went with it (§5.3.1). The homepage still renders the selected layer itself.
 
 #### 5.3.1 One brief document every format renders from (2026-10-06)
 
@@ -2047,6 +2046,26 @@ the island carries the fields the slide reads (`regime`, `recordDate`, `lines`, 
 `sourceLabel`). The island's two scores and its confidence are required: a malformed island
 yields no slide rather than a stand-in. The flip conditions print as "Watch this week". §1.1.12's
 reading of them as "the resume thresholds" was the mislabel.
+
+**The Slack brief, the board slide bullets and the ticket brief render the document**
+(`buildSlackBrief(document)`, `buildBoardSlideBullets(document)`,
+`buildIssueTrackerMarkdownBrief(document, format)`), and `ExportLayerOptions` /
+`ModeledExportDecisionPayload` are gone. Every Slack caller builds the same document: the Monday
+post from the snapshot, and `GET /api/brief/slack`, the manual deliver and
+`scripts/generateWeeklySlackBrief.ts` through `buildBriefDocumentFromReport`, under the call the
+read path serves every page. The script had passed no options, so `docs/briefs/` printed stand-ins
+every week: "Keep last week's approvals as they are; start nothing new." as the action, the no-
+reading pause line, and "Live data is back and conditions have held for a week." as the resume
+line, on live data. The area rows carry their distances on every path ("(crossed)", "(44 pts
+away)", "(already met)"): the snapshot path built them without the scores. Blocks no production
+caller reached went with the options: the "This week's guidance" recap (whose "Points from the
+change line: 0.0", "Could conditions change next week: no" and "no live reading this week" were
+stand-ins on /share's meeting pack, the one place it printed), the historical-analogs block, the
+failure-mode warning and the interpretation block.
+
+**/share offers one Slack text and the meeting pack carries it.** The pack pasted the long Monday
+post beside the picker's Slack post, under a different call on a held week. Its "SLACK POST"
+section is the picker's post now.
 
 **One provenance footer.** `formatSourceFooter` (`lib/export/exportTerms.ts`) prints "Source:
 {publisher}, {date}, via whether.work" and "(saved copy, not a live reading)" when it is one. Every

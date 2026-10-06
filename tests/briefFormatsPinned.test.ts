@@ -22,6 +22,7 @@ import {
 import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBriefDocumentFromReport } from "../lib/report/briefDocument";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
@@ -188,7 +189,7 @@ const collectRoutes = async (out: Record<string, string>) => {
 
   /* What `scripts/generateWeeklySlackBrief.ts` writes to docs/briefs: the same read, the same call. */
   const report = await loadReportData();
-  out["weekly slack artifact script"] = buildSlackBrief(report.assessment, report.treasury, report.sensors, report.macroSeries);
+  out["weekly slack artifact script"] = buildSlackBrief(await buildBriefDocumentFromReport(report, { degraded: false }));
 
   /* The citation the answer pages print. */
   out["answer-page citation"] = (await loadWeeklyBriefSnapshot()).snapshot.callCitation;

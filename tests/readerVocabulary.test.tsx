@@ -26,7 +26,7 @@ import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import type { RunwayBand } from "../lib/report/operatorRunway";
-import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
+import { assessment, fixtureBriefDocument, treasury, macros } from "./factories/exportFixtures";
 import { renderOgElement } from "../app/api/og/renderOgElement";
 import { collectPageShareCards } from "./fixtures/pageShareCards";
 
@@ -212,10 +212,10 @@ const record: TrackRecord = {
 };
 
 const artifactSurfaces: Surface[] = [
-  { name: "Slack brief", text: () => buildSlackBrief(assessment, treasury, sensors, macros) },
+  { name: "Slack brief", text: () => buildSlackBrief(fixtureBriefDocument()) },
   { name: "call citation", text: () => buildCallCitation(assessment, treasury) },
-  { name: "board slide bullets", text: () => buildBoardSlideBullets(assessment, treasury, macros) },
-  { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros) },
+  { name: "board slide bullets", text: () => buildBoardSlideBullets(fixtureBriefDocument()) },
+  { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(fixtureBriefDocument()) },
   {
     name: "weekly operator brief",
     text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall: fixtureWeeklyCall })),
