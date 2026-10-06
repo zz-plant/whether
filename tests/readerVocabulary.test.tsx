@@ -206,12 +206,12 @@ const record: TrackRecord = {
 
 const artifactSurfaces: Surface[] = [
   { name: "Slack brief", text: () => buildSlackBrief(fixtureBriefDocument()) },
-  { name: "call citation", text: () => buildCallCitation(assessment, treasury) },
+  { name: "call citation", text: () => buildCallCitation(fixtureBriefDocument()) },
   { name: "board slide bullets", text: () => buildBoardSlideBullets(fixtureBriefDocument()) },
   { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(fixtureBriefDocument()) },
   {
     name: "weekly operator brief",
-    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall: fixtureWeeklyCall() })),
+    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(fixtureBriefDocument())),
   },
   { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(buildExportSlidePayload(fixtureSnapshot, null)) },
   { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(buildExportSlidePayload(fixtureSnapshot, null))) },

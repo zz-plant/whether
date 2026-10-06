@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildBriefPermalinkLine, buildBriefPermalinkUrl } from "../lib/export/briefPermalink";
+import { buildBriefPermalinkUrl } from "../lib/export/briefPermalink";
 import { buildPublishedBriefPath, latestPublishedBrief } from "../lib/report/publishedBriefs";
 
 const shiftDays = (isoDate: string, days: number) =>
@@ -28,10 +28,5 @@ describe("shared brief permalink", () => {
       assert.equal(url.search, "");
       assert.equal(url.hash, "");
     }
-  });
-
-  it("labels the line so a reader knows what the link is", () => {
-    const line = buildBriefPermalinkLine(latestPublishedBrief.recordDate);
-    assert.match(line, /^Full brief: https?:\/\//);
   });
 });

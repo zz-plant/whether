@@ -1,19 +1,16 @@
 import { formatNumberWithUnit } from "../formatters";
 import type { RegimeAssessment } from "../regimeEngine";
-import type { TreasuryData } from "../types";
 import type { BriefDocument } from "../report/briefArtifact";
-import { buildBriefPermalinkLine } from "./briefPermalink";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { resolvePublishedConfidence } from "../report/confidence";
 import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
-import { describeBaseRateSource, describeConditions, formatExportConfidence } from "./exportTerms";
+import { describeBaseRateSource, formatExportConfidence } from "./exportTerms";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -261,14 +258,26 @@ export const buildSlackBrief = (document: BriefDocument) => {
   ].join("\n");
 };
 
-export const buildCallCitation = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  options?: { postureWithStageLabel?: string },
-) => [
-  `Whether Weekly Brief — ${treasury.record_date}`,
-  `Conditions: ${describeConditions(assessment.regime, options?.postureWithStageLabel)}`,
-  `${formatExportConfidence(resolvePublishedConfidence({ assessment, record: treasury }).label)} (how far the scores sit from the line where conditions change)`,
-  `Source note: ${treasury.source}`,
-  buildBriefPermalinkLine(treasury.record_date),
+/**
+ * The dated reference the answer pages print under their own reading. It reads
+ * the document's fields rather than the assessment, the treasury record and a
+ * label of the caller's choosing, so the confidence is the published one and
+ * the conditions carry the brief's own label. The share formats' citation is
+ * the document's (`formatBriefArtifact(document, "citation")`); /share offered
+ * both, two citations for one week, and offers that one now.
+ */
+export const buildCallCitation = ({
+  conditions,
+  confidence,
+  provenance,
+}: {
+  conditions: Pick<BriefDocument["conditions"], "line">;
+  confidence: BriefDocument["confidence"];
+  provenance: Pick<BriefDocument["provenance"], "sourceUrl" | "recordDate" | "permalink">;
+}) => [
+  `Whether Weekly Brief — ${provenance.recordDate}`,
+  `Conditions: ${conditions.line}`,
+  `${formatExportConfidence(confidence)} (how far the scores sit from the line where conditions change)`,
+  `Source note: ${provenance.sourceUrl}`,
+  `Full brief: ${provenance.permalink}`,
 ].join("\n");

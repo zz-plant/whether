@@ -4,7 +4,7 @@ import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../l
 import { regimeSignalLabel } from "../lib/report/signalTranslations";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 
-import { assessment, fixtureBriefDocument, fixtureWeeklyCall, treasury } from "./factories/exportFixtures";
+import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
 
 const slot = (brief: string, label: string) => brief.match(new RegExp(`• ${label}: (.+)`))?.[1] ?? "";
 
@@ -188,11 +188,13 @@ describe("buildBoardSlideBullets", () => {
 });
 
 describe("buildCallCitation", () => {
-  it("names the conditions under the label it is given, for a reader rather than the engine", () => {
-    const stageLabel = "Expansion — Late (Fragile)";
-    const citation = buildCallCitation(assessment, treasury, { postureWithStageLabel: stageLabel });
+  it("names the conditions under the call's label and the published confidence, for a reader rather than the engine", () => {
+    const citation = buildCallCitation(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), regimeStage: "Sunny — Late" } }));
 
-    assert.match(citation, /Conditions: Expansion — Late \(Fragile\)/);
+    assert.match(citation, /^Conditions: Sunny — Late \(money is cheap and available\)$/m);
+    assert.match(citation, /^High confidence \(how far the scores sit/m);
+    assert.match(citation, /^Source note: https:\/\/fred\.stlouisfed\.org$/m);
+    assert.match(citation, /^Full brief: https?:\/\//m);
     assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");
   });
 });

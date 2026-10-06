@@ -105,15 +105,12 @@ describe("posture state contract consumers", () => {
 
     const canonicalDecisionCopy = buildCanonicalDecisionCopy({ homeBriefModel, postureState });
     const weeklyCall = buildWeeklyCallContract({ assessment, homeBriefModel, canonicalDecisionCopy });
-    const operatorBrief = buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall });
-
-    const envelope = buildWeeklyMandateEnvelope(
-      buildBriefDocument(
-        { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
-        weeklyCall,
-      ),
-      postureState,
+    const document = buildBriefDocument(
+      { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+      weeklyCall,
     );
+    const operatorBrief = buildWeeklyOperatorBriefPayload(document);
+    const envelope = buildWeeklyMandateEnvelope(document, postureState);
 
     assert.equal(homeBriefModel.confidenceLabel, postureState.currentState.confidenceLabel);
     assert.equal(homeBriefModel.flipThreshold, postureState.whatFlipsNext.flipTrigger);

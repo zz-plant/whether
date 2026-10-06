@@ -4,6 +4,7 @@ import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplicatio
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
+import { buildBriefDocument } from "../lib/report/briefDocument";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import type { PostureStateContract } from "../lib/report/postureStateContract";
@@ -106,7 +107,12 @@ describe("canonical decision copy contract", () => {
       homeBriefModel: buildHomeBriefModel({ assessment, stopItems: ["Preserve runway"], regimeAlert: null, postureState }),
       canonicalDecisionCopy: canonical,
     });
-    const payload = buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall });
+    const payload = buildWeeklyOperatorBriefPayload(
+      buildBriefDocument(
+        { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 7, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+        weeklyCall,
+      ),
+    );
     const text = buildWeeklyOperatorBriefPlainText(payload);
 
     assert.equal(payload.regimeStage, canonical.currentRegimeLabel);

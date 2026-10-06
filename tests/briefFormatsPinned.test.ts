@@ -22,7 +22,7 @@ import {
 import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
-import { buildBriefDocumentFromReport } from "../lib/report/briefDocument";
+import { briefSourceFromSnapshot, buildBriefDocument, buildBriefDocumentFromReport } from "../lib/report/briefDocument";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
@@ -235,7 +235,7 @@ const collectReader = (out: Record<string, string>, snapshot: OperatingSnapshot,
     runwayBand: fixture.runwayBand,
   });
   out["reader operator brief"] = buildWeeklyOperatorBriefPlainText(
-    buildWeeklyOperatorBriefPayload({ assessment: snapshot.assessment, treasury: snapshot.treasury, weeklyCall }),
+    buildWeeklyOperatorBriefPayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), weeklyCall)),
   );
 };
 
@@ -272,7 +272,7 @@ const readGolden = (): Record<string, Record<string, string>> => {
 
 describe("every brief format, pinned", () => {
   for (const fixture of fixtures) {
-    it(`renders the ${fixture.name} exactly as pinned`, async () => {
+    it(`renders the ${fixture.name} byte for byte against its pin`, async () => {
       const actual = await collect(fixture);
       if (UPDATE) {
         const golden = readGolden();

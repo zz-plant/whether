@@ -5,6 +5,7 @@ import {
   buildWeeklyOperatorBriefPlainText,
 } from "../lib/export/weeklyOperatorBrief";
 import type { WeeklyCallContract } from "../lib/report/weeklyCallContract";
+import { buildBriefDocument } from "../lib/report/briefDocument";
 import { getClipboardUiState } from "../app/components/useClipboardCopy";
 import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 
@@ -48,12 +49,16 @@ const weeklyCall: WeeklyCallContract = {
   policyOverrideReason: null,
 };
 
+/* The week's brief document for the fixture reading, under a given call. */
+const documentFor = (call: WeeklyCallContract = weeklyCall) =>
+  buildBriefDocument(
+    { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 4, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+    call,
+  );
+
 describe("weekly operator brief export adapters", () => {
   it("projects the weekly call contract, slot for slot", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      weeklyCall,
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       weeklyLeadershipSummary: {
         boldnessScore: 42,
         boldnessDelta: -3,
@@ -75,7 +80,8 @@ describe("weekly operator brief export adapters", () => {
     assert.match(payload.conditions, /^Defensive · Late Cycle \(money is [a-z ]+\)$/);
     assert.equal(payload.currentCall, weeklyCall.currentCall);
     assert.equal(payload.actionNow, weeklyCall.actionNow);
-    assert.equal(payload.pauseIf, weeklyCall.pauseIf);
+    // The document holds the pause line as its condition: the label already says "Pause if".
+    assert.equal(payload.pauseIf, "Funding pressure rises above 76");
     assert.equal(payload.callChangesIf, weeklyCall.callChangesIf);
     assert.deepEqual(payload.doNowBullets, weeklyCall.doNowBullets);
     assert.deepEqual(payload.flipConditionLabels, weeklyCall.flipConditionLabels);
@@ -83,10 +89,7 @@ describe("weekly operator brief export adapters", () => {
   });
 
   it("renders the plain text in the page's order", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      weeklyCall,
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       weeklyLeadershipSummary: {
         boldnessScore: 58,
         boldnessDelta: 4,
@@ -115,10 +118,7 @@ describe("weekly operator brief export adapters", () => {
 
   it("prints a stage's resume line beside the call-change line, never in its place", () => {
     const text = buildWeeklyOperatorBriefPlainText(
-      buildWeeklyOperatorBriefPayload({
-        assessment,
-        treasury,
-        weeklyCall: { ...weeklyCall, resumeWhen: "Two weekly reads below the pause line" },
+      buildWeeklyOperatorBriefPayload(documentFor({ ...weeklyCall, resumeWhen: "Two weekly reads below the pause line" }), {
       }),
     );
 
@@ -126,10 +126,7 @@ describe("weekly operator brief export adapters", () => {
   });
 
   it("names the reading the latitude move is measured against, where the week records one", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      weeklyCall,
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       weeklyLeadershipSummary: {
         boldnessScore: 33,
         boldnessDelta: -17,
@@ -145,10 +142,7 @@ describe("weekly operator brief export adapters", () => {
   });
 
   it("embeds customTeamNote when provided", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      weeklyCall,
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       customTeamNote: "All-hands update: hold Q3 designer headcount open until Sep 15.",
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);

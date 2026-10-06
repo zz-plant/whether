@@ -501,6 +501,9 @@ merged is the part with no such constraint:
   and the snapshot marker. `tests/briefArtifactFormats.test.ts` asserts the two are byte-identical.
   (2026-10-06: the "clears-when line" was the flip conditions, printed as the resume line; it prints
   as "Watch this week" now, and the slide routes go through the same adapter. §5.3.1.)
+  (2026-10-06: `buildSlackBrief` and `buildCallCitation` render the brief document now. The
+  archive keeps every record it wrote; the records written after it carry the contract's call,
+  and the stand-ins the script printed on live weeks are gone. §5.3.1.)
 - The slide model had no field for the call, only `actionNow`. Mapping one onto the other dropped
   the headline whenever they differed, so the payload gained a `call` that renders as a stance line
   above the action — and is omitted when the two hold the same sentence.
@@ -1985,7 +1988,7 @@ that never came:
   beside the ones `/share` serves. It was the only caller of `buildBoardBrief`,
   `buildWeeklyBoardSnippetPlainText` and `buildWeeklyCallSnapshotPlainText`, which went with it. The
   "delta-only brief in the share rail" in §1.1 was this payload and never rendered.
-- `buildWeeklyOperatorBriefPayload` takes the `WeeklyCallContract` as required. Without one it
+- `buildWeeklyOperatorBriefPayload` no longer takes the `WeeklyCallContract` as optional. Without one it
   re-derived every slot from the action strip, the posture state and the canonical copy in a
   fallback chain of its own; every production caller passes the contract. Its `flipWatchLine`
   (the nearest crossing in market units) was set only on that branch, so it never printed in a
@@ -2097,6 +2100,19 @@ section is the picker's post now.
 slide format closes with confidence and that footer; the SVG and the deck carry the conditions in
 the subtitle instead of the source, and the right-aligned "whether.work" went, since the footer
 names it.
+
+**The operator brief and the citations read the document.** `buildWeeklyOperatorBriefPayload(document,
+{ date?, weeklyLeadershipSummary?, customTeamNote? })` takes the slots, the conditions line and the
+published confidence from the document instead of resolving its own; its payload's `pauseIf` is the
+condition only, which is what its plain text already printed. `buildCallCitation` takes the
+document's conditions line, confidence and provenance. The answer pages pass the call's
+`regimeStage` and the home model's published band, so on a held week their citation names "Sunny",
+as every other format does, where it named the home model's "Sunny for 9 months". /share offers one
+citation, the picker's (`formatBriefArtifact(document, "citation")`), and the meeting pack's
+CITATION section is that one; it carried the answer pages' beside it. The email closes with the
+document's source footer and the permanent link instead: the picker's citation prints the island's
+call (the do-now line) as "Guidance", under the brief's own "Guidance". `buildBriefPermalinkLine`
+went with its last caller.
 
 ### 5.6 Signal Ops (live)
 - Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).

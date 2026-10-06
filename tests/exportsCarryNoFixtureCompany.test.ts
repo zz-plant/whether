@@ -14,7 +14,7 @@ import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import { buildTrustStatus } from "../lib/report/trustStatus";
-import { assessment, fixtureBriefDocument, treasury, macros } from "./factories/exportFixtures";
+import { fixtureBriefDocument, treasury, macros } from "./factories/exportFixtures";
 
 /**
  * Every artifact that leaves the site was audited on 2026-09-22 for facts about the reader's
@@ -45,7 +45,7 @@ describe("artifacts that leave the site carry no facts about a company the site 
   it("Slack brief, citation and slide bullets", () => {
     for (const text of [
       buildSlackBrief(fixtureBriefDocument()),
-      buildCallCitation(assessment, treasury),
+      buildCallCitation(fixtureBriefDocument()),
       buildBoardSlideBullets(fixtureBriefDocument()),
     ]) {
       assert.doesNotMatch(text, FIXTURE_COMPANY);

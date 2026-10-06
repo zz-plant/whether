@@ -11,6 +11,7 @@ import {
   resetDecisionMemoryRepository,
 } from "../lib/storage/decisionMemoryRepository";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
+import { briefSourceFromSnapshot, buildBriefDocument } from "../lib/report/briefDocument";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 import { snapshotData } from "../lib/snapshot";
 import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";
@@ -252,11 +253,7 @@ describe("Architecture Invariants", () => {
     assert.ok(weeklyCall.actionNow);
 
     // Operator brief projection
-    const briefPayload = buildWeeklyOperatorBriefPayload({
-      assessment: snapshot.assessment,
-      treasury: snapshot.treasury,
-      weeklyCall: snapshot.weeklyCall,
-    });
+    const briefPayload = buildWeeklyOperatorBriefPayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall));
 
     assert.equal(briefPayload.currentCall, weeklyCall.currentCall);
     assert.equal(briefPayload.actionNow, weeklyCall.actionNow);

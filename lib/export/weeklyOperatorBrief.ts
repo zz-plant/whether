@@ -1,11 +1,9 @@
 import { resolveWeekEndingIsoDateUTC } from "../formatters";
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../report/reportCopy";
-import { describeConditions, formatExportConfidence, pauseConditionOnly } from "./exportTerms";
-import type { RegimeAssessment } from "../regimeEngine";
-import type { TreasuryData } from "../types";
+import { formatExportConfidence, pauseConditionOnly } from "./exportTerms";
+import type { BriefDocument } from "../report/briefArtifact";
 import { publicDecisionLabels } from "../report/reportFormatting";
-import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
-import { resolvePublishedConfidence } from "../report/confidence";
+import { weeklyCallChangeLines } from "../report/weeklyCallContract";
 import { comparisonBasis } from "../report/comparisonBasis";
 import type { ComparedWith } from "../report/reportDataTypes";
 
@@ -36,32 +34,30 @@ type WeeklyOperatorBriefPayload = {
 };
 
 /*
- * The weekly call is required. This used to take it as optional and, without
- * one, re-derive every slot from the action strip, the posture state and the
- * canonical copy in a fallback chain of its own: a second answer to "what is
- * this week's call" that only tests ever reached, because every production
- * caller passed the contract. The contract is the one answer now.
+ * From the week's brief document, whose slots are the weekly call contract's.
+ * This used to take the contract as optional and, without one, re-derive every
+ * slot from the action strip, the posture state and the canonical copy in a
+ * fallback chain of its own: a second answer to "what is this week's call" that
+ * only tests ever reached, because every production caller passed the contract.
+ * Operating latitude is the home model's, which the document does not carry.
  */
-export const buildWeeklyOperatorBriefPayload = ({
-  assessment,
-  treasury,
-  date,
-  weeklyCall,
-  weeklyLeadershipSummary,
-  customTeamNote,
-}: {
-  assessment: RegimeAssessment;
-  treasury: TreasuryData;
-  date?: string;
-  weeklyCall: WeeklyCallContract;
-  weeklyLeadershipSummary?: {
-    boldnessScore: number;
-    boldnessDelta: number;
-    shorthandLine: string;
-    comparedWith?: ComparedWith;
-  };
-  customTeamNote?: string;
-}): WeeklyOperatorBriefPayload => {
+export const buildWeeklyOperatorBriefPayload = (
+  document: BriefDocument,
+  {
+    date,
+    weeklyLeadershipSummary,
+    customTeamNote,
+  }: {
+    date?: string;
+    weeklyLeadershipSummary?: {
+      boldnessScore: number;
+      boldnessDelta: number;
+      shorthandLine: string;
+      comparedWith?: ComparedWith;
+    };
+    customTeamNote?: string;
+  } = {},
+): WeeklyOperatorBriefPayload => {
   const boldnessBudget = weeklyLeadershipSummary
     ? {
         score: weeklyLeadershipSummary.boldnessScore,
@@ -70,24 +66,24 @@ export const buildWeeklyOperatorBriefPayload = ({
         ...(weeklyLeadershipSummary.comparedWith ? { comparedWith: weeklyLeadershipSummary.comparedWith } : {}),
       }
     : undefined;
-  /* From the reading, not from a caller. This took an optional label and fell
-     back to a sentence with no band in it, and the /share caller passed none. */
-  const confidenceLabel = resolvePublishedConfidence({ assessment, record: treasury }).label;
+  const { slots } = document;
 
   return {
-    date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
+    date: date ?? resolveWeekEndingIsoDateUTC(document.provenance.recordDate),
     boldnessBudget,
-    regimeStage: weeklyCall.regimeStage,
-    conditions: describeConditions(assessment.regime, weeklyCall.regimeStage),
-    confidence: formatExportConfidence(confidenceLabel),
-    currentCall: weeklyCall.currentCall,
-    actionNow: weeklyCall.actionNow,
-    pauseIf: weeklyCall.pauseIf,
-    callChangesIf: weeklyCall.callChangesIf,
-    ...(weeklyCall.resumeWhen ? { resumeWhen: weeklyCall.resumeWhen } : {}),
-    doNowBullets: weeklyCall.doNowBullets,
-    whyCouldBeWrong: weeklyCall.whyCouldBeWrong,
-    flipConditionLabels: weeklyCall.flipConditionLabels,
+    regimeStage: document.conditions.label,
+    conditions: document.conditions.line,
+    /* The published band, which the document resolved from the reading. This
+       took an optional label and fell back to a sentence with no band in it. */
+    confidence: formatExportConfidence(document.confidence),
+    currentCall: slots.currentCall,
+    actionNow: slots.actionNow,
+    pauseIf: slots.pauseIf,
+    callChangesIf: slots.callChangesIf,
+    ...(slots.resumeWhen ? { resumeWhen: slots.resumeWhen } : {}),
+    doNowBullets: [...slots.doNowBullets],
+    whyCouldBeWrong: slots.whyCouldBeWrong,
+    flipConditionLabels: [...slots.flipConditionLabels],
     customTeamNote,
   };
 };

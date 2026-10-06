@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../lib/report/homePageAssembler";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../../lib/export/weeklyOperatorBrief";
+import { briefSourceFromReportData, buildBriefDocument } from "../../lib/report/briefDocument";
 import { DATA_CAVEAT_LABEL, buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
@@ -81,13 +82,13 @@ export function buildBriefMarkdown(homepage: HomePage): string {
      stage's `resumeWhen`. */
   const leadResume = actionItems[0]?.reversalCondition;
 
-  const operatorCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({
-    assessment: reportData.assessment,
-    treasury: reportData.treasury,
-    date: reportData.weeklyRecordDate,
-    weeklyCall: homepage.weeklyCall,
-    weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
-  }));
+  const operatorCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(
+    buildBriefDocument(briefSourceFromReportData(reportData), homepage.weeklyCall),
+    {
+      date: reportData.weeklyRecordDate,
+      weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
+    },
+  ));
 
   const markdown = md`
 # Whether Weekly Brief — ${reportData.weeklyRecordDate}

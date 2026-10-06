@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
+import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
 import { buildPostureStateContract, type PostureStateContract } from "../lib/report/postureStateContract";
 import type { LoadReportDataSafeResult } from "../lib/report/reportData";
 import { buildAssessmentFixture, buildReportDataFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
@@ -75,13 +76,13 @@ describe("assembleHomePage streaming contract", () => {
     const workspaceModel = await homepage.workspaceModelPromise;
     const reportDataForCopy = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
-    const headerOperatorBriefCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({
-      assessment: reportDataForCopy.assessment,
-      treasury: reportDataForCopy.treasury,
-      date: reportDataForCopy.weeklyRecordDate,
-      weeklyCall: homepage.weeklyCall,
-      weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
-    }));
+    const headerOperatorBriefCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(
+      buildBriefDocument(briefSourceFromReportData(reportDataForCopy), homepage.weeklyCall),
+      {
+        date: reportDataForCopy.weeklyRecordDate,
+        weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
+      },
+    ));
 
     assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
     assert.match(headerOperatorBriefCopy, /Conditions:/);

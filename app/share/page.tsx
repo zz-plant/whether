@@ -10,7 +10,7 @@ import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument } from "../../lib/report/briefDocument";
 import { formatBriefArtifact } from "../../lib/report/briefArtifact";
-import { briefReadingLines, buildBoardSlideBullets, buildCallCitation } from "../../lib/export/briefBuilders";
+import { briefReadingLines, buildBoardSlideBullets } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
 import { buildPortfolioNote } from "../../lib/export/portfolioNote";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
@@ -21,8 +21,8 @@ import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
 } from "../../lib/export/weeklyOperatorBrief";
-import { buildBriefPermalinkLine } from "../../lib/export/briefPermalink";
 import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdateSnippet";
+import { formatSourceFooter } from "../../lib/export/exportTerms";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
@@ -65,13 +65,7 @@ const buildCurrentShareArtifact = async () => {
     title: "Whether Weekly Brief",
   });
   const actionStripItems = document.areaRows;
-  const weeklyOperatorBrief = buildWeeklyOperatorBriefPlainText(
-    buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      weeklyCall: snapshot.weeklyCall,
-    }),
-  );
+  const weeklyOperatorBrief = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(document));
   /* One Slack text for the week: the post the picker offers is the one the
      meeting pack carries. The pack used to paste the Monday post's long form
      beside it, so the page offered two Slack texts with two different calls. */
@@ -110,9 +104,9 @@ const buildCurrentShareArtifact = async () => {
      so the server copy states the regime cap; the pull-policy section above
      carries the thresholds that gate it. */
   const wipGuidance = buildWipGuidance({ regime: assessment.regime });
-  const citation = buildCallCitation(assessment, treasury, {
-    postureWithStageLabel: snapshot.weeklyCall.regimeStage,
-  });
+  /* One citation for the week: the one the picker offers. The meeting pack and
+     the email carried a second, the answer pages', with a different shape. */
+  const citation = formatBriefArtifact(document, "citation", siteUrl);
   // The slide bullets rather than the board brief, which is the Slack brief
   // with the bullets appended: this pack used to paste the same block twice.
   const boardSlideBullets = buildBoardSlideBullets(document);
@@ -153,15 +147,17 @@ const buildCurrentShareArtifact = async () => {
     // The island the share rail reads: the document's artifact half.
     briefArtifact: briefArtifactOf(document),
     fullBrief: weeklyOperatorBrief,
+    /* The brief, then where it came from and where it lives. This carried the
+       answer pages' citation, a second one for the week; the picker's would
+       print the do-now line as "Guidance" under the brief's own "Guidance", so
+       the email closes with the document's source footer instead. */
     emailBrief: [
       "Whether: this week's guidance",
       "",
       weeklyOperatorBrief,
       "",
-      "Citation",
-      citation,
-      "",
-      buildBriefPermalinkLine(treasury.record_date),
+      formatSourceFooter(document.provenance),
+      `Full brief: ${document.provenance.permalink}`,
     ].join("\n"),
     standupLine,
     meetingPack,
@@ -261,7 +257,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "email",
       group: "Docs and email",
       label: "Email",
-      hint: "The full brief with its citation and permanent link, for a leadership note.",
+      hint: "The full brief with its source and permanent link, for a leadership note.",
       kind: "text",
       text: artifact.emailBrief,
       copyLabel: "Copy email",
