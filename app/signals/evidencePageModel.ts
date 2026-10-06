@@ -101,7 +101,6 @@ export const focusLabelByTab: Record<FocusTab, string> = {
 
 /** The page's sections, in the order a reader answers their questions. */
 const signalsSectionLinks = [
-  { href: "#decision-summary", label: "What this means now" },
   { href: "#what-changed", label: "What changed" },
   { href: "#call-lines", label: DECISION_CONTRACT_LABELS.watch.flipWatch },
   { href: "#instruments", label: "Deeper evidence" },
@@ -171,7 +170,6 @@ const deriveSignalsPageModel = (
     selectedMonth,
     selectedYear,
     statusLabel,
-    actionNowShort,
     actionStripItems,
     guardrailThreshold,
     treasury,
@@ -241,7 +239,6 @@ const deriveSignalsPageModel = (
     selectedMonth,
     selectedYear,
     statusLabel,
-    actionNowShort,
     treasury,
     treasuryProvenance,
     monthPickerOpen,

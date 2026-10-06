@@ -200,10 +200,10 @@ export const TimeMachinePanel = ({
     searchParams,
     nextSnapshot,
   );
-  const nowDecisionHref = `${nowHref}#decision-summary`;
+  const nowDecisionHref = `${nowHref}#what-changed`;
   const centeredPillLinkClass = "justify-center";
 
-  // No panel of its own: this sits inside the "Past months" disclosure on the
+  // No panel of its own: this sits inside the earlier-month disclosure on the
   // evidence page, which is the box.
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="mt-4">
