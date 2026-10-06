@@ -1,4 +1,5 @@
 import { ActionLink } from "../ui/actionLink";
+import { UrlDetails } from "../ui/urlDetails";
 import { StatTile } from "../ui/statTile";
 import {
   PHASE_SPANS,
@@ -90,9 +91,11 @@ type RegimePhaseMapProps = {
   spanHref: (span: PhaseSpanKey) => string;
   /** Months in the full record, for the line that says what the window is a slice of. */
   totalMonths: number;
+  /** Server-resolved open state: a shared `?map=1` link, or a window link (`?span=`). */
+  open?: boolean;
 };
 
-export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: RegimePhaseMapProps) {
+export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open = false }: RegimePhaseMapProps) {
   const model = buildRegimePhaseModel(series);
   if (!model) return null;
 
@@ -130,414 +133,428 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths }: Re
   ].join(" ");
 
   return (
-    <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="phase-map-heading">
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <div className="min-w-0">
-          {/* Headed as the mechanism, not the reading. The month strip and the
-              track record above already give the record's answer; this chart
-              is the second read — how the two scores decide the call — and a
-              heading that said "where this month sits" made it compete with
-              them for the first question. */}
-          <h2 className="text-xl font-semibold text-white sm:text-2xl" id="phase-map-heading">
-            How the two scores set conditions
-          </h2>
-          <p className="max-w-prose text-sm text-slate-300">
-            Funding pressure and risk appetite together are one point on this chart, and conditions
-            follow whichever quarter of it the point lands in. The lines at {thresholds.tightness} and{" "}
-            {thresholds.riskAppetite} are the same two numbers the weekly brief cites.
-          </p>
+    /* Closed until asked. The month strip, the published weeks and the track
+       record answer what the page is for; this chart explains the mechanism,
+       and open it was the tallest block on the page, ahead of the month table
+       and the published weeks. The heading is the summary, so the outline and
+       the rail still name it. */
+    <UrlDetails
+      queryKey="map"
+      initialOpen={open}
+      className="weather-auto-chevron weather-panel px-5 max-sm:px-0 py-5"
+      summaryClassName="cursor-pointer select-none"
+      summary={
+        /* Headed as the mechanism, not the reading. The month strip and the
+           track record above already give the record's answer; this chart
+           is the second read — how the two scores decide the call — and a
+           heading that said "where this month sits" made it compete with
+           them for the first question. */
+        <h2 className="text-xl font-semibold text-white sm:text-2xl" id="phase-map-heading">
+          How the two scores set conditions
+        </h2>
+      }
+    >
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div className="min-w-0">
+            <p className="max-w-prose text-sm text-slate-300">
+              Funding pressure and risk appetite together are one point on this chart, and conditions
+              follow whichever quarter of it the point lands in. The lines at {thresholds.tightness} and{" "}
+              {thresholds.riskAppetite} are the same two numbers the weekly brief cites.
+            </p>
+          </div>
+
+          {/* A control, not navigation, but it changes the URL rather than client
+              state so a shared link opens on the window the sharer was reading. */}
+          <nav aria-label="Window shown on the phase map" className="flex shrink-0 flex-wrap gap-1.5">
+            {PHASE_SPANS.map((span) => {
+              const active = span.key === activeSpan;
+              return (
+                <ActionLink
+                  key={span.key}
+                  href={spanHref(span.key)}
+                  scroll={false}
+                  variant="pill"
+                  aria-current={active ? "true" : undefined}
+                  aria-label={`Show ${span.description}`}
+                  /* Padding and weight only. The pill's 44px floor is the touch
+                     target the standards set, and a segmented row is exactly the
+                     place the temptation to shrink it turns up. */
+                  className={active ? "border-sky-400/60 bg-sky-500/15 text-sky-100" : "text-slate-300"}
+                >
+                  {span.label}
+                </ActionLink>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* A control, not navigation, but it changes the URL rather than client
-            state so a shared link opens on the window the sharer was reading. */}
-        <nav aria-label="Window shown on the phase map" className="flex shrink-0 flex-wrap gap-1.5">
-          {PHASE_SPANS.map((span) => {
-            const active = span.key === activeSpan;
-            return (
-              <ActionLink
-                key={span.key}
-                href={spanHref(span.key)}
-                scroll={false}
-                variant="pill"
-                aria-current={active ? "true" : undefined}
-                aria-label={`Show ${span.description}`}
-                /* Padding and weight only. The pill's 44px floor is the touch
-                   target the standards set, and a segmented row is exactly the
-                   place the temptation to shrink it turns up. */
-                className={active ? "border-sky-400/60 bg-sky-500/15 text-sky-100" : "text-slate-300"}
-              >
-                {span.label}
-              </ActionLink>
-            );
-          })}
-        </nav>
-      </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem]">
+          <figure className="m-0">
+            {/* The chart is hidden from assistive tech, and real text carries its
+                content instead: the paragraph below, the visible caption, and the
+                full table further down. `role="img"` would prune the ~200 shapes to one
+                labelled node, which is the usual fix, but it collapses the whole
+                thing to a single `<desc>` string — and a reader who wants the March
+                2024 coordinate cannot get at it that way. Prose plus a table is both
+                more useful and more portable than a description AT announces
+                inconsistently. */}
+            <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="mx-auto block h-auto w-full max-w-[30rem]" aria-hidden="true">
+              {/* Kept under aria-hidden because a native tooltip is a pointer
+                  affordance, not an accessibility one; the table is the other route. */}
+              <title>{chartTitle}</title>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem]">
-        <figure className="m-0">
-          {/* The chart is hidden from assistive tech, and real text carries its
-              content instead: the paragraph below, the visible caption, and the
-              full table further down. `role="img"` would prune the ~200 shapes to one
-              labelled node, which is the usual fix, but it collapses the whole
-              thing to a single `<desc>` string — and a reader who wants the March
-              2024 coordinate cannot get at it that way. Prose plus a table is both
-              more useful and more portable than a description AT announces
-              inconsistently. */}
-          <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="mx-auto block h-auto w-full max-w-[30rem]" aria-hidden="true">
-            {/* Kept under aria-hidden because a native tooltip is a pointer
-                affordance, not an accessibility one; the table is the other route. */}
-            <title>{chartTitle}</title>
+              {quadrants.map((quadrant) => (
+                <rect key={quadrant.regime} x={quadrant.x} y={quadrant.y} width={quadrant.w} height={quadrant.h} fill={quadrant.fill} />
+              ))}
 
-            {quadrants.map((quadrant) => (
-              <rect key={quadrant.regime} x={quadrant.x} y={quadrant.y} width={quadrant.w} height={quadrant.h} fill={quadrant.fill} />
-            ))}
+              {TICKS.filter((tick) => tick > 0 && tick < 100).map((tick) => (
+                <g key={`grid-${tick}`}>
+                  <line x1={xFor(tick)} y1={PLOT_Y} x2={xFor(tick)} y2={PLOT_BOTTOM} stroke="var(--phase-grid)" strokeWidth="1" />
+                  <line x1={PLOT_X} y1={yFor(tick)} x2={PLOT_RIGHT} y2={yFor(tick)} stroke="var(--phase-grid)" strokeWidth="1" />
+                </g>
+              ))}
 
-            {TICKS.filter((tick) => tick > 0 && tick < 100).map((tick) => (
-              <g key={`grid-${tick}`}>
-                <line x1={xFor(tick)} y1={PLOT_Y} x2={xFor(tick)} y2={PLOT_BOTTOM} stroke="var(--phase-grid)" strokeWidth="1" />
-                <line x1={PLOT_X} y1={yFor(tick)} x2={PLOT_RIGHT} y2={yFor(tick)} stroke="var(--phase-grid)" strokeWidth="1" />
-              </g>
-            ))}
-
-            {/* The frame, minus its top edge. That edge is funding pressure 100,
-                which is where the score stops distinguishing expensive money from
-                very expensive money — so when the window holds clipped months it
-                is drawn as a broken line rather than as an ordinary axis end, and
-                markers pinned there sit visibly on it. Saying so costs no extra
-                ink and no label that could collide with the quadrant names; the
-                caption and the table's asterisk carry the wording. */}
-            <path
-              d={`M${PLOT_X} ${PLOT_Y} V${PLOT_BOTTOM} H${PLOT_RIGHT} V${PLOT_Y}`}
-              fill="none"
-              stroke="var(--phase-grid)"
-              strokeWidth="1"
-            />
-            <line
-              x1={PLOT_X}
-              y1={PLOT_Y}
-              x2={PLOT_RIGHT}
-              y2={PLOT_Y}
-              stroke={model.saturatedMonths > 0 ? "var(--phase-boundary)" : "var(--phase-grid)"}
-              strokeWidth={model.saturatedMonths > 0 ? 1.5 : 1}
-              strokeDasharray={model.saturatedMonths > 0 ? "2 3" : undefined}
-            />
-
-            {quadrants.map((quadrant) => (
-              <text
-                key={`label-${quadrant.regime}`}
-                x={quadrant.tx}
-                y={quadrant.ty}
-                textAnchor={quadrant.anchor}
-                fontSize="13"
-                fontWeight="600"
-                letterSpacing="0.04em"
-                data-regime={regimeDataAttribute(quadrant.regime)}
-                fill="var(--regime-ink)"
-              >
-                {model.occupancy.find((row) => row.regime === quadrant.regime)?.regimeLabel.toUpperCase()}
-              </text>
-            ))}
-
-            {/* The rule itself. Heavier than the grid because these two lines are
-                the only ones that decide anything. */}
-            <line x1={boundaryX} y1={PLOT_Y} x2={boundaryX} y2={PLOT_BOTTOM} stroke="var(--phase-boundary)" strokeWidth="1.5" />
-            <line x1={PLOT_X} y1={boundaryY} x2={PLOT_RIGHT} y2={boundaryY} stroke="var(--phase-boundary)" strokeWidth="1.5" />
-
-            {runs.map((run, index) => (
+              {/* The frame, minus its top edge. That edge is funding pressure 100,
+                  which is where the score stops distinguishing expensive money from
+                  very expensive money — so when the window holds clipped months it
+                  is drawn as a broken line rather than as an ordinary axis end, and
+                  markers pinned there sit visibly on it. Saying so costs no extra
+                  ink and no label that could collide with the quadrant names; the
+                  caption and the table's asterisk carry the wording. */}
               <path
-                key={`run-${index}`}
-                d={run.d}
+                d={`M${PLOT_X} ${PLOT_Y} V${PLOT_BOTTOM} H${PLOT_RIGHT} V${PLOT_Y}`}
                 fill="none"
-                stroke={REGIME_HEX_COLORS[run.regime]}
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                /* Older runs recede rather than disappear: the decade parked at the
-                   zero bound is the context that makes the excursion legible. */
-                opacity={(0.22 + 0.55 * (run.endIndex / Math.max(model.points.length - 1, 1))).toFixed(2)}
+                stroke="var(--phase-grid)"
+                strokeWidth="1"
               />
-            ))}
-
-            {model.recent.map((point, index) => (
-              <circle
-                key={`recent-${point.recordDate}`}
-                cx={xFor(point.riskAppetite)}
-                cy={yFor(point.tightness)}
-                r={1.6 + 1.1 * (index / Math.max(model.recent.length - 1, 1))}
-                fill={REGIME_HEX_COLORS[point.regime]}
-                opacity={(0.45 + 0.45 * (index / Math.max(model.recent.length - 1, 1))).toFixed(2)}
+              <line
+                x1={PLOT_X}
+                y1={PLOT_Y}
+                x2={PLOT_RIGHT}
+                y2={PLOT_Y}
+                stroke={model.saturatedMonths > 0 ? "var(--phase-boundary)" : "var(--phase-grid)"}
+                strokeWidth={model.saturatedMonths > 0 ? 1.5 : 1}
+                strokeDasharray={model.saturatedMonths > 0 ? "2 3" : undefined}
               />
-            ))}
 
-            {/* The months the call actually changed — the events the track record
-                below calls the thing worth reading. Rings, not dots, so they read
-                as annotation over the trace rather than as more of it. */}
-            {model.changes.map((point) => (
-              <g key={`change-${point.recordDate}`}>
-                <title>{`${point.monthLabel}: changed to ${point.regimeLabel} — funding pressure ${point.tightness}, risk appetite ${point.riskAppetite}`}</title>
+              {quadrants.map((quadrant) => (
+                <text
+                  key={`label-${quadrant.regime}`}
+                  x={quadrant.tx}
+                  y={quadrant.ty}
+                  textAnchor={quadrant.anchor}
+                  fontSize="13"
+                  fontWeight="600"
+                  letterSpacing="0.04em"
+                  data-regime={regimeDataAttribute(quadrant.regime)}
+                  fill="var(--regime-ink)"
+                >
+                  {model.occupancy.find((row) => row.regime === quadrant.regime)?.regimeLabel.toUpperCase()}
+                </text>
+              ))}
+
+              {/* The rule itself. Heavier than the grid because these two lines are
+                  the only ones that decide anything. */}
+              <line x1={boundaryX} y1={PLOT_Y} x2={boundaryX} y2={PLOT_BOTTOM} stroke="var(--phase-boundary)" strokeWidth="1.5" />
+              <line x1={PLOT_X} y1={boundaryY} x2={PLOT_RIGHT} y2={boundaryY} stroke="var(--phase-boundary)" strokeWidth="1.5" />
+
+              {runs.map((run, index) => (
+                <path
+                  key={`run-${index}`}
+                  d={run.d}
+                  fill="none"
+                  stroke={REGIME_HEX_COLORS[run.regime]}
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  /* Older runs recede rather than disappear: the decade parked at the
+                     zero bound is the context that makes the excursion legible. */
+                  opacity={(0.22 + 0.55 * (run.endIndex / Math.max(model.points.length - 1, 1))).toFixed(2)}
+                />
+              ))}
+
+              {model.recent.map((point, index) => (
                 <circle
+                  key={`recent-${point.recordDate}`}
                   cx={xFor(point.riskAppetite)}
                   cy={yFor(point.tightness)}
-                  r="4"
-                  fill="none"
-                  stroke={REGIME_HEX_COLORS[point.regime]}
+                  r={1.6 + 1.1 * (index / Math.max(model.recent.length - 1, 1))}
+                  fill={REGIME_HEX_COLORS[point.regime]}
+                  opacity={(0.45 + 0.45 * (index / Math.max(model.recent.length - 1, 1))).toFixed(2)}
+                />
+              ))}
+
+              {/* The months the call actually changed — the events the track record
+                  below calls the thing worth reading. Rings, not dots, so they read
+                  as annotation over the trace rather than as more of it. */}
+              {model.changes.map((point) => (
+                <g key={`change-${point.recordDate}`}>
+                  <title>{`${point.monthLabel}: changed to ${point.regimeLabel} — funding pressure ${point.tightness}, risk appetite ${point.riskAppetite}`}</title>
+                  <circle
+                    cx={xFor(point.riskAppetite)}
+                    cy={yFor(point.tightness)}
+                    r="4"
+                    fill="none"
+                    stroke={REGIME_HEX_COLORS[point.regime]}
+                    strokeWidth="1.5"
+                    opacity="0.9"
+                  />
+                </g>
+              ))}
+
+              {/* Both gaps, each on its own axis, each in its own points. Never a
+                  hypotenuse — the two scales are not commensurable and a diagonal
+                  would quietly claim they are. */}
+              <g stroke={REGIME_HEX_COLORS[current.regime]} strokeWidth="1" strokeDasharray="3 3" opacity="0.75">
+                <line x1={currentX} y1={currentY} x2={boundaryX} y2={currentY} />
+                <line x1={currentX} y1={currentY} x2={currentX} y2={boundaryY} />
+              </g>
+              {/* Knocked out of whatever they land on. A gap label sits by
+                  construction in the busiest part of the plot — between the reading
+                  and the rule — so relying on placement alone to keep it off the
+                  trace does not survive a change of window. */}
+              {/* Each label sits at the rule end of its own gap line, just past
+                  the rule, on the side away from the marker. They used to sit at
+                  the midpoints, which for a reading near both rules — the usual
+                  case, since a call is made near its lines — put the two labels
+                  on the same few units of plot and on the marker's halo. */}
+              <g fontSize="12" fontWeight="600" fill="var(--app-text-secondary)" stroke="var(--bg-panel)" strokeWidth="3.5" paintOrder="stroke">
+                <text
+                  x={boundaryX + (boundaryX < currentX ? -5 : 5)}
+                  y={currentY + 3.2}
+                  textAnchor={boundaryX < currentX ? "end" : "start"}
+                >
+                  {gaps.riskAppetite.distance} pts
+                </text>
+                <text
+                  x={currentX}
+                  y={boundaryY < currentY ? boundaryY - 5 : boundaryY + 11}
+                  textAnchor="middle"
+                >
+                  {gaps.tightness.distance} pts
+                </text>
+              </g>
+
+              <g>
+                <title>{currentTitle}</title>
+                <circle cx={currentX} cy={currentY} r="9" fill={REGIME_HEX_COLORS[current.regime]} opacity="0.18" />
+                <circle
+                  cx={currentX}
+                  cy={currentY}
+                  r="4.5"
+                  fill={REGIME_HEX_COLORS[current.regime]}
+                  stroke="var(--bg-panel)"
                   strokeWidth="1.5"
-                  opacity="0.9"
                 />
               </g>
-            ))}
-
-            {/* Both gaps, each on its own axis, each in its own points. Never a
-                hypotenuse — the two scales are not commensurable and a diagonal
-                would quietly claim they are. */}
-            <g stroke={REGIME_HEX_COLORS[current.regime]} strokeWidth="1" strokeDasharray="3 3" opacity="0.75">
-              <line x1={currentX} y1={currentY} x2={boundaryX} y2={currentY} />
-              <line x1={currentX} y1={currentY} x2={currentX} y2={boundaryY} />
-            </g>
-            {/* Knocked out of whatever they land on. A gap label sits by
-                construction in the busiest part of the plot — between the reading
-                and the rule — so relying on placement alone to keep it off the
-                trace does not survive a change of window. */}
-            {/* Each label sits at the rule end of its own gap line, just past
-                the rule, on the side away from the marker. They used to sit at
-                the midpoints, which for a reading near both rules — the usual
-                case, since a call is made near its lines — put the two labels
-                on the same few units of plot and on the marker's halo. */}
-            <g fontSize="12" fontWeight="600" fill="var(--app-text-secondary)" stroke="var(--bg-panel)" strokeWidth="3.5" paintOrder="stroke">
               <text
-                x={boundaryX + (boundaryX < currentX ? -5 : 5)}
-                y={currentY + 3.2}
-                textAnchor={boundaryX < currentX ? "end" : "start"}
-              >
-                {gaps.riskAppetite.distance} pts
-              </text>
-              <text
-                x={currentX}
-                y={boundaryY < currentY ? boundaryY - 5 : boundaryY + 11}
-                textAnchor="middle"
-              >
-                {gaps.tightness.distance} pts
-              </text>
-            </g>
-
-            <g>
-              <title>{currentTitle}</title>
-              <circle cx={currentX} cy={currentY} r="9" fill={REGIME_HEX_COLORS[current.regime]} opacity="0.18" />
-              <circle
-                cx={currentX}
-                cy={currentY}
-                r="4.5"
-                fill={REGIME_HEX_COLORS[current.regime]}
+                x={currentX + (current.riskAppetite > 70 ? -13 : 13)}
+                y={currentY + 3.5}
+                textAnchor={current.riskAppetite > 70 ? "end" : "start"}
+                fontSize="12"
+                fontWeight="700"
+                fill="var(--app-text)"
                 stroke="var(--bg-panel)"
+                strokeWidth="3.5"
+                paintOrder="stroke"
+              >
+                {current.monthLabel}
+              </text>
+
+              {/* Where the drawn path starts, so the trace reads as a direction
+                  rather than as a cloud with one highlighted member. A bare marker,
+                  named in the caption instead of in the plot: the oldest reading
+                  lands wherever the window happens to open, and every in-plot label
+                  for it collided with a quadrant name for some window — at five
+                  years it sat on top of SUNNY. */}
+              <circle
+                cx={xFor(oldest.riskAppetite)}
+                cy={yFor(oldest.tightness)}
+                r="2.5"
+                fill="none"
+                stroke="var(--phase-trace)"
                 strokeWidth="1.5"
               />
-            </g>
-            <text
-              x={currentX + (current.riskAppetite > 70 ? -13 : 13)}
-              y={currentY + 3.5}
-              textAnchor={current.riskAppetite > 70 ? "end" : "start"}
-              fontSize="12"
-              fontWeight="700"
-              fill="var(--app-text)"
-              stroke="var(--bg-panel)"
-              strokeWidth="3.5"
-              paintOrder="stroke"
-            >
-              {current.monthLabel}
-            </text>
 
-            {/* Where the drawn path starts, so the trace reads as a direction
-                rather than as a cloud with one highlighted member. A bare marker,
-                named in the caption instead of in the plot: the oldest reading
-                lands wherever the window happens to open, and every in-plot label
-                for it collided with a quadrant name for some window — at five
-                years it sat on top of SUNNY. */}
-            <circle
-              cx={xFor(oldest.riskAppetite)}
-              cy={yFor(oldest.tightness)}
-              r="2.5"
-              fill="none"
-              stroke="var(--phase-trace)"
-              strokeWidth="1.5"
+              {TICKS.map((tick) => (
+                <text key={`x-tick-${tick}`} x={xFor(tick)} y={PLOT_BOTTOM + 15} textAnchor="middle" fontSize="12" fill="var(--app-text-muted)">
+                  {tick}
+                </text>
+              ))}
+              {TICKS.map((tick) => (
+                <text key={`y-tick-${tick}`} x={PLOT_X - 8} y={yFor(tick) + 3.4} textAnchor="end" fontSize="12" fill="var(--app-text-muted)">
+                  {tick}
+                </text>
+              ))}
+
+              <text x={PLOT_X + PLOT_SIZE / 2} y={VIEW_H - 8} textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--app-text-secondary)">
+                Risk appetite →
+              </text>
+              <text
+                x={13}
+                y={PLOT_Y + PLOT_SIZE / 2}
+                textAnchor="middle"
+                fontSize="13"
+                fontWeight="600"
+                fill="var(--app-text-secondary)"
+                transform={`rotate(-90 13 ${PLOT_Y + PLOT_SIZE / 2})`}
+              >
+                Funding pressure →
+              </text>
+            </svg>
+
+            <p className="sr-only">{description}</p>
+
+            <figcaption className="mt-2 max-w-prose text-fluid-nano text-white/45">
+              {model.points.length} of {totalMonths.toLocaleString("en-US")} months on record, from {oldest.monthLabel} at
+              the hollow grey marker to {current.monthLabel} at the filled one. Coloured rings mark the{" "}
+              {model.changes.length}{" "}
+              {model.changes.length === 1 ? "month" : "months"} conditions changed.
+              {model.saturatedMonths > 0 ? (
+                <>
+                  {" "}
+                  The broken top edge is the score ceiling: funding pressure stops separating expensive
+                  money from very expensive money there, and {model.saturatedMonths}{" "}
+                  {model.saturatedMonths === 1 ? "month sits" : "months sit"} pinned against it.
+                </>
+              ) : null}
+            </figcaption>
+          </figure>
+
+          <div className="space-y-4">
+            {/* Not "Reading now". `current` is the last plotted point, and every
+                point here is a month-end reading from the archive, so this is the
+                last completed month — up to five weeks behind the weekly call,
+                and regularly a different regime from it. Labelled "Reading now"
+                this panel told a reader the call was Sunny on a week the brief
+                was calling Freezing. /signals already states the same caveat over
+                the same series; this is that sentence, on the page a reader comes
+                to when they want to check the record. */}
+            <StatTile
+              label="Last completed month"
+              value={
+                <span className="inline-flex items-baseline gap-2">
+                  <span
+                    aria-hidden="true"
+                    className="size-2.5 shrink-0 self-center rounded-full"
+                    style={{ background: REGIME_HEX_COLORS[current.regime] }}
+                  />
+                  {current.regimeLabel}
+                </span>
+              }
+              unit={current.monthLabel}
+              detail={
+                <>
+                  <dl className="mt-1 space-y-1 text-fluid-xs">
+                    {[gaps.tightness, gaps.riskAppetite].map((gap) => (
+                      <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
+                        <dt className="text-slate-400">{gap.label}</dt>
+                        {/* Out of 100, and the distance said as a direction: "72 / +2 from
+                            70" asked the reader to know the scale and to read a slash
+                            and a sign as "two above the line". */}
+                        {/* The score and the distance each stay whole, so "from 70" never
+                            splits, but the distance may drop under the score: held on one
+                            line, it ran past the card's edge on a 360px phone. */}
+                        <dd className="ml-auto text-right tabular-nums text-slate-200">
+                          <span className="whitespace-nowrap">
+                            {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
+                            <span className="text-slate-500"> ·</span>
+                          </span>{" "}
+                          <span className="whitespace-nowrap text-slate-500">
+                            {gap.side === "on"
+                              ? "on"
+                              : `${gap.distance} ${gap.side}`}{" "}
+                            the line at {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
+                          </span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="mt-2 border-t border-[color:var(--border-subtle)] pt-2 text-fluid-nano text-slate-400">
+                    {gaps.tightness.distance <= gaps.riskAppetite.distance
+                      ? describePhaseGap(gaps.tightness)
+                      : describePhaseGap(gaps.riskAppetite)}
+                  </p>
+                  <p className="mt-2 text-fluid-nano text-slate-500">
+                    Every point here is a month-end reading, so this is the last completed
+                    month rather than{" "}
+                    <Link href="/" className="text-sky-300">
+                      this week&rsquo;s guidance
+                    </Link>
+                    .
+                  </p>
+                </>
+              }
             />
 
-            {TICKS.map((tick) => (
-              <text key={`x-tick-${tick}`} x={xFor(tick)} y={PLOT_BOTTOM + 15} textAnchor="middle" fontSize="12" fill="var(--app-text-muted)">
-                {tick}
-              </text>
-            ))}
-            {TICKS.map((tick) => (
-              <text key={`y-tick-${tick}`} x={PLOT_X - 8} y={yFor(tick) + 3.4} textAnchor="end" fontSize="12" fill="var(--app-text-muted)">
-                {tick}
-              </text>
-            ))}
-
-            <text x={PLOT_X + PLOT_SIZE / 2} y={VIEW_H - 8} textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--app-text-secondary)">
-              Risk appetite →
-            </text>
-            <text
-              x={13}
-              y={PLOT_Y + PLOT_SIZE / 2}
-              textAnchor="middle"
-              fontSize="13"
-              fontWeight="600"
-              fill="var(--app-text-secondary)"
-              transform={`rotate(-90 13 ${PLOT_Y + PLOT_SIZE / 2})`}
-            >
-              Funding pressure →
-            </text>
-          </svg>
-
-          <p className="sr-only">{description}</p>
-
-          <figcaption className="mt-2 max-w-prose text-fluid-nano text-white/45">
-            {model.points.length} of {totalMonths.toLocaleString("en-US")} months on record, from {oldest.monthLabel} at
-            the hollow grey marker to {current.monthLabel} at the filled one. Coloured rings mark the{" "}
-            {model.changes.length}{" "}
-            {model.changes.length === 1 ? "month" : "months"} conditions changed.
-            {model.saturatedMonths > 0 ? (
-              <>
-                {" "}
-                The broken top edge is the score ceiling: funding pressure stops separating expensive
-                money from very expensive money there, and {model.saturatedMonths}{" "}
-                {model.saturatedMonths === 1 ? "month sits" : "months sit"} pinned against it.
-              </>
-            ) : null}
-          </figcaption>
-        </figure>
-
-        <div className="space-y-4">
-          {/* Not "Reading now". `current` is the last plotted point, and every
-              point here is a month-end reading from the archive, so this is the
-              last completed month — up to five weeks behind the weekly call,
-              and regularly a different regime from it. Labelled "Reading now"
-              this panel told a reader the call was Sunny on a week the brief
-              was calling Freezing. /signals already states the same caveat over
-              the same series; this is that sentence, on the page a reader comes
-              to when they want to check the record. */}
-          <StatTile
-            label="Last completed month"
-            value={
-              <span className="inline-flex items-baseline gap-2">
-                <span
-                  aria-hidden="true"
-                  className="size-2.5 shrink-0 self-center rounded-full"
-                  style={{ background: REGIME_HEX_COLORS[current.regime] }}
-                />
-                {current.regimeLabel}
-              </span>
-            }
-            unit={current.monthLabel}
-            detail={
-              <>
-                <dl className="mt-1 space-y-1 text-fluid-xs">
-                  {[gaps.tightness, gaps.riskAppetite].map((gap) => (
-                    <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
-                      <dt className="text-slate-400">{gap.label}</dt>
-                      {/* Out of 100, and the distance said as a direction: "72 / +2 from
-                          70" asked the reader to know the scale and to read a slash
-                          and a sign as "two above the line". */}
-                      {/* The score and the distance each stay whole, so "from 70" never
-                          splits, but the distance may drop under the score: held on one
-                          line, it ran past the card's edge on a 360px phone. */}
-                      <dd className="ml-auto text-right tabular-nums text-slate-200">
-                        <span className="whitespace-nowrap">
-                          {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
-                          <span className="text-slate-500"> ·</span>
-                        </span>{" "}
-                        <span className="whitespace-nowrap text-slate-500">
-                          {gap.side === "on"
-                            ? "on"
-                            : `${gap.distance} ${gap.side}`}{" "}
-                          the line at {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
-                        </span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-2 border-t border-[color:var(--border-subtle)] pt-2 text-fluid-nano text-slate-400">
-                  {gaps.tightness.distance <= gaps.riskAppetite.distance
-                    ? describePhaseGap(gaps.tightness)
-                    : describePhaseGap(gaps.riskAppetite)}
-                </p>
-                <p className="mt-2 text-fluid-nano text-slate-500">
-                  Every point here is a month-end reading, so this is the last completed
-                  month rather than{" "}
-                  <Link href="/" className="text-sky-300">
-                    this week&rsquo;s guidance
-                  </Link>
-                  .
-                </p>
-              </>
-            }
-          />
-
-          <div>
-            <p className="type-eyebrow text-fluid-nano">Months in each quadrant</p>
-            <ul className="mt-2 space-y-1.5">
-              {model.occupancy.map((row) => (
-                <li key={row.regime} className="grid grid-cols-[4.5rem_1fr_2.5rem] items-center gap-2 text-fluid-nano">
-                  <span className="truncate text-slate-300">{row.regimeLabel}</span>
-                  {/* `block`, not the default inline: an inline box ignores the
-                      height and the child's percentage width resolves against a
-                      shrink-to-fit line box, so every bar rendered full-length.
-                      The track is a token rather than `bg-white/[0.06]`, which is
-                      a dark-theme idiom — on the light ground it disappeared, and
-                      a proportion bar with no track shows no proportion. */}
-                  <span className="block h-1.5 overflow-hidden rounded-full" style={{ background: "var(--phase-grid)" }}>
-                    <span
-                      className="block h-full rounded-full"
-                      style={{ width: percent(row.share), background: REGIME_HEX_COLORS[row.regime] }}
-                    />
-                  </span>
-                  <span className="text-right tabular-nums text-slate-400">{row.months}</span>
-                </li>
-              ))}
-            </ul>
+            <div>
+              <p className="type-eyebrow text-fluid-nano">Months in each quadrant</p>
+              <ul className="mt-2 space-y-1.5">
+                {model.occupancy.map((row) => (
+                  <li key={row.regime} className="grid grid-cols-[4.5rem_1fr_2.5rem] items-center gap-2 text-fluid-nano">
+                    <span className="truncate text-slate-300">{row.regimeLabel}</span>
+                    {/* `block`, not the default inline: an inline box ignores the
+                        height and the child's percentage width resolves against a
+                        shrink-to-fit line box, so every bar rendered full-length.
+                        The track is a token rather than `bg-white/[0.06]`, which is
+                        a dark-theme idiom — on the light ground it disappeared, and
+                        a proportion bar with no track shows no proportion. */}
+                    <span className="block h-1.5 overflow-hidden rounded-full" style={{ background: "var(--phase-grid)" }}>
+                      <span
+                        className="block h-full rounded-full"
+                        style={{ width: percent(row.share), background: REGIME_HEX_COLORS[row.regime] }}
+                      />
+                    </span>
+                    <span className="text-right tabular-nums text-slate-400">{row.months}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* The chart's data, not a summary of it. A `<desc>` tells a screen reader
-          what the picture shows; this is what a sighted reader can get by
-          looking at a point, and there is no other route to it. */}
-      <details className="weather-auto-chevron">
-        <summary className="text-fluid-nano text-slate-400">
-          Plotted months, as a table
-        </summary>
-        <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-white/[0.06]">
-          <table className="w-full text-left text-fluid-nano tabular-nums">
-            <caption className="sr-only">
-              Every month drawn on the phase map, newest first, with its coordinates and the conditions it
-              produced.
-            </caption>
-            <thead className="sticky top-0 bg-slate-950/90 text-slate-400">
-              <tr>
-                <th scope="col" className="px-2.5 py-1.5 font-medium">Month</th>
-                <th scope="col" className="px-2.5 py-1.5 font-medium">Conditions</th>
-                <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Funding pressure (0–100)</th>
-                <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Risk appetite (0–100)</th>
-              </tr>
-            </thead>
-            <tbody className="text-slate-300">
-              {[...model.points].reverse().map((point) => (
-                <tr key={point.recordDate} className="border-t border-white/[0.04]">
-                  <th scope="row" className="px-2.5 py-1 font-normal text-slate-400">{point.monthLabel}</th>
-                  <td className="px-2.5 py-1">
-                    {point.regimeLabel}
-                    {point.changed ? <span className="ml-1.5 text-sky-300">changed</span> : null}
-                  </td>
-                  <td className="px-2.5 py-1 text-right">
-                    {point.tightness}
-                    {point.saturated ? <span className="text-slate-500" title="Clipped at the score ceiling">*</span> : null}
-                  </td>
-                  <td className="px-2.5 py-1 text-right">{point.riskAppetite}</td>
+        {/* The chart's data, not a summary of it. A `<desc>` tells a screen reader
+            what the picture shows; this is what a sighted reader can get by
+            looking at a point, and there is no other route to it. */}
+        <details className="weather-auto-chevron">
+          <summary className="text-fluid-nano text-slate-400">
+            Plotted months, as a table
+          </summary>
+          <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-white/[0.06]">
+            <table className="w-full text-left text-fluid-nano tabular-nums">
+              <caption className="sr-only">
+                Every month drawn on the phase map, newest first, with its coordinates and the conditions it
+                produced.
+              </caption>
+              <thead className="sticky top-0 bg-slate-950/90 text-slate-400">
+                <tr>
+                  <th scope="col" className="px-2.5 py-1.5 font-medium">Month</th>
+                  <th scope="col" className="px-2.5 py-1.5 font-medium">Conditions</th>
+                  <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Funding pressure (0–100)</th>
+                  <th scope="col" className="px-2.5 py-1.5 text-right font-medium">Risk appetite (0–100)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
-    </section>
+              </thead>
+              <tbody className="text-slate-300">
+                {[...model.points].reverse().map((point) => (
+                  <tr key={point.recordDate} className="border-t border-white/[0.04]">
+                    <th scope="row" className="px-2.5 py-1 font-normal text-slate-400">{point.monthLabel}</th>
+                    <td className="px-2.5 py-1">
+                      {point.regimeLabel}
+                      {point.changed ? <span className="ml-1.5 text-sky-300">changed</span> : null}
+                    </td>
+                    <td className="px-2.5 py-1 text-right">
+                      {point.tightness}
+                      {point.saturated ? <span className="text-slate-500" title="Clipped at the score ceiling">*</span> : null}
+                    </td>
+                    <td className="px-2.5 py-1 text-right">{point.riskAppetite}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </UrlDetails>
   );
 }

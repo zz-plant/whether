@@ -105,7 +105,7 @@ export default async function SignalsPage({
         ]}
         openPanelHref="#what-changed"
       />
-      {/* The four sections, in the reader's order, as an array: the shell
+      {/* The three sections, in the reader's order, as an array: the shell
           wraps each array entry in its own divided row. */}
       {signalsEvidenceSections({
         model,

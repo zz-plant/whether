@@ -49,7 +49,7 @@ export function PublishedBriefCopyControls({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="share-brief-title" className="text-lg font-semibold text-slate-100">
-            Share this week&apos;s guidance
+            Share the week of {recordDateLabel}
           </h2>
           <p className="text-xs text-slate-400">
             Copy date-pinned leadership updates into Slack or email.
