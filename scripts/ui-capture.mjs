@@ -30,6 +30,7 @@ const run = async () => {
     baseUrl: options.baseUrl,
     outDir: options.outDir,
     theme: options.theme,
+    visitor: options.visitor,
     captures,
   });
 

@@ -58,6 +58,25 @@ export const parseCaptureTheme = (args) => {
   return theme;
 };
 
+const CAPTURE_VISITORS = new Set(["first", "returning"]);
+
+/**
+ * `--visitor returning` captures the page a reader sees on their second
+ * visit. The layout bootstrap folds the homepage behind the first-visit
+ * picker unless this browser has stored a week before
+ * (`activationLastWeekStorageKey` in lib/activationFunnel.ts), so without
+ * this every capture of `/` was the first-visit fold, and the Monday reader's
+ * page — what changed, what it changes, what would change it — was never in
+ * the loop. The capture seeds last week's slug, the gap of a weekly returner.
+ */
+export const parseCaptureVisitor = (args) => {
+  const visitor = readArgValue(args, "--visitor", "first");
+  if (!CAPTURE_VISITORS.has(visitor)) {
+    throw new Error(`\`--visitor\` must be one of ${[...CAPTURE_VISITORS].join(", ")}; got "${visitor}".`);
+  }
+  return visitor;
+};
+
 export const parseCaptureOptions = (args) => {
   const onlyIds = parseOnlyIds(readArgValue(args, "--only", ""));
 
@@ -67,6 +86,7 @@ export const parseCaptureOptions = (args) => {
     outDir: readArgValue(args, "--out-dir", DEFAULT_UI_CAPTURE_OUT_DIR),
     onlyIds,
     theme: parseCaptureTheme(args),
+    visitor: parseCaptureVisitor(args),
     targets: resolveCaptureTargets(onlyIds),
   };
 };
@@ -333,15 +353,29 @@ const launchChromium = async () => {
 };
 
 const THEME_STORAGE_KEY = "whether-theme";
+const ACTIVATION_LAST_WEEK_STORAGE_KEY = "whether.activation.lastWeek";
 
-export const captureFileName = (targetId, theme = "dark") =>
-  theme === "light" ? `${targetId}-light.png` : `${targetId}.png`;
+/** Same ISO-week arithmetic and slug as lib/isoWeek.ts, which a Node script cannot import. */
+const isoWeekSlug = (date) => {
+  const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = target.getUTCDay() || 7;
+  target.setUTCDate(target.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${target.getUTCFullYear()}-w${String(week).padStart(2, "0")}`;
+};
+
+const captureVariantSuffix = (theme = "dark", visitor = "first") =>
+  `${visitor === "returning" ? "-returning" : ""}${theme === "light" ? "-light" : ""}`;
+
+export const captureFileName = (targetId, theme = "dark", visitor = "first") =>
+  `${targetId}${captureVariantSuffix(theme, visitor)}.png`;
 
 /** The first screen of a target, as a phone screenshot would frame it. */
-const firstScreenFileName = (targetId, theme = "dark") =>
-  captureFileName(`${targetId}-screen`, theme);
+const firstScreenFileName = (targetId, theme = "dark", visitor = "first") =>
+  captureFileName(`${targetId}-screen`, theme, visitor);
 
-export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" }) => {
+export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark", visitor = "first" }) => {
   await mkdir(outDir, { recursive: true });
 
   const browser = await launchChromium();
@@ -359,8 +393,14 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" 
           [THEME_STORAGE_KEY, "light"],
         );
       }
+      if (visitor === "returning") {
+        await page.addInitScript(
+          ([key, value]) => window.localStorage.setItem(key, value),
+          [ACTIVATION_LAST_WEEK_STORAGE_KEY, isoWeekSlug(new Date(Date.now() - 7 * 86400000))],
+        );
+      }
       const url = new URL(target.path, baseUrl).toString();
-      const outputFileName = captureFileName(target.id, theme);
+      const outputFileName = captureFileName(target.id, theme, visitor);
       const outputPath = path.resolve(process.cwd(), outDir, outputFileName);
 
       // Collected regardless of whether the caller checks them, so a capture
@@ -385,7 +425,7 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" 
       });
       let screenFileName = null;
       if (target.firstScreen) {
-        screenFileName = firstScreenFileName(target.id, theme);
+        screenFileName = firstScreenFileName(target.id, theme, visitor);
         await page.evaluate(() => window.scrollTo(0, 0));
         await page.screenshot({
           path: path.resolve(process.cwd(), outDir, screenFileName),
@@ -399,11 +439,12 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark" 
 
       captures.push({
         id: target.id,
-        label: theme === "light" ? `${target.label} / light` : target.label,
+        label: `${target.label}${visitor === "returning" ? " / returning" : ""}${theme === "light" ? " / light" : ""}`,
         path: target.path,
         viewport: target.viewport,
         fullPage: target.fullPage ?? true,
         theme,
+        visitor,
         outputPath,
         outputFileName,
         screenFileName,
@@ -595,15 +636,15 @@ export const buildCaptureGalleryHtml = ({ baseUrl, captures, generatedAt }) => {
 </html>`;
 };
 
-export const writeCaptureArtifacts = async ({ baseUrl, outDir, captures, theme = "dark" }) => {
-  const suffix = theme === "light" ? "-light" : "";
+export const writeCaptureArtifacts = async ({ baseUrl, outDir, captures, theme = "dark", visitor = "first" }) => {
+  const suffix = captureVariantSuffix(theme, visitor);
   const manifestPath = path.resolve(process.cwd(), outDir, `manifest${suffix}.json`);
   const galleryPath = path.resolve(process.cwd(), outDir, `index${suffix}.html`);
   const generatedAt = new Date().toISOString();
 
   await writeFile(
     manifestPath,
-    `${JSON.stringify({ baseUrl, generatedAt, theme, captures }, null, 2)}\n`,
+    `${JSON.stringify({ baseUrl, generatedAt, theme, visitor, captures }, null, 2)}\n`,
     "utf8",
   );
   await writeFile(
