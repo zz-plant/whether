@@ -72,7 +72,7 @@ export const pauseConditionOnly = (value: string): string => {
 };
 
 /** The marker a paste carries when its numbers came off a saved copy rather than a live read. */
-export const SAVED_COPY_NOTE = "saved copy, not a live reading";
+const SAVED_COPY_NOTE = "saved copy, not a live reading";
 
 /**
  * The one provenance footer: the source as a reader names it, the record's

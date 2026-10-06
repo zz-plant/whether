@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { briefArtifactOf, briefSourceFromSnapshot, buildBriefDocument } from "../lib/report/briefDocument";
 import { parseBriefArtifact } from "../lib/report/briefArtifact";
+import { resolvePublishedConfidence, type ConfidenceInputs } from "../lib/report/confidence";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
@@ -74,7 +75,11 @@ describe("the brief document", () => {
   });
 
   it("resolves the published confidence once, and says when the numbers are a saved copy", () => {
-    const live = buildBriefDocument(briefSourceFromSnapshot(ordinary()), ordinary().weeklyCall);
+    const reading = ordinary();
+    const live = buildBriefDocument(briefSourceFromSnapshot(reading), reading.weeklyCall);
+    /* The band the page publishes, from the inputs confidence is resolved from, once for every format. */
+    const inputs: ConfidenceInputs = reading.assessment;
+    assert.equal(live.confidence, resolvePublishedConfidence({ assessment: inputs, record: reading.treasury }).label);
     assert.equal(live.provenance.isFallback, false);
     assert.equal(live.confidenceLabel, live.confidence);
 
