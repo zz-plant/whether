@@ -35,6 +35,7 @@ Useful options:
 ```bash
 bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
 bun run ui:iterate -- --theme light --only home-mobile,home-desktop
+bun run ui:iterate -- --visitor returning --only home-mobile,home-desktop
 bun run ui:iterate -- --base-url http://127.0.0.1:3001
 bun run ui:iterate -- --dev-script dev
 bun run ui:iterate -- --no-dev
@@ -47,6 +48,13 @@ init script and the page renders light from the first frame. Light captures land
 beside the dark one it is compared against instead of overwriting it. The default is dark.
 Review both before calling a visual change done — the harness could only capture dark until
 2026-09-15, and the light theme accumulated defects nobody had seen.
+
+`--visitor returning` captures the homepage a reader sees after their first visit. The layout
+bootstrap folds `/` behind the first-visit picker unless the browser has stored a week before,
+so a plain capture is always the first-visit fold. This flag seeds last week's slug and writes
+`<id>-returning.png` (and `<id>-returning-light.png` with `--theme light`) with its own gallery
+and manifest. Until 2026-10-05 no capture had shown the returning reader's page, and it drew the
+same two score ladders three times. Other routes render the same either way.
 
 What `ui:iterate` does:
 

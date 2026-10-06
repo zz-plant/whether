@@ -6,6 +6,7 @@ import {
   captureFileName,
   parseCaptureOptions,
   parseCaptureTheme,
+  parseCaptureVisitor,
   probeBaseUrl,
   probeHtmlAssetIntegrity,
   resolveCaptureTargets,
@@ -20,6 +21,15 @@ describe("ui capture helpers", () => {
     assert.equal(parseCaptureOptions(["--theme", "light"]).theme, "light");
     assert.equal(captureFileName("home-mobile"), "home-mobile.png");
     assert.equal(captureFileName("home-mobile", "light"), "home-mobile-light.png");
+  });
+
+  it("captures a first visit by default and a returning reader on request, in files of their own", () => {
+    assert.equal(parseCaptureVisitor([]), "first");
+    assert.equal(parseCaptureVisitor(["--visitor", "returning"]), "returning");
+    assert.throws(() => parseCaptureVisitor(["--visitor", "lapsed"]), /--visitor/);
+    assert.equal(parseCaptureOptions(["--visitor", "returning"]).visitor, "returning");
+    assert.equal(captureFileName("home-mobile", "dark", "returning"), "home-mobile-returning.png");
+    assert.equal(captureFileName("home-mobile", "light", "returning"), "home-mobile-returning-light.png");
   });
 
   it("keeps the full configured capture set when no filters are provided", () => {
@@ -84,6 +94,7 @@ describe("ui capture helpers", () => {
           viewport: { width: 430, height: 932 },
           fullPage: true,
           theme: "dark",
+          visitor: "first",
           outputPath: "/tmp/operator-brief-mobile.png",
           outputFileName: "operator-brief-mobile.png",
           url: "http://127.0.0.1:3000/mockups/operator-brief?viewport=mobile&density=compact",
