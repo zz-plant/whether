@@ -28,6 +28,15 @@ type Props = {
    * an archived card has no strip, so a crop of it would otherwise carry no date.
    */
   captionDetail?: string;
+  /**
+   * A question this card answers, for the pages a reader reaches from search
+   * (`/answers/*`, `/signals/[cluster]`). It becomes the heading, set above the
+   * call, and the call becomes the answer under it — the same card the brief
+   * opens on, so a search visitor meets the artifact before any explanation.
+   */
+  question?: string;
+  /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
+  lines?: ReadonlyArray<{ label: string; value: string }>;
 };
 
 const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
@@ -60,6 +69,8 @@ export function DecisionHero({
   trust,
   titleLevel = "h1",
   captionDetail,
+  question,
+  lines,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -113,14 +124,42 @@ export function DecisionHero({
         {/* The homepage's `h1`. It was an `h2` under a visually hidden `h1`
             reading "Weekly Brief", so the one heading a crawler and a
             screen-reader user meet first said nothing this week that it did
-            not say every week. The call is the page. */}
-        <TitleTag
-          id="weekly-call-title"
-          style={{ viewTransitionName: "page-title" }}
-          className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white"
-        >
-          {call}
-        </TitleTag>
+            not say every week. The call is the page. On a page that asks a
+            question, the question is the heading and the call answers it, in
+            the same size and place. */}
+        {question ? (
+          <>
+            <TitleTag
+              id="weekly-call-title"
+              style={{ viewTransitionName: "page-title" }}
+              className="max-w-2xl text-pretty text-fluid-lg font-semibold text-slate-300"
+            >
+              {question}
+            </TitleTag>
+            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white">
+              {call}
+            </p>
+          </>
+        ) : (
+          <TitleTag
+            id="weekly-call-title"
+            style={{ viewTransitionName: "page-title" }}
+            className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white"
+          >
+            {call}
+          </TitleTag>
+        )}
+
+        {lines && lines.length > 0 ? (
+          <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm sm:grid-cols-[max-content_1fr]">
+            {lines.map((line) => (
+              <div key={line.label} className="space-y-0.5 sm:contents sm:space-y-0">
+                <dt className="font-semibold text-slate-300">{line.label}</dt>
+                <dd className="text-slate-100">{line.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
 
         {detail ? (
           <div className="max-w-xl border-l-2 border-slate-700/80 pl-3 py-0.5">

@@ -2434,6 +2434,29 @@ own lines — were closed, two and three sections down.
 - Step ids are unchanged, so every deep link — `#ops-monthly-action-summary` from the brief, the
   portfolio note, the CLI — still opens its section.
 
+
+### 1.1.37 Pages reached from search open on the brief's card (2026-10-06)
+
+Answer pages (`/answers/*`) and signal watch pages (`/signals/[cluster]`) are where most strangers
+meet the product, and each opened in its own frame. Answer pages led with a generic header and a
+"Short answer" box of advice that holds in any week, with the week's conditions in small print further
+down. Signal watch pages led with a bare heading, then a bulleted block that put the call-change line
+under an area's resume label.
+
+- **One card.** Both open on `DecisionHero`, the card the brief opens on, with two optional props:
+  `question` (the page's question or signal, set as the heading above the call) and `lines` (the
+  lines the answer holds between). The stamp, the trust strip and the screenshot caption come with it.
+- **Answer pages.** The card shows this week's answer for the page's decision areas
+  (`payload.currentCall`), its Do now / Pause if / Resume when lines, and the page's enduring
+  `shortAnswer` under the call. Copy decision brief and the related questions follow the card.
+- **Signal watch pages.** The card shows the week's call with its Pause if and Conditions change if
+  lines; the signal's own reading follows it. `DecisionContractBlock` had no caller left and was
+  deleted, along with the unused `ResolutionCompassGlyph`.
+- **Scenario and toolkit pages** keep their frames. Scenario pages read build-time payloads that can
+  lag the live week, so a live stamp beside them could disagree with the text. Both lose the
+  button-shaped pills and capitalised badges they used for plain facts (freshness, trust, time,
+  participants), and toolkit pages lose the back link that repeated the breadcrumb.
+
 ### Shared page spacing (2026-10-04)
 
 The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.

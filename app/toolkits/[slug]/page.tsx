@@ -57,22 +57,25 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           { label: toolkit.title },
         ]}
       />
-      <Link href="/resolve#toolkit-library" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-        ← Back to Decision Tools toolkit library
-      </Link>
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="type-badge text-fluid-micro rounded px-2 py-0.5 bg-slate-800 text-sky-300 font-mono">
-                {toolkit.timeToRun}
-              </span>
-              <span className="type-badge text-fluid-micro rounded px-2 py-0.5 bg-slate-800 text-slate-300">
-                {toolkit.recommendedParticipants}
-              </span>
-            </div>
             <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
             <p className="text-sm text-slate-300">{toolkit.whenToUse}</p>
+            {/* How long and who, stated plainly under the title. They were two
+                capitalised badges above it, the time in the monospace face, and
+                the participant list a whole sentence in capitals: the stamp and
+                figure registers spent on a meeting's logistics. */}
+            <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+              <div className="flex gap-1.5">
+                <dt className="text-slate-500">Time</dt>
+                <dd className="font-medium text-slate-200">{toolkit.timeToRun}</dd>
+              </div>
+              <div className="flex gap-1.5">
+                <dt className="text-slate-500">Who</dt>
+                <dd className="font-medium text-slate-200">{toolkit.recommendedParticipants}</dd>
+              </div>
+            </dl>
           </div>
           <ToolkitPlaybookGlyph size={60} className="self-start sm:self-center" />
         </div>
@@ -102,7 +105,6 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {toolkit.reversalTrigger}</li>
         </ul>
         <p className="text-sm text-slate-300"><span className="font-semibold">By pace:</span> {toolkit.byPosture}</p>
-        <p className="text-sm text-slate-300"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>
       </section>
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Prep checklist</h2>
