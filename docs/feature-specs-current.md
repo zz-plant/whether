@@ -2558,7 +2558,7 @@ own near the foot, ten screens from the strip that draws the same months.
   `tests/recordRoutesReadingOrder.test.tsx`.
 
 
-### 1.1.43 Delivery channels: one Slack poster, one tally (2026-10-06)
+### 1.1.43 Delivery channels: one Slack poster, one email shell, one tally (2026-10-06)
 
 Every send — the weekly email, the weekly Slack post, the between-Monday alerts, the month-end
 pulse and the regime-change push — now goes through `lib/delivery/`.
@@ -2576,4 +2576,17 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   skipped; the five senders counted those in five shapes. Each route keeps the shape it already
   publishes — the weekly Slack post counts a retired webhook as a failed one, the push result's
   `pruned` is the tally's `retired` — so no response changed.
-- Tests: `tests/deliveryChannels.test.ts`.
+- **One email shell** (`lib/email/emailShell.ts`, `renderEmailShell`). The alert templates'
+  `baseHtml`, the copy of it inline in the weekly brief, and the month-end pulse's own shell are
+  one. The copy is why the 2026-09-17 `siteUrl` fix missed the alerts: their links, their
+  unsubscribe URL and their plain-text "View full brief" / "Your lines" lines still wrote
+  `https://whether.work`, so a preview deployment mailed production links. Every origin in a
+  sent email now comes from `lib/siteUrl`. On production that is the same string, and the alert
+  and weekly mail are byte-for-byte what they were. The month-end pulse is the one email whose
+  HTML changed: it gains the shared footer and the unsubscribe link its HTML part never carried,
+  its title is the shell's, and its block is fully escaped (it escaped `<` only, so an `&` or a
+  quote in the pasted block went out raw); its plain-text part is unchanged. One `escapeHtml`
+  serves every email and the subscription action pages.
+- Tests: `tests/deliveryChannels.test.ts`, `tests/emailShell.test.ts` (production output pinned
+  byte for byte; the no-literal-origin rule is a source read, because on production the two are
+  the same string).

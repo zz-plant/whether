@@ -28,10 +28,9 @@ import { getWhetherKv } from "../runtime/kv";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getSubscriberStore } from "../email/subscriberStore";
 import { createCloudflareEmailAdapter } from "../email/emailDelivery";
-import { unsubscribeFooterText } from "./alertTemplates";
+import { escapeHtml, renderEmailShell, unsubscribeFooterText } from "../email/emailShell";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { fanOut } from "../delivery/fanOut";
-import { siteUrl } from "../siteUrl";
 import { getRegimePublicLabel } from "../regimePresentation";
 
 const LAST_PULSED_KEY = "month-end:last-pulsed";
@@ -167,14 +166,15 @@ const sendEmailPulse = async (headline: string, block: string): Promise<number> 
         to: subscriber,
         subject: `Whether — ${headline}`,
         text: [block, "", ...unsubscribeFooterText(subscriber.token)].join("\n"),
-        html: [
-          `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#e2e8f0;background:#0a0a0a;">`,
-          `<h1 style="color:#f1f5f9;font-size:1.15rem;">${headline}</h1>`,
-          `<div style="white-space:pre-wrap;color:#cbd5e1;font-size:0.9rem;line-height:1.6;">${block.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</div>`,
-          `<p style="margin-top:24px;"><a href="${siteUrl}" style="color:#38bdf8;">View the brief →</a></p>`,
-          `<p style="margin-top:24px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
-          `</div>`,
-        ].join(""),
+        /* The shell every Whether email uses, which gives this one the footer
+           and the unsubscribe link its HTML part never carried. The block is
+           text a reader pastes into a letter, so all of it is escaped: this
+           escaped `<` alone, and an `&` or a quote in a stamp went out raw. */
+        html: renderEmailShell({
+          title: headline,
+          body: `<div style="white-space:pre-wrap;color:#cbd5e1;font-size:0.9rem;line-height:1.6;">${escapeHtml(block).replace(/\n/g, "<br/>")}</div>`,
+          unsubscribeToken: subscriber.token,
+        }),
       });
       return result.ok ? "sent" : "failed";
     });

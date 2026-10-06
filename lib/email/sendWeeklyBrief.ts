@@ -1,5 +1,5 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
-import { unsubscribeFooterHtml, unsubscribeFooterText } from "../alert/alertTemplates";
+import { emailTextFooter, renderEmailShell } from "./emailShell";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
@@ -235,9 +235,7 @@ export const sendWeeklyBrief = async (options?: {
         `Move these lines for your own plan, and hear the day one is crossed: ${planLinesUrl}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
-        `---`,
-        `Whether · weekly operating brief`,
-        ...unsubscribeFooterText(recipient.token),
+        ...emailTextFooter(recipient.token),
       ].join("\n");
 
       /* Regime-adaptive email */
@@ -266,27 +264,14 @@ export const sendWeeklyBrief = async (options?: {
         `</td></tr></table>`
       );
 
-      const html = [
-        `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#e2e8f0;">`,
-        `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#f1f5f9;">Whether Weekly Brief</h1>`,
-        `<p style="color:#94a3b8;font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
-        ...sections,
-        `<div style="margin-top:24px;">`,
-        `<a href="${briefUrl}" style="display:inline-block;padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,rgba(56,189,248,0.9),rgba(14,116,144,0.85));color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
-        `</div>`,
-        `<p style="margin-top:32px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
-        `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.15);margin-top:24px;" />`,
-        `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
-        `<td style="font-size:0.7rem;color:#64748b;padding-top:12px;">`,
-        `<a href="${siteUrl}/trust" style="color:#64748b;text-decoration:underline;">Methodology</a>`,
-        ` · `,
-        `<a href="${siteUrl}/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
-        ` · `,
-        `<a href="${siteUrl}" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
-        unsubscribeFooterHtml(recipient.token),
-        `</td></tr></table>`,
-        `</body></html>`,
-      ].join("\n");
+      const html = renderEmailShell({
+        title: "Whether Weekly Brief",
+        body: [
+          `<p style="color:#94a3b8;font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
+          ...sections,
+        ].join("\n"),
+        unsubscribeToken: recipient.token,
+      });
 
       const result = await adapter.send({ to: recipient, subject, html, text });
       return result.ok ? "sent" : "failed";
