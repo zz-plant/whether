@@ -95,5 +95,8 @@ describe("premium funnel helpers", () => {
     );
 
     assert.equal(fetchMock.mock.calls.length, 1);
+    // Every caller awaits the mirror, so it is bounded rather than left to hang on a dead dashboard.
+    const init: unknown = fetchMock.mock.calls[0]?.[1];
+    assert.ok(typeof init === "object" && init !== null && Reflect.get(init, "signal") instanceof AbortSignal);
   });
 });

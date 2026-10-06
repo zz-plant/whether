@@ -72,6 +72,9 @@ describe("POST /api/webhooks/slack/actions signature verification", () => {
     assert.equal(fetchMock.mock.calls.length, 1);
     // The route hands fetch the string from the payload, so the target compares as one.
     assert.equal(fetchMock.mock.calls[0][0], RESPONSE_URL);
+    // Awaited before the route answers, inside Slack's three-second window, so it is bounded.
+    const init: unknown = fetchMock.mock.calls[0][1];
+    assert.ok(typeof init === "object" && init !== null && Reflect.get(init, "signal") instanceof AbortSignal);
   });
 
   it("verifies the signature over the raw form body Slack actually sends", async () => {

@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "./fetchWithTimeout";
+
 export type PremiumFunnelEventType =
   | "premium_intent"
   | "premium_gate_view"
@@ -103,6 +105,13 @@ export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunne
  * discarded every production event silently. Durable capture no longer depends on that
  * env var being set; the webhook is now an optional mirror for external dashboards.
  */
+/**
+ * The mirror is optional and every caller swallows its failure, but each one awaits it — the
+ * checkout route before it hands the reader their Stripe link — so a dashboard that stops
+ * answering must not hold the request open.
+ */
+const PREMIUM_FUNNEL_WEBHOOK_TIMEOUT_MS = 3_000;
+
 export const dispatchPremiumFunnelEvent = async (
   payload: PremiumFunnelEvent,
   webhookUrl = process.env.PREMIUM_FUNNEL_WEBHOOK_URL,
@@ -113,11 +122,16 @@ export const dispatchPremiumFunnelEvent = async (
   await recordPremiumFunnelEvent(payload);
 
   if (webhookUrl) {
-    await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    });
+    await fetchWithTimeout(
+      fetch,
+      webhookUrl,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      },
+      PREMIUM_FUNNEL_WEBHOOK_TIMEOUT_MS,
+    );
   }
 };

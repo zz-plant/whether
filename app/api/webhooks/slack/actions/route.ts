@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireSlackSignature } from "../../../../../lib/api/slackSignature";
+import { fetchWithTimeout } from "../../../../../lib/fetchWithTimeout";
 import { getDecisionMemoryRepository } from "../../../../../lib/storage/decisionMemoryRepository";
 
 export const runtime = "edge";
@@ -39,6 +40,10 @@ const parseSlackActionPayload = (rawBody: string, contentType: string): SlackAct
    its choosing. The warning names the origin only — a path can carry a credential, and
    this one was chosen by whoever sent the payload. */
 const SLACK_RESPONSE_URL_ORIGIN = "https://hooks.slack.com";
+
+/* Slack drops an interaction this route has not answered within three seconds, and the
+   confirmation POST below is awaited before the answer goes out; it gets two of them. */
+const SLACK_RESPONSE_URL_TIMEOUT_MS = 2_000;
 
 const slackResponseUrl = (candidate: string): string | null => {
   let parsed: URL;
@@ -94,14 +99,14 @@ export async function POST(request: NextRequest) {
               ? "🔄 Queued for team review by"
               : "📦 Archived by";
 
-        await fetch(responseUrl, {
+        await fetchWithTimeout(fetch, responseUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             response_type: "ephemeral",
             text: `${statusText} @${payload.user.username || payload.user.name || "operator"}.`,
           }),
-        }).catch(() => {});
+        }, SLACK_RESPONSE_URL_TIMEOUT_MS).catch(() => {});
       }
 
       return NextResponse.json({ ok: true, action: actionId, decisionId }, { status: 200 });
