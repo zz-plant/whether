@@ -130,7 +130,10 @@ configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 tha
 deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions`, then
 `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks` on its own. So every push, `main`
 included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
-before anything is built or deployed. The audit runs second and alone because it spawns a dev
+before anything is built or deployed. (Since 2026-10-06 the command is
+`bun scripts/run-checks.mjs --preset deploy`: the same two stages and the same signal, declared
+once in `scripts/check-tasks.mjs` beside the pre-push hook's preset, which `vinext-run.mjs` reads
+too. The lists had been written out in four places and a test compared two of them.) The audit runs second and alone because it spawns a dev
 server and compiles every route against it; on a small box a server competing with lint, tsc,
 and the suite for cores turns a slow route into one that "never answered". **A failing test does
 block a deploy.**

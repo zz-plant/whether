@@ -4,17 +4,19 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { passedChecks } from "./check-gate-marker.mjs";
+import { presetTasks } from "./check-tasks.mjs";
+import { withDeployGate } from "./deploy-gate.mjs";
 
 /** The branch whose builds ship to production. */
 const PRODUCTION_BRANCH = "main";
 
 /**
- * What must have passed before this build proceeds. The same list `check:vinext`
- * runs, because they are the same gate reached from two directions — the build
- * command, and the deploy command that lands here afterwards. Exported so a test
- * can compare it against the configured command without parsing this file.
+ * What must have passed before this build proceeds: every task of the `deploy` preset
+ * `check:vinext` runs, because they are the same gate reached from two directions — the
+ * build command, and the deploy command that lands here afterwards. Read from the preset
+ * (scripts/check-tasks.mjs) rather than written out again, so the two cannot drift.
  */
-export const GATE_TASKS = ["lint", "typecheck", "test", "assets", "suppressions", "dead-exports", "landmarks"];
+export const GATE_TASKS = presetTasks("deploy");
 
 /**
  * The gate tasks still owed for this commit.
@@ -120,15 +122,16 @@ function main() {
       } else {
         console.log(`[vinext-run] check gate: running ${outstanding.join(", ")}.`);
 
-        // WHETHER_DEPLOY_GATE tells the test runner it is inside the deploy path,
+        // The deploy-gate signal tells the test runner it is inside the deploy path,
         // so it leaves out tests/tools/ — suites that drive external interpreters
         // the build image does not guarantee — and gives each test a longer
         // ceiling, because this container is smaller than a dev machine (see
         // scripts/run-tests.mjs). Those tests still run on every `bun run check`
         // and on pre-push; what they must not do is block a deploy over a
-        // dependency that cannot affect the built artifact.
+        // dependency that cannot affect the built artifact. The outstanding tasks
+        // run as one stage, as they always have here.
         const checks = spawnSync("bun", ["scripts/run-checks.mjs", ...outstanding], {
-          env: { ...process.env, WHETHER_DEPLOY_GATE: "1" },
+          env: withDeployGate(process.env),
           stdio: "inherit",
         });
 

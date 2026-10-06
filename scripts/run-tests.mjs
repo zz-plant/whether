@@ -2,6 +2,7 @@
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
+import { isDeployGate } from './deploy-gate.mjs';
 import { walkFiles } from './walk-files.mjs';
 
 const TEST_ROOT_ARG = './tests';
@@ -27,7 +28,7 @@ const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
  * contention here is `tests/whetherCli.test.ts` spawning 62 Node processes while
  * lint and tsc share the same cores, and no test-runner flag reaches that.
  */
-const inDeployGate = process.env.WHETHER_DEPLOY_GATE === '1';
+const inDeployGate = isDeployGate();
 const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? (inDeployGate ? "120000" : "60000");
 
 /*

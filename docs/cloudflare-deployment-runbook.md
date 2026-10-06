@@ -24,15 +24,17 @@ The build command configured in the Workers Builds dashboard is `bun run check:v
 the deploy gate, not the full local check:
 
 ```bash
-WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions dead-exports \
-  && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks
+bun scripts/run-checks.mjs --preset deploy
 ```
 
-The landmark audit runs second and alone: it spawns a dev server and compiles every route
-against it, and a server sharing a small container's cores with lint, tsc, and the suite turns a
-slow route into one that "never answered".
+The `deploy` preset (`scripts/check-tasks.mjs`, where the pre-push hook's preset is declared too)
+is two stages: lint, typecheck, test, assets, suppressions and dead-exports together, then the
+landmark audit on its own once they pass, under `WHETHER_DEPLOY_GATE=1` for the run and every task
+it spawns. The landmark audit runs second and alone: it spawns a dev server and compiles every
+route against it, and a server sharing a small container's cores with lint, tsc, and the suite
+turns a slow route into one that "never answered".
 
-`WHETHER_DEPLOY_GATE=1` makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
+`WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
 not guarantee), and gives the landmark audit's dev-server readiness and per-route bounds room for a
 cold start. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
@@ -44,8 +46,9 @@ gate's own output can be thousands of lines, so the per-task `❌` scrolls out o
 2026-09-15 the run ends by repeating each failure with the lines that named it, which is the part
 that survives.
 
-If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
-in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
+If the build command in the dashboard is ever changed, change `check:vinext` (or the `deploy`
+preset) instead: the tests in `tests/deployGateTestScope.test.ts` pin what that script runs, and
+the dashboard has no test.
 
 ### "the working tree is not the commit it claims to be"
 
