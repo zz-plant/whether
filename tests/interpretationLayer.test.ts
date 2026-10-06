@@ -58,8 +58,7 @@ const homeBriefModel = {
 } as ReturnType<typeof import("../lib/report/homeBriefModel").buildHomeBriefModel>;
 
 // The panel these views were asserted through is gone; buildInterpretationLayer
-// is the live half (lib/export/briefBuilders, lib/report/home/artifactPayload,
-// lib/report/homePageAssembler all consume it), so the content assertions now
+// is the live half (lib/report/homePageAssembler consumes it), so the content assertions now
 // read the layer directly instead of its former HTML. Assertions that only
 // described the panel's markup — toggle hrefs, aria-current, the toggle-shell
 // labels — are gone with it.

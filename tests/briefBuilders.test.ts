@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { regimeSignalLabel } from "../lib/report/signalTranslations";
 
 import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
@@ -219,7 +219,7 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /BBB credit spread \(OAS\): 174\.00 basis points · refreshed 2026-03-04/);
   });
 
-  it("carries interpretation context into board and citation artifacts", () => {
+  it("carries interpretation context into the brief and citation artifacts", () => {
     const interpretationLayer = {
       view: "forecast" as const,
       label: "Forecast view",
@@ -231,10 +231,10 @@ describe("buildSlackBrief", () => {
       ],
     };
 
-    const board = buildBoardBrief(assessment, treasury, sensors, macros, { interpretationLayer });
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, { interpretationLayer });
     const citation = buildCallCitation(assessment, treasury, { interpretationLayer });
 
-    assert.match(board, /^Forecast view: Boundary pressure translation for planning windows\.$/m);
+    assert.match(brief, /^Forecast view: Boundary pressure translation for planning windows\.$/m);
     assert.match(citation, /^Forecast view: /m);
   });
 

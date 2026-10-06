@@ -6,7 +6,7 @@ import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
 import { signalScenarioRoutes } from "../app/seoRouteClusters";
 import { toolkitDefinitions } from "../lib/decisionDomainCatalog";
-import { buildBoardBrief, buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import {
@@ -21,6 +21,8 @@ import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestP
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
 import { publishedScoreLines } from "../lib/alert/alertEvaluator";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import type { RunwayBand } from "../lib/report/operatorRunway";
@@ -187,6 +189,12 @@ const routeSurfaces: Surface[] = [
 ];
 
 const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });
+/* The weekly call for the same reading the other export surfaces print, through the contract
+   every production caller passes the operator brief. */
+const fixtureWeeklyCall = buildWeeklyCallContract({
+  assessment,
+  homeBriefModel: buildHomeBriefModel({ assessment, stopItems: assessment.constraints, regimeAlert: null }),
+});
 const record: TrackRecord = {
   monthsCovered: 176,
   firstRecordDate: "2012-01-31",
@@ -203,13 +211,12 @@ const record: TrackRecord = {
 
 const artifactSurfaces: Surface[] = [
   { name: "Slack brief", text: () => buildSlackBrief(assessment, treasury, sensors, macros) },
-  { name: "board brief", text: () => buildBoardBrief(assessment, treasury, sensors, macros) },
   { name: "call citation", text: () => buildCallCitation(assessment, treasury) },
   { name: "board slide bullets", text: () => buildBoardSlideBullets(assessment, treasury, macros) },
   { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros) },
   {
     name: "weekly operator brief",
-    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury })),
+    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall: fixtureWeeklyCall })),
   },
   { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(extractMeetingSlidePayload(snapshot)) },
   { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(extractMeetingSlidePayload(snapshot))) },

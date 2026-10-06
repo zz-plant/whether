@@ -3,7 +3,8 @@ import { describe, it } from "bun:test";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { buildPostureStateContract } from "../lib/report/postureStateContract";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
-import { buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
+import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
+import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import { buildWeeklyMandateEnvelope } from "../lib/integrationBriefs";
 import { buildPostureTransitionEvent } from "../lib/storage/postureTransitionEventRepository";
 import type { RegimeAssessment } from "../lib/regimeEngine";
@@ -101,27 +102,22 @@ describe("posture state contract consumers", () => {
       postureState,
     });
 
-    const operatorBrief = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      postureState,
-      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-      actionStripItems: homeBriefModel.actionStripItems,
-      flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
-    });
+    const canonicalDecisionCopy = buildCanonicalDecisionCopy({ homeBriefModel, postureState });
+    const weeklyCall = buildWeeklyCallContract({ assessment, homeBriefModel, canonicalDecisionCopy });
+    const operatorBrief = buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall });
 
     const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
 
     assert.equal(homeBriefModel.confidenceLabel, postureState.currentState.confidenceLabel);
     assert.equal(homeBriefModel.flipThreshold, postureState.whatFlipsNext.flipTrigger);
-    assert.equal(operatorBrief.flipTrigger, postureState.whatFlipsNext.flipTrigger);
+    assert.equal(operatorBrief.callChangesIf, postureState.whatFlipsNext.flipTrigger);
     assert.equal(envelope.lastChange.timestamp, postureState.lastCommittedChangeEvent.timestamp);
     assert.equal(envelope.lastChange.reason, postureState.lastCommittedChangeEvent.reason);
     assert.deepEqual(
       operatorBrief.flipConditionLabels,
       buildFlipConditionsWithoutTriggerDuplication({
         flipTrigger: postureState.whatFlipsNext.flipTrigger,
-        flipConditions: homeBriefModel.compactFlipConditionLabels,
+        flipConditions: canonicalDecisionCopy.flipConditions,
       }),
     );
   });

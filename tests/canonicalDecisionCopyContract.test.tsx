@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
-import { buildWeeklyOperatorBriefPayload, buildWeeklyCallSnapshotPlainText } from "../lib/export/weeklyOperatorBrief";
+import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
+import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import type { PostureStateContract } from "../lib/report/postureStateContract";
@@ -98,33 +100,23 @@ describe("canonical decision copy contract", () => {
       postureState,
     });
 
-    const payload = buildWeeklyOperatorBriefPayload({
+    /* The export reads the weekly call, and the weekly call reads the canonical copy first. */
+    const weeklyCall = buildWeeklyCallContract({
       assessment,
-      treasury,
-      postureWithStageLabel: "Defensive — Watchful",
-      postureState,
+      homeBriefModel: buildHomeBriefModel({ assessment, stopItems: ["Preserve runway"], regimeAlert: null, postureState }),
       canonicalDecisionCopy: canonical,
     });
-
-    const snapshot = buildWeeklyCallSnapshotPlainText({
-      regime: canonical.currentRegimeLabel,
-      call: canonical.operatingCall,
-      trend: "Deteriorating",
-      confidence: "68% (MED)",
-      doNow: canonical.doNowLines[0],
-      avoid: "Avoid irreversible expansion",
-      watch: canonical.flipTrigger,
-      flipConditions: canonical.flipConditions,
-    });
+    const payload = buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall });
+    const text = buildWeeklyOperatorBriefPlainText(payload);
 
     assert.equal(payload.regimeStage, canonical.currentRegimeLabel);
     assert.equal(payload.doNowBullets[0], canonical.doNowLines[0]);
-    assert.equal(payload.flipTrigger, canonical.flipTrigger);
+    assert.equal(payload.callChangesIf, canonical.flipTrigger);
     assert.equal(payload.flipConditionLabels[0], canonical.flipConditions[0]);
-    assert.match(snapshot, /CONDITIONS: Defensive — Watchful/);
-    assert.match(snapshot, /GUIDANCE: Stage approvals and protect runway\./);
-    assert.match(snapshot, /DO NOW: Pause net-new fixed burn commitments this week\./);
-    assert.match(snapshot, /CONDITIONS CHANGE IF: Flip when tightness falls below 65 and holds\./);
+    assert.match(text, /^Conditions: Defensive — Watchful/m);
+    assert.match(text, /^Guidance: Stage approvals and protect runway\.$/m);
+    assert.match(text, /^Do now: Pause net-new fixed burn commitments this week\.$/m);
+    assert.match(text, /^Conditions change if: Flip when tightness falls below 65 and holds\.$/m);
   });
 
   it("keeps command bar flip list unique when canonical conditions include the trigger", () => {

@@ -5,16 +5,6 @@ import type { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "../h
 import type { loadHomePageReportData } from "../homePageData";
 import type { WeeklyCallContract } from "../weeklyCallContract";
 
-export type ArtifactPayload = {
-  boardSummary: string;
-  boardSnippetText: string;
-  weeklyOperatorBriefText: string;
-  weeklyCallSnapshotText: string;
-  deltaOnlyBriefText: string;
-  callCitation: string;
-  meetingPackText: string;
-};
-
 export type HomePageDiagnosticsLane = {
   weeklyMemoLines: ReturnType<typeof buildHomeBriefModel>["weeklyMemoLines"];
   immediateDecision: string;
@@ -166,7 +156,6 @@ export type HomePageAssembly = {
   reportResult: Awaited<ReturnType<typeof loadHomePageReportData>>;
   weeklyCall: WeeklyCallContract;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
-  leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
   interpretationLayer: InterpretationLayer;

@@ -1970,6 +1970,24 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
 - Financial view may append compact runway action lines (runway risk, raise timing, burn adjustment) so the selected lens is transmissible in copy/paste artifacts.
 - Fallback behavior: default view omits interpretation context entirely; invalid/missing view resolves to default and exports remain canonical.
 
+#### 5.3.1 One brief document every format renders from (2026-10-06)
+
+Parallel builds of the week that only tests reached were deleted rather than kept for a consumer
+that never came:
+
+- `leadershipArtifactPayloadPromise` on the home assembly (`lib/report/home/artifactPayload.ts`),
+  which built a second meeting pack, a board note, a "guidance snapshot" and a delta-only brief
+  beside the ones `/share` serves. It was the only caller of `buildBoardBrief`,
+  `buildWeeklyBoardSnippetPlainText` and `buildWeeklyCallSnapshotPlainText`, which went with it. The
+  "delta-only brief in the share rail" in §1.1 was this payload and never rendered.
+- `buildWeeklyOperatorBriefPayload` takes the `WeeklyCallContract` as required. Without one it
+  re-derived every slot from the action strip, the posture state and the canonical copy in a
+  fallback chain of its own; every production caller passes the contract. Its `flipWatchLine`
+  (the nearest crossing in market units) was set only on that branch, so it never printed in a
+  production paste; it was removed with the branch.
+- `buildWeeklyOperatorBriefSlackBlocks` and `buildWeeklyOperatorBriefCardText`, called only from
+  tests.
+
 ### 5.6 Signal Ops (live)
 - Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
 - Alert payloads include reason codes, source URLs, and Time Machine deep links.

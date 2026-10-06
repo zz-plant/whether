@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import { buildBoardBrief, buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import {
   extractMeetingSlidePayload,
@@ -42,10 +42,9 @@ const FIXTURE_COMPANY =
 const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });
 
 describe("artifacts that leave the site carry no facts about a company the site never asked about", () => {
-  it("Slack brief, board brief, citation and slide bullets", () => {
+  it("Slack brief, citation and slide bullets", () => {
     for (const text of [
       buildSlackBrief(assessment, treasury, sensors, macros),
-      buildBoardBrief(assessment, treasury, sensors, macros),
       buildCallCitation(assessment, treasury),
       buildBoardSlideBullets(assessment, treasury, macros),
     ]) {

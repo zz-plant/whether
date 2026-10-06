@@ -429,18 +429,6 @@ export const buildSlackBrief = (
   ].join("\n");
 };
 
-export const buildBoardBrief = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[],
-  options?: ExportLayerOptions,
-) => {
-  const briefing = buildSlackBrief(assessment, treasury, sensors, macros, options);
-  const slideBullets = buildBoardSlideBullets(assessment, treasury, macros, options);
-  return [briefing, "", "---", "", slideBullets].join("\n");
-};
-
 export const buildCallCitation = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
