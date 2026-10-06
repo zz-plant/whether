@@ -25,8 +25,6 @@ export const STORAGE_KEYS = {
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
   /** The call this browser last saw — written on every visit, read on the next. */
   lastSeenCall: "whether.lastSeenCall",
-  /** Which steps of the weekly plan this browser has ticked off, keyed by the record date so a new week starts clean. */
-  weekChecklist: "whether.operate.weekChecklist",
   /** Set from `/privacy` section 5; `lib/telemetry/sendTelemetry.ts` sends nothing while it holds "1". */
   measurementOff: "whether.measurement.off",
   /* How many decisions this browser last knew its record to hold, beside the id the

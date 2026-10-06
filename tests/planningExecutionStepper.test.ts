@@ -155,7 +155,7 @@ describe("OperationsExecutionStepper markup", () => {
   ];
 
   it("carries the current step on aria-current and nowhere else", () => {
-    const html = renderToStaticMarkup(createElement(OperationsExecutionStepper, { recordDate: "2026-09-18", steps }));
+    const html = renderToStaticMarkup(createElement(OperationsExecutionStepper, { steps }));
 
     assert.equal((html.match(/aria-current="step"/g) ?? []).length, 1);
     assert.match(html, /id="first"[^>]*aria-current="step"|aria-current="step"[^>]*id="first"/);
@@ -164,7 +164,7 @@ describe("OperationsExecutionStepper markup", () => {
   });
 
   it("prints owner, status and change signal as facts, not pills", () => {
-    const html = renderToStaticMarkup(createElement(OperationsExecutionStepper, { recordDate: "2026-09-18", steps }));
+    const html = renderToStaticMarkup(createElement(OperationsExecutionStepper, { steps }));
 
     assert.doesNotMatch(html, /weather-pill/);
     assert.match(html, /<dt[^>]*>Owner: <\/dt><dd[^>]*>Finance<\/dd>/);

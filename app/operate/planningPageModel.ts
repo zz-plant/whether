@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import type { Route } from "../../lib/navigation/routeType";
 import { buildBreadcrumbList, organizationId, websiteName } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -21,7 +20,6 @@ import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRout
 import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
-import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import type { ReportShellModel } from "../components/reportShell";
 import { AreaTable } from "../components/ui/areaTable";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
@@ -211,61 +209,74 @@ export async function buildPlanningPageModel(
         })
         : null,
       h(OperationsExecutionStepper, {
-        recordDate: historicalSelection ? null : reportData.weeklyRecordDate,
         steps: [
           {
+            id: "ops-decision-shield",
+            // First and open: the plan is the reader's own decisions, and this is
+            // where one meets this week's lines. The page used to open on a copy of
+            // the brief's area table and ladders, with this two sections down and closed.
+            defaultOpen: true,
+            label: "Test",
+            title: "Test a decision",
+            description: "Check one move against this week's lines before you commit to it: a hire, a price change, a roadmap bet or an acquisition.",
+            hashAliases: ["ops-decision-shield-panel"],
+            // The question this header used to ask now heads DecisionShieldPanel itself, so the
+            // step reads "Test a decision" → "Is this move safe right now?" with nothing between.
+            children: h(ReportSection, { variant: "split",
+              hideHeader: true,
+              id: "ops-decision-shield-panel",
+              title: "Test a decision",
+              children: h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
+            }),
+          },
+          {
+            id: "ops-playbook",
+            // Open on arrival: these are the per-area guardrails a reader has to
+            // read before committing, and this page owns them. Behind a click
+            // they were effectively unreachable, which is why the weekly brief
+            // still carries its own copy.
+            defaultOpen: true,
+            label: "Rules",
+            title: "Rules before you commit",
+            description: "Do, don't, and limit rules for new commitments.",
+            hashAliases: ["ops-playbook-panel"],
+            // The step header above states this, and PlaybookPanel carries its own header below.
+            children: h(ReportSection, { variant: "split",
+              hideHeader: true,
+              id: "ops-playbook-panel",
+              title: "Rules before you commit",
+              children: h(Fragment, null,
+              /* The per-area rows are the weekly plan step's AreaTable now — the
+                 consequence tier, in the one order every surface uses. What is
+                 left here is what to read before committing. */
+              h(RulesBeforeCommit, {
+                playbook,
+                stopItems,
+                startItems,
+                fenceItems,
+                showAll: showAllActionLanes,
+              }),
+              ),
+            }),
+          },
+          {
             id: "ops-monthly-action-summary",
-            label: "Plan",
-            title: "Weekly plan",
-            description: "What to approve, hold, or revisit this cycle.",
+            label: "Areas",
+            title: "This week's rule for each area",
+            description: "Each area's rule with its pause line and resume line, the reference the rules and tests above read from.",
             hashAliases: ["ops-monthly-action-summary-panel"],
             // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {
               variant: "split",
               hideHeader: true,
               id: "ops-monthly-action-summary-panel",
-              title: "Weekly plan",
+              title: "This week's rule for each area",
               children: h(Fragment, null,
-              // A labelled group, not another box. `weather-surface` is the Surface tier —
-              // the outermost radius, with its own elevation — and this sat two
-              // containers deep inside the step card, wrapping three cells that are
-              // bordered themselves. Three frames for one group, and the middle one
-              // put the block on its own left edge. Same call the playbook panel
-              // already records for its "Rules by area" group.
-              // The corridor leads the plan. It is the graphic every rule on
-              // this page refers to, and it sat 1,600px down inside a collapsed
-              // step under a checklist and three text cards.
-              h(BoundedCorridorRails, {
-                items: actionStripItems,
-                scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
-              }),
-              /* Ruled off from the score bars above, and the list from the table
-                 below by more than the rows inside either: three groups sat a
-                 single gap apart, so the bars' key ran straight into the first line of the call. */
-              h("section", { className: "space-y-6 border-t border-[var(--border-subtle)] pt-5" },
-                /* The call, as a plain list. It was three bordered cards under
-                   "This week's guidance · Read this first.", each headed in its
-                   own colour in tracked capitals — three encodings (box, hue,
-                   case) for three labels, on a page whose job is the plan below
-                   them. Colour marks state here, not labels (ui-ux-standards
-                   §XVIII); these are the one statement of the call on /operate,
-                   so they stay, in the register the rest of the step reads in. */
-                /* On a phone each pair is its own block, label tight to its value:
-                   one 12px gap between every dt and dd left each label as near the
-                   line above it as the line below. From sm the pairs are rows of
-                   the two-column grid. */
-                h("dl", { className: "grid gap-x-6 gap-y-4 sm:grid-cols-[max-content_1fr] sm:gap-y-3" },
-                  ...[
-                    { label: DECISION_CONTRACT_LABELS.action.actionNow, value: weeklyCall.actionNow },
-                    { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: weeklyCall.pauseIf },
-                    ...weeklyCallChangeLines(weeklyCall),
-                  ].map(({ label, value }) =>
-                    h("div", { key: label, className: "space-y-1 sm:contents sm:space-y-0" },
-                      h("dt", { className: "type-eyebrow sm:pt-0.5" }, label),
-                      h("dd", { className: "text-sm text-slate-100" }, value),
-                    ),
-                  ),
-                ),
+              /* The table only. This step drew the score rails and an Action now /
+                 Pause if / Conditions change if list above it, both already on the
+                 brief one click away; the table is what the rules and tests on this
+                 page refer to, so it is what the page keeps. */
+              h("section", { className: "space-y-4" },
                 /* One row per area, in the order every surface uses, with the rule and
                    both its lines — the same table the brief prints. */
                 h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
@@ -282,6 +293,52 @@ export async function buildPlanningPageModel(
                 "Planning a month, not a week? ",
                 h("a", { href: "/?cadence=monthly", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Open the monthly guidance"),
                 ".",
+              ),
+              ),
+            }),
+          },
+          /* The use the record fits: lines agreed once, and an email the day one is
+             crossed. Live weeks only — lines started from a past month's rules
+             would watch a reading nobody is planning against. */
+          ...(historicalSelection
+            ? []
+            : [{
+              id: "ops-plan-lines",
+              label: "Lines",
+              title: "Set this plan's lines",
+              description: "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
+              children: h(PlanLinesForm, {
+                defaults: planLinesFromRules(buildCanonicalBoundedDecisionRules({
+                  regime: assessment.regime,
+                  thresholds: assessment.thresholds,
+                  scores: assessment.scores,
+                })),
+              }),
+            }]),
+          {
+            id: "ops-finance-strategy",
+            label: "Finance",
+            title: "Finance strategy",
+            description: "Budget direction and cash timing for the quarter.",
+            hashAliases: ["ops-finance-strategy-panel"],
+            // The step header above and FinanceStrategyPanel's own header both state this already.
+            children: h(ReportSection, { variant: "split",
+              hideHeader: true,
+              id: "ops-finance-strategy-panel",
+              title: "Finance strategy",
+              children: h(Fragment, null,
+              h(FinanceStrategyPanel, {
+                regime: assessment.regime,
+                provenance: treasuryProvenance,
+                showProvenance: false,
+              }),
+              // The planner has one owner, /operate/financial. The same 520-line
+              // panel was mounted here as well, so two routes carried one form
+              // and the URL a reader shared depended on which they had open.
+              h("p", { className: "text-xs leading-5 text-slate-400" },
+                "Enter your runway, burn and revenue in ",
+                h("a", { href: "/operate/financial", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the runway planner"),
+                " to size this week's plan against your figures.",
               ),
               ),
             }),
@@ -329,97 +386,6 @@ export async function buildPlanningPageModel(
                 children: h(OperatorRequestsPanel, { provenance: internalProvenance, showProvenance: false }),
               }),
             ),
-          },
-          {
-            id: "ops-playbook",
-            // Open on arrival: these are the per-area guardrails a reader has to
-            // read before committing, and this page owns them. Behind a click
-            // they were effectively unreachable, which is why the weekly brief
-            // still carries its own copy.
-            defaultOpen: true,
-            label: "Rules",
-            title: "Rules before you commit",
-            description: "Do, don't, and limit rules for new commitments.",
-            hashAliases: ["ops-playbook-panel"],
-            // The step header above states this, and PlaybookPanel carries its own header below.
-            children: h(ReportSection, { variant: "split",
-              hideHeader: true,
-              id: "ops-playbook-panel",
-              title: "Rules before you commit",
-              children: h(Fragment, null,
-              /* The per-area rows are the weekly plan step's AreaTable now — the
-                 consequence tier, in the one order every surface uses. What is
-                 left here is what to read before committing. */
-              h(RulesBeforeCommit, {
-                playbook,
-                stopItems,
-                startItems,
-                fenceItems,
-                showAll: showAllActionLanes,
-              }),
-              ),
-            }),
-          },
-          /* The use the record fits: lines agreed once, and an email the day one is
-             crossed. Live weeks only — lines started from a past month's rules
-             would watch a reading nobody is planning against. */
-          ...(historicalSelection
-            ? []
-            : [{
-              id: "ops-plan-lines",
-              label: "Lines",
-              title: "Set this plan's lines",
-              description: "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
-              children: h(PlanLinesForm, {
-                defaults: planLinesFromRules(buildCanonicalBoundedDecisionRules({
-                  regime: assessment.regime,
-                  thresholds: assessment.thresholds,
-                  scores: assessment.scores,
-                })),
-              }),
-            }]),
-          {
-            id: "ops-decision-shield",
-            label: "Test",
-            title: "Test a decision",
-            description: "Check whether one move is safe right now: a hire, a price change, a roadmap bet or an acquisition.",
-            hashAliases: ["ops-decision-shield-panel"],
-            // The question this header used to ask now heads DecisionShieldPanel itself, so the
-            // step reads "Test a decision" → "Is this move safe right now?" with nothing between.
-            children: h(ReportSection, { variant: "split",
-              hideHeader: true,
-              id: "ops-decision-shield-panel",
-              title: "Test a decision",
-              children: h(DecisionShieldPanel, { assessment, provenance: treasuryProvenance, recordDate: treasury.record_date }),
-            }),
-          },
-          {
-            id: "ops-finance-strategy",
-            label: "Finance",
-            title: "Finance strategy",
-            description: "Budget direction and cash timing for the quarter.",
-            hashAliases: ["ops-finance-strategy-panel"],
-            // The step header above and FinanceStrategyPanel's own header both state this already.
-            children: h(ReportSection, { variant: "split",
-              hideHeader: true,
-              id: "ops-finance-strategy-panel",
-              title: "Finance strategy",
-              children: h(Fragment, null,
-              h(FinanceStrategyPanel, {
-                regime: assessment.regime,
-                provenance: treasuryProvenance,
-                showProvenance: false,
-              }),
-              // The planner has one owner, /operate/financial. The same 520-line
-              // panel was mounted here as well, so two routes carried one form
-              // and the URL a reader shared depended on which they had open.
-              h("p", { className: "text-xs leading-5 text-slate-400" },
-                "Enter your runway, burn and revenue in ",
-                h("a", { href: "/operate/financial", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the runway planner"),
-                " to size this week's plan against your figures.",
-              ),
-              ),
-            }),
           },
         ],
       }),

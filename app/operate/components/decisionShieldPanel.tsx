@@ -17,7 +17,6 @@ import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { SegmentedControl, type SegmentedOption } from "../../components/ui/segmentedControl";
 import { SpinnerIcon } from "../../components/uiIcons";
-import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { getClipboardUiState } from "../../components/useClipboardCopy";
 import { ComparePlansMode, PlanStressTestMode } from "./decisionShieldPlanModes";
 import { RecordDecisionButton } from "./recordDecisionButton";
@@ -54,11 +53,9 @@ const planModeOptions: readonly SegmentedOption<PlanMode>[] = [
 
 export const DecisionShieldPanel = ({
   assessment,
-  provenance,
   recordDate,
 }: {
   assessment: RegimeAssessment;
-  provenance: DataProvenance;
   /** The reading this verdict was computed against, stored with anything recorded. */
   recordDate: string;
 }) => {
@@ -98,37 +95,12 @@ export const DecisionShieldPanel = ({
   );
 
   return (
-    <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
-      <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="type-label text-slate-400">Decision check</p>
-            <h3 id="decision-shield-title" className="type-section text-slate-100">
-              Is this move safe right now?
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
-              Apply this week&apos;s guidance to a specific decision, then copy the verdict.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-3">
-            <ClipboardActionRow
-              label="Copy verdict"
-              state={getClipboardUiState("verdict", clipboardState)}
-              buttonVariant="pill"
-              stateIcons={{ copying: <SpinnerIcon className="h-3 w-3" /> }}
-              onClick={handleCopy}
-            />
-            <ClipboardActionRow
-              label="Copy link"
-              state={getClipboardUiState("link", clipboardState)}
-              buttonVariant="pill"
-              buttonLabels={{ copied: "Link copied" }}
-              onClick={handleCopyLink}
-            />
-            <RecordDecisionButton buildPayload={buildLedgerPayload} />
-            <DataProvenanceStrip provenance={provenance} />
-          </div>
-        </div>
+    /* The body only. The plan page's step already asks the question and names the
+       moves; this panel used to ask it again in its own header, put Copy verdict,
+       Copy link and Record above the input — before there was a verdict to copy —
+       and print a provenance block the page's trust line already states. */
+    <section id="decision-shield" aria-label="Test a decision">
+      <div>
         {/* The toast above is the one announcement of a copy result; two
             live regions restating it read every outcome three times. */}
         {clipboardState.error && lastAttemptedTarget === "verdict" ? (
@@ -149,7 +121,7 @@ export const DecisionShieldPanel = ({
           </div>
         ) : null}
 
-        <div className="mt-6 space-y-5">
+        <div className="space-y-5">
           {/* Mode Switcher */}
           <div className="border-b border-slate-800 pb-3">
             <SegmentedControl
@@ -270,6 +242,26 @@ export const DecisionShieldPanel = ({
               </div>
             </>
           )}
+
+          {/* What to do with the verdict, after it: copy it, link to it, or keep it
+              on the record against this week's reading. */}
+          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border-subtle)] pt-4">
+            <ClipboardActionRow
+              label="Copy verdict"
+              state={getClipboardUiState("verdict", clipboardState)}
+              buttonVariant="pill"
+              stateIcons={{ copying: <SpinnerIcon className="h-3 w-3" /> }}
+              onClick={handleCopy}
+            />
+            <ClipboardActionRow
+              label="Copy link"
+              state={getClipboardUiState("link", clipboardState)}
+              buttonVariant="pill"
+              buttonLabels={{ copied: "Link copied" }}
+              onClick={handleCopyLink}
+            />
+            <RecordDecisionButton buildPayload={buildLedgerPayload} />
+          </div>
         </div>
       </div>
     </section>

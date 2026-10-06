@@ -20,7 +20,6 @@ mockAny.module("next/navigation", () => ({
 import { DecisionShieldPresetsSection } from "../app/operate/components/decisionShieldPresetsSection";
 import { DecisionShieldPanel } from "../app/operate/components/decisionShieldPanel";
 import type { RegimeAssessment } from "../lib/regimeEngine";
-import type { DataProvenance } from "../app/components/dataProvenanceStrip";
 
 const sampleAssessment: RegimeAssessment = {
   regime: "DEFENSIVE",
@@ -70,14 +69,6 @@ const sampleAssessment: RegimeAssessment = {
       experimentationTolerance: "MEDIUM",
     },
   },
-};
-
-const sampleProvenance: DataProvenance = {
-  sourceLabel: "FRED + Treasury",
-  recordDateLabel: "2026-09-25",
-  timestampLabel: "2026-09-25T12:00:00Z",
-  ageLabel: "fresh",
-  statusLabel: "Live (high confidence)",
 };
 
 describe("DecisionShieldPresetsSection markup", () => {
@@ -191,15 +182,17 @@ describe("DecisionShieldPanel markup", () => {
         null,
         createElement(DecisionShieldPanel, {
           assessment: sampleAssessment,
-          provenance: sampleProvenance,
           recordDate: "2026-09-25",
         })
       )
     );
 
     assert.ok(markup.includes("id=\"decision-shield\""));
-    assert.ok(markup.includes("Is this move safe right now?"));
+    // The step around it asks the question; the panel no longer asks it again.
+    assert.ok(!markup.includes("Is this move safe right now?"));
     assert.ok(markup.includes("Copy verdict"));
+    // The copy and record actions follow the verdict they act on.
+    assert.ok(markup.indexOf("Decision verdict") < markup.indexOf("Copy verdict"), "the verdict comes before the copy action");
     assert.ok(markup.includes("Copy link"));
     assert.ok(markup.includes("Describe a plan"));
     assert.ok(markup.includes("Compare two plans"));
@@ -220,7 +213,6 @@ describe("DecisionShieldPanel markup", () => {
           null,
           createElement(DecisionShieldPanel, {
             assessment: sampleAssessment,
-            provenance: sampleProvenance,
             recordDate: "2026-09-25",
           })
         )
