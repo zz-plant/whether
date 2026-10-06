@@ -12,7 +12,7 @@ import { toPublishedJsonSchema } from "./jsonSchema";
  * read (`labelChoices`), so nothing here names an argument.
  */
 
-type AgentToolTransport = "http" | "stdio";
+export type AgentToolTransport = "http" | "stdio";
 
 type ToolArgument = {
   name: string;

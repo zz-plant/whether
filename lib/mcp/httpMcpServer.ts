@@ -10,16 +10,13 @@
  * as the SDK requires for serverless) and the refusal of batched requests,
  * which protocol revision 2025-06-18 removed.
  *
- * The tools themselves are `lib/agent/tools.ts`, the same definitions the
- * local stdio server (`bun run mcp:whether`) and the plain-GET shim in
- * app/api/mcp/route.ts read; this module is only the transport.
+ * The server is `lib/mcp/server.ts`, the one the local stdio server
+ * (`bun run mcp:whether`) also runs, over the tools in `lib/agent/tools.ts`
+ * that the plain-GET shim in app/api/mcp/route.ts reads too; this module is
+ * only the transport.
  */
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError, ToolSchema } from "@modelcontextprotocol/sdk/types.js";
-import { AgentInputError } from "../agent/registry";
-import { callAgentTool, listAgentTools } from "../agent/tools";
-import { MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./serverIdentity";
+import { createWhetherMcpServer } from "./server";
 
 const jsonErrorResponse = (status: number, code: number, message: string) =>
   new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code, message } }), {
@@ -51,25 +48,7 @@ export const handleMcpRequest = async (request: Request): Promise<Response> => {
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
   });
-  const server = new Server(MCP_SERVER_INFO, {
-    capabilities: { tools: { listChanged: false } },
-    instructions: MCP_SERVER_INSTRUCTIONS,
-  });
-
-  // The SDK's own schema is the check that what is listed is what a client can read.
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: listAgentTools("http").map((tool) => ToolSchema.parse(tool)),
-  }));
-
-  server.setRequestHandler(CallToolRequestSchema, async ({ params }) => {
-    try {
-      return await callAgentTool(params.name, params.arguments, "http");
-    } catch (error) {
-      // An unknown tool is the protocol's refusal; a wrong argument to a known one is a tool result.
-      if (error instanceof AgentInputError) throw new McpError(ErrorCode.InvalidParams, error.message);
-      throw error;
-    }
-  });
+  const server = createWhetherMcpServer("http");
 
   await server.connect(transport);
   return transport.handleRequest(request, { parsedBody: message });

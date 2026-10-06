@@ -2061,7 +2061,7 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
   directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
 - `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
-- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/stdioServer.ts`): the same tools, plus
+- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/server.ts`, the one `/api/mcp` runs): the same tools, plus
   `pull_recent_site_info`.
 
 ### 6.9 One state, one tool registry (2026-09-29)

@@ -101,8 +101,9 @@ Script entrypoint:
 bun run mcp:whether
 ```
 
-This starts a stdio MCP server (`lib/mcp/stdioServer.ts`) with the **same tools as `/api/mcp`**, from the
-same definitions (`lib/agent/tools.ts`), plus one that only makes sense on a local checkout:
+This starts the **same MCP server as `/api/mcp`** (`lib/mcp/server.ts`, built for either transport) over
+stdio, with the same tools from the same definitions (`lib/agent/tools.ts`), plus one that only makes
+sense on a local checkout:
 
 - `pull_recent_site_info(cadence?, siteUrl?)`
   - fetches the latest `/api/agent` payload from the site so an agent can pull recent live context
@@ -133,7 +134,8 @@ site's weather word in any case; and the server's name is `whether`, not `whethe
 
 `https://whether.work/api/mcp` is an MCP streamable-HTTP server (JSON-RPC 2.0; `initialize`,
 `ping`, `tools/list`, `tools/call`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
-key. Transport: `lib/mcp/httpMcpServer.ts`; transport tests: `tests/mcpStreamableTransport.test.ts`.
+key. Transport: `lib/mcp/httpMcpServer.ts`, a fresh `lib/mcp/server.ts` per request; transport tests:
+`tests/mcpStreamableTransport.test.ts`.
 The `initialize` result carries instructions that say where to start (`lib/mcp/serverIdentity.ts`).
 
 Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
