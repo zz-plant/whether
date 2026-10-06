@@ -11,10 +11,10 @@ import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/compa
 import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQueryState";
 
 /**
- * The first three of the evidence page's four sections, in the order a reader
- * answers their questions: what the call is, what moved, and how close the
- * scores sit to the lines that would change it. The instruments — charts, the
- * line editor, the month picker — are the fourth, in `evidenceInstruments.tsx`.
+ * The first two of the evidence page's three sections, in the order a reader
+ * answers their questions: what moved, and how close the scores sit to the
+ * lines that would change the guidance. The instruments — charts, the line
+ * editor, the month picker — are the third, in `evidenceInstruments.tsx`.
  *
  * What these replaced (2026-09-22): a decision summary whose "Main pressure"
  * cell restated the first entry of a five-queue "checks" section two screens
@@ -59,13 +59,6 @@ const DeltaChip = ({ row }: { row: SignalReferenceRow }) => {
     </span>
   );
 };
-
-/* The trust strip that sat under this line is the shell intro's now (DD-040). */
-export const SignalsCallSection = ({ callLine }: { callLine: string }) => (
-  <ReportSection id="decision-summary" title="What this means now">
-    <p className="text-base font-semibold text-slate-100 sm:text-lg">{callLine}</p>
-  </ReportSection>
-);
 
 type ChangedSignalRow = SignalReferenceRow & { note: string | null };
 

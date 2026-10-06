@@ -1561,29 +1561,26 @@ true.
   not 64, which no rule used.
 
 ### 1.2 Evidence report (/signals)
-The evidence report is the deep evidence appendix for the weekly workspace, with sections for:
-- Sensor array (live yield curve readings + derived scores)
-- Macro signal snapshot (CPI, unemployment, BBB spreads)
-- Time Machine (historical month selector + cached summaries) visible without advanced-mode gating
-- Threshold tuning (URL-driven overrides + audit log)
-- Regime timeline (24‑month sequence for quick jumps)
+The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
+in the order a reader asks:
 
-Advanced controls remain available for threshold tuning and diagnostics expansion, but historical
-replay is no longer treated as an expert-only action.
-The entry sequence now opens with a compact `what this means now` summary before the denser
-diagnostic stack so cold visitors get the operating implication before the appendix depth.
-`/signals` now also supports two explicit evidence modes:
-- `What this means now` for action-first implication reading and compact scorecards
-- `Evidence detail` for prioritized diagnostics, replay, threshold tuning, and advanced controls
+- **What changed.** One table of every signal: from → to, its line, and why it matters. The focus
+  filters narrow it and travel in the URL.
+- **What would change this guidance.** The two score ladders with their Pause if and Resume when lines.
+- **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
+  interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
+  moved this year? · What would the call be with different lines? · What did the brief say in an
+  earlier month? · Which past cycle looks most like this one? · Which habits from the zero-rate
+  years still shape your company?
 
-The section navigation now follows the active evidence mode so implication-first visitors are not
-routed toward hidden detail-only sections. The top summary also includes persisted evidence and
-trust translation helpers for first-use definitions of `tightness`, `risk appetite`, `curve slope`,
-`confidence`, and `freshness`.
-The implication scorecards now use threshold-anchored meters with explicit distance-to-watch-line
-labels instead of equal-width safe/caution/risk bands. The inversion preview now shows a labeled
-zero line, time anchors, direct end labels, and visible breaks when monthly spread reads are
-missing. The deeper yield-curve diagnostics now direct-label multi-series lines, preserve gaps
+The page used to open on "What this means now", the brief's call restated under the shell's own
+stamp, and the charts disclosure opened by default: about 2,000px of charts before the other five
+instruments. The call stays on the brief. Links that targeted `#decision-summary` (search, and the
+month picker's "Back to this week") land on `#what-changed`. `?advanced=1` still opens the month
+picker, `?fossil=1` the fossil record, and threshold parameters the line settings.
+
+The inversion preview shows a labeled zero line, time anchors, direct end labels, and visible
+breaks when monthly spread reads are missing. The deeper yield-curve diagnostics now direct-label multi-series lines, preserve gaps
 instead of connecting through missing data, and encode scatterplot recency through a chronological
 path plus a highlighted latest point.
 
@@ -2482,3 +2479,22 @@ like nothing the reader had seen on Monday.
 The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.
 
 The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
+
+### 1.1.39 `/history` answers its two questions in order (2026-10-06)
+
+The page summary names two jobs: look up what the guidance said in any past month, and how it held
+up. The sections ran in neither order. The published weeks, the record a reader cites, sat fifth,
+under a phase map that was the tallest block on the page. "Conditions by year" was a section of its
+own near the foot, ten screens from the strip that draws the same months.
+
+- **What the guidance said.** The month strip, with each closed year's link under it, then the
+  published weeks.
+- **How it held up.** The track record tiles with the confidence record, then the grading table
+  ("How the record held up"), which used to sit two sections away. The grading table stays open: it
+  lists the changes nothing signaled, and that is its point.
+- **The mechanism, folded.** The phase map is a closed disclosure whose summary is its heading, so
+  the outline and the rail still name it. `?map=1` opens it, and so does a window link (`?span=`),
+  which lands on the chart it changed. Monthly readings and the explorer stay folded.
+- Measured: 3,964 → 3,160 px desktop, about 6,160 → 4,990 px phone. Tests:
+  `tests/recordRoutesReadingOrder.test.tsx`.
+
