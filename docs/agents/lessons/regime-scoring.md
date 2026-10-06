@@ -137,3 +137,29 @@ What did not change: the strings are still stored. The walk keeps `description` 
 the generators write every one of them into `data/`, so a wording edit in `regimeDescription.ts` still
 rewrites archived text on the next regeneration. The split makes that edit visibly a copy change; it does
 not make it free.
+
+## One replay walk, and the archives replayed offline (2026-10-06)
+
+The threaded walk (evaluate, hand the machine snapshot forward) existed four times: the runtime month walk in
+`timeMachineCache.ts` and one per archive generator, each with its own copy of the VIX reading literal, and
+the generators with three copies of the record-date search, the Treasury snapshot, the coverage check and the
+provenance formatters, plus a re-implementation of the engine's velocity-window search. Divergence between
+copies is what 050e9371 had to repair. Now:
+
+- `replayRegimeWalk` and `buildReplayVixReading` (`lib/timeMachine/regimeReplay.ts`) are the walk; the
+  runtime walk and `replayArchivePeriods` (`scripts/regimeArchiveContext.ts`) both call them.
+- The cadence logic each generator owned is `buildWeeklyArchive`, `buildMonthlyArchive` and
+  `buildQuarterlyYearlyArchive` in `scripts/regimeArchiveReplay.ts`; the `generate*Summaries.ts` scripts
+  fetch, call one, and write.
+- The velocity pair the cache stores comes from the engine's `resolveBaseRateVelocityPair`, the same search
+  that scores the term.
+
+The refactor was proven byte-identical by running all three generator scripts before and after it, offline,
+against FRED-shaped series rebuilt from the bundle and a frozen clock: every file they write matched.
+
+**The bundle is enough to replay the archives.** Each month-end's yields, the base-rate pair, the daily VIX
+tail and every weekly and pre-2012 quarterly input are on record, and rebuilt into series they reproduce the
+monthly archive's record dates, regimes and both scores for all 176 months, and the Time Machine cache entry
+for entry, apart from the fetch timestamp. `tests/regimeArchiveReplay.test.ts` holds the generators' own code
+to that, so a change that moves an archived month fails offline instead of surfacing at the next
+regeneration.

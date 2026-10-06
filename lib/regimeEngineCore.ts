@@ -258,8 +258,8 @@ export const RISK_APPETITE_REGIME_THRESHOLD = 50;
  * the gradual 2015-18 liftoff (~25bp/quarter) stays at 0, as it should.
  */
 export const BASE_RATE_VELOCITY_LOOKBACK_DAYS = 91;
-export const BASE_RATE_VELOCITY_MIN_GAP_DAYS = 60;
-export const BASE_RATE_VELOCITY_MAX_GAP_DAYS = 130;
+const BASE_RATE_VELOCITY_MIN_GAP_DAYS = 60;
+const BASE_RATE_VELOCITY_MAX_GAP_DAYS = 130;
 /** Trailing-window base-rate move, in points, above which tightening starts
  *  counting. Roughly one meeting at 50bp per quarter. */
 export const BASE_RATE_VELOCITY_THRESHOLD = 0.4;
@@ -391,11 +391,32 @@ export const resolveBaseRateVelocityDelta = (
   baseRateHistory: RegimeEvaluationContext["baseRateHistory"],
   lookbackDays: number = BASE_RATE_VELOCITY_LOOKBACK_DAYS,
 ): number | null => {
+  const pair = resolveBaseRateVelocityPair(baseRateHistory, lookbackDays);
+  return pair ? pair.latest.value - pair.compare.value : null;
+};
+
+type BaseRateObservation = { date: string; value: number };
+
+/**
+ * The two observations the trailing-window move is measured between: the latest
+ * print, and the one whose gap to it sits inside the bounds and nearest the
+ * lookback (the earliest, on a tie). Null when history cannot answer.
+ *
+ * Exposed because the archive generator stores this pair on each Time Machine
+ * cache entry, so the runtime walk can score the same move from two numbers
+ * that the generator scored from the full daily series. It used to re-implement
+ * this search in `scripts/regimeArchiveContext.ts`; two copies of a window rule
+ * is how the walk and the archives came to disagree before (050e9371).
+ */
+export const resolveBaseRateVelocityPair = (
+  baseRateHistory: RegimeEvaluationContext["baseRateHistory"],
+  lookbackDays: number = BASE_RATE_VELOCITY_LOOKBACK_DAYS,
+): { compare: BaseRateObservation; latest: BaseRateObservation } | null => {
   if (!baseRateHistory || baseRateHistory.length === 0) {
     return null;
   }
   const observations = baseRateHistory.filter(
-    (point): point is { date: string; value: number } => typeof point.value === "number",
+    (point): point is BaseRateObservation => typeof point.value === "number",
   );
   if (observations.length < 2) {
     return null;
@@ -405,7 +426,7 @@ export const resolveBaseRateVelocityDelta = (
     return null;
   }
 
-  let best: { value: number; gap: number } | null = null;
+  let best: { observation: BaseRateObservation; gap: number } | null = null;
   for (const observation of observations) {
     const gap = daysBetweenDates(latest.date, observation.date);
     if (Number.isNaN(gap) || gap < BASE_RATE_VELOCITY_MIN_GAP_DAYS || gap > BASE_RATE_VELOCITY_MAX_GAP_DAYS) {
@@ -413,14 +434,17 @@ export const resolveBaseRateVelocityDelta = (
     }
     const distance = Math.abs(gap - lookbackDays);
     if (!best || distance < Math.abs(best.gap - lookbackDays)) {
-      best = { value: observation.value, gap };
+      best = { observation, gap };
     }
   }
 
   if (!best) {
     return null;
   }
-  return latest.value - best.value;
+  return {
+    compare: { date: best.observation.date, value: best.observation.value },
+    latest: { date: latest.date, value: latest.value },
+  };
 };
 
 /** Points of tightness from the trailing move, floored at 0 so easing never

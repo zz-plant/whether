@@ -3,13 +3,12 @@
  * Keeps historical lookups local to avoid third-party calls in replay mode.
  */
 import { z } from "zod";
-import type { MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../types";
+import type { SeriesHistoryPoint, TreasuryData } from "../types";
 import { TreasuryDataSchema } from "../treasury/treasurySchema";
-import { evaluateRegime, type RegimeAssessment } from "../regimeEngine";
-import type { RegimeThresholds } from "../regimeEngine";
-import type { RegimeMachineSnapshot } from "../regimeStateMachine";
+import type { RegimeAssessment, RegimeKey, RegimeThresholds } from "../regimeEngine";
 import rawCache from "../../data/time_machine_cache.json";
 import { snapshotData } from "../snapshot";
+import { buildReplayVixReading, replayRegimeWalk } from "./regimeReplay";
 
 const SeriesHistoryPointSchema = z.object({
   date: z.string(),
@@ -207,7 +206,7 @@ export type TimeMachineRegimeEntry = {
   year: number;
   month: number;
   recordDate: string;
-  regime: ReturnType<typeof evaluateRegime>["regime"];
+  regime: RegimeKey;
   summary: string;
   tightness: number;
   riskAppetite: number;
@@ -285,7 +284,8 @@ const regimeAssessmentMemo = new Map<string, Map<string, RegimeAssessment>>();
  * confirm through the gate, shocks commit and get marked) and supplies each
  * entry its trailing base-rate window (the velocity term) plus its VIX reading
  * with the daily tail stored alongside it (the haircut and the market-stress
- * veto) when the cache carries one.
+ * veto) when the cache carries one. The threading itself is `replayRegimeWalk`,
+ * the same loop the archive generators run.
  */
 const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMachineRegimeEntry[] => {
   const walkKey = buildRegimeWalkCacheKey(overrides);
@@ -294,50 +294,37 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
     return memoized;
   }
 
-  const walk: TimeMachineRegimeEntry[] = [];
+  const replay = replayRegimeWalk(
+    sortedSnapshots.map((snapshot, index) => {
+      const velocityWindow = snapshot.baseRateVelocityWindow;
+      const baseRateHistory = velocityWindow
+        ? [
+            { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
+            { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
+          ]
+        : sortedSnapshots
+            .slice(Math.max(0, index - 5), index + 1)
+            .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
+      const macroSeries =
+        typeof snapshot.vix === "number"
+          ? [
+              buildReplayVixReading({
+                value: snapshot.vix,
+                recordDate: snapshot.record_date,
+                fetchedAt: snapshot.fetched_at,
+                history: snapshot.vixHistory ?? [],
+              }),
+            ]
+          : [];
+      return { treasury: snapshot, snapshot, macroSeries, baseRateHistory };
+    }),
+    overrides,
+  );
+
   const assessments = new Map<string, RegimeAssessment>();
-  let machineState: RegimeMachineSnapshot | null = null;
-
-  sortedSnapshots.forEach((snapshot, index) => {
-    const velocityWindow = snapshot.baseRateVelocityWindow;
-    const baseRateHistory = velocityWindow
-      ? [
-          { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
-          { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
-        ]
-      : sortedSnapshots
-          .slice(Math.max(0, index - 5), index + 1)
-          .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
-
-    const macroSeries: MacroSeriesReading[] = [];
-    if (typeof snapshot.vix === "number") {
-      macroSeries.push({
-        id: "VIX_INDEX",
-        label: "CBOE volatility index (VIX)",
-        value: snapshot.vix,
-        unit: "index",
-        explanation: "Implied equity volatility used as a short-cycle shock and regime-boundary warning signal.",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
-        formulaUrl: "/formulas#vix",
-        record_date: snapshot.record_date,
-        fetched_at: snapshot.fetched_at,
-        isLive: false,
-        history: snapshot.vixHistory ?? [],
-      });
-    }
-
-    const assessment = evaluateRegime(
-      snapshot,
-      overrides,
-      macroSeries,
-      machineState,
-      { baseRateHistory },
-    );
-    machineState = assessment.regimeTransition?.snapshot ?? machineState;
+  const walk: TimeMachineRegimeEntry[] = replay.map(({ step: { snapshot }, assessment }) => {
     assessments.set(snapshot.record_date, assessment);
-
-    walk.push({
+    return {
       year: snapshot.year,
       month: snapshot.month,
       recordDate: snapshot.record_date,
@@ -346,7 +333,7 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
       tightness: assessment.scores.tightness,
       riskAppetite: assessment.scores.riskAppetite,
       shock: assessment.regimeTransition?.shock || undefined,
-    });
+    };
   });
 
   regimeWalkMemo.set(walkKey, walk);
