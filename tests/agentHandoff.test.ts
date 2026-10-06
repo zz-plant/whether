@@ -185,7 +185,8 @@ describe("agent handoff contract", () => {
      and the PM handoff's list and the prompt's numbered asks are read from them. These are the
      words both said when each was its own copy, in the skills' order. */
   it("lists the briefing steps and asks for them in the skills' order, in the words they always had", () => {
-    const payload = buildAgentPayload(assessment as any, treasury as any, sensors, macroSignals);
+    const realAssessment = evaluateRegime(snapshotData);
+    const payload = buildAgentPayload(realAssessment, snapshotData, buildSensorReadings(snapshotData), []);
 
     assert.deepEqual(payload.pm_handoff, {
       decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
@@ -198,7 +199,7 @@ describe("agent handoff contract", () => {
       ],
     });
     assert.equal(
-      buildAgentPrompt(assessment as any, treasury as any),
+      buildAgentPrompt(realAssessment, snapshotData),
       [
         "You are an autonomous PM assistant.",
         "Follow the skills list in the JSON payload and deliver outputs in the same order.",
@@ -209,7 +210,7 @@ describe("agent handoff contract", () => {
         "4) A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
         "5) A short list of questions to confirm with the PM before acting.",
         "",
-        "Context: Whether Weekly Brief for 2026-03-01 (DEFENSIVE).",
+        `Context: Whether Weekly Brief for ${snapshotData.record_date} (${realAssessment.regime}).`,
       ].join("\n"),
     );
     assert.equal(payload.skills.length, payload.pm_handoff.briefing_actions.length, "one step per skill");
