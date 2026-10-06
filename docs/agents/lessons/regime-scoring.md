@@ -191,3 +191,12 @@ change looked the same in `data/`. `ENGINE_VERSION` (`lib/regimeEngineCore.ts`) 
   synthetic grid and pins the digest to the version, so a scoring change under an unchanged version fails.
   The grid is synthetic so a regeneration of the bundled data never reads as a new calibration. Bump the
   version and add a digest; never overwrite an old one.
+
+**The weekly, quarterly and yearly archives are pinned the same way (2026-10-06).** They store no scores, so
+`tests/regimeArchiveReplay.test.ts` holds their regime and record date: all 452 weeks inside the bundled VIX
+tails, and every quarter and year from 2012. Two limits are stated in the test rather than passed by luck:
+weeks after the last cached month-end replay without VIX (the tails end there), and 2010-2011 quarters have no
+VIX either, so they thread the walk without being compared. Weekly yields come from the weekly entries' own
+inputs, so for that cadence the test checks the engine and the walk, not the yields. A mutation of the
+machine's confirmation gate fails the monthly, weekly and quarterly replays and the version fingerprint
+together.

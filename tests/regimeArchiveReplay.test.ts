@@ -7,7 +7,11 @@ import summaryArchive from "../data/summary_archive.json";
 import { ENGINE_VERSION } from "../lib/regimeEngineCore";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { parseSeries, type TreasuryDatasets } from "../scripts/regimeArchiveContext";
-import { buildMonthlyArchive } from "../scripts/regimeArchiveReplay";
+import {
+  buildMonthlyArchive,
+  buildQuarterlyYearlyArchive,
+  buildWeeklyArchive,
+} from "../scripts/regimeArchiveReplay";
 
 /*
  * The archive generators replayed offline, on series rebuilt from the bundled
@@ -193,6 +197,68 @@ describe("archive replay from bundled series", () => {
         yields,
       }));
     assert.deepEqual(comparable(timeMachineEntries), comparable(cache));
+  });
+
+  /*
+   * The weekly, quarterly and yearly entries store no scores, so these hold the
+   * regime and the record date. Two limits on what the bundle can replay, and
+   * the comparisons stop at them rather than pass by luck:
+   *  - The daily VIX tails end at the last cached month-end, so a week after it
+   *    replays without the stress adjustments the archive scored with.
+   *  - VIX tails start in late 2011, so 2010-2011 quarters replay without them;
+   *    those periods still thread the walk, they are just not compared.
+   * The weekly base-rate series is also thinner than FRED's (month-ends, weekly
+   * record dates and the stored pairs), which can move the tightening-speed
+   * term's comparison point; the regimes on record do not depend on it today.
+   */
+  it("reproduces every weekly regime and record date the bundle can replay", () => {
+    const { entries } = buildWeeklyArchive({ ...bundled, now: NOW });
+    const onRecord = archive.filter((entry) => entry.cadence === "weekly");
+    assert.equal(entries.length, onRecord.length);
+
+    const lastVixCovered = cache.at(-1)?.record_date ?? "";
+    const replayed = new Map(entries.map((entry) => [entry.asOf, entry]));
+    const compared = onRecord.filter((entry) => entry.asOf <= lastVixCovered);
+    assert.ok(compared.length > 400, `only ${compared.length} weeks fall inside the bundled VIX tails`);
+
+    const diffs = compared.flatMap((entry) => {
+      const replay = replayed.get(entry.asOf);
+      return replay?.record_date === entry.record_date && replay.summary.regime === entry.summary.regime
+        ? []
+        : [`${entry.asOf}: replay ${replay?.record_date} ${replay?.summary.regime} vs record ${entry.record_date} ${entry.summary.regime}`];
+    });
+    assert.deepEqual(diffs, []);
+  });
+
+  it("reproduces every quarterly and yearly regime and record date from 2012", () => {
+    const { quarterlyEntries, yearlyEntries } = buildQuarterlyYearlyArchive({ ...bundled, now: NOW });
+    const cases = [
+      {
+        onRecord: archive.filter((entry) => entry.cadence === "quarterly"),
+        replayed: quarterlyEntries,
+        key: (entry: { year: number; quarter?: number }) => `${entry.year}-Q${entry.quarter}`,
+      },
+      {
+        onRecord: archive.filter((entry) => entry.cadence === "yearly"),
+        replayed: yearlyEntries,
+        key: (entry: { year: number }) => `${entry.year}`,
+      },
+    ];
+    for (const { onRecord, replayed, key } of cases) {
+      assert.equal(replayed.length, onRecord.length);
+      const byKey = new Map<string, { record_date: string; summary: { regime: string } }>(
+        replayed.map((entry) => [key(entry), entry]),
+      );
+      const compared = onRecord.filter((entry) => entry.year >= 2012);
+      assert.ok(compared.length > 10);
+      const diffs = compared.flatMap((entry) => {
+        const replay = byKey.get(key(entry));
+        return replay?.record_date === entry.record_date && replay.summary.regime === entry.summary.regime
+          ? []
+          : [`${key(entry)}: replay ${replay?.record_date} ${replay?.summary.regime} vs record ${entry.record_date} ${entry.summary.regime}`];
+      });
+      assert.deepEqual(diffs, []);
+    }
   });
 
   it("scores each month the way the runtime walk does", () => {
