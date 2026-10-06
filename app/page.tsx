@@ -618,8 +618,6 @@ async function PageContent({
               runwayEmphasis={runwayEmphasis}
               planHref={isRoute(operateHref) ? operateHref : "/operate"}
               isHistorical={Boolean(historicalSelection)}
-              actionStripItems={homepage.weeklyDecisionCardModel.decision.actionStripItems}
-              scores={{ tightness, riskAppetite }}
             />
 
             {/* 4. What would change the call: the two ladders with their three
@@ -636,7 +634,6 @@ async function PageContent({
               thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
-              basis={basis}
               regime={regime}
             />
 

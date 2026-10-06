@@ -138,7 +138,8 @@ export function WhatChangedSection({
                       </span>
                     ) : row.key === "curveSlope" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
-                        Feeds into <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>
+                        Feeds into <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and{" "}
+                        <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> once inverted
                       </span>
                     ) : null}
                     {/* Which end of the scale is which. A composite score is the one

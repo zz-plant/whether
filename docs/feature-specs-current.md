@@ -2334,9 +2334,30 @@ current "stable" verdict, so the sentence and the data fail together.
 
 Visual navigation upgrades across the five homepage sections to sharpen decision transmission without adding framework bloat or novel taxonomies:
 1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines supplied by the active thresholds. Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary. The caption measures the score distance to that plotted call-change line; company-specific pause-line distances stay in the section heading and ladders. Radar labels use theme-aware semantic ink.
-2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails. Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
+2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails (removed from the homepage on 2026-10-05, §1.1.31; `/operate` keeps them). Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
 3. **High-Contrast Monday Delta & Decision Staleness Badges:** Upgraded `SinceLastVisit.tsx` to surface `linesCrossedLead` (`movementSentence`) for returning operators. Upgraded `YourRecordNote.tsx` with high-visibility badges (`Reconsider` in rose, `Watch` in amber) when an operator's active assumptions in `/decisions` have had their macro conditions breached.
 4. **Interlinked Causal Navigation & Target Highlighting:** Added anchor targets (`#signal-funding-pressure`, `#signal-risk-appetite`) and direct links from each signal to the operating areas it governs in Section 2 (`WhatChangedSection.tsx`). Added row IDs (`id="area-${row.area}"`) and reverse citation anchor links in `AreaTable.tsx`. Added CSS `:target` styling (`tr:target`) to illuminate rows when jumped to via anchor links.
+
+### 1.1.31 One drawing of the score ladders on the homepage (2026-10-05)
+
+The first capture of the returning reader's homepage (`ui:iterate --visitor returning`) showed the two
+score ladders drawn three times in three sections: per row in *What changed* (all three lines and the
+earlier reading's dot), as the pause/resume rails above the rules table in *What that changes*, and as
+a pair again beside the radar in *What would change this guidance* (DD-039).
+
+- *What changed* keeps them. Each row carries where the score is, where it was, and where its lines
+  are (`tests/whatChangedSignalRows.test.tsx`).
+- *What that changes* drops the rails. Each area row prints its pause and resume lines and the distance
+  to each, which refers up to the ladders. `/operate` keeps the rails over its own rules table, where no
+  ladder sits above it.
+- *What would change this guidance* keeps the radar (the second dimension) and lists the market move
+  that would cross each call line under the score it moves, without redrawing either ladder.
+- The recession gauge's relationship line now says what the engine does: it sets risk appetite and
+  adds to funding pressure only once inverted (`computeRiskAppetiteScore`, the inversion points in
+  `regimeEngineCore.ts`). The homepage said risk appetite alone, `/signals` funding pressure alone.
+
+Still open under DD-039: the *Changed* column repeats one sentence ("Pause now applies: funding
+pressure rose through 76.") in each area whose pause line is the same score's.
 
 ### Shared page spacing (2026-10-04)
 

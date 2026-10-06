@@ -11,8 +11,6 @@ import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRule
 import type { RunwayBand } from "../../../lib/report/operatorRunway";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { toRoute, type Route } from "../../../lib/navigation/routeType";
-import type { ActionStripItem } from "../../../lib/report/operatingCalls";
-import { BoundedCorridorRails } from "../boundedCorridorRails";
 
 /**
  * Consequence, by area: the five areas in their fixed order, each with this
@@ -21,6 +19,11 @@ import { BoundedCorridorRails } from "../boundedCorridorRails";
  * the rule column; the runway notes sit under the row they concern once a
  * band is set. The stage and runway selectors head the table because they are
  * what the rules are written for — "which company", then the rules.
+ *
+ * No ladders here. The pause/resume rails that /operate draws over its rules
+ * table were drawn here too, a section after "What changed" had drawn the same
+ * two scores against the same lines (DD-039). Each row already prints its
+ * lines and the distance to them, and refers up to those ladders.
  */
 export function WhatItChangesSection({
   rows,
@@ -30,8 +33,6 @@ export function WhatItChangesSection({
   runwayEmphasis,
   planHref,
   isHistorical,
-  actionStripItems,
-  scores,
 }: {
   rows: readonly HomeAreaRow[];
   regime: RegimeKey;
@@ -42,8 +43,6 @@ export function WhatItChangesSection({
   planHref: Route;
   /** Live briefs only carry the operator's runway: it dates a company's cash position to today. */
   isHistorical: boolean;
-  actionStripItems?: readonly Pick<ActionStripItem, "pauseConditions" | "resumeConditions">[];
-  scores?: { tightness: number; riskAppetite: number };
 }) {
   const tableRows: AreaRowData[] = rows.map((row) => ({
     area: row.area,
@@ -94,12 +93,6 @@ export function WhatItChangesSection({
         </div>
         {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
       </div>
-
-      {actionStripItems && actionStripItems.length > 0 ? (
-        <div className="rounded-lg border border-slate-800/80 bg-slate-900/40 weather-inset">
-          <BoundedCorridorRails items={actionStripItems} scores={scores} />
-        </div>
-      ) : null}
 
       <AreaTable
         rows={tableRows}

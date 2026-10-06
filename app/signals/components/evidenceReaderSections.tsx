@@ -151,9 +151,16 @@ export const SignalsWhatChangedSection = ({
                     row.label
                   )}
                   {row.kindLabel ? <span className="block text-xs font-normal text-slate-500">{row.kindLabel}</span> : null}
-                  {row.key === "baseRate" || row.key === "curveSlope" ? (
+                  {row.key === "baseRate" ? (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
                       Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
+                    </span>
+                  ) : row.key === "curveSlope" ? (
+                    /* Sets risk appetite outright, and adds to funding pressure only
+                       below zero (`computeRiskAppetiteScore` and the inversion points
+                       in regimeEngineCore). This said funding pressure alone. */
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                      Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
                     </span>
                   ) : (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">

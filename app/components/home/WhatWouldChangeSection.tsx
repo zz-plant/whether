@@ -1,12 +1,10 @@
 import { HomeSection } from "./HomeSection";
 import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
-import { ScoreLadder } from "../ui/scoreLadder";
 import { BoundedValue } from "../ui/boundedValue";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
 import type { ThresholdBusinessConsequence } from "../../../lib/report/operatingCalls";
 import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
-import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { RegimeRadar } from "./RegimeRadar";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
@@ -23,13 +21,15 @@ type HomeScoreLadder = {
 type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string };
 
 /**
- * Confidence and distance: the two scores on their ladders with the three
- * lines and the earlier reading's dot, the market move that would cross each line under
- * the ladder it describes, and — on a week the call changed — the last time
- * it did. This was the bounded-conditions box inside the hero; the box is
- * gone and its content is a section, because "how close are we" is the
- * question a reader asks after "what does it change", not inside "what is
- * the call".
+ * Distance to the call changing: both scores as one point among the four
+ * conditions, the market move that would cross each call line in the
+ * market's units, and — on a week the call changed — the last time it did.
+ *
+ * The two score ladders are not redrawn here. "What changed" draws each score
+ * on its ladder with all three lines and the earlier reading's dot, and this
+ * section used to draw the same two ladders again, so a returning reader met
+ * them twice in three sections (DD-039). What this section adds is the second
+ * dimension and the move in the market that would cross a line.
  */
 export function WhatWouldChangeSection({
   ladders,
@@ -41,7 +41,6 @@ export function WhatWouldChangeSection({
   thresholdBusinessConsequence,
   lastTime,
   callChangeLines,
-  basis = comparisonBasis(),
   regime,
 }: {
   ladders: readonly HomeScoreLadder[];
@@ -54,8 +53,6 @@ export function WhatWouldChangeSection({
   thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
   lastTime: LastTimeCallChanged | null;
   callChangeLines: { tightness: number; riskAppetite: number };
-  /** The earlier reading the hollow dot is drawn from; "last week" when the week does not date it. */
-  basis?: ComparisonBasis;
   regime?: string;
 }) {
   const pointsToPause = thresholdBusinessConsequence?.pointsToThreshold;
@@ -103,27 +100,23 @@ export function WhatWouldChangeSection({
             currentRegime={activeRegime}
             className="w-full max-w-[240px] mx-auto md:mx-0 shrink-0"
           />
-          <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-            {ladders.map((ladder) => (
-              <div key={ladder.metric} className="min-w-0 space-y-1.5" data-ladder={ladder.metric}>
-                <ScoreLadder
-                  label={ladder.label}
-                  value={ladder.value}
-                  previous={ladder.previous}
-                  previousLabel={basis.label}
-                  lines={ladder.lines}
-                />
-                {/* The market move that crosses the line, in the market's units:
-                    the ladder says how far the score sits; this says what has to
-                    happen on the curve or the bill for that line to be crossed. */}
-                {flipProximity
-                  .filter((line) => line.axis === ladder.metric)
-                  .map((line) => (
-                    <p key={line.sentence} className="text-fluid-xs leading-5 text-slate-300">{line.sentence}</p>
+          {/* The market move that crosses each call line, in the market's
+              units: the ladders above say how far each score sits; this says
+              what has to happen on the curve or the bill for a line to go. */}
+          <dl className="grid content-start gap-x-6 gap-y-4 sm:grid-cols-2">
+            {ladders.map((ladder) => {
+              const moves = flipProximity.filter((line) => line.axis === ladder.metric);
+              if (moves.length === 0) return null;
+              return (
+                <div key={ladder.metric} className="min-w-0 space-y-1" data-flip-axis={ladder.metric}>
+                  <dt className="text-fluid-nano font-semibold text-slate-400">{ladder.label}</dt>
+                  {moves.map((line) => (
+                    <dd key={line.sentence} className="text-fluid-xs leading-5 text-slate-300">{line.sentence}</dd>
                   ))}
-              </div>
-            ))}
-          </div>
+                </div>
+              );
+            })}
+          </dl>
         </div>
       ) : null}
 
@@ -140,8 +133,8 @@ export function WhatWouldChangeSection({
           </div>
           <dl className="grid gap-3 sm:grid-cols-2 text-fluid-xs">
             {/* The sentences print only where no ladder could be drawn for them;
-                otherwise the ladders carry the numbers and the sentences would
-                restate them. The regime line is the exception: the call itself
+                otherwise the ladders in "What changed" carry the numbers and the
+                sentences would restate them. The regime line is the exception: the call itself
                 changes there, which is a different claim from a rule tripping. */}
             {guardrail && ladders.length === 0 ? (
               <div className="flex flex-col gap-1 border-l-2 border-amber-400/80 pl-2.5">
