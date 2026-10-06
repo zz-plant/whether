@@ -16,6 +16,7 @@ import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { loadReportData } from "../lib/report/reportData";
 import { assessPublishReadiness } from "../lib/report/briefPublishGuard";
 import { buildBriefDocumentFromReport } from "../lib/report/briefDocument";
+import { isSavedCopy } from "../lib/report/provenanceStatus";
 
 const run = async () => {
   const { values } = parseArgs({
@@ -31,7 +32,7 @@ const run = async () => {
 
   const readiness = assessPublishReadiness({
     degraded: false,
-    isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
+    isFallback: isSavedCopy(treasury),
     isLive: treasury.isLive,
     fallbackReason: treasury.fallback_reason,
     recordDate: treasury.record_date ?? treasury.fetched_at,

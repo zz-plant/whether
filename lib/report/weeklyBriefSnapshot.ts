@@ -13,6 +13,7 @@ import type { PostureStateContract } from "./postureStateContract";
 import { applyStageToWeeklyCall, buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
 import type { StartupVariantMode } from "./boundedDecisionRules";
 import type { RunwayBand } from "./operatorRunway";
+import { isSavedCopy } from "./provenanceStatus";
 
 export type WeeklyBriefSnapshot = {
   reportData: ReportData | ReportDataFallback;
@@ -94,7 +95,7 @@ export const buildWeeklyBriefSnapshot = ({
   runwayBand,
   runwayMonths,
 }: BuildWeeklyBriefSnapshotArgs): WeeklyBriefSnapshot => {
-  const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
+  const isFallback = isSavedCopy(reportData.treasury);
   const homeBriefModel = buildHomeBriefModel(
     buildHomeBriefInput(reportData, postureState),
     { overlaySector, startupVariantMode, runwayBand, runwayMonths },

@@ -18,6 +18,7 @@ import { previousScoresFromDynamics, type PreviousReading } from "../export/scor
 import { buildPostureState } from "./postureStateSource";
 import type { PostureStateContract } from "./postureStateContract";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
+import { isSavedCopy } from "./provenanceStatus";
 
 /**
  * What a brief document is built from: one reading, wherever it was read.
@@ -120,7 +121,7 @@ export const buildBriefDocument = (
   const stageLabel = stage ? call.stageScopedAdjustments?.[stage]?.label : undefined;
   const confidence = resolvePublishedConfidence({ assessment, record: treasury, historical: source.historical }).label;
   const citableBrief = selectCitablePermalinkBrief(treasury.record_date);
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const isFallback = isSavedCopy(treasury);
   const pauseIf = pauseConditionOnly(call.pauseIf);
   const sensors = source.sensors ?? buildSensorReadings(treasury);
   const thresholds = assessment.thresholds;

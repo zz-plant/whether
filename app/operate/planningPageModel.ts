@@ -37,6 +37,7 @@ import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
 import { ReportSection } from "../components/reportSection";
+import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
 export type PlanningSearchParams = {
   month?: string;
@@ -111,7 +112,7 @@ export async function buildPlanningPageModel(
     treasury,
     treasuryProvenance,
   } = reportData;
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const isFallback = isSavedCopy(treasury);
   const { trustStatusTone } = snapshot.trustStatus;
 
   const showAllActionLanes = resolvedSearchParams?.actions === "all";

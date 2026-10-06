@@ -23,6 +23,7 @@ import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
 export type SignalsPageSearchParams = {
   month?: string;
@@ -174,7 +175,7 @@ const deriveSignalsPageModel = (
      every link written as `/signals?advanced=1#time-machine` opens it. A month
      already loaded opens it too: the reader is in the middle of using it. */
   const monthPickerOpen = resolvedSearchParams?.advanced === "1" || Boolean(historicalSelection);
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const isFallback = isSavedCopy(treasury);
   const trust = buildTrustStatus({
     historicalSelection: Boolean(historicalSelection),
     isFallback,

@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import {
   PROVENANCE_STATUS,
   historicalMacroStatus,
+  isSavedCopy,
   resolveProvenanceStatus,
 } from "../lib/report/provenanceStatus";
 
@@ -53,5 +54,18 @@ describe("provenance status", () => {
     // macro series could not be aligned, so only treasury backs the reading.
     assert.equal(historicalMacroStatus(undefined), "Treasury-only (low)");
     assert.equal(historicalMacroStatus("something-else"), "Treasury-only (low)");
+  });
+});
+
+describe("isSavedCopy", () => {
+  it("marks a reading saved when either stamp is present, and live when neither is", () => {
+    assert.equal(isSavedCopy({ fallback_at: "2026-10-05T09:00:00Z", fallback_reason: null }), true);
+    assert.equal(isSavedCopy({ fallback_at: null, fallback_reason: "Treasury feed timed out" }), true);
+    assert.equal(isSavedCopy({ fallback_at: null, fallback_reason: null }), false);
+    assert.equal(isSavedCopy({}), false);
+    // An empty stamp is no stamp: the client never writes one, and a blank must not read as a saved copy.
+    assert.equal(isSavedCopy({ fallback_at: "", fallback_reason: "" }), false);
+    assert.equal(isSavedCopy(null), false);
+    assert.equal(isSavedCopy(undefined), false);
   });
 });
