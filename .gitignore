@@ -27,12 +27,16 @@ artifacts/
 # vinext (Next.js plugin)
 .vinext/
 
-# Tooling
+# Tooling. `.claude/` and `.codex/` are partly tracked (skills, hooks, launch
+# config), so ignore only their local state; ignoring the directories outright
+# hid every newly added skill from `git status`.
 .cmux/
 .sisyphus/
-.codex/
 .agent/
-.claude/
+.claude/settings.local.json
+.claude/worktrees/
+opencode.json
+skills-lock.json
 
 # QA screenshots and snapshot dumps.
 # These are one-off local artifacts, never inputs. Keep the repo root scannable:

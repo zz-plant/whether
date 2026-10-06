@@ -5,7 +5,7 @@ This matrix is the checked-in source of truth for stack upgrade candidates, bloc
 | Element | Current | Candidate | Status | Blockers / risks | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | Bun | 1.3.14 (package manager pin; 1.3.11 in the sandbox) | 1.4.0 (npm `latest`) | **Trial**: read the release notes before moving the pin | bun.com was unreachable from the session that checked, so 1.4's changes are unverified here. `bun test --randomize` (present in 1.3.11) is adopted in the deploy gate. | `package.json`; `bun test --help`; 2026-09-02 |
-| Node.js | `>=22` (engine target) | 22 LTS | **GO for active lane** | Vinext requires Node 22+, so keep deploy/build environments pinned there. | `package.json`; `docs/vinext-cloudflare-evaluation.md` |
+| Node.js | `>=22` (engine target) | 22 LTS | **GO for active lane** | Vinext requires Node 22+, so keep deploy/build environments pinned there. | `package.json` |
 | Next.js (compat surface under Vinext) | 16.3.4 | in-range minors | **GO** | Only `next/*` import aliases and types are used; Vinext resolves them. 16.2.9 → 16.3.4 typechecked and passed the suite. | `bun update` 2026-09-02; `bun run typecheck`; `bun run test` |
 | React / React DOM | 19.2.8 | 19.3 (canary) · React Compiler 1.0 | **Hold** | Compiler arrives via Vinext 1.0's `react: { compiler: true }`; trial it on preview when 1.0.0 ships. | npm dist-tags 2026-09-02 |
 | TypeScript | 7.0.2 (native compiler) | 7.1 (programmatic API) | **GO / adopted** | No programmatic API until 7.1: typescript-eslint cannot run on it, which is fine because ESLint is retired. No other TS API consumer in the repo. Typecheck 9s → ~5s locally. | `bun run typecheck` 2026-09-02 |

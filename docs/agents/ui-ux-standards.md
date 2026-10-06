@@ -71,10 +71,11 @@
 - **Evidence (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
 - **Plan (`/operate`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
 - **Resolve (`/resolve`):** role translation only (founder, product, finance, strategy views).
-- **Toolkits (`/toolkits`):** runnable instruments/templates only; do not restate posture logic or evidence narrative.
+- **Toolkits (`/toolkits/[slug]`, linked from `/resolve`; the `/toolkits` index redirects to `/`):**
+  runnable instruments/templates only; do not restate posture logic or evidence narrative.
 - **Learn:** diagnostic and conceptual references only; no new canonical guidance should
-  originate here. There is no `/learn` route today — this content lives under `/resolve` and
-  `/toolkits`; the boundary still applies wherever it lands.
+  originate here. There is no `/learn` route (it redirects to `/trust`); this content lives under
+  `/resolve` and the toolkit pages, and the boundary still applies wherever it lands.
 - **Trust (`/trust`):** transparency only (formulas, sources, cadence, limitations).
 - Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.
 
@@ -88,7 +89,7 @@
   - ensure keyboard users can visibly track focus on citation/copy actions.
 
 ## X. Shared action-link primitives
-- Reuse `app/components/ui/actionLink.tsx` and `app/components/ui/buttonLink.tsx` for entry-page CTAs before introducing new one-off class chains.
+- Reuse `app/components/ui/actionLink.tsx` for entry-page CTAs before introducing new one-off class chains.
 - Use variants consistently:
   - `primary`: main CTA (`weather-button-primary`) with 44px touch target.
   - `pill`: secondary navigation CTA (`weather-pill`) with shared hover/focus/touch behavior.
@@ -261,7 +262,7 @@ take the other's job.
   numerals stay sharp on purpose: they are tag-class labels and figures. Sentence-casing every
   eyebrow was considered for this register and rejected — it stacks near-duplicates (`Plan` over
   `Weekly plan`) across the report shells. Rationing eyebrows is per-surface content work
-  (`docs/ui-facelift-plan.md`, Phase 2), not a register change.
+  (the 2026-09 UI facelift, Phase 2), not a register change.
 
 ## XV. Encoding a number (figure register, and when to draw the line)
 

@@ -26,9 +26,9 @@
 
 ## IDE workspace defaults
 - Repo-local VS Code compatible workspace settings live under `.vscode/`.
-- `settings.json` pins the editor to the workspace TypeScript version, enables Bun-aware ESLint defaults, and excludes generated artifacts (`.next`, `output`, deploy/build folders) from the default explorer/search/watch loops.
+- `settings.json` pins the editor to the workspace TypeScript version, runs the oxlint fixer (the oxc extension) on save, and excludes generated artifacts (`.next`, `output`, deploy/build folders) from the default explorer/search/watch loops.
 - `tasks.json` exposes the common repo commands (`dev`, `lint`, `typecheck`, `test`, `check`, `build:cloudflare`, `ui:shots`, `mcp:whether`) in the task runner.
-- `extensions.json` recommends the baseline extension set for this repo: ESLint, Bun, Tailwind CSS, Playwright, and GitLens.
+- `extensions.json` recommends the baseline extension set for this repo: oxc (oxlint), Bun, Tailwind CSS, Playwright, and GitLens. The repo moved from ESLint to oxlint on 2026-09-02.
 - `whether-skills.code-snippets` adds repo-local snippets for drafting first-party skills and trigger-test blocks directly in the editor.
 - `.roomodes` adds repo-scoped Roo modes that route common Whether work to the right repo-local skills:
   - `whether-briefing`

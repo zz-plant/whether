@@ -7,16 +7,8 @@
   "javascript.preferences.importModuleSpecifier": "relative",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "eslint.useFlatConfig": true,
-  "eslint.packageManager": "bun",
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
+    "source.fixAll.oxc": "explicit",
     "source.organizeImports": "explicit"
   },
   "npm.packageManager": "bun",
@@ -28,7 +20,7 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
-    "package.json": "bun.lock, tsconfig.json, eslint.config.mjs, .eslintrc.json, next.config.js, vite.config.ts, wrangler.toml, postcss.config.js"
+    "package.json": "bun.lock, tsconfig.json, .oxlintrc.json, next.config.js, vite.config.ts, wrangler.toml, postcss.config.js"
   },
   "files.exclude": {
     "**/.next": true,

@@ -31,7 +31,6 @@ Use this guide when editing planning stepper content, guardrail approval, share/
 Treat these as upstream when changing semantics:
 - `lib/export/briefBuilders.ts`
 - `lib/export/weeklyOperatorBrief.ts`
-- `lib/export/explainerBrief.ts`
 - `lib/report/canonicalDecisionCopy.ts`
 - `lib/report/decisionTransmissionCopy.ts`
 - `lib/report/homeBriefModel.ts`

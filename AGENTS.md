@@ -38,7 +38,7 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 - Full checks: `bun run check`
 - Lint: `bun run lint`
 - Tests: `bun run test` (full suite, ~14s — it runs offline; see docs/agents/lessons/toolchain-and-gates.md)
-- CI: `.github/workflows/ci.yml` — runs lint, typecheck, test on push/PR to main
+- CI: `.github/workflows/ci.yml` is manual-only (`workflow_dispatch`). The gates that run are `.husky/pre-push` and Cloudflare Workers Builds; see "Local gate enforced, remote gate on every push" below.
 
 Use targeted tests when possible before running full checks:
 
@@ -410,7 +410,7 @@ Do not spend major effort on these unless explicitly requested:
 
 ## Repo-local skill conventions
 
-- Preferred skill path: `.codex/skills/<skill-name>/SKILL.md`
+- Skill path: `.claude/skills/<skill-name>/SKILL.md`, mirrored to `.codex/skills/` for the Codex runtime; keep the two in sync (see `.claude/skills/README.md`)
 - Use kebab-case for skill directories
 - Keep skills narrow, task-specific, and output-contract driven
 - Default to least-privilege tool access
