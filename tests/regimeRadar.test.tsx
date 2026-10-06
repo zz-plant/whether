@@ -81,3 +81,52 @@ describe("RegimeRadar", () => {
     assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
   });
 });
+
+/**
+ * The brief's map carries the month-ends that led to this reading as a path,
+ * so the direction of travel reads before any number does. The path replaces
+ * the single earlier dot, ends at the current point, and says what its dots are.
+ */
+describe("RegimeRadar path", () => {
+  const base = {
+    tightness: 90,
+    riskAppetite: 48,
+    tightnessThreshold: 70,
+    riskAppetiteThreshold: 50,
+    currentRegime: "SCARCITY",
+  };
+  const trail = [
+    { tightness: 40, riskAppetite: 61 },
+    { tightness: 50, riskAppetite: 59 },
+    { tightness: 63, riskAppetite: 56 },
+  ];
+
+  it("joins every month-end to the current point, and drops the single earlier dot", () => {
+    const html = renderToStaticMarkup(
+      <RegimeRadar {...base} previousTightness={63} previousRiskAppetite={56} trail={trail} />,
+    );
+    const points = /<polyline points="([^"]+)"/.exec(html)?.[1]?.split(" ") ?? [];
+    assert.equal(points.length, trail.length + 1, "the path ends at the current reading");
+    assert.equal((html.match(/r="2\.4"/g) ?? []).length, trail.length, "one dot per month-end");
+    assert.doesNotMatch(html, /r="2\.5"/, "the single earlier dot is the path's last point, not drawn twice");
+  });
+
+  it("states the path's domain and its like-for-like note when it has a path", () => {
+    const html = renderToStaticMarkup(
+      <RegimeRadar
+        {...base}
+        trail={trail}
+        trailCaption="Path: month-ends Jun–Aug 2026, then now."
+        caveat="The Aug 31 scores were built from interest rates alone."
+      />,
+    );
+    assert.match(html, /Path: month-ends Jun–Aug 2026, then now\./);
+    assert.match(html, /built from interest rates alone/);
+  });
+
+  it("leaves the distance caption to a surface that already states it", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} showDistance={false} />);
+    assert.doesNotMatch(html, /points to nearest change line/);
+    assert.doesNotMatch(html, /<figcaption/, "no empty caption is drawn");
+  });
+});

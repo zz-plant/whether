@@ -2796,3 +2796,46 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
 - Tests: `tests/deliveryChannels.test.ts`, `tests/emailShell.test.ts` (production output pinned
   byte for byte; the no-literal-origin rule is a source read, because on production the two are
   the same string), `tests/operatingSnapshotResolution.test.ts`, `tests/alertFallbackReadiness.test.ts`, `tests/deliveryOnceMarkers.test.ts`.
+
+### 1.1.44 The homepage's first screen carries the news (2026-10-06)
+
+A screenshot review of `/` found it accurate and dull: the week's change ("this week they went
+from Sunny to Freezing") sat in a paragraph below the fold, the one line with suspense ("Could
+change next week: Yes, risk appetite is 2 pts from its line") was styled as metadata, the only
+picture (the conditions quadrant) was about 200px wide two-thirds of the way down, the decision
+picker asked before it answered, and a first visit opened on the category tagline. Every change
+below moves data the page already computed to where the eye lands first; nothing new is derived.
+
+- **What conditions were.** On a reading whose conditions differ from the earlier one, the card's
+  stamp line ends "Was Sunny on Aug 31" in the regime ink (`describeEarlierConditions`,
+  `lib/report/home/homeSectionModel.ts`). It is dated by the comparison's own basis, because the
+  earlier reading is a month-end snapshot and "this week" would claim a change the reading cannot
+  date. Archived weeks carry none.
+- **The map in the card, from `md` up.** `DecisionHero` takes an `aside`, drawn in a right-hand
+  column from `md` and hidden below it, where the card must leave the picker on the first phone
+  screen. On `/` it is `RegimeRadar` with a **path**: the last six month-ends before the
+  reading's month (the month in progress is left out, because the cron writes it from the same
+  week the current point draws), joined to the current point, older dots fainter. The path's
+  domain ("Path: month-ends Mar–Aug 2026, then now.", `describeConditionsTrail`) and, when the
+  earlier scores were built from fewer inputs, the like-for-like note (`describeScoreMovementCaveat`)
+  sit under the trust row as `asideNote`, so the map stays compact; its distance caption is off
+  there because the trust row already says it. The left column stretches to the map's height and
+  the trust row sits at its foot. "What would change this guidance" stops drawing the quadrant from
+  `md` up (one picture of where the reading sits per screen) and keeps it, with the same path,
+  below `md`.
+- **The answers before the click.** Each "What are you deciding?" choice carries a second line:
+  "Pause line crossed" in the caution ink, or "4 pts from its pause line"
+  (`describeAreaPauseStatus`), from the same row the answer and the area table print, now carrying
+  `points` and `met` beside its words. Over the choices, the count: "Pause lines crossed in 4 of 5
+  areas this week." (`describePauseLineCount`). `SegmentedControl`'s "choices" layout prints a
+  sublabel as the option's second line at every width.
+- **First visit.** The standfirst is `canonicalPositioningLine` (the stakes: the lines that pause or
+  resume hiring, spend and raise) instead of `websiteName` (the category). "Has this happened
+  before?" opens on `LastTimeCallChangedCard` — the two earlier scores as tiles and the comparison
+  with this week — rather than a one-sentence summary; `summarizeLastTimeCallChanged` went with it.
+- Not done, deliberately: no animation, illustration or new section, and no second encoding of the
+  score lines on the fold (the rails stay in "What changed").
+- Tests: `tests/homeFoldNews.test.tsx`, `tests/regimeRadar.test.tsx` (path),
+  `tests/homeDecisionPicker.test.tsx` (choices and count), `tests/firstRunOrientationGuide.test.tsx`
+  (standfirst).
+

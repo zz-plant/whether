@@ -53,9 +53,13 @@ import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   buildHomeAreaRows,
   buildSignalChangeRows,
+  describeConditionsTrail,
+  describeEarlierConditions,
   describeWeeklyMovement,
 } from "../lib/report/home/homeSectionModel";
-import { findLastTimeCallChanged, summarizeLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
+import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
@@ -119,6 +123,9 @@ const HOME_CADENCE_HORIZONS: readonly CadenceCallHorizon[] = ["monthly", "quarte
 
 const resolveHomeCadence = (value: string | undefined): CadenceCallHorizon | "weekly" =>
   HOME_CADENCE_HORIZONS.find((horizon) => horizon === value) ?? "weekly";
+
+/** Month-ends on the conditions map's path: half a year, enough to show a direction without crowding the plane. */
+const CONDITIONS_TRAIL_MONTHS = 6;
 
 async function PageContent({
   searchParams,
@@ -408,6 +415,29 @@ async function PageContent({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
   }));
+  /* The conditions map's path: the month-end readings before this reading's
+     month, oldest first. The month in progress is left out, because the cron
+     writes it from the same week the current point already draws. */
+  const currentMonthKey = reportData.treasury.record_date.slice(0, 7);
+  const conditionsTrailEntries = alignedRegimeHistory
+    .filter((entry) => entry.record_date.slice(0, 7) < currentMonthKey)
+    .flatMap((entry) =>
+      typeof entry.tightness === "number" && typeof entry.riskAppetite === "number"
+        ? [{ recordDate: entry.record_date, tightness: entry.tightness, riskAppetite: entry.riskAppetite }]
+        : [],
+    )
+    .slice(-CONDITIONS_TRAIL_MONTHS);
+  const conditionsTrail = {
+    points: conditionsTrailEntries.map((entry) => ({ tightness: entry.tightness, riskAppetite: entry.riskAppetite })),
+    caption: describeConditionsTrail(conditionsTrailEntries.map((entry) => entry.recordDate)),
+    caveat: describeScoreMovementCaveat(homepage.weeklyDecisionCardModel.decision.reportDynamics.movement, basis),
+  };
+  /* On a reading whose conditions differ from the earlier one, the card's stamp
+     line says what they were, dated by the comparison's own basis. */
+  const earlierConditions =
+    !historicalSelection && previousRegime && previousRegime !== regime
+      ? describeEarlierConditions({ previousLabel: getRegimePublicLabel(previousRegime), basis })
+      : undefined;
   const trustStripProps = buildTrustStripProps({
     recordDateLabel: homepage.reportShell.recordDateLabel,
     isFallback: homepage.reportShell.showOfflineBadge,
@@ -530,6 +560,22 @@ async function PageContent({
                 callDetail={cardCallDetail}
                 regime={regime}
                 direction={historicalSelection ? undefined : cardCall.directionLabel}
+                earlier={earlierConditions}
+                aside={
+                  <RegimeRadar
+                    tightness={tightness}
+                    riskAppetite={riskAppetite}
+                    previousTightness={previousScores?.tightness ?? null}
+                    previousRiskAppetite={previousScores?.riskAppetite ?? null}
+                    tightnessThreshold={callChangeLines.tightness}
+                    riskAppetiteThreshold={callChangeLines.riskAppetite}
+                    currentRegime={regime}
+                    trail={conditionsTrail.points}
+                    showDistance={false}
+                    className="ml-auto w-full max-w-[240px]"
+                  />
+                }
+                asideNote={[conditionsTrail.caption, conditionsTrail.caveat].flatMap((line) => (line ? [line] : []))}
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
@@ -586,7 +632,7 @@ async function PageContent({
                 regime={regime}
                 scores={{ tightness, riskAppetite }}
                 flipCondition={reversalTriggerLabel}
-                lastTime={lastTimeCallChanged ? summarizeLastTimeCallChanged(lastTimeCallChanged) : undefined}
+                lastTime={lastTimeCallChanged ? { record: lastTimeCallChanged, callChangeLines } : undefined}
                 turningPoints={turningPoints}
                 calibration={{
                   stageLabel: operatorStageLabel(operatorStageForVariantMode(activeStage)),
@@ -636,6 +682,7 @@ async function PageContent({
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
               regime={regime}
+              conditionsTrail={conditionsTrail}
             />
 
             {/* 5. Do and share, including the one conversion on the page. */}

@@ -56,7 +56,12 @@ describe("first-run orientation guide", () => {
 
   it("keeps the standfirst first and the guide collapsed behind it", () => {
     const html = markup();
-    const standfirst = html.indexOf(websiteName);
+    /* The standfirst is the stakes line, not the category tagline: what the
+       page will do to a reader's hiring, spend and raise is the reason to read
+       the card under it; "Weekly Operating Guidance for Startup Leaders" named
+       a shelf. Both come from lib/seo.ts. */
+    const standfirst = html.indexOf(canonicalPositioningLine);
+    assert.ok(!html.includes(websiteName), "the category tagline is back as the opening line");
     const guide = html.indexOf("How to read this page");
 
     assert.ok(standfirst >= 0 && guide > standfirst, "the guide displaced the opening line");

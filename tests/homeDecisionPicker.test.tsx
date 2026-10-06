@@ -4,7 +4,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DecisionPicker, type DecisionPickerOption } from "../app/components/home/DecisionPicker";
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
-import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { findLastTimeCallChanged, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
@@ -32,12 +32,25 @@ mockAny.module("next/navigation", () => ({
  * the configuration it is — a stylesheet rule and a bootstrap line.
  */
 
-const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area) => ({
+const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area, index) => ({
   area,
   rule: `Rule for ${area}`,
-  pause: { line: "Funding pressure > 76", distance: "crossed" },
-  resume: { line: "Funding pressure < 66", distance: "17 pts away" },
+  /* Four areas past their pause line and one four points short of it, as the
+     week of Oct 5, 2026 read at the default calibration. */
+  pause:
+    index === 1
+      ? { line: "Risk appetite < 40", distance: "4 pts away", points: 4, met: false }
+      : { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true },
+  resume: { line: "Funding pressure < 66", distance: "17 pts away", points: 17, met: false },
 }));
+
+const LAST_TIME = findLastTimeCallChanged({
+  series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+  currentRegime: "SCARCITY",
+  previousRegime: "EXPANSION",
+  currentScores: { tightness: 90, riskAppetite: 44 },
+});
+const CALL_CHANGE_LINES = { tightness: 70, riskAppetite: 50 };
 
 describe("first-visit decision picker", () => {
   const html = renderToStaticMarkup(
@@ -46,7 +59,7 @@ describe("first-visit decision picker", () => {
       regime="SCARCITY"
       scores={{ tightness: 90, riskAppetite: 44 }}
       flipCondition="Funding pressure falls to or below 70."
-      lastTime="The last time conditions tightened was Sep 2022, from Stormy to Freezing; this week they went from Sunny to Freezing."
+      lastTime={LAST_TIME ? { record: LAST_TIME, callChangeLines: CALL_CHANGE_LINES } : undefined}
       turningPoints={[{ label: "Sep 2022, Stormy to Freezing", href: "/?month=9&year=2022" }]}
       calibration={{ stageLabel: "Series A", runwayPhrase: "12–24 months", chosen: false }}
     />,
@@ -86,8 +99,23 @@ describe("first-visit decision picker", () => {
     assert.ok(scores < html.indexOf("Next change to watch"), "the alert box quotes a score before the page says what it means");
   });
 
+  it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
+    const choices = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
+    assert.equal((choices.match(/Pause line crossed/g) ?? []).length, 4);
+    assert.match(choices, /4 pts from its pause line/);
+    assert.match(choices, /semantic-caution-fg[^"]*">Pause line crossed/, "a crossed line is drawn as a state, in the caution ink");
+  });
+
+  it("counts the crossed pause lines once, over the choices", () => {
+    const count = html.indexOf("Pause lines crossed in 4 of 5 areas this week.");
+    assert.ok(count > html.indexOf("What are you deciding?"), "the count sits under the question");
+    assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
+  });
+
   it("answers whether this has happened before on the page, and only when the week has an answer", () => {
-    assert.match(html, /The last time conditions tightened was Sep 2022, from Stormy to Freezing; this week they went from Sunny to Freezing\./);
+    assert.ok(LAST_TIME, "the record has an earlier tightening to show");
+    assert.match(html, /data-testid="last-time-call-changed"/);
+    assert.match(html, /The last time conditions tightened/);
     const quietWeek = renderToStaticMarkup(
       <DecisionPicker
         options={OPTIONS}

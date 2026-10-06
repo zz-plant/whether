@@ -8,7 +8,7 @@ import {
   FIRST_TIME_GUIDE_STEPS,
 } from "../../lib/report/reportCopy";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
-import { canonicalPositioningLine, websiteName } from "../../lib/seo";
+import { canonicalPositioningLine } from "../../lib/seo";
 import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
@@ -106,8 +106,13 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
             This is this week&apos;s guidance from Whether. {canonicalPositioningLine}
           </p>
         ) : (
-          <p className="min-w-0 max-w-[64ch] font-normal text-slate-300 leading-relaxed">
-            {websiteName}
+          /* The stakes, not the category. The tagline ("Weekly Operating
+             Guidance for Startup Leaders") named a shelf the reader had not
+             asked about; this line says what the page will do to their hiring,
+             spend and raise, which is the reason to read the card below. Same
+             single source (lib/seo.ts), so the two cannot drift. */
+          <p className="min-w-0 max-w-[64ch] font-normal text-slate-200 leading-relaxed">
+            {canonicalPositioningLine}
           </p>
         )}
         <button

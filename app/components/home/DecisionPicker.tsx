@@ -4,12 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
-import { HOME_SECTIONS, type HomeAreaRow } from "../../../lib/report/home/homeSectionModel";
+import {
+  HOME_SECTIONS,
+  describeAreaPauseStatus,
+  describePauseLineCount,
+  type HomeAreaRow,
+} from "../../../lib/report/home/homeSectionModel";
+import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
 import { SignalReading } from "../ui/plainLanguage";
 import { SubscribeForm } from "../SubscribeForm";
 import { CommitmentTest } from "./CommitmentTest";
+import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { RUNWAY_CHANGED_EVENT } from "../useOperatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
@@ -85,8 +92,13 @@ export function DecisionPicker({
   /** This week's two scores, printed with what they mean before any line that quotes them. */
   scores: { tightness: number; riskAppetite: number };
   flipCondition?: string;
-  /** `summarizeLastTimeCallChanged`, on a week the guidance changed; absent on every other week. */
-  lastTime?: string;
+  /**
+   * On a week conditions changed, the last time they moved the same way and the
+   * lines they turn on: drawn as the same card the folded brief carries, so a
+   * first visit sees the two earlier scores rather than reading them in a
+   * paragraph. Absent on every other week.
+   */
+  lastTime?: { record: LastTimeCallChanged; callChangeLines: { tightness: number; riskAppetite: number } };
   turningPoints: readonly { label: string; href: string }[];
   /** Who the lines below are scaled for. The controls that set it sit in the brief, under "What that changes for you". */
   calibration?: { stageLabel: string; runwayPhrase: string; chosen: boolean };
@@ -118,10 +130,19 @@ export function DecisionPicker({
     return () => window.removeEventListener("hashchange", unfoldForHash);
   }, []);
 
-  const segmentedOptions: SegmentedOption<DecisionArea>[] = options.map((option) => ({
-    key: option.area,
-    label: QUESTION_BY_AREA[option.area],
-  }));
+  /* Each choice carries where its area stands against its pause line, so the
+     five answers are on the page before any is picked; the click opens the
+     rule and its lines. The count over them is the same rows, summed. */
+  const segmentedOptions: SegmentedOption<DecisionArea>[] = options.map((option) => {
+    const status = describeAreaPauseStatus(option);
+    return {
+      key: option.area,
+      label: QUESTION_BY_AREA[option.area],
+      sublabel: status?.text,
+      sublabelTone: status?.crossed ? "caution" : undefined,
+    };
+  });
+  const pauseLineCount = describePauseLineCount(options);
 
   /* Picking a decision is the first deliberate act this block exists to raise.
      `ActivationTracker` records it as `oriented`, the same as any other control
@@ -146,6 +167,11 @@ export function DecisionPicker({
           <h2 id="first-visit-decision-heading" className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
             What are you deciding?
           </h2>
+          {pauseLineCount ? (
+            <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
+              {pauseLineCount}
+            </p>
+          ) : null}
           <p className="text-fluid-xs text-slate-400">
             Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
           </p>
@@ -236,27 +262,26 @@ export function DecisionPicker({
       <div data-first-visit-only="true" className="space-y-8">
         <SubscribeForm compact defaultFrequency="alerts" condition={flipCondition} />
 
-        {/* The answer to "has this happened before", on the page. The card that
-            says it at length is in the folded brief, and the turning points
-            below are links; a sceptical first visit had to leave to check. */}
-        {lastTime || turningPoints.length > 0 ? (
+        {/* The answer to "has this happened before", on the page: the last
+            time conditions moved this way, as the card the folded brief draws,
+            and the turning points as links. A sceptical first visit had to
+            leave to check. */}
+        {lastTime ? <LastTimeCallChangedCard record={lastTime.record} callChangeLines={lastTime.callChangeLines} /> : null}
+
+        {turningPoints.length > 0 ? (
           <div className="space-y-2">
             <h3 className="type-eyebrow">Has this happened before?</h3>
-            {lastTime ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{lastTime}</p> : null}
-
-            {turningPoints.length > 0 ? (
-              <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
-                Check it against the record. What the guidance said at the last turns:{" "}
-                {turningPoints.map((point, index) => (
-                  <span key={point.href}>
-                    {index > 0 ? " · " : null}
-                    <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                      {point.label}
-                    </Link>
-                  </span>
-                ))}
-              </p>
-            ) : null}
+            <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
+              Check it against the record. What the guidance said at the last turns:{" "}
+              {turningPoints.map((point, index) => (
+                <span key={point.href}>
+                  {index > 0 ? " · " : null}
+                  <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+                    {point.label}
+                  </Link>
+                </span>
+              ))}
+            </p>
           </div>
         ) : null}
 
