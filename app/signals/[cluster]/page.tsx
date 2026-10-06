@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DecisionContractBlock } from "../../components/decisionContractBlock";
+import { DecisionHero } from "../../components/DecisionHero";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { buildTrustStripProps } from "../../../lib/report/evidenceReaderModel";
+import { buildDegradedSourceRows } from "../../../lib/report/sourceHealth";
+import { resolvePublishedConfidence } from "../../../lib/report/confidence";
 import { buildPageMetadata } from "../../../lib/seo";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { isStaleForIndexing } from "../../../lib/seo/freshnessIndexation";
@@ -105,25 +109,29 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
           { label: clusterDefinition.title },
         ]}
       />
-      {/* The header used to carry an instrument glyph beside the title: a
-          barometer needle keyed to the reading's direction, or a static
-          trip-wire on the curve watch. The reading panel directly below states
-          the direction in words and figures, so the glyph restated it at best
-          and, on the curve watch, encoded nothing. */}
-      <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-        <div className="max-w-2xl space-y-2">
-          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{clusterDefinition.title}</h1>
-          <p className="text-sm text-slate-300">{clusterDefinition.summary}</p>
-        </div>
-      </section>
-      {reading ? <SignalReadingPanel reading={reading} recordDateLabel={reportData.recordDateLabel} /> : null}
-      <DecisionContractBlock
-        conditions={reportData.statusLabel}
-        action={reportData.actionNowShort}
-        pauseIf={reportData.guardrailThreshold}
-        callChangesIf={reportData.flipThreshold}
-        evidence={clusterDefinition.evidence}
+      {/* The signal as the card the brief opens on: the week's stamp, the signal's
+          name as the heading, this week's call under it, and the lines it holds
+          between. This page opened on a bare heading and a summary sentence, with
+          the call in a bulleted block further down that put the call-change line
+          under an area's resume label. The signal's own reading follows the card. */}
+      <DecisionHero
+        question={clusterDefinition.title}
+        weeklyCall={reportData.actionNowShort}
+        callDetail={clusterDefinition.summary}
+        regime={reportData.assessment.regime}
+        lines={[
+          { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: reportData.guardrailThreshold },
+          { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: reportData.flipThreshold },
+        ]}
+        trust={buildTrustStripProps({
+          recordDateLabel: reportData.recordDateLabel,
+          isFallback: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+          degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
+          confidenceLabel: resolvePublishedConfidence({ assessment: reportData.assessment, record: reportData.treasury }).label,
+          assessment: reportData.assessment,
+        })}
       />
+      {reading ? <SignalReadingPanel reading={reading} recordDateLabel={reportData.recordDateLabel} /> : null}
       {/* The five decision pages under this signal. They were in the sitemap
           and linked from nowhere on the site, so the only path to them was the
           sitemap itself — and this page, whose metadata comment calls them its

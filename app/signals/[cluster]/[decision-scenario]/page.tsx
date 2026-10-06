@@ -170,14 +170,18 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{signal.title}: {scenario.title}</h1>
         <p className="text-sm text-slate-300">{signal.summary}</p>
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">
-            Freshness: {payload.freshness}
-          </span>
-          <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">
-            Trust: {payload.trustSummary}
-          </span>
-        </div>
+        {/* Facts about the reading, not controls: they were two pill buttons,
+            the shape every clickable chip on the site uses, and did nothing. */}
+        <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+          <div className="flex gap-1.5">
+            <dt className="text-slate-500">Freshness</dt>
+            <dd className="font-medium text-slate-200">{payload.freshness}</dd>
+          </div>
+          <div className="flex gap-1.5">
+            <dt className="text-slate-500">Trust</dt>
+            <dd className="font-medium text-slate-200">{payload.trustSummary}</dd>
+          </div>
+        </dl>
         {dataCurrency ? (
           <p className="rounded-md border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
             {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}

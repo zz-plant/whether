@@ -12,15 +12,15 @@ import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings"
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import Link from "next/link";
-import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
+import { SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
-import { TrustStrip } from "../components/trustStrip";
+import { DecisionHero } from "../components/DecisionHero";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
-import { formatConfidenceChipLabel, publicDecisionLabels } from "../../lib/report/reportFormatting";
+import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import {
@@ -33,7 +33,6 @@ import { PlainEnglishScoreNote, SignalScaleNote } from "../components/ui/plainLa
 import { signalPlainEnglish, type CompositeSignalKey } from "../../lib/report/signalTranslations";
 import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
-import { ResolutionCompassGlyph } from "../components/illustrations/ResolutionCompassGlyph";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -185,77 +184,75 @@ export async function DecisionAnswerPageContent({
             { label: page.title },
           ]}
         />
-        <SecondaryPageHeader
-          eyebrow="Direct answer"
-          title={page.title}
-          description={page.directAnswer}
-          actions={(
-            <ReportCta
-              href={pagePath}
-              label="Copy decision brief"
-              copyText={copyText}
-              copyTarget="Decision brief"
-              telemetryEvent={{
-                pagePath,
-                cluster: measurement.cluster,
-                intent: measurement.intent,
-                ctaId: "copy_decision_brief_header",
-              }}
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
-            />
-          )}
-          aside={(
-            <div className="weather-surface space-y-2 px-4 py-4">
-              <div className="flex items-center justify-between gap-2">
-                <p className="type-eyebrow">Short answer</p>
-                <ResolutionCompassGlyph size={26} />
-              </div>
-              <p className="text-sm font-semibold text-sky-200">{page.shortAnswer}</p>
-              {dataCurrency ? (
-                <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                  {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
-                  <ActionLink href={DATA_CURRENCY_ACTION_HREF} variant="inline">Source dates</ActionLink>
-                </p>
-              ) : null}
-            </div>
-          )}
-        />
-
-        {relatedPages.length > 0 ? (
-          <nav aria-label="Related operator questions" className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-slate-400 font-medium">Related:</span>
-            {relatedPages.slice(0, 3).map((related) => (
-              <Link
-                key={related.slug}
-                href={`/answers/${related.slug}`}
-                className="weather-focus-ring inline-flex min-h-11 items-center rounded-md border border-slate-800 bg-slate-900/60 px-2.5 py-2 text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
-              >
-                {related.title} →
-              </Link>
-            ))}
-          </nav>
-        ) : null}
-
-        {/* `degraded` is assembly failing outright; a read that fell back to
-            the bundled snapshot succeeds, so it said "Live" over a snapshot
-            weeks old. The fallback flags are what move under an outage. */}
-        <TrustStrip
-          {...buildTrustStripProps({
+        {/* The answer as the card the brief opens on: the week's stamp, the question,
+            this week's answer to it, the lines it holds between, and the trust strip.
+            This page used to open on a generic header and a "Short answer" box of
+            enduring advice, with the week's conditions in small print further down,
+            so a reader arriving from search met explanation before the answer. */}
+        <DecisionHero
+          question={page.title}
+          weeklyCall={payload.currentCall}
+          callDetail={page.shortAnswer}
+          regime={assessment.regime}
+          lines={[
+            ...(payload.immediateAction.trim() !== payload.currentCall.trim()
+              ? [{ label: DECISION_CONTRACT_LABELS.action.doNow, value: payload.immediateAction }]
+              : []),
+            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: payload.triggerThreshold },
+            { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: payload.reversalCondition },
+          ]}
+          trust={buildTrustStripProps({
             recordDateLabel,
+            // `degraded` is assembly failing outright; a read that fell back to the
+            // bundled snapshot succeeds, so the fallback flags are what move under an outage.
             isFallback: degraded || Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
             degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
             confidenceLabel: homeBriefModel.confidenceLabel,
             assessment,
           })}
-          href="/trust"
-          className="mb-6"
         />
+        {dataCurrency ? (
+          <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+            {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
+            <ActionLink href={DATA_CURRENCY_ACTION_HREF} variant="inline">Source dates</ActionLink>
+          </p>
+        ) : null}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <ReportCta
+            href={pagePath}
+            label="Copy decision brief"
+            copyText={copyText}
+            copyTarget="Decision brief"
+            telemetryEvent={{
+              pagePath,
+              cluster: measurement.cluster,
+              intent: measurement.intent,
+              ctaId: "copy_decision_brief_header",
+            }}
+            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
+          />
+          {relatedPages.length > 0 ? (
+            <nav aria-label="Related operator questions" className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 font-medium">Related:</span>
+              {relatedPages.slice(0, 3).map((related) => (
+                <Link
+                  key={related.slug}
+                  href={`/answers/${related.slug}`}
+                  className="weather-focus-ring inline-flex min-h-11 items-center rounded-md border border-slate-800 bg-slate-900/60 px-2.5 py-2 text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
+                >
+                  {related.title} →
+                </Link>
+              ))}
+            </nav>
+          ) : null}
+        </div>
 
         <SecondaryPageSection title={headings.posture}>
           <div className="space-y-2 text-sm text-slate-200">
             <p className="text-xs text-slate-400">Market guidance as of {recordDateLabel}</p>
-            <p><span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</p>
-            <p><span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</p>
+            {/* The guidance and its action are the card's now; this section says how to use them. */}
+            <p>{page.directAnswer}</p>
             <p>{contextSummary.summaryLine}</p>
             {contextSummary.classificationLine ? (
               <p className="text-xs text-slate-400">{contextSummary.classificationLine}</p>
