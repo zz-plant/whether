@@ -51,7 +51,7 @@ describe("buildDecisionMovement", () => {
     ]);
     assert.equal(
       result.sentence,
-      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
     );
     // A link preview and a card have room for the consequence and not the evidence.
     assert.equal(result.headline, "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area.");
@@ -100,7 +100,7 @@ describe("buildDecisionMovement", () => {
     assert.deepEqual(result.moved.map((entry) => entry.area), ["hiring", "capital-raising", "burn-discipline", "expansion-bets"]);
     assert.equal(
       result.sentence,
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets: funding pressure rose through 76.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose through 76.",
     );
     // A reading that only touches the line has not crossed it.
     const touching = movement({ from: { tightness: 70, riskAppetite: 60 }, to: { tightness: 76, riskAppetite: 60 }, regime: "DEFENSIVE" });
@@ -129,7 +129,7 @@ describe("buildDecisionMovement", () => {
     );
     assert.equal(
       recovered.sentence,
-      "Since Aug 31, conditions changed from Freezing to Sunny and the resume line is now met for every area: funding pressure fell through 66 and risk appetite rose through 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell through 66 and risk appetite rose through 54.",
     );
 
     // Back out of the pause but not to the resume line: 80 to 72 is through 76 and no further.
@@ -155,7 +155,7 @@ describe("buildDecisionMovement", () => {
     assert.equal(result.areas.find((entry) => entry.area === "burn-discipline")?.kind, "held");
     assert.equal(
       result.sentence,
-      "Since Aug 31, the resume line is no longer met for Hiring, Roadmap, Fundraising and New bets: risk appetite fell through 54.",
+      "Since Aug 31, the resume line is no longer met for Hiring, Roadmap, Fundraising and New bets, because risk appetite fell through 54.",
     );
   });
 
@@ -167,7 +167,7 @@ describe("buildDecisionMovement", () => {
     assert.ok(behind);
     assert.equal(behind.conditions, null);
     assert.doesNotMatch(behind.sentence, /conditions changed/i);
-    assert.match(behind.sentence, /^Since Aug 31, the pause now applies to every area: /);
+    assert.match(behind.sentence, /^Since Aug 31, the pause now applies to every area, because /);
   });
 
   it("reads 'this week' where the source did not date the earlier reading", () => {
@@ -183,7 +183,7 @@ describe("buildDecisionMovement", () => {
 
     const crossed = movement({ from: { tightness: 60, riskAppetite: 60 }, to: { tightness: 80, riskAppetite: 60 }, regime: "DEFENSIVE", label: null });
     assert.ok(crossed);
-    assert.match(crossed.sentence, /^This week, conditions changed from Sunny to Cloudy and /);
+    assert.match(crossed.sentence, /^This week, conditions changed from Sunny to Cloudy\. /);
   });
 
   it("claims nothing without an earlier reading, or without an area that states a line", () => {

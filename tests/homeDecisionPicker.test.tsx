@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FirstVisitDecisionPicker, type DecisionPickerOption } from "../app/components/home/FirstVisitDecisionPicker";
+import { DecisionPicker, type DecisionPickerOption } from "../app/components/home/DecisionPicker";
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
@@ -22,8 +22,10 @@ mockAny.module("next/navigation", () => ({
 }));
 
 /**
- * The first-visit front door on `/`: the brief below the call folds away for a
- * browser that has never rendered it, and one question takes its place.
+ * "What are you deciding?" on `/`, for every reader. On a first visit the brief
+ * below folds away and the picker carries the alert, the record line and the
+ * button that opens the brief; a returning reader gets the question without the
+ * fold. It used to be first-visit only, so the page was two products at one URL.
  *
  * The homepage itself does not render in this suite (it suspends at the report
  * read path), so the picker is rendered on its own and the fold is checked as
@@ -39,18 +41,28 @@ const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area) => ({
 
 describe("first-visit decision picker", () => {
   const html = renderToStaticMarkup(
-    <FirstVisitDecisionPicker
+    <DecisionPicker
       options={OPTIONS}
       regime="SCARCITY"
       scores={{ tightness: 90, riskAppetite: 44 }}
       flipCondition="Funding pressure falls to or below 70."
-      lastTime="The last time conditions moved this way was Sep 2022 (Stormy to Freezing)."
+      lastTime="The last time conditions tightened was Sep 2022, from Stormy to Freezing; this week they went from Sunny to Freezing."
       turningPoints={[{ label: "Sep 2022, Stormy to Freezing", href: "/?month=9&year=2022" }]}
+      calibration={{ stageLabel: "Series A", runwayPhrase: "12–24 months", chosen: false }}
     />,
   );
 
-  it("renders only for a first visit, so the default page is unchanged", () => {
-    assert.match(html, /data-first-visit-only="true"/);
+  it("asks every reader, and folds only the first-visit extras", () => {
+    assert.match(html, /^<section data-testid="decision-picker"/);
+    assert.doesNotMatch(html.slice(0, html.indexOf(">")), /data-first-visit-only/, "the question is not first-visit only");
+    const fold = html.indexOf('data-first-visit-only="true"');
+    assert.ok(fold > html.indexOf("What are you deciding?"), "the extras fold after the question");
+    assert.ok(html.indexOf("Show the full brief") > fold, "the reveal button is one of them");
+  });
+
+  it("says whose lines the answers are scaled to, where the reader first meets them", () => {
+    assert.match(html, /Lines set for Series A with 12–24 months of runway \(the defaults\)\./);
+    assert.match(html, /href="#company-calibration"/);
   });
 
   it("asks one question with an answer for every area", () => {
@@ -60,10 +72,11 @@ describe("first-visit decision picker", () => {
     }
   });
 
-  it("offers the alerts-only signup beside the condition it watches", () => {
-    assert.match(html, /Tell me when this changes/);
+  it("offers the one subscribe form, starting on alerts only, beside the condition it watches", () => {
+    assert.match(html, /Tell me when the guidance changes/);
     assert.match(html, /Next change to watch: Funding pressure falls to or below 70\./);
     assert.match(html, /No weekly newsletter/);
+    assert.match(html, /Every Monday too/, "the weekly choice is on the same form");
   });
 
   it("says what each score means before any line quotes one", () => {
@@ -74,16 +87,16 @@ describe("first-visit decision picker", () => {
   });
 
   it("answers whether this has happened before on the page, and only when the week has an answer", () => {
-    assert.match(html, /The last time conditions moved this way was Sep 2022 \(Stormy to Freezing\)\./);
+    assert.match(html, /The last time conditions tightened was Sep 2022, from Stormy to Freezing; this week they went from Sunny to Freezing\./);
     const quietWeek = renderToStaticMarkup(
-      <FirstVisitDecisionPicker
+      <DecisionPicker
         options={OPTIONS}
         regime="SCARCITY"
         scores={{ tightness: 90, riskAppetite: 44 }}
         turningPoints={[]}
       />,
     );
-    assert.doesNotMatch(quietWeek, /The last time conditions moved/);
+    assert.doesNotMatch(quietWeek, /The last time conditions/);
   });
 
   it("links the turning points into the time machine and offers the full brief", () => {

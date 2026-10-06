@@ -8,15 +8,21 @@ import { HOME_SECTIONS, type HomeAreaRow } from "../../../lib/report/home/homeSe
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
 import { SignalReading } from "../ui/plainLanguage";
-import { FlipAlertForm } from "./FlipAlertForm";
+import { SubscribeForm } from "../SubscribeForm";
 import { CommitmentTest } from "./CommitmentTest";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { RUNWAY_CHANGED_EVENT } from "../useOperatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 /**
- * The first-visit front door: one question under the call, instead of the
- * whole brief.
+ * "What are you deciding?": one question under the call, for every reader.
+ *
+ * It was first-visit only, so the page was two products at one URL: a first
+ * visit got the question and no evidence, and a returning reader got the
+ * evidence and lost the question. The question now shows on every live weekly
+ * brief. What stays first-visit only is the fold: the alert form, the record
+ * line and the button that opens the rest of the brief, which a returning
+ * reader already has open below.
  *
  * A first-time reader meets a call about the market — "freeze new commitments"
  * — and five sections of evidence for it, and nothing that says what it means
@@ -64,13 +70,14 @@ const hashTargetsFoldedBrief = () => {
   return Boolean(document.getElementById(id)?.closest("[data-first-visit-collapsible]"));
 };
 
-export function FirstVisitDecisionPicker({
+export function DecisionPicker({
   options,
   regime,
   scores,
   flipCondition,
   lastTime,
   turningPoints,
+  calibration,
 }: {
   options: readonly DecisionPickerOption[];
   /** This week's conditions, which pick the runway note the runway test quotes. */
@@ -81,6 +88,8 @@ export function FirstVisitDecisionPicker({
   /** `summarizeLastTimeCallChanged`, on a week the guidance changed; absent on every other week. */
   lastTime?: string;
   turningPoints: readonly { label: string; href: string }[];
+  /** Who the lines below are scaled for. The controls that set it sit in the brief, under "What that changes for you". */
+  calibration?: { stageLabel: string; runwayPhrase: string; chosen: boolean };
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<DecisionArea | undefined>(undefined);
@@ -124,8 +133,7 @@ export function FirstVisitDecisionPicker({
 
   return (
     <section
-      data-first-visit-only="true"
-      data-testid="first-visit-decision-picker"
+      data-testid="decision-picker"
       aria-labelledby="first-visit-decision-heading"
       className="order-1 space-y-8 border-t border-slate-800/70 pt-5"
     >
@@ -141,6 +149,21 @@ export function FirstVisitDecisionPicker({
           <p className="text-fluid-xs text-slate-400">
             Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
           </p>
+          {/* The answers are scaled to a stage and a runway, and the controls
+              that set them sat mid-page under the content they change. This
+              says whose lines these are where the reader first meets them. */}
+          {calibration ? (
+            <p className="text-fluid-xs text-slate-400" data-calibration-note>
+              Lines set for {calibration.stageLabel} with {calibration.runwayPhrase} of runway
+              {calibration.chosen ? "" : " (the defaults)"}.{" "}
+              <a
+                href="#company-calibration"
+                className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200 max-sm:hidden"
+              >
+                Change
+              </a>
+            </p>
+          ) : null}
         </div>
 
         <SegmentedControl
@@ -208,39 +231,43 @@ export function FirstVisitDecisionPicker({
         ) : null}
       </div>
 
-      <FlipAlertForm condition={flipCondition} />
+      {/* First visit only: the alert, the record line and the button that opens
+          the brief. A returning reader has all three in the brief below. */}
+      <div data-first-visit-only="true" className="space-y-8">
+        <SubscribeForm compact defaultFrequency="alerts" condition={flipCondition} />
 
-      {/* The answer to "has this happened before", on the page. The card that
-          says it at length is in the folded brief, and the turning points
-          below are links; a sceptical first visit had to leave to check. */}
-      {lastTime || turningPoints.length > 0 ? (
-        <div className="space-y-2">
-          <h3 className="type-eyebrow">Has this happened before?</h3>
-          {lastTime ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{lastTime}</p> : null}
+        {/* The answer to "has this happened before", on the page. The card that
+            says it at length is in the folded brief, and the turning points
+            below are links; a sceptical first visit had to leave to check. */}
+        {lastTime || turningPoints.length > 0 ? (
+          <div className="space-y-2">
+            <h3 className="type-eyebrow">Has this happened before?</h3>
+            {lastTime ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{lastTime}</p> : null}
 
-          {turningPoints.length > 0 ? (
-            <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
-              Check it against the record. What the guidance said at the last turns:{" "}
-              {turningPoints.map((point, index) => (
-                <span key={point.href}>
-                  {index > 0 ? " · " : null}
-                  <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                    {point.label}
-                  </Link>
-                </span>
-              ))}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
+            {turningPoints.length > 0 ? (
+              <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
+                Check it against the record. What the guidance said at the last turns:{" "}
+                {turningPoints.map((point, index) => (
+                  <span key={point.href}>
+                    {index > 0 ? " · " : null}
+                    <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+                      {point.label}
+                    </Link>
+                  </span>
+                ))}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
 
-      <button
-        type="button"
-        onClick={handleReveal}
-        className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold"
-      >
-        Show the full brief: what changed, by area, and what would change it
-      </button>
+        <button
+          type="button"
+          onClick={handleReveal}
+          className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold"
+        >
+          Show the full brief
+        </button>
+      </div>
     </section>
   );
 }

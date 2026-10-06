@@ -74,11 +74,15 @@ const LineCell = ({
     !isCrossed &&
     Boolean(distanceText.match(/\b([0-4](\.\d+)?|5(\.0+)?)\s+pts\b/));
 
+  /* A crossed pause line is a pause in force: caution, the colour of the
+     column it sits in. It was red, the same red a Freezing week paints the
+     page, the stamp and the change line, so "in force" read as "error". Near
+     a line is the quieter tint of the same hue. */
   const distanceClass =
     kind === "pause" && isCrossed
-      ? "text-rose-300 font-medium"
+      ? "text-semantic-caution-fg font-semibold"
       : kind === "pause" && isNear
-        ? "text-amber-300 font-medium"
+        ? "text-amber-200/80 font-medium"
         : kind === "resume" && isCrossed
           ? "text-emerald-300 font-medium"
           : "text-slate-400";

@@ -13,7 +13,6 @@ import { ActivationTracker } from "./components/activationTracker";
 import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
 import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
-import { CompactTrustPopover } from "./components/CompactTrustPopover";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
@@ -30,6 +29,9 @@ import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildQuietDayRead } from "../lib/report/flipProximity";
 import { buildChangedLead } from "../lib/report/decisionMovement";
+import { splitWeeklyCall } from "../lib/report/reportEvidence";
+import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
+import { DEFAULT_RUNWAY_BAND, runwayBandPhrase } from "../lib/report/operatorRunway";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
@@ -57,12 +59,11 @@ import { findLastTimeCallChanged, summarizeLastTimeCallChanged } from "../lib/re
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
-import { buildTrackRecord } from "../lib/report/trackRecord";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
-import { FirstVisitDecisionPicker, type DecisionPickerOption } from "./components/home/FirstVisitDecisionPicker";
+import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
@@ -254,6 +255,12 @@ async function PageContent({
     resumeWhenLabel,
     briefShareLines,
   } = deriveBriefCallFields(homepage.weeklyDecisionCardModel);
+  /* The card prints the action; the week's direction rides on the stamp line.
+     Copy Brief, the sticky strip and every paste keep the composed call. */
+  const cardCall = splitWeeklyCall(primaryCall);
+  const actionNowShort = homepage.weeklyDecisionCardModel.decision.actionNowShort;
+  const cardCallDetail =
+    actionNowShort && splitWeeklyCall(actionNowShort).action !== cardCall.action ? actionNowShort : undefined;
 
   const v2HeroSignalData = {
     ...buildV2HeroSignalData(reportData),
@@ -309,11 +316,6 @@ async function PageContent({
     recordDate: reportData.treasury.record_date,
     title: cadenceTitle ?? "Whether Weekly Brief",
   });
-
-  /* The whole record, as /history reads it, so the popover's "months on
-   * record" and the page it links to agree. The series walk is cached per
-   * window, so the second reader of the full window pays nothing. */
-  const trackRecord = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
 
   /* The five sections' data, built once here and drawn by the components under
      app/components/home. The lines every score is judged against are the same
@@ -524,9 +526,10 @@ async function PageContent({
               {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
                 titleLevel={cadenceCall ? "h2" : "h1"}
-                weeklyCall={primaryCall}
-                callDetail={homepage.weeklyDecisionCardModel.decision.actionNowShort}
+                weeklyCall={cardCall.action}
+                callDetail={cardCallDetail}
                 regime={regime}
+                direction={historicalSelection ? undefined : cardCall.directionLabel}
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
@@ -567,30 +570,29 @@ async function PageContent({
                 className="mt-4 flex flex-wrap items-center gap-2"
               >
                 <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
-                <CompactTrustPopover
-                  /* The fallback is a code like the real value, not the phrase it
-                     used to be — the popover formats both the same way now. */
-                  confidenceLabel={confidenceLabel ?? "HIGH"}
-                  isHistorical={Boolean(historicalSelection)}
-                  fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
-                  recordDateLabel={homepage.reportShell.recordDateLabel}
-                  treasurySource={homepage.reportShell.treasurySource}
-                  degradedCount={homepage.reportShell.degradedSourceRows?.length ?? 0}
-                  record={trackRecord}
-                  regime={regime}
-                />
-                <CadenceSelector />
+                {/* Labelled: three bare words beside Copy Brief did not say they
+                    set the horizon the guidance is stated for. The confidence chip
+                    that sat between them repeated the trust strip on the card. */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-fluid-xs text-slate-400">Plan horizon</span>
+                  <CadenceSelector />
+                </div>
               </div>
             </div>
 
             {offersFirstVisitFold ? (
-              <FirstVisitDecisionPicker
+              <DecisionPicker
                 options={decisionPickerOptions}
                 regime={regime}
                 scores={{ tightness, riskAppetite }}
                 flipCondition={reversalTriggerLabel}
                 lastTime={lastTimeCallChanged ? summarizeLastTimeCallChanged(lastTimeCallChanged) : undefined}
                 turningPoints={turningPoints}
+                calibration={{
+                  stageLabel: operatorStageLabel(operatorStageForVariantMode(activeStage)),
+                  runwayPhrase: runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND),
+                  chosen: Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway),
+                }}
               />
             ) : null}
 
@@ -631,7 +633,6 @@ async function PageContent({
               resumeWhen={resumeWhenLabel}
               guardrail={guardrailLabel}
               flipConditions={flipConditionLabels}
-              thresholdBusinessConsequence={homepage.weeklyDecisionCardModel.decision.thresholdBusinessConsequence}
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
               regime={regime}
@@ -642,6 +643,7 @@ async function PageContent({
               operateHref={operateHref}
               planLabel={cadenceCall?.planLabel}
               currentRecordDate={reportData.treasury.record_date}
+              currentRecordDateLabel={homepage.reportShell.recordDateLabel}
             />
             </div>
         </div>

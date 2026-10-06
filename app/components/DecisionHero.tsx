@@ -13,6 +13,8 @@ type Props = {
   /** The longer sentence behind the call; printed only when it says more than the call does. */
   callDetail?: string;
   regime: string;
+  /** The week's direction ("Tightening this week"), printed after what the regime means. */
+  direction?: string;
   /** Freshness and confidence, drawn once under the call. Absent on an archived week, which the banner above marks. */
   trust?: Omit<TrustStripProps, "href" | "className"> | null;
   /**
@@ -66,6 +68,7 @@ export function DecisionHero({
   weeklyCall,
   callDetail,
   regime,
+  direction,
   trust,
   titleLevel = "h1",
   captionDetail,
@@ -117,6 +120,7 @@ export function DecisionHero({
           {regimeKey ? (
             <span className="text-xs leading-relaxed text-slate-400">
               {REGIME_WEATHER_RATIONALES[regimeKey]}
+              {direction ? <span className="text-slate-300"> · {direction}</span> : null}
             </span>
           ) : null}
         </div>

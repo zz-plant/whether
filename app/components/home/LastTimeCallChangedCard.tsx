@@ -3,7 +3,7 @@ import { ScoreCell } from "../ui/scoreCell";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { buildLastTimeCompareHref, describeAgainstToday, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import { buildLastTimeCompareHref, describeAgainstToday, lastTimeVerb, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 
 /**
  * On a week the call changed: the last time it moved this way, what the two
@@ -31,10 +31,10 @@ export function LastTimeCallChangedCard({
   return (
     <aside
       data-testid="last-time-call-changed"
-      aria-label="The last time conditions moved this way"
+      aria-label={`The last time conditions ${lastTimeVerb(record)}`}
       className="space-y-3 border-t border-slate-800/60 pt-4"
     >
-      <p className="type-eyebrow">The last time conditions moved this way</p>
+      <p className="type-eyebrow">The last time conditions {lastTimeVerb(record)}</p>
       <p className="text-fluid-xs leading-5 text-slate-200">
         <span className="font-semibold text-white">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.

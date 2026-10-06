@@ -121,8 +121,9 @@ describe("the homepage's changed-signals table", () => {
 
   it("leaves the dated ladders to What changed, and says nothing undated over the move", () => {
     /* The section used to redraw the two ladders "What changed" draws, hollow
-       dot and all (DD-039). It keeps the radar and the market moves; the dated
-       dot is asserted on the "What changed" table above. */
+       dot and all (DD-039). It keeps the radar and the market moves, folded
+       under the call-change line; the dated dot is asserted on the "What
+       changed" table above. */
     const html = renderToStaticMarkup(
       <WhatWouldChangeSection
         ladders={[
@@ -141,7 +142,7 @@ describe("the homepage's changed-signals table", () => {
     );
 
     assert.doesNotMatch(html, /data-ladder-row=/, "no score ladder is redrawn here");
-    assert.match(html.replace(/<[^>]+>/g, " "), /Funding pressure\s+If the 1-month bill rate falls 0\.15%/);
+    assert.match(html.replace(/<[^>]+>/g, " "), /Funding pressure:\s+If the 1-month bill rate falls 0\.15%/);
     assert.doesNotMatch(html, noWords);
   });
 });

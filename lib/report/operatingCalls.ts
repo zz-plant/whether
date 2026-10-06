@@ -70,67 +70,6 @@ export type ActionStripItem = {
   priorityOrderIndex?: number;
 };
 
-export type ThresholdBusinessConsequence = {
-  pointsToThreshold: number;
-  consequenceLabel: string;
-  status: "approaching" | "crossed";
-};
-
-const thresholdConsequenceByLever: Record<BusinessAreaKey, string> = {
-  "hiring-stance": "the hiring pause line",
-  "investment-pace": "the expansion pause line",
-  "sales-posture": "the fundraising pause line",
-  "product-priorities": "the roadmap pause line",
-  "risk-tolerance": "the spending pause line",
-};
-
-const decisionAreaByLever: Record<BusinessAreaKey, DecisionArea> = {
-  "hiring-stance": "hiring",
-  "investment-pace": "expansion-bets",
-  "sales-posture": "capital-raising",
-  "product-priorities": "product-tempo",
-  "risk-tolerance": "burn-discipline",
-};
-
-/**
- * Names the business consequence attached to the nearest bounded pause line.
- * Revisit order wins ties so the hero repeats the decision already surfaced to
- * operators instead of inferring meaning from a score or component label.
- */
-export const buildThresholdBusinessConsequence = ({
-  actionStripItems,
-  revisitAreaPriority = [],
-}: {
-  actionStripItems: ActionStripItem[];
-  revisitAreaPriority?: DecisionArea[];
-}): ThresholdBusinessConsequence | null => {
-  const candidates = actionStripItems.filter(
-    (item): item is ActionStripItem & { priorityDistancePoints: number } =>
-      typeof item.priorityDistancePoints === "number" && Number.isFinite(item.priorityDistancePoints),
-  );
-  if (candidates.length === 0) return null;
-
-  const nearestDistance = Math.min(...candidates.map((item) => item.priorityDistancePoints));
-  const nearest = candidates
-    .filter((item) => item.priorityDistancePoints === nearestDistance)
-    .sort((left, right) => {
-      const leftRevisitIndex = revisitAreaPriority.indexOf(decisionAreaByLever[left.lever]);
-      const rightRevisitIndex = revisitAreaPriority.indexOf(decisionAreaByLever[right.lever]);
-      const leftPriority = leftRevisitIndex === -1 ? Number.MAX_SAFE_INTEGER : leftRevisitIndex;
-      const rightPriority = rightRevisitIndex === -1 ? Number.MAX_SAFE_INTEGER : rightRevisitIndex;
-      return leftPriority - rightPriority
-        || (left.priorityOrderIndex ?? Number.MAX_SAFE_INTEGER) - (right.priorityOrderIndex ?? Number.MAX_SAFE_INTEGER);
-    })[0];
-
-  if (!nearest) return null;
-  const pointsToThreshold = Math.max(0, Math.round(nearest.priorityDistancePoints));
-  return {
-    pointsToThreshold,
-    consequenceLabel: thresholdConsequenceByLever[nearest.lever],
-    status: pointsToThreshold === 0 ? "crossed" : "approaching",
-  };
-};
-
 export type RoleAwareOperatingTemplate = {
   role: "startup-leadership" | "vc-partner";
   roleLabel: string;

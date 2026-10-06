@@ -19,6 +19,8 @@ export type TrustStripProps = {
   confidenceLabel: "HIGH" | "MED" | "LOW";
   /** Whether the call could change at the next reading. */
   couldChangeNextWeek: boolean;
+  /** Why it could: "risk appetite is 3 pts from its line". Printed after "Yes". */
+  changeReason?: string;
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
   className?: string;
@@ -38,6 +40,7 @@ export function TrustStrip({
   sourcesLabel,
   confidenceLabel,
   couldChangeNextWeek,
+  changeReason,
   href,
   className = "",
 }: TrustStripProps) {
@@ -50,7 +53,11 @@ export function TrustStrip({
      * a promise about the future the confidence cell had just declined to
      * make. "Not expected" states the expectation the score distance gives,
      * and lets the adjacent confidence qualify it. */
-    { label: "Could change next week", value: couldChangeNextWeek ? "Yes" : "Not expected", tone: couldChangeNextWeek ? "caution" : undefined },
+    {
+      label: "Could change next week",
+      value: couldChangeNextWeek ? (changeReason ? `Yes, ${changeReason}` : "Yes") : "Not expected",
+      tone: couldChangeNextWeek ? "caution" : undefined,
+    },
   ];
   /* A phone wraps the four pairs, and a label told from a value only by its
      shade then reads into the next pair: "Confidence High Could change next

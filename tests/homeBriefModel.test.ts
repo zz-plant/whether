@@ -3,68 +3,10 @@ import { describe, it } from "bun:test";
 import { buildDecisionMatrixPayload, buildHomeBriefModel, buildMemoryRail } from "../lib/report/homeBriefModel";
 import { getWeeklyPostureHistory } from "../lib/summary/weeklyPostureHistory";
 import { REGIME_LABELS } from "../lib/regimePresentation";
-import { buildThresholdBusinessConsequence, type ActionStripItem } from "../lib/report/operatingCalls";
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 describe("buildHomeBriefModel", () => {
-  it("derives the nearest threshold consequence from its single affected bounded decision", () => {
-    const consequence = buildThresholdBusinessConsequence({
-      actionStripItems: [{
-        lever: "hiring-stance",
-        label: "Hiring posture",
-        areaActionNow: "Hold speculative hiring.",
-        triggerThreshold: "Pause net-new hiring above 56.",
-        reversalCondition: "Resume below 46.",
-        priorityDistancePoints: 3,
-        priorityOrderIndex: 0,
-      }],
-    });
-
-    assert.deepEqual(consequence, {
-      pointsToThreshold: 3,
-      consequenceLabel: "the hiring pause line",
-      status: "approaching",
-    });
-  });
-
-  it("uses the highest-priority surfaced decision when decisions share a threshold", () => {
-    const sharedItems: ActionStripItem[] = [
-      {
-        lever: "hiring-stance", label: "Hiring posture", areaActionNow: "A", triggerThreshold: "T",
-        reversalCondition: "R", priorityDistancePoints: 4, priorityOrderIndex: 0,
-      },
-      {
-        lever: "investment-pace", label: "Investment pace", areaActionNow: "A", triggerThreshold: "T",
-        reversalCondition: "R", priorityDistancePoints: 4, priorityOrderIndex: 1,
-      },
-    ];
-
-    assert.deepEqual(buildThresholdBusinessConsequence({
-      actionStripItems: sharedItems,
-      revisitAreaPriority: ["expansion-bets", "hiring"],
-    }), {
-      pointsToThreshold: 4,
-      consequenceLabel: "the expansion pause line",
-      status: "approaching",
-    });
-  });
-
-  it("preserves zero distance when the bounded threshold is already crossed", () => {
-    const consequence = buildThresholdBusinessConsequence({
-      actionStripItems: [{
-        lever: "hiring-stance", label: "Hiring posture", areaActionNow: "A", triggerThreshold: "T",
-        reversalCondition: "R", priorityDistancePoints: 0, priorityOrderIndex: 0,
-      }],
-    });
-
-    assert.deepEqual(consequence, {
-      pointsToThreshold: 0,
-      consequenceLabel: "the hiring pause line",
-      status: "crossed",
-    });
-  });
-
   it("keeps the memory rail labels and posture sequence aligned with the recent weekly posture artifact", () => {
     const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
     const expectedPriorEntries = getWeeklyPostureHistory()
@@ -198,7 +140,7 @@ describe("buildHomeBriefModel", () => {
        crosses the pause line at 56, so four of the five areas pause. */
     assert.equal(
       dated.weeklyMovement.summary,
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets: funding pressure rose through 56.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose through 56.",
     );
     assert.equal(dated.decisionMovement?.comparedWith, "Aug 31");
     assert.doesNotMatch(dated.weeklyMovement.summary, /Pressure increased|Slow new commitments/);
@@ -209,7 +151,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(undated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs last week");
     assert.equal(undated.weeklyLeadershipSummary.comparedWith, undefined);
     assert.match(undated.weeklyLeadershipSummary.netDeltaLabel, /than last week\.$|where it was last week\.$/);
-    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*: funding pressure rose through 56\.$/);
+    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*, because funding pressure rose through 56\.$/);
   });
 
   /*
@@ -241,7 +183,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.equal(
       model.weeklyMovement.summary,
-      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
     );
     assert.equal(model.decisionShiftHeadline, model.weeklyMovement.summary);
     assert.equal(model.decisionMovement?.moved.length, 5);

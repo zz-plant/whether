@@ -315,7 +315,7 @@ describe("/ and /brief.md agree on whether conditions could change next week", (
     const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Confidence:**"));
     assert.ok(stripValue, "expected the strip to state whether conditions could change next week");
     assert.ok(briefTrustLine, "expected /brief.md to open with its confidence line");
-    return { stripSaysYes: stripValue === "Yes", briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
+    return { stripSaysYes: stripValue?.startsWith("Yes") ?? false, briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
   };
 
   it("says not expected on the week of Sep 29, on both", async () => {

@@ -113,7 +113,7 @@ export function WhatChangedSection({
                   <div className="space-y-1">
                     <Link
                       href={`/signals#${row.key}`}
-                      className="weather-hit text-sm font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 underline-offset-2 transition-colors"
+                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 underline-offset-2 transition-colors"
                       title={`View ${row.label} evidence and historical charts`}
                     >
                       {row.label}
@@ -142,43 +142,43 @@ export function WhatChangedSection({
                         <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> once inverted
                       </span>
                     ) : null}
-                    {/* Which end of the scale is which. A composite score is the one
-                        number on this page with no unit, and a first-time reader has
-                        no way to tell 0 from 100 without it. */}
-                    {row.scaleLabel || isCompositeSignalKey(row.key) ? (
-                      <div className="flex flex-wrap items-center gap-x-1.5 text-fluid-nano font-normal text-slate-400">
-                        {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
-                        {row.scaleLabel && isCompositeSignalKey(row.key) ? (
-                          <span aria-hidden="true" className="text-slate-600">·</span>
-                        ) : null}
-                        {isCompositeSignalKey(row.key) ? (
-                          <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {/* What the score means at the level it is actually at. The
-                        band label above says where it sits; this says what that
-                        is like to operate in. */}
-                    {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
-                      <PlainEnglishScoreNote
-                        signalKey={row.key}
-                        score={row.value}
-                        className="whitespace-normal font-normal text-slate-300/80"
-                      />
-                    ) : null}
                     {/* Which inputs took the score from the earlier reading to
                         this one. The chip says how far it went; without this a
                         27-point move reads as the market having moved 27 points,
                         when part of a score's move can be an input the earlier
                         score never had. */}
                     {row.movement ? (
-                      <div
-                        className="mt-1 rounded-md border border-slate-800/80 bg-slate-900/40 p-2 text-fluid-nano font-normal leading-relaxed text-slate-300"
-                        data-movement={row.key}
-                      >
-                        <span className="font-semibold text-slate-200">What moved it: </span>
+                      <p className="text-fluid-xs font-normal leading-relaxed text-slate-300" data-movement={row.key}>
+                        <span className="text-slate-400">What moved it: </span>
                         {row.movement}
-                      </div>
+                      </p>
+                    ) : null}
+                    {/* The scale and what the score means at its level, one click
+                        away. They were four more stacked lines in every row, at
+                        the same small size as the name and the move, so a row
+                        had six layers and no first thing to read. */}
+                    {row.scaleLabel || isCompositeSignalKey(row.key) ? (
+                      <details className="weather-auto-chevron text-fluid-nano font-normal text-slate-400">
+                        <summary className="cursor-pointer select-none">What the score means</summary>
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-x-1.5">
+                            {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
+                            {row.scaleLabel && isCompositeSignalKey(row.key) ? (
+                              <span aria-hidden="true" className="text-slate-600">·</span>
+                            ) : null}
+                            {isCompositeSignalKey(row.key) ? (
+                              <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
+                            ) : null}
+                          </div>
+                          {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
+                            <PlainEnglishScoreNote
+                              signalKey={row.key}
+                              score={row.value}
+                              className="whitespace-normal font-normal text-slate-300/80"
+                            />
+                          ) : null}
+                        </div>
+                      </details>
                     ) : null}
                   </div>
                 </th>

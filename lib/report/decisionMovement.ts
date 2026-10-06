@@ -279,7 +279,6 @@ export const buildDecisionMovement = ({
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
-    const causes = uniqueLines(groups.flatMap((group) => group.crossed)).map(describeCrossing);
     const lead = conditions
       ? `${upperFirst(window)}, conditions changed from ${conditions.from} to ${conditions.to} and `
       : `${upperFirst(window)}, `;
@@ -291,8 +290,19 @@ export const buildDecisionMovement = ({
        label; then the areas go to a count. */
     const withoutConditions = `${upperFirst(window)}, ${clauses.join("; ")}.`;
     const counted = `${lead}${countAreas(moved.length, movements.length)} crossed a pause or resume line.`;
+    /* Short sentences, each group with its own cause. It was one sentence with a
+       semicolon between the groups and a colon before every cause at once — 45
+       words on a week that changed conditions and moved areas two ways — so a
+       reader had to hold the areas in mind until the causes arrived. */
+    const grouped = groups.map(
+      (group) =>
+        `${GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length))}, because ${joinAnd(group.crossed.map(describeCrossing))}`,
+    );
+    const sentence = conditions
+      ? [`${upperFirst(window)}, conditions changed from ${conditions.from} to ${conditions.to}.`, ...grouped.map((clause) => `${upperFirst(clause)}.`)].join(" ")
+      : [`${upperFirst(window)}, ${grouped[0]}.`, ...grouped.slice(1).map((clause) => `${upperFirst(clause)}.`)].join(" ");
     return {
-      sentence: `${lead}${clauses.join("; ")}: ${joinAnd(causes)}.`,
+      sentence,
       headline: full,
       headlines: [...new Set([full, withoutConditions, counted])],
     };
