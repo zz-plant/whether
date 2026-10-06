@@ -9,16 +9,16 @@ describe("operations navigation", () => {
   });
 
   it("indexes the plan page in page order, one entry per section", () => {
-    // The six stepper steps, then the risk-checks tail — the order a reader
-    // meets them. This used to be six labels in a different order, two of which
-    // named panels inside other steps, and none of which named the Test step.
+    // The six sections, then the risk-checks tail — the order a reader meets
+    // them. Plan-first since 2026-10-06: the reader's own decision leads, then
+    // the rules, then the area reference the brief also prints.
     assert.deepEqual(operationsSectionLinks.plan.map((link) => link.href), [
-      "#ops-monthly-action-summary",
-      "#ops-export-briefs",
-      "#ops-playbook",
-      "#ops-plan-lines",
       "#ops-decision-shield",
+      "#ops-playbook",
+      "#ops-monthly-action-summary",
+      "#ops-plan-lines",
       "#ops-finance-strategy",
+      "#ops-export-briefs",
       "#ops-failure-patterns",
     ]);
   });

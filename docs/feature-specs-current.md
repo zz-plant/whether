@@ -249,8 +249,7 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
   key-number gauges and the inversion timeline; the two twelve-month lines are a
   `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
   the fossil-record table is behind a `?fossil=1` disclosure.
-- **Plan** opens with the shared corridor rails (`BoundedCorridorRails`) inside the weekly plan
-  step, and the rules table refers back to them; the sticky one-row strip is section navigation
+- **Plan** opens with "Test a decision" (§1.1.36); the sticky one-row strip is section navigation
   only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
 - **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
   2026-09-08: each asked the reader to maintain browser-local state the product could not pay
@@ -2334,7 +2333,7 @@ current "stable" verdict, so the sentence and the data fail together.
 
 Visual navigation upgrades across the five homepage sections to sharpen decision transmission without adding framework bloat or novel taxonomies:
 1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines supplied by the active thresholds. Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary. The caption measures the score distance to that plotted call-change line; company-specific pause-line distances stay in the section heading and ladders. Radar labels use theme-aware semantic ink.
-2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails (removed from the homepage on 2026-10-05, §1.1.33; `/operate` keeps them). Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
+2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails (removed from the homepage on 2026-10-05, §1.1.33, and from `/operate` on 2026-10-06, §1.1.36). Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
 3. **High-Contrast Monday Delta & Decision Staleness Badges:** Upgraded `SinceLastVisit.tsx` to surface `linesCrossedLead` (`movementSentence`) for returning operators. Upgraded `YourRecordNote.tsx` with high-visibility badges (`Reconsider` in rose, `Watch` in amber) when an operator's active assumptions in `/decisions` have had their macro conditions breached.
 4. **Interlinked Causal Navigation & Target Highlighting:** Added anchor targets (`#signal-funding-pressure`, `#signal-risk-appetite`) and direct links from each signal to the operating areas it governs in Section 2 (`WhatChangedSection.tsx`). Added row IDs (`id="area-${row.area}"`) and reverse citation anchor links in `AreaTable.tsx`. Added CSS `:target` styling (`tr:target`) to illuminate rows when jumped to via anchor links.
 
@@ -2411,6 +2410,29 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
   render was the page's one hydration mismatch.
 - `/operate`'s "Share the brief" step keeps the rail's four formats
   (`app/components/briefIslandPicker.tsx`) and links to `/share` for the rest.
+
+
+### 1.1.36 `/operate` opens on the reader's decision, not a copy of the brief (2026-10-06)
+
+The plan page opened on a "Weekly plan" step that restated the brief: the score rails, an Action now
+/ Pause if / Conditions change if list, and the same five-area rules table the homepage prints.
+Under it sat six accordion steps, each with a Done box and a "0 of 6 done this week" count, though
+most steps were reading, not tasks. The parts that make it a plan — testing a move, setting your
+own lines — were closed, two and three sections down.
+
+- **Order.** Test a decision (open), Rules before you commit (open), This week's rule for each area,
+  Set this plan's lines, Finance strategy, Share the brief, then Risk checks. The section index
+  (`operationsSectionLinks.plan`) follows the page.
+- **The area step keeps the table only.** The rails and the restated call lines are gone; they are
+  on the brief one click away. `BoundedCorridorRails` had no caller left and was deleted.
+- **No checklist.** The Done boxes, the weekly count and the browser record behind them
+  (`app/operate/weekChecklist.ts`, `STORAGE_KEYS.weekChecklist`) are removed, and `/privacy` 2.4
+  no longer lists them.
+- **Test a decision is a body, not a second page.** `DecisionShieldPanel` drops its own header
+  (the step asks the question), drops the provenance block (the page's trust line states it), and
+  moves Copy verdict, Copy link and Record this decision below the verdict they act on.
+- Step ids are unchanged, so every deep link — `#ops-monthly-action-summary` from the brief, the
+  portfolio note, the CLI — still opens its section.
 
 ### Shared page spacing (2026-10-04)
 

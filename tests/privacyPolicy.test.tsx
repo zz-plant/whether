@@ -33,7 +33,6 @@ const STORAGE_KEY_SECTIONS: Record<keyof typeof STORAGE_KEYS, string> = {
   operatorWorkflowLastPath: "2.4 — stays in the browser, never sent",
   lastSeenCall: "2.4 — stays in the browser, never sent",
   decisionShieldPresets: "2.4 — stays in the browser, never sent",
-  weekChecklist: "2.4 — stays in the browser, never sent",
   entitlementToken: "2.2 — the token that tells this browser its plan is active",
   decisionMemory: "2.3 and 2.4 — keyed to the browser identifier, and stored server-side",
   measurementOff: "5 — the reader's choice to send no 2.6 measurement from this browser",
