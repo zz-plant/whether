@@ -2422,7 +2422,7 @@ decisions, the 404) had its own widths and a navy backdrop, so an answer page an
 opened on the same card at different widths. Five routes hand-rolled a `<main>` with no `id`: the
 published brief record, `/about`, `/contact`, the decision-shield overview and every resource
 article. On those the layout's "Skip to content" link went nowhere. The landmark audit passed them,
-because its streamed-route fallback finds the 404 boundary's `<main>` in every flight payload.
+because its streamed-route fallback found the 404 boundary's `<main>` in every flight payload.
 
 - Answers and the 404 take `content`; calibration, concepts, decisions and the articles (with their
   rail) take `wide`; the brief record, about, contact and the overview take `prose`.

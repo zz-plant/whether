@@ -33,21 +33,78 @@ const SKIP_LINK =
   /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bskip-link\b)(?=[^>]*\bhref\s*=\s*["']#main-content["'])[^>]*>/gi;
 
 /*
- * Most routes here are client-streamed, so their landmark never reaches the
- * response as literal markup — it arrives as an RSC flight row instead:
+ * A client-streamed route's landmark never reaches the response as literal
+ * markup — it arrives as an RSC flight row instead:
  *
  *   ["$","main",null,{"id":"main-content","tabIndex":-1,...}]
  *
- * embedded in a script, with the quotes backslash-escaped. Scanning only for
- * `<main>` tags reported 21 of 40 routes as missing a landmark they in fact
- * had. These patterns tolerate the escaping and the surrounding props.
+ * embedded in a script, with the quotes backslash-escaped. On 2026-08-31,
+ * scanning only for `<main>` tags reported 21 of 40 routes as missing a
+ * landmark they in fact had. By 2026-10-06 every one of the 35 audited routes
+ * painted its landmark as markup and none took this path. These patterns
+ * tolerate the escaping and the surrounding props.
  */
 const FLIGHT_MAIN_WITH_TARGET =
   /\\?"main\\?"\s*,\s*null\s*,\s*\{[^{}]*\\?"id\\?"\s*:\s*\\?"main-content\\?"/g;
 const FLIGHT_SKIP_LINK = /\\?"className\\?"\s*:\s*\\?"skip-link\\?"/g;
 
+/*
+ * A row starts after a newline in the stream, which reaches the HTML as an
+ * escaped `\n` (one whose backslash is not itself escaped, as a newline inside
+ * a string would be), or at the start of a pushed chunk.
+ */
+const FLIGHT_ROW_START = /(?:(?<!\\)\\n|\n|\(")([0-9a-f]+):(?=[[{"A-Z])/g;
+const FLIGHT_ROW_REF = /\\?"\$L?([0-9a-f]+)\\?"/g;
+const FLIGHT_FALLBACK_REF = /\\?"fallback\\?"\s*:\s*\\?"\$L?([0-9a-f]+)\\?"/g;
+
 /**
- * What the flight payload claims about the landmark.
+ * The flight payload's rows, keyed by id. A chunk boundary can fall inside a
+ * row, so the script glue between two chunks is read as part of the row it
+ * interrupts; it carries no element, so that costs nothing.
+ */
+const readFlightRows = (html) => {
+  const starts = [...html.matchAll(FLIGHT_ROW_START)];
+  const rows = new Map();
+
+  starts.forEach((start, index) => {
+    const end = starts[index + 1]?.index ?? html.length;
+    rows.set(start[1], (rows.get(start[1]) ?? "") + html.slice(start.index, end));
+  });
+
+  return rows;
+};
+
+/**
+ * Rows a boundary renders instead of the route, and every row they reach.
+ *
+ * The layout wraps each route in boundaries that carry their alternative as a
+ * `fallback`, and the 404's is in every payload:
+ *
+ *   ["$","$L64",null,{"resetKey":"about","fallback":"$65","children":[...]}]
+ *   65:["$","main",null,{"id":"main-content",...}]
+ *
+ * app/not-found.tsx renders a targeted <main>, so until 2026-10-06 that row
+ * satisfied this check on every route whatever the route itself rendered.
+ * Following references from the fallback rows also catches a 404 whose
+ * <main> is outlined below its root row. If that reaches too far, it can only
+ * hide a real landmark, which fails the route, never pass a missing one.
+ */
+const collectFallbackRows = (html, rows) => {
+  const pending = [...html.matchAll(FLIGHT_FALLBACK_REF)].map((match) => match[1]);
+  const reached = new Set();
+
+  while (pending.length > 0) {
+    const id = pending.pop();
+    if (reached.has(id)) continue;
+    reached.add(id);
+    for (const ref of (rows.get(id) ?? "").matchAll(FLIGHT_ROW_REF)) pending.push(ref[1]);
+  }
+
+  return reached;
+};
+
+/**
+ * What the flight payload claims about the route's own landmark.
  *
  * Presence only, deliberately not counts. React re-emits a segment's rows when
  * a stream resumes, so the same single landmark can legitimately appear twice —
@@ -55,10 +112,16 @@ const FLIGHT_SKIP_LINK = /\\?"className\\?"\s*:\s*\\?"skip-link\\?"/g;
  * checked for "declares its landmark and a link to it"; duplicate and nesting
  * detection stay with the routes that ship literal markup.
  */
-const inspectFlightPayload = (html) => ({
-  hasMainWithTarget: countMatches(html, FLIGHT_MAIN_WITH_TARGET) > 0,
-  hasSkipLink: countMatches(html, FLIGHT_SKIP_LINK) > 0,
-});
+const inspectFlightPayload = (html) => {
+  const rows = readFlightRows(html);
+  const fallbackRows = collectFallbackRows(html, rows);
+  const routeRows = [...rows].filter(([id]) => !fallbackRows.has(id)).map(([, row]) => row);
+
+  return {
+    hasMainWithTarget: routeRows.some((row) => countMatches(row, FLIGHT_MAIN_WITH_TARGET) > 0),
+    hasSkipLink: routeRows.some((row) => countMatches(row, FLIGHT_SKIP_LINK) > 0),
+  };
+};
 
 /**
  * The in-page anchors a rendered page links to, and the ids it carries.
@@ -143,14 +206,18 @@ export const inspectMainContentHtml = (html) => {
   const devErrorBoundary = html.includes("__VINEXT_INITIAL_DEV_ERRORS__");
 
   /*
-   * A streamed route's real landmark arrives in the flight payload. Some also
-   * flush a placeholder <main> first — /state ships a centered loading shell
-   * with no id — so the trigger is "the literal markup never produced a
-   * correctly-targeted landmark", not "there was no <main>". A route that does
-   * ship a targeted one in HTML is judged on that markup, so genuine duplicates
-   * and nesting still fail rather than being excused by the payload.
+   * Only a route that paints no <main> at all is judged on its flight payload.
+   * A <main> in the markup is the landmark the reader gets, so it is judged as
+   * painted, id or not.
+   *
+   * This used to fall back whenever the markup lacked a *targeted* <main>, to
+   * excuse a "placeholder" /state was said to flush. /state had no loading
+   * shell: its page rendered `<main className="flex min-h-screen ...">`, the
+   * same missing id as five reading routes that passed for the same reason
+   * until 2026-10-06. Loading fallbacks render no <main> at all
+   * (tests/mainContentLandmarks.test.tsx).
    */
-  if (mainWithTargetCount === 0 && !devErrorBoundary) {
+  if (openingMainTags.length === 0 && !devErrorBoundary) {
     const flight = inspectFlightPayload(html);
 
     if (flight.hasMainWithTarget) {
