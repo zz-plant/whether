@@ -8,7 +8,6 @@ import {
 import {
   buildActionStripItems,
   buildRoleAwareOperatingTemplates,
-  buildThresholdBusinessConsequence,
 } from "../operatingCalls";
 import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
@@ -542,10 +541,6 @@ export const buildHomeBriefModelInternal = (
     decisionRules,
     reportDynamics,
   });
-  const thresholdBusinessConsequence = buildThresholdBusinessConsequence({
-    actionStripItems,
-    revisitAreaPriority: revisitQueue.map((item) => item.id),
-  });
 
   const regimeSignalIndicators = buildRegimeSignalIndicators({
     assessment,
@@ -640,7 +635,6 @@ export const buildHomeBriefModelInternal = (
     startupVariantPolicy,
     decisionMatrix,
     actionStripItems,
-    thresholdBusinessConsequence,
     sharedFlipCorridor,
     roleAwareTemplates,
     executiveOperationalStance,
@@ -790,7 +784,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       decisionMatrix: homeBriefModel.decisionMatrix,
       startupVariantPolicy: homeBriefModel.startupVariantPolicy,
       actionStripItems: homeBriefModel.actionStripItems,
-      thresholdBusinessConsequence: homeBriefModel.thresholdBusinessConsequence,
       sharedFlipCorridor: homeBriefModel.sharedFlipCorridor,
       roleAwareTemplates: homeBriefModel.roleAwareTemplates,
       executiveOperationalStance: homeBriefModel.executiveOperationalStance,

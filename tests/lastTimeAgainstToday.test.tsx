@@ -56,7 +56,7 @@ describe("the last time conditions moved this way, against this week", () => {
     assert.ok(record);
     assert.equal(
       summarizeLastTimeCallChanged(record),
-      "The last time conditions moved this way was Sep 2022 (Stormy to Freezing). "
+      "The last time conditions tightened was Sep 2022, from Stormy to Freezing; this week they went from Sunny to Freezing. "
         + "By Dec 2022, funding pressure had gone from 79 to 100 (money is hard to raise) "
         + "and risk appetite from 7 to 16 (investors are avoiding risk). "
         + "One earlier outcome, not a forecast.",

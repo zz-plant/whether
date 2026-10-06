@@ -215,6 +215,29 @@ export const buildCallLineLadders = (
   return [forKey("tightness", thresholds.tightnessRegime), forKey("riskAppetite", thresholds.riskAppetiteRegime)];
 };
 
+/* Why the next reading could change conditions. Beside "Confidence: High" a
+   bare "Could change next week: Yes" read as a contradiction; the reason is the
+   nearer line and how far off it is, or a change already waiting on its second
+   reading. Confidence measures something else (how often conditions held at
+   this distance), and the two read together once this one says what it means. */
+const describeChangeReason = (assessment: {
+  regimeTransition?: { pending?: unknown };
+  scores?: { tightness: number; riskAppetite: number };
+  thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
+}): string | undefined => {
+  if (assessment.regimeTransition?.pending) return "a change is waiting on a second reading";
+  const { scores, thresholds } = assessment;
+  if (!scores || !thresholds) return undefined;
+  const nearest = [
+    { key: "tightness" as const, gap: Math.abs(scores.tightness - thresholds.tightnessRegime) },
+    { key: "riskAppetite" as const, gap: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) },
+  ].sort((left, right) => left.gap - right.gap)[0];
+  if (!nearest) return undefined;
+  const label = regimeSignalLabelByKey[nearest.key].toLowerCase();
+  const points = Math.round(nearest.gap);
+  return points === 0 ? `${label} is at its line` : `${label} is ${points} ${points === 1 ? "pt" : "pts"} from its line`;
+};
+
 /**
  * The four trust facts, the one way every reading route states them.
  *
@@ -228,7 +251,8 @@ export const buildCallLineLadders = (
  * - confidence: the published label (`resolvePublishedConfidence`, which
  *   drops a step on a stale fallback), passed in by the caller that holds it;
  * - could change: `couldCallChangeNextWeek`, the rule /brief.md and every
- *   export read through the homepage model's `transitionWatch`.
+ *   export read through the homepage model's `transitionWatch`, with the
+ *   reason beside it (`changeReason`).
  */
 export const buildTrustStripProps = ({
   recordDateLabel,
@@ -244,7 +268,10 @@ export const buildTrustStripProps = ({
   /** Sources answering from a fallback (`buildDegradedSourceRows(...).length`). */
   degradedSourceCount?: number;
   confidenceLabel: TrustStripProps["confidenceLabel"];
-  assessment: Parameters<typeof couldCallChangeNextWeek>[0];
+  assessment: Parameters<typeof couldCallChangeNextWeek>[0] & {
+    scores?: { tightness: number; riskAppetite: number };
+    thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
+  };
 }): Omit<TrustStripProps, "href" | "className"> => ({
   recordDateLabel,
   sourcesLive: !isHistorical && !isFallback && degradedSourceCount === 0,
@@ -255,4 +282,5 @@ export const buildTrustStripProps = ({
   }),
   confidenceLabel,
   couldChangeNextWeek: couldCallChangeNextWeek(assessment),
+  changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
 });

@@ -51,7 +51,10 @@ const LINE_LABELS: Record<LadderLineKind, string> = {
 const LINE_CLASS: Record<LadderLineKind, string> = {
   pause: "bg-semantic-caution-border text-semantic-caution-fg",
   resume: "bg-semantic-easing-border text-semantic-easing-fg",
-  callChange: "bg-[var(--regime-accent)] text-[var(--regime-ink)]",
+  /* Neutral, not the regime accent: on a Freezing week the accent is the red
+     the page wash, the stamp and an alarm already use, and a red tick read as
+     a line already broken. Where conditions change is a boundary, not a state. */
+  callChange: "bg-slate-300 text-slate-200",
 };
 
 const clampPercent = (value: number, max: number) => Math.min(100, Math.max(0, (value / max) * 100));

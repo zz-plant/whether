@@ -48,6 +48,33 @@ const ACTION_NOW_BY_REGIME: Record<RegimeKey, Record<WeeklyTone, string>> = {
   },
 };
 
+/* What the week's direction reads as beside the regime word on the brief's card,
+   where the call itself prints the action alone. */
+const WEEKLY_DIRECTION_LABEL: Record<WeeklyTone, string> = {
+  tightening: "Tightening this week",
+  easing: "Easing this week",
+  holding: "Holding this week",
+};
+
+const DIRECTION_SENTENCE = /^Conditions are (tightening|easing|holding)\.\s+/;
+const isWeeklyTone = (value: string): value is WeeklyTone =>
+  value === "tightening" || value === "easing" || value === "holding";
+
+/**
+ * The call as the card prints it: the action, with the week's direction as a
+ * label for the stamp line. The composed call opens "Conditions are
+ * tightening." under a stamp that already says Freezing and a line that says
+ * money is expensive, so on the card the conditions were stated three times
+ * before the action. Pastes and the sticky strip keep the composed call: they
+ * carry no stamp. A call this table did not compose comes back whole.
+ */
+export const splitWeeklyCall = (call: string): { action: string; directionLabel?: string } => {
+  const match = DIRECTION_SENTENCE.exec(call);
+  const tone = match?.[1];
+  if (!match || !tone || !isWeeklyTone(tone)) return { action: call };
+  return { action: call.slice(match[0].length), directionLabel: WEEKLY_DIRECTION_LABEL[tone] };
+};
+
 export const buildActionNowShort = ({
   directionLabel,
   regimeChanged,

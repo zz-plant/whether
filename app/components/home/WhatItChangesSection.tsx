@@ -73,7 +73,7 @@ export function WhatItChangesSection({
       {/* Stage and runway: the sm+ tablists. The header carries the phone pills,
           so one control per axis at every width. */}
       <div className={isHistorical && !runwayEmphasis ? "hidden sm:grid sm:gap-6" : "weather-section-stack"}>
-        <div className={`${runwayEmphasis ? "" : "hidden sm:block"} rounded-xl border border-slate-800/80 bg-slate-950/40 weather-inset space-y-4`.trim()}>
+        <div id="company-calibration" className={`${runwayEmphasis ? "" : "hidden sm:block"} rounded-xl border border-slate-800/80 bg-slate-950/40 weather-inset space-y-4`.trim()}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800/60 pb-4">
             <p className="type-eyebrow">Company calibration</p>
             <p className="text-fluid-nano text-slate-400">

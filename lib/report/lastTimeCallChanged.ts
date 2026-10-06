@@ -136,6 +136,10 @@ export const describeAgainstToday = (record: LastTimeCallChanged): { alike: bool
  * alone reads as a forecast; the meaning rides with the later number, and with the earlier one
  * too when the two sit in different bands. The caveat is the card's, on the same condition.
  */
+/** "tightened" or "eased": what the found month has in common with this week. */
+export const lastTimeVerb = (record: Pick<LastTimeCallChanged, "direction">) =>
+  record.direction === "tightening" ? "tightened" : "eased";
+
 export const summarizeLastTimeCallChanged = (record: LastTimeCallChanged): string => {
   const movement = (key: "tightness" | "riskAppetite") => {
     const { atChange, later } = record[key];
@@ -145,8 +149,16 @@ export const summarizeLastTimeCallChanged = (record: LastTimeCallChanged): strin
   };
   const changedAt = formatMonthLabel(record.changedAt.year, record.changedAt.month);
   const after = formatMonthLabel(record.after.year, record.after.month);
+  /* "Moved this way" matched direction, not the pair, so on a Sunny-to-Freezing
+     week it named a Stormy-to-Freezing month as if it were the same move. It
+     says which it matched, and names this week's move when they differ, as
+     the card's comparison already does. */
+  const { today } = record;
+  const samePair = record.changedAt.from === today.from && record.changedAt.to === today.to;
   const sentences = [
-    `The last time conditions moved this way was ${changedAt} (${record.changedAt.fromLabel} to ${record.changedAt.toLabel}).`,
+    samePair
+      ? `The last time conditions went from ${record.changedAt.fromLabel} to ${record.changedAt.toLabel} was ${changedAt}.`
+      : `The last time conditions ${lastTimeVerb(record)} was ${changedAt}, from ${record.changedAt.fromLabel} to ${record.changedAt.toLabel}; this week they went from ${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}.`,
     `By ${after}, funding pressure had gone from ${movement("tightness")} and risk appetite from ${movement("riskAppetite")}.`,
     ...(describeAgainstToday(record).alike ? [] : ["One earlier outcome, not a forecast."]),
   ];

@@ -29,7 +29,6 @@ import {
   buildDecisionTransmissionBoundedRules,
   type ActionStripItem,
   type RoleAwareOperatingTemplate,
-  type ThresholdBusinessConsequence,
 } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
@@ -364,7 +363,6 @@ export type WeeklyDecisionCardViewModel = {
     startupVariantPolicy: StartupVariantPolicy;
     actionStripItems?: ActionStripItem[];
     /** Nearest bounded pause line translated into one compact business consequence. */
-    thresholdBusinessConsequence?: ThresholdBusinessConsequence | null;
     /** The clear-condition corridor every lever shares, stated once. Null when they diverge. */
     sharedFlipCorridor?: string | null;
     roleAwareTemplates: RoleAwareOperatingTemplate[];

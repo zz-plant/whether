@@ -17,9 +17,33 @@ import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../../../l
  * current — the module then argues against the page it sits on. Rendering
  * nothing is the safer failure.
  */
-function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: string }) {
+function CanonicalWeekPermalink({
+  currentRecordDate,
+  currentRecordDateLabel,
+}: {
+  currentRecordDate: string;
+  currentRecordDateLabel: string;
+}) {
   const brief = selectCitablePermalinkBrief(currentRecordDate);
   if (!brief) return null;
+
+  /* The record is frozen on Monday and the reading above keeps updating, so
+     most days they are different readings. "Citable permalink" under a page
+     dated Oct 2 sent a reader to the Sep 29 record as if it were this page.
+     It says which reading the record holds when it is not this one. */
+  if (brief.recordDate !== currentRecordDate) {
+    return (
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-xs text-slate-300">
+        <span>
+          The reading above is from <span className="font-medium text-white">{currentRecordDateLabel}</span>. The last
+          frozen record is dated <span className="font-medium text-white">{brief.recordDateLabel}</span>.
+        </span>
+        <ActionLink href={buildPublishedBriefPath(brief.slug)} variant="inline">
+          Read the {brief.recordDateLabel} record →
+        </ActionLink>
+      </p>
+    );
+  }
 
   return (
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-xs text-slate-300">
@@ -34,46 +58,39 @@ function CanonicalWeekPermalink({ currentRecordDate }: { currentRecordDate: stri
 }
 
 /**
- * Act and share: the slide and image copies, the plan and evidence links, the
- * subscribe row and the citable permalink. Copy Brief, DD-005's canonical
- * primary action, sits under the call card in `app/page.tsx` since 2026-09-30;
- * the plan link is the one `pill` on the page, and the rest are inline links.
+ * Act and share: the plan, the slide and image copies, the subscribe row and
+ * the citable permalink. Copy Brief, DD-005's canonical primary action, sits
+ * under the call card in `app/page.tsx` since 2026-09-30.
+ *
+ * One primary action. The plan link was a pill among two copy buttons, four
+ * arrow links (stress-test, decision record, answers, AI assistant) and a
+ * subscribe form, all at the same weight, so nothing said what to do next. The
+ * plan is the primary button; the copies are secondary; the four links are in
+ * the footer and the header already.
  */
 export function DoAndShareSection({
   operateHref,
   planLabel,
   currentRecordDate,
+  currentRecordDateLabel,
 }: {
   operateHref: string;
   /** Named for the selected cadence, so the one plan CTA matches the horizon on screen. */
   planLabel?: string;
   currentRecordDate: string;
+  currentRecordDateLabel: string;
 }) {
   return (
     <HomeSection id={HOME_SECTIONS.act.id} heading={HOME_SECTIONS.act.heading} className="order-5">
       <div className="flex flex-wrap items-center gap-2">
+        <ActionLink href={operateHref} variant="primary">
+          {planLabel ?? "Build this week’s plan →"}
+        </ActionLink>
         {/* Neither takes a payload: the slide reads the same published
             artifact the share panel and the presentation frames read, and the
             image is the brief card `/share` lists, for the reading on screen. */}
         <CopyMeetingSlideButton />
         <CopyImageCardButton />
-        <ActionLink href={operateHref} variant="pill">
-          {planLabel ?? "Build this week’s plan →"}
-        </ActionLink>
-      </div>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-        <ActionLink href="/operate#ops-decision-shield" variant="inline">
-          Stress-test a plan →
-        </ActionLink>
-        <ActionLink href="/decisions" variant="inline">
-          Track your decision record →
-        </ActionLink>
-        <ActionLink href="/resolve#direct-answers" variant="inline">
-          Answers to common questions →
-        </ActionLink>
-        <ActionLink href="/api-docs" variant="inline">
-          Connect an AI assistant →
-        </ActionLink>
       </div>
       {/* The one conversion on the page, beside the actions rather than 3,000px
           below them. The push toggle sits with it: it is the same alert by
@@ -83,7 +100,7 @@ export function DoAndShareSection({
         <SubscribeForm compact />
         <RegimeAlertToggle />
       </div>
-      <CanonicalWeekPermalink currentRecordDate={currentRecordDate} />
+      <CanonicalWeekPermalink currentRecordDate={currentRecordDate} currentRecordDateLabel={currentRecordDateLabel} />
     </HomeSection>
   );
 }

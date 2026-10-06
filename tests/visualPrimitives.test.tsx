@@ -272,7 +272,7 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.match(html, /Funding pressure/);
   });
 
-  it("provides a direct jump to #subscribe from operating boundary rules", () => {
+  it("provides a direct jump to #subscribe beside the call-change line", () => {
     const { WhatWouldChangeSection } = require("../app/components/home/WhatWouldChangeSection");
     const html = renderToStaticMarkup(
       <WhatWouldChangeSection
@@ -283,19 +283,26 @@ describe("Wayfinding shortcuts and deep-links", () => {
       />,
     );
     assert.match(html, /href="#subscribe"/);
-    assert.match(html, /Get notified when lines cross/);
+    assert.match(html, /Get an email the day a line is crossed/);
   });
 
-  it("exposes decision record discovery in DoAndShareSection action links", () => {
+  /* The plan link was a pill among two copy buttons, four arrow links and a
+     subscribe form at one weight. It is the section's primary button now; the
+     decision record is in the footer ("Your record"), with the other three. */
+  it("leads DoAndShareSection with the plan as its one primary action", () => {
     const { DoAndShareSection } = require("../app/components/home/DoAndShareSection");
     const html = renderToStaticMarkup(
       <DoAndShareSection
         operateHref="/operate"
         currentRecordDate="2026-09-28"
+        currentRecordDateLabel="Sep 28, 2026"
       />,
     );
-    assert.match(html, /href="\/decisions"/);
-    assert.match(html, /Track your decision record/);
+    const plan = /<a[^>]*href="\/operate"[^>]*>/.exec(html)?.[0] ?? "";
+    assert.match(plan, /weather-button-primary|weather-cta-primary/, "the plan link is the primary button");
+    assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant/);
+    const layout = require("node:fs").readFileSync("app/layout.tsx", "utf8");
+    assert.match(layout, /href="\/decisions"[^>]*>Your record</, "the decision record stays one click away, in the footer");
   });
 
   it("deep-links AreaTable consequence rows to #ops-monthly-action-summary on /operate", () => {

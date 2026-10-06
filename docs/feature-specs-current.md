@@ -1098,7 +1098,7 @@ outcomes actually happened (`posted` / `partial` / `skipped_unconfigured` /
 
 A first-time reader met a call about the market and roughly 3,200px of evidence for it, with
 nothing connecting either to the decision they arrived with. For a browser that has never
-rendered the brief, `/` now folds sections 2 to 5 away and shows `FirstVisitDecisionPicker`
+rendered the brief, `/` now folds sections 2 to 5 away and shows `DecisionPicker`
 under the call:
 
 - **"What are you deciding?"** Five choices (hire, roadmap, raise, spend, something new),
@@ -2373,6 +2373,19 @@ word in the intro ("All sources live • As of Oct 2"), and again in the `TrustS
   or padding between them. `signalsEvidenceSections()` returns a keyed array the page spreads into the
   shell.
 
+
+### 1.1.42 The homepage, after a product-design critique (2026-10-06)
+
+- **Card:** the headline is the action ("Freeze new commitments and protect runway."); the week's direction rides on the stamp line ("· Tightening this week", `splitWeeklyCall` in `lib/report/reportEvidence.ts`). Pastes and the sticky strip keep the composed call.
+- **One structure:** "What are you deciding?" (`home/DecisionPicker.tsx`) shows for every reader; only the alert form, the record line and "Show the full brief" are first-visit only. It says whose lines the answers use ("Lines set for Series A with 12–24 months of runway") and links to `#company-calibration`.
+- **One subscribe form:** `SubscribeForm` offers "Only when it changes" or "Every Monday too"; the first visit starts on alerts. `FlipAlertForm` is gone.
+- **Lines stated once in points:** "What would change" drops the red "0 points — … crossed" counter and the boxed rules panel; the call-change line sits beside the quadrant, with the market move folded under "In interest-rate terms". `thresholdBusinessConsequence` had no other reader and is removed.
+- **Colour:** the ladders' change line is neutral, not the regime accent; a crossed pause line is caution amber, not red.
+- **Dates:** when the frozen record is not today's reading, the footer says so ("The reading above is from Oct 2. The last frozen record is dated Sep 29.") instead of "Citable permalink".
+- **Controls row:** the duplicate confidence chip (`CompactTrustPopover`) is gone; the cadence control is labelled "Plan horizon"; the trust strip's "Could change next week" gives its reason on every route.
+- **What changed:** each signal shows its name, what it governs and what moved it; the scale and meaning fold under "What the score means".
+- **Do and share:** the plan is the one primary button; the four arrow links are in the footer and header.
+- **Copy:** the movement lead is short sentences, one cause each; "the last time conditions moved this way" now says "tightened"/"eased" and names both moves when they differ.
 
 ### 1.1.35 `/share`: one format picker instead of a wall of sections (2026-10-06)
 

@@ -67,7 +67,7 @@ describe("the record note", () => {
     /* The picker, not the first fold attribute: the horizon and confidence row
        above the call folds on a first visit too, and everything folded below
        the call comes after the picker. */
-    assert.ok(mount < page.indexOf("<FirstVisitDecisionPicker"), "in the first block, where the reader who has a record looks");
+    assert.ok(mount < page.indexOf("<DecisionPicker"), "in the first block, where the reader who has a record looks");
     assert.match(page.slice(mount - 40, mount), /!historicalSelection \?/, "an archived week is not compared with today's decisions");
   });
 });
