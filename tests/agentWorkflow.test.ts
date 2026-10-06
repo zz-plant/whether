@@ -38,13 +38,55 @@ describe("agent workflow helpers", () => {
     });
 
     assert.equal(packet.skill, "subagent-handoff");
-    assert.ok(packet.packet.readAnchors.includes(".codex/skills/subagent-handoff/SKILL.md"));
+    assert.ok(packet.packet.readAnchors.includes(".claude/skills/subagent-handoff/SKILL.md"));
     assert.ok(packet.packet.constraints.some((item) => item.includes("subagent-handoff")));
     assert.deepEqual(packet.packet.returnContract, [
       "Changed files.",
       "Commands run and outcomes.",
       "Open risks, drift, or follow-ups.",
     ]);
+  });
+
+  /*
+   * `.claude/skills` is the canonical directory and `.codex/skills` is generated from it.
+   * The helpers read `.codex/skills` until 2026-10-06, so the two UI skills that only
+   * exist in the canonical directory could never be anchored in a handoff or indexed.
+   */
+  it("resolves and indexes skills from the canonical .claude/skills directory", () => {
+    for (const skill of ["whether-ui-loop", "whether-ui-standards"]) {
+      const packet = buildHandoffPacket({ repoRoot: process.cwd(), job: "Tighten the home page spacing.", skill });
+      assert.ok(
+        packet.packet.readAnchors.includes(`.claude/skills/${skill}/SKILL.md`),
+        `${skill} is not anchored in its handoff`,
+      );
+    }
+
+    const index = buildRepoIndex({ repoRoot: process.cwd() });
+    const names = index.skillsMap.skills.map((skill) => skill.name);
+    assert.ok(names.includes("whether-ui-loop"));
+    assert.ok(names.includes("whether-ui-standards"));
+    assert.ok(index.skillsMap.skills.every((skill) => skill.path.startsWith(".claude/skills/")));
+    assert.equal(index.fileMap.counts.skills, names.length);
+  });
+
+  it("reads skills from .claude/skills only, not from the generated runtime mirror", () => {
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-skills-"));
+
+    try {
+      for (const file of [".claude/skills/canonical/SKILL.md", ".codex/skills/mirror-only/SKILL.md"]) {
+        fs.mkdirSync(path.dirname(path.join(temporaryRoot, file)), { recursive: true });
+        fs.writeFileSync(path.join(temporaryRoot, file), "---\nname: x\n---\n");
+      }
+
+      const index = buildRepoIndex({ repoRoot: temporaryRoot });
+      assert.deepEqual(index.skillsMap.skills, [{ name: "canonical", path: ".claude/skills/canonical/SKILL.md" }]);
+      assert.equal(index.fileMap.counts.skills, 1);
+
+      const mirrorOnly = buildHandoffPacket({ repoRoot: temporaryRoot, job: "x", skill: "mirror-only" });
+      assert.ok(!mirrorOnly.packet.readAnchors.some((anchor) => anchor.includes("mirror-only")));
+    } finally {
+      fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    }
   });
 
   it("includes repo AGENTS guidance in doctor reports", () => {

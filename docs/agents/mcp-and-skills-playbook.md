@@ -139,6 +139,11 @@ Helper commands:
 - `bun run agent:index` to refresh the repo cache under `artifacts/agent/`
 - `bun run agent:prewarm` to check LM Studio, warm the fast local model role, and refresh the repo cache
 
+The task profiles these route to (docs, first files and checks per profile) live in
+`scripts/agent-workflow.config.mjs`; the routing engine in `scripts/agent-workflow-lib.mjs` names
+nothing about this repo. `--skill <name>` anchors `.claude/skills/<name>/SKILL.md`, the canonical
+skills directory, and the index lists the skills found there.
+
 ## Context compression rules for delegation
 
 Pass enough context to prevent drift, but not so much that the subagent has to re-orient from scratch.
