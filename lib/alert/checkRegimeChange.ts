@@ -1,10 +1,9 @@
 import { getRegimePublicLabel } from "../regimePresentation";
-import { loadReportData } from "../report/reportData";
 import { getRegimeProjection } from "../report/regimeContext";
 import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
-import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
@@ -65,25 +64,31 @@ export const checkRegimeChange = async (options?: {
   const kv = getWhetherKv();
   if (!kv) return { ok: false, error: "KV not available" };
 
-  let assessment;
-  let record;
-  let reportDynamics;
+  /* The cron's snapshot, else the stored one, else a report read — the manual
+     route's path when nothing is stored. */
+  const reading = await resolveOperatingSnapshot({
+    given: { snapshot: options?.snapshot, weeklyCall: options?.weeklyCall },
+    onMiss: "report",
+    route: "check-regime-change",
+  });
 
-  if (options?.snapshot) {
-    assessment = options.snapshot.assessment;
-    record = options.snapshot.treasury;
-  } else {
-    const stored = await getOperatingSnapshotStore().readLatest();
-    if (stored) {
-      assessment = stored.assessment;
-      record = stored.treasury;
-    } else {
-      const data = await loadReportData({});
-      assessment = data.assessment;
-      record = data.treasury;
-      reportDynamics = data.reportDynamics;
-    }
+  /*
+   * A report read succeeds on an outage by serving the bundled copy, and this
+   * check acted on whatever it got: a manual run with nothing stored judged a
+   * months-old saved reading against the last-known regime, posted the "change"
+   * to every channel, and wrote `regime:last-known` from it, so the next real
+   * reading was compared with the copy. The weekly sends have refused that
+   * reading since 2026-09-17; this asks the same question before judging or
+   * writing anything.
+   */
+  if (reading.source === "report") {
+    const readiness = assessReadingReadiness(reading, new Date());
+    if (!readiness.ok) return { ok: false, error: `refused_unpublishable: ${readiness.reason}` };
   }
+
+  const assessment = reading.source === "report" ? reading.report.assessment : reading.snapshot.assessment;
+  const record = reading.source === "report" ? reading.report.treasury : reading.snapshot.treasury;
+  const reportDynamics = reading.source === "report" ? reading.report.reportDynamics : undefined;
   const currentRegime = assessment.regime;
 
   const lastKnown = await kv.get("regime:last-known");

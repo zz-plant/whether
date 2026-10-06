@@ -2591,14 +2591,26 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   `resolveOperatingSnapshot({ given, onMiss })`). A given snapshot is used as given, with its own
   weekly call unless one is passed; otherwise the stored one; otherwise the caller's named miss
   policy — `"refuse"` (weekly email, month-end pulse) or `"report"`, a report read that serves the
-  bundled copy on an outage (the Slack post, which skips the store because its report read is
-  `GET /api/brief/slack`'s path and already projects the stored snapshot). `lib/export/exportSnapshot.ts` keeps its own resolution on purpose: an export builds
+  bundled copy on an outage (alert delivery, the regime check, and the Slack post, which skips the
+  store because its report read is `GET /api/brief/slack`'s path and already projects the stored
+  snapshot). `lib/export/exportSnapshot.ts` keeps its own resolution on purpose: an export builds
   from the materialized inputs, which is a read, not a send.
 - **One readiness check for a send** (`assessSnapshotReadiness`, `assessReadingReadiness`). The
   email judged a snapshot's own flags (`freshness.status`, `provenance.isLive`) and the Slack post
   the treasury's fallback stamp, so a reading marked one way and not the other was sent by one and
   refused by the other. Both read both now, and the email's refusal names the fallback reason when
   there is one.
+- **The manual alert runs refuse a saved copy** (fix). `POST /api/check-regime-change` and
+  `POST /api/alert-deliveries` pass no snapshot, and with nothing stored both fell back to a report
+  read and acted on it unchecked. Offline that read is the bundled 2026-06-17 copy: a manual regime
+  check posted "Conditions changed" (Sunny → Stormy) to every Slack target and wrote
+  `regime:last-known`, `regime:weeks-to-flip` and `regime:confidence` from it, and a manual alert
+  run mailed every opted-in subscriber a regime change and wrote `alert:state` — so the next real
+  reading was judged against the copy. Both now ask the weekly sends' readiness question of a
+  report read and, when it fails, judge, send and write nothing; the routes answer 503 with
+  `ok: false` and `error: "refused_unpublishable: …"` (the alert route keeps its `sent` / `skipped`
+  / `alerts` / `errors` fields at zero). A given or stored snapshot is judged as before: the cron
+  hands one over on every run, and the stored one is what the cron last judged.
 - Tests: `tests/deliveryChannels.test.ts`, `tests/emailShell.test.ts` (production output pinned
   byte for byte; the no-literal-origin rule is a source read, because on production the two are
-  the same string), `tests/operatingSnapshotResolution.test.ts`.
+  the same string), `tests/operatingSnapshotResolution.test.ts`, `tests/alertFallbackReadiness.test.ts`.
