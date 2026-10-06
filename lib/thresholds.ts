@@ -2,8 +2,8 @@
  * Threshold parsing helpers for URL-driven regime tuning.
  * Keeps defaults and validation centralized for auditability.
  */
-import type { RegimeThresholds } from "./regimeEngine";
-import { DEFAULT_THRESHOLDS } from "./regimeEngine";
+import type { RegimeThresholds } from "./regimeEngineCore";
+import { DEFAULT_THRESHOLDS } from "./regimeEngineCore";
 
 export const THRESHOLD_PARAM_KEYS = {
   baseRate: "baseRateThreshold",
