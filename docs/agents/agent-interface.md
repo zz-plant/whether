@@ -142,6 +142,10 @@ site's weather word in any case; and the server's name is `whether`, not `whethe
 key. Transport: `lib/mcp/httpMcpServer.ts`, a fresh `lib/mcp/server.ts` per request; transport tests:
 `tests/mcpStreamableTransport.test.ts`.
 The `initialize` result carries instructions that say where to start (`lib/mcp/serverIdentity.ts`).
+They are prose and name ten of the thirteen tools by use; `get_signals`, `get_analog_playbook` and
+`list_agent_skills` are left to `tools/list` on purpose, since none changes where an agent starts or
+what it checks before acting. `tests/agentDiscoveryParity.test.ts` fails on a name the registry does not
+serve, and on a tool added to the registry until the instructions name it or the test leaves it out.
 
 Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 

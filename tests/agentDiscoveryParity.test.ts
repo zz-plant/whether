@@ -11,7 +11,7 @@ import { AGENT_START_TOOL, WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/disc
 import { describeAgentTools, listAgentTools } from "../lib/agent/tools";
 import { agentManifestResponse } from "../lib/agentManifest";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
-import { MCP_PROTOCOL_VERSIONS } from "../lib/mcp/serverIdentity";
+import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INSTRUCTIONS } from "../lib/mcp/serverIdentity";
 
 /*
  * A tool that is served and not listed is one an agent never learns to call, and a tool that is
@@ -57,6 +57,21 @@ describe("every place an agent learns what to call", () => {
     for (const name of [...names, "pull_recent_site_info"]) {
       assert.ok(guide.includes(`\`${name}`), `docs/agents/agent-interface.md names ${name}`);
     }
+  });
+
+  it("names in the server's instructions only tools it serves, and leaves out only the ones chosen to be", () => {
+    /* The instructions are prose a client puts in the model's context at `initialize`: where to
+       start and what to check before acting, grouped by what a tool is for. They are not a
+       catalogue (tools/list is), so these three reference reads are left to their descriptions:
+       they change neither where an agent starts nor what it checks before acting. A tool added to
+       the registry fails here until someone decides whether the instructions should name it. */
+    const leftToToolsList = ["get_signals", "get_analog_playbook", "list_agent_skills"];
+    const names = httpTools.map((tool) => tool.name);
+    const named = [...new Set(MCP_SERVER_INSTRUCTIONS.match(/\b[a-z]+(?:_[a-z]+)+\b/g) ?? [])];
+
+    assert.deepEqual(named.filter((name) => !names.includes(name)), [], "every tool the instructions name is served");
+    assert.deepEqual(names.filter((name) => !named.includes(name)).sort(), [...leftToToolsList].sort(), "every served tool is named or left out on purpose");
+    assert.ok(MCP_SERVER_INSTRUCTIONS.includes(`Call ${AGENT_START_TOOL} first`));
   });
 
   it("points to the state where an agent begins, and the route answers it", async () => {
