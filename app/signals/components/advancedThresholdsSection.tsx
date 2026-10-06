@@ -36,13 +36,10 @@ export const AdvancedThresholdsSection = ({
   }, []);
 
   return (
-    <section id="advanced-controls" className="weather-panel space-y-4 p-5" aria-labelledby="advanced-controls-heading">
-      <div>
-        <p className="type-eyebrow">Advanced controls</p>
-        <h3 id="advanced-controls-heading" className="mt-1 text-base font-semibold text-slate-100">
-          Move the lines where conditions change.
-        </h3>
-      </div>
+    /* A row in the instruments list like the others: the question is the
+       control. It was an eyebrow, a heading and a separate "Open the line
+       settings · Show / hide" button, three lines for one toggle. */
+    <section id="advanced-controls" className="weather-panel p-5" aria-label="Line settings">
       {/* Kept as a JS collapsible rather than a native `<details>`, on
           purpose: `ThresholdsPanel` restores a saved draft into the URL from
           a mount effect, and a `<details>` mounts its content whether or not
@@ -51,12 +48,14 @@ export const AdvancedThresholdsSection = ({
       <Collapsible.Root defaultOpen={defaultOpen}>
         <Collapsible.Trigger
           type="button"
-          className="weather-button inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100"
+          className="group weather-focus-ring flex min-h-[44px] w-full cursor-pointer select-none items-center justify-between gap-3 text-left text-base font-semibold text-slate-100"
         >
-          Open the line settings
-          <span className="text-fluid-micro text-slate-400">Show / hide</span>
+          <span>What would the call be with different lines?</span>
+          <span aria-hidden="true" className="text-[color:var(--app-text-muted)] transition-transform group-data-[panel-open]:rotate-180">
+            ▾
+          </span>
         </Collapsible.Trigger>
-        <Collapsible.Panel>
+        <Collapsible.Panel className="mt-4">
           <ThresholdsPanel currentThresholds={currentThresholds} />
         </Collapsible.Panel>
       </Collapsible.Root>

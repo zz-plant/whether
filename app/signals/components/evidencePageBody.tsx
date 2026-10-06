@@ -1,19 +1,21 @@
 import type { ReactElement } from "react";
 import type { SignalsPageModel, SignalsPageSearchParams } from "../evidencePageModel";
 import type { FocusTab } from "../evidenceQueryState";
-import { SignalsCallLinesSection, SignalsCallSection, SignalsWhatChangedSection } from "./evidenceReaderSections";
+import { SignalsCallLinesSection, SignalsWhatChangedSection } from "./evidenceReaderSections";
 import { SignalsInstrumentsSection } from "./evidenceInstruments";
 
 /**
- * The evidence page's four sections, in the order a reader answers their
- * questions: what the call is, what changed, what would change it, and the
- * instruments to check the method with.
+ * The evidence page's three sections, in the order a reader answers their
+ * questions: what changed, what would change the guidance, and the
+ * instruments to check the method with. It opened on "What this means now",
+ * the brief's call restated under the shell's own stamp; the page leads with
+ * the delta now (Hard rule 1), and the call stays on the brief.
  *
  * Returned as an array, and called rather than rendered. `ReportShell` wraps
  * each child in a divided, padded row, and `Children.toArray` flattens arrays
  * but not a component's output. This used to be a component returning a
  * fragment, on the belief that the fragment's children arrived as siblings;
- * they did not, so all four sections shared one row and ran into each other
+ * they did not, so every section shared one row and ran into each other
  * with no rule or gap between them.
  */
 export const signalsEvidenceSections = ({
@@ -29,10 +31,6 @@ export const signalsEvidenceSections = ({
   riskAppetiteTrend: Array<{ label: string; value: number }>;
   searchParams?: SignalsPageSearchParams;
 }): ReactElement[] => [
-  <SignalsCallSection
-    key="decision-summary"
-    callLine={model.actionNowShort ?? "Keep this week's guidance while the scores stay inside their lines."}
-  />,
   <SignalsWhatChangedSection
     key="what-changed"
     rows={model.changedSignalRows}

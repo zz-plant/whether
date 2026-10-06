@@ -44,7 +44,7 @@ const StartFromAJob = () => (
   <section aria-labelledby="search-start-heading" className="space-y-3">
     <h2 id="search-start-heading" className="type-eyebrow">Start from what you&apos;re deciding</h2>
     <div className="flex flex-wrap gap-2">
-      <ActionLink href="/signals#decision-summary" variant="pill">{searchJobLabels.check}</ActionLink>
+      <ActionLink href="/signals#what-changed" variant="pill">{searchJobLabels.check}</ActionLink>
       <ActionLink href="/operate" variant="pill">{searchJobLabels.approve}</ActionLink>
       <ActionLink href={buildToolkitLibraryHref()} variant="pill">{searchJobLabels.resolve}</ActionLink>
       <ActionLink href="/trust#revisit-call" variant="pill">{searchJobLabels.risk}</ActionLink>

@@ -1,48 +1,50 @@
 import { insightDatabase } from "../../../data/recommendations";
 import { UrlDetails } from "../../components/ui/urlDetails";
 
-export function FossilRecordSection({ regime, open = false }: { regime?: string; open?: boolean }) {
+/**
+ * The last of the evidence page's instruments: a disclosure titled with the
+ * question it answers. It was a heading block with a second, boxed "Show the
+ * table" disclosure inside the instruments list, the only item that opened
+ * twice. One disclosure now, URL-carried so a shared link opens it.
+ */
+export function FossilRecordSection({
+  regime,
+  open = false,
+  className,
+  summaryClassName,
+}: {
+  regime?: string;
+  open?: boolean;
+  className?: string;
+  summaryClassName?: string;
+}) {
   const { fossilRecord } = insightDatabase;
   const isTightClimate = regime === "SCARCITY" || regime === "DEFENSIVE";
 
   return (
-    <section
+    <UrlDetails
       id="fossil-record"
-      aria-labelledby="fossil-record-title"
-      className="weather-panel space-y-5 p-5"
+      queryKey="fossil"
+      initialOpen={open}
+      className={className}
+      summaryClassName={summaryClassName}
+      summary={<span>Which habits from the zero-rate years still shape your company?</span>}
     >
       {/* The header used to carry a mono chip reading "Now: {regime}", which
           restated the page's status line one screen up, and the table ended
           on a "Source: Whether Insight Database" footer — the product citing
           itself. Both are gone; the regime still shapes the sentence below. */}
       <div>
-        <div>
-          <p className="type-eyebrow">
-            {fossilRecord.title} · {fossilRecord.subtitle}
-          </p>
-          <h3 id="fossil-record-title" className="mt-1 text-base font-semibold text-slate-100">
-            Habits from the zero-rate years
-          </h3>
-          <p className="mt-1 max-w-3xl text-fluid-xs leading-relaxed text-slate-400">
-            {fossilRecord.description}
-            {isTightClimate
-              ? " With money this expensive, worth checking whether any of these still shape your budget."
-              : " A way to check how your company is set up against habits from low-rate and high-rate years."}
-          </p>
-        </div>
+        <p className="type-eyebrow">
+          {fossilRecord.title} · {fossilRecord.subtitle}
+        </p>
+        <p className="mt-1 max-w-3xl text-fluid-xs leading-relaxed text-slate-400">
+          {fossilRecord.description}
+          {isTightClimate
+            ? " With money this expensive, worth checking whether any of these still shape your budget."
+            : " A way to check how your company is set up against habits from low-rate and high-rate years."}
+        </p>
       </div>
-
-      {/* Collapsed by default. This is architecture reference on the evidence
-          page, and a six-row, four-column table of prose is unreadable at phone
-          width; the header above states what it is, the disclosure carries the
-          table. URL-carried so a shared link opens it. */}
-      <UrlDetails
-        queryKey="fossil"
-        initialOpen={open}
-        className="weather-auto-chevron"
-        summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
-        summary={<span>Show the table ({fossilRecord.rows.length} areas)</span>}
-      >
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-fluid-xs">
           <colgroup>
@@ -98,7 +100,6 @@ export function FossilRecordSection({ regime, open = false }: { regime?: string;
           </tbody>
         </table>
       </div>
-      </UrlDetails>
-    </section>
+    </UrlDetails>
   );
 }
