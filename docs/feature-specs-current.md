@@ -2432,6 +2432,27 @@ own lines — were closed, two and three sections down.
   portfolio note, the CLI — still opens its section.
 
 
+### 1.1.40 The governance guides: one copy of each section, the reference folded (2026-10-06)
+
+The three `/resources/*` governance guides ran to about 12,000px on a desktop and 18,700 on a phone.
+Four reference sections (the board Q&A, the anti-patterns, the 12-month cadence, the director
+checklist) were the same 945 words on all three URLs. A sentence splitter re-cut every paragraph into
+two-sentence chunks on ".", "!" and "?", so a quoted question printed a lone "," or "'" as its own
+paragraph. The parent guide listed itself under "Related pages". None of the three said what
+conditions were.
+
+- **One copy.** The four shared sections live on the parent guide; the framework and reversibility
+  guides link to them (`updatedAt` 2026-10-06 on both).
+- **Reference folded.** A section can carry `reference: true` (`lib/resourceContentSource.ts`). The
+  argument reads open, then its closing note, then the template CTA, then a Reference section of
+  closed disclosures. The index lists the argument, then the reference on one line.
+- **As written.** Paragraphs render as authored. "Back to top" (eleven per page) is gone.
+- **This week.** The header states the week's conditions and what they mean for last week's decisions
+  (the sentence the articles already print), with the record date and a link to the brief. It
+  replaces the "Start from Weekly Brief" and "Return to Planning" pills (AGENTS.md, "Thin SEO page").
+- Measured on the parent guide: 12,013 → 7,034 px desktop, 18,762 → 11,139 px phone. Tests:
+  `tests/resourcePillarPage.test.tsx`.
+
 ### 1.1.37 Pages reached from search open on the brief's card (2026-10-06)
 
 Answer pages (`/answers/*`) and signal watch pages (`/signals/[cluster]`) are where most strangers
