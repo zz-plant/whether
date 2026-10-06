@@ -4,6 +4,7 @@ import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { loadReportDataSafe } from "../report/reportData";
 import { buildPostureState } from "../report/postureStateSource";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
+import { buildWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
@@ -103,10 +104,13 @@ const buildSlackBriefPayload = async (
     assessment,
     reportDynamics: reportData.reportDynamics,
   });
+  /* The call contract the read path serves the brief, /share and the email from. */
+  const { weeklyCall } = buildWeeklyBriefSnapshot({ reportData, degraded: !reportResult.ok, postureState });
   const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
     postureState,
     actionStripItems: reportData.actionStripItems,
     previousScores: previousScoresFromDynamics(reportData.reportDynamics, assessment.scores),
+    weeklyCall,
   });
   return {
     text,
@@ -162,10 +166,12 @@ const buildSlackBriefPayloadFromSnapshot = async (
     reportDynamics: buildReportDynamics({ current: assessment, previous: null }),
   });
   /* The snapshot holds no previous week, so this post prints no last week —
-     the builder's rule, rather than a zero move. The area rows it can derive. */
+     the builder's rule, rather than a zero move. The area rows it can derive.
+     The call slots are the snapshot's own contract, the one the email reads. */
   const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
     postureState,
     actionStripItems: buildGuidanceBundleFromAssessment(assessment).actionStripItems,
+    weeklyCall: snapshot.weeklyCall,
   });
   return {
     text,

@@ -3,6 +3,7 @@ import { buildSlackBrief } from "../../../../lib/export/briefBuilders";
 import { previousScoresFromDynamics } from "../../../../lib/export/scoreReference";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { buildPostureState } from "../../../../lib/report/postureStateSource";
+import { buildWeeklyBriefSnapshot } from "../../../../lib/report/weeklyBriefSnapshot";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -17,10 +18,12 @@ export async function GET() {
     assessment,
     reportDynamics: reportData.reportDynamics,
   });
+  const { weeklyCall } = buildWeeklyBriefSnapshot({ reportData, degraded: !reportResult.ok, postureState });
   const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
     postureState,
     actionStripItems: reportData.actionStripItems,
     previousScores: previousScoresFromDynamics(reportData.reportDynamics, assessment.scores),
+    weeklyCall,
   });
 
   return jsonResponse(

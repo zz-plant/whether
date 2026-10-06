@@ -17,7 +17,8 @@ import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionR
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
-import { describeBaseRateSource, describeConditions, describeWeeklyDirection, formatExportConfidence } from "./exportTerms";
+import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { describeBaseRateSource, describeConditions, describeWeeklyDirection, formatExportConfidence, pauseConditionOnly } from "./exportTerms";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -67,6 +68,14 @@ type ExportLayerOptions = {
    * Null or absent prints no earlier-reading part rather than a stand-in for one.
    */
   previousScores?: PreviousReading | null;
+  /**
+   * The week's call contract, which the weekly email prints. When given, the
+   * call slots are its slots. Without it they were re-derived from the lead
+   * area row and the assessment's description, with no policy-override branch,
+   * so on a week the two scores disagreed the Monday post printed the lead
+   * area's action beside an email saying the guidance was being held.
+   */
+  weeklyCall?: WeeklyCallContract;
 };
 
 const resolveModeledDecisionPayload = (options?: ExportLayerOptions): ModeledExportDecisionPayload => {
@@ -110,10 +119,38 @@ const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line where condit
 const firstMeaningful = (...values: Array<string | undefined | null>) =>
   values.find((value) => typeof value === "string" && value.trim().length > 0);
 
-/** The call itself: the four slots every surface prints first. */
-export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+type CallSlot = { label: string; value: string };
+
+/**
+ * The call slots from the contract, in the order every paste prints them. The
+ * pause line carries its condition only, as the email's does. The resume line
+ * is the lead area's, then a stage's discipline when one is chosen: both say
+ * when a hold lifts. A held call prints none, because its change line is its
+ * one resume line (`applyStageToWeeklyCall` keeps a stage's out for the same
+ * reason) and an area's would compete with it.
+ */
+const callSlotsFromContract = (weeklyCall: WeeklyCallContract, leadItem: ActionStripItem | undefined): CallSlot[] => {
+  const leadResume = firstMeaningful(leadItem?.reversalCondition);
+  const resumeLines = weeklyCall.policyOverrideActive
+    ? []
+    : [
+        ...(leadResume ? [formatDecisionReversal(leadResume)] : []),
+        ...(weeklyCall.resumeWhen ? [weeklyCall.resumeWhen] : []),
+      ];
+  return [
+    { label: publicDecisionLabels.call, value: weeklyCall.currentCall },
+    { label: publicDecisionLabels.action, value: weeklyCall.actionNow },
+    { label: publicDecisionLabels.threshold, value: pauseConditionOnly(weeklyCall.pauseIf) },
+    ...(resumeLines.length > 0 ? [{ label: publicDecisionLabels.reversal, value: resumeLines.join("; ") }] : []),
+    { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: weeklyCall.callChangesIf },
+  ];
+};
+
+/** The call itself: the slots every surface prints first. */
+const buildCallSlots = (assessment: RegimeAssessment, options?: ExportLayerOptions): CallSlot[] => {
   const modeled = resolveModeledDecisionPayload(options);
   const leadItem = modeled.actionStripItems?.[0];
+  if (options?.weeklyCall) return callSlotsFromContract(options.weeklyCall, leadItem);
   const currentCall =
     firstMeaningful(modeled.currentCall, assessment.description)
     ?? FALLBACK_CURRENT_CALL;
@@ -140,13 +177,16 @@ export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLay
     ?? buildFlipThreshold(assessment);
 
   return [
-    `• ${publicDecisionLabels.call}: ${currentCall}`,
-    `• ${publicDecisionLabels.action}: ${actionNow}`,
-    `• ${publicDecisionLabels.threshold}: ${pauseIf}`,
-    `• ${publicDecisionLabels.reversal}: ${resumeWhen}`,
-    `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${callChangesIf}`,
+    { label: publicDecisionLabels.call, value: currentCall },
+    { label: publicDecisionLabels.action, value: actionNow },
+    { label: publicDecisionLabels.threshold, value: pauseIf },
+    { label: publicDecisionLabels.reversal, value: resumeWhen },
+    { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: callChangesIf },
   ];
 };
+
+export const buildCallLines = (assessment: RegimeAssessment, options?: ExportLayerOptions) =>
+  buildCallSlots(assessment, options).map(({ label, value }) => `• ${label}: ${value}`);
 
 const areaOrderIndex = (item: ActionStripItem) => decisionAreaOrder.indexOf(operatingLeverToDecisionArea[item.lever]);
 
@@ -393,6 +433,7 @@ export const buildSlackBrief = (
   const conditionsLabel = describeConditions(assessment.regime, modeled.postureWithStageLabel);
   const areaRows = buildAreaRowLines(options);
   const confidenceLabel = resolvePublishedConfidence({ assessment, record: treasury }).label;
+  const callSlots = buildCallSlots(assessment, options);
 
   /*
    * The page's order: the call, what changed, what that changes for you, what
@@ -403,8 +444,8 @@ export const buildSlackBrief = (
     `Whether Weekly Brief — ${treasury.record_date}`,
     `Conditions: ${conditionsLabel}`,
     "",
-    `This week's decision (${publicDecisionLabels.call} / ${publicDecisionLabels.action} / ${publicDecisionLabels.threshold} / ${publicDecisionLabels.reversal} / ${DECISION_CONTRACT_LABELS.watch.postureFlips}):`,
-    ...buildCallLines(assessment, options),
+    `This week's decision (${callSlots.map(({ label }) => label).join(" / ")}):`,
+    ...callSlots.map(({ label, value }) => `• ${label}: ${value}`),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,
     ...buildReadingLines(assessment, options),

@@ -1087,6 +1087,10 @@ outcomes actually happened (`posted` / `partial` / `skipped_unconfigured` /
   the step deadline. `deliverSlackBrief` now takes that snapshot — its treasury already carries
   the sensor and report-dynamics derivations — so the Slack post is the email's call in Slack's
   blocks. `GET /api/brief/slack` keeps the report-read path for on-demand automation.
+  Until 2026-10-06 that last claim held for the reading but not for the call: the post re-derived
+  its call slots from the lead area row and the assessment's description, with no
+  policy-override branch, while the email read the snapshot's `WeeklyCallContract`. The post's
+  call slots are the contract's now (§5.3.1).
 - **The flip reaches subscribed channels.** `checkRegimeChange` posted regime-change, flash, and
   flip-window alerts to `SLACK_WEBHOOK_URL` alone. Those now go to every subscribed webhook as
   well (never throwing, so a slow Slack post cannot fail the KV state write after it), which is
@@ -1987,6 +1991,23 @@ that never came:
   production paste; it was removed with the branch.
 - `buildWeeklyOperatorBriefSlackBlocks` and `buildWeeklyOperatorBriefCardText`, called only from
   tests.
+
+**The Monday post and the email print one call.** The post's call slots (Guidance, Do now, Pause
+if, Resume when, Conditions change if) were derived from the lead area row and
+`assessment.description`, while the email read the snapshot's `WeeklyCallContract`, which swaps
+in `POLICY_OVERRIDE_CALL` on a held week. So a held week mailed "the guidance is not changing this
+week" and posted the lead area's own action and pause line, and an ordinary week posted a
+different change line from the one mailed. The post reads the contract now, on the Monday path,
+the manual `POST /api/brief/slack/deliver` path and `GET /api/brief/slack`: the pause line as its
+condition only (`pauseConditionOnly`, as the email prints it), the lead area's resume line plus a
+stage's when one is set, and no resume line on a held call, whose change line is its one resume
+line. `tests/mondaySlackMatchesEmail.test.ts` holds the two to the same lines on a held and an
+ordinary week.
+
+Every format's output is pinned on four weeks (ordinary, saved copy, held, a stage-and-runway
+reader) through its production entry point in `tests/briefFormatsPinned.test.ts`; a change that
+means to move a string regenerates `tests/fixtures/briefFormats.golden.json` with
+`WHETHER_UPDATE_BRIEF_GOLDEN=1` in the same commit.
 
 ### 5.6 Signal Ops (live)
 - Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
