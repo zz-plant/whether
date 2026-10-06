@@ -39,7 +39,7 @@ export type PremiumFunnelEvent = {
 export const PREMIUM_EVENT_ENDPOINT = "/api/telemetry/premium-funnel";
 
 export const isPremiumIntentSource = (value: string): value is PremiumIntentSource =>
-  PREMIUM_INTENT_SOURCES.includes(value as PremiumIntentSource);
+  PREMIUM_INTENT_SOURCES.some((source) => source === value);
 
 const isPremiumFunnelEventType = (value: string): value is PremiumFunnelEventType =>
   value === "premium_intent" ||
@@ -63,12 +63,14 @@ const withinBound = (value: unknown, max: number, required = false): boolean => 
   return typeof value === "string" && value.length > 0 && value.length <= max;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
 export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunnelEvent => {
-  if (!input || typeof input !== "object") {
+  if (!isRecord(input)) {
     return false;
   }
 
-  const payload = input as Record<string, unknown>;
+  const payload = input;
 
   /* These were `String(value)`, so an object arrived at the enum check as
      "[object Object]" and was rejected for the wrong reason. A non-string is

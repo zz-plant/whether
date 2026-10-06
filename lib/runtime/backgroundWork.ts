@@ -6,10 +6,10 @@
  */
 type WaitUntil = (promise: Promise<unknown>) => void;
 
-const globalScope = globalThis as { WHETHER_WAIT_UNTIL?: WaitUntil };
+const WAIT_UNTIL_GLOBAL = "WHETHER_WAIT_UNTIL";
 
 export const installWaitUntil = (waitUntil: WaitUntil) => {
-  globalScope.WHETHER_WAIT_UNTIL = waitUntil;
+  Reflect.set(globalThis, WAIT_UNTIL_GLOBAL, waitUntil);
 };
 
 export const runInBackground = (label: string, work: () => Promise<unknown>) => {
@@ -18,6 +18,9 @@ export const runInBackground = (label: string, work: () => Promise<unknown>) => 
     .catch((error) => {
       console.error(`[background] ${label} failed`, error);
     });
-  globalScope.WHETHER_WAIT_UNTIL?.(task);
+  const waitUntil: unknown = Reflect.get(globalThis, WAIT_UNTIL_GLOBAL);
+  if (typeof waitUntil === "function") {
+    Reflect.apply(waitUntil, globalThis, [task]);
+  }
   return task;
 };
