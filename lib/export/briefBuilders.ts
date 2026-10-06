@@ -57,20 +57,26 @@ type CallSlot = { label: string; value: string };
  * (`applyStageToWeeklyCall` keeps a stage's out for the same reason) and an
  * area's would compete with it.
  */
+/** The resume line beside the call, or null for a held call or a week with none. */
+export const briefResumeLine = (document: BriefDocument): string | null => {
+  const { slots } = document;
+  if (slots.policyOverrideActive) return null;
+  const leadResume = document.areaRows[0]?.reversalCondition?.trim();
+  const lines = [
+    ...(leadResume ? [formatDecisionReversal(leadResume)] : []),
+    ...(slots.resumeWhen ? [slots.resumeWhen] : []),
+  ];
+  return lines.length > 0 ? lines.join("; ") : null;
+};
+
 const briefCallSlots = (document: BriefDocument): CallSlot[] => {
   const { slots } = document;
-  const leadResume = document.areaRows[0]?.reversalCondition?.trim();
-  const resumeLines = slots.policyOverrideActive
-    ? []
-    : [
-        ...(leadResume ? [formatDecisionReversal(leadResume)] : []),
-        ...(slots.resumeWhen ? [slots.resumeWhen] : []),
-      ];
+  const resumeLine = briefResumeLine(document);
   return [
     { label: publicDecisionLabels.call, value: slots.currentCall },
     { label: publicDecisionLabels.action, value: slots.actionNow },
     { label: publicDecisionLabels.threshold, value: slots.pauseIf },
-    ...(resumeLines.length > 0 ? [{ label: publicDecisionLabels.reversal, value: resumeLines.join("; ") }] : []),
+    ...(resumeLine ? [{ label: publicDecisionLabels.reversal, value: resumeLine }] : []),
     { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: slots.callChangesIf },
   ];
 };

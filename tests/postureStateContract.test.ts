@@ -6,6 +6,7 @@ import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBri
 import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import { buildWeeklyMandateEnvelope } from "../lib/integrationBriefs";
+import { buildBriefDocument } from "../lib/report/briefDocument";
 import { buildPostureTransitionEvent } from "../lib/storage/postureTransitionEventRepository";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
@@ -106,7 +107,13 @@ describe("posture state contract consumers", () => {
     const weeklyCall = buildWeeklyCallContract({ assessment, homeBriefModel, canonicalDecisionCopy });
     const operatorBrief = buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall });
 
-    const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
+    const envelope = buildWeeklyMandateEnvelope(
+      buildBriefDocument(
+        { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+        weeklyCall,
+      ),
+      postureState,
+    );
 
     assert.equal(homeBriefModel.confidenceLabel, postureState.currentState.confidenceLabel);
     assert.equal(homeBriefModel.flipThreshold, postureState.whatFlipsNext.flipTrigger);

@@ -2078,6 +2078,16 @@ lines stay the portfolio note's (the area tables' joined lines). Both close with
 document for its block. On a saved-copy week the footer names the publisher, not "Canonical snapshot
 (FRED)".
 
+**The integration mandate renders the document** (`buildWeeklyMandatePayload(target, document,
+postureState)`, `/api/integrations/weekly-mandate`). It printed the posture state's lock-commitment
+line as "Conditions change if" — a different line from the brief's — and its other flip conditions
+as "- Resume when:" bullets, one of which ended "tighten again". The markdown now prints the brief's
+change line, the resume line the Slack post prints (none on a held week), and the flip conditions as
+"Watch this week". The posture state still supplies the last change in conditions and the JSON's
+structured `metadata.nextFlip`, which is the posture state's own and can name a different line from
+the markdown's. Its invented fallback ("Check again after the next update.") went: the route always
+builds a posture state, so the parameter is required.
+
 **/share offers one Slack text and the meeting pack carries it.** The pack pasted the long Monday
 post beside the picker's Slack post, under a different call on a held week. Its "SLACK POST"
 section is the picker's post now.
