@@ -6,43 +6,15 @@ import {
   isPremiumSeatBand,
 } from "../../../../lib/premiumFunnel";
 import { cancelEntitlementByCustomerId, saveEntitlement } from "../../../../lib/billing/entitlements";
+import { constantTimeCompare } from "../../../../lib/constantTimeCompare";
+import { hmacSha256, toHex } from "../../../../lib/crypto";
 
 const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
 
 export const runtime = "edge";
 
-const encoder = new TextEncoder();
-
-const toHex = (bytes: Uint8Array) =>
-  Array.from(bytes)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-
-const constantTimeEqual = (left: string, right: string) => {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  let mismatch = 0;
-  for (let index = 0; index < left.length; index += 1) {
-    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  }
-
-  return mismatch === 0;
-};
-
-const createStripeSignature = async ({ payload, timestamp, secret }: { payload: string; timestamp: number; secret: string }) => {
-  const signedPayload = `${timestamp}.${payload}`;
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(signedPayload));
-  return toHex(new Uint8Array(signature));
-};
+const createStripeSignature = async ({ payload, timestamp, secret }: { payload: string; timestamp: number; secret: string }) =>
+  toHex(await hmacSha256(secret, `${timestamp}.${payload}`));
 
 const parseStripeSignature = (header: string | null) => {
   if (!header) {
@@ -102,7 +74,7 @@ const isStripeSignatureValid = async ({
     secret,
   });
 
-  return parsedSignature.signatures.some((signature) => constantTimeEqual(expectedSignature, signature));
+  return parsedSignature.signatures.some((signature) => constantTimeCompare(signature, expectedSignature));
 };
 
 type StripeCheckoutCompletedEvent = {
@@ -127,34 +99,18 @@ type StripeSubscriptionDeletedEvent = {
   data: { object: { customer?: string } };
 };
 
-const isSubscriptionDeletedEvent = (payload: unknown): payload is StripeSubscriptionDeletedEvent => {
-  if (!payload || typeof payload !== "object") return false;
-  const event = payload as Record<string, unknown>;
-  if (event.type !== "customer.subscription.deleted") return false;
-  const data = event.data;
-  if (!data || typeof data !== "object") return false;
-  const object = (data as Record<string, unknown>).object;
-  return Boolean(object && typeof object === "object");
-};
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 
-const isCheckoutCompletedEvent = (payload: unknown): payload is StripeCheckoutCompletedEvent => {
-  if (!payload || typeof payload !== "object") {
-    return false;
-  }
+/* Both handled events are recognized by type and by carrying an object at `data.object`; the
+   fields read off that object are each checked where they are used. */
+const hasEventObject = (payload: unknown, type: string): boolean =>
+  isRecord(payload) && payload.type === type && isRecord(payload.data) && isRecord(payload.data.object);
 
-  const event = payload as Record<string, unknown>;
-  if (event.type !== "checkout.session.completed") {
-    return false;
-  }
+const isSubscriptionDeletedEvent = (payload: unknown): payload is StripeSubscriptionDeletedEvent =>
+  hasEventObject(payload, "customer.subscription.deleted");
 
-  const data = event.data;
-  if (!data || typeof data !== "object") {
-    return false;
-  }
-
-  const object = (data as Record<string, unknown>).object;
-  return Boolean(object && typeof object === "object");
-};
+const isCheckoutCompletedEvent = (payload: unknown): payload is StripeCheckoutCompletedEvent =>
+  hasEventObject(payload, "checkout.session.completed");
 
 export async function POST(request: Request) {
   const payload = await request.text();

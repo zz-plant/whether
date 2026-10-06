@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { constantTimeCompare } from "../constantTimeCompare";
+import { hmacSha256, toHex } from "../crypto";
 import { readSetting } from "../runtime/settings";
 
 /**
@@ -19,13 +20,6 @@ const SLACK_SIGNATURE_VERSION = "v0";
 /** Slack's own guidance: refuse a timestamp more than five minutes from local time. */
 export const SLACK_SIGNATURE_TOLERANCE_SECONDS = 300;
 
-const encoder = new TextEncoder();
-
-const toHex = (bytes: Uint8Array): string =>
-  Array.from(bytes)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-
 const computeSlackSignature = async ({
   secret,
   timestamp,
@@ -35,16 +29,8 @@ const computeSlackSignature = async ({
   timestamp: string;
   rawBody: string;
 }): Promise<string> => {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
   const baseString = `${SLACK_SIGNATURE_VERSION}:${timestamp}:${rawBody}`;
-  const digest = await crypto.subtle.sign("HMAC", key, encoder.encode(baseString));
-  return `${SLACK_SIGNATURE_VERSION}=${toHex(new Uint8Array(digest))}`;
+  return `${SLACK_SIGNATURE_VERSION}=${toHex(await hmacSha256(secret, baseString))}`;
 };
 
 type SlackSignatureVerdict =
@@ -84,7 +70,7 @@ export const verifySlackSignature = async ({
   /* The header goes into the base string verbatim, not re-serialized from the
      parsed number, so "0123" signs as "0123". */
   const expected = await computeSlackSignature({ secret, timestamp: timestampHeader, rawBody });
-  return constantTimeCompare(expected, signatureHeader)
+  return constantTimeCompare(signatureHeader, expected)
     ? { ok: true }
     : { ok: false, error: "invalid_signature" };
 };

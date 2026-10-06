@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { getWhetherKv, parseStoredJson } from "../runtime/kv";
+import { constantTimeCompare } from "../constantTimeCompare";
+import { hmacSha256, toHex } from "../crypto";
 import type { PremiumPlan } from "../billingStripe";
 
 /**
@@ -129,24 +131,6 @@ const getSigningSecret = (): string | null => {
   return typeof secret === "string" && secret.trim().length > 0 ? secret.trim() : null;
 };
 
-const hmac = async (secret: string, message: string): Promise<Uint8Array> => {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  return new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(message)));
-};
-
-const constantTimeBytesEqual = (left: Uint8Array, right: Uint8Array): boolean => {
-  if (left.length !== right.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < left.length; i += 1) mismatch |= left[i] ^ right[i];
-  return mismatch === 0;
-};
-
 export const issueEntitlementToken = async (
   record: Pick<EntitlementRecord, "plan" | "sessionId" | "customerEmail">,
   now = Date.now(),
@@ -162,7 +146,7 @@ export const issueEntitlementToken = async (
     exp: now + TOKEN_TTL_MS,
   };
   const body = toBase64Url(encoder.encode(JSON.stringify(payload)));
-  const signature = toBase64Url(await hmac(secret, body));
+  const signature = toBase64Url(await hmacSha256(secret, body));
   return `${body}.${signature}`;
 };
 
@@ -181,8 +165,8 @@ export const verifyEntitlementToken = async (
   const payloadBytes = fromBase64Url(body);
   if (!providedSignature || !payloadBytes) return { ok: false, reason: "malformed" };
 
-  const expectedSignature = await hmac(secret, body);
-  if (!constantTimeBytesEqual(providedSignature, expectedSignature)) {
+  const expectedSignature = await hmacSha256(secret, body);
+  if (!constantTimeCompare(toHex(providedSignature), toHex(expectedSignature))) {
     return { ok: false, reason: "bad_signature" };
   }
 

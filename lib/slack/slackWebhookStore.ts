@@ -1,5 +1,6 @@
 import { getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
 import { selectStoreByBinding } from "../runtime/storeSelection";
+import { sha256Hex } from "../crypto";
 import { isSlackWebhookUrl } from "./deliverSlackBrief";
 
 type SlackSubscription = {
@@ -33,13 +34,7 @@ const ACTIVE_PREFIX = "slack:active:";
 
 const generateToken = (): string => crypto.randomUUID();
 
-const hashUrl = async (url: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(url.trim());
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
-};
+const hashUrl = (url: string): Promise<string> => sha256Hex(url.trim());
 
 const readStoredString = (source: object, key: string): string | undefined => {
   const value: unknown = Reflect.get(source, key);
