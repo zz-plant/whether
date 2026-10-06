@@ -1068,7 +1068,7 @@ for a post that never left the building; the full `buildSlackBrief` text — pos
 signal check, bounded decisions, citations — sat unused in `lib/export/briefBuilders.ts`. The
 cron's Slack step now posts the real brief to every delivery target and reports which of five
 outcomes actually happened (`posted` / `partial` / `skipped_unconfigured` /
-`refused_unpublishable` / `failed`).
+`refused_unpublishable` / `failed`; §1.1.43 adds `skipped_already_posted` when every target already has the week's post).
 
 - **Channels can subscribe.** The subscribe form gained a Slack channel; `POST /api/slack/subscribe`
   pings the webhook to verify it and introduce the cadence, then stores
@@ -2558,7 +2558,7 @@ own near the foot, ten screens from the strip that draws the same months.
   `tests/recordRoutesReadingOrder.test.tsx`.
 
 
-### 1.1.43 Delivery channels: one Slack poster, one email shell, one tally (2026-10-06)
+### 1.1.43 Delivery channels: one Slack poster, one email shell, one tally, one send record (2026-10-06)
 
 Every send — the weekly email, the weekly Slack post, the between-Monday alerts, the month-end
 pulse and the regime-change push — now goes through `lib/delivery/`.
@@ -2600,6 +2600,28 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   the treasury's fallback stamp, so a reading marked one way and not the other was sent by one and
   refused by the other. Both read both now, and the email's refusal names the fallback reason when
   there is one.
+- **The weekly sends go out once a week per recipient** (`lib/delivery/onceFor.ts`). Repeat
+  protection came in four schemes — per-inbox markers for alert mail (`alert:delivered:*`, a
+  seven-day window), one key per month for the month-end pulse (`month-end:last-pulsed`), the
+  regime check's `regime:*` last-known state — and none for the weekly email or the weekly Slack
+  post, so a manual `POST /api/email/send-weekly` or `POST /api/brief/slack/deliver` after the
+  Monday cron sent every subscriber and every channel the same brief again. `onceFor(periodKey)`
+  writes one KV key per recipient after that recipient's send succeeds:
+  `delivery:once:<period>:<sha256 of the recipient>`, where the period is
+  `weekly-email:<ISO week>` or `weekly-slack:<ISO week>` of the send (`2026-w41`), kept 14 days
+  (`expirationTtl`). Nothing else in the namespace starts with `delivery:`, and the recipient is
+  hashed because a webhook URL is a credential. Per recipient rather than per run, so a run that
+  failed part-way can be re-run and reaches only the ones it missed. The cron path respects the
+  markers; the two manual routes take `?force=1` (or `?force=true`) to send again on purpose,
+  which still writes markers and never overrides the readiness refusal. A skipped recipient is
+  reported as `skipped` (absent when zero); an email run where everyone was skipped says so in
+  `message`, and a Slack run where every channel was skipped reports
+  `status: "skipped_already_posted"`, `ok: true`. A stub email send (no `EMAIL` binding outside
+  production) delivered nothing and records nothing, and without a KV binding nothing is recorded
+  or skipped, as before. The alert mail's markers are the same store (`sentMarkers`) with its
+  seven-day window and its existing keys; the month-end key and the regime state are left as they
+  are — one is a whole-run gate the pulse's own comment explains, the other a transition detector,
+  not a record of a send.
 - **The manual alert runs refuse a saved copy** (fix). `POST /api/check-regime-change` and
   `POST /api/alert-deliveries` pass no snapshot, and with nothing stored both fell back to a report
   read and acted on it unchecked. Offline that read is the bundled 2026-06-17 copy: a manual regime
@@ -2613,4 +2635,4 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   hands one over on every run, and the stored one is what the cron last judged.
 - Tests: `tests/deliveryChannels.test.ts`, `tests/emailShell.test.ts` (production output pinned
   byte for byte; the no-literal-origin rule is a source read, because on production the two are
-  the same string), `tests/operatingSnapshotResolution.test.ts`, `tests/alertFallbackReadiness.test.ts`.
+  the same string), `tests/operatingSnapshotResolution.test.ts`, `tests/alertFallbackReadiness.test.ts`, `tests/deliveryOnceMarkers.test.ts`.

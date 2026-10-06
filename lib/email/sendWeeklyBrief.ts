@@ -9,6 +9,7 @@ import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } fr
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { siteUrl } from "../siteUrl";
 import { fanOut } from "../delivery/fanOut";
+import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
 
 /**
@@ -125,6 +126,8 @@ type SendWeeklyBriefResult = {
   deliveryMode: "live" | "stub";
   error?: string;
   message?: string;
+  /** Subscribers who already had this week's brief and were not sent it again. Absent when none. */
+  skipped?: number;
 };
 
 /**
@@ -137,7 +140,10 @@ export const sendWeeklyBrief = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
   now?: Date;
+  /** Send to subscribers who already had this week's brief. The manual route's explicit opt-in; the cron never passes it. */
+  force?: boolean;
 }): Promise<SendWeeklyBriefResult> => {
+  const now = options?.now ?? new Date();
   const subscriptions = await getActiveSubscriptions();
   const adapter = createCloudflareEmailAdapter();
   const deliveryMode = adapter.mode ?? "live";
@@ -175,7 +181,7 @@ export const sendWeeklyBrief = async (options?: {
    * week frozen into the archive make the same claim about which week it is.
    * The Slack post asks the same question the same way.
    */
-  const readiness = assessSnapshotReadiness(snapshot, options?.now ?? new Date());
+  const readiness = assessSnapshotReadiness(snapshot, now);
   if (!readiness.ok) {
     return refuse(readiness.reason);
   }
@@ -253,10 +259,22 @@ export const sendWeeklyBrief = async (options?: {
       const result = await adapter.send({ to: recipient, subject, html, text });
       return result.ok ? "sent" : "failed";
     },
+    /* Once per subscriber per ISO week, so a manual run after the Monday cron
+       does not mail the brief twice, and a run that failed part-way reaches
+       only the ones it missed. A stub delivers nothing, so it records nothing. */
+    deliveryMode === "live"
+      ? {
+          once: {
+            markers: onceFor(weeklyPeriodKey("weekly-email", now), { force: options?.force }),
+            keyOf: (recipient) => recipient.email,
+          },
+        }
+      : {},
   );
 
   const sent = tally.sent;
   const errors = tally.failed;
+  const skipped = tally.skipped;
 
   const ok = errors === 0;
   const error = ok
@@ -265,5 +283,15 @@ export const sendWeeklyBrief = async (options?: {
       ? `email_binding_missing: 0/${subscriptions.length} delivered`
       : `${errors}/${subscriptions.length} sends failed`;
 
-  return { ok, sent, errors, total: subscriptions.length, deliveryMode, ...(error ? { error } : {}) };
+  const alreadySent = skipped > 0 && sent === 0 && errors === 0;
+  return {
+    ok,
+    sent,
+    errors,
+    total: subscriptions.length,
+    deliveryMode,
+    ...(error ? { error } : {}),
+    ...(skipped > 0 ? { skipped } : {}),
+    ...(alreadySent ? { message: "Every subscriber already has this week's brief; nothing was sent again. Pass force to re-send." } : {}),
+  };
 };

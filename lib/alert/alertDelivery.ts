@@ -13,6 +13,7 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { sentMarkers } from "../delivery/onceFor";
 import { describeConditions } from "../export/exportTerms";
 
 const ALERT_STATE_KEY = "alert:state";
@@ -72,38 +73,23 @@ const listAlertSubscribers = async (): Promise<Subscriber[]> => {
   }
 };
 
-const wasAlreadyDelivered = async (
-  email: string,
-  alertType: string,
-): Promise<boolean> => {
-  const kv = getKv();
-  if (!kv) return false;
-  try {
-    const raw = await kv.get(`${ALERT_DELIVERED_PREFIX}${email}:${alertType}`);
-    if (!raw) return false;
-    const deliveredMs = Date.parse(raw);
-    if (Number.isNaN(deliveredMs)) return false;
-    return Date.now() - deliveredMs < 7 * 24 * 60 * 60 * 1000;
-  } catch {
-    return false;
-  }
-};
+/** The same alert reaches an inbox at most once in this window. */
+const ALERT_REDELIVERY_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-const recordDelivery = async (
-  email: string,
-  alertType: string,
-): Promise<void> => {
-  const kv = getKv();
-  if (!kv) return;
-  try {
-    await kv.put(
-      `${ALERT_DELIVERED_PREFIX}${email}:${alertType}`,
-      new Date().toISOString(),
-    );
-  } catch {
-    /* non-fatal */
-  }
-};
+/* The shared sent-marker store (`lib/delivery/onceFor.ts`) with a rolling
+   window instead of a period, under the keys these markers have always had. */
+const deliveredMarkers = () =>
+  sentMarkers({
+    kv: getKv(),
+    keyFor: (key) => `${ALERT_DELIVERED_PREFIX}${key}`,
+    withinMs: ALERT_REDELIVERY_WINDOW_MS,
+  });
+
+const wasAlreadyDelivered = (email: string, alertType: string): Promise<boolean> =>
+  deliveredMarkers().wasSent(`${email}:${alertType}`);
+
+const recordDelivery = (email: string, alertType: string): Promise<void> =>
+  deliveredMarkers().markSent(`${email}:${alertType}`);
 
 type DeliveryResult = {
   sent: number;

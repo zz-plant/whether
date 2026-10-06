@@ -12,6 +12,7 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
 import { slackChannel } from "../delivery/slack";
+import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 
 /**
  * Slack delivery for the weekly brief.
@@ -28,6 +29,8 @@ type SlackDeliveryStatus =
   | "posted"
   | "partial"
   | "skipped_unconfigured"
+  /** Every target already had this week's post; nothing was posted again. */
+  | "skipped_already_posted"
   | "refused_unpublishable"
   | "failed";
 
@@ -39,6 +42,8 @@ type SlackDeliveryResult = {
   delivered: number;
   recordDate?: string;
   error?: string;
+  /** Targets that already had this week's post and were not posted to again. Absent when none. */
+  skipped?: number;
 };
 
 export const isSlackWebhookUrl = (value: string): boolean =>
@@ -171,7 +176,10 @@ export const deliverSlackBrief = async (options?: {
    *  is built from it instead of a second report read. */
   snapshot?: OperatingSnapshot;
   now?: Date;
+  /** Post to channels that already had this week's post. The manual route's explicit opt-in; the cron never passes it. */
+  force?: boolean;
 }): Promise<SlackDeliveryResult> => {
+  const now = options?.now ?? new Date();
   const urls = options?.webhookUrls ?? (await slackChannel.listTargets());
   if (urls.length === 0) {
     /* Nothing configured is a real state, not a failure — but it must never be
@@ -182,7 +190,6 @@ export const deliverSlackBrief = async (options?: {
   let payload = options?.payload;
   if (!payload) {
     try {
-      const now = options?.now ?? new Date();
       /* The cron's snapshot when it passed one. Otherwise the report read, which
          is GET /api/brief/slack's path, so a manual post and the read endpoint
          say the same thing; the store is not read here because the report
@@ -226,12 +233,23 @@ export const deliverSlackBrief = async (options?: {
   const blocks = buildSlackBriefBlocks(text, recordDate, { imageUrl: options?.imageUrl });
   /* The top-level text is the notification-preview fallback. A webhook Slack
      has revoked (404/410) is retired inside the fan-out, awaited, so the next
-     Monday does not count it as a target. */
+     Monday does not count it as a target. Once per webhook per ISO week, so a
+     manual run after the Monday cron does not post the brief twice, and a run
+     that failed part-way reaches only the channels it missed. */
   const tally = await slackChannel.deliver(
     urls,
     { blocks, text: `Whether Weekly Brief — ${recordDate}` },
-    { fetchImpl: options?.fetchImpl },
+    {
+      fetchImpl: options?.fetchImpl,
+      once: onceFor(weeklyPeriodKey("weekly-slack", now), { force: options?.force }),
+    },
   );
+
+  const skipped = tally.skipped > 0 ? { skipped: tally.skipped } : {};
+  const attempted = urls.length - tally.skipped;
+  if (attempted === 0) {
+    return { ok: true, status: "skipped_already_posted", attempted: 0, delivered: 0, recordDate, ...skipped };
+  }
 
   const delivered = tally.sent;
   /* A retired webhook still missed this week's post, so it counts as failed here. */
@@ -241,9 +259,10 @@ export const deliverSlackBrief = async (options?: {
   return {
     ok: failed === 0,
     status,
-    attempted: urls.length,
+    attempted,
     delivered,
     recordDate,
-    ...(failed > 0 ? { error: `${failed}/${urls.length} Slack webhooks failed` } : {}),
+    ...(failed > 0 ? { error: `${failed}/${attempted} Slack webhooks failed` } : {}),
+    ...skipped,
   };
 };
