@@ -1,3 +1,4 @@
+import { AGENT_START_TOOL, WHETHER_AGENT_MANIFEST_PATH, buildAgentEndpoints, buildAgentStartPointers } from "../agent/discovery";
 import { describeToolParams } from "../agent/registry";
 import { describeAgentTools } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
@@ -10,9 +11,12 @@ import { canonicalPositioningLine } from "../seo";
  * The tool section is written from the definitions the MCP servers run (`lib/agent/tools.ts`),
  * so a tool cannot be served and missing here. It used to be written by hand and described the
  * plain-GET shim (five of twelve tools) as if it were the interface, and never said that
- * `/api/mcp` is an MCP server.
+ * `/api/mcp` is an MCP server. The start pointers and endpoints are the manifest's
+ * (`lib/agent/discovery.ts`), so the two cannot send an agent to different places.
  */
 export const buildLlmsTxt = (baseUrl: string) => {
+  const endpoints = buildAgentEndpoints(baseUrl);
+  const start = buildAgentStartPointers(baseUrl);
   const toolLines = describeAgentTools("http").flatMap((tool) => {
     const query = new URLSearchParams({ tool: tool.name, ...Object.fromEntries(Object.entries(tool.example).map(([key, value]) => [key, String(value)])) });
     return [
@@ -20,7 +24,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
       `- ${tool.description}${tool.plainGetNote ? ` ${tool.plainGetNote}` : ""}`,
       `- Arguments: ${describeToolParams(tool.arguments)}`,
       ...(tool.aliases.length > 0 ? [`- Also called: ${tool.aliases.join(", ")}`] : []),
-      `- Plain GET: ${baseUrl}/api/mcp?${query}`,
+      `- Plain GET: ${endpoints.mcp}?${query}`,
       "",
     ];
   });
@@ -32,24 +36,24 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "",
     "## Start here",
     "",
-    `- Decide from the state: GET ${baseUrl}/api/agent?view=state`,
+    `- Decide from the state: ${start.http}`,
     "  - The current reading in about 3KB: the conditions and the confidence in them, the data's freshness, each score against its pause, resume and change lines, the moves behind each score, and the guidance.",
     "  - Check `automation.ready` first. False means the reading is a saved copy, or older than " +
       `${PUBLISH_MAX_RECORD_AGE_DAYS} days, or assembly failed: say so, and do not act on it without a person looking.`,
-    `- MCP client: ${baseUrl}/api/mcp (streamable HTTP, JSON-RPC 2.0, protocol ${MCP_PROTOCOL_VERSIONS.join(" or ")}). Call get_state first.`,
+    `- MCP client: ${endpoints.mcp} (streamable HTTP, JSON-RPC 2.0, protocol ${MCP_PROTOCOL_VERSIONS.join(" or ")}). Call ${AGENT_START_TOOL} first.`,
     "  - `bun run mcp:whether` runs the same tools over stdio from a checkout of the repository.",
-    `- Read rather than decide: GET ${baseUrl}/brief.md (Markdown).`,
-    "- CLI, from a checkout: `bun run cli:whether -- state --json`",
+    `- Read rather than decide: ${start.markdown} (Markdown).`,
+    `- CLI, from a checkout: \`${start.cli}\``,
     "",
     "## MCP tools",
     "",
     "The same tools on both MCP transports, and on plain GET for an agent with no MCP client:",
-    `GET ${baseUrl}/api/mcp?tool=<name>&<argument>=<value>. Every tool reads; none writes.`,
+    `GET ${endpoints.mcp}?tool=<name>&<argument>=<value>. Every tool reads; none writes.`,
     "A regime is accepted by its key (SCARCITY, DEFENSIVE, VOLATILE, EXPANSION) or by the word the site prints",
     "(Freezing, Cloudy, Stormy, Sunny), in any case. A wrong argument is refused with the values that would have worked,",
     "and an argument a tool does not take is named rather than ignored.",
     "",
-    `### GET ${baseUrl}/api/mcp?tool=get_actions`,
+    `### GET ${endpoints.mcp}?tool=get_actions`,
     "- Returns: this catalogue, with each tool's arguments and a call that works.",
     "",
     ...toolLines,
@@ -60,20 +64,20 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "## Machine-readable endpoints",
     "",
     "### Markdown brief (recommended for browser/reading agents)",
-    `- GET ${baseUrl}/brief.md`,
+    `- GET ${endpoints.brief}`,
     "- Returns: Structured Markdown with posture, decisions, revisit triggers, provenance, and copy-paste-ready operator brief",
     "- Content-Type: text/markdown; charset=utf-8",
     "- Cache: 900s",
     "",
     "### JSON agent API",
-    `- GET ${baseUrl}/api/agent?cadence=<weekly|monthly|quarterly|yearly>`,
+    `- GET ${endpoints.agent}?cadence=<weekly|monthly|quarterly|yearly>`,
     "- Default cadence: weekly",
     "- Response: JSON with summary, posture, decision delta, flip watch, agent handoff payload + prompt, provenance",
     "- `&view=state` answers the compact state instead (weekly only); the default view is the whole brief",
     "- Invalid cadence or view: HTTP 400 with the values allowed",
     "",
     "### Jev decision request",
-    `- GET ${baseUrl}/api/agent?format=jev`,
+    `- GET ${endpoints.agent}?format=jev`,
     "- Returns: this week's guidance as a ready-to-send request for TypeSafe's Jev decision model (typesafe/jev): typed state with a `plan` slot, plus questions (does the plan conflict with the guidance, which decision area, how reversible, is it safer after conditions change)",
     "- Fill `request.state.plan` and send `request` to Jev yourself; Whether never receives the plan",
     "- Check `automationReady` first: false means the reading is not live or not current",
@@ -88,10 +92,10 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "- Informational only: not investment, legal, tax or employment advice, and not a forecast",
     "",
     "## Discovery",
-    `- Manifest: ${baseUrl}/.well-known/whether-agent.json`,
+    `- Manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,
     `- Homepage: ${baseUrl}/`,
-    `- Brief (Markdown): ${baseUrl}/brief.md`,
-    `- Agent API: ${baseUrl}/api/agent`,
-    `- MCP server: ${baseUrl}/api/mcp`,
+    `- Brief (Markdown): ${endpoints.brief}`,
+    `- Agent API: ${endpoints.agent}`,
+    `- MCP server: ${endpoints.mcp}`,
   ].join("\n");
 };

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { siteUrl } from "../lib/siteUrl";
 
 // Capital Posture Governance SEO guardrails: make the dashboard discoverable and scannable.
@@ -16,7 +17,7 @@ const ALLOWED_PATHS = [
   "/brief.md",
   "/api/agent",
   "/api/mcp",
-  "/.well-known/whether-agent.json",
+  WHETHER_AGENT_MANIFEST_PATH,
   "/llms.txt",
   "/llms-full.txt",
   "/api/posture/current",

@@ -86,6 +86,11 @@ Machine-discovery routes:
   never registered and 404s. It did, in production, for as long as it existed. The manifest body
   lives in `lib/agentManifest.ts`; Invariant 10 in `tests/architectureInvariants.test.ts` fails if
   any route file reappears under a dot-directory.
+- The manifest's path, the `start` pointers, the `endpoints` and the `views` are written once, in
+  `lib/agent/discovery.ts`, and read by the manifest, `/llms.txt`, `/llms-full.txt`, `robots.ts`, the
+  root layout's `<link rel="mcp-manifest">`, `/api-docs` and `/api/agent` itself.
+  `tests/agentDiscoveryParity.test.ts` holds `/llms.txt` to the manifest's start pointers and endpoints,
+  and every advertised endpoint to a route that serves it.
 
 ### Example
 

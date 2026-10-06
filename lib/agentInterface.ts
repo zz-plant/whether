@@ -1,3 +1,4 @@
+import { WHETHER_AGENT_MANIFEST_PATH } from "./agent/discovery";
 import { buildAgentPayload, buildAgentPrompt } from "./agentHandoff";
 import { loadReportRouteContext } from "./api/reportRoute";
 import type { RegimeAssessment } from "./regimeEngine";
@@ -195,7 +196,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
     links: {
       self: `/api/agent?cadence=${cadence}`,
       llms: "/llms.txt",
-      discovery: "/.well-known/whether-agent.json",
+      discovery: WHETHER_AGENT_MANIFEST_PATH,
     },
     generatedAt: now.toISOString(),
     version: "v1",

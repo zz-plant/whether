@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { buildAgentEndpoints } from "./agent/discovery";
 import { REGIME_KEYS } from "./agent/inputs";
 import { loadAgentInterfaceContext, type AgentInterfaceContext } from "./agentInterface";
 import { REGIME_WEATHER_RATIONALES } from "./regimePresentation";
@@ -215,6 +216,7 @@ export const buildAgentState = (
   const riskAppetite = scoreState("riskAppetite");
   const conditionsMeaning = lowerFirst((REGIME_WEATHER_RATIONALES[assessment.regime].split(". ")[0] ?? "").replace(/\.$/, ""));
   const label = postureState.currentState.postureLabel;
+  const endpoints = buildAgentEndpoints(siteUrl);
 
   return {
     version: "v1",
@@ -256,8 +258,8 @@ export const buildAgentState = (
     },
     use: buildUseConstraint(),
     links: {
-      brief: `${siteUrl}/brief.md`,
-      full: `${siteUrl}/api/agent?cadence=weekly`,
+      brief: endpoints.brief,
+      full: `${endpoints.agent}?cadence=weekly`,
       trust: `${siteUrl}/trust`,
     },
   };
