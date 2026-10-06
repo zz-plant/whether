@@ -8,6 +8,7 @@
  * resolves its periods, scores them as one threaded walk
  * (`replayArchivePeriods`), and turns each reading into the archived entry.
  */
+import { ENGINE_VERSION } from "../lib/regimeEngine";
 import { buildMonthlySummary, type MonthlySummary } from "../lib/summary/monthlySummary";
 import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
 import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySummary";
@@ -36,6 +37,13 @@ type ArchiveInputs = {
 
 type ArchiveMode = "replace" | "merge";
 
+/**
+ * Which engine calibration scored an entry. Every entry these builders write
+ * carries it; entries written before it existed do not, so readers treat it as
+ * optional.
+ */
+type EngineStamp = { engineVersion: string };
+
 // ── Weekly ──
 
 const WEEKLY_START_YEAR = 2018;
@@ -47,7 +55,7 @@ export type WeeklySummaryArchiveEntry = {
   asOf: string;
   record_date: string;
   summary: WeeklySummary;
-};
+} & EngineStamp;
 
 const resolveHistoryWeeksLimit = () => {
   const value = process.env[HISTORY_WEEKS_ENV];
@@ -178,6 +186,7 @@ export const buildWeeklyArchive = ({ datasets, vixDataset, now }: ArchiveInputs)
         asOf,
         record_date: treasury.record_date,
         summary: withArchiveInputSources(summary, assessment.scores.baseRateUsed),
+        engineVersion: ENGINE_VERSION,
       };
     });
 
@@ -200,7 +209,7 @@ export type MonthlySummaryArchiveEntry = {
   summary: MonthlySummary;
   tightness: number;
   riskAppetite: number;
-};
+} & EngineStamp;
 
 export type TimeMachineCacheEntry = TreasuryData & {
   year: number;
@@ -289,6 +298,7 @@ export const buildMonthlyArchive = ({ datasets, vixDataset, now }: ArchiveInputs
         summary: withArchiveInputSources(summary, assessment.scores.baseRateUsed),
         tightness: assessment.scores.tightness,
         riskAppetite: assessment.scores.riskAppetite,
+        engineVersion: ENGINE_VERSION,
       };
     }),
     timeMachineEntries: readings.map(({ period: { year, month }, asOfTime, treasury, vixReading }) => ({
@@ -313,14 +323,14 @@ export type QuarterlySummaryArchiveEntry = {
   asOf: string;
   record_date: string;
   summary: ReturnType<typeof buildQuarterlySummary>;
-};
+} & EngineStamp;
 
 export type YearlySummaryArchiveEntry = {
   year: number;
   asOf: string;
   record_date: string;
   summary: ReturnType<typeof buildYearlySummary>;
-};
+} & EngineStamp;
 
 type QuarterOrYear =
   | { kind: "quarter"; year: number; quarter: number; asOf: string }
@@ -416,6 +426,7 @@ export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, now }: Archi
         asOf: period.asOf,
         record_date: treasury.record_date,
         summary: withArchiveInputSources(summary, assessment.scores.baseRateUsed),
+        engineVersion: ENGINE_VERSION,
       });
     } else {
       const summary = buildYearlySummary({
@@ -429,6 +440,7 @@ export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, now }: Archi
         asOf: period.asOf,
         record_date: treasury.record_date,
         summary: withArchiveInputSources(summary, assessment.scores.baseRateUsed),
+        engineVersion: ENGINE_VERSION,
       });
     }
   }

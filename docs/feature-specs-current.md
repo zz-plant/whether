@@ -1713,6 +1713,14 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
   `time-machine:update-summaries` sets to 2024) walks from the first year and
   filters only which records it writes, so a merge lands the same
   confirmations a full replay produces.
+- One walk (2026-10-06): the runtime replay and all three generators thread the
+  engine through `replayRegimeWalk` (`lib/timeMachine/regimeReplay.ts`), and the
+  generators' period logic is `scripts/regimeArchiveReplay.ts`.
+  `tests/regimeArchiveReplay.test.ts` replays every cadence offline from series
+  rebuilt out of the bundled data and holds it to the archive on record.
+- Every entry a generator writes carries `engineVersion` (`ENGINE_VERSION`, the
+  engine calibration that scored it). It is additive: entries written earlier have
+  none, and the archive reader ignores it.
 - A flip is a shock only when the one-step move is 25 points or more *and* the
   prior reading sat outside the 5-point near band; from inside the band the
   warning could have fired, so the flip confirms through the gate.

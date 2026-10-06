@@ -340,6 +340,23 @@ export const CONFIDENCE_PERCENT_CEILING = 92;
  *  should read as weaker than the weakest call built on real ones. */
 export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
 
+/**
+ * Which calibration scored a reading.
+ *
+ * Bump it with any change that moves a score, a regime, a diagnostic or a
+ * policy composite for the same inputs: a constant above, a macro adjustment,
+ * the machine's gate, the policy spec. A wording change does not bump it — the
+ * words are written in `lib/report/regimeDescription.ts`, after scoring.
+ * `tests/engineVersion.test.ts` fingerprints the scorer's output on a fixed grid
+ * of synthetic inputs and fails when that output moves under an unchanged
+ * version.
+ *
+ * The archive generators stamp it on every entry they write (`engineVersion`),
+ * and the operating snapshot's input hash includes it, so two snapshots of the
+ * same inputs scored by different calibrations are stored as two snapshots.
+ */
+export const ENGINE_VERSION = "engine-2026-10-06";
+
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
   tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,

@@ -174,3 +174,20 @@ file nothing at the call site named. The history is an argument now — `scoreRe
 supplies the bundled series (`TREASURY_POLICY_HISTORY`, `lib/policy/history.ts`). `lib/regimeEngine.ts` and
 `lib/policy/history.ts` are the only engine-layer files that import bundled data or `lib/report/`;
 `tests/architectureInvariants.test.ts` holds the rest to that.
+
+## Which calibration scored it: `ENGINE_VERSION` (2026-10-06)
+
+Nothing recorded which engine scored an archived entry or a stored snapshot, so a constant change and a data
+change looked the same in `data/`. `ENGINE_VERSION` (`lib/regimeEngineCore.ts`) names the calibration:
+
+- The generators stamp `engineVersion` on every entry they write (all four cadences in
+  `summary_archive.json`, and the weekly and monthly summary files). It is optional to readers: entries
+  written before it have none, and `lib/summary/summaryArchive.ts` does not read it.
+- `hashOperatingInputs` includes it, so a re-score of the same inputs under a new calibration is a new
+  snapshot id and KV key. That changed every hash once, which was traced before it shipped: the hash names
+  the snapshot, its per-reading KV key (no reader) and a field in the ingest-pipeline telemetry; nothing
+  compares it between runs, triggers on it, or sends anything because of it.
+- `tests/engineVersion.test.ts` fingerprints the scorer's output (codes and numbers, no copy) on a fixed
+  synthetic grid and pins the digest to the version, so a scoring change under an unchanged version fails.
+  The grid is synthetic so a regeneration of the bundled data never reads as a new calibration. Bump the
+  version and add a digest; never overwrite an old one.

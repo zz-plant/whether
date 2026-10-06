@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import timeMachineCache from "../data/time_machine_cache.json";
 import summaryArchive from "../data/summary_archive.json";
+import { ENGINE_VERSION } from "../lib/regimeEngineCore";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { parseSeries, type TreasuryDatasets } from "../scripts/regimeArchiveContext";
 import { buildMonthlyArchive } from "../scripts/regimeArchiveReplay";
@@ -173,6 +174,8 @@ describe("archive replay from bundled series", () => {
       return expected === actual ? [] : [`${entry.year}-${entry.month}: replay ${actual} vs record ${expected}`];
     });
     assert.deepEqual(diffs, []);
+    // Each entry names the calibration that scored it.
+    assert.deepEqual([...new Set(entries.map((entry) => entry.engineVersion))], [ENGINE_VERSION]);
   });
 
   it("writes the Time Machine cache the runtime walk reads, entry for entry", () => {
