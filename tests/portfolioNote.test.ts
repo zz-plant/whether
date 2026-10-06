@@ -4,6 +4,8 @@ import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { RUNWAY_BAND_OPTIONS } from "../lib/report/operatorRunway";
 import type { TreasuryData } from "../lib/types";
+import { buildBriefDocument } from "../lib/report/briefDocument";
+import { fixtureWeeklyCall } from "./factories/exportFixtures";
 
 /*
  * The portfolio note runs from one sender to many companies (2026-10-01), so it
@@ -25,8 +27,17 @@ const areas = [
   { area: "product-tempo" as const, rule: "Keep the core roadmap on schedule" },
 ];
 
-const build = (isFallback = false) =>
-  buildPortfolioNote({ assessment: evaluateRegime(treasury), record: treasury, areas, sourceLabel: "U.S. Treasury", isFallback });
+const build = (isFallback = false) => {
+  const record = isFallback ? { ...treasury, isLive: false, fallback_at: "2026-09-29T09:00:00Z", fallback_reason: "FRED unreachable." } : treasury;
+  const assessment = evaluateRegime(record);
+  return buildPortfolioNote(
+    buildBriefDocument(
+      { assessment, treasury: record, macroSeries: [], recordDateLabel: record.record_date, sourceLabel: "U.S. Treasury" },
+      fixtureWeeklyCall(assessment),
+    ),
+    areas,
+  );
+};
 
 describe("portfolio note", () => {
   it("prints what the week means at every runway band, not one company's", () => {

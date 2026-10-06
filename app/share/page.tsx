@@ -119,24 +119,13 @@ const buildCurrentShareArtifact = async () => {
   // Monthly, against the prior month-end in the regime history, because that
   // is the cadence an investor letter compares itself on. The runway sentence
   // is composed in the browser: this page is cached and cannot read the cookie.
-  const investorUpdate = buildInvestorUpdateSnippetParts({
-    assessment,
-    record: treasury,
-    weeklyCall: snapshot.weeklyCall,
-    monthlyHistory: getMonthlyRegimeHistory(),
-    // The provenance label, not `treasury.source`, which is a FRED series URL on a live read.
-    sourceLabel: reportData.treasuryProvenance.sourceLabel,
-    isFallback: snapshot.isFallback,
-  });
+  const investorUpdate = buildInvestorUpdateSnippetParts(document, getMonthlyRegimeHistory());
   /* One sender to many companies, so every runway band rather than the reader's:
      the investor update above runs the other way. */
-  const portfolioNote = buildPortfolioNote({
-    assessment,
-    record: treasury,
-    areas: areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
-    sourceLabel: reportData.treasuryProvenance.sourceLabel,
-    isFallback: snapshot.isFallback,
-  });
+  const portfolioNote = buildPortfolioNote(
+    document,
+    areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
+  );
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,

@@ -70,12 +70,9 @@ describe("artifacts that leave the site carry no facts about a company the site 
   });
 
   it("portfolio note speaks to every runway band and to no one company", () => {
-    const note = buildPortfolioNote({
-      assessment,
-      record: treasury,
-      areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
-      sourceLabel: treasury.source,
-    });
+    const note = buildPortfolioNote(fixtureBriefDocument(), [
+      { area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" },
+    ]);
     assert.doesNotMatch(note, FIXTURE_COMPANY);
   });
 

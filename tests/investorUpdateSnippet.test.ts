@@ -8,6 +8,8 @@ import {
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { MonthlyRegimeHistoryEntry } from "../lib/summary/monthlyRegimeHistory";
 import type { TreasuryData } from "../lib/types";
+import { buildBriefDocument } from "../lib/report/briefDocument";
+import { fixtureWeeklyCall } from "./factories/exportFixtures";
 
 const treasury: TreasuryData = {
   record_date: "2026-09-16",
@@ -19,10 +21,19 @@ const treasury: TreasuryData = {
 
 // The live contract's clauses are written for labelled slots and carry no full
 // stop; the block has to supply one or the paragraph runs together.
-const weeklyCall = {
+const callLines = {
   actionNow: "Hold net-new hiring and require reversible commitments.",
   pauseIf: "Pause if funding pressure crosses 66",
   callChangesIf: "Risk appetite rises above 50 for two reads",
+};
+
+/* The week's brief document for this reading, under the call lines above. */
+const documentFor = (record: TreasuryData = treasury) => {
+  const assessment = evaluateRegime(record);
+  return buildBriefDocument(
+    { assessment, treasury: record, macroSeries: [], recordDateLabel: record.record_date, sourceLabel: record.source },
+    { ...fixtureWeeklyCall(assessment), ...callLines, policyOverrideActive: false },
+  );
 };
 
 const history: MonthlyRegimeHistoryEntry[] = [
@@ -41,14 +52,7 @@ describe("investor update snippet", () => {
   });
 
   it("writes the regime, the move over the month, and the call as two paragraphs with a stamp", () => {
-    const assessment = evaluateRegime(treasury);
-    const parts = buildInvestorUpdateSnippetParts({
-      assessment,
-      record: treasury,
-      weeklyCall,
-      monthlyHistory: history,
-      sourceLabel: treasury.source,
-    });
+    const parts = buildInvestorUpdateSnippetParts(documentFor(), history);
     assert.match(parts.conditions, /as of 2026-09-16/);
     assert.match(parts.conditions, /(unchanged since|moved to .* from .* at) the end of Aug 2026/);
     assert.match(parts.conditions, /Over the month, funding pressure moved to \d+ of 100 \(((\+|-)?\d+ points|unchanged); money is [a-z ]+\)/);
@@ -72,35 +76,17 @@ describe("investor update snippet", () => {
     const priorDiffers = history.map((entry) =>
       entry.record_date === "2026-08-31" ? { ...entry, regime: assessment.regime === "EXPANSION" ? "SCARCITY" as const : "EXPANSION" as const } : entry,
     );
-    const parts = buildInvestorUpdateSnippetParts({
-      assessment,
-      record: treasury,
-      weeklyCall,
-      monthlyHistory: priorDiffers,
-      sourceLabel: treasury.source,
-    });
+    const parts = buildInvestorUpdateSnippetParts(documentFor(), priorDiffers);
     assert.match(parts.conditions, /moved to .+ as of 2026-09-16, from .+ at the end of Aug 2026\./);
   });
 
   it("reports no move when the archive month has no scores, and none at all with no prior month", () => {
     const assessment = evaluateRegime(treasury);
-    const scoreless = buildInvestorUpdateSnippetParts({
-      assessment,
-      record: treasury,
-      weeklyCall,
-      monthlyHistory: [{ record_date: "2026-08-31", regime: assessment.regime }],
-      sourceLabel: treasury.source,
-    });
+    const scoreless = buildInvestorUpdateSnippetParts(documentFor(), [{ record_date: "2026-08-31", regime: assessment.regime }]);
     assert.match(scoreless.conditions, /Funding pressure sits at \d+ of 100 \([a-z ]+\) and risk appetite at \d+ of 100 \([a-z ]+\)\./);
     assert.doesNotMatch(scoreless.conditions, /over the month/i);
 
-    const first = buildInvestorUpdateSnippetParts({
-      assessment,
-      record: treasury,
-      weeklyCall,
-      monthlyHistory: [],
-      sourceLabel: treasury.source,
-    });
+    const first = buildInvestorUpdateSnippetParts(documentFor(), []);
     assert.doesNotMatch(first.conditions, /end of/);
   });
 
@@ -125,14 +111,10 @@ describe("investor update snippet", () => {
   });
 
   it("stamps a cached reading as one", () => {
-    const parts = buildInvestorUpdateSnippetParts({
-      assessment: evaluateRegime(treasury),
-      record: treasury,
-      weeklyCall,
-      monthlyHistory: history,
-      sourceLabel: treasury.source,
-      isFallback: true,
-    });
+    const parts = buildInvestorUpdateSnippetParts(
+      documentFor({ ...treasury, isLive: false, fallback_at: "2026-09-16T09:00:00Z", fallback_reason: "FRED unreachable." }),
+      history,
+    );
     assert.match(parts.source, /saved copy, not a live reading/);
   });
 });

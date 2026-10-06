@@ -2067,6 +2067,17 @@ failure-mode warning and the interpretation block.
 lines, conditions line and readings row come from the snapshot's document, and the readings row
 takes the document's confidence instead of resolving its own. Its text did not change.
 
+**The investor update and the portfolio note render the document**
+(`buildInvestorUpdateSnippetParts(document, monthlyHistory)`, `buildPortfolioNote(document, areas)`),
+and keep their two runway framings: the investor update is one founder's letter, so the browser
+composes the reader's band into it (`formatInvestorUpdateSnippet`); the portfolio note goes from one
+sender to many companies, so it prints the document's every-band runway. The month-end history
+stays the investor update's own input (a letter compares itself with the last one), and the area
+lines stay the portfolio note's (the area tables' joined lines). Both close with
+`formatSourceFooter`; the month-end pulse mail (`lib/alert/monthEndPulse.ts`) builds the same
+document for its block. On a saved-copy week the footer names the publisher, not "Canonical snapshot
+(FRED)".
+
 **/share offers one Slack text and the meeting pack carries it.** The pack pasted the long Monday
 post beside the picker's Slack post, under a different call on a held week. Its "SLACK POST"
 section is the picker's post now.

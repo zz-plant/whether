@@ -1,13 +1,9 @@
-import type { RegimeAssessment } from "../regimeEngine";
+import type { BriefDocument } from "../report/briefArtifact";
 import { decisionAreaLabel, type DecisionArea } from "../report/boundedDecisionRules";
-import { resolvePublishedConfidence, type ConfidenceRecord } from "../report/confidence";
-import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../report/runwayConditionedNotes";
-import { RUNWAY_BAND_OPTIONS } from "../report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatDateUTC, formatThresholdNumber } from "../formatters";
 import { signalReadingMeaning } from "../report/signalTranslations";
-import { buildBriefPermalinkLine } from "./briefPermalink";
-import { describeConditions, formatExportConfidenceWord, SAVED_COPY_NOTE } from "./exportTerms";
+import { formatExportConfidenceWord, formatSourceFooter } from "./exportTerms";
 import { buildCanonicalUrl } from "../seo";
 
 /**
@@ -17,8 +13,9 @@ import { buildCanonicalUrl } from "../seo";
  * The other formats run from a company outward (`investorUpdateSnippet.ts` is a
  * founder writing to investors). This runs the other way, one sender to many
  * companies whose runways differ, so it cannot carry one runway sentence: it
- * prints what the week means at each of the four bands, from the same notes the
- * brief prints for the band a reader picks (`buildRunwayConditionedNotes`), and
+ * prints what the week means at each of the four bands — the document's
+ * every-band runway, from the same notes the brief prints for the band a
+ * reader picks (`buildRunwayConditionedNotes`) — and
  * every area's rule with its two lines. It ends where a company can set lines of
  * its own, because a shared reading is the start of a plan, not the plan.
  *
@@ -49,39 +46,29 @@ const formatArea = ({ area, rule, pause, resume }: PortfolioArea) => {
   return `- ${decisionAreaLabel(area)}: ${asSentence(rule)}${lines}`;
 };
 
-export const buildPortfolioNote = ({
-  assessment,
-  record,
-  areas,
-  sourceLabel,
-  isFallback = false,
-}: {
-  assessment: RegimeAssessment;
-  /** The treasury record the assessment was read from. */
-  record: ConfidenceRecord & { record_date: string };
-  areas: readonly PortfolioArea[];
-  sourceLabel: string;
-  isFallback?: boolean;
-}): string => {
-  const { tightness, riskAppetite } = assessment.scores;
-  const confidence = formatExportConfidenceWord(resolvePublishedConfidence({ assessment, record }).label);
+/**
+ * The areas come in as the area tables print them (`app/operate/areaRows.ts`
+ * joins each rule's lines), so a company reads the same lines here as on the
+ * plan page; everything else is the week's brief document.
+ */
+export const buildPortfolioNote = (document: BriefDocument, areas: readonly PortfolioArea[]): string => {
+  const { tightness, riskAppetite } = document.readings.scores;
+  const confidence = formatExportConfidenceWord(document.confidence);
 
   /* Each note opens "With <runway> of runway", which reads once on the brief and
      three times in a row here; the band's label says it once instead. */
-  const bands = RUNWAY_BAND_OPTIONS.flatMap((band) => {
-    const runway = resolveRunwayForNotes({ band: band.key });
-    if (!runway) return [];
-    const opener = `With ${runway.runwayPhrase} of runway`;
-    const notes = buildRunwayConditionedNotes({ regime: assessment.regime, ...runway }).map((note) =>
-      capitalize(note.note.startsWith(opener) ? note.note.slice(opener.length).replace(/^,?\s*/, "") : note.note),
+  const bands = document.runway.everyBand.flatMap(({ phrase, notes }) => {
+    const opener = `With ${phrase} of runway`;
+    const lines = notes.map((note) =>
+      capitalize(note.startsWith(opener) ? note.slice(opener.length).replace(/^,?\s*/, "") : note),
     );
-    return notes.length > 0 ? [`- ${capitalize(runway.runwayPhrase)} of runway: ${notes.join(" ")}`] : [];
+    return lines.length > 0 ? [`- ${capitalize(phrase)} of runway: ${lines.join(" ")}`] : [];
   });
 
   return [
-    `For the companies we back: this week's funding climate, from Whether (week of ${formatDateUTC(record.record_date)}).`,
+    `For the companies we back: this week's funding climate, from Whether (week of ${formatDateUTC(document.provenance.recordDate)}).`,
     "",
-    `Conditions: ${describeConditions(assessment.regime)}. Confidence: ${confidence}.`,
+    `Conditions: ${document.conditions.line}. Confidence: ${confidence}.`,
     `Funding pressure is ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}); risk appetite is ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`,
     "",
     "The rule for each area, with the line that pauses it and the line that resumes it:",
@@ -91,7 +78,7 @@ export const buildPortfolioNote = ({
     ...bands,
     "",
     `To move these lines for your own plan and get an email the day one is crossed: ${buildCanonicalUrl("/operate")}#ops-plan-lines`,
-    `Source: ${sourceLabel}, ${record.record_date}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}.`,
-    buildBriefPermalinkLine(record.record_date),
+    `${formatSourceFooter(document.provenance)}.`,
+    `Full brief: ${document.provenance.permalink}`,
   ].join("\n");
 };

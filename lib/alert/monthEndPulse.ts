@@ -17,6 +17,7 @@
  */
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
 import type { MonthlyRegimeHistoryEntry } from "../summary/monthlyRegimeHistory";
 import { getMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import {
@@ -106,14 +107,10 @@ const buildBlock = (
   snapshot: OperatingSnapshot,
   weeklyCall: WeeklyCallContract,
 ): string => {
-  const parts = buildInvestorUpdateSnippetParts({
-    assessment: snapshot.assessment,
-    record: snapshot.treasury,
-    weeklyCall,
-    monthlyHistory: getMonthlyRegimeHistory(),
-    sourceLabel: snapshot.provenance.sourceLabel,
-    isFallback: snapshot.freshness.status === "fallback",
-  });
+  const parts = buildInvestorUpdateSnippetParts(
+    buildBriefDocument(briefSourceFromSnapshot(snapshot), weeklyCall),
+    getMonthlyRegimeHistory(),
+  );
   return formatInvestorUpdateSnippet(parts, null);
 };
 

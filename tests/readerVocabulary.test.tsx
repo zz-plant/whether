@@ -21,12 +21,10 @@ import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestP
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
 import { publishedScoreLines } from "../lib/alert/alertEvaluator";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
-import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
-import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import type { RunwayBand } from "../lib/report/operatorRunway";
-import { assessment, fixtureBriefDocument, treasury, macros } from "./factories/exportFixtures";
+import { assessment, fixtureBriefDocument, fixtureWeeklyCall, treasury, macros } from "./factories/exportFixtures";
 import { renderOgElement } from "../app/api/og/renderOgElement";
 import { collectPageShareCards } from "./fixtures/pageShareCards";
 
@@ -189,14 +187,9 @@ const routeSurfaces: Surface[] = [
 ];
 
 const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });
-/* The weekly call for the same reading the other export surfaces print, through the contract
-   every production caller passes the operator brief. */
-const fixtureWeeklyCall = buildWeeklyCallContract({
-  assessment,
-  homeBriefModel: buildHomeBriefModel({ assessment, stopItems: assessment.constraints, regimeAlert: null }),
-});
-/* The slide routes draw the stored snapshot; this one carries the same reading and call. */
-const fixtureSnapshot = { ...snapshot, assessment, weeklyCall: fixtureWeeklyCall };
+/* The slide routes draw the stored snapshot; this one carries the same reading and call the
+   other export surfaces print. */
+const fixtureSnapshot = { ...snapshot, assessment, weeklyCall: fixtureWeeklyCall() };
 const record: TrackRecord = {
   monthsCovered: 176,
   firstRecordDate: "2012-01-31",
@@ -218,7 +211,7 @@ const artifactSurfaces: Surface[] = [
   { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(fixtureBriefDocument()) },
   {
     name: "weekly operator brief",
-    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall: fixtureWeeklyCall })),
+    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury, weeklyCall: fixtureWeeklyCall() })),
   },
   { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(buildExportSlidePayload(fixtureSnapshot, null)) },
   { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(buildExportSlidePayload(fixtureSnapshot, null))) },
@@ -226,13 +219,7 @@ const artifactSurfaces: Surface[] = [
   {
     name: "investor update",
     text: () => {
-      const parts = buildInvestorUpdateSnippetParts({
-        assessment,
-        record: treasury,
-        weeklyCall: snapshot.weeklyCall,
-        monthlyHistory: [],
-        sourceLabel: treasury.source,
-      });
+      const parts = buildInvestorUpdateSnippetParts(fixtureBriefDocument(), []);
       const bands: RunwayBand[] = ["critical", "tight", "balanced", "abundant"];
       return bands.map((band) => formatInvestorUpdateSnippet(parts, band)).join("\n");
     },
@@ -240,12 +227,9 @@ const artifactSurfaces: Surface[] = [
   {
     name: "portfolio note",
     text: () =>
-      buildPortfolioNote({
-        assessment,
-        record: treasury,
-        areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
-        sourceLabel: treasury.source,
-      }),
+      buildPortfolioNote(fixtureBriefDocument(), [
+        { area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" },
+      ]),
   },
   { name: "published brief (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },
   { name: "published brief (email)", text: () => (latestPublishedBrief ? buildPublishedBriefEmailUpdate(latestPublishedBrief) : "") },
