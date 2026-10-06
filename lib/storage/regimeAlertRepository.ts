@@ -1,5 +1,6 @@
 import type { AlertDeliveryEvent, RegimeAlertEvent } from "../signalOps";
 import { getWhetherKv } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import { DurableEventLog, type KvNamespaceLike } from "./eventLog";
 
 type Cursor = string | null;
@@ -88,19 +89,13 @@ class KvRegimeAlertRepository implements RegimeAlertRepository {
   }
 }
 
-const getKvBinding = (): KvNamespaceLike | null => getWhetherKv();
+const repositorySelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): RegimeAlertRepository => (kv ? new KvRegimeAlertRepository(kv) : new InMemoryRegimeAlertRepository()),
+);
 
-let sharedRepository: RegimeAlertRepository | null = null;
+export const getRegimeAlertRepository = (): RegimeAlertRepository => repositorySelection.get();
 
-export const getRegimeAlertRepository = (): RegimeAlertRepository => {
-  if (!sharedRepository) {
-    const kv = getKvBinding();
-    sharedRepository = kv ? new KvRegimeAlertRepository(kv) : new InMemoryRegimeAlertRepository();
-  }
-  return sharedRepository;
-};
-
-export const resetRegimeAlertRepository = (): RegimeAlertRepository => {
-  sharedRepository = new InMemoryRegimeAlertRepository();
-  return sharedRepository;
-};
+/** Test hook: an empty in-memory repository, held until the next reset whatever the binding does. */
+export const resetRegimeAlertRepository = (): RegimeAlertRepository =>
+  repositorySelection.reset(new InMemoryRegimeAlertRepository());

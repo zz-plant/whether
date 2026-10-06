@@ -1,4 +1,5 @@
 import { getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import { isSlackWebhookUrl } from "./deliverSlackBrief";
 
 type SlackSubscription = {
@@ -289,18 +290,11 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
   }
 }
 
-let sharedSlackStore: SlackWebhookStore | null = null;
+const slackStoreSelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): SlackWebhookStore => (kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore()),
+);
 
-export const getSlackWebhookStore = (): SlackWebhookStore => {
-  if (!sharedSlackStore) {
-    const kv = getWhetherKv();
-    sharedSlackStore = kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore();
-  }
-  return sharedSlackStore;
-};
+export const getSlackWebhookStore = (): SlackWebhookStore => slackStoreSelection.get();
 
-export const resetSlackWebhookStore = (): SlackWebhookStore => {
-  const kv = getWhetherKv();
-  sharedSlackStore = kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore();
-  return sharedSlackStore;
-};
+export const resetSlackWebhookStore = (): SlackWebhookStore => slackStoreSelection.reset();

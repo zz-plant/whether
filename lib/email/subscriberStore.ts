@@ -1,4 +1,5 @@
 import { getJson, getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import { parsePlanLines, parsePlanRunway, type PlanLines, type PlanRunway } from "../alert/planLines";
 import type { RunwayBand } from "../report/operatorRunway";
 /**
@@ -653,18 +654,11 @@ class InMemorySubscriberStore implements SubscriberStore {
   }
 }
 
-let sharedStore: SubscriberStore | null = null;
+const subscriberStoreSelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): SubscriberStore => (kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore()),
+);
 
-export const getSubscriberStore = (): SubscriberStore => {
-  if (!sharedStore) {
-    const kv = getWhetherKv();
-    sharedStore = kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore();
-  }
-  return sharedStore;
-};
+export const getSubscriberStore = (): SubscriberStore => subscriberStoreSelection.get();
 
-export const resetSubscriberStore = (): SubscriberStore => {
-  const kv = getWhetherKv();
-  sharedStore = kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore();
-  return sharedStore;
-};
+export const resetSubscriberStore = (): SubscriberStore => subscriberStoreSelection.reset();

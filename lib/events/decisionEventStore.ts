@@ -1,4 +1,5 @@
 import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 
 export type RegimeDecisionEvent = {
@@ -321,18 +322,8 @@ export const buildRegimeDecisionEvent = ({
   transitionReason,
 });
 
-const getCloudflareKvBinding = (): CloudflareKvNamespaceLike | null => getWhetherKv();
+const decisionEventStoreSelection = selectStoreByBinding(getWhetherKv, (kv) => new DecisionEventStore(kv));
 
-let sharedDecisionEventStore: DecisionEventStore | null = null;
+export const getDecisionEventStore = () => decisionEventStoreSelection.get();
 
-export const getDecisionEventStore = () => {
-  if (!sharedDecisionEventStore) {
-    sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
-  }
-  return sharedDecisionEventStore;
-};
-
-export const resetDecisionEventStore = () => {
-  sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
-  return sharedDecisionEventStore;
-};
+export const resetDecisionEventStore = () => decisionEventStoreSelection.reset();
