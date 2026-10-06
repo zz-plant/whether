@@ -1,3 +1,55 @@
+/**
+ * What `scripts/ui-capture.lib.mjs` captures in this app, and how this app is told which
+ * variant to render. The library is the capture mechanism — probe, launch, wait, shoot,
+ * write the gallery — and names nothing about Whether; everything below does.
+ */
+
+/** The gallery page's title. */
+export const galleryTitle = "Whether UI Capture Gallery";
+
+/** A route that answers 200 (or 503 while degraded) once the server is up. */
+export const healthPath = "/api/health";
+
+/**
+ * Routes whose main content streams in after `load`, and the element that marks it
+ * arrived. The homepage brief streams, so a capture of "/" waits for the share artifact
+ * to hydrate before screenshotting. Keyed by pathname; a target's own `readySelector`
+ * wins over this.
+ */
+export const streamedContentReadySelectors = new Map([["/", "#share-ready-artifact"]]);
+
+const THEME_STORAGE_KEY = "whether-theme";
+const ACTIVATION_LAST_WEEK_STORAGE_KEY = "whether.activation.lastWeek";
+
+/**
+ * Same ISO-week arithmetic and slug as lib/isoWeek.ts, which a Node script cannot import.
+ * tests/uiCaptureLib.test.ts holds the two to the same answer.
+ */
+export const isoWeekSlug = (date) => {
+  const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = target.getUTCDay() || 7;
+  target.setUTCDate(target.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${target.getUTCFullYear()}-w${String(week).padStart(2, "0")}`;
+};
+
+/**
+ * The localStorage entries a page is seeded with before its first script runs, in order.
+ *
+ * `light` seeds the key the layout's theme bootstrap reads (`buildThemeBootstrapScript` in
+ * app/layout.tsx), so the page renders light from the first frame. `returning` seeds the
+ * week this browser last saw (`activationLastWeekStorageKey` in lib/activationFunnel.ts) as
+ * last week's slug — the gap of a weekly returner — so `/` renders the returning reader's
+ * page instead of the first-visit fold.
+ */
+export const captureStorageSeeds = ({ theme, visitor, now = Date.now() }) => [
+  ...(theme === "light" ? [[THEME_STORAGE_KEY, "light"]] : []),
+  ...(visitor === "returning"
+    ? [[ACTIVATION_LAST_WEEK_STORAGE_KEY, isoWeekSlug(new Date(now - 7 * 86400000))]]
+    : []),
+];
+
 const MOBILE = { width: 430, height: 932 };
 const DESKTOP = { width: 1600, height: 1400 };
 

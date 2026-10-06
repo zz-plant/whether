@@ -166,7 +166,10 @@ export const suppressionCensusConfig: SuppressionCensusConfig = {
      * a lint failure directly, so what remains here is the count of live suppressions.
      */
     lintSuppressions: 4,
-    typeSuppressions: 3,
+    // 3 -> 2 on 2026-10-06: tests/uiCaptureLib.test.ts imported ui-capture.lib.mjs under a
+    // type-checker suppression its own .d.mts had made unnecessary; the declaration now
+    // matches the module. (Spelling the directive out here would count it: this file is scanned.)
+    typeSuppressions: 2,
     skippedTests: 0,
     /*
      * 1 -> 0 on 2026-09-17. `react/set-state-in-effect` was the last rule off,
