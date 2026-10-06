@@ -31,6 +31,7 @@ import { createCloudflareEmailAdapter } from "../email/emailDelivery";
 import { escapeHtml, renderEmailShell, unsubscribeFooterText } from "../email/emailShell";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { fanOut } from "../delivery/fanOut";
+import { resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { getRegimePublicLabel } from "../regimePresentation";
 
 const LAST_PULSED_KEY = "month-end:last-pulsed";
@@ -126,18 +127,6 @@ type MonthEndPulseResult = {
   headline?: string;
 };
 
-const resolveSnapshot = async (
-  options?: { snapshot?: OperatingSnapshot; weeklyCall?: WeeklyCallContract },
-): Promise<{ snapshot: OperatingSnapshot; weeklyCall: WeeklyCallContract } | null> => {
-  if (options?.snapshot && options?.weeklyCall) {
-    return { snapshot: options.snapshot, weeklyCall: options.weeklyCall };
-  }
-  const { getOperatingSnapshotStore } = await import("../operatingState/snapshotStore");
-  const stored = await getOperatingSnapshotStore().readLatest();
-  if (stored) return { snapshot: stored, weeklyCall: stored.weeklyCall };
-  return null;
-};
-
 /**
  * Post one month-end block to every Slack target, never throwing. Through the
  * shared channel, so a post is bounded and a webhook Slack has revoked (404/410)
@@ -193,7 +182,13 @@ export const runMonthEndPulse = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
 }): Promise<MonthEndPulseResult> => {
-  const resolved = await resolveSnapshot(options);
+  /* The cron's snapshot, or the stored one for a manual run. With neither there
+     is nothing to compare: a report read would serve the bundled copy on an
+     outage, and a letter compares month-ends, not fallbacks. */
+  const resolved = await resolveOperatingSnapshot({
+    given: { snapshot: options?.snapshot, weeklyCall: options?.weeklyCall },
+    onMiss: "refuse",
+  });
   if (!resolved) {
     return { ok: false, error: "No operating snapshot is available; nothing to compare." };
   }

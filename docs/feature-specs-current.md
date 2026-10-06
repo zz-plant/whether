@@ -2587,6 +2587,18 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   its title is the shell's, and its block is fully escaped (it escaped `<` only, so an `&` or a
   quote in the pasted block went out raw); its plain-text part is unchanged. One `escapeHtml`
   serves every email and the subscription action pages.
+- **One answer to "the current snapshot"** (`lib/operatingState/resolveSnapshot.ts`,
+  `resolveOperatingSnapshot({ given, onMiss })`). A given snapshot is used as given, with its own
+  weekly call unless one is passed; otherwise the stored one; otherwise the caller's named miss
+  policy — `"refuse"` (weekly email, month-end pulse) or `"report"`, a report read that serves the
+  bundled copy on an outage (the Slack post, which skips the store because its report read is
+  `GET /api/brief/slack`'s path and already projects the stored snapshot). `lib/export/exportSnapshot.ts` keeps its own resolution on purpose: an export builds
+  from the materialized inputs, which is a read, not a send.
+- **One readiness check for a send** (`assessSnapshotReadiness`, `assessReadingReadiness`). The
+  email judged a snapshot's own flags (`freshness.status`, `provenance.isLive`) and the Slack post
+  the treasury's fallback stamp, so a reading marked one way and not the other was sent by one and
+  refused by the other. Both read both now, and the email's refusal names the fallback reason when
+  there is one.
 - Tests: `tests/deliveryChannels.test.ts`, `tests/emailShell.test.ts` (production output pinned
   byte for byte; the no-literal-origin rule is a source read, because on production the two are
-  the same string).
+  the same string), `tests/operatingSnapshotResolution.test.ts`.

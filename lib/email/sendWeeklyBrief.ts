@@ -2,12 +2,11 @@ import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDel
 import { emailTextFooter, renderEmailShell } from "./emailShell";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
-import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
 import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } from "../export/exportTerms";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
-import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
 import { fanOut } from "../delivery/fanOut";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
@@ -129,33 +128,6 @@ type SendWeeklyBriefResult = {
 };
 
 /**
- * What this send is allowed to claim, given the reading behind it.
- *
- * `scripts/freezeWeeklyBrief.ts` and `scripts/generateWeeklySlackBrief.ts` have
- * asked this since 2026-08-29, and this path — the one artifact that leaves the
- * building and cannot be corrected afterwards — did not. It read the snapshot
- * with `?.` throughout and filled every gap with a constant: no snapshot meant
- * regime `"DEFENSIVE"`, "Hold bounded operating discipline.", and a record date
- * reading "this week". That is a call nobody computed, mailed to every
- * subscriber, returning `ok: true` so the Monday `cron-step` row on /trust went
- * green for it.
- *
- * The flags to judge on were already in hand: `buildOperatingSnapshot` writes
- * `provenance.isLive` and `freshness.status`, which are what `assessPublishReadiness`
- * takes. The staleness limit is the archive's, deliberately — a brief mailed as
- * this week's and a week frozen into the archive make the same claim about which
- * week it is.
- */
-const assessSendReadiness = (snapshot: OperatingSnapshot, now: Date) =>
-  assessPublishReadiness({
-    degraded: false,
-    isFallback: snapshot.freshness.status === "fallback",
-    isLive: snapshot.provenance.isLive,
-    recordDate: snapshot.recordDate,
-    now,
-  });
-
-/**
  * Send the weekly brief to all active subscribers. Shared by the cron trigger
  * (direct call from worker/index.ts) and the POST /api/email/send-weekly route,
  * projecting the authoritative OperatingSnapshot. Slack delivery is its own cron
@@ -173,17 +145,12 @@ export const sendWeeklyBrief = async (options?: {
     return { ok: true, sent: 0, errors: 0, total: 0, deliveryMode, message: "No active subscriptions." };
   }
 
-  let snapshot = options?.snapshot;
-  let weeklyCall = options?.weeklyCall;
-
-  if (!snapshot || !weeklyCall) {
-    const store = getOperatingSnapshotStore();
-    const stored = await store.readLatest();
-    if (stored) {
-      snapshot = stored;
-      weeklyCall = stored.weeklyCall;
-    }
-  }
+  /* The cron's snapshot, or the stored one for a manual run; with neither there
+     is no guidance to send, and this refuses rather than filling the gap. */
+  const reading = await resolveOperatingSnapshot({
+    given: { snapshot: options?.snapshot, weeklyCall: options?.weeklyCall },
+    onMiss: "refuse",
+  });
 
   const refuse = (reason: string): SendWeeklyBriefResult => ({
     ok: false,
@@ -194,11 +161,21 @@ export const sendWeeklyBrief = async (options?: {
     error: `refused_unpublishable: ${reason}`,
   });
 
-  if (!snapshot || !weeklyCall) {
+  if (!reading) {
     return refuse("No operating snapshot is available; there is no guidance to send.");
   }
+  const { snapshot, weeklyCall } = reading;
 
-  const readiness = assessSendReadiness(snapshot, options?.now ?? new Date());
+  /*
+   * What this send is allowed to claim, given the reading behind it. Until
+   * 2026-09-17 this path, the one artifact that leaves the building and cannot
+   * be corrected afterwards, filled every gap with a constant and mailed a call
+   * nobody computed (the automation-and-deploy-gate lesson). The staleness
+   * limit is the archive's, deliberately: a brief mailed as this week's and a
+   * week frozen into the archive make the same claim about which week it is.
+   * The Slack post asks the same question the same way.
+   */
+  const readiness = assessSnapshotReadiness(snapshot, options?.now ?? new Date());
   if (!readiness.ok) {
     return refuse(readiness.reason);
   }

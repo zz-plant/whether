@@ -1,7 +1,11 @@
 import { buildSlackBrief } from "../export/briefBuilders";
 import { previousScoresFromDynamics } from "../export/scoreReference";
-import { assessPublishReadiness } from "../report/briefPublishGuard";
-import { loadReportDataSafe } from "../report/reportData";
+import {
+  assessReadingReadiness,
+  assessSnapshotReadiness,
+  resolveOperatingSnapshot,
+  type OperatingReading,
+} from "../operatingState/resolveSnapshot";
 import { buildPostureState } from "../report/postureStateSource";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
 import type { OperatingSnapshot } from "../operatingState/types";
@@ -90,14 +94,14 @@ export const buildSlackBriefBlocks = (
  * to correct, so readiness is judged there, on the flags that move.
  */
 const buildSlackBriefPayload = async (
+  reading: Extract<OperatingReading, { source: "report" }>,
   now: Date,
 ): Promise<{
   text: string;
   recordDate: string;
-  readiness: ReturnType<typeof assessPublishReadiness>;
+  readiness: ReturnType<typeof assessReadingReadiness>;
 }> => {
-  const reportResult = await loadReportDataSafe(undefined, { route: "slack/deliver-brief" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const reportData = reading.report;
   const { assessment, treasury, sensors, macroSeries } = reportData;
   const postureState = await buildPostureState({
     record: treasury,
@@ -112,14 +116,7 @@ const buildSlackBriefPayload = async (
   return {
     text,
     recordDate: treasury.record_date,
-    readiness: assessPublishReadiness({
-      degraded: !reportResult.ok,
-      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
-      isLive: treasury.isLive,
-      fallbackReason: treasury.fallback_reason,
-      recordDate: treasury.record_date ?? treasury.fetched_at,
-      now,
-    }),
+    readiness: assessReadingReadiness(reading, now),
   };
 };
 
@@ -142,7 +139,7 @@ const buildSlackBriefPayloadFromSnapshot = async (
 ): Promise<{
   text: string;
   recordDate: string;
-  readiness: ReturnType<typeof assessPublishReadiness>;
+  readiness: ReturnType<typeof assessSnapshotReadiness>;
 }> => {
   const { assessment, treasury, macroSeries } = snapshot;
   const sensors = buildSensorReadings(treasury);
@@ -160,14 +157,7 @@ const buildSlackBriefPayloadFromSnapshot = async (
   return {
     text,
     recordDate: treasury.record_date,
-    readiness: assessPublishReadiness({
-      degraded: false,
-      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
-      isLive: treasury.isLive,
-      fallbackReason: treasury.fallback_reason,
-      recordDate: treasury.record_date ?? treasury.fetched_at,
-      now,
-    }),
+    readiness: assessSnapshotReadiness(snapshot, now),
   };
 };
 
@@ -192,9 +182,21 @@ export const deliverSlackBrief = async (options?: {
   let payload = options?.payload;
   if (!payload) {
     try {
-      const built = options?.snapshot
-        ? await buildSlackBriefPayloadFromSnapshot(options.snapshot, options?.now ?? new Date())
-        : await buildSlackBriefPayload(options?.now ?? new Date());
+      const now = options?.now ?? new Date();
+      /* The cron's snapshot when it passed one. Otherwise the report read, which
+         is GET /api/brief/slack's path, so a manual post and the read endpoint
+         say the same thing; the store is not read here because the report
+         loader already projects the stored snapshot. Either way, readiness is
+         the email's check (lib/operatingState/resolveSnapshot.ts). */
+      const reading = await resolveOperatingSnapshot({
+        given: { snapshot: options?.snapshot },
+        onMiss: "report",
+        consultStore: false,
+        route: "slack/deliver-brief",
+      });
+      const built = reading.source === "report"
+        ? await buildSlackBriefPayload(reading, now)
+        : await buildSlackBriefPayloadFromSnapshot(reading.snapshot, now);
       if (!built.readiness.ok) {
         /* Not a failure of this dispatcher, and not a post either. A channel
            that is told nothing this Monday can ask; a channel handed a stale
