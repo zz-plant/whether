@@ -7,7 +7,7 @@ import type { PostureStateContract } from "./report/postureStateContract";
 import type { ReportDynamics } from "./report/reportData";
 import { comparisonBasis } from "./report/comparisonBasis";
 import type { RegimeAssessment } from "./regimeEngine";
-import { agentSkills } from "./agentSkills";
+import { agentBriefingActions, agentPromptAsks, agentSkills } from "./agentSkills";
 import { getRegimePublicLabel } from "./regimePresentation";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "./types";
 
@@ -242,13 +242,7 @@ export const buildAgentPayload = (
     skills: agentSkills,
     pm_handoff: {
       decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
-      briefing_actions: [
-        "Summarize the regime in plain English.",
-        "State what changed this week and what decisions should change now.",
-        "Call out constraints that block or enable new initiatives.",
-        "Track flip triggers before making irreversible commitments.",
-        "List open questions for the product manager.",
-      ],
+      briefing_actions: [...agentBriefingActions],
     },
   };
 };
@@ -261,11 +255,7 @@ export const buildAgentPrompt = (
     "You are an autonomous PM assistant.",
     "Follow the skills list in the JSON payload and deliver outputs in the same order.",
     "Use the JSON payload to draft:",
-    "1) A 3-bullet summary of the capital posture.",
-    "2) A concise decision delta: what changed this week and what changes now.",
-    "3) The top 3 constraints that should shape roadmap decisions.",
-    "4) A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
-    "5) A short list of questions to confirm with the PM before acting.",
+    ...agentPromptAsks,
     "",
     `Context: Whether Weekly Brief for ${treasury.record_date} (${assessment.regime}).`,
   ].join("\n");

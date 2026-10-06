@@ -1,4 +1,6 @@
-import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { DurableEventLog, parseCursor } from "../storage/eventLog";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 
 export type RegimeDecisionEvent = {
@@ -30,20 +32,16 @@ type ListSinceResult = {
   cursor: Cursor;
 };
 
-type CloudflareKvNamespaceLike = KvNamespace;
-
-const EVENT_PREFIX = "decision-event:";
-const EVENT_INDEX_KEY = "meta:decision-event:index";
+/**
+ * The durable half is a DurableEventLog under the topic `decision-event`, which writes the keys
+ * this store always has: `decision-event:<12-digit index>` and the `meta:decision-event:index`
+ * counter. It used to carry its own copy of that log — the clone, the key format, the counter,
+ * the queue and the 1000-entry scan cap — line for line.
+ */
+const DECISION_EVENT_TOPIC = "decision-event";
 
 /** Ceiling on a single unpaginated read so log length cannot stall the route. */
 const MAX_EVENT_SCAN = 1000;
-
-const clone = <T>(value: T): T => {
-  if (typeof structuredClone === "function") {
-    return structuredClone(value);
-  }
-  return JSON.parse(JSON.stringify(value)) as T;
-};
 
 const freeze = <T>(value: T): T => {
   if (typeof value !== "object" || value === null) {
@@ -51,7 +49,7 @@ const freeze = <T>(value: T): T => {
   }
 
   Object.freeze(value);
-  for (const nested of Object.values(value as Record<string, unknown>)) {
+  for (const nested of Object.values(value)) {
     if (typeof nested === "object" && nested !== null && !Object.isFrozen(nested)) {
       freeze(nested);
     }
@@ -60,57 +58,40 @@ const freeze = <T>(value: T): T => {
   return value;
 };
 
-const toEventKey = (index: number) => `${EVENT_PREFIX}${String(index).padStart(12, "0")}`;
-
-const parseEventIndex = (key: string) => {
-  if (!key.startsWith(EVENT_PREFIX)) {
-    return null;
-  }
-  const parsed = Number.parseInt(key.slice(EVENT_PREFIX.length), 10);
-  return Number.isNaN(parsed) ? null : parsed;
-};
-
-const parseCursorIndex = (cursor: Cursor) => {
-  if (!cursor) {
-    return -1;
-  }
-  const parsed = Number.parseInt(cursor, 10);
-  return Number.isNaN(parsed) ? -1 : parsed;
-};
-
-const isRegimeDecisionEvent = (value: unknown): value is RegimeDecisionEvent => {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-  const event = value as Partial<RegimeDecisionEvent>;
-  return event.type === "RegimeDecisionEvent" && typeof event.id === "string";
-};
+const isRegimeDecisionEvent = (value: unknown): value is RegimeDecisionEvent =>
+  typeof value === "object"
+  && value !== null
+  && Reflect.get(value, "type") === "RegimeDecisionEvent"
+  && typeof Reflect.get(value, "id") === "string";
 
 export class DecisionEventStore {
   private readonly events: RegimeDecisionEvent[] = [];
+  private readonly log: DurableEventLog<RegimeDecisionEvent> | null;
   private persistQueue: Promise<void> = Promise.resolve();
 
-  constructor(private readonly cloudflareKv: CloudflareKvNamespaceLike | null = null) {}
+  constructor(cloudflareKv: KvNamespace | null = null) {
+    this.log = cloudflareKv ? new DurableEventLog(DECISION_EVENT_TOPIC, cloudflareKv, isRegimeDecisionEvent) : null;
+  }
 
+  /**
+   * Synchronous for the caller: the event is in this isolate's list at once, and the durable
+   * write follows on a queue whose failure is non-fatal — the in-memory stream stays available.
+   */
   append(event: RegimeDecisionEvent): RegimeDecisionEvent {
-    const next = freeze(clone(event));
+    const next = freeze(structuredClone(event));
     this.events.push(next);
 
-    if (this.cloudflareKv) {
+    const log = this.log;
+    if (log) {
       this.persistQueue = this.persistQueue
-        .then(async () => {
-          const currentIndexRaw = await this.cloudflareKv?.get(EVENT_INDEX_KEY);
-          const currentIndex = currentIndexRaw ? Number.parseInt(currentIndexRaw, 10) : -1;
-          const nextIndex = Number.isNaN(currentIndex) ? 0 : currentIndex + 1;
-          await this.cloudflareKv?.put(toEventKey(nextIndex), JSON.stringify(next));
-          await this.cloudflareKv?.put(EVENT_INDEX_KEY, String(nextIndex));
-        })
-        .catch(() => {
-          // Non-fatal persistence fallback: keep in-memory event stream available.
-        });
+        .then(() => log.append(next))
+        .then(
+          () => undefined,
+          () => undefined,
+        );
     }
 
-    return clone(next);
+    return structuredClone(next);
   }
 
   async whenDurableFlushCompletes() {
@@ -124,12 +105,12 @@ export class DecisionEventStore {
    */
   async listSince(cursor: Cursor, limit?: number): Promise<ListSinceResult> {
     const inMemory = this.listSinceInMemory(cursor, limit);
-    if (!this.cloudflareKv) {
+    if (!this.log) {
       return inMemory;
     }
 
     await this.whenDurableFlushCompletes();
-    const durable = await this.listSinceDurable(cursor, limit);
+    const durable = await this.listSinceDurable(this.log, cursor, limit);
     if (durable.events.length === 0) {
       return inMemory;
     }
@@ -152,12 +133,12 @@ export class DecisionEventStore {
   }
 
   private listSinceInMemory(cursor: Cursor, limit?: number): ListSinceResult {
-    const startIndex = parseCursorIndex(cursor) + 1;
+    const startIndex = parseCursor(cursor) + 1;
     const safeStart = Math.max(0, startIndex);
     const window = this.events.slice(safeStart);
     // Mirrors the durable path: return one past the page so callers can detect `hasMore`.
     const sliced = (limit === undefined ? window : window.slice(0, limit + 1)).map((event) =>
-      clone(event),
+      structuredClone(event),
     );
     const nextCursor = this.events.length > 0 ? `${this.events.length - 1}` : cursor;
 
@@ -167,86 +148,20 @@ export class DecisionEventStore {
     };
   }
 
-  private async resolveEventIndexes(thresholdIndex: number): Promise<number[]> {
-    const rawLatest = await this.cloudflareKv!.get(EVENT_INDEX_KEY);
-    const latest = rawLatest === null ? Number.NaN : Number.parseInt(rawLatest, 10);
-
-    if (Number.isFinite(latest)) {
-      const indexes: number[] = [];
-      for (let index = Math.max(thresholdIndex + 1, 0); index <= latest; index++) {
-        indexes.push(index);
-      }
-      return indexes;
-    }
-
-    const indexes: number[] = [];
-    let listCursor: string | undefined;
-
-    do {
-      const page = await this.cloudflareKv!.list({
-        prefix: EVENT_PREFIX,
-        cursor: listCursor,
-        limit: 1000,
-      });
-
-      for (const key of page.keys) {
-        const index = parseEventIndex(key.name);
-        if (index !== null && index > thresholdIndex) {
-          indexes.push(index);
-        }
-      }
-
-      listCursor = page.cursor;
-      if (page.list_complete) {
-        break;
-      }
-    } while (listCursor);
-
-    return indexes.sort((left, right) => left - right);
-  }
-
-  private async listSinceDurable(cursor: Cursor, limit?: number): Promise<ListSinceResult> {
-    if (!this.cloudflareKv) {
-      return this.listSinceInMemory(cursor, limit);
-    }
-
-    const thresholdIndex = parseCursorIndex(cursor);
-    const collected: Array<{ index: number; event: RegimeDecisionEvent }> = [];
-
-    const available = await this.resolveEventIndexes(thresholdIndex);
+  private async listSinceDurable(
+    log: DurableEventLog<RegimeDecisionEvent>,
+    cursor: Cursor,
+    limit?: number,
+  ): Promise<ListSinceResult> {
     // Read one past the requested page so callers can still detect `hasMore` without
-    // paying for the rest of the log.
+    // paying for the rest of the log. Uncached: this is a tail a caller polls.
     const scanCeiling = limit === undefined ? MAX_EVENT_SCAN : Math.min(limit + 1, MAX_EVENT_SCAN);
-    const selected = available.slice(0, scanCeiling);
+    const collected = await log.readAfter(parseCursor(cursor), scanCeiling);
 
-    const raws = await readKvValues(this.cloudflareKv, selected.map(toEventKey));
-
-    for (let i = 0; i < selected.length; i++) {
-      const raw = raws[i];
-      if (!raw) {
-        continue;
-      }
-
-      let parsed: unknown;
-      try {
-        parsed = JSON.parse(raw);
-      } catch {
-        continue;
-      }
-      if (!isRegimeDecisionEvent(parsed)) {
-        continue;
-      }
-
-      collected.push({ index: selected[i], event: parsed });
-    }
-
-    collected.sort((left, right) => left.index - right.index);
-    const events = collected.map(({ event }) => clone(event));
-    const nextCursor = collected.length > 0 ? `${collected[collected.length - 1]?.index ?? thresholdIndex}` : cursor;
-
+    const last = collected[collected.length - 1];
     return {
-      events,
-      cursor: nextCursor,
+      events: collected.map(({ item }) => item),
+      cursor: last ? `${last.index}` : cursor,
     };
   }
 }
@@ -321,18 +236,8 @@ export const buildRegimeDecisionEvent = ({
   transitionReason,
 });
 
-const getCloudflareKvBinding = (): CloudflareKvNamespaceLike | null => getWhetherKv();
+const decisionEventStoreSelection = selectStoreByBinding(getWhetherKv, (kv) => new DecisionEventStore(kv));
 
-let sharedDecisionEventStore: DecisionEventStore | null = null;
+export const getDecisionEventStore = () => decisionEventStoreSelection.get();
 
-export const getDecisionEventStore = () => {
-  if (!sharedDecisionEventStore) {
-    sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
-  }
-  return sharedDecisionEventStore;
-};
-
-export const resetDecisionEventStore = () => {
-  sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
-  return sharedDecisionEventStore;
-};
+export const resetDecisionEventStore = () => decisionEventStoreSelection.reset();

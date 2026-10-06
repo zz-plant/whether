@@ -1,6 +1,6 @@
 import type { GovernanceParameterSet } from "./policy/governance";
-import { classifyRegimeQuadrant, type RegimeStateTransition } from "./report/regimeStateMachine";
-import type { TreasuryData, TreasuryYields, RegimeKey } from "./types";
+import type { RegimeStateTransition } from "./regimeStateMachine";
+import type { TreasuryYields, RegimeKey } from "./types";
 
 export type { RegimeKey };
 
@@ -75,6 +75,12 @@ export type RegimeDiagnostics = {
   tightnessVsThreshold: number;
   riskAppetiteVsThreshold: number;
   nearestThresholdDelta: number;
+  /**
+   * The state machine's confirmation-gate band, not a published confidence.
+   * It ranks the raw gap (cutoffs 13 and 6), and it decides how many confirming
+   * reads a flip needs. What a reader is told is `resolvePublishedConfidence`
+   * in `lib/report/confidence.ts`. Named `confidence` because it is stored.
+   */
   confidence: "LOW" | "MEDIUM" | "HIGH";
   transitionWatch: boolean;
   intensity: "MILD" | "STANDARD" | "STRONG";
@@ -252,8 +258,8 @@ export const RISK_APPETITE_REGIME_THRESHOLD = 50;
  * the gradual 2015-18 liftoff (~25bp/quarter) stays at 0, as it should.
  */
 export const BASE_RATE_VELOCITY_LOOKBACK_DAYS = 91;
-export const BASE_RATE_VELOCITY_MIN_GAP_DAYS = 60;
-export const BASE_RATE_VELOCITY_MAX_GAP_DAYS = 130;
+const BASE_RATE_VELOCITY_MIN_GAP_DAYS = 60;
+const BASE_RATE_VELOCITY_MAX_GAP_DAYS = 130;
 /** Trailing-window base-rate move, in points, above which tightening starts
  *  counting. Roughly one meeting at 50bp per quarter. */
 export const BASE_RATE_VELOCITY_THRESHOLD = 0.4;
@@ -334,93 +340,39 @@ export const CONFIDENCE_PERCENT_CEILING = 92;
  *  should read as weaker than the weakest call built on real ones. */
 export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
 
+/**
+ * Which calibration scored a reading.
+ *
+ * Bump it with any change that moves a score, a regime, a diagnostic or a
+ * policy composite for the same inputs: a constant above, a macro adjustment,
+ * the machine's gate, the policy spec. A wording change does not bump it — the
+ * words are written in `lib/report/regimeDescription.ts`, after scoring.
+ * `tests/engineVersion.test.ts` fingerprints the scorer's output on a fixed grid
+ * of synthetic inputs and fails when that output moves under an unchanged
+ * version.
+ *
+ * The archive generators stamp it on every entry they write (`engineVersion`),
+ * and the operating snapshot's input hash includes it, so two snapshots of the
+ * same inputs scored by different calibrations are stored as two snapshots.
+ */
+export const ENGINE_VERSION = "engine-2026-10-06";
+
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
   tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,
   riskAppetiteRegime: RISK_APPETITE_REGIME_THRESHOLD,
 };
 
-const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
-  SCARCITY: {
-    description: "Capital is expensive and lenders are pulling back. Prioritize survival over growth.",
-    constraints: [
-      "Shorten payback windows and preserve cash.",
-      "Delay speculative hiring or large platform rewrites.",
-      "Route roadmap bets through revenue certainty.",
-    ],
-  },
-  DEFENSIVE: {
-    description: "Capital is expensive but funding stays selective. Operate for efficiency.",
-    constraints: [
-      "Focus on margin expansion and retention.",
-      "Cut low-leverage experiments.",
-      "Convert demand with tighter sales cycles.",
-    ],
-  },
-  VOLATILE: {
-    description: "Capital is cheaper but funding is wary. Build trust and resilience.",
-    constraints: [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees.",
-    ],
-  },
-  EXPANSION: {
-    description: "Capital is available and financing conditions are supportive. The weekly guidance sets the tempo inside that window.",
-    constraints: [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong.",
-    ],
-  },
-};
-
-export const getRegimeProfile = (regime: RegimeKey) => REGIME_PROFILES[regime];
-
-export const buildTightnessExplanation = (thresholds: RegimeThresholds) =>
-  `Tightness score blends up to three components capped at ${TIGHTNESS_CAP}: ` +
-  `base rate points ramp from 0 to ${TIGHTNESS_BASE_RATE_POINTS} when rates move above ${thresholds.baseRateTightness}%, ` +
-  `inversion points ramp from 0 to ${TIGHTNESS_INVERSION_POINTS} when slope moves below 0%, ` +
-  `and tightening-speed points ramp from 0 to ${BASE_RATE_VELOCITY_POINTS} when the trailing ${BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day ` +
-  `base-rate move exceeds ${BASE_RATE_VELOCITY_THRESHOLD} points (the term needs base-rate history; without it it is 0).`;
-
-/**
- * What the risk-appetite axis actually measures, in the reader's words.
- *
- * The score is a *financing-conditions* proxy: it maps the 10Y-2Y slope onto a
- * 0-100 scale. The slope moves when the market reprices expected monetary policy,
- * so the score rises when the central bank eases — March 2020's emergency cuts
- * steepened the curve and lifted the score during the fastest crash on record.
- * Calling that "risk appetite is healthy" published a claim about market
- * psychology that this reading cannot see; observed risk appetite (volatility,
- * credit stress) enters through the separate macro adjustments, which haircut
- * this score but never the other way around. The axis name stays — it is the
- * published vocabulary — but the explanation now says what drives it.
+/*
+ * Nothing in this module writes a sentence. The regime profiles, the two axis
+ * explanations, the input labels and the base-rate source names used to live
+ * here, and every wording edit to them was a commit to a scoring file that also
+ * rewrote archived history on the next regeneration. They are in
+ * `lib/report/regimeDescription.ts`, which turns what the engine scored into the
+ * stored assessment.
  */
-export const RISK_APPETITE_EXPLANATION =
-  `Risk-appetite score is a financing-conditions proxy: it maps the 10Y-2Y slope from ` +
-  `${RISK_APPETITE_MIN_SLOPE}% (capital pulling back) to ${RISK_APPETITE_MAX_SLOPE}% (capital leaning in), scaled to 0-100. ` +
-  `The slope is a monetary-expectations read, not observed market appetite — ` +
-  `volatility and credit stress enter through separate adjustments.`;
 
-/**
- * What the base rate reading actually is, in the reader's words.
- *
- * `getBaseRate` falls through to the one-month bill on every render — nothing
- * populates `fedFunds` (see `TREASURY_SOURCE_LABEL` above and the note in
- * `treasury/treasuryClient.ts`). Surfaces used to call the result "the Fed
- * rate" regardless, which put a claim about the policy rate into verdicts and
- * into the text operators paste into threads. Name the series that was read;
- * wiring DFF is a change to the published call and is not this label's job.
- */
-export const BASE_RATE_SOURCE_LABELS: Record<RegimeScores["baseRateUsed"], string> = {
-  FED: "The federal funds rate",
-  "1M": "The 1-month Treasury bill",
-  "3M": "The 3-month Treasury bill",
-  MISSING: "The short-rate anchor",
-};
-
-export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+export const clamp =(value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /**
  * Optional evaluation inputs a caller supplies when it has base-rate history.
@@ -456,11 +408,32 @@ export const resolveBaseRateVelocityDelta = (
   baseRateHistory: RegimeEvaluationContext["baseRateHistory"],
   lookbackDays: number = BASE_RATE_VELOCITY_LOOKBACK_DAYS,
 ): number | null => {
+  const pair = resolveBaseRateVelocityPair(baseRateHistory, lookbackDays);
+  return pair ? pair.latest.value - pair.compare.value : null;
+};
+
+type BaseRateObservation = { date: string; value: number };
+
+/**
+ * The two observations the trailing-window move is measured between: the latest
+ * print, and the one whose gap to it sits inside the bounds and nearest the
+ * lookback (the earliest, on a tie). Null when history cannot answer.
+ *
+ * Exposed because the archive generator stores this pair on each Time Machine
+ * cache entry, so the runtime walk can score the same move from two numbers
+ * that the generator scored from the full daily series. It used to re-implement
+ * this search in `scripts/regimeArchiveContext.ts`; two copies of a window rule
+ * is how the walk and the archives came to disagree before (050e9371).
+ */
+export const resolveBaseRateVelocityPair = (
+  baseRateHistory: RegimeEvaluationContext["baseRateHistory"],
+  lookbackDays: number = BASE_RATE_VELOCITY_LOOKBACK_DAYS,
+): { compare: BaseRateObservation; latest: BaseRateObservation } | null => {
   if (!baseRateHistory || baseRateHistory.length === 0) {
     return null;
   }
   const observations = baseRateHistory.filter(
-    (point): point is { date: string; value: number } => typeof point.value === "number",
+    (point): point is BaseRateObservation => typeof point.value === "number",
   );
   if (observations.length < 2) {
     return null;
@@ -470,7 +443,7 @@ export const resolveBaseRateVelocityDelta = (
     return null;
   }
 
-  let best: { value: number; gap: number } | null = null;
+  let best: { observation: BaseRateObservation; gap: number } | null = null;
   for (const observation of observations) {
     const gap = daysBetweenDates(latest.date, observation.date);
     if (Number.isNaN(gap) || gap < BASE_RATE_VELOCITY_MIN_GAP_DAYS || gap > BASE_RATE_VELOCITY_MAX_GAP_DAYS) {
@@ -478,14 +451,17 @@ export const resolveBaseRateVelocityDelta = (
     }
     const distance = Math.abs(gap - lookbackDays);
     if (!best || distance < Math.abs(best.gap - lookbackDays)) {
-      best = { value: observation.value, gap };
+      best = { observation, gap };
     }
   }
 
   if (!best) {
     return null;
   }
-  return latest.value - best.value;
+  return {
+    compare: { date: best.observation.date, value: best.observation.value },
+    latest: { date: latest.date, value: latest.value },
+  };
 };
 
 /** Points of tightness from the trailing move, floored at 0 so easing never
@@ -527,70 +503,6 @@ export const computeCurveSlope = (yields: TreasuryYields): number | null => {
   }
 
   return tenYear - twoYear;
-};
-
-export const buildRegimeInputs = (
-  treasury: TreasuryData,
-  baseRate: ReturnType<typeof getBaseRate>,
-  curveSlope: number | null,
-): RegimeInput[] => {
-  // "Policy base rate (1M)" named a policy rate and then admitted in parentheses
-  // that it had read a bill. The label now says which series it is.
-  const baseRateLabel =
-    baseRate.used === "MISSING"
-      ? "Short-rate anchor (missing)"
-      : `${BASE_RATE_SOURCE_LABELS[baseRate.used]} (${baseRate.used})`;
-  const baseRateNotes =
-    baseRate.used === "MISSING"
-      ? "No 1M or 3M Treasury rate available; defaulted to 0% for scoring."
-      : "Used as the cost-of-money anchor for tightness scoring.";
-  const sourceUrl = treasury.source;
-
-  return [
-    {
-      id: "base-rate",
-      label: baseRateLabel,
-      value: baseRate.used === "MISSING" ? null : baseRate.value,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-      notes: baseRateNotes,
-    },
-    {
-      id: "two-year",
-      label: "US Treasury 2Y",
-      value: treasury.yields.twoYear ?? null,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-    },
-    {
-      id: "ten-year",
-      label: "US Treasury 10Y",
-      value: treasury.yields.tenYear ?? null,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-    },
-    {
-      id: "curve-slope",
-      label: "Yield curve slope (10Y - 2Y)",
-      value: curveSlope,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-      derivedFrom: "US Treasury 10Y and 2Y yields",
-      notes: "Derived metric used to score risk appetite.",
-    },
-  ];
 };
 
 export const resolveThresholds = (
@@ -675,5 +587,16 @@ export const computeRiskAppetiteScore = (curveSlope: number) => {
 export const classifyRegime = (
   tightness: number,
   riskAppetite: number,
-  thresholds: RegimeThresholds,
-): RegimeKey => classifyRegimeQuadrant({ tightness, riskAppetite, thresholds });
+  thresholds: Pick<RegimeThresholds, "tightnessRegime" | "riskAppetiteRegime">,
+): RegimeKey => {
+  if (tightness > thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
+    return "SCARCITY";
+  }
+  if (tightness > thresholds.tightnessRegime && riskAppetite > thresholds.riskAppetiteRegime) {
+    return "DEFENSIVE";
+  }
+  if (tightness <= thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
+    return "VOLATILE";
+  }
+  return "EXPANSION";
+};

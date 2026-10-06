@@ -17,6 +17,7 @@
 
 import { z } from "zod";
 import { getWhetherKv, type KvNamespace } from "./runtime/kv";
+import { readSetting } from "./runtime/settings";
 
 /**
  * The basket, with the names the page prints.
@@ -263,14 +264,7 @@ const ALPHA_VANTAGE_REVALIDATE_SECONDS = 24 * 60 * 60;
  * A Worker secret (`wrangler secret put ALPHA_VANTAGE_API_KEY`) installed on globalThis by
  * worker/index.ts, or an environment variable for scripts. Absent, the basket stays on Yahoo.
  */
-const resolveAlphaVantageApiKey = (): string | null => {
-  const fromBinding: unknown = Reflect.get(globalThis, "ALPHA_VANTAGE_API_KEY");
-  if (typeof fromBinding === "string" && fromBinding.trim() !== "") {
-    return fromBinding.trim();
-  }
-  const fromEnv = typeof process !== "undefined" ? process.env?.ALPHA_VANTAGE_API_KEY : undefined;
-  return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
-};
+const resolveAlphaVantageApiKey = (): string | null => readSetting("ALPHA_VANTAGE_API_KEY");
 
 export const resolveMarketDataProvider = (): MarketDataProvider =>
   resolveAlphaVantageApiKey() ? "alpha-vantage" : "yahoo";

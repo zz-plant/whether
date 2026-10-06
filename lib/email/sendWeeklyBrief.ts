@@ -1,14 +1,15 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
-import { unsubscribeFooterHtml, unsubscribeFooterText } from "../alert/alertTemplates";
+import { emailTextFooter, renderEmailShell } from "./emailShell";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
-import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
+import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
 import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } from "../export/exportTerms";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
-import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
+import { fanOut } from "../delivery/fanOut";
+import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
 
 /**
@@ -125,34 +126,9 @@ type SendWeeklyBriefResult = {
   deliveryMode: "live" | "stub";
   error?: string;
   message?: string;
+  /** Subscribers who already had this week's brief and were not sent it again. Absent when none. */
+  skipped?: number;
 };
-
-/**
- * What this send is allowed to claim, given the reading behind it.
- *
- * `scripts/freezeWeeklyBrief.ts` and `scripts/generateWeeklySlackBrief.ts` have
- * asked this since 2026-08-29, and this path — the one artifact that leaves the
- * building and cannot be corrected afterwards — did not. It read the snapshot
- * with `?.` throughout and filled every gap with a constant: no snapshot meant
- * regime `"DEFENSIVE"`, "Hold bounded operating discipline.", and a record date
- * reading "this week". That is a call nobody computed, mailed to every
- * subscriber, returning `ok: true` so the Monday `cron-step` row on /trust went
- * green for it.
- *
- * The flags to judge on were already in hand: `buildOperatingSnapshot` writes
- * `provenance.isLive` and `freshness.status`, which are what `assessPublishReadiness`
- * takes. The staleness limit is the archive's, deliberately — a brief mailed as
- * this week's and a week frozen into the archive make the same claim about which
- * week it is.
- */
-const assessSendReadiness = (snapshot: OperatingSnapshot, now: Date) =>
-  assessPublishReadiness({
-    degraded: false,
-    isFallback: snapshot.freshness.status === "fallback",
-    isLive: snapshot.provenance.isLive,
-    recordDate: snapshot.recordDate,
-    now,
-  });
 
 /**
  * Send the weekly brief to all active subscribers. Shared by the cron trigger
@@ -164,7 +140,10 @@ export const sendWeeklyBrief = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
   now?: Date;
+  /** Send to subscribers who already had this week's brief. The manual route's explicit opt-in; the cron never passes it. */
+  force?: boolean;
 }): Promise<SendWeeklyBriefResult> => {
+  const now = options?.now ?? new Date();
   const subscriptions = await getActiveSubscriptions();
   const adapter = createCloudflareEmailAdapter();
   const deliveryMode = adapter.mode ?? "live";
@@ -172,17 +151,12 @@ export const sendWeeklyBrief = async (options?: {
     return { ok: true, sent: 0, errors: 0, total: 0, deliveryMode, message: "No active subscriptions." };
   }
 
-  let snapshot = options?.snapshot;
-  let weeklyCall = options?.weeklyCall;
-
-  if (!snapshot || !weeklyCall) {
-    const store = getOperatingSnapshotStore();
-    const stored = await store.readLatest();
-    if (stored) {
-      snapshot = stored;
-      weeklyCall = stored.weeklyCall;
-    }
-  }
+  /* The cron's snapshot, or the stored one for a manual run; with neither there
+     is no guidance to send, and this refuses rather than filling the gap. */
+  const reading = await resolveOperatingSnapshot({
+    given: { snapshot: options?.snapshot, weeklyCall: options?.weeklyCall },
+    onMiss: "refuse",
+  });
 
   const refuse = (reason: string): SendWeeklyBriefResult => ({
     ok: false,
@@ -193,11 +167,21 @@ export const sendWeeklyBrief = async (options?: {
     error: `refused_unpublishable: ${reason}`,
   });
 
-  if (!snapshot || !weeklyCall) {
+  if (!reading) {
     return refuse("No operating snapshot is available; there is no guidance to send.");
   }
+  const { snapshot, weeklyCall } = reading;
 
-  const readiness = assessSendReadiness(snapshot, options?.now ?? new Date());
+  /*
+   * What this send is allowed to claim, given the reading behind it. Until
+   * 2026-09-17 this path, the one artifact that leaves the building and cannot
+   * be corrected afterwards, filled every gap with a constant and mailed a call
+   * nobody computed (the automation-and-deploy-gate lesson). The staleness
+   * limit is the archive's, deliberately: a brief mailed as this week's and a
+   * week frozen into the archive make the same claim about which week it is.
+   * The Slack post asks the same question the same way.
+   */
+  const readiness = assessSnapshotReadiness(snapshot, now);
   if (!readiness.ok) {
     return refuse(readiness.reason);
   }
@@ -211,8 +195,9 @@ export const sendWeeklyBrief = async (options?: {
   const changeLines = weeklyCallChangeLines(weeklyCall);
   const recordDate = snapshot.provenance.recordDateLabel;
 
-  const results = await Promise.allSettled(
-    subscriptions.map((recipient) => {
+  const tally = await fanOut(
+    subscriptions,
+    async (recipient) => {
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regimeLabel}: ${actionNow}`
         : `Whether Brief — ${regimeLabel}`;
@@ -233,9 +218,7 @@ export const sendWeeklyBrief = async (options?: {
         `Move these lines for your own plan, and hear the day one is crossed: ${planLinesUrl}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
-        `---`,
-        `Whether · weekly operating brief`,
-        ...unsubscribeFooterText(recipient.token),
+        ...emailTextFooter(recipient.token),
       ].join("\n");
 
       /* Regime-adaptive email */
@@ -264,34 +247,34 @@ export const sendWeeklyBrief = async (options?: {
         `</td></tr></table>`
       );
 
-      const html = [
-        `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#e2e8f0;">`,
-        `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#f1f5f9;">Whether Weekly Brief</h1>`,
-        `<p style="color:#94a3b8;font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
-        ...sections,
-        `<div style="margin-top:24px;">`,
-        `<a href="${briefUrl}" style="display:inline-block;padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,rgba(56,189,248,0.9),rgba(14,116,144,0.85));color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
-        `</div>`,
-        `<p style="margin-top:32px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
-        `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.15);margin-top:24px;" />`,
-        `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
-        `<td style="font-size:0.7rem;color:#64748b;padding-top:12px;">`,
-        `<a href="${siteUrl}/trust" style="color:#64748b;text-decoration:underline;">Methodology</a>`,
-        ` · `,
-        `<a href="${siteUrl}/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
-        ` · `,
-        `<a href="${siteUrl}" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
-        unsubscribeFooterHtml(recipient.token),
-        `</td></tr></table>`,
-        `</body></html>`,
-      ].join("\n");
+      const html = renderEmailShell({
+        title: "Whether Weekly Brief",
+        body: [
+          `<p style="color:#94a3b8;font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
+          ...sections,
+        ].join("\n"),
+        unsubscribeToken: recipient.token,
+      });
 
-      return adapter.send({ to: recipient, subject, html, text });
-    }),
+      const result = await adapter.send({ to: recipient, subject, html, text });
+      return result.ok ? "sent" : "failed";
+    },
+    /* Once per subscriber per ISO week, so a manual run after the Monday cron
+       does not mail the brief twice, and a run that failed part-way reaches
+       only the ones it missed. A stub delivers nothing, so it records nothing. */
+    deliveryMode === "live"
+      ? {
+          once: {
+            markers: onceFor(weeklyPeriodKey("weekly-email", now), { force: options?.force }),
+            keyOf: (recipient) => recipient.email,
+          },
+        }
+      : {},
   );
 
-  const sent = results.filter((r) => r.status === "fulfilled" && r.value.ok).length;
-  const errors = results.filter((r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.ok)).length;
+  const sent = tally.sent;
+  const errors = tally.failed;
+  const skipped = tally.skipped;
 
   const ok = errors === 0;
   const error = ok
@@ -300,5 +283,15 @@ export const sendWeeklyBrief = async (options?: {
       ? `email_binding_missing: 0/${subscriptions.length} delivered`
       : `${errors}/${subscriptions.length} sends failed`;
 
-  return { ok, sent, errors, total: subscriptions.length, deliveryMode, ...(error ? { error } : {}) };
+  const alreadySent = skipped > 0 && sent === 0 && errors === 0;
+  return {
+    ok,
+    sent,
+    errors,
+    total: subscriptions.length,
+    deliveryMode,
+    ...(error ? { error } : {}),
+    ...(skipped > 0 ? { skipped } : {}),
+    ...(alreadySent ? { message: "Every subscriber already has this week's brief; nothing was sent again. Pass force to re-send." } : {}),
+  };
 };

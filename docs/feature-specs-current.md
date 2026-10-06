@@ -386,7 +386,7 @@ called the reading "the Fed rate":
 - `buildRegimeInputs` labelled the input "Policy base rate (1M)" — a policy-rate claim that then
   admitted in parentheses it had read a bill.
 
-`BASE_RATE_SOURCE_LABELS` (`lib/regimeEngineCore.ts`) is now the one place that names the reading,
+`BASE_RATE_SOURCE_LABELS` (`lib/report/regimeDescription.ts`, moved from the engine core with the rest of the engine's copy) is now the one place that names the reading,
 and both surfaces use it: "The 1-month Treasury bill is 5.20%…". The `FED` entry exists so that
 wiring DFF renames the surface rather than leaving it wrong in the other direction.
 **Wiring DFF is deliberately not done here** — `treasury/treasuryClient.ts` says that is a live
@@ -1007,8 +1007,8 @@ or not a score crossed anything. Consecutive means the previous snapshot, which
 something fires and would turn weeks of drift into a flash — and at most seven days apart,
 because the size assumes a short window. It is a critical CFO alert that bypasses the weekly
 cooldown like a regime change, deduplicated per input (`flash:baseRate`, `flash:curveSlope`),
-mailed through `flashMoveEmail` and posted to `SLACK_WEBHOOK_URL` through the one
-`postSlackAlert` helper in `checkRegimeChange`, on both crons. `/privacy` §2.1 says what the
+mailed through `flashMoveEmail` and posted to every Slack target through the shared
+`slackChannel` (`lib/delivery/slack.ts`, §1.1.43), on both crons. `/privacy` §2.1 says what the
 between-Monday alerts now include.
 
 **The flip watch.** The hero's Conditions cell states the market move that would change the
@@ -1068,7 +1068,7 @@ for a post that never left the building; the full `buildSlackBrief` text — pos
 signal check, bounded decisions, citations — sat unused in `lib/export/briefBuilders.ts`. The
 cron's Slack step now posts the real brief to every delivery target and reports which of five
 outcomes actually happened (`posted` / `partial` / `skipped_unconfigured` /
-`refused_unpublishable` / `failed`).
+`refused_unpublishable` / `failed`; §1.1.43 adds `skipped_already_posted` when every target already has the week's post).
 
 - **Channels can subscribe.** The subscribe form gained a Slack channel; `POST /api/slack/subscribe`
   pings the webhook to verify it and introduce the cadence, then stores
@@ -1713,6 +1713,14 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
   `time-machine:update-summaries` sets to 2024) walks from the first year and
   filters only which records it writes, so a merge lands the same
   confirmations a full replay produces.
+- One walk (2026-10-06): the runtime replay and all three generators thread the
+  engine through `replayRegimeWalk` (`lib/timeMachine/regimeReplay.ts`), and the
+  generators' period logic is `scripts/regimeArchiveReplay.ts`.
+  `tests/regimeArchiveReplay.test.ts` replays every cadence offline from series
+  rebuilt out of the bundled data and holds it to the archive on record.
+- Every entry a generator writes carries `engineVersion` (`ENGINE_VERSION`, the
+  engine calibration that scored it). It is additive: entries written earlier have
+  none, and the archive reader ignores it.
 - A flip is a shock only when the one-step move is 25 points or more *and* the
   prior reading sat outside the 5-point near band; from inside the band the
   warning could have fired, so the flip confirms through the gate.
@@ -2061,7 +2069,7 @@ Interpretation-context transmission contract (homepage-selected `?view=` only):
   `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
   directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
 - `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
-- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/stdioServer.ts`): the same tools, plus
+- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/server.ts`, the one `/api/mcp` runs): the same tools, plus
   `pull_recent_site_info`.
 
 ### 6.9 One state, one tool registry (2026-09-29)
@@ -2070,9 +2078,17 @@ Changes, all additive except where noted:
 
 - **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
   MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
-  carry the published confidence now. `/api/weekly` and `/api/monthly` still return the engine's label in
-  `summary.confidence` (their archive regenerates from the same builders, and `summary.summary` prose there
-  can still disagree with the published label); a decision for the owner, not made here.
+  carry the published confidence now. `/api/weekly` and `/api/monthly` (and `/api/cadence`,
+  `/api/summary-delta`) followed on 2026-10-06: the summary builders read `resolveSummaryConfidence`
+  (`lib/summary/summaryFormatting.ts`, the published label in the stored LOW / MEDIUM / HIGH spelling) for
+  both `summary.confidence` and the prose sentence, and the routes pass the record so a stale fallback
+  lowers it as it does on the page. The archives regenerate from the same builders, so the next run rewrites
+  `summary.confidence`, the confidence sentence in `summary.summary`, `structured.posture.summary[0]`
+  (monthly) and `copy` wherever the two ladders disagree: 55 of the 176 monthly entries on record (23 LOW
+  and 25 MEDIUM to HIGH, 7 LOW to MEDIUM); the weekly count is not computable offline because weekly
+  entries store no scores. One consequence to know: the published ladder ignores the engine's shock
+  downgrade, so a shock week's summary now says what the page says (Dec 2025: HIGH, not LOW) and the shock
+  sentence beside it carries the warning.
 - **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
   first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
   Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.
@@ -2081,7 +2097,7 @@ Changes, all additive except where noted:
   `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
   in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
   and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
-- **Inputs** (`lib/agent/inputs.ts`): a regime by key or by the site's weather word in any case; empty
+- **Inputs** (`lib/agent/inputs.ts`, parsed and refused by the generic `lib/agent/registry.ts`): a regime by key or by the site's weather word in any case; empty
   arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
   with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
   an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became
@@ -2557,3 +2573,82 @@ own near the foot, ten screens from the strip that draws the same months.
 - Measured: 3,964 → 3,160 px desktop, about 6,160 → 4,990 px phone. Tests:
   `tests/recordRoutesReadingOrder.test.tsx`.
 
+
+### 1.1.43 Delivery channels: one Slack poster, one email shell, one tally, one send record (2026-10-06)
+
+Every send — the weekly email, the weekly Slack post, the between-Monday alerts, the month-end
+pulse and the regime-change push — now goes through `lib/delivery/`.
+
+- **One Slack channel** (`lib/delivery/slack.ts`, `slackChannel`). The targets (the
+  `SLACK_WEBHOOK_URL` webhook plus every active stored one) were resolved in three places; they are
+  resolved in one. Every post is bounded (10s; the alert and pulse posts had no timeout, so an edge
+  that never answered held the cron step to its 60s deadline), and every post retires a webhook
+  Slack answers 404/410 for. The month-end pulse never did, so a channel that deleted its webhook
+  stayed a target of every pulse. Alerts and the pulse share one block shape
+  (`slackAlertBlocks`: header, body, "View brief"); every post now carries
+  `Content-Type: application/json`, which only the weekly post set before. The blocks and text
+  are unchanged.
+- **One tally** (`lib/delivery/fanOut.ts`). A target is sent to, gone (and retired), failed, or
+  skipped; the five senders counted those in five shapes. Each route keeps the shape it already
+  publishes — the weekly Slack post counts a retired webhook as a failed one, the push result's
+  `pruned` is the tally's `retired` — so no response changed.
+- **One email shell** (`lib/email/emailShell.ts`, `renderEmailShell`). The alert templates'
+  `baseHtml`, the copy of it inline in the weekly brief, and the month-end pulse's own shell are
+  one. The copy is why the 2026-09-17 `siteUrl` fix missed the alerts: their links, their
+  unsubscribe URL and their plain-text "View full brief" / "Your lines" lines still wrote
+  `https://whether.work`, so a preview deployment mailed production links. Every origin in a
+  sent email now comes from `lib/siteUrl`. On production that is the same string, and the alert
+  and weekly mail are byte-for-byte what they were. The month-end pulse is the one email whose
+  HTML changed: it gains the shared footer and the unsubscribe link its HTML part never carried,
+  its title is the shell's, and its block is fully escaped (it escaped `<` only, so an `&` or a
+  quote in the pasted block went out raw); its plain-text part is unchanged. One `escapeHtml`
+  serves every email and the subscription action pages.
+- **One answer to "the current snapshot"** (`lib/operatingState/resolveSnapshot.ts`,
+  `resolveOperatingSnapshot({ given, onMiss })`). A given snapshot is used as given, with its own
+  weekly call unless one is passed; otherwise the stored one; otherwise the caller's named miss
+  policy — `"refuse"` (weekly email, month-end pulse) or `"report"`, a report read that serves the
+  bundled copy on an outage (alert delivery, the regime check, and the Slack post, which skips the
+  store because its report read is `GET /api/brief/slack`'s path and already projects the stored
+  snapshot). `lib/export/exportSnapshot.ts` keeps its own resolution on purpose: an export builds
+  from the materialized inputs, which is a read, not a send.
+- **One readiness check for a send** (`assessSnapshotReadiness`, `assessReadingReadiness`). The
+  email judged a snapshot's own flags (`freshness.status`, `provenance.isLive`) and the Slack post
+  the treasury's fallback stamp, so a reading marked one way and not the other was sent by one and
+  refused by the other. Both read both now, and the email's refusal names the fallback reason when
+  there is one.
+- **The weekly sends go out once a week per recipient** (`lib/delivery/onceFor.ts`). Repeat
+  protection came in four schemes — per-inbox markers for alert mail (`alert:delivered:*`, a
+  seven-day window), one key per month for the month-end pulse (`month-end:last-pulsed`), the
+  regime check's `regime:*` last-known state — and none for the weekly email or the weekly Slack
+  post, so a manual `POST /api/email/send-weekly` or `POST /api/brief/slack/deliver` after the
+  Monday cron sent every subscriber and every channel the same brief again. `onceFor(periodKey)`
+  writes one KV key per recipient after that recipient's send succeeds:
+  `delivery:once:<period>:<sha256 of the recipient>`, where the period is
+  `weekly-email:<ISO week>` or `weekly-slack:<ISO week>` of the send (`2026-w41`), kept 14 days
+  (`expirationTtl`). Nothing else in the namespace starts with `delivery:`, and the recipient is
+  hashed because a webhook URL is a credential. Per recipient rather than per run, so a run that
+  failed part-way can be re-run and reaches only the ones it missed. The cron path respects the
+  markers; the two manual routes take `?force=1` (or `?force=true`) to send again on purpose,
+  which still writes markers and never overrides the readiness refusal. A skipped recipient is
+  reported as `skipped` (absent when zero); an email run where everyone was skipped says so in
+  `message`, and a Slack run where every channel was skipped reports
+  `status: "skipped_already_posted"`, `ok: true`. A stub email send (no `EMAIL` binding outside
+  production) delivered nothing and records nothing, and without a KV binding nothing is recorded
+  or skipped, as before. The alert mail's markers are the same store (`sentMarkers`) with its
+  seven-day window and its existing keys; the month-end key and the regime state are left as they
+  are — one is a whole-run gate the pulse's own comment explains, the other a transition detector,
+  not a record of a send.
+- **The manual alert runs refuse a saved copy** (fix). `POST /api/check-regime-change` and
+  `POST /api/alert-deliveries` pass no snapshot, and with nothing stored both fell back to a report
+  read and acted on it unchecked. Offline that read is the bundled 2026-06-17 copy: a manual regime
+  check posted "Conditions changed" (Sunny → Stormy) to every Slack target and wrote
+  `regime:last-known`, `regime:weeks-to-flip` and `regime:confidence` from it, and a manual alert
+  run mailed every opted-in subscriber a regime change and wrote `alert:state` — so the next real
+  reading was judged against the copy. Both now ask the weekly sends' readiness question of a
+  report read and, when it fails, judge, send and write nothing; the routes answer 503 with
+  `ok: false` and `error: "refused_unpublishable: …"` (the alert route keeps its `sent` / `skipped`
+  / `alerts` / `errors` fields at zero). A given or stored snapshot is judged as before: the cron
+  hands one over on every run, and the stored one is what the cron last judged.
+- Tests: `tests/deliveryChannels.test.ts`, `tests/emailShell.test.ts` (production output pinned
+  byte for byte; the no-literal-origin rule is a source read, because on production the two are
+  the same string), `tests/operatingSnapshotResolution.test.ts`, `tests/alertFallbackReadiness.test.ts`, `tests/deliveryOnceMarkers.test.ts`.

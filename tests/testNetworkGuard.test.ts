@@ -5,7 +5,8 @@ import { readFile } from "node:fs/promises";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { getDefaultIngestionStore } from "../lib/ingestion/store";
-import { createGuardedFetch, isLocalTarget, redactTarget, targetUrl } from "../scripts/test-network-guard";
+import { createGuardedFetch, isLocalTarget, redactTarget, targetUrl } from "../scripts/network-guard.lib";
+import { suiteNetworkGuard } from "../scripts/test-network-guard";
 
 /**
  * The suite runs offline by default.
@@ -33,7 +34,7 @@ describe("test network guard", () => {
 
   const guarded = (passThrough: typeof fetch = alwaysLocal) => {
     const explained: string[] = [];
-    return { fetch: createGuardedFetch(passThrough, (text) => explained.push(text)), explained };
+    return { fetch: createGuardedFetch(passThrough, (text) => explained.push(text), suiteNetworkGuard), explained };
   };
 
   it("blocks an outbound host and names it", async () => {

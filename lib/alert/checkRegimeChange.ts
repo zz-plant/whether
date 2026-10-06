@@ -1,13 +1,10 @@
 import { getRegimePublicLabel } from "../regimePresentation";
-import { loadReportData } from "../report/reportData";
 import { getRegimeProjection } from "../report/regimeContext";
 import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
-import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
-import { getSlackWebhookStore } from "../slack/slackWebhookStore";
-import { isSlackWebhookUrl } from "../slack/deliverSlackBrief";
-import { siteUrl } from "../siteUrl";
+import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
+import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
 import { formatExportConfidenceWord } from "../export/exportTerms";
@@ -31,61 +28,23 @@ type CheckRegimeChangeResult = {
   flashMoves?: FlashMove[];
 };
 
-/** One Slack post, in the block shape every alert here uses. */
-const postSlackAlert = async (webhook: string, header: string, body: string) => {
-  const response = await fetch(webhook, {
-    method: "POST",
-    body: JSON.stringify({
-      blocks: [
-        { type: "header", text: { type: "plain_text", text: header } },
-        { type: "section", text: { type: "mrkdwn", text: body } },
-        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
-      ],
-    }),
-  });
-  /* A webhook Slack has revoked reads 404/410; drop it so the weekly step stops
-     counting it as a target. Same rule the weekly deliverer applies. Awaited,
-     not floated: a Worker can drop a floating promise at request end, and this
-     is the only thing that retires a dead target. */
-  if (response.status === 404 || response.status === 410) {
-    await getSlackWebhookStore().deactivateByUrl(webhook).catch(() => undefined);
-  }
-  return response;
-};
-
 /**
- * Every Slack target for an alert: the env-configured webhook plus every
- * webhook a channel subscribed through the form (KV store). A regime change or
- * flash reaches the channels that signed up for the weekly brief, not just the
- * operator's own webhook — the flip is the one mid-week event the channel
- * needs, and it is exactly what the form's "a note if the call flips" promises.
+ * Post an alert to every Slack target, never throwing: a slow Slack post must
+ * not fail the regime check, which has KV state to write after this.
+ *
+ * The targets are the env-configured webhook plus every webhook a channel
+ * subscribed through the form. A regime change or flash reaches the channels
+ * that signed up for the weekly brief, not just the operator's own webhook —
+ * the flip is the one mid-week event the channel needs, and it is exactly what
+ * the form's "a note if the call flips" promises. A webhook Slack has revoked
+ * (404/410) is retired by the shared channel, so the weekly step stops counting
+ * it as a target.
  */
-const resolveAlertSlackWebhooks = async (): Promise<string[]> => {
-  const urls = new Set<string>(resolveConfiguredAlertWebhook());
-  try {
-    const store = getSlackWebhookStore();
-    const stored = await store.listActiveWebhooks();
-    for (const url of stored) {
-      if (isSlackWebhookUrl(url)) urls.add(url);
-    }
-  } catch (error) {
-    console.warn("[slack-alert] failed to load subscribed webhooks", error);
-  }
-  return [...urls];
-};
-
-const resolveConfiguredAlertWebhook = (): string[] => {
-  const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
-  return envUrl && isSlackWebhookUrl(envUrl) ? [envUrl] : [];
-};
-
-/** Post an alert to every target, never throwing: a slow Slack post must not
- *  fail the regime check, which has KV state to write after this. */
 const postSlackAlerts = async (header: string, body: string) => {
   try {
-    const webhooks = await resolveAlertSlackWebhooks();
+    const webhooks = await slackChannel.listTargets();
     if (webhooks.length === 0) return;
-    await Promise.allSettled(webhooks.map((webhook) => postSlackAlert(webhook, header, body)));
+    await slackChannel.deliver(webhooks, { blocks: slackAlertBlocks(header, body) });
   } catch (error) {
     console.warn("[slack-alert] delivery failed", error);
   }
@@ -105,25 +64,31 @@ export const checkRegimeChange = async (options?: {
   const kv = getWhetherKv();
   if (!kv) return { ok: false, error: "KV not available" };
 
-  let assessment;
-  let record;
-  let reportDynamics;
+  /* The cron's snapshot, else the stored one, else a report read — the manual
+     route's path when nothing is stored. */
+  const reading = await resolveOperatingSnapshot({
+    given: { snapshot: options?.snapshot, weeklyCall: options?.weeklyCall },
+    onMiss: "report",
+    route: "check-regime-change",
+  });
 
-  if (options?.snapshot) {
-    assessment = options.snapshot.assessment;
-    record = options.snapshot.treasury;
-  } else {
-    const stored = await getOperatingSnapshotStore().readLatest();
-    if (stored) {
-      assessment = stored.assessment;
-      record = stored.treasury;
-    } else {
-      const data = await loadReportData({});
-      assessment = data.assessment;
-      record = data.treasury;
-      reportDynamics = data.reportDynamics;
-    }
+  /*
+   * A report read succeeds on an outage by serving the bundled copy, and this
+   * check acted on whatever it got: a manual run with nothing stored judged a
+   * months-old saved reading against the last-known regime, posted the "change"
+   * to every channel, and wrote `regime:last-known` from it, so the next real
+   * reading was compared with the copy. The weekly sends have refused that
+   * reading since 2026-09-17; this asks the same question before judging or
+   * writing anything.
+   */
+  if (reading.source === "report") {
+    const readiness = assessReadingReadiness(reading, new Date());
+    if (!readiness.ok) return { ok: false, error: `refused_unpublishable: ${readiness.reason}` };
   }
+
+  const assessment = reading.source === "report" ? reading.report.assessment : reading.snapshot.assessment;
+  const record = reading.source === "report" ? reading.report.treasury : reading.snapshot.treasury;
+  const reportDynamics = reading.source === "report" ? reading.report.reportDynamics : undefined;
   const currentRegime = assessment.regime;
 
   const lastKnown = await kv.get("regime:last-known");

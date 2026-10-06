@@ -1,12 +1,18 @@
 import { buildSlackBrief } from "../export/briefBuilders";
 import { previousScoresFromDynamics } from "../export/scoreReference";
-import { assessPublishReadiness } from "../report/briefPublishGuard";
-import { loadReportDataSafe } from "../report/reportData";
+import {
+  assessReadingReadiness,
+  assessSnapshotReadiness,
+  resolveOperatingSnapshot,
+  type OperatingReading,
+} from "../operatingState/resolveSnapshot";
 import { buildPostureState } from "../report/postureStateSource";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
+import { slackChannel } from "../delivery/slack";
+import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 
 /**
  * Slack delivery for the weekly brief.
@@ -23,6 +29,8 @@ type SlackDeliveryStatus =
   | "posted"
   | "partial"
   | "skipped_unconfigured"
+  /** Every target already had this week's post; nothing was posted again. */
+  | "skipped_already_posted"
   | "refused_unpublishable"
   | "failed";
 
@@ -34,6 +42,8 @@ type SlackDeliveryResult = {
   delivered: number;
   recordDate?: string;
   error?: string;
+  /** Targets that already had this week's post and were not posted to again. Absent when none. */
+  skipped?: number;
 };
 
 export const isSlackWebhookUrl = (value: string): boolean =>
@@ -89,14 +99,14 @@ export const buildSlackBriefBlocks = (
  * to correct, so readiness is judged there, on the flags that move.
  */
 const buildSlackBriefPayload = async (
+  reading: Extract<OperatingReading, { source: "report" }>,
   now: Date,
 ): Promise<{
   text: string;
   recordDate: string;
-  readiness: ReturnType<typeof assessPublishReadiness>;
+  readiness: ReturnType<typeof assessReadingReadiness>;
 }> => {
-  const reportResult = await loadReportDataSafe(undefined, { route: "slack/deliver-brief" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const reportData = reading.report;
   const { assessment, treasury, sensors, macroSeries } = reportData;
   const postureState = await buildPostureState({
     record: treasury,
@@ -111,26 +121,8 @@ const buildSlackBriefPayload = async (
   return {
     text,
     recordDate: treasury.record_date,
-    readiness: assessPublishReadiness({
-      degraded: !reportResult.ok,
-      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
-      isLive: treasury.isLive,
-      fallbackReason: treasury.fallback_reason,
-      recordDate: treasury.record_date ?? treasury.fetched_at,
-      now,
-    }),
+    readiness: assessReadingReadiness(reading, now),
   };
-};
-
-import { getSlackWebhookStore } from "./slackWebhookStore";
-
-export const resolveConfiguredSlackWebhooks = (): string[] => {
-  const urls = new Set<string>();
-  const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
-  if (envUrl && isSlackWebhookUrl(envUrl)) {
-    urls.add(envUrl);
-  }
-  return [...urls];
 };
 
 /**
@@ -152,7 +144,7 @@ const buildSlackBriefPayloadFromSnapshot = async (
 ): Promise<{
   text: string;
   recordDate: string;
-  readiness: ReturnType<typeof assessPublishReadiness>;
+  readiness: ReturnType<typeof assessSnapshotReadiness>;
 }> => {
   const { assessment, treasury, macroSeries } = snapshot;
   const sensors = buildSensorReadings(treasury);
@@ -170,31 +162,8 @@ const buildSlackBriefPayloadFromSnapshot = async (
   return {
     text,
     recordDate: treasury.record_date,
-    readiness: assessPublishReadiness({
-      degraded: false,
-      isFallback: Boolean(treasury.fallback_at || treasury.fallback_reason),
-      isLive: treasury.isLive,
-      fallbackReason: treasury.fallback_reason,
-      recordDate: treasury.record_date ?? treasury.fetched_at,
-      now,
-    }),
+    readiness: assessSnapshotReadiness(snapshot, now),
   };
-};
-
-const resolveAllTargetSlackWebhooks = async (): Promise<string[]> => {
-  const urls = new Set<string>(resolveConfiguredSlackWebhooks());
-  try {
-    const store = getSlackWebhookStore();
-    const stored = await store.listActiveWebhooks();
-    for (const url of stored) {
-      if (isSlackWebhookUrl(url)) {
-        urls.add(url);
-      }
-    }
-  } catch (error) {
-    console.warn("[slack] failed to load stored webhooks", error);
-  }
-  return [...urls];
 };
 
 export const deliverSlackBrief = async (options?: {
@@ -207,22 +176,34 @@ export const deliverSlackBrief = async (options?: {
    *  is built from it instead of a second report read. */
   snapshot?: OperatingSnapshot;
   now?: Date;
+  /** Post to channels that already had this week's post. The manual route's explicit opt-in; the cron never passes it. */
+  force?: boolean;
 }): Promise<SlackDeliveryResult> => {
-  const urls = options?.webhookUrls ?? (await resolveAllTargetSlackWebhooks());
+  const now = options?.now ?? new Date();
+  const urls = options?.webhookUrls ?? (await slackChannel.listTargets());
   if (urls.length === 0) {
     /* Nothing configured is a real state, not a failure — but it must never be
        reported as "posted". */
     return { ok: true, status: "skipped_unconfigured", attempted: 0, delivered: 0 };
   }
 
-  const doFetch = options?.fetchImpl ?? fetch;
-
   let payload = options?.payload;
   if (!payload) {
     try {
-      const built = options?.snapshot
-        ? await buildSlackBriefPayloadFromSnapshot(options.snapshot, options?.now ?? new Date())
-        : await buildSlackBriefPayload(options?.now ?? new Date());
+      /* The cron's snapshot when it passed one. Otherwise the report read, which
+         is GET /api/brief/slack's path, so a manual post and the read endpoint
+         say the same thing; the store is not read here because the report
+         loader already projects the stored snapshot. Either way, readiness is
+         the email's check (lib/operatingState/resolveSnapshot.ts). */
+      const reading = await resolveOperatingSnapshot({
+        given: { snapshot: options?.snapshot },
+        onMiss: "report",
+        consultStore: false,
+        route: "slack/deliver-brief",
+      });
+      const built = reading.source === "report"
+        ? await buildSlackBriefPayload(reading, now)
+        : await buildSlackBriefPayloadFromSnapshot(reading.snapshot, now);
       if (!built.readiness.ok) {
         /* Not a failure of this dispatcher, and not a post either. A channel
            that is told nothing this Monday can ask; a channel handed a stale
@@ -250,36 +231,38 @@ export const deliverSlackBrief = async (options?: {
 
   const { text, recordDate } = payload;
   const blocks = buildSlackBriefBlocks(text, recordDate, { imageUrl: options?.imageUrl });
-  const results = await Promise.allSettled(
-    urls.map(async (url) => {
-      const response = await doFetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        /* The top-level text is the notification-preview fallback. */
-        body: JSON.stringify({ blocks, text: `Whether Weekly Brief — ${recordDate}` }),
-      });
-      if (!response.ok) {
-        if (response.status === 404 || response.status === 410) {
-          /* Awaited, not floated: the delivery's return means its bookkeeping
-             is done — in a Worker a floating promise can die with the request,
-             leaving a revoked webhook counted as a target forever. */
-          await getSlackWebhookStore().deactivateByUrl(url).catch(() => undefined);
-        }
-        throw new Error(`slack_webhook_${response.status}`);
-      }
-    }),
+  /* The top-level text is the notification-preview fallback. A webhook Slack
+     has revoked (404/410) is retired inside the fan-out, awaited, so the next
+     Monday does not count it as a target. Once per webhook per ISO week, so a
+     manual run after the Monday cron does not post the brief twice, and a run
+     that failed part-way reaches only the channels it missed. */
+  const tally = await slackChannel.deliver(
+    urls,
+    { blocks, text: `Whether Weekly Brief — ${recordDate}` },
+    {
+      fetchImpl: options?.fetchImpl,
+      once: onceFor(weeklyPeriodKey("weekly-slack", now), { force: options?.force }),
+    },
   );
 
-  const delivered = results.filter((entry) => entry.status === "fulfilled").length;
-  const failed = urls.length - delivered;
+  const skipped = tally.skipped > 0 ? { skipped: tally.skipped } : {};
+  const attempted = urls.length - tally.skipped;
+  if (attempted === 0) {
+    return { ok: true, status: "skipped_already_posted", attempted: 0, delivered: 0, recordDate, ...skipped };
+  }
+
+  const delivered = tally.sent;
+  /* A retired webhook still missed this week's post, so it counts as failed here. */
+  const failed = tally.failed + tally.retired;
   const status: SlackDeliveryStatus = delivered === 0 ? "failed" : failed > 0 ? "partial" : "posted";
 
   return {
     ok: failed === 0,
     status,
-    attempted: urls.length,
+    attempted,
     delivered,
     recordDate,
-    ...(failed > 0 ? { error: `${failed}/${urls.length} Slack webhooks failed` } : {}),
+    ...(failed > 0 ? { error: `${failed}/${attempted} Slack webhooks failed` } : {}),
+    ...skipped,
   };
 };

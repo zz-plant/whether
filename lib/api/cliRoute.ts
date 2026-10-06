@@ -1,36 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { parseAsOfSearchParam, rejectUnsupportedCliQuery } from "../cli/queryContracts";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import type { ReportSearchParams } from "../report/reportData";
 
-export const INVALID_AS_OF_ERROR = "Invalid asOf input. Expected YYYY-MM.";
-
-export const parseCliRouteRequest = (
-  request: NextRequest,
-  endpointAllowlist: readonly string[],
-): { asOf?: { year: number; month: number } } | NextResponse => {
-  const invalidQuery = rejectUnsupportedCliQuery(request, endpointAllowlist);
-  if (invalidQuery) {
-    return invalidQuery;
-  }
-
-  const parsedAsOf = parseAsOfSearchParam(request.nextUrl.searchParams.get("asOf"));
-  if (parsedAsOf === null) {
-    return NextResponse.json({ error: INVALID_AS_OF_ERROR }, { status: 400 });
-  }
-
-  if (!("year" in parsedAsOf && "month" in parsedAsOf) || !parsedAsOf.year || !parsedAsOf.month) {
-    return {};
-  }
-
-  return {
-    asOf: {
-      year: Number(parsedAsOf.year),
-      month: Number(parsedAsOf.month),
-    },
-  };
-};
-
+/* A route's query is read by `parseCliQuery` (`lib/cli/queryContracts.ts`). */
 export const loadCliRouteContext = async ({
   route,
   searchParams,

@@ -46,7 +46,7 @@
  */
 import { z } from "zod";
 
-import { withDeadline } from "../withDeadline";
+import { cachedLoader } from "./cachedLoader";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { isActivationEvent } from "../activationFunnel";
 import {
@@ -233,11 +233,13 @@ const queryActivation = async (
   };
 };
 
-let cached: { at: number; value: Promise<ActivationFunnelReport> } | null = null;
+const activationLoader = cachedLoader<ActivationFunnelReport>({
+  label: "activation-funnel",
+  ttlMs: CACHE_MS,
+  failureReason: "activation funnel read failed",
+});
 
-export const resetActivationFunnelCacheForTests = () => {
-  cached = null;
-};
+export const resetActivationFunnelCacheForTests = () => activationLoader.reset();
 
 /** Never throws: whatever reads this must not go down with the telemetry API. */
 export const loadActivationFunnelReport = async (options: LoadOptions = {}): Promise<ActivationFunnelReport> => {
@@ -245,26 +247,10 @@ export const loadActivationFunnelReport = async (options: LoadOptions = {}): Pro
   if (!config) return { status: "unconfigured" };
 
   const now = options.now ?? new Date();
-  if (cached && now.getTime() - cached.at < CACHE_MS) return cached.value;
-
-  const value = withDeadline(
-    queryActivation(config, {
-      fetcher: options.fetcher ?? fetch,
-      now,
-      timeoutMs: options.timeoutMs ?? REPORT_TIMEOUT_MS,
-    }),
-    options.timeoutMs ?? REPORT_TIMEOUT_MS,
-    "activation-funnel",
-  ).catch((error: unknown): ActivationFunnelReport => ({
-    status: "unavailable",
-    reason: error instanceof Error ? error.message : "activation funnel read failed",
-  }));
-
-  cached = { at: now.getTime(), value };
-  const resolved = await value;
-  // A failed read is not worth remembering for fifteen minutes; the next request tries again.
-  if (resolved.status !== "ok") cached = null;
-  return resolved;
+  const timeoutMs = options.timeoutMs ?? REPORT_TIMEOUT_MS;
+  return activationLoader.load(now, timeoutMs, () =>
+    queryActivation(config, { fetcher: options.fetcher ?? fetch, now, timeoutMs }),
+  );
 };
 
 /**

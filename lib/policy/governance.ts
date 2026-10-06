@@ -1,4 +1,4 @@
-import type { PolicyPosture } from "../regimeEngine";
+import type { PolicyPosture } from "../regimeEngineCore";
 
 export interface GovernanceParameterSet {
   hiringThreshold: "MODERATE" | "HIGH" | "VERY_HIGH";

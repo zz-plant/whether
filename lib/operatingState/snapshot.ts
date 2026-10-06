@@ -1,6 +1,6 @@
 import type { MacroSeriesReading, TreasuryData } from "../types";
-import { evaluateRegime, type RegimeThresholds } from "../regimeEngine";
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import { ENGINE_VERSION, evaluateRegime, type RegimeThresholds } from "../regimeEngine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import { buildWeeklyCallContract } from "../report/weeklyCallContract";
 import { buildHomeBriefModel } from "../report/homeBriefModel";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
@@ -8,6 +8,19 @@ import { buildSensorReadings } from "../sensors";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC, formatWeekEndingUTC } from "../formatters";
 import type { OperatingSnapshot } from "./types";
 
+/**
+ * The identity of what scored a snapshot: its record date, its inputs, and the
+ * engine calibration that read them (`ENGINE_VERSION`), so a re-score of the
+ * same inputs under a new calibration is stored as a new snapshot rather than
+ * under the old one's key.
+ *
+ * Folding the version in changed every hash once, on the first refresh after
+ * it landed (2026-10-06). That was traced before it shipped: the hash names the
+ * snapshot (`id`), its per-reading KV key and a field in the ingest-pipeline
+ * telemetry stream, and nothing compares it between runs — change detection
+ * reads the regime, the alerts read the latest snapshot, and the per-reading
+ * key has no reader — so the change re-keyed one write and nothing else.
+ */
 export const hashOperatingInputs = (treasury: TreasuryData, macroSeries: MacroSeriesReading[]): string => {
   const yieldsKey = [
     treasury.yields.oneMonth,
@@ -21,7 +34,7 @@ export const hashOperatingInputs = (treasury: TreasuryData, macroSeries: MacroSe
     .sort()
     .join(";");
 
-  const raw = `${treasury.record_date}|${yieldsKey}|${macroKey}`;
+  const raw = `${ENGINE_VERSION}|${treasury.record_date}|${yieldsKey}|${macroKey}`;
   let hash = 0;
   for (let i = 0; i < raw.length; i++) {
     const char = raw.charCodeAt(i);

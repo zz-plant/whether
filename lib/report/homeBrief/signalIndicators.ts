@@ -1,4 +1,5 @@
-import { buildSignalInfluence, DEFAULT_THRESHOLDS } from "../../regimeEngine";
+import { DEFAULT_THRESHOLDS } from "../../regimeEngine";
+import { buildSignalInfluence } from "../regimeDescription";
 import {
   formatRegimeSignalValue,
   formatTrendArrow,

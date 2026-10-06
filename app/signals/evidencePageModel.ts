@@ -4,9 +4,11 @@ import type { ReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import {
   buildBreadcrumbList,
+  organizationId,
   organizationName,
-  websiteName,
+  websiteId,
 } from "../../lib/seo";
+import { graph } from "../../lib/seo/pageStructuredData";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
@@ -106,9 +108,10 @@ const signalsSectionLinks = [
   { href: "#instruments", label: "Deeper evidence" },
 ];
 
-const buildStructuredData = () => ({
-  "@context": "https://schema.org",
-  "@graph": [
+/* The site node comes from `graph`, so `isPartOf` names it by id; it was an inline WebSite with
+   no id, which reads to a parser as a second site. */
+const buildStructuredData = () =>
+  graph([
     {
       "@type": "WebPage",
       "@id": `${siteUrl}/signals#webpage`,
@@ -117,36 +120,27 @@ const buildStructuredData = () => ({
       description:
         "Evidence for the weekly brief: drivers, thresholds, timestamps, and past months.",
       inLanguage: "en",
-      isPartOf: {
-        "@type": "WebSite",
-        name: websiteName,
-        url: siteUrl,
-      },
-      publisher: {
-        "@id": `${siteUrl}#organization`,
-      },
+      isPartOf: { "@id": websiteId },
+      publisher: { "@id": organizationId },
       mainEntity: {
         "@type": "Dataset",
         name: "Macro signal evidence feed",
         description:
           "Macro signal dataset for Whether, including thresholds, sensor readings, and the evidence behind the guidance.",
-        creator: {
-          "@id": `${siteUrl}#organization`,
-        },
+        creator: { "@id": organizationId },
         license: `${siteUrl}/terms-of-service`,
       },
     },
     {
       "@type": "Organization",
-      "@id": `${siteUrl}#organization`,
+      "@id": organizationId,
       name: organizationName,
       url: siteUrl,
     },
     buildBreadcrumbList(
       createBreadcrumbTrail([{ path: "/" }, { path: "/signals" }]),
     ),
-  ],
-});
+  ]);
 
 /**
  * The page model from report data already in hand. Split from the loader so a

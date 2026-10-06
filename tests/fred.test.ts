@@ -16,8 +16,8 @@ import {
   resetFredCircuitBreaker,
   resolveFredApiKey,
   getFredCircuitBreakerState,
-  withRetry,
 } from "../lib/fred";
+import { withRetry } from "../lib/runtime/retry";
 
 const buildFredCsv = (rows: string[]) => `DATE,VALUE\n${rows.join("\n")}\n`;
 
@@ -206,6 +206,26 @@ describe("withRetry — budget", () => {
     assert.deepEqual(seen, [9_000, 8_000]);
   });
 
+  /* The Treasury client gives its retry a longer timeout than its first try. */
+  it("hands each attempt its index, and with no budget never runs out of time", async () => {
+    const seen: Array<[number, number]> = [];
+    await assert.rejects(
+      withRetry(
+        async (remainingMs, attempt) => {
+          seen.push([remainingMs, attempt]);
+          throw new Error("boom");
+        },
+        { attempts: 3, backoffMs: 0 },
+      ),
+    );
+
+    assert.deepEqual(seen, [
+      [Number.POSITIVE_INFINITY, 0],
+      [Number.POSITIVE_INFINITY, 1],
+      [Number.POSITIVE_INFINITY, 2],
+    ]);
+  });
+
   it("keeps retrying while the budget still funds an attempt", async () => {
     let calls = 0;
     const result = await withRetry(
@@ -229,7 +249,7 @@ describe("withRetry — budget", () => {
           calls += 1;
           throw new FredResponseError("DGS10", 400);
         },
-        { attempts: 3, backoffMs: 0, budgetMs: 9_000 },
+        { attempts: 3, backoffMs: 0, budgetMs: 9_000, isRetryable: isRetryableFredError },
       ),
       /HTTP 400/,
     );

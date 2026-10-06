@@ -5,6 +5,8 @@
 import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { fetchWithTimeout } from "../fetchWithTimeout";
+import { FRED_BASE_URL, parseFredCsvSeries } from "../fred";
+import { isTestRuntime, withRetry } from "../runtime/retry";
 
 const TREASURY_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
@@ -14,10 +16,8 @@ const TREASURY_FETCH_HEADERS = {
 const PRIMARY_FETCH_TIMEOUT_MS = 1_500;
 const RETRY_FETCH_TIMEOUT_MS = 2_500;
 const MAX_SERIES_FETCH_ATTEMPTS = 2;
-// See lib/fred.ts: stubbed upstreams fail instantly under `bun test`, so the
-// backoff sleep is pure suite wall clock. The retry path still runs.
-const RETRY_BACKOFF_MS =
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test" ? 0 : 250;
+// Zero under the suite, where stubbed upstreams fail at once (see isTestRuntime).
+const RETRY_BACKOFF_MS = isTestRuntime() ? 0 : 250;
 /**
  * Year-scoped rather than `/current/all`: that path answers 200 with a
  * zero-byte body -- an empty object cached at the CDN, not an error -- so the
@@ -38,10 +38,10 @@ const buildTreasuryRatesEndpoint = (year: number) =>
  * reading it is not.
  */
 export const TREASURY_ENDPOINTS = {
-  oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
-  threeMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO",
-  twoYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2",
-  tenYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
+  oneMonth: `${FRED_BASE_URL}?id=DGS1MO`,
+  threeMonth: `${FRED_BASE_URL}?id=DGS3MO`,
+  twoYear: `${FRED_BASE_URL}?id=DGS2`,
+  tenYear: `${FRED_BASE_URL}?id=DGS10`,
 } as const;
 
 interface TreasuryFetchOptions {
@@ -58,29 +58,6 @@ const buildFallbackSnapshot = (snapshot: TreasuryData, reason: string): Treasury
     fallback_at: new Date().toISOString(),
     fallback_reason: reason,
   };
-};
-
-const parseFredCsv = (csv: string) => {
-  const [header, ...rows] = csv.trim().split(/\r?\n/);
-  if (!header) {
-    return new Map<string, number | null>();
-  }
-
-  const values = new Map<string, number | null>();
-  for (const row of rows) {
-    const [date, value] = row.split(",");
-    if (!date) {
-      continue;
-    }
-    if (!value || value === ".") {
-      values.set(date, null);
-      continue;
-    }
-    const numeric = Number(value);
-    values.set(date, Number.isFinite(numeric) ? numeric : null);
-  }
-
-  return values;
 };
 
 const parseTreasuryCsvNumber = (value: string | undefined): number | null => {
@@ -344,58 +321,51 @@ const formatFetchError = (error: unknown) => {
   return error instanceof Error ? error.message : "Unknown Treasury fetch error";
 };
 
-const pause = (durationMs: number) => new Promise<void>((resolve) => setTimeout(resolve, durationMs));
-
-const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string) => {
-  let lastError: unknown;
-  let lastResponse: Response | null = null;
-
-  for (let attempt = 0; attempt < MAX_SERIES_FETCH_ATTEMPTS; attempt += 1) {
-    try {
-      const response = await fetchWithTimeout(
-        fetcher,
-        endpoint,
-        {
-          headers: TREASURY_FETCH_HEADERS,
-        },
-        attempt === 0 ? PRIMARY_FETCH_TIMEOUT_MS : RETRY_FETCH_TIMEOUT_MS
-      );
-
-      if (response.ok) {
-        return response;
-      }
-
-      lastResponse = response;
-      const shouldRetryStatus = response.status >= 500 || response.status === 429;
-      if (!shouldRetryStatus) {
-        return response;
-      }
-
-      if (attempt < MAX_SERIES_FETCH_ATTEMPTS - 1) {
-        await pause(RETRY_BACKOFF_MS * (attempt + 1));
-      }
-    } catch (error) {
-      lastError = error;
-      const shouldRetryError = isAbortLikeError(error) || isTransientFetchError(error);
-      if (!shouldRetryError || attempt >= MAX_SERIES_FETCH_ATTEMPTS - 1) {
-        throw error;
-      }
-
-      await pause(RETRY_BACKOFF_MS * (attempt + 1));
-    }
+/**
+ * A 5xx or 429 answer, thrown so the shared retry loop treats it as a failure worth another
+ * attempt. It carries the response because, once attempts run out, the caller still gets that
+ * response back to judge rather than an exception.
+ */
+class RetryableStatusError extends Error {
+  constructor(readonly response: Response) {
+    super(`Treasury series request answered HTTP ${response.status}`);
+    this.name = "RetryableStatusError";
   }
+}
 
-  if (lastResponse) {
-    if (lastResponse.status === 520) {
+const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string): Promise<Response> => {
+  try {
+    return await withRetry(
+      async (_remainingMs, attempt) => {
+        const response = await fetchWithTimeout(
+          fetcher,
+          endpoint,
+          { headers: TREASURY_FETCH_HEADERS },
+          attempt === 0 ? PRIMARY_FETCH_TIMEOUT_MS : RETRY_FETCH_TIMEOUT_MS,
+        );
+        if (!response.ok && (response.status >= 500 || response.status === 429)) {
+          throw new RetryableStatusError(response);
+        }
+        return response;
+      },
+      {
+        attempts: MAX_SERIES_FETCH_ATTEMPTS,
+        backoffMs: RETRY_BACKOFF_MS,
+        isRetryable: (error) =>
+          error instanceof RetryableStatusError || isAbortLikeError(error) || isTransientFetchError(error),
+      },
+    );
+  } catch (error) {
+    if (!(error instanceof RetryableStatusError)) {
+      throw error;
+    }
+    if (error.response.status === 520) {
       throw new Error(
         `FRED Treasury upstream unavailable (HTTP 520) after ${MAX_SERIES_FETCH_ATTEMPTS} attempts.`
       );
     }
-
-    return lastResponse;
+    return error.response;
   }
-
-  throw (lastError ?? new Error("Unknown Treasury fetch error"));
 };
 
 export const fetchTreasuryData = async (
@@ -469,10 +439,10 @@ export const fetchTreasuryData = async (
       responses.map((response) => response.text())
     );
 
-    const oneMonthSeries = parseFredCsv(oneMonthCsv);
-    const threeMonthSeries = parseFredCsv(threeMonthCsv);
-    const twoYearSeries = parseFredCsv(twoYearCsv);
-    const tenYearSeries = parseFredCsv(tenYearCsv);
+    const oneMonthSeries = parseFredCsvSeries(oneMonthCsv);
+    const threeMonthSeries = parseFredCsvSeries(threeMonthCsv);
+    const twoYearSeries = parseFredCsvSeries(twoYearCsv);
+    const tenYearSeries = parseFredCsvSeries(tenYearCsv);
 
     const recordDate = findLatestCommonDate([
       oneMonthSeries,

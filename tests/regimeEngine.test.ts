@@ -11,7 +11,9 @@ import {
   deriveRegimeTrend,
   evaluateRegime,
 } from "../lib/regimeEngine";
-import { advanceRegimeState } from "../lib/report/regimeStateMachine";
+import { TREASURY_POLICY_HISTORY } from "../lib/policy/history";
+import { scoreRegime } from "../lib/regimeEngineScoring";
+import { advanceRegimeState } from "../lib/regimeStateMachine";
 import type { TreasuryData } from "../lib/types";
 
 describe("regime engine scoring", () => {
@@ -501,5 +503,43 @@ describe("regime state machine", () => {
     assert.equal(pending.pending, true);
     assert.equal(reverted.nextState, "DEFENSIVE");
     assert.equal(reverted.pending, false);
+  });
+});
+
+describe("policy composites and their rate history", () => {
+  const treasury: TreasuryData = {
+    source: "https://example.com/treasury",
+    record_date: "2024-06-28",
+    fetched_at: "2024-06-28T12:00:00.000Z",
+    isLive: false,
+    yields: { oneMonth: 5.5, threeMonth: 5.45, twoYear: 4.7, tenYear: 4.3 },
+  };
+
+  it("scores against the bundled history when evaluateRegime supplies the default", () => {
+    const scored = scoreRegime(treasury, undefined, [], null, {}, TREASURY_POLICY_HISTORY);
+    const evaluated = evaluateRegime(treasury).policyAssessment;
+    assert.deepEqual(evaluated.composites, scored.policy.composites);
+    assert.deepEqual(evaluated.normalizations, scored.policy.normalizations);
+  });
+
+  it("standardizes against the history it is handed, and only the part before the reading", () => {
+    const history = (baseRate: number) =>
+      Array.from({ length: 24 }, (_, index) => ({
+        recordDate: `${2022 + Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}-28`,
+        baseRate: baseRate + (index % 2) * 0.5,
+        curveSlope: 0.5 + (index % 2) * 0.5,
+      }));
+    const low = scoreRegime(treasury, undefined, [], null, {}, history(1));
+    const high = scoreRegime(treasury, undefined, [], null, {}, history(5));
+    const baseRateZ = (scoring: typeof low) =>
+      scoring.policy.normalizations.find((entry) => entry.id === "BASE_RATE")?.z ?? Number.NaN;
+    assert.ok(baseRateZ(low) > baseRateZ(high), "a higher history mean lowers the z-score");
+
+    // A point dated on or after the reading is not history yet.
+    const withFuture = [...history(1), { recordDate: "2024-06-28", baseRate: 40, curveSlope: 9 }];
+    assert.deepEqual(
+      scoreRegime(treasury, undefined, [], null, {}, withFuture).policy.normalizations,
+      low.policy.normalizations,
+    );
   });
 });

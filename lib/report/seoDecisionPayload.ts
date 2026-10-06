@@ -1,5 +1,5 @@
 import type { RegimeAssessment } from "../regimeEngine";
-import { getRegimeProfile } from "../regimeEngine";
+import { getRegimeProfile } from "./regimeDescription";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 import type { ReportEvidenceItem } from "./reportData";

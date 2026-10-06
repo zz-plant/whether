@@ -10,7 +10,7 @@ import {
   type PhaseSeriesEntry,
 } from "../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
-import { advanceRegimeState } from "../lib/report/regimeStateMachine";
+import { advanceRegimeState } from "../lib/regimeStateMachine";
 import type { RegimeKey } from "../lib/types";
 
 /** The state machine's own classifier, reached through its public entry point.

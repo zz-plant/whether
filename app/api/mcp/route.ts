@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { AgentInputError } from "../../../lib/agent/inputs";
-import { checkAgentToolArguments, describeAgentTools, describeToolParams, runAgentTool } from "../../../lib/agent/tools";
+import { AgentInputError, describeToolParams } from "../../../lib/agent/registry";
+import { checkAgentToolArguments, describeAgentTools, runAgentTool } from "../../../lib/agent/tools";
 import { mcpApiCorsHeaders } from "../../../lib/agentApiCors";
 import { buildAgentInterfaceResponse, supportedAgentCadences } from "../../../lib/agentInterface";
 import { subscribeAndSendVerification } from "../../../lib/email/subscriptionFlow";

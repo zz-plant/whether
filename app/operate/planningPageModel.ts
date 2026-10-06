@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import type { Route } from "../../lib/navigation/routeType";
-import { buildBreadcrumbList, organizationId, websiteName } from "../../lib/seo";
+import { buildBreadcrumbList, organizationId, websiteId } from "../../lib/seo";
+import { graph } from "../../lib/seo/pageStructuredData";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
 import {
@@ -72,31 +73,25 @@ export async function buildPlanningPageModel(
   searchParams?: Promise<PlanningSearchParams>,
 ): Promise<PlanningPageModel> {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebPage",
-        name: "Whether Weekly Brief — Planning",
-        url: `${siteUrl}/planning`,
-        description:
-          "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
-        inLanguage: "en",
-        isPartOf: {
-          "@type": "WebSite",
-          name: websiteName,
-          url: siteUrl,
-        },
-        publisher: { "@id": organizationId },
-      },
-      buildBreadcrumbList(
-        createBreadcrumbTrail([
-          { path: "/" },
-          { path: "/operate" },
-        ]),
-      ),
-    ],
-  };
+  // `isPartOf` names the site node `graph` adds, where it was an inline WebSite with no id.
+  const structuredData = graph([
+    {
+      "@type": "WebPage",
+      name: "Whether Weekly Brief — Planning",
+      url: `${siteUrl}/planning`,
+      description:
+        "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
+      inLanguage: "en",
+      isPartOf: { "@id": websiteId },
+      publisher: { "@id": organizationId },
+    },
+    buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/operate" },
+      ]),
+    ),
+  ]);
 
   const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
   const reportResult = weeklySnapshotResult.reportResult;

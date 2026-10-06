@@ -11,7 +11,8 @@
 # skip here means the push is unverified. Cloudflare Workers Builds still builds
 # and deploys every push, which is the one remote gate left.
 #
-# Runs concurrently, ~40s.
+# Runs concurrently, ~40s. The task list is the `pre-push` preset in
+# scripts/check-tasks.mjs, declared once beside the deploy gate's.
 #
 # Escape hatches:
 #   SKIP_PREPUSH=1 git push     # skip just this hook
@@ -47,4 +48,4 @@ if [ ! -t 0 ]; then
   fi
 fi
 
-bun scripts/run-checks.mjs lint lint:types typecheck test assets suppressions dead-exports hotspot-preflight landmarks
+bun scripts/run-checks.mjs --preset pre-push

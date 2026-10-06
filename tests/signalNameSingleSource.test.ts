@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildSignalInfluence } from "../lib/regimeEngineDiagnostics";
+import { buildSignalInfluence } from "../lib/report/regimeDescription";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import { buildRuleCondition, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { regimeSignalLabel } from "../lib/report/signalTranslations";

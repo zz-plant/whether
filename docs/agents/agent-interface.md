@@ -36,8 +36,9 @@ weekly state under another name) and cannot be combined with `format=jev`.
 all carry the published confidence. `summary.confidence` and the prose sentence beside it on this route are
 set to it too. They read the engine's own label (its confirmation gate, not a published fact) until
 2026-09-29, and said MEDIUM on a week the page called High (`tests/agentConfidenceAgreement.test.ts`).
-`/api/weekly` and `/api/monthly` still return the engine's label in `summary.confidence`, and the archive is
-regenerated from the same builders; use `/api/scores` or `/api/agent` when the number is what you gate on.
+`/api/weekly`, `/api/monthly`, `/api/cadence` and `/api/summary-delta` carry it as well since 2026-10-06: the
+summary builders read the published confidence themselves (`resolveSummaryConfidence`, handed the record
+the reading came from). The archived summaries switch on their next regeneration.
 
 ## Why this approach
 
@@ -86,6 +87,11 @@ Machine-discovery routes:
   never registered and 404s. It did, in production, for as long as it existed. The manifest body
   lives in `lib/agentManifest.ts`; Invariant 10 in `tests/architectureInvariants.test.ts` fails if
   any route file reappears under a dot-directory.
+- The manifest's path, the `start` pointers, the `endpoints` and the `views` are written once, in
+  `lib/agent/discovery.ts`, and read by the manifest, `/llms.txt`, `/llms-full.txt`, `robots.ts`, the
+  root layout's `<link rel="mcp-manifest">`, `/api-docs` and `/api/agent` itself.
+  `tests/agentDiscoveryParity.test.ts` holds `/llms.txt` to the manifest's start pointers and endpoints,
+  and every advertised endpoint to a route that serves it.
 
 ### Example
 
@@ -101,8 +107,9 @@ Script entrypoint:
 bun run mcp:whether
 ```
 
-This starts a stdio MCP server (`lib/mcp/stdioServer.ts`) with the **same tools as `/api/mcp`**, from the
-same definitions (`lib/agent/tools.ts`), plus one that only makes sense on a local checkout:
+This starts the **same MCP server as `/api/mcp`** (`lib/mcp/server.ts`, built for either transport) over
+stdio, with the same tools from the same definitions (`lib/agent/tools.ts`), plus one that only makes
+sense on a local checkout:
 
 - `pull_recent_site_info(cadence?, siteUrl?)`
   - fetches the latest `/api/agent` payload from the site so an agent can pull recent live context
@@ -133,8 +140,13 @@ site's weather word in any case; and the server's name is `whether`, not `whethe
 
 `https://whether.work/api/mcp` is an MCP streamable-HTTP server (JSON-RPC 2.0; `initialize`,
 `ping`, `tools/list`, `tools/call`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
-key. Transport: `lib/mcp/httpMcpServer.ts`; transport tests: `tests/mcpStreamableTransport.test.ts`.
+key. Transport: `lib/mcp/httpMcpServer.ts`, a fresh `lib/mcp/server.ts` per request; transport tests:
+`tests/mcpStreamableTransport.test.ts`.
 The `initialize` result carries instructions that say where to start (`lib/mcp/serverIdentity.ts`).
+They are prose and name ten of the thirteen tools by use; `get_signals`, `get_analog_playbook` and
+`list_agent_skills` are left to `tools/list` on purpose, since none changes where an agent starts or
+what it checks before acting. `tests/agentDiscoveryParity.test.ts` fails on a name the registry does not
+serve, and on a tool added to the registry until the instructions name it or the test leaves it out.
 
 Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 
@@ -166,8 +178,8 @@ would reject. Only an unknown tool is a protocol error (`-32602`), and it lists 
 
 ### Inputs
 
-Every tool takes named arguments from `lib/agent/inputs.ts`, and refuses what it cannot take with the
-values that would have worked:
+Every tool takes named arguments from `lib/agent/inputs.ts`, read by `lib/agent/registry.ts`, and refuses
+what it cannot take with the values that would have worked:
 
 - A **regime** is accepted by key (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`) or by the word
   the site prints (`Freezing`, `Cloudy`, `Stormy`, `Sunny`), in any case, and answered on the key.
@@ -206,7 +218,12 @@ answers `{ ok, tool, result, use }`. An unknown tool, or a wrong argument, is a 
 
 ### Adding a tool
 
-Add one `defineTool` in `lib/agent/tools.ts`: name, description, a zod input shape, a `run`. The remote
+Add one `defineTool` in `lib/agent/tools.ts`: name, description, a zod input shape, a `run`. A tool is
+read-only (and annotated so) unless its definition passes `readOnly: false`. The mechanism under it, which
+knows nothing about Whether, is `lib/agent/registry.ts`: the definition, the argument parsing and the
+refusals, and the list and call paths. An input with a fixed set of values says how they read in a refusal
+with `labelChoices` (the regime input lists `SCARCITY (Freezing)`), so the refusal builder names no
+argument. The remote
 server, the local one, the GET shim and its catalogue, `/.well-known/whether-agent.json` (`mcp.tools`),
 `/llms.txt` and the `/api-docs` page pick it up. `tests/agentDiscoveryParity.test.ts` fails if a place
 that names the tools is missing one, and requires this guide to name it.
@@ -226,6 +243,11 @@ Current app-level skills in the payload:
 - `constraint-translation`
 - `flip-watch`
 - `pm-questions`
+
+Each skill is written once in `lib/agentSkills.ts` together with its step in the briefing: the action
+`pm_handoff.briefing_actions` lists and the numbered ask in `agentHandoff.prompt`. Both lists are read
+from it, in the skills' order, so the three cannot drift apart (`tests/agentHandoff.test.ts` pins the
+words).
 
 ## Recommended usage pattern for agent builders
 

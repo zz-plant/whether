@@ -60,6 +60,22 @@ export async function POST(request: Request) {
   try {
     const result = await runScheduledAlertDelivery();
 
+    if (result.refused) {
+      /* Nothing stored and the report read served the bundled copy: nothing was
+         judged, sent or recorded. Same answer as /api/check-regime-change. */
+      return NextResponse.json(
+        {
+          ok: false,
+          error: result.refused,
+          sent: result.sent,
+          skipped: result.skipped,
+          alerts: result.alerts,
+          errors: result.errors,
+        },
+        { status: 503 },
+      );
+    }
+
     return NextResponse.json({
       ok: true,
       sent: result.sent,

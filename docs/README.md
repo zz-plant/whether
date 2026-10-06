@@ -75,7 +75,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `agents/documentation.md` — documentation lifecycle and update triggers
 - `agents/quality-and-pr.md` — validation depth and PR hygiene
 - `agents/mcp-and-skills-playbook.md` — skill usage and maintenance rules
-- `../.codex/skills/README.md` — repo-local skill index and overlap guide
+- `../.claude/skills/README.md` — repo-local skill index and overlap guide (canonical; `.codex/skills/` is generated from it by `bun run skills:sync`)
 
 ## Working and planning docs
 

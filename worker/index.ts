@@ -12,7 +12,8 @@ import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
-import { WHETHER_AGENT_MANIFEST_PATH, agentManifestResponse } from "../lib/agentManifest";
+import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { agentManifestResponse } from "../lib/agentManifest";
 import { installBindings } from "./bindings";
 
 /* Durable Object and Workflow classes must be exported from the Worker entry to exist. All
@@ -73,6 +74,17 @@ type ExecutionContext = { waitUntil(promise: Promise<unknown>): void; passThroug
 const CRON_STEP_TIMEOUT_MS = 60_000;
 
 /**
+ * One `cron-step` row, the stream /trust's run history reads (lib/telemetry/runHistory.ts).
+ * The stream name stays on the call's first line: tests/telemetryStreamReachability.test.ts
+ * finds a stream's producer by reading `writeAnalytics("<stream>"` out of the source.
+ */
+const recordCronStep = (label: string, outcome: { ok: boolean; error?: string }, durationMs: number) => {
+  writeAnalytics("cron-step", { step: label, ok: outcome.ok, error: outcome.error, durationMs }, {
+    doubles: [outcome.ok ? 1 : 0, durationMs],
+  });
+};
+
+/**
  * Cron steps are independent: a failing ingest should not silently cancel the weekly
  * email and alert delivery that follow it. Each step is a direct library call (no
  * self-fetch through the public edge), bounded by a wall-clock deadline, and its
@@ -82,23 +94,13 @@ const runCronStep = async (label: string, step: () => Promise<{ ok: boolean; err
   const startTime = Date.now();
   try {
     const result = await withDeadline(step(), CRON_STEP_TIMEOUT_MS, `cron:${label}`);
-    const durationMs = Date.now() - startTime;
-    writeAnalytics(
-      "cron-step",
-      { step: label, ok: result.ok, error: result.error, durationMs },
-      { doubles: [result.ok ? 1 : 0, durationMs] },
-    );
+    recordCronStep(label, result, Date.now() - startTime);
     if (!result.ok) {
       console.error(`[cron] ${label} failed`, result.error);
     }
   } catch (error) {
-    const durationMs = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    writeAnalytics(
-      "cron-step",
-      { step: label, ok: false, error: errorMessage, durationMs },
-      { doubles: [0, durationMs] },
-    );
+    recordCronStep(label, { ok: false, error: errorMessage }, Date.now() - startTime);
     console.error(`[cron] ${label} failed`, error);
   }
 };
@@ -109,22 +111,18 @@ export default {
 
     const isDailyIngestion = event.cron === "0 2 * * *";
 
-    /* Always refresh operating state to KV with fresh signals. Recorded like every other
-       step so the trust page's run history (lib/telemetry/runHistory.ts) shows the ingest
-       itself, not only what ran after it; its result feeds the steps below, which is why it
-       is not a runCronStep. */
+    /* Always refresh operating state to KV with fresh signals. Recorded through the same
+       writer as every other step so the trust page's run history shows the ingest itself,
+       not only what ran after it. It is not a runCronStep: its result feeds the steps below,
+       it never throws (refreshOperatingState returns its failures), and it has no 60s
+       deadline, because a forced ingest of every family may legitimately take longer and
+       cutting it would cancel the week's sends rather than delay them. */
     const refreshStartedAt = Date.now();
     const refreshResult = await refreshOperatingState({ forceIngest: true });
-    const refreshDurationMs = Date.now() - refreshStartedAt;
-    writeAnalytics(
-      "cron-step",
-      {
-        step: "refresh-operating-state",
-        ok: refreshResult.ok,
-        error: refreshResult.ok ? undefined : refreshResult.error,
-        durationMs: refreshDurationMs,
-      },
-      { doubles: [refreshResult.ok ? 1 : 0, refreshDurationMs] },
+    recordCronStep(
+      "refresh-operating-state",
+      { ok: refreshResult.ok, error: refreshResult.ok ? undefined : refreshResult.error },
+      Date.now() - refreshStartedAt,
     );
     if (!refreshResult.ok) {
       console.error("[cron] refreshOperatingState failed", refreshResult.error);

@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { GET as getAgent } from "../app/api/agent/route";
 import { loadAgentInterfaceContext, type AgentInterfaceContext } from "../lib/agentInterface";
 import { agentStateSchema, buildAgentState } from "../lib/agentState";
+import { buildCliStatusContract } from "../lib/cli/contracts";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
 
 /*
@@ -260,5 +261,25 @@ describe("/api/agent?view=state", () => {
 
     const bogus = await get("?view=state&cadence=hourly");
     assert.equal(bogus.status, 400);
+  });
+});
+
+/* `/api/cli/status` predates the state and overlaps it. Its guidance is the state's, read by the
+   same builder under the names the CLI had first, so the two cannot disagree about one reading. */
+describe("the CLI status beside the state", () => {
+  it("prints the state's guidance, conditions and confidence for the same reading", async () => {
+    const context = await loadAgentInterfaceContext("test");
+    const state = buildAgentState(context);
+    const status = buildCliStatusContract(context);
+
+    assert.deepEqual(status.call, {
+      summary: state.guidance.call,
+      do: state.guidance.doNow,
+      avoid: state.guidance.avoidNow,
+      flipConditions: state.guidance.flipConditions,
+    });
+    assert.equal(status.regime, state.conditions.label);
+    assert.deepEqual(status.confidence, { label: state.confidence.label, score: state.confidence.percent });
+    assert.equal(status.updatedAt, state.freshness.fetchedAt);
   });
 });

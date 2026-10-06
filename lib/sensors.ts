@@ -11,7 +11,8 @@ import type {
   SeriesHistoryPoint,
   TreasuryData,
 } from "./types";
-import { buildSignalInfluence, computeCurveSlope, DEFAULT_THRESHOLDS, getBaseRate, TREASURY_SOURCE_LABEL } from "./regimeEngine";
+import { computeCurveSlope, DEFAULT_THRESHOLDS, getBaseRate, TREASURY_SOURCE_LABEL } from "./regimeEngine";
+import { buildSignalInfluence } from "./report/regimeDescription";
 import { getTimeMachineRollingYieldSeries } from "./timeMachine/timeMachineCache";
 
 const BASE_RATE_EXPLANATION =

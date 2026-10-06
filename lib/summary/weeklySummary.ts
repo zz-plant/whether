@@ -6,7 +6,8 @@ import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { joinSentences } from "../report/reportFormatting";
 import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
-import { formatConfidenceSentence } from "./summaryFormatting";
+import type { ConfidenceRecord } from "../report/confidence";
+import { formatConfidenceSentence, resolveSummaryConfidence, type SummaryConfidence } from "./summaryFormatting";
 
 import type { SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
@@ -20,7 +21,8 @@ export type WeeklySummary = {
   regimeLabel: string;
   stageLabel?: string;
   guidance: string;
-  confidence: RegimeAssessment["diagnostics"]["confidence"];
+  /** The published confidence (`resolveSummaryConfidence`), not the engine's confirmation gate. */
+  confidence: SummaryConfidence;
   transitionWatch: boolean;
   intensity: RegimeAssessment["diagnostics"]["intensity"];
   constraints: string[];
@@ -235,13 +237,17 @@ export const buildWeeklySummary = ({
   provenance,
   recordDateLabel,
   stageLabel,
+  record,
 }: {
   assessment: RegimeAssessment;
   provenance: WeeklySummaryProvenance;
   recordDateLabel?: string;
   stageLabel?: string;
+  /** The record the reading came from, so a stale fallback lowers the published confidence. */
+  record?: ConfidenceRecord | null;
 }): WeeklySummary => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
+  const confidence = resolveSummaryConfidence(assessment, record);
   const financingSaturated = assessment.scores.tightnessSaturated === true;
   const guidance = getWeeklyActionGuidance(assessment.regime, { financingSaturated });
   const transitionCue = assessment.diagnostics.transitionWatch
@@ -262,7 +268,7 @@ export const buildWeeklySummary = ({
   const summary = joinSentences(
     `${stagedRegimeLabel}: ${assessment.description}`,
     `The priority this week is to ${guidance}`,
-    formatConfidenceSentence(assessment.diagnostics.confidence, assessment.diagnostics.intensity),
+    formatConfidenceSentence(confidence, assessment.diagnostics.intensity),
     transitionCue,
     shockCue,
     refusalCue,
@@ -291,7 +297,7 @@ export const buildWeeklySummary = ({
     regimeLabel,
     stageLabel,
     guidance,
-    confidence: assessment.diagnostics.confidence,
+    confidence,
     transitionWatch: assessment.diagnostics.transitionWatch,
     intensity: assessment.diagnostics.intensity,
     constraints: assessment.constraints,

@@ -19,7 +19,7 @@ describe("suppression census", () => {
     );
     assert.ok(
       census.counts.typeSuppressions > 0,
-      "scripts/seo-weekly-runbook.ts and tests/uiCaptureLib.test.ts carry type suppressions",
+      "scripts/seo-weekly-runbook.ts and tests/seoRefreshQueue.test.ts carry type suppressions",
     );
 
     const lintFiles = new Set(census.hits.lintSuppressions.map((hit) => hit.file));

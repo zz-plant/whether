@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { PageShell } from "../components/pageShell";
+import { WHETHER_AGENT_MANIFEST_PATH } from "../../lib/agent/discovery";
 import { describeAgentTools } from "../../lib/agent/tools";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
@@ -151,8 +152,8 @@ export default function ApiDocsPage() {
           <h2 className="type-eyebrow">For developers</h2>
           <div className="space-y-3">
             <Endpoint
-              signature="GET /.well-known/whether-agent.json"
-              tryHref="/.well-known/whether-agent.json"
+              signature={`GET ${WHETHER_AGENT_MANIFEST_PATH}`}
+              tryHref={WHETHER_AGENT_MANIFEST_PATH}
               tryLabel="Try it"
               tryCta="try_agent_manifest"
             >

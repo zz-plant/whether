@@ -106,7 +106,8 @@ Source of truth: `lib/premiumFunnel.ts`.
   Cloudflare rate-limiting rule on `POST /api/telemetry/premium-funnel` before treating volume
   figures as decision-grade, since an unthrottled caller can still inflate counts.
 - Additionally forwards to `PREMIUM_FUNNEL_WEBHOOK_URL` when configured — a mirror for external
-  dashboards, no longer the only sink.
+  dashboards, no longer the only sink. The forward is bounded at 3s, because the checkout route
+  awaits it before handing the reader their Stripe link.
 - `GET /api/telemetry/premium-funnel` reads the data back (aggregate by default, `?events=1` for the
   raw tail). Authorized with the cron secret; `?limit=` caps the scan window at 1000.
 

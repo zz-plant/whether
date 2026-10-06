@@ -3,13 +3,23 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { chromium } from "@playwright/test";
-import { uiCaptureTargets } from "./ui-capture.config.mjs";
+import {
+  captureStorageSeeds,
+  galleryTitle,
+  healthPath,
+  streamedContentReadySelectors,
+  uiCaptureTargets,
+} from "./ui-capture.config.mjs";
 
+/*
+ * The capture mechanism. What it captures in this app — the targets, which routes stream,
+ * which localStorage keys pick a theme or a returning visitor, the health route, the
+ * gallery's title — is scripts/ui-capture.config.mjs.
+ */
 export const DEFAULT_UI_CAPTURE_BASE_URL =
   process.env.UI_CAPTURE_BASE_URL ?? "http://127.0.0.1:3000";
 export const DEFAULT_UI_CAPTURE_OUT_DIR = "artifacts/ui";
 const HTML_ASSET_PATTERN = /<(?:link|script)\b[^>]+(?:href|src)="([^"]+)"/gi;
-const STREAMED_CONTENT_READY_SELECTOR = "#share-ready-artifact";
 const STREAMED_CONTENT_READY_TIMEOUT_MS = 15000;
 
 export const readArgValue = (args, flag, fallback) => {
@@ -219,7 +229,7 @@ export const probeHtmlAssetIntegrity = async (baseUrl) => {
 };
 
 export const probeBaseUrl = async (baseUrl) => {
-  const healthUrl = new URL("/api/health", baseUrl).toString();
+  const healthUrl = new URL(healthPath, baseUrl).toString();
   const assetProbe = await probeHtmlAssetIntegrity(baseUrl);
 
   let healthStatus;
@@ -262,19 +272,18 @@ export const ensureBaseUrlReachable = async (baseUrl) => {
   );
 };
 
-// The homepage brief streams; captures of "/" wait for the share artifact to
-// hydrate before screenshotting.
-const isStreamedCapturePath = (targetPath) => {
+// A route whose content streams in after `load` names the element that marks it arrived
+// (`streamedContentReadySelectors` in the config); the capture waits for it.
+const streamedReadySelector = (targetPath) => {
   try {
-    return new URL(targetPath, "http://capture.local").pathname === "/";
+    return streamedContentReadySelectors.get(new URL(targetPath, "http://capture.local").pathname) ?? null;
   } catch {
-    return false;
+    return null;
   }
 };
 
 export const waitForCaptureReady = async (page, target) => {
-  const readySelector = target.readySelector
-    ?? (isStreamedCapturePath(target.path) ? STREAMED_CONTENT_READY_SELECTOR : null);
+  const readySelector = target.readySelector ?? streamedReadySelector(target.path);
 
   if (!readySelector) {
     return false;
@@ -352,19 +361,6 @@ const launchChromium = async () => {
   }
 };
 
-const THEME_STORAGE_KEY = "whether-theme";
-const ACTIVATION_LAST_WEEK_STORAGE_KEY = "whether.activation.lastWeek";
-
-/** Same ISO-week arithmetic and slug as lib/isoWeek.ts, which a Node script cannot import. */
-const isoWeekSlug = (date) => {
-  const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const day = target.getUTCDay() || 7;
-  target.setUTCDate(target.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
-  const week = Math.ceil(((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  return `${target.getUTCFullYear()}-w${String(week).padStart(2, "0")}`;
-};
-
 const captureVariantSuffix = (theme = "dark", visitor = "first") =>
   `${visitor === "returning" ? "-returning" : ""}${theme === "light" ? "-light" : ""}`;
 
@@ -387,16 +383,11 @@ export const captureTargets = async ({ baseUrl, outDir, targets, theme = "dark",
         viewport: target.viewport,
         deviceScaleFactor: target.deviceScaleFactor ?? 1,
       });
-      if (theme === "light") {
+      // Seeded from an init script, so the page renders the variant from its first frame.
+      for (const seed of captureStorageSeeds({ theme, visitor })) {
         await page.addInitScript(
           ([key, value]) => window.localStorage.setItem(key, value),
-          [THEME_STORAGE_KEY, "light"],
-        );
-      }
-      if (visitor === "returning") {
-        await page.addInitScript(
-          ([key, value]) => window.localStorage.setItem(key, value),
-          [ACTIVATION_LAST_WEEK_STORAGE_KEY, isoWeekSlug(new Date(Date.now() - 7 * 86400000))],
+          seed,
         );
       }
       const url = new URL(target.path, baseUrl).toString();
@@ -500,7 +491,7 @@ export const buildCaptureGalleryHtml = ({ baseUrl, captures, generatedAt }) => {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Whether UI Capture Gallery</title>
+    <title>${escapeHtml(galleryTitle)}</title>
     <style>
       :root {
         color-scheme: dark;
@@ -621,7 +612,7 @@ export const buildCaptureGalleryHtml = ({ baseUrl, captures, generatedAt }) => {
   <body>
     <main>
       <header>
-        <h1>Whether UI Capture Gallery</h1>
+        <h1>${escapeHtml(galleryTitle)}</h1>
         <div class="meta-strip">
           <span><strong>Base URL:</strong> ${escapeHtml(baseUrl)}</span>
           <span><strong>Captured:</strong> ${escapeHtml(generatedAt)}</span>

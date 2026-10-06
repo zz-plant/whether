@@ -1,6 +1,7 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 import { buildLineage, type DurableLineage } from "./lineage";
-import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
+import { getJson, getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 
 export type PostureTransitionEvent = DurableLineage & {
   id: string;
@@ -224,13 +225,8 @@ export class KvPostureTransitionEventRepository implements PostureTransitionEven
     if (page.keys.length > 0) {
       const raws = await readKvValues(this.kv, page.keys.map((k) => k.name), { cacheTtl: 60 });
       for (const raw of raws) {
-        if (!raw) continue;
-        try {
-          const event = parsePostureTransitionEvent(JSON.parse(raw));
-          if (event) events.push(event);
-        } catch {
-          // ignore corrupted json
-        }
+        const event = parseStoredJson(raw, parsePostureTransitionEvent);
+        if (event) events.push(event);
       }
     }
 
@@ -255,13 +251,7 @@ export class KvPostureTransitionEventRepository implements PostureTransitionEven
   async findByIdempotencyKey(idempotencyKey: string): Promise<PostureTransitionEvent | null> {
     const eventKey = await this.kv.get(`${IDEMPOTENCY_PREFIX}${idempotencyKey}`);
     if (!eventKey) return null;
-    const raw = await this.kv.get(eventKey);
-    if (!raw) return null;
-    try {
-      return parsePostureTransitionEvent(JSON.parse(raw));
-    } catch {
-      return null;
-    }
+    return getJson(this.kv, eventKey, parsePostureTransitionEvent);
   }
 
   async latest(): Promise<PostureTransitionEvent | null> {
@@ -284,24 +274,17 @@ export class KvPostureTransitionEventRepository implements PostureTransitionEven
   }
 }
 
-const getKvBinding = (): KvNamespace | null => {
-  return getWhetherKv();
-};
+const repositorySelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): PostureTransitionEventRepository =>
+    kv ? new KvPostureTransitionEventRepository(kv) : new InMemoryPostureTransitionEventRepository(),
+);
 
-let sharedRepository: PostureTransitionEventRepository | null = null;
+export const getPostureTransitionEventRepository = (): PostureTransitionEventRepository => repositorySelection.get();
 
-export const getPostureTransitionEventRepository = (): PostureTransitionEventRepository => {
-  if (!sharedRepository) {
-    const kv = getKvBinding();
-    sharedRepository = kv ? new KvPostureTransitionEventRepository(kv) : new InMemoryPostureTransitionEventRepository();
-  }
-  return sharedRepository;
-};
-
-export const resetPostureTransitionEventRepository = (): PostureTransitionEventRepository => {
-  sharedRepository = new InMemoryPostureTransitionEventRepository();
-  return sharedRepository;
-};
+/** Test hook: an empty in-memory repository, held until the next reset whatever the binding does. */
+export const resetPostureTransitionEventRepository = (): PostureTransitionEventRepository =>
+  repositorySelection.reset(new InMemoryPostureTransitionEventRepository());
 
 export const buildPostureTransitionEvent = ({
   id,

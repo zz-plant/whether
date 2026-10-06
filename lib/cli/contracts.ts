@@ -1,3 +1,4 @@
+import { buildAgentGuidance } from "../agentState";
 import { deriveRegimeStage } from "../regimePresentation";
 import type { RuleCondition } from "../report/boundedDecisionRules";
 import { comparisonBasis } from "../report/comparisonBasis";
@@ -173,27 +174,39 @@ const buildFreshness = ({ reportData, confidenceLabel, degraded }: { reportData:
   };
 };
 
-export const buildCliStatusContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusContract => ({
-  version: "v1",
-  generatedAt: new Date().toISOString(),
-  updatedAt: reportData.treasury.fetched_at,
-  freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
-  regime: postureState.currentState.postureLabel,
-  cyclePhase: deriveCyclePhaseLabel(reportData, postureState),
-  confidence: {
-    label: postureState.currentState.confidenceLabel,
-    score: postureState.currentState.confidencePercent,
-  },
-  trend: describeTrend(reportData.reportDynamics.directionLabel),
-  decisionStability: buildDecisionStability(postureState),
-  call: {
-    summary: reportData.actionNowShort,
-    do: reportData.startItems,
-    avoid: reportData.stopItems,
-    flipConditions: [...postureState.whatFlipsNext.thresholds],
-  },
-  degraded,
-});
+/*
+ * The status overlaps the agent state (`lib/agentState.ts`), which was written to be the one
+ * answer to decide from. Its guidance is the state's, read by the same builder and printed under
+ * the names this contract had first; `regime` and `confidence` read the posture fields the
+ * state's `conditions.label` and `confidence` do. It is not built from the whole state: the
+ * status answers any month on the record (`asOf`) where the state is today's reading only, and
+ * the state reads inputs the status never prints (the lines, the action strip, the record date),
+ * so building it would add ways for the status to fail without adding anything it says.
+ */
+export const buildCliStatusContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusContract => {
+  const guidance = buildAgentGuidance({ reportData, postureState });
+  return {
+    version: "v1",
+    generatedAt: new Date().toISOString(),
+    updatedAt: reportData.treasury.fetched_at,
+    freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
+    regime: postureState.currentState.postureLabel,
+    cyclePhase: deriveCyclePhaseLabel(reportData, postureState),
+    confidence: {
+      label: postureState.currentState.confidenceLabel,
+      score: postureState.currentState.confidencePercent,
+    },
+    trend: describeTrend(reportData.reportDynamics.directionLabel),
+    decisionStability: buildDecisionStability(postureState),
+    call: {
+      summary: guidance.call,
+      do: guidance.doNow,
+      avoid: guidance.avoidNow,
+      flipConditions: guidance.flipConditions,
+    },
+    degraded,
+  };
+};
 
 export const buildCliStatusExpandedContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusExpandedContract => ({
   ...buildCliStatusContract({ reportData, postureState, degraded }),

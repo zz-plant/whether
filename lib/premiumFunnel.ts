@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "./fetchWithTimeout";
+
 export type PremiumFunnelEventType =
   | "premium_intent"
   | "premium_gate_view"
@@ -37,7 +39,7 @@ export type PremiumFunnelEvent = {
 export const PREMIUM_EVENT_ENDPOINT = "/api/telemetry/premium-funnel";
 
 export const isPremiumIntentSource = (value: string): value is PremiumIntentSource =>
-  PREMIUM_INTENT_SOURCES.includes(value as PremiumIntentSource);
+  PREMIUM_INTENT_SOURCES.some((source) => source === value);
 
 const isPremiumFunnelEventType = (value: string): value is PremiumFunnelEventType =>
   value === "premium_intent" ||
@@ -61,12 +63,14 @@ const withinBound = (value: unknown, max: number, required = false): boolean => 
   return typeof value === "string" && value.length > 0 && value.length <= max;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
 export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunnelEvent => {
-  if (!input || typeof input !== "object") {
+  if (!isRecord(input)) {
     return false;
   }
 
-  const payload = input as Record<string, unknown>;
+  const payload = input;
 
   /* These were `String(value)`, so an object arrived at the enum check as
      "[object Object]" and was rejected for the wrong reason. A non-string is
@@ -103,6 +107,13 @@ export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunne
  * discarded every production event silently. Durable capture no longer depends on that
  * env var being set; the webhook is now an optional mirror for external dashboards.
  */
+/**
+ * The mirror is optional and every caller swallows its failure, but each one awaits it — the
+ * checkout route before it hands the reader their Stripe link — so a dashboard that stops
+ * answering must not hold the request open.
+ */
+const PREMIUM_FUNNEL_WEBHOOK_TIMEOUT_MS = 3_000;
+
 export const dispatchPremiumFunnelEvent = async (
   payload: PremiumFunnelEvent,
   webhookUrl = process.env.PREMIUM_FUNNEL_WEBHOOK_URL,
@@ -113,11 +124,16 @@ export const dispatchPremiumFunnelEvent = async (
   await recordPremiumFunnelEvent(payload);
 
   if (webhookUrl) {
-    await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    });
+    await fetchWithTimeout(
+      fetch,
+      webhookUrl,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      },
+      PREMIUM_FUNNEL_WEBHOOK_TIMEOUT_MS,
+    );
   }
 };

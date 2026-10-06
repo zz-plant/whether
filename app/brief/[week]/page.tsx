@@ -13,6 +13,7 @@ import {
   organizationName,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
+import { graph } from "../../../lib/seo/pageStructuredData";
 import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefImageParams,
@@ -140,25 +141,22 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const frozenScores = brief.scores;
   const tabulateDecisions = frozenScores !== undefined && brief.decisions.some((decision) => (decision.pause?.length ?? 0) > 0);
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Article",
-        headline: briefTitle(brief),
-        description: briefDescription(brief),
-        datePublished: brief.publishedAt,
-        dateModified: brief.publishedAt,
-        author: buildAuthorSchema(),
-        publisher: buildPublisherSchema(organizationName),
-        image: [buildPublishedBriefImageUrl(brief)],
-        url: canonicalUrl,
-        mainEntityOfPage: canonicalUrl,
-        isAccessibleForFree: true,
-      },
-      // The trail is described by <Breadcrumbs> below, from the trail it draws.
-    ],
-  };
+  const structuredData = graph([
+    {
+      "@type": "Article",
+      headline: briefTitle(brief),
+      description: briefDescription(brief),
+      datePublished: brief.publishedAt,
+      dateModified: brief.publishedAt,
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      image: [buildPublishedBriefImageUrl(brief)],
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      isAccessibleForFree: true,
+    },
+    // The trail is described by <Breadcrumbs> below, from the trail it draws.
+  ]);
 
   return (
     <ContentPageShell measure="prose">

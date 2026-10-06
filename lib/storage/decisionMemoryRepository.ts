@@ -1,5 +1,6 @@
 import { parseDecisionMemoryEntry, type DecisionMemoryEntry } from "../decisionMemory";
-import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, parseStoredJson, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 
 type Cursor = string | null;
 
@@ -102,13 +103,8 @@ export class KvDecisionMemoryRepository implements DecisionMemoryRepository {
       );
 
       for (const raw of rawEntries) {
-        if (!raw) continue;
-        try {
-          const entry = parseDecisionMemoryEntry(JSON.parse(raw));
-          if (entry) entries.push(entry);
-        } catch {
-          // ignore corrupted json
-        }
+        const entry = parseStoredJson(raw, parseDecisionMemoryEntry);
+        if (entry) entries.push(entry);
       }
     }
 
@@ -128,25 +124,13 @@ export class KvDecisionMemoryRepository implements DecisionMemoryRepository {
   }
 }
 
-const getKvBinding = (): KvNamespace | null => {
-  return getWhetherKv();
-};
+const repositorySelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): DecisionMemoryRepository => (kv ? new KvDecisionMemoryRepository(kv) : new InMemoryDecisionMemoryRepository()),
+);
 
-let sharedRepository: DecisionMemoryRepository | null = null;
+export const getDecisionMemoryRepository = (): DecisionMemoryRepository => repositorySelection.get();
 
-export const getDecisionMemoryRepository = (): DecisionMemoryRepository => {
-  if (!sharedRepository) {
-    const kv = getKvBinding();
-    if (kv) {
-      sharedRepository = new KvDecisionMemoryRepository(kv);
-    } else {
-      sharedRepository = new InMemoryDecisionMemoryRepository();
-    }
-  }
-  return sharedRepository;
-};
-
-export const resetDecisionMemoryRepository = (): DecisionMemoryRepository => {
-  sharedRepository = new InMemoryDecisionMemoryRepository();
-  return sharedRepository;
-};
+/** Test hook: an empty in-memory repository, held until the next reset whatever the binding does. */
+export const resetDecisionMemoryRepository = (): DecisionMemoryRepository =>
+  repositorySelection.reset(new InMemoryDecisionMemoryRepository());

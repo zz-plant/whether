@@ -14,7 +14,12 @@ export async function POST(request: Request) {
 
     const result = await checkRegimeChange();
     if (!result.ok) {
-      return NextResponse.json(result, { status: result.error === "KV not available" ? 503 : 500 });
+      /* Both are a dependency this run lacks rather than a fault in it: no KV to
+         read state from, or no reading it may act on (nothing stored, and the
+         report read serving the bundled copy). */
+      const unavailable =
+        result.error === "KV not available" || (result.error?.startsWith("refused_unpublishable:") ?? false);
+      return NextResponse.json(result, { status: unavailable ? 503 : 500 });
     }
     return NextResponse.json(result);
   } catch (error) {

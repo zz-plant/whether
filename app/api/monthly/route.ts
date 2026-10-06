@@ -10,11 +10,12 @@ export const revalidate = 3600;
 export async function GET() {
   return buildCadenceRouteResponse({
     route: "/api/monthly",
-    buildSummary: ({ assessment, treasuryProvenance, recordDateLabel }) =>
+    buildSummary: ({ assessment, treasury, treasuryProvenance, recordDateLabel }) =>
       buildMonthlySummary({
         assessment,
         provenance: treasuryProvenance,
         recordDateLabel,
+        record: treasury,
       }),
     buildExtraPayload: async ({ reportData, summary }) => {
       const { assessment, treasury, sensors, macroSeries, reportDynamics, actionNowShort, startItems, stopItems } = reportData;

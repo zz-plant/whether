@@ -679,4 +679,101 @@ describe("Architecture Invariants", () => {
 
     assert.deepEqual(orphaned, [], `\n${orphaned.join("\n")}\n`);
   });
+
+  /*
+   * The engine scores; it does not write copy, render, or read bundled data.
+   * Until 2026-10-06 the state machine lived in `lib/report/` and imported its
+   * signal labels from there, the diagnostics did the same, and the policy
+   * composites imported the 1.2MB Time Machine cache through
+   * `lib/policy/history.ts` — so a wording edit was a commit to a scoring file
+   * and a scored reading depended on a file its caller never named.
+   *
+   * The modules below are the engine, listed by hand so adding one is a
+   * decision. Everything they import, transitively, must stay inside the list
+   * (plus `lib/types.ts`), and nothing they reach may be under `lib/report/` or
+   * `app/`, a JSON file, or React or Next. Two files sit outside on purpose and
+   * are the only places the engine touches either: `lib/regimeEngine.ts`
+   * composes the scorer with the report layer's description step and the
+   * bundled policy history, and `lib/policy/history.ts` is that history.
+   */
+  it("Invariant 12: the regime engine imports nothing from lib/report/, React, or bundled data", () => {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+    const ENGINE_MODULES = [
+      "lib/regimeEngineCore.ts",
+      "lib/regimeEngineScoring.ts",
+      "lib/regimeEngineDiagnostics.ts",
+      "lib/regimeEnginePolicy.ts",
+      "lib/regimeStateMachine.ts",
+      "lib/policy/config.ts",
+      "lib/policy/governance.ts",
+      "lib/policy/transforms.ts",
+      "lib/thresholds.ts",
+    ];
+    const ALSO_ALLOWED = new Set(["lib/types.ts"]);
+
+    const specifiersOf = (source: string): string[] => {
+      const found: string[] = [];
+      const patterns = [
+        /\b(?:import|export)\b[^;]*?\bfrom\s*["']([^"']+)["']/g,
+        /^\s*import\s*["']([^"']+)["']/gm,
+        /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g,
+        /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g,
+      ];
+      for (const pattern of patterns) {
+        for (const match of source.matchAll(pattern)) found.push(match[1]);
+      }
+      return found;
+    };
+
+    const resolveRelative = (fromRel: string, specifier: string): string => {
+      const base = relative(repoRoot, join(repoRoot, dirname(fromRel), specifier));
+      if (/\.(json|tsx?)$/.test(base)) return base;
+      for (const candidate of [`${base}.ts`, `${base}.tsx`, `${base}/index.ts`]) {
+        if (statSync(join(repoRoot, candidate), { throwIfNoEntry: false })?.isFile()) return candidate;
+      }
+      return base;
+    };
+
+    /** Every boundary violation reachable from `roots`, and every module reached outside the allowed set. */
+    const scan = (roots: readonly string[]) => {
+      const violations: string[] = [];
+      const outside: string[] = [];
+      const seen = new Set<string>();
+      const queue = [...roots];
+      while (queue.length > 0) {
+        const file = queue.shift();
+        if (file === undefined || seen.has(file)) continue;
+        seen.add(file);
+        for (const specifier of specifiersOf(readFileSync(join(repoRoot, file), "utf8"))) {
+          if (!specifier.startsWith(".")) {
+            if (/^(react|react-dom|next)(\/|$)/.test(specifier)) violations.push(`${file} imports ${specifier}`);
+            continue;
+          }
+          const target = resolveRelative(file, specifier);
+          if (target.endsWith(".json") || target.startsWith("data/")) {
+            violations.push(`${file} imports bundled data ${target}`);
+          } else if (target.startsWith("lib/report/") || target.startsWith("app/")) {
+            violations.push(`${file} imports ${target}`);
+          } else {
+            if (!roots.includes(target) && !ALSO_ALLOWED.has(target)) outside.push(`${file} -> ${target}`);
+            queue.push(target);
+          }
+        }
+      }
+      return { violations, outside };
+    };
+
+    const engine = scan(ENGINE_MODULES);
+    assert.deepEqual(engine.violations, [], `\n${engine.violations.join("\n")}\n`);
+    assert.deepEqual(
+      engine.outside,
+      [],
+      `\nThe engine reaches modules outside its list. Keep the import inside the engine, or add the module to ENGINE_MODULES if it is engine code:\n${engine.outside.join("\n")}\n`,
+    );
+
+    // The scan is not vacuous: the composition layer is where the report and data imports went.
+    const composition = scan(["lib/regimeEngine.ts"]).violations;
+    assert.ok(composition.some((line) => line.includes("lib/report/regimeDescription.ts")), composition.join("\n"));
+    assert.ok(composition.some((line) => line.includes("data/time_machine_cache.json")), composition.join("\n"));
+  });
 });

@@ -12,13 +12,9 @@ export const fetchWithTimeout = async (
   const upstreamSignal = init?.signal;
   if (upstreamSignal) {
     if (upstreamSignal.aborted) {
-      controller.abort((upstreamSignal as AbortSignal).reason);
+      controller.abort(upstreamSignal.reason);
     } else {
-      upstreamSignal.addEventListener(
-        "abort",
-        () => controller.abort((upstreamSignal as AbortSignal).reason),
-        { once: true },
-      );
+      upstreamSignal.addEventListener("abort", () => controller.abort(upstreamSignal.reason), { once: true });
     }
   }
 

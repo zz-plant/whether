@@ -5,8 +5,9 @@ import {
   buildSlackBriefBlocks,
   deliverSlackBrief,
   isSlackWebhookUrl,
-  resolveConfiguredSlackWebhooks,
 } from "../lib/slack/deliverSlackBrief";
+import { slackChannel } from "../lib/delivery/slack";
+import { resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
@@ -75,14 +76,15 @@ describe("Slack brief delivery", () => {
     assert.equal(result.status, "failed");
   });
 
-  it("only accepts hooks.slack.com URLs from the environment", () => {
+  it("only accepts hooks.slack.com URLs from the environment", async () => {
     assert.equal(isSlackWebhookUrl("https://hooks.slack.com/services/T0/B0/x"), true);
     assert.equal(isSlackWebhookUrl("https://evil.example.com/hook"), false);
 
     const previous = process.env.SLACK_WEBHOOK_URL;
     process.env.SLACK_WEBHOOK_URL = "https://evil.example.com/hook";
+    resetSlackWebhookStore();
     try {
-      assert.deepEqual(resolveConfiguredSlackWebhooks(), []);
+      assert.deepEqual(await slackChannel.listTargets(), []);
     } finally {
       if (previous === undefined) delete process.env.SLACK_WEBHOOK_URL;
       else process.env.SLACK_WEBHOOK_URL = previous;

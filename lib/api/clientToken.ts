@@ -1,4 +1,6 @@
 import { constantTimeCompare } from "../constantTimeCompare";
+import { hmacSha256, toHex } from "../crypto";
+import { readSetting } from "../runtime/settings";
 
 /**
  * Proof that a client id was issued by this server rather than chosen by the caller.
@@ -25,24 +27,11 @@ import { constantTimeCompare } from "../constantTimeCompare";
 export const CLIENT_TOKEN_HEADER = "x-whether-client-token";
 
 const resolveSecret = (): string | null => {
-  const secret = (globalThis as { WHETHER_LEDGER_SECRET?: string }).WHETHER_LEDGER_SECRET
-    ?? process.env.WHETHER_LEDGER_SECRET;
+  const secret = readSetting("WHETHER_LEDGER_SECRET", { trim: false });
   return secret && secret.length >= 16 ? secret : null;
 };
 
-const toHex = (buffer: ArrayBuffer) =>
-  Array.from(new Uint8Array(buffer), (byte) => byte.toString(16).padStart(2, "0")).join("");
-
-const sign = async (clientId: string, secret: string): Promise<string> => {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  return toHex(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(clientId)));
-};
+const sign = async (clientId: string, secret: string): Promise<string> => toHex(await hmacSha256(secret, clientId));
 
 /** Mint a token for an id. Returns null when this deployment cannot sign. */
 export const issueClientToken = async (clientId: string): Promise<string | null> => {
@@ -64,5 +53,5 @@ export const verifyClientToken = async (
 ): Promise<boolean> => {
   const secret = resolveSecret();
   if (!secret || !token) return false;
-  return constantTimeCompare(await sign(clientId, secret), token);
+  return constantTimeCompare(token, await sign(clientId, secret));
 };

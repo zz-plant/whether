@@ -1,6 +1,6 @@
 import type { TreasuryData } from "../types";
 import { evaluateRegime } from "../regimeEngine";
-import type { RegimeMachineSnapshot } from "../report/regimeStateMachine";
+import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import { resolveDistanceToFlip as resolveDistanceToFlipFromInputs } from "./confidence";
 import { buildReportDynamics } from "./reportEvidence";
 import type {

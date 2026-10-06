@@ -24,15 +24,17 @@ The build command configured in the Workers Builds dashboard is `bun run check:v
 the deploy gate, not the full local check:
 
 ```bash
-WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions dead-exports \
-  && WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs landmarks
+bun scripts/run-checks.mjs --preset deploy
 ```
 
-The landmark audit runs second and alone: it spawns a dev server and compiles every route
-against it, and a server sharing a small container's cores with lint, tsc, and the suite turns a
-slow route into one that "never answered".
+The `deploy` preset (`scripts/check-tasks.mjs`, where the pre-push hook's preset is declared too)
+is two stages: lint, typecheck, test, assets, suppressions and dead-exports together, then the
+landmark audit on its own once they pass, under `WHETHER_DEPLOY_GATE=1` for the run and every task
+it spawns. The landmark audit runs second and alone: it spawns a dev server and compiles every
+route against it, and a server sharing a small container's cores with lint, tsc, and the suite
+turns a slow route into one that "never answered".
 
-`WHETHER_DEPLOY_GATE=1` makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
+`WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
 not guarantee), and gives the landmark audit's dev-server readiness and per-route bounds room for a
 cold start. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
@@ -44,8 +46,9 @@ gate's own output can be thousands of lines, so the per-task `❌` scrolls out o
 2026-09-15 the run ends by repeating each failure with the lines that named it, which is the part
 that survives.
 
-If the build command in the dashboard is ever changed, change `check:vinext` instead: the tests
-in `tests/deployGateTestScope.test.ts` pin what that script runs, and the dashboard has no test.
+If the build command in the dashboard is ever changed, change `check:vinext` (or the `deploy`
+preset) instead: the tests in `tests/deployGateTestScope.test.ts` pin what that script runs, and
+the dashboard has no test.
 
 ### "the working tree is not the commit it claims to be"
 
@@ -88,7 +91,9 @@ stack trace pointing into minified code.
 ## Secrets and provider keys
 
 Secrets are set per lane with `bunx wrangler secret put <NAME>` (add `--env preview` for the
-preview lane) and reach library code through `globalThis`, like every binding. The site serves
+preview lane) and reach library code through `globalThis`, like every binding; `readSetting`
+(`lib/runtime/settings.ts`) reads one by name, falling back to `process.env` for scripts and
+local runs, and treats an empty value as unset at either source. The site serves
 without any of them: each provider key switches a read from a keyless path to a keyed one, and
 the Slack signing secret gates one webhook route.
 
@@ -98,7 +103,7 @@ the Slack signing secret gates one webhook route.
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
 | `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token: contents and pull requests, write, on this repository only. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
-| `SLACK_WEBHOOK_URL` | `lib/alert/checkRegimeChange.ts`, from both crons' `check-regime-change` step | The three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`; nothing is posted to Slack. (The Monday brief itself goes through the per-team webhook registry, not this secret.) |
+| `SLACK_WEBHOOK_URL` | `lib/delivery/slack.ts` (`slackChannel.listTargets`), for the Monday brief, both crons' `check-regime-change` alerts and the month-end pulse | The operator's own channel is not a target. Every post still goes to the channels subscribed through the form (the per-team webhook registry), and the three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`. |
 | `CLOUDFLARE_ACCOUNT_ID` | `lib/telemetry/runHistory.ts`, `lib/export/briefScreenshot.ts` | Both readers below report themselves unconfigured. The account id is not a secret, but it is set the same way so the two tokens cannot be present without it. |
 | `CLOUDFLARE_ANALYTICS_READ_TOKEN` | `lib/telemetry/runHistory.ts` (`loadCronRunHistory`), from `app/trust/trustPageModel.ts` | `/trust` renders no "Scheduled runs" section. With it, the page reads the `cron-step` stream back through the Analytics Engine SQL API and shows runs, failures, and last success per scheduled step for the trailing 30 days, cached 15 minutes per isolate under a 2.5s deadline. Token permission: Account Analytics: Read. |
 | `CLOUDFLARE_BROWSER_RENDERING_TOKEN` | `lib/export/briefScreenshot.ts` (`captureAndStoreBriefScreenshot`), from the Monday cron | The `artifact/brief-screenshot` cron step reports `skipped_unconfigured` and the Slack brief goes out as text blocks. With it, the cron captures the weekly-call block at `/?screenshot=1` through the Browser Rendering screenshot endpoint, stores the PNG in KV under the record date for 60 days, and the Slack post carries it as an image block served from `/api/image/brief-screenshot?date=YYYY-MM-DD`. Token permission: Browser Rendering: Edit. One capture a week sits well inside the free plan's ten minutes of browser time a day. |
@@ -253,7 +258,7 @@ This dry run is now a manual check: `bun run deploy:cloudflare:dry-run`. The wor
 ### Current toolchain notes
 
 - Tailwind now runs on v4 via [`app/globals.css`](../app/globals.css) and [`postcss.config.js`](../postcss.config.js) using `@tailwindcss/postcss`; the legacy `tailwind.config.ts` file was removed during the CSS-first migration.
-- Keep `vinext` and `@vinext/cloudflare` on the same pinned release (currently `0.2.1`). This repo still verifies Bun's Vinext install during `postinstall` via [`scripts/repair-vinext-install.mjs`](../scripts/repair-vinext-install.mjs) before build/deploy commands run.
+- Keep `vinext` and `@vinext/cloudflare` on the same pinned release (currently `0.2.1`). The `postinstall` repair that restored `dist/` files Bun left out of `vinext@0.0.38` was retired on 2026-10-06: cold installs of `0.2.1` (fresh cache, scripts off) were complete — all 858 published files — on every Bun this repo runs on (1.1.38 as seen in the build container, the pinned 1.3.14, and 1.4.2), 19 times out of 19, and the script returned early in CI regardless. If a Vinext bump ever fails with a missing `node_modules/vinext/dist/...` module, compare the installed file count with `npm view vinext@<version> dist.fileCount` before suspecting the code.
 - Web-vitals telemetry now uses the official [`web-vitals`](https://www.npmjs.com/package/web-vitals) package in [`app/components/webVitalsTracker.tsx`](../app/components/webVitalsTracker.tsx) instead of `next/web-vitals`, which keeps the current Vinext compatibility check free of that prior warning.
 - Root layout fonts now load from CSS in [`app/globals.css`](../app/globals.css) instead of `next/font/google` in [`app/layout.tsx`](../app/layout.tsx), which removes the last repo-local compatibility gap on the active Vinext lane.
 
@@ -289,7 +294,7 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 ### Durable KV (`WHETHER_DURABLE_KV`)
 
-All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`.
+All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`, and the subscriber, Slack-webhook, alert and entitlement stores) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`, which refuses a binding without `list()`. Stored JSON is read back through `getJson` / `parseStoredJson` in the same module, narrowed by a zod schema or the store's own parser; an unparseable or non-matching record reads as no record. Every `get…Store()` / `get…Repository()` picks KV or its in-memory fallback through `selectStoreByBinding` (`lib/runtime/storeSelection.ts`), which re-checks the binding on each call the way `getDefaultIngestionStore` does, so a call that ran before the binding was installed no longer leaves the isolate writing to memory.
 
 The consolidated state architecture operates around `refreshOperatingState()`, which executes the single authoritative signal refresh, pure regime evaluation, `OperatingSnapshot` persistence, state machine update, and transition recording. Current brief reads project the latest committed `OperatingSnapshot`; explicit historical reads continue to reconstruct the requested period. Read paths perform zero writes while the materialized signal store is current; a cold store ingests inline, and a stale one takes the refresh lock and refreshes off the request (Invariants 1, 1b, 1c in `tests/architectureInvariants.test.ts`).
 

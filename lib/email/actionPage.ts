@@ -1,4 +1,4 @@
-import { escapeHtml } from "./subscriptionFlow";
+import { escapeHtml } from "./emailShell";
 
 /**
  * The small page an email link opens: confirm a subscription, or leave one.

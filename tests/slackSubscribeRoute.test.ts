@@ -26,6 +26,7 @@ describe("Slack subscribe/unsubscribe API routes", () => {
   it("accepts valid Slack webhook, pings it, and registers subscription", async () => {
     let pingedUrl: string | undefined;
     let pingPayload: string | undefined;
+    let pingSignal: unknown;
 
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -33,6 +34,7 @@ describe("Slack subscribe/unsubscribe API routes", () => {
       /* The body is a JSON string here; stringify rather than String() so a
          non-string body can never read as "[object Object]". */
       pingPayload = typeof init?.body === "string" ? init.body : JSON.stringify(init?.body ?? null);
+      pingSignal = init?.signal;
       return new Response("ok", { status: 200 });
     };
 
@@ -55,6 +57,7 @@ describe("Slack subscribe/unsubscribe API routes", () => {
 
       assert.equal(pingedUrl, "https://hooks.slack.com/services/T00/B00/test1");
       assert.match(String(pingPayload), /Whether Weekly Brief Connected/);
+      assert.ok(pingSignal instanceof AbortSignal, "the ping is bounded; the reader is waiting on the form");
 
       const store = getSlackWebhookStore();
       const active = await store.listActiveWebhooks();

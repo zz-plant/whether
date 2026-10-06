@@ -105,6 +105,13 @@ export const serializeJsonLd = (value: unknown) =>
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
 
+/**
+ * Text for an XML text node or attribute in `/feed.xml` and `/news-sitemap.xml`: a `&` in a
+ * call or a headline broke the document. One copy, where each route had its own.
+ */
+export const escapeXml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
 /* The /api/og templates that draw a title and subtitle a page supplies (the rest
    draw live data or a published record). Kept in step with `StaticOgTemplate`. */
 const TEXT_CARD_TEMPLATES: ReadonlySet<string> = new Set([

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-// @ts-ignore Runtime-only .mjs helper is validated by these tests.
+import { formatIsoWeekSlug, getIsoWeekInfo } from "../lib/isoWeek";
+import { captureStorageSeeds, isoWeekSlug } from "../scripts/ui-capture.config.mjs";
 import {
   buildCaptureGalleryHtml,
   captureFileName,
@@ -30,6 +31,33 @@ describe("ui capture helpers", () => {
     assert.equal(parseCaptureOptions(["--visitor", "returning"]).visitor, "returning");
     assert.equal(captureFileName("home-mobile", "dark", "returning"), "home-mobile-returning.png");
     assert.equal(captureFileName("home-mobile", "light", "returning"), "home-mobile-returning-light.png");
+  });
+
+  /*
+   * The capture seeds the week this browser "last saw" as a slug, and the app compares it
+   * with its own. The config re-implements lib/isoWeek.ts because a Node script cannot
+   * import it, so the two are held to one answer — including the weeks that belong to
+   * the neighbouring year.
+   */
+  it("derives the same ISO week slug as lib/isoWeek.ts", () => {
+    const dates = [
+      "2020-12-31", "2021-01-01", "2021-01-03", "2021-01-04", "2024-12-30", "2025-12-29",
+      "2026-01-01", "2026-06-15", "2026-10-06", "2026-12-31", "2027-01-03", "2027-01-04",
+    ].map((day) => new Date(`${day}T12:00:00Z`));
+    for (let offset = 0; offset < 400; offset += 1) dates.push(new Date(Date.UTC(2026, 0, 1 + offset)));
+
+    for (const date of dates) {
+      assert.equal(isoWeekSlug(date), formatIsoWeekSlug(getIsoWeekInfo(date)), date.toISOString());
+    }
+  });
+
+  it("seeds the theme and the returning visitor's last week, in that order, and nothing by default", () => {
+    const now = Date.UTC(2026, 9, 6, 12);
+    assert.deepEqual(captureStorageSeeds({ theme: "dark", visitor: "first", now }), []);
+    assert.deepEqual(captureStorageSeeds({ theme: "light", visitor: "returning", now }), [
+      ["whether-theme", "light"],
+      ["whether.activation.lastWeek", "2026-w40"],
+    ]);
   });
 
   it("keeps the full configured capture set when no filters are provided", () => {

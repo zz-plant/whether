@@ -16,6 +16,7 @@ import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
+import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
 import { activationLastWeekStorageKey } from "../lib/activationFunnel";
@@ -23,7 +24,7 @@ import { activationLastWeekStorageKey } from "../lib/activationFunnel";
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
 const LLMS_TXT_URL = `${siteUrl}/llms.txt`;
-const WELL_KNOWN_MANIFEST_URL = `${siteUrl}/.well-known/whether-agent.json`;
+const WELL_KNOWN_MANIFEST_URL = `${siteUrl}${WHETHER_AGENT_MANIFEST_PATH}`;
 const FEED_URL = `${siteUrl}/feed.xml`;
 
 const siteName = websiteName;

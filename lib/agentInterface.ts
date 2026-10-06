@@ -1,3 +1,4 @@
+import { WHETHER_AGENT_MANIFEST_PATH } from "./agent/discovery";
 import { buildAgentPayload, buildAgentPrompt } from "./agentHandoff";
 import { loadReportRouteContext } from "./api/reportRoute";
 import type { RegimeAssessment } from "./regimeEngine";
@@ -62,6 +63,13 @@ export type AgentInterfaceContext = {
  * data and the posture state that publishes its confidence. Split from the
  * builders so a test (or a second view of the same week) can hand them a
  * crafted context instead of going through the loader.
+ *
+ * It is the first half of `loadWeeklyBriefSnapshot` (`lib/report/weeklyBriefSnapshot.ts`):
+ * the same `loadReportDataSafe` call, the same bundled snapshot behind `degraded` when
+ * assembly fails, the same posture state. It stops there, because nothing an agent is
+ * answered from reads the homepage model that loader goes on to build. It takes no search
+ * params, so the reading is never historical and the posture state's `historical` flag,
+ * which that loader passes, would always be false here.
  */
 export const loadAgentInterfaceContext = async (route = "agent-interface"): Promise<AgentInterfaceContext> => {
   const { reportData, degraded } = await loadReportRouteContext({ route });
@@ -132,12 +140,14 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
         assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel: weeklyRecordDateLabel,
+        record: treasury,
       }),
     monthly: () =>
       buildMonthlySummary({
         assessment: summarizedAssessment,
         provenance: treasuryProvenance,
         recordDateLabel,
+        record: treasury,
       }),
     quarterly: () =>
       buildQuarterlySummary({
@@ -195,7 +205,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
     links: {
       self: `/api/agent?cadence=${cadence}`,
       llms: "/llms.txt",
-      discovery: "/.well-known/whether-agent.json",
+      discovery: WHETHER_AGENT_MANIFEST_PATH,
     },
     generatedAt: now.toISOString(),
     version: "v1",

@@ -7,7 +7,8 @@
  * the engine's codes here ("MEDIUM confidence", "(1M)", "cached snapshot"),
  * each in its own shape, and the page that explained them was the glossary.
  */
-import { BASE_RATE_SOURCE_LABELS, type RegimeScores } from "../regimeEngineCore";
+import type { RegimeScores } from "../regimeEngineCore";
+import { BASE_RATE_SOURCE_LABELS } from "../report/regimeDescription";
 import { getRegimePublicLabel, isRegimeKey, REGIME_WEATHER_RATIONALES } from "../regimePresentation";
 import { formatConfidenceChipLabel } from "../report/reportFormatting";
 

@@ -9,7 +9,9 @@ import {
   buildPageMetadata,
   organizationId,
   organizationName,
+  websiteId,
 } from "../../lib/seo";
+import { graph } from "../../lib/seo/pageStructuredData";
 import {
   buildAuthorSchema,
   buildPublisherSchema,
@@ -37,25 +39,23 @@ const inlineLinkClass =
 
 export default function AboutPage() {
   const record = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "AboutPage",
-        url: buildCanonicalUrl(publisherProfilePath),
-        name: "About Whether",
-        // The site entity by its id, not a lookalike with a name and a URL: an
-        // unlinked Organization node reads to a parser as a second publisher.
-        publisher: buildPublisherSchema(organizationName),
-      },
-      {
-        ...buildAuthorSchema(),
-        description: publisherAuthor.bio,
-        worksFor: { "@id": organizationId },
-      },
-      buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherProfilePath, label: "About" }])),
-    ],
-  };
+  const structuredData = graph([
+    {
+      "@type": "AboutPage",
+      url: buildCanonicalUrl(publisherProfilePath),
+      name: "About Whether",
+      isPartOf: { "@id": websiteId },
+      // The site entity by its id, not a lookalike with a name and a URL: an
+      // unlinked Organization node reads to a parser as a second publisher.
+      publisher: buildPublisherSchema(organizationName),
+    },
+    {
+      ...buildAuthorSchema(),
+      description: publisherAuthor.bio,
+      worksFor: { "@id": organizationId },
+    },
+    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherProfilePath, label: "About" }])),
+  ]);
 
   return (
     <ContentPageShell measure="prose">

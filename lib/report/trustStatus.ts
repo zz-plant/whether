@@ -1,7 +1,7 @@
 import type { RegimeDiagnostics } from "../regimeEngine";
 import { formatConfidenceChipLabel, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
-import type { RegimeStateTransition } from "./regimeStateMachine";
+import type { RegimeStateTransition } from "../regimeStateMachine";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
 

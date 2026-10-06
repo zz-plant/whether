@@ -9,16 +9,18 @@ export const revalidate = 3600;
 
 export async function GET() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/cadence" });
-  const { assessment, treasuryProvenance, recordDateLabel, weeklyRecordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { assessment, treasury, treasuryProvenance, recordDateLabel, weeklyRecordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance: treasuryProvenance,
     recordDateLabel: weeklyRecordDateLabel,
+    record: treasury,
   });
   const monthlySummary = buildMonthlySummary({
     assessment,
     provenance: treasuryProvenance,
     recordDateLabel,
+    record: treasury,
   });
   const alignment = buildCadenceAlignment(weeklySummary, monthlySummary);
 

@@ -15,7 +15,9 @@ export async function POST(request: Request) {
 
     const result = await runMonthEndPulse();
     if (!result.ok) {
-      return NextResponse.json(result, { status: result.error === "KV not available" ? 503 : 500 });
+      /* A missing KV binding is a dependency the run lacks, not a fault in it. The pulse's
+         message goes on to say what that costs, so match its start, not the whole string. */
+      return NextResponse.json(result, { status: result.error?.startsWith("KV not available") ? 503 : 500 });
     }
     return NextResponse.json(result);
   } catch (error) {

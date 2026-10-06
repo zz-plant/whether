@@ -94,14 +94,18 @@ Available starter skills:
 - `executive-brief-pack` → leadership-ready strategy/export brief outputs
 - `system-skill-router` → routes skill-management tasks with deterministic sequencing and standardized output sections
 - `vercel-react-best-practices` → React/Next.js performance rules for rendering, bundling, server, and async code
+- `whether-ui-loop` → screenshot-driven UI iteration with `bun run ui:iterate`
+- `whether-ui-standards` → UI/UX rules for anything that renders under `app/`
 
 Repository path convention (runtime-dependent — see below):
-- Codex: `.codex/skills/<skill-name>/SKILL.md`, index at `.codex/skills/README.md`
-- Claude Code: `.claude/skills/<skill-name>/SKILL.md`, index at `.claude/skills/README.md`
+- Claude Code: `.claude/skills/<skill-name>/SKILL.md`, index at `.claude/skills/README.md` — canonical
+- Codex: `.codex/skills/<skill-name>/SKILL.md`, index at `.codex/skills/README.md` — generated
 
-Claude Code only discovers skills under `.claude/skills/`, so the same skill set is mirrored there
-(minus `web-design-guidelines`, which Claude Code already gets from a global plugin). Keep both
-directories in sync when a skill is added, removed, or materially changed.
+Edit skills under `.claude/skills/` only, then run `bun run skills:sync`, which regenerates
+`.codex/skills/` from it plus the per-runtime overlay in `.codex/skills-overlay/` (the Codex
+`system-skill-router`, which routes to Codex's built-in installer, and `web-design-guidelines`,
+which Claude Code already gets from a global plugin). `tests/skillsMirror.test.ts` fails when
+`.codex/skills/` has drifted from what the sync writes.
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description

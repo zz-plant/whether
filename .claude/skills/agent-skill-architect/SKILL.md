@@ -14,7 +14,7 @@ Improve first-party Whether skills so they are easier to trigger correctly, easi
 
 ## Use this skill when
 
-- a task asks to create a new skill in `.claude/skills/*` (mirrored at `.codex/skills/*`)
+- a task asks to create a new skill in `.claude/skills/*` (`.codex/skills/*` is generated from it)
 - a current skill is too broad, too vague, or overlapping another skill
 - a reviewer asks for stronger output contracts, guardrails, or maintenance guidance
 - the repo needs a better skills index or skill discovery aid
@@ -38,7 +38,7 @@ Improve first-party Whether skills so they are easier to trigger correctly, easi
 - `docs/agents/README.md`
 - `docs/agents/documentation.md`
 - `docs/agents/mcp-and-skills-playbook.md`
-- `.claude/skills/README.md` (mirrored at `.codex/skills/README.md`)
+- `.claude/skills/README.md` (generated into `.codex/skills/README.md`)
 
 ## Workflow
 
@@ -56,7 +56,9 @@ Improve first-party Whether skills so they are easier to trigger correctly, easi
    - guardrails
    - maintenance notes
 5. Add trigger tests with at least two should-use and two should-not-use prompts.
-6. Update `.claude/skills/README.md` and `.codex/skills/README.md` together if discovery guidance changed.
+6. Update `.claude/skills/README.md` if discovery guidance changed, then run `bun run skills:sync` to
+   regenerate `.codex/skills/`. Never edit `.codex/skills/` by hand: a file that must differ for Codex
+   goes in `.codex/skills-overlay/`, and `tests/skillsMirror.test.ts` fails when the mirror drifts.
 
 ## Output contract
 

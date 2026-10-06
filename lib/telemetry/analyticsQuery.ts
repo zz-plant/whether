@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { readSetting } from "../runtime/settings";
 
 /**
  * One transport for reading Analytics Engine.
@@ -19,13 +20,6 @@ import { z } from "zod";
 const DEFAULT_DATASET = "whether_telemetry";
 
 export type AnalyticsReadConfig = { accountId: string; token: string; dataset: string };
-
-const readSetting = (name: string): string | null => {
-  const fromBinding: unknown = Reflect.get(globalThis, name);
-  if (typeof fromBinding === "string" && fromBinding.trim() !== "") return fromBinding.trim();
-  const fromEnv = typeof process !== "undefined" ? process.env?.[name] : undefined;
-  return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
-};
 
 /** Dataset names are identifiers, and this one comes from a var; anything else is refused rather than interpolated. */
 export const isDatasetName = (value: string) => /^[a-z][a-z0-9_]{0,63}$/i.test(value);

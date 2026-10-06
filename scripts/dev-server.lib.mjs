@@ -80,6 +80,15 @@ const resolveAutoStartBaseUrl = async ({ baseUrl, initialProbe }) => {
  * that dies on a build error fails in a second with a pointer to its log,
  * instead of burning the whole timeout.
  */
+/*
+ * Exited by code *or* by signal. A child killed by a signal keeps `exitCode` null and sets
+ * `signalCode` instead — and a `bun run` wrapper answers the SIGTERM below that way — so
+ * reading `exitCode` alone made every teardown wait out its full five seconds and then
+ * SIGKILL a group that was already gone, and let a server killed during startup (OOM, a
+ * stray signal) burn the whole readiness timeout. tests/devServerLib.test.ts pins both.
+ */
+const hasExited = (child) => child.exitCode != null || child.signalCode != null;
+
 const waitForBaseUrl = async ({ baseUrl, timeoutMs, child, logPath, probe }) => {
   const startedAt = Date.now();
   let lastProbe = null;
@@ -90,7 +99,7 @@ const waitForBaseUrl = async ({ baseUrl, timeoutMs, child, logPath, probe }) => 
       return lastProbe;
     }
 
-    if (child?.exitCode != null) {
+    if (child && hasExited(child)) {
       const statusDetail = lastProbe.error
         ? lastProbe.error
         : `status ${lastProbe.status ?? "unknown"}`;
@@ -128,20 +137,36 @@ const signalGroup = (child, signal) => {
   }
 };
 
+/** Whether any process in the child's group is alive: signal 0 asks without signalling. */
+const groupAlive = (child) => {
+  try {
+    process.kill(-child.pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const stopDevServer = async (child) => {
   if (!child) {
     return;
   }
 
-  if (child.exitCode == null) {
+  if (!hasExited(child)) {
     signalGroup(child, "SIGTERM");
 
+    /*
+     * Until the whole group is gone, not just the wrapper: the wrapper dies on the
+     * SIGTERM at once, and the dev server it spawned may take longer. The old wait
+     * on the wrapper never ended early, so the SIGKILL after it always reached a
+     * straggler; waiting on the group keeps that guarantee without the five seconds.
+     */
     const startedAt = Date.now();
-    while (child.exitCode == null && Date.now() - startedAt < 5000) {
+    while ((!hasExited(child) || groupAlive(child)) && Date.now() - startedAt < 5000) {
       await wait(100);
     }
 
-    if (child.exitCode == null) {
+    if (!hasExited(child) || groupAlive(child)) {
       signalGroup(child, "SIGKILL");
     }
   }
