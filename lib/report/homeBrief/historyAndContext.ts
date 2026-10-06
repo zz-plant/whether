@@ -15,6 +15,7 @@ import type {
   WhyThisCallItem,
 } from "../homeBriefModel";
 import type { WeeklyDecisionCardViewModel } from "../homeBriefModel";
+import { regimeSignalLabel } from "../signalTranslations";
 
 export const buildMemoryRail = (
   recordDateLabel: string | undefined,
@@ -277,7 +278,7 @@ export const buildWhyThisCall = ({
 }): WhyThisCallItem[] => {
   const nearestIsTightness = tightnessGap <= riskGap;
   const nearestGap = nearestIsTightness ? tightnessGap : riskGap;
-  const boundaryLabel = nearestIsTightness ? "Funding pressure" : "Risk appetite";
+  const boundaryLabel = nearestIsTightness ? regimeSignalLabel.tightness : regimeSignalLabel.riskAppetite;
   const boundaryThreshold = nearestIsTightness ? tightnessThreshold : riskThreshold;
   const boundaryDirection = (nearestIsTightness ? tightnessDirection : riskDirection) === "riseAbove"
     ? "rises above"

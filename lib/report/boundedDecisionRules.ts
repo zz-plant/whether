@@ -10,6 +10,7 @@ import {
   formatDecisionTriplet,
 } from "./reportFormatting";
 import { resolveRunwayBand, runwayBandLabel, type RunwayBand } from "./operatorRunway";
+import { regimeSignalLabel } from "./signalTranslations";
 
 export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "burn-discipline" | "expansion-bets";
 
@@ -70,9 +71,10 @@ export type BoundedDecisionRule = {
   rationale: string;
 };
 
+/** Read from the one signal-name table, so a rename lands here and in every rule label. */
 export const ruleMetricLabel: Record<RuleConditionMetric, string> = {
-  tightness: "Funding pressure",
-  riskAppetite: "Risk appetite",
+  tightness: regimeSignalLabel.tightness,
+  riskAppetite: regimeSignalLabel.riskAppetite,
 };
 
 export const buildRuleCondition = (

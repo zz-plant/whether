@@ -13,6 +13,7 @@ import { classifyRegimeQuadrant } from "./regimeStateMachine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { formatThresholdNumber } from "../formatters";
 import type { BoundaryDimension, BoundaryDirection, Regime } from "./homeBriefModel";
+import { regimeSignalLabel } from "./signalTranslations";
 
 export const boundaryDirectionForRegime = (
   regime: Regime,
@@ -32,8 +33,8 @@ export const boundaryDirectionForRegime = (
 const requiresTightSide = (regime: Regime) => regime === "SCARCITY" || regime === "DEFENSIVE";
 const requiresWillingRisk = (regime: Regime) => regime === "EXPANSION" || regime === "DEFENSIVE";
 
-const TIGHTNESS_BOUNDARY_LABEL = "Funding pressure";
-const RISK_BOUNDARY_LABEL = "Risk appetite";
+const TIGHTNESS_BOUNDARY_LABEL = regimeSignalLabel.tightness;
+const RISK_BOUNDARY_LABEL = regimeSignalLabel.riskAppetite;
 
 type RegimeFlipState = {
   /**

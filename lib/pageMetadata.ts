@@ -1,1 +1,0 @@
-export { buildPageMetadata } from "./seo";

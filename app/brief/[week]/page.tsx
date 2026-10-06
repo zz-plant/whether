@@ -107,7 +107,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 import { SubscribeForm } from "../../components/SubscribeForm";
 import { JsonLdScript } from "../../components/jsonLdScript";
-import { compositeSignalScales, signalReadingMeaning } from "../../../lib/report/signalTranslations";
+import { compositeSignalScales, regimeSignalLabel, signalReadingMeaning } from "../../../lib/report/signalTranslations";
 
 export default async function PublishedBriefPage({ params }: { params: Promise<Params> }) {
   const { week } = await params;
@@ -133,8 +133,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
     : [];
   const readings = brief.scores
     ? [
-        { key: "tightness" as const, label: "Funding pressure", value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta), worseWhenUp: true },
-        { key: "riskAppetite" as const, label: "Risk appetite", value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta), worseWhenUp: false },
+        { key: "tightness" as const, label: regimeSignalLabel.tightness, value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta), worseWhenUp: true },
+        { key: "riskAppetite" as const, label: regimeSignalLabel.riskAppetite, value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta), worseWhenUp: false },
       ]
     : [];
   const frozenScores = brief.scores;
