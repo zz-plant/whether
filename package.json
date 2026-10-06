@@ -115,5 +115,8 @@
   },
   "bin": {
     "whether": "./scripts/whether-cli.mjs"
+  },
+  "overrides": {
+    "proxy-addr": "^2.0.8"
   }
 }
