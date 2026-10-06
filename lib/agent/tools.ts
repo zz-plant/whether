@@ -12,19 +12,8 @@ import { buildUseConstraint } from "../report/useConstraint";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { fetchSaaSValuations } from "../saasMultiples";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
-import {
-  AgentInputError,
-  REGIME_KEYS,
-  SIGNAL_KEYS,
-  lifecycleInput,
-  lowerCasedInput,
-  numberInput,
-  parseToolArguments,
-  regimeInput,
-  signalKeyInput,
-  textInput,
-} from "./inputs";
-import { toPublishedJsonSchema } from "./jsonSchema";
+import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
+import { createAgentToolRegistry, defineTool } from "./registry";
 
 /**
  * Every tool an agent can call, defined once.
@@ -35,84 +24,11 @@ import { toPublishedJsonSchema } from "./jsonSchema";
  * missing from the rest, and nothing said so. Now a tool is one definition here, and the
  * remote server, the local server, the GET shim, the manifest and `/llms.txt` all read it.
  *
- * `execute` parses its own arguments (see `inputs.ts`) so a caller that is wrong is told
- * what would have been right, and returns an object: MCP's `structuredContent` must be one.
+ * Each tool's arguments are parsed before it runs (`registry.ts`, in the words `inputs.ts`
+ * defines), so a caller that is wrong is told what would have been right; `run` returns an
+ * object, because MCP's `structuredContent` must be one. Every tool here only reads, which is
+ * `defineTool`'s default.
  */
-
-type AgentToolTransport = "http" | "stdio";
-
-type ToolArgument = {
-  name: string;
-  required: boolean;
-  type: string | null;
-  description: string | null;
-  values: readonly string[] | null;
-};
-
-type AgentTool = {
-  name: string;
-  title: string;
-  description: string;
-  /** Names it has answered to before, so a client configured against one keeps working. */
-  aliases: readonly string[];
-  transports: readonly AgentToolTransport[];
-  annotations: { readOnlyHint: true; destructiveHint: false; idempotentHint: true; openWorldHint: boolean };
-  inputSchema: Record<string, unknown>;
-  outputSchema: Record<string, unknown> | null;
-  arguments: readonly ToolArgument[];
-  schema: z.ZodObject<z.ZodRawShape, z.core.$ZodObjectConfig>;
-  /** One call that works, as arguments: what the docs and the plain-GET catalogue show. */
-  example: Record<string, string | number>;
-  /** Where the plain-GET answer differs from the MCP one, for a catalogue to say so. */
-  plainGetNote: string | null;
-  execute: (args: unknown) => Promise<Record<string, unknown>>;
-};
-
-const describeArguments = (schema: z.ZodObject<z.ZodRawShape, z.core.$ZodObjectConfig>): ToolArgument[] =>
-  Object.entries(schema.shape).map(([name, field]) => {
-    const json = z.toJSONSchema(field, { io: "input" });
-    return {
-      name,
-      required: !z.safeParse(field, undefined).success,
-      type: typeof json.type === "string" ? json.type : null,
-      description: json.description ?? null,
-      values: Array.isArray(json.enum) ? json.enum.map(String) : null,
-    };
-  });
-
-const defineTool = <Shape extends z.ZodRawShape>(tool: {
-  name: string;
-  title: string;
-  description: string;
-  input: Shape;
-  output?: z.ZodType;
-  aliases?: readonly string[];
-  transports?: readonly AgentToolTransport[];
-  /** True when the tool reaches a source outside Whether's own data. */
-  openWorld?: boolean;
-  example?: Record<string, string | number>;
-  plainGetNote?: string;
-  run: (args: z.output<z.ZodObject<Shape, z.core.$strict>>) => Promise<Record<string, unknown>>;
-}): AgentTool => {
-  const schema = z.strictObject(tool.input);
-  return {
-    name: tool.name,
-    title: tool.title,
-    description: tool.description,
-    aliases: tool.aliases ?? [],
-    transports: tool.transports ?? ["http", "stdio"],
-    // Everything here reads; nothing writes, so a client may run any of it without asking first.
-    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: tool.openWorld ?? false },
-    inputSchema: toPublishedJsonSchema(schema),
-    outputSchema: tool.output ? toPublishedJsonSchema(tool.output) : null,
-    arguments: describeArguments(schema),
-    schema,
-    example: tool.example ?? {},
-    plainGetNote: tool.plainGetNote ?? null,
-    // Async, so a refusal is always a rejection: a caller that awaits or catches never has to also try/catch a synchronous throw.
-    execute: async (args) => tool.run(parseToolArguments(tool.name, schema, args)),
-  };
-};
 
 const REGIME_ARGUMENT =
   "A regime by key (SCARCITY, DEFENSIVE, VOLATILE, EXPANSION) or by the word the site prints (Freezing, Cloudy, Stormy, Sunny), in any case.";
@@ -131,7 +47,7 @@ const rulesFor = (regime: (typeof REGIME_KEYS)[number]) =>
     scores: { tightness: 50, riskAppetite: 50 },
   }).map((rule) => ({ area: rule.area, ...formatBoundedDecisionTriplet(rule) }));
 
-const AGENT_TOOLS: readonly AgentTool[] = [
+const AGENT_TOOLS = [
   defineTool({
     name: "get_state",
     title: "Get the current state",
@@ -361,81 +277,10 @@ const AGENT_TOOLS: readonly AgentTool[] = [
   }),
 ];
 
-const availableOn = (transport: AgentToolTransport) => AGENT_TOOLS.filter((tool) => tool.transports.includes(transport));
+const registry = createAgentToolRegistry(AGENT_TOOLS);
 
-const requireTool = (name: string, transport: AgentToolTransport): AgentTool => {
-  const tool = availableOn(transport).find((candidate) => candidate.name === name || candidate.aliases.includes(name));
-  if (tool) return tool;
-  const available = availableOn(transport).map((candidate) => candidate.name);
-  const message = `Unknown tool: ${name ? JSON.stringify(name) : "(missing name)"}. Available: ${available.join(", ")}.`;
-  throw new AgentInputError(message, "unknown_tool", [{ argument: "name", message, allowed: available }]);
-};
-
-/** What `tools/list` answers: the fields a client reads, and nothing it would have to ignore. */
-export const listAgentTools = (transport: AgentToolTransport) =>
-  availableOn(transport).map(({ name, title, description, inputSchema, outputSchema, annotations }) => ({
-    name,
-    title,
-    description,
-    inputSchema,
-    ...(outputSchema ? { outputSchema } : {}),
-    annotations,
-  }));
-
-/** The same tools with what a page or a manifest wants: the arguments, an example, the transports. */
-export const describeAgentTools = (transport: AgentToolTransport) =>
-  availableOn(transport).map(({ name, title, description, aliases, transports, annotations, arguments: args, example, plainGetNote }) => ({
-    name,
-    title,
-    description,
-    aliases,
-    transports,
-    readOnly: annotations.readOnlyHint,
-    arguments: args,
-    example,
-    plainGetNote,
-  }));
-
-/** One line per tool argument, for a catalogue read by something that has no schema parser: "regime (optional: SCARCITY/DEFENSIVE)". */
-export const describeToolParams = (args: readonly ToolArgument[]) =>
-  args.length === 0
-    ? "none"
-    : args
-        .map(({ name, required, type, values }) => {
-          const qualifiers = [required ? "required" : "optional", ...(type === "number" ? ["number"] : [])].join(" ");
-          return `${name} (${qualifiers}${values ? `: ${values.join("/")}` : ""})`;
-        })
-        .join(", ");
-
-/** Runs a tool and returns its object; throws `AgentInputError` for a caller's mistake, anything else for a fault. */
-export const runAgentTool = async (name: string, args: unknown, transport: AgentToolTransport) => requireTool(name, transport).execute(args);
-
-/** Refuses arguments the tool would refuse, without running it, for a caller that builds its own answer. */
-export const checkAgentToolArguments = (name: string, args: unknown, transport: AgentToolTransport): void => {
-  const tool = requireTool(name, transport);
-  parseToolArguments(tool.name, tool.schema, args);
-};
-
-type AgentToolCallResult = {
-  content: [{ type: "text"; text: string }];
-  structuredContent?: Record<string, unknown>;
-  isError?: true;
-};
-
-/**
- * A tool call as MCP answers it. The text is compact JSON of the same object as
- * `structuredContent`, which the spec asks for so a client that reads only text still gets
- * everything, and which indentation would have made a quarter longer. A refusal or a failure
- * is a result with `isError`, in plain words the model reads; it carries no `structuredContent`,
- * because a client validating against a tool's `outputSchema` would reject it. An unknown tool
- * is the caller's protocol mistake and throws.
- */
-export const callAgentTool = async (name: string, args: unknown, transport: AgentToolTransport): Promise<AgentToolCallResult> => {
-  const tool = requireTool(name, transport);
-  try {
-    const structured = await tool.execute(args);
-    return { content: [{ type: "text", text: JSON.stringify(structured) }], structuredContent: structured };
-  } catch (error) {
-    return { content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }], isError: true };
-  }
-};
+export const listAgentTools = registry.listAgentTools;
+export const describeAgentTools = registry.describeAgentTools;
+export const runAgentTool = registry.runAgentTool;
+export const checkAgentToolArguments = registry.checkAgentToolArguments;
+export const callAgentTool = registry.callAgentTool;

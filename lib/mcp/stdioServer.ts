@@ -1,6 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError, ToolSchema } from "@modelcontextprotocol/sdk/types.js";
-import { AgentInputError } from "../agent/inputs";
+import { AgentInputError } from "../agent/registry";
 import { callAgentTool, listAgentTools } from "../agent/tools";
 import { MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./serverIdentity";
 

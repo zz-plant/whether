@@ -2081,7 +2081,7 @@ Changes, all additive except where noted:
   `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
   in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
   and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
-- **Inputs** (`lib/agent/inputs.ts`): a regime by key or by the site's weather word in any case; empty
+- **Inputs** (`lib/agent/inputs.ts`, parsed and refused by the generic `lib/agent/registry.ts`): a regime by key or by the site's weather word in any case; empty
   arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
   with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
   an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became

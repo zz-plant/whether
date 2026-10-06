@@ -1,4 +1,5 @@
-import { describeAgentTools, describeToolParams } from "../agent/tools";
+import { describeToolParams } from "../agent/registry";
+import { describeAgentTools } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
 import { PUBLISH_MAX_RECORD_AGE_DAYS } from "../report/briefPublishGuard";
 import { canonicalPositioningLine } from "../seo";

@@ -1,5 +1,6 @@
 import { resolveSiteUrl } from "./siteUrl";
-import { describeAgentTools, describeToolParams } from "./agent/tools";
+import { describeToolParams } from "./agent/registry";
+import { describeAgentTools } from "./agent/tools";
 import { supportedAgentCadences } from "./agentInterface";
 import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./mcp/serverIdentity";
 import { PUBLISH_MAX_RECORD_AGE_DAYS } from "./report/briefPublishGuard";

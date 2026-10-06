@@ -166,8 +166,8 @@ would reject. Only an unknown tool is a protocol error (`-32602`), and it lists 
 
 ### Inputs
 
-Every tool takes named arguments from `lib/agent/inputs.ts`, and refuses what it cannot take with the
-values that would have worked:
+Every tool takes named arguments from `lib/agent/inputs.ts`, read by `lib/agent/registry.ts`, and refuses
+what it cannot take with the values that would have worked:
 
 - A **regime** is accepted by key (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`) or by the word
   the site prints (`Freezing`, `Cloudy`, `Stormy`, `Sunny`), in any case, and answered on the key.
@@ -206,7 +206,12 @@ answers `{ ok, tool, result, use }`. An unknown tool, or a wrong argument, is a 
 
 ### Adding a tool
 
-Add one `defineTool` in `lib/agent/tools.ts`: name, description, a zod input shape, a `run`. The remote
+Add one `defineTool` in `lib/agent/tools.ts`: name, description, a zod input shape, a `run`. A tool is
+read-only (and annotated so) unless its definition passes `readOnly: false`. The mechanism under it, which
+knows nothing about Whether, is `lib/agent/registry.ts`: the definition, the argument parsing and the
+refusals, and the list and call paths. An input with a fixed set of values says how they read in a refusal
+with `labelChoices` (the regime input lists `SCARCITY (Freezing)`), so the refusal builder names no
+argument. The remote
 server, the local one, the GET shim and its catalogue, `/.well-known/whether-agent.json` (`mcp.tools`),
 `/llms.txt` and the `/api-docs` page pick it up. `tests/agentDiscoveryParity.test.ts` fails if a place
 that names the tools is missing one, and requires this guide to name it.
