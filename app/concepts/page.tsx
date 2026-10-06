@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { buildPageMetadata } from "../../lib/seo";
 import { buildProductCanonStructuredData } from "../../lib/seo/pageStructuredData";
-import { SecondaryPageHeader, SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
+import { SecondaryPageHeader, SecondaryPageSection } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
@@ -20,6 +20,7 @@ import {
   formatCanonPublished,
   type CanonReading,
 } from "../../lib/productCanon";
+import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const runtime = "edge";
 
@@ -114,7 +115,7 @@ export default function ProductCanonPage() {
     : null;
 
   return (
-    <SecondaryPageShell width="standard">
+    <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
 
       <SecondaryPageHeader
@@ -252,6 +253,6 @@ export default function ProductCanonPage() {
           </li>
         </ul>
       </SecondaryPageSection>
-    </SecondaryPageShell>
+    </ContentPageShell>
   );
 }

@@ -22,6 +22,7 @@ import { OperatingLoopGlyph } from "../components/illustrations/OperatingLoopGly
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { describeRecordCadence } from "../../lib/report/trackRecordCopy";
+import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
@@ -57,7 +58,7 @@ export default function AboutPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6 sm:py-10">
+    <ContentPageShell measure="prose">
       <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
@@ -206,6 +207,6 @@ export default function AboutPage() {
           </ActionLink>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }

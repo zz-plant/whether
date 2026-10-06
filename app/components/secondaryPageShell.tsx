@@ -1,17 +1,5 @@
 import type { ReactNode } from "react";
 
-const widthClassNames = {
-  compact: "weather-page-shell-compact",
-  narrow: "weather-page-shell-narrow",
-  standard: "weather-page-shell-standard",
-  wide: "weather-page-shell-wide",
-} as const;
-
-type SecondaryPageShellProps = {
-  children: ReactNode;
-  width?: keyof typeof widthClassNames;
-};
-
 type SecondaryPageHeaderProps = {
   eyebrow?: string;
   title: string;
@@ -30,22 +18,6 @@ type SecondaryPageSectionProps = {
 };
 
 const joinClasses = (...values: Array<string | undefined>) => values.filter(Boolean).join(" ");
-
-export function SecondaryPageShell({
-  children,
-  width = "standard",
-}: SecondaryPageShellProps) {
-  return (
-    <main
-      id="main-content"
-      tabIndex={-1}
-      className={joinClasses("weather-page-shell weather-secondary-shell", widthClassNames[width])}
-    >
-      <div className="weather-secondary-shell-backdrop" aria-hidden="true" />
-      {children}
-    </main>
-  );
-}
 
 export function SecondaryPageHeader({
   eyebrow,

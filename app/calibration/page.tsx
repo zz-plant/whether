@@ -5,13 +5,13 @@ import { buildCalibrationStudyStructuredData } from "../../lib/seo/pageStructure
 import {
   SecondaryPageHeader,
   SecondaryPageSection,
-  SecondaryPageShell,
 } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
 import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
+import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const runtime = "edge";
 
@@ -45,7 +45,7 @@ export default function CalibrationPage() {
   const totals = confidenceCalibrationTotals();
 
   return (
-    <SecondaryPageShell width="standard">
+    <ContentPageShell measure="wide">
       <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
 
       <SecondaryPageHeader
@@ -125,6 +125,6 @@ export default function CalibrationPage() {
           </li>
         </ul>
       </SecondaryPageSection>
-    </SecondaryPageShell>
+    </ContentPageShell>
   );
 }

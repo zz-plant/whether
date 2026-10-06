@@ -2409,6 +2409,28 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
   (`app/components/briefIslandPicker.tsx`) and links to `/share` for the rest.
 
 
+### 1.1.41 Two page frames: report and reading (2026-10-06)
+
+Report routes (`/signals`, `/trust`, `/operate`, `/resolve`, `/history`) use `ReportShell`, which builds
+on `PageShell`; the utility pages (`/share`, `/pricing`, `/search`, the API docs, the legal pages) use
+`PageShell` directly, without the status-led intro. Every page that is read rather than operated uses
+`ContentPageShell` (`app/components/ui/contentPageShell.tsx`) with one of three measures: `prose`
+(48rem), `content` (56rem) or `wide` (72rem, new).
+
+Before, the reading pages had three frames. `SecondaryPageShell` (answers, calibration, concepts,
+decisions, the 404) had its own widths and a navy backdrop, so an answer page and a signal-watch page
+opened on the same card at different widths. Five routes hand-rolled a `<main>` with no `id`: the
+published brief record, `/about`, `/contact`, the decision-shield overview and every resource
+article. On those the layout's "Skip to content" link went nowhere. The landmark audit passed them,
+because its streamed-route fallback finds the 404 boundary's `<main>` in every flight payload.
+
+- Answers and the 404 take `content`; calibration, concepts, decisions and the articles (with their
+  rail) take `wide`; the brief record, about, contact and the overview take `prose`.
+- `SecondaryPageShell` and its CSS (`.weather-secondary-shell*`, the compact and narrow widths) are
+  deleted; `SecondaryPageHeader` and `SecondaryPageSection` stay as section components.
+- `tests/readingFrameRoutes.test.tsx` renders each reading route and holds it to one
+  `<main id="main-content">`.
+
 ### 1.1.36 `/operate` opens on the reader's decision, not a copy of the brief (2026-10-06)
 
 The plan page opened on a "Weekly plan" step that restated the brief: the score rails, an Action now
