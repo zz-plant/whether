@@ -99,6 +99,13 @@ Suggested PR body scaffold:
 - Re-check intended behavior in `docs/feature-specs-current.md`.
 - Validate nearby assumptions in `lib/` modules touched by the change.
 
+### Build is slow on a constrained machine
+- `next.config.js` reads three build knobs: `NEXT_BUILD_CPUS` (build worker count),
+  `NEXT_STATIC_GENERATION_WORKERS` (static-generation concurrency) and
+  `NEXT_STATIC_GENERATION_MIN_PAGES_PER_WORKER` (pages chunked per worker).
+- Measured on 2026-03-08: more workers did not cut wall-clock time on a constrained box, so tune
+  them to the machine's actual cores rather than raising them by default.
+
 ### PR is hard to review
 - Separate concerns and split into smaller PRs.
 - Move opportunistic cleanup to a follow-up PR.

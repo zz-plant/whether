@@ -2,6 +2,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { ReportData } from "./reportData";
 import { isSignalsClusterSlug } from "../../app/signals/clusterRoutes";
 import { comparisonBasis, type ComparisonBasis } from "./comparisonBasis";
+import { regimeSignalLabel } from "./signalTranslations";
 
 /**
  * What a signal cluster page is actually about.
@@ -205,7 +206,7 @@ export const buildSignalClusterReading = (
     const direction = describeSignalDirection(delta, "lower", " points", SIGNED_WHOLE, basisOf(reportData));
 
     return {
-      measure: "Funding pressure",
+      measure: regimeSignalLabel.tightness,
       value: scores.tightness,
       displayValue: WHOLE.format(scores.tightness),
       unit: "",
@@ -247,7 +248,7 @@ export const buildSignalClusterReading = (
     const direction = describeSignalDirection(delta, "higher", " points", SIGNED_WHOLE, basisOf(reportData));
 
     return {
-      measure: "Risk appetite",
+      measure: regimeSignalLabel.riskAppetite,
       value: scores.riskAppetite,
       displayValue: WHOLE.format(scores.riskAppetite),
       unit: "",

@@ -15,6 +15,7 @@ import {
   type PlannerStage,
 } from "./runwayPlanner";
 import { deriveSectorAdjustedPosture, type SectorKey } from "./sectorSensitivity";
+import { regimeSignalLabel } from "./signalTranslations";
 
 /** Listed rather than read off `Object.entries`, which types its keys as `string`. */
 const FORECAST_REGIME_LABELS: readonly ForecastRegimeLabel[] = ["Expansion", "Mixed", "Scarcity", "Defensive"];
@@ -297,7 +298,7 @@ export const buildInterpretationLayer = ({
     const thresholds = assessment.thresholds ?? { tightnessRegime: 70, riskAppetiteRegime: 50 };
     const tightnessGap = Math.abs(assessment.scores.tightness - thresholds.tightnessRegime);
     const riskGap = Math.abs(assessment.scores.riskAppetite - thresholds.riskAppetiteRegime);
-    const closestDimension = tightnessGap <= riskGap ? "Funding pressure" : "Risk appetite";
+    const closestDimension = tightnessGap <= riskGap ? regimeSignalLabel.tightness : regimeSignalLabel.riskAppetite;
     const closestScore = tightnessGap <= riskGap ? assessment.scores.tightness : assessment.scores.riskAppetite;
     const closestThreshold = tightnessGap <= riskGap ? thresholds.tightnessRegime : thresholds.riskAppetiteRegime;
 

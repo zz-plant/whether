@@ -4,6 +4,7 @@
  * the consensus trap, the winning counter-intuitive move, and the reversal marker.
  */
 import type { RegimeScores } from "./regimeEngine";
+import { regimeSignalLabel } from "./report/signalTranslations";
 
 type AnalogCoordinate = {
   key: "baseRate" | "curveSlope" | "tightness" | "riskAppetite";
@@ -183,8 +184,8 @@ export function getHistoricalAnalogPlaybook(assessment: AnalogPlaybookInput): An
   const matchBasis: AnalogCoordinate[] = [
     { key: "baseRate", label: "Short-term borrowing rate", historical: bestMatch.baseRate, live: baseRate, unit: "%" },
     { key: "curveSlope", label: "Recession warning gauge (10-year minus 2-year rate)", historical: bestMatch.curveSlope, live: currentSlope, unit: "%" },
-    { key: "tightness", label: "Funding pressure", historical: bestMatch.tightness, live: tightness, unit: "pts" },
-    { key: "riskAppetite", label: "Risk appetite", historical: bestMatch.riskAppetite, live: riskAppetite, unit: "pts" },
+    { key: "tightness", label: regimeSignalLabel.tightness, historical: bestMatch.tightness, live: tightness, unit: "pts" },
+    { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, historical: bestMatch.riskAppetite, live: riskAppetite, unit: "pts" },
   ];
 
   return {

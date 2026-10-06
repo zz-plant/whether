@@ -10,7 +10,7 @@ Run the smallest meaningful verification set for the scope and risk of your chan
 | Broad/refactor/high-risk logic change | `bun run check` + targeted regression coverage |
 
 Additional requirements:
-- CI also runs the production application build and asset-integrity check so RSC boundaries and deploy artifacts are merge-blocking.
+- Nothing on GitHub blocks a merge: `ci.yml` is manual-only. Cloudflare Workers Builds runs the deploy gate (`bun run check:vinext`) and the build on every push, so a failing test or broken build blocks the deploy, not the merge. Run `bun run check` before merging.
 - Add/update tests when changing scoring, classification, or decision behavior.
 - Validate deterministic fallback behavior for data-path changes.
 - Capture command outcomes in your PR summary.

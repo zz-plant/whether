@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "../../../lib/pageMetadata";
+import { buildPageMetadata } from "../../../lib/seo";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 

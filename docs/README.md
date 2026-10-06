@@ -81,10 +81,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 
 Use these when shaping follow-on work, not as sole implementation truth:
 
-- `layout-architecture-plan.md` — landmark consolidation and container width standards
-- `ui-facelift-plan.md` — typography and color token consistency
-- `design-improvements-priority.md` — prioritized UI improvements
-- `design-debt-prioritized.md` — UI/UX and IA design debt tracker (DD-001–DD-009)
+- `design-debt-prioritized.md` — the one UI/UX and IA design-debt tracker: shipped rows and open ones
 - `implementation-status.md` — implementation status and milestone tracker
 - `roadmap-prioritized-spec.md` — prioritized, detailed specs for open roadmap items
 - `premium-launch-readiness.md` — launch readiness for pricing/billing
@@ -96,17 +93,11 @@ Use these when shaping follow-on work, not as sole implementation truth:
 
 ## Historical specs and proposals
 
-These documents describe earlier architectures, retired routes, or proposals that have been absorbed or superseded:
+These documents describe earlier architectures, retired routes, or proposals that have been absorbed or superseded. Plans that finished or were dropped are deleted rather than kept here; `git log --diff-filter=D -- docs/` finds them (the 2026-10-05 cleanup removed 22).
 
-- `frontend-v2-spec.md` — proposed `/briefing` / `/playbook` routes (superseded by rationalized IA)
-- `prd-next-level.md` & `specs-next-level.md` — Signal Ops & briefing pack specs (shipped in M9)
-- `agent-accelerated-prioritization-spec.md` — Decision delta and one-screen brief backlog (shipped)
-- `policy-spec-alignment-plan.md` — statistical 10-year rolling z-score proposal (unadopted)
 - `adoption-driven-change-plan.md` — early adoption analysis (absorbed into AGENTS.md)
-- `concepts-enhancements.md` — proposed `/concepts` hub (retired and redirected to `/trust`)
-- `solutions-enhancements.md` — proposed `/solutions` hub (retired and redirected to `/answer`)
-- `toolkits-rewrite-enhancement-audit.md` — standalone `/toolkits` index (redirected to `/`)
-- `yield-curve-terminal-layout.md` — Bloomberg-style terminal proposal (unimplemented)
+- `concepts-enhancements.md` — proposed `/concepts` hub. The route was retired, then restored on 2026-09-23 as the product-writing reading list.
+- `toolkits-rewrite-enhancement-audit.md` — standalone `/toolkits` index (redirected to `/`; `/toolkits/[slug]` pages remain)
 
 ## Evidence and research docs
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { requestSubscription } from "../../components/subscribeRequest";
 import { trackActivationEvent } from "../../../lib/activationFunnel";
-import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel, ruleMetricLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { PlanLineCondition, PlanLines } from "../../../lib/alert/planLines";
 import { runwayBandLabel } from "../../../lib/report/operatorRunway";
@@ -31,11 +31,6 @@ import { useOperatorRunway } from "../../components/useOperatorRunway";
  * (`describePlanLineCrossing`). The band, never a cash or runway figure.
  */
 
-const METRIC_LABEL: Record<PlanLineCondition["metric"], string> = {
-  tightness: "Funding pressure",
-  riskAppetite: "Risk appetite",
-};
-
 const clampLine = (raw: string): number | null => {
   const value = Number(raw);
   if (raw.trim() === "" || !Number.isFinite(value)) return null;
@@ -60,7 +55,7 @@ function ConditionInputs({
         <span key={`${condition.metric}${condition.operator}`} className="inline-flex flex-wrap items-center gap-1.5">
           {index > 0 ? <span className="text-slate-400">{join}</span> : null}
           <span>
-            {METRIC_LABEL[condition.metric]} {condition.operator}
+            {ruleMetricLabel[condition.metric]} {condition.operator}
           </span>
           <input
             type="number"
@@ -69,7 +64,7 @@ function ConditionInputs({
             max={100}
             step={1}
             defaultValue={condition.value}
-            aria-label={`${decisionAreaLabel(area)}, ${side === "pause" ? "pause" : "resume"}: ${METRIC_LABEL[condition.metric]} ${condition.operator === ">" ? "above" : "below"}`}
+            aria-label={`${decisionAreaLabel(area)}, ${side === "pause" ? "pause" : "resume"}: ${ruleMetricLabel[condition.metric]} ${condition.operator === ">" ? "above" : "below"}`}
             onChange={(event) => {
               const value = clampLine(event.target.value);
               if (value !== null) onChange(index, value);

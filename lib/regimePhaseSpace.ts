@@ -32,6 +32,7 @@
 import type { RegimeKey } from "./types";
 import { REGIME_ORDER, REGIME_LABELS } from "./regimePresentation";
 import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "./regimeEngineCore";
+import { regimeSignalLabel } from "./report/signalTranslations";
 
 /**
  * Regime hues, in hex, for canvases that cannot resolve a CSS class — SVG fills
@@ -185,8 +186,8 @@ const buildGap = (
 };
 
 const PHASE_AXIS_LABELS: Record<PhaseAxis, string> = {
-  tightness: "Funding pressure",
-  riskAppetite: "Risk appetite",
+  tightness: regimeSignalLabel.tightness,
+  riskAppetite: regimeSignalLabel.riskAppetite,
 };
 
 /**

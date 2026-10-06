@@ -881,7 +881,7 @@ second plan CTA); the tabbed `WeeklyRetrospectiveCard` with `LastWeekInHindsight
 revisit badge and delta — `lib/report/hindsight.ts` went with it); `DirectAnswersStrip` (the
 list /resolve owns; the handoff gets a text link). `SinceLastVisit` stays, directly under the
 call on live briefs. `StickyCallStrip` renders from `md` up only: on phones it stacked on the
-tab bar (reverses P0 #1 in `docs/design-improvements-priority.md`).
+tab bar (reverses P0 #1 of the design-improvements tracker, retired 2026-10-05).
 
 **Global chrome.** One header band on every route — wordmark, tabs, actions — reversing the
 2026-08-11 two-band note in the weekly-brief spec: the `Weekly Brief` button duplicated the Brief

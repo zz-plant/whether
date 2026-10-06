@@ -12,6 +12,7 @@ import { TimeMachinePanel } from "./timeMachinePanel";
 import { RegimeTimelinePanel } from "./regimeTimelinePanel";
 import { FossilRecordSection } from "./fossilRecordSection";
 import type { SignalsPageSearchParams } from "../evidencePageModel";
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 
 /**
  * The fourth section of the evidence page: the instruments. Charts, the line
@@ -183,8 +184,8 @@ export const SignalsInstrumentsSection = ({
           </p>
           <SignalSparklineStrip
             series={[
-              { key: "tightness", label: "Funding pressure", points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
-              { key: "riskAppetite", label: "Risk appetite", points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
+              { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
+              { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
             ]}
           />
         </div>

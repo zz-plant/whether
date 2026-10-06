@@ -10,7 +10,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~14s | 1,900+ tests / 297 files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run test` | ~14s | 2,500+ tests / 360+ files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
@@ -129,7 +129,9 @@ Canonical modules — extend these before creating new ones:
   `lib/report/operatorContext.ts`
 - **Share artifacts** — `/share` owns every copy, file and image format; builders in
   `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `portfolioNote`, `meetingSlideExport`,
-  `boardSlideDeck`), all reading one `exportSnapshot`
+  `boardSlideDeck`). The page reads `lib/report/weeklyBriefSnapshot.ts`; the slide and image
+  routes read `lib/export/exportSnapshot.ts`. Both resolve the stored operating snapshot first,
+  so they draw the same week unless report assembly falls back
 - **Alerts between Mondays** — `lib/alert/*`: `alertEvaluator` decides, `flashMoves` judges
   raw-input moves against the previous snapshot, `checkRegimeChange` posts Slack,
   `alertDelivery` mails subscribers

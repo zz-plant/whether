@@ -1,5 +1,6 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
+import { regimeSignalLabel } from "./signalTranslations";
 
 type RegimeState = RegimeKey;
 
@@ -142,13 +143,13 @@ const advanceRegimeStateBase = (
       previous: previousState?.lastSignals?.tightness,
       current: currentSignals.tightness,
       threshold: currentSignals.thresholds.tightnessRegime,
-      label: "Funding pressure",
+      label: regimeSignalLabel.tightness,
     }),
     crossed({
       previous: previousState?.lastSignals?.riskAppetite,
       current: currentSignals.riskAppetite,
       threshold: currentSignals.thresholds.riskAppetiteRegime,
-      label: "Risk appetite",
+      label: regimeSignalLabel.riskAppetite,
     }),
   ].filter((reason): reason is string => Boolean(reason));
 

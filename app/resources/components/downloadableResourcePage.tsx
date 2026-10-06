@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "../../../lib/pageMetadata";
+import { buildPageMetadata } from "../../../lib/seo";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";

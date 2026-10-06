@@ -3,6 +3,7 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { sharedDecisionLines } from "../report/boundedDecisionRules";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../regimeEngineCore";
 import type { FlashMove } from "./flashMoves";
+import { regimeSignalLabel } from "../report/signalTranslations";
 
 type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
 
@@ -121,7 +122,7 @@ const buildRegimeDecision = (regime: string): AlertDecision => ({
 
 const buildThresholdDecision = (line: PublishedLine, score: number): AlertDecision => {
   const metric: AlertMetric = line.metric === "tightness" ? "credit" : "sentiment";
-  const label = line.metric === "tightness" ? "Funding pressure" : "Risk appetite";
+  const label = regimeSignalLabel[line.metric];
   return {
     type: "threshold",
     severity: line.kind === "resume" ? "info" : "warning",
