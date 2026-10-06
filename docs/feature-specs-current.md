@@ -2334,11 +2334,11 @@ current "stable" verdict, so the sentence and the data fail together.
 
 Visual navigation upgrades across the five homepage sections to sharpen decision transmission without adding framework bloat or novel taxonomies:
 1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines supplied by the active thresholds. Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary. The caption measures the score distance to that plotted call-change line; company-specific pause-line distances stay in the section heading and ladders. Radar labels use theme-aware semantic ink.
-2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails (removed from the homepage on 2026-10-05, §1.1.31; `/operate` keeps them). Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
+2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails (removed from the homepage on 2026-10-05, §1.1.33; `/operate` keeps them). Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
 3. **High-Contrast Monday Delta & Decision Staleness Badges:** Upgraded `SinceLastVisit.tsx` to surface `linesCrossedLead` (`movementSentence`) for returning operators. Upgraded `YourRecordNote.tsx` with high-visibility badges (`Reconsider` in rose, `Watch` in amber) when an operator's active assumptions in `/decisions` have had their macro conditions breached.
 4. **Interlinked Causal Navigation & Target Highlighting:** Added anchor targets (`#signal-funding-pressure`, `#signal-risk-appetite`) and direct links from each signal to the operating areas it governs in Section 2 (`WhatChangedSection.tsx`). Added row IDs (`id="area-${row.area}"`) and reverse citation anchor links in `AreaTable.tsx`. Added CSS `:target` styling (`tr:target`) to illuminate rows when jumped to via anchor links.
 
-### 1.1.31 One drawing of the score ladders on the homepage (2026-10-05)
+### 1.1.33 One drawing of the score ladders on the homepage (2026-10-05)
 
 The first capture of the returning reader's homepage (`ui:iterate --visitor returning`) showed the two
 score ladders drawn three times in three sections: per row in *What changed* (all three lines and the
@@ -2358,6 +2358,24 @@ a pair again beside the radar in *What would change this guidance* (DD-039).
 
 Still open under DD-039: the *Changed* column repeats one sentence ("Pause now applies: funding
 pressure rose through 76.") in each area whose pause line is the same score's.
+
+### 1.1.34 One trust line per report route, drawn in the intro (2026-10-05)
+
+`/operate`, `/signals` and `/trust` printed the sources and the record date twice: beside the status
+word in the intro ("All sources live • As of Oct 2"), and again in the `TrustStrip` a row below (DD-040).
+
+- `ReportShellModel.trust.strip` hands the shell the route's strip. `CommandCenterNavBlock` draws it
+  under the h1, in place of the intro's own sources-and-date line, which keeps only the status word
+  (and the offline badge when one applies). A route that passes a strip renders no copy in its body.
+- On a phone those routes hide the intro's summary sentence. The bottom bar names the page, and the
+  strip is the line a reader needs before the first task block.
+- Routes without a strip (`/resolve`, `/history`, `/share`) keep the intro line as it was.
+- `/trust` keeps `#trust-snapshot` ("System status"), which the rail and search link to. It now holds
+  the caveat directly under the strip.
+- `/signals` sections are divided. `SignalsEvidenceBody` returned a fragment, but `Children.toArray`
+  treats a component's output as one child, so the shell gave all four sections one row with no rule
+  or padding between them. `signalsEvidenceSections()` returns a keyed array the page spreads into the
+  shell.
 
 ### Shared page spacing (2026-10-04)
 

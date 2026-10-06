@@ -10,7 +10,6 @@ import {
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
 import { ReportSection } from "../components/reportSection";
-import { TrustStrip } from "../components/trustStrip";
 import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord";
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
@@ -43,7 +42,6 @@ export default async function MethodPage({
     warnings,
     meetingSnippet,
     revisitBullets,
-    trustStrip,
     scorePositions,
     runHistory,
     readerReturns,
@@ -187,17 +185,15 @@ export default async function MethodPage({
 
   return (
     <ReportShell model={reportShellModel}>
-      {/* The strip, directly under the h1, in the slot every reading route
-          gives it: record date, sources, confidence, could the call change.
-          This was a five-cell "System status" card — data, freshness, sources,
-          confidence, warnings — each cell with a coloured dot and a detail
-          line, and before that five stacked cards. The facts the cells carried
-          beyond the strip are all below: the refresh stamp is in the intro
-          block, the warnings under "What would make this recommendation
-          wrong?", the flip condition under "Confidence and reliability
-          limits". No link on this page's copy — the explanation is the page.
-          The id stays: the rail, the search command and three in-page links
-          point at #trust-snapshot as "System status", and the strip is that. */}
+      {/* System status: the trust strip, which the shell draws in the intro
+          directly above this section (record date, sources, confidence, could
+          the call change), and the caveat that goes with it. This was a
+          five-cell "System status" card — data, freshness, sources,
+          confidence, warnings — and before that five stacked cards; the facts
+          beyond the strip are below: the warnings under "What would make this
+          recommendation wrong?", the flip condition under "Confidence and
+          reliability limits". The id stays: the rail, the search command and
+          three in-page links point at #trust-snapshot as "System status". */}
       <section
         id="trust-snapshot"
         data-page-section="trust-snapshot"
@@ -206,7 +202,6 @@ export default async function MethodPage({
         className="space-y-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       >
         <h2 id="section-trust-snapshot-heading" className="sr-only">System status</h2>
-        <TrustStrip {...trustStrip} />
         <p className="text-xs leading-5 text-slate-400">
           {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
           {PRIMARY_AUDIENCE_SUMMARY} Check the sources and add your own numbers before acting on anything you can't undo.

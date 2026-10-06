@@ -23,7 +23,6 @@ import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPane
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import { BoundedCorridorRails } from "../components/boundedCorridorRails";
 import type { ReportShellModel } from "../components/reportShell";
-import { TrustStrip } from "../components/trustStrip";
 import { AreaTable } from "../components/ui/areaTable";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
@@ -132,6 +131,19 @@ export async function buildPlanningPageModel(
     resourceSupportingPages.decisionShieldOverview,
   ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
+  /* Freshness and confidence, once, under the h1 before anything asks the
+     reader to act. The shell draws it in the intro (DD-040). */
+  const trustStrip = {
+    ...buildTrustStripProps({
+      recordDateLabel,
+      isFallback,
+      isHistorical: Boolean(historicalSelection),
+      degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
+      confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+      assessment,
+    }),
+    href: "/trust" as const,
+  };
 
   return {
     reportShellModel: {
@@ -155,6 +167,7 @@ export async function buildPlanningPageModel(
       trust: {
         trustStatusTone,
         showOfflineBadge: isFallback && !historicalSelection,
+        strip: trustStrip,
       },
       actions: {
         // No hero Share. The Share step further down the same page owns
@@ -185,19 +198,6 @@ export async function buildPlanningPageModel(
     },
     children: h(Fragment, null,
       h(OperatorWorkflowRouteTracker),
-      /* Freshness and confidence, once, in the same slot every reading route
-         puts them: under the h1, before anything asks the reader to act. */
-      h(TrustStrip, {
-        ...buildTrustStripProps({
-          recordDateLabel,
-          isFallback,
-          isHistorical: Boolean(historicalSelection),
-          degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
-          confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-          assessment,
-        }),
-        href: "/trust",
-      }),
       // At the page root, not inside the Share step: that step is collapsed on
       // arrival, and the island has to exist before the nav block's Share
       // button or the picker can read it.

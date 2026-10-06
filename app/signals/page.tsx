@@ -9,7 +9,7 @@ import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import { buildSignalsPageModel, focusLabelByTab, type SignalsPageSearchParams } from "./evidencePageModel";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
-import { SignalsEvidenceBody } from "./components/evidencePageBody";
+import { signalsEvidenceSections } from "./components/evidencePageBody";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -68,6 +68,7 @@ export default async function SignalsPage({
         trust: {
           trustStatusTone: model.trust.trustStatusTone,
           showOfflineBadge: model.isFallback && !model.historicalSelection,
+          strip: { ...model.trustStrip, href: "/trust" },
         },
         actions: {
           nextStep: {
@@ -104,15 +105,15 @@ export default async function SignalsPage({
         ]}
         openPanelHref="#what-changed"
       />
-      {/* The four sections, in the reader's order. `SignalsEvidenceBody` is a
-          fragment: the shell wraps each of its children in a divided row. */}
-      <SignalsEvidenceBody
-        model={model}
-        focusLabelByTab={focusLabelByTab}
-        tightnessTrend={tightnessTrend}
-        riskAppetiteTrend={riskAppetiteTrend}
-        searchParams={resolvedSearchParams}
-      />
+      {/* The four sections, in the reader's order, as an array: the shell
+          wraps each array entry in its own divided row. */}
+      {signalsEvidenceSections({
+        model,
+        focusLabelByTab,
+        tightnessTrend,
+        riskAppetiteTrend,
+        searchParams: resolvedSearchParams,
+      })}
     </ReportShell>
   );
 }

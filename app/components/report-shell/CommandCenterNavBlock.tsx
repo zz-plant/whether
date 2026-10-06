@@ -3,6 +3,7 @@ import { ScreenshotCaption } from "../screenshotCaption";
 import { ShareRailButton } from "./ShareRailButton";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import { OperatingLoopGlyph, type OperatingLoopStep } from "../illustrations/OperatingLoopGlyph";
+import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
 /**
  * The one page intro block a report route gets (ui-ux-standards §XI): kicker,
@@ -26,6 +27,7 @@ export function CommandCenterNavBlock({
   showOfflineBadge,
   offlineBadgeLabel,
   activeStep,
+  trustStrip,
 }: {
   pageTitle: string;
   pageSummary: string;
@@ -45,16 +47,22 @@ export function CommandCenterNavBlock({
   resolvedNextRefreshLabel?: string;
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
+  /** The route's trust strip. It carries the record date and the sources, so
+   *  the line beside the status word drops both rather than print them twice. */
+  trustStrip?: Omit<TrustStripProps, "className">;
 }) {
   // The status word leads and prints in the regime ink — it is this page's
   // equivalent of the hero's stamp, and the only word on the route that
   // names the week. The rest of the line stays neutral.
+  // With a strip, the sources and the record date are its cells: /operate,
+  // /signals and /trust printed "All sources live • As of Oct 2" here and the
+  // same two facts again in the strip a row below (DD-040).
   const introMetaRest = [
-    trustStatusLabel,
+    trustStrip ? null : trustStatusLabel,
     // Interpolated only when there is a date. `As of ${x}` is a truthy string
     // even when x is "", so the filter below could never drop it, and a caller
     // passing no record date printed a bare "As of" with nothing after it.
-    recordDateLabel ? `As of ${recordDateLabel}` : null,
+    !trustStrip && recordDateLabel ? `As of ${recordDateLabel}` : null,
     showOfflineBadge ? offlineBadgeLabel : null,
   ]
     .filter(Boolean)
@@ -100,9 +108,13 @@ export function CommandCenterNavBlock({
           >
             {pageTitle}
           </h1>
-          <p className="max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base">
+          {/* On a phone a route with a strip drops the summary: the bottom bar
+              already names the page, and the strip is the line a reader
+              needs before the first task block. */}
+          <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
             {pageSummary}
           </p>
+          {trustStrip ? <TrustStrip {...trustStrip} className="pt-2" /> : null}
         </div>
 
         <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">

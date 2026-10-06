@@ -40,6 +40,7 @@ import type { OperatingLoopStep } from "./illustrations/OperatingLoopGlyph";
 import { NextStepCard, type NextStep } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
+import type { TrustStripProps } from "./trustStrip";
 
 export type ReportShellModel = {
   status: {
@@ -60,6 +61,10 @@ export type ReportShellModel = {
     degradedSourceRows?: Array<{ sourceName: string; modeLabel: string; freshnessStatus: string }>;
     showOfflineBadge?: boolean;
     offlineBadgeLabel?: string;
+    /** The route's trust strip, drawn in the intro under the h1 in place of
+     *  the intro's own "sources • as of" line. A route that passes one renders
+     *  no second copy in its body. */
+    strip?: Omit<TrustStripProps, "className">;
   };
   chrome?: {
     sidebarVariant?: "full" | "hidden";
@@ -95,6 +100,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
       degradedSourceRows,
       showOfflineBadge = false,
       offlineBadgeLabel = "Cached snapshot",
+      strip: trustStrip,
     },
     chrome: { sidebarVariant = "full" } = {},
     actions: {
@@ -173,6 +179,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             showOfflineBadge={showOfflineBadge}
             offlineBadgeLabel={offlineBadgeLabel}
             activeStep={activeStep}
+            trustStrip={trustStrip}
           />
 
           {/* The outline, as a row of tabs, where the rail is hidden. Under the
