@@ -88,7 +88,9 @@ stack trace pointing into minified code.
 ## Secrets and provider keys
 
 Secrets are set per lane with `bunx wrangler secret put <NAME>` (add `--env preview` for the
-preview lane) and reach library code through `globalThis`, like every binding. The site serves
+preview lane) and reach library code through `globalThis`, like every binding; `readSetting`
+(`lib/runtime/settings.ts`) reads one by name, falling back to `process.env` for scripts and
+local runs, and treats an empty value as unset at either source. The site serves
 without any of them: each provider key switches a read from a keyless path to a keyed one, and
 the Slack signing secret gates one webhook route.
 
@@ -289,7 +291,7 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 ### Durable KV (`WHETHER_DURABLE_KV`)
 
-All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`.
+All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`, and the subscriber, Slack-webhook, alert and entitlement stores) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`, which refuses a binding without `list()`. Stored JSON is read back through `getJson` / `parseStoredJson` in the same module, narrowed by a zod schema or the store's own parser; an unparseable or non-matching record reads as no record. Every `get…Store()` / `get…Repository()` picks KV or its in-memory fallback through `selectStoreByBinding` (`lib/runtime/storeSelection.ts`), which re-checks the binding on each call the way `getDefaultIngestionStore` does, so a call that ran before the binding was installed no longer leaves the isolate writing to memory.
 
 The consolidated state architecture operates around `refreshOperatingState()`, which executes the single authoritative signal refresh, pure regime evaluation, `OperatingSnapshot` persistence, state machine update, and transition recording. Current brief reads project the latest committed `OperatingSnapshot`; explicit historical reads continue to reconstruct the requested period. Read paths perform zero writes while the materialized signal store is current; a cold store ingests inline, and a stale one takes the refresh lock and refreshes off the request (Invariants 1, 1b, 1c in `tests/architectureInvariants.test.ts`).
 

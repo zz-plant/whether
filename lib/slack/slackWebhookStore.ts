@@ -1,4 +1,6 @@
-import { readKvValues, type KvNamespace } from "../runtime/kv";
+import { getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
+import { sha256Hex } from "../crypto";
 import { isSlackWebhookUrl } from "./deliverSlackBrief";
 
 type SlackSubscription = {
@@ -14,8 +16,6 @@ type SlackSubscribeOptions = {
   channelName?: string;
   teamName?: string;
 };
-
-type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
 
 export interface SlackWebhookStore {
   subscribe(webhookUrl: string, options?: SlackSubscribeOptions): Promise<SlackSubscription>;
@@ -34,13 +34,7 @@ const ACTIVE_PREFIX = "slack:active:";
 
 const generateToken = (): string => crypto.randomUUID();
 
-const hashUrl = async (url: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(url.trim());
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
-};
+const hashUrl = (url: string): Promise<string> => sha256Hex(url.trim());
 
 const readStoredString = (source: object, key: string): string | undefined => {
   const value: unknown = Reflect.get(source, key);
@@ -69,7 +63,7 @@ const hydrateSubscription = (raw: unknown): SlackSubscription | null => {
 class KvSlackWebhookStore implements SlackWebhookStore {
   private readonly fallback = new InMemorySlackWebhookStore();
 
-  constructor(private readonly kv: KvNamespaceLike) {}
+  constructor(private readonly kv: KvNamespace) {}
 
   async subscribe(webhookUrl: string, options?: SlackSubscribeOptions): Promise<SlackSubscription> {
     const trimmed = webhookUrl.trim();
@@ -150,10 +144,6 @@ class KvSlackWebhookStore implements SlackWebhookStore {
   }
 
   async listActiveSubscriptions(): Promise<SlackSubscription[]> {
-    if (!this.kv.list) {
-      return this.fallback.listActiveSubscriptions();
-    }
-
     const subscriptions: SlackSubscription[] = [];
     let cursor: string | undefined;
 
@@ -166,13 +156,7 @@ class KvSlackWebhookStore implements SlackWebhookStore {
       const raws = await readKvValues(this.kv, candidateKeys.map((k) => SUB_PREFIX + k));
 
       for (const raw of raws) {
-        if (!raw) continue;
-        let sub: SlackSubscription | null = null;
-        try {
-          sub = hydrateSubscription(JSON.parse(raw));
-        } catch {
-          continue;
-        }
+        const sub = parseStoredJson(raw, hydrateSubscription);
         if (sub?.active) {
           this.fallback.saveToMemory(sub);
           subscriptions.push(sub);
@@ -301,32 +285,11 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
   }
 }
 
-const isKvNamespaceLike = (value: unknown): value is KvNamespaceLike =>
-  typeof value === "object" &&
-  value !== null &&
-  typeof Reflect.get(value, "get") === "function" &&
-  typeof Reflect.get(value, "put") === "function";
+const slackStoreSelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): SlackWebhookStore => (kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore()),
+);
 
-const getKvBinding = (): KvNamespaceLike | null => {
-  const binding: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
-  if (!isKvNamespaceLike(binding)) {
-    return null;
-  }
-  return binding;
-};
+export const getSlackWebhookStore = (): SlackWebhookStore => slackStoreSelection.get();
 
-let sharedSlackStore: SlackWebhookStore | null = null;
-
-export const getSlackWebhookStore = (): SlackWebhookStore => {
-  if (!sharedSlackStore) {
-    const kv = getKvBinding();
-    sharedSlackStore = kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore();
-  }
-  return sharedSlackStore;
-};
-
-export const resetSlackWebhookStore = (): SlackWebhookStore => {
-  const kv = getKvBinding();
-  sharedSlackStore = kv ? new KvSlackWebhookStore(kv) : new InMemorySlackWebhookStore();
-  return sharedSlackStore;
-};
+export const resetSlackWebhookStore = (): SlackWebhookStore => slackStoreSelection.reset();

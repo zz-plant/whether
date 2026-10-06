@@ -1,4 +1,5 @@
-import type { KvNamespace as KvNamespaceLike } from "../runtime/kv";
+import { z } from "zod";
+import { getJson, getWhetherKv, type KvNamespace as KvNamespaceLike } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
 import { alertDeliveryKey, evaluateAlert } from "./alertEvaluator";
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "./alertTemplates";
@@ -19,27 +20,21 @@ import { describeConditions } from "../export/exportTerms";
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
 
-const getKv = (): KvNamespaceLike | null => {
-  const binding = (globalThis as {
-    WHETHER_DURABLE_KV?: KvNamespaceLike;
-  }).WHETHER_DURABLE_KV;
-  if (
-    !binding ||
-    typeof binding.get !== "function" ||
-    typeof binding.put !== "function" ||
-    typeof binding.list !== "function"
-  ) {
-    return null;
-  }
-  return binding;
-};
+const getKv = (): KvNamespaceLike | null => getWhetherKv();
+
+/* What `writeAlertState` stores. A record that does not match reads as no state, as an unparseable one always did. */
+const lastAlertStateSchema: z.ZodType<LastAlertState> = z.object({
+  regime: z.string(),
+  tightness: z.number(),
+  riskAppetite: z.number(),
+  lastSentAt: z.string(),
+});
 
 const readAlertState = async (): Promise<LastAlertState | null> => {
   const kv = getKv();
   if (!kv) return null;
   try {
-    const raw = await kv.get(ALERT_STATE_KEY);
-    return raw ? (JSON.parse(raw) as LastAlertState) : null;
+    return await getJson(kv, ALERT_STATE_KEY, lastAlertStateSchema);
   } catch {
     return null;
   }

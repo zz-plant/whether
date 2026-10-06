@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "bun:test";
 import { getWhetherKv, type KvNamespace } from "../lib/runtime/kv";
+import { resetSubscriberStore } from "../lib/email/subscriberStore";
+import { resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 
 /*
  * WHETHER_DURABLE_KV is the only data namespace wrangler.toml declares. The
@@ -27,6 +29,8 @@ const fakeKv = (): KvNamespace => ({
 afterEach(() => {
   Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
   for (const name of LEGACY_NAMES) Reflect.deleteProperty(globalThis, name);
+  resetSubscriberStore();
+  resetSlackWebhookStore();
 });
 
 describe("durable KV binding", () => {
@@ -44,5 +48,19 @@ describe("durable KV binding", () => {
   it("rejects a binding that cannot list, which the event logs need", () => {
     Reflect.set(globalThis, "WHETHER_DURABLE_KV", { get: async () => null, put: async () => {} });
     assert.equal(getWhetherKv(), null);
+  });
+
+  /* The subscriber, Slack-webhook, alert-delivery and regime-machine stores each resolved
+     the binding by hand, and the first two accepted one with no list(): reads and writes
+     went to KV while every listing answered from this isolate's memory. They resolve it
+     here now, so a binding the event logs cannot use is no binding for them either. */
+  it("gives the subscriber stores the same binding, and the same refusal", () => {
+    Reflect.set(globalThis, "WHETHER_DURABLE_KV", { get: async () => null, put: async () => {} });
+    assert.equal(resetSubscriberStore().backendStatus(), "local-fallback");
+    assert.equal(resetSlackWebhookStore().backendStatus(), "local-fallback");
+
+    Reflect.set(globalThis, "WHETHER_DURABLE_KV", fakeKv());
+    assert.equal(resetSubscriberStore().backendStatus(), "durable");
+    assert.equal(resetSlackWebhookStore().backendStatus(), "durable");
   });
 });

@@ -1,5 +1,6 @@
 import type { OperatingSnapshot } from "./types";
 import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import { parseTreasuryData } from "../treasury/treasurySchema";
 
 const LATEST_KEY = "snapshot:latest";
@@ -216,17 +217,13 @@ export class KvOperatingSnapshotStore implements OperatingSnapshotStore {
   }
 }
 
-let sharedStore: OperatingSnapshotStore | null = null;
+const snapshotStoreSelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): OperatingSnapshotStore => (kv ? new KvOperatingSnapshotStore(kv) : new InMemoryOperatingSnapshotStore()),
+);
 
-export const getOperatingSnapshotStore = (): OperatingSnapshotStore => {
-  if (!sharedStore) {
-    const kv = getWhetherKv();
-    sharedStore = kv ? new KvOperatingSnapshotStore(kv) : new InMemoryOperatingSnapshotStore();
-  }
-  return sharedStore;
-};
+export const getOperatingSnapshotStore = (): OperatingSnapshotStore => snapshotStoreSelection.get();
 
-export const resetOperatingSnapshotStore = (): OperatingSnapshotStore => {
-  sharedStore = new InMemoryOperatingSnapshotStore();
-  return sharedStore;
-};
+/** Test hook: an empty in-memory store, held until the next reset whatever the binding does. */
+export const resetOperatingSnapshotStore = (): OperatingSnapshotStore =>
+  snapshotStoreSelection.reset(new InMemoryOperatingSnapshotStore());

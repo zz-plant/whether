@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { isSlackWebhookUrl } from "../../../../lib/slack/deliverSlackBrief";
 import { getSlackWebhookStore } from "../../../../lib/slack/slackWebhookStore";
 import { RateLimitedError, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
+import { fetchWithTimeout } from "../../../../lib/fetchWithTimeout";
 
 export const runtime = "edge";
+
+const SLACK_PING_TIMEOUT_MS = 5_000;
 
 export async function POST(request: Request) {
   try {
@@ -18,8 +21,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Ping Slack to verify the webhook is active and introduce the weekly cadence
-    const pingResponse = await fetch(webhookUrl, {
+    // Ping Slack to verify the webhook is active and introduce the weekly cadence. Bounded,
+    // because the reader is waiting on the form; an incoming webhook answers in well under a second.
+    const pingResponse = await fetchWithTimeout(fetch, webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -47,7 +51,7 @@ export async function POST(request: Request) {
           },
         ],
       }),
-    });
+    }, SLACK_PING_TIMEOUT_MS);
 
     if (!pingResponse.ok) {
       return NextResponse.json(

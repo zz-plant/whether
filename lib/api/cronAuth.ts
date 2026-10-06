@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { constantTimeCompare } from "../constantTimeCompare";
+import { readSetting } from "../runtime/settings";
 
 export const requireCronAuth = (request: Request) => {
-  const secret = (globalThis as { WHETHER_CRON_SECRET?: string }).WHETHER_CRON_SECRET
-    ?? process.env.WHETHER_CRON_SECRET;
+  const secret = readSetting("WHETHER_CRON_SECRET", { trim: false });
 
   if (!secret) {
     return NextResponse.json({ error: "cron_secret_not_configured" }, { status: 503 });

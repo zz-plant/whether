@@ -1,4 +1,5 @@
-import { readKvValues, type KvNamespace } from "../runtime/kv";
+import { getJson, getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
+import { selectStoreByBinding } from "../runtime/storeSelection";
 import { parsePlanLines, parsePlanRunway, type PlanLines, type PlanRunway } from "../alert/planLines";
 import type { RunwayBand } from "../report/operatorRunway";
 /**
@@ -6,7 +7,7 @@ import type { RunwayBand } from "../report/operatorRunway";
  * Stores individual subscriber records keyed by email
  * and verification/unsubscribe tokens for one-click links.
  *
- * Follows the same KV binding pattern as lib/storage/alertPreferenceRepository.ts.
+ * The binding is WHETHER_DURABLE_KV, resolved by `getWhetherKv` like every other store.
  */
 
 export type Subscriber = {
@@ -121,8 +122,6 @@ const pendingRunwayFor = (options: SubscribeOptions | undefined, now: Date): Pic
   options?.planLines && options.planLines.length > 0 && options.runwayBand
     ? { pendingPlanRunway: { band: options.runwayBand, setOn: now.toISOString() } }
     : {};
-
-type KvNamespaceLike = Omit<KvNamespace, "list"> & { list?: KvNamespace["list"] };
 
 export interface SubscriberStore {
   subscribe(email: string, options?: SubscribeOptions): Promise<Subscriber>;
@@ -377,7 +376,7 @@ const normalizeEmail = (raw: string): string | null => {
 class KvSubscriberStore implements SubscriberStore {
   private readonly fallback = new InMemorySubscriberStore();
 
-  constructor(private readonly kv: KvNamespaceLike) {}
+  constructor(private readonly kv: KvNamespace) {}
 
   async subscribe(email: string, options?: SubscribeOptions): Promise<Subscriber> {
     const normalized = normalizeEmail(email);
@@ -452,14 +451,7 @@ class KvSubscriberStore implements SubscriberStore {
   async getPendingConfirmation(token: string): Promise<Subscriber | null> {
     const email = (await this.kv.get(CONFIRM_PREFIX + token)) ?? (await this.kv.get(TOKEN_PREFIX + token));
     if (!email) return null;
-    const raw = await this.kv.get(SUB_PREFIX + email);
-    if (!raw) return null;
-    let sub: Subscriber | null = null;
-    try {
-      sub = hydrateSubscriber(JSON.parse(raw));
-    } catch {
-      return null;
-    }
+    const sub = await getJson(this.kv, SUB_PREFIX + email, hydrateSubscriber);
     return sub && confirms(sub, token, Date.now()) ? sub : null;
   }
 
@@ -501,10 +493,6 @@ class KvSubscriberStore implements SubscriberStore {
   }
 
   async listActiveSubscribers(): Promise<Subscriber[]> {
-    if (!this.kv.list) {
-      return this.fallback.listActiveSubscribers();
-    }
-
     const subscribers: Subscriber[] = [];
     let cursor: string | undefined;
 
@@ -520,13 +508,7 @@ class KvSubscriberStore implements SubscriberStore {
       const raws = await readKvValues(this.kv, candidateEmails.map((email) => SUB_PREFIX + email));
 
       for (const raw of raws) {
-        if (!raw) continue;
-        let sub: Subscriber | null = null;
-        try {
-          sub = hydrateSubscriber(JSON.parse(raw));
-        } catch {
-          continue;
-        }
+        const sub = parseStoredJson(raw, hydrateSubscriber);
         if (sub?.active && sub.verified) {
           this.fallback.saveToMemory(sub);
           subscribers.push(sub);
@@ -672,28 +654,11 @@ class InMemorySubscriberStore implements SubscriberStore {
   }
 }
 
-const getKvBinding = (): KvNamespaceLike | null => {
-  const binding =
-    (globalThis as { WHETHER_DURABLE_KV?: KvNamespaceLike }).WHETHER_DURABLE_KV;
+const subscriberStoreSelection = selectStoreByBinding(
+  getWhetherKv,
+  (kv): SubscriberStore => (kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore()),
+);
 
-  if (!binding || typeof binding.get !== "function" || typeof binding.put !== "function") {
-    return null;
-  }
-  return binding;
-};
+export const getSubscriberStore = (): SubscriberStore => subscriberStoreSelection.get();
 
-let sharedStore: SubscriberStore | null = null;
-
-export const getSubscriberStore = (): SubscriberStore => {
-  if (!sharedStore) {
-    const kv = getKvBinding();
-    sharedStore = kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore();
-  }
-  return sharedStore;
-};
-
-export const resetSubscriberStore = (): SubscriberStore => {
-  const kv = getKvBinding();
-  sharedStore = kv ? new KvSubscriberStore(kv) : new InMemorySubscriberStore();
-  return sharedStore;
-};
+export const resetSubscriberStore = (): SubscriberStore => subscriberStoreSelection.reset();

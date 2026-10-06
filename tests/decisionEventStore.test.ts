@@ -195,4 +195,45 @@ describe("decision event store", () => {
     assert.equal(sinceFirst.events[0]?.id, second.id);
   });
 
+  /* The store's durable half is DurableEventLog now. Production KV holds events under the
+     keys the store wrote by hand before, so those keys are the contract. */
+  it("keeps the key scheme production KV already holds", async () => {
+    const data = new Map<string, string>([
+      ["meta:decision-event:index", "0"],
+      [
+        "decision-event:000000000000",
+        JSON.stringify({ id: "stored-before", type: "RegimeDecisionEvent", previousState: "EXPANSION", nextState: "DEFENSIVE" }),
+      ],
+    ]);
+    const kv = {
+      get: async (key: string) => data.get(key) ?? null,
+      put: async (key: string, value: string) => {
+        data.set(key, value);
+      },
+      list: async () => ({ keys: [], list_complete: true }),
+    };
+
+    const store = new DecisionEventStore(kv);
+    const appended = store.append(
+      buildRegimeDecisionEvent({
+        previousState: "DEFENSIVE",
+        nextState: "SCARCITY",
+        tightness: 82,
+        riskAppetite: 44,
+        thresholds: DEFAULT_THRESHOLDS,
+        diagnostics: { confidence: "HIGH", nearestThresholdDelta: 9, transitionWatch: false },
+        pendingCount: 1,
+        transitionReason: "Risk appetite crossed below 50. Transition committed.",
+      }),
+    );
+    await store.whenDurableFlushCompletes();
+
+    assert.equal(data.get("meta:decision-event:index"), "1");
+    assert.equal(JSON.parse(data.get("decision-event:000000000001") ?? "{}").id, appended.id);
+
+    const listed = await new DecisionEventStore(kv).listSince(null, 1);
+    assert.deepEqual(listed.events.map((event) => event.id), ["stored-before", appended.id], "one past the page");
+    assert.equal(listed.cursor, "1");
+  });
+
 });

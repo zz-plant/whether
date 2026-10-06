@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
+import { fetchFredCsv, getFredCircuitBreakerState, resetFredCircuitBreaker } from "../lib/fred";
 import type { TreasuryData } from "../lib/types";
 
 /** The URL a fetch stub was asked for, whichever form the caller passed. */
@@ -492,5 +493,63 @@ describe("treasury client", () => {
     assert.equal(data.isLive, true);
     assert.equal(data.record_date, "2025-12-31");
     assert.equal(data.source, "https://home.treasury.gov");
+  });
+
+  /* The client parsed FRED's CSV with its own reader, which caught "" and "." but read a
+     whitespace-only field as Number(" ") = 0, a finite zero print. It reads through
+     lib/fred.ts's parser now, where isMissingFredValue trims first. */
+  it("reads a whitespace-only FRED field as missing, not as a zero print", async () => {
+    const fetcher: typeof fetch = async (input) => {
+      const url = requestUrl(input);
+      const latest = url.includes("DGS10") ? " " : "4.1";
+      return new Response(
+        buildCsv("DGS", [
+          { date: "2026-02-01", value: "4.0" },
+          { date: "2026-02-02", value: latest },
+        ])
+      );
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.record_date, "2026-02-01", "the latest common date skips the blank ten-year field");
+    assert.equal(data.yields.tenYear, 4.0);
+    assert.deepEqual(
+      data.oneMonthHistory?.map((point) => point.date),
+      ["2026-02-01", "2026-02-02"],
+      "a missing value keeps its date in the series",
+    );
+  });
+
+  /* The yield-curve read goes to FRED's CSV export but stays outside lib/fred.ts's breaker:
+     it has Treasury's own file and the snapshot behind it, so its failures are not FRED's
+     to count, and an open breaker left by unrelated reads does not skip it. */
+  it("neither counts against nor waits on the FRED circuit breaker", async () => {
+    resetFredCircuitBreaker();
+    try {
+      await fetchTreasuryData({
+        fetcher: async () => new Response("{}", { status: 503 }),
+        snapshotFallback: {
+          source: "snapshot",
+          record_date: "2024-09-30",
+          fetched_at: "2026-02-01T00:00:00Z",
+          isLive: false,
+          yields: { oneMonth: 5.1, twoYear: 4.7, tenYear: 4.5 },
+        },
+      });
+      assert.equal(getFredCircuitBreakerState().consecutiveFailures, 0);
+
+      for (let i = 0; i < 3; i += 1) {
+        await assert.rejects(fetchFredCsv(async () => new Response("down", { status: 503 }), "DGS10", { backoffMs: 0 }));
+      }
+      assert.equal(getFredCircuitBreakerState().open, true);
+
+      const data = await fetchTreasuryData({
+        fetcher: async () => new Response(buildCsv("DGS", [{ date: "2026-02-02", value: "4.2" }])),
+      });
+      assert.equal(data.source, "https://fred.stlouisfed.org");
+      assert.equal(data.isLive, true);
+    } finally {
+      resetFredCircuitBreaker();
+    }
   });
 });

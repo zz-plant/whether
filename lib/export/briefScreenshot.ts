@@ -18,6 +18,7 @@
  * fetches a public endpoint for what a direct call can give them.
  */
 import { getWhetherKv, type KvNamespace } from "../runtime/kv";
+import { readSetting } from "../runtime/settings";
 import { resolveSiteUrl } from "../siteUrl";
 
 const BRIEF_SCREENSHOT_ROUTE = "/api/image/brief-screenshot";
@@ -31,13 +32,6 @@ export const BRIEF_SCREENSHOT_SELECTOR = "#weekly-call";
 export const isRecordDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
 type BrowserRenderingConfig = { accountId: string; token: string };
-
-const readSetting = (name: string): string | null => {
-  const fromBinding: unknown = Reflect.get(globalThis, name);
-  if (typeof fromBinding === "string" && fromBinding.trim() !== "") return fromBinding.trim();
-  const fromEnv = typeof process !== "undefined" ? process.env?.[name] : undefined;
-  return typeof fromEnv === "string" && fromEnv.trim() !== "" ? fromEnv.trim() : null;
-};
 
 const resolveBrowserRenderingConfig = (): BrowserRenderingConfig | null => {
   const accountId = readSetting("CLOUDFLARE_ACCOUNT_ID");

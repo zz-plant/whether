@@ -32,12 +32,14 @@ type AnalyticsEngineBinding = {
 
 const TELEMETRY_BLOB_BYTE_LIMIT = 4_900;
 
+const isAnalyticsEngineBinding = (value: unknown): value is AnalyticsEngineBinding =>
+  (typeof value === "object" || typeof value === "function")
+  && value !== null
+  && typeof Reflect.get(value, "writeDataPoint") === "function";
+
 const getBinding = (): AnalyticsEngineBinding | null => {
-  const candidate = (globalThis as { ANALYTICS?: AnalyticsEngineBinding }).ANALYTICS;
-  if (!candidate || typeof candidate.writeDataPoint !== "function") {
-    return null;
-  }
-  return candidate;
+  const candidate: unknown = Reflect.get(globalThis, "ANALYTICS");
+  return isAnalyticsEngineBinding(candidate) ? candidate : null;
 };
 
 const truncateBlob = (value: string) => {

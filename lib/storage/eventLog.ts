@@ -4,14 +4,12 @@ type Cursor = string | null;
 
 export type KvNamespaceLike = KvNamespace;
 
-const clone = <T>(value: T): T => {
-  if (typeof structuredClone === "function") {
-    return structuredClone(value);
-  }
-  return JSON.parse(JSON.stringify(value)) as T;
-};
+/* Every runtime this code runs in (Workers, bun, node 17+) has structuredClone; the JSON
+   round-trip fallback this used to carry could not run, and needed a cast to compile. */
+const clone = <T>(value: T): T => structuredClone(value);
 
-const parseCursor = (cursor: Cursor): number => {
+/** A cursor is the index of the last entry a caller has seen; none, or garbage, is "before the first". */
+export const parseCursor = (cursor: Cursor): number => {
   if (!cursor) return -1;
   const parsed = Number.parseInt(cursor, 10);
   return Number.isNaN(parsed) ? -1 : parsed;
@@ -164,9 +162,32 @@ export class DurableEventLog<T> {
     return indexes.sort((left, right) => left - right);
   }
 
+  /**
+   * Entries after `afterIndex`, oldest first, reading at most `max` keys: the window a caller
+   * following the log forward pages through, for one that shapes its own page. Uncached unless
+   * asked, because a reader polling for what is new must not be handed a cached miss.
+   */
+  async readAfter(
+    afterIndex: number,
+    max: number,
+    options?: { cached?: boolean },
+  ): Promise<Array<{ index: number; item: T }>> {
+    await this.persistQueue;
+    if (!this.kv) {
+      return this.inMemoryEntries
+        .filter((entry) => entry.index > afterIndex)
+        .slice(0, max)
+        .map((entry) => ({ index: entry.index, item: clone(entry.item) }));
+    }
+    const indexes = (await this.resolveIndexes(afterIndex)).slice(0, max);
+    const collected = await this.readIndexes(indexes, undefined, options?.cached ?? false);
+    return collected.sort((a, b) => a.index - b.index);
+  }
+
   private async readIndexes(
     indexes: number[],
     filter?: (item: T) => boolean,
+    cached = true,
   ): Promise<Array<{ index: number; item: T }>> {
     const collected: Array<{ index: number; item: T }> = [];
 
@@ -174,7 +195,11 @@ export class DurableEventLog<T> {
      * repeated scans of the same window. 60s is the KV minimum; it also caches
      * misses, which bounds how quickly another isolate's fresh append becomes
      * visible here — acceptable for list views, so latest() stays uncached. */
-    const raws = await readKvValues(this.kv!, indexes.map((index) => this.toKey(index)), { cacheTtl: 60 });
+    const raws = await readKvValues(
+      this.kv!,
+      indexes.map((index) => this.toKey(index)),
+      cached ? { cacheTtl: 60 } : undefined,
+    );
 
     for (let i = 0; i < indexes.length; i++) {
       const raw = raws[i];

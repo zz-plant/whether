@@ -17,7 +17,7 @@
  * the pipeline itself has.
  */
 import { z } from "zod";
-import { withDeadline } from "../withDeadline";
+import { cachedLoader } from "./cachedLoader";
 import {
   queryAnalyticsEngine,
   resolveAnalyticsReadConfig,
@@ -209,11 +209,13 @@ const queryCronSteps = async (
   return result.truncated ? { ...summary, truncated: true } : summary;
 };
 
-let cached: { at: number; value: Promise<CronRunHistory> } | null = null;
+const runHistoryLoader = cachedLoader<CronRunHistory>({
+  label: "run-history",
+  ttlMs: RUN_HISTORY_CACHE_MS,
+  failureReason: "run history read failed",
+});
 
-export const resetRunHistoryCacheForTests = () => {
-  cached = null;
-};
+export const resetRunHistoryCacheForTests = () => runHistoryLoader.reset();
 
 /** Never throws: a page that reads this must not go down with the telemetry API. */
 export const loadCronRunHistory = async (options: LoadCronRunHistoryOptions = {}): Promise<CronRunHistory> => {
@@ -221,27 +223,13 @@ export const loadCronRunHistory = async (options: LoadCronRunHistoryOptions = {}
   if (!config) return { status: "unconfigured" };
 
   const now = options.now ?? new Date();
-  if (cached && now.getTime() - cached.at < RUN_HISTORY_CACHE_MS) {
-    return cached.value;
-  }
-
-  const value = withDeadline(
+  const timeoutMs = options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS;
+  return runHistoryLoader.load(now, timeoutMs, () =>
     queryCronSteps(config, {
       fetcher: options.fetcher ?? fetch,
       now,
       windowDays: options.windowDays ?? RUN_HISTORY_WINDOW_DAYS,
-      timeoutMs: options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS,
+      timeoutMs,
     }),
-    options.timeoutMs ?? RUN_HISTORY_TIMEOUT_MS,
-    "run-history",
-  ).catch((error: unknown): CronRunHistory => ({
-    status: "unavailable",
-    reason: error instanceof Error ? error.message : "run history read failed",
-  }));
-
-  cached = { at: now.getTime(), value };
-  const resolved = await value;
-  // A failed read is not worth remembering for fifteen minutes; the next request tries again.
-  if (resolved.status !== "ok") cached = null;
-  return resolved;
+  );
 };
