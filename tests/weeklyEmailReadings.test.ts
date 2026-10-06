@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildWeeklyEmailReadings } from "../lib/email/sendWeeklyBrief";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { briefSourceFromSnapshot, buildBriefDocument } from "../lib/report/briefDocument";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
 
@@ -12,7 +13,7 @@ describe("weekly email readings", () => {
       macroSeries,
       now: new Date("2026-08-31T12:00:00.000Z"),
     });
-    const readings = buildWeeklyEmailReadings(snapshot);
+    const readings = buildWeeklyEmailReadings(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall));
 
     assert.deepEqual(readings.map((reading) => reading.label), ["Funding pressure", "Risk appetite", "Confidence"]);
     assert.match(readings[0].value, /^\d+\/100$/);

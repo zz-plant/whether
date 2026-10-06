@@ -4,14 +4,11 @@
  * rich-text HTML for Keynote/Google Slides, and 16:9 standalone SVG slide cards.
  */
 
-import type { OperatingSnapshot } from "../operatingState/types";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { getRegimePublicLabel } from "../regimePresentation";
-import type { StartupVariantMode } from "../report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { resolvePublishedConfidence } from "../report/confidence";
 import { buildScoreReferenceLines } from "./scoreReference";
-import { describeConditions, formatExportConfidence, pauseConditionOnly, SAVED_COPY_NOTE } from "./exportTerms";
+import { describeConditions, formatExportConfidence, formatSourceFooter } from "./exportTerms";
 
 /*
  * The slide's three slot labels are the page's. `callChangesIf` carries the
@@ -32,6 +29,7 @@ export interface MeetingSlidePayload {
   recordDate: string;
   /** The same date as ISO, for a filename or a timestamp; absent when the caller only has the label. */
   recordDateIso?: string;
+  /** The engine key, for the badge's colour and the conditions line's meaning. */
   regime: string;
   stageLabel: string;
   actionNow: string;
@@ -54,7 +52,7 @@ export interface MeetingSlidePayload {
   /** The operating call itself. The snapshot path has only `actionNow`, which
    *  is why this is optional: it renders as the stance line when the two differ. */
   call?: string;
-  /** The levels at which the pause lifts. Absent from a snapshot-derived slide. */
+  /** The other things that would change the guidance, printed under their own name. */
   clearsWhen?: readonly string[];
   /** Where to read the whole brief. Absent when the caller has no origin. */
   url?: string;
@@ -63,53 +61,12 @@ export interface MeetingSlidePayload {
 }
 
 /*
- * The share panel's "Slide" format and `CopyMeetingSlideButton` used to emit two
- * different markdown blocks for the same artifact — the panel's carried the
- * clears-when line and a link, the button's carried neither, and each built its
- * own string. Both now compose through `formatMeetingSlideMarkdown`, fed by
- * `briefArtifactToSlidePayload` in `lib/report/briefArtifact.ts`, so the meeting
- * slide gained the resume thresholds it was missing and the two controls cannot
- * drift apart. The adapter lives there rather than here because this module is
- * the lower layer: `extractMeetingSlidePayload` also feeds the OG image route
- * straight from an `OperatingSnapshot`, with no presentation model involved.
+ * Every slide comes through `briefArtifactToSlidePayload` in
+ * `lib/report/briefArtifact.ts`: the share panel's "Slide" format and
+ * `CopyMeetingSlideButton` from the published island, and the SVG, PPTX and PDF
+ * routes from a `BriefDocument`, which extends the same artifact. The adapter
+ * lives there rather than here because this module is the lower layer.
  */
-
-/*
- * `stage` is null when the reader chose none. It used to default to "seed", so every slide,
- * PPTX and PDF reached without a `?stage=` was titled as a seed-stage company's — a fact about
- * the reader the site never asked for. No stage means no stage on the slide.
- */
-export function extractMeetingSlidePayload(
-  snapshot: OperatingSnapshot,
-  stage: StartupVariantMode | null = null
-): MeetingSlidePayload {
-  const weeklyCall = snapshot.weeklyCall;
-  const stageAdj = stage ? weeklyCall.stageScopedAdjustments?.[stage] : undefined;
-
-  const actionNow = stageAdj?.actionNow ?? weeklyCall.actionNow;
-  const pauseIf = pauseConditionOnly(stageAdj?.pauseIf ?? weeklyCall.pauseIf);
-  const resumeWhen = stageAdj?.resumeWhen ?? weeklyCall.resumeWhen;
-  const stageLabel = stageAdj?.label ?? (stage === "seed" ? "Seed" : stage ? "Startup" : "");
-
-  return {
-    recordDate: snapshot.provenance.recordDateLabel,
-    recordDateIso: snapshot.recordDate,
-    regime: snapshot.assessment.regime,
-    stageLabel,
-    actionNow,
-    pauseIf,
-    callChangesIf: weeklyCall.callChangesIf,
-    ...(resumeWhen ? { resumeWhen } : {}),
-    tightness: snapshot.assessment.scores.tightness,
-    riskAppetite: snapshot.assessment.scores.riskAppetite,
-    lines: {
-      tightness: snapshot.assessment.thresholds.tightnessRegime,
-      riskAppetite: snapshot.assessment.thresholds.riskAppetiteRegime,
-    },
-    confidence: resolvePublishedConfidence({ assessment: snapshot.assessment, record: snapshot.treasury }).label,
-    provenance: snapshot.provenance.sourceLabel || "U.S. Treasury",
-  };
-}
 
 /**
  * The two scores against the call-change lines, as the slide, the deck files
@@ -124,14 +81,20 @@ export const slideReadingLines = (payload: MeetingSlidePayload): string[] =>
       : DEFAULT_THRESHOLDS,
   });
 
-const resumeConditions = (payload: MeetingSlidePayload): string[] => [
-  ...(payload.clearsWhen ?? []),
-  ...(payload.resumeWhen ? [payload.resumeWhen] : []),
-];
-
 /** The stage's resume line as every slide format prints it, or null without a stage. */
 export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
   payload.resumeWhen ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.resumeWhen}` : null;
+
+/** The conditions as every slide format prints them: the weather word, with what it means for money. */
+export const slideConditions = (payload: MeetingSlidePayload): string => describeConditions(payload.regime);
+
+/** Confidence, then the one provenance footer, as every slide format closes. */
+export const slideFooterLine = (payload: MeetingSlidePayload): string =>
+  `${formatExportConfidence(payload.confidence)} · ${formatSourceFooter({
+    sourceLabel: payload.provenance,
+    recordDate: payload.recordDateIso ?? payload.recordDate,
+    isFallback: payload.isFallback,
+  })}`;
 
 /**
  * Generates formatted Markdown / Notion Callout Block
@@ -139,7 +102,7 @@ export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
   return [
     `> **Whether: this week's guidance** — *${payload.recordDate}*`,
-    `> **Conditions**: ${describeConditions(payload.regime)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
+    `> **Conditions**: ${slideConditions(payload)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
     // The stance the week is called at, above the action it implies. Omitted
     // when the two are the same sentence, which is what the model returns on a
@@ -149,18 +112,21 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
       : []),
     `> 🎯 **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
     `> ⚠️ **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
-    // One resume line: the levels a pause lifts at, then the stage's own
-    // discipline when one is chosen. Both say when a hold lifts.
-    ...(resumeConditions(payload).length > 0
-      ? [`> ✅ **${SLIDE_LABELS.resume.toUpperCase()}**: ${resumeConditions(payload).join("; ")}`]
-      : []),
+    // The stage's own discipline for lifting its hold, when one is chosen.
+    ...(payload.resumeWhen ? [`> ✅ **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
     `> 🔄 **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
+    // The other things that would change the guidance, under the name the share
+    // formats give them. They printed as the resume line here, which on a held
+    // week put "why the guidance is held" under "Resume when".
+    ...(payload.clearsWhen && payload.clearsWhen.length > 0
+      ? [`> **${DECISION_CONTRACT_LABELS.watch.watchThisWeek.toUpperCase()}**: ${payload.clearsWhen.join("; ")}`]
+      : []),
     `>`,
     // The snapshot marker travels with the numbers. A slide pasted into a deck
     // during an upstream outage has to say so on the slide, not on the page it
     // was copied from.
     ...slideReadingLines(payload).map((line) => `> *${line}*`),
-    `> *${formatExportConfidence(payload.confidence)} · Source: ${payload.provenance}${payload.isFallback ? ` · ${SAVED_COPY_NOTE}` : ""}*`,
+    `> *${slideFooterLine(payload)}*`,
     ...(payload.url ? [`> ${payload.url}`] : []),
   ].join("\n");
 }
@@ -178,7 +144,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
     <div>
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; font-weight: 700;">Whether · Weekly Operating Brief</span>
       <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's guidance${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
-      <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Conditions: ${describeConditions(payload.regime)}</p>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Conditions: ${slideConditions(payload)}</p>
     </div>
     <div style="text-align: right;">
       <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
@@ -217,7 +183,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
 
   <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: #64748b; padding-top: 8px;">
     <span style="display: flex; flex-direction: column; gap: 2px;">${slideReadingLines(payload).map((line) => `<span>${line}</span>`).join("")}</span>
-    <span>${formatExportConfidence(payload.confidence)} · Source: ${payload.provenance}${payload.isFallback ? ` · ${SAVED_COPY_NOTE}` : ""} · whether.work</span>
+    <span>${slideFooterLine(payload)}</span>
   </div>
 </div>
 `.trim();
@@ -257,7 +223,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 70)">
     <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING GUIDANCE</text>
     <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's guidance${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
-    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · ${esc(describeConditions(payload.regime))} · Source: ${esc(payload.provenance)}</text>
+    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · ${esc(slideConditions(payload))}</text>
     
     <!-- Regime Badge -->
     <g transform="translate(880, 10)">
@@ -300,10 +266,7 @@ ${slideReadingLines(payload)
   )
   .join("\n")}
     <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
-      <tspan fill="#f1f5f9">${esc(formatExportConfidence(payload.confidence))}</tspan>${payload.isFallback ? ` · ${SAVED_COPY_NOTE}` : ""}
-    </text>
-    <text x="1040" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="end">
-      whether.work
+      <tspan fill="#f1f5f9">${esc(formatExportConfidence(payload.confidence))}</tspan> · ${esc(slideFooterLine(payload).slice(formatExportConfidence(payload.confidence).length + 3))}
     </text>${
       slideResumeLine(payload)
         ? `

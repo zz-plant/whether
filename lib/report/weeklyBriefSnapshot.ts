@@ -1,4 +1,6 @@
 import { buildCallCitation } from "../export/briefBuilders";
+import { buildBriefPermalinkUrl } from "../export/briefPermalink";
+import { describeConditions } from "../export/exportTerms";
 import { buildPostureState } from "./postureStateSource";
 import { getRegimeDisplayLabel } from "../regimePresentation";
 import { buildCanonicalDecisionCopy, type CanonicalDecisionCopy } from "./canonicalDecisionCopy";
@@ -142,8 +144,16 @@ export const buildWeeklyBriefSnapshot = ({
         runwayBand,
         runwayMonths,
       });
-  const callCitation = buildCallCitation(reportData.assessment, reportData.treasury, {
-    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+  /* The answer pages' citation, under the call's own conditions label and the
+     published confidence the home model already resolved for this read. */
+  const callCitation = buildCallCitation({
+    conditions: { line: describeConditions(reportData.assessment.regime, weeklyCall.regimeStage) },
+    confidence: homeBriefModel.confidenceLabel,
+    provenance: {
+      sourceUrl: reportData.treasury.source,
+      recordDate: reportData.treasury.record_date,
+      permalink: buildBriefPermalinkUrl(reportData.treasury.record_date),
+    },
   });
   const weeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
     homeBriefModel,

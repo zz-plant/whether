@@ -3,10 +3,9 @@ import { describe, it } from "bun:test";
 import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
-  buildWeeklyOperatorBriefSlackBlocks,
-  buildWeeklyOperatorBriefCardText,
-  buildWeeklyCallSnapshotPlainText,
 } from "../lib/export/weeklyOperatorBrief";
+import type { WeeklyCallContract } from "../lib/report/weeklyCallContract";
+import { buildBriefDocument } from "../lib/report/briefDocument";
 import { getClipboardUiState } from "../app/components/useClipboardCopy";
 import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 
@@ -36,12 +35,30 @@ const treasury = buildTreasuryFixture({
   yields: { oneMonth: 5.1, twoYear: 4.7, tenYear: 4.4 },
 });
 
+/* The contract every production caller passes; the payload is a projection of it. */
+const weeklyCall: WeeklyCallContract = {
+  regimeStage: "Defensive · Late Cycle",
+  currentCall: "Stage approvals and protect runway.",
+  actionNow: "Pause net-new fixed burn commitments this week.",
+  pauseIf: "Pause net-new hiring if funding pressure rises above 76",
+  callChangesIf: "Funding pressure at or below 70",
+  doNowBullets: ["Pause net-new fixed burn commitments this week.", "Ship only reversible roadmap items."],
+  flipConditionLabels: ["Risk appetite > 50", "Yield curve steepens"],
+  whyCouldBeWrong: "Confidence is not high; near-threshold moves can reverse quickly.",
+  policyOverrideActive: false,
+  policyOverrideReason: null,
+};
+
+/* The week's brief document for the fixture reading, under a given call. */
+const documentFor = (call: WeeklyCallContract = weeklyCall) =>
+  buildBriefDocument(
+    { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 4, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+    call,
+  );
+
 describe("weekly operator brief export adapters", () => {
-  it("standardizes the payload contract fields", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      postureWithStageLabel: "Defensive · Late Cycle",
+  it("projects the weekly call contract, slot for slot", () => {
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       weeklyLeadershipSummary: {
         boldnessScore: 42,
         boldnessDelta: -3,
@@ -61,15 +78,18 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(payload.confidence, "Low confidence");
     // The paste line adds what the weather means; the contract field stays the modeled label.
     assert.match(payload.conditions, /^Defensive · Late Cycle \(money is [a-z ]+\)$/);
-    assert.ok(payload.doNowBullets.length > 0);
-    assert.ok(payload.whyCouldBeWrong.length > 0);
-    assert.ok(payload.flipTrigger.length > 0);
+    assert.equal(payload.currentCall, weeklyCall.currentCall);
+    assert.equal(payload.actionNow, weeklyCall.actionNow);
+    // The document holds the pause line as its condition: the label already says "Pause if".
+    assert.equal(payload.pauseIf, "Funding pressure rises above 76");
+    assert.equal(payload.callChangesIf, weeklyCall.callChangesIf);
+    assert.deepEqual(payload.doNowBullets, weeklyCall.doNowBullets);
+    assert.deepEqual(payload.flipConditionLabels, weeklyCall.flipConditionLabels);
+    assert.equal(payload.resumeWhen, undefined, "no stage, no resume line");
   });
 
-  it("renders plain text and image/PDF card text adapters", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
+  it("renders the plain text in the page's order", () => {
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       weeklyLeadershipSummary: {
         boldnessScore: 58,
         boldnessDelta: 4,
@@ -77,7 +97,6 @@ describe("weekly operator brief export adapters", () => {
       },
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);
-    const cardText = buildWeeklyOperatorBriefCardText(payload);
 
     assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     // The number never travels without what it measures.
@@ -86,19 +105,28 @@ describe("weekly operator brief export adapters", () => {
     assert.doesNotMatch(text, /\bLOW\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);
-    assert.match(text, /Guidance:/);
-    assert.match(text, /Do now:/);
-    assert.match(text, /Pause if:/); // replaces Watch for
+    assert.match(text, /^Guidance: Stage approvals and protect runway\.$/m);
+    assert.match(text, /^Do now: Pause net-new fixed burn commitments this week\.$/m);
+    // The pause line under its label carries the condition only, not the rule's own verb.
+    assert.match(text, /^Pause if: Funding pressure rises above 76$/m);
     assert.match(text, /Why this could be wrong:/);
     // The change condition sits under the label every other surface gives it.
-    assert.match(text, /Conditions change if:/);
-    assert.equal(cardText, text);
+    assert.match(text, /^Conditions change if: Funding pressure at or below 70$/m);
+    assert.match(text, /Also this week:\n• Ship only reversible roadmap items\./);
+    assert.match(text, /Other things that would change this guidance:\n• Risk appetite > 50\n• Yield curve steepens/);
+  });
+
+  it("prints a stage's resume line beside the call-change line, never in its place", () => {
+    const text = buildWeeklyOperatorBriefPlainText(
+      buildWeeklyOperatorBriefPayload(documentFor({ ...weeklyCall, resumeWhen: "Two weekly reads below the pause line" }), {
+      }),
+    );
+
+    assert.match(text, /^Conditions change if: Funding pressure at or below 70\nResume when: Two weekly reads below the pause line$/m);
   });
 
   it("names the reading the latitude move is measured against, where the week records one", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       weeklyLeadershipSummary: {
         boldnessScore: 33,
         boldnessDelta: -17,
@@ -113,118 +141,13 @@ describe("weekly operator brief export adapters", () => {
     assert.doesNotMatch(text, /vs last week/);
   });
 
-  it("states the flip distance in the market's units, not score points", () => {
-    // The hero's flip watch says what has to happen on the curve or the bill;
-    // the pasted artifact carries the same sentence so a reader in Slack can
-    // state the flip condition without the score vocabulary.
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-    });
-
-    assert.ok(payload.flipWatchLine, "the assessment fixture has a reachable crossing");
-    assert.match(
-      payload.flipWatchLine!,
-      /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), conditions turn (Sunny|Cloudy|Stormy|Freezing)\.$/,
-    );
-    assert.doesNotMatch(payload.flipWatchLine!, /tightness|riskAppetite|score/i);
-
-    const text = buildWeeklyOperatorBriefPlainText(payload);
-    assert.match(text, /What would change this guidance: If /);
-
-    const blocks = buildWeeklyOperatorBriefSlackBlocks(payload);
-    assert.ok(blocks.includes("What would change this guidance"));
-  });
-
-  it("renders Slack blocks adapter with required sections", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      weeklyLeadershipSummary: {
-        boldnessScore: 58,
-        boldnessDelta: 0,
-        shorthandLine: "The call is holding steady this week.",
-      },
-    });
-    const blocksJson = buildWeeklyOperatorBriefSlackBlocks(payload);
-    const parsed = JSON.parse(blocksJson) as { blocks: Array<{ type: string }> };
-
-    assert.equal(parsed.blocks[0]?.type, "header");
-    assert.ok(blocksJson.includes("Operating latitude"));
-    assert.ok(parsed.blocks.some((block) => block.type === "section"));
-    assert.ok(parsed.blocks.some((block) => block.type === "context"));
-  });
-
-  it("falls back to non-canonical flip text when canonical copy is unavailable", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      flipConditionLabels: ["Tightness < 65", "Risk appetite > 50"],
-    });
-
-    assert.equal(payload.flipTrigger, "Tightness < 65");
-    assert.deepEqual(payload.flipConditionLabels, ["Tightness < 65", "Risk appetite > 50"]);
-    assert.equal(payload.doNowBullets.length > 0, true);
-  });
-
-  it("removes flip trigger duplication from canonical flip conditions", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
-      canonicalDecisionCopy: {
-        currentRegimeLabel: "Cloudy",
-        operatingCall: "Protect runway.",
-        doNowLines: ["Hold fixed burn."],
-        flipTrigger: "Tightness < 65",
-        flipConditions: ["Tightness < 65", "Risk appetite > 50", "Yield curve steepens"],
-      },
-    });
-
-    assert.deepEqual(payload.flipConditionLabels, ["Risk appetite > 50", "Yield curve steepens"]);
-    const text = buildWeeklyOperatorBriefPlainText(payload);
-    assert.doesNotMatch(text, /Flip conditions:\n• Tightness < 65/);
-  });
-
-  it("embeds customTeamNote when provided in plain text and Slack blocks", () => {
-    const payload = buildWeeklyOperatorBriefPayload({
-      assessment,
-      treasury,
+  it("embeds customTeamNote when provided", () => {
+    const payload = buildWeeklyOperatorBriefPayload(documentFor(), {
       customTeamNote: "All-hands update: hold Q3 designer headcount open until Sep 15.",
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);
-    const slackJson = buildWeeklyOperatorBriefSlackBlocks(payload);
 
     assert.match(text, /Team context: All-hands update: hold Q3 designer headcount open until Sep 15\./);
-    assert.match(slackJson, /\*Team Context\*/);
-    assert.match(slackJson, /All-hands update: hold Q3 designer headcount open until Sep 15\./);
-  });
-
-});
-
-
-describe("weekly call snapshot export", () => {
-  it("renders sections in decision-first order with bulleted flip conditions", () => {
-    const text = buildWeeklyCallSnapshotPlainText({
-      regime: "Defensive — Late Cycle",
-      call: "Hold approval velocity and protect runway.",
-      trend: "Deteriorating",
-      confidence: "74% (MED)",
-      doNow: "Ship only reversible roadmap items.",
-      avoid: "Pause net-new fixed burn commitments.",
-      watch: "Track threshold pressure near regime boundary.",
-      flipConditions: [
-        "Resume hiring when risk appetite clears 50 for two weekly reads.",
-        "Release expansion spend after tightness falls below 70 and holds.",
-      ],
-    });
-
-    assert.match(text, /CONDITIONS: Defensive — Late Cycle/);
-    assert.match(text, /GUIDANCE: Hold approval velocity and protect runway\./);
-    assert.match(text, /DO NOW: Ship only reversible roadmap items\./);
-    assert.match(text, /PAUSE IF: Pause net-new fixed burn commitments\./);
-    assert.match(text, /CONDITIONS CHANGE IF: Track threshold pressure near regime boundary\./);
-    assert.doesNotMatch(text, /AVOID:|WATCH:/);
-    assert.match(text, /OTHER THINGS THAT WOULD CHANGE THIS GUIDANCE:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
   });
 });
 

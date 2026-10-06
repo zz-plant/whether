@@ -1,11 +1,12 @@
 import type { assembleHomePage } from "../homePageAssembler";
 import type { BriefArtifact } from "../briefArtifact";
 import type { WeeklyCallContract } from "../weeklyCallContract";
+import type { ReportData, ReportDataFallback } from "../reportData";
 import { decisionAreaLabel } from "../boundedDecisionRules";
 import { getRegimePublicLabel } from "../../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../publishedBriefs";
-import { resolvePublishedConfidence, type ConfidenceInputs } from "../confidence";
+import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument, publisherSourceLabel } from "../briefDocument";
 
 type HomePageAssembly = Awaited<ReturnType<typeof assembleHomePage>>;
 type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
@@ -96,6 +97,7 @@ export const buildBriefArtifact = ({
   const fields = deriveBriefCallFields(card);
   const citableBrief = selectCitablePermalinkBrief(recordDate);
   const treasurySource = homepage.reportShell.treasurySource;
+  const { thresholds } = (homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback).assessment;
 
   return {
     title,
@@ -107,7 +109,6 @@ export const buildBriefArtifact = ({
     resumeWhen: fields.resumeWhenLabel,
     clearsWhen: fields.flipConditionLabels,
     regimeLabel: getRegimePublicLabel(homepage.reportShell.regime),
-    postureLabel: card.status.postureWithStageLabel ?? "",
     tightness: card.diagnostics.currentScores.tightness,
     riskAppetite: card.diagnostics.currentScores.riskAppetite,
     confidenceLabel: card.status.confidenceLabel,
@@ -116,6 +117,12 @@ export const buildBriefArtifact = ({
     noChangeAreas: fields.noChangeAreas,
     permalinkPath: citableBrief ? buildPublishedBriefPath(citableBrief.slug) : undefined,
     isFallback: homepage.reportShell.showOfflineBadge,
+    /* What the slide reads: it printed the conditions label as the reader's
+       stage, the weather word as the engine key and the engine's default lines. */
+    regime: homepage.reportShell.regime,
+    recordDate,
+    lines: { tightness: thresholds.tightnessRegime, riskAppetite: thresholds.riskAppetiteRegime },
+    sourceLabel: publisherSourceLabel(homepage.reportShell.provenance.sourceLabel),
   };
 };
 
@@ -126,58 +133,16 @@ export const buildBriefArtifact = ({
  * `fetch` with a throw to hold that line — so it cannot take the home assembly,
  * which reads cookies and may refresh upstream. The snapshot's call contract
  * has every field the copy formats print; only the revisit queue is absent,
- * which the formats already treat as optional. Two adapters, one model: the
- * page and the panel still cannot offer different briefs.
+ * which the formats already treat as optional. It is the artifact half of the
+ * brief document (`lib/report/briefDocument.ts`), so the island /operate
+ * publishes and the formats /share renders are one derivation.
  */
 export const buildBriefArtifactFromSnapshot = ({
   reportData,
   weeklyCall,
   title,
 }: {
-  reportData: {
-    recordDateLabel: string;
-    assessment: ConfidenceInputs & { regime: string };
-    treasury: {
-      record_date: string;
-      source?: string;
-      fallback_at?: string | null;
-      fallback_reason?: string | null;
-    };
-    historicalSelection?: unknown;
-  };
+  reportData: ReportData | ReportDataFallback;
   weeklyCall: WeeklyCallContract;
   title: string;
-}): BriefArtifact => {
-  const citableBrief = selectCitablePermalinkBrief(reportData.treasury.record_date);
-  const source = reportData.treasury.source;
-
-  return {
-    title,
-    recordDateLabel: reportData.recordDateLabel,
-    /* `actionNow`, not `currentCall`: the homepage artifact leads with the
-       canonical do-now line, and for the bundled fallback snapshot the two
-       differ — so the same Slack button copied two different calls. */
-    call: weeklyCall.actionNow,
-    actionNow: weeklyCall.actionNow,
-    guardrail: weeklyCall.pauseIf,
-    reversal: weeklyCall.callChangesIf,
-    resumeWhen: weeklyCall.resumeWhen,
-    clearsWhen: weeklyCall.flipConditionLabels,
-    regimeLabel: getRegimePublicLabel(reportData.assessment.regime),
-    postureLabel: weeklyCall.regimeStage,
-    tightness: reportData.assessment.scores.tightness,
-    riskAppetite: reportData.assessment.scores.riskAppetite,
-    /* The published label, as the homepage adapter above gets it from the
-       card. This was the engine's, so the copy on /share and /operate said
-       "medium" on a week the homepage's said "high". */
-    confidenceLabel: resolvePublishedConfidence({
-      assessment: reportData.assessment,
-      record: reportData.treasury,
-      historical: Boolean(reportData.historicalSelection),
-    }).label,
-    source: source?.startsWith("http") ? "FRED" : source ?? "FRED",
-    permalinkPath: citableBrief ? buildPublishedBriefPath(citableBrief.slug) : undefined,
-    isFallback: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
-  };
-};
-
+}): BriefArtifact => briefArtifactOf(buildBriefDocument(briefSourceFromReportData(reportData), weeklyCall, { title }));

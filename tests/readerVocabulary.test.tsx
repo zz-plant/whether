@@ -6,15 +6,15 @@ import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
 import { signalScenarioRoutes } from "../app/seoRouteClusters";
 import { toolkitDefinitions } from "../lib/decisionDomainCatalog";
-import { buildBoardBrief, buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import {
-  extractMeetingSlidePayload,
   formatMeetingSlideHtml,
   formatMeetingSlideMarkdown,
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
@@ -24,7 +24,7 @@ import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
 import type { RunwayBand } from "../lib/report/operatorRunway";
-import { assessment, treasury, sensors, macros } from "./factories/exportFixtures";
+import { assessment, fixtureBriefDocument, fixtureWeeklyCall, treasury, macros } from "./factories/exportFixtures";
 import { renderOgElement } from "../app/api/og/renderOgElement";
 import { collectPageShareCards } from "./fixtures/pageShareCards";
 
@@ -187,6 +187,9 @@ const routeSurfaces: Surface[] = [
 ];
 
 const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });
+/* The slide routes draw the stored snapshot; this one carries the same reading and call the
+   other export surfaces print. */
+const fixtureSnapshot = { ...snapshot, assessment, weeklyCall: fixtureWeeklyCall() };
 const record: TrackRecord = {
   monthsCovered: 176,
   firstRecordDate: "2012-01-31",
@@ -202,28 +205,21 @@ const record: TrackRecord = {
 };
 
 const artifactSurfaces: Surface[] = [
-  { name: "Slack brief", text: () => buildSlackBrief(assessment, treasury, sensors, macros) },
-  { name: "board brief", text: () => buildBoardBrief(assessment, treasury, sensors, macros) },
-  { name: "call citation", text: () => buildCallCitation(assessment, treasury) },
-  { name: "board slide bullets", text: () => buildBoardSlideBullets(assessment, treasury, macros) },
-  { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(assessment, treasury, sensors, macros) },
+  { name: "Slack brief", text: () => buildSlackBrief(fixtureBriefDocument()) },
+  { name: "call citation", text: () => buildCallCitation(fixtureBriefDocument()) },
+  { name: "board slide bullets", text: () => buildBoardSlideBullets(fixtureBriefDocument()) },
+  { name: "issue-tracker brief", text: () => buildIssueTrackerMarkdownBrief(fixtureBriefDocument()) },
   {
     name: "weekly operator brief",
-    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload({ assessment, treasury })),
+    text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(fixtureBriefDocument())),
   },
-  { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(extractMeetingSlidePayload(snapshot)) },
-  { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(extractMeetingSlidePayload(snapshot))) },
-  { name: "meeting slide (svg)", text: () => visibleText(formatMeetingSlideSvg(extractMeetingSlidePayload(snapshot))) },
+  { name: "meeting slide (markdown)", text: () => formatMeetingSlideMarkdown(buildExportSlidePayload(fixtureSnapshot, null)) },
+  { name: "meeting slide (html)", text: () => visibleText(formatMeetingSlideHtml(buildExportSlidePayload(fixtureSnapshot, null))) },
+  { name: "meeting slide (svg)", text: () => visibleText(formatMeetingSlideSvg(buildExportSlidePayload(fixtureSnapshot, null))) },
   {
     name: "investor update",
     text: () => {
-      const parts = buildInvestorUpdateSnippetParts({
-        assessment,
-        record: treasury,
-        weeklyCall: snapshot.weeklyCall,
-        monthlyHistory: [],
-        sourceLabel: treasury.source,
-      });
+      const parts = buildInvestorUpdateSnippetParts(fixtureBriefDocument(), []);
       const bands: RunwayBand[] = ["critical", "tight", "balanced", "abundant"];
       return bands.map((band) => formatInvestorUpdateSnippet(parts, band)).join("\n");
     },
@@ -231,12 +227,9 @@ const artifactSurfaces: Surface[] = [
   {
     name: "portfolio note",
     text: () =>
-      buildPortfolioNote({
-        assessment,
-        record: treasury,
-        areas: [{ area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" }],
-        sourceLabel: treasury.source,
-      }),
+      buildPortfolioNote(fixtureBriefDocument(), [
+        { area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" },
+      ]),
   },
   { name: "published brief (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },
   { name: "published brief (email)", text: () => (latestPublishedBrief ? buildPublishedBriefEmailUpdate(latestPublishedBrief) : "") },

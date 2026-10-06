@@ -13,14 +13,12 @@
  * the one paragraph that depends on the reader's company. The page builds the
  * reading; the client composes the block with whichever band the browser holds.
  */
-import type { RegimeAssessment } from "../regimeEngine";
-import type { WeeklyCallContract } from "../report/weeklyCallContract";
+import type { BriefDocument } from "../report/briefArtifact";
 import type { MonthlyRegimeHistoryEntry } from "../summary/monthlyRegimeHistory";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
-import { resolvePublishedConfidence, type ConfidenceRecord } from "../report/confidence";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { pauseConditionOnly, SAVED_COPY_NOTE } from "./exportTerms";
+import { formatSourceFooter } from "./exportTerms";
 import { signalReadingMeaning } from "../report/signalTranslations";
 import { formatMonthYearShortFromValue, formatSignedDelta, formatThresholdNumber } from "../formatters";
 import type { RunwayBand } from "../report/operatorRunway";
@@ -54,7 +52,7 @@ const RUNWAY_IMPLICATIONS: Record<RunwayBand, string> = {
     "With more than two years of runway we are [what the cushion is going on], without loosening the payback bar.",
 };
 
-const CONFIDENCE_PHRASES: Record<ReturnType<typeof resolvePublishedConfidence>["label"], string> = {
+const CONFIDENCE_PHRASES: Record<BriefDocument["confidence"], string> = {
   HIGH: "well clear of the line where they would change",
   MED: "within reach of the line where they would change",
   LOW: "close to the line where they would change",
@@ -87,36 +85,31 @@ const describeMove = (current: number, previous: number | undefined) => {
   return Math.abs(delta) < 0.5 ? "unchanged" : `${formatSignedDelta(delta)} points`;
 };
 
-export const buildInvestorUpdateSnippetParts = ({
-  assessment,
-  record,
-  weeklyCall,
-  monthlyHistory,
-  sourceLabel,
-  isFallback = false,
-}: {
-  assessment: RegimeAssessment;
-  /** The treasury record the assessment was read from. */
-  record: ConfidenceRecord & { record_date: string };
-  weeklyCall: Pick<WeeklyCallContract, "actionNow" | "pauseIf" | "callChangesIf" | "resumeWhen">;
-  monthlyHistory: readonly MonthlyRegimeHistoryEntry[];
-  sourceLabel: string;
-  isFallback?: boolean;
-}): InvestorUpdateSnippetParts => {
-  const regimeLabel = getRegimePublicLabel(assessment.regime);
-  const { tightness, riskAppetite } = assessment.scores;
-  const recordDate = record.record_date;
+/**
+ * The block's parts, from the week's brief document. The month-end history is
+ * this format's own: an investor letter compares itself with the last one, so
+ * the move it reports is against the prior month-end, not last Monday.
+ */
+export const buildInvestorUpdateSnippetParts = (
+  document: BriefDocument,
+  monthlyHistory: readonly MonthlyRegimeHistoryEntry[],
+): InvestorUpdateSnippetParts => {
+  const { regime } = document.conditions;
+  const regimeLabel = getRegimePublicLabel(regime);
+  const { tightness, riskAppetite } = document.readings.scores;
+  const recordDate = document.provenance.recordDate;
   const prior = findPriorMonthEnd(monthlyHistory, recordDate);
-  const confidence = CONFIDENCE_PHRASES[resolvePublishedConfidence({ assessment, record }).label];
+  const confidence = CONFIDENCE_PHRASES[document.confidence];
+  const { slots } = document;
 
   const regimeSentence = prior
-    ? prior.regime === assessment.regime
+    ? prior.regime === regime
       ? `Whether's read of the operating environment is ${regimeLabel} as of ${recordDate}, unchanged since the end of ${formatMonthYearShortFromValue(prior.record_date)}.`
       : `Whether's read of the operating environment moved to ${regimeLabel} as of ${recordDate}, from ${getRegimePublicLabel(prior.regime)} at the end of ${formatMonthYearShortFromValue(prior.record_date)}.`
     : `Whether's read of the operating environment is ${regimeLabel} as of ${recordDate}.`;
 
   /* The weather word alone means nothing to an investor who has never seen the site. */
-  const meaningSentence = getRegimeWeatherRationale(assessment.regime).split(". ")[0].replace(/\.?$/, ".");
+  const meaningSentence = getRegimeWeatherRationale(regime).split(". ")[0].replace(/\.?$/, ".");
 
   const tightnessMove = describeMove(tightness, prior?.tightness);
   const riskMove = describeMove(riskAppetite, prior?.riskAppetite);
@@ -130,15 +123,15 @@ export const buildInvestorUpdateSnippetParts = ({
      same three lines under the same words. "Guardrail" and "change our
      course" were two more names for them. */
   const response = [
-    `Our operating response this month: ${asSentence(weeklyCall.actionNow)}`,
-    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${asSentence(pauseConditionOnly(weeklyCall.pauseIf))}`,
-    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${asSentence(weeklyCall.callChangesIf)}`,
-    ...(weeklyCall.resumeWhen
-      ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${asSentence(weeklyCall.resumeWhen)}`]
+    `Our operating response this month: ${asSentence(slots.actionNow)}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${asSentence(slots.pauseIf)}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${asSentence(slots.callChangesIf)}`,
+    ...(slots.resumeWhen
+      ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${asSentence(slots.resumeWhen)}`]
       : []),
   ].join(" ");
 
-  const source = `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}.`;
+  const source = `${formatSourceFooter(document.provenance)}.`;
 
   return { conditions, response, source };
 };

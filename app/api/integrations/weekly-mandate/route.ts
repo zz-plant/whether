@@ -6,6 +6,7 @@ import {
   parseIntegrationTarget,
 } from "../../../../lib/integrationBriefs";
 import { buildPostureState } from "../../../../lib/report/postureStateSource";
+import { buildBriefDocumentFromReport } from "../../../../lib/report/briefDocument";
 
 export const runtime = "edge";
 
@@ -32,11 +33,12 @@ export async function GET(request: Request) {
     assessment,
     reportDynamics: reportData.reportDynamics,
   });
+  const document = await buildBriefDocumentFromReport(reportData, { degraded: !reportResult.ok, postureState });
 
   return NextResponse.json({
     target,
     recordDate: treasury.record_date,
-    payload: buildWeeklyMandatePayload(target, assessment, treasury, postureState),
+    payload: buildWeeklyMandatePayload(target, document, postureState),
     postureState,
     degraded: !reportResult.ok,
   });

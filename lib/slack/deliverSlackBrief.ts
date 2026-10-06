@@ -1,15 +1,12 @@
 import { buildSlackBrief } from "../export/briefBuilders";
-import { previousScoresFromDynamics } from "../export/scoreReference";
 import {
   assessReadingReadiness,
   assessSnapshotReadiness,
   resolveOperatingSnapshot,
   type OperatingReading,
 } from "../operatingState/resolveSnapshot";
-import { buildPostureState } from "../report/postureStateSource";
-import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
+import { briefSourceFromSnapshot, buildBriefDocument, buildBriefDocumentFromReport } from "../report/briefDocument";
 import type { OperatingSnapshot } from "../operatingState/types";
-import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
 import { slackChannel } from "../delivery/slack";
 import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
@@ -106,18 +103,8 @@ const buildSlackBriefPayload = async (
   recordDate: string;
   readiness: ReturnType<typeof assessReadingReadiness>;
 }> => {
-  const reportData = reading.report;
-  const { assessment, treasury, sensors, macroSeries } = reportData;
-  const postureState = await buildPostureState({
-    record: treasury,
-    assessment,
-    reportDynamics: reportData.reportDynamics,
-  });
-  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
-    postureState,
-    actionStripItems: reportData.actionStripItems,
-    previousScores: previousScoresFromDynamics(reportData.reportDynamics, assessment.scores),
-  });
+  const { treasury } = reading.report;
+  const text = buildSlackBrief(await buildBriefDocumentFromReport(reading.report, { degraded: reading.degraded }));
   return {
     text,
     recordDate: treasury.record_date,
@@ -146,19 +133,11 @@ const buildSlackBriefPayloadFromSnapshot = async (
   recordDate: string;
   readiness: ReturnType<typeof assessSnapshotReadiness>;
 }> => {
-  const { assessment, treasury, macroSeries } = snapshot;
-  const sensors = buildSensorReadings(treasury);
-  const postureState = await buildPostureState({
-    record: treasury,
-    assessment,
-    reportDynamics: buildReportDynamics({ current: assessment, previous: null }),
-  });
+  const { treasury } = snapshot;
   /* The snapshot holds no previous week, so this post prints no last week —
-     the builder's rule, rather than a zero move. The area rows it can derive. */
-  const text = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
-    postureState,
-    actionStripItems: buildGuidanceBundleFromAssessment(assessment).actionStripItems,
-  });
+     the builder's rule, rather than a zero move. The call is the snapshot's own
+     contract, the one the email reads. */
+  const text = buildSlackBrief(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall));
   return {
     text,
     recordDate: treasury.record_date,

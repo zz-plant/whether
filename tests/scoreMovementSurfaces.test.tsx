@@ -10,7 +10,7 @@ import { buildSignalReferenceRows } from "../lib/report/evidenceReaderModel";
 import { buildSignalChangeRows } from "../lib/report/home/homeSectionModel";
 import type { RegimeSignalIndicator } from "../lib/report/homeBriefModel";
 import type { ReportDynamics } from "../lib/report/reportDataTypes";
-import { assessment, macros, sensors, treasury } from "./factories/exportFixtures";
+import { assessment, fixtureBriefDocument } from "./factories/exportFixtures";
 
 /*
  * The move a score made is shown with what it is made of: the page's rows, the
@@ -148,7 +148,7 @@ describe("the pastes", () => {
       "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from startup-market inputs). The Aug 31 scores were built from interest rates alone.",
     );
 
-    const brief = buildSlackBrief(assessment, treasury, sensors, macros, { previousScores });
+    const brief = buildSlackBrief(fixtureBriefDocument({ previousScores }));
     assert.match(brief, /^What moved the scores since Aug 31: funding pressure \+27/m);
     // Under the two readings, above the rate inputs they explain.
     assert.ok(brief.indexOf("Risk appetite ") < brief.indexOf("What moved the scores"));
@@ -159,7 +159,7 @@ describe("the pastes", () => {
     const previousScores = previousScoresFromDynamics(withoutMovement, scores);
 
     assert.equal(buildScoreMovementLine(previousScores), null);
-    assert.doesNotMatch(buildSlackBrief(assessment, treasury, sensors, macros, { previousScores }), /What moved the scores/);
+    assert.doesNotMatch(buildSlackBrief(fixtureBriefDocument({ previousScores })), /What moved the scores/);
     assert.equal(buildScoreMovementLine(null), null);
   });
 });

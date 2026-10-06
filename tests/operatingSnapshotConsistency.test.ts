@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
+import { pauseConditionOnly } from "../lib/export/exportTerms";
+import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
 import { GET as getWeeklyRoute } from "../app/api/weekly/route";
 import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { macroSeries } from "../lib/macroSnapshot";
@@ -80,11 +82,9 @@ describe("OperatingSnapshot read consistency", () => {
 
     const reportData = await loadReportData({ consistencyCase: "persisted-current" });
     const brief = await loadWeeklyBriefSnapshot({ consistencyCase: "persisted-brief" });
-    const exported = buildWeeklyOperatorBriefPayload({
-      assessment: brief.reportData.assessment,
-      treasury: brief.reportData.treasury,
-      weeklyCall: brief.snapshot.weeklyCall,
-    });
+    const exported = buildWeeklyOperatorBriefPayload(
+      buildBriefDocument(briefSourceFromReportData(brief.reportData), brief.snapshot.weeklyCall),
+    );
 
     assert.deepEqual(reportData.assessment, persisted.assessment);
     assert.deepEqual(reportData.treasury, persisted.treasury);
@@ -92,7 +92,7 @@ describe("OperatingSnapshot read consistency", () => {
     assert.deepEqual(brief.snapshot.weeklyCall, persisted.weeklyCall);
     assert.equal(exported.currentCall, persisted.weeklyCall.currentCall);
     assert.equal(exported.actionNow, persisted.weeklyCall.actionNow);
-    assert.equal(exported.pauseIf, persisted.weeklyCall.pauseIf);
+    assert.equal(exported.pauseIf, pauseConditionOnly(persisted.weeklyCall.pauseIf));
     assert.equal(exported.callChangesIf, persisted.weeklyCall.callChangesIf);
   });
 

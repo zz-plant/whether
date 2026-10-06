@@ -6,6 +6,8 @@ import {
   integrationTargets,
   parseIntegrationTarget,
 } from "../lib/integrationBriefs";
+import { buildBriefDocument } from "../lib/report/briefDocument";
+import { fixtureWeeklyCall } from "./factories/exportFixtures";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 
@@ -80,6 +82,12 @@ const treasury = {
   yields: { oneMonth: 5.2, twoYear: 4.6, tenYear: 4.5 },
 } as TreasuryData;
 
+/* The week's brief document for this reading, under the call contract every production caller builds. */
+const document = buildBriefDocument(
+  { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+  fixtureWeeklyCall(assessment),
+);
+
 describe("integration briefs", () => {
   it("parses only supported targets", () => {
     assert.equal(parseIntegrationTarget("slack"), "slack");
@@ -88,31 +96,38 @@ describe("integration briefs", () => {
   });
 
   it("builds reusable envelope", () => {
-    const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
+    const envelope = buildWeeklyMandateEnvelope(document, postureState);
     assert.match(envelope.title, /weekly mandate/i);
     assert.match(envelope.markdown, /## Whether weekly mandate/);
     // Pasted with no page beside it: the scores carry their scale and the lines use the page's names.
     assert.match(envelope.summary, /Funding pressure 72\/100: money is hard to raise\./);
-    assert.match(envelope.markdown, /Conditions change if: /);
-    assert.match(envelope.markdown, /- Resume when: Risk appetite/);
+    // The brief's own change line, not the posture state's lock commitment.
+    assert.match(envelope.markdown, new RegExp(`^Conditions change if: ${document.slots.callChangesIf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "m"));
+    assert.doesNotMatch(envelope.markdown, /Tightness ≤ 66 for 2 consecutive refreshes/);
+    assert.match(envelope.markdown, /^Resume when: /m);
+    assert.doesNotMatch(envelope.markdown, /Resume when: .*tighten again/i, "a condition that tightens is not a resume line");
     assert.doesNotMatch(envelope.markdown, /flip|Reversal:|regime|DEFENSIVE/i);
+    // What the document does not carry still comes from the posture state.
+    assert.equal(envelope.lastChange.reason, "Tightness crossed above 70.");
   });
 
   it("builds slack payload", () => {
-    const payload = buildWeeklyMandatePayload("slack", assessment, treasury, postureState) as { text: string; metadata: { regime: string } };
-    assert.match(payload.text, /Whether weekly mandate/);
+    const payload = buildWeeklyMandatePayload("slack", document, postureState);
+    const text = "text" in payload ? payload.text ?? "" : "";
+    assert.match(text, /Whether weekly mandate/);
     assert.equal(payload.metadata.regime, "DEFENSIVE");
   });
 
   it("builds notion payload", () => {
-    const payload = buildWeeklyMandatePayload("notion", assessment, treasury, postureState);
+    const payload = buildWeeklyMandatePayload("notion", document, postureState);
     // A database row a team reads: the weather word, not the engine key.
     assert.match(JSON.stringify(payload), /"Conditions":\{"select":\{"name":"Cloudy"\}\}/);
   });
 
   it("builds linear payload", () => {
-    const payload = buildWeeklyMandatePayload("linear", assessment, treasury, postureState) as { labels: string[] };
-    assert.ok(payload.labels.includes("cloudy"));
-    assert.ok(!payload.labels.includes("defensive"));
+    const payload = buildWeeklyMandatePayload("linear", document, postureState);
+    const labels = "labels" in payload ? payload.labels ?? [] : [];
+    assert.ok(labels.includes("cloudy"));
+    assert.ok(!labels.includes("defensive"));
   });
 });

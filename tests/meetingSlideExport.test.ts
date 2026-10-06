@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import {
-  extractMeetingSlidePayload,
   formatMeetingSlideMarkdown,
   formatMeetingSlideHtml,
   formatMeetingSlideSvg,
 } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import type { TreasuryData } from "../lib/types";
+import { macroSeries } from "../lib/macroSnapshot";
+import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 
 const mockTreasury: TreasuryData = {
   record_date: "2026-08-31",
@@ -23,13 +25,27 @@ const mockTreasury: TreasuryData = {
 };
 
 describe("Meeting Slide & Notion Exporter", () => {
+  it("keeps a held call held whatever stage the slide is downloaded for", () => {
+    /* With no macro series the policy layer holds the guidance. The slide used to
+       print the stage's own action over that, while the brief, the email and the
+       Monday post printed the held call. */
+    const held = buildOperatingSnapshot({ treasury: mockTreasury, macroSeries: [] });
+    assert.equal(held.weeklyCall.policyOverrideActive, true);
+    const seed = buildExportSlidePayload(held, "seed");
+    assert.equal(seed.stageLabel, "Seed");
+    assert.equal(seed.actionNow, POLICY_OVERRIDE_CALL.actionNow);
+    assert.equal(seed.pauseIf, POLICY_OVERRIDE_CALL.pauseIf);
+    assert.equal(seed.resumeWhen, undefined, "a held call has one resume line, its change line");
+  });
+
   it("extracts and formats slide payloads across stages", () => {
     const snapshot = buildOperatingSnapshot({
       treasury: mockTreasury,
-      macroSeries: [],
+      macroSeries,
     });
 
-    const seedPayload = extractMeetingSlidePayload(snapshot, "seed");
+    assert.equal(snapshot.weeklyCall.policyOverrideActive, false, "an ordinary week, which a stage calibrates");
+    const seedPayload = buildExportSlidePayload(snapshot, "seed");
     assert.equal(seedPayload.stageLabel, "Seed");
     assert.equal(seedPayload.regime, "SCARCITY");
     assert.ok(seedPayload.actionNow.length > 0);
@@ -37,12 +53,12 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.equal(seedPayload.callChangesIf, snapshot.weeklyCall.callChangesIf, "a stage never replaces the change line");
     assert.equal(seedPayload.resumeWhen, snapshot.weeklyCall.stageScopedAdjustments?.seed.resumeWhen);
 
-    const seriesAPayload = extractMeetingSlidePayload(snapshot, "series-a");
+    const seriesAPayload = buildExportSlidePayload(snapshot, "series-a");
     assert.equal(seriesAPayload.stageLabel, "Series A");
 
     // No stage chosen means no stage on the slide. This used to default to "Seed", which titled
     // every slide reached without a `?stage=` as a seed-stage company's.
-    const unstaged = extractMeetingSlidePayload(snapshot);
+    const unstaged = buildExportSlidePayload(snapshot, null);
     assert.equal(unstaged.stageLabel, "");
     assert.doesNotMatch(formatMeetingSlideMarkdown(unstaged), /Stage\*\*/);
     assert.doesNotMatch(formatMeetingSlideHtml(unstaged), /Seed|Startup/);
@@ -52,10 +68,10 @@ describe("Meeting Slide & Notion Exporter", () => {
   it("generates structured markdown callout for Notion", () => {
     const snapshot = buildOperatingSnapshot({
       treasury: mockTreasury,
-      macroSeries: [],
+      macroSeries,
     });
 
-    const payload = extractMeetingSlidePayload(snapshot, "seed");
+    const payload = buildExportSlidePayload(snapshot, "seed");
     const markdown = formatMeetingSlideMarkdown(payload);
 
     assert.ok(markdown.includes("> **Whether: this week's guidance**"));
@@ -72,10 +88,10 @@ describe("Meeting Slide & Notion Exporter", () => {
   it("generates rich HTML with executive styling for slide copy", () => {
     const snapshot = buildOperatingSnapshot({
       treasury: mockTreasury,
-      macroSeries: [],
+      macroSeries,
     });
 
-    const payload = extractMeetingSlidePayload(snapshot, "seed");
+    const payload = buildExportSlidePayload(snapshot, "seed");
     const html = formatMeetingSlideHtml(payload);
 
     assert.ok(html.includes("Whether · Weekly Operating Brief"));
@@ -90,10 +106,10 @@ describe("Meeting Slide & Notion Exporter", () => {
   it("generates valid 16:9 standalone SVG slide", () => {
     const snapshot = buildOperatingSnapshot({
       treasury: mockTreasury,
-      macroSeries: [],
+      macroSeries,
     });
 
-    const payload = extractMeetingSlidePayload(snapshot, "series-b");
+    const payload = buildExportSlidePayload(snapshot, "series-b");
     const svg = formatMeetingSlideSvg(payload);
 
     assert.ok(svg.startsWith("<svg"));
