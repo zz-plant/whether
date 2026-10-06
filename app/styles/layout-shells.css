@@ -112,34 +112,6 @@ html[data-focus-mode] [data-home-shell-main] {
   padding-block: 3rem;
 }
 
-.weather-secondary-shell {
-  position: relative;
-  isolation: isolate;
-}
-
-.weather-secondary-shell > * {
-  position: relative;
-  z-index: 1;
-}
-
-.weather-secondary-shell-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, rgba(7, 18, 38, 0.24) 0%, rgba(8, 27, 47, 0.08) 100%);
-  pointer-events: none;
-}
-
-.weather-page-shell-compact {
-  max-width: 56rem;
-}
-
-.weather-page-shell-narrow {
-  max-width: 64rem;
-}
-
 .weather-page-shell-standard {
   max-width: 72rem;
 }
@@ -169,11 +141,10 @@ html[data-focus-mode] [data-home-shell-main] {
   pointer-events: none;
 }
 
-/* The two shell backdrops are navy washes tuned for the dark ground. On the
-   light theme a 40% navy over cream is a grey slab, and /pricing, /answers
-   and the 404 sat on one; here they fade to the page. */
-html[data-theme="light"] .weather-hub-backdrop,
-html[data-theme="light"] .weather-secondary-shell-backdrop {
+/* The hub backdrop is a navy wash tuned for the dark ground. On the light
+   theme a 40% navy over cream is a grey slab, and /pricing sat on one; here
+   it fades to the page. */
+html[data-theme="light"] .weather-hub-backdrop {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 100%);
 }
 

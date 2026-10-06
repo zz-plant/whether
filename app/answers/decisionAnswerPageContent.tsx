@@ -12,7 +12,7 @@ import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings"
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import Link from "next/link";
-import { SecondaryPageSection, SecondaryPageShell } from "../components/secondaryPageShell";
+import { SecondaryPageSection } from "../components/secondaryPageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
@@ -33,6 +33,7 @@ import { PlainEnglishScoreNote, SignalScaleNote } from "../components/ui/plainLa
 import { signalPlainEnglish, type CompositeSignalKey } from "../../lib/report/signalTranslations";
 import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
+import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -172,7 +173,7 @@ export async function DecisionAnswerPageContent({
   ];
 
   return (
-    <SecondaryPageShell width="narrow">
+    <ContentPageShell measure="content">
       <ContentMeasurementTracker pagePath={pagePath} cluster={measurement.cluster} intent={measurement.intent} />
       <JsonLdScript data={faqData} />
 
@@ -355,6 +356,6 @@ export async function DecisionAnswerPageContent({
           </div>
         </SecondaryPageSection>
       </div>
-    </SecondaryPageShell>
+    </ContentPageShell>
   );
 }

@@ -45,8 +45,6 @@ import { ActionLink } from "../../components/ui/actionLink";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
 type Params = { slug: string };
-const RESOURCES_RETURN_HREF = "/operate" as const;
-const RESOURCES_RETURN_LABEL = "Return to Planning";
 
 export const revalidate = 21600;
 
@@ -156,34 +154,24 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const article = findResourceArticleBySlug(slug);
   if (article) {
     const { reportData, snapshot, postureSummary } = await loadPostureLine(`/resources/${article.slug}`);
-    const { homeBriefModel, callCitation } = snapshot;
+    const { homeBriefModel } = snapshot;
     const decisionAreas = getResourceArticleDecisionAreas(article);
     const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
 
+    /* The link back to the brief is inside the article's live-guidance block.
+       It was a pair of pills ("Start from Weekly Brief", "Return to Planning")
+       rendered above the page's <main>, outside the landmark and off its column. */
     return (
-      <>
-        <section className="mx-auto mt-6 flex w-full max-w-4xl flex-wrap gap-2 px-4 sm:px-6">
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-            Start from Weekly Brief
-          </Link>
-          <Link
-            href={RESOURCES_RETURN_HREF}
-            className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100"
-          >
-            {RESOURCES_RETURN_LABEL}
-          </Link>
-        </section>
-        <ResourceArticlePage
-          article={article}
-          decisionArtifact={{
-            decisionShiftSummary: homeBriefModel.decisionShiftSummary,
-            postureSummary,
-            mappedRules,
-            freshnessLabel: reportData.fetchedAtLabel,
-            citation: callCitation,
-          }}
-        />
-      </>
+      <ResourceArticlePage
+        article={article}
+        decisionArtifact={{
+          decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+          postureSummary,
+          mappedRules,
+          freshnessLabel: reportData.fetchedAtLabel,
+          recordDateLabel: reportData.recordDateLabel,
+        }}
+      />
     );
   }
 

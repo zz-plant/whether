@@ -4,12 +4,12 @@ import { buildPageMetadata } from "../../lib/seo";
 import {
   SecondaryPageHeader,
   SecondaryPageSection,
-  SecondaryPageShell,
 } from "../components/secondaryPageShell";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { DecisionShieldGlyph } from "../components/illustrations/DecisionShieldGlyph";
 import { DecisionRecordPanel } from "./decisionRecordPanel";
 import { DecisionRecordDownloads } from "./decisionRecordDownloads";
+import { ContentPageShell } from "../components/ui/contentPageShell";
 export const runtime = "edge";
 export const revalidate = 900;
 /**
@@ -48,7 +48,7 @@ export default async function DecisionsPage() {
   const { reportData } = await loadWeeklyBriefSnapshot(undefined, { route: "/decisions" });
   const scores = reportData.assessment.scores;
   return (
-    <SecondaryPageShell width="standard">
+    <ContentPageShell measure="wide">
       <SecondaryPageHeader
         eyebrow="Your record"
         title="Your decision record"
@@ -84,6 +84,6 @@ export default async function DecisionsPage() {
           .
         </p>
       </SecondaryPageSection>
-    </SecondaryPageShell>
+    </ContentPageShell>
   );
 }

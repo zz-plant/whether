@@ -38,6 +38,7 @@ import {
   toThresholdDistance,
   type RuleThresholdDistance,
 } from "../../../lib/report/operatingCalls";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
 
 /**
  * The nearest of a decision's lines to the frozen reading, for the distance
@@ -160,7 +161,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell measure="prose">
       <JsonLdScript data={structuredData} />
 
       <Breadcrumbs
@@ -441,6 +442,6 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       {/* A shared brief used to be a dead end: the recipient got the citation
           and nothing that brought next Monday's call to them. */}
       <SubscribeForm />
-    </main>
+    </ContentPageShell>
   );
 }

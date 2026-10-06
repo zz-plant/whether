@@ -1,7 +1,16 @@
 import type { ComponentProps } from "react";
 
-/* The outer <main> for the long-tail content routes — answer, toolkits,
- * resources, signals clusters, history periods.
+/* The reading frame: the outer <main> for every page that is read rather than
+ * operated — answers, toolkits, resources and their articles, signal clusters,
+ * history periods, the published brief record, calibration, concepts,
+ * decisions, about, contact and the 404. The report routes (/signals, /trust,
+ * /operate, /resolve, /history) use `ReportShell`; those are the two frames.
+ *
+ * Until 2026-10-06 the reading pages were split across this, a
+ * `SecondaryPageShell` with its own widths and a navy backdrop, and five
+ * hand-rolled <main>s. The hand-rolled ones carried no `id`, so the layout's
+ * skip link went nowhere on the brief record, about, contact and the resource
+ * articles.
  *
  * Twelve call sites carried this exact class chain, character for character.
  * That is less a styling detail than a layout contract: these pages are meant
@@ -15,6 +24,8 @@ import type { ComponentProps } from "react";
  * `data-page-cluster` attributes off the same element for instrumentation.
  */
 const measureClassNames = {
+  /* Tables and side columns: calibration, concepts, decisions, the articles' rail. */
+  wide: "max-w-6xl",
   content: "max-w-4xl",
   prose: "max-w-3xl",
 } as const;

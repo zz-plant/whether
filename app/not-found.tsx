@@ -1,9 +1,10 @@
-import { SecondaryPageHeader, SecondaryPageShell } from "./components/secondaryPageShell";
+import { SecondaryPageHeader } from "./components/secondaryPageShell";
 import { ActionLink } from "./components/ui/actionLink";
+import { ContentPageShell } from "./components/ui/contentPageShell";
 
 export default function NotFound() {
   return (
-    <SecondaryPageShell width="compact">
+    <ContentPageShell measure="content">
       <SecondaryPageHeader
         eyebrow="Page not found"
         title="That page moved."
@@ -18,6 +19,6 @@ export default function NotFound() {
           </>
         )}
       />
-    </SecondaryPageShell>
+    </ContentPageShell>
   );
 }

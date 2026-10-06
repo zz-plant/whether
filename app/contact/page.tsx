@@ -15,6 +15,7 @@ import {
   publisherProfilePath,
 } from "../../lib/publisher";
 import { EditorialDeskGlyph } from "../components/illustrations/EditorialDeskGlyph";
+import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Contact Whether",
@@ -38,7 +39,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <ContentPageShell measure="prose">
       <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
@@ -105,6 +106,6 @@ export default function ContactPage() {
           </ActionLink>
         </div>
       </section>
-    </main>
+    </ContentPageShell>
   );
 }
