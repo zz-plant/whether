@@ -1,18 +1,5 @@
 
 
-.weather-delta-card {
-  transition:
-    transform 220ms ease,
-    border-color 220ms ease,
-    background-color 220ms ease,
-    box-shadow 220ms ease;
-}
-
-.weather-delta-card:hover,
-.weather-delta-card:focus-within {
-  transform: translateY(-1px);
-}
-
 /* Connected causal anchor target highlighting */
 tr:target {
   background-color: rgba(56, 189, 248, 0.08);

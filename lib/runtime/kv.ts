@@ -126,15 +126,13 @@ const isKvNamespace = (value: unknown): value is KvNamespace =>
   && typeof Reflect.get(value, "list") === "function";
 
 /**
- * Resolve the durable KV binding installed by worker/index.ts, preferring the shared
- * namespace and falling back to a legacy per-domain binding name when provided.
+ * Resolve the durable KV binding installed by worker/index.ts. WHETHER_DURABLE_KV is the
+ * only KV namespace wrangler.toml declares for data; the per-domain names this used to
+ * fall back to (INGESTION_KV, POSTURE_EVENTS_KV, DECISION_MEMORY_KV, DECISION_EVENTS_KV,
+ * REGIME_ALERTS_KV) were never bound in any environment.
  */
-export const getWhetherKv = (legacyBindingName?: string): KvNamespace | null => {
-  const sharedBinding: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
-  const legacyBinding: unknown = legacyBindingName
-    ? Reflect.get(globalThis, legacyBindingName)
-    : undefined;
-  const candidate: unknown = sharedBinding ?? legacyBinding;
+export const getWhetherKv = (): KvNamespace | null => {
+  const candidate: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
   if (!isKvNamespace(candidate)) {
     return null;
   }

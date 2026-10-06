@@ -17,13 +17,16 @@ export function resolveCaptureTargets(onlyIds?: string[]): Array<{
 export function listCaptureTargets(): string[];
 export type CaptureTheme = "dark" | "light";
 export function parseCaptureTheme(args: string[]): CaptureTheme;
-export function captureFileName(targetId: string, theme?: CaptureTheme): string;
+export type CaptureVisitor = "first" | "returning";
+export function parseCaptureVisitor(args: string[]): CaptureVisitor;
+export function captureFileName(targetId: string, theme?: CaptureTheme, visitor?: CaptureVisitor): string;
 export function parseCaptureOptions(args: string[]): {
   args: string[];
   baseUrl: string;
   outDir: string;
   onlyIds: string[];
   theme: CaptureTheme;
+  visitor: CaptureVisitor;
   targets: ReturnType<typeof resolveCaptureTargets>;
 };
 export function probeHtmlAssetIntegrity(baseUrl: string): Promise<{
@@ -51,6 +54,7 @@ export function captureTargets(options: {
   outDir: string;
   targets: ReturnType<typeof resolveCaptureTargets>;
   theme?: CaptureTheme;
+  visitor?: CaptureVisitor;
 }): Promise<Array<{
   id: string;
   label: string;
@@ -58,6 +62,7 @@ export function captureTargets(options: {
   viewport: { width: number; height: number };
   fullPage: boolean;
   theme: CaptureTheme;
+  visitor: CaptureVisitor;
   outputPath: string;
   outputFileName: string;
   screenFileName?: string | null;
@@ -73,4 +78,5 @@ export function writeCaptureArtifacts(options: {
   outDir: string;
   captures: Awaited<ReturnType<typeof captureTargets>>;
   theme?: CaptureTheme;
+  visitor?: CaptureVisitor;
 }): Promise<{ manifestPath: string; galleryPath: string; generatedAt: string }>;

@@ -104,7 +104,6 @@ svg :where(.type-eyebrow, .type-badge) {
   font-size: var(--text-display);
   font-family: var(--font-sans);
 }
-.text-heading { font-size: var(--text-heading); }
 
  :where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
   line-height: 1.7;
@@ -167,16 +166,4 @@ html {
   scroll-padding-top: calc(env(safe-area-inset-top) + 7rem);
   scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
-
-@keyframes weather-stream-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 

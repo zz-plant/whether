@@ -138,7 +138,7 @@ const isStoredSnapshotRecord = (value: unknown): value is StoredSnapshotRecord =
 };
 
 const getKvBinding = () => {
-  const binding = getWhetherKv("INGESTION_KV");
+  const binding = getWhetherKv();
   if (!binding || typeof binding.list !== "function") {
     return null;
   }

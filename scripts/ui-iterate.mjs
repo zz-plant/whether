@@ -45,6 +45,7 @@ const run = async () => {
       baseUrl: captureBaseUrl,
       outDir: options.outDir,
       theme: options.theme,
+      visitor: options.visitor,
       captures: captures.map((capture) => ({
         ...capture,
         url: new URL(capture.path, captureBaseUrl).toString(),

@@ -13,8 +13,7 @@
   .weather-button,
   .weather-button-primary,
   .weather-cta,
-  .weather-hub-link-card,
-  .weather-delta-card {
+  .weather-hub-link-card {
     transition: none;
   }
 }
