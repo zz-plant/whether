@@ -1,6 +1,6 @@
 import type { GovernanceParameterSet } from "./policy/governance";
 import type { RegimeStateTransition } from "./regimeStateMachine";
-import type { TreasuryData, TreasuryYields, RegimeKey } from "./types";
+import type { TreasuryYields, RegimeKey } from "./types";
 
 export type { RegimeKey };
 
@@ -340,87 +340,16 @@ export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   riskAppetiteRegime: RISK_APPETITE_REGIME_THRESHOLD,
 };
 
-const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
-  SCARCITY: {
-    description: "Capital is expensive and lenders are pulling back. Prioritize survival over growth.",
-    constraints: [
-      "Shorten payback windows and preserve cash.",
-      "Delay speculative hiring or large platform rewrites.",
-      "Route roadmap bets through revenue certainty.",
-    ],
-  },
-  DEFENSIVE: {
-    description: "Capital is expensive but funding stays selective. Operate for efficiency.",
-    constraints: [
-      "Focus on margin expansion and retention.",
-      "Cut low-leverage experiments.",
-      "Convert demand with tighter sales cycles.",
-    ],
-  },
-  VOLATILE: {
-    description: "Capital is cheaper but funding is wary. Build trust and resilience.",
-    constraints: [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees.",
-    ],
-  },
-  EXPANSION: {
-    description: "Capital is available and financing conditions are supportive. The weekly guidance sets the tempo inside that window.",
-    constraints: [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong.",
-    ],
-  },
-};
-
-export const getRegimeProfile = (regime: RegimeKey) => REGIME_PROFILES[regime];
-
-export const buildTightnessExplanation = (thresholds: RegimeThresholds) =>
-  `Tightness score blends up to three components capped at ${TIGHTNESS_CAP}: ` +
-  `base rate points ramp from 0 to ${TIGHTNESS_BASE_RATE_POINTS} when rates move above ${thresholds.baseRateTightness}%, ` +
-  `inversion points ramp from 0 to ${TIGHTNESS_INVERSION_POINTS} when slope moves below 0%, ` +
-  `and tightening-speed points ramp from 0 to ${BASE_RATE_VELOCITY_POINTS} when the trailing ${BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day ` +
-  `base-rate move exceeds ${BASE_RATE_VELOCITY_THRESHOLD} points (the term needs base-rate history; without it it is 0).`;
-
-/**
- * What the risk-appetite axis actually measures, in the reader's words.
- *
- * The score is a *financing-conditions* proxy: it maps the 10Y-2Y slope onto a
- * 0-100 scale. The slope moves when the market reprices expected monetary policy,
- * so the score rises when the central bank eases — March 2020's emergency cuts
- * steepened the curve and lifted the score during the fastest crash on record.
- * Calling that "risk appetite is healthy" published a claim about market
- * psychology that this reading cannot see; observed risk appetite (volatility,
- * credit stress) enters through the separate macro adjustments, which haircut
- * this score but never the other way around. The axis name stays — it is the
- * published vocabulary — but the explanation now says what drives it.
+/*
+ * Nothing in this module writes a sentence. The regime profiles, the two axis
+ * explanations, the input labels and the base-rate source names used to live
+ * here, and every wording edit to them was a commit to a scoring file that also
+ * rewrote archived history on the next regeneration. They are in
+ * `lib/report/regimeDescription.ts`, which turns what the engine scored into the
+ * stored assessment.
  */
-export const RISK_APPETITE_EXPLANATION =
-  `Risk-appetite score is a financing-conditions proxy: it maps the 10Y-2Y slope from ` +
-  `${RISK_APPETITE_MIN_SLOPE}% (capital pulling back) to ${RISK_APPETITE_MAX_SLOPE}% (capital leaning in), scaled to 0-100. ` +
-  `The slope is a monetary-expectations read, not observed market appetite — ` +
-  `volatility and credit stress enter through separate adjustments.`;
 
-/**
- * What the base rate reading actually is, in the reader's words.
- *
- * `getBaseRate` falls through to the one-month bill on every render — nothing
- * populates `fedFunds` (see `TREASURY_SOURCE_LABEL` above and the note in
- * `treasury/treasuryClient.ts`). Surfaces used to call the result "the Fed
- * rate" regardless, which put a claim about the policy rate into verdicts and
- * into the text operators paste into threads. Name the series that was read;
- * wiring DFF is a change to the published call and is not this label's job.
- */
-export const BASE_RATE_SOURCE_LABELS: Record<RegimeScores["baseRateUsed"], string> = {
-  FED: "The federal funds rate",
-  "1M": "The 1-month Treasury bill",
-  "3M": "The 3-month Treasury bill",
-  MISSING: "The short-rate anchor",
-};
-
-export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+export const clamp =(value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /**
  * Optional evaluation inputs a caller supplies when it has base-rate history.
@@ -527,70 +456,6 @@ export const computeCurveSlope = (yields: TreasuryYields): number | null => {
   }
 
   return tenYear - twoYear;
-};
-
-export const buildRegimeInputs = (
-  treasury: TreasuryData,
-  baseRate: ReturnType<typeof getBaseRate>,
-  curveSlope: number | null,
-): RegimeInput[] => {
-  // "Policy base rate (1M)" named a policy rate and then admitted in parentheses
-  // that it had read a bill. The label now says which series it is.
-  const baseRateLabel =
-    baseRate.used === "MISSING"
-      ? "Short-rate anchor (missing)"
-      : `${BASE_RATE_SOURCE_LABELS[baseRate.used]} (${baseRate.used})`;
-  const baseRateNotes =
-    baseRate.used === "MISSING"
-      ? "No 1M or 3M Treasury rate available; defaulted to 0% for scoring."
-      : "Used as the cost-of-money anchor for tightness scoring.";
-  const sourceUrl = treasury.source;
-
-  return [
-    {
-      id: "base-rate",
-      label: baseRateLabel,
-      value: baseRate.used === "MISSING" ? null : baseRate.value,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-      notes: baseRateNotes,
-    },
-    {
-      id: "two-year",
-      label: "US Treasury 2Y",
-      value: treasury.yields.twoYear ?? null,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-    },
-    {
-      id: "ten-year",
-      label: "US Treasury 10Y",
-      value: treasury.yields.tenYear ?? null,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-    },
-    {
-      id: "curve-slope",
-      label: "Yield curve slope (10Y - 2Y)",
-      value: curveSlope,
-      unit: "%",
-      sourceLabel: TREASURY_SOURCE_LABEL,
-      sourceUrl,
-      recordDate: treasury.record_date,
-      fetchedAt: treasury.fetched_at,
-      derivedFrom: "US Treasury 10Y and 2Y yields",
-      notes: "Derived metric used to score risk appetite.",
-    },
-  ];
 };
 
 export const resolveThresholds = (

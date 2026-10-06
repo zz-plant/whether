@@ -5,7 +5,14 @@ import {
   type RegimeKey,
   type RegimeThresholds,
 } from "./regimeEngineCore";
-import { regimeSignalLabel } from "./report/signalTranslations";
+
+/*
+ * The engine's flip governance. It decides; it does not say. Every sentence a
+ * reader meets about a transition ("Funding pressure crossed above 70. Transition
+ * committed.") is written from the `cause` this returns, by
+ * `describeRegimeAssessment` in `lib/report/regimeDescription.ts`. Wording lives
+ * there so an edit to it is visibly a copy change, never a scoring one.
+ */
 
 type RegimeState = RegimeKey;
 
@@ -47,6 +54,11 @@ export type RegimeMachineSnapshot = {
   lastSignals?: Pick<RegimeMachineSignals, "tightness" | "riskAppetite">;
 };
 
+/**
+ * A transition as stored and published: the machine's step with its cause
+ * written out as `transitionReason`. This is the shape inside every stored
+ * operating snapshot and transition event, so it stays as it is.
+ */
 export type RegimeStateTransition = {
   nextState: RegimeState;
   candidateState: RegimeState;
@@ -62,6 +74,29 @@ export type RegimeStateTransition = {
    */
   shock?: boolean;
   snapshot: RegimeMachineSnapshot;
+};
+
+/** One classification line a score crossed between the previous reading and this one. */
+export type RegimeLineCrossing = {
+  axis: "tightness" | "riskAppetite";
+  direction: "above" | "below";
+  threshold: number;
+};
+
+/** Why the machine did what it did, as data. The report layer words it. */
+export type RegimeTransitionCause =
+  | { outcome: "held" }
+  | {
+      outcome: "pending";
+      crossings: RegimeLineCrossing[];
+      pendingCount: number;
+      confirmationGate: number;
+    }
+  | { outcome: "committed"; crossings: RegimeLineCrossing[]; shock: boolean };
+
+/** What `advanceRegimeState` returns: the stored transition with its cause as a code. */
+export type RegimeMachineStep = Omit<RegimeStateTransition, "transitionReason"> & {
+  cause: RegimeTransitionCause;
 };
 
 /**
@@ -88,21 +123,21 @@ const crossed = ({
   previous,
   current,
   threshold,
-  label,
+  axis,
 }: {
   previous: number | undefined;
   current: number;
   threshold: number;
-  label: string;
-}) => {
+  axis: RegimeLineCrossing["axis"];
+}): RegimeLineCrossing | null => {
   if (typeof previous !== "number") {
     return null;
   }
   if (previous <= threshold && current > threshold) {
-    return `${label} crossed above ${threshold}`;
+    return { axis, direction: "above", threshold };
   }
   if (previous > threshold && current <= threshold) {
-    return `${label} crossed below ${threshold}`;
+    return { axis, direction: "below", threshold };
   }
   return null;
 };
@@ -110,7 +145,7 @@ const crossed = ({
 const advanceRegimeStateBase = (
   previousState: RegimeMachineSnapshot | null,
   currentSignals: RegimeMachineSignals,
-): RegimeStateTransition => {
+): RegimeMachineStep => {
   const candidateState = classifyFromSignals(currentSignals);
   const committedState = previousState?.committedState ?? candidateState;
 
@@ -120,7 +155,7 @@ const advanceRegimeStateBase = (
       candidateState,
       committed: false,
       pending: false,
-      transitionReason: "No threshold crossing changed the committed state.",
+      cause: { outcome: "held" },
       transitionPendingCount: 0,
       snapshot: {
         committedState,
@@ -134,20 +169,20 @@ const advanceRegimeStateBase = (
     };
   }
 
-  const crossingReasons = [
+  const crossings = [
     crossed({
       previous: previousState?.lastSignals?.tightness,
       current: currentSignals.tightness,
       threshold: currentSignals.thresholds.tightnessRegime,
-      label: regimeSignalLabel.tightness,
+      axis: "tightness",
     }),
     crossed({
       previous: previousState?.lastSignals?.riskAppetite,
       current: currentSignals.riskAppetite,
       threshold: currentSignals.thresholds.riskAppetiteRegime,
-      label: regimeSignalLabel.riskAppetite,
+      axis: "riskAppetite",
     }),
-  ].filter((reason): reason is string => Boolean(reason));
+  ].filter((crossing): crossing is RegimeLineCrossing => crossing !== null);
 
   /**
    * A crossing is a shock when the axis moved `SHOCK_CROSSING_POINTS` or more in
@@ -178,17 +213,13 @@ const advanceRegimeStateBase = (
   const confirmationGate = requiresConfirmation ? 2 : 1;
   const committed = (!confidenceBlocked && pendingCount >= confirmationGate) || shockCrossed;
 
-  const transitionReason = crossingReasons.length > 0
-    ? `${crossingReasons.join("; ")}.`
-    : "Evidence moved into a different regime quadrant.";
-
   if (!committed) {
     return {
       nextState: committedState,
       candidateState,
       committed: false,
       pending: true,
-      transitionReason: `${transitionReason} Transition pending confidence gate (${pendingCount}/${confirmationGate}).`,
+      cause: { outcome: "pending", crossings, pendingCount, confirmationGate },
       transitionPendingCount: pendingCount,
       snapshot: {
         committedState,
@@ -207,9 +238,7 @@ const advanceRegimeStateBase = (
     candidateState,
     committed: true,
     pending: false,
-    transitionReason: shockCrossed
-      ? `${transitionReason} Committed as a shock crossing — the one-step move bypassed the near-band, so no published reversal condition fired.`
-      : `${transitionReason} Transition committed.`,
+    cause: { outcome: "committed", crossings, shock: shockCrossed },
     transitionPendingCount: pendingCount,
     shock: shockCrossed || undefined,
     snapshot: {

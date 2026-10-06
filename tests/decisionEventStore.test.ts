@@ -122,7 +122,7 @@ describe("decision event store", () => {
           thresholds: DEFAULT_THRESHOLDS,
           diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 4, transitionWatch: true },
           pendingCount: second.transitionPendingCount ?? 2,
-          transitionReason: second.transitionReason,
+          transitionReason: "Risk appetite crossed below 50. Transition committed.",
         }),
       );
     }

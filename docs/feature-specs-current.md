@@ -386,7 +386,7 @@ called the reading "the Fed rate":
 - `buildRegimeInputs` labelled the input "Policy base rate (1M)" — a policy-rate claim that then
   admitted in parentheses it had read a bill.
 
-`BASE_RATE_SOURCE_LABELS` (`lib/regimeEngineCore.ts`) is now the one place that names the reading,
+`BASE_RATE_SOURCE_LABELS` (`lib/report/regimeDescription.ts`, moved from the engine core with the rest of the engine's copy) is now the one place that names the reading,
 and both surfaces use it: "The 1-month Treasury bill is 5.20%…". The `FED` entry exists so that
 wiring DFF renames the surface rather than leaving it wrong in the other direction.
 **Wiring DFF is deliberately not done here** — `treasury/treasuryClient.ts` says that is a live

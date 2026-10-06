@@ -107,3 +107,25 @@ and 11 from startup-market inputs the earlier score never had, and the "pause li
 readings, ask whether the readings share their inputs; if they do not, say which part of the difference is
 the inputs. `explainScoreMovement` (`lib/report/scoreMovement.ts`) does that for the two scores, and
 `docs/feature-specs-current.md` §1.1.27 has the numbers and the like-for-like question it leaves open.
+
+## The engine decides; `lib/report/` says it (2026-10-06)
+
+Four of the last wording commits to the regime's copy (91cb0156, e9879a0f, 4bba8ebe, a244e212) were
+commits to scoring files, because the regime profiles, the axis explanations, the input labels, the data
+warnings, the contributor lines, the policy refusal reasons and the machine's transition reasons were all
+written inside `regimeEngineCore`, `regimeEngine`, `regimeEngineDiagnostics`, `regimeEnginePolicy` and the
+state machine — which imported `regimeSignalLabel` from `lib/report/` to do it, so the engine and the report
+layer imported each other.
+
+The scorer (`scoreRegime`, `lib/regimeEngineScoring.ts`) now returns codes: the regime key, contributor codes,
+warning codes, a transition `cause` (`held` / `pending` / `committed`, with the lines crossed and whether it
+was a shock), refusal codes. `describeRegimeAssessment` (`lib/report/regimeDescription.ts`) writes them into
+the same `RegimeAssessment`, field for field and in the same key order — a stored snapshot is JSON, and a
+re-read one must equal the one written. `evaluateRegime` composes the two and kept its signature. The state
+machine lives at `lib/regimeStateMachine.ts`, and `advanceRegimeState` returns the step with its `cause`;
+only the described assessment carries `transitionReason`.
+
+What did not change: the strings are still stored. The walk keeps `description` as each month's summary and
+the generators write every one of them into `data/`, so a wording edit in `regimeDescription.ts` still
+rewrites archived text on the next regeneration. The split makes that edit visibly a copy change; it does
+not make it free.

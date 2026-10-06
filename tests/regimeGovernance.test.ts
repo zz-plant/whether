@@ -19,7 +19,7 @@ import { buildMonthlySummary } from "../lib/summary/monthlySummary";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import summaryArchive from "../data/summary_archive.json";
 import { z } from "zod";
-import type { RegimeAssessment } from "../lib/regimeEngine";
+import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
 import type { MacroSeriesReading } from "../lib/types";
 
 const thresholds: RegimeThresholds = { ...DEFAULT_THRESHOLDS };
@@ -160,7 +160,34 @@ describe("flip governance", () => {
     const shock = advanceRegimeState(first.snapshot, machineSignals(40 + SHOCK_CROSSING_POINTS + 6, 40));
     assert.equal(shock.committed, true);
     assert.equal(shock.shock, true);
-    assert.ok(shock.transitionReason.includes("no published reversal condition fired"));
+    assert.deepEqual(shock.cause, {
+      outcome: "committed",
+      crossings: [
+        { axis: "tightness", direction: "above", threshold: 70 },
+        { axis: "riskAppetite", direction: "below", threshold: 50 },
+      ],
+      shock: true,
+    });
+  });
+
+  it("words a shock commit as one in the stored transition reason", () => {
+    // Tightness 20 to 81 in one read: the engine marks the shock as a code and
+    // the description step is what says no published reversal condition fired.
+    const assessment = evaluateRegime(
+      {
+        source: "https://example.com",
+        record_date: "2026-06-30",
+        fetched_at: "2026-06-30T00:00:00.000Z",
+        isLive: false,
+        yields: { oneMonth: 4.3, twoYear: 4.0, tenYear: 4.4 },
+      },
+      undefined,
+      [],
+      { committedState: "EXPANSION", pendingState: null, pendingCount: 0, lastSignals: { tightness: 20, riskAppetite: 70 } },
+    );
+    assert.equal(assessment.regimeTransition?.shock, true);
+    assert.ok(assessment.regimeTransition?.transitionReason.includes("no published reversal condition fired"));
+    assert.ok(assessment.dataWarnings.some((warning) => warning.startsWith("Shock crossing:")));
   });
 
   it("does not mark a shock when the prior reading sat inside the near band", () => {
@@ -171,7 +198,11 @@ describe("flip governance", () => {
     const crossing = advanceRegimeState(first.snapshot, machineSignals(95, 30));
     assert.equal(crossing.candidateState, "SCARCITY");
     assert.equal(crossing.shock, undefined);
-    assert.ok(!crossing.transitionReason.includes("no published reversal condition fired"));
+    assert.deepEqual(crossing.cause, {
+      outcome: "committed",
+      crossings: [{ axis: "tightness", direction: "above", threshold: 70 }],
+      shock: false,
+    });
   });
 
   it("requires two confirmations for a near-boundary gradual crossing", () => {

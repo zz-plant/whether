@@ -21,7 +21,6 @@
  * cap, so a crossing that needs risk appetite to rise is not reported.
  */
 import {
-  BASE_RATE_SOURCE_LABELS,
   clamp,
   computeRiskAppetiteScore,
   computeTightnessScore,
@@ -30,6 +29,7 @@ import {
   type RegimeKey,
 } from "../regimeEngineCore";
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
+import { BASE_RATE_SOURCE_LABELS } from "./regimeDescription";
 import { getRegimePublicLabel } from "../regimePresentation";
 
 type FlipProximity = {

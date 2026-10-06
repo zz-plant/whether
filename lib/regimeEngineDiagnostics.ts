@@ -4,11 +4,9 @@ import {
   clamp,
   type RegimeAssessment,
   type RegimeDiagnostics,
-  type RegimeSignalInfluence,
   type RegimeThresholds,
   type RegimeTrend,
 } from "./regimeEngineCore";
-import { regimeSignalLabel } from "./report/signalTranslations";
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 100;
@@ -107,6 +105,25 @@ export const MACRO_ADJUSTMENT_CONSTANTS = {
   layoffRiskAppetiteCap: LAYOFF_RISK_APPETITE_CAP,
 } as const;
 
+/**
+ * Which corroborating read moved a score, as a code. The engine records that a
+ * read contributed; the sentence a reader sees for each one is written in
+ * `lib/report/regimeDescription.ts`, so rewording it never touches scoring.
+ */
+export type MacroContributorCode =
+  | "high-yield-stress"
+  | "financial-conditions-tightening"
+  | "equity-volatility"
+  | "market-stress-veto"
+  | "market-stress-unwind"
+  | "vc-funding-slowdown"
+  | "tech-layoff-pressure";
+
+/** The engine's diagnostics: the stored shape, with contributors still as codes. */
+export type RegimeDiagnosticsScoring = Omit<RegimeDiagnostics, "boundaryContributors"> & {
+  boundaryContributors: MacroContributorCode[];
+};
+
 const getMacroValue = (series: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
   series.find((entry) => entry.id === id)?.value ?? null;
 
@@ -132,7 +149,7 @@ export const applyMacroAdjustments = (
 ) => {
   let adjustedTightness = tightness;
   let adjustedRiskAppetite = riskAppetite;
-  const contributors: string[] = [];
+  const contributors: MacroContributorCode[] = [];
   let weakReadCount = 0;
   let vetoApplied = false;
 
@@ -147,7 +164,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("High-yield bond market stress");
+    contributors.push("high-yield-stress");
     weakReadCount += 1;
   }
 
@@ -162,7 +179,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Financial conditions are tightening");
+    contributors.push("financial-conditions-tightening");
     weakReadCount += 1;
   }
 
@@ -177,7 +194,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Stock market volatility is high");
+    contributors.push("equity-volatility");
     weakReadCount += 1;
   }
 
@@ -190,9 +207,7 @@ export const applyMacroAdjustments = (
     if (adjustedRiskAppetite > vetoCap) {
       adjustedRiskAppetite = vetoCap;
       contributors.push(
-        vixMean >= VIX_MARKET_STRESS_VETO_MEAN
-          ? "Market stress veto — posture cannot read better than transitional"
-          : "Market stress unwinding — expansion tempo capped",
+        vixMean >= VIX_MARKET_STRESS_VETO_MEAN ? "market-stress-veto" : "market-stress-unwind",
       );
       vetoApplied = true;
     }
@@ -212,7 +227,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("VC funding slowdown");
+    contributors.push("vc-funding-slowdown");
     weakReadCount += 1;
   }
 
@@ -227,7 +242,7 @@ export const applyMacroAdjustments = (
       SCORE_MIN,
       SCORE_MAX,
     );
-    contributors.push("Tech layoff pressure");
+    contributors.push("tech-layoff-pressure");
     weakReadCount += 1;
   }
 
@@ -244,7 +259,7 @@ export const computeDiagnostics = (
   tightness: number,
   riskAppetite: number,
   thresholds: RegimeThresholds,
-  boundaryContributors: string[] = [],
+  boundaryContributors: MacroContributorCode[] = [],
   weakReadCount = 0,
   /*
    * Set when either score came from a stand-in rather than a reading. Both
@@ -253,7 +268,7 @@ export const computeDiagnostics = (
    * data at all reported HIGH.
    */
   hasImputedInputs = false,
-): RegimeDiagnostics => {
+): RegimeDiagnosticsScoring => {
   const tightnessVsThreshold = Math.round(tightness - thresholds.tightnessRegime);
   const riskAppetiteVsThreshold = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
   const nearestThresholdDelta = Math.min(Math.abs(tightnessVsThreshold), Math.abs(riskAppetiteVsThreshold));
@@ -284,51 +299,6 @@ export const computeDiagnostics = (
     twoWeakReadsWarning: weakReadCount >= TWO_WEAK_READS_WARNING_COUNT,
   };
 };
-
-export const buildSignalInfluence = ({
-  tightness,
-  riskAppetite,
-  baseRate,
-  curveSlope,
-  thresholds,
-}: {
-  tightness: number;
-  riskAppetite: number;
-  baseRate: number | null;
-  curveSlope: number | null;
-  thresholds: RegimeThresholds;
-}): RegimeSignalInfluence[] => [
-  {
-    key: "tightness",
-    label: regimeSignalLabel.tightness,
-    influence: Math.abs(tightness - thresholds.tightnessRegime),
-    unavailable: false,
-  },
-  {
-    key: "riskAppetite",
-    label: regimeSignalLabel.riskAppetite,
-    influence: Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
-    unavailable: false,
-  },
-  {
-    key: "baseRate",
-    /**
-     * Names the series actually read, matching `BASE_RATE_SOURCE_LABELS` in the
-     * engine core. This used to say "Fed interest rate" while the reading fell
-     * through to the one-month bill on every render.
-     */
-    label: "Short rate (1M bill)",
-    influence:
-      typeof baseRate === "number" ? Math.abs(baseRate - thresholds.baseRateTightness) : null,
-    unavailable: typeof baseRate !== "number",
-  },
-  {
-    key: "curveSlope",
-    label: "Recession warning gauge",
-    influence: typeof curveSlope === "number" ? Math.abs(curveSlope) : null,
-    unavailable: typeof curveSlope !== "number",
-  },
-];
 
 export const deriveRegimeTrend = (
   previous: RegimeAssessment | null,

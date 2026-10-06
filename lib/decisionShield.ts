@@ -4,7 +4,7 @@
  */
 import type { RegimeAssessment } from "./regimeEngine";
 import { REGIME_REVERSAL_DAYS } from "./regimeEngine";
-import { BASE_RATE_SOURCE_LABELS } from "./regimeEngineCore";
+import { BASE_RATE_SOURCE_LABELS } from "./report/regimeDescription";
 import { REGIME_LABELS } from "./regimePresentation";
 import { formatSignalReading } from "./report/signalTranslations";
 import {

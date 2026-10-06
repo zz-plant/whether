@@ -171,6 +171,14 @@ These modules form the core reasoning path of the product. They matter more than
 
 The core classification engine. It takes normalized market inputs and decides what kind of environment the operator is in.
 
+`evaluateRegime()` is a composition of two steps. `scoreRegime()` (`lib/regimeEngineScoring.ts`) is the
+deterministic scorer and writes no copy: profile, contributors, warnings, the machine's transition cause and
+policy refusals come out as codes. `describeRegimeAssessment()` (`lib/report/regimeDescription.ts`) writes
+those codes into the stored `RegimeAssessment`, string for string, so every caller and every stored shape
+is unchanged. A wording edit is therefore a commit to `lib/report/`, never to a scoring file — but the
+strings are still stored (the month walk keeps `description`, the generators write the archives), so it
+still rewrites archived text on the next regeneration.
+
 **Key Functions:**
 - `evaluateRegime()` — Main scoring function; accepts a threaded machine snapshot and a context carrying base-rate history
 - `computeTightnessScore()` — Base-rate ramp + curve-inversion points + tightening-speed term → tightness

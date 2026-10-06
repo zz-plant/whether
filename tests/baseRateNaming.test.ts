@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { evaluateDecision } from "../lib/decisionShield";
 import { buildShareText } from "../app/operate/components/decisionShieldUtils";
-import { BASE_RATE_SOURCE_LABELS, buildRegimeInputs, getBaseRate } from "../lib/regimeEngineCore";
+import { getBaseRate } from "../lib/regimeEngineCore";
+import { BASE_RATE_SOURCE_LABELS, buildRegimeInputs } from "../lib/report/regimeDescription";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 
