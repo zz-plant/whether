@@ -40,7 +40,7 @@ export const metadata: Metadata = buildPageMetadata({
   imageParams: { template: "record", eyebrow: "History" },
 });
 
-type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string };
+type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string };
 
 /** The phase map's window rides in the URL, so its links have to preserve the
  *  other params on the page — a reader who has the raw-conditions disclosure open
@@ -84,15 +84,18 @@ export default async function HistoryPage({
   const weekAfterRecord =
     latestWeek && trackRecord && latestWeek.recordDate > trackRecord.latestRecordDate ? latestWeek : undefined;
 
-  /* The reader's order, not the mechanism's: the record's answer first (the
-     month strip, then the tiles), the method second (the phase map), then the
-     evidence (the table) and the published weeks. The rail follows the page. */
+  /* The two questions the page summary names, in that order: what the
+     guidance said (the month strip with its years, then the published weeks),
+     then how it held up (the tiles and their grading). The method (the phase
+     map) and the lookup tables follow, closed. The published weeks sat fifth,
+     under the phase map, though they are the record a reader cites. The rail
+     follows the page. */
   const historySectionLinks = [
     ...(fullSeries.length > 0 ? [{ href: "#call-by-month", label: "Conditions by month" }] : []),
+    ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
     ...(trackRecord ? [{ href: "#track-record", label: "Track record" }] : []),
     { href: "#regime-map", label: "How the two scores set conditions" },
     ...(trackRecord ? [{ href: "#monthly-calls", label: "Monthly readings" }] : []),
-    ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
   ];
 
   /*
@@ -171,6 +174,22 @@ export default async function HistoryPage({
             </p>
           ) : null}
           <MonthStrip entries={fullSeries} />
+          {/* Each closed year, under the strip it summarises. "Conditions by
+              year" was a section of its own near the foot of the page, ten
+              screens from the strip that draws the same months. */}
+          <div className="space-y-2">
+            <h3 className="type-eyebrow">Each closed year</h3>
+            <ul className="flex flex-wrap gap-2">
+              {postureArchiveYears.map((year) => (
+                <li key={year.slug}>
+                  <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
+                    {year.title}
+                    <span className="ml-2 text-slate-400">{toWeatherLabel(year.operatorLabel)}</span>
+                  </ActionLink>
+                </li>
+              ))}
+            </ul>
+          </div>
           <p className="text-sm text-slate-300">
             For founders, finance teams and boards comparing funding environments: use the monthly record
             to examine how the model reads past conditions. Historical readings are not evidence that a
@@ -184,50 +203,6 @@ export default async function HistoryPage({
           </div>
         </section>
       ) : null}
-
-      {/* The tiles, with the confidence record beside them: "how often did the
-          call hold" and "how often was the confidence label right" are the same
-          question asked twice, and the second answer used to live on /trust. */}
-      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-        {/* The export copies the track record, so it sits in that section's
-            header. It had a row of its own between the page intro and the
-            first section, belonging to neither. */}
-        <TrackRecordTiles
-          record={trackRecord}
-          action={trackRecord ? <ExportBoardAnnexButton record={trackRecord} /> : null}
-          aside={
-            <div className="space-y-3">
-              <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
-              <ConfidenceRecordBody />
-              <p className="text-fluid-xs text-slate-400">
-                <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-                  Read the calibration study
-                </Link>
-                {" · "}
-                <Link href="/concepts" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-                  Product writing on the same record
-                </Link>
-              </p>
-            </div>
-          }
-        />
-      </div>
-
-      <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-        <RegimePhaseMap
-          series={phaseSeries}
-          activeSpan={phaseSpan.key}
-          spanHref={(span) => buildSpanHref(resolvedSearchParams, span)}
-          totalMonths={fullSeries.length}
-        />
-      </div>
-
-      <div id="monthly-calls" data-page-section="monthly-calls" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
-        <TrackRecordTable
-          record={trackRecord}
-          allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
-        />
-      </div>
 
       {publishedBriefs.length > 0 ? (
         <section
@@ -270,31 +245,55 @@ export default async function HistoryPage({
         </section>
       ) : null}
 
+      {/* The tiles, with the confidence record beside them: "how often did the
+          call hold" and "how often was the confidence label right" are the same
+          question asked twice, and the second answer used to live on /trust. */}
+      <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        {/* The export copies the track record, so it sits in that section's
+            header. It had a row of its own between the page intro and the
+            first section, belonging to neither. */}
+        <TrackRecordTiles
+          record={trackRecord}
+          action={trackRecord ? <ExportBoardAnnexButton record={trackRecord} /> : null}
+          aside={
+            <div className="space-y-3">
+              <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
+              <ConfidenceRecordBody />
+              <p className="text-fluid-xs text-slate-400">
+                <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                  Read the calibration study
+                </Link>
+                {" · "}
+                <Link href="/concepts" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                  Product writing on the same record
+                </Link>
+              </p>
+            </div>
+          }
+        />
+      </div>
+
       {/* Grades the record above: which regime changes were visible in the near band
           beforehand, and which were not. */}
       <TrackRecordSection series={statsSeries} />
 
-      <section
-        data-page-section="posture-by-year"
-        tabIndex={-1}
-        aria-labelledby="posture-by-year-heading"
-        className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
-      >
-        <h2 id="posture-by-year-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by year</h2>
-        <p className="text-sm text-slate-300">
-          What conditions were in each closed year, how the months split, and where they changed mid-year.
-        </p>
-        <ul className="flex flex-wrap gap-2">
-          {postureArchiveYears.map((year) => (
-            <li key={year.slug}>
-              <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
-                {year.title}
-                <span className="ml-2 text-slate-400">{toWeatherLabel(year.operatorLabel)}</span>
-              </ActionLink>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        <RegimePhaseMap
+          series={phaseSeries}
+          activeSpan={phaseSpan.key}
+          spanHref={(span) => buildSpanHref(resolvedSearchParams, span)}
+          totalMonths={fullSeries.length}
+          /* A window link sets `span`, and lands on a chart it just changed. */
+          open={isDisclosureOpenInParams(resolvedSearchParams, "map") || Boolean(resolvedSearchParams?.span)}
+        />
+      </div>
+
+      <div id="monthly-calls" data-page-section="monthly-calls" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+        <TrackRecordTable
+          record={trackRecord}
+          allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
+        />
+      </div>
 
       <UrlDetails
         queryKey="explore"

@@ -2462,3 +2462,22 @@ under an area's resume label.
 The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.
 
 The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
+
+### 1.1.39 `/history` answers its two questions in order (2026-10-06)
+
+The page summary names two jobs: look up what the guidance said in any past month, and how it held
+up. The sections ran in neither order. The published weeks, the record a reader cites, sat fifth,
+under a phase map that was the tallest block on the page. "Conditions by year" was a section of its
+own near the foot, ten screens from the strip that draws the same months.
+
+- **What the guidance said.** The month strip, with each closed year's link under it, then the
+  published weeks.
+- **How it held up.** The track record tiles with the confidence record, then the grading table
+  ("How the record held up"), which used to sit two sections away. The grading table stays open: it
+  lists the changes nothing signaled, and that is its point.
+- **The mechanism, folded.** The phase map is a closed disclosure whose summary is its heading, so
+  the outline and the rail still name it. `?map=1` opens it, and so does a window link (`?span=`),
+  which lands on the chart it changed. Monthly readings and the explorer stay folded.
+- Measured: 3,964 → 3,160 px desktop, about 6,160 → 4,990 px phone. Tests:
+  `tests/recordRoutesReadingOrder.test.tsx`.
+
