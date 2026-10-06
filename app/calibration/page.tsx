@@ -86,8 +86,7 @@ export default function CalibrationPage() {
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
             Six changes in conditions in fourteen years is not enough to estimate a probability per band. A
-            curve fitted to that base rate would report about 97% every week and discriminate
-            nothing, which is worse than a number that at least measures something real.
+            curve fitted to that base rate would report about 97% every week and discriminate nothing. That is worse than a number that at least measures something real.
           </li>
           <li>
             One month is the only horizon tested. Nothing here says what a reading is worth over a

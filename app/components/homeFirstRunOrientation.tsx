@@ -150,8 +150,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
 
         {arrival !== "share" ? (
           <p className="mt-2 max-w-[64ch] leading-relaxed text-slate-300">
-            Two scores, how hard it is to raise money and how much risk investors will fund, read each
-            Monday against the lines that pause or resume hiring, spend and raising.
+            Two scores, read each Monday against the lines that pause or resume hiring, spend and raising: how hard it is to raise money, and how much risk investors will fund.
           </p>
         ) : null}
 

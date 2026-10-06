@@ -292,7 +292,7 @@ export const buildCommitmentImpact = ({
       : `runway goes from ${runwayBefore} to ${runwayAfter} months (${monthsSpent} ${monthsSpent === 1 ? "month" : "months"} spent)`;
   const summary =
     `At ${cost} more a month, ${movement}` +
-    (bandChange ? `, which moves you from ${bandChange.from} into ${bandChange.to}.` : ".");
+    (bandChange ? `, and you move from ${bandChange.from} into ${bandChange.to}.` : ".");
 
   const noteAfter =
     buildRunwayConditionedNotes({

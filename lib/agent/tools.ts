@@ -136,7 +136,7 @@ const AGENT_TOOLS: readonly AgentTool[] = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer (about 3KB): the conditions and how sure, whether the data is live and current (automation.ready), where each score sits against its pause, resume and change lines, what moved each score since the earlier reading and which areas' pause or resume lines that crossed, and the guidance.",
+      "Start here. The current reading in one small answer (about 3KB): the conditions and the confidence in them, the data's freshness (automation.ready says whether it is live and current), each score against its pause, resume and change lines, the moves behind each score since the earlier reading and the areas whose pause or resume lines they crossed, and the guidance.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -329,7 +329,7 @@ const AGENT_TOOLS: readonly AgentTool[] = [
     name: "get_analog_playbook",
     title: "Get the historical analog playbook",
     description:
-      "Matches today's conditions against four hand-picked past periods (Q3 2007, Q4 2018, Q2 2021, Q2 2022) and returns, for the closest, a common mistake then, what held up, and what marked the turn. Editorial summaries of the public record, not a measured sample of companies.",
+      "Matches today's conditions against four hand-picked past periods (Q3 2007, Q4 2018, Q2 2021, Q2 2022) and returns, for the closest, the common mistake then, the move that held up, and the sign that marked the turn. Editorial summaries of the public record, not a measured sample of companies.",
     input: {},
     example: {},
     run: async () => {

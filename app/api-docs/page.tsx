@@ -78,7 +78,7 @@ export default function ApiDocsPage() {
           </div>
           <p className="text-xs text-slate-300">
             <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
-            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, how far each score sits from its line, and what a scenario would produce, while it reasons.
+            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, each score's distance from its line, and a scenario's result while it reasons.
           </p>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
@@ -89,9 +89,7 @@ export default function ApiDocsPage() {
             </pre>
           </div>
           <p className="text-xs text-slate-300">
-            Start with <span className="text-sky-200 font-mono">get_state</span>: one small answer with the
-            conditions, how sure Whether is, whether the data is live and current, where each
-            score sits against its lines, what moved it, and the guidance. Every tool only reads:{" "}
+            Start with <span className="text-sky-200 font-mono">get_state</span>: one small answer with the conditions and the confidence in them, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
             {toolNames.map((name, index) => (
               <Fragment key={name}>
                 {index > 0 ? ", " : ""}
@@ -177,9 +175,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_agent_state"
             >
-              The state to decide from, about a tenth the size of the full brief: the conditions, how sure, whether
-              the data is live and current (<code className="font-mono">automation.ready</code>), each score against its
-              pause, resume and change lines, what moved it, and the guidance. Weekly only. Check{" "}
+              The state to decide from, about a tenth the size of the full brief: the conditions and the confidence in them, the data's freshness (<code className="font-mono">automation.ready</code>), each score against its pause, resume and change lines with the moves behind it, and the guidance. Weekly only. Check{" "}
               <code className="font-mono">automation.ready</code> before acting without a person looking.
             </Endpoint>
             <Endpoint
@@ -356,7 +352,7 @@ export default function ApiDocsPage() {
           <h2 className="type-eyebrow">Command line</h2>
           <p className="text-xs text-slate-300">
             The <span className="text-sky-200">whether</span> CLI is an operator terminal for the
-            same data: conditions, the guidance, what changed, what would change it.
+            same data: the conditions, the guidance, this week's changes and the lines that would change the guidance.
           </p>
           <div className="space-y-3">
             <Endpoint signature="whether status">

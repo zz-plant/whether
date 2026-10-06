@@ -310,7 +310,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "portfolio-note",
       group: "Docs and email",
       label: "Portfolio note",
-      hint: "For an investor or accelerator writing to the companies it backs: each area's rule and lines, what the week means at every runway, and a link for each company to set its own lines.",
+      hint: "For an investor or accelerator writing to the companies it backs: each area's rule and lines, a note on the week for every runway band, and a link for each company to set its own lines.",
       kind: "text",
       text: artifact.portfolioNote,
       copyLabel: "Copy portfolio note",

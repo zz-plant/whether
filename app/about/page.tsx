@@ -133,8 +133,7 @@ export default function AboutPage() {
             A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
           </li>
           <li>
-            Under six months of runway. Cash decides before markets do, which is why the guidance leads with cash
-            there.
+            Under six months of runway. Cash decides before markets do, so the guidance leads with cash there.
           </li>
           <li>
             A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
@@ -168,8 +167,7 @@ export default function AboutPage() {
         <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
         <p className="text-sm text-slate-300">
           Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
-          pressure comes from the one-month bill rate, how fast it has risen, and whether long rates have fallen below
-          short ones; risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings
+          pressure comes from the one-month bill rate, the speed of its rise, and an inverted curve (long rates below short ones); risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings
           then adjust them: the extra interest riskier companies pay to borrow, the Chicago Fed&apos;s summary of
           borrowing conditions, and the VIX, the stock market&apos;s forecast of turbulence. Where the pair lands sets
           the conditions: Sunny, Cloudy, Stormy or Freezing.

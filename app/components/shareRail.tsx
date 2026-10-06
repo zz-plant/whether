@@ -94,7 +94,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
       case "finance":
         return `${context}This week's guidance, with its sources and how fresh the data is.\n${briefUrl}/trust`;
       case "team":
-        return `${context}This week's guidance, what to do now, and the evidence behind it.\n${briefUrl}`;
+        return `${context}This week's guidance, the move it calls for, and the evidence behind it.\n${briefUrl}`;
       default:
         return `${context}This week's guidance from Whether.\n${briefUrl}`;
     }

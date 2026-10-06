@@ -62,8 +62,7 @@ export function ReaderReturnsSection({ line, generatedAt }: ReaderReturnsProps) 
       <p className="text-sm text-slate-100">{line}</p>
       <p className="mt-2 text-xs leading-5 text-slate-400">
         Counting stops once a browser has been counted in a week, so a week holds at most one
-        return per browser. It is not a headcount: a reader with a laptop and a phone counts
-        twice, which is why this is a count and not a rate. Recorded{" "}
+        return per browser. It is not a headcount: a reader with a laptop and a phone counts twice, so this is a count and not a rate. Recorded{" "}
         {recordDateFormat.format(new Date(generatedAt))} by the weekly run.
       </p>
     </ReportSection>

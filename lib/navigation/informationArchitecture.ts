@@ -31,7 +31,7 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/",
     label: "Weekly Brief",
     navLabel: "Brief",
-    description: "See this week's guidance, what to do now, and a brief you can share.",
+    description: "See this week's guidance, the move it calls for, and a brief you can share.",
     boundary: "Use this first to see the current guidance and the next move.",
     tier: "primary",
   },

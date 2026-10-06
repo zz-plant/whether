@@ -41,7 +41,7 @@ export default function Page() {
         <h2 className="text-lg font-semibold text-slate-100">Portfolio-wide framework</h2>
         <ol className="space-y-2 text-sm text-slate-200">
           <li>1. Standardize SAFE / RISKY / DANGEROUS commitment classes across every company.</li>
-          <li>2. Require one monthly memo format: the current guidance, which thresholds were breached, what was done, and what can be undone.</li>
+          <li>2. Require one monthly memo format: the current guidance, the thresholds breached, the action taken, and the steps that can still be undone.</li>
           <li>3. Use one escalation rule: a threshold still breached at the second monthly check-in gets a written addendum to the board pack, with an owner, an action and a rollback date.</li>
           <li>4. Normalize reversibility language so rollback windows, owners, and communication sequencing are explicit.</li>
         </ol>

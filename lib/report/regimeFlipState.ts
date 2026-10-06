@@ -79,7 +79,7 @@ const buildBoundaryTriggerText = ({
 }) => {
   const dimensionLabel = dimension === "tightness" ? TIGHTNESS_BOUNDARY_LABEL : RISK_BOUNDARY_LABEL;
   const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
-  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today), which turns conditions ${targetRegimeLabel}.`;
+  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today). Conditions then turn ${targetRegimeLabel}.`;
 };
 
 /**

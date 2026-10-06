@@ -132,11 +132,11 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
     bullets.push("The recession warning gauge is unavailable this week, so inversion risk is unconfirmed.");
   } else if (curveSlope < 0) {
     bullets.push(
-      `The recession warning gauge (10-year minus 2-year rate) is ${curveSlope.toFixed(2)}%: long-term rates are below short-term rates, which has historically come before recessions.`
+      `The recession warning gauge (10-year minus 2-year rate) is ${curveSlope.toFixed(2)}%: long-term rates are below short-term rates. That has historically come before recessions.`
     );
   } else {
     bullets.push(
-      `The recession warning gauge (10-year minus 2-year rate) is +${curveSlope.toFixed(2)}%: long-term rates are above short-term rates, which leaves room for risk-taking.`
+      `The recession warning gauge (10-year minus 2-year rate) is +${curveSlope.toFixed(2)}%: long-term rates are above short-term rates. That leaves room for risk-taking.`
     );
   }
 
@@ -484,7 +484,7 @@ export const stressTestDecisionPlan = (
   }
   if (curveSlope !== null && curveSlope < 0) {
     fragileAssumptions.push(
-      `Assumes customers keep buying at the same pace with the yield curve inverted (${curveSlope.toFixed(2)}%), which has stretched sales cycles before.`
+      `Assumes customers keep buying at the same pace with the yield curve inverted (${curveSlope.toFixed(2)}%). Past inversions have stretched sales cycles.`
     );
   }
   if (riskAppetite < 50 && profile?.businessModel !== "BOOTSTRAPPED") {

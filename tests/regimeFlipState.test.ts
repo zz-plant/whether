@@ -51,7 +51,7 @@ describe("buildRegimeFlipState", () => {
     // The nearest boundary is risk appetite, and crossing it from a willing-risk
     // call names the regime that crossing actually produces — Stormy, the
     // loose-unwilling quadrant — not the call's primary shift target.
-    assert.match(state.text, /Risk appetite falls to or below 50 \(62 today\), which turns conditions Stormy\./);
+    assert.match(state.text, /Risk appetite falls to or below 50 \(62 today\)\. Conditions then turn Stormy\./);
     assert.equal(state.watch.dimension, "riskAppetite");
   });
 
@@ -64,7 +64,7 @@ describe("buildRegimeFlipState", () => {
     });
 
     assert.equal(state.pendingCandidate, null);
-    assert.match(state.text, /which turns conditions /);
+    assert.match(state.text, /Conditions then turn /);
   });
 
   it("names the target change when the watched boundary would cross", () => {

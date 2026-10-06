@@ -394,8 +394,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What are conditions now?</h2>
         <p className="text-sm text-slate-300">
-          {period.title} is a closed record. Current conditions, what to do this week, and what would change them live on
-          the weekly brief.
+          {period.title} is a closed record. The weekly brief has the current conditions, this week&apos;s move and the lines that would change it.
         </p>
         <ActionLink href="/" variant="primary">
           Open this week&apos;s brief
