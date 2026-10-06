@@ -56,7 +56,7 @@ export const buildGuardrailChecklist = (
 /* Three peer lists, one colour. These carried an "Operate / Translate / Watch"
    badge, an emoji, and a sky / emerald / violet tint each — a status legend on
    a page where emerald and amber mean easing and tightening everywhere else
-   (see shareCopyControls.tsx, which made the same cut for the same reason). */
+   (the share page's format cards made the same cut for the same reason). */
 const visualSections = [
   {
     key: "decisionGuardrails",

@@ -108,6 +108,20 @@ export const useBrowserSource = <TValue>(source: BrowserSource<TValue>): TValue 
   useSyncExternalStore(source.subscribe, source.getSnapshot, source.getServerSnapshot);
 
 /**
+ * The URL fragment without its "#". Empty on the server and through hydration.
+ * A writer that changes the fragment with `history.replaceState` (which fires
+ * no `hashchange`) calls `refresh()` so every reader moves with it.
+ */
+export const locationHashSource = createBrowserSource({
+  read: () => window.location.hash.replace(/^#/, ""),
+  serverValue: "",
+  watch: (onChange) => {
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
+  },
+});
+
+/**
  * One source per storage key, for slots whose key is itself a browser value.
  *
  * The decision-shield presets are stored under the persistent client id, which

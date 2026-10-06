@@ -197,7 +197,7 @@ describe("one reading's confidence across routes and exports", () => {
       { buildPlanningPageModel },
       { buildTrustPageModel },
       { default: SharePage },
-      { ShareCopyControls },
+      { SharePageFormats },
       { BriefArtifactScript },
       { loadWeeklyBriefSnapshot },
       { createHomePageReportDataLoader },
@@ -207,7 +207,7 @@ describe("one reading's confidence across routes and exports", () => {
       import("../app/operate/planningPageModel"),
       import("../app/trust/trustPageModel"),
       import("../app/share/page"),
-      import("../app/share/shareCopyControls"),
+      import("../app/share/sharePageFormats"),
       import("../app/components/briefArtifactScript"),
       import("../lib/report/weeklyBriefSnapshot"),
       import("../lib/report/homePageData"),
@@ -227,7 +227,7 @@ describe("one reading's confidence across routes and exports", () => {
         signals: (await buildSignalsPageModel()).trustStrip.confidenceLabel,
         operate: operate.reportShellModel.trust.strip?.confidenceLabel,
         trust: await buildTrustPageModel(),
-        pastes: propsHandedTo(share, ShareCopyControls)[0],
+        pastes: propsHandedTo(share, SharePageFormats)[0]?.options,
         shareArtifact: propsHandedTo(share, BriefArtifactScript)[0]?.artifact,
       };
     });
@@ -257,12 +257,16 @@ describe("one reading's confidence across routes and exports", () => {
 
     // Every band a /share paste prints, in either of its two phrasings.
     const { pastes } = surfaces;
-    assert.ok(pastes, "/share hands its pastes to the copy controls");
+    assert.ok(pastes, "/share hands its pastes to the format picker");
+    const textOf = (id: string) => {
+      const option = pastes.find((candidate) => candidate.id === id);
+      return option?.kind === "text" ? option.text : "";
+    };
     const texts = {
-      slackBrief: pastes.slackBrief,
-      meetingPack: pastes.meetingPack,
-      issueTrackerBrief: pastes.issueTrackerBrief,
-      emailBrief: pastes.emailBrief,
+      fullBrief: textOf("full-brief"),
+      meetingPack: textOf("meeting-pack"),
+      ticketBrief: textOf("ticket-brief"),
+      email: textOf("email"),
     };
     for (const [key, text] of Object.entries(texts)) {
       const bands = [...text.matchAll(/\b(High|Medium|Low) confidence\b|Confidence: (High|Medium|Low)\b/g)]
@@ -271,6 +275,8 @@ describe("one reading's confidence across routes and exports", () => {
       assert.deepEqual([...new Set(bands)], [WORD[published.label]], `${key} prints one band, the published one`);
       assert.doesNotMatch(text, /confidence is not high/i, `${key} says confidence is not high on a High week`);
     }
-    assert.match(pastes.investorUpdate.conditions, /Conditions are well clear of the line where they would change\./, "investor update");
+    const investor = pastes.find((candidate) => candidate.id === "investor-update");
+    assert.ok(investor?.kind === "investor", "/share offers the investor update");
+    assert.match(investor.parts.conditions, /Conditions are well clear of the line where they would change\./, "investor update");
   });
 });

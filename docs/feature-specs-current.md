@@ -2377,6 +2377,41 @@ word in the intro ("All sources live • As of Oct 2"), and again in the `TrustS
   or padding between them. `signalsEvidenceSections()` returns a keyed array the page spreads into the
   shell.
 
+
+### 1.1.35 `/share`: one format picker instead of a wall of sections (2026-10-06)
+
+`/share` stacked every format as its own section: the share rail's four-format picker, a grid of
+eight "longer format" cards with a preview that showed only what had already been copied, the
+work-item tags, the pull policies and the role memos. That was about 5,700px on desktop and
+10,000px on a phone, and the Slack text was drawn three times (DD-041).
+
+- **One picker** (`app/share/sharePageFormats.tsx`). Formats are grouped by destination — Chat
+  (Slack post, Full brief, Standup line), Meetings (Meeting pack, Monday agenda, Slide text), Docs
+  and email (Email, Investor update, Portfolio note, Citation), Tickets and boards (Ticket brief,
+  Work-item tags, Pull policies), Team (Role memos). It is a list from `md` up and the platform's
+  grouped `<select>` below it. There is one preview (`BriefPreview`, shared with the share rail)
+  and one copy action, so a reader reads exactly what they will paste before copying it.
+- **Two Slack texts, kept on purpose.** *Slack post* is the rail's short block, the shape a
+  channel skims. *Full brief* is the weekly operator brief, every area's rule and lines. Each is
+  drawn once.
+- **Sets of blocks** (a tag per area, a pull policy per area plus the WIP cap, the role memo and
+  checklist) render their own per-block copy controls in the preview's place.
+  `GuardrailTagControls` and `PullPolicyControls` are bodies now; the picker names them.
+- **Canonical links.** The rail's four formats are built on the server against `siteUrl`, so the
+  brief link a reader pastes points at the brief rather than at a preview host, and the server
+  renders the preview the page opens on.
+- **URL state.** The selection is the hash (`/share#investor-update`), written with
+  `replaceState` so switching formats adds no history entries. The old section anchors still
+  land: `#meeting-slack` opens the Slack post, `#tickets-kanban` the work-item tags,
+  `#role-memos` the role memos. `#image-artifacts` and `#embed` stay real sections.
+- **Embed folded.** The embed builder is a disclosure, open only when the hash is `#embed` (the
+  retired `/embed` route redirects there).
+- **Calendar link built in the browser.** "Add a Monday review" is computed from the reader's
+  next Monday after hydration, under the meeting pack and the agenda. Building it during server
+  render was the page's one hydration mismatch.
+- `/operate`'s "Share the brief" step keeps the rail's four formats
+  (`app/components/briefIslandPicker.tsx`) and links to `/share` for the rest.
+
 ### Shared page spacing (2026-10-04)
 
 The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.

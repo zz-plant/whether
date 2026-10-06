@@ -20,7 +20,8 @@ import type { AreaRowText } from "../operate/areaRows";
  *
  * The preview is the one area table every surface draws, in its one order, so
  * the reader who checks Fundraising on the plan page finds it in the same row
- * here; the copy controls follow that order.
+ * here; the copy controls follow that order. The body only: `/share`'s format
+ * picker names it and says what it is for.
  */
 const isLever = (value: string): value is BusinessAreaKey =>
   Object.prototype.hasOwnProperty.call(operatingLeverToDecisionArea, value);
@@ -43,36 +44,27 @@ export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlo
     .sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area));
 
   return (
-    <section className="weather-panel weather-section-stack p-0" aria-labelledby="guardrail-tags-heading">
-      <div className="space-y-1">
-        <h2 id="guardrail-tags-heading" className="text-xl font-semibold text-white sm:text-2xl">Pause and resume lines for work items</h2>
-        <p className="text-xs leading-relaxed text-slate-300">
-          Copy one block per business area into a Linear or Jira card description. No integration,
-          no tokens — the card carries this week&apos;s guidance, its pause line, and what would change it.
-        </p>
-      </div>
-      {/* Each copy button in the row it copies. They were a row of five under
-          the table, so the button for a row sat a table's height from it. */}
-      <AreaTable
-        rows={rows.map((row) => {
-          const match = ordered.find(({ area }) => area === row.area);
-          return match
-            ? {
-                ...row,
-                action: (
-                  <ClipboardActionRow
-                    compact
-                    label={`Copy ${decisionAreaLabel(match.area)} tag`}
-                    state={clipboardState(`guardrail-${match.block.area}`)}
-                    onClick={() => void copyToClipboard(match.block.markdown, `guardrail-${match.block.area}`)}
-                    buttonLabels={{ error: "Copy failed" }}
-                  />
-                ),
-              }
-            : row;
-        })}
-        caption="This week's rule, pause line and resume line for each area, as the tags carry them"
-      />
-    </section>
+    /* Each copy button in the row it copies. They were a row of five under the
+       table, so the button for a row sat a table's height from it. */
+    <AreaTable
+      rows={rows.map((row) => {
+        const match = ordered.find(({ area }) => area === row.area);
+        return match
+          ? {
+              ...row,
+              action: (
+                <ClipboardActionRow
+                  compact
+                  label={`Copy ${decisionAreaLabel(match.area)} tag`}
+                  state={clipboardState(`guardrail-${match.block.area}`)}
+                  onClick={() => void copyToClipboard(match.block.markdown, `guardrail-${match.block.area}`)}
+                  buttonLabels={{ error: "Copy failed" }}
+                />
+              ),
+            }
+          : row;
+      })}
+      caption="This week's rule, pause line and resume line for each area, as the tags carry them"
+    />
   );
 }

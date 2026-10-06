@@ -11,7 +11,8 @@ import type { WipGuidance } from "../../lib/report/wipPolicy";
  * The same pause/resume conditions the weekly call prints, re-verbed for a
  * pull system: what to keep pulling, when to stop, when to resume — plus the
  * regime's numeric WIP cap. No tokens, no integration — the team pastes the
- * policy where the board lives.
+ * policy where the board lives. The body only: `/share`'s format picker names
+ * it and says what it is for.
  */
 export function PullPolicyControls({
   blocks,
@@ -27,16 +28,7 @@ export function PullPolicyControls({
   if (blocks.length === 0 && !wipGuidance) return null;
 
   return (
-    <section className="weather-panel weather-section-stack p-0" aria-labelledby="wip-limits-heading">
-      <div className="space-y-1">
-        <h2 id="wip-limits-heading" className="text-xl font-semibold text-white sm:text-2xl">Work-in-progress limits</h2>
-        <p className="text-xs leading-relaxed text-slate-300">
-          A work-in-progress limit is how many things a team runs at once. This week&apos;s guidance as
-          one: what to keep starting, when to stop, when to resume, and how many bets can run in
-          parallel. Copy one block per area into a wiki or a project board; pick a runway band on
-          the brief to scale the cap to your cash.
-        </p>
-      </div>
+    <div className="space-y-3">
       {wipGuidance ? (
         <article className="weather-surface space-y-2 px-4 py-3">
           <div className="flex items-center justify-between gap-2">
@@ -73,6 +65,6 @@ export function PullPolicyControls({
           </article>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { locationHashSource, useBrowserSource } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
@@ -48,20 +49,28 @@ export function EmbedBuilder() {
     void copyToClipboard(embedCode, "embed");
   }, [copyToClipboard, embedCode]);
 
+  /* Folded by default: most readers come to /share to paste, and the builder
+     open was the page's tallest section, an empty preview box included. It
+     opens for a link that names it — the retired /embed route redirects to
+     /share#embed. */
+  const openFromLink = useBrowserSource(locationHashSource) === "embed";
+
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="text-fluid-xs font-semibold tracking-[0.04em] text-sky-300">
-          Embed
-        </p>
-        <h2 className="mt-2 text-xl font-bold tracking-tight text-slate-100 sm:text-2xl">
-          Add a live brief to a newsletter, wiki or dashboard
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">
-          Embed the live brief in any newsletter or webpage. Readers get this week&apos;s guidance, what to do
-          now, and what would change it — updated automatically every week.
-        </p>
-      </div>
+    <details className="weather-auto-chevron" open={openFromLink}>
+      <summary className="cursor-pointer list-none">
+        {/* One block, so the summary's row lays the chevron beside the title
+            and its line rather than splitting the two into columns. */}
+        <div className="min-w-0 space-y-2">
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Add a live brief to a newsletter, wiki or dashboard
+          </h2>
+          <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
+            A snippet that shows this week&apos;s guidance, what to do now and what would change it,
+            updated every week.
+          </p>
+        </div>
+      </summary>
+      <div className="mt-6 space-y-8">
 
       {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
           the embed snippet's <pre> pushed its column to 520px inside a 358px
@@ -159,6 +168,7 @@ export function EmbedBuilder() {
           </div>
         </div>
       </details>
-    </div>
+      </div>
+    </details>
   );
 }
