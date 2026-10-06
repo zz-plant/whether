@@ -32,7 +32,14 @@ const websiteNode = () => ({
 
 const isPartOfSite = { "@id": websiteId } as const;
 
-const graph = (nodes: Array<Record<string, unknown>>): JsonLdGraph => ({
+/**
+ * A page's JSON-LD document: its nodes, after the site's `WebSite` node. Every page that
+ * publishes JSON-LD goes through this, so each one carries the node its `@id` references resolve
+ * against; eleven pages wrote `"@context"` by hand and nine of them left it out. The homepage is
+ * the exception: it declares the full `WebSite` and `Organization` nodes itself
+ * (`lib/report/home/structuredData.ts`).
+ */
+export const graph = (nodes: Array<Record<string, unknown>>): JsonLdGraph => ({
   "@context": "https://schema.org",
   "@graph": [websiteNode(), ...nodes],
 });

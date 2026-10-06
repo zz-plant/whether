@@ -7,6 +7,7 @@ import {
   organizationName,
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
+import { graph } from "../../../lib/seo/pageStructuredData";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
@@ -133,39 +134,38 @@ type ResourceDecisionArtifact = {
 export function ResourceArticlePage({ article, decisionArtifact }: { article: ResourceArticle; decisionArtifact?: ResourceDecisionArtifact }) {
   const canonicalUrl = buildCanonicalUrl(`/resources/${article.slug}`);
   const pagePath = `/resources/${article.slug}`;
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: article.faqs.map((faq) => ({
-      "@type": "Question",
-      name: faq.question,
-      acceptedAnswer: { "@type": "Answer", text: faq.answer },
-    })),
-  };
-
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.description,
-    author: buildAuthorSchema(),
-    publisher: buildPublisherSchema(organizationName),
-    mainEntityOfPage: canonicalUrl,
-    url: canonicalUrl,
-    keywords: [article.keyword, "capital posture", "board memo"],
-    // Google's Article rich result asks for both dates and an image; the page
-    // published neither, so it was eligible for a plain blue link only.
-    datePublished: article.publishedAt,
-    dateModified: article.updatedAt,
-    image: [buildPageImageUrl(article.title, article.description, { template: "guides", title: article.title })],
-  };
+  /* The article and its FAQ in one graph, after the site node, where they were two documents. */
+  const structuredData = graph([
+    {
+      "@type": "Article",
+      headline: article.title,
+      description: article.description,
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      mainEntityOfPage: canonicalUrl,
+      url: canonicalUrl,
+      keywords: [article.keyword, "capital posture", "board memo"],
+      // Google's Article rich result asks for both dates and an image; the page
+      // published neither, so it was eligible for a plain blue link only.
+      datePublished: article.publishedAt,
+      dateModified: article.updatedAt,
+      image: [buildPageImageUrl(article.title, article.description, { template: "guides", title: article.title })],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: article.faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: { "@type": "Answer", text: faq.answer },
+      })),
+    },
+  ]);
 
   return (
     <ContentPageShell measure="wide" data-content-measurement-root={pagePath}>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <ContentMeasurementTracker pagePath={pagePath} cluster={article.cluster} intent={article.intent} />
-        <JsonLdScript data={articleSchema} />
-        <JsonLdScript data={faqSchema} />
+        <JsonLdScript data={structuredData} />
 
         <div className="space-y-6 print:text-black">
           <Breadcrumbs

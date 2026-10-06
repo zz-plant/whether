@@ -3,8 +3,10 @@ import {
   organizationKnowsAbout,
   buildOgImageUrl,
   defaultSiteDescription,
+  organizationId,
   organizationName,
   organizationSameAs,
+  websiteId,
   websiteName,
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
@@ -52,13 +54,17 @@ export type HomeBriefStructuredDataInput = {
  * never read the assembled value — so for as long as that held, the homepage
  * shipped a lone Article node and the brand entity was anchored nowhere. Render
  * this; do not add a second, competing script tag to the page.
+ *
+ * It is the one page graph not built with `graph` (`lib/seo/pageStructuredData.ts`), which
+ * prepends a short `WebSite` node: this one declares that node in full, so it would be there
+ * twice. The ids are the shared `organizationId` and `websiteId` every other graph points at.
  */
 export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): JsonLdDocument => ({
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
-      "@id": `${siteUrl}#organization`,
+      "@id": organizationId,
       name: organizationName,
       url: siteUrl,
       logo: `${siteUrl}/icon.svg`,
@@ -72,14 +78,14 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
     },
     {
       "@type": "WebSite",
-      "@id": `${siteUrl}#website`,
+      "@id": websiteId,
       name: websiteName,
       url: siteUrl,
       description: defaultSiteDescription,
       inLanguage: "en",
       mainEntityOfPage: `${siteUrl}/`,
       publisher: {
-        "@id": `${siteUrl}#organization`,
+        "@id": organizationId,
       },
     },
     {
@@ -94,7 +100,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         "@id": `${siteUrl}/`,
       },
       isPartOf: {
-        "@id": `${siteUrl}#website`,
+        "@id": websiteId,
       },
       about: {
         "@type": "Thing",
@@ -107,7 +113,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         description:
           "The weekly US Treasury reading Whether bases its guidance on, with its confidence and what would change it.",
         creator: {
-          "@id": `${siteUrl}#organization`,
+          "@id": organizationId,
         },
         license: `${siteUrl}/terms-of-service`,
         temporalCoverage: brief.datePublishedIso,
@@ -183,7 +189,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       dateModified: brief.dateModifiedIso,
       author: buildAuthorSchema(),
       publisher: {
-        "@id": `${siteUrl}#organization`,
+        "@id": organizationId,
       },
       image: [buildOgImageUrl({ template: "report" })],
       url: siteUrl,
@@ -191,7 +197,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         "@id": `${siteUrl}/#webpage`,
       },
       isPartOf: {
-        "@id": `${siteUrl}#website`,
+        "@id": websiteId,
       },
       isBasedOn: {
         "@id": `${siteUrl}/#dataset`,
@@ -211,7 +217,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         },
       })),
       isPartOf: {
-        "@id": `${siteUrl}#website`,
+        "@id": websiteId,
       },
     },
     buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }])),
