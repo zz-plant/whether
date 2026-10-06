@@ -2070,9 +2070,17 @@ Changes, all additive except where noted:
 
 - **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
   MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
-  carry the published confidence now. `/api/weekly` and `/api/monthly` still return the engine's label in
-  `summary.confidence` (their archive regenerates from the same builders, and `summary.summary` prose there
-  can still disagree with the published label); a decision for the owner, not made here.
+  carry the published confidence now. `/api/weekly` and `/api/monthly` (and `/api/cadence`,
+  `/api/summary-delta`) followed on 2026-10-06: the summary builders read `resolveSummaryConfidence`
+  (`lib/summary/summaryFormatting.ts`, the published label in the stored LOW / MEDIUM / HIGH spelling) for
+  both `summary.confidence` and the prose sentence, and the routes pass the record so a stale fallback
+  lowers it as it does on the page. The archives regenerate from the same builders, so the next run rewrites
+  `summary.confidence`, the confidence sentence in `summary.summary`, `structured.posture.summary[0]`
+  (monthly) and `copy` wherever the two ladders disagree: 55 of the 176 monthly entries on record (23 LOW
+  and 25 MEDIUM to HIGH, 7 LOW to MEDIUM); the weekly count is not computable offline because weekly
+  entries store no scores. One consequence to know: the published ladder ignores the engine's shock
+  downgrade, so a shock week's summary now says what the page says (Dec 2025: HIGH, not LOW) and the shock
+  sentence beside it carries the warning.
 - **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
   first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
   Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.

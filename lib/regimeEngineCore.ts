@@ -75,6 +75,12 @@ export type RegimeDiagnostics = {
   tightnessVsThreshold: number;
   riskAppetiteVsThreshold: number;
   nearestThresholdDelta: number;
+  /**
+   * The state machine's confirmation-gate band, not a published confidence.
+   * It ranks the raw gap (cutoffs 13 and 6), and it decides how many confirming
+   * reads a flip needs. What a reader is told is `resolvePublishedConfidence`
+   * in `lib/report/confidence.ts`. Named `confidence` because it is stored.
+   */
   confidence: "LOW" | "MEDIUM" | "HIGH";
   transitionWatch: boolean;
   intensity: "MILD" | "STANDARD" | "STRONG";

@@ -36,8 +36,9 @@ weekly state under another name) and cannot be combined with `format=jev`.
 all carry the published confidence. `summary.confidence` and the prose sentence beside it on this route are
 set to it too. They read the engine's own label (its confirmation gate, not a published fact) until
 2026-09-29, and said MEDIUM on a week the page called High (`tests/agentConfidenceAgreement.test.ts`).
-`/api/weekly` and `/api/monthly` still return the engine's label in `summary.confidence`, and the archive is
-regenerated from the same builders; use `/api/scores` or `/api/agent` when the number is what you gate on.
+`/api/weekly`, `/api/monthly`, `/api/cadence` and `/api/summary-delta` carry it as well since 2026-10-06: the
+summary builders read the published confidence themselves (`resolveSummaryConfidence`, handed the record
+the reading came from). The archived summaries switch on their next regeneration.
 
 ## Why this approach
 

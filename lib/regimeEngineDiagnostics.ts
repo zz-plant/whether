@@ -70,12 +70,21 @@ const LAYOFF_RISK_APPETITE_MULTIPLIER = 0.6;
 const LAYOFF_RISK_APPETITE_CAP = 12;
 
 /**
- * Diagnostic bands, all measured in score points of distance from the nearest
- * regime threshold. They govern how loudly the product speaks, never what the
- * regime is: confidence wording, the transition-watch flag, and intensity.
+ * Diagnostic bands, all measured in raw score points of distance from the
+ * nearest regime threshold: the transition-watch flag, intensity, and the
+ * confirmation-gate band.
+ *
+ * The gate band is what `diagnostics.confidence` holds, and it is not the
+ * confidence the product publishes. It ranks the raw gap, where a
+ * risk-appetite point is a 4.5x larger move than a funding-pressure point, and
+ * its only job is to tell the state machine how many confirming reads a flip
+ * needs (and the alert rules whether to downgrade). Every surface that prints a
+ * confidence reads `resolvePublishedConfidence` in `lib/report/confidence.ts`,
+ * which normalises the two gaps first and cuts at 5 and 12. The field keeps its
+ * name because it is stored in every operating snapshot and transition event.
  */
-const DIAGNOSTIC_CONFIDENCE_HIGH_DELTA = 13;
-const DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA = 6;
+const CONFIRMATION_GATE_HIGH_DELTA = 13;
+const CONFIRMATION_GATE_MEDIUM_DELTA = 6;
 const DIAGNOSTIC_TRANSITION_WATCH_DELTA = 5;
 const DIAGNOSTIC_INTENSITY_STRONG_DELTA = 25;
 const DIAGNOSTIC_INTENSITY_STANDARD_DELTA = 10;
@@ -264,19 +273,20 @@ export const computeDiagnostics = (
   /*
    * Set when either score came from a stand-in rather than a reading. Both
    * stand-ins sit far from the regime boundaries, and distance from a boundary is
-   * what the confidence label below reads — so without this, a payload with no
-   * data at all reported HIGH.
+   * what the gate band below reads — so without this, a payload with no data at
+   * all reported HIGH.
    */
   hasImputedInputs = false,
 ): RegimeDiagnosticsScoring => {
   const tightnessVsThreshold = Math.round(tightness - thresholds.tightnessRegime);
   const riskAppetiteVsThreshold = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
   const nearestThresholdDelta = Math.min(Math.abs(tightnessVsThreshold), Math.abs(riskAppetiteVsThreshold));
-  const confidence: RegimeDiagnostics["confidence"] = hasImputedInputs
+  // The confirmation-gate band, stored as `confidence`; see the note on the bands above.
+  const confirmationGateBand: RegimeDiagnostics["confidence"] = hasImputedInputs
     ? "LOW"
-    : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
+    : nearestThresholdDelta >= CONFIRMATION_GATE_HIGH_DELTA
       ? "HIGH"
-      : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA
+      : nearestThresholdDelta >= CONFIRMATION_GATE_MEDIUM_DELTA
         ? "MEDIUM"
         : "LOW";
   const transitionWatch = nearestThresholdDelta <= DIAGNOSTIC_TRANSITION_WATCH_DELTA;
@@ -291,7 +301,7 @@ export const computeDiagnostics = (
     tightnessVsThreshold,
     riskAppetiteVsThreshold,
     nearestThresholdDelta,
-    confidence,
+    confidence: confirmationGateBand,
     transitionWatch,
     intensity,
     boundaryContributors,

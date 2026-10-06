@@ -88,10 +88,18 @@ of them, which is less obvious.
   the posture state and every `/share` paste through the real loader against that week's reading.
 
   The engine's label stays: it is the state machine's confirmation gate, and a gate is not a
-  published fact. Its other readers are the alert-rule gate in `lib/signalOps.ts`, the band stored
-  on transition events, and `lib/summary/*`. The last one still prints it, in the `summary` block
-  of `/api/weekly` and `/api/monthly` and in the generated monthly archive; moving it rewrites
-  archived text on the next regeneration, so it is its own change.
+  published fact (the diagnostics now say so by name: `CONFIRMATION_GATE_*`, and a doc comment on
+  `RegimeDiagnostics.confidence`, which keeps its name because it is stored). Its other readers are
+  the alert-rule gate in `lib/signalOps.ts` and the band stored on transition events. `lib/summary/*`
+  printed it until 2026-10-06, in the `summary` block of `/api/weekly` and `/api/monthly` and in the
+  generated archives; the builders read `resolveSummaryConfidence` now, and the archives switch on
+  their next regeneration (55 of 176 monthly entries change; `docs/feature-specs-current.md` §6.9).
+
+  Still open, and its own change: the published confidence ignores the shock downgrade. The engine
+  sets its gate band to LOW on a shock crossing so the flip is not dressed as confirmed, but
+  `resolvePublishedConfidence` reads only the scores, so a shock week publishes its distance-based
+  label on every surface (Dec 2025, archived as a shock: HIGH). The shock sentence carries the
+  warning. Honouring it would move the published confidence on every shock week.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.

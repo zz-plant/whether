@@ -1,8 +1,37 @@
+import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
+
 const CONFIDENCE_COPY = {
   HIGH: "The read is solid",
   MEDIUM: "The read is workable but not settled",
   LOW: "The read is shaky",
 } as const;
+
+/** The confidence a summary stores and prints, in the archive's LOW / MEDIUM / HIGH spelling. */
+export type SummaryConfidence = keyof typeof CONFIDENCE_COPY;
+
+const SUMMARY_CONFIDENCE_BY_PUBLISHED_LABEL = {
+  HIGH: "HIGH",
+  MED: "MEDIUM",
+  LOW: "LOW",
+} as const satisfies Record<ReturnType<typeof resolvePublishedConfidence>["label"], SummaryConfidence>;
+
+/**
+ * The published confidence (`resolvePublishedConfidence`), spelled the way the
+ * summary shape has always stored it.
+ *
+ * The summaries used to print the engine's `diagnostics.confidence`, which ranks
+ * the raw gap to the nearest line, where a risk-appetite point is a 4.5x larger
+ * move than a funding-pressure point. That label is the state machine's
+ * confirmation gate, not a published fact, and on a week like Sep 22, 2026 it
+ * said Medium while every page said High. Pass the record the reading came from
+ * so a stale fallback lowers it the way it does on every other surface; an
+ * archived period passes none, because it is old by design.
+ */
+export const resolveSummaryConfidence = (
+  assessment: ConfidenceInputs,
+  record?: ConfidenceRecord | null,
+): SummaryConfidence =>
+  SUMMARY_CONFIDENCE_BY_PUBLISHED_LABEL[resolvePublishedConfidence({ assessment, record }).label];
 
 const INTENSITY_COPY = {
   STRONG: "the signals behind it are moving hard",
@@ -15,7 +44,7 @@ const INTENSITY_COPY = {
  * signal)` label pair, which reads like a debug dump in a shared artifact.
  */
 export const formatConfidenceSentence = (
-  confidence: keyof typeof CONFIDENCE_COPY,
+  confidence: SummaryConfidence,
   intensity: keyof typeof INTENSITY_COPY,
 ) => `${CONFIDENCE_COPY[confidence]}, and ${INTENSITY_COPY[intensity]}.`;
 
