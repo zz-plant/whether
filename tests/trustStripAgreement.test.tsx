@@ -199,7 +199,6 @@ describe("one reading's confidence across routes and exports", () => {
       { default: SharePage },
       { ShareCopyControls },
       { BriefArtifactScript },
-      { TrustStrip },
       { loadWeeklyBriefSnapshot },
       { createHomePageReportDataLoader },
     ] = await Promise.all([
@@ -210,7 +209,6 @@ describe("one reading's confidence across routes and exports", () => {
       import("../app/share/page"),
       import("../app/share/shareCopyControls"),
       import("../app/components/briefArtifactScript"),
-      import("../app/components/trustStrip"),
       import("../lib/report/weeklyBriefSnapshot"),
       import("../lib/report/homePageData"),
     ]);
@@ -227,7 +225,7 @@ describe("one reading's confidence across routes and exports", () => {
         postureState: snapshot.postureState,
         home: home.weeklyDecisionCardModel.status.confidenceLabel,
         signals: (await buildSignalsPageModel()).trustStrip.confidenceLabel,
-        operate: propsHandedTo(operate.children, TrustStrip)[0]?.confidenceLabel,
+        operate: operate.reportShellModel.trust.strip?.confidenceLabel,
         trust: await buildTrustPageModel(),
         pastes: propsHandedTo(share, ShareCopyControls)[0],
         shareArtifact: propsHandedTo(share, BriefArtifactScript)[0]?.artifact,

@@ -185,6 +185,8 @@ export async function buildTrustPageModel() {
       trustStatusTone,
       degradedSourceRows,
       showOfflineBadge: isFallback,
+      // No link: the strip's link points here.
+      strip: trustStrip,
     },
     chrome: {
       sidebarVariant: "full",

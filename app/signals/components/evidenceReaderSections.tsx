@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ReportSection } from "../../components/reportSection";
-import { TrustStrip, type TrustStripProps } from "../../components/trustStrip";
 import { ScoreCell } from "../../components/ui/scoreCell";
 import { ScoreLadder } from "../../components/ui/scoreLadder";
 import { BoundedValue } from "../../components/ui/boundedValue";
@@ -61,16 +60,10 @@ const DeltaChip = ({ row }: { row: SignalReferenceRow }) => {
   );
 };
 
-export const SignalsCallSection = ({
-  callLine,
-  trustStrip,
-}: {
-  callLine: string;
-  trustStrip: Omit<TrustStripProps, "href" | "className">;
-}) => (
+/* The trust strip that sat under this line is the shell intro's now (DD-040). */
+export const SignalsCallSection = ({ callLine }: { callLine: string }) => (
   <ReportSection id="decision-summary" title="What this means now">
     <p className="text-base font-semibold text-slate-100 sm:text-lg">{callLine}</p>
-    <TrustStrip {...trustStrip} href="/trust" />
   </ReportSection>
 );
 
