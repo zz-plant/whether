@@ -285,7 +285,7 @@ export class KvPostureTransitionEventRepository implements PostureTransitionEven
 }
 
 const getKvBinding = (): KvNamespace | null => {
-  return getWhetherKv("POSTURE_EVENTS_KV");
+  return getWhetherKv();
 };
 
 let sharedRepository: PostureTransitionEventRepository | null = null;

@@ -3,7 +3,6 @@
 This roadmap focuses on shipping a defensible, operator-facing “product strategy weather report.”
 Each milestone is tied to the core loop: ingest Treasury data → compute regime → translate into
 plain‑English operational constraints with traceable sources.
-Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 Prioritized specs for the open items below live in `docs/roadmap-prioritized-spec.md`.
 
 ## Immediate priority backlog (live-gap focused)
@@ -13,7 +12,7 @@ Prioritized specs for the open items below live in `docs/roadmap-prioritized-spe
 2. ~~**Ship source health panel (stale/failed feed visibility)**~~ — Shipped: System status and Source board on `/trust` with per-source freshness, fallback reasons, and fetch metadata.
 3. ~~**Harden API contracts for summary and Signal Ops payloads**~~ — Shipped: `tests/apiSummaryContracts.test.ts` and `tests/cliContracts.test.ts` provide contract coverage for `/api/weekly`, `/api/monthly`, alerts, and digest.
 4. ~~**Finish historical structured archive materialization**~~ — Shipped: `lib/summary/summaryArchive.ts` with deterministic regression coverage.
-5. ~~**Consolidate operations IA around live routes**~~ — Shipped: `lib/navigation/informationArchitecture.ts` consolidates live routes (`/`, `/operate`, `/signals`, `/answer`, `/trust`, `/history`).
+5. ~~**Consolidate operations IA around live routes**~~ — Shipped: `lib/navigation/informationArchitecture.ts` consolidates live routes (`/`, `/operate`, `/signals`, `/resolve`, `/trust`, `/history`).
 
 ### Active focus (community & operator demand)
 1. ~~**Scheduled Monday Slack & Email delivery**~~ (Top request #1 & #3) — Shipped: KV-backed multi-team webhook registry (`lib/slack/slackWebhookStore.ts`), connection & test API (`/api/slack/subscribe`), UI destination toggle, and automated Monday delivery fan-out with auto-pruning (2026-09-17).

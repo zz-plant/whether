@@ -289,7 +289,7 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 ### Durable KV (`WHETHER_DURABLE_KV`)
 
-All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/storage/alertPreferenceRepository.ts`, `lib/ingestion/store.ts`) connect through `lib/runtime/boundary.ts` to `WHETHER_DURABLE_KV`.
+All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`.
 
 The consolidated state architecture operates around `refreshOperatingState()`, which executes the single authoritative signal refresh, pure regime evaluation, `OperatingSnapshot` persistence, state machine update, and transition recording. Current brief reads project the latest committed `OperatingSnapshot`; explicit historical reads continue to reconstruct the requested period. Read paths perform zero writes while the materialized signal store is current; a cold store ingests inline, and a stale one takes the refresh lock and refreshes off the request (Invariants 1, 1b, 1c in `tests/architectureInvariants.test.ts`).
 
@@ -328,5 +328,3 @@ If CI reports a new warning class, treat it as action-required until triaged and
 ## Shared UI import exceptions
 
 - `app/components/uiIcons.tsx` now imports Lucide icons from `lucide-react/dist/esm/icons/*` so the shared client chunk only analyzes the icons the weekly brief and operations surfaces actually render.
-- `simple-icons` does not expose stable per-icon ESM component entrypoints in the current package shape; `app/components/workAppIcon.tsx` therefore inlines the four non-Slack SVG metadata records used across export/integration surfaces instead of importing the full package entry.
-- If we revisit `simple-icons`, treat any return to `import { ... } from "simple-icons"` inside shared UI modules as an explicit bundle-cost tradeoff that must be re-measured in `bun run build`.

@@ -81,13 +81,8 @@ body::-webkit-scrollbar-thumb:hover {
   .anchor-feedback-active > header h2,
   .anchor-feedback-active > h2,
   .anchor-feedback-active [data-anchor-title='true'],
-  .weather-section-stage,
   .weather-step-panel {
     animation: none;
-  }
-
-  .weather-delta-card {
-    transition: none;
   }
 }
 

@@ -31,6 +31,14 @@ bun run ui:iterate -- --theme light --only home-mobile,home-desktop
 
 Until 2026-09-15 the harness could only capture dark, which is how the light theme shipped a white title on a cream page (`/answers`), invisible posture tags (`/brief`), and a grey slab behind `/pricing` without anyone seeing them. A visual change is not reviewed until it has been looked at in both.
 
+For `/`, capture the **returning reader** too. A plain capture is always the first-visit fold, because the layout bootstrap folds the page behind one question until the browser has stored a week. `--visitor returning` seeds last week and writes `<id>-returning.png`:
+
+```bash
+bun run ui:iterate -- --visitor returning --only home-mobile,home-desktop
+```
+
+This is the Monday reader's page, and until 2026-10-05 no capture had shown it.
+
 **2. Look.** Read the captured PNGs from `artifacts/ui/` with the Read tool. This is the step that gets skipped, and skipping it defeats the whole loop — you cannot critique a layout you haven't seen. Compare mobile against desktop for the same target rather than judging either alone; most density problems in this app are mobile-only.
 
 **3. Critique.** Judge against `whether-ui-standards` — especially section XI (report shell hierarchy) and section VIII (IA boundaries), since those govern whether a screen earns its vertical space. Useful questions: what does the eye hit first, and is that the decision? How many stacked chrome layers come before the first task block? Does anything restate posture that a card above already stated?

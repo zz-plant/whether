@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "dbaeumer.vscode-eslint",
+    "oxc.oxc-vscode",
     "oven.bun-vscode",
     "bradlc.vscode-tailwindcss",
     "ms-playwright.playwright",

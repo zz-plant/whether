@@ -18,19 +18,13 @@
   --text-fluid-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
   --color-semantic-tightening-fg: #fca5a5;
   --color-semantic-tightening-border: #f87171;
-  --color-semantic-tightening-bg: #3f1a1a;
   --color-semantic-easing-fg: #86efac;
   --color-semantic-easing-border: #4ade80;
-  --color-semantic-easing-bg: #123023;
-  --color-semantic-unchanged-fg: #cbd5e1;
   --color-semantic-unchanged-border: #64748b;
-  --color-semantic-unchanged-bg: #162133;
   --color-semantic-caution-fg: #fcd34d;
   --color-semantic-caution-border: #f59e0b;
   --color-semantic-caution-bg: #3b2d0b;
   --color-semantic-reversal-fg: #fda4af;
-  --color-semantic-reversal-border: #fb7185;
-  --color-semantic-reversal-bg: #3c1420;
   /* The Stormy regime as text. Violet, not sky: sky is the action accent on
      every link, button and focus ring here, so a Stormy week used to paint
      the call in the colour that elsewhere means "click". A regime hue that
@@ -38,21 +32,6 @@
      chrome around it. Same levels as the families above — 300 on the dark
      ground, 700 in the light block. */
   --color-semantic-stormy-fg: #c4b5fd;
-
-  /* Decision semantics */
-  --color-decision-do: #6ee7b7;
-  --color-decision-do-bg: rgba(110, 231, 183, 0.08);
-  --color-decision-pause: #fda4af;
-  --color-decision-pause-bg: rgba(253, 164, 175, 0.08);
-  --color-decision-watch: #fcd34d;
-  --color-decision-watch-bg: rgba(252, 211, 77, 0.08);
-  --color-decision-flip: #7dd3fc;
-  --color-decision-flip-bg: rgba(125, 211, 252, 0.08);
-
-  /* Trust semantics */
-  --color-trust-high: #6ee7b7;
-  --color-trust-medium: #fcd34d;
-  --color-trust-low: #fda4af;
 
   /* Text role tokens */
   /* Display sizes the weekly-call headline (its only consumer, DecisionHero).
@@ -64,17 +43,7 @@
      shouting. Kept as a token because the earlier 7vw/6.5rem ceiling wrapped
      it to seven lines and pushed the brief below the fold — the cap matters. */
   --text-display: clamp(1.5rem, 1.2rem + 1.35vw, 2.25rem);
-  --text-heading: clamp(1.25rem, 1rem + 1.4vw, 2.15rem);
-  --text-label: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
-  --text-caption: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
-  --color-app-surface: var(--app-surface);
-  --color-app-raised: var(--app-raised);
-  --color-app-nested: var(--app-nested);
-  --color-app-text: var(--app-text);
   --color-app-text-secondary: var(--app-text-secondary);
-  --color-app-text-muted: var(--app-text-muted);
-  --color-app-border: var(--app-border);
-  --color-app-border-strong: var(--app-border-strong);
 }
 
 @layer base {
@@ -144,12 +113,8 @@
   --fs-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
 
   /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
-  --space-2xl: 48px;
   /* Layout roles: page sections, content groups, and framed card insets. */
   --layout-section-gap: 24px;
   --layout-content-gap: 16px;
@@ -198,9 +163,6 @@
   --border-default: rgba(226, 232, 240, 0.13);
   --border-strong: rgba(226, 232, 240, 0.19);
 
-  --app-surface: #181b21;
-  --app-raised: #1f232a;
-  --app-nested: #0d0f12;
   --app-text: #f4f7fb;
   /* Secondary/muted are the two most-rendered inks on the page: slate-400/500
      both alias to --app-text-muted (574 call sites). slate-400 (#94a3b8) passes
@@ -210,8 +172,6 @@
      distinguishable. */
   --app-text-secondary: #d7dee8;
   --app-text-muted: #a7b3c4;
-  --app-border: rgba(226, 232, 240, 0.13);
-  --app-border-strong: rgba(226, 232, 240, 0.19);
 
   /* Regime atmosphere — a top-of-page posture tint that fades into --bg-body.
      Must stay theme-aware: a fixed dark tint washes out the light surface. */
@@ -275,7 +235,6 @@
   --shadow-color-faint: rgba(0, 0, 0, 0.16);
   --shadow-color-soft: rgba(0, 0, 0, 0.28);
   --shadow-color-mid: rgba(0, 0, 0, 0.44);
-  --shadow-color-deep: rgba(0, 0, 0, 0.62);
 
   /* Each step is contact (tight, defines the edge) + ambient (wide, defines
      the height). Contact carries most of the read at small sizes, which is why
@@ -288,8 +247,6 @@
             0 calc(16 * var(--sh)) calc(32 * var(--sh)) calc(-16 * var(--sh)) var(--shadow-color-mid);
   --elev-4: 0 calc(4 * var(--sh)) calc(9 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-soft),
             0 calc(24 * var(--sh)) calc(48 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-mid);
-  --elev-5: 0 calc(6 * var(--sh)) calc(13 * var(--sh)) calc(-6 * var(--sh)) var(--shadow-color-mid),
-            0 calc(36 * var(--sh)) calc(68 * var(--sh)) calc(-32 * var(--sh)) var(--shadow-color-deep);
 
   /* Top-edge specular. Dark theme only — on the light theme the surfaces are
      already near-white, so a white inset just muddies the border. */
@@ -304,15 +261,11 @@
   /* Accent glows. Spread scales with the same knob so a focus ring or a hover
      halo keeps its proportion to the shadow it sits inside. */
   --glow-soft: 0 0 calc(16 * var(--sh)) var(--accent-glow);
-  --glow-strong: 0 0 calc(24 * var(--sh)) var(--accent-strong);
 
   /* Legacy aliases. Complete values only — never put these in a color slot. */
   --shadow-light: var(--elev-1);
   --shadow-sm: var(--elev-1);
   --shadow-mid: var(--elev-2);
-  --shadow-md: var(--elev-2);
-  --shadow-lg: var(--elev-3);
-  --shadow-heavy: var(--elev-4);
 
   /* Accent colors — reserved by function */
   --accent-action: #38bdf8;
@@ -320,7 +273,6 @@
   --accent-success: #34d399;
   --accent-warning: #fbbf24;
   --accent-danger: #f87171;
-  --accent-strong: rgba(56, 189, 248, 0.5);
   --accent-border: rgba(56, 189, 248, 0.35);
   --accent-border-soft: rgba(56, 189, 248, 0.15);
   --accent-glow: rgba(56, 189, 248, 0.06);
@@ -332,10 +284,6 @@
   --z-overlay: 30;
   --z-modal: 40;
   --z-toast: 50;
-
-  /* Overlay highlights */
-  --white-overlay-subtle: rgba(255, 255, 255, 0.02);
-  --white-overlay-faint: rgba(255, 255, 255, 0.01);
 
   /* CTA button. The previous stops (#47cce a → #208bc4, stock sky/cyan) put
      .weather-button-primary's text-slate-100 at 1.73:1 against the top of the
@@ -355,8 +303,6 @@
   /* shadcn dark mode defaults */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
@@ -366,25 +312,11 @@
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
   --radius: 0.25rem;
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
 
 /* Elevation vs. viewport. The ladder is authored at the 640-1279px reference
@@ -426,31 +358,6 @@ html, body {
   scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
 }
 
-/* Historical / time-travel mode — subtle sepia tint */
-[data-historical="true"] {
-  --bg-body: #0e0b07;
-  --bg-panel: #1c1812;
-  --bg-surface: #181410;
-  --bg-raised: #241e17;
-  --bg-nested: #13100c;
-  --border-default: rgba(180, 130, 60, 0.06);
-  --border-strong: rgba(180, 130, 60, 0.10);
-  --text-primary: #f0e6d3;
-  --text-secondary: #a09080;
-  --text-muted: #706050;
-  --accent-action: #d4a030;
-  --accent-glow: rgba(212, 160, 48, 0.04);
-}
-
-html:has([data-historical="true"]) {
-  background-image: radial-gradient(64rem 28rem at 50% -12%, rgba(212, 160, 48, 0.03), transparent 60%);
-}
-
-/* Compass text — dark mode default, light mode override in theme-light.css */
-.regime-compass-text { fill: rgba(148,163,184,0.5); }
-.regime-compass-grid { stroke: rgba(148,163,184,0.15); }
-.regime-compass-dot { stroke: #0a0a0a; }
-
 /* Screenshot mode — clean, self-contained view for sharing */
 html[data-screenshot="true"] body > header,
 html[data-screenshot="true"] aside,
@@ -476,25 +383,10 @@ html[data-screenshot="true"] body {
   --color-slate-500: var(--app-text-muted);
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -503,8 +395,6 @@ html[data-screenshot="true"] body {
   --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   /* Generates the rounded-* utilities. Mirrors the :root scale above, and
@@ -523,8 +413,6 @@ html[data-screenshot="true"] body {
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
@@ -534,22 +422,10 @@ html[data-screenshot="true"] body {
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
 }
 
 html[data-theme="light"] {
@@ -590,17 +466,12 @@ html[data-theme="light"] {
   --border-default: rgba(0, 0, 0, 0.12);
   --border-strong: rgba(0, 0, 0, 0.195);
 
-  --app-surface: #ffffff;
-  --app-raised: #f4f1ec;
-  --app-nested: #e9e5de;
   --app-text: #0f172a;
   --app-text-secondary: #334155;
   /* slate-600, not slate-500: muted text is the target of text-slate-400/500 and
      at 12-13px slate-500 lands at 3.9-4.5:1 on --bg-body, just under AA. */
   --app-text-muted: #475569;
   /* Kept in lockstep with --border-default / --border-strong above. */
-  --app-border: rgba(0, 0, 0, 0.12);
-  --app-border-strong: rgba(0, 0, 0, 0.195);
 
   /* Light-surface posture tint: same hues, held to a wash so text keeps contrast. */
   --atmosphere-expansion: rgba(16, 185, 129, 0.10);
@@ -634,37 +505,17 @@ html[data-theme="light"] {
      mix the bg token down to ~12% before painting. */
   --color-semantic-tightening-fg: #b91c1c;
   --color-semantic-tightening-border: #ef4444;
-  --color-semantic-tightening-bg: #fee2e2;
   --color-semantic-easing-fg: #047857;
   --color-semantic-easing-border: #10b981;
-  --color-semantic-easing-bg: #d1fae5;
-  --color-semantic-unchanged-fg: #334155;
   --color-semantic-unchanged-border: #94a3b8;
-  --color-semantic-unchanged-bg: #e2e8f0;
   --color-semantic-caution-fg: #b45309;
   --color-semantic-caution-border: #f59e0b;
   --color-semantic-caution-bg: #fef3c7;
   --color-semantic-reversal-fg: #be123c;
-  --color-semantic-reversal-border: #f43f5e;
-  --color-semantic-reversal-bg: #ffe4e6;
   --color-semantic-stormy-fg: #6d28d9;
-
-  --color-decision-do: #047857;
-  --color-decision-do-bg: rgba(4, 120, 87, 0.08);
-  --color-decision-pause: #be123c;
-  --color-decision-pause-bg: rgba(190, 18, 60, 0.08);
-  --color-decision-watch: #b45309;
-  --color-decision-watch-bg: rgba(180, 83, 9, 0.08);
-  --color-decision-flip: #0369a1;
-  --color-decision-flip-bg: rgba(3, 105, 161, 0.08);
-
-  --color-trust-high: #047857;
-  --color-trust-medium: #b45309;
-  --color-trust-low: #be123c;
 
   /* Accent tints and the CTA treatment were dark-only, so the primary button
      kept a bright cyan gradient and a glow tuned for a near-black page. */
-  --accent-strong: rgba(3, 105, 161, 0.45);
   --accent-border: rgba(3, 105, 161, 0.30);
   --accent-border-soft: rgba(3, 105, 161, 0.14);
   --accent-glow: rgba(3, 105, 161, 0.05);
@@ -675,8 +526,6 @@ html[data-theme="light"] {
   --cta-border: rgba(3, 105, 161, 0.5);
   --cta-shadow: 0 4px 10px -8px rgba(3, 105, 161, 0.45);
   --cta-shadow-hover: 0 6px 14px -8px rgba(3, 105, 161, 0.55);
-  --white-overlay-subtle: rgba(0, 0, 0, 0.015);
-  --white-overlay-faint: rgba(0, 0, 0, 0.008);
 
   /* Only the shadow COLORS flip — the --elev-* geometry is shared, so a card is
      the same height in both themes and only the ink changes. Light shadows need
@@ -686,7 +535,6 @@ html[data-theme="light"] {
   --shadow-color-faint: rgba(15, 23, 42, 0.04);
   --shadow-color-soft: rgba(15, 23, 42, 0.07);
   --shadow-color-mid: rgba(15, 23, 42, 0.11);
-  --shadow-color-deep: rgba(15, 23, 42, 0.16);
 
   /* A white top edge on a white card is invisible at best and a seam at worst. */
   --edge-highlight: rgba(255, 255, 255, 0);
@@ -695,8 +543,6 @@ html[data-theme="light"] {
   /* shadcn light mode overrides */
   --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
@@ -706,7 +552,6 @@ html[data-theme="light"] {
   --muted: oklch(0.961 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.961 0 0);
-  --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -772,12 +617,7 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 
 [data-theme="light"] .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.06) !important; }
 [data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }
-[data-theme="light"] .border-white\/\[0\.12\] { border-color: rgba(0,0,0,0.12) !important; }
-[data-theme="light"] .border-white\/\[0\.14\] { border-color: rgba(0,0,0,0.14) !important; }
 
-html[data-theme="light"] .regime-compass-text { fill: rgba(71,85,105,0.7); }
-html[data-theme="light"] .regime-compass-grid { stroke: rgba(0,0,0,0.1); }
-html[data-theme="light"] .regime-compass-dot { stroke: #fff; }
 html[data-theme="light"] .weather-input,
 html[data-theme="light"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
 html[data-theme="light"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
@@ -788,8 +628,7 @@ html[data-theme="light"] .weather-button-primary { color: #ffffff; }
    the pill kept a near-black background while text-slate-100 flipped to dark,
    so the /evidence header chip rendered dark-on-dark. background-image must be
    cleared explicitly -- the shorthand alone loses to the later stylesheet. */
-html[data-theme="light"] .weather-pill,
-html[data-theme="light"] .weather-pill-muted {
+html[data-theme="light"] .weather-pill {
   color: var(--text-primary);
   border-color: var(--border-strong);
   background-color: var(--bg-panel);
@@ -827,8 +666,6 @@ html[data-theme="light"] [class^="bg-emerald-950"], html[data-theme="light"] [cl
 html[data-theme="light"] [class^="bg-emerald-900"], html[data-theme="light"] [class*=" bg-emerald-900"] { background-color: #ecfdf5 !important; }
 html[data-theme="light"] [class^="bg-sky-950"], html[data-theme="light"] [class*=" bg-sky-950"],
 html[data-theme="light"] [class^="bg-sky-900"], html[data-theme="light"] [class*=" bg-sky-900"] { background-color: #f0f9ff !important; }
-html[data-theme="light"] [class^="bg-indigo-950"], html[data-theme="light"] [class*=" bg-indigo-950"],
-html[data-theme="light"] [class^="bg-indigo-900"], html[data-theme="light"] [class*=" bg-indigo-900"] { background-color: #eef2ff !important; }
 html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(0,0,0,0.05) !important; }
 html[data-theme="light"] [class^="border-slate-800"], html[data-theme="light"] [class*=" border-slate-800"],
 html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [class*=" border-slate-900"] { border-color: rgba(0,0,0,0.10) !important; }
@@ -874,16 +711,6 @@ html[data-theme="light"] [class^="text-rose-2"], html[data-theme="light"] [class
 html[data-theme="light"] [class^="text-rose-3"], html[data-theme="light"] [class*=" text-rose-3"],
 html[data-theme="light"] [class^="text-rose-4"], html[data-theme="light"] [class*=" text-rose-4"] { color: #b91c1c !important; }
 
-/* Teal is the brand accent — the logo, the active tab, the confidence chip,
-   the hero cards' icon wells and their "View history" links — and it was the
-   one hue this layer did not cover, so all 47 call sites kept text-teal-300
-   (#5eead4) on the light ground at 1.6:1. teal-800 clears 4.5:1 on --bg-body
-   and on the teal-500/10 tint the chips sit on. */
-html[data-theme="light"] [class^="text-teal-1"], html[data-theme="light"] [class*=" text-teal-1"],
-html[data-theme="light"] [class^="text-teal-2"], html[data-theme="light"] [class*=" text-teal-2"],
-html[data-theme="light"] [class^="text-teal-3"], html[data-theme="light"] [class*=" text-teal-3"],
-html[data-theme="light"] [class^="text-teal-4"], html[data-theme="light"] [class*=" text-teal-4"] { color: #115e59 !important; }
-
 /* The two remaining hues, each a handful of call sites: violet is the
    "change course if" eyebrow on /operate and /history/compare, cyan a
    scenario label. Same 100-400 floor as the rest. */
@@ -901,7 +728,6 @@ html[data-theme="light"] [class*="hover:text-emerald-"]:hover { color: #065f46 !
 html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #78350f !important; }
 html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #0c4a6e !important; }
 html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !important; }
-html[data-theme="light"] [class*="hover:text-teal-"]:hover { color: #134e4a !important; }
 
 /* Focus rings are authored as sky-200/300/400 (51 usages) — bright cyan that
    reads on the dark surface and washes out on white. The ring is the primary

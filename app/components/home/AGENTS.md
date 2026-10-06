@@ -50,7 +50,7 @@ Prefer changing these before changing home presentation:
 
 When home orchestration or section order changes, update:
 - `tests/homeRouteDecisionTransmissionContract.test.tsx` (section/cadence placement contract)
-- `tests/homePageHeading.test.ts`
+- `tests/homePageHeading.test.tsx`
 - `tests/reportShellSections.test.tsx` if shell behavior changes
 - `docs/feature-specs-current.md`
 

@@ -28,8 +28,8 @@ type Props = {
  * once the reader has scrolled past the hero. Below `md` the bottom tab bar
  * owns the thumb zone, and this strip used to sit on top of it — two fixed
  * bars, roughly 128px of a 932px viewport, plus a spacer the strip reserved for
- * itself even while hidden. (Reverses the 2026-08 thumb-zone strip in
- * docs/design-improvements-priority.md, P0 #1.)
+ * itself even while hidden. (Reverses the 2026-08 thumb-zone strip, P0 #1 of
+ * the design-improvements tracker retired on 2026-10-05.)
  *
  * The phone variant is one line at the *top*, under the header, shown once
  * the hero has left the viewport: weather word, the call, confidence, and a
