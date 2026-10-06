@@ -154,6 +154,65 @@ describe("fetch-based main-content guard", () => {
 });
 
 /*
+ * Every route's flight payload carries the layout's 404 boundary, and
+ * app/not-found.tsx renders a targeted <main>. Until 2026-10-06 the audit read
+ * that row as the route's own landmark, so five reading routes whose <main> had
+ * no id passed it. The payloads here are trimmed from what vinext serves: rows
+ * pushed as one escaped string, the 404 named as a boundary's `fallback`.
+ */
+describe("the 404 boundary in every flight payload", () => {
+  const row = (id: string, value: unknown) => `${id}:${JSON.stringify(value)}`;
+  const flight = (...rows: string[]) =>
+    `<script>(self.rsc??=[]).push(${JSON.stringify(`${rows.join("\n")}\n`)})</script>`;
+  const layout = row("0", ["$", "body", null, {
+    children: [
+      ["$", "a", null, { className: "skip-link", href: "#main-content", children: "Skip to content" }],
+      ["$", "$L1", null, { resetKey: "about", fallback: "$2", children: "$3" }],
+    ],
+  }]);
+  const notFound = row("2", ["$", "main", null, { id: "main-content", tabIndex: -1, children: "That page moved." }]);
+  const routeMain = (props: Record<string, unknown>) => row("3", ["$", "main", null, { ...props, children: "About" }]);
+  const skipLink = '<a class="skip-link" href="#main-content">Skip to content</a>';
+
+  it("fails a painted <main> without the id, though the 404's targeted one is in the payload", () => {
+    const html = `${skipLink}<main class="mx-auto">About</main>${flight(layout, notFound, routeMain({}))}`;
+
+    assert.ok(
+      inspectMainContentHtml(html).issues.some((issue: string) => /id="main-content" on the route's <main>; found 0/.test(issue)),
+    );
+  });
+
+  it("passes a streamed route whose own targeted <main> arrives in the payload", () => {
+    const html = `${skipLink}<div>Loading</div>${flight(layout, notFound, routeMain({ id: "main-content", tabIndex: -1 }))}`;
+
+    assert.deepEqual(inspectMainContentHtml(html).issues, []);
+  });
+
+  it("fails a streamed route whose only targeted <main> is the 404's, wherever its row sits", () => {
+    /* The second shape outlines the 404's <main> below its fallback row, as a
+       not-found page that wraps its shell in another component would. */
+    const outlinedNotFound = [
+      row("2", ["$", "$L4", null, { children: "$5" }]),
+      row("5", ["$", "main", null, { id: "main-content", tabIndex: -1, children: "That page moved." }]),
+    ];
+
+    for (const notFoundRows of [[notFound], outlinedNotFound]) {
+      const html = `${skipLink}<div>Loading</div>${flight(layout, ...notFoundRows, routeMain({}))}`;
+      assert.ok(inspectMainContentHtml(html).issues.some((issue: string) => /found 0 <main>/.test(issue)));
+    }
+  });
+
+  it("judges a painted <main> as painted, even beside a targeted one in the payload", () => {
+    /* The fallback used to excuse this as a "placeholder" /state flushed. /state
+       had no loading shell: its page rendered a <main> without the id, the same
+       defect as the five reading routes. */
+    const html = `${skipLink}<main class="flex min-h-screen">Loading</main>${flight(layout, notFound, routeMain({ id: "main-content" }))}`;
+
+    assert.notDeepEqual(inspectMainContentHtml(html).issues, []);
+  });
+});
+
+/*
  * A dead `#anchor` fails silently — the browser stays put — and nothing in a
  * type check or a unit test sees it. The four found by hand on 2026-09-16 were
  * all invisible for one reason: they sat in code that never rendered, so no

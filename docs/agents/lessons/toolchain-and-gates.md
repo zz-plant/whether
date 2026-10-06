@@ -221,3 +221,15 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
   derived from it and the census script reading it.
 
+
+- **An excuse in a gate has to fail a payload you know is broken (2026-10-06).** The landmark
+  audit read the RSC flight payload whenever a route's markup had no targeted `<main>`, to excuse a
+  placeholder `<main>` that /state was said to flush. Every payload carries the layout's 404
+  boundary, and `app/not-found.tsx` renders `<main id="main-content">`, so the excuse held on every
+  route: five reading routes whose `<main>` had no id passed (/about, /contact, the brief record,
+  the decision-shield overview, every resource article). /state never had a placeholder either. Its
+  page rendered `<main className="flex min-h-screen ...">` without the id, so the case the excuse
+  was written for was the first instance of the bug. A painted `<main>` is now judged as painted.
+  The payload is read only for a route that paints none, and the rows a boundary names as its
+  `fallback` are skipped there. Against 6404891a, the commit before #1518 fixed those pages, the old
+  audit passed all 35 routes and the new one fails exactly the five.
