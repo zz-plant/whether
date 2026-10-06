@@ -29,7 +29,11 @@ const headingsInOrder = (html: string) =>
   [...html.matchAll(/<h[1-3][^>]*>([^<]*)</g)].map(([, text]) => text.replace(/&#x27;/g, "'"));
 
 describe("/history leads with the record's answer", () => {
-  it("draws the month strip before the phase map, and the tiles beside the confidence record", async () => {
+  /* The order follows the page summary's two questions: what the guidance said
+     (the strip, then the published weeks), then how it held up (the tiles and
+     the confidence record). The published weeks used to close the page, under
+     the phase map, though they are the record a reader cites. */
+  it("draws the strip, then the published weeks, then the track record, then the phase map", async () => {
     const page = await import("../app/history/page");
     const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
     const headings = headingsInOrder(html);
@@ -43,9 +47,9 @@ describe("/history leads with the record's answer", () => {
 
     assert.ok(strip !== -1 && record !== -1 && map !== -1 && table !== -1, `headings: ${headings.join(" | ")}`);
     assert.ok(strip < record, "the month strip opens the page");
+    assert.ok(briefs === -1 || (strip < briefs && briefs < record), "the published weeks follow the strip");
     assert.ok(record < confidence && confidence < map, "the confidence record sits with the track record, before the phase map");
     assert.ok(map < table, "the month-by-month table is evidence, after the map");
-    assert.ok(briefs === -1 || table < briefs, "published briefs close the record");
 
     assert.equal((html.match(/data-month-strip/g) ?? []).length, 1);
     assert.ok(html.indexOf("data-month-strip") < html.indexOf('id="phase-map-heading"'));
@@ -75,7 +79,31 @@ describe("/history leads with the record's answer", () => {
     const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
     const rail = [...html.matchAll(/href="#(call-by-month|track-record|regime-map|monthly-calls|published-briefs)"/g)].map(([, id]) => id);
     const firstOfEach = [...new Set(rail)];
-    assert.deepEqual(firstOfEach.slice(0, 4), ["call-by-month", "track-record", "regime-map", "monthly-calls"]);
+    assert.deepEqual(firstOfEach, ["call-by-month", "published-briefs", "track-record", "regime-map", "monthly-calls"]);
+  });
+
+  it("folds the phase map until asked, and opens it for a window link", async () => {
+    const page = await import("../app/history/page");
+    const mapTag = (html: string) => {
+      const heading = html.indexOf('id="phase-map-heading"');
+      return html.slice(0, heading).match(/<details[^>]*>/g)?.at(-1) ?? "";
+    };
+    const closed = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
+    assert.doesNotMatch(mapTag(closed), /\sopen/, "the mechanism is a second read");
+    const windowed = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({ span: "5y" }) }));
+    assert.match(mapTag(windowed), /\sopen/, "a window link lands on the chart it changed");
+  });
+
+  it("lists each closed year under the strip, not in a section of its own", async () => {
+    const page = await import("../app/history/page");
+    const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
+    const { buildPostureArchivePath, postureArchiveYears } = await import("../lib/summary/postureArchiveYears");
+    const strip = /<section[^>]*id="call-by-month"[^>]*>([\s\S]*?)<\/section>/.exec(html)?.[1] ?? "";
+    assert.ok(postureArchiveYears.length > 0);
+    for (const year of postureArchiveYears) {
+      assert.ok(strip.includes(`href="${buildPostureArchivePath(year.slug)}"`), `${year.title} links from the strip's section`);
+    }
+    assert.doesNotMatch(html, /posture-by-year-heading/);
   });
 });
 
