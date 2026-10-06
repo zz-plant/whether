@@ -16,6 +16,7 @@ import { ContentMeasurementTracker } from "../../components/contentMeasurementTr
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { ActionLink } from "../../components/ui/actionLink";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
 
@@ -125,7 +126,8 @@ type ResourceDecisionArtifact = {
   postureSummary: string;
   mappedRules: BoundedDecisionRule[];
   freshnessLabel: string;
-  citation: string;
+  /** The reading's own date; the paste-ready citation printed here ran to three lines of URLs. */
+  recordDateLabel: string;
 };
 
 export function ResourceArticlePage({ article, decisionArtifact }: { article: ResourceArticle; decisionArtifact?: ResourceDecisionArtifact }) {
@@ -190,7 +192,10 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                   </article>
                 ))}
               </div>
-              <p className="text-xs text-slate-400">{decisionArtifact.citation} · Freshness: {decisionArtifact.freshnessLabel}</p>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
+                <span>As of {decisionArtifact.recordDateLabel} · signals refreshed {decisionArtifact.freshnessLabel}</span>
+                <ActionLink href="/" variant="inline" className="print:hidden">Open this week&apos;s brief</ActionLink>
+              </p>
             </section>
           ) : null}
 

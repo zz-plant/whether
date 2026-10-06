@@ -62,3 +62,20 @@ describe("every reading page renders in the reading frame", () => {
     });
   }
 });
+
+describe("a resource article", () => {
+  /* Its only link back to the brief was a pair of pills rendered above the
+     page's <main>, and its live-guidance block printed the full paste citation,
+     URLs and all, as its date line. */
+  it("links back to the brief from inside its <main>, under a dated line", async () => {
+    const page = await import("../app/resources/[slug]/page");
+    const html = renderToStaticMarkup(
+      await page.default({ params: Promise.resolve({ slug: "should-we-freeze-hiring-high-interest-rate-environment" }) }),
+    );
+    const main = html.indexOf("<main");
+    assert.equal(html.slice(0, main).replace(/<[^>]+>/g, "").trim(), "", "nothing renders before the landmark");
+    assert.ok(html.indexOf("Open this week&#x27;s brief") > main);
+    assert.match(html, /As of [A-Z][a-z]{2} \d{1,2}, \d{4} · signals refreshed/);
+    assert.doesNotMatch(html, /Start from Weekly Brief|Source note: https?:/);
+  });
+});

@@ -2428,8 +2428,11 @@ because its streamed-route fallback finds the 404 boundary's `<main>` in every f
   rail) take `wide`; the brief record, about, contact and the overview take `prose`.
 - `SecondaryPageShell` and its CSS (`.weather-secondary-shell*`, the compact and narrow widths) are
   deleted; `SecondaryPageHeader` and `SecondaryPageSection` stay as section components.
+- Resource articles lose the "Start from Weekly Brief" and "Return to Planning" pills that rendered
+  above their `<main>`. The link back to the brief is in the live-guidance block, under a dated line
+  ("As of Oct 2, 2026 · signals refreshed …") that replaces the paste-ready citation and its URLs.
 - `tests/readingFrameRoutes.test.tsx` renders each reading route and holds it to one
-  `<main id="main-content">`.
+  `<main id="main-content">`, and the article to nothing before it.
 
 ### 1.1.36 `/operate` opens on the reader's decision, not a copy of the brief (2026-10-06)
 
