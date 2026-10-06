@@ -118,10 +118,10 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
       </section>
       {reading ? <SignalReadingPanel reading={reading} recordDateLabel={reportData.recordDateLabel} /> : null}
       <DecisionContractBlock
-        call={reportData.statusLabel}
+        conditions={reportData.statusLabel}
         action={reportData.actionNowShort}
-        threshold={reportData.guardrailThreshold}
-        reversal={reportData.flipThreshold}
+        pauseIf={reportData.guardrailThreshold}
+        callChangesIf={reportData.flipThreshold}
         evidence={clusterDefinition.evidence}
       />
       {/* The five decision pages under this signal. They were in the sitemap
