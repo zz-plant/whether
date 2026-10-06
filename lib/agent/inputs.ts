@@ -64,7 +64,12 @@ export const lowerCasedInput = (value: unknown) => (typeof value === "string" ? 
 /**
  * A finite number, sent as a number or as text (a query parameter is always text). Zero is a
  * value: the plain-GET shim tested the parsed number for truth and refused `riskAppetite=0`.
+ * Blank text is not zero, though `Number("")` is (the FRED lesson): it is refused as text. A
+ * tool never sees it, because an empty argument is not sent; the CLI's query string does.
  */
-export const numberInput = z.preprocess((value) => (typeof value === "string" ? Number(value.trim()) : value), z.number());
+export const numberInput = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() !== "" ? Number(value.trim()) : value),
+  z.number(),
+);
 
 export const textInput = z.string().min(1);

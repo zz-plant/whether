@@ -183,6 +183,15 @@ Order: **flags > env vars > config file**.
 
 All are versioned `v1` payloads for automation-safe command output.
 
+Each `/api/cli/*` route reads its query string with the agent tools' parser (`lib/cli/queryContracts.ts`,
+over `lib/agent/registry.ts`), and the scenario scores with the tools' `numberInput`. A query the route
+cannot read is a 400 whose `error` is the sentence it always was (`Unsupported query parameters.` with
+`unsupported` and `supported`, `Invalid asOf input. Expected YYYY-MM.`, `Invalid weeks input. ...`,
+`Invalid tightness input.`), plus `problems`: one `{ argument, message, allowed? }` per argument, as an
+agent tool's refusal carries. A name the route does not take is refused first, then the first value it
+cannot read. `asOf=` (empty) is not sent; any other empty or blank value is refused (`tightness=%20` was
+read as 0 until 2026-10-06).
+
 
 ## Troubleshooting (error categories)
 

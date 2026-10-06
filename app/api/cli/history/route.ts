@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
-import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseWeeksSearchParam } from "../../../../lib/cli/queryContracts";
+import { CLI_QUERIES, parseCliQuery, resolveWeeksWindow } from "../../../../lib/cli/queryContracts";
 import { formatConfidencePlainLabel } from "../../../../lib/report/reportFormatting";
 import { resolvePublishedConfidence } from "../../../../lib/report/confidence";
-import { parseCliRouteRequest } from "../../../../lib/api/cliRoute";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -13,23 +12,16 @@ const DEFAULT_WINDOW_WEEKS = 12;
 const MAX_WINDOW_WEEKS = 52;
 
 export async function GET(request: NextRequest) {
-  const parsedRequest = parseCliRouteRequest(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.history);
-  if (parsedRequest instanceof NextResponse) return parsedRequest;
+  const query = parseCliQuery(request, CLI_QUERIES.history);
+  if (query instanceof NextResponse) return query;
 
-  const searchParams = parsedRequest.asOf
-    ? { year: String(parsedRequest.asOf.year), month: String(parsedRequest.asOf.month) }
-    : undefined;
-
-  const weeksParam = parseWeeksSearchParam({
-    weeks: request.nextUrl.searchParams.get("weeks"),
+  const weeksParam = resolveWeeksWindow({
+    weeks: query.weeks,
     defaultWeeks: DEFAULT_WINDOW_WEEKS,
     maxWeeks: MAX_WINDOW_WEEKS,
   });
-  if (weeksParam === null) {
-    return NextResponse.json({ error: "Invalid weeks input. Expected integer between 1 and 52." }, { status: 400 });
-  }
 
-  const reportResult = await loadReportDataSafe(searchParams, { route: "/api/cli/history" });
+  const reportResult = await loadReportDataSafe(query.asOf, { route: "/api/cli/history" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const confidenceLabel = formatConfidencePlainLabel(
     resolvePublishedConfidence({

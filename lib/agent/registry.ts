@@ -147,7 +147,7 @@ const describeIssue = (issue: z.core.$ZodIssue, given: Record<string, unknown>, 
  * Takes the values as given; `parseToolArguments` first drops the empty ones, and a caller
  * with a contract of its own for an empty value (the CLI's query string) calls this directly.
  */
-const parseNamedArguments = <Schema extends ToolSchema>(tool: string, schema: Schema, given: Record<string, unknown>): z.output<Schema> => {
+export const parseNamedArguments = <Schema extends ToolSchema>(tool: string, schema: Schema, given: Record<string, unknown>): z.output<Schema> => {
   const parsed = schema.safeParse(given);
   if (parsed.success) return parsed.data;
   const problems = parsed.error.issues.map((issue) => describeIssue(issue, given, tool, schema));
