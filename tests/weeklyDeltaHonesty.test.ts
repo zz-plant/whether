@@ -45,12 +45,13 @@ describe("threshold distance is not a weekly move", () => {
  * carries the real move; these two must not drift back together.
  */
 describe("the weekly email labels what it shows", () => {
+  const diagnostics = computeDiagnostics(79, 53, DEFAULT_THRESHOLDS);
   const snapshot = {
-    assessment: {
+    readings: {
       scores: { tightness: 79, riskAppetite: 53 },
-      thresholds: DEFAULT_THRESHOLDS,
-      diagnostics: computeDiagnostics(79, 53, DEFAULT_THRESHOLDS),
+      vsThreshold: { tightness: diagnostics.tightnessVsThreshold, riskAppetite: diagnostics.riskAppetiteVsThreshold },
     },
+    confidence: "MED" as const,
   };
 
   it("carries the distance from the line, not a claim about last week", () => {

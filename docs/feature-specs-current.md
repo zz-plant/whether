@@ -2063,6 +2063,10 @@ change line: 0.0", "Could conditions change next week: no" and "no live reading 
 stand-ins on /share's meeting pack, the one place it printed), the historical-analogs block, the
 failure-mode warning and the interpretation block.
 
+**The weekly email reads the same document** (`sendWeeklyBrief`): its action, pause line, change
+lines, conditions line and readings row come from the snapshot's document, and the readings row
+takes the document's confidence instead of resolving its own. Its text did not change.
+
 **/share offers one Slack text and the meeting pack carries it.** The pack pasted the long Monday
 post beside the picker's Slack post, under a different call on a held week. Its "SLACK POST"
 section is the picker's post now.

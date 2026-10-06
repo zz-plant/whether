@@ -5,11 +5,12 @@ import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weekly
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
-import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } from "../export/exportTerms";
+import { formatExportConfidenceWord } from "../export/exportTerms";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
-import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
+import type { BriefDocument } from "../report/briefArtifact";
+import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
 
 /**
  * How far a reading sits from the line that would change the call, and which
@@ -50,20 +51,18 @@ const distanceFromLine = (
  * reads has no previous week in it, so the honest fix is the label — the
  * published archive, which does have one, now carries the real move instead.
  */
-/* Exactly the fields the readings row reads. A full `OperatingSnapshot` is
-   assignable, and a test can build these five without asserting its way past
-   the thirty it does not touch. */
+/* Exactly the fields the readings row reads: the brief document's readings and
+   its published confidence, resolved once for every format. A full
+   `BriefDocument` is assignable, and a test can build these without asserting
+   its way past the fields it does not touch. */
 type WeeklyEmailReadingSource = {
-  assessment: ConfidenceInputs & {
-    diagnostics: Pick<OperatingSnapshot["assessment"]["diagnostics"], "tightnessVsThreshold" | "riskAppetiteVsThreshold">;
-  };
-  /** The record the scores were read from, which decides whether they have gone stale. */
-  treasury?: ConfidenceRecord;
+  readings: Pick<BriefDocument["readings"], "scores" | "vsThreshold">;
+  confidence: BriefDocument["confidence"];
 };
 
-export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | undefined) => {
-  if (!snapshot) return [];
-  const { scores, diagnostics } = snapshot.assessment;
+export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | undefined) => {
+  if (!document) return [];
+  const { scores, vsThreshold } = document.readings;
   /* Each score carries what it means, because the inbox has no page beside it
      to say which end of the scale is bad. */
   return [
@@ -72,18 +71,18 @@ export const buildWeeklyEmailReadings = (snapshot: WeeklyEmailReadingSource | un
       value: `${scores.tightness}/100`,
       meaning: signalReadingMeaning("tightness", scores.tightness),
       /* Above the line is the tighter regime, so above is the worse side here. */
-      distance: distanceFromLine(diagnostics.tightnessVsThreshold, "above"),
+      distance: distanceFromLine(vsThreshold.tightness, "above"),
     },
     {
       label: regimeSignalLabel.riskAppetite,
       value: `${scores.riskAppetite}/100`,
       meaning: signalReadingMeaning("riskAppetite", scores.riskAppetite),
       /* The risk line is a floor: below it is risk-off. */
-      distance: distanceFromLine(diagnostics.riskAppetiteVsThreshold, "below"),
+      distance: distanceFromLine(vsThreshold.riskAppetite, "below"),
     },
     {
       label: "Confidence",
-      value: formatExportConfidenceWord(resolvePublishedConfidence({ assessment: snapshot.assessment, record: snapshot.treasury }).label),
+      value: formatExportConfidenceWord(document.confidence),
       meaning: null,
       distance: null,
     },
@@ -202,14 +201,16 @@ export const sendWeeklyBrief = async (options?: {
     return refuse(readiness.reason);
   }
 
-  /* Past the guard, every line below is a reading rather than a stand-in for one. */
-  const regime = snapshot.assessment.regime;
+  /* Past the guard, every line below is a reading rather than a stand-in for one,
+     from the brief document every other format renders. */
+  const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), weeklyCall);
+  const regime = document.conditions.regime;
   const regimeLabel = getRegimePublicLabel(regime);
-  const readings = buildWeeklyEmailReadings(snapshot);
-  const actionNow = weeklyCall.actionNow;
-  const pauseIf = pauseConditionOnly(weeklyCall.pauseIf);
-  const changeLines = weeklyCallChangeLines(weeklyCall);
-  const recordDate = snapshot.provenance.recordDateLabel;
+  const readings = buildWeeklyEmailReadings(document);
+  const actionNow = document.slots.actionNow;
+  const pauseIf = document.slots.pauseIf;
+  const changeLines = weeklyCallChangeLines(document.slots);
+  const recordDate = document.recordDateLabel;
 
   const results = await Promise.allSettled(
     subscriptions.map((recipient) => {
@@ -225,7 +226,7 @@ export const sendWeeklyBrief = async (options?: {
 
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
-        `Conditions: ${describeConditions(regime)}`,
+        `Conditions: ${document.conditions.line}`,
         ...readingsText(readings),
         `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
