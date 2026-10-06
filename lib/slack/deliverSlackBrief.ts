@@ -7,6 +7,7 @@ import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../repor
 import type { OperatingSnapshot } from "../operatingState/types";
 import { buildSensorReadings } from "../sensors";
 import { siteUrl } from "../siteUrl";
+import { slackChannel } from "../delivery/slack";
 
 /**
  * Slack delivery for the weekly brief.
@@ -122,17 +123,6 @@ const buildSlackBriefPayload = async (
   };
 };
 
-import { getSlackWebhookStore } from "./slackWebhookStore";
-
-export const resolveConfiguredSlackWebhooks = (): string[] => {
-  const urls = new Set<string>();
-  const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
-  if (envUrl && isSlackWebhookUrl(envUrl)) {
-    urls.add(envUrl);
-  }
-  return [...urls];
-};
-
 /**
  * The weekly brief from the operating snapshot the cron just materialized,
  * with no second report read.
@@ -181,22 +171,6 @@ const buildSlackBriefPayloadFromSnapshot = async (
   };
 };
 
-const resolveAllTargetSlackWebhooks = async (): Promise<string[]> => {
-  const urls = new Set<string>(resolveConfiguredSlackWebhooks());
-  try {
-    const store = getSlackWebhookStore();
-    const stored = await store.listActiveWebhooks();
-    for (const url of stored) {
-      if (isSlackWebhookUrl(url)) {
-        urls.add(url);
-      }
-    }
-  } catch (error) {
-    console.warn("[slack] failed to load stored webhooks", error);
-  }
-  return [...urls];
-};
-
 export const deliverSlackBrief = async (options?: {
   webhookUrls?: string[];
   fetchImpl?: typeof fetch;
@@ -208,14 +182,12 @@ export const deliverSlackBrief = async (options?: {
   snapshot?: OperatingSnapshot;
   now?: Date;
 }): Promise<SlackDeliveryResult> => {
-  const urls = options?.webhookUrls ?? (await resolveAllTargetSlackWebhooks());
+  const urls = options?.webhookUrls ?? (await slackChannel.listTargets());
   if (urls.length === 0) {
     /* Nothing configured is a real state, not a failure — but it must never be
        reported as "posted". */
     return { ok: true, status: "skipped_unconfigured", attempted: 0, delivered: 0 };
   }
-
-  const doFetch = options?.fetchImpl ?? fetch;
 
   let payload = options?.payload;
   if (!payload) {
@@ -250,28 +222,18 @@ export const deliverSlackBrief = async (options?: {
 
   const { text, recordDate } = payload;
   const blocks = buildSlackBriefBlocks(text, recordDate, { imageUrl: options?.imageUrl });
-  const results = await Promise.allSettled(
-    urls.map(async (url) => {
-      const response = await doFetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        /* The top-level text is the notification-preview fallback. */
-        body: JSON.stringify({ blocks, text: `Whether Weekly Brief — ${recordDate}` }),
-      });
-      if (!response.ok) {
-        if (response.status === 404 || response.status === 410) {
-          /* Awaited, not floated: the delivery's return means its bookkeeping
-             is done — in a Worker a floating promise can die with the request,
-             leaving a revoked webhook counted as a target forever. */
-          await getSlackWebhookStore().deactivateByUrl(url).catch(() => undefined);
-        }
-        throw new Error(`slack_webhook_${response.status}`);
-      }
-    }),
+  /* The top-level text is the notification-preview fallback. A webhook Slack
+     has revoked (404/410) is retired inside the fan-out, awaited, so the next
+     Monday does not count it as a target. */
+  const tally = await slackChannel.deliver(
+    urls,
+    { blocks, text: `Whether Weekly Brief — ${recordDate}` },
+    { fetchImpl: options?.fetchImpl },
   );
 
-  const delivered = results.filter((entry) => entry.status === "fulfilled").length;
-  const failed = urls.length - delivered;
+  const delivered = tally.sent;
+  /* A retired webhook still missed this week's post, so it counts as failed here. */
+  const failed = tally.failed + tally.retired;
   const status: SlackDeliveryStatus = delivered === 0 ? "failed" : failed > 0 ? "partial" : "posted";
 
   return {

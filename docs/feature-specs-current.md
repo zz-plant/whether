@@ -1007,8 +1007,8 @@ or not a score crossed anything. Consecutive means the previous snapshot, which
 something fires and would turn weeks of drift into a flash — and at most seven days apart,
 because the size assumes a short window. It is a critical CFO alert that bypasses the weekly
 cooldown like a regime change, deduplicated per input (`flash:baseRate`, `flash:curveSlope`),
-mailed through `flashMoveEmail` and posted to `SLACK_WEBHOOK_URL` through the one
-`postSlackAlert` helper in `checkRegimeChange`, on both crons. `/privacy` §2.1 says what the
+mailed through `flashMoveEmail` and posted to every Slack target through the shared
+`slackChannel` (`lib/delivery/slack.ts`, §1.1.43), on both crons. `/privacy` §2.1 says what the
 between-Monday alerts now include.
 
 **The flip watch.** The hero's Conditions cell states the market move that would change the
@@ -2557,3 +2557,23 @@ own near the foot, ten screens from the strip that draws the same months.
 - Measured: 3,964 → 3,160 px desktop, about 6,160 → 4,990 px phone. Tests:
   `tests/recordRoutesReadingOrder.test.tsx`.
 
+
+### 1.1.43 Delivery channels: one Slack poster, one tally (2026-10-06)
+
+Every send — the weekly email, the weekly Slack post, the between-Monday alerts, the month-end
+pulse and the regime-change push — now goes through `lib/delivery/`.
+
+- **One Slack channel** (`lib/delivery/slack.ts`, `slackChannel`). The targets (the
+  `SLACK_WEBHOOK_URL` webhook plus every active stored one) were resolved in three places; they are
+  resolved in one. Every post is bounded (10s; the alert and pulse posts had no timeout, so an edge
+  that never answered held the cron step to its 60s deadline), and every post retires a webhook
+  Slack answers 404/410 for. The month-end pulse never did, so a channel that deleted its webhook
+  stayed a target of every pulse. Alerts and the pulse share one block shape
+  (`slackAlertBlocks`: header, body, "View brief"); every post now carries
+  `Content-Type: application/json`, which only the weekly post set before. The blocks and text
+  are unchanged.
+- **One tally** (`lib/delivery/fanOut.ts`). A target is sent to, gone (and retired), failed, or
+  skipped; the five senders counted those in five shapes. Each route keeps the shape it already
+  publishes — the weekly Slack post counts a retired webhook as a failed one, the push result's
+  `pruned` is the tally's `retired` — so no response changed.
+- Tests: `tests/deliveryChannels.test.ts`.

@@ -29,8 +29,8 @@ import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getSubscriberStore } from "../email/subscriberStore";
 import { createCloudflareEmailAdapter } from "../email/emailDelivery";
 import { unsubscribeFooterText } from "./alertTemplates";
-import { getSlackWebhookStore } from "../slack/slackWebhookStore";
-import { isSlackWebhookUrl } from "../slack/deliverSlackBrief";
+import { slackAlertBlocks, slackChannel } from "../delivery/slack";
+import { fanOut } from "../delivery/fanOut";
 import { siteUrl } from "../siteUrl";
 import { getRegimePublicLabel } from "../regimePresentation";
 
@@ -139,41 +139,21 @@ const resolveSnapshot = async (
   return null;
 };
 
-/** Post one month-end block to every Slack target, never throwing. */
+/**
+ * Post one month-end block to every Slack target, never throwing. Through the
+ * shared channel, so a post is bounded and a webhook Slack has revoked (404/410)
+ * is retired — this was the one Slack sender that kept posting to a deleted
+ * webhook every month.
+ */
 const postSlackPulse = async (headline: string, block: string): Promise<number> => {
-  const urls = new Set<string>();
-  const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
-  if (envUrl && isSlackWebhookUrl(envUrl)) urls.add(envUrl);
   try {
-    const store = getSlackWebhookStore();
-    for (const url of await store.listActiveWebhooks()) {
-      if (isSlackWebhookUrl(url)) urls.add(url);
-    }
+    const targets = await slackChannel.listTargets();
+    if (targets.length === 0) return 0;
+    const tally = await slackChannel.deliver(targets, { blocks: slackAlertBlocks(`📬 ${headline}`, block) });
+    return tally.sent;
   } catch {
-    /* non-fatal */
+    return 0;
   }
-  if (urls.size === 0) return 0;
-
-  const results = await Promise.allSettled(
-    [...urls].map((webhook) =>
-      fetch(webhook, {
-        method: "POST",
-        body: JSON.stringify({
-          blocks: [
-            { type: "header", text: { type: "plain_text", text: `📬 ${headline}` } },
-            { type: "section", text: { type: "mrkdwn", text: block } },
-            {
-              type: "actions",
-              elements: [
-                { type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" },
-              ],
-            },
-          ],
-        }),
-      }),
-    ),
-  );
-  return results.filter((result) => result.status === "fulfilled" && result.value.ok).length;
 };
 
 /** Send the month-end block to every alert subscriber, never throwing. */
@@ -182,24 +162,23 @@ const sendEmailPulse = async (headline: string, block: string): Promise<number> 
   try {
     const subscribers = await getSubscriberStore().listAlertSubscribers();
     if (subscribers.length === 0) return 0;
-    const results = await Promise.allSettled(
-      subscribers.map((subscriber) =>
-        adapter.send({
-          to: subscriber,
-          subject: `Whether — ${headline}`,
-          text: [block, "", ...unsubscribeFooterText(subscriber.token)].join("\n"),
-          html: [
-            `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#e2e8f0;background:#0a0a0a;">`,
-            `<h1 style="color:#f1f5f9;font-size:1.15rem;">${headline}</h1>`,
-            `<div style="white-space:pre-wrap;color:#cbd5e1;font-size:0.9rem;line-height:1.6;">${block.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</div>`,
-            `<p style="margin-top:24px;"><a href="${siteUrl}" style="color:#38bdf8;">View the brief →</a></p>`,
-            `<p style="margin-top:24px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
-            `</div>`,
-          ].join(""),
-        }),
-      ),
-    );
-    return results.filter((result) => result.status === "fulfilled" && result.value.ok).length;
+    const tally = await fanOut(subscribers, async (subscriber) => {
+      const result = await adapter.send({
+        to: subscriber,
+        subject: `Whether — ${headline}`,
+        text: [block, "", ...unsubscribeFooterText(subscriber.token)].join("\n"),
+        html: [
+          `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#e2e8f0;background:#0a0a0a;">`,
+          `<h1 style="color:#f1f5f9;font-size:1.15rem;">${headline}</h1>`,
+          `<div style="white-space:pre-wrap;color:#cbd5e1;font-size:0.9rem;line-height:1.6;">${block.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</div>`,
+          `<p style="margin-top:24px;"><a href="${siteUrl}" style="color:#38bdf8;">View the brief →</a></p>`,
+          `<p style="margin-top:24px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
+          `</div>`,
+        ].join(""),
+      });
+      return result.ok ? "sent" : "failed";
+    });
+    return tally.sent;
   } catch {
     return 0;
   }

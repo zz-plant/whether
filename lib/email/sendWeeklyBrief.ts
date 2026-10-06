@@ -9,6 +9,7 @@ import { describeConditions, formatExportConfidenceWord, pauseConditionOnly } fr
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { siteUrl } from "../siteUrl";
+import { fanOut } from "../delivery/fanOut";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
 
 /**
@@ -211,8 +212,9 @@ export const sendWeeklyBrief = async (options?: {
   const changeLines = weeklyCallChangeLines(weeklyCall);
   const recordDate = snapshot.provenance.recordDateLabel;
 
-  const results = await Promise.allSettled(
-    subscriptions.map((recipient) => {
+  const tally = await fanOut(
+    subscriptions,
+    async (recipient) => {
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regimeLabel}: ${actionNow}`
         : `Whether Brief — ${regimeLabel}`;
@@ -286,12 +288,13 @@ export const sendWeeklyBrief = async (options?: {
         `</body></html>`,
       ].join("\n");
 
-      return adapter.send({ to: recipient, subject, html, text });
-    }),
+      const result = await adapter.send({ to: recipient, subject, html, text });
+      return result.ok ? "sent" : "failed";
+    },
   );
 
-  const sent = results.filter((r) => r.status === "fulfilled" && r.value.ok).length;
-  const errors = results.filter((r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.ok)).length;
+  const sent = tally.sent;
+  const errors = tally.failed;
 
   const ok = errors === 0;
   const error = ok

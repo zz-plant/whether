@@ -5,9 +5,7 @@ import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
-import { getSlackWebhookStore } from "../slack/slackWebhookStore";
-import { isSlackWebhookUrl } from "../slack/deliverSlackBrief";
-import { siteUrl } from "../siteUrl";
+import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
 import { formatExportConfidenceWord } from "../export/exportTerms";
@@ -31,61 +29,23 @@ type CheckRegimeChangeResult = {
   flashMoves?: FlashMove[];
 };
 
-/** One Slack post, in the block shape every alert here uses. */
-const postSlackAlert = async (webhook: string, header: string, body: string) => {
-  const response = await fetch(webhook, {
-    method: "POST",
-    body: JSON.stringify({
-      blocks: [
-        { type: "header", text: { type: "plain_text", text: header } },
-        { type: "section", text: { type: "mrkdwn", text: body } },
-        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "View brief" }, url: siteUrl, action_id: "open_brief" }] },
-      ],
-    }),
-  });
-  /* A webhook Slack has revoked reads 404/410; drop it so the weekly step stops
-     counting it as a target. Same rule the weekly deliverer applies. Awaited,
-     not floated: a Worker can drop a floating promise at request end, and this
-     is the only thing that retires a dead target. */
-  if (response.status === 404 || response.status === 410) {
-    await getSlackWebhookStore().deactivateByUrl(webhook).catch(() => undefined);
-  }
-  return response;
-};
-
 /**
- * Every Slack target for an alert: the env-configured webhook plus every
- * webhook a channel subscribed through the form (KV store). A regime change or
- * flash reaches the channels that signed up for the weekly brief, not just the
- * operator's own webhook — the flip is the one mid-week event the channel
- * needs, and it is exactly what the form's "a note if the call flips" promises.
+ * Post an alert to every Slack target, never throwing: a slow Slack post must
+ * not fail the regime check, which has KV state to write after this.
+ *
+ * The targets are the env-configured webhook plus every webhook a channel
+ * subscribed through the form. A regime change or flash reaches the channels
+ * that signed up for the weekly brief, not just the operator's own webhook —
+ * the flip is the one mid-week event the channel needs, and it is exactly what
+ * the form's "a note if the call flips" promises. A webhook Slack has revoked
+ * (404/410) is retired by the shared channel, so the weekly step stops counting
+ * it as a target.
  */
-const resolveAlertSlackWebhooks = async (): Promise<string[]> => {
-  const urls = new Set<string>(resolveConfiguredAlertWebhook());
-  try {
-    const store = getSlackWebhookStore();
-    const stored = await store.listActiveWebhooks();
-    for (const url of stored) {
-      if (isSlackWebhookUrl(url)) urls.add(url);
-    }
-  } catch (error) {
-    console.warn("[slack-alert] failed to load subscribed webhooks", error);
-  }
-  return [...urls];
-};
-
-const resolveConfiguredAlertWebhook = (): string[] => {
-  const envUrl = process.env.SLACK_WEBHOOK_URL?.trim();
-  return envUrl && isSlackWebhookUrl(envUrl) ? [envUrl] : [];
-};
-
-/** Post an alert to every target, never throwing: a slow Slack post must not
- *  fail the regime check, which has KV state to write after this. */
 const postSlackAlerts = async (header: string, body: string) => {
   try {
-    const webhooks = await resolveAlertSlackWebhooks();
+    const webhooks = await slackChannel.listTargets();
     if (webhooks.length === 0) return;
-    await Promise.allSettled(webhooks.map((webhook) => postSlackAlert(webhook, header, body)));
+    await slackChannel.deliver(webhooks, { blocks: slackAlertBlocks(header, body) });
   } catch (error) {
     console.warn("[slack-alert] delivery failed", error);
   }
