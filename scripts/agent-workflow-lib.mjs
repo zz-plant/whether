@@ -35,6 +35,9 @@ const SKIP_DIRECTORIES = new Set([
   "dist",
   "node_modules",
   "out",
+  // `.claude/worktrees/*` are gitignored full checkouts made for parallel agent sessions;
+  // indexing them counted every file and nested AGENTS.md once per worktree.
+  "worktrees",
 ]);
 
 /** `.claude/skills/<name>/SKILL.md`, as a repo-relative path prefix. */

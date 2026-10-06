@@ -17,6 +17,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
+| `bun run skills:sync` | <1s | After editing `.claude/skills/` or `.codex/skills-overlay/`: regenerates the `.codex/skills/` mirror. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
@@ -35,9 +36,10 @@ to inherits them — which silently redirects those calls at the pushing reposit
 only under the hook, so the symptom reads as flakiness. Reproduce it with
 `GIT_DIR=$PWD/.git bun run test tests/checkGateMarker.test.ts`. Note that
 this worktree is often shared with other sessions, so a pre-push failure may be someone else's
-in-flight edit rather than yours — check `git status` first. The hook covers lint, typecheck, test,
-assets, and `hotspot-preflight`, and deliberately omits `audit`, which needs the network — run
-`bun run check` before a merge to pick that one up. Cloudflare Workers Builds still builds and
+in-flight edit rather than yours — check `git status` first. The hook runs `run-checks.mjs --preset
+pre-push` (lint, lint:types, typecheck, test, assets, suppressions, dead-exports, hotspot-preflight,
+landmarks); every gate's task list is declared once, in `scripts/check-tasks.mjs`. It deliberately
+omits `audit`, which needs the network — run `bun run check` before a merge to pick that one up. Cloudflare Workers Builds still builds and
 deploys every push, which is the only remote gate left.
 
 ## Read before you touch (the long reasoning lives in `docs/agents/lessons/`)
@@ -64,6 +66,9 @@ open the one that matches the task instead of reading them all.
 - **Check the undrawn fields.** A value computed and rendered nowhere is where invented data survives.
 - **Read a default's comment before calling it a defect.** Rendering tells you what a reader sees, not whether someone chose it.
 - **Render before asserting** for UI: `whether-ui-loop`, or `renderToStaticMarkup` where the page renders offline.
+- **The engine writes no copy and reads no data.** Wording goes in `lib/report/regimeDescription.ts`; Invariant 12 in `tests/architectureInvariants.test.ts` rejects engine imports of `lib/report/`, React or `data/`. A scoring change bumps `ENGINE_VERSION` (`tests/engineVersion.test.ts`).
+- **Runtime plumbing goes through `lib/runtime/`.** `readSetting` for a binding-or-env value, `getWhetherKv` for KV, `getJson`/`parseStoredJson` for JSON out of KV, `selectStoreByBinding` for a store singleton, `withRetry`/`createCircuitBreaker` for upstream retries. `constantTimeCompare(supplied, expected)`: supplied value first.
+- **A send goes through `lib/delivery/` and `renderEmailShell`.** A sender that resolves its own Slack targets or copies the email shell is how the 2026-09-17 `siteUrl` fix missed the alert mail.
 
 ### When a check fails and you don't know why
 
@@ -135,12 +140,24 @@ Canonical modules — extend these before creating new ones:
 - **Alerts between Mondays** — `lib/alert/*`: `alertEvaluator` decides, `flashMoves` judges
   raw-input moves against the previous snapshot, `checkRegimeChange` posts Slack,
   `alertDelivery` mails subscribers
+- **Delivery channels** — `lib/delivery/` (`slackChannel` lists, posts and retires webhooks;
+  `fanOut` tallies; `onceFor` once-per-week markers, `?force=1` to re-send), `lib/email/emailShell.ts`
+  (the one email shell and `escapeHtml`), and `resolveOperatingSnapshot` / `assessReadingReadiness`
+  in `lib/operatingState/resolveSnapshot.ts` for which reading a send acts on
+- **Regime engine** — `lib/regimeEngineScoring.ts` (`scoreRegime`, codes only),
+  `lib/regimeStateMachine.ts`, `lib/regimeEngineCore.ts`; the copy in `lib/report/regimeDescription.ts`;
+  `lib/regimeEngine.ts` composes them (`evaluateRegime`). One replay walk:
+  `lib/timeMachine/regimeReplay.ts`; the archive generators' cadence logic: `scripts/regimeArchiveReplay.ts`
+- **Runtime helpers** — `lib/runtime/` (settings, KV and stored JSON, store selection, retry and
+  circuit breaker, background work), `lib/crypto.ts`, `lib/constantTimeCompare.ts`
 - **Trust / continuity** — `lib/report/trustStatus.ts`, `lib/report/reportFormatting.ts`,
   `lib/timeMachine/*`
 - **Agent surfaces** — the state (`lib/agentState.ts`, served at `/api/agent?view=state`), and every tool an
   agent can call in `lib/agent/tools.ts`: the two MCP transports (`lib/mcp/`), the `/api/mcp?tool=` shim, the
   manifest and `/llms.txt` all read it, and `tests/agentDiscoveryParity.test.ts` holds them to it. Add a tool
-  there, once. Inputs and refusals: `lib/agent/inputs.ts`.
+  there, once. The words a tool takes: `lib/agent/inputs.ts`; the mechanism (definitions, parsing,
+  refusals, list/call): `lib/agent/registry.ts`; the server for both MCP transports: `lib/mcp/server.ts`;
+  the manifest path, start pointers, endpoints and views: `lib/agent/discovery.ts`.
 - **Operator-domain catalog** — `lib/decisionDomainCatalog.ts`
 - **Navigation IA** — `lib/navigation/informationArchitecture.ts`
 
@@ -168,8 +185,9 @@ reading the set. Product specs live in `docs/`.
 - **Other repo-local skills** live under `.claude/skills/` — see
   [.claude/skills/README.md](.claude/skills/README.md) for the full index (research briefs, feature
   audits, PR hygiene, provenance audits, executive briefs, skill authoring, subagent handoffs, React/
-  Next.js performance rules). These are mirrored at `.codex/skills/` for the Codex runtime; keep both
-  in sync when editing.
+  Next.js performance rules). `.claude/skills/` is canonical; `bun run skills:sync` regenerates
+  `.codex/skills/` from it plus `.codex/skills-overlay/`. Never edit the mirror;
+  `tests/skillsMirror.test.ts` fails on drift.
 - **FRED marks a missing observation with an empty CSV field, not only `"."`.** `Number("")`
   is `0`, so any parser that guards only against the dot reads a market holiday as a zero print.
   Seven month-ends in `data/time_machine_cache.json` carried all-zero yields, and the stress
