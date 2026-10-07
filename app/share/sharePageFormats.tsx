@@ -162,11 +162,14 @@ export function SharePageFormats({
     <section id="formats" className="weather-panel weather-section-stack p-0" aria-labelledby="copy-call-heading">
       <h2 id="copy-call-heading" className="text-xl font-semibold text-white sm:text-2xl">Copy this week&apos;s guidance</h2>
       {/* Labelled and ruled at the left, so the lines read as the readings
-          behind every format rather than the opening of the text below. */}
+          behind every format rather than the opening of the text below. At the
+          explanatory floor (§VI, text-fluid-xs) and a reading measure: at 12px
+          across the full 72rem column each line ran to ~150 characters, the
+          densest text on the page, above the preview it explains. */}
       {scoreReferences.length > 0 ? (
-        <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
+        <div className="max-w-3xl space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p id="copy-call-scores-label" className="type-eyebrow">This week&apos;s readings</p>
-          <ul className="space-y-1 text-xs tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
+          <ul className="space-y-1.5 text-fluid-xs leading-5 tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
             {scoreReferences.map((line) => (
               <li key={line}>{line}</li>
             ))}
