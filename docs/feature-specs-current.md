@@ -2854,9 +2854,9 @@ strip across a phone's first screen, a footer set louder than the pages above it
   `/trust`, where the strip is the page's System status and has no link, all four facts print. The
   refresh stamp ("Signals refreshed …") is a desktop line; a route whose status line carries
   "sources • as of" (`/resolve`, `/history`) keeps the caption at the foot of the block, where it
-  does not wrap under the status line. The intro on `/operate` measured about 260px of a 932px
-  screen and is about 135px; on `/trust` about 235px and is about 155px. From `sm` up nothing
-  changed. Tests: `tests/visualPrimitives.test.tsx` (what folds), `tests/screenshotCaption.test.tsx`
+  does not wrap under the status line. Measured at 430×932 with touch: the intro on `/operate`
+  and `/signals` 259 → 127px (the first section starts at 282px instead of 414px), `/trust`
+  235 → 147px, `/resolve` 180 → 153px. From `sm` up nothing changed. Tests: `tests/visualPrimitives.test.tsx` (what folds), `tests/screenshotCaption.test.tsx`
   (where the caption sits on a phone).
 - **The footer** (`app/layout.tsx`). Its seventeen links were `text-fluid-sm` in 44px rows at
   every width, larger than most body copy on the pages above, and each group was split into two
@@ -2865,7 +2865,7 @@ strip across a phone's first screen, a footer set louder than the pages above it
   a fine pointer and hover from `sm`, the same condition the compact controls use. From `sm` each
   group is as wide as its links, 48px from the next. The Shortcuts button is hidden on a screen
   with no hover, where it listed keys for a keyboard the phone does not have. Measured with a
-  mouse at 1280px: about 440 → 360px tall; on a touch phone the rows keep their 44px.
+  mouse at 1280px: 439 → 359px tall; on a 430px touch phone 679 → 587px, the rows keeping 44px.
 - **`/pricing`.** "Cannot be bought yet. A request records that you want it." prints in the price's
   qualifier ink (`text-slate-400`), not the caution amber: it is a plain fact about the offer, and
   amber read it as a warning about the product. The "What a request does" section lost its 20px
