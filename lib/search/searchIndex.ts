@@ -4,15 +4,12 @@ import { isIndexableAnswerSlug } from "../seo/indexationPolicy";
 
 type SearchEntityType = "toolkit" | "failure-mode" | "doc";
 export type SearchEntityJob = "check" | "approve" | "resolve" | "risk" | "trust";
-type SearchPrimaryHub = "/signals" | "/operate" | "/resolve" | "/trust";
 
 type SearchEntity = {
   id: string;
   type: SearchEntityType;
   job: SearchEntityJob;
   routePriority: number;
-  recommendedHubHref: SearchPrimaryHub;
-  recommendedHubLabel: string;
   title: string;
   href: string;
   summary: string;
@@ -26,8 +23,6 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "check",
     routePriority: 4,
-    recommendedHubHref: "/signals",
-    recommendedHubLabel: "Evidence",
     title: "Check what changed and why",
     href: "/signals",
     summary: "Review the evidence, the pause lines, and what is behind this week's guidance.",
@@ -39,8 +34,6 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "trust",
     routePriority: 4,
-    recommendedHubHref: "/trust",
-    recommendedHubLabel: "Trust",
     title: "Run a trust check",
     href: "/trust",
     summary: "See how the scores are built, how often the data refreshes, and where it comes from.",
@@ -52,8 +45,6 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "check",
     routePriority: 4,
-    recommendedHubHref: "/signals",
-    recommendedHubLabel: "Evidence",
     title: "Audit evidence and provenance",
     href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating guidance.",
@@ -65,11 +56,9 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
-    recommendedHubLabel: "Decision Tools",
-    title: "Translate the guidance inside Decision Tools",
+    title: "Read the guidance for your role or stage",
     href: "/resolve#guided-translation",
-    summary: "Role and stage translation now lives inside the canonical Decision Tools workflow.",
+    summary: "What this week's guidance means for founders, product leads and finance leads, and at each company stage.",
     intentLabel: "Translate decision by role",
     keywords: ["guides", "stakeholder", "stage", "decision translation", "weekly brief"],
   },
@@ -78,8 +67,6 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
-    recommendedHubLabel: "Decision Tools",
     title: "Get a direct answer",
     href: "/resolve#direct-answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
@@ -91,11 +78,9 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "approve",
     routePriority: 1,
-    recommendedHubHref: "/operate",
-    recommendedHubLabel: "Planning",
     title: "Prepare a board-ready artifact",
     href: "/operate#ops-export-briefs",
-    summary: "Planning's artifact checkpoint when leadership needs a board-ready export after the weekly plan is set.",
+    summary: "The plan's export step, for a board-ready copy once the week's plan is set.",
     intentLabel: "Prepare governance artifact",
     keywords: ["resources", "board", "artifact", "template", "operations"],
   },
@@ -104,8 +89,6 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "risk",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
-    recommendedHubLabel: "Decision Tools",
     title: "Translate framework language into a decision",
     href: "/resolve#guided-translation",
     summary: "Route product or operating framework language back into a live decision path instead of browsing concept libraries.",
@@ -117,8 +100,6 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "trust",
     routePriority: 1,
-    recommendedHubHref: "/trust",
-    recommendedHubLabel: "Trust",
     title: "Product writing against the record",
     href: "/concepts",
     summary: "Widely read product management essays and books, each placed on the month-end record: the conditions the month it came out.",
@@ -130,21 +111,17 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 1,
-    recommendedHubHref: "/resolve",
-    recommendedHubLabel: "Decision Tools",
     title: "Search the toolkit shortlist",
     href: "/resolve#toolkit-library",
-    summary: "Toolkit search now lives under Decision Tools as a supporting shortlist rather than a standalone library.",
+    summary: "Step-by-step toolkits for one decision each: rollback, roadmap, pricing, capacity.",
     intentLabel: "Find a runnable toolkit",
-    keywords: ["toolkits", "rollback", "pmf", "roadmap", "pricing", "capacity"],
+    keywords: ["toolkits", "toolkit library", "shortlist", "rollback", "pmf", "roadmap", "pricing", "capacity"],
   },
   {
     id: "doc-method-formulas",
     type: "doc",
     job: "trust",
     routePriority: 4,
-    recommendedHubHref: "/trust",
-    recommendedHubLabel: "Trust",
     title: "Inspect scoring and formulas",
     href: "/trust#formula-reference",
     summary: "Open the formula reference section from the canonical Trust hub.",
@@ -161,8 +138,6 @@ export const buildSearchIndex = (): SearchEntity[] => {
       type: "doc",
       job: "resolve",
       routePriority: 2,
-      recommendedHubHref: "/resolve",
-      recommendedHubLabel: "Decision Tools",
       title: page.title,
       href: `/answers/${page.slug}`,
       summary: page.shortAnswer,
@@ -174,8 +149,6 @@ export const buildSearchIndex = (): SearchEntity[] => {
     type: "toolkit",
     job: "resolve",
     routePriority: 2,
-    recommendedHubHref: "/resolve",
-    recommendedHubLabel: "Decision Tools",
     title: toolkit.title,
     href: `/toolkits/${toolkit.slug}`,
     summary: toolkit.decisionThisSession,
@@ -194,8 +167,6 @@ export const buildSearchIndex = (): SearchEntity[] => {
     type: "failure-mode",
     job: "risk",
     routePriority: 2,
-    recommendedHubHref: "/trust",
-    recommendedHubLabel: "Trust",
     title: failureMode.title,
     href: `/trust#revisit-call`,
     summary: failureMode.summary,

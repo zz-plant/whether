@@ -89,6 +89,33 @@ describe("global shortcut targets", () => {
   });
 });
 
+describe("the share shortcut the palette advertises", () => {
+  /*
+   * The palette printed ⇧S beside "Share brief" from the commit that added it, and nothing
+   * bound the key (found 2026-10-06). ⌘⇧S was bound — to focus mode. Called with the
+   * fields a keydown carries, so this is the decision the handler makes, not its text.
+   */
+  const press = (key: string, modifiers: Partial<Record<"shiftKey" | "metaKey" | "ctrlKey" | "altKey", boolean>> = {}) => ({
+    key,
+    shiftKey: false,
+    metaKey: false,
+    ctrlKey: false,
+    altKey: false,
+    ...modifiers,
+  });
+
+  it("opens the share rail on ⇧S and on nothing else", async () => {
+    const { isShareRailShortcut } = await import("../app/components/KeyboardShortcuts");
+
+    assert.equal(isShareRailShortcut(press("S", { shiftKey: true })), true, "⇧S is the advertised key");
+    assert.equal(isShareRailShortcut(press("s")), false, "plain s is unbound");
+    assert.equal(isShareRailShortcut(press("S")), false, "caps lock is not shift");
+    assert.equal(isShareRailShortcut(press("S", { shiftKey: true, metaKey: true })), false, "⌘⇧S belongs to focus mode");
+    assert.equal(isShareRailShortcut(press("S", { shiftKey: true, ctrlKey: true })), false, "Ctrl+⇧S belongs to focus mode");
+    assert.equal(isShareRailShortcut(press("S", { shiftKey: true, altKey: true })), false, "⌥⇧S types a character on a Mac");
+  });
+});
+
 describe("tablists support the keyboard", () => {
   /*
    * `role="tablist"` promises arrow-key movement between tabs. `StagePersonaSelector`

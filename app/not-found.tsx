@@ -1,21 +1,24 @@
+import { loopNavigationLayers } from "../lib/navigation/informationArchitecture";
 import { SecondaryPageHeader } from "./components/secondaryPageShell";
 import { ActionLink } from "./components/ui/actionLink";
 import { ContentPageShell } from "./components/ui/contentPageShell";
 
+/* The header's loop, read from the IA. This page hand-listed its own copy and
+   kept "Planning" and "Decision Tools" after the header renamed both. */
 export default function NotFound() {
   return (
     <ContentPageShell measure="content">
       <SecondaryPageHeader
         eyebrow="Page not found"
         title="That page moved."
-        description="That older link no longer works, but the weekly brief, evidence, and planning pages are still here."
+        description="That older link no longer works, but the weekly brief and the pages behind it are still here."
         actions={(
           <>
-            <ActionLink href="/" variant="primary">Weekly Brief</ActionLink>
-            <ActionLink href="/signals" variant="ghost">Evidence</ActionLink>
-            <ActionLink href="/operate" variant="ghost">Planning</ActionLink>
-            <ActionLink href="/resolve" variant="ghost">Decision Tools</ActionLink>
-            <ActionLink href="/trust" variant="ghost">Trust</ActionLink>
+            {loopNavigationLayers.map((layer, index) => (
+              <ActionLink key={layer.key} href={layer.href} variant={index === 0 ? "primary" : "ghost"}>
+                {layer.label}
+              </ActionLink>
+            ))}
           </>
         )}
       />

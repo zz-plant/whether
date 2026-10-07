@@ -207,7 +207,7 @@ export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   /* Was `#executive-snapshot`, which no page renders. The guide had never been
      rendered either, so nobody could click it and find that out. */
   { href: "#weekly-call", label: "This week's guidance" },
-  { href: "/operate#ops-playbook", label: "Planning" },
+  { href: "/operate#ops-playbook", label: "Plan" },
   { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
 ];
 

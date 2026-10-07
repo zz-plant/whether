@@ -23,7 +23,7 @@ export default function DecisionShieldOverviewPage() {
           It also says how hard the plan would be to undo, and keeps a record of what you decided.
         </p>
         <Link href="/operate" className="weather-button inline-flex items-center justify-center" data-conversion-event="demo/contact">
-          Open Decision Shield in Planning
+          Open Decision Shield in the plan
         </Link>
       </section>
     </ContentPageShell>

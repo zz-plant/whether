@@ -12,7 +12,8 @@
  *   `tests/readerVocabulary.test.tsx` can ban a word; it cannot see a sentence
  *   that assumes the reader has a board without saying "board". This can.
  * - `brief` puts the latest published call (`data/published_briefs.json`) and
- *   the generated brief text side by side and asks whether the text contradicts
+ *   the generated brief text (`bun run brief:weekly:artifact` writes it to
+ *   `artifacts/weekly-slack-brief.txt`) side by side and asks whether the text contradicts
  *   the call — the shape of the `/history` "Reading now" defect, where two
  *   surfaces disagreed and every check was green.
  *
@@ -27,7 +28,7 @@
  *   bun run dev   # in another shell
  *   bun run audit:jev-copy
  *   bun run audit:jev-copy -- --routes /,/trust --threshold 0.7
- *   bun run audit:jev-copy -- --mode brief
+ *   bun run brief:weekly:artifact && bun run audit:jev-copy -- --mode brief
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
@@ -211,9 +212,13 @@ const runCopyAudit = async (args: ReturnType<typeof parseArgs>, credentials: { a
 const runBriefAudit = async (args: ReturnType<typeof parseArgs>, credentials: { accountId: string; apiToken: string }) => {
   const archive: unknown = JSON.parse(readFileSync("data/published_briefs.json", "utf8"));
   const latest = Array.isArray(archive) ? archive.at(-1) : null;
-  const briefPath = existsSync("artifacts/weekly-slack-brief.txt")
-    ? "artifacts/weekly-slack-brief.txt"
-    : "docs/briefs/latest-weekly-slack-brief.md";
+  /* Generated, never a committed copy: the committed one fell back here while it sat three weeks
+     behind the archive, so a "contradiction" would have been its age, not a disagreement. */
+  const briefPath = "artifacts/weekly-slack-brief.txt";
+  if (!existsSync(briefPath)) {
+    console.error(`jev-copy-audit: ${briefPath} is missing; run \`bun run brief:weekly:artifact\` first.`);
+    return 1;
+  }
   if (!latest || typeof latest !== "object") {
     console.error("jev-copy-audit: data/published_briefs.json holds no published call to compare against.");
     return 1;

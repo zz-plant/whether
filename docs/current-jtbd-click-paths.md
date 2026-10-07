@@ -12,7 +12,7 @@ Validation note: click labels in this document were verified from the current ro
 **Clicks**
 1. Open `/` or click `Weekly Brief` in global navigation.
 2. Read the `This week in 15 seconds` block.
-3. If execution detail is needed, click `Open Planning`.
+3. If execution detail is needed, click `Plan` in global navigation.
 
 **Current output**
 - Current posture
@@ -164,7 +164,7 @@ the browser (`whether.operatorProfile`) and are shared with the plan stress test
 **JTBD:** When different leaders need different decision framing, let me translate the same call into a role-specific path.
 
 **Clicks**
-1. Click `Decision Tools` in global navigation.
+1. Click `Resolve` (`/resolve`) in global navigation.
 2. Review the `Start from this week's live call` block.
 3. Under `Explore by role`, click the relevant role card.
 3. Review:
@@ -183,7 +183,7 @@ the browser (`whether.operatorProfile`) and are shared with the plan stress test
 **JTBD:** When I already know the decision situation, take me straight to the right operating instrument.
 
 **Clicks**
-1. Click `Decision Tools`.
+1. Click `Resolve` (`/resolve`) in global navigation.
 2. Review the `Start from this week's live call` block.
 3. Under `Explore by situation`, click the relevant situation card.
 4. Click a toolkit in `Start here` or `Run this now`.
@@ -202,7 +202,7 @@ the browser (`whether.operatorProfile`) and are shared with the plan stress test
 **JTBD:** When the base weekly call needs company-specific guardrails or exceptions, carry it into Planning instead of using a separate personalization branch.
 
 **Clicks**
-1. Click `Decision Tools`.
+1. Click `Resolve` (`/resolve`) in global navigation.
 2. Review the `Start from this week's live call` block.
 3. If company context matters, open Planning and use the export / governance sections to add the company-specific note.
 4. Copy or share the plan with the live weekly call preserved as the base.
@@ -217,7 +217,7 @@ the browser (`whether.operatorProfile`) and are shared with the plan stress test
 **JTBD:** When I need a bounded launch decision, help me turn the macro call into a go, wait, or kill recommendation.
 
 **Clicks**
-1. Click `Decision Tools`.
+1. Click `Resolve` (`/resolve`) in global navigation.
 2. Review the `Start from this week's live call` block.
 3. In `Decision utilities`, click `Whether to ship checklist`.
 3. Set:

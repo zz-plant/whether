@@ -15,6 +15,7 @@ type HelpModalProps = {
 
 const SHORTCUTS: Array<[string, string]> = [
   ["C", "Copy Slack brief"],
+  ["⇧S", "Share brief"],
   ["F", "Toggle presentation / focus mode"],
   ["J", "Next section"],
   ["K", "Previous section"],

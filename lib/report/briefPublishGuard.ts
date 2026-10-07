@@ -2,9 +2,9 @@
  * What must be true before current-week data may be published.
  *
  * Two writers ask this: `scripts/freezeWeeklyBrief.ts`, which appends to the
- * permanent record, and `scripts/generateWeeklySlackBrief.ts`, which publishes
- * the brief people paste into a channel. Both take live data and stamp it with
- * the current week, so both are wrong in the same way when the data is not live.
+ * permanent record, and `scripts/generateWeeklySlackBrief.ts`, which writes the
+ * Slack brief text. Both take live data and stamp it with the current week, so
+ * both are wrong in the same way when the data is not live.
  *
  * `data/published_briefs.json` is append-only and citable: a brief someone
  * quoted in a board deck has to still say what it said that day. That makes a

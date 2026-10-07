@@ -58,7 +58,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Resolve a decision by role, situation or toolkit",
   description: "One focused path per open decision: route by role, company stage, single answer, or a reusable toolkit.",
   path: "/resolve",
-  imageAlt: "Whether decision tools",
+  imageAlt: "Whether: resolve a decision",
   imageParams: {
     template: "solutions",
     title: "Resolve a decision",
