@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import { CheckIcon, CopyIcon } from "./uiIcons";
 import { ClipboardActionRow } from "./clipboardActionRow";
+import { isTypingTarget } from "./KeyboardShortcuts";
 import { useBriefArtifact } from "./useBriefArtifact";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { briefConditionEntries, formatBriefArtifact } from "../../lib/report/briefArtifact";
@@ -48,11 +49,8 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
       // control as its target. Space and Enter belong to that control; only the
       // arrows drive the sequence.
       const onControl = target?.closest("button, a");
-      const typing =
-        target !== null &&
-        (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
 
-      if (typing) return;
+      if (isTypingTarget(target)) return;
 
       if (event.key === "ArrowRight" || (!onControl && (event.key === " " || event.key === "Enter"))) {
         event.preventDefault();
