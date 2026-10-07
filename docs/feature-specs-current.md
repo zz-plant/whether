@@ -2866,3 +2866,9 @@ strip across a phone's first screen, a footer set louder than the pages above it
   group is as wide as its links, 48px from the next. The Shortcuts button is hidden on a screen
   with no hover, where it listed keys for a keyboard the phone does not have. Measured with a
   mouse at 1280px: about 440 → 360px tall; on a touch phone the rows keep their 44px.
+- **`/pricing`.** "Cannot be bought yet. A request records that you want it." prints in the price's
+  qualifier ink (`text-slate-400`), not the caution amber: it is a plain fact about the offer, and
+  amber read it as a warning about the product. The "What a request does" section lost its 20px
+  side inset from `sm`, which set it out of line with the title and the cards (§XXI: an unboxed
+  section sits on the page column), and "What that means in practice" takes `.weather-hit`, the
+  44px target every inline link in a sentence has. `tests/pricing.test.ts` holds the ink.
