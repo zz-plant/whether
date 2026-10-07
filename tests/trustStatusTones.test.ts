@@ -196,4 +196,19 @@ describe("buildTrustStatus trust tones", () => {
     assert.doesNotMatch(caution.detail, /policy override|posture|two scores/i);
   });
 
+  /* Missing inputs lower the confidence too, so a week held for them is LOW, and
+     the low-confidence branch said only that conditions sat close to a line. */
+  it("holds on low confidence in the words of the reason a held week is held", () => {
+    const held = buildDecisionReadinessState({
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      isFallbackSnapshot: false,
+      policyHold: POLICY_OVERRIDE_CALL["inputs-missing"],
+    });
+
+    assert.equal(held.label, "Hold");
+    assert.ok(held.detail.startsWith(POLICY_OVERRIDE_CALL["inputs-missing"].currentCall), held.detail);
+    assert.doesNotMatch(held.detail, /close to a line/);
+  });
+
 });

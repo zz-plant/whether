@@ -14,7 +14,7 @@ import type {
   ReportDynamics,
   ReportEvidenceItem,
 } from "./reportDataTypes";
-import type { ComparisonReading } from "./comparisonReading";
+import { observedBaseRate, type ComparisonReading } from "./comparisonReading";
 import type { RegimeKey } from "../regimeEngine";
 
 type WeeklyTone = "tightening" | "easing" | "holding";
@@ -416,12 +416,15 @@ export const buildReportDynamics = ({
 
   /* A rate missing from either reading has no move, not a zero one and not the
      whole of the other reading: the curve used to be read as 0 where it was
-     missing, so a gauge at 0.47 against no reading moved "+0.47". */
+     missing, so a gauge at 0.47 against no reading moved "+0.47". The engine
+     scores a missing short-term rate as 0 rather than null, so it is read
+     through `observedBaseRate`, or a feed failure moved the rate to zero. */
+  const currentRates = { baseRate: observedBaseRate(current.scores), curveSlope: current.scores.curveSlope };
   const notCompared = (["baseRate", "curveSlope"] as const).filter(
-    (key) => current.scores[key] === null || previous.scores[key] === null,
+    (key) => currentRates[key] === null || previous.scores[key] === null,
   );
   const rateMoves = (["baseRate", "curveSlope"] as const).flatMap((key): SignalMove[] => {
-    const now = current.scores[key];
+    const now = currentRates[key];
     const before = previous.scores[key];
     return now === null || before === null ? [] : [{ key, label: signalLabels[key], delta: now - before }];
   });

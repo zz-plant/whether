@@ -62,6 +62,11 @@ const PublishedBriefScoresSchema = z.object({
    */
   baseRate: z.number().nullable().optional(),
   curveSlope: z.number().nullable().optional(),
+  /**
+   * The engine that scored them (`ENGINE_VERSION`). Next week compares with this
+   * record only under the same engine; absent on records frozen before it was stored.
+   */
+  engineVersion: z.string().optional(),
 });
 
 const PublishedBriefEvidenceSchema = z.object({

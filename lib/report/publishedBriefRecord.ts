@@ -12,7 +12,9 @@
  */
 import { formatIsoWeekSlug, getIsoWeekInfo, type IsoWeek } from "../isoWeek";
 import { previousScoresFromDynamics } from "../export/scoreReference";
+import { ENGINE_VERSION } from "../regimeEngine";
 import { assessPublishReadiness } from "./briefPublishGuard";
+import { observedBaseRate } from "./comparisonReading";
 import type { PublishedBrief } from "./publishedBriefs";
 import { FRED_SOURCE_LABEL } from "./provenanceStatus";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
@@ -34,15 +36,16 @@ import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnap
  * The short-term rate and the recession warning gauge are stored as published,
  * so next week's brief can compare its own with them. Records frozen before
  * these were stored carry the two scores alone, and a week compared with one of
- * them prints no move for either rate.
+ * them prints no move for either rate. So is the engine that scored them: next
+ * week compares with this record only if the same engine scores it.
  */
 const scoresWithComparison = (reportData: WeeklyBriefSnapshotResult["reportData"]): NonNullable<PublishedBrief["scores"]> => {
   const { scores } = reportData.assessment;
   const current = { tightness: scores.tightness, riskAppetite: scores.riskAppetite };
-  /* A missing base rate scores as 0 (`baseRateUsed: "MISSING"`), which is not a reading. */
   const rates = {
-    baseRate: scores.baseRateUsed === "MISSING" ? null : scores.baseRate,
+    baseRate: observedBaseRate(scores),
     curveSlope: scores.curveSlope,
+    engineVersion: ENGINE_VERSION,
   };
   const previous = previousScoresFromDynamics(reportData.reportDynamics, current);
   const comparedWith = previous?.comparedWith;

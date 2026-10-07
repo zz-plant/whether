@@ -7,13 +7,12 @@ import { buildScoreMovementLine, previousScoresFromDynamics } from "../lib/expor
 import { macroSeries } from "../lib/macroSnapshot";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
-import { getRegimePublicLabel } from "../lib/regimePresentation";
+import { ENGINE_VERSION } from "../lib/regimeEngine";
 import { buildComparedWith, comparisonBasis } from "../lib/report/comparisonBasis";
 import { findWeeklyComparisonReading, type ComparisonReading } from "../lib/report/comparisonReading";
 import { findSignalDelta } from "../lib/report/evidenceReaderModel";
 import {
   buildSignalChangeRows,
-  describeEarlierConditions,
   describeWeeklyMovement,
 } from "../lib/report/home/homeSectionModel";
 import { createHomePageReportDataLoader } from "../lib/report/homePageData";
@@ -36,57 +35,72 @@ import { buildAssessmentFixture } from "./fixtures/reportFixtures";
 
 type RecordFields = Pick<PublishedBrief, "recordDate" | "regime" | "scores">;
 
+/* The engine the unit records below were scored by, and the one reading them. */
+const ENGINE = "engine-under-test";
+
 const brief = (recordDate: string, scores: PublishedBrief["scores"] = { tightness: 80, riskAppetite: 40 }): RecordFields => ({
   recordDate,
   regime: "SCARCITY",
-  scores,
+  scores: scores && { engineVersion: ENGINE, ...scores },
 });
 
 describe("the reading a week compares with", () => {
   it("is the most recent brief five to fourteen days before it", () => {
     const archive = [brief("2026-09-15"), brief("2026-09-22"), brief("2026-09-29")];
 
-    assert.equal(findWeeklyComparisonReading(archive, "2026-10-05")?.recordDate, "2026-09-29");
+    assert.equal(findWeeklyComparisonReading(archive, "2026-10-05", ENGINE)?.recordDate, "2026-09-29");
     // A mid-week read compares with the previous week's brief, never this week's own.
-    assert.equal(findWeeklyComparisonReading(archive, "2026-10-01")?.recordDate, "2026-09-22");
+    assert.equal(findWeeklyComparisonReading(archive, "2026-10-01", ENGINE)?.recordDate, "2026-09-22");
   });
 
   it("is never a record dated on or after the reading, or under five days before it", () => {
     const thisWeek = [brief("2026-09-29")];
 
     for (const reading of ["2026-09-28", "2026-09-29", "2026-09-30", "2026-10-03"]) {
-      assert.equal(findWeeklyComparisonReading(thisWeek, reading), null, `a read of ${reading}`);
+      assert.equal(findWeeklyComparisonReading(thisWeek, reading, ENGINE), null, `a read of ${reading}`);
     }
-    assert.equal(findWeeklyComparisonReading(thisWeek, "2026-10-04")?.recordDate, "2026-09-29", "five days is last week");
+    assert.equal(findWeeklyComparisonReading(thisWeek, "2026-10-04", ENGINE)?.recordDate, "2026-09-29", "five days is last week");
   });
 
   it("reaches back two weeks for a missed freeze, and no further, so the month-end takes over", () => {
-    assert.equal(findWeeklyComparisonReading([brief("2026-09-21")], "2026-10-05")?.recordDate, "2026-09-21");
-    assert.equal(findWeeklyComparisonReading([brief("2026-09-20")], "2026-10-05"), null);
+    assert.equal(findWeeklyComparisonReading([brief("2026-09-21")], "2026-10-05", ENGINE)?.recordDate, "2026-09-21");
+    assert.equal(findWeeklyComparisonReading([brief("2026-09-20")], "2026-10-05", ENGINE), null);
   });
 
   it("passes over a record that carries no scores", () => {
     const archive = [brief("2026-09-24"), { recordDate: "2026-09-29", regime: "SCARCITY" as const, scores: undefined }];
 
-    assert.equal(findWeeklyComparisonReading(archive, "2026-10-05")?.recordDate, "2026-09-24");
+    assert.equal(findWeeklyComparisonReading(archive, "2026-10-05", ENGINE)?.recordDate, "2026-09-24");
   });
 
   it("carries the record's conditions and scores, and no rate the record did not store", () => {
     const w40Shape = { tightness: 90, riskAppetite: 44, tightnessDelta: 27, riskAppetiteDelta: -12 };
-    assert.deepEqual(findWeeklyComparisonReading([brief("2026-09-29", w40Shape)], "2026-10-05"), {
+    assert.deepEqual(findWeeklyComparisonReading([brief("2026-09-29", w40Shape)], "2026-10-05", ENGINE), {
       recordDate: "2026-09-29",
       regime: "SCARCITY",
       scores: { tightness: 90, riskAppetite: 44, baseRate: null, curveSlope: null },
     });
-    const stored = findWeeklyComparisonReading([brief("2026-09-29", { ...w40Shape, baseRate: 3.98, curveSlope: 0.41 })], "2026-10-05");
+    const stored = findWeeklyComparisonReading([brief("2026-09-29", { ...w40Shape, baseRate: 3.98, curveSlope: 0.41 })], "2026-10-05", ENGINE);
     assert.deepEqual(stored?.scores, { tightness: 90, riskAppetite: 44, baseRate: 3.98, curveSlope: 0.41 });
   });
 
-  it("finds w40 in the archive for the Oct 5 reading, and nothing for a replayed month", () => {
-    const archive = getPublishedBriefs();
+  it("passes over a record scored by another engine, or by one it did not record", () => {
+    const otherEngine = { recordDate: "2026-09-29", regime: "SCARCITY" as const, scores: { tightness: 80, riskAppetite: 40, engineVersion: "engine-before" } };
+    const unrecorded = { recordDate: "2026-09-29", regime: "SCARCITY" as const, scores: { tightness: 80, riskAppetite: 40 } };
 
-    assert.equal(findWeeklyComparisonReading(archive, "2026-10-05")?.recordDate, "2026-09-29");
-    assert.equal(findWeeklyComparisonReading(archive, "2020-03-31"), null);
+    assert.equal(findWeeklyComparisonReading([otherEngine], "2026-10-05", ENGINE), null, "the move would be the scoring change's");
+    assert.equal(findWeeklyComparisonReading([unrecorded], "2026-10-05", ENGINE), null);
+    assert.equal(findWeeklyComparisonReading([brief("2026-09-24"), otherEngine], "2026-10-05", ENGINE)?.recordDate, "2026-09-24");
+  });
+
+  it("finds no brief in the archive for the Oct 5 reading: w38–w40 did not record their engine", () => {
+    const archive = getPublishedBriefs();
+    const w40 = archive.find((record) => record.recordDate === "2026-09-29");
+
+    assert.ok(w40?.scores, "the archive holds the Sep 29 brief");
+    assert.equal(w40.scores.engineVersion, undefined);
+    assert.equal(findWeeklyComparisonReading(archive, "2026-10-05", ENGINE_VERSION), null);
+    assert.equal(findWeeklyComparisonReading(archive, "2020-03-31", ENGINE_VERSION), null);
   });
 });
 
@@ -162,6 +176,23 @@ describe("the week's dynamics against last week's brief", () => {
     assert.equal(findSignalDelta(stored, "curveSlope"), 0, "stored and unmoved is a zero move");
   });
 
+  /* The engine scores a missing short-term rate as 0, not null. */
+  it("compares no short-term rate this week did not read, rather than a fall to zero", () => {
+    const missing = buildAssessmentFixture({
+      regime: "SCARCITY",
+      scores: { tightness: 90, riskAppetite: 48, baseRateUsed: "MISSING", baseRate: 0, curveSlope: 0.47 },
+    });
+    const dynamicsWithoutRate = buildReportDynamics({
+      current: missing,
+      previous: { ...w40, scores: { ...w40.scores, baseRate: 3.95, curveSlope: 0.47 } },
+      comparedWith,
+    });
+
+    assert.deepEqual(dynamicsWithoutRate.notCompared, ["baseRate"]);
+    assert.equal(findSignalDelta(dynamicsWithoutRate, "baseRate"), null);
+    assert.equal(dynamicsWithoutRate.anomalySignals.length, 0, "a feed failure is not an anomalous move");
+  });
+
   it("splits nothing and says nothing about interest rates alone: both readings were scored the same way", () => {
     const basis = comparisonBasis(dynamics.comparedWith);
 
@@ -188,7 +219,7 @@ afterEach(() => {
 });
 
 describe("the assembled homepage on Oct 5, 2026", () => {
-  it("compares with the Sep 29 brief and names it, with no month-end caveat", async () => {
+  it("compares with the month-end, not with the Sep 29 brief an earlier engine scored", async () => {
     await resetOperatingSnapshotStore().write(
       buildOperatingSnapshot({
         treasury: {
@@ -209,50 +240,28 @@ describe("the assembled homepage on Oct 5, 2026", () => {
     assert.ok(home.reportResult.ok, "the stored snapshot is a live reading");
     const reportData = home.reportResult.data;
     const dynamics = home.weeklyDecisionCardModel.decision.reportDynamics;
-    const w40 = findPublishedBrief("2026-w40")?.scores;
-    assert.ok(w40, "the archive holds the Sep 29 brief");
-    const scores = { tightness: reportData.assessment.scores.tightness, riskAppetite: reportData.assessment.scores.riskAppetite };
+    assert.ok(findPublishedBrief("2026-w40")?.scores, "the archive holds the Sep 29 brief");
 
-    assert.deepEqual(dynamics.comparedWith, { recordDate: "2026-09-29", label: "Sep 29" });
-    assert.deepEqual(previousScoresFromDynamics(dynamics, scores), {
-      tightness: w40.tightness,
-      riskAppetite: w40.riskAppetite,
-      comparedWith: dynamics.comparedWith,
-    });
-    assert.equal(dynamics.movement, undefined, "no rates-versus-inputs split against a like-for-like reading");
-    assert.deepEqual(dynamics.notCompared, ["baseRate", "curveSlope"], "w40 stored neither rate");
+    /* w40 was frozen before records stored their engine, and the engine has
+       changed since (ENGINE_VERSION), so its scores are not this reading's. */
+    const monthEnd = reportData.monthEndComparison?.comparedWith;
+    assert.ok(monthEnd, "the month-end before Oct 5");
+    assert.notEqual(monthEnd.recordDate, "2026-09-29");
+    assert.deepEqual(dynamics.comparedWith, monthEnd);
 
-    // The section as the page draws it: its lead, the table, the hollow dots.
     const basis = comparisonBasis(dynamics.comparedWith);
-    const movement = home.weeklyDecisionCardModel.decision.decisionMovement;
-    assert.match(movement?.sentence ?? "", /^(Since Sep 29,|Conditions .* since Sep 29)/);
     const rows = buildSignalChangeRows({
       indicators: home.weeklyDecisionCardModel.diagnostics.regimeSignalIndicators,
       dynamics,
       lines: { tightness: { callChange: 70 }, riskAppetite: { callChange: 50 } },
     });
+    const movement = home.weeklyDecisionCardModel.decision.decisionMovement;
     const text = renderToStaticMarkup(
       <WhatChangedSection rows={rows} lead={movement?.sentence ?? ""} comparisonUnavailable={false} basis={basis} />,
     ).replace(/<[^>]+>/g, " ");
 
-    assert.match(text, /Sep 29 → this week/);
-    assert.match(text, new RegExp(`Sep 29: ${w40.tightness}`), "the funding-pressure ladder's hollow dot is the Sep 29 score");
-    assert.match(text, /since Sep 29/);
-    assert.doesNotMatch(text, /Aug 31|interest rates alone/);
-    assert.equal(rows.find((row) => row.key === "baseRate")?.delta, null);
-
-    /* The stamp line names what conditions were on Sep 29. The bundled reading is
-       not Freezing, so the alert is against the brief's own published conditions. */
-    const previousRegime = reportData.regimeAlert?.previousRegime;
-    assert.notEqual(reportData.assessment.regime, "SCARCITY", "the fixture reading differs from w40's conditions");
-    assert.equal(previousRegime, "SCARCITY");
-    assert.equal(
-      describeEarlierConditions({ previousLabel: getRegimePublicLabel(previousRegime), basis }),
-      "Was Freezing on Sep 29",
-    );
-
-    // The conditions map still draws month-ends, and its note is dated by the month-end.
-    assert.notEqual(reportData.monthEndComparison?.comparedWith?.recordDate, "2026-09-29");
+    assert.match(text, new RegExp(`${monthEnd.label} → this week`));
+    assert.doesNotMatch(text, /Sep 29/);
   });
 
   it("keeps a replayed month on the month-end before it", async () => {

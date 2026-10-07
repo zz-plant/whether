@@ -19,7 +19,7 @@
 import { fetchTreasuryData } from "../treasury/treasuryClient";
 import { snapshotData } from "../snapshot";
 import { buildSensorReadings } from "../sensors";
-import { deriveRegimeTrend, evaluateRegime } from "../regimeEngine";
+import { deriveRegimeTrend, ENGINE_VERSION, evaluateRegime } from "../regimeEngine";
 import {
   getLatestTimeMachineSnapshot,
   getTimeMachineCoverage,
@@ -214,7 +214,8 @@ const reportDataDependencies = () => ({
   getTimeMachineYieldCurveSeries,
   getTimeMachineSnapshots,
   getPreviousTimeMachineSnapshot,
-  findWeeklyComparisonReading: (recordDate: string) => findWeeklyComparisonReading(getPublishedBriefs(), recordDate),
+  findWeeklyComparisonReading: (recordDate: string) =>
+    findWeeklyComparisonReading(getPublishedBriefs(), recordDate, ENGINE_VERSION),
   findTimeMachineSnapshot,
   findTimeMachineGovernedAssessment,
   DEFAULT_REGIME_SERIES_MONTHS,

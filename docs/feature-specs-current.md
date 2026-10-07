@@ -2316,11 +2316,17 @@ The sweeps in §1.1.49–§1.1.50 left two decisions open. Both are decided here
   the reading, never one on or after it; with none, and always on a replay or a threshold override,
   the previous month-end is the fallback and is named by its date as before. The month-end basis made
   every Monday in a month repeat one crossing: the Oct 5 brief still led "Since Aug 31, conditions
-  changed from Sunny to Freezing" three weeks after the change. A published record was scored the
-  way this reading is, so against it there is no rates-versus-inputs split and no "built from interest
-  rates alone" note; the conditions map still draws month-ends and keeps that note. Records before w41
-  stored only the two scores, so the base rate and curve rows print "—" until new records, which now
-  store `scores.baseRate` and `scores.curveSlope`, are in range.
+  changed from Sunny to Freezing" three weeks after the change. A record counts only if the engine
+  that scored it is this reading's: new records store `scores.engineVersion`, and one scored by
+  another `ENGINE_VERSION`, or by one it did not record, is passed over, since across a scoring change
+  the move would be the code's, printed as the market's (Codex review on #1534). Against a counted
+  record there is no rates-versus-inputs split and no "built from interest rates alone" note; the
+  conditions map still draws month-ends and keeps that note. Records before w41 stored only the two
+  scores, so the base rate and curve rows print "—" until new records, which now store
+  `scores.baseRate` and `scores.curveSlope`, are in range. A short-term rate the engine scored as
+  missing (`baseRateUsed: "MISSING"`, scored as 0) is not compared on either side
+  (`observedBaseRate`), and a held week with low confidence names the hold's reason, not "close to a
+  line".
 - **An improving week holds while a pause applies.** Against a week, small moves now set the tone,
   and a four-point rise in risk appetite turned the Oct 5 headline into "Conditions are easing. Resume
   paused work with clear milestones." with funding pressure fourteen points past the pause line for
@@ -2335,8 +2341,9 @@ The sweeps in §1.1.49–§1.1.50 left two decisions open. Both are decided here
   claim a confidence; alert reasons and the digest print whole points against a named line and the
   conditions word; the recession warning gauge on cluster pages is in percentage points.
 
-On Oct 5 the homepage reads "Holding this week · Keep spend flat and require paybacks inside 6
-months." and "Conditions held steady since Sep 29; no pause or resume line was crossed."
+w38–w40 did not record their engine, and `ENGINE_VERSION` changed on 2026-10-06, so no record in the
+archive counts yet: the week compares with the month-end, as before, until the first record frozen
+after this change is 5–14 days old.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

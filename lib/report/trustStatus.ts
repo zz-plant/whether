@@ -479,11 +479,14 @@ export const buildDecisionReadinessState = ({
     };
   }
 
+  /* A held week's reason outranks the generic one: missing inputs also lower the
+     confidence, and "close to a line" was printed for a week held because its
+     inputs were missing. */
   if (confidenceLabel === "LOW") {
     return {
       label: "Hold",
       tone: "warning",
-      detail: "Conditions sit close to a line. Keep last week's plan; anything you can't undo can wait for a clearer reading.",
+      detail: `${policyHold ? policyHold.currentCall : "Conditions sit close to a line."} Keep last week's plan; anything you can't undo can wait for a clearer reading.`,
     };
   }
 
